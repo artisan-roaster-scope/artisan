@@ -1,7 +1,7 @@
 #
 # connection.py
 #
-# Copyright (c) 2018, Paul Holleis, Marko Luther
+# Copyright (c) 2023, Paul Holleis, Marko Luther
 # All rights reserved.
 #
 #
@@ -22,14 +22,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtCore import QSemaphore  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib import __version__
-from typing import Any, Optional, Dict, Final  #for Python >= 3.9: can remove 'Dict' since type hints can now use the generic 'dict'
+from typing import Any, Optional, Dict  #for Python >= 3.9: can remove 'Dict' since type hints can now use the generic 'dict'
+from typing_extensions import Final  # Python <=3.7
 
 import datetime
 import gzip
@@ -40,7 +41,7 @@ import dateutil.parser
 
 from plus import config, account, util
 
-_log: Final = logging.getLogger(__name__)
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 JSON = Any
@@ -80,8 +81,8 @@ def setToken(token: str, nickname: Optional[str] = None) -> None:
         config.nickname = nickname
         assert config.app_window is not None
         if (
-            config.app_window.qmc.operator is None
-            or config.app_window.qmc.operator == ''
+            (config.app_window.qmc.operator is None
+            or config.app_window.qmc.operator == '')
             and nickname is not None
             and nickname != ''
         ):  # @UndefinedVariable
@@ -262,7 +263,8 @@ def authentify() -> bool:
                     try:
                         if paidUntil != '' and (
                             dateutil.parser.parse(paidUntil).date()
-                            - datetime.datetime.now().date()
+#                            - datetime.datetime.now().date()  # DTZ005 The use of `datetime.datetime.now()` without `tz` argument is not allowed
+                            - datetime.datetime.now(datetime.timezone.utc).date()
                         ).days < (-config.expired_subscription_max_days):
                             _log.debug(
                                     '-> authentication failed due to'
@@ -309,11 +311,11 @@ def authentify() -> bool:
         return False
     except requests.exceptions.RequestException as e:
         _log.info(e)
-        raise(e)
+        raise e
     except Exception as e:  # ylint: disable=broad-except
         _log.exception(e)
         clearCredentials()
-        raise(e)
+        raise e
 
 
 def getHeaders(

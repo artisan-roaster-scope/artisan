@@ -13,7 +13,7 @@
 # the GNU General Public License for more details.
 
 # AUTHOR
-# Marko Luther, 2020
+# Marko Luther, 2023
 
 ##########################################################################
 #####################     Curves DLG     #################################
@@ -23,7 +23,11 @@ import sys
 import platform
 import numpy
 import logging
-from typing import Final
+from typing import List, TYPE_CHECKING
+from typing_extensions import Final  # Python <=3.7
+
+if TYPE_CHECKING:
+    from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
 
 from artisanlib.util import (deltaLabelBigPrefix, deltaLabelPrefix, deltaLabelUTF8,
                              stringtoseconds, stringfromseconds, toFloat)
@@ -32,16 +36,16 @@ from artisanlib.widgets import MyQDoubleSpinBox
 from help import symbolic_help
 
 try:
-    #ylint: disable = E, W, R, C
-    from PyQt6.QtCore import (Qt, pyqtSlot, QSettings, QCoreApplication, QRegularExpression) # @UnusedImport @Reimport  @UnresolvedImport
+    #pylint: disable = E, W, R, C
+    from PyQt6.QtCore import (Qt, pyqtSlot, QSettings, QRegularExpression) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import (QColor, QIntValidator, QRegularExpressionValidator, QPixmap) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QLayout, QMessageBox, QRadioButton, QStyleFactory, QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
                                  QTableWidget, QTableWidgetItem, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
-    from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QCoreApplication, QRegularExpression) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    #pylint: disable = E, W, R, C
+    from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QRegularExpression) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import (QColor, QIntValidator, QRegularExpressionValidator, QPixmap) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
@@ -49,7 +53,7 @@ except Exception: # pylint: disable=broad-except
                                  QTableWidget, QTableWidgetItem, QFrame) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
-_log: Final = logging.getLogger(__name__)
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 ########################################################################################
 #####################  PLOTTER DATA DLG  ###############################################
@@ -57,7 +61,7 @@ _log: Final = logging.getLogger(__name__)
 
 
 class equDataDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         self.setWindowTitle(QApplication.translate('Form Caption','Plotter Data'))
         self.setModal(True)
@@ -117,7 +121,7 @@ class equDataDlg(ArtisanDialog):
             self.datatable.setRowCount(ndata)
 
             mm = ''
-            for i in range(len(self.aw.qmc.plotterequationresults)):
+            for i, _ in enumerate(self.aw.qmc.plotterequationresults):
                 if len(self.aw.qmc.plotterequationresults[i]):
                     mm += 'P'+str(i+1)+' '
                     #ite = len(self.aw.qmc.plotterequationresults[i])
@@ -276,10 +280,10 @@ class equDataDlg(ArtisanDialog):
 
 
 class CurvesDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None, activeTab = 0):
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow', activeTab = 0) -> None:
         super().__init__(parent, aw)
 
-        self.app = QCoreApplication.instance()
+        self.app = aw.app
 
         self.setWindowTitle(QApplication.translate('Form Caption','Curves'))
         self.setModal(True)
@@ -760,15 +764,15 @@ class CurvesDlg(ArtisanDialog):
         self.equc7colorlabel = QLabel('  ')
         self.equc8colorlabel = QLabel('  ')
         self.equc9colorlabel = QLabel('  ')
-        self.equc1colorlabel.setStyleSheet("background-color:'%s';"%self.aw.qmc.plotcurvecolor[0])
-        self.equc2colorlabel.setStyleSheet("background-color:'%s';"%self.aw.qmc.plotcurvecolor[1])
-        self.equc3colorlabel.setStyleSheet("background-color:'%s';"%self.aw.qmc.plotcurvecolor[2])
-        self.equc4colorlabel.setStyleSheet("background-color:'%s';"%self.aw.qmc.plotcurvecolor[3])
-        self.equc5colorlabel.setStyleSheet("background-color:'%s';"%self.aw.qmc.plotcurvecolor[4])
-        self.equc6colorlabel.setStyleSheet("background-color:'%s';"%self.aw.qmc.plotcurvecolor[5])
-        self.equc7colorlabel.setStyleSheet("background-color:'%s';"%self.aw.qmc.plotcurvecolor[6])
-        self.equc8colorlabel.setStyleSheet("background-color:'%s';"%self.aw.qmc.plotcurvecolor[7])
-        self.equc9colorlabel.setStyleSheet("background-color:'%s';"%self.aw.qmc.plotcurvecolor[8])
+        self.equc1colorlabel.setStyleSheet(f"background-color:'{self.aw.qmc.plotcurvecolor[0]}';")
+        self.equc2colorlabel.setStyleSheet(f"background-color:'{self.aw.qmc.plotcurvecolor[1]}';")
+        self.equc3colorlabel.setStyleSheet(f"background-color:'{self.aw.qmc.plotcurvecolor[2]}';")
+        self.equc4colorlabel.setStyleSheet(f"background-color:'{self.aw.qmc.plotcurvecolor[3]}';")
+        self.equc5colorlabel.setStyleSheet(f"background-color:'{self.aw.qmc.plotcurvecolor[4]}';")
+        self.equc6colorlabel.setStyleSheet(f"background-color:'{self.aw.qmc.plotcurvecolor[5]}';")
+        self.equc7colorlabel.setStyleSheet(f"background-color:'{self.aw.qmc.plotcurvecolor[6]}';")
+        self.equc8colorlabel.setStyleSheet(f"background-color:'{self.aw.qmc.plotcurvecolor[7]}';")
+        self.equc9colorlabel.setStyleSheet(f"background-color:'{self.aw.qmc.plotcurvecolor[8]}';")
 
         equdrawbutton = QPushButton(QApplication.translate('Button','Plot'))
         equdrawbutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -886,10 +890,9 @@ class CurvesDlg(ArtisanDialog):
         self.expresult.setStyleSheet("background-color:'lightgrey';")
         self.expradiobutton1 = QRadioButton('x\xb2')
         self.expradiobutton1.setChecked(True)
-        self.expradiobutton1.power = self.exppower = 2
+        self.exppower = 2
         self.expradiobutton1.toggled.connect(self.expradiobuttonClicked)
         self.expradiobutton2 = QRadioButton('x\xb3')
-        self.expradiobutton2.power = 3
         self.expradiobutton2.toggled.connect(self.expradiobuttonClicked)
         self.exptimeoffsetLabel = QLabel(QApplication.translate('Label', 'Offset seconds from CHARGE'))
         self.exptimeoffset = QLineEdit('180')   #default to 180 seconds past CHARGE
@@ -961,18 +964,18 @@ class CurvesDlg(ArtisanDialog):
         self.polyfitdeg.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.polyfitdeg.setMinimumWidth(20)
         # build list of available curves
-        self.curves = []
-        self.curvenames = []
-        self.deltacurves = [] # list of flags. True if delta curve, False otherwise
+        self.curves:List[List[float]] = []
+        self.curvenames:List[str] = []
+        self.deltacurves:List[bool] = [] # list of flags. True if delta curve, False otherwise
         self.c1ComboBox = QComboBox()
         self.c2ComboBox = QComboBox()
         univarButton.clicked.connect(self.showunivarinfo)
         self.polyfitCheck = QCheckBox(QApplication.translate('CheckBox', 'Show'))
         self.polyfitCheck.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.polyfitCheck.clicked.connect(self.polyfit) #toggle
-        self.result = QLineEdit()
-        self.result.setReadOnly(True)
-        self.result.setStyleSheet("background-color:'lightgrey';")
+        self.resultWidget = QLineEdit()
+        self.resultWidget.setReadOnly(True)
+        self.resultWidget.setStyleSheet("background-color:'lightgrey';")
         startlabel = QLabel(QApplication.translate('Label', 'Start'))
         endlabel = QLabel(QApplication.translate('Label', 'End'))
         self.startEdit = QLineEdit()
@@ -1051,7 +1054,7 @@ class CurvesDlg(ArtisanDialog):
         polyCurves = QHBoxLayout()
         polyCurves.addWidget(self.polyfitRoRflag)
         polyCurves.addWidget(self.c1ComboBox)
-        polyCurves.addWidget(self.result)
+        polyCurves.addWidget(self.resultWidget)
         polyCurves.addWidget(self.c2ComboBox)
         polyLayout = QHBoxLayout()
         polyLayout.addWidget(self.polyfitCheck)
@@ -1135,7 +1138,7 @@ class CurvesDlg(ArtisanDialog):
         self.styleComboBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         try:
             #ylint: disable=E1102
-            self.styleComboBox.setCurrentIndex(list(map(lambda x:x.lower(),available)).index(self.aw.appearance.lower()))
+            self.styleComboBox.setCurrentIndex([x.lower() for x in available].index(self.aw.appearance.lower()))
         except Exception: # pylint: disable=broad-except
             pass
         self.styleComboBox.currentIndexChanged.connect(self.setappearance)
@@ -1423,7 +1426,7 @@ class CurvesDlg(ArtisanDialog):
 
     @pyqtSlot()
     def segmentdeltathresholdChanged(self):
-        self.aw.qmc.segmentdeltathreshold = self.aw.float2float(toFloat(self.segmentdeltathreshold.text(),),4)
+        self.aw.qmc.segmentdeltathreshold = self.aw.float2float(toFloat(self.segmentdeltathreshold.text()),4)
 
     @pyqtSlot()
     def curvefittimeoffsetChanged(self):
@@ -1442,12 +1445,15 @@ class CurvesDlg(ArtisanDialog):
     @pyqtSlot(bool)
     def expradiobuttonClicked(self,_=False):
         expradioButton = self.sender()
+        assert isinstance(expradioButton, QRadioButton)
+        power:int = 3
+        if self.expradiobutton1.isChecked():
+            power = 2
         if expradioButton.isChecked():
-            self.exppower = expradioButton.power
-            self.expvarCheck.setChecked(False)
-            self.expvar(0)
-            self.expvarCheck.setChecked(True)
-            self.expvar(0)
+            self.exppower = power
+            self.aw.qmc.resetlines()
+            self.redraw_enabled_math_curves()
+            self.processExpvar()
 
     #watermark image
     @pyqtSlot(bool)
@@ -1509,7 +1515,10 @@ class CurvesDlg(ArtisanDialog):
 
     def getWebLCDsURL(self):
         import socket
-        localIP = [(s.connect(('8.8.8.8', 80)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 80))
+        localIP = s.getsockname()[0]
+        s.close()
         return 'http://' + str(localIP) + ':' + str(self.aw.WebLCDsPort) + '/artisan'
 
     @pyqtSlot(bool)
@@ -1588,15 +1597,15 @@ class CurvesDlg(ArtisanDialog):
                 colorname = str(colorf.name())
                 self.aw.qmc.plotcurvecolor[x] = colorname
                 #refresh right color labels
-                self.equc1colorlabel.setStyleSheet("background-color:'%s';"%self.aw.qmc.plotcurvecolor[0])
-                self.equc2colorlabel.setStyleSheet("background-color:'%s';"%self.aw.qmc.plotcurvecolor[1])
-                self.equc3colorlabel.setStyleSheet("background-color:'%s';"%self.aw.qmc.plotcurvecolor[2])
-                self.equc4colorlabel.setStyleSheet("background-color:'%s';"%self.aw.qmc.plotcurvecolor[3])
-                self.equc5colorlabel.setStyleSheet("background-color:'%s';"%self.aw.qmc.plotcurvecolor[4])
-                self.equc6colorlabel.setStyleSheet("background-color:'%s';"%self.aw.qmc.plotcurvecolor[5])
-                self.equc7colorlabel.setStyleSheet("background-color:'%s';"%self.aw.qmc.plotcurvecolor[6])
-                self.equc8colorlabel.setStyleSheet("background-color:'%s';"%self.aw.qmc.plotcurvecolor[7])
-                self.equc9colorlabel.setStyleSheet("background-color:'%s';"%self.aw.qmc.plotcurvecolor[8])
+                self.equc1colorlabel.setStyleSheet(f"background-color:'{self.aw.qmc.plotcurvecolor[0]}';")
+                self.equc2colorlabel.setStyleSheet(f"background-color:'{self.aw.qmc.plotcurvecolor[1]}';")
+                self.equc3colorlabel.setStyleSheet(f"background-color:'{self.aw.qmc.plotcurvecolor[2]}';")
+                self.equc4colorlabel.setStyleSheet(f"background-color:'{self.aw.qmc.plotcurvecolor[3]}';")
+                self.equc5colorlabel.setStyleSheet(f"background-color:'{self.aw.qmc.plotcurvecolor[4]}';")
+                self.equc6colorlabel.setStyleSheet(f"background-color:'{self.aw.qmc.plotcurvecolor[5]}';")
+                self.equc7colorlabel.setStyleSheet(f"background-color:'{self.aw.qmc.plotcurvecolor[6]}';")
+                self.equc8colorlabel.setStyleSheet(f"background-color:'{self.aw.qmc.plotcurvecolor[7]}';")
+                self.equc9colorlabel.setStyleSheet(f"background-color:'{self.aw.qmc.plotcurvecolor[8]}';")
 
             self.plotequ()
         except Exception as e: # pylint: disable=broad-except
@@ -1645,26 +1654,28 @@ class CurvesDlg(ArtisanDialog):
             EQU = [str(self.equedit1.text()),str(self.equedit2.text())]
             incompatiblevars = ['P','F','$','#']
             error = ''
-            for i in range(len(incompatiblevars)):
+            for i, _ in enumerate(incompatiblevars):
                 if incompatiblevars[i] in EQU[0]:
                     error = f'P1: \n-{incompatiblevars[i]}\n\n[{EQU[0]}]'
                 elif incompatiblevars[i] in EQU[1]:
                     error = f'P2: \n-{incompatiblevars[i]}\n\n[{EQU[1]}]'
 
             if error:
-                string = QApplication.translate('Message','Incompatible variables found in %s'%error)
+                string = QApplication.translate('Message','Incompatible variables found in %s')%error
                 QMessageBox.warning(self,QApplication.translate('Message','Assignment problem'),string,
                                     QMessageBox.StandardButton.Discard)
 
             else:
+                extratemp1:List[float] = []
+                extratemp2:List[float] = []
                 for e in range(2):
                     #create y range
-                    y_range = []
+                    y_range:List[float] = []
                     if self.aw.qmc.timeindex[0] > -1:
                         toff = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
                     else:
                         toff = 0
-                    for i in range(len(self.aw.qmc.timex)):
+                    for i, _ in enumerate(self.aw.qmc.timex):
                         y_range.append(self.aw.qmc.eval_math_expression(EQU[e],self.aw.qmc.timex[i],t_offset=toff))
                     if e:
                         extratemp2 = y_range
@@ -1687,7 +1698,7 @@ class CurvesDlg(ArtisanDialog):
                 # redraw
                 self.aw.qmc.redraw(recomputeAllDeltas=False)
 
-                self.aw.sendmessage(QApplication.translate('Message','New Extra Device: virtual: y1(x) =[%s]; y2(x)=[%s]'%(EQU[0],EQU[1]))) # noqa: UP031
+                self.aw.sendmessage(QApplication.translate('Message','New Extra Device: virtual: y1(x) =[%s]; y2(x)=[%s]')%(EQU[0],EQU[1])) # noqa: UP031
 
         self.aw.calcVirtualdevices()
         self.update_equbuttons()
@@ -1858,8 +1869,8 @@ class CurvesDlg(ArtisanDialog):
                     y_range = []
 
                     if not commentoutplot[e]:
-                        for i in range(len(x_range)):
-                            y_range.append(self.aw.qmc.eval_math_expression(eqs,x_range[i],equeditnumber=e+1,t_offset=toff)) #pass e+1 = equeditnumber(1-9)
+                        for xr in x_range:
+                            y_range.append(self.aw.qmc.eval_math_expression(eqs,xr,equeditnumber=e+1,t_offset=toff)) #pass e+1 = equeditnumber(1-9)
                         if not hideplot[e]:
                             self.aw.qmc.ax.plot(x_range, y_range, color=self.aw.qmc.plotcurvecolor[e], linestyle = '-', linewidth=1)
 
@@ -1885,7 +1896,7 @@ class CurvesDlg(ArtisanDialog):
         if self.aw.qmc.timeindex[0] > -1 and self.aw.qmc.timeindex[6]:
             self.aw.qmc.univariateinfo()
         else:
-            self.aw.sendmessage(QApplication.translate('Univariate: no profile data available'))
+            self.aw.sendmessage(QApplication.translate('Error Message', 'Univariate: no profile data available'))
 
     @pyqtSlot(int)
     def lnvar(self,_):
@@ -1907,23 +1918,26 @@ class CurvesDlg(ArtisanDialog):
             self.aw.qmc.resetlines()
             self.redraw_enabled_math_curves()
 
+    def processExpvar(self):
+        #check for finished roast
+        if self.aw.qmc.timeindex[0] > -1 and self.aw.qmc.timeindex[6]:
+            try:
+                curvefit_starttime = int(self.exptimeoffset.text()) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
+            except Exception: # pylint: disable=broad-except
+                curvefit_starttime = 0
+            res = self.aw.qmc.lnRegression(power=self.exppower, curvefit_starttime=curvefit_starttime)
+            self.expresult.setText(res)
+            self.bkgndButton.setEnabled(True)
+        else:
+            self.aw.sendmessage(QApplication.translate('Error Message', 'expvar(): no profile data available'))
+            self.expvarCheck.setChecked(False)
+            self.expresult.setText('')
+            self.bkgndButton.setEnabled(False)
+
     @pyqtSlot(int)
     def expvar(self,_):
         if self.expvarCheck.isChecked():
-            #check for finished roast
-            if self.aw.qmc.timeindex[0] > -1 and self.aw.qmc.timeindex[6]:
-                try:
-                    curvefit_starttime = int(self.exptimeoffset.text()) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-                except Exception: # pylint: disable=broad-except
-                    curvefit_starttime = 0
-                res = self.aw.qmc.lnRegression(power=self.exppower, curvefit_starttime=curvefit_starttime)
-                self.expresult.setText(res)
-                self.bkgndButton.setEnabled(True)
-            else:
-                self.aw.sendmessage(QApplication.translate('Error Message', 'expvar(): no profile data available'))
-                self.expvarCheck.setChecked(False)
-                self.expresult.setText('')
-                self.bkgndButton.setEnabled(False)
+            self.processExpvar()
         else:
             self.expresult.setText('')
             self.aw.qmc.resetlines()
@@ -2019,11 +2033,11 @@ class CurvesDlg(ArtisanDialog):
             QApplication.translate('Table', 'SC END'),
             QApplication.translate('Table', 'DROP'),
             QApplication.translate('Table', 'COOL')]
-        for e in range(len(names)):
+        for e, _ in enumerate(names):
             if self.aw.qmc.timeindex[e+1]:
                 events.append((names[e],self.aw.qmc.timeindex[e+1]))
-        for e in range(len(self.aw.qmc.specialevents)):
-            events.append(('{} {}'.format(QApplication.translate('Label', 'EVENT'),str(e+1)),self.aw.qmc.specialevents[e]))
+        for e, _ in enumerate(self.aw.qmc.specialevents):
+            events.append((f"{QApplication.translate('Label', 'EVENT')} {str(e+1)}", self.aw.qmc.specialevents[e]))
         return events
 
     def doPolyfit(self):
@@ -2031,12 +2045,12 @@ class CurvesDlg(ArtisanDialog):
         starttime = stringtoseconds(str(self.startEdit.text()))
         endtime = stringtoseconds(str(self.endEdit.text()))
         if starttime == -1 or endtime == -1:
-            self.result.setText('')
-            self.result.repaint()
+            self.resultWidget.setText('')
+            self.resultWidget.repaint()
             return False
         if  endtime > self.aw.qmc.timex[-1] or endtime < starttime:
-            self.result.setText('')
-            self.result.repaint()
+            self.resultWidget.setText('')
+            self.resultWidget.repaint()
             return False
         if self.aw.qmc.timeindex[0] != -1:
             start = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
@@ -2056,11 +2070,11 @@ class CurvesDlg(ArtisanDialog):
                     break
         if res and z is not None:
             s = self.aw.fit2str(z)
-            self.result.setText(s)
-            self.result.repaint()
+            self.resultWidget.setText(s)
+            self.resultWidget.repaint()
             return True
-        self.result.setText('')
-        self.result.repaint()
+        self.resultWidget.setText('')
+        self.resultWidget.repaint()
         return False
 
     @pyqtSlot()
@@ -2078,14 +2092,14 @@ class CurvesDlg(ArtisanDialog):
                 res = self.doPolyfit()
                 if not res:
                     self.polyfitCheck.setChecked(False)
-                    self.result.setText('')
-                    self.result.repaint()
+                    self.resultWidget.setText('')
+                    self.resultWidget.repaint()
                     self.aw.qmc.resetlines()
                 QApplication.processEvents()
             else:
                 self.polyfitCheck.setChecked(False)
-                self.result.setText('')
-                self.result.repaint()
+                self.resultWidget.setText('')
+                self.resultWidget.repaint()
                 self.aw.qmc.resetlines()
         except Exception: # pylint: disable=broad-except
             pass
@@ -2169,8 +2183,8 @@ class CurvesDlg(ArtisanDialog):
                     self.aw.sendmessage(QApplication.translate('Error Message', 'Polyfit: no profile data available'))
                     self.polyfitCheck.setChecked(False)
             else:
-                self.result.setText('')
-                self.result.repaint()
+                self.resultWidget.setText('')
+                self.resultWidget.repaint()
                 self.aw.qmc.resetlines()
                 self.redraw_enabled_math_curves()
         except Exception: # pylint: disable=broad-except

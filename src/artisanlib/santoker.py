@@ -13,17 +13,19 @@
 # the GNU General Public License for more details.
 
 # AUTHOR
-# Marko Luther, 2022
+# Marko Luther, 2023
 
 import logging
-from typing import Final, Optional, Callable
+from typing import Optional, Callable
+from typing_extensions import Final  # Python <=3.7
+
 import asyncio
 from contextlib import suppress
 from threading import Thread
 
 from pymodbus.utilities import computeCRC
 
-_log: Final = logging.getLogger(__name__)
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 class SantokerNetwork():
 
@@ -228,8 +230,13 @@ class SantokerNetwork():
     async def handle_writes(self, writer: asyncio.StreamWriter, queue: asyncio.Queue[bytes]) -> None:
         try:
             with suppress(asyncio.CancelledError):
-                while (message := await queue.get()) != b'':
+# assignments in while are only only available from Python 3.8
+#                while (message := await queue.get()) != b'':
+#                    await self.write(writer, message)
+                message = await queue.get()
+                while message != b'':
                     await self.write(writer, message)
+                    message = await queue.get()
         except Exception as e: # pylint: disable=broad-except
             _log.error(e)
         finally:
@@ -275,7 +282,8 @@ class SantokerNetwork():
                 _log.error(e)
             await asyncio.sleep(1)
 
-    def start_background_loop(self, loop: asyncio.AbstractEventLoop) -> None:
+    @staticmethod
+    def start_background_loop(loop: asyncio.AbstractEventLoop) -> None:
         asyncio.set_event_loop(loop)
         try:
             # run_forever() returns after calling loop.stop()

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>583</width>
+    <width>621</width>
     <height>414</height>
    </rect>
   </property>
@@ -42,6 +42,12 @@
      </property>
      <item>
       <widget class="ClickableQGroupBox" name="EnergyGroupBox">
+       <property name="toolTip">
+        <string notr="true"/>
+       </property>
+       <property name="accessibleDescription">
+        <string notr="true"/>
+       </property>
        <property name="title">
         <string notr="true">Energy</string>
        </property>
@@ -173,8 +179,14 @@
             <bold>true</bold>
            </font>
           </property>
+          <property name="toolTip">
+           <string notr="true"/>
+          </property>
+          <property name="accessibleDescription">
+           <string notr="true"/>
+          </property>
           <property name="text">
-           <string/>
+           <string notr="true"/>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -207,6 +219,12 @@
      </item>
      <item>
       <widget class="ClickableQGroupBox" name="CO2GroupBox">
+       <property name="toolTip">
+        <string notr="true"/>
+       </property>
+       <property name="accessibleDescription">
+        <string notr="true"/>
+       </property>
        <property name="title">
         <string notr="true">CO2</string>
        </property>
@@ -338,8 +356,14 @@
             <bold>true</bold>
            </font>
           </property>
+          <property name="toolTip">
+           <string notr="true"/>
+          </property>
+          <property name="accessibleDescription">
+           <string notr="true"/>
+          </property>
           <property name="text">
-           <string/>
+           <string notr="true"/>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -386,10 +410,19 @@
      <property name="toolTip">
       <string notr="true"/>
      </property>
+     <property name="accessibleDescription">
+      <string notr="true"/>
+     </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="detailsTab">
+      <property name="toolTip">
+       <string notr="true"/>
+      </property>
+      <property name="accessibleDescription">
+       <string notr="true"/>
+      </property>
       <attribute name="title">
        <string notr="true">Details</string>
       </attribute>
@@ -418,6 +451,9 @@
           </sizepolicy>
          </property>
          <property name="toolTip">
+          <string notr="true"/>
+         </property>
+         <property name="accessibleDescription">
           <string notr="true"/>
          </property>
          <property name="horizontalScrollBarPolicy">
@@ -506,6 +542,9 @@
            <property name="toolTip">
             <string notr="true"/>
            </property>
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
            <property name="text">
             <string notr="true">Copy Table</string>
            </property>
@@ -526,6 +565,9 @@
          </item>
          <item>
           <widget class="QLabel" name="roastbatchposLabel">
+           <property name="toolTip">
+            <string notr="true"/>
+           </property>
            <property name="accessibleDescription">
             <string notr="true"/>
            </property>
@@ -542,6 +584,12 @@
       </layout>
      </widget>
      <widget class="QWidget" name="loadsTab">
+      <property name="toolTip">
+       <string notr="true"/>
+      </property>
+      <property name="accessibleDescription">
+       <string notr="true"/>
+      </property>
       <attribute name="title">
        <string notr="true">Burners</string>
       </attribute>
@@ -563,6 +611,12 @@
        </property>
        <item>
         <widget class="QWidget" name="loadsGrid" native="true">
+         <property name="toolTip">
+          <string notr="true"/>
+         </property>
+         <property name="accessibleDescription">
+          <string notr="true"/>
+         </property>
          <layout class="QGridLayout" name="gridLayout_3">
           <property name="leftMargin">
            <number>2</number>
@@ -584,6 +638,9 @@
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="accessibleDescription">
              <string notr="true"/>
             </property>
@@ -594,8 +651,20 @@
           </item>
           <item row="3" column="7">
            <widget class="QSpinBox" name="zeropcts2">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="suffix">
+             <string notr="true"/>
+            </property>
+            <property name="prefix">
+             <string notr="true"/>
             </property>
             <property name="maximum">
              <number>998</number>
@@ -607,15 +676,36 @@
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="currentText">
              <string notr="true"/>
             </property>
            </widget>
           </item>
           <item row="4" column="1">
            <widget class="QLineEdit" name="loadlabel3">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
             <property name="maxLength">
              <number>12</number>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
@@ -623,6 +713,9 @@
            <widget class="QComboBox" name="sourcetype1">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
             </property>
             <property name="accessibleDescription">
              <string notr="true"/>
@@ -639,6 +732,9 @@
               <bold>true</bold>
              </font>
             </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="accessibleDescription">
              <string notr="true"/>
             </property>
@@ -649,8 +745,23 @@
           </item>
           <item row="3" column="2">
            <widget class="QLineEdit" name="loadrating2">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
@@ -658,6 +769,9 @@
            <widget class="QComboBox" name="sourcetype3">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
             </property>
             <property name="accessibleDescription">
              <string notr="true"/>
@@ -671,6 +785,9 @@
            <widget class="QComboBox" name="sourcetype2">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
             </property>
             <property name="accessibleDescription">
              <string notr="true"/>
@@ -690,6 +807,9 @@
             <property name="toolTip">
              <string notr="true"/>
             </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
             <property name="text">
              <string notr="true">Label</string>
             </property>
@@ -700,8 +820,20 @@
           </item>
           <item row="2" column="8">
            <widget class="QSpinBox" name="hundredpct1">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="suffix">
+             <string notr="true"/>
+            </property>
+            <property name="prefix">
+             <string notr="true"/>
             </property>
             <property name="maximum">
              <number>999</number>
@@ -713,8 +845,20 @@
           </item>
           <item row="1" column="8">
            <widget class="QSpinBox" name="hundredpct0">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="suffix">
+             <string notr="true"/>
+            </property>
+            <property name="prefix">
+             <string notr="true"/>
             </property>
             <property name="maximum">
              <number>999</number>
@@ -731,6 +875,9 @@
               <bold>true</bold>
              </font>
             </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="accessibleDescription">
              <string notr="true"/>
             </property>
@@ -744,8 +891,17 @@
           </item>
           <item row="2" column="7">
            <widget class="QSpinBox" name="zeropcts1">
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="suffix">
+             <string notr="true"/>
+            </property>
+            <property name="prefix">
+             <string notr="true"/>
             </property>
             <property name="maximum">
              <number>998</number>
@@ -758,6 +914,9 @@
              <font>
               <bold>true</bold>
              </font>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
             </property>
             <property name="accessibleDescription">
              <string notr="true"/>
@@ -777,6 +936,9 @@
               <bold>true</bold>
              </font>
             </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="accessibleDescription">
              <string notr="true"/>
             </property>
@@ -795,6 +957,9 @@
             <property name="toolTip">
              <string notr="true"/>
             </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
             <property name="text">
              <string notr="true">Pressure %</string>
             </property>
@@ -805,15 +970,42 @@
           </item>
           <item row="3" column="1">
            <widget class="QLineEdit" name="loadlabel2">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
             <property name="maxLength">
              <number>12</number>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
           <item row="4" column="8">
            <widget class="QSpinBox" name="hundredpct3">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="suffix">
+             <string notr="true"/>
+            </property>
+            <property name="prefix">
+             <string notr="true"/>
             </property>
             <property name="maximum">
              <number>999</number>
@@ -828,6 +1020,9 @@
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="accessibleDescription">
              <string notr="true"/>
             </property>
@@ -838,8 +1033,20 @@
           </item>
           <item row="1" column="7">
            <widget class="QSpinBox" name="zeropcts0">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="suffix">
+             <string notr="true"/>
+            </property>
+            <property name="prefix">
+             <string notr="true"/>
             </property>
             <property name="maximum">
              <number>998</number>
@@ -853,6 +1060,9 @@
               <bold>true</bold>
              </font>
             </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="accessibleDescription">
              <string notr="true"/>
             </property>
@@ -863,8 +1073,20 @@
           </item>
           <item row="4" column="7">
            <widget class="QSpinBox" name="zeropcts3">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="suffix">
+             <string notr="true"/>
+            </property>
+            <property name="prefix">
+             <string notr="true"/>
             </property>
             <property name="maximum">
              <number>998</number>
@@ -873,15 +1095,42 @@
           </item>
           <item row="1" column="2">
            <widget class="QLineEdit" name="loadrating0">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
           <item row="3" column="8">
            <widget class="QSpinBox" name="hundredpct2">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="suffix">
+             <string notr="true"/>
+            </property>
+            <property name="prefix">
+             <string notr="true"/>
             </property>
             <property name="maximum">
              <number>999</number>
@@ -893,8 +1142,23 @@
           </item>
           <item row="4" column="2">
            <widget class="QLineEdit" name="loadrating3">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
@@ -906,6 +1170,9 @@
             <property name="toolTip">
              <string notr="true"/>
             </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
             <property name="currentText">
              <string notr="true"/>
             </property>
@@ -915,6 +1182,9 @@
            <widget class="QComboBox" name="events1">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
             </property>
             <property name="accessibleDescription">
              <string notr="true"/>
@@ -929,6 +1199,9 @@
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="accessibleDescription">
              <string notr="true"/>
             </property>
@@ -939,15 +1212,45 @@
           </item>
           <item row="2" column="1">
            <widget class="QLineEdit" name="loadlabel1">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
             <property name="maxLength">
              <number>12</number>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
           <item row="2" column="2">
            <widget class="QLineEdit" name="loadrating1">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
@@ -956,12 +1259,24 @@
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="currentText">
+             <string notr="true"/>
+            </property>
            </widget>
           </item>
           <item row="1" column="3">
            <widget class="QComboBox" name="ratingunit0">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
             </property>
             <property name="accessibleDescription">
              <string notr="true"/>
@@ -978,6 +1293,9 @@
               <bold>true</bold>
              </font>
             </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="accessibleDescription">
              <string notr="true"/>
             </property>
@@ -991,8 +1309,23 @@
           </item>
           <item row="1" column="1">
            <widget class="QLineEdit" name="loadlabel0">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
             <property name="maxLength">
              <number>12</number>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
@@ -1002,6 +1335,9 @@
              <font>
               <bold>true</bold>
              </font>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
             </property>
             <property name="accessibleDescription">
              <string notr="true"/>
@@ -1015,6 +1351,9 @@
            <widget class="QComboBox" name="ratingunit2">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
             </property>
             <property name="accessibleDescription">
              <string notr="true"/>
@@ -1030,6 +1369,9 @@
              <font>
               <bold>true</bold>
              </font>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
             </property>
             <property name="accessibleDescription">
              <string notr="true"/>
@@ -1049,6 +1391,9 @@
               <bold>true</bold>
              </font>
             </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="accessibleDescription">
              <string notr="true"/>
             </property>
@@ -1066,6 +1411,9 @@
              <font>
               <bold>true</bold>
              </font>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
             </property>
             <property name="accessibleDescription">
              <string notr="true"/>
@@ -1102,6 +1450,9 @@
                <enum>Qt::NoFocus</enum>
               </property>
               <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
                <string notr="true"/>
               </property>
               <property name="text">
@@ -1147,6 +1498,9 @@
               <property name="toolTip">
                <string notr="true"/>
               </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text">
                <string notr="true"/>
               </property>
@@ -1187,6 +1541,9 @@
               <property name="toolTip">
                <string notr="true"/>
               </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text">
                <string notr="true"/>
               </property>
@@ -1225,6 +1582,9 @@
             <item>
              <widget class="QCheckBox" name="pressureCheckBox3">
               <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
                <string notr="true"/>
               </property>
               <property name="text">
@@ -1294,6 +1654,12 @@
            </item>
            <item>
             <widget class="QSpinBox" name="electricEnergyMixSpinBox">
+             <property name="toolTip">
+              <string notr="true"/>
+             </property>
+             <property name="accessibleDescription">
+              <string notr="true"/>
+             </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
@@ -1313,6 +1679,9 @@
          <item>
           <widget class="QLabel" name="renewableLabel">
            <property name="toolTip">
+            <string notr="true"/>
+           </property>
+           <property name="accessibleDescription">
             <string notr="true"/>
            </property>
            <property name="text">
@@ -1350,6 +1719,12 @@
        </item>
        <item>
         <widget class="QWidget" name="loadsButtonsLine" native="true">
+         <property name="toolTip">
+          <string notr="true"/>
+         </property>
+         <property name="accessibleDescription">
+          <string notr="true"/>
+         </property>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <property name="leftMargin">
            <number>0</number>
@@ -1369,6 +1744,9 @@
              <enum>Qt::NoFocus</enum>
             </property>
             <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
              <string notr="true"/>
             </property>
             <property name="text">
@@ -1394,6 +1772,9 @@
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="accessibleDescription">
              <string notr="true"/>
             </property>
@@ -1408,6 +1789,12 @@
       </layout>
      </widget>
      <widget class="QWidget" name="protocolTab">
+      <property name="toolTip">
+       <string notr="true"/>
+      </property>
+      <property name="accessibleDescription">
+       <string notr="true"/>
+      </property>
       <attribute name="title">
        <string notr="true">Protocol</string>
       </attribute>
@@ -1429,6 +1816,12 @@
        </property>
        <item>
         <widget class="QWidget" name="roasts_per_sessionLine" native="true">
+         <property name="toolTip">
+          <string notr="true"/>
+         </property>
+         <property name="accessibleDescription">
+          <string notr="true"/>
+         </property>
          <layout class="QGridLayout" name="gridLayout">
           <property name="leftMargin">
            <number>5</number>
@@ -1447,22 +1840,67 @@
           </property>
           <item row="3" column="6">
            <widget class="QLineEdit" name="preheatenergies3">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
           <item row="5" column="3">
            <widget class="QLineEdit" name="coolingenergies0">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
           <item row="5" column="1">
            <widget class="QLineEdit" name="coolingDuration">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
@@ -1476,6 +1914,9 @@
             <property name="toolTip">
              <string notr="true"/>
             </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
             <property name="text">
              <string notr="true">Between Batches</string>
             </property>
@@ -1486,15 +1927,45 @@
           </item>
           <item row="4" column="3">
            <widget class="QLineEdit" name="betweenbatchesenergy0">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
           <item row="4" column="4">
            <widget class="QLineEdit" name="betweenbatchesenergy1">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
@@ -1505,14 +1976,23 @@
             </property>
             <item>
              <widget class="QLabel" name="label_3">
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text">
-               <string/>
+               <string notr="true"/>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QLabel" name="timeUnitLabel">
               <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
                <string notr="true"/>
               </property>
               <property name="text">
@@ -1533,6 +2013,9 @@
             <item>
              <widget class="QLabel" name="loadALabel">
               <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
                <string notr="true"/>
               </property>
               <property name="text">
@@ -1571,6 +2054,9 @@
               <property name="toolTip">
                <string notr="true"/>
               </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text">
                <string notr="true">Burner B</string>
               </property>
@@ -1582,6 +2068,9 @@
             <item>
              <widget class="QLabel" name="loadBUnitLabel">
               <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
                <string notr="true"/>
               </property>
               <property name="text">
@@ -1627,7 +2116,7 @@
              <string notr="true"/>
             </property>
             <property name="accessibleDescription">
-             <string/>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string notr="true">Duration</string>
@@ -1639,6 +2128,12 @@
           </item>
           <item row="2" column="2" rowspan="5">
            <widget class="Line" name="line">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
             <property name="orientation">
              <enum>Qt::Vertical</enum>
             </property>
@@ -1646,15 +2141,45 @@
           </item>
           <item row="5" column="6">
            <widget class="QLineEdit" name="coolingenergies3">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
           <item row="4" column="1">
            <widget class="QLineEdit" name="betweenBatchesDuration">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
@@ -1668,6 +2193,9 @@
             <property name="toolTip">
              <string notr="true"/>
             </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
             <property name="text">
              <string notr="true">Pre-Heating</string>
             </property>
@@ -1678,8 +2206,23 @@
           </item>
           <item row="5" column="5">
            <widget class="QLineEdit" name="coolingenergies2">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
@@ -1691,6 +2234,9 @@
             <item>
              <widget class="QLabel" name="loadDLabel">
               <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
                <string notr="true"/>
               </property>
               <property name="text">
@@ -1706,6 +2252,9 @@
               <property name="toolTip">
                <string notr="true"/>
               </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text">
                <string notr="true">(BTU)</string>
               </property>
@@ -1718,29 +2267,89 @@
           </item>
           <item row="3" column="3">
            <widget class="QLineEdit" name="preheatenergies0">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
           <item row="4" column="6">
            <widget class="QLineEdit" name="betweenbatchesenergy3">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
           <item row="3" column="5">
            <widget class="QLineEdit" name="preheatenergies2">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
           <item row="4" column="5">
            <widget class="QLineEdit" name="betweenbatchesenergy2">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
@@ -1752,6 +2361,9 @@
             <item>
              <widget class="QLabel" name="loadCLabel">
               <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
                <string notr="true"/>
               </property>
               <property name="text">
@@ -1767,6 +2379,9 @@
               <property name="toolTip">
                <string notr="true"/>
               </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text">
                <string notr="true">(BTU)</string>
               </property>
@@ -1779,8 +2394,23 @@
           </item>
           <item row="3" column="1">
            <widget class="QLineEdit" name="preheatDuration">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
@@ -1794,6 +2424,9 @@
             <property name="toolTip">
              <string notr="true"/>
             </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
             <property name="text">
              <string notr="true">Measured Energy or Output %</string>
             </property>
@@ -1804,15 +2437,45 @@
           </item>
           <item row="5" column="4">
            <widget class="QLineEdit" name="coolingenergies1">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
           <item row="3" column="4">
            <widget class="QLineEdit" name="preheatenergies1">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
@@ -1881,6 +2544,9 @@
          </item>
          <item>
           <widget class="QCheckBox" name="BBPafterPreHeatcheckBox">
+           <property name="toolTip">
+            <string notr="true"/>
+           </property>
            <property name="accessibleDescription">
             <string notr="true"/>
            </property>
@@ -1919,6 +2585,12 @@
        </item>
        <item>
         <widget class="QWidget" name="protocolButtonsLine" native="true">
+         <property name="toolTip">
+          <string notr="true"/>
+         </property>
+         <property name="accessibleDescription">
+          <string notr="true"/>
+         </property>
          <layout class="QHBoxLayout" name="horizontalLayout_5">
           <property name="leftMargin">
            <number>0</number>
@@ -1938,6 +2610,9 @@
              <enum>Qt::NoFocus</enum>
             </property>
             <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
              <string notr="true"/>
             </property>
             <property name="text">
@@ -1966,6 +2641,9 @@
             <property name="toolTip">
              <string notr="true"/>
             </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
             <property name="text">
              <string notr="true">Restore Defaults</string>
             </property>
@@ -1982,6 +2660,9 @@
     <layout class="QHBoxLayout" name="helpButtonLine">
      <item>
       <widget class="QLabel" name="resultunitLabel">
+       <property name="toolTip">
+        <string notr="true"/>
+       </property>
        <property name="accessibleDescription">
         <string notr="true"/>
        </property>
@@ -1996,6 +2677,9 @@
         <enum>Qt::NoFocus</enum>
        </property>
        <property name="toolTip">
+        <string notr="true"/>
+       </property>
+       <property name="accessibleDescription">
         <string notr="true"/>
        </property>
        <property name="currentText">

@@ -1,7 +1,7 @@
 #
 # controller.py
 #
-# Copyright (c) 2018, Paul Holleis, Marko Luther
+# Copyright (c) 2023, Paul Holleis, Marko Luther
 # All rights reserved.
 #
 #
@@ -22,26 +22,26 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import QSemaphore, QTimer, Qt # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import QWidget,QApplication, QMessageBox # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtCore import QSemaphore, QTimer, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QWidget, QApplication, QMessageBox # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 import platform
 import threading
 import logging
-from typing import Final, Optional
-
+from typing import Optional
+from typing_extensions import Final  # Python <=3.7
 
 
 from plus import config, connection, stock, queue, sync, roast
 
 
 
-_log: Final = logging.getLogger(__name__)
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 connect_semaphore = QSemaphore(1)
 
@@ -63,10 +63,12 @@ def is_on() -> bool:
 # no profile is loaded currently
 def is_synced():
     aw = config.app_window
-    if aw.qmc.roastUUID is None:
-        return not bool(aw.curFile)
-    res = sync.getSync(aw.qmc.roastUUID)
-    return bool(res)
+    if aw is not None:
+        if aw.qmc.roastUUID is None:
+            return not bool(aw.curFile)
+        res = sync.getSync(aw.qmc.roastUUID)
+        return bool(res)
+    return False
 
 
 def start(app_window):
@@ -79,7 +81,7 @@ def start(app_window):
 def toggle(app_window):
     _log.debug('toggle()')
     config.app_window = app_window
-    if config.app_window.plus_account is None:  # @UndefinedVariable
+    if config.app_window is not None and config.app_window.plus_account is None:  # @UndefinedVariable
         connect()
         if (
             is_connected()
@@ -87,28 +89,26 @@ def toggle(app_window):
             and config.app_window.curFile is not None
         ):  # @UndefinedVariable
             sync.sync()
-    else:
-        if config.connected:
-            if is_synced():
-                # a CTR-click (COMMAND on macOS) logs out and
-                # discards the credentials
-                modifiers = QApplication.keyboardModifiers()
-                disconnect(
-                    interactive=True,
-                    remove_credentials=(modifiers == Qt.KeyboardModifier.ControlModifier),
-                    keepON=False,
-                )
-            else:
-                # we (manually) turn syncing for the current roast on
-                if app_window.qmc.checkSaved(allow_discard=False):
-                    queue.addRoast()
-        else:
+    elif config.connected:
+        if is_synced():
+            # a CTR-click (COMMAND on macOS) logs out and
+            # discards the credentials
+            modifiers = QApplication.keyboardModifiers()
             disconnect(
-                remove_credentials=False,
-                stop_queue=True,
                 interactive=True,
+                remove_credentials=(modifiers == Qt.KeyboardModifier.ControlModifier),
                 keepON=False,
             )
+        elif app_window.qmc.checkSaved(allow_discard=False):
+            # we (manually) turn syncing for the current roast on
+            queue.addRoast()
+    else:
+        disconnect(
+            remove_credentials=False,
+            stop_queue=True,
+            interactive=True,
+            keepON=False,
+        )
 
 
 # if clear_on_failure is set, credentials are removed if connect fails
@@ -166,6 +166,7 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                     import plus.login
 
                     login, passwd, remember, res = plus.login.plus_login(
+                        config.app_window,
                         config.app_window,
                         config.app_window.plus_email,
                         config.passwd,
@@ -244,29 +245,28 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                             config.app_window.resetDonateCounter()
                         except Exception as e:  # pylint: disable=broad-except
                             _log.exception(e)
-                    else:
-                        if clear_on_failure:
-                            connection.clearCredentials()
-                            config.app_window.sendmessageSignal.emit(
-                                QApplication.translate(
-                                    'Plus', 'artisan.plus turned off'
-                                ),
-                                True,
-                                None,
+                    elif clear_on_failure:
+                        connection.clearCredentials()
+                        config.app_window.sendmessageSignal.emit(
+                            QApplication.translate(
+                                'Plus', 'artisan.plus turned off'
+                            ),
+                            True,
+                            None,
+                        )  # @UndefinedVariable
+                    elif interactive:
+                        message = QApplication.translate(
+                            'Plus', 'Authentication failed'
+                        )
+                        if (
+                            config.app_window.plus_account is not None
+                        ):  # @UndefinedVariable
+                            message = (
+                                f'{config.app_window.plus_account} {message}'
                             )  # @UndefinedVariable
-                        elif interactive:
-                            message = QApplication.translate(
-                                'Plus', 'Authentication failed'
-                            )
-                            if (
-                                config.app_window.plus_account is not None
-                            ):  # @UndefinedVariable
-                                message = (
-                                    f'{config.app_window.plus_account} {message}'
-                                )  # @UndefinedVariable
-                            config.app_window.sendmessageSignal.emit(
-                                message, True, None
-                            )  # @UndefinedVariable
+                        config.app_window.sendmessageSignal.emit(
+                            message, True, None
+                        )  # @UndefinedVariable
         except Exception as e:  # pylint: disable=broad-except
             if interactive:
                 _log.debug(e)

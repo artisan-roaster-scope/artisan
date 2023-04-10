@@ -13,20 +13,22 @@
 # the GNU General Public License for more details.
 
 # AUTHOR
-# Marko Luther, 2020
+# Marko Luther, 2023
+
+from typing import Optional
 
 from artisanlib.util import stringfromseconds, stringtoseconds
 from artisanlib.dialogs import ArtisanDialog
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import Qt, pyqtSlot, QRegularExpression, QSettings # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QIntValidator, QRegularExpressionValidator # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QLabel, # @UnusedImport @Reimport  @UnresolvedImport
         QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
         QGroupBox, QLineEdit, QMessageBox, QLayout) # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtCore import Qt, pyqtSlot, QRegularExpression, QSettings # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QIntValidator, QRegularExpressionValidator # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QLabel, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
@@ -39,7 +41,7 @@ except Exception: # pylint: disable=broad-except
 #########################################################################
 
 class designerconfigDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
+    def __init__(self, parent, aw) -> None:
         super().__init__(parent, aw)
         self.setWindowTitle(QApplication.translate('Form Caption','Designer Config'))
         self.setModal(True)
@@ -80,15 +82,15 @@ class designerconfigDlg(ArtisanDialog):
         etsettinglabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.Edit0 = QLineEdit(stringfromseconds(0))
         self.Edit0.setEnabled(False)
-        self.Edit0bt = QLineEdit('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[0]])
-        self.Edit0et = QLineEdit('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[0]])
+        self.Edit0bt = QLineEdit(f'{self.aw.qmc.temp2[self.aw.qmc.timeindex[0]]:.1f}')
+        self.Edit0et = QLineEdit(f'{self.aw.qmc.temp1[self.aw.qmc.timeindex[0]]:.1f}')
         self.Edit0.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.Edit0bt.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.Edit0et.setAlignment(Qt.AlignmentFlag.AlignRight)
         if self.aw.qmc.timeindex[1]:
             self.Edit1 = QLineEdit(stringfromseconds(self.aw.qmc.timex[self.aw.qmc.timeindex[1]] - start))
-            self.Edit1bt = QLineEdit('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[1]])
-            self.Edit1et = QLineEdit('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[1]])
+            self.Edit1bt = QLineEdit(f'{self.aw.qmc.temp2[self.aw.qmc.timeindex[1]]:.1f}')
+            self.Edit1et = QLineEdit(f'{self.aw.qmc.temp1[self.aw.qmc.timeindex[1]]:.1f}')
         else:
             self.Edit1 = QLineEdit(stringfromseconds(0))
             self.Edit1bt = QLineEdit('0.0')
@@ -98,8 +100,8 @@ class designerconfigDlg(ArtisanDialog):
         self.Edit1et.setAlignment(Qt.AlignmentFlag.AlignRight)
         if self.aw.qmc.timeindex[2]:
             self.Edit2 = QLineEdit(stringfromseconds(self.aw.qmc.timex[self.aw.qmc.timeindex[2]] - start))
-            self.Edit2bt = QLineEdit('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[2]])
-            self.Edit2et = QLineEdit('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[2]])
+            self.Edit2bt = QLineEdit(f'{self.aw.qmc.temp2[self.aw.qmc.timeindex[2]]:.1f}')
+            self.Edit2et = QLineEdit(f'{self.aw.qmc.temp1[self.aw.qmc.timeindex[2]]:.1f}')
         else:
             self.Edit2 = QLineEdit(stringfromseconds(0))
             self.Edit2bt = QLineEdit('0.0')
@@ -109,8 +111,8 @@ class designerconfigDlg(ArtisanDialog):
         self.Edit2et.setAlignment(Qt.AlignmentFlag.AlignRight)
         if self.aw.qmc.timeindex[3]:
             self.Edit3 = QLineEdit(stringfromseconds(self.aw.qmc.timex[self.aw.qmc.timeindex[3]] - start))
-            self.Edit3bt = QLineEdit('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[3]])
-            self.Edit3et = QLineEdit('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[3]])
+            self.Edit3bt = QLineEdit(f'{self.aw.qmc.temp2[self.aw.qmc.timeindex[3]]:.1f}')
+            self.Edit3et = QLineEdit(f'{self.aw.qmc.temp1[self.aw.qmc.timeindex[3]]:.1f}')
         else:
             self.Edit3 = QLineEdit(stringfromseconds(0))
             self.Edit3bt = QLineEdit('0.0')
@@ -120,8 +122,8 @@ class designerconfigDlg(ArtisanDialog):
         self.Edit3et.setAlignment(Qt.AlignmentFlag.AlignRight)
         if self.aw.qmc.timeindex[4]:
             self.Edit4 = QLineEdit(stringfromseconds(self.aw.qmc.timex[self.aw.qmc.timeindex[4]] - start))
-            self.Edit4bt = QLineEdit('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[4]])
-            self.Edit4et = QLineEdit('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[4]])
+            self.Edit4bt = QLineEdit(f'{self.aw.qmc.temp2[self.aw.qmc.timeindex[4]]:.1f}')
+            self.Edit4et = QLineEdit(f'{self.aw.qmc.temp1[self.aw.qmc.timeindex[4]]:.1f}')
         else:
             self.Edit4 = QLineEdit(stringfromseconds(0))
             self.Edit4bt = QLineEdit('0.0')
@@ -131,8 +133,8 @@ class designerconfigDlg(ArtisanDialog):
         self.Edit4et.setAlignment(Qt.AlignmentFlag.AlignRight)
         if self.aw.qmc.timeindex[5]:
             self.Edit5 = QLineEdit(stringfromseconds(self.aw.qmc.timex[self.aw.qmc.timeindex[5]] - start))
-            self.Edit5bt = QLineEdit('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[5]])
-            self.Edit5et = QLineEdit('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[5]])
+            self.Edit5bt = QLineEdit(f'{self.aw.qmc.temp2[self.aw.qmc.timeindex[5]]:.1f}')
+            self.Edit5et = QLineEdit(f'{self.aw.qmc.temp1[self.aw.qmc.timeindex[5]]:.1f}')
         else:
             self.Edit5 = QLineEdit(stringfromseconds(0))
             self.Edit5bt = QLineEdit('0.0')
@@ -142,8 +144,8 @@ class designerconfigDlg(ArtisanDialog):
         self.Edit5et.setAlignment(Qt.AlignmentFlag.AlignRight)
         if self.aw.qmc.timeindex[6]:
             self.Edit6 = QLineEdit(stringfromseconds(self.aw.qmc.timex[self.aw.qmc.timeindex[6]] - start))
-            self.Edit6bt = QLineEdit('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[6]])
-            self.Edit6et = QLineEdit('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[6]])
+            self.Edit6bt = QLineEdit(f'{self.aw.qmc.temp2[self.aw.qmc.timeindex[6]]:.1f}')
+            self.Edit6et = QLineEdit(f'{self.aw.qmc.temp1[self.aw.qmc.timeindex[6]]:.1f}')
         else:
             self.Edit6 = QLineEdit(stringfromseconds(0))
             self.Edit6bt = QLineEdit('0.0')
@@ -354,11 +356,10 @@ class designerconfigDlg(ArtisanDialog):
             self.aw.qmc.temp1[self.aw.qmc.timeindex[0]] = float(str(self.Edit0et.text()))
             self.Edit0etcopy = self.Edit0et.text()
         if self.dryend.isChecked():
-            if self.Edit1.text() != self.Edit1copy:
-                if stringtoseconds(str(self.Edit1.text())):
-                    timez = stringtoseconds(str(self.Edit1.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-                    self.aw.qmc.timex[self.aw.qmc.timeindex[1]] = timez
-                    self.Edit1copy = self.Edit1.text()
+            if self.Edit1.text() != self.Edit1copy and stringtoseconds(str(self.Edit1.text())):
+                timez = stringtoseconds(str(self.Edit1.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
+                self.aw.qmc.timex[self.aw.qmc.timeindex[1]] = timez
+                self.Edit1copy = self.Edit1.text()
             if self.Edit1bt.text() != self.Edit1btcopy:
                 self.aw.qmc.temp2[self.aw.qmc.timeindex[1]] = float(str(self.Edit1bt.text()))
                 self.Edit1btcopy = self.Edit1bt.text()
@@ -366,11 +367,10 @@ class designerconfigDlg(ArtisanDialog):
                 self.aw.qmc.temp1[self.aw.qmc.timeindex[1]] = float(str(self.Edit1et.text()))
                 self.Edit1etcopy = self.Edit1et.text()
         if self.fcs.isChecked():
-            if self.Edit2.text() != self.Edit2copy:
-                if stringtoseconds(str(self.Edit2.text())):
-                    timez = stringtoseconds(str(self.Edit2.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-                    self.aw.qmc.timex[self.aw.qmc.timeindex[2]] = timez
-                    self.Edit2copy = self.Edit2.text()
+            if self.Edit2.text() != self.Edit2copy and stringtoseconds(str(self.Edit2.text())):
+                timez = stringtoseconds(str(self.Edit2.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
+                self.aw.qmc.timex[self.aw.qmc.timeindex[2]] = timez
+                self.Edit2copy = self.Edit2.text()
             if self.Edit2bt.text() != self.Edit2btcopy:
                 self.aw.qmc.temp2[self.aw.qmc.timeindex[2]] = float(str(self.Edit2bt.text()))
                 self.Edit2btcopy = self.Edit2bt.text()
@@ -378,11 +378,10 @@ class designerconfigDlg(ArtisanDialog):
                 self.aw.qmc.temp1[self.aw.qmc.timeindex[2]] = float(str(self.Edit2et.text()))
                 self.Edit2etcopy = self.Edit2et.text()
         if self.fce.isChecked():
-            if self.Edit3.text() != self.Edit3copy:
-                if stringtoseconds(str(self.Edit3.text())):
-                    timez = stringtoseconds(str(self.Edit3.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-                    self.aw.qmc.timex[self.aw.qmc.timeindex[3]] = timez
-                    self.Edit3copy = self.Edit3.text()
+            if self.Edit3.text() != self.Edit3copy and stringtoseconds(str(self.Edit3.text())):
+                timez = stringtoseconds(str(self.Edit3.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
+                self.aw.qmc.timex[self.aw.qmc.timeindex[3]] = timez
+                self.Edit3copy = self.Edit3.text()
             if self.Edit3bt.text() != self.Edit3btcopy:
                 self.aw.qmc.temp2[self.aw.qmc.timeindex[3]] = float(str(self.Edit3bt.text()))
                 self.Edit3btcopy = self.Edit3bt.text()
@@ -390,11 +389,10 @@ class designerconfigDlg(ArtisanDialog):
                 self.aw.qmc.temp1[self.aw.qmc.timeindex[3]] = float(str(self.Edit3et.text()))
                 self.Edit3etcopy = self.Edit3et.text()
         if self.scs.isChecked():
-            if self.Edit4.text() != self.Edit4copy:
-                if stringtoseconds(str(self.Edit4.text())):
-                    timez = stringtoseconds(str(self.Edit4.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-                    self.aw.qmc.timex[self.aw.qmc.timeindex[4]] = timez
-                    self.Edit4copy = self.Edit4.text()
+            if self.Edit4.text() != self.Edit4copy and stringtoseconds(str(self.Edit4.text())):
+                timez = stringtoseconds(str(self.Edit4.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
+                self.aw.qmc.timex[self.aw.qmc.timeindex[4]] = timez
+                self.Edit4copy = self.Edit4.text()
             if self.Edit4bt.text() != self.Edit4btcopy:
                 self.aw.qmc.temp2[self.aw.qmc.timeindex[4]] = float(str(self.Edit4bt.text()))
                 self.Edit4btcopy = self.Edit4bt.text()
@@ -402,22 +400,20 @@ class designerconfigDlg(ArtisanDialog):
                 self.aw.qmc.temp1[self.aw.qmc.timeindex[4]] = float(str(self.Edit4et.text()))
                 self.Edit4etcopy = self.Edit4et.text()
         if self.sce.isChecked():
-            if self.Edit5.text() != self.Edit5copy:
-                if stringtoseconds(str(self.Edit5.text())):
-                    timez = stringtoseconds(str(self.Edit5.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-                    self.aw.qmc.timex[self.aw.qmc.timeindex[5]] = timez
-                    self.Edit5copy = self.Edit5.text()
+            if self.Edit5.text() != self.Edit5copy and stringtoseconds(str(self.Edit5.text())):
+                timez = stringtoseconds(str(self.Edit5.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
+                self.aw.qmc.timex[self.aw.qmc.timeindex[5]] = timez
+                self.Edit5copy = self.Edit5.text()
             if self.Edit5bt.text() != self.Edit5btcopy:
                 self.aw.qmc.temp2[self.aw.qmc.timeindex[5]] = float(str(self.Edit5bt.text()))
                 self.Edit5btcopy = self.Edit5bt.text()
             if self.Edit5et.text() != self.Edit5etcopy:
                 self.aw.qmc.temp1[self.aw.qmc.timeindex[5]] = float(str(self.Edit5et.text()))
                 self.Edit5etcopy = self.Edit5et.text()
-        if self.Edit6.text() != self.Edit6copy:
-            if stringtoseconds(str(self.Edit6.text())):
-                timez = stringtoseconds(str(self.Edit6.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-                self.aw.qmc.timex[self.aw.qmc.timeindex[6]] = timez
-                self.Edit6copy = self.Edit6.text()
+        if self.Edit6.text() != self.Edit6copy and stringtoseconds(str(self.Edit6.text())):
+            timez = stringtoseconds(str(self.Edit6.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
+            self.aw.qmc.timex[self.aw.qmc.timeindex[6]] = timez
+            self.Edit6copy = self.Edit6.text()
         if self.Edit6bt.text() != self.Edit6btcopy:
             self.aw.qmc.temp2[self.aw.qmc.timeindex[6]] = float(str(self.Edit6bt.text()))
             self.Edit6btcopy = self.Edit6bt.text()
@@ -455,10 +451,10 @@ class designerconfigDlg(ArtisanDialog):
         strings.append(self.Edit4.text())
         strings.append(self.Edit5.text())
         strings.append(self.Edit6.text())
-        for i in range(len(strings)):
+        for i, _ in enumerate(strings):
             if len(str(strings[i])) < 5:
                 return i
-            return 1000
+        return 1000
 
     #supporting function for settimes()
     @pyqtSlot(bool)
@@ -505,20 +501,20 @@ class designerconfigDlg(ArtisanDialog):
         self.Edit4.setText(stringfromseconds(self.aw.qmc.designertimeinit[4]))
         self.Edit5.setText(stringfromseconds(self.aw.qmc.designertimeinit[5]))
         self.Edit6.setText(stringfromseconds(self.aw.qmc.designertimeinit[6]))
-        self.Edit0bt.setText('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[0]])
-        self.Edit1bt.setText('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[1]])
-        self.Edit2bt.setText('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[2]])
-        self.Edit3bt.setText('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[3]])
-        self.Edit4bt.setText('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[4]])
-        self.Edit5bt.setText('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[5]])
-        self.Edit6bt.setText('%.1f'%self.aw.qmc.temp2[self.aw.qmc.timeindex[6]])
-        self.Edit0et.setText('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[0]])
-        self.Edit1et.setText('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[1]])
-        self.Edit2et.setText('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[2]])
-        self.Edit3et.setText('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[3]])
-        self.Edit4et.setText('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[4]])
-        self.Edit5et.setText('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[5]])
-        self.Edit6et.setText('%.1f'%self.aw.qmc.temp1[self.aw.qmc.timeindex[6]])
+        self.Edit0bt.setText(f'{self.aw.qmc.temp2[self.aw.qmc.timeindex[0]]:.1f}')
+        self.Edit1bt.setText(f'{self.aw.qmc.temp2[self.aw.qmc.timeindex[1]]:.1f}')
+        self.Edit2bt.setText(f'{self.aw.qmc.temp2[self.aw.qmc.timeindex[2]]:.1f}')
+        self.Edit3bt.setText(f'{self.aw.qmc.temp2[self.aw.qmc.timeindex[3]]:.1f}')
+        self.Edit4bt.setText(f'{self.aw.qmc.temp2[self.aw.qmc.timeindex[4]]:.1f}')
+        self.Edit5bt.setText(f'{self.aw.qmc.temp2[self.aw.qmc.timeindex[5]]:.1f}')
+        self.Edit6bt.setText(f'{self.aw.qmc.temp2[self.aw.qmc.timeindex[6]]:.1f}')
+        self.Edit0et.setText(f'{self.aw.qmc.temp1[self.aw.qmc.timeindex[0]]:.1f}')
+        self.Edit1et.setText(f'{self.aw.qmc.temp1[self.aw.qmc.timeindex[1]]:.1f}')
+        self.Edit2et.setText(f'{self.aw.qmc.temp1[self.aw.qmc.timeindex[2]]:.1f}')
+        self.Edit3et.setText(f'{self.aw.qmc.temp1[self.aw.qmc.timeindex[3]]:.1f}')
+        self.Edit4et.setText(f'{self.aw.qmc.temp1[self.aw.qmc.timeindex[4]]:.1f}')
+        self.Edit5et.setText(f'{self.aw.qmc.temp1[self.aw.qmc.timeindex[5]]:.1f}')
+        self.Edit6et.setText(f'{self.aw.qmc.temp1[self.aw.qmc.timeindex[6]]:.1f}')
         self.aw.sendmessage(QApplication.translate('Message','Designer has been reset'))
 
     def loadconfigflags(self):
@@ -545,21 +541,16 @@ class designerconfigDlg(ArtisanDialog):
         else:
             return
         if self.validatetimeorder() != 1000:
-            if idi == 1:
-                if self.dryend.isChecked():
-                    self.dryend.setChecked(False)
-            elif idi == 2:
-                if self.fcs.isChecked():
-                    self.fcs.setChecked(False)
-            elif idi == 3:
-                if self.fce.isChecked():
-                    self.fce.setChecked(False)
-            elif idi == 4:
-                if self.scs.isChecked():
-                    self.scs.setChecked(False)
-            elif idi == 5:
-                if self.sce.isChecked():
-                    self.sce.setChecked(False)
+            if idi == 1 and self.dryend.isChecked():
+                self.dryend.setChecked(False)
+            elif idi == 2 and self.fcs.isChecked():
+                self.fcs.setChecked(False)
+            elif idi == 3 and self.fce.isChecked():
+                self.fce.setChecked(False)
+            elif idi == 4 and self.scs.isChecked():
+                self.scs.setChecked(False)
+            elif idi == 5 and self.sce.isChecked():
+                self.sce.setChecked(False)
             #ERROR time from edit boxes is not in ascending order
             strings = [QApplication.translate('Message','CHARGE'),
                        QApplication.translate('Message','DRY END'),
@@ -579,6 +570,9 @@ class designerconfigDlg(ArtisanDialog):
             self.aw.qmc.removepoint()
         else:
             #ADD mark point
+            timez:Optional[float] = None
+            bt:Optional[float] = None
+            et:Optional[float] = None
             if idi == 1:
                 timez = stringtoseconds(str(self.Edit1.text())) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
                 bt = float(str(self.Edit1bt.text()))
@@ -599,17 +593,18 @@ class designerconfigDlg(ArtisanDialog):
                 timez = stringtoseconds(str(self.Edit5.text())) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
                 bt = float(str(self.Edit5bt.text()))
                 et = float(str(self.Edit5et.text()))
-            self.aw.qmc.currentx = timez
-            self.aw.qmc.currenty = bt
-            newindex = self.aw.qmc.addpoint(manual=False)
-            self.aw.qmc.timeindex[idi] = newindex
-            self.aw.qmc.temp2[self.aw.qmc.timeindex[idi]] = bt
-            self.aw.qmc.temp1[self.aw.qmc.timeindex[idi]] = et
-            self.aw.qmc.xaxistosm(redraw=False)
-            self.aw.qmc.redrawdesigner()
+            if timez is not None and bt is not None and et is not None:
+                self.aw.qmc.currentx = timez
+                self.aw.qmc.currenty = bt
+                newindex = self.aw.qmc.addpoint(manual=False)
+                self.aw.qmc.timeindex[idi] = newindex
+                self.aw.qmc.temp2[self.aw.qmc.timeindex[idi]] = bt
+                self.aw.qmc.temp1[self.aw.qmc.timeindex[idi]] = et
+                self.aw.qmc.xaxistosm(redraw=False)
+                self.aw.qmc.redrawdesigner()
 
 class pointDlg(ArtisanDialog):
-    def __init__(self,parent = None, aw = None, values = None):
+    def __init__(self,parent, aw, values = None) -> None:
         super().__init__(parent, aw)
         if values is None:
             values = [0,0]

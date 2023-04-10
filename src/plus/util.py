@@ -1,7 +1,7 @@
 #
 # util.py
 #
-# Copyright (c) 2018, Paul Holleis, Marko Luther
+# Copyright (c) 2023, Paul Holleis, Marko Luther
 # All rights reserved.
 #
 #
@@ -22,25 +22,24 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtCore import pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import decodeLocal
 from pathlib import Path
 from plus import config
-from typing import Optional, List  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
-from typing import Final
 import datetime
 import dateutil.parser
 import logging
 import os
 import numpy
+from typing import Optional, Union, Any, Dict, List  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
+from typing_extensions import Final  # Python <=3.7
 
-
-_log: Final = logging.getLogger(__name__)
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 # Files
@@ -48,7 +47,7 @@ _log: Final = logging.getLogger(__name__)
 
 # returns the last modification date as EPOCH (float incl. milliseconds) of
 # the given file if it exists, or None
-def getModificationDate(path):
+def getModificationDate(path:str) -> Optional[float]:
     #    return Path(path).stat().st_mtime
     try:
         return os.path.getmtime(Path(path))
@@ -60,42 +59,47 @@ def getModificationDate(path):
 # Timestamps
 
 # given a datetime object returns e.g. '2018-10-12T12:55:12.999Z'
-def datetime2ISO8601(dt):
+def datetime2ISO8601(dt:datetime.datetime) -> str:
     (dtstr, micro) = dt.strftime('%Y-%m-%dT%H:%M:%S.%f').split('.')
-    return '%s.%03dZ' % (dtstr, int(micro) / 1000)
+    return f'{dtstr}.{(int(micro) / 1000):03.0f}Z'
+#    return '%s.%03dZ' % (dtstr, int(micro) / 1000)
+
+def ISO86012datetime(ts:str) -> datetime.datetime:
+    return dateutil.parser.parse(ts)
 
 
-def ISO86012datetime(ts):
-    dt = dateutil.parser.parse(ts)
-    return dt  # dt.replace(tzinfo=None)
-
-
-def datetime2epoch(dt):
+def datetime2epoch(dt:datetime.datetime) -> float:
     return dt.timestamp()
 
 
-def epoch2datetime(epoch):
-    return datetime.datetime.utcfromtimestamp(epoch)
+def epoch2datetime(epoch:float) -> datetime.datetime:
+#    return datetime.datetime.utcfromtimestamp(epoch) # considered dangerous!
+    return datetime.datetime.fromtimestamp(epoch, tz=datetime.timezone.utc)
 
 
 # given a epoch returns e.g. '2018-10-12T12:55:12.999Z'
-def epoch2ISO8601(epoch):
+def epoch2ISO8601(epoch:float) -> str:
     return datetime2ISO8601(epoch2datetime(epoch))
 
 
-def ISO86012epoch(ts):
+def ISO86012epoch(ts:str) -> float:
     return datetime2epoch(ISO86012datetime(ts))
 
 
-def getGMToffset():
-    return datetime.datetime.now(
-        datetime.timezone.utc
-    ).astimezone().utcoffset() // datetime.timedelta(seconds=1)
+def getGMToffset() -> int:
+    try:
+        offset = datetime.datetime.now(
+            datetime.timezone.utc).astimezone().utcoffset()
+        if offset is not None:
+            return offset // datetime.timedelta(seconds=1)
+    except Exception: # pylint: disable=broad-except
+        pass
+    return 0
 
 
 # extra simple information from a dict
 # res is assumed to be a dict and the projection result to be a non-empty string or a number
-def extractInfo(res, attr: str, default):
+def extractInfo(res:Dict, attr: Union[str, int, float], default:Any) -> Any:
     if attr in res and ((isinstance(res[attr], str) and res[attr] != '') or (isinstance(res[attr],(int, float)))):
         return res[attr]
     return default
@@ -149,12 +153,12 @@ def RoRtemp2C(temp: Optional[float],mode=None) -> Optional[float]:
 
 # in addition to float2float restricting to n decimals this one returns
 # integers if possible
-def float2floatMin(fs: Optional[float], n: int = 1) -> Optional[float]:
+def float2floatMin(fs: Optional[float], n: int = 1) -> Optional[Union[float, int]]:
     if fs is None:
         return None
     assert config.app_window is not None
-    f = config.app_window.float2float(float(fs), n)  # @UndefinedVariable
-    i = int(f)
+    f:float = config.app_window.float2float(float(fs), n)  # @UndefinedVariable
+    i:int = int(f)
     if f == i:
         return i
     return f
@@ -222,7 +226,7 @@ def addNum2dict(
     minn,
     maxn,
     digits,
-    factor=1,
+    factor:float=1.,
 ):
     if key_source in dict_source and dict_source[key_source]:
         n = dict_source[key_source]
@@ -245,7 +249,7 @@ def addAllNum2dict(
     minn,
     maxn,
     digits,
-    factor=1,
+    factor:float=1.,
 ):
     for p in key_source_target_pairs:
         if isinstance(p, tuple):
@@ -384,19 +388,19 @@ def plusLink() -> str:
     return f'{config.web_base_url}/{getLanguage()}/'
 
 
-def storeLink(plus_store) -> str:
+def storeLink(plus_store:str) -> str:
     return f'{config.web_base_url}/{getLanguage()}/stores;id={plus_store}'
 
 
-def coffeeLink(plus_coffee) -> str:
+def coffeeLink(plus_coffee:str) -> str:
     return f'{config.web_base_url}/{getLanguage()}/coffees;id={plus_coffee}'
 
 
-def blendLink(plus_blend) -> str:
+def blendLink(plus_blend:str) -> str:
     return f'{config.web_base_url}/{getLanguage()}/blends;id={plus_blend}'
 
 
-def roastLink(plus_roast) -> str:
+def roastLink(plus_roast:str) -> str:
     return f'{config.web_base_url}/{getLanguage()}/roasts;id={plus_roast}'
 
 

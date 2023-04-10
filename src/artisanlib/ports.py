@@ -13,21 +13,22 @@
 # the GNU General Public License for more details.
 
 # AUTHOR
-# Marko Luther, 2020
+# Marko Luther, 2023
 
 import sys
 import time
 import platform
 import logging
-from typing import Final
+from typing import List, Tuple, Optional
+from typing_extensions import Final  # Python <=3.7
 
-from artisanlib.util import toFloat, uchr
+from artisanlib.util import toFloat, uchr, comma2dot
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog
 from artisanlib.comm import serialport
 
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import (Qt, pyqtSlot, QEvent, QSettings) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QIntValidator # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
@@ -35,7 +36,7 @@ try:
                                  QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QTextEdit, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
                                  QHeaderView)  # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtCore import (Qt, pyqtSlot, QEvent, QSettings) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QIntValidator # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
@@ -44,10 +45,10 @@ except Exception: # pylint: disable=broad-except
                                  QHeaderView) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
-_log: Final = logging.getLogger(__name__)
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 class scanModbusDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
+    def __init__(self, parent, aw) -> None:
         super().__init__(parent, aw)
         self.setModal(True)
         # current setup selected in the MODBUS tab
@@ -167,17 +168,15 @@ class scanModbusDlg(ArtisanDialog):
                     self.modbusEdit.setHtml(result)
                     break
                 if self.code4:
-                    self.aw.modbus.sleepBetween()
-                    self.aw.modbus.sleepBetween()
-                    self.aw.modbus.connect()
+                    for _ in range(10):
+                        self.aw.modbus.sleepBetween()
                     res = self.aw.modbus.peekSingleRegister(self.slave,int(register),code=4)
                     if res is not None:
                         result += str(register) + '(4),' + str(res) + '<br>'
                         self.modbusEdit.setHtml(result)
                 if self.code3:
-                    self.aw.modbus.sleepBetween()
-                    self.aw.modbus.sleepBetween()
-                    self.aw.modbus.connect()
+                    for _ in range(10):
+                        self.aw.modbus.sleepBetween()
                     res = self.aw.modbus.peekSingleRegister(self.slave,int(register),code=3)
                     if res is not None:
                         result += str(register) + '(3),' + str(res) + '<br>'
@@ -194,10 +193,6 @@ class scanModbusDlg(ArtisanDialog):
         self.aw.modbus.type = self.mtype_aw
         self.aw.modbus.host = self.mhost_aw
         self.aw.modbus.port = self.mport_aw
-
-    def update(self):
-        if self.aw.seriallogflag:
-            self.modbusEdit.setText(self.getstring())
 
     @pyqtSlot(int)
     def checkbox3Changed(self,_):
@@ -219,7 +214,7 @@ class scanModbusDlg(ArtisanDialog):
 
 
 class scanS7Dlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
+    def __init__(self, parent, aw) -> None:
         super().__init__(parent, aw)
         self.setModal(True)
         # current setup selected in the S7 tab
@@ -348,10 +343,6 @@ class scanS7Dlg(ArtisanDialog):
         self.aw.s7.rack = self.srack_aw
         self.aw.s7.slot = self.sslot_aw
 
-    def update(self):
-        if self.aw.seriallogflag:
-            self.S7Edit.setText(self.getstring())
-
     @pyqtSlot(int)
     def checkbox3Changed(self,_):
         if self.checkbox3.isChecked():
@@ -374,14 +365,14 @@ class scanS7Dlg(ArtisanDialog):
         self.stop = True
         self.accept()
 
-class PortComboBox(QComboBox):
+class PortComboBox(QComboBox):  # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
     __slots__ = ['selection','ports','edited'] # save some memory by using slots
-    def __init__(self, parent = None, selection = None):
+    def __init__(self, parent = None, selection = None) -> None:
         super().__init__(parent)
         self.installEventFilter(self)
         self.selection = selection # just the port name (first element of one of the triples in self.ports)
         # a list of triples as returned by serial.tools.list_ports
-        self.ports = []
+        self.ports:List[Tuple[str, Optional[str], str]] = []  # list of tuples (port, desc, hwid)
         self.updateMenu()
         self.edited = None
         self.editTextChanged.connect(self.textEdited)
@@ -414,20 +405,22 @@ class PortComboBox(QComboBox):
         self.blockSignals(True)
         try:
             import serial.tools.list_ports
-            comports = [(cp if isinstance(cp, (list, tuple)) else [cp.device, cp.product, None]) for cp in serial.tools.list_ports.comports()]
+            # on older versions of pyserial list_ports.comports() returned a list of tuples (port, desc, hwid), current versions return a list of ListPortInfo objects
+            comports = [(cp.device, cp.product, 'n/a') for cp in serial.tools.list_ports.comports()]
             if platform.system() == 'Darwin':
                 self.ports = [p for p in comports if (p[0] not in ['/dev/cu.Bluetooth-PDA-Sync',
                     '/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem','/dev/cu.Bluetooth-Incoming-Port','/dev/tty.Bluetooth-Incoming-Port'])]
             else:
                 self.ports = list(comports)
-            if self.selection not in [p[0] for p in self.ports]:
-                self.ports.append([self.selection,'',''])
+            if self.selection is not None and self.selection not in [p[0] for p in self.ports]:
+                self.ports.append((self.selection,'',''))
             self.ports = sorted(self.ports,key=lambda p: p[0])
             self.clear()
-            self.addItems([(p[1] if (p[1] and p[1]!='n/a') else p[0]) for p in self.ports])
+            self.addItems([(p[1] if (p[1] is not None and p[1]!='n/a') else p[0]) for p in self.ports])
             try:
-                pos = [p[0] for p in self.ports].index(self.selection)
-                self.setCurrentIndex(pos)
+                if self.selection is not None:
+                    pos = [p[0] for p in self.ports].index(self.selection)
+                    self.setCurrentIndex(pos)
             except Exception: # pylint: disable=broad-except
                 pass
         except Exception as e: # pylint: disable=broad-except
@@ -435,7 +428,7 @@ class PortComboBox(QComboBox):
         self.blockSignals(False)
 
 class comportDlg(ArtisanResizeablDialog):
-    def __init__(self, parent = None, aw = None):
+    def __init__(self, parent, aw) -> None:
         super().__init__(parent, aw)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, False) # overwrite the ArtisanDialog class default here!!
         self.setWindowTitle(QApplication.translate('Form Caption','Ports Configuration'))
@@ -472,7 +465,7 @@ class comportDlg(ArtisanResizeablDialog):
         self.stopbitsComboBox.addItems(self.stopbits)
         self.stopbitsComboBox.setCurrentIndex(self.aw.ser.stopbits-1)
         timeoutlabel = QLabel(QApplication.translate('Label', 'Timeout'))
-        self.timeoutEdit = QLineEdit(str(self.aw.ser.timeout))
+        self.timeoutEdit:QLineEdit = QLineEdit(str(self.aw.ser.timeout))
         self.timeoutEdit.setValidator(self.aw.createCLocaleDoubleValidator(0,5,1,self.timeoutEdit))
         etbt_help_label = QLabel(QApplication.translate('Label', 'Settings for non-Modbus devices') + '<br>')
         ##########################    TAB 2  WIDGETS   EXTRA DEVICES
@@ -532,62 +525,67 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_input1divlabel = QLabel(QApplication.translate('Label', 'Divider'))
         modbus_input1modelabel = QLabel(QApplication.translate('Label', 'Mode'))
 
-        self.modbus_inputSlaveEdits = [None]*self.aw.modbus.channels
-        self.modbus_inputRegisterEdits = [None]*self.aw.modbus.channels
-        self.modbus_inputCodes = [None]*self.aw.modbus.channels
-        self.modbus_inputDivs = [None]*self.aw.modbus.channels
-        self.modbus_inputModes = [None]*self.aw.modbus.channels
-        self.modbus_inputDecodes = [None]*self.aw.modbus.channels
+        self.modbus_inputSlaveEdits:List[Optional[QLineEdit]] = [None]*self.aw.modbus.channels
+        self.modbus_inputRegisterEdits:List[Optional[QLineEdit]] = [None]*self.aw.modbus.channels
+        self.modbus_inputCodes:List[Optional[QComboBox]] = [None]*self.aw.modbus.channels
+        self.modbus_inputDivs:List[Optional[QComboBox]] = [None]*self.aw.modbus.channels
+        self.modbus_inputModes:List[Optional[QComboBox]] = [None]*self.aw.modbus.channels
+        self.modbus_inputDecodes:List[Optional[QComboBox]] = [None]*self.aw.modbus.channels
 
         for i in range(self.aw.modbus.channels):
-            self.modbus_inputSlaveEdits[i] = QLineEdit(str(self.aw.modbus.inputSlaves[i]))
-            self.modbus_inputSlaveEdits[i].setValidator(QIntValidator(0,247,self.modbus_inputSlaveEdits[i]))
-            self.modbus_inputSlaveEdits[i].setFixedWidth(75)
-            self.modbus_inputSlaveEdits[i].setAlignment(Qt.AlignmentFlag.AlignRight)
+            modbus_inputSlaveEdit:QLineEdit = QLineEdit(str(self.aw.modbus.inputSlaves[i]))
+            modbus_inputSlaveEdit.setValidator(QIntValidator(0,247,self.modbus_inputSlaveEdits[i]))
+            modbus_inputSlaveEdit.setFixedWidth(75)
+            modbus_inputSlaveEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
+            self.modbus_inputSlaveEdits[i] = modbus_inputSlaveEdit
             #
-            self.modbus_inputRegisterEdits[i] = QLineEdit(str(self.aw.modbus.inputRegisters[i]))
-            self.modbus_inputRegisterEdits[i].setValidator(QIntValidator(0,65536,self.modbus_inputRegisterEdits[i]))
-            self.modbus_inputRegisterEdits[i].setFixedWidth(75)
-            self.modbus_inputRegisterEdits[i].setAlignment(Qt.AlignmentFlag.AlignRight)
+            modbus_inputRegisterEdit:QLineEdit = QLineEdit(str(self.aw.modbus.inputRegisters[i]))
+            modbus_inputRegisterEdit.setValidator(QIntValidator(0,65536,self.modbus_inputRegisterEdits[i]))
+            modbus_inputRegisterEdit.setFixedWidth(75)
+            modbus_inputRegisterEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
+            self.modbus_inputRegisterEdits[i] = modbus_inputRegisterEdit
             #
-            self.modbus_inputCodes[i] = QComboBox()
-            self.modbus_inputCodes[i].setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            self.modbus_inputCodes[i].addItems(modbus_function_codes)
-            self.modbus_inputCodes[i].setCurrentIndex(modbus_function_codes.index(str(self.aw.modbus.inputCodes[i])))
-            self.modbus_inputCodes[i].setFixedWidth(85)
+            modbus_inputCode:QComboBox = QComboBox()
+            modbus_inputCode.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            modbus_inputCode.addItems(modbus_function_codes)
+            modbus_inputCode.setCurrentIndex(modbus_function_codes.index(str(self.aw.modbus.inputCodes[i])))
+            modbus_inputCode.setFixedWidth(85)
+            self.modbus_inputCodes[i] = modbus_inputCode
             #
-            self.modbus_inputDivs[i] = QComboBox()
-            self.modbus_inputDivs[i].setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            self.modbus_inputDivs[i].addItems(modbus_divs)
-            self.modbus_inputDivs[i].setCurrentIndex(self.aw.modbus.inputDivs[i])
-            self.modbus_inputDivs[i].setFixedWidth(85)
+            modbus_inputDiv:QComboBox = QComboBox()
+            modbus_inputDiv.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            modbus_inputDiv.addItems(modbus_divs)
+            modbus_inputDiv.setCurrentIndex(self.aw.modbus.inputDivs[i])
+            modbus_inputDiv.setFixedWidth(85)
+            self.modbus_inputDivs[i] = modbus_inputDiv
             #
-            self.modbus_inputModes[i] = QComboBox()
-            self.modbus_inputModes[i].setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            self.modbus_inputModes[i].addItems(modbus_modes)
-            self.modbus_inputModes[i].setCurrentIndex(modbus_modes.index(str(self.aw.modbus.inputModes[i])))
-            self.modbus_inputModes[i].setFixedWidth(85)
+            modbus_inputMode:QComboBox = QComboBox()
+            modbus_inputMode.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            modbus_inputMode.addItems(modbus_modes)
+            modbus_inputMode.setCurrentIndex(modbus_modes.index(str(self.aw.modbus.inputModes[i])))
+            modbus_inputMode.setFixedWidth(85)
+            self.modbus_inputModes[i] = modbus_inputMode
             #
-            self.modbus_inputDecodes[i] = QComboBox()
-            self.modbus_inputDecodes[i].setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            self.modbus_inputDecodes[i].addItems(modbus_decode)
+            modbus_inputDecode:QComboBox = QComboBox()
+            modbus_inputDecode.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            modbus_inputDecode.addItems(modbus_decode)
             if self.aw.modbus.inputBCDsAsInt[i]:
-                self.modbus_inputDecodes[i].setCurrentIndex(4)
+                modbus_inputDecode.setCurrentIndex(4)
             elif self.aw.modbus.inputFloatsAsInt[i]:
                 if self.aw.modbus.inputSigned[i]:
-                    self.modbus_inputDecodes[i].setCurrentIndex(3)
+                    modbus_inputDecode.setCurrentIndex(3)
                 else:
-                    self.modbus_inputDecodes[i].setCurrentIndex(1)
+                    modbus_inputDecode.setCurrentIndex(1)
             elif self.aw.modbus.inputFloats[i]:
-                self.modbus_inputDecodes[i].setCurrentIndex(6)
+                modbus_inputDecode.setCurrentIndex(6)
             elif self.aw.modbus.inputBCDs[i]:
-                self.modbus_inputDecodes[i].setCurrentIndex(5)
+                modbus_inputDecode.setCurrentIndex(5)
+            elif self.aw.modbus.inputSigned[i]:
+                modbus_inputDecode.setCurrentIndex(2)
             else:
-                if self.aw.modbus.inputSigned[i]:
-                    self.modbus_inputDecodes[i].setCurrentIndex(2)
-                else:
-                    self.modbus_inputDecodes[i].setCurrentIndex(0)
-            self.modbus_inputDecodes[i].setFixedWidth(85)
+                modbus_inputDecode.setCurrentIndex(0)
+            modbus_inputDecode.setFixedWidth(85)
+            self.modbus_inputDecodes[i] = modbus_inputDecode
 
         modbus_endianlabel = QLabel(QApplication.translate('Label', 'little-endian'))
 
@@ -762,7 +760,7 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_IP_retries = QLabel(QApplication.translate('Label', 'Retries'))
         self.modbus_IP_retriesComboBox = QComboBox()
 #        modbus_IP_retries.setBuddy(self.modbus_IP_retriesComboBox)
-        self.modbus_IP_retriesComboBox.addItems([str(n) for n in range(3)])
+        self.modbus_IP_retriesComboBox.addItems([str(n) for n in range(4)])
         self.modbus_IP_retriesComboBox.setCurrentIndex(self.aw.modbus.IP_retries)
 
         modbus_IP_grid = QGridLayout()
@@ -896,7 +894,7 @@ class comportDlg(ArtisanResizeablDialog):
         #### dialog buttons
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.accept)
-        self.dialogbuttons.rejected.connect(self.close)
+        self.dialogbuttons.rejected.connect(self.reject)
 
         helpButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Help)
         helpButton.setToolTip(QApplication.translate('Tooltip','Show help'))
@@ -967,13 +965,31 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_input_grid.addWidget(modbus_input1floatlabel,6,0,Qt.AlignmentFlag.AlignRight)
 
         for i in range(self.aw.modbus.channels):
-            modbus_input_grid.addWidget(QLabel(QApplication.translate('GroupBox', 'Input') + ' ' + str(i+1)),0,i+1,Qt.AlignmentFlag.AlignCenter)
-            modbus_input_grid.addWidget(self.modbus_inputSlaveEdits[i],1,i+1)
-            modbus_input_grid.addWidget(self.modbus_inputRegisterEdits[i],2,i+1)
-            modbus_input_grid.addWidget(self.modbus_inputCodes[i],3,i+1)
-            modbus_input_grid.addWidget(self.modbus_inputDivs[i],4,i+1)
-            modbus_input_grid.addWidget(self.modbus_inputModes[i],5,i+1)
-            modbus_input_grid.addWidget(self.modbus_inputDecodes[i],6,i+1,Qt.AlignmentFlag.AlignCenter)
+            if (len(self.modbus_inputSlaveEdits)>i and
+                    len(self.modbus_inputRegisterEdits)>i and
+                    len(self.modbus_inputCodes)>i and
+                    len(self.modbus_inputDivs)>i and
+                    len(self.modbus_inputModes)>i and
+                    len(self.modbus_inputDecodes)>i):
+                modbus_input_grid.addWidget(QLabel(QApplication.translate('GroupBox', 'Input') + ' ' + str(i+1)),0,i+1,Qt.AlignmentFlag.AlignCenter)
+                inputSlaveEdit:Optional[QLineEdit] = self.modbus_inputSlaveEdits[i]
+                inputRegisterEdit:Optional[QLineEdit] = self.modbus_inputRegisterEdits[i]
+                inputCode:Optional[QComboBox] = self.modbus_inputCodes[i]
+                inputDiv:Optional[QComboBox] = self.modbus_inputDivs[i]
+                inputMode:Optional[QComboBox] = self.modbus_inputModes[i]
+                inputDecode:Optional[QComboBox] = self.modbus_inputDecodes[i]
+                if (inputSlaveEdit is not None and
+                        inputRegisterEdit is not None and
+                        inputCode is not None and
+                        inputDiv is not None and
+                        inputMode is not None and
+                        inputDecode is not None):
+                    modbus_input_grid.addWidget(inputSlaveEdit,1,i+1)
+                    modbus_input_grid.addWidget(inputRegisterEdit,2,i+1)
+                    modbus_input_grid.addWidget(inputCode,3,i+1)
+                    modbus_input_grid.addWidget(inputDiv,4,i+1)
+                    modbus_input_grid.addWidget(inputMode,5,i+1)
+                    modbus_input_grid.addWidget(inputDecode,6,i+1,Qt.AlignmentFlag.AlignCenter)
 
         modbus_input_grid.setContentsMargins(0,0,0,0)
         modbus_input_grid.setSpacing(2)
@@ -1723,7 +1739,7 @@ class comportDlg(ArtisanResizeablDialog):
         scan_modbuds_dlg.bytesize = int(str(self.modbus_bytesizeComboBox.currentText()))
         scan_modbuds_dlg.stopbits = int(str(self.modbus_stopbitsComboBox.currentText()))
         scan_modbuds_dlg.parity = str(self.modbus_parityComboBox.currentText())
-        scan_modbuds_dlg.timeout = self.aw.float2float(toFloat(self.aw.comma2dot(str(self.modbus_timeoutEdit.text()))))
+        scan_modbuds_dlg.timeout = self.aw.float2float(toFloat(comma2dot(str(self.modbus_timeoutEdit.text()))))
         scan_modbuds_dlg.mtype = int(self.modbus_type.currentIndex())
         scan_modbuds_dlg.mhost = str(self.modbus_hostEdit.text())
         scan_modbuds_dlg.mport = int(str(self.modbus_portEdit.text()))
@@ -1731,7 +1747,9 @@ class comportDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(int)
     def portComboBoxIndexChanged(self,i):
-        self.sender().setSelection(i)
+        sender = self.sender()
+        assert isinstance(sender, PortComboBox)
+        sender.setSelection(i)
 
     def createserialTable(self):
         try:
@@ -1809,35 +1827,42 @@ class comportDlg(ArtisanResizeablDialog):
                     devid = self.aw.qmc.extradevices[i]
                     devicename = self.aw.qmc.devices[devid-1]    #type identification of the device. Non editable
                     if devid != 29 and devid != 33 and devicename[0] != '+': # hide serial confs for MODBUS and "+XX" extra devices
-                        comportComboBox =  self.serialtable.cellWidget(i,1)
-                        if comportComboBox:
-                            self.aw.extracomport[i] = str(comportComboBox.getSelection())
-                        baudComboBox =  self.serialtable.cellWidget(i,2)
-                        if baudComboBox:
-                            self.aw.extrabaudrate[i] = int(str(baudComboBox.currentText()))
+                        comportComboBox = self.serialtable.cellWidget(i,1)
+                        assert isinstance(comportComboBox, PortComboBox)
+                        self.aw.extracomport[i] = str(comportComboBox.getSelection())
+                        baudComboBox = self.serialtable.cellWidget(i,2)
+                        assert isinstance(baudComboBox, QComboBox)
+                        self.aw.extrabaudrate[i] = int(str(baudComboBox.currentText()))
                         byteComboBox =  self.serialtable.cellWidget(i,3)
-                        if byteComboBox:
-                            self.aw.extrabytesize[i] = int(str(byteComboBox.currentText()))
+                        assert isinstance(byteComboBox, QComboBox)
+                        self.aw.extrabytesize[i] = int(str(byteComboBox.currentText()))
                         parityComboBox =  self.serialtable.cellWidget(i,4)
-                        if parityComboBox:
-                            self.aw.extraparity[i] = str(parityComboBox.currentText())
-                        stopbitsComboBox =  self.serialtable.cellWidget(i,5)
-                        if stopbitsComboBox:
-                            self.aw.extrastopbits[i] = int(str(stopbitsComboBox.currentText()))
+                        assert isinstance(parityComboBox, QComboBox)
+                        self.aw.extraparity[i] = str(parityComboBox.currentText())
+                        stopbitsComboBox = self.serialtable.cellWidget(i,5)
+                        assert isinstance(stopbitsComboBox, QComboBox)
+                        self.aw.extrastopbits[i] = int(str(stopbitsComboBox.currentText()))
                         timeoutEdit = self.serialtable.cellWidget(i,6)
-                        if timeoutEdit:
-                            self.aw.extratimeout[i] = float(str(timeoutEdit.text()))
+                        assert isinstance(timeoutEdit, QLineEdit)
+                        self.aw.extratimeout[i] = float(str(timeoutEdit.text()))
             #create serial ports for each extra device
-            self.aw.extraser = [None]*ser_ports
+            self.aw.extraser = []
             #load the settings for the extra serial ports found
             for i in range(ser_ports):
-                self.aw.extraser[i] = serialport(self.aw)
-                self.aw.extraser[i].comport = str(self.aw.extracomport[i])
-                self.aw.extraser[i].baudrate = self.aw.extrabaudrate[i]
-                self.aw.extraser[i].bytesize = self.aw.extrabytesize[i]
-                self.aw.extraser[i].parity = str(self.aw.extraparity[i])
-                self.aw.extraser[i].stopbits = self.aw.extrastopbits[i]
-                self.aw.extraser[i].timeout = self.aw.extratimeout[i]
+                xser = serialport(self.aw)
+                if len(self.aw.extracomport)>i:
+                    xser.comport = str(self.aw.extracomport[i])
+                if len(self.aw.extrabaudrate)>i:
+                    xser.baudrate = self.aw.extrabaudrate[i]
+                if len(self.aw.extrabytesize)>i:
+                    xser.bytesize = self.aw.extrabytesize[i]
+                if len(self.aw.extraparity)>i:
+                    xser.parity = str(self.aw.extraparity[i])
+                if len(self.aw.extrastopbits)>i:
+                    xser.stopbits = self.aw.extrastopbits[i]
+                if len(self.aw.extratimeout)>i:
+                    xser.timeout = self.aw.extratimeout[i]
+                self.aw.extraser.append(xser)
         except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' saveserialtable(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -1884,7 +1909,7 @@ class comportDlg(ArtisanResizeablDialog):
         bytesize = str(self.bytesizeComboBox.currentText())
         parity = str(self.parityComboBox.currentText())
         stopbits = str(self.stopbitsComboBox.currentText())
-        timeout = self.aw.comma2dot(str(self.timeoutEdit.text()))
+        timeout = comma2dot(str(self.timeoutEdit.text()))
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
         if (self.aw.qmc.device not in self.aw.qmc.nonSerialDevices) and not(self.aw.qmc.device == 0 and self.aw.ser.useModbusPort): # only if serial conf is not hidden
@@ -1898,7 +1923,6 @@ class comportDlg(ArtisanResizeablDialog):
                 self.aw.sendmessage(QApplication.translate('Message','Serial Port Settings: {0}, {1}, {2}, {3}, {4}, {5}').format(comport,baudrate,bytesize,parity,stopbits,timeout))
             except comportError:
                 self.aw.qmc.adderror(QApplication.translate('Error Message','Serial Exception: invalid comm port'))
-                self.comportEdit.selectAll()
                 self.comportEdit.setFocus()
                 return
             except timeoutError:

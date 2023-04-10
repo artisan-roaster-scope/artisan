@@ -10,28 +10,57 @@ import re
 import json
 from lxml import html # type: ignore
 import logging
-from typing import Final
+from typing import Optional, List, TYPE_CHECKING
+from typing_extensions import Final, TypedDict  # Python <=3.7
+
+
+if TYPE_CHECKING:
+    from artisanlib.types import ProfileData # pylint: disable=unused-import
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtCore import QDateTime, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import encodeLocal
 
 
-_log: Final = logging.getLogger(__name__)
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
+class RoastPathDataItem(TypedDict, total=False):
+    Timestamp: str
+#    SecondsAfterStart: int
+#    DisplayTime: str
+#    DisplayUomId: int
+    StandardValue: float
+#    DisplayValue: float
+#    ReadingTypeId: int
+#    IsRateOfRiseReading: bool
+#    RoastStageId: int
+    EventName: Optional[str]
+    Note: float
+    NoteTypeId: int
+
+class RoastPathData(TypedDict, total=False):
+    btData: List[RoastPathDataItem]
+    etData: List[RoastPathDataItem]
+    atData: List[RoastPathDataItem]
+    eventData: List[RoastPathDataItem]
+    rorData: List[RoastPathDataItem]
+    noteData: List[RoastPathDataItem]
+    fuelData: List[RoastPathDataItem]
+    fanData: List[RoastPathDataItem]
+    drumData: List[RoastPathDataItem]
 
 # returns a dict containing all profile information contained in the given RoastPATH document pointed by the given QUrl
 def extractProfileRoastPathHTML(url,_):
-    res = {} # the interpreted data set
+    res:ProfileData = {} # the interpreted data set
     try:
-        s = requests.Session()
-        s.mount('file://', FileAdapter())
-        page = s.get(url.toString(), timeout=(4, 15), headers={'Accept-Encoding' : 'gzip'})
+        sess = requests.Session()
+        sess.mount('file://', FileAdapter())
+        page = sess.get(url.toString(), timeout=(4, 15), headers={'Accept-Encoding' : 'gzip'})
         tree = html.fromstring(page.content)
 
         title = ''
@@ -41,9 +70,15 @@ def extractProfileRoastPathHTML(url,_):
             if len(date_str) > 2:
                 dateQt = QDateTime.fromString(date_str[-2]+date_str[-1], 'yyyy-MM-ddhh:mm')
                 if dateQt.isValid():
-                    res['roastdate'] = encodeLocal(dateQt.date().toString())
-                    res['roastisodate'] = encodeLocal(dateQt.date().toString(Qt.DateFormat.ISODate))
-                    res['roasttime'] = encodeLocal(dateQt.time().toString())
+                    rd:Optional[str] = encodeLocal(dateQt.date().toString())
+                    if rd is not None:
+                        res['roastdate'] = rd
+                    rd_iso:Optional[str] = encodeLocal(dateQt.date().toString(Qt.DateFormat.ISODate))
+                    if rd_iso is not None:
+                        res['roastisodate'] = rd_iso
+                    rt:Optional[str] = encodeLocal(dateQt.time().toString())
+                    if rt is not None:
+                        res['roasttime'] = rt
                     res['roastepoch'] = int(dateQt.toSecsSinceEpoch())
                     res['roasttzoffset'] = libtime.timezone
                 title = ''.join(date_str[:-2]).strip()
@@ -54,7 +89,7 @@ def extractProfileRoastPathHTML(url,_):
 
         coffee = ''
         for m in ['Roasted By','Coffee','Batch Size','Notes','Organization']:
-            s = f'//*[@class="ml-2" and normalize-space(text())="Details"]/following::table[1]/tbody/tr[*]/td/*[normalize-space(text())="{m}"]/following::td[1]/text()'
+            s:str = f'//*[@class="ml-2" and normalize-space(text())="Details"]/following::table[1]/tbody/tr[*]/td/*[normalize-space(text())="{m}"]/following::td[1]/text()'
             value = tree.xpath(s)
             if len(value) > 0:
                 meta = value[0].strip()
@@ -87,21 +122,17 @@ def extractProfileRoastPathHTML(url,_):
                     else:
                         beans += ', ' + meta
         if coffee != '' and title in res: # we did not use the "coffee" as title
-            if beans == '':
-                beans = coffee
-            else:
-                beans = coffee + '\n' + beans
+            beans = coffee if beans == '' else coffee + '\n' + beans
         if beans != '':
             res['beans'] = beans
         if title != '' and 'title' not in res:
             res['title'] = title
 
-        data = {}
+        data:RoastPathData = {}
         for elem in ['btData', 'etData', 'atData', 'eventData', 'rorData', 'noteData', 'fuelData', 'fanData', 'drumData']:
             d = re.findall(fr"var {elem} = JSON\.parse\('(.+?)'\);", page.content.decode('utf-8'), re.S)  # @UndefinedVariable
-            bt = []
             if d:
-                data[elem] = json.loads(d[0])
+                data[elem] = json.loads(d[0]) # type: ignore # generic strings accessors cannot be handled by mypy
 
         if 'btData' in data and len(data['btData']) > 0 and 'Timestamp' in data['btData'][0]:
             # BT
@@ -131,13 +162,13 @@ def extractProfileRoastPathHTML(url,_):
                     'First Crack' : 2,
                     'Second Crack' : 4,
                     'Drop' : 6}
-                for d in data['eventData']:
-                    if 'EventName' in d and d['EventName'] in marks and 'Timestamp' in d:
-                        tx = dateutil.parser.parse(d['Timestamp']).timestamp() - baseTime
+                for dd in data['eventData']:
+                    if 'EventName' in dd and dd['EventName'] in marks and 'Timestamp' in dd:
+                        tx = dateutil.parser.parse(dd['Timestamp']).timestamp() - baseTime
                         try:
 #                            tx_idx = res["timex"].index(tx) # does not cope with dropouts as the next line:
                             tx_idx = next(i for i,item in enumerate(res['timex']) if item >= tx)
-                            timeindex[marks[d['EventName']]] = max(0,tx_idx)
+                            timeindex[marks[dd['EventName']]] = max(0,tx_idx)
                         except Exception: # pylint: disable=broad-except
                             pass
             res['timeindex'] = timeindex
@@ -147,9 +178,8 @@ def extractProfileRoastPathHTML(url,_):
             for tag in ['noteData','fuelData','fanData','drumData']:
                 if tag in data:
                     if noteData is None:
-                        noteData = data[tag]
-                    else:
-                        noteData = noteData + data[tag]
+                        noteData = data[tag] # type: ignore # mypy cannot check generic tags on TypedDicts
+                    noteData = noteData + data[tag] # type: ignore # mypy cannot check generic tags on TypedDicts
             if noteData is not None:
                 specialevents = []
                 specialeventstype = []
@@ -234,8 +264,8 @@ def extractProfileRoastPathHTML(url,_):
                     res['extradevicecolor2'].append('black')
                     res['extramarkersizes1'].append(6.0)
                     res['extramarkersizes2'].append(6.0)
-                    res['extramarkers1'].append(None)
-                    res['extramarkers2'].append(None)
+                    res['extramarkers1'].append('None')
+                    res['extramarkers2'].append('None')
                     res['extralinewidths1'].append(1.0)
                     res['extralinewidths2'].append(1.0)
                     res['extralinestyles1'].append('-')
@@ -267,8 +297,8 @@ def extractProfileRoastPathHTML(url,_):
                     res['extradevicecolor2'].append('black')
                     res['extramarkersizes1'].append(6.0)
                     res['extramarkersizes2'].append(6.0)
-                    res['extramarkers1'].append(None)
-                    res['extramarkers2'].append(None)
+                    res['extramarkers1'].append('None')
+                    res['extramarkers2'].append('None')
                     res['extralinewidths1'].append(1.0)
                     res['extralinewidths2'].append(1.0)
                     res['extralinestyles1'].append('-')

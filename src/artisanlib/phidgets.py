@@ -13,36 +13,40 @@
 # the GNU General Public License for more details.
 
 # AUTHOR
-# Marko Luther, 2018
-
-import logging
-from typing import Final
+# Marko Luther, 2023
 
 from Phidget22.Devices.Manager import Manager # type: ignore
 from Phidget22.DeviceID import DeviceID # type: ignore
 from Phidget22.DeviceClass import DeviceClass # type: ignore
 
+import logging
+from typing import Dict, Optional, TYPE_CHECKING
+from typing_extensions import Final  # Python <=3.7
+
+if TYPE_CHECKING:
+    from Phidget22.Phidget import Phidget # type: ignore # pylint: disable=unused-import
+
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtCore import QSemaphore # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
-_log: Final = logging.getLogger(__name__)
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 class PhidgetManager():
 
-    def __init__(self):
+    def __init__(self) -> None:
         # a dictionary associating all physical attached Phidget channels
         # to their availability state:
         #    True: available for attach to a software channel
         #    False: occupied and connected to a software channel
         # access to this dict is protected by the managersemaphore and
         # should happen only via the methods addChannel and deleteChannel
-        self.attachedPhidgetChannels = {}
+        self.attachedPhidgetChannels:Dict['Phidget', bool] = {}
         self.managersemaphore = QSemaphore(1)
         self.manager = Manager()
         self.manager.setOnAttachHandler(self.attachHandler)
@@ -89,12 +93,11 @@ class PhidgetManager():
                                     self.attachedPhidgetChannels[k] = False
                                 #else:
                                 #  other is also a VINT device. Do nothing
-                            else:
-                                if k.getIsHubPortDevice() == 0:
-                                    # there is a port registered with connected VINT device we deactivate this hubport channel
-                                    state = False
-                                #else:
-                                #   do nothing
+                            elif k.getIsHubPortDevice() == 0:
+                                # there is a port registered with connected VINT device we deactivate this hubport channel
+                                state = False
+                            #else:
+                            #   do nothing
                     except Exception: # pylint: disable=broad-except
                         pass
             except Exception: # pylint: disable=broad-except
@@ -138,11 +141,8 @@ class PhidgetManager():
     def getChannel(self,serial,port,channel,phidget_class_name,device_id,remote,remoteOnly):
         try:
             self.managersemaphore.acquire(1)
-            if device_id in [DeviceID.PHIDID_HUB0000]:
-                # we are looking for HUB ports
-                hub = 1
-            else:
-                hub = 0
+            # we are looking for HUB ports
+            hub = 1 if device_id in [DeviceID.PHIDID_HUB0000] else 0
             for k, _ in self.attachedPhidgetChannels.items():
                 if k.getIsHubPortDevice() or k.getDeviceClass() == DeviceClass.PHIDCLASS_VINT:
                     kport = k.getHubPort()
@@ -227,7 +227,7 @@ class PhidgetManager():
 #            print(k.getDeviceSerialNumber(),k.getChannelClassName(),k.getDeviceID(),k.getIsHubPortDevice(),"port: ", k.getHubPort(),"ch: ",k.getChannel(), "local: ", k.getIsLocal())
 
     # returns the first matching Phidget channel and reserves it
-    def getFirstMatchingPhidget(self,phidget_class_name,device_id,channel=None,remote=False,remoteOnly=False,serial=None,hubport=None):
+    def getFirstMatchingPhidget(self,phidget_class_name,device_id,channel=None,remote=False,remoteOnly=False,serial:Optional[int]=None,hubport=None):
         _log.debug('getFirstMatchingPhidget(%s,%s,%s,%s,%s,%s,%s)',phidget_class_name,device_id,channel,remote,remoteOnly,serial,hubport)
         try:
             self.managersemaphore.acquire(1)

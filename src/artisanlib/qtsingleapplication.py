@@ -12,26 +12,28 @@ Updated to support QT6
 import sys
 import multiprocessing as mp
 
+from typing import Optional
+
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import pyqtSignal, QTextStream, Qt, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtCore import pyqtSignal, QTextStream, Qt, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtNetwork import QLocalSocket, QLocalServer # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
-class QtSingleApplication(QApplication):
+class QtSingleApplication(QApplication): # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
     messageReceived = pyqtSignal(str)
 
     __slots__ = [ '_id', '_viewer_id', '_activationWindow', '_activateOnMessage', '_inSocket', '_outSocket', '_isRunning', '_server',
         '_isRunningViewer', '_outSocketViewer', '_inStream', '_outStream', '_outStreamViewer' ]
 
-    def __init__(self, _id,_viewer_id, *argv):
+    def __init__(self, _id,_viewer_id, *argv) -> None:
 
         if sys.platform.startswith('darwin') and mp.current_process().name == 'WebLCDs':
             import AppKit # type: ignore # pylint: disable=import-error
@@ -45,9 +47,19 @@ class QtSingleApplication(QApplication):
         self._activationWindow = None
         self._activateOnMessage = False
 
-        self._outSocket = None
-        self._isRunning = False
+        self._inSocket:Optional[QLocalSocket] = None
+        self._outSocket:Optional[QLocalSocket] = None
+
+        self._isRunning:bool = False
+        self._isRunningViewer:bool = False
+
         self._server = None
+
+        self._inStream:Optional[QTextStream] = None
+        self._outStream:Optional[QTextStream] = None
+
+        self._outSocketViewer: Optional[QLocalSocket] = None
+        self._outStreamViewer:Optional[QTextStream] = None
 
         # we exclude the WebLCDs parallel process from participating any Artisan inter-app communication
         if mp.current_process().name != 'WebLCDs':
@@ -59,7 +71,7 @@ class QtSingleApplication(QApplication):
                 # Yes, there is.
                 self._outStream = QTextStream(self._outSocket)
                 try:
-                    self._outStream.setCodec('UTF-8') # setCodec not available in PyQt6, but UTF-8 the default encoding
+                    self._outStream.setCodec('UTF-8') # type: ignore # setCodec not available in PyQt6, but UTF-8 the default encoding
                 except Exception: # pylint: disable=broad-except
                     pass
                 # Is there another viewer running?
@@ -69,7 +81,7 @@ class QtSingleApplication(QApplication):
                 if self._isRunningViewer:
                     self._outStreamViewer = QTextStream(self._outSocketViewer)
                     try:
-                        self._outStreamViewer.setCodec('UTF-8') # setCodec not available in PyQt6, but UTF-8 the default encoding
+                        self._outStreamViewer.setCodec('UTF-8') # type: ignore # setCodec not available in PyQt6, but UTF-8 the default encoding
                     except Exception: # pylint: disable=broad-except
                         pass
                 else:
@@ -123,22 +135,24 @@ class QtSingleApplication(QApplication):
         self._activationWindow.activateWindow()
 
     def sendMessage(self, msg):
-        if not self._outStream:
+        if self._outStream is None or self._outSocket is None:
             return False
-        self._outStream << msg << '\n' # pylint: disable=pointless-statement
+        self._outStream << msg << '\n' # pylint: disable=pointless-statement # pyright: ignore # warning: Expression value is unused (reportUnusedExpression)
         self._outStream.flush()
         return self._outSocket.waitForBytesWritten()
 
     @pyqtSlot()
     def _onNewConnection(self):
-        if self._inSocket:
+        if self._inSocket is not None:
             self._inSocket.readyRead.disconnect(self._onReadyRead)
+        if self._server is None:
+            return
         self._inSocket = self._server.nextPendingConnection()
-        if not self._inSocket:
+        if self._inSocket is None:
             return
         self._inStream = QTextStream(self._inSocket)
         try:
-            self._inStream.setCodec('UTF-8') # setCodec not available in PyQt6, but UTF-8 the default encoding
+            self._inStream.setCodec('UTF-8') # type: ignore # setCodec not available in PyQt6, but UTF-8 the default encoding
         except Exception: # pylint: disable=broad-except
             pass
         self._inSocket.readyRead.connect(self._onReadyRead)
@@ -148,6 +162,8 @@ class QtSingleApplication(QApplication):
     @pyqtSlot()
     def _onReadyRead(self):
         while True:
+            if self._inStream is None:
+                break
             msg = self._inStream.readLine()
             if not msg:
                 break

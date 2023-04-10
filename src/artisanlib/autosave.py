@@ -13,23 +13,25 @@
 # the GNU General Public License for more details.
 
 # AUTHOR
-# Marko Luther, 2020
+# Marko Luther, 2023
 
 from artisanlib.dialogs import ArtisanDialog
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import Qt, pyqtSlot, QSettings # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QLabel, QPushButton, QDialogButtonBox,  # @UnusedImport @Reimport  @UnresolvedImport
         QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QLineEdit) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import QStandardItemModel # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #plint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtCore import Qt, pyqtSlot, QSettings # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QLabel, QPushButton, QDialogButtonBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QLineEdit) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QStandardItemModel # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 class autosaveDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
+    def __init__(self, parent, aw) -> None:
         super().__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Autosave'))
@@ -71,7 +73,8 @@ class autosaveDlg(ArtisanDialog):
         try:
             if not self.aw.QtWebEngineSupport:
                 # disable "PDF Report" item if QtWebEngine Support is not available
-                self.imageTypesComboBox.model().item(self.aw.qmc.autoasaveimageformat_types.index('PDF Report')).setEnabled(False)
+                assert isinstance(self.imageTypesComboBox, QStandardItemModel)
+                self.imageTypesComboBox.model().item(self.aw.qmc.autoasaveimageformat_types.index('PDF Report')).setEnabled(False) # pyright: ignore # Cannot access member "item" for type "QAbstractItemModel"
         except Exception: # pylint: disable=broad-except
             pass
         self.imageTypesComboBox.setCurrentIndex(self.aw.qmc.autoasaveimageformat_types.index(self.aw.qmc.autosaveimageformat))
@@ -81,7 +84,7 @@ class autosaveDlg(ArtisanDialog):
 
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.autoChanged)
-        self.dialogbuttons.rejected.connect(self.close)
+        self.dialogbuttons.rejected.connect(lambda : (None if self.close() else None)) # lambda to make mypy happy, turning close from None->bool into None->None
         self.helpButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Help)
         self.setButtonTranslations(self.helpButton,'Help',QApplication.translate('Button','Help'))
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.Help).clicked.connect(self.showautosavehelp)

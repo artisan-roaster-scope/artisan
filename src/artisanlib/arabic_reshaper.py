@@ -157,7 +157,7 @@ def replace_jalalah(unshaped_word):
 def replace_lam_alef(unshaped_word):
     list_word = list(unshaped_word)
     letter_before = ''
-    for i in range(len(unshaped_word)):
+    for i, _ in enumerate(unshaped_word):
         if not is_haraka(unshaped_word[i]) and unshaped_word[i] != DEFINED_CHARACTERS_ORGINAL_LAM:
             letter_before = unshaped_word[i]
 
@@ -186,29 +186,29 @@ def get_lam_alef(candidate_alef, candidate_lam, is_end_of_word):
     if is_end_of_word:
         shift_rate += 1
 
-    if DEFINED_CHARACTERS_ORGINAL_LAM == candidate_lam:
-        if DEFINED_CHARACTERS_ORGINAL_ALF_UPPER_MDD == candidate_alef:
+    if candidate_lam == DEFINED_CHARACTERS_ORGINAL_LAM:
+        if candidate_alef == DEFINED_CHARACTERS_ORGINAL_ALF_UPPER_MDD:
             reshaped_lam_alef = LAM_ALEF_GLYPHS[0][shift_rate]
 
-        if DEFINED_CHARACTERS_ORGINAL_ALF_UPPER_HAMAZA == candidate_alef:
+        if candidate_alef == DEFINED_CHARACTERS_ORGINAL_ALF_UPPER_HAMAZA:
             reshaped_lam_alef = LAM_ALEF_GLYPHS[1][shift_rate]
 
-        if DEFINED_CHARACTERS_ORGINAL_ALF == candidate_alef:
+        if candidate_alef == DEFINED_CHARACTERS_ORGINAL_ALF:
             reshaped_lam_alef = LAM_ALEF_GLYPHS[2][shift_rate]
 
-        if DEFINED_CHARACTERS_ORGINAL_ALF_LOWER_HAMAZA == candidate_alef:
+        if candidate_alef == DEFINED_CHARACTERS_ORGINAL_ALF_LOWER_HAMAZA:
             reshaped_lam_alef = LAM_ALEF_GLYPHS[3][shift_rate]
 
     return reshaped_lam_alef
 
 class DecomposedWord(): # pylint: disable=too-few-public-methods
-    def __init__(self, word):
+    def __init__(self, word) -> None:
         self.stripped_harakat = []
         self.harakat_positions = []
         self.stripped_regular_letters = []
         self.letters_position = []
 
-        for i in range(len(word)):
+        for i, _ in enumerate(word):
             c = word[i]
             if is_haraka(c):
                 self.harakat_positions.append(i)
@@ -219,9 +219,9 @@ class DecomposedWord(): # pylint: disable=too-few-public-methods
 
     def reconstruct_word(self, reshaped_word):
         ll = list('\x00' * (len(self.stripped_harakat) + len(reshaped_word)))
-        for i in range(len(self.letters_position)):
+        for i, _ in enumerate(self.letters_position):
             ll[self.letters_position[i]] = reshaped_word[i]
-        for i in range(len(self.harakat_positions)):
+        for i, _ in enumerate(self.harakat_positions):
             ll[self.harakat_positions[i]] = self.stripped_harakat[i]
         return ''.join(ll)
 
@@ -240,7 +240,7 @@ def reshape_it(unshaped_word):
     if len(unshaped_word) == 1:
         return get_reshaped_glyph(unshaped_word[0], 1)
     reshaped_word = []
-    for i in range(len(unshaped_word)):
+    for i, _ in enumerate(unshaped_word):
         before = False
         after = False
         if i == 0:
@@ -271,16 +271,10 @@ def get_words(sentence):
     return []
 
 def has_arabic_letters(word):
-    for c in word:
-        if is_arabic_character(c):
-            return True
-    return False
+    return any(is_arabic_character(c) for c in word)
 
 def is_arabic_word(word):
-    for c in word:
-        if not is_arabic_character(c):
-            return False
-    return True
+    return all(is_arabic_character(c) for c in word)
 
 def get_words_from_mixed_word(word):
     temp_word = ''
@@ -292,12 +286,11 @@ def get_words_from_mixed_word(word):
                 temp_word = c
             else:
                 temp_word += c
+        elif temp_word and is_arabic_word(temp_word):
+            words.append(temp_word)
+            temp_word = c
         else:
-            if temp_word and is_arabic_word(temp_word):
-                words.append(temp_word)
-                temp_word = c
-            else:
-                temp_word += c
+            temp_word += c
     if temp_word:
         words.append(temp_word)
     return words
@@ -305,21 +298,21 @@ def get_words_from_mixed_word(word):
 def reshape(text):
     if text:
         lines = re.split('\\r?\\n', text)
-        for i in range(len(lines)):
+        for i, _ in enumerate(lines):
             lines[i] = reshape_sentence(lines[i])
         return '\n'.join(lines)
     return ''
 
 def reshape_sentence(sentence):
     words = get_words(sentence)
-    for i in range(len(words)):
+    for i, _ in enumerate(words):
         word = words[i]
         if has_arabic_letters(word):
             if is_arabic_word(word):
                 words[i] = get_reshaped_word(word)
             else:
                 mixed_words = get_words_from_mixed_word(word)
-                for j in range(len(mixed_words)):
+                for j, _ in enumerate(mixed_words):
                     mixed_words[j] = get_reshaped_word(mixed_words[j])
                 words[i] = ''.join(mixed_words)
     return ' '.join(words)

@@ -1,7 +1,7 @@
 #
 # countries.py
 #
-# Copyright (c) 2018, Paul Holleis, Marko Luther
+# Copyright (c) 2023, Paul Holleis, Marko Luther
 # All rights reserved.
 #
 #
@@ -22,10 +22,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtWidgets import QApplication  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 QApplication.translate('Countries', 'Afghanistan')

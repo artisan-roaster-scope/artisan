@@ -9,24 +9,28 @@ from requests_file import FileAdapter # type: ignore  # @UnresolvedImport
 import re
 from lxml import html # type: ignore
 import logging
-from typing import Final
+from typing import List, Optional, TYPE_CHECKING
+from typing_extensions import Final  # Python <=3.7
+
+if TYPE_CHECKING:
+    from artisanlib.types import ProfileData # pylint: disable=unused-import
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtCore import QDateTime, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
 from artisanlib.util import encodeLocal, stringtoseconds
 
 
-_log: Final = logging.getLogger(__name__)
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given RoastLog document pointed by the given QUrl
 def extractProfileRoastLog(url,_):
-    res = {} # the interpreted data set
+    res:ProfileData = {} # the interpreted data set
     try:
         s = requests.Session()
         s.mount('file://', FileAdapter())
@@ -50,17 +54,23 @@ def extractProfileRoastLog(url,_):
                 dt = dateutil.parser.parse(tag_values['Roasted on:'])
                 dateQt = QDateTime.fromSecsSinceEpoch(int(round(dt.timestamp())))
                 if dateQt.isValid():
-                    res['roastdate'] = encodeLocal(dateQt.date().toString())
-                    res['roastisodate'] = encodeLocal(dateQt.date().toString(Qt.DateFormat.ISODate))
-                    res['roasttime'] = encodeLocal(dateQt.time().toString())
+                    roastdate:Optional[str] = encodeLocal(dateQt.date().toString())
+                    if roastdate is not None:
+                        res['roastdate'] = roastdate
+                    roastisodate:Optional[str] = encodeLocal(dateQt.date().toString(Qt.DateFormat.ISODate))
+                    if roastisodate is not None:
+                        res['roastisodate'] = roastisodate
+                    roasttime:Optional[str] = encodeLocal(dateQt.time().toString())
+                    if roasttime is not None:
+                        res['roasttime'] = roasttime
                     res['roastepoch'] = int(dateQt.toSecsSinceEpoch())
                     res['roasttzoffset'] = libtime.timezone
             except Exception: # pylint: disable=broad-except
                 pass
 
-        w_in = 0
-        w_out = 0
-        u = 'lb'
+        w_in:str = '0'
+        w_out:str = '0'
+        u:str = 'lb'
         if 'Starting mass:' in tag_values:
             w_in,u = tag_values['Starting mass:'].strip().split(' ')
         if 'Ending mass:' in tag_values:
@@ -105,16 +115,16 @@ def extractProfileRoastLog(url,_):
                 response = requests.get(url, timeout=(4, 15), headers=headers)
                 data_json = response.json()
 
-                timeindex = [-1,0,0,0,0,0,0,0]
-                specialevents = []
-                specialeventstype = []
-                specialeventsvalue = []
-                specialeventsStrings = []
+                timeindex:List[int] = [-1,0,0,0,0,0,0,0]
+                specialevents:List[int] = []
+                specialeventstype:List[int] = []
+                specialeventsvalue:List[float] = []
+                specialeventsStrings:List[str] = []
+                timex = []
+                temp1,temp2,temp3,temp4 = [],[],[],[]
 
                 if 'line_plots' in data_json:
                     mode = 'F'
-                    timex = []
-                    temp1,temp2,temp3,temp4 = [],[],[],[]
                     temp3_label = 'TC3'
                     temp4_label = 'TC4'
 #                    temp1ror = []
@@ -177,8 +187,8 @@ def extractProfileRoastLog(url,_):
                         res['extradevicecolor2'] = ['black']
                         res['extramarkersizes1'] = [6.0]
                         res['extramarkersizes2'] = [6.0]
-                        res['extramarkers1'] = [None]
-                        res['extramarkers2'] = [None]
+                        res['extramarkers1'] = ['None']
+                        res['extramarkers2'] = ['None']
                         res['extralinewidths1'] = [1.0]
                         res['extralinewidths2'] = [1.0]
                         res['extralinestyles1'] = ['-']

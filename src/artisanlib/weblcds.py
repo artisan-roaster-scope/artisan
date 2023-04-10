@@ -13,7 +13,7 @@
 # the GNU General Public License for more details.
 
 # AUTHOR
-# Marko Luther, 2018
+# Marko Luther, 2023
 
 from bottle import default_app, request, abort, route, template, static_file, get, TEMPLATE_PATH # type: ignore
 from gevent import Timeout, kill # type: ignore
@@ -99,7 +99,7 @@ def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,sh
         etc,
         etbg,
         showetflag,
-        showbtflag,))
+        showbtflag))
     process.start()
 
     libtime.sleep(4)
@@ -185,18 +185,9 @@ def status():
 # route to serve the static page
 @route('/artisan')
 def index():
-    if not (showbt and showet):
-        showspace_str = 'inline'
-    else:
-        showspace_str = 'none'
-    if showbt:
-        showbt_str = 'inline'
-    else:
-        showbt_str = 'none'
-    if showet:
-        showet_str = 'inline'
-    else:
-        showet_str = 'none'
+    showspace_str = 'inline' if not (showbt and showet) else 'none'
+    showbt_str = 'inline' if showbt else 'none'
+    showet_str = 'inline' if showet else 'none'
     return template('artisan.tpl',
         port=str(port),
         nonesymbol=nonesymbol,

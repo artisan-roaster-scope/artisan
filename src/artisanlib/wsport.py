@@ -13,7 +13,7 @@
 # the GNU General Public License for more details.
 
 # AUTHOR
-# Marko Luther, 2020
+# Marko Luther, 2023
 
 import sys
 import time
@@ -22,75 +22,80 @@ import threading
 import json
 import random
 
+from typing import List, Dict, Optional, TYPE_CHECKING
+from typing_extensions import Final  # Python <=3.7
+
+if TYPE_CHECKING:
+    import websocket # type: ignore # pylint: disable=unused-import
+
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 class wsport():
-    def __init__(self,aw):
+    def __init__(self,aw) -> None:
         self.aw = aw
 
         # connects to "ws://<host>:<port>/<path>"
-        self.host = '127.0.0.1' # the TCP host
-        self.port = 80          # the TCP port
-        self.path = 'WebSocket' # the ws path
-        self.machineID = 0
+        self.host:str = '127.0.0.1' # the TCP host
+        self.port:int = 80          # the TCP port
+        self.path:str = 'WebSocket' # the ws path
+        self.machineID:int = 0
 
-        self.lastReadResult = 0 # this is set by eventaction following some custom button/slider Modbus actions with "read" command
+        self.lastReadResult:int = 0 # this is set by eventaction following some custom button/slider Modbus actions with "read" command
 
-        self.channels = 10 # maximal number of WebSocket channels
+        self.channels:Final[int] = 10 # maximal number of WebSocket channels
 
         # WebSocket data
         self.readings = [-1]*self.channels
 
-        self.channel_requests = ['']*self.channels
-        self.channel_nodes = ['']*self.channels
-        self.channel_modes = [0]*self.channels # temp mode is an int here, 0:__,1:C,2:F
+        self.channel_requests:List[str] = ['']*self.channels
+        self.channel_nodes:List[str] = ['']*self.channels
+        self.channel_modes:List[int] = [0]*self.channels # temp mode is an int here, 0:__,1:C,2:F
 
         # configurable via the UI:
-        self.connect_timeout = 4    # in seconds
-        self.request_timeout = 0.5  # in seconds
-        self.reconnect_interval = 2 # in seconds
+        self.connect_timeout:float = 4    # in seconds
+        self.request_timeout:float = 0.5  # in seconds
+        self.reconnect_interval:float = 2 # in seconds
         # not configurable via the UI:
-        self.ping_interval = 0      # in seconds; if 0 pings are not send automatically
-        self.ping_timeout = None    # in seconds
+        self.ping_interval:float = 0      # in seconds; if 0 pings are not send automatically
+        self.ping_timeout:Optional[float] = None    # in seconds
 
         # JSON nodes
-        self.id_node = 'id'
-        self.machine_node = 'roasterID'
-        self.command_node = 'command'
-        self.data_node = 'data'
-        self.pushMessage_node = 'pushMessage'
-#        self.parameters_node = "params"
+        self.id_node:str = 'id'
+        self.machine_node:str = 'roasterID'
+        self.command_node:str = 'command'
+        self.data_node:str = 'data'
+        self.pushMessage_node:str = 'pushMessage'
 
         # commands
-        self.request_data_command = 'getData'
+        self.request_data_command:str = 'getData'
 
         # push messages
-        self.charge_message = 'startRoasting'
-        self.drop_message = 'endRoasting'
-        self.addEvent_message = 'addEvent'
+        self.charge_message:str = 'startRoasting'
+        self.drop_message:str = 'endRoasting'
+        self.addEvent_message:str = 'addEvent'
 
-        self.event_node = 'event'
-        self.DRY_node = 'colorChangeEvent'
-        self.FCs_node = 'firstCrackBeginningEvent'
-        self.FCe_node = 'firstCrackEndEvent'
-        self.SCs_node = 'secondCrackBeginningEvent'
-        self.SCe_node = 'secondCrackEndEvent'
+        self.event_node:str = 'event'
+        self.DRY_node:str = 'colorChangeEvent'
+        self.FCs_node:str = 'firstCrackBeginningEvent'
+        self.FCe_node:str = 'firstCrackEndEvent'
+        self.SCs_node:str = 'secondCrackBeginningEvent'
+        self.SCe_node:str = 'secondCrackEndEvent'
 
         # flags
-        self.STARTonCHARGE = False
-        self.OFFonDROP = False
+        self.STARTonCHARGE:bool = False
+        self.OFFonDROP:bool = False
 
-        self.open_event = None # an event set on connecting
-        self.pending_events = {}
+        self.open_event:Optional[threading.Event] = None # an event set on connecting
+        self.pending_events:Dict[int, threading.Event] = {}
 
-        self.active = False
-        self.ws = None  # the WebService client object
-        self.wst = None # the WebService thread
+        self.active:bool = False
+        self.ws:Optional['websocket.WebSocketApp'] = None  # the WebService client object
+        self.wst:Optional[threading.Thread] = None # the WebService thread
 
     def onMessage(self, _, message):
         if message is not None:
@@ -221,10 +226,11 @@ class wsport():
                                 on_close=self.onClose,
                                 on_open=self.onOpen
                                 )
-                self.ws.run_forever(
-                    skip_utf8_validation=True,
-                    ping_interval=self.ping_interval,
-                    ping_timeout=self.ping_timeout)
+                if self.ws is not None:
+                    self.ws.run_forever(
+                        skip_utf8_validation=True,
+                        ping_interval=self.ping_interval,
+                        ping_timeout=self.ping_timeout)
             except Exception as e: # pylint: disable=broad-except
                 self.aw.qmc.adderror(QApplication.translate('Error Message','WebSocket connection failed: {}').format(e))
                 if self.aw.seriallogflag:
@@ -234,17 +240,20 @@ class wsport():
                 self.aw.sendmessage(QApplication.translate('Error Message','Reconnecting WebSocket'))
         self.ws = None
 
-    def connect(self):
+    def connect(self) -> bool:
         if not self.is_connected():
             if self.aw.seriallogflag:
                 self.aw.addserial('wsport connect()')
             self.active = True
             self.wst = threading.Thread(target=self.create)
-            self.open_event = threading.Event()
-            self.wst.start()
-            success = self.open_event.wait(timeout=self.connect_timeout + 0.3)
-            self.open_event = None
-            return success
+            if self.wst is not None:
+                self.open_event = threading.Event()
+                if self.open_event is not None:
+                    self.wst.start()
+                    success = self.open_event.wait(timeout=self.connect_timeout + 0.3)
+                    self.open_event = None
+                    return success
+            return False
         return True
 
     def is_connected(self):
@@ -255,10 +264,12 @@ class wsport():
             if self.aw.seriallogflag:
                 self.aw.addserial('wsport disconnect()')
             self.active = False
-            self.ws.close()
-            self.ws = None
-            self.wst.join()
-            self.wst = None
+            if self.ws is not None:
+                self.ws.close()
+                self.ws = None
+            if self.wst is not None:
+                self.wst.join()
+                self.wst = None
 
 
     # request event handling
@@ -297,7 +308,7 @@ class wsport():
     def send(self,request,block=True):
         try:
             connected = self.connect()
-            if connected:
+            if connected and self.ws is not None:
                 message_id = random.randint(1,99999)
                 request[self.id_node] = message_id
                 if self.machine_node:
@@ -324,5 +335,8 @@ class wsport():
             return None
         except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' wsport:send() {0}').format(str(e)),exc_tb.tb_lineno)
+            lineno = 0
+            if exc_tb is not None:
+                lineno = exc_tb.tb_lineno
+            self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' wsport:send() {0}').format(str(e)),lineno)
             return None

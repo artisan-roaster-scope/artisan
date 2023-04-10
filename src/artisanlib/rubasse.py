@@ -5,24 +5,31 @@
 import os
 import csv
 import logging
-from typing import Final
+from typing import List, TYPE_CHECKING
+from typing_extensions import Final  # Python <=3.7
+
+if TYPE_CHECKING:
+    from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
+    from artisanlib.types import ProfileData # pylint: disable=unused-import
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
-_log: Final = logging.getLogger(__name__)
+_log: Final[logging.Logger] = logging.getLogger(__name__)
+
+
 
 # returns a dict containing all profile information contained in the given Rubasse CSV file
-def extractProfileRubasseCSV(file,aw):
-    res = {} # the interpreted data set
+def extractProfileRubasseCSV(file:str, aw:'ApplicationWindow') -> 'ProfileData':
+    res:ProfileData = {} # the interpreted data set
 
     res['samplinginterval'] = 1.0
-    filename = os.path.basename(file)
+    filename:str = os.path.basename(file)
     res['title'] = filename
 
     with open(file, newline='',encoding='utf-8') as csvFile:
@@ -38,20 +45,20 @@ def extractProfileRubasseCSV(file,aw):
         fan_event = False # set to True if a fan event exists
         heater_event = False # set to True if a heater event exists
 
-        specialevents = []
-        specialeventstype = []
-        specialeventsvalue = []
-        specialeventsStrings = []
-        timex = []
-        temp1 = []
-        temp2 = []
-        extra1 = []
-        extra2 = []
-        extra3 = []
-        extra4 = []
-        extra5 = []
-        extra6 = []
-        timeindex = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
+        specialevents:List[int] = []
+        specialeventstype:List[int] = []
+        specialeventsvalue:List[float] = []
+        specialeventsStrings:List[str] = []
+        timex:List[float] = []
+        temp1:List[float] = []
+        temp2:List[float] = []
+        extra1:List[float] = []
+        extra2:List[float] = []
+        extra3:List[float] = []
+        extra4:List[float] = []
+        extra5:List[float] = []
+        extra6:List[float] = []
+        timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
 
 
 
@@ -65,14 +72,14 @@ def extractProfileRubasseCSV(file,aw):
             # take i as time in seconds
             timex.append(i)
 
-            et = -1
+            et:float = -1.0
             try:
                 et = float(item['ET'])
             except Exception: # pylint: disable=broad-except
                 pass
             temp1.append(et)
 
-            bt = -1
+            bt:float = -1.0
             try:
                 bt = float(item['BT'])
                 # after 2min we mark DRY if not auto adjusted
@@ -82,42 +89,42 @@ def extractProfileRubasseCSV(file,aw):
                 pass
             temp2.append(bt)
 
-            heaterV = -1
+            heaterV:float = -1.0
             try:
                 heaterV = float(item['Heater'])
             except Exception: # pylint: disable=broad-except
                 pass
             extra1.append(heaterV)
 
-            fanV = -1
+            fanV:float = -1.0
             try:
                 fanV = float(item['Fan'])
             except Exception: # pylint: disable=broad-except
                 pass
             extra2.append(fanV)
 
-            humidity = -1
+            humidity:float = -1.0
             try:
                 humidity = float(item['Humidity'])
             except Exception: # pylint: disable=broad-except
                 pass
             extra3.append(humidity)
 
-            pressure = -1
+            pressure:float = -1.0
             try:
                 pressure = float(item['Pressure'])
             except Exception: # pylint: disable=broad-except
                 pass
             extra4.append(pressure)
 
-            drum = -1
+            drum:float = -1.0
             try:
                 drum = float(item['Drum'])
             except Exception: # pylint: disable=broad-except
                 pass
             extra5.append(drum)
 
-            DT = -1
+            DT:float = -1.0
             try:
                 DT = float(item['DT'])
             except Exception: # pylint: disable=broad-except
@@ -147,7 +154,7 @@ def extractProfileRubasseCSV(file,aw):
                             specialeventsvalue.append(v)
                             specialevents.append(i)
                             specialeventstype.append(0)
-                            specialeventsStrings.append('{}'.format(float(item['Fan'])) + '%')
+                            specialeventsStrings.append(f"{float(item['Fan'])}%")
                     else:
                         fan_last = None
                 except Exception as e: # pylint: disable=broad-except
@@ -174,7 +181,7 @@ def extractProfileRubasseCSV(file,aw):
                             specialeventsvalue.append(v)
                             specialevents.append(i)
                             specialeventstype.append(3)
-                            specialeventsStrings.append('{}'.format(float(item['Heater'])) + '%')
+                            specialeventsStrings.append(f"{float(item['Heater'])}%")
                     else:
                         heater_last = None
                 except Exception as e: # pylint: disable=broad-except
@@ -212,7 +219,7 @@ def extractProfileRubasseCSV(file,aw):
     if timeindex[6] == 0:
         timeindex[6] = max(0,len(timex)-1)
 
-    res['mode'] = 'C'
+    res['mode']= 'C'
 
     res['timex'] = timex
     res['temp1'] = temp1

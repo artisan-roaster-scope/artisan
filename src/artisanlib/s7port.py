@@ -13,7 +13,7 @@
 # the GNU General Public License for more details.
 
 # AUTHOR
-# Marko Luther, 2018
+# Marko Luther, 2023
 
 import time
 import platform
@@ -21,7 +21,13 @@ import os
 import sys
 import struct
 import logging
-from typing import Final
+from typing import List, Dict, Tuple, Optional, Iterator, TYPE_CHECKING
+from typing_extensions import Final  # Python <=3.7
+
+if TYPE_CHECKING:
+    from artisanlib.s7client import S7Client # noqa: F401 # pylint: disable=unused-import
+    from snap7.types import Areas # noqa: F401 # pylint: disable=unused-import
+    from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
 
 # imports avoided to speed up startup for non-S7 users
 #from snap7.types import Areas
@@ -30,16 +36,16 @@ from typing import Final
 import artisanlib.util
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtCore import QSemaphore # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
-_log: Final = logging.getLogger(__name__)
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 ################
@@ -147,8 +153,7 @@ def get_int(bytearray_: bytearray, byte_index: int) -> int:
     data[1] = data[1] & 0xff
     data[0] = data[0] & 0xff
     packed = struct.pack('2B', *data)
-    value = struct.unpack('>h', packed)[0]
-    return value
+    return struct.unpack('>h', packed)[0]
 
 def get_real(bytearray_: bytearray, byte_index: int) -> float:
     """Get real value.
@@ -170,8 +175,7 @@ def get_real(bytearray_: bytearray, byte_index: int) -> float:
             123.32099914550781
     """
     x = bytearray_[byte_index:byte_index + 4]
-    real = struct.unpack('>f', struct.pack('4B', *x))[0]
-    return real
+    return struct.unpack('>f', struct.pack('4B', *x))[0]
 
 def set_real(bytearray_: bytearray, byte_index: int, real) -> bytearray:
     """Set Real value
@@ -200,7 +204,6 @@ def set_real(bytearray_: bytearray, byte_index: int, real) -> bytearray:
         bytearray_[byte_index + i] = b
     return bytearray_
 
-
 class s7port():
 
     __slots__ = [ 'aw', 'readRetries', 'channels', 'host', 'port', 'rack', 'slot', 'lastReadResult', 'area', 'db_nr', 'start', 'type', 'mode',
@@ -208,68 +211,72 @@ class s7port():
         'PID_i_register', 'PID_d_register', 'PID_ON_action', 'PID_OFF_action', 'PIDmultiplier', 'SVtype', 'SVmultiplier', 'COMsemaphore',
         'areas', 'last_request_timestamp', 'min_time_between_requests', 'is_connected', 'plc', 'commError', 'libLoaded' ]
 
-    def __init__(self,aw):
+    def __init__(self, aw:'ApplicationWindow') -> None:
         self.aw = aw
 
-        self.readRetries = 1
-        self.channels = 10 # maximal number of S7 channels
-        self.host = '127.0.0.1' # the TCP host
-        self.port = 102 # the TCP port
-        self.rack = 0 # 0,..,7
-        self.slot = 0 # 0,..,31
+        self.readRetries:int = 1
+        self.channels:int = 10 # maximal number of S7 channels
+        self.host:str = '127.0.0.1' # the TCP host
+        self.port:int = 102 # the TCP port
+        self.rack:int = 0 # 0,..,7
+        self.slot:int = 0 # 0,..,31
 
-        self.lastReadResult = 0 # this is set by eventaction following some custom button/slider S/ actions with "read" command
+        self.lastReadResult:float = 0. # this is set by eventaction following some custom button/slider S/ actions with "read" command
 
-        self.area = [0]*self.channels
-        self.db_nr = [1]*self.channels
-        self.start = [0]*self.channels
-        self.type = [0]*self.channels # type 0 => int, type 1 => float, type 2 => intFloat
+        self.area:List[int] = [0]*self.channels
+        self.db_nr:List[int] = [1]*self.channels
+        self.start:List[int] = [0]*self.channels
+        self.type:List[int] = [0]*self.channels # type 0 => int, type 1 => float, type 2 => intFloat
         #  type 3 => Bool(0), type 4 => Bool(1), type 5 => Bool(2), type 6 => Bool(3), type 7 => Bool(4), type 8 => Bool(5), type 9 => Bool(6), type 10 => Bool(7)
-        self.mode = [0]*self.channels # temp mode is an int here, 0:__,1:C,2:F (this is different than other places)
-        self.div = [0]*self.channels
+        self.mode:List[int] = [0]*self.channels # temp mode is an int here, 0:__,1:C,2:F (this is different than other places)
+        self.div:List[int] = [0]*self.channels
 
-        self.optimizer = True # if set, values of consecutive register addresses are requested in single requests
-        self.fetch_max_blocks = False # if set, the optimizer fetches only one sequence per area from the minimum to the maximum register ignoring gaps
-        self.fail_on_cache_miss = True # if False and request cannot be resolved from optimizer cache while optimizer is active,
+        self.optimizer:bool = True # if set, values of consecutive register addresses are requested in single requests
+        self.fetch_max_blocks:bool = False # if set, the optimizer fetches only one sequence per area from the minimum to the maximum register ignoring gaps
+        self.fail_on_cache_miss:bool = True # if False and request cannot be resolved from optimizer cache while optimizer is active,
             # send individual reading request; if set to True, never send individual data requests while optimizer is on
             # NOTE: if TRUE read requests with force=False (default) will fail
 
-        # S7 areas associated to dicts associating S7 DB numbers to start registers in use
+        # S7 areas associated to dicts associating S7 DB numbers to registers in use
         # for optimized read of full register segments with single requests
         # this dict is re-computed on each connect() by a call to updateActiveRegisters()
         # NOTE: for registers of type float (32bit = 2x16bit) also the succeeding register is registered here
-        self.activeRegisters = {}
+        # S7 area => db_nr => [registers]
+        self.activeRegisters:Dict[int, Dict[int, List[int]]] = {}
+
         # the readings cache that is filled by requesting sequences of values in blocks
-        self.readingsCache = {}
+        # readingsCache is a dict associating area to dicts associating db numbers to dicts associating registers to readings
+        # S7 area => db_nr => register => value
+        self.readingsCache:Dict[int, Dict[int, Dict[int, int]]] = {}
 
-        self.PID_area = 0
-        self.PID_db_nr = 0
-        self.PID_SV_register = 0
-        self.PID_p_register = 0
-        self.PID_i_register = 0
-        self.PID_d_register = 0
-        self.PID_ON_action = ''
-        self.PID_OFF_action = ''
-        self.PIDmultiplier = 0
-        self.SVtype = 0
-        self.SVmultiplier = 0
+        self.PID_area:int = 0
+        self.PID_db_nr:int = 0
+        self.PID_SV_register:int = 0
+        self.PID_p_register:int = 0
+        self.PID_i_register:int = 0
+        self.PID_d_register:int = 0
+        self.PID_ON_action:str = ''
+        self.PID_OFF_action:str = ''
+        self.PIDmultiplier:int = 0
+        self.SVtype:int = 0
+        self.SVmultiplier:int = 0
 
-        self.COMsemaphore = QSemaphore(1)
+        self.COMsemaphore:QSemaphore = QSemaphore(1)
 
         # we do not use the snap7 enums here to avoid the import for non S7 users
-        self.areas = None # lazy initialized in initArray() on connect
-        self.last_request_timestamp = time.time()
-        self.min_time_between_requests = 0.04
+        self.areas:Optional[List['Areas']] = None # lazy initialized in initArray() on connect
+        self.last_request_timestamp:float = time.time()
+        self.min_time_between_requests:float = 0.04
 
-        self.is_connected = False # local cache of the connection state
+        self.is_connected:bool = False # local cache of the connection state
 
-        self.plc = None
-        self.commError = False # True after a communication error was detected and not yet cleared by receiving proper data
-        self.libLoaded = False
+        self.plc:Optional['S7Client'] = None
+        self.commError:bool = False # True after a communication error was detected and not yet cleared by receiving proper data
+        self.libLoaded:bool = False
 
 ################
 
-    def initArrays(self):
+    def initArrays(self) -> None:
         if self.areas is None:
             from snap7.types import Areas
             self.areas = [
@@ -282,7 +289,7 @@ class s7port():
             ]
 
     # waits if need to ensure a minimal time delta between network requests which are scheduled directly after this functions evaluation and set the new timestamp
-    def waitToEnsureMinTimeBetweenRequests(self):
+    def waitToEnsureMinTimeBetweenRequests(self) -> None:
         elapsed = time.time() - self.last_request_timestamp
         if elapsed < self.min_time_between_requests:
             time.sleep(self.min_time_between_requests - elapsed)
@@ -291,19 +298,19 @@ class s7port():
 ################
 
 
-    def setPID(self,p,i,d,PIDmultiplier):
+    def setPID(self, p:float, i:float, d:float, PIDmultiplier:int) -> None:
         _log.debug('setPID(%s,%s,%s,%s)',p,i,d,PIDmultiplier)
-        if self.PID_area and not (self.PID_p_register == self.PID_i_register == self.PID_d_register == 0):
+        if self.PID_area and not self.PID_p_register == self.PID_i_register == self.PID_d_register == 0:
             multiplier = 1.
             if PIDmultiplier == 1:
-                PIDmultiplier = 10.
+                multiplier = 10.
             elif PIDmultiplier == 2:
                 multiplier = 100.
             self.writeInt(self.PID_area-1,self.PID_db_nr,self.PID_p_register,p*multiplier)
             self.writeInt(self.PID_area-1,self.PID_db_nr,self.PID_i_register,i*multiplier)
             self.writeInt(self.PID_area-1,self.PID_db_nr,self.PID_d_register,d*multiplier)
 
-    def setTarget(self,sv,SVmultiplier):
+    def setTarget(self,sv:float, SVmultiplier:int) -> None:
         _log.debug('setTarget(%s,%s)',sv,SVmultiplier)
         if self.PID_area:
             multiplier = 1.
@@ -316,7 +323,7 @@ class s7port():
             else:
                 self.writeInt(self.PID_area-1,self.PID_db_nr,self.PID_SV_register,int(round(sv*multiplier)))
 
-    def isConnected(self):
+    def isConnected(self) -> bool:
         # the check on the CPU state is needed as get_connected() still returns True if the connect got terminated from the peer due to a bug in snap7
         # disconnects and clears the S7 plc objects if get_connected() but not str(self.plc.get_cpu_state()) == "S7CpuStatusRun" to force a clear restart
 #        return self.plc is not None and self.plc.get_connected() and str(self.plc.get_cpu_state()) == "S7CpuStatusRun"
@@ -330,7 +337,7 @@ class s7port():
         _log.debug('isConnected() => False')
         return False
 
-    def disconnect(self):
+    def disconnect(self) -> None:
         _log.debug('disconnect()')
 # don't stop the PLC as we want to keep it running beyond the Artisan disconnect!!
 #        try:
@@ -352,7 +359,7 @@ class s7port():
         self.clearReadingsCache()
 
 
-    def connect(self):
+    def connect(self) -> None:
         if not self.libLoaded:
             _log.debug('connect() load lib')
             from snap7.common import load_library as load_snap7_library
@@ -393,6 +400,7 @@ class s7port():
             time.sleep(0.2)
             if artisanlib.util.isOpen(self.host,self.port):
                 try:
+                    assert self.plc is not None
                     self.plc.connect(self.host,self.rack,self.slot,self.port)
                     time.sleep(0.2)
                 except Exception as e: # pylint: disable=broad-except
@@ -433,8 +441,8 @@ class s7port():
 
 ########## S7 optimizer for fetching register data in batches
 
-    # S7 area => db_nr => [start registers]
-    def updateActiveRegisters(self):
+    # S7 area => db_nr => [registers]
+    def updateActiveRegisters(self) -> None:
         _log.debug('updateActiveRegisters()')
         self.activeRegisters = {}
         for c in range(self.channels):
@@ -456,11 +464,11 @@ class s7port():
                 else:
                     self.activeRegisters[area][db_nr] = registers
 
-    def clearReadingsCache(self):
+    def clearReadingsCache(self) -> None:
         _log.debug('clearReadingsCache()')
         self.readingsCache = {}
 
-    def cacheReadings(self,area,db_nr,register,results):
+    def cacheReadings(self,area:int, db_nr:int, register:int, results:bytearray) -> None:
         if area not in self.readingsCache:
             self.readingsCache[area] = {}
         if db_nr not in self.readingsCache[area]:
@@ -471,7 +479,7 @@ class s7port():
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
-    def readActiveRegisters(self):
+    def readActiveRegisters(self) -> None:
         if not self.optimizer:
             return
         try:
@@ -481,15 +489,16 @@ class s7port():
             self.clearReadingsCache()
             self.connect()
             if self.isConnected():
-                for area in self.activeRegisters:
-                    for db_nr in self.activeRegisters[area]:
-                        registers = sorted(self.activeRegisters[area][db_nr])
+                for area, db_numbers in self.activeRegisters.items():
+                    for db_nr, registers in db_numbers.items():
+                        sorted_registers:List[int] = sorted(registers)
+                        sequences:List[Tuple[int, int]]
                         if self.fetch_max_blocks:
-                            sequences = [[registers[0],registers[-1]]]
+                            sequences = [(sorted_registers[0],sorted_registers[-1])]
                         else:
                             # split in successive sequences
-                            gaps = [[s, e] for s, e in zip(registers, registers[1:]) if s+1 < e] # ylint: disable=used-before-assignment
-                            edges = iter(registers[:1] + sum(gaps, []) + registers[-1:])
+                            gaps:List[List[int]] = [[s, e] for s, e in zip(sorted_registers, sorted_registers[1:]) if s+1 < e] # ylint: disable=used-before-assignment
+                            edges:Iterator[int] = iter(sorted_registers[:1] + sum(gaps, []) + sorted_registers[-1:])
                             sequences = list(zip(edges, edges)) # list of pairs of the form (start-register,end-register)
                         for seq in sequences:
                             retry = self.readRetries
@@ -500,6 +509,8 @@ class s7port():
                                 self.waitToEnsureMinTimeBetweenRequests()
                                 _log.debug('readActive(%d,%d,%d,%d)', area, db_nr, register, count)
                                 try:
+                                    assert self.plc is not None
+                                    assert self.areas is not None
                                     res = self.plc.read_area(self.areas[area],db_nr,register,count)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.info('readActive(%d,%d,%d,%d) failed', area, db_nr, register, count)
@@ -539,7 +550,7 @@ class s7port():
 ##########
 
 
-    def writeFloat(self,area,dbnumber,start,value):
+    def writeFloat(self, area:int, dbnumber:int, start:int, value:float):
         _log.debug('writeFloat(%d,%d,%d,%.3f)',area,dbnumber,start,value)
         try:
             #### lock shared resources #####
@@ -547,6 +558,8 @@ class s7port():
             self.connect()
             if self.isConnected():
                 self.waitToEnsureMinTimeBetweenRequests()
+                assert self.plc is not None
+                assert self.areas is not None
                 ba = self.plc.read_area(self.areas[area],dbnumber,start,4)
                 if len(ba) != 4:
                     raise Exception(f'read_area({area},{dbnumber},{start},4) returned result of length {len(ba)}') # pylint: disable=broad-exception-raised
@@ -568,7 +581,7 @@ class s7port():
             if self.aw.seriallogflag:
                 self.aw.addserial(f'S7 writeFloat({area},{dbnumber},{start},{value})')
 
-    def writeInt(self,area,dbnumber,start,value):
+    def writeInt(self, area:int, dbnumber:int, start:int, value:float):
         _log.debug('writeInt(%d,%d,%d,%d)',area,dbnumber,start,value)
         try:
             #### lock shared resources #####
@@ -576,6 +589,8 @@ class s7port():
             self.connect()
             if self.isConnected():
                 self.waitToEnsureMinTimeBetweenRequests()
+                assert self.plc is not None
+                assert self.areas is not None
                 ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
                 if len(ba) != 2:
                     raise Exception(f'read_area({area},{dbnumber},{start},2) returned result of length {len(ba)}') # pylint: disable=broad-exception-raised
@@ -597,7 +612,7 @@ class s7port():
             if self.aw.seriallogflag:
                 self.aw.addserial(f'S7 writeInt({area},{dbnumber},{start},{value})')
 
-    def maskWriteInt(self,area,dbnumber,start,and_mask,or_mask,value):
+    def maskWriteInt(self, area:int, dbnumber:int, start:int, and_mask:int, or_mask,value:int):
         _log.debug('maskWriteInt(%d,%d,%d,%s,%s,%d)',area,dbnumber,start,and_mask,or_mask,value)
         try:
             #### lock shared resources #####
@@ -605,6 +620,8 @@ class s7port():
             self.connect()
             if self.isConnected():
                 self.waitToEnsureMinTimeBetweenRequests()
+                assert self.plc is not None
+                assert self.areas is not None
                 ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
                 if len(ba) != 2:
                     raise Exception(f'read_area({area},{dbnumber},{start},2) returned result of length {len(ba)}') # pylint: disable=broad-exception-raised
@@ -627,7 +644,7 @@ class s7port():
             if self.aw.seriallogflag:
                 self.aw.addserial(f'S7 writeInt({area},{dbnumber},{start},{value})')
 
-    def writeBool(self,area,dbnumber,start,index,value):
+    def writeBool(self, area:int, dbnumber:int, start:int, index:int, value:bool):
         _log.debug('writeInt(%d,%d,%d,%d,%s)',area,dbnumber,start,index,value)
         try:
             #### lock shared resources #####
@@ -635,6 +652,8 @@ class s7port():
             self.connect()
             if self.isConnected():
                 self.waitToEnsureMinTimeBetweenRequests()
+                assert self.plc is not None
+                assert self.areas is not None
                 ba = self.plc.read_area(self.areas[area],dbnumber,start,1)
                 if len(ba) != 1:
                     raise Exception(f'read_area({area},{dbnumber},{start},1) returned result of length {len(ba)}') # pylint: disable=broad-exception-raised
@@ -657,10 +676,11 @@ class s7port():
                 self.aw.addserial(f'S7 writeBool({area},{dbnumber},{start},{index},{value})')
 
     # if force the readings cache is ignored and fresh readings are requested
-    def readFloat(self,area,dbnumber,start,force=False):
+    def readFloat(self, area:int, dbnumber:int, start:int,force:bool=False) -> Optional[float]:
         _log.debug('readFloat(%d,%d,%d,%s)',area,dbnumber,start,force)
         if area == 0:
             return None
+        res: Optional[bytearray]
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -689,6 +709,8 @@ class s7port():
                 while True:
                     self.waitToEnsureMinTimeBetweenRequests()
                     try:
+                        assert self.plc is not None
+                        assert self.areas is not None
                         res = self.plc.read_area(self.areas[area],dbnumber,start,4)
                     except Exception as e: # pylint: disable=broad-except
                         _log.info('readFloat(%d,%d,%d,%s) failed',area,dbnumber,start,force)
@@ -729,7 +751,7 @@ class s7port():
 
     # as readFloat, but does not retry nor raise and error and returns a None instead
     # also does not reserve the port via a semaphore nor uses the cache!
-    def peakFloat(self,area,dbnumber,start):
+    def peakFloat(self, area:int, dbnumber:int, start:int) -> Optional[float]:
         _log.debug('peakFloat(%d,%d,%d)',area,dbnumber,start)
         if area == 0:
             return None
@@ -737,6 +759,8 @@ class s7port():
             self.connect()
             if self.isConnected():
                 self.waitToEnsureMinTimeBetweenRequests()
+                assert self.plc is not None
+                assert self.areas is not None
                 res = self.plc.read_area(self.areas[area],dbnumber,start,4)
                 if len(res) != 4:
                     raise Exception(f'read_area({area},{dbnumber},{start},4) returned result of length {len(res)}') # pylint: disable=broad-exception-raised
@@ -748,10 +772,11 @@ class s7port():
             return None
 
     # if force the readings cache is ignored and fresh readings are requested
-    def readInt(self,area,dbnumber,start,force=False):
+    def readInt(self, area:int, dbnumber:int, start:int, force:bool=False) -> Optional[int]:
         _log.debug('readInt(%d,%d,%d,%s)',area,dbnumber,start,force)
         if area == 0:
             return None
+        res: Optional[bytearray]
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -777,6 +802,8 @@ class s7port():
                 while True:
                     self.waitToEnsureMinTimeBetweenRequests()
                     try:
+                        assert self.plc is not None
+                        assert self.areas is not None
                         res = self.plc.read_area(self.areas[area],dbnumber,start,2)
                     except Exception as e: # pylint: disable=broad-except
                         _log.info('readInt(%d,%d,%d,%s) failed',area,dbnumber,start,force)
@@ -821,7 +848,7 @@ class s7port():
 
     # as readInt, but does not retry nor raise and error and returns a None instead
     # also does not reserve the port via a semaphore nor uses the cache!
-    def peekInt(self,area,dbnumber,start):
+    def peekInt(self, area:int, dbnumber:int, start:int) -> Optional[int]:
         _log.debug('peakInt(%d,%d,%d)',area,dbnumber,start)
         if area == 0:
             return None
@@ -829,6 +856,8 @@ class s7port():
             self.connect()
             if self.isConnected():
                 self.waitToEnsureMinTimeBetweenRequests()
+                assert self.plc is not None
+                assert self.areas is not None
                 res = self.plc.read_area(self.areas[area],dbnumber,start,2)
                 if len(res) != 2:
                     raise Exception(f'read_area({area},{dbnumber},{start},2) returned result of length {len(res)}') # pylint: disable=broad-exception-raised
@@ -840,10 +869,11 @@ class s7port():
             return None
 
     # if force the readings cache is ignored and fresh readings are requested
-    def readBool(self,area,dbnumber,start,index,force=False):
+    def readBool(self, area:int, dbnumber:int, start:int, index:int, force:bool = False) -> Optional[bool]:
         _log.debug('readBool(%d,%d,%d,%s)',area,dbnumber,start,force)
         if area == 0:
             return None
+        res: Optional[bytearray]
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -867,6 +897,8 @@ class s7port():
                 while True:
                     self.waitToEnsureMinTimeBetweenRequests()
                     try:
+                        assert self.plc is not None
+                        assert self.areas is not None
                         res = self.plc.read_area(self.areas[area],dbnumber,start,1)
                     except Exception as e: # pylint: disable=broad-except
                         _log.info('readBool(%d,%d,%d,%s) failed',area,dbnumber,start,force)

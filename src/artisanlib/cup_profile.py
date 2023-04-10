@@ -13,7 +13,7 @@
 # the GNU General Public License for more details.
 
 # AUTHOR
-# Marko Luther, 2020
+# Marko Luther, 2023
 
 from matplotlib import rcParams
 
@@ -21,20 +21,20 @@ from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import MyQDoubleSpinBox
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import (Qt, pyqtSlot, QSettings) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QCheckBox, QHBoxLayout, QVBoxLayout, QLabel, # @UnusedImport @Reimport  @UnresolvedImport
                                  QLineEdit,QPushButton, QComboBox, QDialogButtonBox, QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
                                  QTableWidget, QDoubleSpinBox, QGroupBox) # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtCore import (Qt, pyqtSlot, QSettings) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QCheckBox, QHBoxLayout, QVBoxLayout, QLabel, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QLineEdit,QPushButton, QComboBox, QDialogButtonBox, QHeaderView, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QTableWidget, QDoubleSpinBox, QGroupBox) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 class flavorDlg(ArtisanResizeablDialog):
-    def __init__(self, parent = None, aw = None):
+    def __init__(self, parent, aw) -> None:
         super().__init__(parent, aw)
         self.setModal(True)
         rcParams['path.effects'] = []
@@ -182,15 +182,14 @@ class flavorDlg(ArtisanResizeablDialog):
                 message = QApplication.translate('Message','Background profile not found')
                 self.aw.sendmessage(message)
                 self.backgroundCheck.setChecked(False)
+            elif len(self.aw.qmc.backgroundFlavors) != len(self.aw.qmc.flavors):
+                message = QApplication.translate('Message','Background does not match number of labels')
+                self.aw.sendmessage(message)
+                self.aw.qmc.flavorbackgroundflag = False
+                self.backgroundCheck.setChecked(False)
             else:
-                if len(self.aw.qmc.backgroundFlavors) != len(self.aw.qmc.flavors):
-                    message = QApplication.translate('Message','Background does not match number of labels')
-                    self.aw.sendmessage(message)
-                    self.aw.qmc.flavorbackgroundflag = False
-                    self.backgroundCheck.setChecked(False)
-                else:
-                    self.aw.qmc.flavorbackgroundflag = True
-                    self.aw.qmc.flavorchart()
+                self.aw.qmc.flavorbackgroundflag = True
+                self.aw.qmc.flavorchart()
         else:
             self.aw.qmc.flavorbackgroundflag = False
             self.aw.qmc.flavorchart()
@@ -206,9 +205,11 @@ class flavorDlg(ArtisanResizeablDialog):
         self.aw.qmc.flavorchart()
 
     def savetable(self):
-        for i in range(len(self.aw.qmc.flavorlabels)):
+        for i, _ in enumerate(self.aw.qmc.flavorlabels):
             labeledit = self.flavortable.cellWidget(i,0)
+            assert isinstance(labeledit, QLineEdit)
             valueSpinBox = self.flavortable.cellWidget(i,1)
+            assert isinstance(valueSpinBox, MyQDoubleSpinBox)
             label = labeledit.text()
             if '\\n' in label:              #make multiple line text if "\n" found in label string
                 parts = label.split('\\n')
@@ -225,6 +226,7 @@ class flavorDlg(ArtisanResizeablDialog):
         x = self.aw.findWidgetsRow(self.flavortable,self.sender(),0)
         if x is not None:
             labeledit = self.flavortable.cellWidget(x,0)
+            assert isinstance(labeledit, QLineEdit)
             self.aw.qmc.flavorlabels[x] = labeledit.text()
             self.aw.qmc.updateFlavorchartLabel(x) # fast incremental redraw
 
@@ -233,6 +235,7 @@ class flavorDlg(ArtisanResizeablDialog):
         x = self.aw.findWidgetsRow(self.flavortable,self.sender(),1)
         if x is not None:
             valueSpinBox = self.flavortable.cellWidget(x,1)
+            assert isinstance(valueSpinBox, MyQDoubleSpinBox)
             self.aw.qmc.flavors[x] = valueSpinBox.value()
 #            self.aw.qmc.flavorchart() # slow full redraw
             self.aw.qmc.updateFlavorchartValues() # fast incremental redraw

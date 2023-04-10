@@ -13,18 +13,18 @@
 # the GNU General Public License for more details.
 
 # AUTHOR
-# Marko Luther, 2020
+# Marko Luther, 2023
 
 import platform
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import Qt, QSettings, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QDialog, QMessageBox, QDialogButtonBox, QTextEdit,  # @UnusedImport @Reimport  @UnresolvedImport
                 QHBoxLayout, QVBoxLayout, QLabel, QLineEdit)  # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QKeySequence, QAction  # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtCore import Qt, QSettings, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QAction, QDialog, QMessageBox, QDialogButtonBox, QTextEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                 QHBoxLayout, QVBoxLayout, QLabel, QLineEdit) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
@@ -32,11 +32,14 @@ except Exception: # pylint: disable=broad-except
 
 from artisanlib.widgets import MyQComboBox
 
-class ArtisanDialog(QDialog):
+from typing import Optional
+
+
+class ArtisanDialog(QDialog): # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
 
     __slots__ = ['aw', 'dialogbuttons']
 
-    def __init__(self, parent=None, aw = None):
+    def __init__(self, parent, aw) -> None:
         super().__init__(parent)
         self.aw = aw # the Artisan application window
 
@@ -71,12 +74,19 @@ class ArtisanDialog(QDialog):
         # add additional CMD-. shortcut to close the dialog
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).setShortcut(QKeySequence('Ctrl+.'))
         # add additional CMD-W shortcut to close this dialog (ESC on Mac OS X)
-        cancelAction = QAction(self, triggered=lambda _:self.dialogbuttons.rejected.emit())
+#        cancelAction = QAction(self, triggered=lambda _:self.dialogbuttons.rejected.emit())
+        cancelAction = QAction(self)
+        cancelAction.triggered.connect(self.cancelDialog)
         try:
             cancelAction.setShortcut(QKeySequence.StandardKey.Cancel)
         except Exception: # pylint: disable=broad-except
             pass
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).addActions([cancelAction])
+
+    @pyqtSlot()
+    def cancelDialog(self) -> None:
+#        self.dialogbuttons.rejected.emit()
+        self.reject()
 
     @staticmethod
     def setButtonTranslations(btn, txt, trans):
@@ -102,18 +112,18 @@ class ArtisanDialog(QDialog):
             super().keyPressEvent(event)
 
 class ArtisanResizeablDialog(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
+    def __init__(self, parent, aw) -> None:
         super().__init__(parent, aw)
         if str(platform.system()) == 'Windows':
             windowFlags = self.windowFlags()
             windowFlags |= Qt.WindowType.WindowMinMaxButtonsHint  # add min/max combo
             self.setWindowFlags(windowFlags)
 
-class ArtisanMessageBox(QMessageBox):
+class ArtisanMessageBox(QMessageBox): # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
 
     __slots__ = ['timeout', 'currentTime']
 
-    def __init__(self, parent = None, title=None, text=None, timeout=0, modal=True):
+    def __init__(self, parent = None, title=None, text=None, timeout=0, modal=True) -> None:
         super().__init__(parent)
         self.setWindowTitle(title)
         self.setText(text)
@@ -132,11 +142,11 @@ class ArtisanMessageBox(QMessageBox):
 
     def timerEvent(self,_):
         self.currentTime = self.currentTime + 1
-        if (self.currentTime >= self.timeout):
+        if self.currentTime >= self.timeout:
             self.done(0)
 
 class HelpDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None, title = '', content = ''):
+    def __init__(self, parent, aw, title = '', content = '') -> None:
         super().__init__(parent, aw)
         self.setWindowTitle(title)
         self.setModal(False)
@@ -151,11 +161,10 @@ class HelpDlg(ArtisanDialog):
 
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel))
-        self.dialogbuttons.accepted.connect(self.close)
+        self.dialogbuttons.accepted.connect(self.reject)
 
         homeLabel = QLabel()
-        homeLabel.setText('{} {}'.format(QApplication.translate('Label', 'For more details visit'),
-                 "<a href='https://artisan-scope.org'>artisan-scope.org</a>"))
+        homeLabel.setText(f"{QApplication.translate('Label', 'For more details visit')} <a href='https://artisan-scope.org'>artisan-scope.org</a>")
         homeLabel.setOpenExternalLinks(True)
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(homeLabel)
@@ -177,7 +186,7 @@ class ArtisanInputDialog(ArtisanDialog):
 
     __slots__ = ['url', 'inputLine']
 
-    def __init__(self, parent = None, aw = None, title='',label=''):
+    def __init__(self, parent, aw, title='',label='') -> None:
         super().__init__(parent, aw)
 
         self.url = ''
@@ -219,10 +228,10 @@ class ArtisanComboBoxDialog(ArtisanDialog):
 
     __slots__ = ['idx', 'comboBox']
 
-    def __init__(self, parent = None, aw = None, title='',label='',choices=None,default=-1):
+    def __init__(self, parent, aw, title='',label='',choices=None,default=-1) -> None:
         super().__init__(parent, aw)
 
-        self.idx = None
+        self.idx:Optional[int] = None
 
         self.setWindowTitle(title)
         self.setModal(True)

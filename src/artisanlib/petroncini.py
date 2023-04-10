@@ -8,21 +8,24 @@ import csv
 import re
 import time as libtime
 import logging
-from typing import Final
+from typing import List, Optional, TYPE_CHECKING
+from typing_extensions import Final  # Python <=3.7
 
+if TYPE_CHECKING:
+    from artisanlib.types import ProfileData # pylint: disable=unused-import
 from artisanlib.util import fill_gaps, encodeLocal
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import QDateTime, QDate, QTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtCore import QDateTime, QDate, QTime, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
-_log: Final = logging.getLogger(__name__)
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 def replace_duplicates(data):
     lv = -1
@@ -40,9 +43,13 @@ def replace_duplicates(data):
 
 # returns a dict containing all profile information contained in the given IKAWA CSV file
 def extractProfilePetronciniCSV(file,aw):
-    res = {} # the interpreted data set
+    res:ProfileData = {}
 
     res['samplinginterval'] = 1.0
+
+    roastdate:Optional[str]
+    roastisodate:Optional[str]
+    roasttime:Optional[str]
 
     # set profile date from the file name if it has the format "yyyy_mm_dd_hh_mm_ss.csv"
     try:
@@ -50,11 +57,17 @@ def extractProfilePetronciniCSV(file,aw):
         p = re.compile(r'\d{4,4}_\d{1,2}_\d{1,2}_\d{1,2}_\d{1,2}_\d{1,2}.csv')
         if p.match(filename):
             s = filename[:-4] # the extracted date time string
-            date = QDateTime.fromString(s,'yyyy_MM_dd_HH_mm_ss')
-            res['roastdate'] = encodeLocal(date.date().toString())
-            res['roastisodate'] = encodeLocal(date.date().toString(Qt.DateFormat.ISODate))
-            res['roasttime'] = encodeLocal(date.time().toString())
-            res['roastepoch'] = int(date.toSecsSinceEpoch())
+            datetime:QDateTime = QDateTime.fromString(s,'yyyy_MM_dd_HH_mm_ss')
+            roastdate = encodeLocal(datetime.date().toString())
+            if roastdate is not None:
+                res['roastdate'] = roastdate
+            roastisodate = encodeLocal(datetime.date().toString(Qt.DateFormat.ISODate))
+            if roastisodate is not None:
+                res['roastisodate'] = roastisodate
+            roasttime = encodeLocal(datetime.time().toString())
+            if roasttime is not None:
+                res['roasttime'] = roasttime
+            res['roastepoch'] = int(datetime.toSecsSinceEpoch())
             res['roasttzoffset'] = libtime.timezone
     except Exception as e: # pylint: disable=broad-except
         _log.exception(e)
@@ -70,16 +83,16 @@ def extractProfilePetronciniCSV(file,aw):
         power = None # holds last processed heater event value
         power_last = None # holds the heater event value before the last one
         power_event = False # set to True if a heater event exists
-        specialevents = []
-        specialeventstype = []
-        specialeventsvalue = []
-        specialeventsStrings = []
-        timex = []
-        temp1 = [] # outlet temperature as ET
-        temp2 = [] # bean temperature
-        extra1 = [] # inlet temperature
-        extra2 = [] # burner percentage
-        timeindex = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
+        specialevents:List[int] = []
+        specialeventstype:List[int] = []
+        specialeventsvalue:List[float] = []
+        specialeventsStrings:List[str] = []
+        timex:List[float] = []
+        temp1:List[float] = [] # outlet temperature as ET
+        temp2:List[float] = [] # bean temperature
+        extra1:List[float] = [] # inlet temperature
+        extra2:List[float] = [] # burner percentage
+        timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
         i = 0
         for row in data:
             if row == []:
@@ -94,7 +107,7 @@ def extractProfilePetronciniCSV(file,aw):
             # extract roast_date
             if roast_date is None and 'Year' in item and 'Month' in item and 'Day' in item and 'Hour' in item and 'Minute' in item and 'Second' in item:
                 try:
-                    date = QDate(int(item['Year']),int(item['Month']),int(item['Day']))
+                    date:QDate = QDate(int(item['Year']),int(item['Month']),int(item['Day']))
                     time = QTime(int(item['Hour']),int(item['Minute']),int(item['Second']))
                     roast_date = QDateTime(date,time)
                 except Exception:  # pylint: disable=broad-except
@@ -109,7 +122,7 @@ def extractProfilePetronciniCSV(file,aw):
             else:
                 temp2.append(-1)
             # mark CHARGE
-            if not timeindex[0] > -1:
+            if timeindex[0] <= -1:
                 timeindex[0] = i
             # mark DROP
             if timeindex[0] > -1 and i>0:
@@ -178,9 +191,15 @@ def extractProfilePetronciniCSV(file,aw):
 
     # set date
     if roast_date is not None and roast_date.isValid():
-        res['roastdate'] = encodeLocal(roast_date.date().toString())
-        res['roastisodate'] = encodeLocal(roast_date.date().toString(Qt.DateFormat.ISODate))
-        res['roasttime'] = encodeLocal(roast_date.time().toString())
+        roastdate = encodeLocal(roast_date.date().toString())
+        if roastdate is not None:
+            res['roastdate'] = roastdate
+        roastisodate = encodeLocal(roast_date.date().toString(Qt.DateFormat.ISODate))
+        if roastisodate is not None:
+            res['roastisodate'] = roastisodate
+        roasttime = encodeLocal(roast_date.time().toString())
+        if roasttime is not None:
+            res['roasttime'] = roasttime
         res['roastepoch'] = int(roast_date.toSecsSinceEpoch())
         res['roasttzoffset'] = libtime.timezone
 

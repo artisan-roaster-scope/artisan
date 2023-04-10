@@ -13,18 +13,18 @@
 # the GNU General Public License for more details.
 
 # AUTHOR
-# Marko Luther, 2020
+# Marko Luther, 2023
 
 from artisanlib import __version__
 
 from artisanlib.dialogs import ArtisanDialog
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QLabel, QCheckBox, QTextEdit, QVBoxLayout) # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtCore import pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QLabel, QCheckBox, QTextEdit, QVBoxLayout) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
@@ -34,7 +34,7 @@ except Exception: # pylint: disable=broad-except
 ##########################################################################
 
 class serialLogDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
+    def __init__(self, parent, aw) -> None:
         super().__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Serial Log'))
@@ -78,7 +78,7 @@ class serialLogDlg(ArtisanDialog):
 ##########################################################################
 
 class errorDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
+    def __init__(self, parent, aw) -> None:
         super().__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Error Log'))
@@ -111,7 +111,7 @@ class errorDlg(ArtisanDialog):
 ##########################################################################
 
 class messageDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
+    def __init__(self, parent, aw) -> None:
         super().__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Message History'))

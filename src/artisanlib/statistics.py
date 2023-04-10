@@ -13,18 +13,18 @@
 # the GNU General Public License for more details.
 
 # AUTHOR
-# Marko Luther, 2020
+# Marko Luther, 2023
 
 from artisanlib.dialogs import ArtisanDialog
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import Qt, pyqtSlot, QSettings # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
         QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGroupBox, QLayout, # @UnusedImport @Reimport  @UnresolvedImport
         QSpinBox) # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtCore import Qt, pyqtSlot, QSettings # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGroupBox, QLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
@@ -33,12 +33,12 @@ except Exception: # pylint: disable=broad-except
 from artisanlib.util import deltaLabelUTF8
 
 class StatisticsDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
+    def __init__(self, parent, aw) -> None:
         super().__init__(parent, aw)
         self.setWindowTitle(QApplication.translate('Form Caption','Statistics'))
         self.setModal(True)
         self.timez = QCheckBox(QApplication.translate('CheckBox','Time'))
-        self.bar = QCheckBox(QApplication.translate('CheckBox','Bar'))
+        self.barb = QCheckBox(QApplication.translate('CheckBox','Bar'))
         self.dt = QCheckBox(deltaLabelUTF8 + self.aw.qmc.mode)
         self.ror = QCheckBox(self.aw.qmc.mode + QApplication.translate('CheckBox','/min'))
         self.area = QCheckBox(QApplication.translate('CheckBox','Characteristics'))
@@ -50,7 +50,7 @@ class StatisticsDlg(ArtisanDialog):
             if self.aw.qmc.statisticsflags[0]:
                 self.timez.setChecked(True)
             if self.aw.qmc.statisticsflags[1]:
-                self.bar.setChecked(True)
+                self.barb.setChecked(True)
             if self.aw.qmc.statisticsflags[3]:
                 self.area.setChecked(True)
             if self.aw.qmc.statisticsflags[4]:
@@ -60,12 +60,12 @@ class StatisticsDlg(ArtisanDialog):
         else:
             self.aw.qmc.statisticsflags = [1,1,0,1,1,0,1]
             self.timez.setChecked(True)
-            self.bar.setChecked(True)
+            self.barb.setChecked(True)
             self.area.setChecked(True)
             self.ror.setChecked(True)
             self.dt.setChecked(False)
         self.timez.stateChanged.connect(self.changeStatisticsflag)
-        self.bar.stateChanged.connect(self.changeStatisticsflag)
+        self.barb.stateChanged.connect(self.changeStatisticsflag)
         # flag 2 not used anymore
         self.area.stateChanged.connect(self.changeStatisticsflag)
         self.ror.stateChanged.connect(self.changeStatisticsflag)
@@ -77,7 +77,7 @@ class StatisticsDlg(ArtisanDialog):
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel))
         flagsLayout = QGridLayout()
         flagsLayout.addWidget(self.timez,0,0)
-        flagsLayout.addWidget(self.bar,0,1)
+        flagsLayout.addWidget(self.barb,0,1)
         flagsLayout.addWidget(self.dt,0,2)
         flagsLayout.addWidget(self.ror,0,3)
         flagsLayout.addWidget(self.area,0,4)
@@ -232,7 +232,7 @@ class StatisticsDlg(ArtisanDialog):
         sender = self.sender()
         if sender == self.timez:
             i = 0
-        elif sender == self.bar:
+        elif sender == self.barb:
             i = 1
         elif sender == self.area:
             i = 3
@@ -268,7 +268,7 @@ class StatisticsDlg(ArtisanDialog):
         else:
             self.aw.qmc.statisticsflags[0] = 0
 
-        if self.bar.isChecked():
+        if self.barb.isChecked():
             self.aw.qmc.statisticsflags[1] = 1
         else:
             self.aw.qmc.statisticsflags[1] = 0

@@ -13,6 +13,9 @@ class Ui_customBlendDialog(object):
     def setupUi(self, customBlendDialog):
         customBlendDialog.setObjectName("customBlendDialog")
         customBlendDialog.resize(563, 257)
+        customBlendDialog.setWindowTitle("Dialog")
+        customBlendDialog.setToolTip("")
+        customBlendDialog.setAccessibleDescription("")
         self.verticalLayout = QtWidgets.QVBoxLayout(customBlendDialog)
         self.verticalLayout.setObjectName("verticalLayout")
         self.horizontalLayout = QtWidgets.QHBoxLayout()
@@ -84,8 +87,7 @@ class Ui_customBlendDialog(object):
         QtCore.QMetaObject.connectSlotsByName(customBlendDialog)
 
     def retranslateUi(self, customBlendDialog):
-        _translate = QtCore.QCoreApplication.translate
-        customBlendDialog.setWindowTitle(_translate("customBlendDialog", "Dialog"))
+        pass
 
 
 if __name__ == "__main__":

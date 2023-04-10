@@ -13,7 +13,7 @@
 # the GNU General Public License for more details.
 
 # AUTHOR
-# Marko Luther, 2020
+# Marko Luther, 2023
 
 import platform
 
@@ -21,14 +21,14 @@ from artisanlib.util import deltaLabelUTF8, deltaLabelPrefix, stringfromseconds
 from artisanlib.dialogs import ArtisanResizeablDialog
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import (Qt, pyqtSlot, QSettings) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QColor, QKeySequence # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QCheckBox, QGridLayout, QHBoxLayout, QVBoxLayout, # @UnusedImport @Reimport  @UnresolvedImport
                                  QLabel, QLineEdit,QPushButton, QComboBox, QDialogButtonBox, QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
                                  QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QWidget, QGroupBox) # @UnusedImport @Reimport  @UnresolvedImport
 except Exception:  # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtCore import (Qt, pyqtSlot, QSettings) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QColor, QKeySequence # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QCheckBox, QGridLayout, QHBoxLayout, QVBoxLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
@@ -37,12 +37,12 @@ except Exception:  # pylint: disable=broad-except
 
 
 import logging
-from typing import Final
+from typing_extensions import Final  # Python <=3.7
 
-_log: Final = logging.getLogger(__name__)
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 class backgroundDlg(ArtisanResizeablDialog):
-    def __init__(self, parent = None, aw = None, activeTab = 0):
+    def __init__(self, parent, aw, activeTab = 0) -> None:
         super().__init__(parent, aw)
         self.setWindowTitle(QApplication.translate('Form Caption','Profile Background'))
         self.setModal(True)
@@ -472,14 +472,14 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.aw.backgroundDlg_activeTab = self.TabWidget.currentIndex()
 #        self.aw.closeEventSettings() # save all app settings
 
-    def getColorIdx(self,c):
-        try:
-            return self.defaultcolorsmapped.index(c)
-        except Exception: # pylint: disable=broad-except
-            try:
-                return self.colors.index(c) + 5
-            except Exception:  # pylint: disable=broad-except
-                return 0
+#    def getColorIdx(self,c):
+#        try:
+#            return self.defaultcolorsmapped.index(c)
+#        except Exception: # pylint: disable=broad-except
+#            try:
+#                return self.colors.index(c) + 5
+#            except Exception:  # pylint: disable=broad-except
+#                return 0
 
     @pyqtSlot(int)
     def setplaybackevent(self,_):
@@ -583,49 +583,49 @@ class backgroundDlg(ArtisanResizeablDialog):
         else:
             self.aw.qmc.hideBgafterprofileload = False
 
-    def adjustcolor(self,curve):
-
-        curve = str(curve).lower()
-
-        etcolor = str(self.metcolorComboBox.currentText()).lower()
-        btcolor = str(self.btcolorComboBox.currentText()).lower()
-        deltabtcolor = str(self.deltabtcolorComboBox.currentText()).lower()
-        deltaetcolor = str(self.deltaetcolorComboBox.currentText()).lower()
-        xtcolor = str(self.xtcolorComboBox.currentText()).lower()
-
-        defaults =  ['et','bt','deltaet','deltabt']
-
-        if curve == 'et':
-            if etcolor in defaults:
-                self.aw.qmc.backgroundmetcolor = self.aw.qmc.palette[etcolor]
-            else:
-                self.aw.qmc.backgroundmetcolor = etcolor
-
-        elif curve == 'bt':
-            if btcolor in defaults:
-                self.aw.qmc.backgroundbtcolor = self.aw.qmc.palette[btcolor]
-            else:
-                self.aw.qmc.backgroundbtcolor = btcolor
-
-        elif curve == 'deltaet':
-            if deltaetcolor in defaults:
-                self.aw.qmc.backgrounddeltaetcolor = self.aw.qmc.palette[deltaetcolor]
-            else:
-                self.aw.qmc.backgrounddeltaetcolor = deltaetcolor
-
-        elif curve == 'deltabt':
-            if deltabtcolor in defaults:
-                self.aw.qmc.backgrounddeltabtcolor = self.aw.qmc.palette[deltabtcolor]
-            else:
-                self.aw.qmc.backgrounddeltabtcolor = deltabtcolor
-
-        elif curve == 'xt':
-            if xtcolor in defaults:
-                self.aw.qmc.backgroundxtcolor = self.aw.qmc.palette[xtcolor]
-            else:
-                self.aw.qmc.backgroundxtcolor = xtcolor
-
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
+#    def adjustcolor(self,curve):
+#
+#        curve = str(curve).lower()
+#
+#        etcolor = str(self.metcolorComboBox.currentText()).lower()
+#        btcolor = str(self.btcolorComboBox.currentText()).lower()
+#        deltabtcolor = str(self.deltabtcolorComboBox.currentText()).lower()
+#        deltaetcolor = str(self.deltaetcolorComboBox.currentText()).lower()
+#        xtcolor = str(self.xtcolorComboBox.currentText()).lower()
+#
+#        defaults =  ['et','bt','deltaet','deltabt']
+#
+#        if curve == 'et':
+#            if etcolor in defaults:
+#                self.aw.qmc.backgroundmetcolor = self.aw.qmc.palette[etcolor]
+#            else:
+#                self.aw.qmc.backgroundmetcolor = etcolor
+#
+#        elif curve == 'bt':
+#            if btcolor in defaults:
+#                self.aw.qmc.backgroundbtcolor = self.aw.qmc.palette[btcolor]
+#            else:
+#                self.aw.qmc.backgroundbtcolor = btcolor
+#
+#        elif curve == 'deltaet':
+#            if deltaetcolor in defaults:
+#                self.aw.qmc.backgrounddeltaetcolor = self.aw.qmc.palette[deltaetcolor]
+#            else:
+#                self.aw.qmc.backgrounddeltaetcolor = deltaetcolor
+#
+#        elif curve == 'deltabt':
+#            if deltabtcolor in defaults:
+#                self.aw.qmc.backgrounddeltabtcolor = self.aw.qmc.palette[deltabtcolor]
+#            else:
+#                self.aw.qmc.backgrounddeltabtcolor = deltabtcolor
+#
+#        elif curve == 'xt':
+#            if xtcolor in defaults:
+#                self.aw.qmc.backgroundxtcolor = self.aw.qmc.palette[xtcolor]
+#            else:
+#                self.aw.qmc.backgroundxtcolor = xtcolor
+#
+#        self.aw.qmc.redraw(recomputeAllDeltas=False)
 
     @pyqtSlot(bool)
     def delete(self,_):
@@ -770,10 +770,7 @@ class backgroundDlg(ArtisanResizeablDialog):
             timez = QTableWidgetItem(stringfromseconds(self.aw.qmc.timeB[self.aw.qmc.backgroundEvents[i]]-start))
             timez.setTextAlignment(Qt.AlignmentFlag.AlignRight + Qt.AlignmentFlag.AlignVCenter)
 
-            if self.aw.qmc.LCDdecimalplaces:
-                fmtstr = '%.1f'
-            else:
-                fmtstr = '%.0f'
+            fmtstr = '%.1f' if self.aw.qmc.LCDdecimalplaces else '%.0f'
 
             etline = QTableWidgetItem(fmtstr%(self.aw.qmc.temp1B[self.aw.qmc.backgroundEvents[i]]) + self.aw.qmc.mode)
             etline.setTextAlignment(Qt.AlignmentFlag.AlignRight + Qt.AlignmentFlag.AlignVCenter)
@@ -828,6 +825,8 @@ class backgroundDlg(ArtisanResizeablDialog):
                                                       deltaLabelUTF8 + QApplication.translate('Table','ET'),
                                                       deltaLabelUTF8 + QApplication.translate('Table','BT')]
             xtcurve = False # no XT curve
+            n3:int = 0
+            n4:int = 0
             if self.aw.qmc.xtcurveidx > 0: # 3rd background curve set?
                 idx3 = self.aw.qmc.xtcurveidx - 1
                 n3 = idx3 // 2
@@ -861,24 +860,21 @@ class backgroundDlg(ArtisanResizeablDialog):
             for i in range(ndata):
                 Rtime = QTableWidgetItem(stringfromseconds(self.aw.qmc.timeB[i]-start))
                 Rtime.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
-                if self.aw.qmc.LCDdecimalplaces:
-                    fmtstr = '%.1f'
-                else:
-                    fmtstr = '%.0f'
+                fmtstr = '%.1f' if self.aw.qmc.LCDdecimalplaces else '%.0f'
                 ET = QTableWidgetItem(fmtstr%self.aw.qmc.temp1B[i])
                 BT = QTableWidgetItem(fmtstr%self.aw.qmc.temp2B[i])
                 ET.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
                 BT.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
                 if i:
-                    d = (self.aw.qmc.timeB[i]-self.aw.qmc.timeB[i-1])
+                    d = self.aw.qmc.timeB[i] - self.aw.qmc.timeB[i-1]
                     if d == 0:
                         dET = 0.
                         dBT = 0.
                     else:
-                        dET = (60*(self.aw.qmc.temp1B[i]-self.aw.qmc.temp1B[i-1])/d)
-                        dBT = (60*(self.aw.qmc.temp2B[i]-self.aw.qmc.temp2B[i-1])/d)
-                    deltaET = QTableWidgetItem('%.1f'%dET)
-                    deltaBT = QTableWidgetItem('%.1f'%dBT)
+                        dET = 60*(self.aw.qmc.temp1B[i] - self.aw.qmc.temp1B[i-1])/d
+                        dBT = 60*(self.aw.qmc.temp2B[i] - self.aw.qmc.temp2B[i-1])/d
+                    deltaET = QTableWidgetItem(f'{dET:.1f}')
+                    deltaBT = QTableWidgetItem(f'{dBT:.1f}')
                 else:
                     deltaET = QTableWidgetItem('--')
                     deltaBT = QTableWidgetItem('--')
@@ -924,19 +920,19 @@ class backgroundDlg(ArtisanResizeablDialog):
                 self.datatable.setItem(i,3,deltaET)
                 self.datatable.setItem(i,4,deltaBT)
 
-                if xtcurve and len(self.aw.qmc.temp1BX[n3]) > i: # an XT column is available, fill it with data
+                if xtcurve and n3 is not None and len(self.aw.qmc.temp1BX[n3]) > i: # an XT column is available, fill it with data
                     if self.aw.qmc.xtcurveidx % 2:
-                        XT = QTableWidgetItem('%.0f'%self.aw.qmc.temp1BX[n3][i])
+                        XT = QTableWidgetItem(f'{self.aw.qmc.temp1BX[n3][i]}:.0f')
                     else:
-                        XT = QTableWidgetItem('%.0f'%self.aw.qmc.temp2BX[n3][i])
+                        XT = QTableWidgetItem(f'{self.aw.qmc.temp2BX[n3][i]}:.0f')
                     XT.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
                     self.datatable.setItem(i,5,XT)
 
-                if ytcurve and len(self.aw.qmc.temp1BX[n4]) > i: # an YT column is available, fill it with data
+                if ytcurve and n4 is not None and len(self.aw.qmc.temp1BX[n4]) > i: # an YT column is available, fill it with data
                     if self.aw.qmc.ytcurveidx % 2:
-                        YT = QTableWidgetItem('%.0f'%self.aw.qmc.temp1BX[n4][i])
+                        YT = QTableWidgetItem(f'{self.aw.qmc.temp1BX[n4][i]}:.0f')
                     else:
-                        YT = QTableWidgetItem('%.0f'%self.aw.qmc.temp2BX[n4][i])
+                        YT = QTableWidgetItem(f'{self.aw.qmc.temp2BX[n4][i]}:.0f')
                     YT.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
                     if xtcurve:
                         self.datatable.setItem(i,6,YT)

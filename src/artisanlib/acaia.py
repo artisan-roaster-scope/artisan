@@ -13,14 +13,17 @@
 # the GNU General Public License for more details.
 
 # AUTHOR
-# Marko Luther, 2019
+# Marko Luther, 2023
 
 import logging
-from typing import Final, List
+from typing import List, Optional, Tuple
+
+from typing_extensions import Final  # Python <=3.7
+
 from artisanlib.ble import BLE_CHAR_TYPE
 
 
-_log: Final = logging.getLogger(__name__)
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 class AcaiaBLE():
@@ -99,17 +102,17 @@ class AcaiaBLE():
     protocolParseCRC:List[int]=[]
 
 
-    def __init__(self):
+    def __init__(self) -> None:
 
         self.timeStart = None
 
         self.notificationConfSentFast = False
         self.notificationConfSentSlow = False
         # holds msgType on messages split in header and payload
-        self.msgType = None
+        self.msgType:Optional[int] = None
         self.weight = None
-        self.battery = None
-        self.firmware = None # on connect this is set to a triple of integers, (major, minor, patch)-version
+        self.battery:Optional[int] = None
+        self.firmware:Optional[Tuple[int,int,int]] = None # on connect this is set to a triple of integers, (major, minor, patch)-version
         self.unit = 2 # 1: kg, 2: g, 5: ounce
         self.max_weight = 0 # in g
 
@@ -134,24 +137,24 @@ class AcaiaBLE():
             elif self.protocolParseStep == self.E_PRS_CMDID:
                 self.protocolParseCMD=c_in
                 # In these commands the data len is determined by the next byte, so assign 255
-                if(self.protocolParseCMD == self.NEW_CMD_SYSTEM_SA):
+                if self.protocolParseCMD == self.NEW_CMD_SYSTEM_SA:
                     self.protocolParseDataLen=255
-                elif (self.protocolParseCMD == self.NEW_CMD_INFO_A):
+                elif self.protocolParseCMD == self.NEW_CMD_INFO_A:
                     self.protocolParseDataLen = 255
-                elif (self.protocolParseCMD == self.NEW_CMD_STATUS_A):
+                elif self.protocolParseCMD == self.NEW_CMD_STATUS_A:
                     self.protocolParseDataLen = 255
-                elif (self.protocolParseCMD == self.NEW_CMD_EVENT_SA):
+                elif self.protocolParseCMD == self.NEW_CMD_EVENT_SA:
                     self.protocolParseDataLen = 255
                 self.protocolParseStep = self.E_PRS_CMDDATA
             elif self.protocolParseStep == self.E_PRS_CMDDATA:
-                if (self.protocolParseDataIndex==0 and self.protocolParseDataLen==255):
+                if self.protocolParseDataIndex==0 and self.protocolParseDataLen==255:
                     self.protocolParseDataLen = c_in
                 self.protocolParseBuf.append(c_in)
                 self.protocolParseDataIndex+=1
 
-                if(self.protocolParseDataIndex==self.protocolParseDataLen):
+                if self.protocolParseDataIndex==self.protocolParseDataLen:
                     self.protocolParseStep=self.E_PRS_CHECKSUM1
-                if(self.protocolParseDataIndex > 20):
+                if self.protocolParseDataIndex > 20:
                     self.resetProtocolParser()
             elif self.protocolParseStep == self.E_PRS_CHECKSUM1:
                 self.protocolParseCRC.append(c_in)
@@ -171,14 +174,14 @@ class AcaiaBLE():
 
 
     def reset(self):
-        self.__init__()
+        self.__init__() # type: ignore # pylint: disable=unnecessary-dunder-call
 
     # return a bytearray of len 2 containing the even and odd CRCs over the given payload
     @staticmethod
     def crc(payload):
         cksum1 = 0
         cksum2 = 0
-        for i in range(len(payload)):
+        for i, _ in enumerate(payload):
             if (i % 2) == 0:
                 cksum1 = (cksum1 + payload[i]) & 0xFF
             else:
@@ -410,12 +413,6 @@ class AcaiaBLE():
         old_battery = self.battery
         self.acaiaProtocolParser(write, data)
 
-        if old_weight == self.weight:
-            w = None # weight did not change
-        else:
-            w = self.weight
-        if old_battery == self.battery:
-            b = None # battery did not change
-        else:
-            b = self.battery
+        w = None if old_weight == self.weight else self.weight
+        b = None if old_battery == self.battery else self.battery
         return w,b

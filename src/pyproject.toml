@@ -1,3 +1,5 @@
+## black
+
 [tool.black]
 line-length = 79
 target-version = ['py39']
@@ -7,3 +9,224 @@ extend-exclude = '''
 # in the root of the project.
 ^/foo.py  # exclude a file named foo.py in the root of the project (in addition to the defaults)
 '''
+
+## pylint conf
+
+[tool.pylint.MASTER]
+load-plugins = [
+    'pylint.extensions.no_self_use'
+]
+ignore-paths = [ "^uic/.*$",
+                 "^build/.*$",
+                 "^dist/.*$",
+                 "^test/.*$" ]
+
+# A comma-separated list of package or module names from where C extensions may
+# be loaded. Extensions are loading into the active Python interpreter and may
+# run arbitrary code.
+extension-pkg-allow-list='''PyQt6'''
+
+[tool.pylint.'MESSAGES CONTROL']
+
+# Disable the message, report, category or checker with the given id(s). You
+# can either give multiple identifiers separated by comma (,) or put this
+# option multiple times (only on the command line, not in the configuration
+# file where it should appear only once). You can also use "--disable=all" to
+# disable everything first and then re-enable specific checks. For example, if
+# you want to run only the similarities checker, you can use "--disable=all
+# --enable=similarities". If you want to run only the classes checker, but have
+# no Warning level messages displayed, use "--disable=all --enable=classes
+# --disable=W".
+disable='''
+        line-too-long,
+        too-many-lines,
+        trailing-whitespace,
+        missing-final-newline,
+        trailing-newlines,
+        multiple-statements,
+        multiple-imports,
+        wrong-import-order,
+        ungrouped-imports,
+        wrong-import-position,
+        useless-import-alias,
+        import-outside-toplevel,
+        empty-docstring,
+        missing-module-docstring,
+        missing-class-docstring,
+        missing-function-docstring,
+        invalid-name,
+        too-many-statements,
+        too-many-branches,
+        too-many-ancestors,
+        too-many-instance-attributes,
+        too-few-public-methods,
+        too-many-public-methods,
+        too-many-return-statements,
+        too-many-branches,
+        too-many-arguments,
+        too-many-locals,
+        too-many-boolean-expressions,
+        too-many-nested-blocks,
+        cyclic-import,
+        duplicate-code,
+'''
+
+#        raw-checker-failed,
+#        bad-inline-option,
+#        locally-disabled,
+#        file-ignored,
+#        suppressed-message,
+#        useless-suppression,
+#        deprecated-pragma,
+#        use-symbolic-message-instead,
+#        wrong-spelling-in-comment,
+#        wrong-spelling-in-docstring,
+#        invalid-characters-in-docstring,
+#        unnecessary-dunder-call,
+#        bad-file-encoding,
+#        bad-classmethod-argument,
+#        bad-mcs-method-argument,
+#        bad-mcs-classmethod-argument,
+#        single-string-used-for-slots,
+#        unnecessary-lambda-assignment,
+#        unnecessary-direct-lambda-call,
+#        non-ascii-name,
+#        non-ascii-module-import,
+
+#        superfluous-parens,
+#        mixed-line-endings,
+#        unexpected-line-ending-format,
+
+#        unneeded-not,
+#        consider-using-enumerate,
+#        consider-iterating-dictionary,
+#        consider-using-dict-items,
+#        use-maxsplit-arg,
+#        use-sequence-for-iteration,
+#        consider-using-f-string,
+#        use-implicit-booleaness-not-len,
+#        use-implicit-booleaness-not-comparison,
+
+
+#        disallowed-name,
+#        typevar-name-incorrect-variance,
+#        typevar-double-variance,
+#        typevar-name-mismatch,
+
+#        singleton-comparison,
+#        unidiomatic-typecheck,
+#        useless-option-value,
+#        no-classmethod-decorator,
+#        no-staticmethod-decorator,
+#        useless-object-inheritance,
+#        property-with-parameters,
+#        consider-using-from-import,
+#        consider-merging-isinstance,
+#        simplifiable-if-statement,
+#        redefined-argument-from-local,
+#        no-else-return,
+#        consider-using-ternary,
+#        trailing-comma-tuple,
+#        stop-iteration-return,
+#        simplify-boolean-expression,
+#        inconsistent-return-statements,
+#        useless-return,
+#        consider-swap-variables,
+#        consider-using-join,
+#        consider-using-in,
+#        consider-using-get,
+#        chained-comparison,
+#        consider-using-dict-comprehension,
+#        consider-using-set-comprehension,
+#        simplifiable-if-expression,
+#        no-else-raise,
+#        unnecessary-comprehension,
+#        consider-using-sys-exit,
+#        no-else-break,
+#        no-else-continue,
+#        super-with-arguments,
+#        simplifiable-condition,
+#        condition-evals-to-constant,
+#        consider-using-generator,
+#        use-a-generator,
+#        consider-using-min-builtin,
+#        consider-using-max-builtin,
+#        consider-using-with,
+#        unnecessary-dict-index-lookup,
+#        use-list-literal,
+#        use-dict-literal,
+#        unnecessary-list-index-lookup,
+#        literal-comparison,
+#        comparison-with-itself,
+#        comparison-of-constants,
+#        no-self-use,
+
+# Enable the message, report, category or checker with the given id(s). You can
+# either give multiple identifier separated by comma (,) or put this option
+# multiple time (only on the command line, not in the configuration file where
+# it should appear only once). See also the "--disable" option for examples.
+enable='''c-extension-no-member,'''
+
+
+## mypy conf
+
+[tool.mypy]
+#python_version = "3.7"
+check_untyped_defs = true
+
+plugins = ["numpy.typing.mypy_plugin"]
+
+[[tool.mypy.overrides]]
+module = "matplotlib.*"
+ignore_missing_imports = true
+
+
+## ruff conf
+
+[tool.ruff]
+# Enable pycodestyle (`E`), Pyflakes (`F`), Updates ('UP'), flake8-bugbear (`B`) codes by default.
+# also flake8-2020 (YTT), flake8-commas (COM), flake8-comprehensions (C4),
+# flake8-datetimez (DTZ), flake8-pie (PIE), flake8-raise (RSE), flake8-return (RET),
+# flake8-simplify (SIM), flake8-gettext (INT), flake8-unused-arguments (ARG),
+# Error (PLE), Refactor (PLR), Warning (PLW)
+## next: flake8-use-pathlib (PTH), flake8-print (T20)
+select = ["E", "F", "UP", "B", "A", "YTT", "COM", "C4", "DTZ", "PIE", "RSE", "RET", "SIM", "INT", "ARG", "PLE", "PLR", "PLW"]
+
+# Same as Black.
+line-length = 80
+
+# Never enforce `E501` (line length violations).
+ignore = ["E402", "E501", "E741", "PLR0913", "PLR2004", "COM812", "PLR0912", "PLR0915", "PLW0603", "PLR0911", "SIM105", "SIM114"]
+
+# Exclude a variety of commonly ignored directories.
+exclude = ["dist", "build", ".pytype", ".mypy_cache", ".git"]
+
+# Assume Python 3.7.
+target-version = "py37"
+
+[tool.ruff.per-file-ignores]
+"uic/*.py" = ["UP004", "F401", "ARG002"]
+
+
+
+## pyright conf
+
+[tool.pyright]
+include = ["artisanlib", "plus" ]
+#exclude = []
+# ignore = ["src/oldstuff"]
+
+reportMissingImports = true
+reportMissingTypeStubs = false
+
+pythonVersion = "3.7"
+pythonPlatform = "All"
+
+#typeCheckingMode = "basic" # "off", "basic", "strict"
+
+# strict disabled checks
+#reportUnknownParameterType = false
+#reportMissingParameterType = false
+#reportUnknownMemberType = false
+#reportUnknownArgumentType = false
+#reportGeneralTypeIssues = false # "error", false, true

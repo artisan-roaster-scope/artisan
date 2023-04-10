@@ -13,17 +13,18 @@
 # the GNU General Public License for more details.
 
 # AUTHOR
-# Marko Luther, 2019
+# Marko Luther, 2023
 
 import multiprocessing as mp
 from multiprocessing.sharedctypes import Value
 from ctypes import c_bool, c_double
 import serial
-import logging
-from typing import Final
 import time
+import logging
+from typing import Optional, Any
+from typing_extensions import Final  # Python <=3.7
 
-_log: Final = logging.getLogger(__name__)
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 process = None
 control = False # Hottop under control?
@@ -35,23 +36,23 @@ SP = None
 BTcutoff = 220 # 220C = 428F (was 212C/413F before)
 BTleaveControl = 180 # 180C = 350F; the BT below which the control can be released; above the control cannot be released to avoid sudden stop at high temperatures
 
-xCONTROL = None # False: just logging; True: logging+control
-xBT = None
-xET = None
-xHEATER = None
-xFAN = None
-xMAIN_FAN = None
-xSOLENOID = None # False: closed; True: open
-xDRUM_MOTOR = None
-xCOOLING_MOTOR = None
-xCHAFF_TRAY = None
+xCONTROL:Optional[Any] = None # False: just logging; True: logging+control
+xBT:Optional[Any] = None
+xET:Optional[Any] = None
+xHEATER:Optional[Any] = None
+xFAN:Optional[Any] = None
+xMAIN_FAN:Optional[Any] = None
+xSOLENOID:Optional[Any] = None # False: closed; True: open
+xDRUM_MOTOR:Optional[Any] = None
+xCOOLING_MOTOR:Optional[Any] = None
+xCHAFF_TRAY:Optional[Any] = None
 # set values
-xSET_HEATER = None
-xSET_FAN = None
-xSET_MAIN_FAN = None
-xSET_SOLENOID = None # False: closed; True: open
-xSET_DRUM_MOTOR = None
-xSET_COOLING_MOTOR = None
+xSET_HEATER:Optional[Any] = None
+xSET_FAN:Optional[Any] = None
+xSET_MAIN_FAN:Optional[Any] = None
+xSET_SOLENOID:Optional[Any] = None # False: closed; True: open
+xSET_DRUM_MOTOR:Optional[Any] = None
+xSET_COOLING_MOTOR:Optional[Any] = None
 
 def hex2int(h1,h2=None):
     if h2:
@@ -60,14 +61,14 @@ def hex2int(h1,h2=None):
 
 def openport(p):
     try:
-        if not p.isOpen():
+        if p is not None and not p.isOpen():
             p.open()
     except Exception as e: # pylint: disable=broad-except
         _log.exception(e)
 
 def closeport(p):
     try:
-        if p is None and p.isOpen():
+        if p is not None and p.isOpen():
             p.close()
     except Exception as e: # pylint: disable=broad-except
         _log.exception(e)
@@ -100,7 +101,7 @@ def gettemperatures(p,retry=True):
                 P1 = hex2int(r[1])
                 chksum = sum(hex2int(c) for c in r[:35]) & 0xFF
                 P35 = hex2int(r[35])
-                if P0 != 165 or P1 != 150 or P35 != chksum:
+                if P0 != 165 or P1 != 150 or chksum != P35:
                     closeport(p)
                     if retry: # we retry once
                         return gettemperatures(p,retry=False)
@@ -119,7 +120,7 @@ def gettemperatures(p,retry=True):
         _log.exception(e)
     return BT, ET, HEATER, FAN, MAIN_FAN, SOLENOID, DRUM_MOTOR, COOLING_MOTOR, CHAFF_TRAY
 
-def doWork(interval, comport, baudrate, bytesize, parity, stopbits, timeout,
+def doWork(interval:float, comport, baudrate, bytesize, parity, stopbits, timeout,
         aBT, aET, aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR, aCHAFF_TRAY,
         aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR, aCONTROL):
     global SP # pylint: disable=global-statement
@@ -164,7 +165,7 @@ def doWork(interval, comport, baudrate, bytesize, parity, stopbits, timeout,
         # control part
         if aCONTROL.value:
             # safety cut at BT=220C/428F (was 212C/413F before)
-            if BT >= BTcutoff:
+            if BTcutoff <= BT:
                 # set main fan to maximum (set to 10), turn off heater (set to 0), open solenoid for eject, turn on drum and stirrer (all set to 1)
                 aSET_HEATER.value = 0
                 #aSET_FAN.value = 10
@@ -229,13 +230,13 @@ def HOTTOPcontrol(aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOT
 # External Interface
 
 def takeHottopControl():
-    if xCONTROL:
+    if xCONTROL is not None:
         xCONTROL.value = True
         return True
     return False
 
 def releaseHottopControl():
-    if xCONTROL and xBT.value < BTleaveControl:
+    if xCONTROL is not None and xBT is not None and xBT.value < BTleaveControl:
         xCONTROL.value = False
         return True
     return False
@@ -254,24 +255,24 @@ def getHottop():
 # fan, main_fan : int(0-100) (will be converted to the internal int(0-10))
 # solenoid, drum_motor, cooling_motor : bool (will be converted to the internal 0 or 1)
 # all parameters are optional and default to None (meanging: don't change value)
-def setHottop(heater=None,fan=None,main_fan=None,solenoid=None,drum_motor=None,cooling_motor=None):
+def setHottop(heater:Optional[int]=None,fan:Optional[int]=None,main_fan:Optional[int]=None,solenoid:Optional[int]=None,drum_motor:Optional[int]=None,cooling_motor:Optional[int]=None):
     if xCONTROL and xCONTROL.value:
-        if heater is not None:
+        if heater is not None and xSET_HEATER is not None:
             xSET_HEATER.value = int(heater)
-        if fan is not None:
+        if fan is not None and xSET_FAN is not None:
             xSET_FAN.value = int(round(fan / 10.))
-        if main_fan is not None:
+        if main_fan is not None and xSET_MAIN_FAN is not None:
             xSET_MAIN_FAN.value = int(round(main_fan / 10.))
-        if solenoid is not None:
+        if solenoid is not None and xSET_SOLENOID is not None:
             xSET_SOLENOID.value = int(solenoid)
-        if drum_motor is not None:
+        if drum_motor is not None and xSET_DRUM_MOTOR is not None:
             xSET_DRUM_MOTOR.value = int(drum_motor)
-        if cooling_motor is not None:
+        if cooling_motor is not None and xSET_COOLING_MOTOR is not None:
             xSET_COOLING_MOTOR.value = int(cooling_motor)
 
 
 # interval has to be smaller than 1 (= 1sec)
-def startHottop(interval=1,comport='COM4',baudrate=115200,bytesize=8,parity='N',stopbits=1,timeout=0.5):
+def startHottop(interval:float=1.0,comport='COM4',baudrate=115200,bytesize=8,parity='N',stopbits=1,timeout=0.5):
     global process, xCONTROL, xBT, xET, xHEATER, xFAN, xMAIN_FAN, xSOLENOID, xDRUM_MOTOR, xCOOLING_MOTOR, xCHAFF_TRAY, \
         xSET_HEATER, xSET_FAN, xSET_MAIN_FAN, xSET_SOLENOID, xSET_DRUM_MOTOR, xSET_COOLING_MOTOR # pylint: disable=global-statement
     try:

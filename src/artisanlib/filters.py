@@ -13,12 +13,17 @@
 # the GNU General Public License for more details.
 
 # AUTHOR
-# Marko Luther, 2022
+# Marko Luther, 2023
 
 
 import numpy as np
 from collections import deque
 from bisect import bisect_left, insort
+
+from typing import List, Optional, Deque, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import numpy.typing as npt # pylint: disable=unused-import
 
 # https://www.samproell.io/posts/yarppg/digital-filters-python/
 class LiveFilter:
@@ -45,7 +50,7 @@ class LiveLFilter(LiveFilter):
     >>> lfilter = LiveLFilter(b, a)
     >>> [lfilter(x) for x in xs]
     """
-    def __init__(self, b_, a_):
+    def __init__(self, b_:'npt.NDArray[np.float64]', a_:'npt.NDArray[np.float64]') -> None:
         """Initialize live filter based on difference equation.
 
         Args:
@@ -56,14 +61,14 @@ class LiveLFilter(LiveFilter):
         """
         self.b = b_
         self.a = a_
-        self._xs = deque([0] * len(b), maxlen=len(b))
-        self._ys = deque([0] * (len(a) - 1), maxlen=len(a)-1)
+        self._xs:Deque[float] = deque([0.0] * len(b), maxlen=len(b))
+        self._ys:Deque[float] = deque([0.0] * (len(a) - 1), maxlen=len(a)-1)
 
-    def _process(self, x):
+    def _process(self, x:float) -> float:
         """Filter incoming data with standard difference equations.
         """
         self._xs.appendleft(x)
-        y = np.dot(self.b, self._xs) - np.dot(self.a[1:], self._ys)
+        y = np.dot(np.array(self.b), np.array(self._xs)) - np.dot(np.array(self.a[1:]), np.array(self._ys))
         y = y / self.a[0]
         self._ys.appendleft(y)
 
@@ -77,7 +82,7 @@ class LiveSosFilter(LiveFilter):
     >>> sosfilter = LiveSosFilter(sos)
     >>> [sosfilter(x) for x in xs]
     """
-    def __init__(self, sos_):
+    def __init__(self, sos_) -> None:
         """Initialize live second-order sections filter.
 
         Args:
@@ -92,6 +97,7 @@ class LiveSosFilter(LiveFilter):
     def _process(self, x):
         """Filter incoming data with cascaded second-order sections.
         """
+        y:float = 0
         for s in range(self.n_sections):  # apply filter sections in sequence
             b0, b1, b2, _a0, a1, a2 = self.sos[s, :]
 
@@ -106,43 +112,44 @@ class LiveSosFilter(LiveFilter):
 class LiveMedian(LiveFilter):
     """Live implementation of a median low-pass filter.
     """
-    def __init__(self, k):
+    def __init__(self, k:int) -> None:
         """Initialize live median low-pass filter.
 
         Args:
             k (odd natural number): window size
         """
         assert k % 2 == 1, 'Median filter length must be odd.'
-        self.k = k
-        self.init_list = [] # collects first k readings until initialized
-        self.initialized = False
-        self.q = None
-        self.l = None
-        self.mididx = 0
+        self.k:int = k
+        self.init_list:List[float] = [] # collects first k readings until initialized
+        self.initialized:bool = False
+        self.q:Optional[deque[float]] = None
+        self.l:Optional[List[float]] = None
+        self.mididx:int = 0
 
     def init_queue(self):
-        self.q = q = deque(self.init_list)
-        self.l = list(q)
-        self.l.sort()
-        self.mididx = (len(q) - 1) // 2
-        self.initialized = True
-        del self.init_list
+        self.q = deque(self.init_list)
+        if self.q is not None:
+            self.l = list(self.q)
+            self.l.sort()
+            self.mididx = (len(self.q) - 1) // 2
+            self.initialized = True
+            del self.init_list
 
-    def _process(self, x):
+    def _process(self, x:float) -> float:
         """Filter incoming data with median low-pass filter.
         """
         if not self.initialized:
             if len(self.init_list) < self.k:
                 self.init_list.append(x)
                 return x
-            else:
-                self.init_queue()
-        q, ll = self.q, self.l
-        old_elem = q.popleft()
-        q.append(x)
-        del ll[bisect_left(ll, old_elem)]
-        insort(ll, x)
-        return ll[self.mididx]
+            self.init_queue()
+        if self.q is not None and self.l is not None:
+            old_elem = self.q.popleft()
+            self.q.append(x)
+            del self.l[bisect_left(self.l, old_elem)]
+            insort(self.l, x)
+            return self.l[self.mididx]
+        return x
 
 
 if __name__ == '__main__':

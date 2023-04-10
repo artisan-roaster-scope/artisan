@@ -1,7 +1,7 @@
 #
 # login.py
 #
-# Copyright (c) 2018, Paul Holleis, Marko Luther
+# Copyright (c) 2023, Paul Holleis, Marko Luther
 # All rights reserved.
 #
 #
@@ -22,7 +22,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtWidgets import (
         QApplication, # @UnusedImport @Reimport  @UnresolvedImport
         QCheckBox, # @UnusedImport @Reimport  @UnresolvedImport
@@ -32,11 +32,12 @@ try:
         QLabel, # @UnusedImport @Reimport  @UnresolvedImport
         QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
         QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
+        QWidget # @UnusedImport @Reimport  @UnresolvedImport
     )
     from PyQt6.QtCore import Qt, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QKeySequence, QAction # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtWidgets import ( # type: ignore
         QApplication, # @UnusedImport @Reimport  @UnresolvedImport
         QCheckBox, # @UnusedImport @Reimport  @UnresolvedImport
@@ -47,6 +48,7 @@ except Exception: # pylint: disable=broad-except
         QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
         QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
         QAction, # @UnusedImport @Reimport  @UnresolvedImport
+        QWidget # @UnusedImport @Reimport  @UnresolvedImport
     )
     from PyQt5.QtCore import Qt, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QKeySequence # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
@@ -54,10 +56,13 @@ except Exception: # pylint: disable=broad-except
 import logging
 from artisanlib.dialogs import ArtisanDialog
 from plus import config
-from typing import Optional
-from typing import Final
+from typing import Optional, Tuple, TYPE_CHECKING
+from typing_extensions import Final  # Python <=3.7
 
-_log: Final = logging.getLogger(__name__)
+if TYPE_CHECKING:
+    from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 class Login(ArtisanDialog):
 
@@ -66,16 +71,17 @@ class Login(ArtisanDialog):
 
     def __init__(
         self,
-        parent=None,
-        email=None,
-        saved_password=None,
+        parent:QWidget,
+        aw,
+        email:Optional[str] = None,
+        saved_password:Optional[str] = None,
         remember_credentials: bool = True,
     ) -> None:
-        super().__init__(parent)
+        super().__init__(parent,aw)
 
-        self.login = None
-        self.passwd = None
-        self.remember = remember_credentials
+        self.login:Optional[str] = None
+        self.passwd:Optional[str] = None
+        self.remember:bool = remember_credentials
 
         self.linkRegister = QLabel(
             f'<small><a href="{config.register_url}">{QApplication.translate("Plus", "Register")}</a></small>'
@@ -109,20 +115,20 @@ class Login(ArtisanDialog):
             QKeySequence('Ctrl+.')
         )
         # add additional CMD-W shortcut to close this dialog
-        cancelAction = QAction(self)
+        cancelAction:QAction = QAction(self)
         cancelAction.triggered.connect(self.reject) # type: ignore
         cancelAction.setShortcut(QKeySequence.StandardKey.Cancel)
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).addActions(
             [cancelAction]
         )
 
-        self.textPass = QLineEdit(self)
+        self.textPass:QLineEdit = QLineEdit(self)
         self.textPass.setEchoMode(QLineEdit.EchoMode.Password)
         self.textPass.setPlaceholderText(
             QApplication.translate('Plus', 'Password')
         )
 
-        self.textName = QLineEdit(self)
+        self.textName:QLineEdit = QLineEdit(self)
         self.textName.setPlaceholderText(
             QApplication.translate('Plus', 'Email')
         )
@@ -138,27 +144,27 @@ class Login(ArtisanDialog):
         self.rememberCheckbox.setChecked(self.remember)
         self.rememberCheckbox.stateChanged.connect(self.rememberCheckChanged)  # type: ignore
 
-        credentialsLayout = QVBoxLayout(self)
+        credentialsLayout:QVBoxLayout = QVBoxLayout(self)
         credentialsLayout.addWidget(self.textName)
         credentialsLayout.addWidget(self.textPass)
         credentialsLayout.addWidget(self.rememberCheckbox)
 
-        credentialsGroup = QGroupBox()
+        credentialsGroup:QGroupBox = QGroupBox()
         credentialsGroup.setLayout(credentialsLayout)
 
-        buttonLayout = QHBoxLayout()
+        buttonLayout:QHBoxLayout = QHBoxLayout()
         buttonLayout.addStretch()
         buttonLayout.addWidget(self.dialogbuttons)
         buttonLayout.addStretch()
 
-        linkLayout = QHBoxLayout()
+        linkLayout:QHBoxLayout = QHBoxLayout()
         linkLayout.addStretch()
         linkLayout.addWidget(self.linkRegister)
         linkLayout.addStretch()
         linkLayout.addWidget(self.linkResetPassword)
         linkLayout.addStretch()
 
-        layout = QVBoxLayout(self)
+        layout:QVBoxLayout = QVBoxLayout(self)
         layout.addWidget(credentialsGroup)
         layout.addLayout(linkLayout)
         layout.addLayout(buttonLayout)
@@ -179,15 +185,15 @@ class Login(ArtisanDialog):
             self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setEnabled(True)
 
     @pyqtSlot()
-    def reject(self):
+    def reject(self) -> None:
         self.login = self.textName.text()
         super().reject()
 
     @pyqtSlot(int)
-    def rememberCheckChanged(self, i) -> None:
+    def rememberCheckChanged(self, i:int) -> None:
         self.remember = bool(i)
 
-    def isInputReasonable(self):
+    def isInputReasonable(self) -> bool:
         login = self.textName.text()
         passwd = self.textPass.text()
         return (
@@ -198,7 +204,7 @@ class Login(ArtisanDialog):
         )
 
     @pyqtSlot(str)
-    def textChanged(self, _):
+    def textChanged(self, _:str) -> None:
         if self.isInputReasonable():
             self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).setDefault(
                 False
@@ -211,26 +217,24 @@ class Login(ArtisanDialog):
             self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setEnabled(False)
 
     @pyqtSlot()
-    def setCredentials(self):
+    def setCredentials(self) -> None:
         self.login = self.textName.text()
         self.passwd = self.textPass.text()
         self.accept()
 
 
 def plus_login(
-    window,
+    window: QWidget,
+    aw: 'ApplicationWindow',
     email: Optional[str] = None,
     saved_password: Optional[str] = None,
     remember_credentials: bool = True
-):
+) -> Tuple[Optional[str], Optional[str], bool, int]:
     _log.debug('plus_login()')
-    ld = Login(window, email, saved_password, remember_credentials)
+    ld = Login(window, aw, email, saved_password, remember_credentials)
     ld.setWindowTitle('plus')
     ld.setWindowFlags(Qt.WindowType.Sheet)   # type: ignore
     ld.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)   # type: ignore
-    res = ld.exec()
-    if ld.login is not None:
-        login_processed = ld.login.strip()
-    else:
-        login_processed = None
+    res:int = ld.exec()
+    login_processed:Optional[str] = ld.login.strip() if ld.login is not None else None
     return login_processed, ld.passwd, ld.remember, res

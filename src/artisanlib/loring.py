@@ -6,20 +6,24 @@ from pathlib import Path
 import time as libtime
 import csv
 import logging
-from typing import Final
+from typing import List, Optional, TYPE_CHECKING
+from typing_extensions import Final  # Python <=3.7
+
+if TYPE_CHECKING:
+    from artisanlib.types import ProfileData # pylint: disable=unused-import
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtCore import QDateTime, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import fill_gaps, fromFtoC, RoRfromFtoC, encodeLocal
 
-_log: Final = logging.getLogger(__name__)
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 def replace_duplicates(data):
     lv = -1
@@ -37,7 +41,7 @@ def replace_duplicates(data):
 
 # returns a dict containing all profile information contained in the given IKAWA CSV file
 def extractProfileLoringCSV(file,aw):
-    res = {} # the interpreted data set
+    res:ProfileData = {} # the interpreted data set
 
     with open(file, newline='',encoding='utf-8') as csvFile:
         data = csv.reader(csvFile,delimiter=',')
@@ -46,19 +50,20 @@ def extractProfileLoringCSV(file,aw):
 
         power = None # holds last processed heater event value
         power_last = None # holds the heater event value before the last one
-        specialevents = []
-        specialeventstype = []
-        specialeventsvalue = []
-        specialeventsStrings = []
-        timex = []
-        temp1 = []
-        temp2 = []
-        extra1 = [] # burner
-        extra2 = [] # inlet
-        extra3 = [] # stack
-        extra4 = [] # ror
-        timeindex = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
+        specialevents:List[int] = []
+        specialeventstype:List[int] = []
+        specialeventsvalue:List[float] = []
+        specialeventsStrings:List[str] = []
+        timex:List[float] = []
+        temp1:List[float] = []
+        temp2:List[float] = []
+        extra1:List[float] = [] # burner
+        extra2:List[float] = [] # inlet
+        extra3:List[float] = [] # stack
+        extra4:List[float] = [] # ror
+        timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
 
+        power_event:bool = False
 
         start_datetime = None
         last_sampling = None
@@ -79,14 +84,20 @@ def extractProfileLoringCSV(file,aw):
 
                     #time = int(item['RoastTimeSeconds']) # seems to be unprecise and does not correspond exactly to the 6s interval given by 'Time'
 
-                    datetime = QDateTime.fromString(item['Time'], 'M/d/yyyy h:mm:ss AP')
+                    datetime:QDateTime = QDateTime.fromString(item['Time'], 'M/d/yyyy h:mm:ss AP')
 
                     if start_datetime is None:
                         start_datetime = datetime
                         time = 0
-                        res['roastdate'] = encodeLocal(start_datetime.date().toString())
-                        res['roastisodate'] = encodeLocal(start_datetime.date().toString(Qt.DateFormat.ISODate))
-                        res['roasttime'] = encodeLocal(start_datetime.time().toString())
+                        roastdate:Optional[str] = encodeLocal(start_datetime.date().toString())
+                        if roastdate is not None:
+                            res['roastdate'] = roastdate
+                        roastisodate:Optional[str] = encodeLocal(start_datetime.date().toString(Qt.DateFormat.ISODate))
+                        if roastisodate is not None:
+                            res['roastisodate'] = roastisodate
+                        roasttime:Optional[str] = encodeLocal(start_datetime.time().toString())
+                        if roasttime is not None:
+                            res['roasttime'] = roasttime
                         res['roastepoch'] = int(start_datetime.toSecsSinceEpoch())
                         res['roasttzoffset'] = libtime.timezone
                     else:

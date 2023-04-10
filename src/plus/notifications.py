@@ -1,7 +1,7 @@
 #
 # connection.py
 #
-# Copyright (c) 2021, Paul Holleis, Marko Luther
+# Copyright (c) 2023, Paul Holleis, Marko Luther
 # All rights reserved.
 #
 #
@@ -15,26 +15,28 @@
 # version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
 # the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import QSemaphore, QTimer # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # type: ignore # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtCore import QSemaphore, QTimer # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
-from typing import Final
+from typing import List, Dict, Any
+from typing_extensions import Final  # Python <=3.7
 
 import logging
 
 from artisanlib.notifications import ntype2NotificationType
 from plus import config, controller, connection, util
 
-_log: Final = logging.getLogger(__name__)
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 get_notifications_semaphore = QSemaphore(
@@ -44,7 +46,7 @@ get_notifications_semaphore = QSemaphore(
 
 # if notifications > 0 the new notifications are retrieved and forwarded to the user
 # should only be called from the GUI thread
-def updateNotifications(notifications: int, machines):  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
+def updateNotifications(notifications: int, machines:List[str]) -> None:
     _log.debug('updateNotifications(%s,%s)',notifications,machines)
     try:
         if config.app_window:
@@ -59,7 +61,7 @@ def updateNotifications(notifications: int, machines):  #for Python >= 3.9 can r
 
 # fetches new notifications and forward them to the Artisan notification system
 # sidecondition: at this point all pending notifications are delivered and the "notification" count on the server can be assumed to be 0
-def retrieveNotifications():
+def retrieveNotifications() -> None:
     gotlock = get_notifications_semaphore.tryAcquire(1,0)
     # we try to catch a lock if available but we do not wait, if we fail we just skip this sampling round (prevents stacking of waiting calls)
     if gotlock:
@@ -67,7 +69,7 @@ def retrieveNotifications():
             _log.info('retrieveNotifications()')
             if controller.is_connected():
                 aw = config.app_window
-                if aw.qmc.roastertype_setup != '':
+                if aw is not None and aw.qmc.roastertype_setup != '':
                     params = {'machine': aw.qmc.roastertype_setup}
                 else:
                     params = None
@@ -95,9 +97,9 @@ def retrieveNotifications():
 
 
 # process the received plus notifications and hand them over to the Artisan notification system
-def processNotification(plus_notification):
+def processNotification(plus_notification:Dict[str,Any]) -> None:
     try:
-        if config.app_window:
+        if config.app_window is not None:
             aw = config.app_window
             if aw.notificationManager:
                 created = None

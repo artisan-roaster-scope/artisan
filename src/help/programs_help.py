@@ -1,14 +1,14 @@
 import prettytable
 import re
 try:
-  from PyQt6.QtWidgets import QApplication
-except Exception:
-  from PyQt5.QtWidgets import QApplication # type: ignore
+    from PyQt6.QtWidgets import QApplication # @Reimport @UnresolvedImport @UnusedImport # pylint: disable=import-error
+except Exception: # pylint: disable=broad-except
+    from PyQt5.QtWidgets import QApplication # type: ignore # @Reimport @UnresolvedImport @UnusedImport
 
 def content():
     strlist = []
-    helpstr = ''  #@UnusedVariable
-    newline = '\n'  #@UnusedVariable
+    helpstr = ''  # noqa: F841 #@UnusedVariable # pylint: disable=unused-variable
+    newline = '\n'  # noqa: F841 #@UnusedVariable  # pylint: disable=unused-variable
     strlist.append('<head><style> td, th {border: 1px solid #ddd;  padding: 6px;} th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;} </style></head> <body>')
     strlist.append('<b>')
     strlist.append(QApplication.translate('HelpDlg','EXTERNAL PROGRAMS'))

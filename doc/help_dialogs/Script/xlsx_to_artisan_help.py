@@ -175,14 +175,14 @@ def buildpyCode(fname_in):
     outstr += 'import prettytable'
     outstr += '\n' + 'import re'
     outstr += '\n' + 'try:'
-    outstr += '\n' + '  from PyQt6.QtWidgets import QApplication'
-    outstr += '\n' + 'except Exception:'
-    outstr += '\n' + '  from PyQt5.QtWidgets import QApplication # type: ignore'
+    outstr += '\n' + '    from PyQt6.QtWidgets import QApplication # @Reimport @UnresolvedImport @UnusedImport # pylint: disable=import-error'
+    outstr += '\n' + 'except Exception: # pylint: disable=broad-except'
+    outstr += '\n' + '    from PyQt5.QtWidgets import QApplication # type: ignore # @Reimport @UnresolvedImport @UnusedImport'
     outstr += '\n'
     outstr += '\ndef content():'
     outstr += nlind + 'strlist = []'
-    outstr += nlind + "helpstr = ''  #@UnusedVariable"
-    outstr += nlind + "newline = '\\n'  #@UnusedVariable"
+    outstr += nlind + "helpstr = ''  # noqa: F841 #@UnusedVariable # pylint: disable=unused-variable"
+    outstr += nlind + "newline = '\\n'  # noqa: F841 #@UnusedVariable  # pylint: disable=unused-variable"
     outstr += nlind + "strlist.append('<head><style> td, th {border: 1px solid #ddd;  padding: 6px;} th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;} </style></head> <body>')"
 
     # Open the workbook

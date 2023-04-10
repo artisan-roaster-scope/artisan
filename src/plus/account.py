@@ -1,7 +1,7 @@
 #
 # account.py
 #
-# Copyright (c) 2018, Paul Holleis, Marko Luther
+# Copyright (c) 2023, Paul Holleis, Marko Luther
 # All rights reserved.
 #
 #
@@ -24,10 +24,10 @@
 """This module connects to the artisan.plus inventory management service."""
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtCore import QSemaphore # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from pathlib import Path
@@ -37,20 +37,20 @@ from plus import config
 import os
 import logging
 from typing import Optional
-from typing import Final
+from typing_extensions import Final  # Python <=3.7
 
-_log: Final = logging.getLogger(__name__)
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 ####
 # Account Cache
 # holding all account ids associated to a (local) running account number
 # shared cache between the Artisan and the ArtisanViewer app
-account_cache_semaphore = QSemaphore(1)
+account_cache_semaphore:QSemaphore = QSemaphore(1)
 
 # shared resource between the Artisan and ArtisanViewer app protected
 # by a file lock
-account_cache_path = getDirectory(config.account_cache, share=True)
+account_cache_path:str = getDirectory(config.account_cache, share=True)
 account_cache_lock_path = getDirectory(
     f'{config.account_cache}_lock', share=True
 )

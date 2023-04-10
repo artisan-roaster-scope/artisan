@@ -7,6 +7,6 @@ class ArtisanTestCase(unittest.TestCase):
     def assertNothingRaised(self, exception_klass=Exception):
         try:
             yield
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             if isinstance(e, exception_klass):
                 self.fail('Exception %s was raised' % e.__repr__())

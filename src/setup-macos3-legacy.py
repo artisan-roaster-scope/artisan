@@ -342,10 +342,9 @@ for python_version in ['python3.8', 'python3.9', 'python3.10']:
                 if file.endswith('.pyi'):
                     file_path = os.path.join(subdir, file)
                     subprocess.check_call(f'rm -rf {file_path}',shell = True)
-                if file.endswith('.abi3.so') or file.endswith('.pyi'):
-                    if file.split('.')[0] not in Qt_modules:
-                        file_path = os.path.join(subdir, file)
-                        subprocess.check_call(f'rm -rf {file_path}',shell = True)
+                if file.endswith(('.abi3.so', '.pyi')) and file.split('.')[0] not in Qt_modules:
+                    file_path = os.path.join(subdir, file)
+                    subprocess.check_call(f'rm -rf {file_path}',shell = True)
 
 # uncomment for non-Framework variant
     # remove unused Qt frameworks libs (not in Qt_modules_frameworks)

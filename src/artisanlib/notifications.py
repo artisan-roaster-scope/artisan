@@ -13,15 +13,15 @@
 # the GNU General Public License for more details.
 
 # AUTHOR
-# Marko Luther, 2021
+# Marko Luther, 2023
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtWidgets import QSystemTrayIcon, QApplication, QMenu # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QIcon, QDesktopServices, QAction # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtCore import QTimer, pyqtSlot, QUrl, QObject, QDateTime, QLocale # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtWidgets import QSystemTrayIcon, QApplication, QMenu, QAction # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QIcon, QDesktopServices # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtCore import QTimer, pyqtSlot, QUrl, QObject, QDateTime, QLocale # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
@@ -30,17 +30,18 @@ import os
 import sys
 import time
 import logging
-from datetime import datetime
-from typing import Optional
-from typing import Final
+from datetime import datetime, timezone
 from enum import Enum
 from artisanlib.util import getResourcePath
+from artisanlib.qtsingleapplication import QtSingleApplication
 import plus.util
 import plus.connection
 import plus.config
 
+from typing import Optional
+from typing_extensions import Final  # Python <=3.7
 
-_log: Final = logging.getLogger(__name__)
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 class NotificationType(Enum):
     ARTISAN_SYSTEM = 1 # issued by some internal Artisan activity
@@ -64,7 +65,7 @@ def ntype2NotificationType(ntype:str) -> NotificationType:
 # for notifications received from artisan.plus id is set to the notifications hr_id to be able to confirm its processing on click
 # created is the timestamp as EPOCH indicating when this notification was created
 class Notification():
-    def __init__(self, title: str, message: str, notification_type: NotificationType, created: Optional[float] = None, hr_id: Optional[str] = None):
+    def __init__(self, title: str, message: str, notification_type: NotificationType, created: Optional[float] = None, hr_id: Optional[str] = None) -> None:
         self._title = title
         self._message = message
         self._type = notification_type
@@ -123,7 +124,7 @@ def sendPlusNotificationSeen(hr_id:str, date):
         _log.exception(e)
 
 
-class NotificationManager(QObject):
+class NotificationManager(QObject): # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
 
     __slots__ = ( 'notification_timeout', 'notification_queue_max_length', 'notification_queue_max_age', 'tray_menu', 'tray_icon',
                 'notifications_available', 'notifications_enabled', 'notifications_visible', 'notifications_queue',
@@ -199,6 +200,7 @@ class NotificationManager(QObject):
                     # raise Artisan app
                     app = QApplication.instance()
                     if app is not None:
+                        assert isinstance(app, QtSingleApplication)
                         app.activateWindow()
                 elif self.active_notification.type in [NotificationType.PLUS_SYSTEM, NotificationType.PLUS_ADMIN, NotificationType.PLUS_ADVERT]:
                     # open artisan.plus
@@ -208,7 +210,7 @@ class NotificationManager(QObject):
                     QDesktopServices.openUrl(QUrl(plus.util.remindersLink()))
                 if self.active_notification.id:
                     n = self.active_notification.id # bind the number here such that is available after clearing active_notification
-                    QTimer.singleShot(500, lambda : sendPlusNotificationSeen(n, datetime.now()))
+                    QTimer.singleShot(500, lambda : sendPlusNotificationSeen(n, datetime.now(timezone.utc)))
                 self.removeNotificationItem(self.active_notification)
                 self.active_notification = None
         except Exception as e: # pylint: disable=broad-except
@@ -277,7 +279,9 @@ class NotificationManager(QObject):
                 for n in reversed(self.notifications_queue):
                     title = n.formatedTitle()
                     menu_title = (title[:25] + '...') if len(title) > 25 else title
-                    action = QAction(menu_title, visible=True, triggered=self.notificationItemSelected)
+#                    action = QAction(menu_title, visible=True, triggered=self.notificationItemSelected)
+                    action = QAction(menu_title)
+                    action.triggered.connect(self.notificationItemSelected)
                     action.setData(n)
                     self.notification_menu_actions.append(action)
                     self.tray_menu.addAction(action)

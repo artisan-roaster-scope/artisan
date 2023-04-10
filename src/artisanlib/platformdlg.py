@@ -13,7 +13,7 @@
 # the GNU General Public License for more details.
 
 # AUTHOR
-# Marko Luther, 2020
+# Marko Luther, 2023
 
 import platform
 
@@ -23,14 +23,14 @@ from artisanlib import __revision__
 from artisanlib.dialogs import ArtisanDialog
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtWidgets import QApplication, QVBoxLayout, QTextEdit # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtWidgets import QApplication, QVBoxLayout, QTextEdit # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 class platformDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
+    def __init__(self, parent, aw) -> None:
         super().__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Artisan Platform'))

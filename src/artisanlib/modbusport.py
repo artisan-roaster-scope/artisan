@@ -13,26 +13,35 @@
 # the GNU General Public License for more details.
 
 # AUTHOR
-# Marko Luther, 2019
+# Marko Luther, 2023
 
 import sys
 import time
 import logging
-from typing import Final
+from typing import Optional, List, Dict, Tuple, Union, TYPE_CHECKING
+from typing_extensions import Final  # Python <=3.7
+
+if TYPE_CHECKING:
+    from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
+    from pymodbus.client import ModbusSerialClient, ModbusTcpClient, ModbusUdpClient # pylint: disable=unused-import
+    from pymodbus.payload import BinaryPayloadBuilder # pylint: disable=unused-import
+    from pymodbus.payload import BinaryPayloadDecoder # pylint: disable=unused-import
+    from pymodbus.pdu import ModbusResponse # pylint: disable=unused-import
+
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtCore import QSemaphore # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
-from artisanlib.util import stringp, debugLogLevelActive
+from artisanlib.util import debugLogLevelActive
 
 
-_log: Final = logging.getLogger(__name__)
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 def convert_to_bcd(decimal):
@@ -64,30 +73,18 @@ def convert_from_bcd(bcd):
         place *= 10
     return decimal
 
-def getBinaryPayloadBuilder(byteorderLittle=True,wordorderLittle=False):
+def getBinaryPayloadBuilder(byteorderLittle:bool = True, wordorderLittle:bool = False) -> 'BinaryPayloadBuilder':
     from pymodbus.constants import Endian
     from pymodbus.payload import BinaryPayloadBuilder
-    if byteorderLittle:
-        byteorder = Endian.Little
-    else:
-        byteorder = Endian.Big
-    if wordorderLittle:
-        wordorder = Endian.Little
-    else:
-        wordorder = Endian.Big
+    byteorder = Endian.Little if byteorderLittle else Endian.Big
+    wordorder = Endian.Little if wordorderLittle else Endian.Big
     return BinaryPayloadBuilder(byteorder=byteorder, wordorder=wordorder)
 
-def getBinaryPayloadDecoderFromRegisters(registers,byteorderLittle=True,wordorderLittle=False):
+def getBinaryPayloadDecoderFromRegisters(registers, byteorderLittle:bool = True, wordorderLittle:bool = False) -> 'BinaryPayloadDecoder':
     from pymodbus.constants import Endian
     from pymodbus.payload import BinaryPayloadDecoder
-    if byteorderLittle:
-        byteorder = Endian.Little
-    else:
-        byteorder = Endian.Big
-    if wordorderLittle:
-        wordorder = Endian.Little
-    else:
-        wordorder = Endian.Big
+    byteorder = Endian.Little if byteorderLittle else Endian.Big
+    wordorder = Endian.Little if wordorderLittle else Endian.Big
     return BinaryPayloadDecoder.fromRegisters(registers, byteorder=byteorder, wordorder=wordorder)
 
 
@@ -106,108 +103,107 @@ class modbusport():
         'inputModes', 'optimizer', 'fetch_max_blocks', 'fail_on_cache_miss', 'disconnect_on_error', 'reset_socket', 'activeRegisters', 'readingsCache', 'SVmultiplier', 'PIDmultiplier',
         'byteorderLittle', 'wordorderLittle', 'master', 'COMsemaphore', 'host', 'port', 'type', 'lastReadResult', 'commError' ]
 
-    def __init__(self,aw):
+    def __init__(self, aw:'ApplicationWindow') -> None:
         self.aw = aw
 
-        self.modbus_serial_read_delay = 0.035 # in seconds
-        self.modbus_serial_extra_read_delay = 0.0 # in seconds (user configurable)
-        self.modbus_serial_write_delay = 0.080 # in seconds
+        self.modbus_serial_read_delay       :Final[float] = 0.035 # in seconds
+        self.modbus_serial_extra_read_delay :float = 0.0          # in seconds (user configurable)
+        self.modbus_serial_write_delay      :Final[float] = 0.080 # in seconds
 
-        self.maxCount = 125 # the maximum number of registers that can be fetched in one request according to the MODBUS spec
-        self.readRetries = 0  # retries
+        self.maxCount:Final[int] = 125 # the maximum number of registers that can be fetched in one request according to the MODBUS spec
+        self.readRetries:int = 0  # retries
         #default initial settings. They are changed by settingsload() at initiation of program according to the device chosen
-        self.comport = 'COM5'      #NOTE: this string should not be translated.
-        self.baudrate = 115200
-        self.bytesize = 8
-        self.parity= 'N'
-        self.stopbits = 1
-        self.timeout = 0.3 # serial MODBUS timeout
-        self.serial_readRetries = 0 # user configurable, defaults to 0
-        self.IP_timeout = 0.2 # UDP/TCP MODBUS timeout in seconds
-        self.IP_retries = 1 # UDP/TCP MODBUS retries (max 2)
-        self.PID_slave_ID = 0
-        self.PID_SV_register = 0
-        self.PID_p_register = 0
-        self.PID_i_register = 0
-        self.PID_d_register = 0
-        self.PID_ON_action = ''
-        self.PID_OFF_action = ''
+        self.comport:str = 'COM5'      #NOTE: this string should not be translated.
+        self.baudrate:int = 115200
+        self.bytesize:int = 8
+        self.parity:str = 'N' # Literal['O','E','N']
+        self.stopbits:int = 1
+        self.timeout:float = 0.3 # serial MODBUS timeout
+        self.serial_readRetries:int = 0 # user configurable, defaults to 0
+        self.IP_timeout:float = 0.2 # UDP/TCP MODBUS timeout in seconds
+        self.IP_retries:int = 1 # UDP/TCP MODBUS retries (max 3)
+        self.PID_slave_ID:int = 0
+        self.PID_SV_register:int = 0
+        self.PID_p_register:int = 0
+        self.PID_i_register:int = 0
+        self.PID_d_register:int = 0
+        self.PID_ON_action:str = ''
+        self.PID_OFF_action:str = ''
 
-        self.channels = 8
-        self.inputSlaves = [0]*self.channels
-        self.inputRegisters = [0]*self.channels
+        self.channels:Final[int] = 8
+        self.inputSlaves:List[int] = [0]*self.channels
+        self.inputRegisters:List[int] = [0]*self.channels
         # decoding (default: 16bit uInt)
-        self.inputFloats = [False]*self.channels       # 32bit Floats
-        self.inputBCDs = [False]*self.channels         # 32bit uInt BCD decoded
-        self.inputFloatsAsInt = [False]*self.channels  # 32bit uInt/sInt
-        self.inputBCDsAsInt = [False]*self.channels    # 16bit uInt/sInt
-        self.inputSigned = [False]*self.channels       # if True, decode Integers as signed otherwise as unsigned
+        self.inputFloats:List[bool] = [False]*self.channels       # 32bit Floats
+        self.inputBCDs:List[bool] = [False]*self.channels         # 32bit uInt BCD decoded
+        self.inputFloatsAsInt:List[bool] = [False]*self.channels  # 32bit uInt/sInt
+        self.inputBCDsAsInt:List[bool] = [False]*self.channels    # 16bit uInt/sInt
+        self.inputSigned:List[bool] = [False]*self.channels       # if True, decode Integers as signed otherwise as unsigned
         #
-        self.inputCodes = [3]*self.channels
-        self.inputDivs = [0]*self.channels # 0: none, 1: 1/10, 2:1/100
-        self.inputModes = ['C']*self.channels
+        self.inputCodes:List[int] = [3]*self.channels
+        self.inputDivs:List[int] = [0]*self.channels # 0: none, 1: 1/10, 2:1/100 # :List[Literal[0,1,2]]
+        self.inputModes:List[str] = ['C']*self.channels
 
-        self.optimizer = True # if set, values of consecutive register addresses are requested in single requests
+        self.optimizer:bool = True # if set, values of consecutive register addresses are requested in single requests
         # MODBUS functions associated to dicts associating MODBUS slave ids to registers in use
         # for optimized read of full register segments with single requests
         # this dict is re-computed on each connect() by a call to updateActiveRegisters()
         # NOTE: for registers of type float and BCD (32bit = 2x16bit) also the succeeding registers are registered
-        self.fetch_max_blocks = False # if set, the optimizer fetches only one sequence per area from the minimum to the maximum register ignoring gaps
-        self.fail_on_cache_miss = True # if False and request cannot be resolved from optimizer cache while optimizer is active,
+        self.fetch_max_blocks:bool = False # if set, the optimizer fetches only one sequence per area from the minimum to the maximum register ignoring gaps
+        self.fail_on_cache_miss:bool = True # if False and request cannot be resolved from optimizer cache while optimizer is active,
             # send individual reading request; if set to True, never send individual data requests while optimizer is on
             # NOTE: if TRUE read requests with force=False (default) will fail
-        self.disconnect_on_error = True # if True we explicitly disconnect the MODBUS connection on IO errors if on MODBUS serial and restart it on next request
+        self.disconnect_on_error:bool = True # if True we explicitly disconnect the MODBUS connection on IO errors (was: if on MODBUS serial and restart it on next request)
 
-        self.reset_socket = False # reset socket connection on error (True by default in pymodbus>v2.5.2, False by default in pymodbus v2.3)
+        self.reset_socket:bool = False # reset socket connection on error (True by default in pymodbus>v2.5.2, False by default in pymodbus v2.3)
 
-        self.activeRegisters = {}
-        # the readings cache that is filled by requesting sequences of values in blocks
-        self.readingsCache = {}
+        self.activeRegisters:Dict[int, Dict[int, List[int]]] = {}
+        # the readings cache that is filled by requesting sequences of values of activeRegisters in blocks
+        self.readingsCache:Dict[int, Dict[int, Dict[int, int]]] = {}
 
-        self.SVmultiplier = 0
-        self.PIDmultiplier = 0
-        self.byteorderLittle = False
-        self.wordorderLittle = True
-        self.master = None
-        self.COMsemaphore = QSemaphore(1)
-        self.host = '127.0.0.1' # the TCP/UDP host
-        self.port = 502 # the TCP/UDP port
-        self.type = 0
+        self.SVmultiplier:int = 0  # 0:no, 1:10x, 2:100x # Literal[0,1,2]
+        self.PIDmultiplier:int = 0  # 0:no, 1:10x, 2:100x # :Literal[0,1,2]
+        self.byteorderLittle:bool = False
+        self.wordorderLittle:bool = True
+        self.master:Optional[Union['ModbusSerialClient', 'ModbusTcpClient', 'ModbusUdpClient']] = None
+        self.COMsemaphore:QSemaphore = QSemaphore(1)
+        self.host:str = '127.0.0.1' # the TCP/UDP host
+        self.port:int = 502 # the TCP/UDP port
+        self.type:int = 0 # :Literal[0,1,2,3,4]
         # type =
         #    0: Serial RTU
         #    1: Serial ASCII
         #    2: Serial Binary
         #    3: TCP
         #    4: UDP
-        self.lastReadResult = 0 # this is set by eventaction following some custom button/slider Modbus actions with "read" command
+        self.lastReadResult:Optional[int] = 0 # this is set by eventaction following some custom button/slider Modbus actions with "read" command
 
-        self.commError = False # True after a communication error was detected and not yet cleared by receiving proper data
+        self.commError:bool = False # True after a communication error was detected and not yet cleared by receiving proper data
 
     # this guarantees a minimum of 30 milliseconds between readings and 80ms between writes (according to the Modbus spec) on serial connections
     # this sleep delays between requests seems to be beneficial on slow RTU serial connections like those of the FZ-94
-    def sleepBetween(self,write=False):
+    def sleepBetween(self, write:bool = False) -> None:
         if write:
             pass # handled in MODBUS lib
 #            if self.type in [3,4]: # TCP or UDP
 #                pass
 #            else:
 #                time.sleep(self.modbus_serial_write_delay)
+        elif self.type in [3, 4]: # delay between writes only on serial connections
+            pass
         else:
-            if self.type in [3,4]: # delay between writes only on serial connections
-                pass
-            else:
-                time.sleep(self.modbus_serial_read_delay + self.modbus_serial_extra_read_delay)
+            time.sleep(self.modbus_serial_read_delay + self.modbus_serial_extra_read_delay)
 
     @staticmethod
-    def address2register(addr, code=3):
+    def address2register(addr, code:int = 3) -> int:
         if code in [3, 6]:
             return addr - 40001
         return addr - 30001
 
-    def isConnected(self):
-        return self.master is not None and self.master.socket
+    def isConnected(self) -> bool:
+        return self.master is not None and bool(self.master.socket)
 
-    def disconnect(self):
+    def disconnect(self) -> None:
         _log.debug('disconnect()')
         try:
             if self.master is not None:
@@ -219,17 +215,22 @@ class modbusport():
         self.master = None
         self.clearReadingsCache()
 
-    def disconnectOnError(self):
-        # we only disconnect on error if mechanism is active, we are no longer connected or there is a IO commError, and we are on serial MODBUS (IP MODBUS reconnects automtically)
-        if self.disconnect_on_error and (self.commError or not self.isConnected()) and self.type < 3:
+    def disconnectOnError(self) -> None:
+        # we only disconnect on error if mechanism is active, we are no longer connected or there is a IO commError, [ and we are on serial MODBUS (IP MODBUS reconnects automtically) NOTE: this seems to succeed in any case!?]
+        if self.disconnect_on_error and (self.commError or not self.isConnected()): # and self.type < 3:
+            _log.info('MODBUS disconnectOnError')
             self.disconnect()
 
     # t a duration between start and end time in seconds to be formatted in a string as ms
     @staticmethod
-    def formatMS(start, end):
+    def formatMS(start:float, end:float) -> str:
         return f'{(end-start)*1000:.1f}'
 
-    def connect(self):
+    @staticmethod
+    def reconnect() -> None:
+        _log.info('reconnect()')
+
+    def connect(self) -> None:
 #        if self.master and not self.master.socket:
 #            self.master = None
         if self.master is None or not self.master.socket:
@@ -245,9 +246,12 @@ class modbusport():
                         bytesize=self.bytesize,
                         parity=self.parity,
                         stopbits=self.stopbits,
+                        retries=1,
                         retry_on_empty=False,
                         retry_on_invalid=False,
                         reset_socket=self.reset_socket,
+                        reconnect_delay=0, # avoid automatic reconnection
+                        on_reconnect_callback=self.reconnect,
                         # timeout is in seconds and defaults to 3
                         timeout=min((self.aw.qmc.delay/2000), self.timeout)) # the timeout should not be larger than half of the sampling interval
                     self.readRetries = self.serial_readRetries
@@ -260,9 +264,12 @@ class modbusport():
                         bytesize=self.bytesize,
                         parity=self.parity,
                         stopbits=self.stopbits,
+                        retries=1,
                         retry_on_empty=False,
                         retry_on_invalid=False,
                         reset_socket=self.reset_socket,
+                        reconnect_delay=0, # avoid automatic reconnection
+                        on_reconnect_callback=self.reconnect,
                         # timeout is in seconds and defaults to 3
                         timeout=min((self.aw.qmc.delay/2000), self.timeout)) # the timeout should not be larger than half of the sampling interval
                     self.readRetries = self.serial_readRetries
@@ -272,10 +279,13 @@ class modbusport():
                         self.master = ModbusTcpClient(
                                 host=self.host,
                                 port=self.port,
-                                retry_on_empty=False,   # only supported for serial clients in v2.5.2
-                                retry_on_invalid=False, # only supported for serial clients in v2.5.2
+                                retry_on_empty=True,   # only supported for serial clients in v2.5.2
+                                retry_on_invalid=True, # only supported for serial clients in v2.5.2
+                                close_comm_on_error=self.reset_socket,
                                 reset_socket=self.reset_socket,
                                 retries=self.IP_retries,
+                                reconnect_delay=0, # avoid automatic reconnection
+                                on_reconnect_callback=self.reconnect,
                                 # timeout is in seconds (int) and defaults to 3
                                 timeout=min((self.aw.qmc.delay/2000), self.IP_timeout) # the timeout should not be larger than half of the sampling interval
                                 )
@@ -291,10 +301,13 @@ class modbusport():
                         self.master = ModbusUdpClient(
                             host=self.host,
                             port=self.port,
-                            retry_on_empty=False,   # only supported for serial clients in v2.5.2
-                            retry_on_invalid=False, # only supported for serial clients in v2.5.2
+                            retry_on_empty=True,   # only supported for serial clients in v2.5.2
+                            retry_on_invalid=True, # only supported for serial clients in v2.5.2
+                            close_comm_on_error=self.reset_socket,
                             reset_socket=self.reset_socket,
                             retries=self.IP_retries,
+                            reconnect_delay=0, # avoid automatic reconnection
+                            on_reconnect_callback=self.reconnect,
                             # timeout is in seconds (int) and defaults to 3
                             timeout=min((self.aw.qmc.delay/2000), self.IP_timeout) # the timeout should not be larger than half of the sampling interval
                             )
@@ -313,19 +326,23 @@ class modbusport():
                         bytesize=self.bytesize,
                         parity=self.parity,
                         stopbits=self.stopbits,
+                        retries=1,
                         retry_on_empty=False,  # by default False for faster speed
                         retry_on_invalid=False, # by default False
                         reset_socket=self.reset_socket,
                         strict=False, # settings this to False disables the inter char timeout restriction
+                        reconnect_delay=0, # avoid automatic reconnection
+                        on_reconnect_callback=self.reconnect,
                         timeout=min((self.aw.qmc.delay/2000), self.timeout)) # the timeout should not be larger than half of the sampling interval
 #                    self.master.inter_char_timeout = 0.05
                     self.readRetries = self.serial_readRetries
                 _log.debug('connect(): connecting')
+                time.sleep(.3) # avoid possible hickups on startup
                 self.master.connect()
                 if self.isConnected():
                     self.updateActiveRegisters()
                     self.clearReadingsCache()
-                    time.sleep(.5) # avoid possible hickups on startup
+                    time.sleep(.2) # avoid possible hickups on startup
                     self.aw.sendmessage(QApplication.translate('Message', 'Connected via MODBUS'))
                 else:
                     self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Error: failed to connect'))
@@ -337,7 +354,7 @@ class modbusport():
 ########## MODBUS optimizer for fetching register data in batches
 
     # MODBUS code => slave => [registers]
-    def updateActiveRegisters(self):
+    def updateActiveRegisters(self) -> None:
         _log.debug('updateActiveRegisters()')
         self.activeRegisters = {}
         for c in range(self.channels):
@@ -356,11 +373,11 @@ class modbusport():
                     self.activeRegisters[code][slave] = registers
         _log.debug('active registers: %s',self.activeRegisters)
 
-    def clearReadingsCache(self):
+    def clearReadingsCache(self) -> None:
         _log.debug('clearReadingsCache()')
         self.readingsCache = {}
 
-    def cacheReadings(self,code,slave,register,results):
+    def cacheReadings(self, code:int, slave:int, register:int, results:List[int]):
         if code not in self.readingsCache:
             self.readingsCache[code] = {}
         if slave not in self.readingsCache[code]:
@@ -368,35 +385,32 @@ class modbusport():
         for i,v in enumerate(results):
             self.readingsCache[code][slave][register+i] = v
             if self.aw.seriallogflag:
-                ser_str = 'cache reading : Slave = {} || Register = {} || Rx = {}'.format(
-                    slave,
-                    register+i,
-                    v)
+                ser_str = f'cache reading : Slave = {slave} || Register = {register+i} || Rx = {v}'
                 self.aw.addserial(ser_str)
 
     # first result signals an error
     # second result signals a server error which requires a disconnect/reconnect
     @staticmethod
-    def invalidResult(res,count):
+    def invalidResult(res, count:int) -> Tuple[bool, bool]:
         from pymodbus.pdu import ExceptionResponse
         if res is None:
             _log.info('invalidResult(%d) => None', count)
             return True, False
-        elif isinstance(res, ExceptionResponse):
+        if isinstance(res, ExceptionResponse):
             _log.info('invalidResult(%d) => received exception from device', count)
             return True, False
-        elif res.isError():
+        if res.isError():
             _log.info('invalidResult(%d) => pymodbus error: %s', count, res)
             return True, True
-        elif res.registers is None:
+        if res.registers is None:
             _log.info('invalidResult(%d) => res.registers is None', count)
             return True,False
-        elif len(res.registers) != count:
+        if len(res.registers) != count:
             _log.info('invalidResult(%d) => len(res.registers)=%d', count, len(res.registers))
             return True, False
         return False, False
 
-    def readActiveRegisters(self):
+    def readActiveRegisters(self) -> None:
         if not self.optimizer:
             return
         error_disconnect = False # set to True if a serious error requiring a disconnect was detected
@@ -406,28 +420,30 @@ class modbusport():
             self.COMsemaphore.acquire(1)
             self.connect()
             if self.isConnected():
+                assert self.master is not None
                 self.clearReadingsCache()
-                for code in self.activeRegisters:
-                    for slave in self.activeRegisters[code]:
-                        registers = sorted(self.activeRegisters[code][slave])
+                for code, slaves in self.activeRegisters.items():
+                    for slave, registers in slaves.items():
+                        registers_sorted = sorted(registers)
+                        sequences:List[Tuple[int,int]]
                         if self.fetch_max_blocks:
-                            sequences = [[registers[0],registers[-1]]]
+                            sequences = [(registers_sorted[0],registers_sorted[-1])]
                         else:
                             # split in successive sequences
-                            gaps = [[s, er] for s, er in zip(registers, registers[1:]) if s+1 < er]
-                            edges = iter(registers[:1] + sum(gaps, []) + registers[-1:])
+                            gaps = [[s, er] for s, er in zip(registers_sorted, registers_sorted[1:]) if s+1 < er]
+                            edges = iter(registers_sorted[:1] + sum(gaps, []) + registers_sorted[-1:])
                             sequences = list(zip(edges, edges)) # list of pairs of the form (start-register,end-register)
-                        just_send = False
+                        just_send:bool = False
                         for seq in sequences:
-                            retry = self.readRetries
-                            register = seq[0]
-                            count = seq[1]-seq[0] + 1
+                            retry:int = self.readRetries
+                            register:int = seq[0]
+                            count:int = seq[1]-seq[0] + 1
                             if 0 < count <= self.maxCount:
-                                res = None
+                                res:Optional['ModbusResponse'] = None
                                 if just_send:
                                     self.sleepBetween() # we start with a sleep, as it could be that just a send command happened before the semaphore was caught
                                 just_send = True
-                                tx = time.time()
+                                tx:float = time.time()
                                 while True:
                                     _log.debug('readActive(%d,%d,%d,%d)', slave, code, register, count)
                                     try:
@@ -454,29 +470,11 @@ class modbusport():
                                         break
 
                                 #note: logged chars should be unicode not binary
-                                if self.aw.seriallogflag:
+                                if self.aw.seriallogflag and res is not None and hasattr(res, 'registers'):
                                     if self.type < 3: # serial MODBUS
-                                        ser_str = 'MODBUS readActiveRegisters : {}ms => {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx# = {}'.format(
-                                            self.formatMS(tx,time.time()),
-                                            self.comport,
-                                            self.baudrate,
-                                            self.bytesize,
-                                            self.parity,
-                                            self.stopbits,
-                                            self.timeout,
-                                            slave,
-                                            register,
-                                            code,
-                                            len(res.registers))
+                                        ser_str = f'MODBUS readActiveregisters : {self.formatMS(tx,time.time())}ms => {self.comport},{self.baudrate},{self.bytesize},{self.parity},{self.stopbits},{self.timeout} || Slave = {slave} || Register = {register} || Code = {code} || Rx# = {len(res.registers)}' # pyright: ignore # Cannot access member "registers" for type "ModbusResponse"  Member "registers" is unknown (reportGeneralTypeIssues)
                                     else: # IP MODBUS
-                                        ser_str = 'MODBUS readActiveRegisters : {}ms => {}:{} || Slave = {} || Register = {} || Code = {} || Rx# = {}'.format(
-                                            self.formatMS(tx,time.time()),
-                                            self.host,
-                                            self.port,
-                                            slave,
-                                            register,
-                                            code,
-                                            len(res.registers))
+                                        ser_str = f'MODBUS readActiveregisters : {self.formatMS(tx,time.time())}ms => {self.host}:{self.port} || Slave = {slave} || Register = {register} || Code = {code} || Rx# = {len(res.registers)}' # pyright: ignore # Cannot access member "registers" for type "ModbusResponse" Member "registers" is unknown (reportGeneralTypeIssues)
                                     _log.debug(ser_str)
                                     self.aw.addserial(ser_str)
 
@@ -484,7 +482,8 @@ class modbusport():
                                     if self.commError: # we clear the previous error and send a message
                                         self.commError = False
                                         self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
-                                    self.cacheReadings(code,slave,register,res.registers)
+                                    if hasattr(res, 'registers'):
+                                        self.cacheReadings(code,slave,register,res.registers)  # pyright: ignore # Cannot access member "registers" for type "ModbusResponse" Member "registers" is unknown (reportGeneralTypeIssues)
 
         except Exception as ex: # pylint: disable=broad-except
             _log.debug(ex)
@@ -502,13 +501,17 @@ class modbusport():
 ##########
 
     # function 15 (Write Multiple Coils)
-    def writeCoils(self,slave,register,values):
+    def writeCoils(self, slave:int, register:int, values:List[bool]) -> None:
         _log.debug('writeCoils(%d,%d,%s)', slave, register, values)
+        if slave == 0:
+            return
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            self.master.write_coils(int(register),list(values),slave=int(slave))
+            if self.isConnected():
+                assert self.master is not None
+                self.master.write_coils(int(register),list(values),slave=int(slave))
             time.sleep(.3) # avoid possible hickups on startup
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeCoils(%d,%d,%s)', slave, register, values)
@@ -524,14 +527,18 @@ class modbusport():
                 self.COMsemaphore.release(1)
 
     # function 5 (Write Single Coil)
-    def writeCoil(self,slave,register,value):
+    def writeCoil(self, slave:int ,register:int ,value:bool) -> None:
         _log.debug('writeCoil(%d,%d,%s)', slave, register, value)
+        if slave == 0:
+            return
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            self.master.write_coil(int(register),value,slave=int(slave))
-            time.sleep(.3) # avoid possible hickups on startup
+            if self.isConnected():
+                assert self.master is not None
+                self.master.write_coil(int(register),value,slave=int(slave))
+                time.sleep(.3) # avoid possible hickups on startup
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeCoil(%d,%d,%s) failed', slave, register, value)
             _log.debug(ex)
@@ -545,27 +552,33 @@ class modbusport():
 
     # write value to register on slave (function 6 for int or function 16 for float)
     # value can be one of string (containing an int or float), an int or a float
-    def writeRegister(self,slave,register,value):
+    def writeRegister(self, slave:int, register:int, value: Union[int, float, str]) -> None:
         _log.debug('writeRegister(%d,%d,%s)', slave, register, value)
-        if stringp(value):
+        if slave == 0:
+            return
+        if isinstance(value, str):
             if '.' in value:
-                self.writeWord(slave,register,value)
+                self.writeWord(slave, register, float(value))
             else:
-                self.writeSingleRegister(slave,register,value)
+                self.writeSingleRegister(slave, register, int(value))
         elif isinstance(value, int):
             self.writeSingleRegister(slave,register,value)
         elif isinstance(value, float):
             self.writeWord(slave,register,value)
 
     # function 6 (Write Single Holding Register)
-    def writeSingleRegister(self,slave,register,value):
+    def writeSingleRegister(self, slave:int, register:int, value:float) -> None:
         _log.debug('writeSingleRegister(%d,%d,%s)', slave, register, value)
+        if slave == 0:
+            return
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            self.master.write_register(int(register),int(round(value)),slave=int(slave))
-            time.sleep(.03) # avoid possible hickups on startup
+            if self.isConnected():
+                assert self.master is not None
+                self.master.write_register(int(register),int(round(value)),slave=int(slave))
+                time.sleep(.03) # avoid possible hickups on startup
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeSingleRegister(%d,%d,%s) failed', slave, register, value)
             _log.debug(ex)
@@ -583,14 +596,18 @@ class modbusport():
     # function 22 (Mask Write Register)
     # bits to be modified are "masked" with a 0 in the and_mask (not and_mask)
     # new bit values to be written are taken from the or_mask
-    def maskWriteRegister(self,slave,register,and_mask,or_mask):
+    def maskWriteRegister(self, slave:int, register:int, and_mask:int, or_mask:int) -> None:
         _log.debug('maskWriteRegister(%d,%d,%s,%s)', slave, register, and_mask, or_mask)
+        if slave == 0:
+            return
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            self.master.mask_write_register(int(register),int(and_mask),int(or_mask),slave=int(slave))
-            time.sleep(.03)
+            if self.isConnected():
+                assert self.master is not None
+                self.master.mask_write_register(int(register),int(and_mask),int(or_mask),slave=int(slave))
+                time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('maskWriteRegister(%d,%d,%s,%s) failed', slave, register, and_mask, or_mask)
             if debugLogLevelActive():
@@ -608,20 +625,27 @@ class modbusport():
     # a local variant of function 22 (Mask Write Register)
     # the masks are evaluated locally on the given integer value and the result is send via
     # using function 6
-    def localMaskWriteRegister(self,slave,register,and_mask,or_mask,value):
+    def localMaskWriteRegister(self, slave:int, register:int, and_mask:int, or_mask:int, value:int) -> None:
+        _log.debug('localMaskWriteRegister(%d,%d,%s,%s,%s)', slave, register, and_mask, or_mask, value)
+        if slave == 0:
+            return
         new_val = (int(round(value)) & and_mask) | (or_mask & (and_mask ^ 0xFFFF))
         self.writeSingleRegister(slave,register,int(new_val))
 
     # function 16 (Write Multiple Holding Registers)
     # values is a list of integers or one integer
-    def writeRegisters(self,slave,register,values):
+    def writeRegisters(self, slave:int, register:int, values:Union[List[int], int]) -> None:
         _log.debug('writeRegisters(%d,%d,%s)', slave, register, values)
+        if slave == 0:
+            return
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            self.master.write_registers(int(register),values,slave=int(slave))
-            time.sleep(.03)
+            if self.isConnected():
+                assert self.master is not None
+                self.master.write_registers(int(register),values,slave=int(slave))
+                time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeRegisters(%d,%d,%s) failed', slave, register, values)
             _log.debug(ex)
@@ -636,17 +660,22 @@ class modbusport():
     # function 16 (Write Multiple Holding Registers)
     # value=int or float
     # writes a single precision 32bit float (2-registers)
-    def writeWord(self,slave,register,value):
+    def writeWord(self, slave:int, register:int, value:float) -> None:
         _log.debug('writeWord(%d,%d,%s)', slave, register, value)
+        if slave == 0:
+            return
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            builder = getBinaryPayloadBuilder(self.byteorderLittle,self.wordorderLittle)
-            builder.add_32bit_float(float(value))
-            payload = builder.build()
-            self.master.write_registers(int(register),payload,slave=int(slave),skip_encode=True)
-            time.sleep(.03)
+            if self.isConnected():
+                assert self.master is not None
+                builder = getBinaryPayloadBuilder(self.byteorderLittle,self.wordorderLittle)
+                builder.add_32bit_float(float(value))
+                payload = builder.build()
+                #payload:List[int] = [int.from_bytes(b,("little" if self.byteorderLittle else "big")) for b in builder.build()]
+                self.master.write_registers(int(register),payload,slave=int(slave),skip_encode=True)  # pyright: ignore # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"
+                time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeWord(%d,%d,%s) failed', slave, register, value)
             _log.debug(ex)
@@ -659,18 +688,23 @@ class modbusport():
                 self.COMsemaphore.release(1)
 
     # translates given int value int a 16bit BCD and writes it into one register
-    def writeBCD(self,slave,register,value):
+    def writeBCD(self, slave:int, register:int, value:int) -> None:
         _log.debug('writeBCD(%d,%d,%s)', slave, register, value)
+        if slave == 0:
+            return
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
-            self.connect()
-            builder = getBinaryPayloadBuilder(self.byteorderLittle,self.wordorderLittle)
-            r = convert_to_bcd(int(value))
-            builder.add_16bit_uint(r)
-            payload = builder.build() # .tolist()
-            self.master.write_registers(int(register),payload,slave=int(slave),skip_encode=True)
-            time.sleep(.03)
+            if self.isConnected():
+                assert self.master is not None
+                self.connect()
+                builder = getBinaryPayloadBuilder(self.byteorderLittle,self.wordorderLittle)
+                r = convert_to_bcd(int(value))
+                builder.add_16bit_uint(r)
+                payload = builder.build()
+                #payload:List[int] = [int.from_bytes(b,("little" if self.byteorderLittle else "big")) for b in builder.build()]
+                self.master.write_registers(int(register),payload,slave=int(slave),skip_encode=True)  # pyright: ignore # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"
+                time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeBCD(%d,%d,%s) failed', slave, register, value)
             _log.debug(ex)
@@ -685,17 +719,22 @@ class modbusport():
     # function 16 (Write Multiple Holding Registers)
     # value=int or float
     # writes a 32bit integer (2-registers)
-    def writeLong(self,slave,register,value):
+    def writeLong(self, slave:int, register:int, value:int) -> None:
         _log.debug('writeLong(%d,%d,%s)', slave, register, value)
+        if slave == 0:
+            return
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            builder = getBinaryPayloadBuilder(self.byteorderLittle,self.wordorderLittle)
-            builder.add_32bit_int(int(value))
-            payload = builder.build()
-            self.master.write_registers(int(register),payload,slave=int(slave),skip_encode=True)
-            time.sleep(.03)
+            if self.isConnected():
+                assert self.master is not None
+                builder = getBinaryPayloadBuilder(self.byteorderLittle,self.wordorderLittle)
+                builder.add_32bit_int(int(value))
+                payload = builder.build()
+                #payload:List[int] = [int.from_bytes(b,("little" if self.byteorderLittle else "big")) for b in builder.build()]
+                self.master.write_registers(int(register),payload,slave=int(slave),skip_encode=True)  # pyright: ignore # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"
+                time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeLong(%d,%d,%s) failed', slave, register, value)
             _log.debug(ex)
@@ -709,15 +748,16 @@ class modbusport():
 
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
     # if force the readings cache is ignored and fresh readings are requested
-    def readFloat(self,slave,register,code=3,force=False):
+    def readFloat(self, slave:int, register:int,code:int=3, force:bool=False) -> Optional[float]:
         _log.debug('readFloat(%d,%d,%d,%s)', slave, register, code, force)
         if slave == 0:
             return None
-        r = None
-        retry = self.readRetries
+        r:Optional[float] = None
+        retry:int = self.readRetries
+        tx:float = 0.
         if self.aw.seriallogflag:
             tx = time.time()
-        error_disconnect = False # set to True if a serious error requiring a disconnect was detected
+        error_disconnect:bool = False # set to True if a serious error requiring a disconnect was detected
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -725,8 +765,8 @@ class modbusport():
                 if code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave] \
                     and register+1 in self.readingsCache[code][slave]:
                     # cache hit
-                    res = [self.readingsCache[code][slave][register],self.readingsCache[code][slave][register+1]]
-                    decoder = getBinaryPayloadDecoderFromRegisters(res, self.byteorderLittle, self.wordorderLittle)
+                    res_int:List[int] = [self.readingsCache[code][slave][register],self.readingsCache[code][slave][register+1]]
+                    decoder = getBinaryPayloadDecoderFromRegisters(res_int, self.byteorderLittle, self.wordorderLittle)
                     r = decoder.decode_32bit_float()
                     _log.debug('return cached value => %.3f', r)
                     return r
@@ -734,7 +774,9 @@ class modbusport():
                     _log.debug('optimizer cache miss')
                     return None
             self.connect()
+            res: Optional[ModbusResponse]
             if self.isConnected():
+                assert self.master is not None
                 while True:
                     if code==3:
                         res = self.master.read_holding_registers(int(register),2,slave=int(slave))
@@ -751,14 +793,15 @@ class modbusport():
                             raise Exception('Exception response')  # pylint: disable=broad-exception-raised
                     else:
                         break
-                decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
-                r = decoder.decode_32bit_float()
-                if self.commError: # we clear the previous error and send a message
-                    self.commError = False
-                    self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
-                return r
-            else:
-                return None
+                if res is not None and hasattr(res, 'registers'):
+                    decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)  # pyright: ignore # Cannot access member "registers" for type "ModbusResponse"
+                    r = decoder.decode_32bit_float()
+                    if self.commError: # we clear the previous error and send a message
+                        self.commError = False
+                        self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
+                    time.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
+                    return r
+            return None
         except Exception as ex: # pylint: disable=broad-except
             _log.info('readFloat(%d,%d,%d,%s) failed', slave, register, code, force)
             _log.debug(ex)
@@ -777,43 +820,24 @@ class modbusport():
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 if self.type < 3: # serial MODBUS
-                    ser_str = 'MODBUS readFloat : {}ms => {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {} || retries = {}'.format(
-                        self.formatMS(tx,time.time()),
-                        self.comport,
-                        self.baudrate,
-                        self.bytesize,
-                        self.parity,
-                        self.stopbits,
-                        self.timeout,
-                        slave,
-                        register,
-                        code,
-                        r,
-                        self.readRetries-retry)
+                    ser_str = f'MODBUS readFloat : {self.formatMS(tx,time.time())}ms => {self.comport},{self.baudrate},{self.bytesize},{self.parity},{self.stopbits},{self.timeout} || Slave = {slave} || Register = {register} || Code = {code} || Rx = {r} || retries = {self.readRetries-retry}'
                 else: # IP MODBUS
-                    ser_str = 'MODBUS readFloat : {}ms => {}:{} || Slave = {} || Register = {} || Code = {} || Rx = {} || retries = {}'.format(
-                        self.formatMS(tx,time.time()),
-                        self.host,
-                        self.port,
-                        slave,
-                        register,
-                        code,
-                        r,
-                        self.readRetries-retry)
+                    ser_str = f'MODBUS readFloat : {self.formatMS(tx,time.time())}ms => {self.host}:{self.port} || Slave = {slave} || Register = {register} || Code = {code} || Rx = {r} || retries = {self.readRetries-retry}'
                 self.aw.addserial(ser_str)
 
 
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
     # if force the readings cache is ignored and fresh readings are requested
-    def readBCD(self,slave,register,code=3,force=False):
+    def readBCD(self, slave:int, register:int, code:int = 3, force:bool = False) -> Optional[int]:
         _log.debug('readBCD(%d,%d,%d,%s)', slave, register, code, force)
         if slave == 0:
             return None
-        r = None
-        retry = self.readRetries
+        r:Optional[int] = None
+        retry:int = self.readRetries
+        tx:float = 0.
         if self.aw.seriallogflag:
             tx = time.time()
-        error_disconnect = False # set to True if a serious error requiring a disconnect was detected
+        error_disconnect:bool = False # set to True if a serious error requiring a disconnect was detected
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -821,8 +845,8 @@ class modbusport():
                 if code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave] \
                     and register+1 in self.readingsCache[code][slave]:
                     # cache hit
-                    res = [self.readingsCache[code][slave][register],self.readingsCache[code][slave][register+1]]
-                    decoder = getBinaryPayloadDecoderFromRegisters(res, self.byteorderLittle, self.wordorderLittle)
+                    res_int:List[int] = [self.readingsCache[code][slave][register],self.readingsCache[code][slave][register+1]]
+                    decoder = getBinaryPayloadDecoderFromRegisters(res_int, self.byteorderLittle, self.wordorderLittle)
                     r = convert_from_bcd(decoder.decode_32bit_uint())
                     _log.debug('return cached value => %.3f', r)
                     return r
@@ -830,7 +854,9 @@ class modbusport():
                     _log.debug('optimizer cache miss')
                     return None
             self.connect()
+            res: Optional[ModbusResponse]
             if self.isConnected():
+                assert self.master is not None
                 while True:
                     if code==3:
                         res = self.master.read_holding_registers(int(register),2,slave=int(slave))
@@ -847,15 +873,15 @@ class modbusport():
                             raise Exception('Exception response') # pylint: disable=broad-exception-raised
                     else:
                         break
-                decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
-                r = decoder.decode_32bit_uint()
-                if self.commError: # we clear the previous error and send a message
-                    self.commError = False
-                    self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
-                time.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
-                return convert_from_bcd(r)
-            else:
-                return None
+                if res is not None and hasattr(res, 'registers'):
+                    decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)  # pyright: ignore # Cannot access member "registers" for type "ModbusResponse"
+                    r = decoder.decode_32bit_uint()
+                    if self.commError: # we clear the previous error and send a message
+                        self.commError = False
+                        self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
+                    time.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
+                    return convert_from_bcd(r)
+            return None
         except Exception as ex: # pylint: disable=broad-except
             _log.info('readBCD(%d,%d,%d,%s) failed', slave, register, code, force)
             _log.debug(ex)
@@ -874,61 +900,45 @@ class modbusport():
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 if self.type < 3: # serial MODBUS
-                    ser_str = 'MODBUS readBCD : {}ms => {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {} || retries = {}'.format(
-                        self.formatMS(tx,time.time()),
-                        self.comport,
-                        self.baudrate,
-                        self.bytesize,
-                        self.parity,
-                        self.stopbits,
-                        self.timeout,
-                        slave,
-                        register,
-                        code,
-                        r,
-                        self.readRetries-retry)
+                    ser_str = f'MODBUS readBCD : {self.formatMS(tx,time.time())}ms => {self.comport},{self.baudrate},{self.bytesize},{self.parity},{self.stopbits},{self.timeout} || Slave = {slave} || Register = {register} || Code = {code} || Rx = {r} || retries = {self.readRetries-retry}'
                 else: # IP MODBUS
-                    ser_str = 'MODBUS readBCD : {}ms => {}:{} || Slave = {} || Register = {} || Code = {} || Rx = {} || retries = {}'.format(
-                        self.formatMS(tx,time.time()),
-                        self.host,
-                        self.port,
-                        slave,
-                        register,
-                        code,
-                        r,
-                        self.readRetries-retry)
+                    ser_str = f'MODBUS readBCD : {self.formatMS(tx,time.time())}ms => {self.host}:{self.port} || Slave = {slave} || Register = {register} || Code = {code} || Rx = {r} || retries = {self.readRetries-retry}'
                 self.aw.addserial(ser_str)
 
     # as readSingleRegister, but does not retry nor raise and error and returns a None instead
     # also does not reserve the port via a semaphore!
-    def peekSingleRegister(self,slave,register,code=3):
+    def peekSingleRegister(self, slave:int, register:int, code:int = 3) -> Optional[int]:
         _log.debug('peekSingleRegister(%d,%d,%d)', slave, register, code)
         if slave == 0:
             return None
+        res:Optional['ModbusResponse'] = None
         try:
-            if code==1:
-                res = self.master.read_coils(int(register),1,slave=int(slave))
-            elif code==2:
-                res = self.master.read_discrete_inputs(int(register),1,slave=int(slave))
-            elif code==4:
-                res = self.master.read_input_registers(int(register),1,slave=int(slave))
-            else: # code==3
-                res = self.master.read_holding_registers(int(register),1,slave=int(slave))
+            self.connect()
+            if self.isConnected():
+                assert self.master is not None
+                if code==1:
+                    res = self.master.read_coils(int(register),1,slave=int(slave))
+                elif code==2:
+                    res = self.master.read_discrete_inputs(int(register),1,slave=int(slave))
+                elif code==4:
+                    res = self.master.read_input_registers(int(register),1,slave=int(slave))
+                else: # code==3
+                    res = self.master.read_holding_registers(int(register),1,slave=int(slave))
         except Exception as ex: # pylint: disable=broad-except
             _log.info('peekSingleRegister(%d,%d,%d) failed', slave, register, code)
             _log.debug(ex)
-            res = None
         error, _ = self.invalidResult(res,1)
-        if not error:
+        if res is not None and not error:
             if code in [1,2]:
-                if res is not None and res.bits[0]:
+                if hasattr(res, 'bits') and res.bits[0]:  # pyright: ignore # Cannot access member "bits" for type "ModbusResponse"
                     return 1
                 return 0
-            decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
-            r = decoder.decode_16bit_uint()
-            _log.debug('  res.registers => %s', res.registers)
-            _log.debug('  decoder.decode_16bit_uint() => %s', r)
-            return r
+            if hasattr(res, 'registers'):
+                decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)  # pyright: ignore # Cannot access member "registers" for type "ModbusResponse"
+                r = decoder.decode_16bit_uint()
+#                _log.debug('  res.registers => %s', res.registers)
+                _log.debug('  decoder.decode_16bit_uint() => %s', r)
+                return r
         return None
 
     # function 1 (Read Coil)
@@ -937,23 +947,24 @@ class modbusport():
     # function 4 (Read Input Registers)
     # if force the readings cache is ignored and fresh readings are requested
     # if signed is True, the received data is interpreted as signed integer, otherwise as unsigned
-    def readSingleRegister(self,slave,register,code=3,force=False,signed=False):
+    def readSingleRegister(self, slave:int, register:int, code:int = 3, force:bool = False, signed:bool = False) -> Optional[int]:
         _log.debug('readSingleRegister(%d,%d,%d,%s)', slave, register, code, force)
         if slave == 0:
             return None
-        r = None
-        retry = self.readRetries
+        r:Optional[int] = None
+        retry:int = self.readRetries
+        tx:float = 0.
         if self.aw.seriallogflag:
             tx = time.time()
-        error_disconnect = False # set to True if a serious error requiring a disconnect was detected
+        error_disconnect:bool = False # set to True if a serious error requiring a disconnect was detected
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             if self.optimizer and not force:
                 if code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave]:
                     # cache hit
-                    res = self.readingsCache[code][slave][register]
-                    decoder = getBinaryPayloadDecoderFromRegisters([res], self.byteorderLittle, self.wordorderLittle)
+                    res_int:int = self.readingsCache[code][slave][register]
+                    decoder = getBinaryPayloadDecoderFromRegisters([res_int], self.byteorderLittle, self.wordorderLittle)
                     if signed:
                         r = decoder.decode_16bit_int()
                     else:
@@ -964,7 +975,9 @@ class modbusport():
                     _log.debug('optimizer cache miss')
                     return None
             self.connect()
+            res: Optional[ModbusResponse]
             if self.isConnected():
+                assert self.master is not None
                 while True:
                     try:
                         if code==1:
@@ -989,26 +1002,24 @@ class modbusport():
                             raise Exception(f'readSingleRegister({slave},{register},{code},{force},{signed}) failed')  # pylint: disable=broad-exception-raised
                     else:
                         break
-                if code in [1,2]:
-                    if res is not None and res.bits[0]:
-                        r = 1
-                    else:
-                        r = 0
-                    if self.commError: # we clear the previous error and send a message
-                        self.commError = False
-                        self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
-                    return r
-                decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
-                if signed:
-                    r = decoder.decode_16bit_int()
-                else:
-                    r = decoder.decode_16bit_uint()
-                if self.commError: # we clear the previous error and send a message
-                    self.commError = False
-                    self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
-                return r
-            else:
-                return None
+                if res is not None:
+                    if code in [1,2] and hasattr(res, 'bits'):
+                        r = 1 if res is not None and res.bits[0] else 0  # pyright: ignore # Cannot access member "registers" for type "bits"
+                        if self.commError: # we clear the previous error and send a message
+                            self.commError = False
+                            self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
+                        return r
+                    if hasattr(res, 'registers'):
+                        decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle) # pyright: ignore # Cannot access member "registers" for type "ModbusResponse"
+                        if signed:
+                            r = decoder.decode_16bit_int()
+                        else:
+                            r = decoder.decode_16bit_uint()
+                        if self.commError: # we clear the previous error and send a message
+                            self.commError = False
+                            self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
+                        return r
+            return None
         except Exception as ex: # pylint: disable=broad-except
             _log.info('readSingleRegister(%d,%d,%d,%s) failed', slave, register, code, force)
             _log.debug(ex)
@@ -1027,42 +1038,23 @@ class modbusport():
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 if self.type < 3: # serial MODBUS
-                    ser_str = 'MODBUS readSingleRegister : {}ms => {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {} || retries = {}'.format(
-                        self.formatMS(tx,time.time()),
-                        self.comport,
-                        self.baudrate,
-                        self.bytesize,
-                        self.parity,
-                        self.stopbits,
-                        self.timeout,
-                        slave,
-                        register,
-                        code,
-                        r,
-                        self.readRetries-retry)
+                    ser_str = f'MODBUS readSingleRegister : {self.formatMS(tx,time.time())}ms => {self.comport},{self.baudrate},{self.bytesize},{self.parity},{self.stopbits},{self.timeout} || Slave = {slave} || Register = {register} || Code = {code} || Rx = {r} || retries = {self.readRetries-retry}'
                 else: # IP MODBUS
-                    ser_str = 'MODBUS readSingleRegister : {}ms => {}:{} || Slave = {} || Register = {} || Code = {} || Rx = {} || retries = {}'.format(
-                        self.formatMS(tx,time.time()),
-                        self.host,
-                        self.port,
-                        slave,
-                        register,
-                        code,
-                        r,
-                        self.readRetries-retry)
+                    ser_str = f'MODBUS readSingleRegister : {self.formatMS(tx,time.time())}ms => {self.host}:{self.port} || Slave = {slave} || Register = {register} || Code = {code} || Rx = {r} || retries = {self.readRetries-retry}'
                 self.aw.addserial(ser_str)
 
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
     # if force the readings cache is ignored and fresh readings are requested
-    def readInt32(self,slave,register,code=3,force=False,signed=False):
+    def readInt32(self, slave:int, register:int, code:int = 3,force:bool = False, signed:bool = False) -> Optional[int]:
         _log.debug('readInt32(%d,%d,%d,%s)', slave, register, code, force)
         if slave == 0:
             return None
-        r = None
-        retry = self.readRetries
+        r:Optional[int] = None
+        retry:int = self.readRetries
+        tx:float = 0.
         if self.aw.seriallogflag:
             tx = time.time()
-        error_disconnect = False # set to True if a serious error requiring a disconnect was detected
+        error_disconnect:bool = False # set to True if a serious error requiring a disconnect was detected
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -1070,8 +1062,8 @@ class modbusport():
                 if code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave] \
                     and register+1 in self.readingsCache[code][slave]:
                     # cache hit
-                    res = [self.readingsCache[code][slave][register],self.readingsCache[code][slave][register+1]]
-                    decoder = getBinaryPayloadDecoderFromRegisters(res, self.byteorderLittle, self.wordorderLittle)
+                    res_int:List[int] = [self.readingsCache[code][slave][register],self.readingsCache[code][slave][register+1]]
+                    decoder = getBinaryPayloadDecoderFromRegisters(res_int, self.byteorderLittle, self.wordorderLittle)
                     if signed:
                         r = decoder.decode_32bit_int()
                     else:
@@ -1082,7 +1074,9 @@ class modbusport():
                     _log.debug('optimizer cache miss')
                     return None
             self.connect()
+            res: Optional[ModbusResponse]
             if self.isConnected():
+                assert self.master is not None
                 while True:
                     if code==3:
                         res = self.master.read_holding_registers(int(register),2,slave=int(slave))
@@ -1099,17 +1093,17 @@ class modbusport():
                             raise Exception('Exception response')  # pylint: disable=broad-exception-raised
                     else:
                         break
-                decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
-                if signed:
-                    r = decoder.decode_32bit_int()
-                else:
-                    r = decoder.decode_32bit_uint()
-                if self.commError: # we clear the previous error and send a message
-                    self.commError = False
-                    self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
-                return r
-            else:
-                return None
+                if res is not None and hasattr(res, 'registers'):
+                    decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle) # pyright: ignore # Cannot access member "registers" for type "ModbusResponse"
+                    if signed:
+                        r = decoder.decode_32bit_int()
+                    else:
+                        r = decoder.decode_32bit_uint()
+                    if self.commError: # we clear the previous error and send a message
+                        self.commError = False
+                        self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
+                    return r
+            return None
         except Exception as ex: # pylint: disable=broad-except
             _log.info('readInt32(%d,%d,%d,%s) failed', slave, register, code, force)
             _log.debug(ex)
@@ -1128,52 +1122,33 @@ class modbusport():
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 if self.type < 3: # serial MODBUS
-                    ser_str = 'MODBUS readInt32 : {}ms => {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {} || retries = {}'.format(
-                        self.formatMS(tx,time.time()),
-                        self.comport,
-                        self.baudrate,
-                        self.bytesize,
-                        self.parity,
-                        self.stopbits,
-                        self.timeout,
-                        slave,
-                        register,
-                        code,
-                        r,
-                        self.readRetries-retry)
+                    ser_str = f'MODBUS readInt32 : {self.formatMS(tx,time.time())}ms => {self.comport},{self.baudrate},{self.bytesize},{self.parity},{self.stopbits},{self.timeout} || Slave = {slave} || Register = {register} || Code = {code} || Rx = {r} || retries = {self.readRetries-retry}'
                 else: # IP MODBUS
-                    ser_str = 'MODBUS readInt32 : {}ms => {}:{} || Slave = {} || Register = {} || Code = {} || Rx = {} || retries = {}'.format(
-                        self.formatMS(tx,time.time()),
-                        self.host,
-                        self.port,
-                        slave,
-                        register,
-                        code,
-                        r,
-                        self.readRetries-retry)
+                    ser_str = f'MODBUS readInt32 : {self.formatMS(tx,time.time())}ms => {self.host}:{self.port} || Slave = {slave} || Register = {register} || Code = {code} || Rx = {r} || retries = {self.readRetries-retry}'
                 self.aw.addserial(ser_str)
 
 
     # function 3 (Read Multiple Holding Registers) and
     # function 4 (Read Input Registers)
     # if force the readings cache is ignored and fresh readings are requested
-    def readBCDint(self,slave,register,code=3,force=False):
+    def readBCDint(self, slave:int, register:int, code:int = 3, force:bool = False) -> Optional[int]:
         _log.debug('readBCDint(%d,%d,%d,%s)', slave, register, code, force)
         if slave == 0:
             return None
-        r = None
-        retry = self.readRetries
+        r:Optional[int] = None
+        retry:int = self.readRetries
+        tx:float = 0.
         if self.aw.seriallogflag:
             tx = time.time()
-        error_disconnect = False # set to True if a serious error requiring a disconnect was detected
+        error_disconnect:bool = False # set to True if a serious error requiring a disconnect was detected
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             if self.optimizer and not force:
                 if code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave]:
                     # cache hit
-                    res = self.readingsCache[code][slave][register]
-                    decoder = getBinaryPayloadDecoderFromRegisters([res], self.byteorderLittle, self.wordorderLittle)
+                    res_int:int = self.readingsCache[code][slave][register]
+                    decoder = getBinaryPayloadDecoderFromRegisters([res_int], self.byteorderLittle, self.wordorderLittle)
                     r = convert_from_bcd(decoder.decode_16bit_uint())
                     _log.debug('return cached value => %d', r)
                     return r
@@ -1181,7 +1156,9 @@ class modbusport():
                     _log.debug('optimizer cache miss')
                     return None
             self.connect()
+            res: Optional[ModbusResponse]
             if self.isConnected():
+                assert self.master is not None
                 while True:
                     try:
                         if code==3:
@@ -1201,15 +1178,15 @@ class modbusport():
                             raise Exception('Exception response') # pylint: disable=broad-exception-raised
                     else:
                         break
-                decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
-                r = decoder.decode_16bit_uint()
-                if self.commError: # we clear the previous error and send a message
-                    self.commError = False
-                    self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
-                time.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
-                return convert_from_bcd(r)
-            else:
-                return None
+                if res is not None and hasattr(res, 'registers'):
+                    decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle) # pyright: ignore # Cannot access member "registers" for type "ModbusResponse"
+                    r = decoder.decode_16bit_uint()
+                    if self.commError: # we clear the previous error and send a message
+                        self.commError = False
+                        self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
+                    time.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
+                    return convert_from_bcd(r)
+            return None
         except Exception as ex: # pylint: disable=broad-except
             _log.info('readBCDint(%d,%d,%d,%s) failed', slave, register, code, force)
             _log.debug(ex)
@@ -1228,32 +1205,12 @@ class modbusport():
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 if self.type < 3: # serial MODBUS
-                    ser_str = 'MODBUS readBCDint : {}ms => {},{},{},{},{},{} || Slave = {} || Register = {} || Code = {} || Rx = {} || retries = {}'.format(
-                        self.formatMS(tx,time.time()),
-                        self.comport,
-                        self.baudrate,
-                        self.bytesize,
-                        self.parity,
-                        self.stopbits,
-                        self.timeout,
-                        slave,
-                        register,
-                        code,
-                        r,
-                        self.readRetries-retry)
+                    ser_str = f'MODBUS readBCDint : {self.formatMS(tx,time.time())}ms => {self.comport},{self.baudrate},{self.bytesize},{self.parity},{self.stopbits},{self.timeout} || Slave = {slave} || Register = {register} || Code = {code} || Rx = {r} || retries = {self.readRetries-retry}'
                 else: # IP MODBUS
-                    ser_str = 'MODBUS readBCDint : {}ms => {}:{} || Slave = {} || Register = {} || Code = {} || Rx = {} || retries = {}'.format(
-                        self.formatMS(tx,time.time()),
-                        self.host,
-                        self.port,
-                        slave,
-                        register,
-                        code,
-                        r,
-                        self.readRetries-retry)
+                    ser_str = f'MODBUS readBCDint : {self.formatMS(tx,time.time())}ms => {self.host}:{self.port} || Slave = {slave} || Register = {register} || Code = {code} || Rx = {r} || retries = {self.readRetries-retry}'
                 self.aw.addserial(ser_str)
 
-    def setTarget(self,sv):
+    def setTarget(self, sv:float) -> None:
         _log.debug('setTarget(%s)', sv)
         if self.PID_slave_ID:
             multiplier = 1.
@@ -1263,9 +1220,9 @@ class modbusport():
                 multiplier = 100.
             self.writeSingleRegister(self.PID_slave_ID,self.PID_SV_register,int(round(sv*multiplier)))
 
-    def setPID(self,p,i,d):
+    def setPID(self, p:float, i:float, d:float) -> None:
         _log.debug('setPID(%s,%s,%s)', p, i, d)
-        if self.PID_slave_ID and not (self.PID_p_register == self.PID_i_register == self.PID_d_register == 0):
+        if self.PID_slave_ID and not self.PID_p_register == self.PID_i_register == self.PID_d_register == 0:
             multiplier = 1.
             if self.PIDmultiplier == 1:
                 multiplier = 10.

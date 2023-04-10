@@ -13,23 +13,23 @@
 # the GNU General Public License for more details.
 
 # AUTHOR
-# Marko Luther, 2020
+# Marko Luther, 2023
 
 from artisanlib.dialogs import ArtisanDialog
 
 try:
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import Qt, pyqtSlot, QSettings # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QLabel, QHBoxLayout, QVBoxLayout, QCheckBox, # @UnusedImport @Reimport  @UnresolvedImport
                                  QDialogButtonBox, QGridLayout, QLineEdit, QSpinBox, QLayout) # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
-    #ylint: disable = E, W, R, C
+    #pylint: disable = E, W, R, C
     from PyQt5.QtCore import Qt, pyqtSlot, QSettings # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QLabel, QHBoxLayout, QVBoxLayout, QCheckBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QDialogButtonBox, QGridLayout, QLineEdit, QSpinBox, QLayout) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 class batchDlg(ArtisanDialog):
-    def __init__(self, parent = None, aw = None):
+    def __init__(self, parent, aw) -> None:
         super().__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Batch'))

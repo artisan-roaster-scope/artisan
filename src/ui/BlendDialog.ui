@@ -11,7 +11,13 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string notr="true">Dialog</string>
+  </property>
+  <property name="toolTip">
+   <string notr="true"/>
+  </property>
+  <property name="accessibleDescription">
+   <string notr="true"/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
