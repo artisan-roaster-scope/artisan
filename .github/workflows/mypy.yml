@@ -9,23 +9,89 @@ on:
       - master
   workflow_dispatch:
     inputs:
-      logLevel:
-        description: 'Log level'
-        required: true
-        default: 'warning'
-        type: choice
-        options:
-        - info
-        - warning
-        - debug
-      tags:
-        description: 'Test scenario tags'
+      github_token:
+        description: 'GITHUB_TOKEN'
         required: false
-        type: boolean
-      environment:
-        description: 'Environment to run tests against'
-        type: environment
-        required: true
+        default: '${{ github.token }}'
+      workdir:
+        description: |
+          Working directory of where to run mypy command.
+          Relative to the root directory.
+        required: false
+        default: '.'
+      target:
+        description: |
+          Target file or directory of mypy command.
+          Relative to the working directory.
+        required: false
+        default: '.'
+      ### Flags for setup/execute ###
+      execute_command:
+        description: |
+          mypy execute command.
+          Normally it is "mypy", but for example "poetry run mypy"
+          if you want to run at Poetry without activating the virtual environment.
+        required: false
+        default: 'mypy'
+      setup_command:
+        description: |
+          mypy setup command.
+          Runs when "setup_method" is "install" or required by "adaptive".
+        required: false
+        default: 'pip install mypy'
+      setup_method:
+        description: |
+          mypy setup method. Select from below.
+          "adaptive" - Check "execute_command" with "--version" is executable.
+          If it can be executed, do the same as "nothing", otherwise do the same as "install".
+          "nothing" - no setup process.
+          This option expects the user to prepare the environment
+          (ex. previous workflow step executed "pip install -r requirements.txt").
+          "install" - execute "setup_command".
+
+          Incorrect values behave as "adaptive".
+        required: false
+        default: 'adaptive'
+      ### Flags for reviewdog ###
+      level:
+        description: 'Report level for reviewdog [info,warning,error]'
+        required: false
+        default: 'error'
+      reporter:
+        description: 'Reporter of reviewdog command [github-pr-check,github-pr-review].'
+        required: false
+        default: 'github-pr-check'
+      filter_mode:
+        description: |
+          Filtering mode for the reviewdog command [added,diff_context,file,nofilter].
+          Default is added.
+        required: false
+        default: 'added'
+      fail_on_error:
+        description: |
+          Exit code for reviewdog when errors are found [true,false]
+          Default is `false`.
+        required: false
+        default: 'false'
+      reviewdog_flags:
+        description: 'Additional reviewdog flags'
+        required: false
+        default: ''
+      ### Flags for mypy ###
+      mypy_flags:
+        description: 'mypy options (default: <none>)'
+        required: false
+        default: ''
+      tool_name:
+        description: 'Tool name to use for reviewdog reporter'
+        default: 'mypy'
+      ignore_note:
+        description: |
+          Ignore note entry.
+          mypy report some error with optional note entry.
+          This option is workaround.
+        default: 'false'
+
 
 jobs:
   mypy:
