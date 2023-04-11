@@ -24231,7 +24231,7 @@ def initialize_locale(my_app) -> str:
 
     if len(locale) == 0:
         if platform.system() == 'Darwin':
-            from Cocoa import NSUserDefaults # @UnresolvedImport # pylint: disable=import-error # type: ignore
+            from Cocoa import NSUserDefaults # type: ignore  # @UnresolvedImport # pylint: disable=import-error
             defs = NSUserDefaults.standardUserDefaults()
             langs = defs.objectForKey_('AppleLanguages')
             if langs.objectAtIndex_(0)[:3] == 'zh_' or langs.objectAtIndex_(0)[:3] == 'pt_':

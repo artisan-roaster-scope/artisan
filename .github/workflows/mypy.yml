@@ -53,6 +53,6 @@ jobs:
           # mypy command reads setup.cfg or other settings file in this path.
           workdir: ./src/
 
-          #reviewdog_flags: -filter-mode=file -fail-on-error
-          #filter_mode: nofilter
-          #fail_on_error: true
+          reviewdog_flags: -filter-mode=file -fail-on-error
+          filter_mode: nofilter
+          fail_on_error: true
