@@ -9638,7 +9638,8 @@ class tgraphcanvas(FigureCanvas):
                             loc = self.legend._loc # pylint: disable=protected-access
                         try:
                             try:
-                                leg = self.ax.legend(self.handles,self.labels,loc=loc,ncols=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
+                                leg = self.ax.legend(self.handles,self.labels, loc=loc,
+                                    ncols=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
                             except Exception: # pylint: disable=broad-except
                                 # ncol keyword argument to legend renamed to ncols in MPL 3.6, thus for older MPL versions we need to still use ncol
                                 leg = self.ax.legend(self.handles,self.labels,loc=loc,ncol=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)

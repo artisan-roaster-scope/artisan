@@ -4262,7 +4262,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     def eventFilter(self, obj, event):
         if event.type() == QEvent.Type.ApplicationPaletteChange and sys.platform.startswith('darwin') and self.app is not None and darkdetect.isDark() != self.app.darkmode:
             # called if the palette changed (switch between dark and light mode on macOS)
-            self.app.darkmode = darkdetect.isDark()
+            self.app.darkmode = darkdetect.isDark() # type: ignore
             self.updateCanvasColors()
         return super().eventFilter(obj, event)
 
@@ -13845,10 +13845,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 self.qmc.setFlagPositions(profile['flag_positions'])
             else:
                 self.qmc.l_event_flags_pos_dict = {}
-            if 'legendloc_pos' in profile and self.qmc.loadaxisfromprofile:
+            if 'legendloc_pos' in profile and self.qmc.loadaxisfromprofile and self.qmc.ax is not None:
                 try:
                     # first set the profiles axis limits to have the transformations right
-                    self.qmc.ax.set_xlim(self.qmc.startofx, self.qmc.endofx)
+                    self.qmc.ax.set_xlim(self.qmc.startofx, self.qmc.startofx + self.qmc.endofx)
                     self.qmc.ax.set_ylim(self.qmc.ylimit_min, self.qmc.ylimit)
                     # if available we transform the custom legend position back from data into axis coordinates
                     legendloc_pos_data = numpy.array(profile['legendloc_pos'])
@@ -14591,8 +14591,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     if self.qmc.ax is not None:
                         axis_to_data = self.qmc.ax.transAxes + self.qmc.ax.transData.inverted()
                         profile['legendloc_pos'] = axis_to_data.transform(self.qmc.legend._loc).tolist() # pylint: disable=protected-access
-                except Exception: # pylint: disable=broad-except
-                    pass
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
 
             # Energy Settings
             try:
@@ -23543,6 +23543,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     @pyqtSlot(bool)
     def clearResults(self,_=False):
         self.qmc.fig.canvas.mpl_disconnect(self.qmc.analyzer_connect_id)
+        self.segmentresultsanno = None
+        self.analysisresultsanno = None
         self.autoAdjustAxis()
         self.qmc.redraw(recomputeAllDeltas=True)
 
@@ -23764,7 +23766,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     # returns True as first result if draggable text box artist is contained in the given events region and
     # and it is the one in the region with the highest z-order, otherwise False
     # a dict of properties is returned as second argument
-    def draggable_text_box_picker(self,artist, evt):
+    def draggable_text_box_picker(self, artist, evt):
         try:
             if self.segmentresultsanno is not None and self.analysisresultsanno is not None:
                 # in case the analyzer boxes are displayed
@@ -24229,7 +24231,7 @@ def initialize_locale(my_app) -> str:
 
     if len(locale) == 0:
         if platform.system() == 'Darwin':
-            from Cocoa import NSUserDefaults # @UnresolvedImport # pylint: disable=import-error
+            from Cocoa import NSUserDefaults # @UnresolvedImport # pylint: disable=import-error # type: ignore
             defs = NSUserDefaults.standardUserDefaults()
             langs = defs.objectForKey_('AppleLanguages')
             if langs.objectAtIndex_(0)[:3] == 'zh_' or langs.objectAtIndex_(0)[:3] == 'pt_':
