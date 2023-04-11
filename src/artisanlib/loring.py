@@ -65,10 +65,10 @@ def extractProfileLoringCSV(file,aw):
 
         power_event:bool = False
 
-        start_datetime = None
-        last_sampling = None
-        sampling_interval = 6
-        roasting = 0
+        start_datetime:Optional[QDateTime] = None
+        last_sampling:Optional[float] = None
+        sampling_interval:float = 6
+        roasting:int = 0
 
         mode = 'C' # by default we assume temperature data in degree Celcius
 
@@ -88,7 +88,7 @@ def extractProfileLoringCSV(file,aw):
 
                     if start_datetime is None:
                         start_datetime = datetime
-                        time = 0
+                        time:float = 0
                         roastdate:Optional[str] = encodeLocal(start_datetime.date().toString())
                         if roastdate is not None:
                             res['roastdate'] = roastdate

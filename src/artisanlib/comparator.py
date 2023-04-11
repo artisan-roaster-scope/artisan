@@ -27,6 +27,8 @@ from typing_extensions import TypedDict, Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+    from matplotlib.lines import Line2D # pylint: disable=unused-import
+    import matplotlib as mpl # pylint: disable=unused-import
 
 from artisanlib.util import deltaLabelUTF8, decodeLocal, stringfromseconds, fromFtoC, fromCtoF, fill_gaps
 from artisanlib.suppress_errors import suppress_stdout_stderr
@@ -128,16 +130,16 @@ class RoastProfile():
         self.events2:Optional[Sequence[Optional[float]]] = None # BT temperatures of main events [CHARGE, DRY, FCs, FCe, SCs, SCe, DROP], None if not set
         self.events_timex:Optional[Sequence[Optional[float]]] = None # roast times of main events [CHARGE, DRY, FCs, FCe, SCs, SCe, DROP] in seconds, None if not set
         # artists
-        self.l_temp1 = None
-        self.l_temp2 = None
-        self.l_delta1 = None
-        self.l_delta2 = None
-        self.l_mainEvents1 = None
-        self.l_mainEvents2 = None
-        self.l_events1 = None
-        self.l_events2 = None
-        self.l_events3 = None
-        self.l_events4 = None
+        self.l_temp1:Optional['Line2D'] = None
+        self.l_temp2:Optional['Line2D'] = None
+        self.l_delta1:Optional['Line2D'] = None
+        self.l_delta2:Optional['Line2D'] = None
+        self.l_mainEvents1:Optional['Line2D'] = None
+        self.l_mainEvents2:Optional['Line2D'] = None
+        self.l_events1:Optional['Line2D'] = None
+        self.l_events2:Optional['Line2D'] = None
+        self.l_events3:Optional['Line2D'] = None
+        self.l_events4:Optional['Line2D'] = None
 #        # delta clipping paths
 #        self.l_delta1_clipping = None
 #        self.l_delta2_clipping = None
@@ -802,10 +804,10 @@ class roastCompareDlg(ArtisanDialog):
         self.profiles:List[RoastProfile] = []
         self.label_number = 0
         # align line
-        self.l_align = None
+        self.l_align:Optional['Line2D'] = None
         # legend
-        self.legend = None
-        self.legendloc_pos = None
+        self.legend:Optional['mpl.DraggableLegend'] = None
+        self.legendloc_pos:Optional[Tuple[float,float]] = None
         # table
         self.profileTable = CompareTableWidget()
         self.createProfileTable()
@@ -1680,7 +1682,7 @@ class roastCompareDlg(ArtisanDialog):
         self.profileTable.setRowCount(len(self.profiles))
         self.setProfileTableRow(len(self.profiles)-1)
 
-    def addProfileFromURL(self,extractor,url):
+    def addProfileFromURL(self, extractor, url) -> None:
         _log.info('addProfileFromURL(%s)', url)
         try:
             obj = extractor(url,self.aw)

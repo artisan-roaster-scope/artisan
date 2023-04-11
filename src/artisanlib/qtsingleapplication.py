@@ -12,8 +12,10 @@ Updated to support QT6
 import sys
 import multiprocessing as mp
 
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
 
 try:
     #pylint: disable = E, W, R, C
@@ -33,7 +35,7 @@ class QtSingleApplication(QApplication): # pyright: ignore # Argument to class m
     __slots__ = [ '_id', '_viewer_id', '_activationWindow', '_activateOnMessage', '_inSocket', '_outSocket', '_isRunning', '_server',
         '_isRunningViewer', '_outSocketViewer', '_inStream', '_outStream', '_outStreamViewer' ]
 
-    def __init__(self, _id,_viewer_id, *argv) -> None:
+    def __init__(self, _id:str, _viewer_id:str, *argv) -> None:
 
         if sys.platform.startswith('darwin') and mp.current_process().name == 'WebLCDs':
             import AppKit # type: ignore # pylint: disable=import-error
@@ -42,10 +44,10 @@ class QtSingleApplication(QApplication): # pyright: ignore # Argument to class m
 
         super().__init__(*argv)
 
-        self._id = _id
-        self._viewer_id = _viewer_id
-        self._activationWindow = None
-        self._activateOnMessage = False
+        self._id:str = _id
+        self._viewer_id:str = _viewer_id
+        self._activationWindow:Optional['ApplicationWindow'] = None
+        self._activateOnMessage:bool = False
 
         self._inSocket:Optional[QLocalSocket] = None
         self._outSocket:Optional[QLocalSocket] = None
@@ -53,7 +55,7 @@ class QtSingleApplication(QApplication): # pyright: ignore # Argument to class m
         self._isRunning:bool = False
         self._isRunningViewer:bool = False
 
-        self._server = None
+        self._server:Optional[QLocalServer] = None
 
         self._inStream:Optional[QTextStream] = None
         self._outStream:Optional[QTextStream] = None
@@ -120,7 +122,7 @@ class QtSingleApplication(QApplication): # pyright: ignore # Argument to class m
     def activationWindow(self):
         return self._activationWindow
 
-    def setActivationWindow(self, activationWindow, activateOnMessage=True):
+    def setActivationWindow(self, activationWindow:'ApplicationWindow', activateOnMessage=True):
         self._activationWindow = activationWindow
         self._activateOnMessage = activateOnMessage
 
@@ -148,8 +150,6 @@ class QtSingleApplication(QApplication): # pyright: ignore # Argument to class m
         if self._server is None:
             return
         self._inSocket = self._server.nextPendingConnection()
-        if self._inSocket is None:
-            return
         self._inStream = QTextStream(self._inSocket)
         try:
             self._inStream.setCodec('UTF-8') # type: ignore # setCodec not available in PyQt6, but UTF-8 the default encoding

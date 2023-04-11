@@ -291,9 +291,7 @@ def fill_gaps(ll, interpolate_max=3):
 # if creation or access of the path fails None is returned and memorized
 def getDataDirectory():
     app = QCoreApplication.instance()
-    if app is not None:
-        return _getAppDataDirectory(app)
-    return None
+    return _getAppDataDirectory(app)
 
 # internal function to return
 @functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache

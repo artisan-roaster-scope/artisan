@@ -36,7 +36,7 @@ from bisect import bisect_right
 import psutil
 from psutil._common import bytes2human
 
-from typing import Optional, List, Dict, Callable, Tuple, Union, cast, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
+from typing import Optional, List, Dict, Callable, Tuple, Union, Any, cast, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
 from typing_extensions import Final  # Python <=3.7
 
 if TYPE_CHECKING:
@@ -454,7 +454,8 @@ class tgraphcanvas(FigureCanvas):
                                             QApplication.translate('Textbox', 'Balance'),
                                             QApplication.translate('Textbox', 'Overall')]
 
-        self.ax1 = self.ax2 = None
+        self.ax1:Optional['Axes'] = None
+        self.ax2:Optional['Axes'] = None
 
         # Ambient Data Worker and Thread
         self.ambiWorker:Optional[AmbientWorker] = None
@@ -982,6 +983,7 @@ class tgraphcanvas(FigureCanvas):
 
         self.fig.patch.set_facecolor(str(self.palette['canvas']))
 
+        self.ax:Optional['Axes']
         self.ax = self.fig.add_subplot(111,facecolor=self.palette['background'])
         self.delta_ax:Optional['Axes'] = self.ax.twinx()
 
@@ -1292,7 +1294,7 @@ class tgraphcanvas(FigureCanvas):
         #
         self.last_batchsize:float = 0 # in unit of self.weight[2]; remember the last batchsize used to be applied as default for the next batch
         #
-        self.machinesetup_energy_ratings = None # read from predefined machine setups and used if available to set energy defaults
+        self.machinesetup_energy_ratings:Optional[Dict[int,Dict[float, Dict[str,List[Any]]]]] = None # read from predefined machine setups and used if available to set energy defaults
         #
         self.machinesetup:str = ''
         self.roastingnotes:str = ''
@@ -1776,7 +1778,7 @@ class tgraphcanvas(FigureCanvas):
         self.l_delta1B:Optional['Line2D'] = None
         self.l_delta2B:Optional['Line2D'] = None
 
-        self.l_subtitle = None # the subtitle artist if any as used to render the background title
+        self.l_subtitle:Optional['Text'] = None # the subtitle artist if any as used to render the background title
 
         self.l_BTprojection:Optional['Line2D'] = None
         self.l_ETprojection:Optional['Line2D'] = None
@@ -1951,8 +1953,8 @@ class tgraphcanvas(FigureCanvas):
 
         #flag to plot cross lines from mouse
         self.crossmarker:bool = False
-        self.crossmouseid = None # connect mouse signal id
-        self.onreleaseid = None # connect release signal id
+        self.crossmouseid:Optional[int] = None # connect mouse signal id
+        self.onreleaseid:Optional[int] = None # connect release signal id
 
         #
         self.analyzer_connect_id = None # analyzer connect signal id
@@ -2043,7 +2045,7 @@ class tgraphcanvas(FigureCanvas):
         #Extras more info
         self.idx_met:Optional[int] = None
         self.showmet:bool = False
-        self.met_annotate = None
+        self.met_annotate:Optional['Annotation'] = None
         self.met_timex_temp1_delta:Optional[Tuple[float,float,Optional[float]]] = None # (time, temp, time delta) tuple
         self.extendevents:bool = True
         self.statssummary:bool = False
@@ -2105,8 +2107,10 @@ class tgraphcanvas(FigureCanvas):
         self.electricEnergyMix = self.electricEnergyMix_setup        # the amount of renewable electric energy in the energy mix in %
 
         #mouse cross lines measurement
-        self.baseX,self.baseY = None, None
-        self.base_horizontalcrossline, self.base_verticalcrossline = None, None
+        self.baseX:Optional[float] = None
+        self.baseY:Optional[float] = None
+        self.base_horizontalcrossline:Optional['Line2D'] = None
+        self.base_verticalcrossline:Optional['Line2D'] = None
         self.base_messagevisible:bool = False
 
         #threshold for deltaE color difference comparisons
@@ -2124,33 +2128,33 @@ class tgraphcanvas(FigureCanvas):
 
         self.resizeredrawing = 0 # holds timestamp of last resize triggered redraw
 
-        self.logoimg = None # holds the background logo image
+        self.logoimg:Optional['npt.NDArray'] = None # holds the background logo image
         self.analysisresultsloc_default: Final[Tuple[float, float]] = (.49, .5)
         self.analysisresultsloc:Tuple[float, float] = self.analysisresultsloc_default
         self.analysispickflag:bool = False
         self.analysisresultsstr:str = ''
-        self.analysisstartchoice = 1
-        self.analysisoffset = 180
-        self.curvefitstartchoice = 0
-        self.curvefitoffset = 180
+        self.analysisstartchoice:int = 1
+        self.analysisoffset:int = 180
+        self.curvefitstartchoice:int = 0
+        self.curvefitoffset:int = 180
         self.segmentresultsloc_default: Final[Tuple[float, float]] = (.5, .5)
         self.segmentresultsloc:Tuple[float, float] = self.segmentresultsloc_default
         self.segmentpickflag:bool = False
         self.segmentdeltathreshold:float = 0.6
-        self.segmentsamplesthreshold = 3
+        self.segmentsamplesthreshold:int = 3
 
-        self.stats_summary_rect = None
+        self.stats_summary_rect:Optional[patches.Rectangle] = None
 
         # temp vars used to truncate title and statistic line (x_label) to width of MPL canvas
-        self.title_text = None
-        self.title_artist = None
-        self.title_width = None
+        self.title_text:Optional[str] = None
+        self.title_artist:Optional['Text'] = None
+        self.title_width:Optional[float] = None
         self.background_title_width = 0
-        self.xlabel_text = None
-        self.xlabel_artist = None
-        self.xlabel_width = None
+        self.xlabel_text:Optional[str] = None
+        self.xlabel_artist:Optional['Text'] = None
+        self.xlabel_width:Optional[float] = None
 
-        self.lazyredraw_on_resize_timer =  QTimer()
+        self.lazyredraw_on_resize_timer:QTimer =  QTimer()
         self.lazyredraw_on_resize_timer.timeout.connect(self.lazyredraw_on_resize)
         self.lazyredraw_on_resize_timer.setSingleShot(True)
 
@@ -4028,7 +4032,8 @@ class tgraphcanvas(FigureCanvas):
                         now = (tx if self.timeindex[0] == -1 else tx - sample_timex[self.timeindex[0]])
                         if now > (self.endofx - 45):            # if difference is smaller than 45 seconds
                             self.endofx = now + 180              # increase x limit by 3 minutes (180)
-                            self.ax.set_xlim(self.startofx,self.endofx)
+                            if self.ax is not None:
+                                self.ax.set_xlim(self.startofx,self.endofx)
                             self.xaxistosm()
                     # also in the manual case we check for TP
                     # check for TP event if already CHARGEed and not yet recognized
@@ -4799,31 +4804,30 @@ class tgraphcanvas(FigureCanvas):
                     fname = string.split('#')[0]
         # take c the QDir().current() directory changes with loads and saves
         #            QDesktopServices.openUrl(QUrl("file:///" + str(QDir().current().absolutePath()) + "/" + fname, QUrl.ParsingMode.TolerantMode))
-                    if False: # and platform.system() == 'Windows': # this Windows version fails on commands with arguments # pylint: disable=condition-evals-to-constant,using-constant-test
-                        f = f'file:///{QApplication.applicationDirPath()}/{fname}'
-                        res = QDesktopServices.openUrl(QUrl(f, QUrl.ParsingMode.TolerantMode))
-                    else:
-                        # MacOS X: script is expected to sit next to the Artisan.app or being specified with its full path
-                        # Linux: script is expected to sit next to the artisan binary or being specified with its full path
-                        #
-                        # to get the effect of speaking alarms a text containing the following two lines called "say.sh" could do
-                        #                #!/bin/sh
-                        #                say "Hello" &
-                        # don't forget to do
-                        #                # cd
-                        #                # chmod +x say.sh
-                        #
-                        # alternatively use "say $@ &" as command and send text strings along
-                        # Voices:
-                        #  -v Alex (male english)
-                        #  -v Viki (female english)
-                        #  -v Victoria (female english)
-                        #  -v Yannick (male german)
-                        #  -v Anna (female german)
-                        #  -v Paolo (male italian)
-                        #  -v Silvia (female italian)
-                        self.aw.call_prog_with_args(fname)
-                        res = True
+#                    if False: # and platform.system() == 'Windows': # this Windows version fails on commands with arguments # pylint: disable=condition-evals-to-constant,using-constant-test
+#                        f = f'file:///{QApplication.applicationDirPath()}/{fname}'
+#                        res = QDesktopServices.openUrl(QUrl(f, QUrl.ParsingMode.TolerantMode))
+                    # MacOS X: script is expected to sit next to the Artisan.app or being specified with its full path
+                    # Linux: script is expected to sit next to the artisan binary or being specified with its full path
+                    #
+                    # to get the effect of speaking alarms a text containing the following two lines called "say.sh" could do
+                    #                #!/bin/sh
+                    #                say "Hello" &
+                    # don't forget to do
+                    #                # cd
+                    #                # chmod +x say.sh
+                    #
+                    # alternatively use "say $@ &" as command and send text strings along
+                    # Voices:
+                    #  -v Alex (male english)
+                    #  -v Viki (female english)
+                    #  -v Victoria (female english)
+                    #  -v Yannick (male german)
+                    #  -v Anna (female german)
+                    #  -v Paolo (male italian)
+                    #  -v Silvia (female italian)
+                    self.aw.call_prog_with_args(fname)
+                    res = True
                     if res:
                         self.aw.sendmessage(QApplication.translate('Message','Alarm is calling: {0}').format(fname))
                     else:
@@ -5775,7 +5779,7 @@ class tgraphcanvas(FigureCanvas):
                                 if self.specialeventstype[iii] == nint and index >= self.specialevents[iii]:
                                     break  #index found
                             if iii is None:
-                                val = 0
+                                val = 0 # type: ignore # mypy: Statement is unreachable  [unreachable]
                             else:
                                 val = self.eventsInternal2ExternalValue(self.specialeventsvalue[iii])
                         else:
@@ -6042,6 +6046,7 @@ class tgraphcanvas(FigureCanvas):
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
 
+                reslt:float = -1
                 #background symbols just in case there was no profile loaded but a background loaded.
                 if len(self.timeB) > 0:
                     for i,tsexpr in enumerate(timeshiftexpressions):
@@ -6062,26 +6067,24 @@ class tgraphcanvas(FigureCanvas):
                         pass
                     if propagate_error and any((((k in me) if k not in (['Y1','x','t','b'] if ('max' in me) else ['Y1','t','b']) else False) for k,v in mathdictionary.items() if (v == -1 and (k not in main_events)))):
                         # if any variable is bound to the error value -1 we return -1 for the full formula
-                        res = -1
+                        reslt = -1
                     else:
-                        res = float(eval(me,{'__builtins__':None},mathdictionary)) # pylint: disable=eval-used
+                        reslt = float(eval(me,{'__builtins__':None},mathdictionary)) # pylint: disable=eval-used
                 except TypeError:
-                    res = -1
+                    reslt = -1
                 except ValueError:
-                    res = -1
+                    reslt = -1
                 except ZeroDivisionError:
-                    res = -1
+                    reslt = -1
                 except IndexError:
-                    res = -1
-                if res is None:
-                    return -1
+                    reslt = -1
                 #stack (use in feedback "F" in same formula)
-                self.plotterstack.insert(10,res)
+                self.plotterstack.insert(10,reslt)
                 self.plotterstack.pop(0)
                 #Pnumber results storage
                 if equeditnumber:
-                    self.plotterequationresults[equeditnumber-1].append(res)
-                return res
+                    self.plotterequationresults[equeditnumber-1].append(reslt)
+                return reslt
 
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
@@ -7495,18 +7498,17 @@ class tgraphcanvas(FigureCanvas):
                 fontsize='x-small',
                 x=suptitleX,y=1,
                 color=(self.palette['title_focus'] if (self.backgroundprofile is not None and self.backgroundPlaybackEvents) else self.palette['title']))
-        if self.l_subtitle is not None:
-            try:
-                self.l_subtitle.set_in_layout(False)  # remove title from tight_layout calculation
-            except Exception: # pylint: disable=broad-except  # set_in_layout not available in mpl<3.x
-                pass
-            try:
-                if len(backgroundtitle)>0:
-                    self.background_title_width = self.l_subtitle.get_window_extent(renderer=self.fig.canvas.get_renderer()).width
-                else:
-                    self.background_title_width = 0
-            except Exception: # pylint: disable=broad-except
+        try:
+            self.l_subtitle.set_in_layout(False)  # remove title from tight_layout calculation
+        except Exception: # pylint: disable=broad-except  # set_in_layout not available in mpl<3.x
+            pass
+        try:
+            if len(backgroundtitle)>0:
+                self.background_title_width = self.l_subtitle.get_window_extent(renderer=self.fig.canvas.get_renderer()).width
+            else:
                 self.background_title_width = 0
+        except Exception: # pylint: disable=broad-except
+            self.background_title_width = 0
 
     # if updatebackground is True, the profileDataSemaphore is caught and updatebackground() is called
     @pyqtSlot(str,bool)
@@ -7963,6 +7965,26 @@ class tgraphcanvas(FigureCanvas):
                     self.ax.spines.left.set_visible(self.ygrid != 0)
                     self.ax.spines.right.set_visible(self.zgrid != 0)
 
+                    try:
+                        if self.l_eventtype1dots is not None:
+                            self.l_eventtype1dots.remove()
+                    except Exception: # pylint: disable=broad-except
+                        pass
+                    try:
+                        if self.l_eventtype2dots is not None:
+                            self.l_eventtype2dots.remove()
+                    except Exception: # pylint: disable=broad-except
+                        pass
+                    try:
+                        if self.l_eventtype3dots is not None:
+                            self.l_eventtype3dots.remove()
+                    except Exception: # pylint: disable=broad-except
+                        pass
+                    try:
+                        if self.l_eventtype4dots is not None:
+                            self.l_eventtype4dots.remove()
+                    except Exception: # pylint: disable=broad-except
+                        pass
                     self.l_eventtype1dots = None
                     self.l_eventtype2dots = None
                     self.l_eventtype3dots = None
@@ -9123,11 +9145,6 @@ class tgraphcanvas(FigureCanvas):
                                 E1x = [None]
                                 E1y = [None]
                                 ds = 'steps-post'
-                            try:
-                                if self.l_eventtype1dots is not None:
-                                    self.l_eventtype1dots.remove()
-                            except Exception: # pylint: disable=broad-except
-                                pass
                             self.l_eventtype1dots, = self.ax.plot(E1x, E1y, color=self.EvalueColor[0],
                                                                 marker = (self.EvalueMarker[0] if self.eventsGraphflag != 4 else None),
                                                                 markersize = self.EvalueMarkerSize[0],
@@ -9155,11 +9172,6 @@ class tgraphcanvas(FigureCanvas):
                                 E2x = [None]
                                 E2y = [None]
                                 ds = 'steps-post'
-                            try:
-                                if self.l_eventtype2dots is not None:
-                                    self.l_eventtype2dots.remove()
-                            except Exception: # pylint: disable=broad-except
-                                pass
                             self.l_eventtype2dots, = self.ax.plot(E2x, E2y, color=self.EvalueColor[1],
                                                                 marker = (self.EvalueMarker[1] if self.eventsGraphflag != 4 else None),
                                                                 markersize = self.EvalueMarkerSize[1],
@@ -9187,11 +9199,6 @@ class tgraphcanvas(FigureCanvas):
                                 E3x = [None]
                                 E3y = [None]
                                 ds = 'steps-post'
-                            try:
-                                if self.l_eventtype3dots is not None:
-                                    self.l_eventtype3dots.remove()
-                            except Exception: # pylint: disable=broad-except
-                                pass
                             self.l_eventtype3dots, = self.ax.plot(E3x, E3y, color=self.EvalueColor[2],
                                                                 marker = (self.EvalueMarker[2] if self.eventsGraphflag != 4 else None),
                                                                 markersize = self.EvalueMarkerSize[2],
@@ -9219,11 +9226,6 @@ class tgraphcanvas(FigureCanvas):
                                 E4x = [None]
                                 E4y = [None]
                                 ds = 'steps-post'
-                            try:
-                                if self.l_eventtype4dots is not None:
-                                    self.l_eventtype4dots.remove()
-                            except Exception: # pylint: disable=broad-except
-                                pass
                             self.l_eventtype4dots, = self.ax.plot(E4x, E4y, color=self.EvalueColor[3],
                                                                 marker = (self.EvalueMarker[3] if self.eventsGraphflag != 4 else None),
                                                                 markersize = self.EvalueMarkerSize[3],
@@ -16456,7 +16458,7 @@ class SampleThread(QThread): # pyright: ignore # Argument to class must be a bas
             self.aw.lastdigitizedtemp = [None,None,None,None] # last digitized temp value per quantifier
 
             interval = self.aw.qmc.delay/self.aw.qmc.timeclock.getBase()
-            next_time = None
+            next_time:Optional[float] = None
             while True:
                 if self.aw.qmc.flagon:
                     if next_time is None:
@@ -16475,7 +16477,7 @@ class SampleThread(QThread): # pyright: ignore # Argument to class must be a bas
                         finally:
                             self.aw.qmc.flagsampling = False # we signal that we are done with sampling
                 else:
-                    self.aw.qmc.flagsampling = False # we signal that we are done with sampling
+                    self.aw.qmc.flagsampling = False # type: ignore # mypy: Statement is unreachable  [unreachable] # we signal that we are done with sampling
                     try:
                         if self.aw.ser.SP.is_open:
                             self.aw.ser.closeport()

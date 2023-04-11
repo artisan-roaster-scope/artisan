@@ -237,7 +237,7 @@ class CheckComboBox(QComboBox): # pyright: ignore # Argument to class must be a 
         if self.__popupIsShown and \
                 event.type() == QEvent.Type.MouseMove and \
                 self.view().isVisible() and self.__initialMousePos is not None:
-            diff = obj.mapToGlobal(event.pos()) - self.__initialMousePos
+            diff = obj.mapToGlobal(event.pos()) - self.__initialMousePos # type: ignore # mypy: Statement is unreachable
             if diff.manhattanLength() > 9 and \
                     self.__blockMouseReleaseTimer.isActive():
                 self.__blockMouseReleaseTimer.stop()

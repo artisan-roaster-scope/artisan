@@ -752,11 +752,10 @@ class AlarmDlg(ArtisanResizeablDialog):
                 timez =  self.alarmtable.cellWidget(i,4)
                 assert isinstance(timez, MyQComboBox)
                 self.aw.qmc.alarmtime[i] = self.aw.qmc.menuidx2alarmtime[timez.currentIndex()]
-                offset =  self.alarmtable.cellWidget(i,5)
+                offset = self.alarmtable.cellWidget(i,5)
                 assert isinstance(offset, QTimeEdit)
-                if offset and offset != '':
-                    tx = self.aw.QTime2time(offset.time())
-                    self.aw.qmc.alarmoffset[i] = max(0,tx)
+                tx = self.aw.QTime2time(offset.time())
+                self.aw.qmc.alarmoffset[i] = max(0,tx)
                 atype = self.alarmtable.cellWidget(i,6)
                 assert isinstance(atype, MyQComboBox)
                 self.aw.qmc.alarmsource[i] = int(str(atype.currentIndex())) - 3

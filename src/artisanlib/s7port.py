@@ -723,8 +723,6 @@ class s7port():
                             raise Exception('result None') # pylint: disable=broad-exception-raised
                     else:
                         break
-                if res is None:
-                    return None
                 if self.commError: # we clear the previous error and send a message
                     self.commError = False
                     self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Communication Resumed'))
@@ -816,8 +814,6 @@ class s7port():
                             raise Exception('result None') # pylint: disable=broad-exception-raised
                     else:
                         break
-                if res is None:
-                    return None
                 if self.commError: # we clear the previous error and send a message
                     self.commError = False
                     self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Communication Resumed'))
@@ -911,8 +907,6 @@ class s7port():
                             raise Exception('result None') # pylint: disable=broad-exception-raised
                     else:
                         break
-                if res is None:
-                    return None
                 if self.commError: # we clear the previous error and send a message
                     self.commError = False
                     self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Communication Resumed'))

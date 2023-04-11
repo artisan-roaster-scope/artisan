@@ -609,6 +609,7 @@ def getCoffeeLabels() -> Dict[str, str]:
             stock_semaphore.release(1)
 
 
+# returns coffees with stock
 def getCoffees(weight_unit_idx:int, store:Optional[str]=None) -> List[Tuple[str, Tuple[Coffee, StockItem]]]:
     _log.debug('getCoffees(%s,%s)', weight_unit_idx, store)
     try:
@@ -648,23 +649,16 @@ def getCoffees(weight_unit_idx:int, store:Optional[str]=None) -> List[Tuple[str,
                                 and s['location_hr_id'] == store
                             )) and 'location_label' in s:
                                 location = s['location_label']
-                                if 'amount' in s:
-                                    amount = s['amount']
-                                    if (
-                                        amount > stock_epsilon
-                                    ):  # TODO: check here the machines # pylint: disable=fixme
-                                        # capacity limits
-                                        # add location only if this coffee
-                                        # is available in several locations
-                                        loc = '' if store else f'{location}, '
-                                        res[
-                                            f'{origin}{label} ({loc}{renderAmount(amount,default_unit,weight_unit_idx)})'
-                                        ] = (c, s)
-                                elif store:
-                                    res[f'{origin}{label}'] = (c, s)
-                                else:
+                                amount = s['amount']
+                                if (
+                                    amount > stock_epsilon
+                                ):  # TODO: check here the machines # pylint: disable=fixme
+                                    # capacity limits
+                                    # add location only if this coffee
+                                    # is available in several locations
+                                    loc = '' if store else f'{location}, '
                                     res[
-                                        f'{origin}{label} ({location})'
+                                        f'{origin}{label} ({loc}{renderAmount(amount,default_unit,weight_unit_idx)})'
                                     ] = (c, s)
                 except Exception as e:  # pylint: disable=broad-except
                     _log.exception(e)
@@ -1573,8 +1567,6 @@ def getBlends(weight_unit_idx:int, store:Optional[str] = None, customBlend:Optio
 # note that the ratio_num and ratio_denom attributes of ingredents are ignored
 # in these matches
 def matchBlendDict(blendSpec:Blend, blendDict:Blend, sameLabel:bool=True) -> bool:
-    if blendSpec is None or blendDict is None:
-        return False
     if not sameLabel or blendSpec['label'] == blendDict['label']:
         if (
             'hr_id' in blendSpec

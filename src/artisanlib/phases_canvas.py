@@ -20,11 +20,12 @@ import warnings
 import numpy
 import logging
 
-from typing import Dict, TYPE_CHECKING
+from typing import Dict, Tuple, Optional, TYPE_CHECKING
 from typing_extensions import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
+    from matplotlib.axes import Axes # pylint: disable=unused-import
 
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.util import toGrey, toDim, stringfromseconds
@@ -60,7 +61,7 @@ class tphasescanvas(FigureCanvas):
         self.m = 10             # width of batch number field and drop time field
         self.g = 2              # width of the gap between batch number field and drop time field and the actual phase percentage bars
         # set data
-        self.data = None  # the phases data per profile
+        self.data:Optional[Tuple] = None  # the phases data per profile
         # the canvas
         self.fig = Figure(figsize=(1, 1), frameon=False, dpi=dpi+self.dpi_offset)
 #        self.fig.set_constrained_layout(True)
@@ -69,14 +70,14 @@ class tphasescanvas(FigureCanvas):
         self.fig.set_tight_layout(self.tight_layout_params)
         #
         super().__init__(self.fig)
-        self.ax = None
+        self.ax:Optional['Axes'] = None
         self.clear_phases()
 
     def clear_phases(self):
         if self.ax is None:
             self.ax = self.fig.add_subplot(111, frameon=False)
         if self.ax is not None:
-            self.ax.clear()
+            self.ax.clear() # type: ignore # mypy: Statement is unreachable  [unreachable]
             self.ax.axis('off')
             self.ax.grid(False)
             self.ax.set_xlim(0,100 + 2*self.m + 2*self.g)
@@ -113,8 +114,6 @@ class tphasescanvas(FigureCanvas):
         self.redraw_phases()
 
     def redraw_phases(self):
-        if self.aw is None:
-            return
         if self.ax is None:
             return
         # clear canvas
@@ -164,9 +163,9 @@ class tphasescanvas(FigureCanvas):
                         labels = [label, ''] + labels + ['', stringfromseconds(total_time,leadingzero=False)]
                         # draw the bars
                         if active:
-                            patch_colors = color, background_color, self.aw.qmc.palette['rect1'], self.aw.qmc.palette['rect2'], self.aw.qmc.palette['rect3'], background_color, color
+                            patch_colors = [color, background_color, self.aw.qmc.palette['rect1'], self.aw.qmc.palette['rect2'], self.aw.qmc.palette['rect3'], background_color, color]
                         else:
-                            patch_colors = color, background_color, rect1dim, rect2dim, rect3dim, background_color, color
+                            patch_colors = [color, background_color, rect1dim, rect2dim, rect3dim, background_color, color]
                         rects = self.ax.barh(i, widths, left=starts, height=self.barheight, color=patch_colors)
                     else:
                         _log.error('redraw_phases(): inconsistent phases data in %s (total: %s, sum(phases): %s)', label, total_time, sum(phases_times))

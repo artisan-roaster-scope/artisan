@@ -36,7 +36,11 @@ from plus import config, util, roast, connection, sync, controller
 import threading
 import time
 import logging
-from typing import Any, List, Dict, Optional  #for Python >= 3.9: can remove 'List' and 'Dict' since type hints can use the generic 'list' and 'dict'
+from typing import Any, List, Dict, Optional, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' and 'Dict' since type hints can use the generic 'list' and 'dict'
+
+if TYPE_CHECKING:
+    import persistqueue # type:ignore # pylint: disable=unused-import
+
 from typing_extensions import Final  # Python <=3.7
 
 
@@ -46,15 +50,15 @@ queue_path = getDirectory(config.outbox_cache, share=False)
 
 app = QCoreApplication.instance()
 
-queue = None # holdes the persistqueue.SQLiteQueue, initialized by start()
+queue:Optional[persistqueue.SQLiteQueue] = None # holdes the persistqueue.SQLiteQueue, initialized by start()
 
 # queue entries are dictionaries with entries
 #   url   : the URL to send the request to
 #   data  : the data dictionary that will be send in the body as JSON
 #   verb  : the HTTP verb to be used (POST or PUT)
 
-worker = None
-worker_thread = None
+worker:Optional['Worker'] = None
+worker_thread:Optional[QThread] = None
 
 
 class Worker(QObject): # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
@@ -261,7 +265,8 @@ def start() -> None:
 
 
     _log.debug('start()')
-    _log.debug('-> qsize: %s', queue.qsize())
+    if queue is not None:
+        _log.debug('-> qsize: %s', queue.qsize())
     if worker_thread is None:
         worker = Worker()
         worker_thread = QThread()

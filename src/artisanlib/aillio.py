@@ -542,7 +542,7 @@ def extractProfileBulletDict(data,aw):
             eventtypes = ['blowerSetting','drumSpeedSetting','--','inductionPowerSetting']
             for j, eventname in enumerate(eventtypes):
                 if eventname != '--':
-                    last = None
+                    last:Optional[float] = None
                     ip = data[eventname]
                     for i, _ in enumerate(ip):
                         v = ip[i]+1

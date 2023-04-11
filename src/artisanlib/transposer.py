@@ -668,7 +668,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 fit_str = self.aw.fit2str(fits[0])
             else:
                 formula = ''
-                last_target = None
+                last_target:Optional[Tuple] = None
                 for f,tpl in reversed(active_fits[:-1]):
                     if last_target is None:
                         formula = self.aw.fit2str(f)
@@ -811,7 +811,7 @@ class profileTransformatorDlg(ArtisanDialog):
         if len(sources) != len(targets):
             return [None]*len(sources)
         fits:List[Optional['npt.NDArray[numpy.float64]']] = [None]*len(sources)
-        last_fit = None
+        last_fit:Optional['npt.NDArray[numpy.float64]'] = None
         for i, _ in enumerate(sources):
             if sources[i] is not None:
                 if targets[i] is None:

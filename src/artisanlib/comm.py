@@ -1110,36 +1110,34 @@ class serialport():
             from artisanlib.aillio import AillioR1
             self.R1 = AillioR1()
         tx = self.aw.qmc.timeclock.elapsedMilli()
-        if self.R1 is not None:
-            try:
-                #removed batchcounter to address issue #667
-                #if self.aw.qmc.batchcounter != -1:
-                #    self.aw.qmc.batchcounter = self.R1.get_roast_number()
-                self.aw.qmc.R1_BT = self.R1.get_bt()
-                self.aw.qmc.R1_DT = self.R1.get_dt()
-                self.aw.qmc.R1_DRUM = self.R1.get_drum() * 10
-                self.aw.qmc.R1_VOLTAGE = self.R1.get_voltage()
-                self.aw.qmc.R1_HEATER = self.R1.get_heater() * 10
-                self.aw.qmc.R1_FAN = self.R1.get_fan() * 10
-                self.aw.qmc.R1_BT_ROR = self.R1.get_bt_ror()
-                self.aw.qmc.R1_EXIT_TEMP = self.R1.get_exit_temperature()
-                self.aw.qmc.R1_STATE = self.R1.get_state()
-                self.aw.qmc.R1_FAN_RPM = self.R1.get_fan_rpm()
-                self.aw.qmc.R1_TX = tx
-                newstate = self.R1.get_state_string()
-                if newstate != self.aw.qmc.R1_STATE_STR:
-                    self.aw.qmc.R1_STATE_STR = newstate
-                    self.aw.sendmessage(QApplication.translate('Message', 'R1 state: ' + newstate))
-                if self.aw.qmc.mode == 'F':
-                    self.aw.qmc.R1_DT = fromCtoF(self.aw.qmc.R1_DT)
-                    self.aw.qmc.R1_BT = fromCtoF(self.aw.qmc.R1_BT)
-                    self.aw.qmc.R1_EXIT_TEMP = fromCtoF(self.aw.qmc.R1_EXIT_TEMP)
-                    self.aw.qmc.R1_BT_ROR = RoRfromCtoF(self.aw.qmc.R1_BT_ROR)
-            except Exception as exception: # pylint: disable=broad-except
-                error = QApplication.translate('Error Message', 'Aillio R1: ' + str(exception))
-                self.aw.qmc.adderror(error)
-            return tx, self.aw.qmc.R1_DT, self.aw.qmc.R1_BT
-        return tx, -1, -1
+        try:
+            #removed batchcounter to address issue #667
+            #if self.aw.qmc.batchcounter != -1:
+            #    self.aw.qmc.batchcounter = self.R1.get_roast_number()
+            self.aw.qmc.R1_BT = self.R1.get_bt()
+            self.aw.qmc.R1_DT = self.R1.get_dt()
+            self.aw.qmc.R1_DRUM = self.R1.get_drum() * 10
+            self.aw.qmc.R1_VOLTAGE = self.R1.get_voltage()
+            self.aw.qmc.R1_HEATER = self.R1.get_heater() * 10
+            self.aw.qmc.R1_FAN = self.R1.get_fan() * 10
+            self.aw.qmc.R1_BT_ROR = self.R1.get_bt_ror()
+            self.aw.qmc.R1_EXIT_TEMP = self.R1.get_exit_temperature()
+            self.aw.qmc.R1_STATE = self.R1.get_state()
+            self.aw.qmc.R1_FAN_RPM = self.R1.get_fan_rpm()
+            self.aw.qmc.R1_TX = tx
+            newstate = self.R1.get_state_string()
+            if newstate != self.aw.qmc.R1_STATE_STR:
+                self.aw.qmc.R1_STATE_STR = newstate
+                self.aw.sendmessage(QApplication.translate('Message', 'R1 state: ' + newstate))
+            if self.aw.qmc.mode == 'F':
+                self.aw.qmc.R1_DT = fromCtoF(self.aw.qmc.R1_DT)
+                self.aw.qmc.R1_BT = fromCtoF(self.aw.qmc.R1_BT)
+                self.aw.qmc.R1_EXIT_TEMP = fromCtoF(self.aw.qmc.R1_EXIT_TEMP)
+                self.aw.qmc.R1_BT_ROR = RoRfromCtoF(self.aw.qmc.R1_BT_ROR)
+        except Exception as exception: # pylint: disable=broad-except
+            error = QApplication.translate('Error Message', 'Aillio R1: ' + str(exception))
+            self.aw.qmc.adderror(error)
+        return tx, self.aw.qmc.R1_DT, self.aw.qmc.R1_BT
 
     def R1_BTIBTS(self):
         self.R1_DTBT()
@@ -1547,7 +1545,6 @@ class serialport():
                             s = self.EXTECH755PrevTemp
                             self.EXTECH755PrevTemp = -1
                             return s,s
-                        return -1,-1
                     return -1,-1
                 if retry:
                     return self.EXTECH755pressure(retry=retry - 1)
@@ -2199,7 +2196,7 @@ class serialport():
                 for _ in range(27):
                     rcode = self.SP.read(1)
                     #locate first byte
-                    if rcode == '\x3d':
+                    if rcode == b'\x3d':
                         r = self.SP.read(25)
                         if len(r) == 25:
                             r1 = hex2int(r[11],r[12])/10.
@@ -2281,51 +2278,53 @@ class serialport():
             if self.aw.modbus.inputSlaves[i] and not force: # in force mode (second request in oversampling mode) read only first two channels (ET/BT)
                 if not self.aw.modbus.optimizer or force:
                     self.aw.modbus.sleepBetween() # we start with a sleep, as it could be that just a send command happened before the semaphore was caught
+                rf:Optional[float]
+                ri:Optional[int]
                 if self.aw.modbus.inputFloats[i]:
-                    r = self.aw.modbus.readFloat(
+                    rf = self.aw.modbus.readFloat(
                                 self.aw.modbus.inputSlaves[i],
                                 self.aw.modbus.inputRegisters[i],
                                 self.aw.modbus.inputCodes[i],
                                 force)
-                    if r is not None:
-                        res[i] = r
+                    if rf is not None:
+                        res[i] = rf
                 elif self.aw.modbus.inputFloatsAsInt[i]:
-                    r = self.aw.modbus.readInt32(
+                    ri = self.aw.modbus.readInt32(
                                 self.aw.modbus.inputSlaves[i],
                                 self.aw.modbus.inputRegisters[i],
                                 self.aw.modbus.inputCodes[i],
                                 force,
                                 signed=self.aw.modbus.inputSigned[i])
-                    if r is not None:
-                        res[i] = r
+                    if ri is not None:
+                        res[i] = ri
                 elif self.aw.modbus.inputBCDs[i]:
-                    r = self.aw.modbus.readBCD(
+                    ri = self.aw.modbus.readBCD(
                                 self.aw.modbus.inputSlaves[i],
                                 self.aw.modbus.inputRegisters[i],
                                 self.aw.modbus.inputCodes[i],
                                 force)
-                    if r is not None:
-                        res[i] = r
+                    if ri is not None:
+                        res[i] = ri
                 elif self.aw.modbus.inputBCDsAsInt[i]:
-                    r = self.aw.modbus.readBCDint(
+                    ri = self.aw.modbus.readBCDint(
                                 self.aw.modbus.inputSlaves[i],
                                 self.aw.modbus.inputRegisters[i],
                                 self.aw.modbus.inputCodes[i],
                                 force)
-                    if r is not None:
-                        res[i] = r
+                    if ri is not None:
+                        res[i] = ri
                 else:
-                    r = self.aw.modbus.readSingleRegister(
+                    ri = self.aw.modbus.readSingleRegister(
                                 self.aw.modbus.inputSlaves[i],
                                 self.aw.modbus.inputRegisters[i],
                                 self.aw.modbus.inputCodes[i],
                                 force,
                                 signed=self.aw.modbus.inputSigned[i])
-                    if r is not None:
-                        res[i] = r
-                r = self.processChannelData(res[i],self.aw.modbus.inputDivs[i],self.aw.modbus.inputModes[i])
-                if r is not None:
-                    res[i] = r
+                    if ri is not None:
+                        res[i] = ri
+                rf = self.processChannelData(res[i],self.aw.modbus.inputDivs[i],self.aw.modbus.inputModes[i])
+                if rf is not None:
+                    res[i] = rf
 
         self.aw.qmc.extraMODBUStemps = res[:]
         self.aw.qmc.extraMODBUStx = self.aw.qmc.timeclock.elapsedMilli()
@@ -3885,7 +3884,7 @@ class serialport():
                 self.aw.qmc.startPhidgetManager()
             if self.aw.qmc.phidgetManager is not None:
                 # try to attach the 4 channels of the Phidget OUT1100 module
-                ser = None
+                ser:Optional[str] = None
                 s,p = self.serialString2serialPort(serial)
                 port = None
                 for phidget_id in [DeviceID.PHIDID_OUT1100,DeviceID.PHIDID_REL1100]:
@@ -3902,7 +3901,7 @@ class serialport():
                             ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',phidget_id,channel,
                                     remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
                         else:
-                            break
+                            break # type: ignore # mypy: Statement is unreachable  [unreachable]
                 if ser is not None:
                     self.aw.ser.PhidgetDigitalOut[serial] = []
                     self.aw.ser.PhidgetDigitalOutLastPWM[serial] = [0]*ports # 0-100
@@ -6572,7 +6571,7 @@ class colorport(extraserialport):
                 libtime.sleep(2)
                 if self.SP is not None:
                     # put Tonino into PC mode on first connect
-                    self.SP.write(str2cmd('\nTONINO\n'))
+                    self.SP.write(str2cmd('\nTONINO\n')) # type: ignore # mypy: Statement is unreachable  [unreachable]
                     #self.SP.flush()
                     self.readline_terminated(b'\n')
             if self.SP is not None:

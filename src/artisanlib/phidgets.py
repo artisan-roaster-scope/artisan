@@ -20,7 +20,7 @@ from Phidget22.DeviceID import DeviceID # type: ignore
 from Phidget22.DeviceClass import DeviceClass # type: ignore
 
 import logging
-from typing import Dict, Optional, TYPE_CHECKING
+from typing import Dict, Tuple, Optional, TYPE_CHECKING
 from typing_extensions import Final  # Python <=3.7
 
 if TYPE_CHECKING:
@@ -227,7 +227,7 @@ class PhidgetManager():
 #            print(k.getDeviceSerialNumber(),k.getChannelClassName(),k.getDeviceID(),k.getIsHubPortDevice(),"port: ", k.getHubPort(),"ch: ",k.getChannel(), "local: ", k.getIsLocal())
 
     # returns the first matching Phidget channel and reserves it
-    def getFirstMatchingPhidget(self,phidget_class_name,device_id,channel=None,remote=False,remoteOnly=False,serial:Optional[int]=None,hubport=None):
+    def getFirstMatchingPhidget(self,phidget_class_name,device_id,channel=None,remote=False,remoteOnly=False,serial:Optional[int]=None,hubport=None) -> Tuple[Optional[str],Optional[int]]:
         _log.debug('getFirstMatchingPhidget(%s,%s,%s,%s,%s,%s,%s)',phidget_class_name,device_id,channel,remote,remoteOnly,serial,hubport)
         try:
             self.managersemaphore.acquire(1)
@@ -264,7 +264,7 @@ class PhidgetManager():
                     port = p.getHubPort()
                 else:
                     port = None
-                return p.getDeviceSerialNumber(), port
+                return str(p.getDeviceSerialNumber()), port
             return None, None
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)

@@ -207,6 +207,7 @@ if TYPE_CHECKING:
     from matplotlib.text import Annotation # pylint: disable=unused-import
     from openpyxl.worksheet.worksheet import Worksheet # pylint: disable=unused-import
     import numpy.typing as npt # pylint: disable=unused-import
+    from matplotlib.backend_bases import Event # pylint: disable=unused-import
 
 # fix socket.inet_pton on Windows (used by pymodbus TCP/UDP)
 try:
@@ -246,8 +247,8 @@ if sys.platform.startswith('darwin'):
 #################### Main Application  ################################################
 #######################################################################################
 
-appGuid = '9068bd2fa8e54945a6be1f1a0a589e92'
-viewerAppGuid = '9068bd2fa8e54945a6be1f1a0a589e93'
+appGuid:Final[str] = '9068bd2fa8e54945a6be1f1a0a589e92'
+viewerAppGuid:Final[str] = '9068bd2fa8e54945a6be1f1a0a589e93'
 
 class Artisan(QtSingleApplication):
     __slots__ = [ 'sentToBackground', 'plus_sync_cache_expiration', 'artisanviewerMode', 'darkmode' ]
@@ -325,10 +326,10 @@ class Artisan(QtSingleApplication):
                     if query.hasQueryItem('url'):
                         import requests
                         query_url = QUrl(requests.utils.unquote(query.queryItemValue('url'))) # type: ignore # Module has no attribute "unquote"
-                        if bool(aw.comparator):
-                            QTimer.singleShot(5,lambda: aw.comparator.addProfileFromURL(aw.artisanURLextractor,query_url))
+                        if aw.comparator is not None:
+                            QTimer.singleShot(5,lambda: (aw.comparator.addProfileFromURL(aw.artisanURLextractor, query_url) if aw is not None and aw.comparator is not None else None))
                         else:
-                            QTimer.singleShot(5,lambda: aw.importExternalURL(aw.artisanURLextractor,url=query_url))
+                            QTimer.singleShot(5,lambda: (aw.importExternalURL(aw.artisanURLextractor, url=query_url) if aw is not None else None))
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
             elif url.scheme() == 'file':
@@ -345,14 +346,14 @@ class Artisan(QtSingleApplication):
                 qfile = QFileInfo(filename)
                 file_suffix = qfile.suffix()
                 if file_suffix == 'alog':
-                    if bool(aw.comparator):
+                    if aw.comparator is not None:
                         # add Artisan profile to the comparator selection
-                        QTimer.singleShot(20,lambda : aw.comparator.addProfiles([filename]))
+                        QTimer.singleShot(20,lambda : (aw.comparator.addProfiles([filename]) if (aw is not None and aw.comparator is not None) else None))
                     # load Artisan profile on double-click on *.alog file
                     elif url_query is not None and url_query == 'template':
                         aw.loadBackgroundSignal.emit(filename)
                     else:
-                        QTimer.singleShot(20,lambda : aw.loadFile(filename))
+                        QTimer.singleShot(20,lambda : (aw.loadFile(filename) if aw is not None else None))
                 elif file_suffix == 'alrm':
                     # load Artisan alarms on double-click on *.alrm file
                     QTimer.singleShot(20,lambda : aw.loadAlarms(filename))
@@ -454,10 +455,10 @@ class Artisan(QtSingleApplication):
 if sys.platform.startswith('darwin'):
     try:
         # start method can only be set once!
-        if False:# and 'forkserver' in multiprocessing.get_all_start_methods(): # pylint: disable=condition-evals-to-constant,using-constant-test
-            # signed app with forkserver option fails with a MemoryError
-            multiprocessing.set_start_method('forkserver') # only available on Python3 on Unix, currently (Python 3.8) not supported by frozen executables generated with pyinstaller
-        elif 'fork' in multiprocessing.get_all_start_methods():
+#        if 'forkserver' in multiprocessing.get_all_start_methods(): # pylint: disable=condition-evals-to-constant,using-constant-test
+#            # signed app with forkserver option fails with a MemoryError
+#            multiprocessing.set_start_method('forkserver') # only available on Python3 on Unix, currently (Python 3.8) not supported by frozen executables generated with pyinstaller
+        if 'fork' in multiprocessing.get_all_start_methods():
             multiprocessing.set_start_method('fork') # default on Python3.7 for macOS (and on Unix also under Python3.8), but considered unsafe,
             # not available on Windows, on Python3.8 we have to explicitly set this
             # https://bugs.python.org/issue33725
@@ -724,7 +725,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         self.axis_ranges:List[float] = [] # holds the ranges of all axis to detect if it is zoomed in
 
         # holds the last known cursor event while mouse pointer is in canvas, set by mouse_move()
-        self._last_event = None
+        self._last_event:Optional['Event'] = None
 
         NavigationToolbar.__init__(self, plotCanvas, parent)
 
@@ -881,7 +882,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                                     line.set_markeredgecolor(markeredgecolor)
                         # Redraw
                         figure.canvas.draw()
-                        if not (axes.get_xlim() == orig_xlim and axes.get_ylim() == orig_ylim):
+                        if axes is not None and not (axes.get_xlim() == orig_xlim and axes.get_ylim() == orig_ylim):
                             figure.canvas.toolbar.push_current()
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
@@ -1691,13 +1692,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.eventquantifiermax:List[int] = [100,100,100,100]
         self.eventquantifiercoarse:List[int] = [0,0,0,0]
         self.eventquantifieraction:List[int] = [0,0,0,0]
-        self.clusterEventsFlag = False
+        self.clusterEventsFlag:bool = False
         self.eventquantifierlinspaces = [self.computeLinespace(0),self.computeLinespace(1),self.computeLinespace(2),self.computeLinespace(3)]
-        self.eventquantifiersteps = 10
-        self.eventquantifierthresholdfine = .5 # original: 1.5, changed to 0.5 for Probat Probatone
-        self.eventquantifierthresholdcoarse = .5
-        self.lastdigitizedvalue = [None,None,None,None] # last digitized value per quantifier
-        self.lastdigitizedtemp = [None,None,None,None] # last digitized temp value per quantifier
+        self.eventquantifiersteps:int = 10
+        self.eventquantifierthresholdfine:float = .5 # original: 1.5, changed to 0.5 for Probat Probatone
+        self.eventquantifierthresholdcoarse:float = .5
+        self.lastdigitizedvalue:List[Optional[float]] = [None,None,None,None] # last digitized value per quantifier
+        self.lastdigitizedtemp:List[Optional[float]] = [None,None,None,None] # last digitized temp value per quantifier
 
         self.readingslcdsflags = [0,1,1] # readings LCD visibility per state OFF, ON, START
 
@@ -5750,8 +5751,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 # first order the events table
                 self.orderEvents(lock=False)
                 # second detect the minimum time span between two events (could be equal to the sampling rate)
-                min_span = None
-                last_event_idx = None # index of last event analyzed
+                min_span:Optional[float] = None
+                last_event_idx:Optional[int] = None # index of last event analyzed
                 for i, se in enumerate(self.qmc.specialevents):
                     if self.qmc.specialeventstype[i] == tp and last_event_idx is not None:
                         time_diff = se - self.qmc.specialevents[last_event_idx]
@@ -5762,11 +5763,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     min_span = min(1,min_span,self.qmc.delay/1000 * 3)
                     indexes_to_be_removed = []
                     last_event_idx = None # index of last event analyzed
-                    last_index_not_removed = None
+                    last_index_not_removed:Optional[int] = None
                     # group those with minimally 2x min_span time delta by keeping the first with the value of the last
                     for i, se in enumerate(self.qmc.specialevents):
                         if self.qmc.specialeventstype[i] == tp and last_event_idx is not None:
-                            if self.qmc.specialeventsvalue[last_event_idx] == self.qmc.specialeventsvalue[i]:
+                            if self.qmc.specialeventsvalue[last_event_idx] == self.qmc.specialeventsvalue[i]: # type: ignore # mypy: Statement is unreachable  [unreachable]
                                 # if the value of the event is the same as the previous, we remove it
                                 indexes_to_be_removed.append(i)
                             else:
@@ -8440,8 +8441,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(';')) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
-                            if self.s7.lastReadResult is None:
-                                self.s7.lastReadResult = 0
                             cs = c.strip().replace('_',str(self.s7.lastReadResult)) # the last read value can be accessed via the "_" symbol
                             if cs.startswith('setDBint(') and len(cs) > 14:
                                 try:
@@ -9286,11 +9285,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                     (kb, _, valueb) = line.partition(b'=')
                                     k = kb.decode('UTF-8')
                                     value = valueb.decode('UTF-8')
-                                else: # this branch is most likely never reached
-                                    (k, _, value) = line.partition('=') # pyright: ignore # "Never" is not iterable (reportGeneralTypeIssues)
-                                # don't copy PYTHONHOME nor PYTHONPATH if it points to the Artisan.app
-                                if not ((k in ['PYTHONHOME','PYTHONPATH']) and (('Artisan.app' in value) or 'artisan' in value)):
-                                    my_env[k] = value.rstrip('\n')
+#                                else: # this branch is most likely never reached
+#                                    (k, _, value) = line.partition('=') # pyright: ignore # "Never" is not iterable (reportGeneralTypeIssues)
+                                    # don't copy PYTHONHOME nor PYTHONPATH if it points to the Artisan.app
+                                    if not ((k in ['PYTHONHOME','PYTHONPATH']) and (('Artisan.app' in value) or 'artisan' in value)):
+                                        my_env[k] = value.rstrip('\n')
                             proc.communicate()
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
@@ -11678,8 +11677,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if firstChar == '{':
                 f.close()
                 profile = self.deserialize(filename)
-                if profile is None:
-                    return
                 self.qmc.backgroundprofile = cast('ProfileData',profile)
                 tb = profile['timex']
                 t1 = profile['temp1']
@@ -11928,7 +11925,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                         # even
                         self.qmc.extraname1[int(i/2)] = ef
                 #read data
-                last_time = None
+                last_time:Optional[float] = None
 
                 i = 0
                 for row in data:
@@ -12618,12 +12615,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                     self.qmc.alarmbeep.insert(3,1)      #do beep for charge
                                     self.qmc.alarmstrings.insert(3,QApplication.translate('Label','Charge the beans'))
                                 break
-                        else:
-                            if slider_power == -1:
-                                error_msg += "Could not find slider named 'Power' "
-                            if slider_fan == -1:
-                                error_msg += "Could not find slider named 'Fan' "
-                            error_msg += 'Please rename sliders in Config - Events menu'
+                    else:
+                        if slider_power == -1:
+                            error_msg += "Could not find slider named 'Power' "
+                        if slider_fan == -1:
+                            error_msg += "Could not find slider named 'Fan' "
+                        error_msg += 'Please rename sliders in Config - Events menu'
 
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
@@ -12712,7 +12709,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                         'Time:' + self.qmc.roastdate.time().toString()[:-3]])
                     headrow:List[str] = (['Time1','Time2','ET','BT','Event'] + freduce(lambda x,y : x + [str(y[0]),str(y[1])], list(zip(self.qmc.extraname1[0:len(self.qmc.extradevices)],self.qmc.extraname2[0:len(self.qmc.extradevices)])),[])) # type: ignore
                     writer.writerow(headrow)
-                    last_time = None
+                    last_time:Optional[str] = None
                     for i, tx in enumerate(self.qmc.timex):
                         if tx >= CHARGE > 0:
                             di,mo = divmod(tx - CHARGE, 60)
@@ -12727,7 +12724,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                 break
                         di,mo = divmod(tx,60)
                         time1 = f'{di:02.0f}:{mo:02.0f}'
-                        if not last_time or last_time != time1:
+                        if last_time is None or last_time != time1:
                             extratemps = []
                             for j in range(len(self.qmc.extradevices)):
                                 if j < len(self.qmc.extratemp1) and i < len(self.qmc.extratemp1[j]):
@@ -12861,7 +12858,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                         ws.cell(row=r,column=i+1).alignment = Alignment(horizontal='center')
                     r += 1
 
-                    last_time = None
+                    last_time:Optional[str] = None
                     for i, tx in enumerate(self.qmc.timex):
                         if tx >= CHARGE > 0:
                             di,mo = divmod(tx - CHARGE, 60)
@@ -12887,7 +12884,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 
                         di,mo = divmod(tx,60)
                         time1 = f'{di:02.0f}:{mo:%02.0f}'
-                        if not last_time or last_time != time1:
+                        if last_time is None or last_time != time1:
                             extratemps = []
                             for j in range(len(self.qmc.extradevices)):
                                 if j < len(self.qmc.extratemp1) and i < len(self.qmc.extratemp1[j]):
@@ -13573,34 +13570,22 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 self.qmc.beans = ''
             if 'weight' in profile:
                 weight = profile['weight']
-                if weight is not None:
-                    self.qmc.weight = (float(weight[0]),float(weight[1]),decodeLocalStrict(weight[2], 'g'))
-                else:
-                    self.qmc.weight = (0,0,'g')
+                self.qmc.weight = (float(weight[0]),float(weight[1]),decodeLocalStrict(weight[2], 'g'))
             else:
                 self.qmc.weight = (0,0,'g')
             if 'volume' in profile:
                 volume = profile['volume']
-                if volume is not None:
-                    self.qmc.volume = (float(volume[0]),float(volume[1]),decodeLocalStrict(volume[2], 'l'))
-                else:
-                    self.qmc.volume = (0,0,'l')
+                self.qmc.volume = (float(volume[0]),float(volume[1]),decodeLocalStrict(volume[2], 'l'))
             else:
                 self.qmc.volume = (0,0,'l')
             if 'density' in profile:
                 density = profile['density']
-                if density is not None:
-                    self.qmc.density = (float(density[0]),decodeLocalStrict(density[1], 'g'),float(density[2]),decodeLocalStrict(density[3], 'l'))
-                else:
-                    self.qmc.density = (0,'g',1,'l')
+                self.qmc.density = (float(density[0]),decodeLocalStrict(density[1], 'g'),float(density[2]),decodeLocalStrict(density[3], 'l'))
             else:
                 self.qmc.density = (0,'g',1,'l')
             if 'density_roasted' in profile:
                 density_roasted = profile['density_roasted']
-                if density_roasted is not None:
-                    self.qmc.density_roasted = (float(density_roasted[0]),decodeLocalStrict(density_roasted[1], 'g'),float(density_roasted[2]),decodeLocalStrict(density_roasted[3], 'l'))
-                else:
-                    self.qmc.density_roasted = (0,'g',1,'l')
+                self.qmc.density_roasted = (float(density_roasted[0]),decodeLocalStrict(density_roasted[1], 'g'),float(density_roasted[2]),decodeLocalStrict(density_roasted[3], 'l'))
             else:
                 self.qmc.density_roasted = (0,'g',1,'l')
             if 'roastertype' in profile:
@@ -20746,9 +20731,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     def note2html(notes):
         notes_html = ''
         for nts in notes:
-            if str(nts) == 9:
+            if nts == '\t':
                 notes_html += ' &nbsp&nbsp&nbsp&nbsp '
-            elif str(nts) == '\n':
+            elif nts == '\n':
                 notes_html += '<br>\n'
             else:
                 notes_html += str(nts)

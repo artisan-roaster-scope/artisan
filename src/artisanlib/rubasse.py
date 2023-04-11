@@ -5,7 +5,7 @@
 import os
 import csv
 import logging
-from typing import List, TYPE_CHECKING
+from typing import List, Optional, TYPE_CHECKING
 from typing_extensions import Final  # Python <=3.7
 
 if TYPE_CHECKING:
@@ -38,12 +38,12 @@ def extractProfileRubasseCSV(file:str, aw:'ApplicationWindow') -> 'ProfileData':
         header_row = next(data)
         header = ['time','BT','Fan','Heater','RoR','Drum','Humidity','ET','Pressure'] + ['DT', 'timeB', 'BTB', 'FanB', 'HeaterB', 'RoRB', 'DrumB', 'HumidityB', 'ETB', 'PressureB', 'DTB']
 
-        fan = None # holds last processed fan event value
-        fan_last = None # holds the fan event value before the last one
-        heater = None # holds last processed heater event value
-        heater_last = None # holds the heater event value before the last one
-        fan_event = False # set to True if a fan event exists
-        heater_event = False # set to True if a heater event exists
+        fan:Optional[float] = None # holds last processed fan event value
+        fan_last:Optional[float] = None # holds the fan event value before the last one
+        heater:Optional[float] = None # holds last processed heater event value
+        heater_last:Optional[float] = None # holds the heater event value before the last one
+        fan_event:bool = False # set to True if a fan event exists
+        heater_event:bool = False # set to True if a heater event exists
 
         specialevents:List[int] = []
         specialeventstype:List[int] = []

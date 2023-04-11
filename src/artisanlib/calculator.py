@@ -311,7 +311,7 @@ class calculatorDlg(ArtisanDialog):
         self.tdsEdit.setText(comma2dot(str(self.tdsEdit.text())))
         self.coffeeEdit.setText(comma2dot(str(self.coffeeEdit.text())))
         # Extraction yield % = Brewed Coffee[g] x TDS[%] / Coffee Grounds[g]
-        if self.groundsEdit.text() == '' or self.tdsEdit.text() == '' or self.coffeeEdit.text == '':
+        if self.groundsEdit.text() == '' or self.tdsEdit.text() == '' or self.coffeeEdit.text() == '':
             return
         grounds = float(str(self.groundsEdit.text()))
         tds = float(str(self.tdsEdit.text()))

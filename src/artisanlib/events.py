@@ -18,7 +18,7 @@
 import sys
 import platform
 import logging
-from typing import List, cast, TYPE_CHECKING
+from typing import List, Optional, cast, TYPE_CHECKING
 from typing_extensions import Final  # Python <=3.7
 
 if TYPE_CHECKING:
@@ -1617,8 +1617,8 @@ class EventsDlg(ArtisanResizeablDialog):
                     else:
                         linespacethreshold = abs(linespace[1] - linespace[0]) * self.aw.eventquantifierthresholdfine
                     # loop over that data and classify each value
-                    ld = None # last digitized value
-                    lt = None # last digitized temp value
+                    ld:Optional[float] = None # last digitized value
+                    lt:Optional[float] = None # last digitized temp value
                     for ii, _ in enumerate(temp):
                         t = temp[ii]
                         if t != -1: # -1 is an error value

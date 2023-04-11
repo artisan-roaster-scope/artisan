@@ -24,6 +24,7 @@ from typing_extensions import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+    from artisanlib.ble import BleInterface # noqa: F401 # pylint: disable=unused-import
 
 # import artisan.plus modules
 import plus.config  # @UnusedImport
@@ -96,8 +97,8 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.volumeunit = volumeunit
 
         # the results
-        self.inVolume = None
-        self.outVolume = None
+        self.inVolume:Optional[str] = None
+        self.outVolume:Optional[str] = None
 
         # the QLineedits of the RoastProperties dialog to be updated
         self.inlineedit = inlineedit
@@ -424,7 +425,7 @@ class volumeCalculatorDlg(ArtisanDialog):
 
     @pyqtSlot()
     def updateVolumes(self):
-        if self.inVolume and self.inVolume != '':
+        if self.inVolume:
             if self.volumeunit == 0:
                 self.inlineedit.setText(f'{self.aw.float2floatWeightVolume(self.inVolume):g}')
             else:
@@ -563,10 +564,10 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         self.perKgRoastMode = False # if true only the amount during the roast and not the full batch (incl. preheat and BBP) are displayed), toggled by click on the result widget
 
-        self.ble = None # the BLE interface
-        self.scale_weight = None # weight received from a connected scale
+        self.ble:Optional['BleInterface'] = None # the BLE interface
+        self.scale_weight:Optional[float] = None # weight received from a connected scale
         self.scale_battery = None # battery level of the connected scale in %
-        self.scale_set = None # set weight for accumulation in g
+        self.scale_set:Optional[float] = None # set weight for accumulation in g
 
         self.disconnecting = False # this is set to True to terminate the scale connection
         self.volumedialog:Optional[volumeCalculatorDlg] = None # link forward to the the Volume Calculator
@@ -587,11 +588,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.org_roastpropertiesAutoOpenDropFlag = self.aw.qmc.roastpropertiesAutoOpenDropFlag
 
         # propulated by selecting a recent roast from the popup via recentRoastActivated()
-        self.template_file = None
-        self.template_name = None
-        self.template_uuid = None
-        self.template_batchnr = None
-        self.template_batchprefix = None
+        self.template_file:Optional[str] = None
+        self.template_name:Optional[str] = None
+        self.template_uuid:Optional[str] = None
+        self.template_batchnr:Optional[int] = None
+        self.template_batchprefix:Optional[str] = None
 
         regextime = QRegularExpression(r'^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$')
         #MARKERS
@@ -1348,7 +1349,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 try:
 #                    with suppress_stdout_stderr():
                     # if selected scale is the Acaia, start the BLE interface
-                    from artisanlib.ble import BleInterface
+                    from artisanlib.ble import BleInterface # noqa: F811
                     from artisanlib.acaia import AcaiaBLE
                     acaia = AcaiaBLE()
                     self.ble = BleInterface(
@@ -1724,7 +1725,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.updateLargeScaleLCDs(None, '')
 
     # takes total accumulated weight and renders it as text; returns the empty string if the total weight is not given
-    def updateScaleWeightAccumulated(self,weight=None):
+    def updateScaleWeightAccumulated(self,weight:Optional[float]=None):
         unit = ''
         v_formatted = ''
         if self.scale_set is not None and weight is not None:
@@ -2236,7 +2237,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             # reset coffee and set new blend
             self.plus_coffees_combo.setCurrentIndex(0)
             selected_blend = self.plus_blends[n-1]
-            bsd = plus.stock.getBlendStockDict(selected_blend)
+            bsd:plus.stock.StockItem = plus.stock.getBlendStockDict(selected_blend)
             self.plus_store_selected = bsd['location_hr_id']
             self.plus_store_selected_label = bsd['location_label']
 
@@ -2259,12 +2260,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                     entry['ratio_denom'] = i['ratio_denom']
                 ingredients.append(entry)
             self.plus_blend_selected_spec['ingredients'] = ingredients
-            if 'amount' in bsd:
-                self.plus_amount_selected = plus.stock.getBlendMaxAmount(selected_blend)
-                self.plus_amount_replace_selected = plus.stock.getBlendReplaceMaxAmount(selected_blend)
-            else:
-                self.plus_amount_selected = None
-                self.plus_amount_replace_selected = None
+            self.plus_amount_selected = plus.stock.getBlendMaxAmount(selected_blend)
+            self.plus_amount_replace_selected = plus.stock.getBlendReplaceMaxAmount(selected_blend)
             self.fillBlendData(selected_blend,prev_coffee_label,prev_blend_label)
 
         self.checkWeightIn()
@@ -3835,19 +3832,20 @@ class editGraphDlg(ArtisanResizeablDialog):
         except Exception: # pylint: disable=broad-except
             pass
         #w,d,m = self.aw.scale.readWeight(self.scale_weight) # read value from scale in 'g'
-        w,d,m = self.scale_weight,-1,-1
+        w = self.scale_weight
+        d,m = -1,-1
         if w is not None and w > -1:
             w = w - tare
-            w = self.aw.convertWeight(w,0,self.aw.qmc.weight_units.index(self.aw.qmc.weight[2])) # convert to weight units
+            wf = self.aw.convertWeight(w,0,self.aw.qmc.weight_units.index(self.aw.qmc.weight[2])) # convert to weight units
             current_w:float = 0
             try:
                 current_w = float(comma2dot(weight_edit.text()))
             except Exception: # pylint: disable=broad-except
                 pass
             if overwrite:
-                new_w = w
+                new_w = wf
             else:
-                new_w = current_w + w # we add the new weight to the already existing one!
+                new_w = current_w + wf # we add the new weight to the already existing one!
                 self.scale_set = self.aw.convertWeight(new_w,self.aw.qmc.weight_units.index(self.aw.qmc.weight[2]),0) # convert to weight units
 #            weight_edit.setText("%g" % self.aw.float2float(new_w))
             # updating this widget in a separate thread seems to be important on OS X 10.14 to avoid delayed updates and widget redraw problems
@@ -4796,11 +4794,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         #update ambient temperature source
         self.aw.qmc.ambientTempSource = self.ambientComboBox.currentIndex()
         #update weight
-        w0 = self.aw.qmc.weight[0]
-        w1 = self.aw.qmc.weight[1]
+        w0:float
+        w1:float
         w2 = self.aw.qmc.weight[2]
         try:
-            w0 = float(comma2dot(str(self.weightinedit.text())))
+            w0 = float(comma2dot(self.weightinedit.text()))
         except Exception: # pylint: disable=broad-except
             w0 = 0
         if w0 == 0 and self.aw.qmc.last_batchsize == 0:
@@ -4811,7 +4809,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         else:
             self.aw.qmc.last_batchsize = w0 # remember last used batch size
         try:
-            w1 = float(comma2dot(str(self.weightoutedit.text())))
+            w1 = float(comma2dot(self.weightoutedit.text()))
         except Exception: # pylint: disable=broad-except
             w1 = 0
         w2 = self.unitsComboBox.currentText()
@@ -4821,11 +4819,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         v1 = self.aw.qmc.volume[1]
         v2 = self.aw.qmc.volume[2]
         try:
-            w0 = float(comma2dot(str(self.volumeinedit.text())))
+            w0 = float(comma2dot(self.volumeinedit.text()))
         except Exception: # pylint: disable=broad-except
             w0 = 0
         try:
-            w1 = float(comma2dot(str(self.volumeoutedit.text())))
+            w1 = float(comma2dot(self.volumeoutedit.text()))
         except Exception: # pylint: disable=broad-except
             w1 = 0
         w2 = self.volumeUnitsComboBox.currentText()
@@ -4833,23 +4831,23 @@ class editGraphDlg(ArtisanResizeablDialog):
         #update density
         d0 = self.aw.qmc.density[0]
         try:
-            d0 = float(comma2dot(str(self.bean_density_in_edit.text())))
+            d0 = float(comma2dot(self.bean_density_in_edit.text()))
         except Exception: # pylint: disable=broad-except
             d0 = 0
         self.aw.qmc.density = (d0, 'g', 1, 'l')
         dr0 = self.aw.qmc.density_roasted[0]
         try:
-            dr0 = float(comma2dot(str(self.bean_density_out_edit.text())))
+            dr0 = float(comma2dot(self.bean_density_out_edit.text()))
         except Exception: # pylint: disable=broad-except
             dr0 = 0
         self.aw.qmc.density_roasted = (dr0, 'g', 1, 'l')
         #update bean size
         try:
-            self.aw.qmc.beansize_min = int(str(self.bean_size_min_edit.text()))
+            self.aw.qmc.beansize_min = int(self.bean_size_min_edit.text())
         except Exception: # pylint: disable=broad-except
             self.aw.qmc.beansize_min = 0
         try:
-            self.aw.qmc.beansize_max = int(str(self.bean_size_max_edit.text()))
+            self.aw.qmc.beansize_max = int(self.bean_size_max_edit.text())
         except Exception: # pylint: disable=broad-except
             self.aw.qmc.beansize_max = 0
         #update roastflags
