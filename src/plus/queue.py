@@ -50,7 +50,7 @@ queue_path = getDirectory(config.outbox_cache, share=False)
 
 app = QCoreApplication.instance()
 
-queue:Optional[persistqueue.SQLiteQueue] = None # holdes the persistqueue.SQLiteQueue, initialized by start()
+queue:Optional['persistqueue.SQLiteQueue'] = None # holdes the persistqueue.SQLiteQueue, initialized by start()
 
 # queue entries are dictionaries with entries
 #   url   : the URL to send the request to
