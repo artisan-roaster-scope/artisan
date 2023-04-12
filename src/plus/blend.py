@@ -151,7 +151,7 @@ class CustomBlendDialog(ArtisanDialog):
         # configure UI
         self.ui = BlendDialog.Ui_customBlendDialog()
         self.ui.setupUi(self)
-        self.setWindowTitle(QApplication.translate('Form Caption','Custom CustomBlend'))
+        self.setWindowTitle(QApplication.translate('Form Caption','Custom Blend'))
         self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Apply)
         # hack to assign the Apply button the AcceptRole without losing default system translations
         applyButton = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Apply)
@@ -186,7 +186,7 @@ class CustomBlendDialog(ArtisanDialog):
     @pyqtSlot()
     def weighteditChanged(self):
         weight = float(comma2dot(self.ui.lineEdit_weight.text()))
-        inw = f'{self.aw.float2floatWeightVolume(weight)}:g''%g'
+        inw = f'{self.aw.float2floatWeightVolume(weight)}:g'
         self.ui.lineEdit_weight.setText(inw)
         self.ui.lineEdit_weight.repaint()
         self.initialTotalWeight = float(self.ui.lineEdit_weight.text())
@@ -297,10 +297,10 @@ class CustomBlendDialog(ArtisanDialog):
     def updateAddButton(self):
         self.ui.pushButton_add.setEnabled(len(self.coffees)>len(self.blend.components))
 
-    # returns True if all component rations sum up to 1 and all individual ratios are above 0 and below 100
+    # returns True if all component ratios sum up to (about) 1 and all individual ratios are above 0 and below 100
     def checkRatio(self):
         ratios = [c.ratio for c in self.blend.components]
-        return all(0 < r < 100 for r in ratios) and ((1 - sum(ratios)) < 0.001)
+        return all(0 < r < 100 for r in ratios) and (-0.001 < (1 - sum(ratios)) < 0.001)
 
     def updateComponentTable(self):
         try:

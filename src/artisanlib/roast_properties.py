@@ -1602,7 +1602,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 blend = self.aw.qmc.plus_custom_blend
             else:
                 coffee_tuples = sorted(coffees.items(), key=lambda x: x[0])
-                blend = plus.blend.CustomBlend(QApplication.translate('Form Caption','Custom CustomBlend'),[
+                blend = plus.blend.CustomBlend(QApplication.translate('Form Caption','Custom Blend'),[
                     plus.blend.Component(coffee_tuples[0][1], 0.5),
                     plus.blend.Component(coffee_tuples[1][1], 0.5)
                 ])
@@ -1615,7 +1615,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     self.plus_blends_combo.setCurrentIndex(0)
                     self.blendSelectionChanged(0)
                 # update inweight
-                inw = f'{self.aw.float2floatWeightVolume(total_weight):%g}'
+                inw = f'{self.aw.float2floatWeightVolume(total_weight):g}'
                 self.weightinedit.setText(inw)
                 self.weightineditChanged()
 

@@ -21305,6 +21305,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         from artisanlib.ports import comportDlg
         dialog = comportDlg(self,self)
         if dialog.exec():
+            # we stop the HOTTOP loop to trigger a new connect with the potential changed serial port settings
+            if self.qmc.device == 53:
+                # disconnect HOTTOP
+                from artisanlib.hottop import stopHottop
+                stopHottop()
             # set serial port
             self.ser.comport = str(dialog.comportEdit.getSelection())
             self.ser.baudrate = int(str(dialog.baudrateComboBox.currentText()))              #int changes QString to int
