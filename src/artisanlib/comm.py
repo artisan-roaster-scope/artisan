@@ -1351,9 +1351,9 @@ class serialport():
             # convert temperature scale
             m = self.aw.ws.channel_modes[channel]
             if m == 1 and self.aw.qmc.mode == 'F':
-                res = fromCtoF(res)
-            elif m == 2 and self.aw.qmc.mode == 'C':
-                res = fromFtoC(res)
+                return fromCtoF(res)
+            if m == 2 and self.aw.qmc.mode == 'C':
+                return fromFtoC(res)
             return res
         return -1
 
@@ -2219,23 +2219,21 @@ class serialport():
     # input: value x; divider d; mode m
     # returns processed value
     def processChannelData(self,x:Optional[float],d:int,m:str) -> float:
-        res:float
-        if x is None:
-            res = -1
-        else:
+        if x is not None:
+            res:float = x
             # apply divider
             if d==1: # apply divider
                 res = x / 10.
             elif d==2: # apply divider
                 res = x / 100.
-            else:
-                res = x
+
             # convert temperature scale
             if m == 'C' and self.aw.qmc.mode == 'F':
-                res = fromCtoF(res)
-            elif m == 'F' and self.aw.qmc.mode == 'C':
-                res = fromFtoC(res)
-        return res
+                return fromCtoF(res)
+            if m == 'F' and self.aw.qmc.mode == 'C':
+                return fromFtoC(res)
+            return res
+        return -1
 
     #returns v1,v2 from a connected S7 device
     # mode=0 to read ch1+2
@@ -5040,16 +5038,14 @@ class serialport():
                 self.PhidgetIOlastvalues[i] = res
                 return res
             if API == 'digital':
-                v = int(self.PhidgetIO[idx].getState())
-            elif API == 'current':
-                v = self.PhidgetIO[idx].getCurrent() * self.aw.qmc.phidget1018valueFactor
-            elif API == 'frequency':
-                v = self.PhidgetIO[idx].getFrequency()
-            elif self.aw.qmc.phidget1018_ratio[i] and deviceType != DeviceID.PHIDID_DAQ1400:
-                v = self.PhidgetIO[idx].getVoltageRatio()
-            else:
-                v = self.PhidgetIO[idx].getVoltage() * self.aw.qmc.phidget1018valueFactor
-            return v
+                return int(self.PhidgetIO[idx].getState())
+            if API == 'current':
+                return self.PhidgetIO[idx].getCurrent() * self.aw.qmc.phidget1018valueFactor
+            if API == 'frequency':
+                return self.PhidgetIO[idx].getFrequency()
+            if self.aw.qmc.phidget1018_ratio[i] and deviceType != DeviceID.PHIDID_DAQ1400:
+                return self.PhidgetIO[idx].getVoltageRatio()
+            return self.PhidgetIO[idx].getVoltage() * self.aw.qmc.phidget1018valueFactor
         return -1
 
     def configure1018(self,deviceType,idx,API='voltage'):

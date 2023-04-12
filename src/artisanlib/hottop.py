@@ -135,31 +135,31 @@ def doWork(interval:float, comport, baudrate, bytesize, parity, stopbits, timeou
     while True:
         # logging part
         BT, ET, HEATER, FAN, MAIN_FAN, SOLENOID, DRUM_MOTOR, COOLING_MOTOR, CHAFF_TRAY = gettemperatures(SP)
-        if BT != -1:
+        if -1 != BT:
             if aBT.value == -1:
                 aBT.value = float(BT)
             else:
                 # we compute a running average to compensate for the low precisions
                 aBT.value = (aBT.value + float(BT)) / 2.0
-        if ET != -1:
+        if -1 != ET:
             if aET.value == -1:
                 aET.value = ET
             else:
                 # we compute a running average to compensate for the low precisions
                 aET.value = (aET.value + float(ET)) / 2.0
-        if HEATER != -1:
+        if -1 != HEATER:
             aHEATER.value = HEATER
-        if FAN != -1:
+        if -1 != FAN:
             aFAN.value = FAN
-        if MAIN_FAN != -1:
+        if -1 != MAIN_FAN:
             aMAIN_FAN.value = MAIN_FAN
-        if SOLENOID != -1:
+        if -1 != SOLENOID:
             aSOLENOID.value = SOLENOID
-        if DRUM_MOTOR != -1:
+        if -1 != DRUM_MOTOR:
             aDRUM_MOTOR.value = DRUM_MOTOR
-        if COOLING_MOTOR != -1:
+        if -1 != COOLING_MOTOR:
             aCOOLING_MOTOR.value = COOLING_MOTOR
-        if CHAFF_TRAY != -1:
+        if -1 != CHAFF_TRAY:
             aCHAFF_TRAY.value = xCHAFF_TRAY
 
         # control part

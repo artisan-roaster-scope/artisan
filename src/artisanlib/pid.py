@@ -86,10 +86,8 @@ class PID():
         self.previous_outputs = self.previous_outputs[-self.output_smoothing_factor:]
         # compute smoothed output
         if self.output_smoothing_factor == 0 or len(self.previous_outputs) < self.output_smoothing_factor:
-            res = output # no smoothing yet
-        else:
-            res = float(numpy.average(self.previous_outputs,weights=self.output_decay_weights))
-        return res
+            return output # no smoothing yet
+        return float(numpy.average(self.previous_outputs,weights=self.output_decay_weights))
 
     def _smooth_input(self,inp:float) -> float:
         # create or update smoothing decay weights
@@ -101,10 +99,8 @@ class PID():
         self.previous_inputs = self.previous_inputs[-self.input_smoothing_factor:]
         # compute smoothed output
         if len(self.previous_inputs) < self.input_smoothing_factor or self.input_smoothing_factor == 0:
-            res = inp # no smoothing yet
-        else:
-            res = float(numpy.average(self.previous_inputs,weights=self.input_decay_weights))
-        return res
+            return inp # no smoothing yet
+        return float(numpy.average(self.previous_inputs,weights=self.input_decay_weights))
 
     ### External API guarded by semaphore
 

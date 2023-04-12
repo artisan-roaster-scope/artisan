@@ -10115,7 +10115,6 @@ class tgraphcanvas(FigureCanvas):
 
     #return a 'roast of the day' string with ordinals when english
     def roastOfTheDay(self,roastbatchpos):
-        rotd_str = ''  #return an empty string if roastbatchpos is None
         if roastbatchpos is not None:
             #add an ordinal suffix for english
             if self.locale_str == 'en':
@@ -10124,8 +10123,8 @@ class tgraphcanvas(FigureCanvas):
             else:
                 prefix = '#'
                 suffix = ''
-            rotd_str = f'{prefix}{roastbatchpos}{suffix} {QApplication.translate("AddlInfo", "Roast of the Day")}'
-        return rotd_str
+            return f'{prefix}{roastbatchpos}{suffix} {QApplication.translate("AddlInfo", "Roast of the Day")}'
+        return '' #return an empty string if roastbatchpos is None
 
     #add stats summary to graph
     def statsSummary(self):

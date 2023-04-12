@@ -83,5 +83,4 @@ def content():
     strlist.append(tbl_Actions.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
     strlist.append('</body>')
     helpstr = ''.join(strlist)
-    helpstr = re.sub(r'&amp;', r'&',helpstr)
-    return helpstr
+    return re.sub(r'&amp;', r'&',helpstr)

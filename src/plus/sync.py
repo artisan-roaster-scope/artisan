@@ -50,10 +50,8 @@ sync_cache_semaphore = QSemaphore(1)
 
 def getSyncName() -> str:
     if config.account_nr is None or config.account_nr == 0:
-        fn = config.sync_cache
-    else:
-        fn = f'{config.sync_cache}{config.account_nr}'
-    return fn
+        return config.sync_cache
+    return f'{config.sync_cache}{config.account_nr}'
 
 
 # if lock is True, return the path of the corresponding lock file

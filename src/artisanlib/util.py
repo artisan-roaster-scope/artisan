@@ -312,51 +312,38 @@ def _getAppDataDirectory(app):
 
 @functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
 def getAppPath():
-    res = ''
     platf = platform.system()
     if platf in ['Darwin','Linux']:
         if appFrozen():
-            res = QCoreApplication.applicationDirPath() + '/../../../'
-        else:
-            res = os.path.dirname(os.path.realpath(__file__)) + '/../'
-    elif platf == 'Windows':
+            return QCoreApplication.applicationDirPath() + '/../../../'
+        return os.path.dirname(os.path.realpath(__file__)) + '/../'
+    if platf == 'Windows':
         if appFrozen():
-            res = os.path.dirname(sys.executable) + '\\'
-        else:
-            res = os.path.dirname(os.path.realpath(__file__)) + '\\..\\'
-    else:
-        res = QCoreApplication.applicationDirPath() + '/'
-    return res
+            return os.path.dirname(sys.executable) + '\\'
+        return os.path.dirname(os.path.realpath(__file__)) + '\\..\\'
+    return QCoreApplication.applicationDirPath() + '/'
 
 @functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
 def getResourcePath():
-    res = ''
     platf = platform.system()
     if platf == 'Darwin':
         if appFrozen():
-            res = QCoreApplication.applicationDirPath() + '/../Resources/'
-        else:
-            res = os.path.dirname(os.path.realpath(__file__)) + '/../includes/'
-    elif platf == 'Linux':
+            return QCoreApplication.applicationDirPath() + '/../Resources/'
+        return os.path.dirname(os.path.realpath(__file__)) + '/../includes/'
+    if platf == 'Linux':
         if appFrozen():
-            res = QCoreApplication.applicationDirPath() + '/'
-        else:
-            res = os.path.dirname(os.path.realpath(__file__)) + '/../includes/'
-    elif platf == 'Windows':
+            return QCoreApplication.applicationDirPath() + '/'
+        return os.path.dirname(os.path.realpath(__file__)) + '/../includes/'
+    if platf == 'Windows':
         if appFrozen():
-            res = os.path.dirname(sys.executable) + '\\'
-        else:
-            res = os.path.dirname(os.path.realpath(__file__)) + '\\..\\includes\\'
-    else:
-        res = QCoreApplication.applicationDirPath() + '/'
-    return res
+            return os.path.dirname(sys.executable) + '\\'
+        return os.path.dirname(os.path.realpath(__file__)) + '\\..\\includes\\'
+    return QCoreApplication.applicationDirPath() + '/'
 
 # if share is True, the same (cache) file is shared between the Artisan and
 # ArtisanViewer apps
 # and locks have to be used to avoid race conditions
-def getDirectory(
-    filename: str, ext: Optional[str] = None, share: bool = False
-):
+def getDirectory(filename: str, ext: Optional[str] = None, share: bool = False):
     fn = filename
     if not share:
         app = QCoreApplication.instance()
@@ -490,16 +477,14 @@ def natsort(s):
 def scaleFloat2String(num):
     n = toFloat(num)
     if n == 0:
-        res = '0'
-    elif abs(n) < 1:
-        res = f'{n:.3f}'.rstrip('0').rstrip('.')
-    elif abs(n) >= 1000:
-        res = f'{n:.0f}'
-    elif abs(n) >= 100:
-        res = f'{n:.1f}'.rstrip('0').rstrip('.')
-    else:
-        res = f'{n:.2f}'.rstrip('0').rstrip('.')
-    return res
+        return '0'
+    if abs(n) < 1:
+        return f'{n:.3f}'.rstrip('0').rstrip('.')
+    if abs(n) >= 1000:
+        return f'{n:.0f}'
+    if abs(n) >= 100:
+        return f'{n:.1f}'.rstrip('0').rstrip('.')
+    return f'{n:.2f}'.rstrip('0').rstrip('.')
 
 
 # for use in widgets that expects a double via a self.createCLocalDoubleValidator that accepts both,

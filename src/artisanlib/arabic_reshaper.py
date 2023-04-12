@@ -182,24 +182,23 @@ def replace_lam_alef(unshaped_word):
 
 def get_lam_alef(candidate_alef, candidate_lam, is_end_of_word):
     shift_rate = 1
-    reshaped_lam_alef = ''
     if is_end_of_word:
         shift_rate += 1
 
     if candidate_lam == DEFINED_CHARACTERS_ORGINAL_LAM:
         if candidate_alef == DEFINED_CHARACTERS_ORGINAL_ALF_UPPER_MDD:
-            reshaped_lam_alef = LAM_ALEF_GLYPHS[0][shift_rate]
+            return LAM_ALEF_GLYPHS[0][shift_rate]
 
         if candidate_alef == DEFINED_CHARACTERS_ORGINAL_ALF_UPPER_HAMAZA:
-            reshaped_lam_alef = LAM_ALEF_GLYPHS[1][shift_rate]
+            return LAM_ALEF_GLYPHS[1][shift_rate]
 
         if candidate_alef == DEFINED_CHARACTERS_ORGINAL_ALF:
-            reshaped_lam_alef = LAM_ALEF_GLYPHS[2][shift_rate]
+            return LAM_ALEF_GLYPHS[2][shift_rate]
 
         if candidate_alef == DEFINED_CHARACTERS_ORGINAL_ALF_LOWER_HAMAZA:
-            reshaped_lam_alef = LAM_ALEF_GLYPHS[3][shift_rate]
+            return LAM_ALEF_GLYPHS[3][shift_rate]
 
-    return reshaped_lam_alef
+    return ''
 
 class DecomposedWord(): # pylint: disable=too-few-public-methods
     def __init__(self, word) -> None:

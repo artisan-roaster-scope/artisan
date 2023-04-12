@@ -122,7 +122,7 @@ class LiveMedian(LiveFilter):
         self.k:int = k
         self.init_list:List[float] = [] # collects first k readings until initialized
         self.initialized:bool = False
-        self.q:Optional[deque[float]] = None
+        self.q:Optional[Deque[float]] = None
         self.l:Optional[List[float]] = None
         self.mididx:int = 0
 

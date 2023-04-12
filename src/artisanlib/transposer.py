@@ -48,11 +48,11 @@ class MyQRegularExpressionValidator(QRegularExpressionValidator): # pyright: ign
     @staticmethod
     def fixup(value):
         if ':' not in value:
-            value = value + ':00'
-        elif value.endswith(':'):
-            value = value + '00'
-        elif len(value[value.index(':')+1:]) == 1:
-            value = value + '0'
+            return value + ':00'
+        if value.endswith(':'):
+            return value + '00'
+        if len(value[value.index(':')+1:]) == 1:
+            return value + '0'
         return value
 
 class profileTransformatorDlg(ArtisanDialog):

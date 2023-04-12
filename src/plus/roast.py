@@ -39,7 +39,7 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 # background=True if the bp is holding a background profile (ambientTemp, AUCbase not converted to current temp mode)
 def getTemplate(bp: 'ProfileData', background:bool=False) -> Dict[str, Any]:  #for Python >= 3.9 can replace 'Dict' with the generic type hint 'dict'
     _log.debug('getTemplate()')
-    d: dict[str, Any] = {}
+    d: Dict[str, Any] = {}
     try:
         assert config.app_window is not None
         aw = config.app_window
@@ -463,7 +463,7 @@ sync_record_attributes: List[str] = (  #for Python >= 3.9 can replace 'List' wit
 def getSyncRecord(r: Optional[Dict[str, Any]] = None) -> Tuple[Dict[str, Any], str]:  #for Python >= 3.9 can replace 'Dict' and 'Tuple' with the generic type hints 'dict' and 'tuple'
     _log.debug('getSyncRecord()')
     m = hashlib.sha256()
-    d: dict[str, Any] = {}
+    d: Dict[str, Any] = {}
     try:
         if r is None:
             r = getRoast()

@@ -16884,7 +16884,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     def getColor(line):
         c = line.get_color()
         if isinstance(c, (list, tuple)):
-            c = mpl.colors.rgb2hex(c)
+            return mpl.colors.rgb2hex(c)
         return c
 
     def fetchCurveStyles(self):
@@ -17135,8 +17135,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if platform.system().startswith('Windows'):
                 return 'Windows', platform.release(), platform.machine()
             # we assume Linux
-            if os.uname()[4][:3] == 'arm':
-                return 'RPi',platform.release(),os.uname()[4]
+            if os.uname()[4][:3] == 'arm': # pylint: disable=no-member # not available on Windows
+                return 'RPi',platform.release(),os.uname()[4] # pylint: disable=no-member # not available on Windows
             try:
                 lib,version = platform.libc_ver()
                 return 'Linux',f'{lib} {version}', platform.machine()
@@ -20664,12 +20664,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         return dryphase, midphase, finishphase, coolphase
 
     def event2html(self,cp,time_key,BT_key=None,prev_time_key=None):
-        res = '--'
         if prev_time_key and prev_time_key in cp and time_key in cp:
-            res = f'{stringfromseconds(cp[time_key])} ({stringfromseconds(cp[time_key] - cp[prev_time_key])}m)'
-        elif time_key in cp and BT_key in cp:
-            res = f'{stringfromseconds(cp[time_key])} ({cp[BT_key]:.0f}&deg;{self.qmc.mode})'
-        return res
+            return f'{stringfromseconds(cp[time_key])} ({stringfromseconds(cp[time_key] - cp[prev_time_key])}m)'
+        if time_key in cp and BT_key in cp:
+            return f'{stringfromseconds(cp[time_key])} ({cp[BT_key]:.0f}&deg;{self.qmc.mode})'
+        return '--'
 
     def specialevents2html(self):
         html = ''
@@ -20849,15 +20848,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     # . average delta after i-2 is negative and twice as high (absolute) as the one before
     def BTbreak(self,i,offset):
 #        _log.info('PRINT BTbreak(%s,%s) => %s',i,offset,self.qmc.temp2[i])
-        res = 0
         if len(self.qmc.timex)>5 and i < len(self.qmc.timex):
             if self.checkTop(offset,self.qmc.temp2[i-5],self.qmc.temp2[i-4],self.qmc.temp2[i-3],self.qmc.temp2[i-2],self.qmc.temp2[i-1],self.qmc.temp2[i]):
 #                _log.info('PRINT BTbreak tight success')
-                res = 3
-            elif len(self.qmc.timex)>10 and self.checkTop(offset,self.qmc.temp2[i-10],self.qmc.temp2[i-8],self.qmc.temp2[i-6],self.qmc.temp2[i-4],self.qmc.temp2[i-2],self.qmc.temp2[i],twice=True):
-                res = 5
+                return 3
+            if len(self.qmc.timex)>10 and self.checkTop(offset,self.qmc.temp2[i-10],self.qmc.temp2[i-8],self.qmc.temp2[i-6],self.qmc.temp2[i-4],self.qmc.temp2[i-2],self.qmc.temp2[i],twice=True):
+                return 5
 #                _log.info('PRINT BTbreak loose success')
-        return res
+        return 0
 
     # this can be used to find the CHARGE index as well as the DROP index by using
     # 0 or the DRY index as start index, respectively
@@ -20932,16 +20930,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 
     def AUCstartidx(self, timeindex, TPindex):
         if self.qmc.AUCbegin == 0 and timeindex[0] > -1: # start after CHARGE
-            idx = timeindex[0]
-        elif self.qmc.AUCbegin == 1 and TPindex: # start ater TP
-            idx = TPindex
-        elif self.qmc.AUCbegin == 2 and timeindex[1] > 0: # DRY END
-            idx = timeindex[1]
-        elif self.qmc.AUCbegin == 3 and timeindex[2] > 0: # FC START
-            idx = timeindex[2]
-        else:
-            idx = -1
-        return idx
+            return timeindex[0]
+        if self.qmc.AUCbegin == 1 and TPindex: # start ater TP
+            return TPindex
+        if self.qmc.AUCbegin == 2 and timeindex[1] > 0: # DRY END
+            return timeindex[1]
+        if self.qmc.AUCbegin == 3 and timeindex[2] > 0: # FC START
+            return timeindex[2]
+        return -1
 
     def thisAUC(self,idx,timex,temp,mode):
         if self.qmc.AUCbaseFlag:

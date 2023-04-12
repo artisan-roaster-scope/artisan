@@ -74,7 +74,7 @@ try:
     from PyQt6.QtWidgets import QApplication
 except:
     #pylint: disable = E, W, R, C
-    from PyQt5.QtWidgets import QApplication
+    from PyQt5.QtWidgets import QApplication # type: ignore
 from openpyxl import load_workbook
 import prettytable
 
@@ -143,10 +143,9 @@ def getNotes(all_rows,nrows,tbl_name,notetype='top'):
         if gotnote[1]:
             notes.append(gotnote[0])
             notes_len += 1
-    notes = '+newline+'.join(notes)
     tbl_notes += nlind + tbl_name + ' = prettytable.PrettyTable()'
     tbl_notes += nlind + tbl_name + '.header = False'
-    tbl_notes += nlind + tbl_name + '.add_row([' + notes + '])'
+    tbl_notes += nlind + tbl_name + '.add_row([' + '+newline+'.join(notes) + '])'
 
     return tbl_notes, notes_len
 
@@ -252,12 +251,7 @@ def buildpyCode(fname_in):
     outstr += nlind + 'helpstr = "".join(strlist)'
 
     # clean any html entities that get escaped by PrettyTable in its html output
-    outstr += nlind + 'helpstr = re.sub(r"&amp;", r"&",helpstr)'
-
-#    outstr += nlind + 'print(helpstr)'
-
-    # done
-    outstr += nlind + 'return helpstr'
+    outstr += nlind + 'return re.sub(r"&amp;", r"&",helpstr)'
 
     return outstr
 

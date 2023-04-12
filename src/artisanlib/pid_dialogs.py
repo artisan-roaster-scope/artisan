@@ -2942,7 +2942,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
             command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,reg_dict['selectsv'][1],1)
             N = self.aw.fujipid.readoneword(command)
         # if current svN is different than requested svN
-        if N != -1:
+        if -1 == N:
             if svn != N:
                 string = QApplication.translate('Message','Current sv = {0}. Change now to sv = {1}?',None).format(str(N),str(svn))
                 reply = QMessageBox.question(self.aw,QApplication.translate('Message','Change svN',None),string,
@@ -2969,19 +2969,19 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 elif reply == QMessageBox.StandardButton.Cancel:
                     self.status.showMessage(QApplication.translate('StatusBar','Cancelled svN change',None),5000)
                     #set radio button
-                    if N == 1:
+                    if 1 == N:
                         self.radiosv1.setChecked(True)
-                    elif N == 2:
+                    elif 2 == N:
                         self.radiosv2.setChecked(True)
-                    elif N == 3:
+                    elif 3 == N:
                         self.radiosv3.setChecked(True)
-                    elif N == 4:
+                    elif 4 == N:
                         self.radiosv4.setChecked(True)
-                    elif N == 5:
+                    elif 5 == N:
                         self.radiosv5.setChecked(True)
-                    elif N == 6:
+                    elif 6 == N:
                         self.radiosv6.setChecked(True)
-                    elif N == 7:
+                    elif 7 == N:
                         self.radiosv7.setChecked(True)
                     return
             else:
@@ -3022,7 +3022,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
         else:
             command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,reg_dict['selectedpid'][1],1)
             N = self.aw.fujipid.readoneword(command)
-        if N is not None and N != -1:
+        if N is not None and -1 != N:
             reg_dict['selectedpid'][0] = N
             # if current svN is different than requested svN
             if pidn != N:
@@ -3051,25 +3051,25 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 elif reply == QMessageBox.StandardButton.Cancel:
                     self.status.showMessage(QApplication.translate('StatusBar','Cancelled pid change',None),5000)
                     #put back radio button
-                    if N == 1:
+                    if 1 == N:
                         self.radiosv1.setChecked(True)
                         self.radiopid1.setChecked(True)
-                    elif N == 2:
+                    elif 2 == N:
                         self.radiosv2.setChecked(True)
                         self.radiopid2.setChecked(True)
-                    elif N == 3:
+                    elif 3 == N:
                         self.radiosv3.setChecked(True)
                         self.radiopid3.setChecked(True)
-                    elif N == 4:
+                    elif 4 == N:
                         self.radiosv4.setChecked(True)
                         self.radiopid4.setChecked(True)
-                    elif N == 5:
+                    elif 5 == N:
                         self.radiosv5.setChecked(True)
                         self.radiopid5.setChecked(True)
-                    elif N == 6:
+                    elif 6 == N:
                         self.radiosv6.setChecked(True)
                         self.radiopid6.setChecked(True)
-                    elif N == 7:
+                    elif 7 == N:
                         self.radiosv7.setChecked(True)
                         self.radiopid7.setChecked(True)
                     return
@@ -3449,21 +3449,21 @@ class PXG4pidDlgControl(PXpidDlgControl):
             command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,reg_dict['selectedpid'][1],1)
             N = self.aw.fujipid.readoneword(command)
         libtime.sleep(0.035)
-        if N != -1:
+        if -1 != N:
             self.aw.fujipid.PXG4['selectedpid'][0] = N
-            if N == 1:
+            if 1 == N:
                 self.radiopid1.setChecked(True)
-            elif N == 2:
+            elif 2 == N:
                 self.radiopid2.setChecked(True)
-            elif N == 3:
+            elif 3 == N:
                 self.radiopid3.setChecked(True)
-            elif N == 4:
+            elif 4 == N:
                 self.radiopid4.setChecked(True)
-            elif N == 5:
+            elif 5 == N:
                 self.radiopid5.setChecked(True)
-            elif N == 6:
+            elif 6 == N:
                 self.radiopid6.setChecked(True)
-            elif N == 7:
+            elif 7 == N:
                 self.radiopid7.setChecked(True)
             mssg = QApplication.translate('StatusBar','PID is using pid = {0}',None).format(str(N))
             self.status.showMessage(mssg,5000)

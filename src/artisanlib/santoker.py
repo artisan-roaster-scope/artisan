@@ -53,7 +53,7 @@ class SantokerNetwork():
         # internals
         self._loop:        Optional[asyncio.AbstractEventLoop] = None # the asyncio loop
         self._thread:      Optional[Thread]                    = None # the thread running the asyncio loop
-        self._write_queue: Optional[asyncio.Queue[bytes]]      = None # the write queue
+        self._write_queue: Optional['asyncio.Queue[bytes]']    = None # the write queue
 
         # current readings
         self._bt:float = -1   # bean temperature in °C
@@ -227,7 +227,7 @@ class SantokerNetwork():
         except Exception as e: # pylint: disable=broad-except
             _log.error(e)
 
-    async def handle_writes(self, writer: asyncio.StreamWriter, queue: asyncio.Queue[bytes]) -> None:
+    async def handle_writes(self, writer: asyncio.StreamWriter, queue: 'asyncio.Queue[bytes]') -> None:
         try:
             with suppress(asyncio.CancelledError):
 # assignments in while are only only available from Python 3.8
