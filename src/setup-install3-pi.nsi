@@ -322,6 +322,7 @@ Section Uninstall
   Delete "$INSTDIR\base_library.zip"
 
   RMDir /r "$INSTDIR\certifi"
+  RMDir /r "$INSTDIR\charset_normalizer"
   RMDir /r "$INSTDIR\contourpy"
   RMDir /r "$INSTDIR\gevent"
   RMDir /r "$INSTDIR\greenlet"
@@ -334,6 +335,7 @@ Section Uninstall
   RMDir /r "$INSTDIR\Machines"
   RMDir /r "$INSTDIR\markupsafe"
   RMDir /r "$INSTDIR\matplotlib"
+  RMDir /r "$INSTDIR\matplotlib.libs"
   RMDir /r "$INSTDIR\mpl-data"
   RMDir /r "$INSTDIR\numpy"
   RMDir /r "$INSTDIR\openpyxl"

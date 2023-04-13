@@ -17161,8 +17161,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if platform.system().startswith('Windows'):
                 return 'Windows', platform.release(), platform.machine()
             # we assume Linux
-            if os.uname()[4][:3] == 'arm': # pylint: disable=no-member # not available on Windows
-                return 'RPi',platform.release(),os.uname()[4] # pylint: disable=no-member # not available on Windows
+            if os.uname()[4][:3] == 'arm': # type: ignore[attr-defined] # pylint: disable=no-member # not available on Windows 
+                return 'RPi',platform.release(),os.uname()[4] # type: ignore[attr-defined] # pylint: disable=no-member # not available on Windows
             try:
                 lib,version = platform.libc_ver()
                 return 'Linux',f'{lib} {version}', platform.machine()
