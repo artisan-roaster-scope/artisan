@@ -119,6 +119,7 @@ class ArtisanResizeablDialog(ArtisanDialog):
             windowFlags |= Qt.WindowType.WindowMinMaxButtonsHint  # add min/max combo
             self.setWindowFlags(windowFlags)
 
+# if modal=False the message box is not rendered as native dialog on macOS!
 class ArtisanMessageBox(QMessageBox): # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
 
     __slots__ = ['timeout', 'currentTime']

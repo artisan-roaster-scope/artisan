@@ -891,11 +891,14 @@ class graphColorDlg(ArtisanDialog):
         res = self.aw.colordialog(QColor(palette[select]))
         if QColor.isValid(res):
             nc = str(res.name())
-            if nc != disj_palette[select]:
-                palette[select] = nc
+            if nc == disj_palette[select] or (nc in ['white', '#ffffff'] and disj_palette[select] in ['white', '#ffffff']) or (nc in ['black', '#000000'] and disj_palette[select] in ['black', '#000000']):
+                # this QMessageBox is not rendered native on macOS for unkonwn reason. The same dialog called from a different dialog is rendered nativ.
+                QMessageBox.warning(self.aw,
+                    QApplication.translate('Message', 'Config LCD colors'),
+                    QApplication.translate('Message', 'LCD digits color and background color cannot be the same.'),
+                    QMessageBox.StandardButton.Ok)
             else:
-                QMessageBox.question(self.aw,QApplication.translate('Message', 'Config LCD colors'),
-                    'Digits color and Background color cannot be the same.', QMessageBox.StandardButton.Ok)
+                palette[select] = nc
 
     @pyqtSlot(bool)
     def setColorSlot(self,_):

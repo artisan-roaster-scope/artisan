@@ -4025,7 +4025,7 @@ class DTApidDlgControl(ArtisanDialog):
         #update sv LCD
         self.aw.lcd6.display(sv)
         #update status
-        message = QApplication.translate('StatusBar','SV = %s', None) % sv # pylint: disable=consider-using-f-string
+        message = f"{QApplication.translate('StatusBar','SV =', None)} {sv}"
         self.status.showMessage(message,5000)
 
     #write uses function = 6

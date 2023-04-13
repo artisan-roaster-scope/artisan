@@ -172,11 +172,18 @@ class CustomBlendDialog(ArtisanDialog):
         self.ui.lineEdit_name.editingFinished.connect(self.nameChanged)
         self.ui.pushButton_add.clicked.connect(self.addComponent)
         self.ui.lineEdit_weight.editingFinished.connect(self.weighteditChanged)
+        self.ui.lineEdit_weight.textChanged.connect(self.textChanged)
 
         settings = QSettings()
         if settings.contains('BlendGeometry'):
             self.restoreGeometry(settings.value('BlendGeometry'))
 
+    @pyqtSlot(str)
+    def textChanged(self,s):
+        if s == '': # content got cleared
+            self.ui.lineEdit_weight.setText('0')
+            self.ui.lineEdit_weight.repaint()
+            self.weighteditChanged()
 
     @pyqtSlot()
     def nameChanged(self):
@@ -185,13 +192,16 @@ class CustomBlendDialog(ArtisanDialog):
     # as the total weight was explicitly updated by the user, we set the initialTotalWeight here
     @pyqtSlot()
     def weighteditChanged(self):
-        weight = float(comma2dot(self.ui.lineEdit_weight.text()))
-        inw = f'{self.aw.float2floatWeightVolume(weight)}:g'
-        self.ui.lineEdit_weight.setText(inw)
-        self.ui.lineEdit_weight.repaint()
-        self.initialTotalWeight = float(self.ui.lineEdit_weight.text())
-        self.inWeight = self.initialTotalWeight
-        self.updateComponentTable()
+        try:
+            weight = float(comma2dot(self.ui.lineEdit_weight.text())) # text could be a non-float!
+            inw = f'{self.aw.float2floatWeightVolume(weight):g}'
+            self.ui.lineEdit_weight.setText(inw)
+            self.ui.lineEdit_weight.repaint()
+            self.initialTotalWeight = float(self.ui.lineEdit_weight.text())
+            self.inWeight = self.initialTotalWeight
+            self.updateComponentTable()
+        except Exception as e: # pylint: disable=broad-except
+            _log.error(e)
 
     @pyqtSlot()
     def ratioChanged(self):
@@ -199,11 +209,11 @@ class CustomBlendDialog(ArtisanDialog):
         if i is not None:
             ratioLineEdit = self.ui.tableWidget.cellWidget(i,0)
             assert isinstance(ratioLineEdit, QLineEdit)
-            ratio = float(ratioLineEdit.text()) / 100
-            self.blend.components[i].ratio = ratio
+            ratio = max(0,float(ratioLineEdit.text()) / 100)
+            self.blend.components[i].ratio = max(0,min(1,ratio))
             # if there are exactly two components, we calculate the ratio of the second component to 1
-            if len(self.blend.components) == 2:
-                self.blend.components[(i+1) % 2].ratio = 1 - ratio
+            if len(self.blend.components) == 2 and ratio < 1:
+                self.blend.components[(i+1) % 2].ratio = max(0,min(1,1 - ratio))
             self.updateComponentTable()
 
     @pyqtSlot()
@@ -213,7 +223,7 @@ class CustomBlendDialog(ArtisanDialog):
             weightLineEdit = self.ui.tableWidget.cellWidget(i,1)
             assert isinstance(weightLineEdit, QLineEdit)
             weight = float(comma2dot(weightLineEdit.text()))
-            inw = f'{self.aw.float2floatWeightVolume(weight)}:g'
+            inw = f'{self.aw.float2floatWeightVolume(weight):g}'
             weightLineEdit.setText(inw)
             if self.initialTotalWeight == 0:
                 # we update the total weight
@@ -225,23 +235,25 @@ class CustomBlendDialog(ArtisanDialog):
                     assert isinstance(cw, QLineEdit)
                     inWeight_sum += float(cw.text())
                 self.inWeight = inWeight_sum
-                inw = f'{self.aw.float2floatWeightVolume(self.inWeight)}:g'
+                inw = f'{self.aw.float2floatWeightVolume(self.inWeight):g}'
                 self.ui.lineEdit_weight.setText(inw)
-            # we update the ratio
-            ratio = weight / self.inWeight
-            self.blend.components[i].ratio = ratio
-            # if there are exactly two components, we calculate the ratio of the second component to 1
-            if len(self.blend.components) == 2:
-                self.blend.components[(i+1) % 2].ratio = 1 - ratio
-            elif self.initialTotalWeight == 0:
-                # we calculate the ratio of all other components from their individual weight too
-                for j in range(self.ui.tableWidget.rowCount()):
-                    if j != i: # for component i we already calculated the ratio
-                        wLineEdit = self.ui.tableWidget.cellWidget(j,1)
-                        assert isinstance(wLineEdit, QLineEdit)
-                        weight = float(wLineEdit.text())
-                        ratio = weight / self.inWeight
-                        self.blend.components[j].ratio = ratio
+                self.ui.lineEdit_weight.repaint()
+            if self.inWeight != 0:
+                # we update the ratio
+                ratio = max(0,min(1,weight / self.inWeight))
+                self.blend.components[i].ratio = ratio
+                # if there are exactly two components, we calculate the ratio of the second component to 1
+                if len(self.blend.components) == 2 and ratio < 1:
+                    self.blend.components[(i+1) % 2].ratio = max(0,min(1,1 - ratio))
+                elif self.initialTotalWeight == 0:
+                    # we calculate the ratio of all other components from their individual weight too
+                    for j in range(self.ui.tableWidget.rowCount()):
+                        if j != i: # for component i we already calculated the ratio
+                            wLineEdit = self.ui.tableWidget.cellWidget(j,1)
+                            assert isinstance(wLineEdit, QLineEdit)
+                            weight = float(wLineEdit.text())
+                            ratio = max(0,min(1,weight / self.inWeight))
+                            self.blend.components[j].ratio = ratio
             self.updateComponentTable()
 
     @pyqtSlot(int)
@@ -300,7 +312,7 @@ class CustomBlendDialog(ArtisanDialog):
     # returns True if all component ratios sum up to (about) 1 and all individual ratios are above 0 and below 100
     def checkRatio(self):
         ratios = [c.ratio for c in self.blend.components]
-        return all(0 < r < 100 for r in ratios) and (-0.001 < (1 - sum(ratios)) < 0.001)
+        return all(0 < r < 100 for r in ratios) and (-0.0009 < (1 - sum(ratios)) < 0.001)
 
     def updateComponentTable(self):
         try:
@@ -341,7 +353,7 @@ class CustomBlendDialog(ArtisanDialog):
 
                 #weight
                 component_weight = c.ratio * self.inWeight
-                weightedit = QLineEdit(f'{self.aw.float2floatWeightVolume(component_weight)}:g')
+                weightedit = QLineEdit(f'{self.aw.float2floatWeightVolume(component_weight):g}')
                 weightedit.setAlignment(Qt.AlignmentFlag.AlignRight)
                 weightedit.setMinimumWidth(70)
                 weightedit.setMaximumWidth(70)

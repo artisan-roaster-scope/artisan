@@ -3096,7 +3096,7 @@ class tgraphcanvas(FigureCanvas):
     # pylint: disable=no-self-use # used as slot
     def showAlarmPopup(self, message, timeout):
         # alarm popup message with <self.alarm_popup_timout>sec timeout
-        amb = ArtisanMessageBox(self.aw, QApplication.translate('Message', 'Alarm notice'),message,timeout=timeout,modal=False)
+        amb = ArtisanMessageBox(self.aw, QApplication.translate('Message', 'Alarm notice'),message,timeout=timeout,modal=True) # modal=False prevent rendering as native message box on macOS
         amb.show()
         #send alarm also to connected WebLCDs clients
         if self.aw.WebLCDs and self.aw.WebLCDsAlerts:
@@ -6245,10 +6245,10 @@ class tgraphcanvas(FigureCanvas):
         #prevents deleting accidentally a finished roast
         if self.safesaveflag and len(self.timex) > 3:
             if allow_discard:
-                string = QApplication.translate('Message','Save the profile, Discard the profile (Reset), or Cancel?')
+                string = QApplication.translate('Message','Save profile?')
                 buttons = QMessageBox.StandardButton.Discard|QMessageBox.StandardButton.Save|QMessageBox.StandardButton.Cancel
             else:
-                string = QApplication.translate('Message','Save the profile or Cancel?')
+                string = QApplication.translate('Message','Save profile?')
                 buttons = QMessageBox.StandardButton.Save|QMessageBox.StandardButton.Cancel
             reply = QMessageBox.warning(self.aw, QApplication.translate('Message','Profile unsaved'), string,
                                 buttons)
@@ -14357,13 +14357,13 @@ class tgraphcanvas(FigureCanvas):
 
             #interpretation of coefficients: http://www.sagenb.org/home/pub/1708/
 
-            string = '<b>' + QApplication.translate('Message','Polynomial coefficients (Horner form):') + '</b><br><br>'
-            string += str(coeffs) + '<br><br>'
-            string += '<b>' + QApplication.translate('Message','Knots:') + '</b><br><br>'
-            string += str(knots) + '<br><br>'
-            string += '<b>' + QApplication.translate('Message','Residual:') + '</b><br><br>'
-            string += str(resid) + '<br><br>'
-            string += '<b>' + QApplication.translate('Message','Roots:') + '</b><br><br>'
+            string = f"<b>{QApplication.translate('Message','Polynomial coefficients (Horner form):')}</b><br>"
+            string += f'{coeffs}<br><br>'
+            string += f"<b>{QApplication.translate('Message','Knots:')}</b><br>"
+            string += f'{knots}<br><br>'
+            string += f"<b>{QApplication.translate('Message','Residual:')}</b><br>"
+            string += f'{resid}<br><br>'
+            string += f"<b>{QApplication.translate('Message','Roots:')}</b><br>"
             string += str(roots)
 
             QMessageBox.information(self.aw, QApplication.translate('Message','Profile information'),string)
@@ -14533,7 +14533,6 @@ class tgraphcanvas(FigureCanvas):
             msg = QApplication.translate('Message','Cannot fit this curve to ' + fit)
             QApplication.processEvents() #this is here to be sure the adderror gets wrtten to the log before the sendmessage
             self.aw.sendmessage(msg)
-            #QMessageBox.warning(aw,QApplication.translate("Message","Curve fit problem"), msg)
 
         return res
 

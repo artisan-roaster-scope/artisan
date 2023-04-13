@@ -23,20 +23,24 @@
 
 try:
     #pylint: disable = E, W, R, C
+    from PyQt6.QtGui import QPixmap # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtCore import QSemaphore, QTimer, Qt # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import QWidget,QApplication, QMessageBox # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #pylint: disable = E, W, R, C
+    from PyQt5.QtGui import QPixmap # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtCore import QSemaphore, QTimer, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QWidget, QApplication, QMessageBox # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
+
+import os
 import platform
 import threading
 import logging
 from typing import Optional
 from typing_extensions import Final  # Python <=3.7
 
-
+from artisanlib.util import getResourcePath
 from plus import config, connection, stock, queue, sync, roast
 
 
@@ -311,13 +315,21 @@ def disconnect_confirmed() -> bool:
     string = QApplication.translate('Plus', 'Disconnect artisan.plus?')
     aw = config.app_window
     assert isinstance(aw, QWidget)
-    reply = QMessageBox.question(
-        aw,
-        QApplication.translate('Plus', 'Disconnect?'),
-        string,
-        QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel,
-    )
-    return bool(reply == QMessageBox.StandardButton.Ok)
+#    reply = QMessageBox.question(
+#        aw,
+#        QApplication.translate('Plus', 'Disconnect?'),
+#        string,
+#        QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel,
+#    )
+#    return QMessageBox.StandardButton.Ok == reply
+    mbox = QMessageBox(aw)
+    mbox.setText(string)
+    basedir = os.path.join(getResourcePath(),'Icons')
+    p = os.path.join(basedir, 'plus-notification.svg')
+    mbox.setIconPixmap(QPixmap(p))
+    mbox.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+    res = mbox.exec()
+    return QMessageBox.StandardButton.Yes == res
 
 
 # if keepON is set (the default), the credentials are not removed at all and

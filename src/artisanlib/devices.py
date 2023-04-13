@@ -1980,7 +1980,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             if (nonempty_ETfunction or nonempty_BTfunction):
 
                 # confirm the action
-                string = QApplication.translate('Message', 'Clicking YES will overwrite the existing ET and BT values in this profile with the symbolic values defined here.  Click CANCEL to abort.')
+                string = QApplication.translate('Message', 'Overwrite existing ET and BT values?')
                 reply = QMessageBox.warning(self.aw,QApplication.translate('Message', 'Caution - About to overwrite profile data'),string,
                             QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
                 if reply == QMessageBox.StandardButton.Cancel:

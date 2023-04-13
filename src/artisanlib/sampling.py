@@ -116,7 +116,9 @@ class SamplingDlg(ArtisanDialog):
         self.aw.qmc.flagOpenCompleted = bool(self.openCompletedFlag.isChecked())
         self.aw.qmc.delay = int(self.interval.value()*1000.)
         if self.aw.qmc.delay < self.aw.qmc.default_delay:
-            QMessageBox.warning(self.aw,QApplication.translate('Message', 'Warning',None),QApplication.translate('Message', 'A tight sampling interval might lead to instability on some machines. We suggest a minimum of 1s.'))
+            QMessageBox.warning(self.aw,
+                QApplication.translate('Message', 'Warning', None),
+                QApplication.translate('Message', 'A tight sampling interval might lead to instability on some machines. We suggest a minimum of 1s.'))
         self.storeSettings()
 #        self.aw.closeEventSettings()
         self.accept()

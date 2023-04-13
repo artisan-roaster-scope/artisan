@@ -785,6 +785,7 @@ class CurvesDlg(ArtisanDialog):
         self.equbackgroundbutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.equbackgroundbutton.clicked.connect(self.setbackgroundequ1_slot)
         self.equvdevicebutton = QPushButton()
+        self.equvdevicebutton.clicked.connect(self.setvdevice)
         self.update_equbuttons()
         saveImgButton = QPushButton(QApplication.translate('Button','Save Image'))
         saveImgButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -1635,13 +1636,6 @@ class CurvesDlg(ArtisanDialog):
             self.equbackgroundbutton.setEnabled(True)
             self.equbackgroundbutton.setToolTip(QApplication.translate('Tooltip','Set P1 as ET background B1\nSet P2 as BT background B2\nNote: Erases all existing background curves.'))
 
-        if self.equvdevicebutton.isEnabled():
-            self.equvdevicebutton.clicked.connect(self.setvdevice)
-        else:
-            try:
-                self.equvdevicebutton.disconnect()
-            except Exception: # pylint: disable=broad-except
-                pass
 
     @pyqtSlot(bool)
     def setvdevice(self,_):
@@ -1662,8 +1656,7 @@ class CurvesDlg(ArtisanDialog):
 
             if error:
                 string = QApplication.translate('Message','Incompatible variables found in %s')%error
-                QMessageBox.warning(self,QApplication.translate('Message','Assignment problem'),string,
-                                    QMessageBox.StandardButton.Discard)
+                QMessageBox.warning(self,QApplication.translate('Message','Assignment problem'),string)
 
             else:
                 extratemp1:List[float] = []

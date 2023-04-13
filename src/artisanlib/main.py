@@ -431,7 +431,7 @@ class Artisan(QtSingleApplication):
                     # - in Wheel graph mode
                     # - while editing the cup profile
                     can_open_mode = not aw.qmc.flagon and not aw.qmc.designerflag and not aw.qmc.wheelflag and aw.qmc.flavorchart_plot is None
-                    if can_open_mode and bool(aw.comparator):
+                    if can_open_mode and aw.comparator is not None:
                         # while in comparator mode with the events file already open we rather send it to another instance
                         filename = url.toString(QUrl.UrlFormattingOption.PreferLocalFile)
                         can_open_mode = not any(p.filepath == filename for p in aw.comparator.profiles)
@@ -1089,7 +1089,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                     else:
                         self.set_message(f"{xs: >5}\n{channel} {'' if ys is None else ys: >{min_temp_digits}}\u00B0{self.qmc.mode}{'/min' if self.qmc.fmt_data_RoR else ''}")
             # update running LCDs
-            if not self.qmc.flagon and not bool(self.aw.comparator):
+            if not self.qmc.flagon and self.aw.comparator is None:
                 if self.qmc.running_LCDs == 1: # show foreground profile readings at cursor position in LCDs
                     if timeindex is None:
                         timeindex = self.qmc.time2index(self._last_event.xdata, nearest=False)
@@ -1164,6 +1164,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                 pu = self.aw.plus_paidUntil.date()
                 message = f'{QApplication.translate("Plus","Paid until")} {QDate(pu.year,pu.month,pu.day).toString(QLocale().dateFormat(QLocale.FormatType.ShortFormat))}'
                 reminder_message = ''
+                percent_used_formatted = ''
                 if self.aw.plus_rlimit > 0:
                     percent_used = self.aw.plus_used/(self.aw.plus_rlimit/100)
                     unit = 1 # 1: kg, 2: lb
@@ -1194,8 +1195,29 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                 # n days left <= red if <=3
                 #  3 days, 2 days, 1 day, 0 days left
                 #
+# no links in macOS style boxes
                 subscription_message_box = ArtisanMessageBox(self.aw, QApplication.translate('Message', 'Subscription'), message)
-                subscription_message_box.show()
+#                subscription_message_box.setTextFormat(Qt.TextFormat.RichText)
+                basedir = os.path.join(getResourcePath(),'Icons')
+                p = os.path.join(basedir, 'plus-notification.svg')
+                subscription_message_box.setIconPixmap(QPixmap(p))
+                if percent_used_formatted != '':
+                    percent_used_formatted = '\n' + percent_used_formatted
+                subscription_message_box.setText('Do you want to extend your subscription?')
+                subscription_message_box.setInformativeText(f'Your subscription ends on {QDate(pu.year,pu.month,pu.day).toString(QLocale().dateFormat(QLocale.FormatType.ShortFormat))}\n{days}{percent_used_formatted}')
+                subscription_message_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+#                subscription_message_box.show()
+                res = subscription_message_box.exec()
+                _log.info('PRINT res: %s',res)
+                plus_link = plus.config.shop_base_url
+                if self.aw.plus_subscription == 'PRO':
+                    plus_link += '/shop/professional-roasters/'
+                elif self.aw.plus_subscription == 'HOME':
+                    plus_link += '/shop/home-roasters/'
+                if res == QMessageBox.StandardButton.Yes:
+                    QDesktopServices.openUrl(QUrl(plus_link, QUrl.ParsingMode.TolerantMode))
+#                box = QMessageBox(self)
+#                box.about(self.aw, QApplication.translate('Message', 'Subscription'),message)
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
 
@@ -3933,6 +3955,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         _log.debug('updateLimits(%s,%s,%s,%s,%s)', rlimit, rused, pu, notifications, machines)
         self.updatePlusLimits(rlimit, rused)
         self.updatePlusPaidUntil(pu)
+        self.updatePlusStatus()
         plus.notifications.updateNotifications(notifications, machines)
 
     @pyqtSlot(str,str,NotificationType)
@@ -4107,7 +4130,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         try:
             appTitle = f'{(application_viewer_name if self.app.artisanviewerMode else application_name)} {str(__version__)}'
             dirtySign = '* ' if self.qmc.safesaveflag else ''
-            if bool(self.simulator) and self.simulatorpath:
+            if self.simulator is not None and self.simulatorpath:
                 # simulator running
                 speed = int(self.qmc.timeclock.getBase()/1000)
                 self.setWindowTitle(f'@{speed}x {self.strippedName(self.simulatorpath)} ** {appTitle}')
@@ -4148,15 +4171,18 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     starts is not None and
                     (now >= lastdonationpopup > now-everytime) and
                     0 <= starts < everystarts):
-                message = QApplication.translate('Message', 'Artisan is free to use!<br><br>To keep it free and current please support us<br><br><a href="{0}">{0}</a><br><br>and book<br><br><a href="{1}">{1}</a><br><br>to suppress this dialog')
-                message = message.format('https://artisan-scope.org/donate/', 'https://artisan.plus')
+#                message = QApplication.translate('Message', 'Artisan is free to use!<br><br>To keep it free and current please support us<br><br><a href="{0}">{0}</a><br><br>and book<br><br><a href="{1}">{1}</a><br><br>to suppress this dialog')
+#                message = message.format('https://artisan-scope.org/donate/', 'https://artisan.plus')
+                message = QApplication.translate('Message', 'Artisan is free to use!\n\nTo keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!')
                 donate_message_box = QMessageBox(self)
                 donate_message_box.setText(message)
                 donate_message_box.setIcon(QMessageBox.Icon.Information)
                 donate_message_box.setModal(True)
-                donate_message_box.setStandardButtons(QMessageBox.StandardButton.Ok)
+                donate_message_box.setStandardButtons(QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
                 donate_message_box.setDefaultButton(QMessageBox.StandardButton.Ok)
-                donate_message_box.exec()
+                res = donate_message_box.exec()
+                if res == QMessageBox.StandardButton.Ok:
+                    QDesktopServices.openUrl(QUrl('https://artisan-scope.org/donate/', QUrl.ParsingMode.TolerantMode))
                 self.resetDonateCounter()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -4203,7 +4229,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         urls = event.mimeData().urls()
         if urls and len(urls)>0:
             self.app.open_url(urls[0])
-            if bool(self.comparator):
+            if self.comparator is not None:
                 for url in urls[0:]:
                     self.app.open_url(url)
 
@@ -10215,7 +10241,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 elif k == 79:                       #O (toggle background showfull flag)
                     self.toggleBackroundShowfullFlag()
                 elif k == 72:                       #H  (load / delete background profile)
-                    if not bool(self.comparator):
+                    if self.comparator is None:
                         # allow SHIFT-H for all platforms (ALT-H additionally for non-Windows platforms)
                         if ((alt_modifier or shift_modifier) and platform.system() != 'Windows') or (control_shift_modifier or control_alt_modifier and platform.system() == 'Windows'): #control_alt_modifier here for backward compatibility only, see note above
                             self.deleteBackground()
@@ -10235,7 +10261,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                 self.qmc.timealign(redraw=False)
                                 self.qmc.redraw()
                 elif k == 76:                       #L (load alarms)
-                    if not self.qmc.designerflag and not bool(self.comparator):
+                    if not self.qmc.designerflag and self.comparator is None:
                         filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Alarms'),ext='*.alrm')
                         if len(filename) == 0:
                             return
@@ -10365,7 +10391,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                         self.qmc.backmoveflag = 0 # do not align background automatically during redraw!
                         self.qmc.redraw(recomputeAllDeltas=False,sampling=self.qmc.flagon)
                 elif k == 65:                     #A (automatic save)
-                    if not self.app.artisanviewerMode and self.qmc.flagon and not self.qmc.designerflag and not bool(self.comparator):
+                    if not self.app.artisanviewerMode and self.qmc.flagon and not self.qmc.designerflag and self.comparator is None:
                         self.automaticsave()
                 elif k == 68:                     #D (toggle xy coordinates between temp and RoR scale)
                     if not self.qmc.wheelflag:
@@ -10384,7 +10410,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                             except Exception as e: # pylint: disable=broad-except
                                 _log.exception(e)
                 elif k == 90:                     #Z (toggle xy coordinates between 0: cursor, 1: BT, 2: ET, 3: BTB, 4: ETB)
-                    if not self.qmc.designerflag and not self.qmc.wheelflag and not bool(self.comparator):
+                    if not self.qmc.designerflag and not self.qmc.wheelflag and self.comparator is None:
                         self.qmc.nextFmtDataCurve()
                 elif k == 85:                     #U (toggle running LCDs on/off)
                     if not self.qmc.flagon:
@@ -10424,23 +10450,23 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 elif k == 84 and not self.qmc.flagon:  #T (toggle mouse cross)
                     self.qmc.togglecrosslines()
                 elif k == 81:                          #Q (quick entry of custom event 1)
-                    if not self.qmc.designerflag and not bool(self.comparator):
+                    if not self.qmc.designerflag and self.comparator is None:
                         self.quickEventShortCut = (0,'')
                         self.sendmessage(self.qmc.etypes[0])
                 elif k == 87:                          #W (quick entry of custom event 2)
-                    if not self.qmc.designerflag and not bool(self.comparator):
+                    if not self.qmc.designerflag and self.comparator is None:
                         self.quickEventShortCut = (1,'')
                         self.sendmessage(self.qmc.etypes[1])
                 elif k == 69:                          #E (quick entry of custom event 3)
-                    if not self.qmc.designerflag and not bool(self.comparator):
+                    if not self.qmc.designerflag and self.comparator is None:
                         self.quickEventShortCut = (2,'')
                         self.sendmessage(self.qmc.etypes[2])
                 elif k == 82:                          #R (quick entry of custom event 4)
-                    if not self.qmc.designerflag and not bool(self.comparator):
+                    if not self.qmc.designerflag and self.comparator is None:
                         self.quickEventShortCut = (3,'')
                         self.sendmessage(self.qmc.etypes[3])
                 elif k == 86:                          #V (set SV)
-                    if not self.qmc.designerflag and not bool(self.comparator):
+                    if not self.qmc.designerflag and self.comparator is None:
                         self.quickEventShortCut = (4,'')
                         self.sendmessage('SV')
                 elif k == 66:                          #B (hides/shows extra rows of event buttons / actives custom event button <nr>)
@@ -13316,7 +13342,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 # we don't ask the user to adjust or not the extra device setup. Instead, now we backup the current settings via createExtraDeviceSettingsBackup() always and reset back to the original state
 # on reset, thus we default to StandardButton.Yes instead of asking in the dialog:
 
-                        if bool(self.simulator):
+                        if self.simulator is not None:
                             # loading files with different extra device settings will not alter those and not mess up an potentially already existing settings backup
                             reply = QMessageBox.StandardButton.No
                         else:
@@ -18110,7 +18136,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if not (platform.system() == 'Darwin' and self.qmc.locale_str == 'en'):
                 self.fullscreenAction.setChecked(False)
             self.showNormal()
-        if not bool(self.simulator):
+        if self.simulator is None:
             if self.qmc.device == 53:
                 # disconnect HOTTOP
                 from artisanlib.hottop import stopHottop
@@ -18261,7 +18287,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     painter.drawPixmap(0, 0, image)
                 else:
                     painter.drawImage(0, 0, image)
-                if bool(self.comparator) and self.qpc and len(self.splitter.sizes())>1 and self.splitter.sizes()[1]>0:
+                if self.comparator is not None and self.qpc and len(self.splitter.sizes())>1 and self.splitter.sizes()[1]>0:
                     phases_image = self.qpc.grab().toImage() # a QImage on macOS
                     if not phases_image.isNull():
                         if self.printer.pageLayout().orientation() == QPageLayout.Orientation.Landscape:
@@ -23246,7 +23272,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     def transferbuttonsto(self,pindex):
         self.buttonpalette[pindex] = self.makePalette()
         self.buttonpalettemaxlen[pindex] = self.buttonlistmaxlen
-        self.sendmessage(QApplication.translate('Message','Buttons copied to Palette #%i')%pindex) # pylint: disable=consider-using-f-string
+        self.sendmessage(f"{QApplication.translate('Message','Buttons copied to Palette #')}{pindex}")
 
     # action not returning anything
     @pyqtSlot(int)
@@ -23911,8 +23937,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 
         if error:
             string = QApplication.translate('Message','Incompatible variables found in %s')%error # pylint: disable=consider-using-f-string
-            QMessageBox.warning(self,QApplication.translate('Message','Assignment problem'),string,
-                                QMessageBox.StandardButton.Discard)
+            QMessageBox.warning(self,QApplication.translate('Message','Assignment problem'),string)
         else:
             try:
                 equ = EQU[0]
@@ -24030,7 +24055,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         control_modifier = modifiers == Qt.KeyboardModifier.ControlModifier # command/apple key on macOS, Control key on Windows
         alt_modifier = modifiers == Qt.KeyboardModifier.AltModifier # OPTION on macOS, ALT on Windows
         shift_modifier = modifiers == Qt.KeyboardModifier.ShiftModifier # SHIFT
-        if bool(self.simulator):
+        if self.simulator is not None:
             if control_modifier or alt_modifier or shift_modifier:
                 # if a modifier we change the speed instead of leaving the simulator (shift: 1x, alt: 2x, control: 4x):
                 speed = 1
@@ -24106,14 +24131,14 @@ def excepthook(excType, excValue, tracebackobj):
                  exc_info=(excType, excValue, tracebackobj))
     import traceback
     separator = '-' * 80
-    logFile = 'simple.log'
+#    logFile = 'simple.log'
     notice = \
-        """An unhandled exception occurred. Please report the problem on Github:\n"""\
-        """https://github.com/artisan-roaster-scope/artisan/issues\n"""\
-        """When reporting this issue, please include your settings file (export \n"""\
-        """via menu Help >> Save Settings) and the details below.\n\n"""\
-        """An entry has been written to the error log (menu Help >> Error).\n\n"""
-    versionInfo= 'Version: ' + str(__version__) + ', revision: ' + str(__revision__) + '\n'
+        """An unhandled exception occurred. Please report the problem on Github:<br>"""\
+        """<a href='https://github.com/artisan-roaster-scope/artisan/issues'>https://github.com/artisan-roaster-scope/artisan/issues</a><br><br>"""\
+        """When reporting this issue, please include your settings file (export <br>"""\
+        """via menu Help >> Save Settings) and the details below.<br><br>"""\
+        """An entry has been written to the error log (menu Help >> Error).<br><br>"""
+    versionInfo= f'Version: {__version__}, revision: {__revision__}<br>'
     timeString = libtime.strftime('%Y-%m-%d, %H:%M:%S')
 
     tbinfofile = io.StringIO()
@@ -24121,7 +24146,7 @@ def excepthook(excType, excValue, tracebackobj):
     traceback.print_tb(tracebackobj, None, tbinfofile)
     tbinfofile.seek(0)
     tbinfo = tbinfofile.read()
-    errmsg = f'{str(excType)}: \n{str(excValue)}'
+    errmsg = f'{str(excType)}: \n{str(excValue)} (line: {getattr(tracebackobj, "tb_lineno", "?")})'
     stack = []
     variables = ''
     tb = tracebackobj
@@ -24141,19 +24166,32 @@ def excepthook(excType, excValue, tracebackobj):
     sections = [timeString, separator, errmsg]
     msg = '\n'.join(sections)
     detailedmsg = '\n'.join([tbinfo, separator, variables])
-    #self.qmc.adderror('Error: ' + detailedmsg)
+
+#    try:
+#        with open(logFile, 'w', encoding='utf-8') as f:
+#            f.write(msg)
+#            f.write(detailedmsg)
+#            f.write(versionInfo)
+#    except OSError:
+#        pass
     try:
-        with open(logFile, 'w', encoding='utf-8') as f:
-            f.write(msg)
-            f.write(detailedmsg)
-            f.write(versionInfo)
-    except OSError:
-        pass
-    errorbox = QMessageBox()
-    errorbox.setIcon(QMessageBox.Icon.Critical)
-    errorbox.setText(str(notice)+str(versionInfo)+str(msg))
-    errorbox.setDetailedText(detailedmsg)
-    errorbox.exec()
+        aw = None
+        for widget in QApplication.topLevelWidgets():
+            if isinstance(widget, ApplicationWindow):
+                aw = widget
+                break
+        if aw is not None:
+            aw.qmc.adderror('Error: ' + detailedmsg)
+            errorbox = QMessageBox(aw)
+            errorbox.about(aw, detailedmsg, f'{notice}{versionInfo}{msg}')
+
+            # using a (native) QErrorMessage dialog which does not allow styled text like bold/links
+#            from PyQt6.QtWidgets import QErrorMessage
+#            em = QErrorMessage(aw)
+#            em.showMessage(f'{notice}{versionInfo}{msg}')
+
+    except Exception as e:
+        _log.exception(e)
 
 sys.excepthook = excepthook
 
