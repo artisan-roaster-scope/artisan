@@ -190,6 +190,8 @@ class ArtisanInputDialog(ArtisanDialog):
     def __init__(self, parent, aw, title='',label='') -> None:
         super().__init__(parent, aw)
 
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, False)
+
         self.url = ''
 
         self.setWindowTitle(title)
@@ -211,7 +213,7 @@ class ArtisanInputDialog(ArtisanDialog):
     @pyqtSlot()
     def accept(self):
         self.url = self.inputLine.text()
-        QDialog.accept(self)
+        super().accept()
 
     @staticmethod
     def dragEnterEvent(event):

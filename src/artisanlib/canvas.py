@@ -6250,8 +6250,7 @@ class tgraphcanvas(FigureCanvas):
             else:
                 string = QApplication.translate('Message','Save profile?')
                 buttons = QMessageBox.StandardButton.Save|QMessageBox.StandardButton.Cancel
-            reply = QMessageBox.warning(self.aw, QApplication.translate('Message','Profile unsaved'), string,
-                                buttons)
+            reply = QMessageBox.warning(self.aw, QApplication.translate('Message','Profile unsaved'), string, buttons)
             if reply == QMessageBox.StandardButton.Save:
                 return self.aw.fileSave(self.aw.curFile)  #if accepted, calls fileClean() and thus turns safesaveflag = False
             if reply == QMessageBox.StandardButton.Discard:

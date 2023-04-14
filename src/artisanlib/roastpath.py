@@ -130,7 +130,12 @@ def extractProfileRoastPathHTML(url,_):
 
         data:RoastPathData = {}
         for elem in ['btData', 'etData', 'atData', 'eventData', 'rorData', 'noteData', 'fuelData', 'fanData', 'drumData']:
-            d = re.findall(fr"var {elem} = JSON\.parse\('(.+?)'\);", page.content.decode('utf-8'), re.S)  # @UndefinedVariable
+            page_content = ''
+            try:
+                page_content = page.content.decode('utf-8')
+            except Exception: # pylint: disable=broad-except
+                page_content = page.content.decode('latin-1')
+            d = re.findall(fr"var {elem} = JSON\.parse\('(.+?)'\);", page_content, re.S)  # @UndefinedVariable
             if d:
                 data[elem] = json.loads(d[0]) # type: ignore # generic strings accessors cannot be handled by mypy
 
@@ -189,24 +194,29 @@ def extractProfileRoastPathHTML(url,_):
                     if 'Timestamp' in n and 'NoteTypeId' in n and 'Note' in n:
                         c = dateutil.parser.parse(n['Timestamp']).timestamp() - baseTime
                         try:
-                            timex_idx = res['timex'].index(c)
-                            specialevents.append(timex_idx)
-                            note_type = n['NoteTypeId']
-                            if note_type == 0: # Fuel/Power
-                                specialeventstype.append(3)
-                            elif note_type == 1: # Fan
-                                specialeventstype.append(0)
-                            elif note_type == 2: # Drum
-                                specialeventstype.append(1)
-                            else: # n == 3: # Notes
-                                specialeventstype.append(4)
-                            try:
-                                v = float(n['Note'])
-                                v = v/10. + 1
-                                specialeventsvalue.append(v)
-                            except Exception: # pylint: disable=broad-except
-                                specialeventsvalue.append(0)
-                            specialeventsStrings.append(n['Note'])
+                            timex_idx = None
+                            if c in res['timex']:
+                                timex_idx = res['timex'].index(c)
+                            elif c+1 in res['timex']:
+                                timex_idx = res['timex'].index(c+1)
+                            if timex_idx is not None:
+                                specialevents.append(timex_idx)
+                                note_type = n['NoteTypeId']
+                                if note_type == 0: # Fuel/Power
+                                    specialeventstype.append(3)
+                                elif note_type == 1: # Fan
+                                    specialeventstype.append(0)
+                                elif note_type == 2: # Drum
+                                    specialeventstype.append(1)
+                                else: # n == 3: # Notes
+                                    specialeventstype.append(4)
+                                try:
+                                    v = float(n['Note'])
+                                    v = v/10. + 1
+                                    specialeventsvalue.append(v)
+                                except Exception: # pylint: disable=broad-except
+                                    specialeventsvalue.append(0)
+                                specialeventsStrings.append(n['Note'])
                         except Exception as e: # pylint: disable=broad-except
                             _log.exception(e)
                 if len(specialevents) > 0:

@@ -84,8 +84,11 @@ def retrieveNotifications() -> None:
                         and 'result' in res
                         and res['result']
                         and isinstance(res['result'],list)):
-                    for n in res['result']:
-                        processNotification(n)
+                    results = [r for r in res['result'] if not ('not_for_artisan' in r and r['not_for_artisan'])]
+                    sorted_results = sorted(results, key=lambda nd: (util.ISO86012epoch(nd['added_on']) if 'added_on' in nd else 0))
+                    # we present the notfications in reverse order, oldest first
+                    for i, n in enumerate(sorted_results):
+                        processNotification(n, i)
 
                 # NOTE: we do not updateLimitsFromResponse(res) here to avoid an infinite loop if
                 # the server does not reset the notifications counter. Further notifications will be retrieved on next request
@@ -97,7 +100,7 @@ def retrieveNotifications() -> None:
 
 
 # process the received plus notifications and hand them over to the Artisan notification system
-def processNotification(plus_notification:Dict[str,Any]) -> None:
+def processNotification(plus_notification:Dict[str,Any], i:int) -> None:
     try:
         if config.app_window is not None:
             aw = config.app_window
@@ -105,13 +108,15 @@ def processNotification(plus_notification:Dict[str,Any]) -> None:
                 created = None
                 try:
                     created = util.ISO86012epoch(plus_notification['added_on'])
-                except Exception:  # pylint: disable=broad-except
-                    pass
+                except Exception as e:  # pylint: disable=broad-except
+                    _log.error(e)
                 aw.notificationManager.sendNotificationMessage(
                     util.extractInfo(plus_notification, 'title', ''),
                     util.extractInfo(plus_notification, 'text', ''),
                     ntype2NotificationType(util.extractInfo(plus_notification, 'ntype', '')),
                     created = created,
-                    hr_id = util.extractInfo(plus_notification, 'hr_id', None))
+                    hr_id = util.extractInfo(plus_notification, 'hr_id', None),
+                    link = util.extractInfo(plus_notification, 'link', None),
+                    pos = i)
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)

@@ -1385,7 +1385,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         'extraLCDframe1', 'extraLCDframe2', 'extraLCDvisibility1', 'extraLCDvisibility2', 'extraCurveVisibility1', 'extraCurveVisibility2',
         'extraDelta1', 'extraDelta2', 'extraFill1', 'extraFill2', 'channel_tare_values', 'messagehist', 'eventlabel', 'eNumberSpinBox',
         'lineEvent', 'etypeComboBox', 'valueEdit', 'etimeline', 'buttonminiEvent', 'buttonlist', 'buttonStates', 'lastbuttonpressed', 'buttonlistmaxlen',
-        'buttonpalette_default_label', 'buttonpalette_label', 'buttonpalettemaxlen', 'buttonpalette_shortcuts', 'buttonsize', 'eventbuttontablecolumnwidths',
+        'buttonpalette_default_label', 'buttonpalette_label', 'buttonpalettemaxlen', 'buttonpalette_shortcuts', 'buttonsize', 'mark_last_button_pressed', 'eventbuttontablecolumnwidths',
         'lowerbuttondialogLayout', 'lowerbuttondialog', 'lowerbuttondialogLayout', 'e1buttonbarLayout', 'e1buttondialog', 'e2buttonbarLayout', 'e2buttondialog',
         'e3buttonbarLayout', 'e3buttondialog', 'e4buttonbarLayout', 'e4buttondialog', 'keyboardmove', 'keyboardButtonList', 'keyboardmoveindex',
         'keyboardmoveflag', 'lastkeyboardcmd', 'error_dlg', 'serial_dlg', 'message_dlg', 'ETname', 'BTname', 'level1frame', 'level1layout', 'EventsGroupLayout',
@@ -3230,6 +3230,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.buttonpalettemaxlen:List[int] = [14]*10  #keeps max number of buttons per row per palette
         self.buttonpalette_shortcuts = True # if True palettes can be changed via the number keys
         self.buttonsize = 1 # 0: tiny, 1: small (default), 2: large
+        self.mark_last_button_pressed:bool = True
 
         self.eventbuttontablecolumnwidths:List[int] = [] # custom event button table column widths
 
@@ -4913,7 +4914,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         if action and hasattr(action,'data') and hasattr(action,'text'):
             label = (action.text() if action.data()[1] == '' else f'{action.data()[1]} {action.text()}')
             label = label.replace('&&','&') # we reduce those && again to & that were introduced to have the & rendered in the menu entry
-            string = QApplication.translate('Message', 'Configure for {0}?<br><br>Your current settings will be overwritten!<br><br>It is advisable to save your current settings beforehand via menu Help >> Save Settings.').format(label)
+            string = QApplication.translate('Message', 'Configure for<br>{0}?<br><br>Your current settings will be overwritten!<br><br>It is advisable to save your current settings beforehand via menu Help >> Save Settings.').format(label)
             reply = QMessageBox.question(self, QApplication.translate('Message', 'Adjust Settings'),string,
                 QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
             if reply == QMessageBox.StandardButton.Cancel:
@@ -9443,7 +9444,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             elif self.extraeventbuttonround[tee] == 3: # both-sides rounded
                 rounding = fully_rounded_style
         #
-        if style=='normal':
+        if style=='normal' or not self.mark_last_button_pressed:
             color = self.extraeventbuttontextcolor[tee]
             backgroundcolor = self.extraeventbuttoncolor[tee]
         else: # style=="pressed":
@@ -11213,11 +11214,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             #print(sip.isdeleted(dlg))
         except Exception: # pylint: disable=broad-except
             pass
-        if res is None:
-            return None
-        url = QUrl(res,QUrl.ParsingMode.StrictMode)
-        if url.isValid():
-            return url
+        if res is not None:
+            url = QUrl(res,QUrl.ParsingMode.StrictMode)
+            if url.isValid():
+                return url
         return None
 
     #the central SaveFileDialog function that should always be called. Besides triggering the file dialog it
@@ -16705,6 +16705,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     self.eventbuttontablecolumnwidths = [toInt(x) for x in toList(settings.value('eventbuttontablecolumnwidths',self.eventbuttontablecolumnwidths))]
                 if settings.contains('buttonsize'):
                     self.buttonsize = toInt(settings.value('buttonsize',self.buttonsize))
+                if settings.contains('marklastbuttonpressed'):
+                    self.mark_last_button_pressed = bool(toBool(settings.value('marklastbuttonpressed',self.mark_last_button_pressed)))
                 if settings.contains('buttonpalette_label'):
                     self.buttonpalette_label = toString(settings.value('buttonpalette_label',self.buttonpalette_label))
             settings.endGroup()
@@ -17161,7 +17163,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if platform.system().startswith('Windows'):
                 return 'Windows', platform.release(), platform.machine()
             # we assume Linux
-            if os.uname()[4][:3] == 'arm': # type: ignore[attr-defined] # pylint: disable=no-member # not available on Windows 
+            if os.uname()[4][:3] == 'arm': # type: ignore[attr-defined] # pylint: disable=no-member # not available on Windows
                 return 'RPi',platform.release(),os.uname()[4] # type: ignore[attr-defined] # pylint: disable=no-member # not available on Windows
             try:
                 lib,version = platform.libc_ver()
@@ -17960,6 +17962,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             settings.setValue('buttonpalette_shortcuts',self.buttonpalette_shortcuts)
             settings.setValue('eventbuttontablecolumnwidths',self.eventbuttontablecolumnwidths)
             settings.setValue('buttonsize',self.buttonsize)
+            settings.setValue('marklastbuttonpressed',self.mark_last_button_pressed)
             settings.setValue('buttonpalette_label',self.buttonpalette_label)
             settings.endGroup()
             settings.beginGroup('RoRlimits')
@@ -22663,37 +22666,38 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     def importExternalURL(self,extractor,message='',url=None):
         _log.info('importExternalURL(%s)', url)
         try:
-            if url is None:
-                url = self.ArtisanOpenURLDialog(msg=message)
-            if url is None:
+            res:bool = self.qmc.reset(redraw=True,soundOn=False)
+            if not res:
                 return
-
-            res:bool = self.qmc.reset(redraw=False,soundOn=False)
             if res:
+                if url is None:
+                    url = self.ArtisanOpenURLDialog(msg=message)
+                if url is None:
+                    return
                 try:
                     obj = extractor(url, self)
                     res = self.setProfile(None, obj) if obj else False
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
-                    res = False
-            if res:
-                self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
-                #update etypes combo box
-                self.etypeComboBox.clear()
-                self.etypeComboBox.addItems(self.qmc.etypes)
-                # profiles was adjusted, ensure that it does not overwrite the original file on saving
-                self.qmc.fileDirtySignal.emit()
-                self.curFile = None
-                # clear annotation cache
-                self.qmc.l_annotations_dict = {}
-                self.qmc.l_event_flags_dict = {}
-                #Plot everything
-                self.qmc.redraw()
-                message = QApplication.translate('Message','{0} imported').format(url.toString())
-                self.sendmessage(message)
-            else:
-                message = QApplication.translate('Message','an error occurred on importing {0}').format(url.toString())
-                self.sendmessage(message)
+                if res:
+                    self.orderEvents()
+                    self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
+                    #update etypes combo box
+                    self.etypeComboBox.clear()
+                    self.etypeComboBox.addItems(self.qmc.etypes)
+                    # profiles was adjusted, ensure that it does not overwrite the original file on saving
+                    self.qmc.fileDirtySignal.emit()
+                    self.curFile = None
+                    # clear annotation cache
+                    self.qmc.l_annotations_dict = {}
+                    self.qmc.l_event_flags_dict = {}
+                    #Plot everything
+                    self.qmc.redraw()
+                    message = QApplication.translate('Message','{0} imported').format(url.toString())
+                    self.sendmessage(message)
+                else:
+                    message = QApplication.translate('Message','an error occurred on importing {0}').format(url.toString())
+                    self.sendmessage(message)
 
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
@@ -23050,7 +23054,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             firstChar = stream.read(1)
             if firstChar == '{':
                 f.close()
-                wheel = cast(Wheel, self.deserialize(filename))
+                wheel = cast('Wheel', self.deserialize(filename))
                 self.qmc.wheelnames = wheel['wheelnames']
                 self.qmc.segmentlengths = wheel['segmentlengths']
                 self.qmc.segmentsalpha = wheel['segmentsalpha']
@@ -23076,10 +23080,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 #            self.sendmessage(message)
         except OSError as ex:
             _, _, exc_tb = sys.exc_info()
+            _log.error(ex)
             self.qmc.adderror((QApplication.translate('Error Message','IO Error:') + ' loadWheel() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return
         except ValueError as ex:
             _, _, exc_tb = sys.exc_info()
+            _log.error(ex)
             self.qmc.adderror((QApplication.translate('Error Message','Value Error:') + ' loadWheel() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return
         except Exception as ex: # pylint: disable=broad-except

@@ -493,7 +493,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.autoCharge.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         if self.app.artisanviewerMode:
             self.autoCharge.setEnabled(False)
-        self.chargeTimer = QCheckBox(QApplication.translate('CheckBox','CHARGE timer'))
+        self.chargeTimer = QCheckBox(QApplication.translate('CheckBox','CHARGE Timer'))
         self.chargeTimer.setChecked(self.aw.qmc.chargeTimerFlag)
         self.chargeTimer.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         if self.app.artisanviewerMode:
@@ -530,14 +530,14 @@ class EventsDlg(ArtisanResizeablDialog):
 
         ###  TAB 2
         #number of buttons per row
-        self.nbuttonslabel = QLabel(QApplication.translate('Label','Max buttons per row'))
+        self.nbuttonslabel = QLabel(QApplication.translate('Label','Max Buttons Per Row'))
         self.nbuttonsSpinBox = QSpinBox()
         self.nbuttonsSpinBox.setMaximumWidth(100)
         self.nbuttonsSpinBox.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.nbuttonsSpinBox.setRange(2,30)
         self.nbuttonsSpinBox.setValue(int(self.aw.buttonlistmaxlen))
         self.nbuttonsSpinBox.valueChanged.connect(self.setbuttonlistmaxlen)
-        nbuttonsSizeLabel = QLabel(QApplication.translate('Label','Button size'))
+        nbuttonsSizeLabel = QLabel(QApplication.translate('Label','Button Size'))
         self.nbuttonsSizeBox = MyQComboBox()
         size_items = [
                     QApplication.translate('ComboBox', 'tiny'),
@@ -546,6 +546,9 @@ class EventsDlg(ArtisanResizeablDialog):
                 ]
         self.nbuttonsSizeBox.addItems(size_items)
         self.nbuttonsSizeBox.setCurrentIndex(self.aw.buttonsize)
+        self.markLastButtonPressed = QCheckBox(QApplication.translate('CheckBox','Mark last pressed'))
+        self.markLastButtonPressed.setChecked(self.aw.mark_last_button_pressed)
+        self.markLastButtonPressed.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         #table for showing events
         self.eventbuttontable = QTableWidget()
         self.eventbuttontable.setTabKeyNavigation(True)
@@ -1290,6 +1293,8 @@ class EventsDlg(ArtisanResizeablDialog):
         nbuttonslayout.addSpacing(10)
         nbuttonslayout.addWidget(colorpatternlabel)
         nbuttonslayout.addWidget(self.colorSpinBox)
+        nbuttonslayout.addSpacing(10)
+        nbuttonslayout.addWidget(self.markLastButtonPressed)
         nbuttonslayout.addStretch()
         tab2buttonlayout = QHBoxLayout()
         tab2buttonlayout.addWidget(addButton)
@@ -3132,6 +3137,7 @@ class EventsDlg(ArtisanResizeablDialog):
         try:
             self.closeHelp()
             self.aw.buttonsize = self.nbuttonsSizeBox.currentIndex()
+            self.aw.mark_last_button_pressed = self.markLastButtonPressed.isChecked()
             self.aw.buttonpalette_label = self.transferpalettecurrentLabelEdit.text()
             self.savetableextraeventbutton()
             # save column widths
