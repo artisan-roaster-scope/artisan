@@ -6510,6 +6510,16 @@ class tgraphcanvas(FigureCanvas):
             self.ystep_down = 0
             self.ystep_up = 0
 
+            #reset extra device +Program_34, +Program_56, +Program_78 and +Program_910
+            self.program_t3 = -1
+            self.program_t4 = -1
+            self.program_t5 = -1
+            self.program_t6 = -1
+            self.program_t7 = -1
+            self.program_t8 = -1
+            self.program_t9 = -1
+            self.program_t10 = -1
+
             # reset keyboard mode
             self.aw.keyboardmoveindex = 0 # points to the last activated button in keyboardButtonList; we start with the CHARGE button
             self.aw.resetKeyboardButtonMarks()
