@@ -2854,6 +2854,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             """
             }
         # we use this high to dynamically adjust the button size to different font sizes (important for high-dpi displays on Windows)
+        self.standard_button_tiny_height:int
+        self.standard_button_small_height:int
+        self.standard_button_height:int
         if platform.system() == 'Windows':
             default_button_height = QPushButton('Test').sizeHint().height()
             self.standard_button_tiny_height = int(round(default_button_height * 1.1))

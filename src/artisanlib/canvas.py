@@ -9281,13 +9281,6 @@ class tgraphcanvas(FigureCanvas):
                                         else:
                                             tempo = None
 
-                                        # plot events on BT when showeventsonbt is true
-                                        if self.showeventsonbt and temp is not None and self.BTcurve:
-                                            if self.flagon:
-                                                tempo = self.temp2[event_idx]
-                                            else:
-                                                tempo = self.stemp2[event_idx]
-
                                         if not self.flagstart and not self.foregroundShowFullflag and (((not self.autotimex or self.autotimexMode == 0) and event_idx < charge_idx) or event_idx > drop_idx):
                                             continue
 
