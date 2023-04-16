@@ -62,31 +62,28 @@ Must be replaced with three periods "..." in the Excel file.
 
 '''
 
-from os.path import join, dirname, abspath, split, splitext
-import os
+from os.path import dirname, abspath, split, splitext
+from os import listdir
 import importlib
-import subprocess
 import sys
 import re
 
 try:
     #pylint: disable = E, W, R, C
-    from PyQt6.QtWidgets import QApplication
-except:
+    from PyQt6.QtWidgets import QApplication  
+except Exception:
     #pylint: disable = E, W, R, C
-    from PyQt5.QtWidgets import QApplication # type: ignore
+    from PyQt5.QtWidgets import QApplication # type: ignore # noqa: F401
 from openpyxl import load_workbook
-import prettytable
 
 def u(x):
     return str(x)
 
-ind = '    '     #indent
+ind = '    '         #indent
 nlind = '\n' + ind   #new line plus indent
 
-def translateStr(str, group='HelpDlg'):
-    t_str = "QApplication.translate('" + group + "','" + u(str) + "')"
-    return t_str
+def translateStr(in_str, group='HelpDlg'):
+    return "QApplication.translate('" + group + "','" + u(in_str) + "')"
 
 def generateRows(ws):
     all_rows = []
@@ -94,7 +91,7 @@ def generateRows(ws):
         this_row = []
         for cell in row:
             # insert a nonbreaking space into blank cells to keep the row height homgenous
-            if cell.value == None or cell.value == '':
+            if cell.value in (None, ''):
                 cell_str = "'&#160;'"
             else:
                 if cell.data_type == 's':
@@ -102,8 +99,8 @@ def generateRows(ws):
                     cell_value = re.subn(r'\n',r'\\n',cell_value[0])
                     # do not translate if the cell has italic format or any font color
                     if cell.font.italic or \
-                            (cell.font.color != None and \
-                             type(cell.font.color.rgb) == str and \
+                            (cell.font.color is not None and \
+                             isinstance(cell.font.color.rgb,str) and \
                              cell.font.color.rgb != 'FF000000'):
                         cell_str = "'" + cell_value[0] + "'"
                     else:
@@ -151,19 +148,18 @@ def getNotes(all_rows,nrows,tbl_name,notetype='top'):
 
 def getFieldnames(rows,tbl_name):
     this_row = ','.join(rows)
-    field_names = u(tbl_name) + '.field_names = [' + str(this_row) + ']'
-    return field_names
+    return u(tbl_name) + '.field_names = [' + str(this_row) + ']'
 
 def getAddrows(all_rows,tbl_name):
     addrows = ''
-    for idx in range(len(all_rows)):
-        this_row = ','.join(all_rows[idx])
+    for idx, row in enumerate(all_rows):
+        this_row = ','.join(row)
         if idx > 0:
             addrows += nlind
         addrows += u(tbl_name) + '.add_row([' + this_row + '])'
     return addrows
 
-def buildpyCode(fname_in):
+def buildpyCode(filename_in):
 
     data_table_attributes = '"width":"100%","border":"1","padding":"1","border-collapse":"collapse"'
     note_table_attributes = '"width":"100%","border":"1","padding":"1","border-collapse":"collapse"'
@@ -185,21 +181,21 @@ def buildpyCode(fname_in):
     outstr += nlind + "strlist.append('<head><style> td, th {border: 1px solid #ddd;  padding: 6px;} th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;} </style></head> <body>')"
 
     # Open the workbook
-    wb = load_workbook(filename = fname_in, read_only=False)
+    wb = load_workbook(filename = filename_in, read_only=False)
 
     # iterate through the sheets
     for ws in wb.worksheets:
 
         print(ws.title, '  ', ws.max_row, 'rows  ', ws.max_column, 'columns')
 
-        # hack to work around when openpyxl seems more rows than actual
+        # hack to work around when openpyxl ws.max_row returns more rows than actual
         num_rows = ws.max_row
-        for max_row, row in enumerate(ws, 1):
+        for row in ws.iter_rows(min_row=1, max_row=num_rows):
             if all(c.value is None for c in row):
-                if max_row == num_rows + 2:
+                if row[0].row == num_rows + 2:  # two empty rows signifies the end of the help sheet
                     break
             else:
-                num_rows = max_row
+                num_rows = row[0].row
 
         # create the table name for the sheet name
         tbl_name = 'tbl_' + re.sub(r'[^A-Za-z0-9]','',ws.title)
@@ -242,7 +238,7 @@ def buildpyCode(fname_in):
 
         # add bottom notes
         if nrows_bottomnotes > 0:
-            outstr += tbl_bottomnotes
+            outstr += tbl_bottomnotes   
             outstr += nlind + 'strlist.append(' + tbl_name + 'bottom' + '.get_html_string(attributes={' + note_table_attributes + '}))'
 
     # finalize outstr - py code
@@ -255,35 +251,34 @@ def buildpyCode(fname_in):
 
     return outstr
 
-def writepyFile(fname_in, fname_out):
-    outstr = buildpyCode(fname_in)
+def writepyFile(filename_in, filename_out):
+    outstr = buildpyCode(filename_in)
 
     # write outstr (py code) to the specified filename
-    outfile = open(fname_out,'w', encoding='utf-8')
-    outfile.write(outstr)
-    outfile.close()
+    with open(filename_out,'w', encoding='utf-8') as file_object:
+        file_object.write(outstr)
 
 
-def writehtmlFile(_fname_in, fname_out, fname_htm):
+def writehtmlFile(_fname_in, filename_out, filename_htm):
     del _fname_in
-    importfile = splitext(split(fname_out)[1])[0]
-    importpath = abspath(split(fname_out)[0])
+    importfile = splitext(split(filename_out)[1])[0]
+    importpath = abspath(split(filename_out)[0])
     sys.path.append(importpath)
     var = importlib.import_module(importfile)
 
     htmstr = var.content()
 
     # write htmlstr (html) to the specified filename
-    outfile = open(fname_htm,'w',encoding='utf-8')
-    outfile.write(htmstr)
-    outfile.close()
+    with open(filename_htm,'w', encoding='utf-8') as file_object:
+        file_object.write(htmstr)
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        currPath = (os.path.dirname(__file__)) + '/'
+        currPath = (dirname(__file__)) + '/'
         #print(f"{currPath=}")
         if sys.argv[1] == 'all':
-            for filename in os.listdir(currPath + '../input_files/'):
+            #for filename in os.listdir(currPath + '../input_files/'):
+            for filename in listdir(currPath + '../input_files/'):
                 if filename.endswith('.xlsx'):
                     fn = filename.replace('.xlsx','')
                     fname_in =  currPath + '../input_files/' + filename
@@ -292,9 +287,6 @@ if __name__ == '__main__':
                     print(f'\n{filename}')
                     writepyFile(fname_in,fname_out)
                     writehtmlFile(fname_in,fname_out,fname_htm)
-                    continue
-                else:
-                    continue
         else:   #only one file
             fname_in =  currPath + '../input_files/' + sys.argv[1] + '.xlsx'
             fname_out = currPath + '../../../src/help/' + sys.argv[1] + '_help.py'
