@@ -26,7 +26,7 @@ import numpy
 import functools
 from pathlib import Path
 from matplotlib import colors
-from typing import Optional, Tuple, List, Any
+from typing import Optional, Tuple, List, Union, Any
 from typing_extensions import Final  # Python <=3.7
 from typing_extensions import TypeGuard  # Python <=3.10
 
@@ -34,10 +34,10 @@ from typing_extensions import TypeGuard  # Python <=3.10
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
-application_name: Final = 'Artisan'
-application_viewer_name: Final = 'ArtisanViewer'
-application_organization_name: Final = 'artisan-scope'
-application_organization_domain: Final = 'artisan-scope.org'
+application_name: Final[str] = 'Artisan'
+application_viewer_name: Final[str] = 'ArtisanViewer'
+application_organization_name: Final[str] = 'artisan-scope'
+application_organization_domain: Final[str] = 'artisan-scope.org'
 
 
 try:
@@ -50,13 +50,13 @@ except Exception: # pylint: disable=broad-except
     from PyQt5.QtGui import QColor  # type: ignore  # @UnusedImport @Reimport  @UnresolvedImport
 
 
-deltaLabelPrefix = '<html>&Delta;&thinsp;</html>' # prefix constant for labels to compose DeltaET/BT by prepending this prefix to ET/BT labels
-deltaLabelUTF8 = 'Delta' if platform.system() == 'Linux' else '\u0394\u2009' # u("\u03B4") # prefix for non HTML Qt Widgets like QPushbuttons
+deltaLabelPrefix:Final[str] = '<html>&Delta;&thinsp;</html>' # prefix constant for labels to compose DeltaET/BT by prepending this prefix to ET/BT labels
+deltaLabelUTF8:Final[str] = 'Delta' if platform.system() == 'Linux' else '\u0394\u2009' # u("\u03B4") # prefix for non HTML Qt Widgets like QPushbuttons
 
-deltaLabelBigPrefix = '<big><b>&Delta;</b></big>&thinsp;<big><b>' # same as above for big/bold use cases
-deltaLabelMathPrefix = r'$\Delta\/$'  # prefix for labels in matplibgraphs to compose DeltaET/BT by prepending this prefix to ET/BT labels
+deltaLabelBigPrefix:Final[str] = '<big><b>&Delta;</b></big>&thinsp;<big><b>' # same as above for big/bold use cases
+deltaLabelMathPrefix:Final[str] = r'$\Delta\/$'  # prefix for labels in matplibgraphs to compose DeltaET/BT by prepending this prefix to ET/BT labels
 
-def appFrozen():
+def appFrozen() -> bool:
     ib = False
     try:
         platf = str(platform.system())
@@ -73,11 +73,11 @@ def appFrozen():
         _log.exception(e)
     return ib
 
-def decs2string(x):
+def decs2string(x) -> bytes:
     if len(x) > 0:
         return bytes(x)
     return b''
-def uchr(x):
+def uchr(x:int) -> str:
     return chr(x)
 def decodeLocal(x:Optional[Any]) -> Optional[str]:
     if x is not None:
@@ -99,15 +99,15 @@ def hex2int(h1,h2=None) -> int:
     if h2 is not None:
         return int(h1*256 + h2)
     return int(h1)
-def str2cmd(s):
+def str2cmd(s:str) -> bytes:
     return bytes(s,'ascii')
-def cmd2str(c):
+def cmd2str(c:bytes) -> str:
     return str(c,'latin1')
 def s2a(s):
     return s.encode('ascii','ignore').decode('ascii')
 
 # returns the prefix of length ll of s and adds eclipse
-def abbrevString(s, ll):
+def abbrevString(s:str, ll:int) -> str:
     if len(s) > ll:
         return f'{s[:ll-1]}...'
     return s
@@ -142,22 +142,22 @@ def stringtoseconds(string:str) -> int:
     seconds -= int(timeparts[1])
     return seconds    #return negative number
 
-def fromFtoC(Ffloat):
+def fromFtoC(Ffloat) -> float:
     if Ffloat in [-1,None] or numpy.isnan(Ffloat):
         return Ffloat
     return (Ffloat-32.0)*(5.0/9.0)
 
-def fromCtoF(Cfloat):
+def fromCtoF(Cfloat) -> float:
     if Cfloat in [-1,None] or numpy.isnan(Cfloat):
         return Cfloat
     return (Cfloat*9.0/5.0)+32.0
 
-def RoRfromCtoF(CRoR):
+def RoRfromCtoF(CRoR) -> float:
     if CRoR in [-1,None] or numpy.isnan(CRoR):
         return CRoR
     return CRoR*9.0/5.0
 
-def RoRfromFtoC(FRoR):
+def RoRfromFtoC(FRoR) -> float:
     if FRoR in [-1,None] or numpy.isnan(FRoR):
         return FRoR
     return FRoR*(5.0/9.0)
@@ -169,8 +169,8 @@ def convertRoR(r,source_unit,target_unit):
         return RoRfromCtoF(r)
     return RoRfromFtoC(r)
 
-def convertTemp(t,source_unit,target_unit):
-    if source_unit == target_unit:
+def convertTemp(t:float, source_unit:str, target_unit:str) -> float:
+    if source_unit == '' or target_unit == '' or source_unit == target_unit:
         return t
     if source_unit == 'C':
         return fromCtoF(t)
@@ -185,27 +185,27 @@ def path2url(path):
 # remaining artifacts from Qt4/5 compatibility layer:
 # note: those conversion functions are sometimes called with string arguments
 # thus a simple int(round(s)) won't work and a int(round(float(s))) needs to be applied
-def toInt(x):
+def toInt(x:Optional[Union[int,str,float]]) -> int:
     if x is None:
         return 0
     try:
         return int(round(float(x)))
     except Exception: # pylint: disable=broad-except
         return 0
-def toString(x):
+def toString(x) -> str:
     return str(x)
-def toList(x):
+def toList(x) -> List:
     if x is None:
         return []
     return list(x)
-def toFloat(x):
+def toFloat(x) -> float:
     if x is None:
         return 0.
     try:
         return float(x)
     except Exception: # pylint: disable=broad-except
         return 0.
-def toBool(x):
+def toBool(x) -> bool:
     if isinstance(x,str):
         if x == 'false':
             return False
@@ -216,7 +216,7 @@ def toBool(x):
         except Exception: # pylint: disable=broad-except
             return False
     return bool(x)
-def toStringList(x):
+def toStringList(x) -> List[str]:
     if x:
         return [str(s) for s in x]
     return []
@@ -232,7 +232,7 @@ def removeAll(ll, s):
 # [-1,-1,2] => [2, 2, 2] # a prefix of -1 of max length 'interpolate_max' will be replaced by the first value in l that is not -1
 # INVARIANT: the resulting list has always the same length as l
 # only gaps of length interpolate_max (should be set to the global aw.qmc.interpolatemax), if not None, are interpolated
-def fill_gaps(ll, interpolate_max=3):
+def fill_gaps(ll, interpolate_max:int=3):
     res = []
     last_val = -1
     skip = -1
@@ -343,7 +343,7 @@ def getResourcePath():
 # if share is True, the same (cache) file is shared between the Artisan and
 # ArtisanViewer apps
 # and locks have to be used to avoid race conditions
-def getDirectory(filename: str, ext: Optional[str] = None, share: bool = False):
+def getDirectory(filename: str, ext: Optional[str] = None, share: bool = False) -> str:
     fn = filename
     if not share:
         app = QCoreApplication.instance()

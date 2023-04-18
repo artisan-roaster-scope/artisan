@@ -51,7 +51,7 @@ account_cache_semaphore:QSemaphore = QSemaphore(1)
 # shared resource between the Artisan and ArtisanViewer app protected
 # by a file lock
 account_cache_path:str = getDirectory(config.account_cache, share=True)
-account_cache_lock_path = getDirectory(
+account_cache_lock_path:str = getDirectory(
     f'{config.account_cache}_lock', share=True
 )
 

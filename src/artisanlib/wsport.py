@@ -45,12 +45,12 @@ class wsport():
         self.path:str = 'WebSocket' # the ws path
         self.machineID:int = 0
 
-        self.lastReadResult:int = 0 # this is set by eventaction following some custom button/slider Modbus actions with "read" command
+        self.lastReadResult:Optional[Dict] = {} # this is set by eventaction following some custom button/slider Modbus actions with "read" command
 
         self.channels:Final[int] = 10 # maximal number of WebSocket channels
 
         # WebSocket data
-        self.readings = [-1]*self.channels
+        self.readings:List[float] = [-1]*self.channels
 
         self.channel_requests:List[str] = ['']*self.channels
         self.channel_nodes:List[str] = ['']*self.channels
@@ -296,14 +296,14 @@ class wsport():
         if message_id in self.pending_events:
             v = self.pending_events[message_id]
             del self.pending_events[message_id]
-            if not isinstance(v,threading.Event):
+            if not isinstance(v, threading.Event):
                 return v
         return None
 
     # takes a request as dict to be send as JSON
     # and returns a dict generated from the JSON response
     # or None on exception or if block=False
-    def send(self,request,block=True):
+    def send(self, request:Dict, block=True) -> Optional[Dict]:
         try:
             connected = self.connect()
             if connected and self.ws is not None:

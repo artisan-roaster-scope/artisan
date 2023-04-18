@@ -329,7 +329,7 @@ Palette = Tuple[
     List[int],    # 9: slider visibilities
     List[int],    # 10: slider actions
     List[str],    # 11: slider commands
-    List[int],    # 12: slider offsets
+    List[float],  # 12: slider offsets
     List[float],  # 13: slider factors
     List[int],    # 14: quantifier active
     List[int],    # 15: quantifier sources

@@ -268,7 +268,7 @@ def getRoast() -> Dict[str, Any]:  #for Python >= 3.9 can replace 'Dict' with th
         _log.debug('getRoast()')
         assert config.app_window is not None
         aw = config.app_window
-        p = aw.getProfile()
+        p:'ProfileData' = aw.getProfile()
 
         d = getTemplate(p)
 

@@ -84,9 +84,8 @@ def retrieveNotifications() -> None:
                         and 'result' in res
                         and res['result']
                         and isinstance(res['result'],list)):
-# not_for_artisan is set to True by the server before sending it for the first time thus we should not filter based on this tag!!
-#                    results = [r for r in res['result'] if not ('not_for_artisan' in r and r['not_for_artisan'])]
-                    results = res['result']
+                    # we remove notifications that are tagged not_for_artisan:True
+                    results = [r for r in res['result'] if not ('not_for_artisan' in r and r['not_for_artisan'])]
                     sorted_results = sorted(results, key=lambda nd: (util.ISO86012epoch(nd['added_on']) if 'added_on' in nd else 0))
                     # we present the notfications in reverse order, oldest first
                     for i, n in enumerate(sorted_results):

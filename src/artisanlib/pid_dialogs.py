@@ -53,7 +53,17 @@ class PID_DlgControl(ArtisanDialog):
         super().__init__(parent, aw)
         self.setModal(True)
         #self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose) # default is True and this is set by default in ArtisanDialog!
-        self.setWindowTitle(QApplication.translate('Form Caption','PID Control'))
+
+        pid_controller = self.aw.pidcontrol.externalPIDControl()
+
+        if pid_controller == 3:
+            self.setWindowTitle(QApplication.translate('Form Caption','Arduino/TC4 PID Control'))
+        elif  pid_controller == 2:
+            self.setWindowTitle(QApplication.translate('Form Caption','S7 PID Control'))
+        elif  pid_controller == 1:
+            self.setWindowTitle(QApplication.translate('Form Caption','MODBUS PID Control'))
+        else:
+            self.setWindowTitle(QApplication.translate('Form Caption','PID Control'))
 
         # PID tab
         tab1Layout = QVBoxLayout()

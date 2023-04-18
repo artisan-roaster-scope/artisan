@@ -1592,7 +1592,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def customBlendButton_triggered(self,_):
-        inWeight = float(comma2dot(str(self.weightinedit.text())))
+        inWeight:float = float(comma2dot(str(self.weightinedit.text())))
 
 
         coffees = plus.stock.getCoffeeLabels()
@@ -3609,8 +3609,9 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     def pctText2Num(self,s):
         try:
+            res:float
             if len(s) == 0:
-                res = 0
+                res = 0.
             elif s == s.strip('%'):
                 res = toFloat(scaleFloat2String(s))
             else:

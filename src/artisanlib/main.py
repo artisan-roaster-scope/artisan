@@ -1385,7 +1385,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         'extraLCDframe1', 'extraLCDframe2', 'extraLCDvisibility1', 'extraLCDvisibility2', 'extraCurveVisibility1', 'extraCurveVisibility2',
         'extraDelta1', 'extraDelta2', 'extraFill1', 'extraFill2', 'channel_tare_values', 'messagehist', 'eventlabel', 'eNumberSpinBox',
         'lineEvent', 'etypeComboBox', 'valueEdit', 'etimeline', 'buttonminiEvent', 'buttonlist', 'buttonStates', 'lastbuttonpressed', 'buttonlistmaxlen',
-        'buttonpalette_default_label', 'buttonpalette_label', 'buttonpalettemaxlen', 'buttonpalette_shortcuts', 'buttonsize', 'mark_last_button_pressed', 'eventbuttontablecolumnwidths',
+        'buttonpalette_default_label', 'buttonpalette_label', 'buttonpalettemaxlen', 'buttonpalette_shortcuts', 'buttonsize', 'mark_last_button_pressed', 'show_extrabutton_tooltips', 'eventbuttontablecolumnwidths',
         'lowerbuttondialogLayout', 'lowerbuttondialog', 'lowerbuttondialogLayout', 'e1buttonbarLayout', 'e1buttondialog', 'e2buttonbarLayout', 'e2buttondialog',
         'e3buttonbarLayout', 'e3buttondialog', 'e4buttonbarLayout', 'e4buttondialog', 'keyboardmove', 'keyboardButtonList', 'keyboardmoveindex',
         'keyboardmoveflag', 'lastkeyboardcmd', 'error_dlg', 'serial_dlg', 'message_dlg', 'ETname', 'BTname', 'level1frame', 'level1layout', 'EventsGroupLayout',
@@ -1693,7 +1693,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.eventsliderKeyboardControl = True # if false sliders cannot be moved using up/down keys
         self.eventslideractions:List[int] = [0,0,0,0] # 0: None, 1: Serial Command, 2: Modbus Command, 3: DTA Command, 4: Call Program, 5: Hottop Heater, 6: Hottop Fan
         self.eventslidercommands:List[str] = ['','','','']
-        self.eventslideroffsets:List[int] = [0,0,0,0]
+        self.eventslideroffsets:List[float] = [0,0,0,0]
         self.eventsliderfactors:List[float] = [1.0,1.0,1.0,1.0]
         self.eventslidermin:List[int] = [0,0,0,0]
         self.eventsMaxValue:Final[int] = 999
@@ -3234,6 +3234,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.buttonpalette_shortcuts = True # if True palettes can be changed via the number keys
         self.buttonsize = 1 # 0: tiny, 1: small (default), 2: large
         self.mark_last_button_pressed:bool = True
+        self.show_extrabutton_tooltips:bool = False
 
         self.eventbuttontablecolumnwidths:List[int] = [] # custom event button table column widths
 
@@ -4495,13 +4496,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     # turns channel off after millis
     @pyqtSlot(int,int,str)
     @pyqtSlot(int,int,str,str)
-    def processSingleShotPhidgetsPulse(self,channel,millis,fct,serial=None):
+    def processSingleShotPhidgetsPulse(self, channel:int, millis:int, fct:str, serial:Optional[str]=None) -> None:
         if fct == 'OUTsetPWM':
             QTimer.singleShot(int(round(millis)),lambda : self.ser.phidgetOUTsetPWM(channel,0,serial))
         elif fct == 'OUTsetPWMhub':
             QTimer.singleShot(int(round(millis)),lambda : self.ser.phidgetOUTsetPWMhub(channel,0,serial))
         elif fct == 'BinaryOUTset':
-            QTimer.singleShot(int(round(millis)),lambda : (None if self.ser.phidgetBinaryOUTset(channel,0,serial) else None)) # return None to fullfil the type signature of QTimer.singleShot()
+            QTimer.singleShot(int(round(millis)),lambda : (None if self.ser.phidgetBinaryOUTset(channel, False, serial) else None)) # return None to fullfil the type signature of QTimer.singleShot()
 
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  #####################################
@@ -8027,9 +8028,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                             elif cs_a[0] == 'toggle' and cs_len > 1:
                                 cx = toInt(cs_a[1])
                                 sn = cs_a[2] if cs_len > 2 else None
-                                #keep state of this gpio, rather than rely on phidget and use non-zero value to set button color
-                                # NOTE: with this strategy the modules state might be different to this one if also a set command is used
-                                newValue = (self.buttonStates[self.lastbuttonpressed] + 1) & 0x1
+#                                #keep state of this gpio, rather than rely on phidget and use non-zero value to set button color
+#                                # NOTE: with this strategy the modules state might be different to this one if also a set command is used
+#                                newValue = (self.buttonStates[self.lastbuttonpressed] + 1) & 0x1
+                                # we rather take the new value from the Phidget itself
+                                newValue = not self.ser.phidgetBinaryOUTget(cx,sn)
                                 if self.ser.phidgetBinaryOUTset(cx, bool(newValue),sn):
                                     self.buttonStates[self.lastbuttonpressed] = newValue
                                 else:
@@ -8043,11 +8046,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                 self.lastbuttonpressed = -1
 
                             elif cs_a[0] == 'pulse' and cs_len > 2:
-                                cs = toInt(cs_a[1])
+                                ci = toInt(cs_a[1])
                                 te = toInt(cs_a[2])
                                 sn = cs_a[3] if cs_len > 3 else None
                                 if 0.0 <= te <= 999999:
-                                    self.ser.phidgetBinaryOUTpulse(cs, te, sn)
+                                    self.ser.phidgetBinaryOUTpulse(ci, te, sn)
                                 else:
                                     self.sendmessage(QApplication.translate('Message', 'Pulse out of range (%d)') % te) # pylint: disable=consider-using-f-string
 
@@ -8073,10 +8076,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                 self.moveslider(toInt(cs_a[1]), v)
                             elif cs_a[0] == 'button' and cs_len > 3:
                                 b = toInt(cs_a[1]) - 1 # gui button list is indexed from 1
-                                cs = toInt(cs_a[2])
+                                ci = toInt(cs_a[2])
                                 v = toInt(cs_a[3])
                                 sn = cs_a[4] if cs_len > 4 else None
-                                if self.ser.phidgetBinaryOUTset(cs, bool(v & 0x1), sn):
+                                if self.ser.phidgetBinaryOUTset(ci, bool(v & 0x1), sn):
                                     self.buttonStates[b] = v & 0x1
                                 else:
                                     self.sendmessage(QApplication.translate('Message', f'Failed to set button({cs_a[1]}, {cs_a[2]}, {cs_a[3]})'))
@@ -8100,9 +8103,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                     try:
                                         v = int(round(float(eval(cs_a[2]))))  # pylint: disable=eval-used
                                         # interpret target as hex string
-                                        b = bytes.fromhex(cs_a[1])
-                                        if len(b)>0:
-                                            self.santokerSendMessageSignal.emit(b[0:1], v)
+                                        bts = bytes.fromhex(cs_a[1])
+                                        if len(bts)>0:
+                                            self.santokerSendMessageSignal.emit(bts[0:1], v)
                                     except Exception as e: # pylint: disable=broad-except
                                         _log.exception(e)
 
@@ -8304,12 +8307,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                     cs_split = cs[4:-1].split(',')
                                     if len(cs_split)>1:
                                         channel=toInt(cs_split[0])
-                                        value=toInt(eval(cs_split[1])) # pylint: disable=eval-used
+                                        int_value = toInt(eval(cs_split[1])) # pylint: disable=eval-used
                                         if len(cs_split) == 2:
-                                            self.ser.phidgetOUTsetPWM(channel, value)
+                                            self.ser.phidgetOUTsetPWM(channel, int_value)
                                         elif len(cs_split) == 3:
-                                            serial=int(cs_split[2])
-                                            self.ser.phidgetOUTsetPWM(channel, value, serial)
+                                            serial=cs_split[2]
+                                            self.ser.phidgetOUTsetPWM(channel, int_value, serial)
                                 elif cs.startswith('frequency(') and len(cs)>14:
                                     cs_split = cs[10:-1].split(',')
                                     if len(cs_split) == 2:
@@ -8474,14 +8477,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                             cs = c.strip().replace('_',str(self.s7.lastReadResult)) # the last read value can be accessed via the "_" symbol
                             if cs.startswith('setDBint(') and len(cs) > 14:
                                 try:
-                                    dbnr,s,v = cs[len('setDBint('):-1].split(',')
-                                    self.s7.writeInt(5,int(dbnr),int(s),eval(v)) # pylint: disable=eval-used
+                                    dbnr,s,v_str = cs[len('setDBint('):-1].split(',')
+                                    self.s7.writeInt(5,int(dbnr),int(s),eval(v_str)) # pylint: disable=eval-used
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             elif cs.startswith('msetDBint(') and len(cs) > 16:
                                 try:
-                                    dbnr,s,a,o,v = cs[len('msetDBint('):-1].split(',')
-                                    self.s7.maskWriteInt(5,int(dbnr),int(s),int(a),int(o),eval(v)) # pylint: disable=eval-used
+                                    dbnr,s,a,o,v_str = cs[len('msetDBint('):-1].split(',')
+                                    self.s7.maskWriteInt(5,int(dbnr),int(s),int(a),int(o),eval(v_str)) # pylint: disable=eval-used
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             elif cs.startswith('getDBint(') and len(cs) > 13:
@@ -8494,8 +8497,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                     _log.exception(e)
                             elif cs.startswith('setDBfloat(') and len(cs) > 16:
                                 try:
-                                    dbnr,s,v = cs[len('setDBfloat('):-1].split(',')
-                                    self.s7.writeFloat(5,int(dbnr),int(s),eval(v)) # pylint: disable=eval-used
+                                    dbnr,s,v_str = cs[len('setDBfloat('):-1].split(',')
+                                    self.s7.writeFloat(5,int(dbnr),int(s),eval(v_str)) # pylint: disable=eval-used
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             elif cs.startswith('getDBfloat(') and len(cs) > 14:
@@ -8508,8 +8511,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                     _log.exception(e)
                             elif cs.startswith('setDBbool(') and len(cs) > 17:
                                 try:
-                                    dbnr,s,si,v = cs[len('setDBbool('):-1].split(',')
-                                    self.s7.writeBool(5,int(dbnr),int(s),int(si),eval(v)) # pylint: disable=eval-used
+                                    dbnr,s,si,v_str = cs[len('setDBbool('):-1].split(',')
+                                    self.s7.writeBool(5,int(dbnr),int(s),int(si),eval(v_str)) # pylint: disable=eval-used
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             elif cs.startswith('getDBbool(') and len(cs) > 15:
@@ -8563,8 +8566,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                             # alarms(<bool>) enable/disable alarms
                             if cs.startswith('alarms(') and cs.endswith(')'):
                                 try:
-                                    value = cs[len('alarms('):-1]
-                                    if value.lower() in ('yes', 'true', 't', '1'):
+                                    value_str = cs[len('alarms('):-1]
+                                    if value_str.lower() in ('yes', 'true', 't', '1'):
                                         self.qmc.silent_alarms = False
                                         self.sendmessage(QApplication.translate('Message','Alarms on'))
                                     else:
@@ -8575,8 +8578,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                             # autoCHARGE(<bool>) enable/disable autoCHARGE
                             elif cs.startswith('autoCHARGE(') and cs.endswith(')'):
                                 try:
-                                    value = cs[len('autoCHARGE('):-1]
-                                    if value.lower() in ('yes', 'true', 't', '1'):
+                                    value_str = cs[len('autoCHARGE('):-1]
+                                    if value_str.lower() in ('yes', 'true', 't', '1'):
                                         self.qmc.autoChargeFlag = True
                                         self.sendmessage(QApplication.translate('Message','autoCHARGE on'))
                                     else:
@@ -8587,8 +8590,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                             # autoDROP(<bool>) enable/disable autoDROP
                             elif cs.startswith('autoDROP(') and cs.endswith(')'):
                                 try:
-                                    value = cs[len('autoDROP('):-1]
-                                    if value.lower() in ('yes', 'true', 't', '1'):
+                                    value_str = cs[len('autoDROP('):-1]
+                                    if value_str.lower() in ('yes', 'true', 't', '1'):
                                         self.qmc.autoDropFlag = True
                                         self.sendmessage(QApplication.translate('Message','autoDROP on'))
                                     else:
@@ -8644,29 +8647,29 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                             # pidmode(<n>) : 0: manual, 1: RS, 2: background follow
                             elif cs.startswith('pidmode(') and cs.endswith(')'):
                                 try:
-                                    value = int(cs[len('pidmode('):-1])
+                                    value_int = int(cs[len('pidmode('):-1])
                                     if self.qmc.device == 0: # Fuji PID
                                         #rs state =0 OFF, = 1 ON, = 2 hold
-                                        if value == 0:
+                                        if value_int == 0:
                                             self.fujipid.setrampsoak(0)
                                             self.fujipid.followBackground = False
                                             self.sendmessage(QApplication.translate('Message','PID mode manual'))
-                                        elif value == 1:
+                                        elif value_int == 1:
                                             self.fujipid.setrampsoak(1)
                                             self.fujipid.followBackground = False
                                             self.sendmessage(QApplication.translate('Message','PID mode Ramp/Soak'))
-                                        elif value == 2:
+                                        elif value_int == 2:
                                             self.fujipid.setrampsoak(0)
                                             self.fujipid.followBackground = True
                                             self.sendmessage(QApplication.translate('Message','PID mode background'))
                                     # software PID
-                                    elif value == 0:
+                                    elif value_int == 0:
                                         self.pidcontrol.svMode = 0
                                         self.sendmessage(QApplication.translate('Message','PID mode manual'))
-                                    elif value == 1:
+                                    elif value_int == 1:
                                         self.pidcontrol.svMode = 1
                                         self.sendmessage(QApplication.translate('Message','PID mode Ramp/Soak'))
-                                    elif value == 2:
+                                    elif value_int == 2:
                                         self.pidcontrol.svMode = 2
                                         self.sendmessage(QApplication.translate('Message','PID mode background'))
                                 except Exception as e: # pylint: disable=broad-except
@@ -8674,20 +8677,20 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                             # playbackmode(<n>) with 0: off, 1: time, 2: BT, 3: ET
                             elif cs.startswith('playbackmode(') and cs.endswith(')'):
                                 try:
-                                    value = int(cs[len('playbackmode('):-1])
-                                    if value == 0:
+                                    value_int = int(cs[len('playbackmode('):-1])
+                                    if value_int == 0:
                                         self.qmc.replayType = 0
                                         self.qmc.backgroundPlaybackEvents = False
                                         self.sendmessage(QApplication.translate('Message','playback off'))
-                                    elif value == 1:
+                                    elif value_int == 1:
                                         self.qmc.replayType = 0
                                         self.qmc.backgroundPlaybackEvents = True
                                         self.sendmessage(QApplication.translate('Message','playback by time'))
-                                    elif value == 2:
+                                    elif value_int == 2:
                                         self.qmc.replayType = 1
                                         self.qmc.backgroundPlaybackEvents = True
                                         self.sendmessage(QApplication.translate('Message','playback by BT'))
-                                    elif value == 3:
+                                    elif value_int == 3:
                                         self.qmc.replayType = 2
                                         self.qmc.backgroundPlaybackEvents = True
                                         self.sendmessage(QApplication.translate('Message','playback by ET'))
@@ -8750,8 +8753,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                             elif cs.startswith('notifications(') and cs.endswith(')'):
                                 try:
                                     if self.notificationManager:
-                                        value = cs[len('notifications('):-1]
-                                        if value.lower() in ('yes', 'true', 't', '1'):
+                                        value_str = cs[len('notifications('):-1]
+                                        if value_str.lower() in ('yes', 'true', 't', '1'):
                                             self.notificationsSetEnabledSignal.emit(True)
                                             self.sendmessage(QApplication.translate('Message','Notifications on'))
                                         else:
@@ -8983,17 +8986,17 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                             # keyboard(<bool>) enable/disable keyboard mode
                             elif cs.startswith('keyboard(') and cs.endswith(')'):
                                 try:
-                                    value = cs[len('keyboard('):-1]
-                                    if ((value.lower() in ('yes', 'true', 't', '1') and self.qmc.flagstart and self.keyboardmoveflag == 0) or
-                                        (value.lower() not in ('yes', 'true', 't', '1') and self.keyboardmoveflag == 1)):
+                                    value_str = cs[len('keyboard('):-1]
+                                    if ((value_str.lower() in ('yes', 'true', 't', '1') and self.qmc.flagstart and self.keyboardmoveflag == 0) or
+                                        (value_str.lower() not in ('yes', 'true', 't', '1') and self.keyboardmoveflag == 1)):
                                         self.moveButtonSignal.emit('enter')
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             # keepON(<bool>) enable/disable Keep ON mode
                             elif cs.startswith('keepON(') and cs.endswith(')'):
                                 try:
-                                    value = cs[len('keepON('):-1]
-                                    if value.lower() in ('yes', 'true', 't', '1'):
+                                    value_str = cs[len('keepON('):-1]
+                                    if value_str.lower() in ('yes', 'true', 't', '1'):
                                         self.qmc.flagKeepON = True
                                         self.sendmessage(QApplication.translate('Message','Keep ON enabled'))
                                     else:
@@ -9072,12 +9075,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                 try:
                                     n = 3
                                     cs_split = cs[len('pulse('):-1].split(',')
-                                    channel,min_pulse,max_pulse = cs_split[0:n]
+                                    channel_str,min_pulse,max_pulse = cs_split[0:n]
                                     if len(cs_split)>n:
                                         sn = cs_split[n]
                                     else:
                                         sn = None
-                                    self.ser.phidgetRCpulse(int(channel),int(min_pulse),int(max_pulse),sn)
+                                    self.ser.phidgetRCpulse(int(channel_str),int(min_pulse),int(max_pulse),sn)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             elif cs.startswith('pos(') and len(cs) > 9:
@@ -9085,12 +9088,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                 try:
                                     n = 3
                                     cs_split = cs[len('pos('):-1].split(',')
-                                    channel,min_pos,max_pos = cs_split[0:n]
+                                    channel_str,min_pos,max_pos = cs_split[0:n]
                                     if len(cs_split)>n:
                                         sn = cs_split[n]
                                     else:
                                         sn = None
-                                    self.ser.phidgetRCpos(int(channel),float(min_pos),float(max_pos),sn)
+                                    self.ser.phidgetRCpos(int(channel_str),float(min_pos),float(max_pos),sn)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             elif cs.startswith('engaged(') and len(cs) > 11:
@@ -9098,12 +9101,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                 try:
                                     n = 2
                                     cs_split = cs[len('engaged('):-1].split(',')
-                                    channel,state = cs_split[0:n]
+                                    channel_str, state_str = cs_split[0:n]
                                     if len(cs_split)>n:
                                         sn = cs_split[n]
                                     else:
                                         sn = None
-                                    self.ser.phidgetRCengaged(int(channel),bool(int(state)),sn)
+                                    state_engaged:bool = bool(state_str.lower() in ('yes', 'true', 't', '1'))
+                                    self.ser.phidgetRCengaged(int(channel_str), state_engaged, sn)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             elif cs.startswith('set(') and len(cs) > 7:
@@ -9111,12 +9115,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                 try:
                                     n = 2
                                     cs_split = cs[len('set('):-1].split(',')
-                                    channel,pos = cs_split[0:n]
+                                    channel_str,pos = cs_split[0:n]
                                     if len(cs_split)>n:
                                         sn = cs_split[n]
                                     else:
                                         sn = None
-                                    self.ser.phidgetRCset(int(channel),toFloat(eval(pos)),sn) # pylint: disable=eval-used
+                                    self.ser.phidgetRCset(int(channel_str),toFloat(eval(pos)),sn) # pylint: disable=eval-used
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             elif cs.startswith('ramp(') and len(cs) > 8:
@@ -9124,12 +9128,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                 try:
                                     n = 2
                                     cs_split = s[len('ramp('):-1].split(',')
-                                    channel,state = cs_split[0:n]
+                                    channel_str,state_str = cs_split[0:n]
                                     if len(cs_split)>n:
                                         sn = cs_split[n]
                                     else:
                                         sn = None
-                                    self.ser.phidgetRCspeedRamping(int(channel),bool(int(state)),sn)
+                                    state_ramp:bool = bool(state_str.lower() in ('yes', 'true', 't', '1'))
+                                    self.ser.phidgetRCspeedRamping(int(channel_str), state_ramp, sn)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             elif cs.startswith('volt(') and len(cs) > 8:
@@ -9137,12 +9142,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                 try:
                                     n = 2
                                     cs_split = cs[len('volt('):-1].split(',')
-                                    channel,volt = cs_split[0:n]
+                                    channel_str,volt = cs_split[0:n]
                                     if len(cs_split)>n:
                                         sn = cs_split[n]
                                     else:
                                         sn = None
-                                    self.ser.phidgetRCvoltage(int(channel),float(volt),sn)
+                                    self.ser.phidgetRCvoltage(int(channel_str),float(volt),sn)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             elif cs.startswith('accel(') and len(cs) > 9:
@@ -9150,12 +9155,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                 try:
                                     n = 2
                                     cs_split = cs[len('accel('):-1].split(',')
-                                    channel,accel = cs_split[0:n]
+                                    channel_str,accel = cs_split[0:n]
                                     if len(cs_split)>n:
                                         sn = cs_split[n]
                                     else:
                                         sn = None
-                                    self.ser.phidgetRCaccel(int(channel),float(accel),sn)
+                                    self.ser.phidgetRCaccel(int(channel_str),float(accel),sn)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             elif cs.startswith('veloc(') and len(cs) > 9:
@@ -9163,12 +9168,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                 try:
                                     n = 2
                                     cs_split = cs[len('veloc('):-1].split(',')
-                                    channel,veloc = cs_split[0:n]
+                                    channel_str, veloc = cs_split[0:n]
                                     if len(cs_split)>n:
                                         sn = cs_split[n]
                                     else:
                                         sn = None
-                                    self.ser.phidgetRCveloc(int(channel),float(veloc),sn)
+                                    self.ser.phidgetRCveloc(int(channel_str), float(veloc), sn)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             elif cs.startswith('sleep('): # in seconds
@@ -9248,7 +9253,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     # read(request) request is a JSON request in brackets; full JSON response is bound to _
                     cmds = filter(None, cmd_str.split(';')) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                     for c in cmds:
-                        cs = c.strip().replace('_',str(self.ws.lastReadResult)) # the last read value can be accessed via the "_" symbol
+                        cs = c.strip()
+                        if self.ws.lastReadResult is not None:
+                            cs = cs.replace('_',str(self.ws.lastReadResult)) # the last read value can be accessed via the "_" symbol
                         # send(<json>) : send <json> request to connected WebSocket
                         if cs.startswith('send') and cs.endswith(')'):
                             try:
@@ -16509,11 +16516,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             #restore sliders
             settings.beginGroup('Sliders')
             if settings.contains('slidervisibilities'):
-                self.eventslidervisibilities = [toInt(x) for x in toList(settings.value('slidervisibilities',self.eventslidervisibilities))]
-                self.eventslideractions = [toInt(x) for x in toList(settings.value('slideractions',self.eventslideractions))]
+                self.eventslidervisibilities = list(map(toInt, toList(settings.value('slidervisibilities',self.eventslidervisibilities))))
+                self.eventslideractions = list(map(toInt, toList(settings.value('slideractions',self.eventslideractions))))
                 self.eventslidercommands = list(map(str,list(toStringList(settings.value('slidercommands',self.eventslidercommands)))))
-                self.eventslideroffsets = [toFloat(x) for x in toList(settings.value('slideroffsets',self.eventslideroffsets))]
-                self.eventsliderfactors = [toFloat(x) for x in toList(settings.value('sliderfactors',self.eventsliderfactors))]
+                self.eventslideroffsets = list(map(toFloat, toList(settings.value('slideroffsets',self.eventslideroffsets))))
+                self.eventsliderfactors = list(map(toFloat, toList(settings.value('sliderfactors',self.eventsliderfactors))))
             if settings.contains('eventsliderKeyboardControl'):
                 self.eventsliderKeyboardControl = bool(toBool(settings.value('eventsliderKeyboardControl',self.eventsliderKeyboardControl)))
             if settings.contains('slidermin'):
@@ -16710,6 +16717,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     self.buttonsize = toInt(settings.value('buttonsize',self.buttonsize))
                 if settings.contains('marklastbuttonpressed'):
                     self.mark_last_button_pressed = bool(toBool(settings.value('marklastbuttonpressed',self.mark_last_button_pressed)))
+                if settings.contains('showextrabuttontooltips'):
+                    self.show_extrabutton_tooltips = bool(toBool(settings.value('showextrabuttontooltips',self.show_extrabutton_tooltips)))
                 if settings.contains('buttonpalette_label'):
                     self.buttonpalette_label = toString(settings.value('buttonpalette_label',self.buttonpalette_label))
             settings.endGroup()
@@ -17966,6 +17975,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             settings.setValue('eventbuttontablecolumnwidths',self.eventbuttontablecolumnwidths)
             settings.setValue('buttonsize',self.buttonsize)
             settings.setValue('marklastbuttonpressed',self.mark_last_button_pressed)
+            settings.setValue('showextrabuttontooltips',self.show_extrabutton_tooltips)
             settings.setValue('buttonpalette_label',self.buttonpalette_label)
             settings.endGroup()
             settings.beginGroup('RoRlimits')
@@ -18871,8 +18881,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     #  . "energy": float in kWh
     #  . "co2": float in g
     #  . "co2kg": float in g
-    def profileRankingData(self,profile):
-        res = {}
+    def profileRankingData(self,profile) -> Dict[str, Any]:
+        res:Dict[str, Any] = {}
         # temp_unit
         res['temp_unit'] = profile['mode']
         timex = profile['timex']
@@ -18966,19 +18976,19 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     #  . "energy"
     #  . "co2"
     #  . "co2kg"
-    def rankingData2string(self,data,units=True) -> Dict[str,str]:
+    def rankingData2string(self,data:Dict[str, Any], units:bool=True) -> Dict[str,str]:
         res:Dict[str,str] = {}
-        res['charge_temp_num'] = (convertTemp(data['charge_temp'],(data['temp_unit'] if units else ''),self.qmc.mode) if 'charge_temp' in data else '0')
+        res['charge_temp_num'] = (f"{convertTemp(float(data['charge_temp']), (data['temp_unit'] if units else ''), self.qmc.mode):.2f}" if 'charge_temp' in data else '0')
         res['charge_temp'] = self.formatTemp(data,'charge_temp',data['temp_unit'],units)
-        res['FCs_time_num'] = (data['FCs_time'] if 'FCs_time' in data else '0')
+        res['FCs_time_num'] = (str(data['FCs_time']) if 'FCs_time' in data else '0')
         res['FCs_time'] = (self.eventtime2string(data['FCs_time']) if 'FCs_time' in data else '')
-        res['FCs_temp_num'] = (convertTemp(data['FCs_temp'],(data['temp_unit'] if units else ''),self.qmc.mode) if 'FCs_temp' in data else '0')
+        res['FCs_temp_num'] = (f"{convertTemp(float(data['FCs_temp']),(data['temp_unit'] if units else ''),self.qmc.mode):.2f}" if 'FCs_temp' in data else '0')
         res['FCs_temp'] = self.formatTemp(data,'FCs_temp',data['temp_unit'],units)
-        res['DROP_time_num'] = (data['DROP_time'] if 'DROP_time' in data else '0')
+        res['DROP_time_num'] = (str(data['DROP_time']) if 'DROP_time' in data else '0')
         res['DROP_time'] = (self.eventtime2string(data['DROP_time']) if 'DROP_time' in data else '')
-        res['DROP_temp_num'] = (convertTemp(data['DROP_temp'],(data['temp_unit'] if units else ''),self.qmc.mode) if 'DROP_temp' in data else '0')
+        res['DROP_temp_num'] = (f"{convertTemp(float(data['DROP_temp']),(data['temp_unit'] if units else ''),self.qmc.mode):.2f}" if 'DROP_temp' in data else '0')
         res['DROP_temp'] = self.formatTemp(data,'DROP_temp',data['temp_unit'],units)
-        res['color_num'] = (data['color'] if 'color' in data else '0')
+        res['color_num'] = (str(data['color']) if 'color' in data else '0')
         res['color'] = (f"{('#' if units else '' )}{data['color']}" if 'color' in data and data['color'] != 0 else '')
         res['cupping'] = f"{data['cupping']:.2f}"
         res['DRY_percent_num'] = (f"{data['DRY_percent']:.1f}" if 'DRY_percent' in data else '0')
@@ -19243,7 +19253,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         fmt = '{0:.1f}' if self.qmc.LCDdecimalplaces else '{0:.0f}'
         return (fmt.format(convertTemp(data[k],unit,self.qmc.mode)) + (self.qmc.mode if units else '') if k in data else '')
 
-    def rankingData2htmlentry(self,production_data,ranking_data,plot_color=None):
+    def rankingData2htmlentry(self, production_data, ranking_data:Dict[str, Any], plot_color=None):
         import string as libstring
         HTML_REPORT_TEMPLATE = """<tr>
 <td$color_code>$batch</td>
@@ -19294,15 +19304,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             title = title_html,
             in_num = (weight_fmt.format(pd['weight_in_num']) if 'weight_in_num' in pd else ''),
             weightin = pd.get('weight_in',''),
-            charge_temp_num = f"{rd['charge_temp_num']:.2f}",
+            charge_temp_num = rd['charge_temp_num'],
             charge_temp = rd['charge_temp'],
             FCs_time_num = rd['FCs_time_num'],
             FCs_time = rd['FCs_time'],
-            FCs_temp_num = f"{rd['FCs_temp_num']:.2f}",
+            FCs_temp_num = rd['FCs_temp_num'],
             FCs_temp = rd['FCs_temp'],
             DROP_time_num = rd['DROP_time_num'],
             DROP_time = rd['DROP_time'],
-            DROP_temp_num = f"{rd['DROP_temp_num']:.2f}",
+            DROP_temp_num = rd['DROP_temp_num'],
             DROP_temp = rd['DROP_temp'],
             DRY_percent_num = rd['DRY_percent_num'],
             DRY_percent = rd['DRY_percent'],
@@ -19314,7 +19324,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             AUC = rd['AUC'],
             loss_num = (f"{pd['weight_loss_num']:.2f}" if 'weight_loss_num' in pd else ''),
             weightloss = pd.get('weight_loss',''),
-            color_num = str(rd['color_num']),
+            color_num = rd['color_num'],
             color = rd['color'],
             cupping = rd['cupping'],
             energy = rd['energy'],
@@ -23247,18 +23257,21 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     #assigns tooltips to extra event buttons
     def settooltip(self):
         for i, bl in enumerate(self.buttonlist):
-            try:
-                tip = QApplication.translate('Tooltip','<b>Label</b>= ') + self.extraeventslabels[i] + '<br>'
-                tip += QApplication.translate('Tooltip','<b>Description </b>= ') + self.extraeventsdescriptions[i] + '<br>'
-                tip += QApplication.translate('Tooltip','<b>Type </b>= ') + self.qmc.etypesf(self.extraeventstypes[i]) + '<br>'
-                if self.extraeventstypes[i] != 4: # no tips for 4: no event type set
-                    tip += QApplication.translate('Tooltip','<b>Value </b>= ') + self.qmc.eventsvalues(self.extraeventsvalues[i]) + '<br>'
-                    #+ str(int(round((self.extraeventsvalues[i]-1)*10.)))  + "<br>"
-                tip += QApplication.translate('Tooltip','<b>Documentation </b>= ') + self.extraeventsactionstrings[i] + '<br>'
-                tip += QApplication.translate('Tooltip','<b>Button# </b>= ') + str(i+1)
-                bl.setToolTip(tip)
-            except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
+            if self.show_extrabutton_tooltips:
+                try:
+                    tip = QApplication.translate('Tooltip','<b>Label</b>= ') + self.extraeventslabels[i] + '<br>'
+                    tip += QApplication.translate('Tooltip','<b>Description </b>= ') + self.extraeventsdescriptions[i] + '<br>'
+                    tip += QApplication.translate('Tooltip','<b>Type </b>= ') + self.qmc.etypesf(self.extraeventstypes[i]) + '<br>'
+                    if self.extraeventstypes[i] != 4: # no tips for 4: no event type set
+                        tip += QApplication.translate('Tooltip','<b>Value </b>= ') + self.qmc.eventsvalues(self.extraeventsvalues[i]) + '<br>'
+                        #+ str(int(round((self.extraeventsvalues[i]-1)*10.)))  + "<br>"
+                    tip += QApplication.translate('Tooltip','<b>Documentation </b>= ') + self.extraeventsactionstrings[i] + '<br>'
+                    tip += QApplication.translate('Tooltip','<b>Button# </b>= ') + str(i+1)
+                    bl.setToolTip(tip)
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
+            else:
+                bl.setToolTip('')
 
     def update_extraeventbuttons_visibility(self):
         for i, bl in enumerate(self.buttonlist):
@@ -23435,7 +23448,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                             slider_visibilities:List[int] = ([int(y) for y in pk[9]] if len(pk)>9 else pal[i][9][:])
                             slider_actions:List[int] = ([int(y) for y in pk[10]] if len(pk)>10 else pal[i][10][:])
                             slider_commands:List[str] = ([str(y) for y in pk[11]] if len(pk)>11 else pal[i][11][:])
-                            slider_offsets:List[int] = ([int(y) for y in pk[12]] if len(pk)>12 else pal[i][12][:])
+                            slider_offsets:List[float] = ([float(y) for y in pk[12]] if len(pk)>12 else pal[i][12][:])
                             slider_factors:List[float] = ([float(y) for y in pk[13]] if len(pk)>13 else pal[i][13][:])
                             #
                             slider_quantifier_active:List[int] = ([int(y) for y in pk[14]] if len(pk)>14 else pal[i][14][:])

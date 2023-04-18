@@ -36,8 +36,11 @@ import dateutil.parser
 import logging
 import os
 import numpy
-from typing import Optional, Union, Any, Dict, List  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
+from typing import Optional, Union, Any, Dict, List, Tuple, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
 from typing_extensions import Final  # Python <=3.7
+
+if TYPE_CHECKING:
+    from artisanlib.types import ProfileData, ComputedProfileInformation # pylint: disable=unused-import
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -114,7 +117,7 @@ def fromFtoC(Ffloat: Optional[float]) -> Optional[float]:
     return (Ffloat - 32.0) * (5.0 / 9.0)
 
 
-def temp2C(temp: Optional[float],mode=None) -> Optional[float]:
+def temp2C(temp: Optional[float],mode:Optional[str] = None) -> Optional[float]:
     if (
         temp is not None and (mode == 'F' or (mode is None and config.app_window is not None and config.app_window.qmc is not None and
             config.app_window.qmc.mode == 'F'))
@@ -140,7 +143,7 @@ def RoRfromFtoC(Ffloat: Optional[float]) -> Optional[float]:
     return Ffloat * (5.0 / 9.0)
 
 
-def RoRtemp2C(temp: Optional[float],mode=None) -> Optional[float]:
+def RoRtemp2C(temp: Optional[float],mode:Optional[str] = None) -> Optional[float]:
     assert config.app_window is not None
     if (
         temp is not None and (mode == 'F' or (mode is None and config.app_window.qmc.mode == 'F'
@@ -207,9 +210,9 @@ def limittext(maxlen: int, s: Optional[str]) -> Optional[str]:
 # Dicts
 
 
-def addString2dict(dict_source, key_source, dict_target, key_target, maxlen):
-    if key_source in dict_source and dict_source[key_source]:
-        txt = limittext(maxlen, decodeLocal(dict_source[key_source]))
+def addString2dict(dict_source:'ProfileData', key_source:str, dict_target:Dict[str, Any], key_target:str, maxlen:int) -> None:
+    if key_source in dict_source and dict_source[key_source]: # type:ignore # TypedDict key must be a string literal; expected one of (
+        txt = limittext(maxlen, decodeLocal(dict_source[key_source])) # type:ignore # TypedDict key must be a string literal; expected one of
         if txt is not None:
             dict_target[key_target] = txt
 
@@ -219,17 +222,17 @@ def addString2dict(dict_source, key_source, dict_target, key_target, maxlen):
 # numbers beyond the given limit are replaced by None
 # Note: None and 0 values are just dropped and no entry is added
 def addNum2dict(
-    dict_source,
-    key_source,
-    dict_target,
-    key_target,
-    minn,
-    maxn,
-    digits,
+    dict_source:Union['ProfileData', 'ComputedProfileInformation'],
+    key_source:str,
+    dict_target:Dict[str, Any],
+    key_target:str,
+    minn:Optional[float],
+    maxn:Optional[float],
+    digits:int,
     factor:float=1.,
-):
-    if key_source in dict_source and dict_source[key_source]:
-        n = dict_source[key_source]
+) -> None:
+    if key_source in dict_source and dict_source[key_source]: # type: ignore # TypedDict key must be a string literal; expected one of
+        n = dict_source[key_source]  # type:ignore # TypedDict key must be a string literal; expected one of
         if n is not None and factor is not None:
             n = n * factor
         n = limitnum(minn, maxn, n)  # may return None
@@ -243,14 +246,14 @@ def addNum2dict(
 # if min or max is None, the corresponding limit is not enforced, otherwise
 # numbers beyond the given limit are replaced by None
 def addAllNum2dict(
-    dict_source,
-    dict_target,
-    key_source_target_pairs,
-    minn,
-    maxn,
-    digits,
+    dict_source:Union['ProfileData', 'ComputedProfileInformation'],
+    dict_target:Dict[str, Any],
+    key_source_target_pairs:List[Union[str, Tuple[str,str]]],
+    minn:Optional[float],
+    maxn:Optional[float],
+    digits:int,
     factor:float=1.,
-):
+) -> None:
     for p in key_source_target_pairs:
         if isinstance(p, tuple):
             (key_source, key_target) = p
@@ -268,16 +271,16 @@ def addAllNum2dict(
         )
 
 
-def addTime2dict(dict_source, key_source, dict_target, key_target):
-    if key_source in dict_source and dict_source[key_source]:
-        tx = limittime(dict_source[key_source])
+def addTime2dict(dict_source:Union['ProfileData', 'ComputedProfileInformation'], key_source:str, dict_target:Dict[str, Any], key_target:str) -> None:
+    if key_source in dict_source and dict_source[key_source]:  # type:ignore # TypedDict key must be a string literal; expected one of
+        tx = limittime(dict_source[key_source])  # type:ignore # TypedDict key must be a string literal; expected one of
         if tx is not None:
             dict_target[key_target] = float2floatMin(tx)
 
 
 # consumes a list of source-target pairs, or just strings used as both source
 # and target key, to be processed with add2dict
-def addAllTime2dict(dict_source, dict_target, key_source_target_pairs):
+def addAllTime2dict(dict_source:Union['ProfileData', 'ComputedProfileInformation'], dict_target:Dict[str, Any], key_source_target_pairs:List[Union[str,Tuple[str,str]]]) -> None:
     for p in key_source_target_pairs:
         if isinstance(p, tuple):
             (key_source, key_target) = p
@@ -287,21 +290,21 @@ def addAllTime2dict(dict_source, dict_target, key_source_target_pairs):
 
 
 # mode indicates the temperature unit, "C" or "F", of the data if not None
-def addTemp2dict(dict_source, key_source, dict_target, key_target, mode=None):
-    if key_source in dict_source and dict_source[key_source]:
-        temp = limittemp(temp2C(dict_source[key_source],mode))
+def addTemp2dict(dict_source:Union['ProfileData', 'ComputedProfileInformation'], key_source:str, dict_target:Dict[str, Any], key_target:str, mode=None) -> None:
+    if key_source in dict_source and dict_source[key_source]:  # type:ignore # TypedDict key must be a string literal; expected one of
+        temp = limittemp(temp2C(dict_source[key_source],mode))  # type:ignore # TypedDict key must be a string literal; expected one of
         if temp is not None and temp != -1 and not numpy.isnan(temp):
             dict_target[key_target] = float2floatMin(temp)
 
-def addTempDiff2dict(dict_source, key_source, dict_target, key_target):
-    if key_source in dict_source and dict_source[key_source]:
-        temp = limittemp(tempDiff2C(dict_source[key_source]))
+def addTempDiff2dict(dict_source:Union['ProfileData', 'ComputedProfileInformation'], key_source:str, dict_target:Dict[str, Any], key_target:str) -> None:
+    if key_source in dict_source and dict_source[key_source]:  # type:ignore # TypedDict key must be a string literal; expected one of
+        temp = limittemp(tempDiff2C(dict_source[key_source]))  # type:ignore # TypedDict key must be a string literal; expected one of
         if temp is not None and temp != -1 and not numpy.isnan(temp):
             dict_target[key_target] = float2floatMin(temp)
 
 # consumes a list of source-target pairs, or just strings used as both source
 # and target key, to be processed with add2dict
-def addAllTemp2dict(dict_source, dict_target, key_source_target_pairs):
+def addAllTemp2dict(dict_source:Union['ProfileData', 'ComputedProfileInformation'], dict_target:Dict[str, Any], key_source_target_pairs:List[Union[str,Tuple[str,str]]]) -> None:
     for p in key_source_target_pairs:
         if isinstance(p, tuple):
             (key_source, key_target) = p
@@ -311,18 +314,18 @@ def addAllTemp2dict(dict_source, dict_target, key_source_target_pairs):
 
 
 # mode indicates the temperature unit, "C" or "F", of the data if not None
-def addRoRTemp2dict(dict_source, key_source, dict_target, key_target, mode=None):
-    if key_source in dict_source and dict_source[key_source]:
-        temp = limittemp(RoRtemp2C(dict_source[key_source],mode))
+def addRoRTemp2dict(dict_source:Union['ProfileData', 'ComputedProfileInformation'], key_source:str, dict_target:Dict[str, Any], key_target:str, mode:Optional[str]=None) -> None:
+    if key_source in dict_source and dict_source[key_source]:  # type:ignore # TypedDict key must be a string literal; expected one of
+        temp = limittemp(RoRtemp2C(dict_source[key_source],mode))  # type:ignore # TypedDict key must be a string literal; expected one of
         if temp is not None:
             dict_target[key_target] = float2floatMin(temp)
 
 
 # returns extends dict_target by item with key_target holding the
 # dict_source[key_source] value if key_source in dict_source and not empty
-def add2dict(dict_source, key_source, dict_target, key_target):
-    if key_source in dict_source and dict_source[key_source]:
-        dict_target[key_target] = dict_source[key_source]
+def add2dict(dict_source:'ProfileData', key_source:str, dict_target:Dict[str, Any], key_target:str) -> None:
+    if key_source in dict_source and dict_source[key_source]:  # type:ignore # TypedDict key must be a string literal; expected one of
+        dict_target[key_target] = dict_source[key_source]  # type:ignore # TypedDict key must be a string literal; expected one of
 
 
 def getLanguage() -> str:
@@ -343,18 +346,18 @@ def getLanguage() -> str:
 
 # if rlimit = -1 or rused = -1 or pu = "", no update information is available and the state is not updated
 @pyqtSlot(float,float,str,int,list)
-def updateLimits(rlimit:float, rused:float, pu:str, notifications:int, machines: List[str]):  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
+def updateLimits(rlimit:float, rused:float, pu:str, notifications:int, machines: List[str]) -> None:  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
     if config.app_window:
         config.app_window.updateLimits(rlimit, rused, pu, notifications, machines)
 
 # takes the JSON response dict and returns the account state as tuple
 # rlimit:float, rused:float, pu:str, notifications:int
-def extractAccountState(response: dict):
-    rlimit = -1
-    rused = -1
-    pu = ''
-    notifications = 0 # unqualified notifications
-    machines = [] # list of machine names with matching notifications
+def extractAccountState(response: Dict) -> Tuple[float, float, str, int, List[str]]:
+    rlimit:float = -1.
+    rused:float = -1.
+    pu:str = ''
+    notifications:int = 0 # unqualified notifications
+    machines:List[str] = [] # list of machine names with matching notifications
     try:
         if response:
             if 'ol' in response:
@@ -376,7 +379,7 @@ def extractAccountState(response: dict):
     return rlimit, rused, pu, notifications, machines
 
 @pyqtSlot(dict)
-def updateLimitsFromResponse(response: dict):
+def updateLimitsFromResponse(response: Dict) -> None:
     rlimit,rused,pu,notifications,machines = extractAccountState(response)
     updateLimits(rlimit,rused,pu,notifications,machines)
 

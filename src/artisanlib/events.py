@@ -77,7 +77,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.eventslidervisibilities:List[int] = [0,0,0,0]
         self.eventslideractions:List[int] = [0,0,0,0]
         self.eventslidercommands:List[str] = ['','','','']
-        self.eventslideroffsets:List[int] = [0,0,0,0]
+        self.eventslideroffsets:List[float] = [0.,0.,0.,0.]
         self.eventsliderfactors:List[float] = [1.0,1.0,1.0,1.0]
         self.eventslidermin:List[int] = [0,0,0,0]
         self.eventslidermax:List[int] = [100,100,100,100]
@@ -549,6 +549,9 @@ class EventsDlg(ArtisanResizeablDialog):
         self.markLastButtonPressed = QCheckBox(QApplication.translate('CheckBox','Mark last pressed'))
         self.markLastButtonPressed.setChecked(self.aw.mark_last_button_pressed)
         self.markLastButtonPressed.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.showExtraButtonTooltips = QCheckBox(QApplication.translate('CheckBox','Tooltips'))
+        self.showExtraButtonTooltips.setChecked(self.aw.show_extrabutton_tooltips)
+        self.showExtraButtonTooltips.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         #table for showing events
         self.eventbuttontable = QTableWidget()
         self.eventbuttontable.setTabKeyNavigation(True)
@@ -1295,6 +1298,8 @@ class EventsDlg(ArtisanResizeablDialog):
         nbuttonslayout.addWidget(self.colorSpinBox)
         nbuttonslayout.addSpacing(10)
         nbuttonslayout.addWidget(self.markLastButtonPressed)
+        nbuttonslayout.addSpacing(10)
+        nbuttonslayout.addWidget(self.showExtraButtonTooltips)
         nbuttonslayout.addStretch()
         tab2buttonlayout = QHBoxLayout()
         tab2buttonlayout.addWidget(addButton)
@@ -2025,9 +2030,9 @@ class EventsDlg(ArtisanResizeablDialog):
             else:
                 self.aw.eventslidercommands = ['','','','']
             if len(copy)>12 and len(copy[12]) == 4:
-                self.aw.eventslideroffsets = cast(List[int], copy[12][:])
+                self.aw.eventslideroffsets = cast(List[float], copy[12][:])
             else:
-                self.aw.eventslideroffsets = [0,0,0,0]
+                self.aw.eventslideroffsets = [0., 0., 0., 0.]
             if len(copy)>13 and len(copy[13]) == 4:
                 self.aw.eventsliderfactors = cast(List[float], copy[13][:])
             else:
@@ -3138,6 +3143,7 @@ class EventsDlg(ArtisanResizeablDialog):
             self.closeHelp()
             self.aw.buttonsize = self.nbuttonsSizeBox.currentIndex()
             self.aw.mark_last_button_pressed = self.markLastButtonPressed.isChecked()
+            self.aw.show_extrabutton_tooltips = self.showExtraButtonTooltips.isChecked()
             self.aw.buttonpalette_label = self.transferpalettecurrentLabelEdit.text()
             self.savetableextraeventbutton()
             # save column widths

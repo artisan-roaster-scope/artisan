@@ -579,8 +579,8 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1045_changeTriggersValues.insert(1,0.02)
         self.phidget1045_changeTriggersStrings.insert(1,'0.05C')
         self.phidget1045_changeTriggersStrings.insert(1,'0.02C')
-        self.phidget1045_emissivity = 1.0
-        self.phidget1045_dataRate = 256
+        self.phidget1045_emissivity:float = 1.0
+        self.phidget1045_dataRate:int = 256
 
         self.phidget1200_async:bool = False
         self.phidget1200_formula:int = 0
@@ -12050,8 +12050,8 @@ class tgraphcanvas(FigureCanvas):
                 self.aw.buttonCHARGE.stopAnimation()
                 try:
                     fmt = '%.1f' if self.LCDdecimalplaces else '%.0f'
-                    bt = fmt%self.temp2[self.timeindex[0]] + self.mode
-                    message = QApplication.translate('Message','Roast time starts now 00:00 BT = {0}').format(bt)
+                    bt_str = fmt%self.temp2[self.timeindex[0]] + self.mode
+                    message = QApplication.translate('Message','Roast time starts now 00:00 BT = {0}').format(bt_str)
                     self.aw.sendmessage(message)
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
@@ -13088,6 +13088,9 @@ class tgraphcanvas(FigureCanvas):
                     Nevents = len(self.specialevents)
                     #if in manual mode record first the last point in self.timex[]
                     if self.device == 18 and self.aw.simulator is None:
+                        tx:float
+                        et:float
+                        bt:float
                         if not doupdategraphics and not doupdatebackground: # a call from a multiple event action
                             tx,et,bt = self.timeclock.elapsed()/1000.,-1,-1
                         else:

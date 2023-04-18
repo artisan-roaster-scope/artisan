@@ -1147,16 +1147,16 @@ class PIDcontrol():
         self.svSlider:bool = False
         self.svButtons:bool = False
         self.svMode:int = 0 # 0: manual, 1: Ramp/Soak, 2: Follow (background profile)
-        self.svLookahead = 0
-        self.dutySteps = 1
-        self.svSliderMin = 0
-        self.svSliderMax = 230
-        self.svValue = 180 # the value in the setSV textinput box of the PID dialog
-        self.dutyMin = -100
-        self.dutyMax = 100
-        self.pidKp = 15.0
-        self.pidKi = 0.01
-        self.pidKd = 20.0
+        self.svLookahead:int = 0
+        self.dutySteps:int = 1
+        self.svSliderMin:int = 0
+        self.svSliderMax:int = 230
+        self.svValue:float = 180 # the value in the setSV textinput box of the PID dialog
+        self.dutyMin:int = -100
+        self.dutyMax:int = 100
+        self.pidKp:float = 15.0
+        self.pidKi:float = 0.01
+        self.pidKd:float = 20.0
         # Proposional on Measurement mode see: http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/
         self.pOnE:bool = True # True for Proposional on Error mode, False for Proposional on Measurement Mode
         # pidSource
@@ -1251,8 +1251,8 @@ class PIDcontrol():
         try:
             self.aw.qmc.rampSoakSemaphore.acquire(1)
             self.svValue = fromCtoF(self.svValue)
-            self.svSliderMin = fromCtoF(self.svSliderMin)
-            self.svSliderMax = fromCtoF(self.svSliderMax)
+            self.svSliderMin = int(round(fromCtoF(self.svSliderMin)))
+            self.svSliderMax = int(round(fromCtoF(self.svSliderMax)))
             # establish ne limits on sliders
             self.aw.sliderSV.setMinimum(int(round(self.svSliderMin)))
             self.aw.sliderSV.setMaximum(int(round(self.svSliderMax)))
