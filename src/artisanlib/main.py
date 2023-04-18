@@ -24240,7 +24240,7 @@ def initialize_locale(my_app) -> str:
     else:
         locale = ''
 
-    supported_languages = [
+    supported_languages:List[str] = [
         'ar',
         'da',
         'de',
@@ -24270,7 +24270,6 @@ def initialize_locale(my_app) -> str:
         'tr',
         'uk',
         'vi',
-        'zh',
         'zh_CN',
         'zh_TW',
     ]
@@ -24280,14 +24279,26 @@ def initialize_locale(my_app) -> str:
             from Cocoa import NSUserDefaults # type: ignore  # @UnresolvedImport # pylint: disable=import-error
             defs = NSUserDefaults.standardUserDefaults()
             langs = defs.objectForKey_('AppleLanguages')
-            if langs.objectAtIndex_(0)[:3] == 'zh_' or langs.objectAtIndex_(0)[:3] == 'pt_':
+            if langs.objectAtIndex_(0)[:7] == 'zh_Hans':
+                locale = 'zh_CN'
+            elif langs.objectAtIndex_(0)[:7] == 'zh_Hant':
+                locale = 'zh_TW'
+            elif len(langs.objectAtIndex_(0))>4 and (langs.objectAtIndex_(0)[:3] == 'zh_' or langs.objectAtIndex_(0)[:3] == 'pt_'):
                 locale = langs.objectAtIndex_(0)[:5]
             else:
                 locale = langs.objectAtIndex_(0)[:2]
-        elif QLocale.system().name()[:2] == 'zh_' or QLocale.system().name()[:2] == 'pt_':
-            locale = QLocale.system().name()[:5]
         else:
-            locale = QLocale.system().name()[:2]
+            lname = QLocale.system().name()
+            if lname[:7] == 'zh_Hans':
+                locale = 'zh_CN'
+            elif lname[:7] == 'zh_Hant':
+                locale = 'zh_TW'
+            elif len(lname)>4 and (lname[:2] == 'zh_' or lname[:2] == 'pt_'):
+                locale = lname[:5]
+            else:
+                locale = lname[:2]
+        if locale == 'zh':
+            locale = 'zh_CN'
         if locale in supported_languages:
             QSettings().setValue('locale', locale)
 

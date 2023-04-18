@@ -80,7 +80,7 @@ class PhidgetManager():
 #        _log.debug("addChannel: %s %s", channel, type(channel))
         try:
             self.managersemaphore.acquire(1)
-            state = True
+            state:bool = True
             try:
                 # reserve all channels with the same hubport on the same hub
                 hub = channel.getHub()

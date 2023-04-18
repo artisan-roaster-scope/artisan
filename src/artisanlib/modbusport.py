@@ -239,8 +239,10 @@ class modbusport():
                 # as in the following the port is None, no port is opened on creation of the (py)serial object
                 if self.type == 1: # Serial ASCII
                     from pymodbus.client import ModbusSerialClient
+                    from pymodbus.transaction import ModbusAsciiFramer
                     self.master = ModbusSerialClient(
-                        method='ascii',
+                        framer=ModbusAsciiFramer,
+                        #method='ascii', # depricated in pymodbus 3.x
                         port=self.comport,
                         baudrate=self.baudrate,
                         bytesize=self.bytesize,
@@ -257,8 +259,10 @@ class modbusport():
                     self.readRetries = self.serial_readRetries
                 elif self.type == 2: # Serial Binary
                     from pymodbus.client import ModbusSerialClient # @Reimport
+                    from pymodbus.transaction import ModbusBinaryFramer
                     self.master = ModbusSerialClient(
-                        method='binary',
+                        framer=ModbusBinaryFramer,
+                        #method='binary', # depricated in pymodbus 3.x
                         port=self.comport,
                         baudrate=self.baudrate,
                         bytesize=self.bytesize,
@@ -319,8 +323,10 @@ class modbusport():
                             )
                 else: # Serial RTU
                     from pymodbus.client import ModbusSerialClient # @Reimport
+                    from pymodbus.transaction import ModbusRtuFramer
                     self.master = ModbusSerialClient(
-                        method='rtu',
+                        framer=ModbusRtuFramer,
+                        #method='rtu', # depricated in pymodbus 3.x
                         port=self.comport,
                         baudrate=self.baudrate,
                         bytesize=self.bytesize,
