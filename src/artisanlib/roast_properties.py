@@ -3205,10 +3205,10 @@ class editGraphDlg(ArtisanResizeablDialog):
 
                 #
                 if metrics['CO2_batch'] >= 0:
-                    scaled_co2_batch = f"{scaleFloat2String(metrics['CO2_batch'])}g' if metrics['CO2_batch']<1000 else f'{scaleFloat2String(metrics['CO2_batch']/1000.)}kg"
+                    scaled_co2_batch = f"{scaleFloat2String(metrics['CO2_batch'])}g" if metrics['CO2_batch']<1000 else f"{scaleFloat2String(metrics['CO2_batch']/1000.)}kg"
                     self.energy_ui.totalCO2Label.setText(f'{scaled_co2_batch}')
                     #
-                    scaled_co2_preheat = f"{scaleFloat2String(metrics['CO2_preheat'])}g' if metrics['CO2_preheat']<1000 else f'{scaleFloat2String(metrics['CO2_preheat']/1000.)}kg"
+                    scaled_co2_preheat = f"{scaleFloat2String(metrics['CO2_preheat'])}g" if metrics['CO2_preheat']<1000 else f"{scaleFloat2String(metrics['CO2_preheat']/1000.)}kg"
                     self.energy_ui.preheatCO2label.setText(f"{scaled_co2_preheat} ({QApplication.translate('Label','Preheat')})")
                     scaled_co2_bbp = f"{scaleFloat2String(metrics['CO2_bbp'])}g" if metrics['CO2_bbp']<1000 else f"{scaleFloat2String(metrics['CO2_bbp']/1000.)}kg"
                     self.energy_ui.BBPCO2label.setText(f"{scaled_co2_bbp} ({QApplication.translate('Label','BBP')})")

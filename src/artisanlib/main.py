@@ -10746,12 +10746,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             _log.exception(e)
         return filename
 
-    #replace fields delimited as %field% with the corresponding value
+    #replace autosave delimited fields with the corresponding value
     #previewmode 0=not preview, 1=preview for while recording, 2=preview for while not recording
     def parseAutosaveprefix(self,fn,previewmode=0):
         try:
-            currtime = QDateTime.currentDateTime().toString('hhmmss')
-
             #single, leading delimiter for the fields
             fieldDelim = '~'  #note this value is hard coded in autosavefields
             #delimiter for ON only
@@ -10759,13 +10757,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             #delimiter for OFF only
             offDelim = '"'
 
-            #it is text only when there are no disallowed characters, so add the date for backward compatibility and return.
-#            if fn == self.removeDisallowedFilenameChars(str(fn)):
+            # when there are no tildes simply add the date for backward compatibility and return.
             if fieldDelim not in fn:
-                fn += '_' + self.qmc.roastdate.toString('yy-MM-dd_hhmm')
-                return fn
+                return f"{fn}_{self.qmc.roastdate.toString('yy-MM-dd_hhmm')}"
 
-            #newlines can sneak in from cut and paste from help page
+            #create the autosave filename
+            #  newlines can sneak in from cut and paste from help page
             fn = fn.replace('\n', '')
 
             #if flagon then the batchcounter has not yet been incremented so we do that here
@@ -10786,34 +10783,53 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             firstline = re.match(r'([^\n]*)',self.qmc.cuppingnotes)
             cuppingnotesline = firstline.group(0) if firstline else ''
 
+            #pull in the compute profle data
+            #note cp[] values of type float always have one decimal place
             cp = self.computedProfileInformation()
+
+            #build *_long times
+            if 'FCs_time' in cp:
+                m, s = divmod(cp['FCs_time'], 60)
+                fcstime_long = f'{int(m):02.0f}_{int(s):02.0f}'
+            else:
+                fcstime_long = '00_00'
             if 'DROP_time' in cp:
                 m, s = divmod(cp['DROP_time'], 60)
                 droptime_long = f'{int(m):02.0f}_{int(s):02.0f}'
             else:
                 droptime_long = '00_00'
+
+            # build dtr, devtime and devtime_long
             if 'DROP_time' in cp and 'FCs_time' in cp and cp['DROP_time'] > 0 and cp['DROP_time'] > cp['FCs_time']:
                 devtime_int = int(cp['DROP_time'] - cp['FCs_time'])
                 devtime = str(devtime_int)
                 m, s = divmod(devtime_int, 60)
                 devtime_long = f'{int(m):02.0f}_{int(s):02.0f}'
-                dtr = str(self.float2float(100 * (cp['DROP_time'] - cp['FCs_time'])/cp['DROP_time'],1))
+                dtr = f"{self.float2float(100 * (cp['DROP_time'] - cp['FCs_time'])/cp['DROP_time'],1)}"
             else:
                 devtime = '0'
                 devtime_long = '00_00'
                 dtr = '0.0'
-            if 'green_density' in cp and 'roasted_density' in cp:
-                density_loss = str(self.float2float(100 *(cp['green_density'] - cp['roasted_density']) / cp['green_density'],1))
-            else:
-                density_loss = '0.0'
 
-            #note: since fields are delimited only at the start, to avoid ambiguity requires the shortest field string to be last in the list.  Example, "date_time" must come before "date" in the list.
+            #calculate density loss
+            if 'green_density' in cp and 'roasted_density' in cp:
+                density_loss = f"{self.float2float(100 *(cp['green_density'] - cp['roasted_density']) / cp['green_density'],1)}"
+            else:
+                density_loss = '0'
+
+            # respect the Decimal Places setting (in Curves>> UI) for fields that are stored as float
+            def setdecimal(rawvalue) -> str:
+                return f'{rawvalue:.1f}' if self.qmc.LCDdecimalplaces else f'{rawvalue:.0f}'
+
+            #note: fields are delimited only at the start, to avoid ambiguity the shortest similar field string 
+            #      must be last in the list.  Example, "date_time" must come before "date" in the list.
+            fields : List[Tuple[str,str]]
             fields = [
-                ('batch_long', self.qmc.roastbatchprefix + str(bnr) + ' (' + str(self.qmc.roastbatchpos) + ')'),
+                ('batch_long',f'{self.qmc.roastbatchprefix}{bnr} ({self.qmc.roastbatchpos})'),
                 ('batchprefix',self.qmc.roastbatchprefix),
-                ('batchcounter',str(bnr)),
-                ('batchposition',str(self.qmc.roastbatchpos)),
-                ('batch', self.qmc.roastbatchprefix + str(bnr)),
+                ('batchcounter',f'{bnr}'),
+                ('batchposition',f'{self.qmc.roastbatchpos}'),
+                ('batch',f'{self.qmc.roastbatchprefix}{bnr}'),
                 ('title',self.qmc.title),
                 ('datetime_long',self.qmc.roastdate.toString('yyyy-MM-dd_hhmm')),
                 ('datetime',self.qmc.roastdate.toString('yy-MM-dd_hhmm')),
@@ -10823,52 +10839,59 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 ('operator',self.qmc.operator),
                 ('organization',self.qmc.organization),
                 ('machine',self.qmc.roastertype),
-                ('capacity',self.qmc.roastersize),
-                ('drumspeed',self.qmc.drumspeed),
-                ('weightloss',str(cp['weight_loss']) if 'weight_loss' in cp else '0.0'),
-                ('volumegain',str(cp['volume_gain']) if 'volume_gain' in cp else '0.0'),
+                ('capacity',f'{self.qmc.roastersize}'),
+                ('drumspeed',f'{self.qmc.drumspeed}'),
+                ('mode',self.qmc.mode),
+                ('test',setdecimal(cp['finish_phase_delta_temp']) if 'test' in cp else setdecimal(0.0)),
+                ('weightloss',f"{cp['weight_loss']}" if 'weight_loss' in cp else '0'),
+                ('volumegain',f"{cp['volume_gain']}" if 'volume_gain' in cp else '0'),
                 ('densityloss',density_loss),
-                ('moistureloss',str(cp['moisture_loss']) if 'moisture_loss' in cp else '0.0'),
+                ('moistureloss',f"{cp['moisture_loss']}" if 'moisture_loss' in cp else '0'),
                 ('weightunits',self.qmc.weight[2]),
-                ('weight',str(self.qmc.weight[0])),
+                ('weight',f'{self.qmc.weight[0]}'),
                 ('volumeunits',self.qmc.volume[2]),
-                ('volume',str(self.qmc.volume[0])),
-                ('densityunits',self.qmc.density[1] + '_' + self.qmc.density[3]),
-                ('density',str(self.qmc.density[0])),
-                ('moisture',str(self.qmc.moisture_greens)),
+                ('volume',f'{self.qmc.volume[0]}'),
+                ('densityunits',f'{self.qmc.density[1]}_{self.qmc.density[3]}'),
+                ('density',f'{self.qmc.density[0]}'),
+                ('moisture',f'{self.qmc.moisture_greens}'),
                 ('beans_line',beansline),
                 ('beans_10',beansline[:10]),
                 ('beans_15',beansline[:15]),
                 ('beans_20',beansline[:20]),
                 ('beans_25',beansline[:25]),
                 ('beans_30',beansline[:30]),
-                ('beans',beansline[:30]),   #undocumented, remains here for hidden backward compatibility with v2.4RC
-                ('roastedweight',str(self.float2float(float(self.qmc.weight[1]),1))),
-                ('roastedvolume',str(self.float2float(float(self.qmc.volume[1]),1))),
-                ('roasteddensity',str(self.float2float(float(self.qmc.density_roasted[0]),1))),
-                ('roastedmoisture',str(self.float2float(float(self.qmc.moisture_roasted)))),
-                ('colorwhole',str(self.qmc.whole_color)),
-                ('colorground',str(self.qmc.ground_color)),
-                ('colorsystem',str(self.qmc.color_systems[self.qmc.color_system_idx])),
-                ('screenmax',str(self.qmc.beansize_max)),
-                ('screenmin',str(self.qmc.beansize_min)),
-                ('greenstemp',str(self.float2float(float(self.qmc.greens_temp)))),
-                ('ambtemp',str(cp['ambient_temperature']) if 'ambient_temperature' in cp else '0.0'),
-                ('ambhumidity',str(cp['ambient_humidity']) if 'ambient_humidity' in cp else '0.0'),
-                ('ambpressure',str(cp['ambient_pressure']) if 'ambient_pressure' in cp else '0.0'),
-                ('aucbase',str(cp['AUCbase']) if 'AUCbase' in cp else '0'),
-                ('auc',str(cp['AUC']) if 'AUC' in cp else '0'),
-                ('chargeet',str(cp['CHARGE_ET']) if 'CHARGE_ET' in cp else '0.0'),
-                ('chargebt',str(cp['CHARGE_BT']) if 'CHARGE_BT' in cp else '0.0'),
-                ('fcset',str(cp['FCs_ET']) if 'FCs_ET' in cp else '0.0'),
-                ('fcsbt',str(cp['FCs_BT']) if 'FCs_BT' in cp else '0.0'),
-                ('dropet',str(cp['DROP_ET']) if 'DROP_ET' in cp else '0.0'),
-                ('dropbt',str(cp['DROP_BT']) if 'DROP_BT' in cp else '0.0'),
-                ('droptime_long', droptime_long),
-                ('droptime',str(int(cp['DROP_time'])) if 'DROP_time' in cp else '0'),
-                ('devtime_long', devtime_long),
-                ('devtime', devtime),
-                ('dtr', dtr),
+                ('beans',beansline[:30]),   #deprecated, undocumented, remains here for hidden backward compatibility with v2.4RC
+                ('roastedweight',f'{self.float2float(float(self.qmc.weight[1]),1)}'),
+                ('roastedvolume',f'{self.float2float(float(self.qmc.volume[1]),1)}'),
+                ('roasteddensity',f'{self.float2float(float(self.qmc.density_roasted[0]),1)}'),
+                ('roastedmoisture',f'{self.float2float(float(self.qmc.moisture_roasted))}'),
+                ('colorwhole',f'{self.qmc.whole_color}'),
+                ('colorground',f'{self.qmc.ground_color}'),
+                ('colorsystem',f'{self.qmc.color_systems[self.qmc.color_system_idx]}'),
+                ('screenmax',f'{self.qmc.beansize_max}'),
+                ('screenmin',f'{self.qmc.beansize_min}'),
+                ('greenstemp',f'{self.float2float(float(self.qmc.greens_temp))}'),
+                ('ambtemp',f"{cp['ambient_temperature']}" if 'ambient_temperature' in cp else '0'),
+                ('ambhumidity',f"{cp['ambient_humidity']}" if 'ambient_humidity' in cp else '0'),
+                ('ambpressure',f"{cp['ambient_pressure']}" if 'ambient_pressure' in cp else '0'),
+                ('aucbase',f"{cp['AUCbase']}" if 'AUCbase' in cp else '0'),
+                ('auc',f"{cp['AUC']}" if 'AUC' in cp else '0'),
+                ('chargeet',setdecimal(cp['CHARGE_ET']) if 'CHARGE_ET' in cp else setdecimal(0.0)),
+                ('chargebt',setdecimal(cp['CHARGE_BT']) if 'CHARGE_BT' in cp else setdecimal(0.0)),
+                ('fcset',setdecimal(cp['FCs_ET']) if 'FCs_ET' in cp else setdecimal(0.0)),
+                ('fcsbt',setdecimal(cp['FCs_BT']) if 'FCs_BT' in cp else setdecimal(0.0)),
+                ('fcstime_long',fcstime_long),
+                ('fcstime',f"{int(cp['FCs_time'])}" if 'FCs_time' in cp else '0'),
+                ('dropet',setdecimal(cp['DROP_ET']) if 'DROP_ET' in cp else setdecimal(0.0)),
+                ('dropbt',setdecimal(cp['DROP_BT']) if 'DROP_BT' in cp else setdecimal(0.0)),
+                ('droptime_long',droptime_long),
+                ('droptime',f"{int(cp['DROP_time'])}" if 'DROP_time' in cp else '0'),
+                ('devtime_long',devtime_long),
+                ('devtime',devtime),
+                ('dtr',dtr),
+                ('dryphasedeltatemp',setdecimal(cp['dry_phase_delta_temp']) if 'dry_phase_delta_temp' in cp else setdecimal(0.0)),  #dave NEW TODO add to help file
+                ('midphasedeltatemp',setdecimal(cp['mid_phase_delta_temp']) if 'mid_phase_delta_temp' in cp else setdecimal(0.0)),  #dave NEW TODO add to help file
+                ('finishphasedeltatemp',setdecimal(cp['finish_phase_delta_temp']) if 'finish_phase_delta_temp' in cp else setdecimal(0.0)),  #dave NEW TODO add to help file
                 ('roastingnotes_line',roastingnotesline),
                 ('roastingnotes_10',roastingnotesline[:10]),
                 ('roastingnotes_15',roastingnotesline[:15]),
@@ -10883,36 +10906,36 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 ('cuppingnotes_25',cuppingnotesline[:25]),
                 ('cuppingnotes_30',cuppingnotesline[:30]),
 #                ("cuppingnotes",cuppingnotesline[:30]),
-                ('roastweight',str(self.float2float(float(self.qmc.weight[1]),1))),            #deprecated
-                ('roastvolume',str(self.float2float(float(self.qmc.volume[1]),1))),            #deprecated
-                ('roastdensity',str(self.float2float(float(self.qmc.density_roasted[0]),1))),  #deprecated
-                ('roastmoisture',str(self.float2float(float(self.qmc.moisture_roasted)))),     #deprecated
-                ('yyyy', self.qmc.roastdate.toString('yyyy')),
-                ('yy', self.qmc.roastdate.toString('yy')),
-                ('mmm', encodeLocal(self.qmc.roastdate.toString('MMM'))),
-                ('mm', self.qmc.roastdate.toString('MM')),
-                ('ddd', encodeLocal(self.qmc.roastdate.toString('ddd'))),
-                ('dd', self.qmc.roastdate.toString('dd')),
-                ('hour', self.qmc.roastdate.toString('hh')),
-                ('minute', self.qmc.roastdate.toString('mm')),
-                ('currtime', currtime),
+                ('roastweight',f'{self.float2float(float(self.qmc.weight[1]),1)}'),            #deprecated, undocumented
+                ('roastvolume',f'{self.float2float(float(self.qmc.volume[1]),1)}'),            #deprecated, undocumented
+                ('roastdensity',f'{self.float2float(float(self.qmc.density_roasted[0]),1)}'),  #deprecated, undocumented
+                ('roastmoisture',f'{self.float2float(float(self.qmc.moisture_roasted))}'),     #deprecated, undocumented
+                ('yyyy',self.qmc.roastdate.toString('yyyy')),
+                ('yy',self.qmc.roastdate.toString('yy')),
+                ('mmm',f"{encodeLocal(self.qmc.roastdate.toString('MMM'))}"),
+                ('mm',self.qmc.roastdate.toString('MM')),
+                ('ddd',f"{encodeLocal(self.qmc.roastdate.toString('ddd'))}"),
+                ('dd',self.qmc.roastdate.toString('dd')),
+                ('hour',self.qmc.roastdate.toString('hh')),
+                ('minute',self.qmc.roastdate.toString('mm')),
+                ('currtime',QDateTime.currentDateTime().toString('yy-MM-dd_hhmmss')),
                 #  Energy Use
-                ('btubatch', str(cp['BTU_batch']) if 'BTU_batch' in cp else '0.0'),
-                ('co2batch', str(cp['CO2_batch']) if 'CO2_batch' in cp else '0.0'),
-                ('btupreheat', str(cp['BTU_preheat']) if 'BTU_preheat' in cp else '0.0'),
-                ('co2preheat', str(cp['CO2_preheat']) if 'CO2_preheat' in cp else '0.0'),
-                ('btubbp', str(cp['BTU_bbp']) if 'BTU_bbp' in cp else '0.0'),
-                ('co2bbp', str(cp['CO2_bbp']) if 'CO2_bbp' in cp else '0.0'),
-                #("btucooling", str(cp["BTU_cooling"]) if "BTU_cooling" in cp else "0.0"),
-                #("co2cooling", str(cp["CO2_cooling"]) if "CO2_cooling" in cp else "0.0"),
-                ('bturoast', str(cp['BTU_roast']) if 'BTU_roast' in cp else '0.0'),
-                ('co2roast', str(cp['CO2_roast']) if 'CO2_roast' in cp else '0.0'),
-                ('co2batchpergreenkg', str(cp['CO2_batch_per_green_kg']) if 'CO2_batch_per_green_kg' in cp else '0.0'),
-                ('co2roastpergreenkg', str(cp['CO2_roast_per_green_kg']) if 'CO2_roast_per_green_kg' in cp else '0.0'),
-                ('btubatchpergreenkg', str(cp['BTU_batch_per_green_kg']) if 'BTU_batch_per_green_kg' in cp else '0.0'),
-                ('bturoastpergreenkg', str(cp['BTU_roast_per_green_kg']) if 'BTU_roast_per_green_kg' in cp else '0.0'),
-                ('effbatch', str(cp['KWH_batch_per_green_kg']) if 'KWH_batch_per_green_kg' in cp else '0.0'),
-                ('effroast', str(cp['KWH_roast_per_green_kg']) if 'KEH_roast_per_green_kg' in cp else '0.0'),
+                ('btubatch',f"{cp['BTU_batch']}" if 'BTU_batch' in cp else '0'),
+                ('co2batch',f"{cp['CO2_batch']}" if 'CO2_batch' in cp else '0'),
+                ('btupreheat',f"{cp['BTU_preheat']}" if 'BTU_preheat' in cp else '0'),
+                ('co2preheat',f"{cp['CO2_preheat']}" if 'CO2_preheat' in cp else '0'),
+                ('btubbp',f"{cp['BTU_bbp']}" if 'BTU_bbp' in cp else '0'),
+                ('co2bbp',f"{cp['CO2_bbp']}" if 'CO2_bbp' in cp else '0'),
+                #("btucooling", f"{cp["BTU_cooling"]}" if "BTU_cooling" in cp else '0'),
+                #("co2cooling", f"{cp["CO2_cooling"]}" if "CO2_cooling" in cp else '0'),
+                ('bturoast',f"{cp['BTU_roast']}" if 'BTU_roast' in cp else '0'),
+                ('co2roast',f"{cp['CO2_roast']}" if 'CO2_roast' in cp else '0'),
+                ('co2batchpergreenkg',f"{cp['CO2_batch_per_green_kg']}" if 'CO2_batch_per_green_kg' in cp else '0'),
+                ('co2roastpergreenkg',f"{cp['CO2_roast_per_green_kg']}" if 'CO2_roast_per_green_kg' in cp else '0'),
+                ('btubatchpergreenkg',f"{cp['BTU_batch_per_green_kg']}" if 'BTU_batch_per_green_kg' in cp else '0'),
+                ('bturoastpergreenkg',f"{cp['BTU_roast_per_green_kg']}" if 'BTU_roast_per_green_kg' in cp else '0'),
+                ('effbatch',f"{cp['KWH_batch_per_green_kg']}" if 'KWH_batch_per_green_kg' in cp else '0'),
+                ('effroast',f"{cp['KWH_roast_per_green_kg']}" if 'KEH_roast_per_green_kg' in cp else '0'),
                 ]
 
             _ignorecase = re.IGNORECASE  # @UndefinedVariable

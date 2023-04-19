@@ -320,6 +320,11 @@
             <td>300</td>
         </tr>
         <tr>
+            <td>~mode</td>
+            <td>From Config&gt;Temperature - the current temperature mode C or F.  </td>
+            <td>F</td>
+        </tr>
+        <tr>
             <td>~chargeet</td>
             <td>From the Profile - ET at CHARGE</td>
             <td>379.4</td>
@@ -338,6 +343,16 @@
             <td>~fcsbt</td>
             <td>From the Profile -BT at FCs</td>
             <td>386.7</td>
+        </tr>
+        <tr>
+            <td>~fcstime</td>
+            <td>From the Profile - FCs time in seconds</td>
+            <td>490</td>
+        </tr>
+        <tr>
+            <td>~fcstime_long</td>
+            <td>From the Profile - FCs time in min_secs</td>
+            <td>08_10</td>
         </tr>
         <tr>
             <td>~dropet</td>
@@ -360,6 +375,21 @@
             <td>10_17</td>
         </tr>
         <tr>
+            <td>~dryphasedeltatemp</td>
+            <td>From the Profile - BT temperature change from TP to DRY</td>
+            <td>121.3</td>
+        </tr>
+        <tr>
+            <td>~midphasedeltatemp</td>
+            <td>From the Profile - BT temperature change from DRY to FCs</td>
+            <td>78.6</td>
+        </tr>
+        <tr>
+            <td>~finishphasedeltatemp</td>
+            <td>From the Profile - BT temperature change from FCs to DROP</td>
+            <td>19.8</td>
+        </tr>
+        <tr>
             <td>~roastingnotes_nn</td>
             <td>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Roasting Notes field.<br>From Roast&gt;Properties&gt;Roasting Notes</td>
             <td>No crash, </td>
@@ -370,12 +400,12 @@
             <td>No crash, maintained RoR</td>
         </tr>
         <tr>
-            <td>~cupptingnotes_nn</td>
+            <td>~cuppingnotes_nn</td>
             <td>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Cupping Notes field.<br>From Roast&gt;Properties&gt;Cupping Notes</td>
             <td>Lots of be</td>
         </tr>
         <tr>
-            <td>~cupptingnotes_line</td>
+            <td>~cuppingnotes_line</td>
             <td>The entire first line From Roast&gt;Properties&gt;Cupping Notes</td>
             <td>Lots of berries and chocolate</td>
         </tr>
@@ -456,6 +486,10 @@
         <tr>
             <td>~beans ~machine ~drumspeedRPM ~weight~weightunits ~poisturePCT ~operator ~date ~batch(~batchposition)</td>
             <td>Burundi Kiganda Murambi Lot44 SF-25 64RPM 10.3Kg 10.2PCT Roberto 20-04-25 Prod-1380(6).alog</td>
+        </tr>
+        <tr>
+            <td>~title ~weight~weightunits ~finishphase_deltatemp~mode</td>
+            <td>Burundi 454.0g 19.8F.alog</td>
         </tr>
         <tr>
             <td>&#x27;Recording ~batchcounter&#39; &quot;~batch&quot; ~title ~datetime_long</td>
