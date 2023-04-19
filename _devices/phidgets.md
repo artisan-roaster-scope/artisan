@@ -152,7 +152,7 @@ Phidget Voltage Output modules can be controlled via `VOUT Command` actions trig
 
 * `out(ch,v[,sn])` : sets output voltage
 * `range(ch,r[,sn])` : sets voltage voltage range (not available on OUT1000)
-* `sleep(s)` : delay processing
+* `sleep(s)` : delay processing for `s` seconds
 
 with
 
@@ -190,7 +190,7 @@ Phidget Digital Output modules can be controlled via `IO Command ` actions trigg
 * `set(ch,b[,sn])` : switches state on/off
 * `toggle(ch[,sn])` : toggles state
 * `pulse(ch,t[,sn])` : sets the output of channel c to on for time t in milliseconds
-* `sleep(s)` : delay processing
+* `sleep(s)` : delay processing for `s` seconds
 
 with
 
@@ -252,7 +252,7 @@ Phidget DC Motor Control modules can be controlled via `IO Command` actions trig
 * `accel(ch,a[,sn])` sets acceleration (duty cycle / second)
 * `vel(ch,v[,sn])`   sets target velocity (duty cycle)
 * `limit(ch,v[,sn])`   sets current limit
-* `sleep(s)` : delay processing
+* `sleep(s)` : delay processing for `s` seconds
 
 with
 
@@ -311,6 +311,8 @@ The first tab of the Phidget Control Panel lists all Phidgets accessible by the 
 </figure>
 
 By default Artisan is only accessing local Phidgets. Ticking the flag in the Network section of the Phidget tab (menu ```Config >> Device```, 4th tab) makes networked Phidgets accessible to Artisan as well. In most cases there is no need to enter the name of the server under Host as the mDNS/ZeroConf protocol will find Phidget servers automatically. In rare cases (e.g. if you set a password on your Phidget Network Servder) one needs to enter the remote server name like ```hub5000.local``` or its IP address in the ```Host``` field and its password (if set) into the ```Password```field. If the ```Remote Only``` flag is ticked too, local Phidgets are ignored.
+
+Note: using the ZeroConf protocol (no host/password in the Phidget tab set) Artisan harvest all modules served by all Phidget Network Servers discoverable on the same network. Thus it is for example possible to connect to modules served by multiple HUB5000 or computers.
 
 
 <figure>
