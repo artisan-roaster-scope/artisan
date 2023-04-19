@@ -10724,7 +10724,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 #        return ''.join(c for c in decodeLocal(cleanedFilename) if c in validFilenameChars)
 
 
-    def generateFilename(self,prefix='',previewmode=0):
+    def generateFilename(self,prefix:str='',previewmode:int=0) -> str:
         filename = ''
         try:
             if prefix == '':
@@ -10748,7 +10748,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 
     #replace autosave delimited fields with the corresponding value
     #previewmode 0=not preview, 1=preview for while recording, 2=preview for while not recording
-    def parseAutosaveprefix(self,fn,previewmode=0):
+    def parseAutosaveprefix(self,fn:str='',previewmode:int=0) -> str:
         try:
             #single, leading delimiter for the fields
             fieldDelim = '~'  #note this value is hard coded in autosavefields
@@ -10818,7 +10818,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 density_loss = '0'
 
             # respect the Decimal Places setting (in Curves>> UI) for fields that are stored as float
-            def setdecimal(rawvalue) -> str:
+            def setdecimal(rawvalue:float) -> str:
                 return f'{rawvalue:.1f}' if self.qmc.LCDdecimalplaces else f'{rawvalue:.0f}'
 
             #note: fields are delimited only at the start, to avoid ambiguity the shortest similar field string 
