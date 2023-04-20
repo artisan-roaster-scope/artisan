@@ -9,62 +9,62 @@
       <translation>Patrocinador de lançamento</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21242" />
+      <location filename="../artisanlib/main.py" line="21265" />
       <source>About</source>
       <translation>Sobre</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21261" />
+      <location filename="../artisanlib/main.py" line="21284" />
       <source>Core Developers</source>
       <translation>Desenvolvedores Principais</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21263" />
+      <location filename="../artisanlib/main.py" line="21286" />
       <source>Contributors</source>
       <translation>Colaboradores</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21266" />
+      <location filename="../artisanlib/main.py" line="21289" />
       <source>License</source>
       <translation>Licença</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21286" />
+      <location filename="../artisanlib/main.py" line="21309" />
       <source>There was a problem retrieving the latest version information.  Please check your Internet connection, try again later, or check manually.</source>
       <translation>Ocorreu um problema ao recuperar as informações da versão mais recente. Verifique sua conexão com a Internet, tente novamente mais tarde ou verifique manualmente.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21295" />
+      <location filename="../artisanlib/main.py" line="21318" />
       <source>A new release is available.</source>
       <translation>Uma nova versão está disponível.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21297" />
+      <location filename="../artisanlib/main.py" line="21320" />
       <source>Show Change list</source>
       <translation>Mostrar lista de mudanças</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21299" />
+      <location filename="../artisanlib/main.py" line="21322" />
       <source>Download Release</source>
       <translation>Baixar versão</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21301" />
+      <location filename="../artisanlib/main.py" line="21324" />
       <source>You are using the latest release.</source>
       <translation>Você está usando a versão mais recente.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21303" />
+      <location filename="../artisanlib/main.py" line="21326" />
       <source>You are using a beta continuous build.</source>
       <translation>Você está usando uma versão beta contínua.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21304" />
+      <location filename="../artisanlib/main.py" line="21327" />
       <source>You will see a notice here once a new official release is available.</source>
       <translation>Você verá um aviso aqui assim que um novo lançamento oficial estiver disponível.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21312" />
+      <location filename="../artisanlib/main.py" line="21335" />
       <source>Update status</source>
       <translation>Atualizar o status</translation>
     </message>
@@ -215,7 +215,7 @@
       <location filename="../artisanlib/alarms.py" line="72" />
       <location filename="../artisanlib/roast_properties.py" line="5090" />
       <location filename="../artisanlib/roast_properties.py" line="765" />
-      <location filename="../artisanlib/events.py" line="564" />
+      <location filename="../artisanlib/events.py" line="566" />
       <location filename="../artisanlib/comparator.py" line="815" />
       <location filename="../artisanlib/wheels.py" line="105" />
       <source>Add</source>
@@ -243,7 +243,7 @@
       <location filename="../artisanlib/roast_properties.py" line="5092" />
       <location filename="../artisanlib/roast_properties.py" line="770" />
       <location filename="../artisanlib/background.py" line="83" />
-      <location filename="../artisanlib/events.py" line="569" />
+      <location filename="../artisanlib/events.py" line="571" />
       <location filename="../artisanlib/comparator.py" line="818" />
       <location filename="../artisanlib/wheels.py" line="431" />
       <source>Delete</source>
@@ -284,7 +284,7 @@
       <location filename="../artisanlib/alarms.py" line="93" />
       <location filename="../artisanlib/curves.py" line="1285" />
       <location filename="../artisanlib/background.py" line="81" />
-      <location filename="../artisanlib/events.py" line="619" />
+      <location filename="../artisanlib/events.py" line="621" />
       <location filename="../artisanlib/pid_dialogs.py" line="2074" />
       <location filename="../artisanlib/pid_dialogs.py" line="493" />
       <source>Load</source>
@@ -292,7 +292,7 @@
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="97" />
-      <location filename="../artisanlib/events.py" line="617" />
+      <location filename="../artisanlib/events.py" line="619" />
       <location filename="../artisanlib/pid_dialogs.py" line="2076" />
       <location filename="../artisanlib/pid_dialogs.py" line="497" />
       <source>Save</source>
@@ -548,9 +548,9 @@
       <location filename="../artisanlib/alarms.py" line="108" />
       <location filename="../artisanlib/curves.py" line="797" />
       <location filename="../artisanlib/roast_properties.py" line="2697" />
-      <location filename="../artisanlib/ports.py" line="901" />
-      <location filename="../artisanlib/events.py" line="875" />
-      <location filename="../artisanlib/events.py" line="583" />
+      <location filename="../artisanlib/ports.py" line="906" />
+      <location filename="../artisanlib/events.py" line="877" />
+      <location filename="../artisanlib/events.py" line="585" />
       <location filename="../artisanlib/events.py" line="224" />
       <location filename="../artisanlib/autosave.py" line="90" />
       <source>Help</source>
@@ -571,30 +571,30 @@
       <location filename="../artisanlib/roast_properties.py" line="775" />
       <location filename="../artisanlib/background.py" line="175" />
       <location filename="../artisanlib/background.py" line="164" />
-      <location filename="../artisanlib/events.py" line="560" />
+      <location filename="../artisanlib/events.py" line="562" />
       <source>Copy Table</source>
       <translation>Copiar Tabela</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="77" />
-      <location filename="../artisanlib/events.py" line="574" />
+      <location filename="../artisanlib/events.py" line="576" />
       <source>Insert</source>
       <translation type="unfinished">Inserir</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="596" />
+      <location filename="../artisanlib/events.py" line="598" />
       <source>&lt;&lt; Store Palette</source>
       <translation>&lt;&lt; Paleta da Loja</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="598" />
+      <location filename="../artisanlib/events.py" line="600" />
       <source>Activate Palette &gt;&gt;</source>
       <translation>Ativar Paleta &gt;&gt;</translation>
     </message>
     <message>
       <location filename="../artisanlib/transposer.py" line="130" />
       <location filename="../artisanlib/designer.py" line="243" />
-      <location filename="../artisanlib/events.py" line="1004" />
+      <location filename="../artisanlib/events.py" line="1006" />
       <source>Apply</source>
       <translation type="unfinished">Aplique</translation>
     </message>
@@ -605,8 +605,8 @@
       <translation type="unfinished">Início</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1062" />
-      <location filename="../artisanlib/ports.py" line="784" />
+      <location filename="../artisanlib/ports.py" line="1067" />
+      <location filename="../artisanlib/ports.py" line="789" />
       <source>Scan</source>
       <translation type="unfinished">Escanear</translation>
     </message>
@@ -1301,7 +1301,7 @@ END</source>
     <message>
       <location filename="../artisanlib/events.py" line="496" />
       <source>CHARGE Timer</source>
-      <translation type="unfinished" />
+      <translation>Temporizador de CARGA</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="508" />
@@ -1326,78 +1326,78 @@ END</source>
     <message>
       <location filename="../artisanlib/events.py" line="549" />
       <source>Mark last pressed</source>
-      <translation type="unfinished" />
+      <translation>Marcar último pressionamento</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="552" />
+      <location filename="../artisanlib/events.py" line="553" />
       <source>Tooltips</source>
-      <translation type="unfinished" />
+      <translation>dicas</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="612" />
+      <location filename="../artisanlib/events.py" line="614" />
       <source>Switch Using Number Keys + Cmd</source>
       <translation type="unfinished">Mude usando Teclado numérico + Cmd</translation>
     </message>
     <message>
       <location filename="../artisanlib/background.py" line="70" />
-      <location filename="../artisanlib/events.py" line="877" />
+      <location filename="../artisanlib/events.py" line="879" />
       <source>Keyboard Control</source>
-      <translation type="unfinished" />
+      <translation>Controle de teclado</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1097" />
+      <location filename="../artisanlib/events.py" line="1099" />
       <source>CHARGE</source>
       <translation type="unfinished">CARREGAR</translation>
     </message>
     <message>
       <location filename="../artisanlib/designer.py" line="52" />
-      <location filename="../artisanlib/events.py" line="1106" />
+      <location filename="../artisanlib/events.py" line="1108" />
       <source>DRY END</source>
       <translation type="unfinished">FIM SECA</translation>
     </message>
     <message>
       <location filename="../artisanlib/designer.py" line="54" />
-      <location filename="../artisanlib/events.py" line="1115" />
+      <location filename="../artisanlib/events.py" line="1117" />
       <source>FC START</source>
       <translation type="unfinished">INÍCIO PE</translation>
     </message>
     <message>
       <location filename="../artisanlib/designer.py" line="56" />
-      <location filename="../artisanlib/events.py" line="1124" />
+      <location filename="../artisanlib/events.py" line="1126" />
       <source>FC END</source>
       <translation type="unfinished">FIM PE</translation>
     </message>
     <message>
       <location filename="../artisanlib/designer.py" line="58" />
-      <location filename="../artisanlib/events.py" line="1133" />
+      <location filename="../artisanlib/events.py" line="1135" />
       <source>SC START</source>
       <translation type="unfinished">INÍCIO SE</translation>
     </message>
     <message>
       <location filename="../artisanlib/designer.py" line="60" />
-      <location filename="../artisanlib/events.py" line="1142" />
+      <location filename="../artisanlib/events.py" line="1144" />
       <source>SC END</source>
       <translation type="unfinished">FIM SE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1151" />
+      <location filename="../artisanlib/events.py" line="1153" />
       <source>DROP</source>
       <translation type="unfinished">RETIRAR</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1160" />
+      <location filename="../artisanlib/events.py" line="1162" />
       <source>COOL END</source>
       <translation type="unfinished">PRONTO</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="96" />
       <source>Fct. 3</source>
-      <translation type="unfinished" />
+      <translation>FCt. 3</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="99" />
       <source>Fct. 4</source>
-      <translation type="unfinished" />
+      <translation>FCt. 4</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="261" />
@@ -1410,12 +1410,12 @@ END</source>
       <translation type="unfinished">Ponto flutuante</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1522" />
+      <location filename="../artisanlib/ports.py" line="1527" />
       <source>START on CHARGE</source>
       <translation>COMEÇAR em CHARGE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1524" />
+      <location filename="../artisanlib/ports.py" line="1529" />
       <source>OFF on DROP</source>
       <translation>OFF em DROP</translation>
     </message>
@@ -1487,61 +1487,61 @@ END</source>
       <translation type="unfinished">Mostrar Sempre</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20631" />
+      <location filename="../artisanlib/main.py" line="20654" />
       <location filename="../artisanlib/roast_properties.py" line="1101" />
       <source>Heavy FC</source>
       <translation>PE intenso</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20633" />
+      <location filename="../artisanlib/main.py" line="20656" />
       <location filename="../artisanlib/roast_properties.py" line="1104" />
       <source>Low FC</source>
       <translation>PE baixo</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20635" />
+      <location filename="../artisanlib/main.py" line="20658" />
       <location filename="../artisanlib/roast_properties.py" line="1107" />
       <source>Light Cut</source>
       <translation>Corte claro</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20637" />
+      <location filename="../artisanlib/main.py" line="20660" />
       <location filename="../artisanlib/roast_properties.py" line="1110" />
       <source>Dark Cut</source>
       <translation>Corte escuro</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20639" />
+      <location filename="../artisanlib/main.py" line="20662" />
       <location filename="../artisanlib/roast_properties.py" line="1113" />
       <source>Drops</source>
       <translation>Gotículas</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20641" />
+      <location filename="../artisanlib/main.py" line="20664" />
       <location filename="../artisanlib/roast_properties.py" line="1116" />
       <source>Oily</source>
       <translation>Oleoso</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20643" />
+      <location filename="../artisanlib/main.py" line="20666" />
       <location filename="../artisanlib/roast_properties.py" line="1119" />
       <source>Uneven</source>
       <translation>Heterogênea</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20645" />
+      <location filename="../artisanlib/main.py" line="20668" />
       <location filename="../artisanlib/roast_properties.py" line="1121" />
       <source>Tipping</source>
       <translation>Pontas escuras</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20647" />
+      <location filename="../artisanlib/main.py" line="20670" />
       <location filename="../artisanlib/roast_properties.py" line="1123" />
       <source>Scorching</source>
       <translation>Chamuscado</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20649" />
+      <location filename="../artisanlib/main.py" line="20672" />
       <location filename="../artisanlib/roast_properties.py" line="1125" />
       <source>Divots</source>
       <translation>Buracos</translation>
@@ -1788,8 +1788,8 @@ END</source>
       <location filename="../artisanlib/canvas.py" line="1467" />
       <location filename="../artisanlib/canvas.py" line="1461" />
       <location filename="../artisanlib/canvas.py" line="1245" />
-      <location filename="../artisanlib/main.py" line="17351" />
-      <location filename="../artisanlib/main.py" line="15413" />
+      <location filename="../artisanlib/main.py" line="17374" />
+      <location filename="../artisanlib/main.py" line="15436" />
       <location filename="../artisanlib/rubasse.py" line="251" />
       <location filename="../artisanlib/cropster.py" line="965" />
       <location filename="../artisanlib/giesen.py" line="188" />
@@ -1803,8 +1803,8 @@ END</source>
       <location filename="../artisanlib/canvas.py" line="1468" />
       <location filename="../artisanlib/canvas.py" line="1462" />
       <location filename="../artisanlib/canvas.py" line="1246" />
-      <location filename="../artisanlib/main.py" line="17352" />
-      <location filename="../artisanlib/main.py" line="15414" />
+      <location filename="../artisanlib/main.py" line="17375" />
+      <location filename="../artisanlib/main.py" line="15437" />
       <location filename="../artisanlib/rubasse.py" line="252" />
       <location filename="../artisanlib/cropster.py" line="966" />
       <location filename="../artisanlib/giesen.py" line="189" />
@@ -1818,8 +1818,8 @@ END</source>
       <location filename="../artisanlib/canvas.py" line="1469" />
       <location filename="../artisanlib/canvas.py" line="1463" />
       <location filename="../artisanlib/canvas.py" line="1247" />
-      <location filename="../artisanlib/main.py" line="17353" />
-      <location filename="../artisanlib/main.py" line="15415" />
+      <location filename="../artisanlib/main.py" line="17376" />
+      <location filename="../artisanlib/main.py" line="15438" />
       <location filename="../artisanlib/rubasse.py" line="253" />
       <location filename="../artisanlib/cropster.py" line="967" />
       <location filename="../artisanlib/giesen.py" line="190" />
@@ -1833,8 +1833,8 @@ END</source>
       <location filename="../artisanlib/canvas.py" line="1470" />
       <location filename="../artisanlib/canvas.py" line="1464" />
       <location filename="../artisanlib/canvas.py" line="1248" />
-      <location filename="../artisanlib/main.py" line="17354" />
-      <location filename="../artisanlib/main.py" line="15416" />
+      <location filename="../artisanlib/main.py" line="17377" />
+      <location filename="../artisanlib/main.py" line="15439" />
       <location filename="../artisanlib/rubasse.py" line="254" />
       <location filename="../artisanlib/cropster.py" line="968" />
       <location filename="../artisanlib/giesen.py" line="191" />
@@ -1990,7 +1990,7 @@ END</source>
       <location filename="../artisanlib/alarms.py" line="796" />
       <location filename="../artisanlib/curves.py" line="2140" />
       <location filename="../artisanlib/roast_properties.py" line="3754" />
-      <location filename="../artisanlib/events.py" line="949" />
+      <location filename="../artisanlib/events.py" line="951" />
       <location filename="../artisanlib/pid_dialogs.py" line="113" />
       <source>ET</source>
       <translation type="unfinished">ET</translation>
@@ -1999,7 +1999,7 @@ END</source>
       <location filename="../artisanlib/alarms.py" line="797" />
       <location filename="../artisanlib/curves.py" line="2141" />
       <location filename="../artisanlib/roast_properties.py" line="3755" />
-      <location filename="../artisanlib/events.py" line="950" />
+      <location filename="../artisanlib/events.py" line="952" />
       <location filename="../artisanlib/pid_dialogs.py" line="114" />
       <source>BT</source>
       <translation type="unfinished">BT</translation>
@@ -2012,9 +2012,9 @@ END</source>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="872" />
-      <location filename="../artisanlib/events.py" line="2294" />
-      <location filename="../artisanlib/events.py" line="1076" />
-      <location filename="../artisanlib/events.py" line="672" />
+      <location filename="../artisanlib/events.py" line="2298" />
+      <location filename="../artisanlib/events.py" line="1078" />
+      <location filename="../artisanlib/events.py" line="674" />
       <location filename="../artisanlib/pid_dialogs.py" line="420" />
       <source>Call Program</source>
       <translation type="unfinished">Programa de chamada</translation>
@@ -2090,7 +2090,7 @@ END</source>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="886" />
-      <location filename="../artisanlib/events.py" line="2285" />
+      <location filename="../artisanlib/events.py" line="2289" />
       <location filename="../artisanlib/pid_dialogs.py" line="434" />
       <source>OFF</source>
       <translation type="unfinished">DESLIGAR</translation>
@@ -2199,173 +2199,173 @@ END</source>
       <translation>ampla</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2293" />
-      <location filename="../artisanlib/events.py" line="1075" />
-      <location filename="../artisanlib/events.py" line="669" />
+      <location filename="../artisanlib/events.py" line="2297" />
+      <location filename="../artisanlib/events.py" line="1077" />
+      <location filename="../artisanlib/events.py" line="671" />
       <source>Serial Command</source>
       <translation type="unfinished">Commando serial</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2296" />
-      <location filename="../artisanlib/events.py" line="1077" />
-      <location filename="../artisanlib/events.py" line="670" />
+      <location filename="../artisanlib/events.py" line="2300" />
+      <location filename="../artisanlib/events.py" line="1079" />
+      <location filename="../artisanlib/events.py" line="672" />
       <source>Modbus Command</source>
       <translation type="unfinished">Comando modbus</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2297" />
-      <location filename="../artisanlib/events.py" line="1078" />
-      <location filename="../artisanlib/events.py" line="671" />
+      <location filename="../artisanlib/events.py" line="2301" />
+      <location filename="../artisanlib/events.py" line="1080" />
+      <location filename="../artisanlib/events.py" line="673" />
       <source>DTA Command</source>
       <translation type="unfinished">Comando DTA</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2299" />
-      <location filename="../artisanlib/events.py" line="1080" />
-      <location filename="../artisanlib/events.py" line="673" />
+      <location filename="../artisanlib/events.py" line="2303" />
+      <location filename="../artisanlib/events.py" line="1082" />
+      <location filename="../artisanlib/events.py" line="675" />
       <source>Hottop Heater</source>
       <translation>Aquecedor quente</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2300" />
-      <location filename="../artisanlib/events.py" line="1081" />
-      <location filename="../artisanlib/events.py" line="674" />
+      <location filename="../artisanlib/events.py" line="2304" />
+      <location filename="../artisanlib/events.py" line="1083" />
+      <location filename="../artisanlib/events.py" line="676" />
       <source>Hottop Fan</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2301" />
-      <location filename="../artisanlib/events.py" line="1082" />
-      <location filename="../artisanlib/events.py" line="675" />
+      <location filename="../artisanlib/events.py" line="2305" />
+      <location filename="../artisanlib/events.py" line="1084" />
+      <location filename="../artisanlib/events.py" line="677" />
       <source>Hottop Command</source>
       <translation>Comando Hottop</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2303" />
-      <location filename="../artisanlib/events.py" line="1084" />
-      <location filename="../artisanlib/events.py" line="676" />
+      <location filename="../artisanlib/events.py" line="2307" />
+      <location filename="../artisanlib/events.py" line="1086" />
+      <location filename="../artisanlib/events.py" line="678" />
       <source>Fuji Command</source>
       <translation>Comando Fuji</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2304" />
-      <location filename="../artisanlib/events.py" line="1085" />
-      <location filename="../artisanlib/events.py" line="677" />
+      <location filename="../artisanlib/events.py" line="2308" />
+      <location filename="../artisanlib/events.py" line="1087" />
+      <location filename="../artisanlib/events.py" line="679" />
       <source>PWM Command</source>
       <translation>Comando PWM</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2305" />
-      <location filename="../artisanlib/events.py" line="1086" />
-      <location filename="../artisanlib/events.py" line="678" />
+      <location filename="../artisanlib/events.py" line="2309" />
+      <location filename="../artisanlib/events.py" line="1088" />
+      <location filename="../artisanlib/events.py" line="680" />
       <source>VOUT Command</source>
       <translation>Comando VOUT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2298" />
-      <location filename="../artisanlib/events.py" line="1079" />
-      <location filename="../artisanlib/events.py" line="679" />
+      <location filename="../artisanlib/events.py" line="2302" />
+      <location filename="../artisanlib/events.py" line="1081" />
+      <location filename="../artisanlib/events.py" line="681" />
       <source>IO Command</source>
       <translation>Comando IO</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2306" />
-      <location filename="../artisanlib/events.py" line="1087" />
-      <location filename="../artisanlib/events.py" line="680" />
+      <location filename="../artisanlib/events.py" line="2310" />
+      <location filename="../artisanlib/events.py" line="1089" />
+      <location filename="../artisanlib/events.py" line="682" />
       <source>S7 Command</source>
       <translation>Comando S7</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2307" />
-      <location filename="../artisanlib/events.py" line="1088" />
-      <location filename="../artisanlib/events.py" line="681" />
+      <location filename="../artisanlib/events.py" line="2311" />
+      <location filename="../artisanlib/events.py" line="1090" />
+      <location filename="../artisanlib/events.py" line="683" />
       <source>Aillio R1 Heater</source>
       <translation type="unfinished">Aillio R1 Aquecedor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2308" />
-      <location filename="../artisanlib/events.py" line="1089" />
-      <location filename="../artisanlib/events.py" line="682" />
+      <location filename="../artisanlib/events.py" line="2312" />
+      <location filename="../artisanlib/events.py" line="1091" />
+      <location filename="../artisanlib/events.py" line="684" />
       <source>Aillio R1 Fan</source>
       <translation type="unfinished">Aillio R1 Ventilador</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2309" />
-      <location filename="../artisanlib/events.py" line="1090" />
-      <location filename="../artisanlib/events.py" line="683" />
+      <location filename="../artisanlib/events.py" line="2313" />
+      <location filename="../artisanlib/events.py" line="1092" />
+      <location filename="../artisanlib/events.py" line="685" />
       <source>Aillio R1 Drum</source>
       <translation type="unfinished">Aillio R1 Tambor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2311" />
-      <location filename="../artisanlib/events.py" line="1092" />
-      <location filename="../artisanlib/events.py" line="684" />
+      <location filename="../artisanlib/events.py" line="2315" />
+      <location filename="../artisanlib/events.py" line="1094" />
+      <location filename="../artisanlib/events.py" line="686" />
       <source>Artisan Command</source>
       <translation>Comando Artesão</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2312" />
-      <location filename="../artisanlib/events.py" line="1093" />
-      <location filename="../artisanlib/events.py" line="685" />
+      <location filename="../artisanlib/events.py" line="2316" />
+      <location filename="../artisanlib/events.py" line="1095" />
+      <location filename="../artisanlib/events.py" line="687" />
       <source>RC Command</source>
       <translation>Comando RC</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2313" />
-      <location filename="../artisanlib/events.py" line="1095" />
-      <location filename="../artisanlib/events.py" line="686" />
+      <location filename="../artisanlib/events.py" line="2317" />
+      <location filename="../artisanlib/events.py" line="1097" />
+      <location filename="../artisanlib/events.py" line="688" />
       <source>WebSocket Command</source>
       <translation>Comando WebSocket</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2302" />
-      <location filename="../artisanlib/events.py" line="1083" />
+      <location filename="../artisanlib/events.py" line="2306" />
+      <location filename="../artisanlib/events.py" line="1085" />
       <source>p-i-d</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2310" />
-      <location filename="../artisanlib/events.py" line="1091" />
+      <location filename="../artisanlib/events.py" line="2314" />
+      <location filename="../artisanlib/events.py" line="1093" />
       <source>Aillio R1 Command</source>
       <translation>Comando Aillio R1</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2295" />
-      <location filename="../artisanlib/events.py" line="1094" />
+      <location filename="../artisanlib/events.py" line="2299" />
+      <location filename="../artisanlib/events.py" line="1096" />
       <source>Multiple Event</source>
       <translation type="unfinished">Evento múltiplo</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="828" />
       <location filename="../artisanlib/alarms.py" line="804" />
-      <location filename="../artisanlib/events.py" line="2286" />
+      <location filename="../artisanlib/events.py" line="2290" />
       <source>ON</source>
       <translation type="unfinished">LIGAR</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="592" />
+      <location filename="../artisanlib/ports.py" line="597" />
       <source>bytes</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="596" />
+      <location filename="../artisanlib/ports.py" line="601" />
       <source>words</source>
       <translation>palavras</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1067" />
-      <location filename="../artisanlib/ports.py" line="789" />
+      <location filename="../artisanlib/ports.py" line="1072" />
+      <location filename="../artisanlib/ports.py" line="794" />
       <source>optimize</source>
       <translation>otimizar</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1072" />
-      <location filename="../artisanlib/ports.py" line="794" />
+      <location filename="../artisanlib/ports.py" line="1077" />
+      <location filename="../artisanlib/ports.py" line="799" />
       <source>fetch full blocks</source>
       <translation>buscar blocos completos</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="799" />
+      <location filename="../artisanlib/ports.py" line="804" />
       <source>reset</source>
       <translation>Redefinir</translation>
     </message>
@@ -4090,23 +4090,23 @@ END</source>
   <context>
     <name>Error Message</name>
     <message>
-      <location filename="../artisanlib/main.py" line="23548" />
-      <location filename="../artisanlib/main.py" line="23511" />
-      <location filename="../artisanlib/main.py" line="23377" />
-      <location filename="../artisanlib/main.py" line="23097" />
-      <location filename="../artisanlib/main.py" line="23027" />
-      <location filename="../artisanlib/main.py" line="22997" />
-      <location filename="../artisanlib/main.py" line="22860" />
-      <location filename="../artisanlib/main.py" line="22747" />
-      <location filename="../artisanlib/main.py" line="22651" />
-      <location filename="../artisanlib/main.py" line="22447" />
-      <location filename="../artisanlib/main.py" line="22367" />
-      <location filename="../artisanlib/main.py" line="20614" />
-      <location filename="../artisanlib/main.py" line="19957" />
-      <location filename="../artisanlib/main.py" line="18662" />
-      <location filename="../artisanlib/main.py" line="14753" />
-      <location filename="../artisanlib/main.py" line="11898" />
-      <location filename="../artisanlib/main.py" line="11439" />
+      <location filename="../artisanlib/main.py" line="23571" />
+      <location filename="../artisanlib/main.py" line="23534" />
+      <location filename="../artisanlib/main.py" line="23400" />
+      <location filename="../artisanlib/main.py" line="23120" />
+      <location filename="../artisanlib/main.py" line="23050" />
+      <location filename="../artisanlib/main.py" line="23020" />
+      <location filename="../artisanlib/main.py" line="22883" />
+      <location filename="../artisanlib/main.py" line="22770" />
+      <location filename="../artisanlib/main.py" line="22674" />
+      <location filename="../artisanlib/main.py" line="22470" />
+      <location filename="../artisanlib/main.py" line="22390" />
+      <location filename="../artisanlib/main.py" line="20637" />
+      <location filename="../artisanlib/main.py" line="19980" />
+      <location filename="../artisanlib/main.py" line="18685" />
+      <location filename="../artisanlib/main.py" line="14776" />
+      <location filename="../artisanlib/main.py" line="11921" />
+      <location filename="../artisanlib/main.py" line="11462" />
       <location filename="../artisanlib/wheels.py" line="642" />
       <source>IO Error:</source>
       <translation>Erro de E/S:</translation>
@@ -4115,12 +4115,12 @@ END</source>
       <location filename="../artisanlib/wsport.py" line="235" />
       <location filename="../artisanlib/wsport.py" line="187" />
       <source>WebSocket connection failed: {}</source>
-      <translation type="unfinished" />
+      <translation>Falha na conexão WebSocket: {}</translation>
     </message>
     <message>
       <location filename="../artisanlib/wsport.py" line="240" />
       <source>Reconnecting WebSocket</source>
-      <translation type="unfinished" />
+      <translation>Reconectando WebSocket</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="16193" />
@@ -4204,69 +4204,69 @@ END</source>
       <location filename="../artisanlib/devices.py" line="1804" />
       <location filename="../artisanlib/devices.py" line="1787" />
       <location filename="../artisanlib/devices.py" line="1589" />
-      <location filename="../artisanlib/main.py" line="24035" />
-      <location filename="../artisanlib/main.py" line="23932" />
-      <location filename="../artisanlib/main.py" line="23793" />
-      <location filename="../artisanlib/main.py" line="23779" />
-      <location filename="../artisanlib/main.py" line="23553" />
-      <location filename="../artisanlib/main.py" line="23516" />
-      <location filename="../artisanlib/main.py" line="23107" />
-      <location filename="../artisanlib/main.py" line="22866" />
-      <location filename="../artisanlib/main.py" line="22753" />
-      <location filename="../artisanlib/main.py" line="22718" />
-      <location filename="../artisanlib/main.py" line="22658" />
-      <location filename="../artisanlib/main.py" line="22453" />
-      <location filename="../artisanlib/main.py" line="22373" />
-      <location filename="../artisanlib/main.py" line="21968" />
-      <location filename="../artisanlib/main.py" line="21758" />
-      <location filename="../artisanlib/main.py" line="21308" />
-      <location filename="../artisanlib/main.py" line="21106" />
-      <location filename="../artisanlib/main.py" line="20625" />
-      <location filename="../artisanlib/main.py" line="20219" />
-      <location filename="../artisanlib/main.py" line="20214" />
-      <location filename="../artisanlib/main.py" line="20149" />
-      <location filename="../artisanlib/main.py" line="19995" />
-      <location filename="../artisanlib/main.py" line="19992" />
-      <location filename="../artisanlib/main.py" line="19889" />
-      <location filename="../artisanlib/main.py" line="19743" />
-      <location filename="../artisanlib/main.py" line="19613" />
-      <location filename="../artisanlib/main.py" line="19249" />
-      <location filename="../artisanlib/main.py" line="18861" />
-      <location filename="../artisanlib/main.py" line="18710" />
-      <location filename="../artisanlib/main.py" line="18669" />
-      <location filename="../artisanlib/main.py" line="18111" />
-      <location filename="../artisanlib/main.py" line="18068" />
-      <location filename="../artisanlib/main.py" line="17132" />
-      <location filename="../artisanlib/main.py" line="16900" />
-      <location filename="../artisanlib/main.py" line="16866" />
-      <location filename="../artisanlib/main.py" line="16783" />
-      <location filename="../artisanlib/main.py" line="15073" />
-      <location filename="../artisanlib/main.py" line="14739" />
-      <location filename="../artisanlib/main.py" line="14646" />
-      <location filename="../artisanlib/main.py" line="14639" />
-      <location filename="../artisanlib/main.py" line="14413" />
-      <location filename="../artisanlib/main.py" line="14358" />
-      <location filename="../artisanlib/main.py" line="14342" />
-      <location filename="../artisanlib/main.py" line="14245" />
-      <location filename="../artisanlib/main.py" line="14224" />
-      <location filename="../artisanlib/main.py" line="14206" />
-      <location filename="../artisanlib/main.py" line="13989" />
-      <location filename="../artisanlib/main.py" line="12994" />
-      <location filename="../artisanlib/main.py" line="12955" />
-      <location filename="../artisanlib/main.py" line="12781" />
-      <location filename="../artisanlib/main.py" line="12419" />
-      <location filename="../artisanlib/main.py" line="12383" />
-      <location filename="../artisanlib/main.py" line="12369" />
-      <location filename="../artisanlib/main.py" line="12350" />
-      <location filename="../artisanlib/main.py" line="12274" />
-      <location filename="../artisanlib/main.py" line="12133" />
-      <location filename="../artisanlib/main.py" line="12021" />
-      <location filename="../artisanlib/main.py" line="11909" />
-      <location filename="../artisanlib/main.py" line="11649" />
-      <location filename="../artisanlib/main.py" line="11598" />
-      <location filename="../artisanlib/main.py" line="11458" />
-      <location filename="../artisanlib/main.py" line="11327" />
-      <location filename="../artisanlib/main.py" line="11074" />
+      <location filename="../artisanlib/main.py" line="24058" />
+      <location filename="../artisanlib/main.py" line="23955" />
+      <location filename="../artisanlib/main.py" line="23816" />
+      <location filename="../artisanlib/main.py" line="23802" />
+      <location filename="../artisanlib/main.py" line="23576" />
+      <location filename="../artisanlib/main.py" line="23539" />
+      <location filename="../artisanlib/main.py" line="23130" />
+      <location filename="../artisanlib/main.py" line="22889" />
+      <location filename="../artisanlib/main.py" line="22776" />
+      <location filename="../artisanlib/main.py" line="22741" />
+      <location filename="../artisanlib/main.py" line="22681" />
+      <location filename="../artisanlib/main.py" line="22476" />
+      <location filename="../artisanlib/main.py" line="22396" />
+      <location filename="../artisanlib/main.py" line="21991" />
+      <location filename="../artisanlib/main.py" line="21781" />
+      <location filename="../artisanlib/main.py" line="21331" />
+      <location filename="../artisanlib/main.py" line="21129" />
+      <location filename="../artisanlib/main.py" line="20648" />
+      <location filename="../artisanlib/main.py" line="20242" />
+      <location filename="../artisanlib/main.py" line="20237" />
+      <location filename="../artisanlib/main.py" line="20172" />
+      <location filename="../artisanlib/main.py" line="20018" />
+      <location filename="../artisanlib/main.py" line="20015" />
+      <location filename="../artisanlib/main.py" line="19912" />
+      <location filename="../artisanlib/main.py" line="19766" />
+      <location filename="../artisanlib/main.py" line="19636" />
+      <location filename="../artisanlib/main.py" line="19272" />
+      <location filename="../artisanlib/main.py" line="18884" />
+      <location filename="../artisanlib/main.py" line="18733" />
+      <location filename="../artisanlib/main.py" line="18692" />
+      <location filename="../artisanlib/main.py" line="18134" />
+      <location filename="../artisanlib/main.py" line="18091" />
+      <location filename="../artisanlib/main.py" line="17155" />
+      <location filename="../artisanlib/main.py" line="16923" />
+      <location filename="../artisanlib/main.py" line="16889" />
+      <location filename="../artisanlib/main.py" line="16806" />
+      <location filename="../artisanlib/main.py" line="15096" />
+      <location filename="../artisanlib/main.py" line="14762" />
+      <location filename="../artisanlib/main.py" line="14669" />
+      <location filename="../artisanlib/main.py" line="14662" />
+      <location filename="../artisanlib/main.py" line="14436" />
+      <location filename="../artisanlib/main.py" line="14381" />
+      <location filename="../artisanlib/main.py" line="14365" />
+      <location filename="../artisanlib/main.py" line="14268" />
+      <location filename="../artisanlib/main.py" line="14247" />
+      <location filename="../artisanlib/main.py" line="14229" />
+      <location filename="../artisanlib/main.py" line="14012" />
+      <location filename="../artisanlib/main.py" line="13017" />
+      <location filename="../artisanlib/main.py" line="12978" />
+      <location filename="../artisanlib/main.py" line="12804" />
+      <location filename="../artisanlib/main.py" line="12442" />
+      <location filename="../artisanlib/main.py" line="12406" />
+      <location filename="../artisanlib/main.py" line="12392" />
+      <location filename="../artisanlib/main.py" line="12373" />
+      <location filename="../artisanlib/main.py" line="12297" />
+      <location filename="../artisanlib/main.py" line="12156" />
+      <location filename="../artisanlib/main.py" line="12044" />
+      <location filename="../artisanlib/main.py" line="11932" />
+      <location filename="../artisanlib/main.py" line="11672" />
+      <location filename="../artisanlib/main.py" line="11621" />
+      <location filename="../artisanlib/main.py" line="11481" />
+      <location filename="../artisanlib/main.py" line="11350" />
+      <location filename="../artisanlib/main.py" line="11097" />
       <location filename="../artisanlib/main.py" line="8149" />
       <location filename="../artisanlib/main.py" line="7703" />
       <location filename="../artisanlib/main.py" line="7415" />
@@ -4306,9 +4306,9 @@ END</source>
       <location filename="../artisanlib/pid_control.py" line="697" />
       <location filename="../artisanlib/roast_properties.py" line="3255" />
       <location filename="../artisanlib/roast_properties.py" line="2491" />
-      <location filename="../artisanlib/ports.py" line="1868" />
-      <location filename="../artisanlib/ports.py" line="1819" />
-      <location filename="../artisanlib/events.py" line="3270" />
+      <location filename="../artisanlib/ports.py" line="1873" />
+      <location filename="../artisanlib/ports.py" line="1824" />
+      <location filename="../artisanlib/events.py" line="3274" />
       <location filename="../artisanlib/comm.py" line="6361" />
       <location filename="../artisanlib/comm.py" line="6328" />
       <location filename="../artisanlib/comm.py" line="6217" />
@@ -4402,17 +4402,17 @@ END</source>
     <message>
       <location filename="../artisanlib/comm.py" line="778" />
       <source>callprogram() received:</source>
-      <translation type="unfinished" />
+      <translation>callprogram() recebido:</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="1548" />
       <source>Extech755pressure(): conversion error, {0} bytes received</source>
-      <translation type="unfinished" />
+      <translation>Extech755pressure(): erro de conversão, {0} bytes recebidos</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="1559" />
       <source>Extech755pressure(): {0} bytes received but 10 needed</source>
-      <translation type="unfinished" />
+      <translation>Extech755pressure(): {0} bytes recebidos, mas 10 necessários</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="1866" />
@@ -4422,17 +4422,17 @@ END</source>
     <message>
       <location filename="../artisanlib/comm.py" line="1991" />
       <source>MS6514temperature(): {0} bytes received but 18 needed</source>
-      <translation type="unfinished" />
+      <translation>MS6514temperature(): {0} bytes recebidos, mas 18 necessários</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="2039" />
       <source>DT301temperature(): {0} bytes received but 11 needed</source>
-      <translation type="unfinished" />
+      <translation>DT301temperature(): {0} bytes recebidos, mas 11 necessários</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="2159" />
       <source>HH806AUtemperature(): {0} bytes received</source>
-      <translation type="unfinished" />
+      <translation>HH806AUtemperature(): {0} bytes recebidos</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="2205" />
@@ -4497,7 +4497,7 @@ END</source>
     <message>
       <location filename="../artisanlib/comm.py" line="5908" />
       <source>Arduino could not set filters</source>
-      <translation type="unfinished" />
+      <translation>Arduino não pôde definir filtros</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="16187" />
@@ -4505,26 +4505,26 @@ END</source>
       <location filename="../artisanlib/canvas.py" line="14589" />
       <location filename="../artisanlib/canvas.py" line="14565" />
       <location filename="../artisanlib/canvas.py" line="14379" />
-      <location filename="../artisanlib/main.py" line="23102" />
-      <location filename="../artisanlib/main.py" line="22862" />
-      <location filename="../artisanlib/main.py" line="22749" />
-      <location filename="../artisanlib/main.py" line="22653" />
-      <location filename="../artisanlib/main.py" line="22449" />
-      <location filename="../artisanlib/main.py" line="22369" />
-      <location filename="../artisanlib/main.py" line="11903" />
-      <location filename="../artisanlib/main.py" line="11454" />
+      <location filename="../artisanlib/main.py" line="23125" />
+      <location filename="../artisanlib/main.py" line="22885" />
+      <location filename="../artisanlib/main.py" line="22772" />
+      <location filename="../artisanlib/main.py" line="22676" />
+      <location filename="../artisanlib/main.py" line="22472" />
+      <location filename="../artisanlib/main.py" line="22392" />
+      <location filename="../artisanlib/main.py" line="11926" />
+      <location filename="../artisanlib/main.py" line="11477" />
       <location filename="../artisanlib/comm.py" line="6311" />
       <location filename="../artisanlib/comm.py" line="6208" />
       <source>Value Error:</source>
       <translation>Erro de valor:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1925" />
+      <location filename="../artisanlib/ports.py" line="1930" />
       <source>Serial Exception: invalid comm port</source>
       <translation type="unfinished">Exceção serial: porta comunicação inválida</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1929" />
+      <location filename="../artisanlib/ports.py" line="1934" />
       <source>Serial Exception: timeout</source>
       <translation type="unfinished">Exceção serial: tempo expirou</translation>
     </message>
@@ -4534,43 +4534,43 @@ END</source>
       <translation type="unfinished">Impossível mover CARREGAR para um valor que não existe</translation>
     </message>
     <message>
-      <location filename="../artisanlib/modbusport.py" line="348" />
+      <location filename="../artisanlib/modbusport.py" line="354" />
       <source>Modbus Error: failed to connect</source>
-      <translation type="unfinished" />
+      <translation>Erro Modbus: falha ao conectar</translation>
     </message>
     <message>
-      <location filename="../artisanlib/modbusport.py" line="744" />
-      <location filename="../artisanlib/modbusport.py" line="714" />
-      <location filename="../artisanlib/modbusport.py" line="685" />
-      <location filename="../artisanlib/modbusport.py" line="655" />
-      <location filename="../artisanlib/modbusport.py" line="620" />
-      <location filename="../artisanlib/modbusport.py" line="591" />
-      <location filename="../artisanlib/modbusport.py" line="548" />
-      <location filename="../artisanlib/modbusport.py" line="524" />
-      <location filename="../artisanlib/modbusport.py" line="352" />
+      <location filename="../artisanlib/modbusport.py" line="750" />
+      <location filename="../artisanlib/modbusport.py" line="720" />
+      <location filename="../artisanlib/modbusport.py" line="691" />
+      <location filename="../artisanlib/modbusport.py" line="661" />
+      <location filename="../artisanlib/modbusport.py" line="626" />
+      <location filename="../artisanlib/modbusport.py" line="597" />
+      <location filename="../artisanlib/modbusport.py" line="554" />
+      <location filename="../artisanlib/modbusport.py" line="530" />
+      <location filename="../artisanlib/modbusport.py" line="358" />
       <source>Modbus Error:</source>
       <translation type="unfinished">Erro de modbus:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/modbusport.py" line="1186" />
-      <location filename="../artisanlib/modbusport.py" line="1104" />
-      <location filename="../artisanlib/modbusport.py" line="1020" />
-      <location filename="../artisanlib/modbusport.py" line="1010" />
-      <location filename="../artisanlib/modbusport.py" line="881" />
-      <location filename="../artisanlib/modbusport.py" line="801" />
-      <location filename="../artisanlib/modbusport.py" line="484" />
+      <location filename="../artisanlib/modbusport.py" line="1192" />
+      <location filename="../artisanlib/modbusport.py" line="1110" />
+      <location filename="../artisanlib/modbusport.py" line="1026" />
+      <location filename="../artisanlib/modbusport.py" line="1016" />
+      <location filename="../artisanlib/modbusport.py" line="887" />
+      <location filename="../artisanlib/modbusport.py" line="807" />
+      <location filename="../artisanlib/modbusport.py" line="490" />
       <source>Modbus Communication Resumed</source>
-      <translation type="unfinished" />
+      <translation>Comunicação Modbus retomada</translation>
     </message>
     <message>
-      <location filename="../artisanlib/modbusport.py" line="1199" />
-      <location filename="../artisanlib/modbusport.py" line="1116" />
-      <location filename="../artisanlib/modbusport.py" line="1032" />
-      <location filename="../artisanlib/modbusport.py" line="894" />
-      <location filename="../artisanlib/modbusport.py" line="814" />
-      <location filename="../artisanlib/modbusport.py" line="495" />
+      <location filename="../artisanlib/modbusport.py" line="1205" />
+      <location filename="../artisanlib/modbusport.py" line="1122" />
+      <location filename="../artisanlib/modbusport.py" line="1038" />
+      <location filename="../artisanlib/modbusport.py" line="900" />
+      <location filename="../artisanlib/modbusport.py" line="820" />
+      <location filename="../artisanlib/modbusport.py" line="501" />
       <source>Modbus Communication Error</source>
-      <translation type="unfinished" />
+      <translation>Erro de Comunicação Modbus</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="662" />
@@ -4586,22 +4586,22 @@ END</source>
       <location filename="../artisanlib/curves.py" line="1947" />
       <location filename="../artisanlib/curves.py" line="1892" />
       <source>Univariate: no profile data available</source>
-      <translation type="unfinished" />
+      <translation>Univariada: nenhum dado de perfil disponível</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1906" />
       <source>ln(): no profile data available</source>
-      <translation type="unfinished" />
+      <translation>ln(): nenhum dado de perfil disponível</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1925" />
       <source>expvar(): no profile data available</source>
-      <translation type="unfinished" />
+      <translation>expvar(): nenhum dado de perfil disponível</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="2176" />
       <source>Polyfit: no profile data available</source>
-      <translation type="unfinished" />
+      <translation>Polyfit: não há dados de perfil disponíveis</translation>
     </message>
     <message>
       <location filename="../artisanlib/s7port.py" line="912" />
@@ -4609,12 +4609,12 @@ END</source>
       <location filename="../artisanlib/s7port.py" line="728" />
       <location filename="../artisanlib/s7port.py" line="529" />
       <source>S7 Communication Resumed</source>
-      <translation type="unfinished" />
+      <translation>Comunicação S7 retomada</translation>
     </message>
     <message>
       <location filename="../artisanlib/s7port.py" line="542" />
       <source>readActiveRegisters() S7 Communication Error</source>
-      <translation type="unfinished" />
+      <translation>readActiveRegisters() S7 Erro de comunicação</translation>
     </message>
     <message>
       <location filename="../artisanlib/s7port.py" line="918" />
@@ -4625,7 +4625,7 @@ END</source>
       <location filename="../artisanlib/s7port.py" line="602" />
       <location filename="../artisanlib/s7port.py" line="571" />
       <source>S7 Error: connecting to PLC failed</source>
-      <translation type="unfinished" />
+      <translation>Erro S7: falha na conexão com o PLC</translation>
     </message>
     <message>
       <location filename="../artisanlib/s7port.py" line="925" />
@@ -4636,79 +4636,79 @@ END</source>
       <location filename="../artisanlib/s7port.py" line="608" />
       <location filename="../artisanlib/s7port.py" line="577" />
       <source>S7 Communication Error</source>
-      <translation type="unfinished" />
+      <translation>Erro de comunicação S7</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11009" />
-      <location filename="../artisanlib/main.py" line="10937" />
+      <location filename="../artisanlib/main.py" line="11032" />
+      <location filename="../artisanlib/main.py" line="10960" />
       <source>Error:</source>
-      <translation type="unfinished" />
+      <translation>Erro:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15137" />
+      <location filename="../artisanlib/main.py" line="15160" />
       <source>Exception: {} not a valid settings file</source>
-      <translation type="unfinished" />
+      <translation>Exceção: {} não é um arquivo de configurações válido</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="18111" />
-      <location filename="../artisanlib/main.py" line="18068" />
-      <location filename="../artisanlib/main.py" line="18062" />
-      <location filename="../artisanlib/main.py" line="16866" />
-      <location filename="../artisanlib/main.py" line="16783" />
+      <location filename="../artisanlib/main.py" line="18134" />
+      <location filename="../artisanlib/main.py" line="18091" />
+      <location filename="../artisanlib/main.py" line="18085" />
+      <location filename="../artisanlib/main.py" line="16889" />
+      <location filename="../artisanlib/main.py" line="16806" />
       <source>Error</source>
       <translation>Erro</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="16893" />
+      <location filename="../artisanlib/main.py" line="16916" />
       <source>Exception: WebLCDs not supported by this build</source>
       <translation>Exceção: WebLCDs não suportados por esta construção</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="18062" />
+      <location filename="../artisanlib/main.py" line="18085" />
       <source>Failed to save settings</source>
-      <translation type="unfinished" />
+      <translation>Falha ao salvar as configurações</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19821" />
-      <location filename="../artisanlib/main.py" line="19449" />
+      <location filename="../artisanlib/main.py" line="19844" />
+      <location filename="../artisanlib/main.py" line="19472" />
       <source>Exception (probably due to an empty profile):</source>
-      <translation type="unfinished" />
+      <translation>Exceção (provavelmente devido a um perfil vazio):</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23597" />
+      <location filename="../artisanlib/main.py" line="23620" />
       <source>Analyze: CHARGE event required, none found</source>
-      <translation type="unfinished" />
+      <translation>Analisar: evento CHARGE necessário, nenhum encontrado</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23601" />
+      <location filename="../artisanlib/main.py" line="23624" />
       <source>Analyze: DROP event required, none found</source>
-      <translation type="unfinished" />
+      <translation>Analisar: evento DROP necessário, nenhum encontrado</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23690" />
+      <location filename="../artisanlib/main.py" line="23713" />
       <source>Analyze: no background profile data available</source>
-      <translation type="unfinished" />
+      <translation>Analisar: não há dados de perfil de segundo plano disponíveis</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23693" />
+      <location filename="../artisanlib/main.py" line="23716" />
       <source>Analyze: background profile requires CHARGE and DROP events</source>
-      <translation type="unfinished" />
+      <translation>Analisar: o perfil de fundo requer eventos CHARGE e DROP</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="11161" />
       <location filename="../artisanlib/canvas.py" line="11154" />
       <source>Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!</source>
-      <translation type="unfinished" />
+      <translation>Exceção: não foi possível iniciar o PhidgetManager. Verifique se o driver Phidget está instalado corretamente!</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="14531" />
       <source>Error in lnRegression:</source>
-      <translation type="unfinished" />
+      <translation>Erro em lnRegressão:</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="15202" />
       <source>Exception: redrawdesigner() Roast events may be out of order. Restting Designer.</source>
-      <translation type="unfinished" />
+      <translation>Exceção: eventos redrawdesigner() Roast podem estar fora de ordem. Descansando Designer.</translation>
     </message>
     <message>
       <source>HH806AUtemperature(): {0} bytes received but 14 needed</source>
@@ -4786,17 +4786,17 @@ END</source>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="60" />
       <source>Arduino/TC4 PID Control</source>
-      <translation type="unfinished" />
+      <translation>Controle Arduino/TC4 PID</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="62" />
       <source>S7 PID Control</source>
-      <translation type="unfinished" />
+      <translation>S7 Controle PID</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="64" />
       <source>MODBUS PID Control</source>
-      <translation type="unfinished" />
+      <translation>Controle MODBUS PID</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="66" />
@@ -4854,60 +4854,60 @@ END</source>
       <translation type="unfinished">Eventos</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3411" />
-      <location filename="../artisanlib/events.py" line="804" />
-      <location filename="../artisanlib/events.py" line="799" />
-      <location filename="../artisanlib/events.py" line="795" />
-      <location filename="../artisanlib/events.py" line="790" />
+      <location filename="../artisanlib/events.py" line="3415" />
+      <location filename="../artisanlib/events.py" line="806" />
+      <location filename="../artisanlib/events.py" line="801" />
+      <location filename="../artisanlib/events.py" line="797" />
+      <location filename="../artisanlib/events.py" line="792" />
       <source>Slider Calculator</source>
       <translation>Calculadora deslizante</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3286" />
+      <location filename="../artisanlib/events.py" line="3290" />
       <source>Event Custom Buttons Help</source>
       <translation>Ajuda dos botões personalizados do evento</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3295" />
+      <location filename="../artisanlib/events.py" line="3299" />
       <source>Event Custom Sliders Help</source>
       <translation>Ajuda dos controles deslizantes personalizados do evento</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3304" />
+      <location filename="../artisanlib/events.py" line="3308" />
       <source>Event Annotations Help</source>
       <translation>Ajuda para anotações de eventos</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11040" />
+      <location filename="../artisanlib/main.py" line="11063" />
       <location filename="../artisanlib/main.py" line="3179" />
       <location filename="../artisanlib/calculator.py" line="60" />
       <location filename="../artisanlib/calculator.py" line="58" />
-      <location filename="../artisanlib/events.py" line="3447" />
+      <location filename="../artisanlib/events.py" line="3451" />
       <source>Event</source>
       <translation type="unfinished">Evento</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="75" />
       <source>Scan Modbus</source>
-      <translation type="unfinished" />
+      <translation>Escanear Modbus</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="230" />
       <source>Scan S7</source>
-      <translation type="unfinished" />
+      <translation>Escanear S7</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="434" />
+      <location filename="../artisanlib/ports.py" line="438" />
       <source>Ports Configuration</source>
       <translation type="unfinished">Configuração das portas</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1877" />
+      <location filename="../artisanlib/ports.py" line="1882" />
       <source>MODBUS Help</source>
       <translation>Ajuda MODBUS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1884" />
+      <location filename="../artisanlib/ports.py" line="1889" />
       <source>S7 Help</source>
       <translation>Ajuda S7</translation>
     </message>
@@ -5020,7 +5020,7 @@ END</source>
       <translation>Ajuda de alarmes</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11019" />
+      <location filename="../artisanlib/main.py" line="11042" />
       <source>Keyboard Shortcuts Help</source>
       <translation>Ajuda para atalhos de teclado</translation>
     </message>
@@ -5128,89 +5128,89 @@ END</source>
       <translation type="unfinished">Dever</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1072" />
+      <location filename="../artisanlib/events.py" line="1074" />
       <source>Event Types</source>
       <translation type="unfinished">Tipos de Evento</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1262" />
+      <location filename="../artisanlib/events.py" line="1264" />
       <source>Default Buttons</source>
       <translation type="unfinished">Botões Padrão</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1273" />
+      <location filename="../artisanlib/events.py" line="1275" />
       <source>Sampling</source>
       <translation type="unfinished">Amostragem</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="207" />
-      <location filename="../artisanlib/events.py" line="1336" />
+      <location filename="../artisanlib/events.py" line="1338" />
       <source>Management</source>
       <translation type="unfinished">Gerenciamento</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1246" />
-      <location filename="../artisanlib/ports.py" line="693" />
+      <location filename="../artisanlib/ports.py" line="1251" />
+      <location filename="../artisanlib/ports.py" line="698" />
       <source>Registers</source>
       <translation type="unfinished">Registros</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1501" />
-      <location filename="../artisanlib/ports.py" line="1263" />
-      <location filename="../artisanlib/ports.py" line="710" />
+      <location filename="../artisanlib/ports.py" line="1506" />
+      <location filename="../artisanlib/ports.py" line="1268" />
+      <location filename="../artisanlib/ports.py" line="715" />
       <source>Commands</source>
       <translation type="unfinished">Comandos</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1161" />
-      <location filename="../artisanlib/ports.py" line="1286" />
-      <location filename="../artisanlib/ports.py" line="722" />
+      <location filename="../artisanlib/ports.py" line="1291" />
+      <location filename="../artisanlib/ports.py" line="727" />
       <source>PID</source>
       <translation type="unfinished">PID</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="955" />
-      <location filename="../artisanlib/ports.py" line="750" />
+      <location filename="../artisanlib/ports.py" line="960" />
+      <location filename="../artisanlib/ports.py" line="755" />
       <source>Serial</source>
       <translation type="unfinished">Comunicação Serial</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="776" />
+      <location filename="../artisanlib/ports.py" line="781" />
       <source>UDP/TCP</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="974" />
+      <location filename="../artisanlib/ports.py" line="979" />
       <source>Input</source>
       <translation type="unfinished">Entrada</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1413" />
+      <location filename="../artisanlib/ports.py" line="1418" />
       <source>Machine</source>
       <translation>Máquina</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1452" />
+      <location filename="../artisanlib/ports.py" line="1457" />
       <source>Timeout</source>
       <translation>Tempo esgotado</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1489" />
+      <location filename="../artisanlib/ports.py" line="1494" />
       <source>Nodes</source>
       <translation>Nós</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1519" />
+      <location filename="../artisanlib/ports.py" line="1524" />
       <source>Messages</source>
       <translation type="unfinished">Mensagens</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1532" />
+      <location filename="../artisanlib/ports.py" line="1537" />
       <source>Flags</source>
       <translation>Bandeiras</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1591" />
+      <location filename="../artisanlib/ports.py" line="1596" />
       <source>Events</source>
       <translation type="unfinished">Eventos</translation>
     </message>
@@ -5512,818 +5512,818 @@ END</source>
   <context>
     <name>HTML Report Template</name>
     <message>
-      <location filename="../artisanlib/main.py" line="19024" />
-      <location filename="../artisanlib/main.py" line="18798" />
-      <location filename="../artisanlib/main.py" line="12844" />
+      <location filename="../artisanlib/main.py" line="19047" />
+      <location filename="../artisanlib/main.py" line="18821" />
+      <location filename="../artisanlib/main.py" line="12867" />
       <source>Profile</source>
       <translation>Perfil</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="18620" />
+      <location filename="../artisanlib/main.py" line="18643" />
       <source>Roast Batches</source>
       <translation>Lotes da torra</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19022" />
-      <location filename="../artisanlib/main.py" line="18793" />
-      <location filename="../artisanlib/main.py" line="18626" />
+      <location filename="../artisanlib/main.py" line="19045" />
+      <location filename="../artisanlib/main.py" line="18816" />
+      <location filename="../artisanlib/main.py" line="18649" />
       <source>Batch</source>
       <translation>Lote</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19906" />
-      <location filename="../artisanlib/main.py" line="18627" />
+      <location filename="../artisanlib/main.py" line="19929" />
+      <location filename="../artisanlib/main.py" line="18650" />
       <source>Date</source>
       <translation>Data</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19110" />
-      <location filename="../artisanlib/main.py" line="18801" />
-      <location filename="../artisanlib/main.py" line="18629" />
+      <location filename="../artisanlib/main.py" line="19133" />
+      <location filename="../artisanlib/main.py" line="18824" />
+      <location filename="../artisanlib/main.py" line="18652" />
       <source>Beans</source>
       <translation>Grãos</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19908" />
-      <location filename="../artisanlib/main.py" line="18804" />
-      <location filename="../artisanlib/main.py" line="18630" />
+      <location filename="../artisanlib/main.py" line="19931" />
+      <location filename="../artisanlib/main.py" line="18827" />
+      <location filename="../artisanlib/main.py" line="18653" />
       <source>In</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="18806" />
-      <location filename="../artisanlib/main.py" line="18631" />
+      <location filename="../artisanlib/main.py" line="18829" />
+      <location filename="../artisanlib/main.py" line="18654" />
       <source>Out</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19909" />
-      <location filename="../artisanlib/main.py" line="18808" />
-      <location filename="../artisanlib/main.py" line="18632" />
+      <location filename="../artisanlib/main.py" line="19932" />
+      <location filename="../artisanlib/main.py" line="18831" />
+      <location filename="../artisanlib/main.py" line="18655" />
       <source>Loss</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="18845" />
-      <location filename="../artisanlib/main.py" line="18633" />
+      <location filename="../artisanlib/main.py" line="18868" />
+      <location filename="../artisanlib/main.py" line="18656" />
       <source>SUM</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="18787" />
+      <location filename="../artisanlib/main.py" line="18810" />
       <source>Production Report</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19023" />
-      <location filename="../artisanlib/main.py" line="18795" />
+      <location filename="../artisanlib/main.py" line="19046" />
+      <location filename="../artisanlib/main.py" line="18818" />
       <source>Time</source>
       <translation>Tempo</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19095" />
-      <location filename="../artisanlib/main.py" line="19025" />
+      <location filename="../artisanlib/main.py" line="19118" />
+      <location filename="../artisanlib/main.py" line="19048" />
       <source>Weight In</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19050" />
-      <location filename="../artisanlib/main.py" line="19026" />
+      <location filename="../artisanlib/main.py" line="19073" />
+      <location filename="../artisanlib/main.py" line="19049" />
       <source>CHARGE BT</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19057" />
-      <location filename="../artisanlib/main.py" line="19027" />
+      <location filename="../artisanlib/main.py" line="19080" />
+      <location filename="../artisanlib/main.py" line="19050" />
       <source>FCs Time</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19059" />
-      <location filename="../artisanlib/main.py" line="19028" />
+      <location filename="../artisanlib/main.py" line="19082" />
+      <location filename="../artisanlib/main.py" line="19051" />
       <source>FCs BT</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19069" />
-      <location filename="../artisanlib/main.py" line="19029" />
+      <location filename="../artisanlib/main.py" line="19092" />
+      <location filename="../artisanlib/main.py" line="19052" />
       <source>DROP Time</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19071" />
-      <location filename="../artisanlib/main.py" line="19030" />
+      <location filename="../artisanlib/main.py" line="19094" />
+      <location filename="../artisanlib/main.py" line="19053" />
       <source>DROP BT</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19031" />
+      <location filename="../artisanlib/main.py" line="19054" />
       <source>Dry Percent</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19032" />
+      <location filename="../artisanlib/main.py" line="19055" />
       <source>MAI Percent</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19033" />
+      <location filename="../artisanlib/main.py" line="19056" />
       <source>Dev Percent</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19089" />
-      <location filename="../artisanlib/main.py" line="19034" />
+      <location filename="../artisanlib/main.py" line="19112" />
+      <location filename="../artisanlib/main.py" line="19057" />
       <source>AUC</source>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19097" />
-      <location filename="../artisanlib/main.py" line="19035" />
+      <location filename="../artisanlib/main.py" line="19120" />
+      <location filename="../artisanlib/main.py" line="19058" />
       <source>Weight Loss</source>
       <translation type="unfinished">Perda de Peso</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19910" />
-      <location filename="../artisanlib/main.py" line="19036" />
+      <location filename="../artisanlib/main.py" line="19933" />
+      <location filename="../artisanlib/main.py" line="19059" />
       <source>Color</source>
       <translation>Cor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19037" />
+      <location filename="../artisanlib/main.py" line="19060" />
       <source>Cupping</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19038" />
+      <location filename="../artisanlib/main.py" line="19061" />
       <source>Roaster</source>
       <translation type="unfinished">Torrador</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19039" />
+      <location filename="../artisanlib/main.py" line="19062" />
       <source>Capacity</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19040" />
+      <location filename="../artisanlib/main.py" line="19063" />
       <source>Operator</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19041" />
+      <location filename="../artisanlib/main.py" line="19064" />
       <source>Organization</source>
       <translation type="unfinished">Organização</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19042" />
+      <location filename="../artisanlib/main.py" line="19065" />
       <source>Drum Speed</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19043" />
+      <location filename="../artisanlib/main.py" line="19066" />
       <source>Whole Color</source>
       <translation type="unfinished">Cor do Café Torrado</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19044" />
+      <location filename="../artisanlib/main.py" line="19067" />
       <source>Ground Color</source>
       <translation type="unfinished">Cor do Café Moído</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19045" />
+      <location filename="../artisanlib/main.py" line="19068" />
       <source>Color System</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19046" />
+      <location filename="../artisanlib/main.py" line="19069" />
       <source>Screen Min</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19047" />
+      <location filename="../artisanlib/main.py" line="19070" />
       <source>Screen Max</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19048" />
+      <location filename="../artisanlib/main.py" line="19071" />
       <source>Bean Temp</source>
       <translation type="unfinished">Temperatura do grão</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19049" />
+      <location filename="../artisanlib/main.py" line="19072" />
       <source>CHARGE ET</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19051" />
+      <location filename="../artisanlib/main.py" line="19074" />
       <source>TP Time</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19052" />
+      <location filename="../artisanlib/main.py" line="19075" />
       <source>TP ET</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19053" />
+      <location filename="../artisanlib/main.py" line="19076" />
       <source>TP BT</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19054" />
+      <location filename="../artisanlib/main.py" line="19077" />
       <source>DRY Time</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19055" />
+      <location filename="../artisanlib/main.py" line="19078" />
       <source>DRY ET</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19056" />
+      <location filename="../artisanlib/main.py" line="19079" />
       <source>DRY BT</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19058" />
+      <location filename="../artisanlib/main.py" line="19081" />
       <source>FCs ET</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19060" />
+      <location filename="../artisanlib/main.py" line="19083" />
       <source>FCe Time</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19061" />
+      <location filename="../artisanlib/main.py" line="19084" />
       <source>FCe ET</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19062" />
+      <location filename="../artisanlib/main.py" line="19085" />
       <source>FCe BT</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19063" />
+      <location filename="../artisanlib/main.py" line="19086" />
       <source>SCs Time</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19064" />
+      <location filename="../artisanlib/main.py" line="19087" />
       <source>SCs ET</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19065" />
+      <location filename="../artisanlib/main.py" line="19088" />
       <source>SCs BT</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19066" />
+      <location filename="../artisanlib/main.py" line="19089" />
       <source>SCe Time</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19067" />
+      <location filename="../artisanlib/main.py" line="19090" />
       <source>SCe ET</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19068" />
+      <location filename="../artisanlib/main.py" line="19091" />
       <source>SCe BT</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19070" />
+      <location filename="../artisanlib/main.py" line="19093" />
       <source>DROP ET</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19072" />
+      <location filename="../artisanlib/main.py" line="19095" />
       <source>COOL Time</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19073" />
+      <location filename="../artisanlib/main.py" line="19096" />
       <source>COOL ET</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19074" />
+      <location filename="../artisanlib/main.py" line="19097" />
       <source>COOL BT</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19075" />
+      <location filename="../artisanlib/main.py" line="19098" />
       <source>Total Time</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19076" />
+      <location filename="../artisanlib/main.py" line="19099" />
       <source>Dry Phase Time</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19077" />
+      <location filename="../artisanlib/main.py" line="19100" />
       <source>Mid Phase Time</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19078" />
+      <location filename="../artisanlib/main.py" line="19101" />
       <source>Finish Phase Time</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19079" />
+      <location filename="../artisanlib/main.py" line="19102" />
       <source>Dry Phase RoR</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19080" />
+      <location filename="../artisanlib/main.py" line="19103" />
       <source>Mid Phase RoR</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19081" />
+      <location filename="../artisanlib/main.py" line="19104" />
       <source>Finish Phase RoR</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19082" />
+      <location filename="../artisanlib/main.py" line="19105" />
       <source>Dry Phase Delta BT</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19083" />
+      <location filename="../artisanlib/main.py" line="19106" />
       <source>Mid Phase Delta BT</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19084" />
+      <location filename="../artisanlib/main.py" line="19107" />
       <source>Finish Phase Delta BT</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19085" />
+      <location filename="../artisanlib/main.py" line="19108" />
       <source>Finish Phase Rise</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19086" />
+      <location filename="../artisanlib/main.py" line="19109" />
       <source>Total RoR</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19087" />
+      <location filename="../artisanlib/main.py" line="19110" />
       <source>FCs RoR</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19088" />
+      <location filename="../artisanlib/main.py" line="19111" />
       <source>MET</source>
       <translation type="unfinished">TMA</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19090" />
+      <location filename="../artisanlib/main.py" line="19113" />
       <source>AUC Begin</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19091" />
+      <location filename="../artisanlib/main.py" line="19114" />
       <source>AUC Base</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19092" />
+      <location filename="../artisanlib/main.py" line="19115" />
       <source>Dry Phase AUC</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19093" />
+      <location filename="../artisanlib/main.py" line="19116" />
       <source>Mid Phase AUC</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19094" />
+      <location filename="../artisanlib/main.py" line="19117" />
       <source>Finish Phase AUC</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19096" />
+      <location filename="../artisanlib/main.py" line="19119" />
       <source>Weight Out</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19098" />
+      <location filename="../artisanlib/main.py" line="19121" />
       <source>Volume In</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19099" />
+      <location filename="../artisanlib/main.py" line="19122" />
       <source>Volume Out</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19100" />
+      <location filename="../artisanlib/main.py" line="19123" />
       <source>Volume Gain</source>
       <translation type="unfinished">Ganho de Volume</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19101" />
+      <location filename="../artisanlib/main.py" line="19124" />
       <source>Green Density</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19102" />
+      <location filename="../artisanlib/main.py" line="19125" />
       <source>Roasted Density</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19103" />
+      <location filename="../artisanlib/main.py" line="19126" />
       <source>Moisture Greens</source>
       <translation type="unfinished">Umidade dos Grãos Verdes</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19104" />
+      <location filename="../artisanlib/main.py" line="19127" />
       <source>Moisture Roasted</source>
       <translation type="unfinished">Umidade dos Grãos Torrados</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19105" />
+      <location filename="../artisanlib/main.py" line="19128" />
       <source>Moisture Loss</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19106" />
+      <location filename="../artisanlib/main.py" line="19129" />
       <source>Organic Loss</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19107" />
+      <location filename="../artisanlib/main.py" line="19130" />
       <source>Ambient Humidity</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19108" />
+      <location filename="../artisanlib/main.py" line="19131" />
       <source>Ambient Pressure</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19109" />
+      <location filename="../artisanlib/main.py" line="19132" />
       <source>Ambient Temperature</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20581" />
-      <location filename="../artisanlib/main.py" line="19111" />
+      <location filename="../artisanlib/main.py" line="20604" />
+      <location filename="../artisanlib/main.py" line="19134" />
       <source>Roasting Notes</source>
       <translation>Notas de torra</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20590" />
-      <location filename="../artisanlib/main.py" line="19112" />
+      <location filename="../artisanlib/main.py" line="20613" />
+      <location filename="../artisanlib/main.py" line="19135" />
       <source>Cupping Notes</source>
       <translation>Notas de prova</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19113" />
+      <location filename="../artisanlib/main.py" line="19136" />
       <source>Heavy FC</source>
       <translation type="unfinished">PE intenso</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19114" />
+      <location filename="../artisanlib/main.py" line="19137" />
       <source>Low FC</source>
       <translation type="unfinished">PE baixo</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19115" />
+      <location filename="../artisanlib/main.py" line="19138" />
       <source>Light Cut</source>
       <translation type="unfinished">Corte claro</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19116" />
+      <location filename="../artisanlib/main.py" line="19139" />
       <source>Dark Cut</source>
       <translation type="unfinished">Corte escuro</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19117" />
+      <location filename="../artisanlib/main.py" line="19140" />
       <source>Drops</source>
       <translation type="unfinished">Gotículas</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19118" />
+      <location filename="../artisanlib/main.py" line="19141" />
       <source>Oily</source>
       <translation type="unfinished">Oleoso</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19119" />
+      <location filename="../artisanlib/main.py" line="19142" />
       <source>Uneven</source>
       <translation type="unfinished">Heterogênea</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19120" />
+      <location filename="../artisanlib/main.py" line="19143" />
       <source>Tipping</source>
       <translation type="unfinished">Pontas escuras</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19121" />
+      <location filename="../artisanlib/main.py" line="19144" />
       <source>Scorching</source>
       <translation type="unfinished">Chamuscado</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19122" />
+      <location filename="../artisanlib/main.py" line="19145" />
       <source>Divots</source>
       <translation type="unfinished">Buracos</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19123" />
+      <location filename="../artisanlib/main.py" line="19146" />
       <source>Mode</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19124" />
+      <location filename="../artisanlib/main.py" line="19147" />
       <source>BTU Batch</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19125" />
+      <location filename="../artisanlib/main.py" line="19148" />
       <source>BTU Batch per green kg</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19126" />
+      <location filename="../artisanlib/main.py" line="19149" />
       <source>CO2 Batch</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19127" />
+      <location filename="../artisanlib/main.py" line="19150" />
       <source>BTU Preheat</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19128" />
+      <location filename="../artisanlib/main.py" line="19151" />
       <source>CO2 Preheat</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19129" />
+      <location filename="../artisanlib/main.py" line="19152" />
       <source>BTU BBP</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19130" />
+      <location filename="../artisanlib/main.py" line="19153" />
       <source>CO2 BBP</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19131" />
+      <location filename="../artisanlib/main.py" line="19154" />
       <source>BTU Cooling</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19132" />
+      <location filename="../artisanlib/main.py" line="19155" />
       <source>CO2 Cooling</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19133" />
+      <location filename="../artisanlib/main.py" line="19156" />
       <source>BTU Roast</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19134" />
+      <location filename="../artisanlib/main.py" line="19157" />
       <source>BTU Roast per green kg</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19135" />
+      <location filename="../artisanlib/main.py" line="19158" />
       <source>CO2 Roast</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19136" />
+      <location filename="../artisanlib/main.py" line="19159" />
       <source>CO2 Batch per green kg</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19137" />
+      <location filename="../artisanlib/main.py" line="19160" />
       <source>BTU LPG</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19138" />
+      <location filename="../artisanlib/main.py" line="19161" />
       <source>BTU NG</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19139" />
+      <location filename="../artisanlib/main.py" line="19162" />
       <source>BTU ELEC</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19140" />
+      <location filename="../artisanlib/main.py" line="19163" />
       <source>Efficiency Batch</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19141" />
+      <location filename="../artisanlib/main.py" line="19164" />
       <source>Efficiency Roast</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19905" />
+      <location filename="../artisanlib/main.py" line="19928" />
       <source>Roast Ranking</source>
       <translation type="unfinished">Classificação de torra</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20016" />
+      <location filename="../artisanlib/main.py" line="20039" />
       <source>Ranking Report</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20157" />
+      <location filename="../artisanlib/main.py" line="20180" />
       <source>AVG</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20509" />
+      <location filename="../artisanlib/main.py" line="20532" />
       <source>Roasting Report</source>
       <translation>Relatório de torra</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20510" />
+      <location filename="../artisanlib/main.py" line="20533" />
       <source>Date:</source>
       <translation>Data:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20512" />
+      <location filename="../artisanlib/main.py" line="20535" />
       <source>Beans:</source>
       <translation>Grãos:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20514" />
+      <location filename="../artisanlib/main.py" line="20537" />
       <source>Weight:</source>
       <translation>Massa:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20518" />
+      <location filename="../artisanlib/main.py" line="20541" />
       <source>Volume:</source>
       <translation>Volume:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20520" />
+      <location filename="../artisanlib/main.py" line="20543" />
       <source>Roaster:</source>
       <translation>Torrador:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20522" />
+      <location filename="../artisanlib/main.py" line="20545" />
       <source>Operator:</source>
       <translation>Operador:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20524" />
+      <location filename="../artisanlib/main.py" line="20547" />
       <source>Organization:</source>
       <translation>Organização:</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="10247" />
-      <location filename="../artisanlib/main.py" line="20526" />
+      <location filename="../artisanlib/main.py" line="20549" />
       <source>Cupping:</source>
       <translation>Prova:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20528" />
+      <location filename="../artisanlib/main.py" line="20551" />
       <source>Color:</source>
       <translation>Cor:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20530" />
+      <location filename="../artisanlib/main.py" line="20553" />
       <source>Energy:</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20532" />
+      <location filename="../artisanlib/main.py" line="20555" />
       <source>CO2:</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20534" />
+      <location filename="../artisanlib/main.py" line="20557" />
       <source>CHARGE:</source>
       <translation>CARREGAR:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20536" />
+      <location filename="../artisanlib/main.py" line="20559" />
       <source>Size:</source>
       <translation>Peneira:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20539" />
+      <location filename="../artisanlib/main.py" line="20562" />
       <source>Density:</source>
       <translation>Densidade:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20541" />
+      <location filename="../artisanlib/main.py" line="20564" />
       <source>Moisture:</source>
       <translation>Umidade:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20543" />
+      <location filename="../artisanlib/main.py" line="20566" />
       <source>Ambient:</source>
       <translation>Ambiente:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20545" />
+      <location filename="../artisanlib/main.py" line="20568" />
       <source>TP:</source>
       <translation>PV:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20547" />
+      <location filename="../artisanlib/main.py" line="20570" />
       <source>DRY:</source>
       <translation>SECA:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20549" />
+      <location filename="../artisanlib/main.py" line="20572" />
       <source>FCs:</source>
       <translation>PEi:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20551" />
+      <location filename="../artisanlib/main.py" line="20574" />
       <source>FCe:</source>
       <translation>PEf:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20553" />
+      <location filename="../artisanlib/main.py" line="20576" />
       <source>SCs:</source>
       <translation>SEi:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20555" />
+      <location filename="../artisanlib/main.py" line="20578" />
       <source>SCe:</source>
       <translation>SEf:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20557" />
+      <location filename="../artisanlib/main.py" line="20580" />
       <source>DROP:</source>
       <translation>RETIRAR:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20559" />
+      <location filename="../artisanlib/main.py" line="20582" />
       <source>COOL:</source>
       <translation>PRONTO:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20561" />
+      <location filename="../artisanlib/main.py" line="20584" />
       <source>MET:</source>
       <translation>TMA:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20563" />
+      <location filename="../artisanlib/main.py" line="20586" />
       <source>CM:</source>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20565" />
+      <location filename="../artisanlib/main.py" line="20588" />
       <source>Drying:</source>
       <translation>Fase de seca:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20567" />
+      <location filename="../artisanlib/main.py" line="20590" />
       <source>Maillard:</source>
       <translation>Fase de Maillard:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20569" />
+      <location filename="../artisanlib/main.py" line="20592" />
       <source>Finishing:</source>
       <translation>Finalização:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20571" />
+      <location filename="../artisanlib/main.py" line="20594" />
       <source>Cooling:</source>
       <translation>Resfriamento:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20573" />
+      <location filename="../artisanlib/main.py" line="20596" />
       <source>Background:</source>
       <translation>Fundo:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20575" />
+      <location filename="../artisanlib/main.py" line="20598" />
       <source>Alarms:</source>
       <translation>Alarmes:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20577" />
+      <location filename="../artisanlib/main.py" line="20600" />
       <source>RoR:</source>
       <translation>RoR:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20579" />
+      <location filename="../artisanlib/main.py" line="20602" />
       <source>AUC:</source>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20587" />
+      <location filename="../artisanlib/main.py" line="20610" />
       <source>Events</source>
       <translation>Eventos</translation>
     </message>
@@ -6373,13 +6373,14 @@ END</source>
     <message>
       <location filename="../help/alarms_help.py" line="14" />
       <source>ALARMS</source>
-      <translation type="unfinished" />
+      <translation>ALARMES</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="18" />
       <source>Each alarm is only triggered once.
 Alarms are scanned in order from the top of the table to the bottom.</source>
-      <translation type="unfinished" />
+      <translation>Cada alarme é acionado apenas uma vez.
+Os alarmes são verificados na ordem do topo da tabela para o fundo.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="64" />
@@ -6387,7 +6388,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
       <location filename="../help/energy_help.py" line="32" />
       <location filename="../help/alarms_help.py" line="21" />
       <source>Field</source>
-      <translation type="unfinished" />
+      <translation>Campo</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="183" />
@@ -6420,12 +6421,12 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="22" />
       <source>Nr</source>
-      <translation type="unfinished" />
+      <translation>Nº</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="22" />
       <source>Alarm number for reference.</source>
-      <translation type="unfinished" />
+      <translation>Número do alarme para referência.</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="23" />
@@ -6435,7 +6436,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="23" />
       <source>Activate or Deactivate the alarm.</source>
-      <translation type="unfinished" />
+      <translation>Ative ou desative o alarme.</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="24" />
@@ -6445,7 +6446,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="24" />
       <source>Alarm triggered only if the alarm with the given number was triggered before. Use 0 for no guard.</source>
-      <translation type="unfinished" />
+      <translation>Alarme acionado apenas se o alarme com o número fornecido foi acionado antes. Use 0 para nenhum guarda.</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="25" />
@@ -6455,7 +6456,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="25" />
       <source>Alarm triggered only if the alarm with the given number was not triggered before. Use 0 for no guard.</source>
-      <translation type="unfinished" />
+      <translation>Alarme acionado somente se o alarme com o número fornecido não foi acionado antes. Use 0 para nenhum guarda.</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="26" />
@@ -6465,7 +6466,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="26" />
       <source>Alarm only triggered after the given event.</source>
-      <translation type="unfinished" />
+      <translation>Alarme somente acionado após determinado evento.</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="27" />
@@ -6475,7 +6476,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="27" />
       <source>If not 00:00, alarm is triggered mm:ss after the event "From" happens.</source>
-      <translation type="unfinished" />
+      <translation>Se não for 00:00, o alarme é acionado mm:ss após o evento "De" acontecer.</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="30" />
@@ -6487,7 +6488,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="28" />
       <source>The observed temperature source.</source>
-      <translation type="unfinished" />
+      <translation>A fonte de temperatura observada.</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="29" />
@@ -6497,7 +6498,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="29" />
       <source>Alarm is triggered if source rises above or below the specified temperature.</source>
-      <translation type="unfinished" />
+      <translation>O alarme é acionado se a fonte subir acima ou abaixo da temperatura especificada.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="26" />
@@ -6508,7 +6509,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="30" />
       <source>The specified temperature limit.</source>
-      <translation type="unfinished" />
+      <translation>O limite de temperatura especificado.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="48" />
@@ -6525,56 +6526,56 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="31" />
       <source>The action to be triggered if all conditions are fulfilled.</source>
-      <translation type="unfinished" />
+      <translation>A ação a ser acionada se todas as condições forem atendidas.</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="32" />
       <source>Commands for alarms with an action go here.  Anything after a &amp;#39;#&amp;#39; character is considered a comment and is ignored when processing the alarm.  </source>
-      <translation type="unfinished" />
+      <translation>Comandos para alarmes com uma ação vão aqui. Qualquer coisa depois de um &amp;#39;#&amp;#39; O caractere é considerado um comentário e é ignorado durante o processamento do alarme.</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="35" />
       <source>ALARM CONFIGURATION OPTIONS</source>
-      <translation type="unfinished" />
+      <translation>OPÇÕES DE CONFIGURAÇÃO DE ALARME</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="30" />
       <location filename="../help/alarms_help.py" line="38" />
       <source>Option</source>
-      <translation type="unfinished" />
+      <translation>Opção</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="34" />
       <location filename="../help/alarms_help.py" line="39" />
       <source>Add</source>
-      <translation type="unfinished" />
+      <translation>Adicionar</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="39" />
       <source>Adds a new alarm to the bottom of the table.</source>
-      <translation type="unfinished" />
+      <translation>Adiciona um novo alarme na parte inferior da tabela.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="35" />
       <location filename="../help/alarms_help.py" line="40" />
       <source>Insert</source>
-      <translation type="unfinished" />
+      <translation>Inserir</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="40" />
       <source>Inserts a new alarm above the selected alarm.</source>
-      <translation type="unfinished" />
+      <translation>Insere um novo alarme acima do alarme selecionado.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="36" />
       <location filename="../help/alarms_help.py" line="41" />
       <source>Delete</source>
-      <translation type="unfinished" />
+      <translation>Excluir</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="41" />
       <source>Deletes the selected alarm.</source>
-      <translation type="unfinished" />
+      <translation>Exclui o alarme selecionado.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="37" />
@@ -6585,27 +6586,27 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="42" />
       <source>Copy the alarm table in tab separated format to the clipboard.  Option or ALT click to copy a tabular format to the clipboard.</source>
-      <translation type="unfinished" />
+      <translation>Copie a tabela de alarmes em formato separado por tabulações para a área de transferência. Option ou ALT clique para copiar um formato tabular para a área de transferência.</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="43" />
       <source>All On</source>
-      <translation type="unfinished" />
+      <translation>Tudo em cima</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="43" />
       <source>Enables all alarms.</source>
-      <translation type="unfinished" />
+      <translation>Habilita todos os alarmes.</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="44" />
       <source>All Off</source>
-      <translation type="unfinished" />
+      <translation>Tudo desligado</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="44" />
       <source>Disables all alarms.</source>
-      <translation type="unfinished" />
+      <translation>Desativa todos os alarmes.</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="45" />
@@ -6615,7 +6616,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="45" />
       <source>Load alarm definition from a file.</source>
-      <translation type="unfinished" />
+      <translation>Carregar definição de alarme de um arquivo.</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="93" />
@@ -6626,17 +6627,17 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="46" />
       <source>Save the alarm definitions to a file.</source>
-      <translation type="unfinished" />
+      <translation>Salve as definições de alarme em um arquivo.</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="47" />
       <source>Clear</source>
-      <translation type="unfinished" />
+      <translation>Claro</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="47" />
       <source>Clears all alarms from the table.</source>
-      <translation type="unfinished" />
+      <translation>Apaga todos os alarmes da tabela.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="38" />
@@ -6649,27 +6650,27 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
       <location filename="../help/eventbuttons_help.py" line="38" />
       <location filename="../help/alarms_help.py" line="48" />
       <source>Opens this window.</source>
-      <translation type="unfinished" />
+      <translation>Abre esta janela.</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="49" />
       <source>Load from Profile</source>
-      <translation type="unfinished" />
+      <translation>Carregar do perfil</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="49" />
       <source>when ticked will replace the alarm table when loading a profile with the alarms stored in the profile.  If there are no alarms in the profile the alarm table will be cleared.</source>
-      <translation type="unfinished" />
+      <translation>quando marcada, substituirá a tabela de alarmes ao carregar um perfil com os alarmes armazenados no perfil. Se não houver alarmes no perfil, a tabela de alarmes será apagada.</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="50" />
       <source>Load from Background</source>
-      <translation type="unfinished" />
+      <translation>Carregar do plano de fundo</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="50" />
       <source>when ticked will replace the alarm table when loading a background profile with the alarms stored in the profile.  If there are no alarms in the profile the alarm table will be cleared.</source>
-      <translation type="unfinished" />
+      <translation>quando marcada, substituirá a tabela de alarmes ao carregar um perfil de fundo com os alarmes armazenados no perfil. Se não houver alarmes no perfil, a tabela de alarmes será apagada.</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="51" />
@@ -6679,17 +6680,17 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="51" />
       <source>A PopUp will automatically close after this time if the OK button has not been clicked.</source>
-      <translation type="unfinished" />
+      <translation>Um PopUp fechará automaticamente após esse período se o botão OK não tiver sido clicado.</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="54" />
       <source>Alarm Actions</source>
-      <translation type="unfinished" />
+      <translation>Ações de Alarme</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="58" />
       <source>Enter the Command into the Description field of the Alarm.</source>
-      <translation type="unfinished" />
+      <translation>Insira o Comando no campo Descrição do Alarme.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="48" />
@@ -6703,22 +6704,22 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
       <location filename="../help/autosave_help.py" line="17" />
       <location filename="../help/alarms_help.py" line="61" />
       <source>Meaning</source>
-      <translation type="unfinished" />
+      <translation>Significado</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="62" />
       <source>Pop Up</source>
-      <translation type="unfinished" />
+      <translation>Aparecer</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="62" />
       <source>&lt;text&gt;</source>
-      <translation type="unfinished" />
+      <translation>&lt;texto&gt;</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="62" />
       <source>the text to  be displayed in the pop up</source>
-      <translation type="unfinished" />
+      <translation>o texto a ser exibido no pop-up</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="50" />
@@ -6732,33 +6733,33 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
       <location filename="../help/eventsliders_help.py" line="59" />
       <location filename="../help/alarms_help.py" line="63" />
       <source>A program/script path (absolute or relative)</source>
-      <translation type="unfinished" />
+      <translation>Um caminho de programa/script (absoluto ou relativo)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="50" />
       <location filename="../help/alarms_help.py" line="63" />
       <source>start an external program</source>
-      <translation type="unfinished" />
+      <translation>iniciar um programa externo</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="64" />
       <source>Event Button</source>
-      <translation type="unfinished" />
+      <translation>Botão de evento</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="64" />
       <source>&lt;button number&gt;</source>
-      <translation type="unfinished" />
+      <translation>&lt;número do botão&gt;</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="64" />
       <source>triggers the button, the button number comes from the Events Buttons configuration</source>
-      <translation type="unfinished" />
+      <translation>aciona o botão, o número do botão vem da configuração dos botões de eventos</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="65" />
       <source>Slider &lt;1&gt;</source>
-      <translation type="unfinished" />
+      <translation>Controle deslizante &lt;1&gt;</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="68" />
@@ -6766,42 +6767,42 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
       <location filename="../help/alarms_help.py" line="66" />
       <location filename="../help/alarms_help.py" line="65" />
       <source>&lt;value&gt;</source>
-      <translation type="unfinished" />
+      <translation>&lt;valor&gt;</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="65" />
       <source>set the slider for special event nr. 1 to the value</source>
-      <translation type="unfinished" />
+      <translation>defina o controle deslizante para o evento especial nr. 1 para o valor</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="66" />
       <source>Slider &lt;2&gt;</source>
-      <translation type="unfinished" />
+      <translation>Controle deslizante &lt;2&gt;</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="66" />
       <source>set the slider for special event nr. 2 to the value</source>
-      <translation type="unfinished" />
+      <translation>defina o controle deslizante para o evento especial nr. 2 ao valor</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="67" />
       <source>Slider &lt;3&gt;</source>
-      <translation type="unfinished" />
+      <translation>Controle deslizante &lt;3&gt;</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="67" />
       <source>set the slider for special event nr. 3 to the value</source>
-      <translation type="unfinished" />
+      <translation>defina o controle deslizante para o evento especial nr. 3 elevado ao valor</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="68" />
       <source>Slider &lt;4&gt;</source>
-      <translation type="unfinished" />
+      <translation>Controle deslizante &lt;4&gt;</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="68" />
       <source>set the slider for special event nr. 4 to the value</source>
-      <translation type="unfinished" />
+      <translation>defina o controle deslizante para o evento especial nr. 4 elevado ao valor</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="69" />
@@ -6811,7 +6812,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="69" />
       <source>trigger START</source>
-      <translation type="unfinished" />
+      <translation>gatilho INÍCIO</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="70" />
@@ -6821,7 +6822,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="70" />
       <source>trigger the DRY event</source>
-      <translation type="unfinished" />
+      <translation>acionar o evento DRY</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="71" />
@@ -6831,7 +6832,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="71" />
       <source>trigger the FCs event</source>
-      <translation type="unfinished" />
+      <translation>acionar o evento FCs</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="72" />
@@ -6841,7 +6842,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="72" />
       <source>trigger the FCe event</source>
-      <translation type="unfinished" />
+      <translation>acionar o evento FCe</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="73" />
@@ -6851,7 +6852,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="73" />
       <source>trigger the SCs event</source>
-      <translation type="unfinished" />
+      <translation>acionar o evento SCs</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="74" />
@@ -6861,7 +6862,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="74" />
       <source>trigger the SCe event</source>
-      <translation type="unfinished" />
+      <translation>disparar o evento SCe</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="75" />
@@ -6871,17 +6872,17 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="75" />
       <source>trigger the DROP event</source>
-      <translation type="unfinished" />
+      <translation>acionar o evento DROP</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="76" />
       <source>COOL END</source>
-      <translation type="unfinished" />
+      <translation>FIM LEGAL</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="76" />
       <source>trigger the COOL END event</source>
-      <translation type="unfinished" />
+      <translation>acionar o evento COOL END</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="77" />
@@ -6891,7 +6892,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="77" />
       <source>trigger OFF</source>
-      <translation type="unfinished" />
+      <translation>desencadear</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="78" />
@@ -6901,7 +6902,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="78" />
       <source>trigger the CHARGE event</source>
-      <translation type="unfinished" />
+      <translation>disparar o evento CHARGE</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="79" />
@@ -6911,7 +6912,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="79" />
       <source>turns PID on and switches to RampSoak mode</source>
-      <translation type="unfinished" />
+      <translation>liga o PID e muda para o modo RampSoak</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="80" />
@@ -6921,7 +6922,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="80" />
       <source>turns PID off and switches to manual mode</source>
-      <translation type="unfinished" />
+      <translation>desliga o PID e muda para o modo manual</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="81" />
@@ -6931,12 +6932,12 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="81" />
       <source>&lt;color&gt;</source>
-      <translation type="unfinished" />
+      <translation>&lt;cor&gt;</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="81" />
       <source>sets the canvas to &lt;color&gt;, can be in hex format, e.g. "#ffaa55" or a color name, e.g. "blue"</source>
-      <translation type="unfinished" />
+      <translation>define a tela para &lt;cor&gt;, pode estar em formato hexadecimal, por exemplo "#ffaa55" ou um nome de cor, por exemplo "azul"</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="82" />
@@ -6947,57 +6948,63 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
       <location filename="../help/alarms_help.py" line="82" />
       <source>reset the canvas color to the color specified in Config&gt;&gt;Colors
 canvas color resets automatically at OFF</source>
-      <translation type="unfinished" />
+      <translation>redefinir a cor da tela para a cor especificada em Config&gt;&gt;Colors
+a cor da tela é redefinida automaticamente em OFF</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="14" />
       <source>EXTERNAL PROGRAMS</source>
-      <translation type="unfinished" />
+      <translation>PROGRAMAS EXTERNOS</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="18" />
       <source>Link external programs that print temperature when called.  This allows to connect meters that use any program language.
 
 Artisan will start the program each sample period.  The program output must be to stdout (like when using print statements).  The program must exit and must not be persistent.</source>
-      <translation type="unfinished" />
+      <translation>Vincule programas externos que imprimem a temperatura quando chamados. Isso permite conectar medidores que usam qualquer linguagem de programa.
+
+O Artisan iniciará o programa a cada período de amostragem. A saída do programa deve ser stdout (como ao usar instruções de impressão). O programa deve sair e não deve ser persistente.</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="18" />
       <source>If only one termperature is provided it will be interpreted as BT.  If more than one temperature is provided the values are order dependent with ET first and BT second.</source>
-      <translation type="unfinished" />
+      <translation>Se apenas um termotemperatura for fornecido, ele será interpretado como BT. Se mais de uma temperatura for fornecida, os valores dependem da ordem com ET primeiro e BT depois.</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="18" />
       <source>Data may also be provided to the "Program" extra devices.  Extra device "Program" are the first two values, typically ET and BT.  "Program 34" are the third and fourth values.  Up to 10 values may be supplied.</source>
-      <translation type="unfinished" />
+      <translation>Os dados também podem ser fornecidos aos dispositivos extras do "Programa". Dispositivo extra "Programa" são os dois primeiros valores, normalmente ET e BT. "Programa 34" são o terceiro e o quarto valores. Podem ser fornecidos até 10 valores.</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="18" />
       <source>Example of output needed from program for single temperature (BT):
 "100.4" (note: "" not needed)</source>
-      <translation type="unfinished" />
+      <translation>Exemplo de saída necessária do programa para temperatura única (BT):
+"100.4" (nota: "" não é necessário)</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="18" />
       <source>Example of output needed from program for double temperature (ET,BT)
 "200.4,100.4" (note: temperatures are separated by a comma "ET,BT")</source>
-      <translation type="unfinished" />
+      <translation>Exemplo de saída necessária do programa para temperatura dupla (ET,BT)
+"200.4,100.4" (nota: as temperaturas são separadas por uma vírgula "ET,BT")</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="18" />
       <source>Example of output needed from program for double temperature (ET,BT) and extra devices (Program and Program 34)
 "200.4,100.4,312.4,345.6,299.0,275.5"</source>
-      <translation type="unfinished" />
+      <translation>Exemplo de saída necessária do programa para temperatura dupla (ET,BT) e dispositivos extras (Programa e Programa 34)
+"200,4.100,4.312,4.345,6.299,0.275,5"</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="22" />
       <source>Example of a file written in Python called test.py:</source>
-      <translation type="unfinished" />
+      <translation>Exemplo de um arquivo escrito em Python chamado test.py:</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="22" />
       <source>#comment: print a string with two numbers separated by a comma</source>
-      <translation type="unfinished" />
+      <translation>#comentário: imprime uma string com dois números separados por vírgula</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="22" />
@@ -7014,32 +7021,33 @@ Artisan will start the program each sample period.  The program output must be t
       <location filename="../help/programs_help.py" line="22" />
       <source>Note: In many cases the path to the Python or other language executatable should be provided along with the external program path.  On Windows it is  advised to enclose the paths with quotation marks if there are any spaces, and use forward slashes &amp;#39;/&amp;#39; in the path.
 "C:/Python38-64/python.exe" "c:/scripts/test.py"</source>
-      <translation type="unfinished" />
+      <translation>Observação: em muitos casos, o caminho para o executável em Python ou outra linguagem deve ser fornecido junto com o caminho do programa externo. No Windows, é recomendável colocar os caminhos entre aspas, se houver espaços, e usar barras &amp;#39;/&amp;#39; no caminho.
+"C:/Python38-64/python.exe" "c:/scripts/test.py"</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="22" />
       <source> Under Output a script can be specified which is called per sample interval with 4 arguments, ET, BT, Background ET and Background BT</source>
-      <translation type="unfinished" />
+      <translation> Em Saída, pode ser especificado um script que é chamado por intervalo de amostra com 4 argumentos, ET, BT, Background ET e Background BT</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="22" />
       <source> the output script also called if Prog is not selected as input source</source>
-      <translation type="unfinished" />
+      <translation> o script de saída também chamado se Prog não for selecionado como fonte de entrada</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="22" />
       <source> Example of a file written in Python called out.py:</source>
-      <translation type="unfinished" />
+      <translation> Exemplo de um arquivo escrito em Python chamado out.py:</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="22" />
       <source>#comment: adds the script arguments ET, BT, ETB, BTB to "/tmp/out.txt"</source>
-      <translation type="unfinished" />
+      <translation>#comentário: adiciona os argumentos do script ET, BT, ETB, BTB a "/tmp/out.txt"</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="22" />
       <source>import sys</source>
-      <translation type="unfinished" />
+      <translation>sistema de importação</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="22" />
@@ -7049,7 +7057,7 @@ Artisan will start the program each sample period.  The program output must be t
     <message>
       <location filename="../help/programs_help.py" line="22" />
       <source>with open("/tmp/out.txt", "w+") as file:</source>
-      <translation type="unfinished" />
+      <translation>com open("/tmp/out.txt", "w+") como arquivo:</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="22" />
@@ -7059,49 +7067,45 @@ Artisan will start the program each sample period.  The program output must be t
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="14" />
       <source>KEYBOARD SHORTCUTS</source>
-      <translation type="unfinished" />
+      <translation>ATALHOS DO TECLADO</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="91" />
       <location filename="../help/keyboardshortcuts_help.py" line="17" />
       <source>Keys</source>
-      <translation type="unfinished" />
+      <translation>Chaves</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="18" />
       <source>ENTER</source>
-      <translation type="unfinished" />
+      <translation>DIGITAR</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="18" />
       <source>Turns ON/OFF Keyboard Shortcuts</source>
-      <translation type="unfinished" />
+      <translation>Ativa/desativa atalhos de teclado</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="19" />
       <source>SPACE</source>
-      <translation type="unfinished" />
+      <translation>ESPAÇO</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="19" />
       <source>When Keyboard Shortcuts are ON chooses the current button
 When Keyboard Shortcuts are OFF adds a custom event</source>
-      <translation type="unfinished" />
+      <translation>Quando os atalhos de teclado estão ativados, escolhe o botão atual
+Quando os atalhos de teclado estão desativados, adiciona um evento personalizado</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="20" />
       <source>LEFT,RIGHT,UP,DOWN</source>
-      <translation type="unfinished" />
+      <translation>ESQUERDA DIREITA CIMA BAIXO</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="20" />
       <source>Move background or key focus</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="21" />
-      <source>A</source>
-      <translation type="unfinished" />
+      <translation>Mover plano de fundo ou foco principal</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="21" />
@@ -7110,198 +7114,98 @@ When Keyboard Shortcuts are OFF adds a custom event</source>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="22" />
-      <source>⌘-N [Mac]
-CRTL+N [Win]</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="22" />
       <source>Autosave + RESET + START</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="23" />
-      <source>T [Mac]
-CTRL+SHIFT+T [Win]</source>
-      <translation type="unfinished" />
+      <translation>Salvamento automático + RESET + INICIAR</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="23" />
       <source>Toggle mouse cross lines</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="24" />
-      <source>G</source>
-      <translation type="unfinished" />
+      <translation>Alternar linhas cruzadas do mouse</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="24" />
       <source>Toggle auto axis mode between Roast, BBP+Roast and BBP</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="25" />
-      <source>D</source>
-      <translation type="unfinished" />
+      <translation>Alternar o modo de eixo automático entre Roast, BBP+Roast e BBP</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="25" />
       <source>Toggle xy cursor mode (off/temp/delta)</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="26" />
-      <source>Z</source>
-      <translation type="unfinished" />
+      <translation>Alterna o modo do cursor xy (off/temp/delta)</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="26" />
       <source>Toggle xy cursor clamp mode (off/BT/ET/BTB/ETB)</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="27" />
-      <source>U</source>
-      <translation type="unfinished" />
+      <translation>Alterna o modo de fixação do cursor xy (desligado/BT/ET/BTB/ETB)</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="27" />
       <source>Toggle LCD cursor (off/profile/background)</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="28" />
-      <source>C</source>
-      <translation type="unfinished" />
+      <translation>Alternar o cursor do LCD (desligado/perfil/fundo)</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="28" />
       <source>Shows/Hides Controls</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="29" />
-      <source>X</source>
-      <translation type="unfinished" />
+      <translation>Mostra/Oculta Controles</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="29" />
       <source>Shows/Hides LCD Readings</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="30" />
-      <source>Y</source>
-      <translation type="unfinished" />
+      <translation>Mostra/oculta as leituras do LCD</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="30" />
       <source>Shows/Hides Mini Event editor (on recording)</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="31" />
-      <source>M</source>
-      <translation type="unfinished" />
+      <translation>Mostra/oculta o editor de mini eventos (na gravação)</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="31" />
       <source>Shows/Hides Event Buttons</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="32" />
-      <source>B</source>
-      <translation type="unfinished" />
+      <translation>Mostra/Oculta Botões de Evento</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="32" />
       <source>Shows/Hides Extra Event Buttons</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="33" />
-      <source>S</source>
-      <translation type="unfinished" />
+      <translation>Mostra/oculta botões extras de eventos</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="33" />
       <source>Shows/Hides Event Sliders</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="34" />
-      <source>P</source>
-      <translation type="unfinished" />
+      <translation>Mostra/oculta controles deslizantes de evento</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="34" />
       <source>Toggle PID mode</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="35" />
-      <source>J</source>
-      <translation type="unfinished" />
+      <translation>Alternar modo PID</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="35" />
       <source>Toggle Playback Events</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="36" />
-      <source>H
-CTRL+H [Win]</source>
-      <translation type="unfinished" />
+      <translation>Alternar eventos de reprodução</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="36" />
       <source>Load background profile</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="39" />
-      <location filename="../help/keyboardshortcuts_help.py" line="37" />
-      <source>OPTION+H [Mac]
-CTRL+SHIFT+H [Win]</source>
-      <translation type="unfinished" />
+      <translation>Carregar perfil de plano de fundo</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="37" />
       <source>Remove background profile</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="38" />
-      <source>I</source>
-      <translation type="unfinished">eu</translation>
+      <translation>Remover perfil de plano de fundo</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="38" />
       <source>Toggle foreground curves “show full”</source>
-      <translation type="unfinished" />
+      <translation>Alternar curvas de primeiro plano “mostrar completo”</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="39" />
       <source>Toggle background curves “show full”</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="40" />
-      <source>L</source>
-      <translation type="unfinished" />
+      <translation>Alternar curvas de fundo “mostrar completo”</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="40" />
       <source>Load alarms</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="41" />
-      <source>+,-</source>
-      <translation type="unfinished" />
+      <translation>Carregar alarmes</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="41" />
@@ -7310,112 +7214,68 @@ CTRL+SHIFT+H [Win]</source>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="42" />
-      <source>⌘ +,- [Mac]
-CRTL +,- [Win]</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="42" />
       <source>Inc/dec graph resolution</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="43" />
-      <source>⌘ 0-9 [Mac]
-CRTL 0-9 [Win]</source>
-      <translation type="unfinished" />
+      <translation>Resolução do gráfico de aumento/diminuição</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="43" />
       <source>Changes Event Button Palettes</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="44" />
-      <source>;</source>
-      <translation type="unfinished" />
+      <translation>Altera Paletas de Botões de Evento</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="44" />
       <source>Application ScreenShot</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="45" />
-      <source>:</source>
-      <translation type="unfinished" />
+      <translation>Captura de tela do aplicativo</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="45" />
       <source>Desktop ScreenShot</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="46" />
-      <source>Q,W,E,R + &lt;value&gt;</source>
-      <translation type="unfinished" />
+      <translation>Captura de tela da área de trabalho</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="46" />
       <source>Quick Special Event Entry.  The keys q,w,e, and r correspond to special events 1,2,3 and 4.  A two digit numeric value must follow the shortcut letter, e.g. &amp;#39;q75&amp;#39;, when the correspoding event slider max value is 100 or less (default setting).   When the slider max value is greater than 100, three digits must be entered and for values less that 100 a leading zero is required, e.g. &amp;#39;q075&amp;#39;.  </source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="47" />
-      <source>V +  &lt;value&gt;</source>
-      <translation type="unfinished" />
+      <translation>Entrada rápida de evento especial. As teclas q,w,e e r correspondem aos eventos especiais 1,2,3 e 4. Um valor numérico de dois dígitos deve seguir a letra de atalho, por exemplo &amp;#39;q75&amp;#39;, quando o valor máximo do controle deslizante de evento correspondente for 100 ou menos (configuração padrão). Quando o valor máximo do controle deslizante for maior que 100, três dígitos devem ser inseridos e, para valores menores que 100, é necessário um zero à esquerda, por exemplo &amp;#39;q075&amp;#39;.</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="47" />
       <source>Quick PID SV Entry.  Value is a three digit number.  For values less than 100 must be entered with a leading zero, e.g. &amp;#39;v075&amp;#39;.</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="48" />
-      <source>OPTION+B + &lt;value&gt; [Mac]
-CTRL+SHIFT+B + &lt;value&gt; [Win]</source>
-      <translation type="unfinished" />
+      <translation>Entrada rápida PID SV. O valor é um número de três dígitos. Para valores menores que 100 devem ser inseridos com um zero à esquerda, por exemplo &amp;#39;v075&amp;#39;.</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="48" />
       <source>Fire custom event button action. Value is a two digit number indicating the button number.</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="49" />
-      <source>F
-CTRL+SHIFT+F [Win]</source>
-      <translation type="unfinished" />
+      <translation>Acione a ação do botão de evento personalizado. O valor é um número de dois dígitos que indica o número do botão.</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="49" />
       <source>Full Screen Mode</source>
-      <translation type="unfinished" />
+      <translation>Modo tela cheia</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="52" />
       <source>ADDITIONAL SHORTCUTS</source>
-      <translation type="unfinished" />
+      <translation>ATALHOS ADICIONAIS</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="55" />
       <source>Key/mouse stroke(s)</source>
-      <translation type="unfinished" />
+      <translation>Curso(s) de tecla/mouse</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="55" />
       <source>Where</source>
-      <translation type="unfinished" />
+      <translation>Onde</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="55" />
       <source>Additional Information</source>
-      <translation type="unfinished" />
+      <translation>Informações adicionais</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="56" />
       <source>Double click on Roast Title</source>
-      <translation type="unfinished" />
+      <translation>Clique duas vezes em Roast Title</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="74" />
@@ -7440,120 +7300,123 @@ CTRL+SHIFT+F [Win]</source>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="56" />
       <source>Open the roast in artisan.plus</source>
-      <translation type="unfinished" />
+      <translation>Abra a assadeira em craft.plus</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="56" />
       <source>Requires an artisan.plus account</source>
-      <translation type="unfinished" />
+      <translation>Requer uma conta craft.plus</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="57" />
       <source>Click on Background Profile Title</source>
-      <translation type="unfinished" />
+      <translation>Clique no título do perfil de plano de fundo</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="57" />
       <source>Toggle Show/Hide Background Profile</source>
-      <translation type="unfinished" />
+      <translation>Alternar mostrar/ocultar perfil de plano de fundo</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="57" />
       <source>Only when a Background profile is loaded</source>
-      <translation type="unfinished" />
+      <translation>Somente quando um perfil de plano de fundo é carregado</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="58" />
       <source>Right click on BT curve</source>
-      <translation type="unfinished" />
+      <translation>Clique com o botão direito na curva BT</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="58" />
       <source>Place or re-place events</source>
-      <translation type="unfinished" />
+      <translation>Colocar ou substituir eventos</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="59" />
       <source>Right click on timer</source>
-      <translation type="unfinished" />
+      <translation>Clique com o botão direito no cronômetro</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="59" />
       <source>Toggle super mode</source>
-      <translation type="unfinished" />
+      <translation>Alternar modo super</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="60" />
       <source>Right click on characteristics line below graph</source>
-      <translation type="unfinished" />
+      <translation>Clique com o botão direito na linha de características abaixo do gráfico</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="60" />
       <source>Toggle set of characteristics displayed</source>
-      <translation type="unfinished" />
+      <translation>Alternar conjunto de características exibidas</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="60" />
       <source>Characteristics must be enabled in Config&gt;&gt; Statistics</source>
-      <translation type="unfinished" />
+      <translation>As características devem ser habilitadas em Config&gt;&gt; Estatísticas</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="61" />
       <source>Click on plus icon (when not red)</source>
-      <translation type="unfinished" />
+      <translation>Clique no ícone de mais (quando não estiver vermelho)</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="61" />
       <source>Toggle connect/disconnect to plus</source>
-      <translation type="unfinished" />
+      <translation>Alternar conectar/desconectar para mais</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="62" />
       <source>Click on plus icon (when it is red)</source>
-      <translation type="unfinished" />
+      <translation>Clique no ícone de mais (quando estiver vermelho)</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="62" />
       <source>Sync the roast with artisan.plus</source>
-      <translation type="unfinished" />
+      <translation>Sincronize o assado com o craft.plus</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="63" />
       <source>⌘ click on plus icon [Mac]
 CTRL click on plus icon [Win]</source>
-      <translation type="unfinished" />
+      <translation>⌘ clique no ícone de adição [Mac]
+CTRL clique no ícone de adição [Win]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="63" />
       <source>When connected to plus, disconnect and clear credentials</source>
-      <translation type="unfinished" />
+      <translation>Quando conectado ao plus, desconecte e limpe as credenciais</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="64" />
       <source>OPTION click on plus icon [Mac]
 ALT click on plus icon [Win]</source>
-      <translation type="unfinished" />
+      <translation>OPÇÃO clique no ícone de mais [Mac]
+ALT clique no ícone de adição [Win]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="64" />
       <source>Generate email message with Artisan Logs</source>
-      <translation type="unfinished" />
+      <translation>Gerar mensagem de e-mail com Artisan Logs</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="65" />
       <source>⌘+OPTION click on plus icon [Mac]
 CTRL+ALT click on plus icon [Win]</source>
-      <translation type="unfinished" />
+      <translation>⌘+OPTION clique no ícone de adição [Mac]
+CTRL+ALT clique no ícone de adição [Win]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="65" />
       <source>Toggle debug logging mode</source>
-      <translation type="unfinished" />
+      <translation>Alternar modo de registro de depuração</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="66" />
       <source>Click on timer</source>
-      <translation type="unfinished" />
+      <translation>Clique no cronômetro</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="66" />
@@ -7563,77 +7426,80 @@ CTRL+ALT click on plus icon [Win]</source>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="66" />
       <source>Toggle Pause/Continue Simulation</source>
-      <translation type="unfinished" />
+      <translation>Alternar pausa/continuar simulação</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="66" />
       <source>Simulator speed may be changd while paused.  See next two shortcuts.</source>
-      <translation type="unfinished" />
+      <translation>A velocidade do simulador pode ser alterada durante a pausa. Veja os próximos dois atalhos.</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="67" />
       <source>OPTION Tools&gt;&gt;Simulator [Mac]
 ALT Tools&gt;&gt;Simulator [Win]</source>
-      <translation type="unfinished" />
+      <translation>OPÇÃO Ferramentas&gt;&gt;Simulador [Mac]
+Ferramentas ALT&gt;&gt;Simulador [Win]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="68" />
       <location filename="../help/keyboardshortcuts_help.py" line="67" />
       <source>Graph/Simulator</source>
-      <translation type="unfinished" />
+      <translation>Gráfico/Simulador</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="67" />
       <source>Start or change Simulator speed to 2x mode</source>
-      <translation type="unfinished" />
+      <translation>Iniciar ou alterar a velocidade do Simulador para o modo 2x</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="68" />
       <source>⌘ Tools&gt;&gt;Simulator [Mac]
 CTRL Tools&gt;&gt;Simulator [Win]</source>
-      <translation type="unfinished" />
+      <translation>⌘ Ferramentas &gt;&gt; Simulador [Mac]
+Ferramentas CTRL&gt;&gt;Simulador [Win]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="68" />
       <source>Start or change Simulator speed to 4x mode</source>
-      <translation type="unfinished" />
+      <translation>Iniciar ou alterar a velocidade do Simulador para o modo 4x</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="69" />
       <source>Click on LCD</source>
-      <translation type="unfinished" />
+      <translation>Clique no LCD</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="70" />
       <location filename="../help/keyboardshortcuts_help.py" line="69" />
       <source>Hide or Show corresponding Curve</source>
-      <translation type="unfinished" />
+      <translation>Ocultar ou Mostrar a Curva correspondente</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="69" />
       <source>In  OFF state this changes the Artisan Settings, in ON/START states the change is temporary until OFF state</source>
-      <translation type="unfinished" />
+      <translation>No estado OFF, isso altera as configurações do Artisan, nos estados ON/START, a alteração é temporária até o estado OFF</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="70" />
       <source>Click on label in the Legend</source>
-      <translation type="unfinished" />
+      <translation>Clique no rótulo na legenda</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="70" />
       <source>Only in OFF state when the Legend is displayed</source>
-      <translation type="unfinished" />
+      <translation>Somente no estado OFF quando a legenda é exibida</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="71" />
       <source>OPTION click &amp;#39;RESET&amp;#39; Button [Mac]
 ALT click &amp;#39;RESET&amp;#39; Button [Win]</source>
-      <translation type="unfinished" />
+      <translation>OPÇÃO clique em &amp;#39;RESET&amp;#39; Botão [Mac]
+ALT clique em &amp;#39;RESET&amp;#39; Botão [Ganhar]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="71" />
       <source>Detach IO Phidgets</source>
-      <translation type="unfinished" />
+      <translation>Desanexar IO Phidgets</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="74" />
@@ -7641,61 +7507,62 @@ ALT click &amp;#39;RESET&amp;#39; Button [Win]</source>
       <location filename="../help/keyboardshortcuts_help.py" line="72" />
       <source>⌘ click &amp;#39;Control&amp;#39; Button [Mac]
 CTRL click &amp;#39;Control&amp;#39; Button [Win]</source>
-      <translation type="unfinished" />
+      <translation>⌘ clique em &amp;#39;Controle&amp;#39; Botão [Mac]
+CTRL clique em &amp;#39;Controle&amp;#39; Botão [Ganhar]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="72" />
       <source>Toggle PID Standby on and off</source>
-      <translation type="unfinished" />
+      <translation>Ativar e desativar o modo de espera do PID</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="72" />
       <source>Device = Fuji or Delta</source>
-      <translation type="unfinished" />
+      <translation>Dispositivo = Fuji ou Delta</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="73" />
       <source>Opens PID dialog</source>
-      <translation type="unfinished" />
+      <translation>Abre a caixa de diálogo PID</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="73" />
       <source>Device = Hottop</source>
-      <translation type="unfinished" />
+      <translation>Dispositivo = Hottop</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="74" />
       <source>Toggle PID</source>
-      <translation type="unfinished" />
+      <translation>Alternar PID</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="74" />
       <source>Device = &lt;all others&gt;, Control enabled in Config&gt;&gt; Device</source>
-      <translation type="unfinished" />
+      <translation>Dispositivo = &lt;todos os outros&gt;, Controle habilitado em Config&gt;&gt; Dispositivo</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="96" />
       <location filename="../help/keyboardshortcuts_help.py" line="75" />
       <source>⌘+C [Mac]
 CTRL+C [Win]</source>
-      <translation type="unfinished" />
+      <translation>⌘+C [Mac]
+CTRL+C [Ganhar]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="75" />
       <source>Roast Properties Data tab</source>
-      <translation type="unfinished" />
+      <translation>Guia Dados de Propriedades da Torrada</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="75" />
       <source>Copy table</source>
-      <translation type="unfinished" />
+      <translation>Copiar tabela</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="108" />
       <location filename="../help/keyboardshortcuts_help.py" line="76" />
       <source>⌘+L [Mac]
 CTRL+L [Win]</source>
-      <translation type="unfinished" />
+      <translation>⌘+L [Mac]
+CTRL+L [Ganhar]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="83" />
@@ -7705,29 +7572,30 @@ CTRL+L [Win]</source>
       <location filename="../help/keyboardshortcuts_help.py" line="79" />
       <location filename="../help/keyboardshortcuts_help.py" line="76" />
       <source>Roast Properties Roast tab</source>
-      <translation type="unfinished" />
+      <translation>Propriedades da Torrada Aba Torrada</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="76" />
       <source>Open volume calculator</source>
-      <translation type="unfinished" />
+      <translation>Calculadora de volume aberto</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="78" />
       <location filename="../help/keyboardshortcuts_help.py" line="77" />
       <source>Enter</source>
-      <translation type="unfinished" />
+      <translation>Digitar</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="77" />
       <source>Roast Properties Roast Tab
 Volume Calculator Unit, Green Unit  Weight or Roasted Unit Weight field</source>
-      <translation type="unfinished" />
+      <translation>Propriedades da Torrada Aba Torrada
+Unidade da calculadora de volume, campo Peso unitário verde ou Peso unitário torrado</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="77" />
       <source>Overwrite with current scale weight (same action as &amp;#39;unit&amp;#39;, &amp;#39;in&amp;#39;, &amp;#39;out&amp;#39; buttons)</source>
-      <translation type="unfinished" />
+      <translation>Sobrescrever com o peso da balança atual (mesma ação dos botões &amp;#39;unidade&amp;#39;, &amp;#39;dentro&amp;#39;, &amp;#39;fora&amp;#39;)</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="81" />
@@ -7736,122 +7604,128 @@ Volume Calculator Unit, Green Unit  Weight or Roasted Unit Weight field</source>
       <location filename="../help/keyboardshortcuts_help.py" line="78" />
       <location filename="../help/keyboardshortcuts_help.py" line="77" />
       <source>Requires a connected scale</source>
-      <translation type="unfinished" />
+      <translation>Requer uma balança conectada</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="78" />
       <source>Roast Properties Roast tab
 Green Weight  or Roasted Weight field</source>
-      <translation type="unfinished" />
+      <translation>Propriedades da Torrada Aba Torrada
+Campo Peso Verde ou Peso Torrado</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="78" />
       <source>Overwrite with current scale weight</source>
-      <translation type="unfinished" />
+      <translation>Sobrescrever com o peso atual da balança</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="79" />
       <source>⌘+I [Mac]
 CTRL+I [Win]</source>
-      <translation type="unfinished" />
+      <translation>⌘+I [Mac]
+CTRL+I [Ganhar]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="79" />
       <source>Adds scale weight to Green Weight field (same action as &amp;#39;in&amp;#39; button)</source>
-      <translation type="unfinished" />
+      <translation>Adiciona o peso da balança ao campo Green Weight (mesma ação do botão &amp;#39;in&amp;#39;)</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="92" />
       <location filename="../help/keyboardshortcuts_help.py" line="80" />
       <source>⌘+O [Mac]
 CTRL+O [Win]</source>
-      <translation type="unfinished" />
+      <translation>⌘+O [Mac]
+CTRL+O [Ganhar]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="80" />
       <source>Adds scale weight to Roasted Weight field (same action as &amp;#39;out&amp;#39; button)</source>
-      <translation type="unfinished" />
+      <translation>Adiciona o peso da balança ao campo Roasted Weight (mesma ação do botão &amp;#39;fora&amp;#39;)</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="94" />
       <location filename="../help/keyboardshortcuts_help.py" line="81" />
       <source>⌘+P [Mac]
 CTRL+P [Win]</source>
-      <translation type="unfinished" />
+      <translation>⌘+P [Mac]
+CTRL+P [Vitória]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="81" />
       <source>Clear accumulated scale weight preview display (same as clicking on the preview display)</source>
-      <translation type="unfinished" />
+      <translation>Limpar exibição de visualização de peso da balança acumulada (o mesmo que clicar na exibição de visualização)</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="82" />
       <source>OPTION click  &amp;#39;+&amp;#39;  button [Mac]
 ALT click  &amp;#39;+&amp;#39;  button [Win]</source>
-      <translation type="unfinished" />
+      <translation>OPÇÃO clique em &amp;#39;+&amp;#39; botão [Mac]
+ALT clique em &amp;#39;+&amp;#39; botão [Ganhar]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="82" />
       <source>Adds Weight Roasted, Volume Roasted, Moisture Roasted, ColorWhole, and Color Ground to the recent roast</source>
-      <translation type="unfinished" />
+      <translation>Adiciona peso torrado, volume torrado, umidade torrado, cor inteira e cor moída à torra recente</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="83" />
       <source>OPTION File&gt;&gt; New&gt;&gt; &lt;recent-roast&gt; [Mac]
 ALT File&gt;&gt; New&gt;&gt; &lt;recent-roast&gt; [Win]</source>
-      <translation type="unfinished" />
+      <translation>OPTION File&gt;&gt; New&gt;&gt; &lt;recent-roast&gt; [Mac]
+Arquivo ALT&gt;&gt; Novo&gt;&gt; &lt;recent-roast&gt; [Win]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="83" />
       <source>Sets roast properties to &lt;recent-roast&gt; without starting a new roast</source>
-      <translation type="unfinished" />
+      <translation>Define as propriedades de torra para &lt;recent-roast&gt; sem iniciar uma nova torra</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="84" />
       <source>OPTION click &amp;#39;Copy Table&amp;#39; Button [Mac]
 ALT click &amp;#39;Copy Table&amp;#39; Button [Win]</source>
-      <translation type="unfinished" />
+      <translation>OPÇÃO clique em &amp;#39;Copiar tabela&amp;#39; Botão [Mac]
+ALT clique em &amp;#39;Copiar tabela&amp;#39; Botão [Ganhar]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="84" />
       <source>Various</source>
-      <translation type="unfinished" />
+      <translation>Vários</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="84" />
       <source>For various tables this copies the table in tabular form</source>
-      <translation type="unfinished" />
+      <translation>Para várias tabelas isto copia a tabela em forma tabular</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="85" />
       <source>Click on Home Icon
 While recording only</source>
-      <translation type="unfinished" />
+      <translation>Clique no ícone inicial
+Durante a gravação apenas</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="85" />
       <source>Navigation Toolbar</source>
-      <translation type="unfinished" />
+      <translation>Barra de navegação</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="85" />
       <source>Toggle Zoom Follow (automatic panning)</source>
-      <translation type="unfinished" />
+      <translation>Alternar Zoom Follow (panning automático)</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="85" />
       <source>Zoom action while recording sets Follow ON</source>
-      <translation type="unfinished" />
+      <translation>Ação de zoom durante a gravação define Follow ON</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="88" />
       <source>MENU SHORTCUTS</source>
-      <translation type="unfinished" />
+      <translation>ATALHOS DO MENU</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="91" />
       <source>Menu</source>
-      <translation type="unfinished" />
+      <translation>Cardápio</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="94" />
@@ -7866,21 +7740,9 @@ While recording only</source>
       <translation type="unfinished">Abrir</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="93" />
-      <source>⌘+S [Mac]
-CTRL+S [Win]</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
       <location filename="../help/keyboardshortcuts_help.py" line="94" />
       <source>Print</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="95" />
-      <source>⌘+X [Mac]
-CTRL+X [Win]</source>
-      <translation type="unfinished" />
+      <translation>Imprimir</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="97" />
@@ -7901,20 +7763,8 @@ CTRL+X [Win]</source>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="97" />
-      <source>⌘+V [Mac]
-CTRL+V [Win]</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="97" />
       <source>Paste</source>
       <translation type="unfinished">Colar</translation>
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="98" />
-      <source>⌘+T [Mac]
-CTRL+T [Win]</source>
-      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="100" />
@@ -7926,35 +7776,17 @@ CTRL+T [Win]</source>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="98" />
       <source>Open Roast Properties dialog</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="99" />
-      <source>⌘+B [Mac]
-CTRL+B [Win]</source>
-      <translation type="unfinished" />
+      <translation>Abra a caixa de diálogo Propriedades da torrefação</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="99" />
       <source>Open Profile Background dialog</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="100" />
-      <source>⌘+F4 [Mac]
-CTRL+F4 [Win]</source>
-      <translation type="unfinished" />
+      <translation>Abrir caixa de diálogo Plano de fundo do perfil</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="100" />
       <source>Switch Profiles (Foreground&lt;=&gt;Background)</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="101" />
-      <source>⌘+D [Mac]
-CTRL+D [Win]</source>
-      <translation type="unfinished" />
+      <translation>Alternar perfis (primeiro plano &lt;=&gt; plano de fundo)</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="105" />
@@ -7968,57 +7800,27 @@ CTRL+D [Win]</source>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="101" />
       <source>Open Devices dialog</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="102" />
-      <source>⌘+U [Mac]
-CTRL+U [Win]</source>
-      <translation type="unfinished" />
+      <translation>Caixa de diálogo Abrir dispositivos</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="102" />
       <source>Open Curves dialog</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="103" />
-      <source>⌘+E [Mac]
-CTRL+E [Win]</source>
-      <translation type="unfinished" />
+      <translation>Diálogo de Curvas Abertas</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="103" />
       <source>Open Events dialog</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="104" />
-      <source>⌘+A [Mac]
-CTRL+A [Win]</source>
-      <translation type="unfinished" />
+      <translation>Abrir caixa de diálogo de eventos</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="104" />
       <source>Open Alarms dialog</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="105" />
-      <source>⌘+SHIFT+A [Mac]
-CTRL+SHIFT+A [Win]</source>
-      <translation type="unfinished" />
+      <translation>Abrir caixa de diálogo de alarmes</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="105" />
       <source>Open Axes dialog</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="106" />
-      <source>⌘+K [Mac]
-CTRL+K [Win]</source>
-      <translation type="unfinished" />
+      <translation>Caixa de Diálogo dos Eixos Abertos</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="107" />
@@ -8029,18 +7831,12 @@ CTRL+K [Win]</source>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="106" />
       <source>Analyzer Auto All</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="107" />
-      <source>⌘+OPTION+A [Mac]
-CTRL+ALT+K [Win]</source>
-      <translation type="unfinished" />
+      <translation>Analisador Automático Tudo</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="107" />
       <source>Analyzer Clear Results</source>
-      <translation type="unfinished" />
+      <translation>Resultados claros do analisador</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="109" />
@@ -8051,28 +7847,17 @@ CTRL+ALT+K [Win]</source>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="108" />
       <source>Show/Hide Large Main LCDs</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="109" />
-      <source>⌘+F [Mac]
-CTRL+SHIFT+F [Win]</source>
-      <translation type="unfinished" />
+      <translation>Mostrar/ocultar grandes LCDs principais</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="109" />
       <source>Toggle Full Screen Mode                                                                                                                                             </source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="110" />
-      <source>F1</source>
-      <translation type="unfinished" />
+      <translation>Alternar modo de tela cheia</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="110" />
       <source>Open QuickStart Guide in the system browser</source>
-      <translation type="unfinished" />
+      <translation>Abra o Guia de início rápido no navegador do sistema</translation>
     </message>
     <message>
       <location filename="../help/transposer_help.py" line="14" />
@@ -8086,42 +7871,50 @@ CTRL+SHIFT+F [Win]</source>
 Three different mapping methods are available to compute from the current profile and the given targets a resulting profile. The linear and quadratic mappings are continuous functions while the discrete option is defined stepwise between the given source/target pairs and extended at the borders
 
 Pressing the "Apply" button applies the current computed mapping to the loaded profile for inspection. "Reset" returns to the original profile shape. Leaving the Transposer with "OK" applies the current mapping to the profile. Leaving the Transposer with "Cancel" returns to the unchanged initially loaded profile.</source>
-      <translation type="unfinished" />
+      <translation>O Transposer permite mapear o perfil atual w.r.t. o eixo de tempo e temperatura definindo metas de tempo e temperatura em eventos principais como ponto amarelo (DRY END) ou primeira rachadura (FC START) ou para transformações de tempo também por duração de fases de destino. As transformações de temperatura são aplicadas apenas à curva de temperatura do grão (BT), enquanto as transformações de tempo são aplicadas a todo o perfil.
+
+Três métodos de mapeamento diferentes estão disponíveis para calcular a partir do perfil atual e dos alvos fornecidos um perfil resultante. Os mapeamentos lineares e quadráticos são funções contínuas, enquanto a opção discreta é definida gradualmente entre os pares fonte/alvo fornecidos e estendida nas bordas
+
+Pressionar o botão "Aplicar" aplica o mapeamento computado atual ao perfil carregado para inspeção. "Redefinir" retorna à forma do perfil original. Deixar o Transposer com "OK" aplica o mapeamento atual ao perfil. Deixar o Transposer com "Cancelar" retorna ao perfil inalterado inicialmente carregado.</translation>
     </message>
     <message>
       <location filename="../help/transposer_help.py" line="21" />
       <source>EXAMPLE 1: ADJUST TOTAL ROAST TIME</source>
-      <translation type="unfinished" />
+      <translation>EXEMPLO 1: AJUSTE O TEMPO TOTAL DE ASSADO</translation>
     </message>
     <message>
       <location filename="../help/transposer_help.py" line="25" />
       <source>You might want to re-roast a profile, but extended/restricted to a total length of 10:00. 
 
 Load the profile and start the Transposer under Tools. Enter our target roast time of "10:00" minutes into the target DROP field under Time and select "linear" as mapping. Check the resulting times of the main events in the time tables last row, press "Apply" to view the transposed profile in the graph. If you are happy with the result, press "OK" and save the newly generated transposed profile such that you can use it as a template for future roasts.</source>
-      <translation type="unfinished" />
+      <translation>Você pode querer reaquecer um perfil, mas estendido/restrito a um comprimento total de 10:00.
+
+Carregue o perfil e inicie o Transposer em Tools. Insira nosso tempo de torrefação alvo de "10:00" minutos no campo DROP alvo em Time e selecione "linear" como mapeamento. Verifique os tempos resultantes dos eventos principais na última linha da tabela de horários, pressione "Aplicar" para visualizar o perfil transposto no gráfico. Se estiver satisfeito com o resultado, pressione "OK" e salve o perfil transposto recém-gerado para que você possa usá-lo como modelo para torras futuras.</translation>
     </message>
     <message>
       <location filename="../help/transposer_help.py" line="28" />
       <source>EXAMPLE 2: MAP BETWEEN TWO ROASTING MACHINES</source>
-      <translation type="unfinished" />
+      <translation>EXEMPLO 2: MAPA ENTRE DUAS MÁQUINAS DE TORRAGEM</translation>
     </message>
     <message>
       <location filename="../help/transposer_help.py" line="32" />
       <source>Transpose temperature readings from your smaller machine to your larger machine assuming on your larger machine the DRY and FC START events happen at different temperatures than on your smaller one.
 
 Load the profile recorded on the smaller machine and open the Transposer. Select the linear mapping and put the DRY and FC START target temperatures as observed on your larger machine into the into the corresponding fields under BT. Underneath the table you see the calculated symbolic formula that can be copy-pasted into the BT symbolic formula under Config &gt;&gt; Devices to adjust the computed mapping automatically while roasting on your smaller machine to see the temperature reading as you expect them on the larger machine.</source>
-      <translation type="unfinished" />
+      <translation>Transponha as leituras de temperatura de sua máquina menor para sua máquina maior, assumindo que em sua máquina maior os eventos DRY e FC START ocorrem em temperaturas diferentes da menor.
+
+Carregue o perfil gravado na máquina menor e abra o Transposer. Selecione o mapeamento linear e coloque as temperaturas-alvo DRY e FC START conforme observadas em sua máquina maior nos campos correspondentes em BT. Abaixo da tabela, você vê a fórmula simbólica calculada que pode ser copiada e colada na fórmula simbólica BT em Config &gt;&gt; Dispositivos para ajustar o mapeamento computado automaticamente durante a torra em sua máquina menor para ver a leitura da temperatura como você espera na máquina maior .</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="14" />
       <source>EVENT CUSTOM SLIDERS</source>
-      <translation type="unfinished" />
+      <translation>SLIDERS PERSONALIZADOS DO EVENTO</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="17" />
       <location filename="../help/eventsliders_help.py" line="17" />
       <source>Column</source>
-      <translation type="unfinished" />
+      <translation>Coluna</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="48" />
@@ -8132,139 +7925,143 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
     <message>
       <location filename="../help/eventsliders_help.py" line="18" />
       <source>Hide or show the corresponding slider.</source>
-      <translation type="unfinished" />
+      <translation>Oculte ou mostre o controle deslizante correspondente.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="19" />
       <source>Perform an action on the slider release.</source>
-      <translation type="unfinished" />
+      <translation>Execute uma ação na liberação do controle deslizante.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="20" />
       <source>Command to perform, depends on the Action type. (&amp;#39;{}&amp;#39; is replaced by the slider value*Factor + Offset)</source>
-      <translation type="unfinished" />
+      <translation>Comando a executar, depende do tipo de Ação. (&amp;#39;{}&amp;#39; é substituído pelo valor do controle deslizante*Fator + Offset)</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="21" />
       <source>Offset</source>
-      <translation type="unfinished" />
+      <translation>Desvio</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="21" />
       <source>Offset to be added to the Slider value (after scaling by Factor).</source>
-      <translation type="unfinished" />
+      <translation>Deslocamento a ser adicionado ao valor do Slider (após o dimensionamento por Fator).</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="22" />
       <source>Factor</source>
-      <translation type="unfinished" />
+      <translation>Fator</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="22" />
       <source>Scale factor, Slider value is multplied by this value.</source>
-      <translation type="unfinished" />
+      <translation>Fator de escala, o valor do Slider é multiplicado por este valor.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="23" />
       <source>Min</source>
-      <translation type="unfinished" />
+      <translation>mín.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="23" />
       <source>Sets the minimum value for the range of the slider.</source>
-      <translation type="unfinished" />
+      <translation>Define o valor mínimo para o intervalo do controle deslizante.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="24" />
       <source>Max</source>
-      <translation type="unfinished" />
+      <translation>máx.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="24" />
       <source>Sets the maximum value for the range of the slider.</source>
-      <translation type="unfinished" />
+      <translation>Define o valor máximo para o intervalo do controle deslizante.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="25" />
       <source>Course</source>
-      <translation type="unfinished" />
+      <translation>Curso</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="25" />
       <source>When ticked the slider moves in steps of 10.</source>
-      <translation type="unfinished" />
+      <translation>Quando marcado, o controle deslizante se move em etapas de 10.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="26" />
       <source>Should be ticked when the slider&amp;#39;s value is a temperature to allow Artisan to properly scale the value between Centigrade and Fahrenheit.</source>
-      <translation type="unfinished" />
+      <translation>Deve ser marcado quando o valor do controle deslizante for uma temperatura para permitir que o Artisan dimensione corretamente o valor entre Centígrados e Fahrenheit.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="46" />
       <location filename="../help/eventsliders_help.py" line="27" />
       <source>Unit</source>
-      <translation type="unfinished" />
+      <translation>Unidade</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="27" />
       <source>Optional text used in annotations to the the units used for the slider value.</source>
-      <translation type="unfinished" />
+      <translation>Texto opcional usado em anotações para as unidades usadas para o valor do controle deslizante.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="41" />
       <location filename="../help/eventsliders_help.py" line="30" />
       <source>COMMANDS</source>
-      <translation type="unfinished" />
+      <translation>COMANDOS</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: "{}" can be used as a placeholder, it will be subsituted by (value*factor + offset). In all slider command actions, but for IO, VOUT, S7 and RC Commands, the bound value is converted from a float to an int.
 </source>
-      <translation type="unfinished" />
+      <translation>Nota: "{}" pode ser usado como marcador de posição, será substituído por (valor*fator + deslocamento). Em todas as ações de comando do controle deslizante, exceto para os comandos IO, VOUT, S7 e RC, o valor vinculado é convertido de float para int.
+</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="45" />
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: The placeholders {ET}, {BT}, {time}, {ETB}, {BTB} will be substituted by the current ET, BT, time, ET background, BT background value in Serial/CallProgram/MODBUS/S7/WebSocket commands
 </source>
-      <translation type="unfinished" />
+      <translation>Nota: Os espaços reservados {ET}, {BT}, {time}, {ETB}, {BTB} serão substituídos pelo valor atual de ET, BT, hora, ET background, BT background em Serial/CallProgram/MODBUS/S7/ Comandos WebSocket
+</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="45" />
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: commands can be sequenced, separated by semicolons like in “&lt;cmd1&gt;;&lt;cmd2&gt;;&lt;cmd3&gt;”
 </source>
-      <translation type="unfinished" />
+      <translation>Nota: os comandos podem ser sequenciados, separados por ponto e vírgula como em “&lt;cmd1&gt;;&lt;cmd2&gt;;&lt;cmd3&gt;”
+</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="45" />
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: in PHIDGET commands, the optional parameter &lt;sn&gt; has the form &lt;hub_serial&gt;[:&lt;hub_port&gt;] allows to refer to a specific Phidget HUB by given its serial number, and optionally specifying the port number the addressed module is connected to.
 </source>
-      <translation type="unfinished" />
+      <translation>Nota: em comandos PHIDGET, o parâmetro opcional &lt;sn&gt; tem a forma &lt;hub_serial&gt;[:&lt;hub_port&gt;] permite referir-se a um Phidget HUB específico, fornecendo seu número de série e, opcionalmente, especificando o número da porta à qual o módulo endereçado está conectado .
+</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: in YOCTOPUCE commands, the optional parameters &lt;sn&gt; holds either the modules serial number or its name</source>
-      <translation type="unfinished" />
+      <translation>Nota: nos comandos YOCTOPUCE, os parâmetros opcionais &lt;sn&gt; contém o número de série do módulo ou seu nome</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="49" />
       <location filename="../help/eventsliders_help.py" line="38" />
       <source>Serial Command</source>
-      <translation type="unfinished" />
+      <translation>Comando Serial</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="49" />
       <location filename="../help/eventsliders_help.py" line="38" />
       <source>ASCII serial command or binary a2b_uu(serial command)</source>
-      <translation type="unfinished" />
+      <translation>Comando serial ASCII ou binário a2b_uu(comando serial)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="52" />
       <location filename="../help/eventsliders_help.py" line="39" />
       <source>Modbus Command</source>
-      <translation type="unfinished" />
+      <translation>Comando Modbus</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="52" />
@@ -8276,7 +8073,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="52" />
       <location filename="../help/eventsliders_help.py" line="39" />
       <source>variable holding the last value read via MODBUS</source>
-      <translation type="unfinished" />
+      <translation>variável que contém o último valor lido via MODBUS</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="170" />
@@ -8292,73 +8089,73 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventsliders_help.py" line="78" />
       <location filename="../help/eventsliders_help.py" line="40" />
       <source>sleep: add a delay of &lt;float&gt; seconds</source>
-      <translation type="unfinished" />
+      <translation>sleep: adicione um atraso de &lt;float&gt; segundos</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="110" />
       <location filename="../help/eventbuttons_help.py" line="54" />
       <location filename="../help/eventsliders_help.py" line="41" />
       <source>sets calling button to “pressed” if argument is 1 or True</source>
-      <translation type="unfinished" />
+      <translation>define o botão de chamada como “pressionado” se o argumento for 1 ou Verdadeiro</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="42" />
       <source>reads register from slave slaveID using function 3 (Read Multiple Holding Registers). The result is bound to the placeholder `_` and thus can be accessed in later commands.</source>
-      <translation type="unfinished" />
+      <translation>lê o registro do slave slaveID usando a função 3 (Read Multiple Holding Registers). O resultado está vinculado ao espaço reservado `_` e, portanto, pode ser acessado em comandos posteriores.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="56" />
       <location filename="../help/eventsliders_help.py" line="43" />
       <source>reads 1 16bit register from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as signed integer. The result is bound to the placeholder `_` and thus can be accessed in later commands.</source>
-      <translation type="unfinished" />
+      <translation>lê 1 registrador de 16 bits do escravo slaveID usando a função 3 (Ler vários registros de retenção) interpretado como inteiro com sinal. O resultado está vinculado ao espaço reservado `_` e, portanto, pode ser acessado em comandos posteriores.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="57" />
       <location filename="../help/eventsliders_help.py" line="44" />
       <source>reads 1 16bit register from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as BCD. The result is bound to the placeholder `_` and thus can be accessed in later commands.</source>
-      <translation type="unfinished" />
+      <translation>lê 1 registro de 16 bits do slave slaveID usando a função 3 (Read Multiple Holding Registers) interpretada como BCD. O resultado está vinculado ao espaço reservado `_` e, portanto, pode ser acessado em comandos posteriores.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="58" />
       <location filename="../help/eventsliders_help.py" line="45" />
       <source>reads 2 16bit registers from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as unsigned integer. The result is bound to the placeholder `_` and thus can be accessed in later commands.</source>
-      <translation type="unfinished" />
+      <translation>lê 2 registros de 16 bits do slave slaveID usando a função 3 (Read Multiple Holding Registers) interpretada como inteiro sem sinal. O resultado está vinculado ao espaço reservado `_` e, portanto, pode ser acessado em comandos posteriores.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="59" />
       <location filename="../help/eventsliders_help.py" line="46" />
       <source>reads 2 16bit registers from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as signed integer. The result is bound to the placeholder `_` and thus can be accessed in later commands.</source>
-      <translation type="unfinished" />
+      <translation>lê 2 registros de 16 bits do escravo slaveID usando a função 3 (Ler vários registros de retenção) interpretado como inteiro com sinal. O resultado está vinculado ao espaço reservado `_` e, portanto, pode ser acessado em comandos posteriores.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="60" />
       <location filename="../help/eventsliders_help.py" line="47" />
       <source>reads 2 16bit register from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as BCD. The result is bound to the placeholder `_` and thus can be accessed in later commands.</source>
-      <translation type="unfinished" />
+      <translation>lê 2 registradores de 16 bits do slave ID do escravo usando a função 3 (Read Multiple Holding Registers) interpretada como BCD. O resultado está vinculado ao espaço reservado `_` e, portanto, pode ser acessado em comandos posteriores.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="61" />
       <location filename="../help/eventsliders_help.py" line="48" />
       <source>reads 2 16bit registers from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as float. The result is bound to the placeholder `_` and thus can be accessed in later commands.</source>
-      <translation type="unfinished" />
+      <translation>lê 2 registros de 16 bits do slave slaveID usando a função 3 (Read Multiple Holding Registers) interpretada como float. O resultado está vinculado ao espaço reservado `_` e, portanto, pode ser acessado em comandos posteriores.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="62" />
       <location filename="../help/eventsliders_help.py" line="49" />
       <source>write register: MODBUS function 6 (int) or function 16 (float)</source>
-      <translation type="unfinished" />
+      <translation>registrador de escrita: MODBUS função 6 (int) ou função 16 (float)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="63" />
       <location filename="../help/eventsliders_help.py" line="50" />
       <source>write coil: MODBUS function 5</source>
-      <translation type="unfinished" />
+      <translation>bobina de gravação: função MODBUS 5</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="64" />
       <location filename="../help/eventsliders_help.py" line="51" />
       <source>write coils: MODBUS function 15</source>
-      <translation type="unfinished" />
+      <translation>bobinas de gravação: função MODBUS 15</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="52" />
@@ -8369,58 +8166,58 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="65" />
       <location filename="../help/eventsliders_help.py" line="52" />
       <source>mask write register: MODBUS function 22 or simulates function 22 with function 6 and the given value v</source>
-      <translation type="unfinished" />
+      <translation>registro de gravação de máscara: função MODBUS 22 ou simula a função 22 com a função 6 e o valor fornecido v</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="66" />
       <location filename="../help/eventsliders_help.py" line="53" />
       <source>write registers: MODBUS function 16</source>
-      <translation type="unfinished" />
+      <translation>registros de gravação: função MODBUS 16</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="67" />
       <location filename="../help/eventsliders_help.py" line="54" />
       <source>write 16bit BCD encoded value v to register r of slave s </source>
-      <translation type="unfinished" />
+      <translation>escreva o valor v codificado em BCD de 16 bits no registrador r do escravo s</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="68" />
       <location filename="../help/eventsliders_help.py" line="55" />
       <source>write 32bit float to two 16bit int registers: MODBUS function 16</source>
-      <translation type="unfinished" />
+      <translation>escreva float de 32 bits em dois registradores int de 16 bits: função MODBUS 16</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="69" />
       <location filename="../help/eventsliders_help.py" line="56" />
       <source>write 32bit integer to two 16bit int registers: MODBUS function 16</source>
-      <translation type="unfinished" />
+      <translation>gravar inteiro de 32 bits em dois registradores int de 16 bits: função MODBUS 16</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="70" />
       <location filename="../help/eventsliders_help.py" line="57" />
       <source>write 16bit integer to a single 16bit register: MODBUS function 6 (int)</source>
-      <translation type="unfinished" />
+      <translation>escreva um inteiro de 16 bits em um único registro de 16 bits: função MODBUS 6 (int)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="71" />
       <location filename="../help/eventsliders_help.py" line="58" />
       <source>DTA Command</source>
-      <translation type="unfinished" />
+      <translation>Comando DTA</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="58" />
       <source>Insert Data address : value, ex. 4701:1000 and sv is 100. </source>
-      <translation type="unfinished" />
+      <translation>Inserir endereço de dados: valor, ex. 4701:1000 e sv é 100.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="58" />
       <source>Always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating</source>
-      <translation type="unfinished" />
+      <translation>Sempre multiplique por 10 se o valor Unidade: 0,1 / ex. 4719:0 pára de aquecer</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="59" />
       <source>start and external program</source>
-      <translation type="unfinished" />
+      <translation>iniciar e programa externo</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="88" />
@@ -8434,13 +8231,13 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventsliders_help.py" line="104" />
       <location filename="../help/eventsliders_help.py" line="60" />
       <source>sets heater to value</source>
-      <translation type="unfinished" />
+      <translation>define o valor do aquecedor</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="89" />
       <location filename="../help/eventsliders_help.py" line="61" />
       <source>Hottop Fan</source>
-      <translation type="unfinished" />
+      <translation>Ventilador Hottop</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="119" />
@@ -8448,7 +8245,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventsliders_help.py" line="105" />
       <location filename="../help/eventsliders_help.py" line="61" />
       <source>sets fan to value</source>
-      <translation type="unfinished" />
+      <translation>define o valor do ventilador</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="90" />
@@ -8460,7 +8257,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="90" />
       <location filename="../help/eventsliders_help.py" line="62" />
       <source>with n={0 ,1},h={0,..100},f={0,..10}</source>
-      <translation type="unfinished" />
+      <translation>com n={0 ,1},h={0,..100},f={0,..10}</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="92" />
@@ -8478,61 +8275,61 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="93" />
       <location filename="../help/eventsliders_help.py" line="64" />
       <source>PHIDGET PWM Output: &lt;value&gt; in [0-100]</source>
-      <translation type="unfinished" />
+      <translation>Saída PHIDGET PWM: &lt;valor&gt; em [0-100]</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
       <location filename="../help/eventsliders_help.py" line="65" />
       <source>PHIDGET PWM Output: toggles &lt;channel&gt;</source>
-      <translation type="unfinished" />
+      <translation>Saída PHIDGET PWM: alterna &lt;canal&gt;</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="95" />
       <location filename="../help/eventsliders_help.py" line="66" />
       <source>PHIDGET PWM Output: turn &lt;channel&gt; on for &lt;millis&gt; milliseconds</source>
-      <translation type="unfinished" />
+      <translation>Saída PHIDGET PWM: liga &lt;canal&gt; por &lt;milis&gt; milissegundos</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="96" />
       <location filename="../help/eventsliders_help.py" line="67" />
       <source>PHIDGET HUB PWM Output: &lt;value&gt; in [0-100]</source>
-      <translation type="unfinished" />
+      <translation>Saída PWM do PHIDGET HUB: &lt;valor&gt; em [0-100]</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="97" />
       <location filename="../help/eventsliders_help.py" line="68" />
       <source>PHIDGET HUB PWM Output: toggles &lt;channel&gt;</source>
-      <translation type="unfinished" />
+      <translation>PHIDGET HUB Saída PWM: alterna &lt;canal&gt;</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="98" />
       <location filename="../help/eventsliders_help.py" line="69" />
       <source>PHIDGET HUB PWM Output:  turn &lt;channel&gt; on for &lt;millis&gt; milliseconds</source>
-      <translation type="unfinished" />
+      <translation>PHIDGET HUB Saída PWM: liga &lt;canal&gt; por &lt;milis&gt; milissegundos</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="99" />
       <location filename="../help/eventsliders_help.py" line="70" />
       <source>YOCTOPUCE PWM Output: PWM running state</source>
-      <translation type="unfinished" />
+      <translation>YOCTOPUCE PWM Output: estado de execução do PWM</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="100" />
       <location filename="../help/eventsliders_help.py" line="71" />
       <source>YOCTOPUCE PWM Output: set PWM frequency to f (Hz)</source>
-      <translation type="unfinished" />
+      <translation>YOCTOPUCE PWM Output: defina a frequência PWM para f (Hz)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="101" />
       <location filename="../help/eventsliders_help.py" line="72" />
       <source>YOCTOPUCE PWM Output: set PWM period with the duty cycle in % as a float [0.0-100.0]</source>
-      <translation type="unfinished" />
+      <translation>YOCTOPUCE PWM Output: defina o período PWM com o ciclo de trabalho em % como flutuante [0,0-100,0]</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="102" />
       <location filename="../help/eventsliders_help.py" line="73" />
       <source>YOCTOPUCE PWM Output: changes progressively the PWM to the specified value over the given time interval</source>
-      <translation type="unfinished" />
+      <translation>YOCTOPUCE PWM Output: altera progressivamente o PWM para o valor especificado durante o intervalo de tempo determinado</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="103" />
@@ -8543,25 +8340,25 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
     <message>
       <location filename="../help/eventsliders_help.py" line="74" />
       <source>for PHIDGET OUTPUT modules: sets voltage voltage range (r=5 fo r5V and r=10 for 10V)</source>
-      <translation type="unfinished" />
+      <translation>para módulos PHIDGET OUTPUT: ajusta a faixa de tensão (r=5 para r5V er=10 para 10V)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="104" />
       <location filename="../help/eventsliders_help.py" line="75" />
       <source>for PHIDGET OUTPUT modules: set analog output channel n to output voltage value v in V (eg. 5.5 for 5.5V)</source>
-      <translation type="unfinished" />
+      <translation>para módulos PHIDGET OUTPUT: defina o canal de saída analógica n para o valor da tensão de saída v em V (por exemplo, 5,5 para 5,5 V)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="105" />
       <location filename="../help/eventsliders_help.py" line="76" />
       <source>for YOCTOPUCE VOLTAGE OUT modules with c the channel (1 or 2),v the voltage as float [0.0-10.0]</source>
-      <translation type="unfinished" />
+      <translation>para módulos YOCTOPUCE VOLTAGE OUT com c o canal (1 ou 2),v a tensão como float [0,0-10,0]</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="106" />
       <location filename="../help/eventsliders_help.py" line="77" />
       <source>for YOCTOPUCE CURRENT OUT modules with c the current as float [3.0-21.0]</source>
-      <translation type="unfinished" />
+      <translation>para módulos YOCTOPUCE CURRENT OUT com c a corrente como float [3.0-21.0]</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="72" />
@@ -8573,91 +8370,91 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="72" />
       <location filename="../help/eventsliders_help.py" line="79" />
       <source>PHIDGET Binary Output: switches channel c off (b=0) and on (b=1)</source>
-      <translation type="unfinished" />
+      <translation>Saída binária PHIDGET: desliga o canal c (b=0) e liga (b=1)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="73" />
       <location filename="../help/eventsliders_help.py" line="80" />
       <source>PHIDGET Binary Output: toggles channel c</source>
-      <translation type="unfinished" />
+      <translation>Saída binária PHIDGET: alterna o canal c</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="74" />
       <location filename="../help/eventsliders_help.py" line="81" />
       <source>PHIDGET Binary Output: sets the output of channel c to on for time t in milliseconds</source>
-      <translation type="unfinished" />
+      <translation>Saída binária PHIDGET: ativa a saída do canal c pelo tempo t em milissegundos</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="75" />
       <location filename="../help/eventsliders_help.py" line="82" />
       <source>PHIDGET Voltage Output: sets voltage output of channel c to v (float)</source>
-      <translation type="unfinished" />
+      <translation>Saída de tensão PHIDGET: define a saída de tensão do canal c a v (float)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="76" />
       <location filename="../help/eventsliders_help.py" line="83" />
       <source>PHIDGET DCMotor: sets acceleration of channel c to v (float)</source>
-      <translation type="unfinished" />
+      <translation>PHIDGET DCMotor: define a aceleração do canal c a v (float)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="77" />
       <location filename="../help/eventsliders_help.py" line="84" />
       <source>PHIDGET DCMotor: sets target velocity of channel c to v (float)</source>
-      <translation type="unfinished" />
+      <translation>PHIDGET DCMotor: define a velocidade alvo do canal c a v (float)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="78" />
       <location filename="../help/eventsliders_help.py" line="85" />
       <source>PHIDGET DCMotor: sets current limit of channel c to v (float)</source>
-      <translation type="unfinished" />
+      <translation>PHIDGET DCMotor: define o limite de corrente do canal c a v (float)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="79" />
       <location filename="../help/eventsliders_help.py" line="86" />
       <source>YOCTOPUCE Relay Output: turn channel c of the relay module on</source>
-      <translation type="unfinished" />
+      <translation>YOCTOPUCE Relay Output: ligue o canal c do módulo de relé</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="80" />
       <location filename="../help/eventsliders_help.py" line="87" />
       <source>YOCTOPUCE Relay Output: turn channel c of the relay module off</source>
-      <translation type="unfinished" />
+      <translation>YOCTOPUCE Relay Output: desligue o canal c do módulo de relé</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="81" />
       <location filename="../help/eventsliders_help.py" line="88" />
       <source>YOCTOPUCE Relay Output: toggle the state of channel c</source>
-      <translation type="unfinished" />
+      <translation>YOCTOPUCE Relay Output: alterna o estado do canal c</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="82" />
       <location filename="../help/eventsliders_help.py" line="89" />
       <source>YOCTOPUCE Relay Output: pulse the channel c on after a delay of delay milliseconds for the duration of duration milliseconds</source>
-      <translation type="unfinished" />
+      <translation>Saída de Relé YOCTOPUCE: pulsar o canal c após um atraso de milissegundos de atraso durante a duração de milissegundos</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="83" />
       <location filename="../help/eventsliders_help.py" line="90" />
       <source>YOCTOPUCE resets the power counter of the Yocto-Watt module</source>
-      <translation type="unfinished" />
+      <translation>YOCTOPUCE redefine o contador de energia do módulo Yocto-Watt</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="84" />
       <location filename="../help/eventsliders_help.py" line="91" />
       <source>move slider c to value v</source>
-      <translation type="unfinished" />
+      <translation>mova o controle deslizante c para o valor v</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="85" />
       <location filename="../help/eventsliders_help.py" line="92" />
       <source>switches channel c off (b=0) and on (b=1) and sets button i to pressed or normal depending on the value b</source>
-      <translation type="unfinished" />
+      <translation>desliga o canal c (b=0) e liga (b=1) e coloca o botão i em pressionado ou normal dependendo do valor b</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="87" />
       <location filename="../help/eventsliders_help.py" line="94" />
       <source>sends integer &lt;value&gt; to &lt;target&gt; register specified by as byte in hex notation like “fa” via the Santoker Network protocol</source>
-      <translation type="unfinished" />
+      <translation>envia o &lt;valor&gt; inteiro para o registrador &lt;destino&gt; especificado por um byte em notação hexadecimal como “fa” por meio do protocolo da Rede Santoker</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="108" />
@@ -8669,74 +8466,74 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="108" />
       <location filename="../help/eventsliders_help.py" line="95" />
       <source>variable holding the last value read via S7</source>
-      <translation type="unfinished" />
+      <translation>variável contendo o último valor lido via S7</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="171" />
       <location filename="../help/eventsliders_help.py" line="156" />
       <location filename="../help/eventsliders_help.py" line="97" />
       <source>sets calling button to “pressed” if argument evaluates to 1 or True</source>
-      <translation type="unfinished" />
+      <translation>define o botão de chamada como “pressionado” se o argumento for avaliado como 1 ou verdadeiro</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="111" />
       <location filename="../help/eventsliders_help.py" line="98" />
       <source>read bool from S7 DB</source>
-      <translation type="unfinished" />
+      <translation>ler bool de S7 DB</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="112" />
       <location filename="../help/eventsliders_help.py" line="99" />
       <source>read int from S7 DB</source>
-      <translation type="unfinished" />
+      <translation>ler int de S7 DB</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="113" />
       <location filename="../help/eventsliders_help.py" line="100" />
       <source>read float from S7 DB</source>
-      <translation type="unfinished" />
+      <translation>ler float de S7 DB</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="114" />
       <location filename="../help/eventsliders_help.py" line="101" />
       <source>write bool to S7 DB</source>
-      <translation type="unfinished" />
+      <translation>escrever bool para S7 DB</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="115" />
       <location filename="../help/eventsliders_help.py" line="102" />
       <source>write int to S7 DB</source>
-      <translation type="unfinished" />
+      <translation>escrever int para S7 DB</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="117" />
       <location filename="../help/eventsliders_help.py" line="103" />
       <source>write float to S7 DB</source>
-      <translation type="unfinished" />
+      <translation>escrever flutuante para S7 DB</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="118" />
       <location filename="../help/eventsliders_help.py" line="104" />
       <source>Aillio R1 Heater</source>
-      <translation type="unfinished" />
+      <translation>Aillio R1 Aquecedor</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="119" />
       <location filename="../help/eventsliders_help.py" line="105" />
       <source>Aillio R1 Fan</source>
-      <translation type="unfinished" />
+      <translation>Ventilador Aillio R1</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="120" />
       <location filename="../help/eventsliders_help.py" line="106" />
       <source>Aillio R1 Drum</source>
-      <translation type="unfinished" />
+      <translation>Tambor Aillio R1</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="120" />
       <location filename="../help/eventsliders_help.py" line="106" />
       <source>sets drum speed to value</source>
-      <translation type="unfinished" />
+      <translation>define a velocidade do tambor para o valor</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="122" />
@@ -8748,205 +8545,205 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="122" />
       <location filename="../help/eventsliders_help.py" line="107" />
       <source>enables/disables alarms</source>
-      <translation type="unfinished" />
+      <translation>habilita/desabilita alarmes</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="123" />
       <location filename="../help/eventsliders_help.py" line="108" />
       <source>enables/disables autoCHARGE</source>
-      <translation type="unfinished" />
+      <translation>habilita/desabilita autoCHARGE</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="124" />
       <location filename="../help/eventsliders_help.py" line="109" />
       <source>enables/disables autoDROP</source>
-      <translation type="unfinished" />
+      <translation>ativa/desativa o autoDROP</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="126" />
       <location filename="../help/eventsliders_help.py" line="111" />
       <source>tare channel &lt;int&gt; with 1 =&gt; ET, 2 =&gt; BT, 3 =&gt; E1c1, 4: E1c2,..</source>
-      <translation type="unfinished" />
+      <translation>canal de tara &lt;int&gt; com 1 =&gt; ET, 2 =&gt; BT, 3 =&gt; E1c1, 4: E1c2,..</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="127" />
       <location filename="../help/eventsliders_help.py" line="112" />
       <source>turns PID on</source>
-      <translation type="unfinished" />
+      <translation>liga o PID</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="128" />
       <location filename="../help/eventsliders_help.py" line="113" />
       <source>turns PID off</source>
-      <translation type="unfinished" />
+      <translation>desliga o PID</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="129" />
       <location filename="../help/eventsliders_help.py" line="114" />
       <source>toggles the PID state</source>
-      <translation type="unfinished" />
+      <translation>alterna o estado PID</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="130" />
       <location filename="../help/eventsliders_help.py" line="115" />
       <source>sets PID mode to 0: manual, 1: RS, 2: background follow</source>
-      <translation type="unfinished" />
+      <translation>define o modo PID para 0: manual, 1: RS, 2: seguimento de fundo</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="131" />
       <location filename="../help/eventsliders_help.py" line="116" />
       <source>sets the p-i-d parameters of the PID</source>
-      <translation type="unfinished" />
+      <translation>define os parâmetros p-i-d do PID</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="132" />
       <location filename="../help/eventsliders_help.py" line="117" />
       <source>increases or decreases the current target SV value by &lt;int&gt;</source>
-      <translation type="unfinished" />
+      <translation>aumenta ou diminui o valor SV alvo atual em &lt;int&gt;</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="133" />
       <location filename="../help/eventsliders_help.py" line="118" />
       <source>sets the PID target set value SV</source>
-      <translation type="unfinished" />
+      <translation>define o valor definido do alvo PID SV</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="134" />
       <location filename="../help/eventsliders_help.py" line="119" />
       <source>activates the PID Ramp-Soak pattern number &lt;rs&gt; (1-based!) or the one labeled &lt;rs&gt;</source>
-      <translation type="unfinished" />
+      <translation>ativa o número do padrão PID Ramp-Soak &lt;rs&gt; (baseado em 1!) ou o identificado como &lt;rs&gt;</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="135" />
       <location filename="../help/eventsliders_help.py" line="120" />
       <source>selects the PID input source with &lt;n&gt; 0: BT, 1: ET (Software PID); &lt;n&gt; in {0,..,3} (Arduino PID)</source>
-      <translation type="unfinished" />
+      <translation>seleciona a fonte de entrada PID com &lt;n&gt; 0: BT, 1: ET (Software PID); &lt;n&gt; em {0,..,3} (Arduino PID)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="136" />
       <location filename="../help/eventsliders_help.py" line="121" />
       <source>sets the PID lookahead</source>
-      <translation type="unfinished" />
+      <translation>define o PID lookahead</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="137" />
       <location filename="../help/eventsliders_help.py" line="122" />
       <source>shows popup with message &lt;msg&gt; which optionally automatically closes after &lt;int&gt; seconds</source>
-      <translation type="unfinished" />
+      <translation>mostra pop-up com mensagem &lt;msg&gt; que opcionalmente fecha automaticamente após &lt;int&gt; segundos</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="138" />
       <location filename="../help/eventsliders_help.py" line="123" />
       <source>shows message &lt;msg&gt; in the message line</source>
-      <translation type="unfinished" />
+      <translation>mostra a mensagem &lt;msg&gt; na linha de mensagem</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="139" />
       <location filename="../help/eventsliders_help.py" line="124" />
       <source>enables/disables notifications; while disabled issued notifications are ignored</source>
-      <translation type="unfinished" />
+      <translation>habilita/desabilita notificações; enquanto as notificações emitidas desabilitadas são ignoradas</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="140" />
       <location filename="../help/eventsliders_help.py" line="125" />
       <source>sends notification with title &lt;title&gt; and optional message &lt;msg&gt;</source>
-      <translation type="unfinished" />
+      <translation>envia notificação com título &lt;title&gt; e mensagem opcional &lt;msg&gt;</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="141" />
       <location filename="../help/eventsliders_help.py" line="126" />
       <source>sets canvas color to the RGB-hex &lt;color&gt; like #27f1d3</source>
-      <translation type="unfinished" />
+      <translation>define a cor da tela para RGB-hex &lt;color&gt; como #27f1d3</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="142" />
       <location filename="../help/eventsliders_help.py" line="127" />
       <source>resets canvas color</source>
-      <translation type="unfinished" />
+      <translation>redefine a cor da tela</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="143" />
       <location filename="../help/eventsliders_help.py" line="128" />
       <source>activates button &lt;name&gt; from { START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF } </source>
-      <translation type="unfinished" />
+      <translation>ativa o botão &lt;nome&gt; de { START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF }</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="144" />
       <location filename="../help/eventsliders_help.py" line="129" />
       <source>activates palette &lt;p&gt; with &lt;p&gt; either a number 0-9 or a palette label</source>
-      <translation type="unfinished" />
+      <translation>ativa paleta &lt;p&gt; com &lt;p&gt; um número 0-9 ou um rótulo de paleta</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="145" />
       <location filename="../help/eventsliders_help.py" line="130" />
       <source>sets playback mode to 0: off, 1: time, 2: BT, 3: ET</source>
-      <translation type="unfinished" />
+      <translation>define o modo de reprodução para 0: desligado, 1: hora, 2: BT, 3: ET</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="146" />
       <location filename="../help/eventsliders_help.py" line="131" />
       <source>opens the Roast Properties dialog</source>
-      <translation type="unfinished" />
+      <translation>abre a caixa de diálogo Roast Properties</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="147" />
       <location filename="../help/eventsliders_help.py" line="132" />
       <source>loads the .alog profile at the given filepath as background profile</source>
-      <translation type="unfinished" />
+      <translation>carrega o perfil .alog no caminho de arquivo fornecido como perfil de fundo</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="148" />
       <location filename="../help/eventsliders_help.py" line="133" />
       <source>clears the current background profile</source>
-      <translation type="unfinished" />
+      <translation>limpa o perfil de fundo atual</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="149" />
       <location filename="../help/eventsliders_help.py" line="134" />
       <source>activates the alarmset with the given number or label</source>
-      <translation type="unfinished" />
+      <translation>ativa o conjunto de alarmes com o número ou rótulo fornecido</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="150" />
       <location filename="../help/eventsliders_help.py" line="135" />
       <source>moves the background profile the indicated number of steps towards &lt;direction&gt;, with &lt;direction&gt; one of up, down, left, right</source>
-      <translation type="unfinished" />
+      <translation>move o perfil do plano de fundo o número indicado de etapas em direção a &lt;direção&gt;, com &lt;direção&gt; uma de cima, baixo, esquerda, direita</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="151" />
       <location filename="../help/eventsliders_help.py" line="136" />
       <source>enables/disables keyboard mode</source>
-      <translation type="unfinished" />
+      <translation>ativa/desativa o modo de teclado</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="152" />
       <location filename="../help/eventsliders_help.py" line="137" />
       <source>enables/disables the Keep ON flag</source>
-      <translation type="unfinished" />
+      <translation>ativa/desativa o sinalizador Keep ON</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="153" />
       <location filename="../help/eventsliders_help.py" line="138" />
       <source>shows/hides the curve indicated by &lt;name&gt; which is one of { ET, BT, DeltaET, DeltaBT, BackgroundET, BackgroundBT}</source>
-      <translation type="unfinished" />
+      <translation>mostra/oculta a curva indicada por &lt;nome&gt; que é uma das { ET, BT, DeltaET, DeltaBT, BackgroundET, BackgroundBT}</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="154" />
       <location filename="../help/eventsliders_help.py" line="139" />
       <source>shows/hides the &lt;curve&gt; (one of {T1,T2}) of the zero-based &lt;extra_device&gt; number</source>
-      <translation type="unfinished" />
+      <translation>mostra/oculta a &lt;curva&gt; (uma de {T1,T2}) do número &lt;extra_device&gt; baseado em zero</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="155" />
       <location filename="../help/eventsliders_help.py" line="140" />
       <source>shows/hides the events of &lt;event_type&gt; in [1,..,5]</source>
-      <translation type="unfinished" />
+      <translation>mostra/oculta os eventos de &lt;event_type&gt; em [1,..,5]</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="156" />
       <location filename="../help/eventsliders_help.py" line="141" />
       <source>shows/hides the events of the background profile</source>
-      <translation type="unfinished" />
+      <translation>mostra/oculta os eventos do perfil de fundo</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="157" />
@@ -8958,72 +8755,72 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="157" />
       <location filename="../help/eventsliders_help.py" line="142" />
       <source>for PHIDGET RC modules: sets the min/max pulse width in microseconds</source>
-      <translation type="unfinished" />
+      <translation>para módulos PHIDGET RC: define a largura de pulso mín/máx em microssegundos</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="158" />
       <location filename="../help/eventsliders_help.py" line="143" />
       <source>for PHIDGET RC modules: sets the min/max position</source>
-      <translation type="unfinished" />
+      <translation>para módulos PHIDGET RC: define a posição min/max</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="159" />
       <location filename="../help/eventsliders_help.py" line="144" />
       <source>for PHIDGET RC modules: engage (b=1) or disengage (b = 0)</source>
-      <translation type="unfinished" />
+      <translation>para módulos PHIDGET RC: engatar (b=1) ou desengatar (b = 0)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="160" />
       <location filename="../help/eventsliders_help.py" line="145" />
       <source>for PHIDGET RC modules: activates or deactivates the speed ramping state</source>
-      <translation type="unfinished" />
+      <translation>para módulos PHIDGET RC: ativa ou desativa o estado de rampa de velocidade</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="161" />
       <location filename="../help/eventsliders_help.py" line="146" />
       <source>for PHIDGET RC modules: set the voltage to one of 5, 6 or 7.4 in Volt</source>
-      <translation type="unfinished" />
+      <translation>para módulos PHIDGET RC: defina a tensão para um de 5, 6 ou 7,4 em Volt</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="162" />
       <location filename="../help/eventsliders_help.py" line="147" />
       <source>for PHIDGET RC modules: set the acceleration</source>
-      <translation type="unfinished" />
+      <translation>para módulos PHIDGET RC: defina a aceleração</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="163" />
       <location filename="../help/eventsliders_help.py" line="148" />
       <source>for PHIDGET RC modules: set the velocity</source>
-      <translation type="unfinished" />
+      <translation>para módulos PHIDGET RC: defina a velocidade</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="164" />
       <location filename="../help/eventsliders_help.py" line="149" />
       <source>for PHIDGET RC modules: set the target position</source>
-      <translation type="unfinished" />
+      <translation>para módulos PHIDGET RC: definir a posição de destino</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="165" />
       <location filename="../help/eventsliders_help.py" line="150" />
       <source>for YOCTOPUCE RC modules: with c:int the channel, b a bool (eg. enabled(0,1) or enabled(0,True))</source>
-      <translation type="unfinished" />
+      <translation>para módulos YOCTOPUCE RC: com c:int o canal, b a bool (por exemplo, habilitado(0,1) ou habilitado(0,True))</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="151" />
       <source>for YOCTOPUCE RC modules: with c:int the channel, p:int the target position, the optional t the duration in ms</source>
-      <translation type="unfinished" />
+      <translation>para módulos YOCTOPUCE RC: com c:int o canal, p:int a posição de destino, o opcional t a duração em ms</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="167" />
       <location filename="../help/eventsliders_help.py" line="152" />
       <source>for YOCTOPUCE RC modules: with n an int [0..65000] in us</source>
-      <translation type="unfinished" />
+      <translation>para módulos YOCTOPUCE RC: com n an int [0..65000] em us</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="168" />
       <location filename="../help/eventsliders_help.py" line="153" />
       <source>for YOCTOPUCE RC modules: with r an int in %</source>
-      <translation type="unfinished" />
+      <translation>para módulos YOCTOPUCE RC: com r an int em %</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="169" />
@@ -9035,35 +8832,36 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventbuttons_help.py" line="169" />
       <location filename="../help/eventsliders_help.py" line="154" />
       <source>If {} substitutions are used, json brackets need to be duplicated to escape them like in send({{ “value”: {}}})</source>
-      <translation type="unfinished" />
+      <translation>Se forem usadas substituições de {}, os colchetes json precisam ser duplicados para escapá-los, como em send({{ “value”: {}}})</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="172" />
       <location filename="../help/eventsliders_help.py" line="157" />
       <source>if the `&lt;json&gt;` text respects the JSON format it is send to the connected WebSocket server and the response is bound to the variable `_`</source>
-      <translation type="unfinished" />
+      <translation>se o texto `&lt;json&gt;` respeitar o formato JSON, ele é enviado para o servidor WebSocket conectado e a resposta é vinculada à variável `_`</translation>
     </message>
     <message>
       <location filename="../help/s7_help.py" line="14" />
       <location filename="../help/modbus_help.py" line="14" />
       <source>PORTS CONFIGURATION</source>
-      <translation type="unfinished" />
+      <translation>CONFIGURAÇÃO DE PORTAS</translation>
     </message>
     <message>
       <location filename="../help/modbus_help.py" line="17" />
       <source>MODBUS SETTINGS</source>
-      <translation type="unfinished" />
+      <translation>CONFIGURAÇÕES DO MODBUS</translation>
     </message>
     <message>
       <location filename="../help/modbus_help.py" line="18" />
       <source>The MODBUS serial protocols RTU, ASCII, and Binary is using the specified serial port parameters. The MODBUS IP protocol on TCP and UDP is respecting the host IP and port.</source>
-      <translation type="unfinished" />
+      <translation>Os protocolos seriais MODBUS RTU, ASCII e binário estão usando os parâmetros de porta serial especificados. O protocolo MODBUS IP em TCP e UDP está respeitando o IP do host e a porta.</translation>
     </message>
     <message>
       <location filename="../help/modbus_help.py" line="19" />
       <source>The inputs 1+2 configure the MODBUS device, inputs 3+4 configure the MODBUS_34 device and so on.
 Inputs with the slave id set to 0 are turned off.</source>
-      <translation type="unfinished" />
+      <translation>As entradas 1+2 configuram o dispositivo MODBUS, as entradas 3+4 configuram o dispositivo MODBUS_34 e assim por diante.
+As entradas com o ID do escravo definido como 0 são desligadas.</translation>
     </message>
     <message>
       <location filename="../help/modbus_help.py" line="20" />
@@ -9071,90 +8869,93 @@ Inputs with the slave id set to 0 are turned off.</source>
 Function 2 (Read Discrete Inputs): registers 0 to 65535 corresponding to numbers 100001 to 165536
 Function 3 (Read Multiple Holding Registers): registers 0 to 65535 corresponding to numbers 400001 to 465536
 Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers 300001 to 365536</source>
-      <translation type="unfinished" />
+      <translation>Função 1 (Read Coils): registros 0 a 65535 correspondentes aos números 000001 a 065536
+Função 2 (Ler entradas discretas): registros 0 a 65535 correspondentes aos números 100001 a 165536
+Função 3 (Ler Multiple Holding Registers): registros 0 a 65535 correspondentes aos números 400001 a 465536
+Função 4 (Read Input Registers): registros 0 a 65535 correspondentes aos números 300001 a 365536</translation>
     </message>
     <message>
       <location filename="../help/modbus_help.py" line="21" />
       <source>Dividers 1/10 and 1/100 can be set to recreate decimals of floats transported as integers multiplied by 10 or 100. Eg. a value of 145.2 might be transmitted as 1452, which is turned back into 145.2 by the 1/10 divider.</source>
-      <translation type="unfinished" />
+      <translation>Os divisores 1/10 e 1/100 podem ser configurados para recriar decimais de floats transportados como inteiros multiplicados por 10 ou 100. Ex. um valor de 145,2 pode ser transmitido como 1452, que é convertido novamente em 145,2 pelo divisor de 1/10.</translation>
     </message>
     <message>
       <location filename="../help/s7_help.py" line="21" />
       <location filename="../help/modbus_help.py" line="22" />
       <source>Temperature readings are automatically converted based on the specified unit per input channel.</source>
-      <translation type="unfinished" />
+      <translation>As leituras de temperatura são convertidas automaticamente com base na unidade especificada por canal de entrada.</translation>
     </message>
     <message>
       <location filename="../help/modbus_help.py" line="23" />
       <source>If a 32bit decoder is set two succeeding 16bit registers are requested and the received 4 bytes are interpreted using the byte and word order as specified by the corresponding flag.</source>
-      <translation type="unfinished" />
+      <translation>Se um decodificador de 32 bits for definido, dois registros sucessivos de 16 bits serão solicitados e os 4 bytes recebidos serão interpretados usando a ordem de bytes e palavras conforme especificado pelo sinalizador correspondente.</translation>
     </message>
     <message>
       <location filename="../help/modbus_help.py" line="24" />
       <source>The PID Control dialog can operate a connected PID slave using the given PID registers to set the p-i-d parameters and the set value (SV). MODBUS commands can be specified to turn the PID slave on and off from that PID Control dialog. See the help page in the Events Dialog for documentation of available MODBUS write commands.</source>
-      <translation type="unfinished" />
+      <translation>A caixa de diálogo PID Control pode operar um escravo PID conectado usando os registros PID fornecidos para definir os parâmetros p-i-d e o valor definido (SV). Os comandos MODBUS podem ser especificados para ligar e desligar o escravo PID a partir dessa caixa de diálogo de controle PID. Consulte a página de ajuda na caixa de diálogo de eventos para obter a documentação dos comandos de gravação MODBUS disponíveis.</translation>
     </message>
     <message>
       <location filename="../help/s7_help.py" line="24" />
       <location filename="../help/modbus_help.py" line="25" />
       <source>The Scan button opens a simple MODBUS scanner to search for data holding registers in the connected device.</source>
-      <translation type="unfinished" />
+      <translation>O botão Scan abre um scanner MODBUS simples para procurar registros de retenção de dados no dispositivo conectado.</translation>
     </message>
     <message>
       <location filename="../help/s7_help.py" line="25" />
       <location filename="../help/modbus_help.py" line="26" />
       <source>Refer to the User Manual of your MODBUS device for information specific to the setup required for your device.</source>
-      <translation type="unfinished" />
+      <translation>Consulte o Manual do usuário do seu dispositivo MODBUS para obter informações específicas sobre a configuração necessária para o seu dispositivo.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="14" />
       <source>EVENT CUSTOM BUTTONS</source>
-      <translation type="unfinished" />
+      <translation>BOTÕES PERSONALIZADOS DE EVENTO</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="18" />
       <source>Button Label</source>
-      <translation type="unfinished" />
+      <translation>Rótulo do botão</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="18" />
       <source>Enter \n to create labels with multiple lines. \t is substituted by the event type.</source>
-      <translation type="unfinished" />
+      <translation>Insira \n para criar rótulos com várias linhas. \t é substituído pelo tipo de evento.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="19" />
       <source>Event Description</source>
-      <translation type="unfinished" />
+      <translation>Descrição do Evento</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="19" />
       <source>Description of the Event to be recorded.</source>
-      <translation type="unfinished" />
+      <translation>Descrição do Evento a ser registrado.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="20" />
       <source>Event Type</source>
-      <translation type="unfinished" />
+      <translation>Tipo de evento</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="20" />
       <source>Event type to be recorded or leave blank for no event. '±' types add a chosen offset (positive or negative) to the present value of the chosen event.</source>
-      <translation type="unfinished" />
+      <translation>Tipo de evento a ser registrado ou deixe em branco para nenhum evento. Os tipos '±' adicionam um deslocamento escolhido (positivo ou negativo) ao valor presente do evento escolhido.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="21" />
       <source>Event Value</source>
-      <translation type="unfinished" />
+      <translation>Valor do Evento</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="21" />
       <source>Value of event (1-100) to be recorded.</source>
-      <translation type="unfinished" />
+      <translation>Valor do evento (1-100) a ser registrado.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="22" />
       <source>Perform an action at the time of the event.</source>
-      <translation type="unfinished" />
+      <translation>Execute uma ação no momento do evento.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="23" />
@@ -9164,32 +8965,32 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
       <location filename="../help/eventbuttons_help.py" line="23" />
       <source>The action Command.  Depends on the action type, &amp;#39;{}&amp;#39; is replaced by the event value and the offset in case of a ± event type.</source>
-      <translation type="unfinished" />
+      <translation>O comando de ação. Depende do tipo de ação, &amp;#39;{}&amp;#39; é substituído pelo valor do evento e o deslocamento no caso de um tipo de evento ±.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="24" />
       <source>Button Visibility</source>
-      <translation type="unfinished" />
+      <translation>Visibilidade do botão</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="24" />
       <source>Hides/shows individual button.</source>
-      <translation type="unfinished" />
+      <translation>Oculta/exibe botão individual.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="27" />
       <source>EVENT BUTTONS CONFIGURATION OPTIONS</source>
-      <translation type="unfinished" />
+      <translation>OPÇÕES DE CONFIGURAÇÃO DOS BOTÕES DE EVENTO</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="31" />
       <source>Max buttons per row</source>
-      <translation type="unfinished" />
+      <translation>Botões máximos por linha</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="31" />
       <source>Sets a maximum number of buttons to display on a single row.</source>
-      <translation type="unfinished" />
+      <translation>Define um número máximo de botões a serem exibidos em uma única linha.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="32" />
@@ -9199,48 +9000,49 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
       <location filename="../help/eventbuttons_help.py" line="32" />
       <source>Sets a size for the buttons.  Choices are tiny, small and large.</source>
-      <translation type="unfinished" />
+      <translation>Define um tamanho para os botões. As opções são minúsculas, pequenas e grandes.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="33" />
       <source>Color Pattern</source>
-      <translation type="unfinished" />
+      <translation>Padrão de cores</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="33" />
       <source>Applies one of 99 autogenerated color patterns to the buttons.  Set to "0" to manually choose the button colors.</source>
-      <translation type="unfinished" />
+      <translation>Aplica um dos 99 padrões de cores gerados automaticamente aos botões. Defina como "0" para escolher manualmente as cores dos botões.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="34" />
       <source>Adds a new button to the bottom of the table.</source>
-      <translation type="unfinished" />
+      <translation>Adiciona um novo botão à parte inferior da tabela.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="35" />
       <source>Inserts a new button above the selected button.</source>
-      <translation type="unfinished" />
+      <translation>Insere um novo botão acima do botão selecionado.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="36" />
       <source>Deletes the selected button.</source>
-      <translation type="unfinished" />
+      <translation>Exclui o botão selecionado.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="37" />
       <source>Copy the button table in tab separated format to the clipboard.  Option or ALT click to copy a tabular format to the clipboard.</source>
-      <translation type="unfinished" />
+      <translation>Copie a tabela de botões em formato separado por tabulações para a área de transferência. Option ou ALT clique para copiar um formato tabular para a área de transferência.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="45" />
       <source>Note: "{}" can be used as a placeholder, it will be substituted by the current button value plus the offset for ± event types.  If a placeholder occurs several times in a description/command, all those occurrences are replaced by the value.
 </source>
-      <translation type="unfinished" />
+      <translation>Nota: "{}" pode ser usado como marcador de posição, ele será substituído pelo valor do botão atual mais o deslocamento para tipos de evento ±. Se um marcador de posição ocorrer várias vezes em uma descrição/comando, todas essas ocorrências serão substituídas pelo valor.
+</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="45" />
       <source>Note: in YOCTOPUCE commands, the optional parameter &lt;sn&gt; holds either the modules serial number or its name</source>
-      <translation type="unfinished" />
+      <translation>Nota: nos comandos YOCTOPUCE, o parâmetro opcional &lt;sn&gt; contém o número de série do módulo ou seu nome</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="51" />
@@ -9250,23 +9052,24 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
       <location filename="../help/eventbuttons_help.py" line="51" />
       <source>button numbers separated by a comma: 1,2,..</source>
-      <translation type="unfinished" />
+      <translation>números de botões separados por vírgula: 1,2,..</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="51" />
       <source>triggers other buttons</source>
-      <translation type="unfinished" />
+      <translation>aciona outros botões</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="55" />
       <source>reads 1 16bit register from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as unsigned integer. The result is bound to the placeholder `_` and thus can be accessed in later commands.</source>
-      <translation type="unfinished" />
+      <translation>lê 1 registro de 16 bits do slave slaveID usando a função 3 (Read Multiple Holding Registers) interpretada como inteiro sem sinal. O resultado está vinculado ao espaço reservado `_` e, portanto, pode ser acessado em comandos posteriores.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="71" />
       <source>Insert Data address : value, ex. 4701:1000 and sv is 100. 
 Always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating</source>
-      <translation type="unfinished" />
+      <translation>Inserir endereço de dados: valor, ex. 4701:1000 e sv é 100.
+Sempre multiplique por 10 se o valor Unidade: 0,1 / ex. 4719:0 pára de aquecer</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="91" />
@@ -9276,17 +9079,17 @@ Always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating</source>
     <message>
       <location filename="../help/eventbuttons_help.py" line="91" />
       <source>configures PID to the values &lt;p&gt;;&lt;i&gt;;&lt;d&gt;</source>
-      <translation type="unfinished" />
+      <translation>configura o PID para os valores &lt;p&gt;;&lt;i&gt;;&lt;d&gt;</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="103" />
       <source>for PHIDGET OUTPUT modules: sets voltage voltage range (r=5 for 5V and r=10 for 10V)</source>
-      <translation type="unfinished" />
+      <translation>para módulos PHIDGET OUTPUT: define a faixa de tensão (r=5 para 5V er=10 para 10V)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="116" />
       <source>write value where bits are replaced by those from orMask at positions where andMask bits are not set</source>
-      <translation type="unfinished" />
+      <translation>valor de gravação onde os bits são substituídos pelos de orMask em posições onde os bits de andMask não são definidos</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="121" />
@@ -9296,107 +9099,112 @@ Always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating</source>
     <message>
       <location filename="../help/eventbuttons_help.py" line="121" />
       <source>Sends PRS command</source>
-      <translation type="unfinished" />
+      <translation>Envia comando PRS</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="166" />
       <source>for YOCTOPUCE RC modules: with c:int the channel, p:int the target position, the optional t the duration in ms, sn the optional modules serial number or logical name</source>
-      <translation type="unfinished" />
+      <translation>para módulos YOCTOPUCE RC: com c:int o canal, p:int a posição de destino, o opcional t a duração em ms, sn o número de série ou nome lógico dos módulos opcionais</translation>
     </message>
     <message>
       <location filename="../help/s7_help.py" line="17" />
       <source>S7 SETTINGS</source>
-      <translation type="unfinished" />
+      <translation>S7 CONFIGURAÇÕES</translation>
     </message>
     <message>
       <location filename="../help/s7_help.py" line="18" />
       <source>The Siemens S7 is respecting the host IP and port.</source>
-      <translation type="unfinished" />
+      <translation>O Siemens S7 está respeitando o IP e a porta do host.</translation>
     </message>
     <message>
       <location filename="../help/s7_help.py" line="19" />
       <source>The inputs 1+2 configure the S7 device, inputs 3+4 configure the S7_34 device and so on.
 Inputs with the area set to the empty input are turned off.</source>
-      <translation type="unfinished" />
+      <translation>As entradas 1+2 configuram o dispositivo S7, as entradas 3+4 configuram o dispositivo S7_34 e assim por diante.
+As entradas com a área definida como entrada vazia são desativadas.</translation>
     </message>
     <message>
       <location filename="../help/s7_help.py" line="20" />
       <source>Factors 1/10 and 1/100 can be set as dividers to recreate decimals of floats transported as integers multiplied by 10 or 100. Eg. a value of 145.2 might be transmitted as 1452, which is turned back into 145.2 by the 1/10 divider.</source>
-      <translation type="unfinished" />
+      <translation>Os fatores 1/10 e 1/100 podem ser definidos como divisores para recriar decimais de floats transportados como inteiros multiplicados por 10 ou 100. Ex. um valor de 145,2 pode ser transmitido como 1452, que é convertido novamente em 145,2 pelo divisor de 1/10.</translation>
     </message>
     <message>
       <location filename="../help/s7_help.py" line="22" />
       <source>If mode is set to C or F, readings are automatically converted to the temperature unit set for display.</source>
-      <translation type="unfinished" />
+      <translation>Se o modo for definido como C ou F, as leituras serão convertidas automaticamente para a unidade de temperatura definida para exibição.</translation>
     </message>
     <message>
       <location filename="../help/s7_help.py" line="23" />
       <source>The PID Control dialog can operate a connected PID slave using the given PID registers to set the p-i-d parameters and the set value (SV). S7 commands can be specified to turn the PID slave on and off from that PID Control dialog. See the help page in the Events Dialog for documentation of available S7 write commands.</source>
-      <translation type="unfinished" />
+      <translation>A caixa de diálogo PID Control pode operar um escravo PID conectado usando os registros PID fornecidos para definir os parâmetros p-i-d e o valor definido (SV). Os comandos S7 podem ser especificados para ligar e desligar o escravo PID a partir dessa caixa de diálogo de controle PID. Consulte a página de ajuda na caixa de diálogo de eventos para obter a documentação dos comandos de gravação do S7 disponíveis.</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="14" />
       <source>EVENT ANNOTATIONS</source>
-      <translation type="unfinished" />
+      <translation>ANOTAÇÕES DO EVENTO</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="30" />
       <location filename="../help/eventannotations_help.py" line="17" />
       <source>Prefix Field</source>
-      <translation type="unfinished" />
+      <translation>Campo de Prefixo</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="58" />
       <location filename="../help/autosave_help.py" line="30" />
       <location filename="../help/eventannotations_help.py" line="17" />
       <source>Example</source>
-      <translation type="unfinished" />
+      <translation>Exemplo</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="18" />
       <source>The value of Event</source>
-      <translation type="unfinished" />
+      <translation>O valor do evento</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="21" />
       <location filename="../help/eventannotations_help.py" line="19" />
       <source>ET value</source>
-      <translation type="unfinished" />
+      <translation>valor ET</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="22" />
       <location filename="../help/eventannotations_help.py" line="20" />
       <source>BT value</source>
-      <translation type="unfinished" />
+      <translation>valor BT</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="21" />
       <source>The Description field of the Event</source>
-      <translation type="unfinished" />
+      <translation>O campo Descrição do Evento</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="22" />
       <source>The Type field of the Event</source>
-      <translation type="unfinished" />
+      <translation>O campo Tipo do Evento</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="23" />
       <source>The value of the Slider Unit for this Event</source>
-      <translation type="unfinished" />
+      <translation>O valor da unidade deslizante para este evento</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="24" />
       <source>Number of seconds before or after CHARGE 
 Before CHARGE shows negative 
 Displays &amp;#39;*&amp;#39; when no CHARGE event exists</source>
-      <translation type="unfinished" />
+      <translation>Número de segundos antes ou depois de CHARGE
+Antes de CHARGE mostrar negativo
+Exibe &amp;#39;*&amp;#39; quando não existe nenhum evento CHARGE</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="25" />
       <source>Time before or after CHARGE in min:sec 
 Before CHARGE shows negative 
 Displays &amp;#39;*&amp;#39; when no CHARGE event exists</source>
-      <translation type="unfinished" />
+      <translation>Tempo antes ou depois da CARGA em min:seg
+Antes de CHARGE mostrar negativo
+Exibe &amp;#39;*&amp;#39; quando não existe nenhum evento CHARGE</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="26" />
@@ -9404,7 +9212,10 @@ Displays &amp;#39;*&amp;#39; when no CHARGE event exists</source>
 Best used inside double quotes (see notes below) 
 Negative value before FCs 
 Displays &amp;#39;*&amp;#39; when no FCs event exists</source>
-      <translation type="unfinished" />
+      <translation>Número de segundos antes ou depois dos FCs
+Melhor usado entre aspas duplas (veja as notas abaixo)
+Valor negativo antes de FCs
+Exibe &amp;#39;*&amp;#39; quando não existe nenhum evento FCs</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="27" />
@@ -9412,7 +9223,10 @@ Displays &amp;#39;*&amp;#39; when no FCs event exists</source>
 Best used inside double quotes (see notes below) 
 Negative value before FCs 
 Displays &amp;#39;*&amp;#39; when no FCs event exists</source>
-      <translation type="unfinished" />
+      <translation>Tempo após FCs em min:seg
+Melhor usado entre aspas duplas (veja as notas abaixo)
+Valor negativo antes de FCs
+Exibe &amp;#39;*&amp;#39; quando não existe nenhum evento FCs</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="28" />
@@ -9420,7 +9234,10 @@ Displays &amp;#39;*&amp;#39; when no FCs event exists</source>
 Best used inside single quotes or back ticks (see notes below) 
 Positive value only 
 Displays &amp;#39;*&amp;#39; after FCs or when no FCs event exists</source>
-      <translation type="unfinished" />
+      <translation>Número de segundos antes dos FCs
+Melhor usado dentro de aspas simples ou back ticks (veja as notas abaixo)
+Somente valor positivo
+Exibe &amp;#39;*&amp;#39; depois de FCs ou quando não existe nenhum evento de FCs</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="29" />
@@ -9428,85 +9245,95 @@ Displays &amp;#39;*&amp;#39; after FCs or when no FCs event exists</source>
 Best used inside single quotes or back ticks (see notes below) 
 Positive value only 
 Displays &amp;#39;*&amp;#39; after FCs or when no FCs event exists</source>
-      <translation type="unfinished" />
+      <translation>Tempo antes dos FCs em min:seg
+Melhor usado dentro de aspas simples ou back ticks (veja as notas abaixo)
+Somente valor positivo
+Exibe &amp;#39;*&amp;#39; depois de FCs ou quando não existe nenhum evento de FCs</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="30" />
       <source>Development time ratio (percent). Note: DTR=0 before FCs 
 100*(t{Event}-t{FCs})/(t{FCs}-t{CHARGE})</source>
-      <translation type="unfinished" />
+      <translation>Taxa de tempo de desenvolvimento (porcentagem). Nota: DTR=0 antes dos FCs
+100*(t{Evento}-t{FCs})/(t{FCs}-t{CARGA})</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="31" />
       <source>The degree symbol</source>
-      <translation type="unfinished" />
+      <translation>O símbolo do grau</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="32" />
       <source>Temperature mode (&amp;#39;C&amp;#39; or &amp;#39;F&amp;#39;)</source>
-      <translation type="unfinished" />
+      <translation>Modo de temperatura (&amp;#39;C&amp;#39; ou &amp;#39;F&amp;#39;)</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="33" />
       <source>Degree symbol with Temperature mode</source>
-      <translation type="unfinished" />
+      <translation>Símbolo de grau com modo de temperatura</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="34" />
       <source>ET RoR value
 Displays &amp;#39;--&amp;#39; when the RoR value is not available.</source>
-      <translation type="unfinished" />
+      <translation>Valor ET RoR
+Exibe &amp;#39;--&amp;#39; quando o valor RoR não está disponível.</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="35" />
       <source>BT RoR value
 Shows &amp;#39;--&amp;#39; when the RoR value Is not available.</source>
-      <translation type="unfinished" />
+      <translation>Valor BT RoR
+Mostra &amp;#39;--&amp;#39; quando o valor RoR não está disponível.</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="36" />
       <source>RoR units
 Shorthand for &amp;#39;~deg~mode/min&amp;#39;</source>
-      <translation type="unfinished" />
+      <translation>unidades RoR
+Abreviatura para &amp;#39;~deg~modo/min&amp;#39;</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="37" />
       <source>ET RoR with units
 Field is hidden when the RoR value is not available.</source>
-      <translation type="unfinished" />
+      <translation>ET RoR com unidades
+O campo fica oculto quando o valor RoR não está disponível.</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="38" />
       <source>BT RoR with units
 Field is hidden when the RoR value is not available.</source>
-      <translation type="unfinished" />
+      <translation>BT RoR com unidades
+O campo fica oculto quando o valor RoR não está disponível.</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="39" />
       <source>Quote symbol</source>
-      <translation type="unfinished" />
+      <translation>símbolo de cotação</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="40" />
       <source>Single quote symbol</source>
-      <translation type="unfinished" />
+      <translation>Símbolo de aspas simples</translation>
     </message>
     <message>
-      <location filename="../help/autosave_help.py" line="113" />
+      <location filename="../help/autosave_help.py" line="119" />
       <location filename="../help/eventannotations_help.py" line="43" />
       <source>EXAMPLES</source>
-      <translation type="unfinished" />
+      <translation>EXEMPLOS</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="47" />
       <source>Assumptions:  The event value is 50.  In the case of Gas the value 50 corresponds to either 5.0kPh or 50%.  
 For a sensory milestone (see notes above) the value 50 corresponds to the "Hay" aroma. </source>
-      <translation type="unfinished" />
+      <translation>Suposições: O valor do evento é 50. No caso de Gás, o valor 50 corresponde a 5,0kPh ou 50%.
+Para um marco sensorial (ver notas acima) o valor 50 corresponde ao aroma "Hay".</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="50" />
       <source>Annotation Field</source>
-      <translation type="unfinished" />
+      <translation>Campo de anotação</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="50" />
@@ -9516,47 +9343,47 @@ For a sensory milestone (see notes above) the value 50 corresponds to the "Hay" 
     <message>
       <location filename="../help/eventannotations_help.py" line="51" />
       <source>Gas ~E @~Y2~degmode</source>
-      <translation type="unfinished" />
+      <translation>Gás ~E @~Y2~degmode</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="51" />
       <source>Gas 50 @340°F</source>
-      <translation type="unfinished" />
+      <translation>Gás 50 @340°F</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="52" />
       <source>Gas ~E% @~Y2~mode</source>
-      <translation type="unfinished" />
+      <translation>Gás ~E% @~Y2~modo</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="52" />
       <source>Gas 50% @340F</source>
-      <translation type="unfinished" />
+      <translation>Gás 50% @340F</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="53" />
       <source>Gas ~E/10kPh @~Y2~mode</source>
-      <translation type="unfinished" />
+      <translation>Gás ~E/10kPh @~Y2~modo</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="53" />
       <source>Gas 5.0kPh @340F</source>
-      <translation type="unfinished" />
+      <translation>Gás 5,0kPh @340F</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="54" />
       <source>Gas ~E/10kPh @~Y2~mode and ~R2~degmin</source>
-      <translation type="unfinished" />
+      <translation>Gás ~E/10kPh @~Y2~modo e ~R2~degmin</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="54" />
       <source>Gas 5.0kPh @340F and 32.8°F/min</source>
-      <translation type="unfinished" />
+      <translation>Gás 5,0kPh @340F e 32,8°F/min</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="55" />
       <source>Gas ~E% &amp;#39;@~Y2 ~degmode&amp;#39;"@~DTR% DTR"</source>
-      <translation type="unfinished" />
+      <translation>Gás ~E% &amp;#39;@~Y2 ~degmode&amp;#39;"@~DTR% DTR"</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="55" />
@@ -9565,12 +9392,16 @@ Gas 50% @340 °F
 
 After FCs:
 Gas 50% @12% DTR</source>
-      <translation type="unfinished" />
+      <translation>Antes do FC:
+Gás 50% a 340 °F
+
+Após CFs:
+Gás 50% a 12% DTR</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="56" />
       <source>Gas ~E% &amp;#39;@~Y2 ~degmode`, ~preFCs sec before FCs`&amp;#39;"@~DTR% DTR"</source>
-      <translation type="unfinished" />
+      <translation>Gás ~E% &amp;#39;@~Y2 ~degmode`, ~preFCs seg antes de FCs`&amp;#39;"@~DTR% DTR"</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="56" />
@@ -9582,59 +9413,68 @@ Gas 50% @340 °F, 50 sec before FCs
 
 After FCs:
 Gas 50% @12% DTR</source>
-      <translation type="unfinished" />
+      <translation>Mais de 90 segundos antes dos FCs:
+Gás 50% a 340 °F
+
+Menos de 90 segundos antes dos FCs:
+Gás 50% a 340 °F, 50 segundos antes dos FCs
+
+Após FCs:
+Gás 50% a 12% DTR</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="57" />
       <source>{20Fresh Cut Grass|50Hay|80Baking Bread|100A Point} @~Y2~degmode</source>
-      <translation type="unfinished" />
+      <translation>{20Grama Fresca Cortada|50Feno|80Cozimento de Pão|100A Ponto} @~Y2~degmode</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="57" />
       <source>Hay @340 °F</source>
-      <translation type="unfinished" />
+      <translation>Feno @340 °F</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="60" />
       <source>NOTES:</source>
-      <translation type="unfinished" />
+      <translation>NOTAS:</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="64" />
       <source>Event annotations apply only for &amp;#39;Step&amp;#39; and &amp;#39;Step+&amp;#39; Events settings</source>
-      <translation type="unfinished" />
+      <translation>As anotações de eventos aplicam-se apenas a &amp;#39;Etapa&amp;#39; e &amp;#39;Passo+&amp;#39; Configurações de eventos</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="65" />
       <source>Anything between double quotes " will show only after FCs. Example: "~E1 @~DTR%"</source>
-      <translation type="unfinished" />
+      <translation>Qualquer coisa entre aspas duplas " será exibida somente após FCs. Exemplo: "~E1 @~DTR%"</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="66" />
       <source>Anything between single quotes &amp;#39; will show only before FCs. Example: &amp;#39;~E1 @~degmode&amp;#39;</source>
-      <translation type="unfinished" />
+      <translation>Qualquer coisa entre aspas simples &amp;#39; será exibido apenas antes dos FCs. Exemplo: &amp;#39;~E1 @~degmode&amp;#39;</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="67" />
       <source>Anything between back ticks ` will show only within 90 seconds before FCs. Example: `~E1 `FCs~dFCs sec`</source>
-      <translation type="unfinished" />
+      <translation>Qualquer coisa entre back ticks ` será exibida apenas 90 segundos antes dos FCs. Exemplo: `~E1 `FCs~dFCs seg`</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="68" />
       <source>When combining back ticks with single or double quotes the back ticks should be inside the quotes.</source>
-      <translation type="unfinished" />
+      <translation>Ao combinar crases com aspas simples ou duplas, os craques devem estar dentro das aspas.</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="69" />
       <source>Background event annotations can be seen during a roast when &amp;#39;Annotations&amp;#39; is checked in the Profile Background window.</source>
-      <translation type="unfinished" />
+      <translation>As anotações de eventos em segundo plano podem ser vistas durante uma torrefação quando &amp;#39;Anotações&amp;#39; está marcada na janela Plano de fundo do perfil.</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="70" />
       <source>Simple scaling of the event value is possible. Use a single math operator (&amp;#39;*&amp;#39;, &amp;#39;/&amp;#39;, &amp;#39;+&amp;#39; or &amp;#39;-&amp;#39;) immediately following the field name "E". For example: 
 &amp;#39;~E/10&amp;#39; will divide the E value by 10. 
 &amp;#39;~E+5&amp;#39; adds 5 to the the value of E.</source>
-      <translation type="unfinished" />
+      <translation>A escala simples do valor do evento é possível. Use um único operador matemático (&amp;#39;*&amp;#39;, &amp;#39;/&amp;#39;, &amp;#39;+&amp;#39; ou &amp;#39;-&amp;#39;) imediatamente após o campo nome "E". Por exemplo:
+&amp;#39;~E/10&amp;#39; dividirá o valor de E por 10.
+&amp;#39;~E+5&amp;#39; adiciona 5 ao valor de E.</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="71" />
@@ -9644,17 +9484,22 @@ This form of annotation must be enclosed in curly brackets &amp;#39;{}&amp;#39;.
 {~E|20Fresh Cut Grass|50Hay|80Baking Bread|100A Point} 
 
 Note that if the event value  does not match any value in the Annotation definition a blank string will be returned.  In the example above an event value of 30 will return a blank string.  The easiest way to ensure these values match is to use Custom Buttons to for the Event.</source>
-      <translation type="unfinished" />
+      <translation>Outro estilo de anotações permite substituir o valor numérico de um evento por uma string de texto, conhecida como valor nominal. Um exemplo em que isso pode ser útil é quando um evento é usado para registrar marcos sensoriais. O valor 20 pode ser usado para &amp;#39;Relva cortada fresca&amp;#39; aroma, 50 para &amp;#39;Hay&amp;#39;, 80 para &amp;#39;Baking Bread&amp;#39; e 100 para representar o &amp;#39;A Point&amp;#39;.
+
+Esta forma de anotação deve ser colocada entre chaves &amp;#39;{}&amp;#39;. As entradas são valores numéricos imediatamente seguidos por seu texto de representação nominal. As entradas são separadas pela barra vertical &amp;#39;|&amp;#39;. A string de anotação a seguir implementa este exemplo.
+{~E|20Relva Fresca Cortada|50Feno|80Assar Pão|100A Ponto}
+
+Observe que, se o valor do evento não corresponder a nenhum valor na definição de anotação, uma string em branco será retornada. No exemplo acima, um valor de evento de 30 retornará uma string em branco. A maneira mais fácil de garantir que esses valores correspondam é usar botões personalizados para o evento.</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="72" />
       <source>When annotations overlap to the point they can not be read, try reducing the value of the &amp;#39;Allowed Annotation Overlap&amp;#39; found on the Annotations configuration page.  The default value for this setting is 100%.</source>
-      <translation type="unfinished" />
+      <translation>Quando as anotações se sobrepõem a ponto de não poderem ser lidas, tente reduzir o valor da opção &amp;#39;Sobreposição de anotação permitida&amp;#39; encontrado na página de configuração de Anotações. O valor padrão para esta configuração é 100%.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="14" />
       <source>Energy and CO2 Calculator</source>
-      <translation type="unfinished" />
+      <translation>Calculadora de energia e CO2</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="18" />
@@ -9663,27 +9508,31 @@ Note that if the event value  does not match any value in the Annotation definit
 Note that pre-heating and roaster cooling energy values are applied to the first roast of a roasting session.  Between batch energies are applied to every roast except the first.  Tick the "Between batches after Pre-Heating box to apply the between batch value to the first roast.
 
 Follow the steps below to set the energy inputs for the roast machine and afterburner.</source>
-      <translation type="unfinished" />
+      <translation>A guia Energia exibe o consumo de energia de um assado. As emissões de CO2 também são calculadas para monitorar o impacto da operação de torrefação. As configurações devem ser feitas para cada carga de energia. As cargas são os queimadores principais, motores e ventiladores, e um pós-combustor, se for usado. A energia usada para o pré-aquecimento, entre os protocolos de resfriamento do lote e do torrador está incluída nos cálculos, e as configurações também estão disponíveis para eles.
+
+Observe que os valores de energia de pré-aquecimento e resfriamento do torrador são aplicados à primeira torra de uma sessão de torra. As energias entre lotes são aplicadas a cada torrefação, exceto a primeira. Marque a caixa "Entre lotes após pré-aquecimento para aplicar o valor entre lotes à primeira torrefação.
+
+Siga as etapas abaixo para definir as entradas de energia para a torradeira e pós-combustão.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="18" />
       <source>Blank entries  are the same as a zero entry.  Negative values are not allowed.</source>
-      <translation type="unfinished" />
+      <translation>Entradas em branco são iguais a uma entrada zero. Valores negativos não são permitidos.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="22" />
       <source>Once you set up the Loads sub-tab and the Protocols sub-tab, it is a good idea to click "Save Defaults" on both  sub-tabs (they are saved separately).  When loading a profile with existing energy values, the profile settings will be read and will overwrite the values on the Loads and Profiles sub-tabs.  Having them saved as defaults allow for them to be quickly restored by clicking "Restore Defaults" on each sub-tab.</source>
-      <translation type="unfinished" />
+      <translation>Depois de configurar a subguia Cargas e a subguia Protocolos, é uma boa ideia clicar em "Salvar padrões" em ambas as subguias (elas são salvas separadamente). Ao carregar um perfil com valores de energia existentes, as configurações do perfil serão lidas e substituirão os valores nas subguias Cargas e Perfis. Tê-los salvos como padrões permite que sejam restaurados rapidamente clicando em "Restaurar padrões" em cada subguia.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="25" />
       <source>1. Details Sub-Tab</source>
-      <translation type="unfinished" />
+      <translation>1. Subguia Detalhes</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="29" />
       <source>This sub-tab shows a detailed table of the energy consumption and CO2 production data for the roast.  The values in this table are based on current Profile and the settings made on the Loads and Protocols sub-tabs.  Columns may be sorted by clicking on the column title.  To return to original sort click on the &amp;#39;Kind&amp;#39; column title.</source>
-      <translation type="unfinished" />
+      <translation>Esta sub-aba mostra uma tabela detalhada dos dados de consumo de energia e produção de CO2 para a torrefação. Os valores nesta tabela são baseados no Perfil atual e nas configurações feitas nas subguias Cargas e Protocolos. As colunas podem ser classificadas clicando no título da coluna. Para retornar à classificação original, clique no botão &amp;#39;Tipo&amp;#39; título da coluna.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="33" />
@@ -9693,32 +9542,32 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
     <message>
       <location filename="../help/energy_help.py" line="33" />
       <source>Choose the energy units for the summary displays and the Details sub-tab.</source>
-      <translation type="unfinished" />
+      <translation>Escolha as unidades de energia para as exibições de resumo e a subguia Detalhes.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="36" />
       <source>2. Loads Sub-Tab</source>
-      <translation type="unfinished" />
+      <translation>2. Subguia Carrega</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="40" />
       <source>Begin by making entries on the Loads sub-tab  to define the sources of energy used by this roast. It might be a good idea to save those settings as defaults to be used to calculate the energy consumption of future roasts</source>
-      <translation type="unfinished" />
+      <translation>Comece fazendo entradas na sub-aba Cargas para definir as fontes de energia utilizadas por esta torrefação. Pode ser uma boa ideia salvar essas configurações como padrão para serem usadas para calcular o consumo de energia de torras futuras</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="40" />
       <source>Power ratings for up to four energy loads may be entered.  Loads will be the main burners or heaters, motors and blowers, and the afterburner if one is used.  Enter one load per line.  Motors and blowers that run continuously may be aggregated and entered as one load.</source>
-      <translation type="unfinished" />
+      <translation>As classificações de energia para até quatro cargas de energia podem ser inseridas. As cargas serão os queimadores principais ou aquecedores, motores e sopradores, e o pós-combustor, se for utilizado. Insira uma carga por linha. Motores e sopradores que funcionam continuamente podem ser agregados e inseridos como uma carga.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="40" />
       <source>Loads are assumed to run continuously. Variable loads, such as the main burner setting, can be recorded in Artisan using one of the four special events.  The settings can be captured from a button, slider or in some cases read directly from the roaster.  The load setup allows linking a load to one of these events.  The energy calculator will then determine the setting percentage and the duration of the setting to calculate the energy consumed.</source>
-      <translation type="unfinished" />
+      <translation>As cargas são assumidas para funcionar continuamente. Cargas variáveis, como a configuração do queimador principal, podem ser registradas no Artisan usando um dos quatro eventos especiais. As configurações podem ser capturadas de um botão, controle deslizante ou, em alguns casos, lidas diretamente do torrador. A configuração de carga permite vincular uma carga a um desses eventos. A calculadora de energia determinará a porcentagem de configuração e a duração da configuração para calcular a energia consumida.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="40" />
       <source>Burner entries require knowing the power rating of the burner.  Roasting machine manufacturer&amp;#39;s typically provide this information.  If this information can not be found for your machine this table provides approximate values based on roaster capacities.  https://artisan-scope.org/ratings/</source>
-      <translation type="unfinished" />
+      <translation>As entradas do queimador requerem o conhecimento da potência nominal do queimador. Os fabricantes de máquinas de torrefação geralmente fornecem essas informações. Se esta informação não puder ser encontrada para sua máquina, esta tabela fornece valores aproximados com base nas capacidades do torrador. https://artisan-scope.org/ratings/</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="44" />
@@ -9728,7 +9577,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
     <message>
       <location filename="../help/energy_help.py" line="44" />
       <source>Enter your personal description for this burner.  Examples are &amp;#39;Main&amp;#39; and &amp;#39;Afterburner&amp;#39;.</source>
-      <translation type="unfinished" />
+      <translation>Digite sua descrição pessoal para este gravador. Os exemplos são &amp;#39;Principais&amp;#39; e &amp;#39;Pós-combustor&amp;#39;.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="45" />
@@ -9738,29 +9587,31 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
     <message>
       <location filename="../help/energy_help.py" line="45" />
       <source>This is the power rating of the load  Choose the units in the next column.  </source>
-      <translation type="unfinished" />
+      <translation>Esta é a potência nominal da carga. Escolha as unidades na próxima coluna.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="46" />
       <source>Select the appropriate power unit. Some manufacturers incorrectly use BTU.  In that case use BTU/h for the unit.</source>
-      <translation type="unfinished" />
+      <translation>Selecione a unidade de alimentação apropriada. Alguns fabricantes usam BTU incorretamente. Nesse caso, use BTU/h para a unidade.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="47" />
       <source>Fuel</source>
-      <translation type="unfinished" />
+      <translation>Combustível</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="47" />
       <source>Select the type of fuel used by this load  &amp;#39;Elec&amp;#39; is assumed to be electricity generated from dirty coal.  There is a setting below to adjust for renewable clean energy sources.</source>
-      <translation type="unfinished" />
+      <translation>Selecione o tipo de combustível utilizado por esta carga &amp;#39;Elec&amp;#39; supõe-se que seja eletricidade gerada a partir de carvão sujo. Há uma configuração abaixo para ajustar para fontes de energia limpas renováveis.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="48" />
       <source>Special Events are often used to record load settings, such as a burner setting, in the roast profile.  Select the Event that corresponds to the load setting here.  
 
 When blank the load is assumed to be at a constant setting, which is the percent &amp;#39;Value 100%&amp;#39; multiplied by the rating.  A 10 kW load at &amp;#39;100% Value&amp;#39;= 60 would thus be 10 kW * 60% = 6 kW. Continuous loads are typically motors and blowers and the afterburner.</source>
-      <translation type="unfinished" />
+      <translation>Eventos especiais são frequentemente usados para registrar configurações de carga, como uma configuração de queimador, no perfil de torra. Selecione o evento que corresponde à configuração de carga aqui.
+
+Quando em branco, assume-se que a carga está em uma configuração constante, que é a porcentagem &amp;#39;Valor 100%&amp;#39; multiplicado pela classificação. Uma carga de 10 kW em &amp;#39;Valor de 100%&amp;#39;= 60 seria, portanto, 10 kW * 60% = 6 kW. As cargas contínuas são normalmente motores e ventiladores e o pós-combustor.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="49" />
@@ -9770,37 +9621,37 @@ When blank the load is assumed to be at a constant setting, which is the percent
     <message>
       <location filename="../help/energy_help.py" line="49" />
       <source>For gas loads tick this box when  the readings are made in units of pressure.  Some roasters and some controllers provide readings in heat energy.  When the readings are made in heat energy leave this box unticked.</source>
-      <translation type="unfinished" />
+      <translation>Para cargas de gás, marque esta caixa quando as leituras forem feitas em unidades de pressão. Alguns torradores e alguns controladores fornecem leituras de energia térmica. Quando as leituras forem feitas em energia térmica, deixe esta caixa desmarcada.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="50" />
       <source>Value 0%</source>
-      <translation type="unfinished" />
+      <translation>Valor 0%</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="50" />
       <source>When an Event is selected in the previous column this value can be set to match the 0% burner setting to the event setting.  In most cases a 0 Event value will correspond to the 0% load setting.</source>
-      <translation type="unfinished" />
+      <translation>Quando um evento é selecionado na coluna anterior, esse valor pode ser definido para corresponder à configuração do queimador de 0% para a configuração do evento. Na maioria dos casos, um valor de evento 0 corresponderá à configuração de carga de 0%.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="51" />
       <source>Value 100%</source>
-      <translation type="unfinished" />
+      <translation>Valor 100%</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="51" />
       <source>When an Event is selected this value can be set to match the 100% load setting to the event setting.  This is useful when the 100% load setting is recorded as a different number in the Event.  For instance, maybe the burner event is recorded as 10x the kPa reading on the gas manometer.  An event value of 35 is recoded to signify 3.5 kPa, which is 50% pressure.  If the 100% burner setting corresponds to 7 kPa then the &amp;#39;Value 100%&amp;#39; should be set to 70, which is 7 * 10  = 70.  Thus 3.5 kPa will be seen by he energy calculator as 50%.  For pressure readings be sure to tick the Pressure box.  Heat energy readings are normally 0%-100% and do not require any adjustment to this  setting.</source>
-      <translation type="unfinished" />
+      <translation>Quando um evento é selecionado, esse valor pode ser definido para corresponder à configuração de carga de 100% para a configuração do evento. Isso é útil quando a configuração de carga de 100% é registrada como um número diferente no evento. Por exemplo, talvez o evento do queimador seja registrado como 10x a leitura de kPa no manômetro de gás. Um valor de evento de 35 é recodificado para significar 3,5 kPa, que é 50% de pressão. Se a configuração do queimador de 100% corresponder a 7 kPa, o &amp;#39;Valor 100%&amp;#39; deve ser definido como 70, que é 7 * 10 = 70. Assim, 3,5 kPa será visto pela calculadora de energia como 50%. Para leituras de pressão, certifique-se de marcar a caixa Pressão. As leituras de energia térmica são normalmente de 0% a 100% e não requerem nenhum ajuste nessa configuração.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="52" />
       <source>Electric Energy Mix</source>
-      <translation type="unfinished" />
+      <translation>Mistura de Energia Elétrica</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="52" />
       <source>This setting allows to set a mix of renewable energy that sources the electric loads.  0% assumes all the energy comes from burning dirty coal and maximizes the CO2 in the calculations.  100% assumes the energy comes only from renewable sources with no CO2 produced.</source>
-      <translation type="unfinished" />
+      <translation>Esta configuração permite definir uma mistura de energia renovável que alimenta as cargas elétricas. 0% assume que toda a energia vem da queima de carvão sujo e maximiza o CO2 nos cálculos. 100% assume que a energia vem apenas de fontes renováveis sem produção de CO2.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="72" />
@@ -9812,7 +9663,7 @@ When blank the load is assumed to be at a constant setting, which is the percent
       <location filename="../help/energy_help.py" line="72" />
       <location filename="../help/energy_help.py" line="53" />
       <source>Stores the current settings on this sub-tab as defaults to be recalled later.  The default values will be stored when saving settings (Help&gt;Save Settings) to a file.  </source>
-      <translation type="unfinished" />
+      <translation>Armazena as configurações atuais nesta subguia como padrões a serem recuperados posteriormente. Os valores padrão serão armazenados ao salvar as configurações (Ajuda&gt;Salvar configurações) em um arquivo.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="73" />
@@ -9824,32 +9675,32 @@ When blank the load is assumed to be at a constant setting, which is the percent
       <location filename="../help/energy_help.py" line="73" />
       <location filename="../help/energy_help.py" line="54" />
       <source>Overwrites the values on this sub-tab with those stored as the defaults.  When a profile with energy settings is opened, the values on this tab will be read from the profile.   They will be overwritten when clicking Restore Defaults.</source>
-      <translation type="unfinished" />
+      <translation>Substitui os valores nesta subguia por aqueles armazenados como padrão. Quando um perfil com configurações de energia é aberto, os valores nesta guia serão lidos a partir do perfil. Eles serão substituídos ao clicar em Restaurar padrões.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="57" />
       <source>3. Protocol Sub-Tab</source>
-      <translation type="unfinished" />
+      <translation>3. Subguia Protocolo</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="61" />
       <source>The Protocol settings allow including Pre-Heating, Between Batch (BBP) and Cooling protocol energy consumption.  There are two ways to specify these values.  The first assumes a constant load setting for a defined period of time.  An example for pre-heating is to set a Duration of 45:00 (45 minutes) at 30% Burner setting.  Percentages must be entered with the percent sign (30%).  When a percentage is entered  a corresponding Duration must be entered.</source>
-      <translation type="unfinished" />
+      <translation>As configurações do protocolo permitem incluir o consumo de energia do protocolo de pré-aquecimento, entre lotes (BBP) e resfriamento. Há duas maneiras de especificar esses valores. O primeiro assume uma configuração de carga constante por um período de tempo definido. Um exemplo de pré-aquecimento é definir uma Duração de 45:00 (45 minutos) a 30% da configuração do queimador. As porcentagens devem ser inseridas com o sinal de porcentagem (30%). Quando uma porcentagem é inserida, uma Duração correspondente deve ser inserida.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="61" />
       <source>The second type of entry is a "measured" energy value.  This can be any value greater than 1.0.  Artisan can inspect the open profile to determine energy values for each Load that is associated with an Event on the Loads sub-tab.  Click the [...] button for each Protocol to auto fill the Measured Energy fields.   The Artisan measurements for Pre-Heating and Between Batches are made from the start of the profile until CHARGE.  If there is no CHARGE event the measurement is from the start to the end of profile.  The values measured for Pre-Heating and Between Batches are the same.  Be sure you do not use the same profile to enter both values.  The Cooling energy is measured from DROP to the end of the profile.  If there is no DROP event the measurement begins at CHARGE.  If there is no CHARGE event the measurement is from the start to the end of the profile.</source>
-      <translation type="unfinished" />
+      <translation>O segundo tipo de entrada é um valor de energia "medido". Pode ser qualquer valor maior que 1,0. O Artisan pode inspecionar o perfil aberto para determinar os valores de energia para cada carga associada a um evento na subguia Cargas. Clique no botão [...] para cada protocolo para preencher automaticamente os campos de energia medida. As medições Artisan para Pré-Aquecimento e Entre Lotes são feitas desde o início do perfil até a CARGA. Se não houver evento CHARGE, a medição será do início ao fim do perfil. Os valores medidos para Pré-Aquecimento e Entre Lotes são os mesmos. Certifique-se de não usar o mesmo perfil para inserir os dois valores. A energia de resfriamento é medida de DROP até o final do perfil. Se não houver evento DROP, a medição começa em CHARGE. Se não houver evento CHARGE, a medição será do início ao fim do perfil.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="61" />
       <source>To use the Artisan energy measurement feature you will need to record one or more profiles that include the protocol of interest.  For example, to measure the Pre-Heating energy, START recording when the roaster is turned on.  Let Artisan record the entire pre-heating procedure.  At the end of the pre-heating you can either STOP recording the profile or go forward with the roast.  The CHARGE event will mark the end of pre-heating when Artisan measures the pre-heat energy.  Similarly a Between Batches protocol can be recorded with START followed by a normal roast.  A Cooling protocol would be captured by not turning the Artisan recording OFF until the roaster is fully cooled.</source>
-      <translation type="unfinished" />
+      <translation>Para usar o recurso de medição de energia do Artisan, você precisará registrar um ou mais perfis que incluam o protocolo de interesse. Por exemplo, para medir a energia de pré-aquecimento, INICIE a gravação quando o torrador for ligado. Deixe o Artisan gravar todo o procedimento de pré-aquecimento. Ao final do pré-aquecimento, você pode PARAR de registrar o perfil ou prosseguir com a torra. O evento CHARGE marcará o fim do pré-aquecimento quando o Artisan medir a energia de pré-aquecimento. Da mesma forma, um protocolo entre lotes pode ser registrado com START seguido por uma torra normal. Um protocolo de resfriamento seria capturado não desligando a gravação Artisan até que o torrador esteja totalmente resfriado.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="61" />
       <source>The Artisan measurements for Pre-Heating and Between Batches are made from the start of the profile until CHARGE.  If there is no CHARGE event the measurement is from the start to the end of profile.  The values measured for Pre-Heating and Between Batches are the same.  Be sure you do not use the same profile to enter both values.  The Cooling energy is measured from DROP to the end of the profile.  If there is no DROP event the measurement begins at CHARGE.  If there is no CHARGE event the measurement is from the start to the end of the profile.</source>
-      <translation type="unfinished" />
+      <translation>As medições Artisan para Pré-Aquecimento e Entre Lotes são feitas desde o início do perfil até a CARGA. Se não houver evento CHARGE, a medição será do início ao fim do perfil. Os valores medidos para Pré-Aquecimento e Entre Lotes são os mesmos. Certifique-se de não usar o mesmo perfil para inserir os dois valores. A energia de resfriamento é medida de DROP até o final do perfil. Se não houver evento DROP, a medição começa em CHARGE. Se não houver evento CHARGE, a medição será do início ao fim do perfil.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="65" />
@@ -9861,7 +9712,9 @@ When blank the load is assumed to be at a constant setting, which is the percent
       <source>This row sets the values for pre-heating energy.  Percentage or measured values may be entered for each burner.  When a percentage is used the Duration field must be set.
 
 Pre-Heating energy is applied only to the first batch of a roasting session.</source>
-      <translation type="unfinished" />
+      <translation>Esta linha define os valores da energia de pré-aquecimento. Porcentagem ou valores medidos podem ser inseridos para cada queimador. Quando uma porcentagem é usada, o campo Duração deve ser definido.
+
+A energia de pré-aquecimento é aplicada apenas ao primeiro lote de uma sessão de torrefação.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="66" />
@@ -9873,19 +9726,23 @@ Pre-Heating energy is applied only to the first batch of a roasting session.</so
       <source>This row sets the values for between batches protocol for the roasting session.  Percentage or measured values may be entered for each burner.  When a percentage is used the Duration field must be set.
 
 Between Batches energy is applied to each batch of the roasting session, except the first batch.  Tick the &amp;#39;Between Batches after Pre-Heating&amp;#39; box to apply Between Batches energies to the first batch of the session too.</source>
-      <translation type="unfinished" />
+      <translation>Esta linha define os valores para o protocolo entre lotes para a sessão de torrefação. Porcentagem ou valores medidos podem ser inseridos para cada queimador. Quando uma porcentagem é usada, o campo Duração deve ser definido.
+
+A energia entre lotes é aplicada a cada lote da sessão de torrefação, exceto o primeiro lote. Marque a opção &amp;#39;Entre lotes após o pré-aquecimento&amp;#39; caixa para aplicar as energias entre lotes também ao primeiro lote da sessão.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="67" />
       <source>Cooling</source>
-      <translation type="unfinished" />
+      <translation>Resfriamento</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="67" />
       <source>This row sets the values for the energy used for cooling.  Most common loads are motors and blowers that consume energy during the roaster cool down period.  Percentage or measured values may be entered for each burner.  When a percentage is used the Duration field must be set.
 
 Pre-Heating energy is applied only to the first batch of a roasting session.</source>
-      <translation type="unfinished" />
+      <translation>Esta linha define os valores para a energia usada para resfriamento. As cargas mais comuns são motores e sopradores que consomem energia durante o período de resfriamento do torrador. Porcentagem ou valores medidos podem ser inseridos para cada queimador. Quando uma porcentagem é usada, o campo Duração deve ser definido.
+
+A energia de pré-aquecimento é aplicada apenas ao primeiro lote de uma sessão de torrefação.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="68" />
@@ -9895,7 +9752,7 @@ Pre-Heating energy is applied only to the first batch of a roasting session.</so
     <message>
       <location filename="../help/energy_help.py" line="68" />
       <source>The length (mm:ss) of protocol.  It is used with a burner&amp;#39;s percentage setting to calculate the energy consumed  by that burner.  When a percentage entry is made for the burner, the Duration field must be set.</source>
-      <translation type="unfinished" />
+      <translation>O comprimento (mm:ss) do protocolo. Ele é usado com a configuração de porcentagem de um queimador para calcular a energia consumida por esse queimador. Quando uma entrada de porcentagem é feita para o queimador, o campo Duração deve ser definido.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="69" />
@@ -9905,17 +9762,17 @@ Pre-Heating energy is applied only to the first batch of a roasting session.</so
     <message>
       <location filename="../help/energy_help.py" line="69" />
       <source>The value is either the measured energy for the protocol or the burner constant percentage setting for the length of the Duration field.</source>
-      <translation type="unfinished" />
+      <translation>O valor é a energia medida para o protocolo ou a configuração percentual da constante do queimador para o comprimento do campo Duração.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="70" />
       <source>Measure Profile [...]</source>
-      <translation type="unfinished" />
+      <translation>Medir Perfil [...]</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="70" />
       <source>Energy is measured from the open profile for each load where an event is specified on the Loads tab.  Click OK to auto fill in the associated Measured Energy field.</source>
-      <translation type="unfinished" />
+      <translation>A energia é medida a partir do perfil aberto para cada carga em que um evento é especificado na guia Cargas. Clique em OK para preencher automaticamente o campo Medido de energia associado.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="71" />
@@ -9925,28 +9782,29 @@ Pre-Heating energy is applied only to the first batch of a roasting session.</so
     <message>
       <location filename="../help/energy_help.py" line="71" />
       <source>This box should be ticked when a Between Batches protocol run is done after the Pre-heating and before the roast.</source>
-      <translation type="unfinished" />
+      <translation>Esta caixa deve ser marcada quando um protocolo entre lotes é executado após o pré-aquecimento e antes da torrefação.</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="14" />
       <source>AUTOSAVE DIALOG</source>
-      <translation type="unfinished" />
+      <translation>DIÁLOGO DE SALVAMENTO AUTOMÁTICO</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="17" />
       <source>Dialog Field</source>
-      <translation type="unfinished" />
+      <translation>Campo de Diálogo</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="18" />
       <source>Autosave [a]</source>
-      <translation type="unfinished" />
+      <translation>Salvamento automático [a]</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="18" />
       <source>Turn Autosave ON or OFF.  When sampling, the keyboard &amp;#39;a&amp;#39; will save the profile at that moment.
 NOTE: Files with the same file name will be silently overwritten.  Use ~currdatetime in the file name prefix to get unique file names.</source>
-      <translation type="unfinished" />
+      <translation>Ative ou desative o salvamento automático. Ao samplear, o teclado &amp;#39;a&amp;#39; irá salvar o perfil naquele momento.
+NOTA: Arquivos com o mesmo nome de arquivo serão substituídos silenciosamente. Use ~currdatetime no prefixo do nome do arquivo para obter nomes de arquivo exclusivos.</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="19" />
@@ -9956,7 +9814,7 @@ NOTE: Files with the same file name will be silently overwritten.  Use ~currdate
     <message>
       <location filename="../help/autosave_help.py" line="19" />
       <source>When checked, Autosaved files will be added to the Files&gt;&gt; Open Recent files list.</source>
-      <translation type="unfinished" />
+      <translation>Quando marcada, os arquivos salvos automaticamente serão adicionados à lista Arquivos&gt;&gt; Abrir arquivos recentes.</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="20" />
@@ -9966,7 +9824,7 @@ NOTE: Files with the same file name will be silently overwritten.  Use ~currdate
     <message>
       <location filename="../help/autosave_help.py" line="20" />
       <source>Defines the file name to use for Autosave.  See the Autosave Fields section below.</source>
-      <translation type="unfinished" />
+      <translation>Define o nome do arquivo a ser usado para o salvamento automático. Consulte a seção Campos de salvamento automático abaixo.</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="21" />
@@ -9977,7 +9835,8 @@ NOTE: Files with the same file name will be silently overwritten.  Use ~currdate
       <location filename="../help/autosave_help.py" line="21" />
       <source>Shows an example of the file name based on the File Name Prefix field.
 A &amp;#39;While Recording:&amp;#39; example will also be shown if the file name will be different when the scope is sampling.</source>
-      <translation type="unfinished" />
+      <translation>Mostra um exemplo do nome do arquivo com base no campo Prefixo do nome do arquivo.
+A &amp;#39;Durante a gravação:&amp;#39; exemplo também será mostrado se o nome do arquivo for diferente quando o escopo estiver amostrando.</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="24" />
@@ -9988,483 +9847,460 @@ A &amp;#39;While Recording:&amp;#39; example will also be shown if the file name
     <message>
       <location filename="../help/autosave_help.py" line="22" />
       <source>Where to store the Autosaved files.</source>
-      <translation type="unfinished" />
+      <translation>Onde armazenar os arquivos salvos automaticamente.</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="23" />
       <source>Save Also</source>
-      <translation type="unfinished" />
+      <translation>Salve também</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="23" />
       <source>Allows to save an additional file.  Choose the file type from the pull-down menu.</source>
-      <translation type="unfinished" />
+      <translation>Permite salvar um arquivo adicional. Escolha o tipo de arquivo no menu suspenso.</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="24" />
       <source>Where to store the additional files.</source>
-      <translation type="unfinished" />
+      <translation>Onde armazenar os arquivos adicionais.</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="27" />
       <source>AUTOSAVE FIELDS</source>
-      <translation type="unfinished" />
+      <translation>CAMPOS DE SALVAMENTO AUTOMÁTICO</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="31" />
       <source>The batch prefix set in Config&gt;Batch&gt;Prefix</source>
-      <translation type="unfinished" />
+      <translation>O prefixo do lote definido em Config&gt;Batch&gt;Prefix</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="32" />
       <source>The current batch number</source>
-      <translation type="unfinished" />
+      <translation>O número do lote atual</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="33" />
       <source>Same as "~batchprefix~batchnum"</source>
-      <translation type="unfinished" />
+      <translation>O mesmo que "~batchprefix~batchnum"</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="34" />
       <source>The current batch position, or "Roast of the Day"</source>
-      <translation type="unfinished" />
+      <translation>A posição atual do lote, ou "Assado do Dia"</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="35" />
       <source>Same as Batch field in Roast Properties
 "~batchprefix~batchnum (~batchposition)"</source>
-      <translation type="unfinished" />
+      <translation>Igual ao campo Batch em Roast Properties
+"~batchprefix~batchnum (~batchposition)"</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="36" />
       <source>From Roast&gt;Properties&gt;Title</source>
-      <translation type="unfinished" />
+      <translation>De Roast&gt;Propriedades&gt;Título</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="37" />
       <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Beans field.
 From Roast&gt;Properties&gt;Beans</source>
-      <translation type="unfinished" />
+      <translation>Substitua “nn” por 10, 15, 20, 25 ou 30 para mostrar os primeiros caracteres “nn” do campo Beans.
+De Torrado&gt;Propriedades&gt;Feijão</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="38" />
       <source>The entire first line From Roast&gt;Properties&gt;Beans</source>
-      <translation type="unfinished" />
+      <translation>Toda a primeira linha De Torrado&gt;Propriedades&gt;Feijão</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="39" />
       <source>Roast date in format yy-MM-dd</source>
-      <translation type="unfinished" />
+      <translation>Data do assado no formato aa-MM-dd</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="40" />
       <source>Roast date in format yyyy-MM-dd</source>
-      <translation type="unfinished" />
+      <translation>Data do assado no formato aaaa-MM-dd</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="41" />
       <source>Roast time in format hhmm</source>
-      <translation type="unfinished" />
+      <translation>Hora do assado no formato hhmm</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="42" />
       <source>Roast date and time in format yy-MM-dd_hhmm</source>
-      <translation type="unfinished" />
+      <translation>Data e hora do assado no formato aa-MM-dd_hhmm</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="43" />
       <source>Roast date and time in format yyyy-MM-dd_hhmm</source>
-      <translation type="unfinished" />
+      <translation>Data e hora do assado no formato aaaa-MM-dd_hhmm</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="44" />
       <source>Roast year in format yyyy</source>
-      <translation type="unfinished" />
+      <translation>Ano assado no formato aaaa</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="45" />
       <source>Roast year in format yy</source>
-      <translation type="unfinished" />
+      <translation>Ano assado no formato aa</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="46" />
       <source>Roast month in format MMM (localized)</source>
-      <translation type="unfinished" />
+      <translation>Mês assado no formato MMM (localizado)</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="47" />
       <source>Roast month in format MM</source>
-      <translation type="unfinished" />
+      <translation>Mês do assado no formato MM</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="48" />
       <source>Roast day in format ddd (localized)</source>
-      <translation type="unfinished" />
+      <translation>Roast day no formato ddd (localizado)</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="49" />
       <source>Roast day in format dd</source>
-      <translation type="unfinished" />
+      <translation>Dia de assado no formato dd</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="50" />
       <source>Roast hour in format hh</source>
-      <translation type="unfinished" />
+      <translation>Hora do assado no formato hh</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="51" />
       <source>Roast minute in format mm</source>
-      <translation type="unfinished" />
+      <translation>Minuto assado no formato mm</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="52" />
       <source>Current date and time with seconds in format yy-MM-dd_hhmmss.  Not the same as roast time. </source>
-      <translation type="unfinished" />
+      <translation>Data e hora atuais com segundos no formato aa-MM-dd_hhmmss. Não é o mesmo que tempo de assado.</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="53" />
       <source>From Roast&gt;Properties&gt;Operator</source>
-      <translation type="unfinished" />
+      <translation>De Torra&gt;Propriedades&gt;Operador</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="54" />
       <source>From Roast&gt;Properties&gt;Organization</source>
-      <translation type="unfinished" />
+      <translation>Da torrefação&gt;Propriedades&gt;Organização</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="55" />
       <source>From Roast&gt;Properties&gt;Machine</source>
-      <translation type="unfinished" />
+      <translation>De Roast&gt;Propriedades&gt;Máquina</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="56" />
       <source>From Roast&gt;Properties&gt;Weight Green</source>
-      <translation type="unfinished" />
+      <translation>De Assado&gt;Propriedades&gt;Peso Verde</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="57" />
       <source>From Roast&gt;Properties&gt;Weight Roasted</source>
-      <translation type="unfinished" />
+      <translation>De Torrado&gt;Propriedades&gt;Peso Torrado</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="58" />
       <source>From Roast&gt;Properties&gt;Weight</source>
-      <translation type="unfinished" />
+      <translation>De Assado&gt;Propriedades&gt;Peso</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="59" />
       <source>Calculated weight loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</source>
-      <translation type="unfinished" />
+      <translation>Perda de peso calculada em porcentagem (o sinal “-” não é mostrado, pode ser adicionado manualmente na frente do campo, se desejado)</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="60" />
       <source>From Roast&gt;Properties&gt;Volume Green</source>
-      <translation type="unfinished" />
+      <translation>De Assado&gt;Propriedades&gt;Volume Verde</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="61" />
       <source>From Roast&gt;Properties&gt;Volume Roasted</source>
-      <translation type="unfinished" />
+      <translation>De Torrado&gt;Propriedades&gt;Volume Torrado</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="62" />
       <source>From Roast&gt;Properties&gt;Volume</source>
-      <translation type="unfinished" />
+      <translation>De Torrado&gt;Propriedades&gt;Volume</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="63" />
       <source>Calculated volume gain in percent</source>
-      <translation type="unfinished" />
+      <translation>Ganho de volume calculado em porcentagem</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="64" />
       <source>From Roast&gt;Properties&gt;Density Green</source>
-      <translation type="unfinished" />
+      <translation>De Torrado&gt;Propriedades&gt;Densidade Verde</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="65" />
       <source>From Roast&gt;Properties&gt;Density Roasted</source>
-      <translation type="unfinished" />
+      <translation>De torrado&gt;Propriedades&gt;Densidade torrado</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="66" />
       <source>From Roast&gt;Properties&gt;Density</source>
-      <translation type="unfinished" />
+      <translation>De Torrado&gt;Propriedades&gt;Densidade</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="67" />
       <source>Calculated density loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</source>
-      <translation type="unfinished" />
+      <translation>Perda de densidade calculada em porcentagem (o sinal “-” não é mostrado, pode ser adicionado manualmente na frente do campo, se desejado)</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="68" />
       <source>From Roast&gt;Properties&gt;Moisture Green</source>
-      <translation type="unfinished" />
+      <translation>De Torrado&gt;Propriedades&gt;Moisture Green</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="69" />
       <source>From Roast&gt;Properties&gt;Moisture Roasted</source>
-      <translation type="unfinished" />
+      <translation>De Tostado&gt;Propriedades&gt;Moisture Roasted</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="70" />
       <source>Calculated moisture loss in percent (the  “-” sign is not shown, it can be added manually in front of the field if desired)</source>
-      <translation type="unfinished" />
+      <translation>Perda de umidade calculada em porcentagem (o sinal “-” não é mostrado, pode ser adicionado manualmente na frente do campo, se desejado)</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="71" />
       <source>From Roast&gt;Properties&gt;Drum Speed</source>
-      <translation type="unfinished" />
+      <translation>Da torrefação&gt;Propriedades&gt;Velocidade do tambor</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="72" />
       <source>From Roast&gt;Properties&gt;Color Whole</source>
-      <translation type="unfinished" />
+      <translation>De Assado&gt;Propriedades&gt;Cor Total</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="73" />
       <source>From Roast&gt;Properties&gt;Color Ground</source>
-      <translation type="unfinished" />
+      <translation>De Roast&gt;Propriedades&gt;Cor Base</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="74" />
       <source>From Roast&gt;Properties&gt;Color System</source>
-      <translation type="unfinished" />
+      <translation>De Torrado&gt;Propriedades&gt;Sistema de cores</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="75" />
       <source>From Roast&gt;Properties&gt;Screen Min</source>
-      <translation type="unfinished" />
+      <translation>De Roast&gt;Propriedades&gt;Tela Min</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="76" />
       <source>From Roast&gt;Properties&gt;Screen Max</source>
-      <translation type="unfinished" />
+      <translation>De Roast&gt;Propriedades&gt;Tela Max</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="77" />
       <source>From Roast&gt;Properties&gt;(Green) Beans Temperature</source>
-      <translation type="unfinished" />
+      <translation>Desde Assado&gt;Propriedades&gt;Temperatura do Feijão (Verde)</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="78" />
       <source>From Roast&gt;Properties&gt;Ambient Temperature</source>
-      <translation type="unfinished" />
+      <translation>De Assado&gt;Propriedades&gt;Temperatura Ambiente</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="79" />
       <source>From Roast&gt;Properties&gt;Ambient Humidity</source>
-      <translation type="unfinished" />
+      <translation>Da torrefação&gt;Propriedades&gt;Umidade ambiente</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="80" />
       <source>From Roast&gt;Properties&gt;Ambient Pressure</source>
-      <translation type="unfinished" />
+      <translation>De Torra&gt;Propriedades&gt;Pressão Ambiente</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="81" />
       <source>Calculated time from FCs to DROP in seconds</source>
-      <translation type="unfinished" />
+      <translation>Tempo calculado de FCs para DROP em segundos</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="82" />
       <source>Calculated time from FCs to DROP in min_secs</source>
-      <translation type="unfinished" />
+      <translation>Tempo calculado de FCs para DROP em min_secs</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="83" />
       <source>From Profile Statistics - DTR (in percent)</source>
-      <translation type="unfinished" />
+      <translation>Das estatísticas do perfil - DTR (em porcentagem)</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="84" />
       <source>From the Profile Statistics - AUC</source>
-      <translation type="unfinished" />
+      <translation>Das Estatísticas do Perfil - AUC</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="85" />
       <source>From the Profile Statistics - AUC Base</source>
-      <translation type="unfinished" />
+      <translation>Das Estatísticas do Perfil - Base AUC</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="86" />
-      <source>From the Profile - ET at CHARGE</source>
-      <translation type="unfinished" />
+      <source>From Config&gt;Temperature - the current temperature mode C or F.  </source>
+      <translation>De Config&gt;Temperatura - o modo de temperatura atual C ou F.</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="87" />
-      <source>From the Profile - BT at CHARGE</source>
-      <translation type="unfinished" />
+      <source>From the Profile - ET at CHARGE</source>
+      <translation>Do perfil - ET no CHARGE</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="88" />
-      <source>From the Profile - ET at FCs</source>
-      <translation type="unfinished" />
+      <source>From the Profile - BT at CHARGE</source>
+      <translation>Do perfil - BT at CHARGE</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="89" />
-      <source>From the Profile -BT at FCs</source>
-      <translation type="unfinished" />
+      <source>From the Profile - ET at FCs</source>
+      <translation>Do perfil - ET em FCs</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="90" />
-      <source>From the Profile - ET at DROP</source>
-      <translation type="unfinished" />
+      <source>From the Profile -BT at FCs</source>
+      <translation>Do perfil -BT em FCs</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="91" />
-      <source>From the Profile - BT at DROP</source>
-      <translation type="unfinished" />
+      <source>From the Profile - FCs time in seconds</source>
+      <translation>Do perfil - FCs tempo em segundos</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="92" />
-      <source>From the Profile - DROP time in seconds</source>
-      <translation type="unfinished" />
+      <source>From the Profile - FCs time in min_secs</source>
+      <translation>Do perfil - FCs tempo em min_secs</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="93" />
-      <source>From the Profile - DROP time in min_secs</source>
-      <translation type="unfinished" />
+      <source>From the Profile - ET at DROP</source>
+      <translation>Do perfil - ET em DROP</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="94" />
-      <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Roasting Notes field.
-From Roast&gt;Properties&gt;Roasting Notes</source>
-      <translation type="unfinished" />
+      <source>From the Profile - BT at DROP</source>
+      <translation>Do perfil - BT em DROP</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="95" />
-      <source>The entire first line From Roast&gt;Properties&gt;Roasting Notes</source>
-      <translation type="unfinished" />
+      <source>From the Profile - DROP time in seconds</source>
+      <translation>Do perfil - tempo de DROP em segundos</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="96" />
-      <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Cupping Notes field.
-From Roast&gt;Properties&gt;Cupping Notes</source>
-      <translation type="unfinished" />
+      <source>From the Profile - DROP time in min_secs</source>
+      <translation>Do perfil - tempo de DROP em min_secs</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="97" />
-      <source>The entire first line From Roast&gt;Properties&gt;Cupping Notes</source>
-      <translation type="unfinished" />
+      <source>From the Profile - BT temperature change from TP to DRY</source>
+      <translation>Do perfil - mudança de temperatura BT de TP para DRY</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="98" />
-      <source>From the Profile Energy Use - Total energy used by the batch in BTU</source>
-      <translation type="unfinished" />
+      <source>From the Profile - BT temperature change from DRY to FCs</source>
+      <translation>Do perfil - mudança de temperatura BT de DRY para FCs</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="99" />
-      <source>From the Profile Energy Use - CO2 produced by the batch in g</source>
-      <translation type="unfinished" />
+      <source>From the Profile - BT temperature change from FCs to DROP</source>
+      <translation>Do perfil - mudança de temperatura BT de FCs para DROP</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="100" />
-      <source>From the Profile Energy Use - Energy used during preheat in BTU</source>
-      <translation type="unfinished" />
+      <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Roasting Notes field.
+From Roast&gt;Properties&gt;Roasting Notes</source>
+      <translation>Substitua “nn” por 10, 15, 20, 25 ou 30 para mostrar os primeiros caracteres “nn” do campo Roasting Notes.
+De Torrado&gt;Propriedades&gt;Notas de Torrefação</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="101" />
-      <source>From the Profile Energy Use - CO2 produced during preheat in g</source>
-      <translation type="unfinished" />
+      <source>The entire first line From Roast&gt;Properties&gt;Roasting Notes</source>
+      <translation>Toda a primeira linha De Torra&gt;Propriedades&gt;Notas de Torra</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="102" />
-      <source>From the Profile Energy Use - Energy used during Between Batch Protocol in BTU</source>
-      <translation type="unfinished" />
+      <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Cupping Notes field.
+From Roast&gt;Properties&gt;Cupping Notes</source>
+      <translation>Substitua “nn” por 10, 15, 20, 25 ou 30 para mostrar os primeiros caracteres “nn” do campo Cupping Notes.
+De Torrado&gt;Propriedades&gt;Notas de degustação</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="103" />
-      <source>From the Profile Energy Use - CO2 produced during Between Batch Protocol in g</source>
-      <translation type="unfinished" />
+      <source>The entire first line From Roast&gt;Properties&gt;Cupping Notes</source>
+      <translation>Toda a primeira linha De Roast&gt;Propriedades&gt;Copping Notes</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="104" />
-      <source>From the Profile Energy Use - Energy used from CHARGE to DROP in BTU</source>
-      <translation type="unfinished" />
+      <source>From the Profile Energy Use - Total energy used by the batch in BTU</source>
+      <translation>Do perfil Uso de energia - Energia total usada pelo lote em BTU</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="105" />
-      <source>From the Profile Energy Use - CO2 produced from CHARGE to DROP in g</source>
-      <translation type="unfinished" />
+      <source>From the Profile Energy Use - CO2 produced by the batch in g</source>
+      <translation>Do Perfil de Uso de Energia - CO2 produzido pelo lote em g</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="106" />
+      <source>From the Profile Energy Use - Energy used during preheat in BTU</source>
+      <translation>Do perfil Uso de energia - Energia usada durante o pré-aquecimento em BTU</translation>
+    </message>
+    <message>
+      <location filename="../help/autosave_help.py" line="107" />
+      <source>From the Profile Energy Use - CO2 produced during preheat in g</source>
+      <translation>Do Perfil de Uso de Energia - CO2 produzido durante o pré-aquecimento em g</translation>
+    </message>
+    <message>
+      <location filename="../help/autosave_help.py" line="108" />
+      <source>From the Profile Energy Use - Energy used during Between Batch Protocol in BTU</source>
+      <translation>Do perfil de uso de energia - energia usada durante o protocolo entre lotes em BTU</translation>
+    </message>
+    <message>
+      <location filename="../help/autosave_help.py" line="109" />
+      <source>From the Profile Energy Use - CO2 produced during Between Batch Protocol in g</source>
+      <translation>Do perfil de uso de energia - CO2 produzido durante o protocolo entre lotes em g</translation>
+    </message>
+    <message>
+      <location filename="../help/autosave_help.py" line="110" />
+      <source>From the Profile Energy Use - Energy used from CHARGE to DROP in BTU</source>
+      <translation>Do perfil de uso de energia - energia usada de CHARGE para DROP em BTU</translation>
+    </message>
+    <message>
+      <location filename="../help/autosave_help.py" line="111" />
+      <source>From the Profile Energy Use - CO2 produced from CHARGE to DROP in g</source>
+      <translation>Do Perfil de Uso de Energia - CO2 produzido de CHARGE para DROP em g</translation>
+    </message>
+    <message>
+      <location filename="../help/autosave_help.py" line="112" />
       <source>From the Profile Energy Use - CO2 produced per kg of green beans in g</source>
-      <translation type="unfinished" />
+      <translation>Do Perfil de Uso de Energia - CO2 produzido por kg de feijão verde em g</translation>
     </message>
     <message>
-      <location filename="../help/autosave_help.py" line="117" />
+      <location filename="../help/autosave_help.py" line="123" />
       <source>Data used to replace the fields in the Autosave File Name Prefix are pulled from the current Roast Properties.  </source>
-      <translation type="unfinished" />
+      <translation>Os dados usados para substituir os campos no prefixo do nome do arquivo de salvamento automático são extraídos das propriedades atuais do Roast.</translation>
     </message>
     <message>
-      <location filename="../help/autosave_help.py" line="120" />
+      <location filename="../help/autosave_help.py" line="126" />
       <source>Autosave Field</source>
-      <translation type="unfinished" />
+      <translation>Campo de salvamento automático</translation>
     </message>
     <message>
-      <location filename="../help/autosave_help.py" line="120" />
+      <location filename="../help/autosave_help.py" line="126" />
       <source>Example File Name</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/autosave_help.py" line="121" />
-      <source>~title Roasted on ~date</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/autosave_help.py" line="121" />
-      <source>Burundi Roasted on 20-04-25.alog</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/autosave_help.py" line="122" />
-      <source>~batchcounter ~title ~date_long</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/autosave_help.py" line="122" />
-      <source>1380 Burundi 2020-04-25_1136.alog</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/autosave_help.py" line="123" />
-      <source>~beans ~machine ~drumspeedRPM ~weight~weightunits ~poisturePCT ~operator ~date ~batch(~batchposition)</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/autosave_help.py" line="123" />
-      <source>Burundi Kiganda Murambi Lot44 SF-25 64RPM 10.3Kg 10.2PCT Roberto 20-04-25 Prod-1380(6).alog</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/autosave_help.py" line="124" />
-      <source>'Recording ~batchcounter&amp;#39; "~batch" ~title ~datetime_long</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/autosave_help.py" line="124" />
-      <source>When OFF:
-Prod-1380 Burundi Kiganda Murambi 2020-04-25_1136.alog
-While Recording:
-Recording 1380  Burundi KigandaMurambi 2020-04-25_1136.alog</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/autosave_help.py" line="125" />
-      <source>'Recording ~batchcounter&amp;#39; "~batch" ~title ~date_long_&amp;#39;~currtime&amp;#39;"~time"</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/autosave_help.py" line="125" />
-      <source>Creates a unique filename for multiple saves while sampling by using ~currtime.
-When OFF:
-Prod-1380 Burundi Kiganda Murambi 2020-04-25_1136.alog
-While Recording. 
-Recording 1380  Burundi KigandaMurambi 2020-04-25_113809.alog</source>
-      <translation type="unfinished" />
+      <translation>Exemplo de nome de arquivo</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="14" />
@@ -10489,12 +10325,13 @@ Recording 1380  Burundi KigandaMurambi 2020-04-25_113809.alog</source>
       <location filename="../help/symbolic_help.py" line="17" />
       <source>Can  shift?
 (see below)</source>
-      <translation type="unfinished" />
+      <translation>Pode mudar?
+(Veja abaixo)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="18" />
       <source>Absolute time (seconds) from begin of recording (not only the time after CHARGE!)</source>
-      <translation type="unfinished" />
+      <translation>Tempo absoluto (segundos) desde o início da gravação (não apenas o tempo após CHARGE!)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="48" />
@@ -10517,374 +10354,379 @@ Recording 1380  Burundi KigandaMurambi 2020-04-25_113809.alog</source>
       <location filename="../help/symbolic_help.py" line="19" />
       <location filename="../help/symbolic_help.py" line="18" />
       <source>Yes</source>
-      <translation type="unfinished" />
+      <translation>Sim</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="19" />
       <source>Absolute time (seconds) from begin of recording of the background profile</source>
-      <translation type="unfinished" />
+      <translation>Tempo absoluto (segundos) desde o início da gravação do perfil de fundo</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="20" />
       <source>Current channel reading (not available in the Plotter)</source>
-      <translation type="unfinished" />
+      <translation>Leitura do canal atual (não disponível no Plotter)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="23" />
       <source>Extra #1 T1 value</source>
-      <translation type="unfinished" />
+      <translation>Extra #1 Valor T1</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="24" />
       <source>Extra #1 T2 value</source>
-      <translation type="unfinished" />
+      <translation>Valor extra #1 T2</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="25" />
       <source>Extra #2 T1 value</source>
-      <translation type="unfinished" />
+      <translation>Valor extra #2 T1</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="26" />
       <source>Extra #2 T2 value</source>
-      <translation type="unfinished" />
+      <translation>Valor extra #2 T2</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="39" />
       <location filename="../help/symbolic_help.py" line="33" />
       <location filename="../help/symbolic_help.py" line="27" />
       <source>...and so forth</source>
-      <translation type="unfinished" />
+      <translation>...e assim por diante</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="28" />
       <source>ET background</source>
-      <translation type="unfinished" />
+      <translation>fundo ET</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="29" />
       <source>BT background</source>
-      <translation type="unfinished" />
+      <translation>Fundo BT</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="30" />
       <source>ExtraBackground #1-A</source>
-      <translation type="unfinished" />
+      <translation>Fundo Extra #1-A</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="31" />
       <source>ExtraBackground #1-B</source>
-      <translation type="unfinished" />
+      <translation>Fundo Extra #1-B</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="32" />
       <source>ExtraBackground #2-A</source>
-      <translation type="unfinished" />
+      <translation>Fundo Extra #2-A</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="34" />
       <source>ET tare value</source>
-      <translation type="unfinished" />
+      <translation>valor da tara ET</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="35" />
       <source>BT tare value</source>
-      <translation type="unfinished" />
+      <translation>BT valor da tara</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="36" />
       <source>Extra Device #1 channel 1 tare value</source>
-      <translation type="unfinished" />
+      <translation>Dispositivo Extra #1 canal 1 valor de tara</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="37" />
       <source>Extra Device #1 channel 2 tare value</source>
-      <translation type="unfinished" />
+      <translation>Dispositivo Extra #1 canal 2 valor de tara</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="38" />
       <source>Extra Device #2 channel 1 tare value</source>
-      <translation type="unfinished" />
+      <translation>Dispositivo Extra #2 canal 1 valor de tara</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="40" />
       <source>Last event value of the first event type</source>
-      <translation type="unfinished" />
+      <translation>Valor do último evento do primeiro tipo de evento</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="41" />
       <source>Last event value of the second event type</source>
-      <translation type="unfinished" />
+      <translation>Valor do último evento do segundo tipo de evento</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="42" />
       <source>Last event value of the third event type</source>
-      <translation type="unfinished" />
+      <translation>Valor do último evento do terceiro tipo de evento</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="43" />
       <source>Last event value of the fourth event type</source>
-      <translation type="unfinished" />
+      <translation>Valor do último evento do quarto tipo de evento</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="45" />
       <source>ET rate of rise</source>
-      <translation type="unfinished" />
+      <translation>taxa de aumento ET</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="46" />
       <source>BT rate of rise</source>
-      <translation type="unfinished" />
+      <translation>taxa de aumento de BT</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="47" />
       <source>Background ET rate of rise</source>
-      <translation type="unfinished" />
+      <translation>Taxa de aumento de fundo ET</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="48" />
       <source>Background BT rate of rise</source>
-      <translation type="unfinished" />
+      <translation>Taxa de aumento de fundo BT</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="51" />
       <source>SHIFTED SYMBOLIC VARIABLES</source>
-      <translation type="unfinished" />
+      <translation>VARIÁVEIS SIMBÓLICAS DESLOCADAS</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="55" />
       <source>The symbolic variables t, b, Y&lt;n&gt;, B&lt;n&gt; and R&lt;n&gt; evaluate to the current value of a sequence of values that define a roast profile. To access earlier or later values one can apply a shift value.</source>
-      <translation type="unfinished" />
+      <translation>As variáveis simbólicas t, b, Y&lt;n&gt;, B&lt;n&gt; e R&lt;n&gt; avaliam o valor atual de uma sequência de valores que definem um perfil de torra. Para acessar valores anteriores ou posteriores, pode-se aplicar um valor de deslocamento.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="55" />
       <source>
 For example, while "Y2" returns the current bean temperature (BT), "Y2[-1]" returns the previous BT temperature and "Y2[-2]" the one before that. Formulas used in the Plotter are applied in sequence to all values, thus there "Y2" points to the current BT temperature processed, "Y2[-1]" the previous BT temperature processed and "Y2[+1]" the next BT temperature to be processed. A positive shift is only available in the Plotter, obviously not during recording.</source>
-      <translation type="unfinished" />
+      <translation>
+Por exemplo, enquanto "Y2" retorna a temperatura atual do grão (BT), "Y2[-1]" retorna a temperatura BT anterior e "Y2[-2]" a anterior. As fórmulas usadas no Plotter são aplicadas em sequência a todos os valores, portanto, "Y2" aponta para a temperatura BT atual processada, "Y2[-1]" a temperatura BT anterior processada e "Y2[+1]" a próxima temperatura BT processada ser processado. Uma mudança positiva só está disponível no Plotter, obviamente não durante a gravação.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="59" />
       <source>Time one index ahead (plotter only)</source>
-      <translation type="unfinished" />
+      <translation>Tempo um índice à frente (somente plotadora)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="60" />
       <source>Time three indexes delayed</source>
-      <translation type="unfinished" />
+      <translation>Tempo três índices atrasados</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="61" />
       <source>ET value delayed by 2 indexes</source>
-      <translation type="unfinished" />
+      <translation>Valor ET atrasado por 2 índices</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="62" />
       <source>BT value index advanced by one index (plotter only)</source>
-      <translation type="unfinished" />
+      <translation>Índice de valor BT avançado por um índice (somente plotadora)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="63" />
       <source>ExtraBackground #1-B delayed 6 indexes</source>
-      <translation type="unfinished" />
+      <translation>ExtraBackground #1-B atrasado 6 índices</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="64" />
       <source>ExtraBackground #2-A advanced 2 indexes (plotter only)</source>
-      <translation type="unfinished" />
+      <translation>ExtraBackground #2-A avançado 2 índices (somente plotter)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="65" />
       <source>ET rate of rise delayed two indexes</source>
-      <translation type="unfinished" />
+      <translation>A taxa de aumento da ET atrasou dois índices</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="68" />
       <source>INDEXED SYMBOLIC VARIABLES</source>
-      <translation type="unfinished" />
+      <translation>VARIÁVEIS SIMBÓLICAS INDEXADAS</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="72" />
       <source>t, b, Y&lt;n&gt;, B&lt;n&gt; and R&lt;n&gt;</source>
-      <translation type="unfinished" />
+      <translation>t, b, Y&lt;n&gt;, B&lt;n&gt; e R&lt;n&gt;</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="72" />
       <source>Previously recorded data assigned to the symbolic variables t, b, Y&lt;n&gt;, B&lt;n&gt; and R&lt;n&gt; can also directly accessed by index. "Y2{0}" evaluates to the first recorded bean temperature (BT) and "Y2{CHARGE}" to the bean temperature at CHARGE. Additionally, the symbolic variable b can be used to access the recording time at a certain index of the background profile. Thus "b{CHARGE}" returns the recording time at CHARGE of the background profile.</source>
-      <translation type="unfinished" />
+      <translation>Os dados previamente registrados atribuídos às variáveis simbólicas t, b, Y&lt;n&gt;, B&lt;n&gt; e R&lt;n&gt; também podem ser acessados diretamente pelo índice. "Y2{0}" é avaliado como a primeira temperatura registrada do grão (BT) e "Y2{CHARGE}" como a temperatura do grão em CHARGE. Além disso, a variável simbólica b pode ser usada para acessar o tempo de gravação em um determinado índice do perfil de fundo. Assim, "b{CHARGE}" retorna o tempo de gravação em CHARGE do perfil de fundo.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="75" />
       <source>AXIS MAPPING</source>
-      <translation type="unfinished" />
+      <translation>MAPEAMENTO DE EIXOS</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="79" />
       <source>Scaling factor from RoR to Temp axis. The range of the temperature scale divided by the range of the delta scale. </source>
-      <translation type="unfinished" />
+      <translation>Fator de escala de RoR para o eixo Temp. O intervalo da escala de temperatura dividido pelo intervalo da escala delta.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="80" />
       <source>Offset from RoR to Temp axis. </source>
-      <translation type="unfinished" />
+      <translation>Deslocamento do eixo RoR para Temp.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="84" />
       <source>Note: RoR values r can be scaled to the temperature axis using a linear approximation of the form "r*k + o". As the variables k and o depend on the actual axis settings which can be changed by the user without triggering a recomputation, those variable are less useful for use in a recording, but useful in the Plotter to plot w.r.t. the RoR y-axis instead of the temperature y-axis.</source>
-      <translation type="unfinished" />
+      <translation>Observação: os valores de RoR r podem ser dimensionados para o eixo da temperatura usando uma aproximação linear da forma "r*k + o". Como as variáveis k e o dependem das configurações reais do eixo que podem ser alteradas pelo usuário sem acionar um novo cálculo, essas variáveis são menos úteis para uso em uma gravação, mas úteis no Plotter para plotar w.r.t. o eixo y RoR em vez do eixo y de temperatura.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="87" />
       <source>EVENT INDEX and TIME DELTA</source>
-      <translation type="unfinished" />
+      <translation>ÍNDICE DE EVENTO e DELTA DE TEMPO</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="91" />
       <source>Index of the corresponding event of the profile to retrieve time and values from the corresponding data structures. Evaluates to -1 if not set.</source>
-      <translation type="unfinished" />
+      <translation>Índice do evento correspondente do perfil para recuperar tempo e valores das estruturas de dados correspondentes. Avalia como -1 se não for definido.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="92" />
       <source>Index of the corresponding event of the background profile to retrieve time and values from the corresponding data structures. Evaluates to -1 if not set.</source>
-      <translation type="unfinished" />
+      <translation>Índice do evento correspondente do perfil de fundo para recuperar tempo e valores das estruturas de dados correspondentes. Avalia como -1 se não for definido.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="94" />
       <source>Time distance in seconds after the corresponding event. Thus dCHARGE is bound to the current roast time (after CHARGE) in seconds while t is bound to the time in seconds from the start of the recording.</source>
-      <translation type="unfinished" />
+      <translation>Distância de tempo em segundos após o evento correspondente. Assim, dCHARGE está vinculado ao tempo de torra atual (após CHARGE) em segundos, enquanto t está vinculado ao tempo em segundos desde o início da gravação.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="97" />
       <source>AREA UNDER THE CURVE (AUC)</source>
-      <translation type="unfinished" />
+      <translation>ÁREA SOB A CURVA (AUC)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="101" />
       <source>AUC base temperature (could be from the selected event, if set)</source>
-      <translation type="unfinished" />
+      <translation>Temperatura base AUC (pode ser do evento selecionado, se definido)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="102" />
       <source>AUC target value (could be from the background profile, if set)</source>
-      <translation type="unfinished" />
+      <translation>Valor alvo AUC (pode ser do perfil de segundo plano, se definido)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="103" />
       <source>the current AUC value. -1 if none available.</source>
-      <translation type="unfinished" />
+      <translation>o valor AUC atual. -1 se nenhum disponível.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="106" />
       <source>PREDICITONS</source>
-      <translation type="unfinished" />
+      <translation>PREVISÕES</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="110" />
       <source>Prediction of the time distance to the DRY event based on the current RoR. Evaluates to -1 on negative RoR and to 0 if the DRY event is already set.</source>
-      <translation type="unfinished" />
+      <translation>Previsão da distância de tempo para o evento DRY com base no RoR atual. Avalia como -1 em RoR negativo e como 0 se o evento DRY já estiver definido.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="111" />
       <source>Same as pDRY, just for the FCs event.</source>
-      <translation type="unfinished" />
+      <translation>Igual ao pDRY, apenas para o evento FCs.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="115" />
       <source>Note: The same rules as for the corresponding PhasesLCDs apply to pDRY and pFCs:</source>
-      <translation type="unfinished" />
+      <translation>Nota: As mesmas regras dos respectivos PhasesLCDs se aplicam a pDRY e pFCs:</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="115" />
       <source>
 If there is no background profile the DRY or FCs bean temperature used for the prediction is taken from the Config&gt;Phases setup.</source>
-      <translation type="unfinished" />
+      <translation>
+Se não houver perfil de fundo, a temperatura do feijão DRY ou FCs usada para a previsão é obtida na configuração Config&gt;Fases.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="115" />
       <source>
 If there is a background profile and there is DRY or FCs event in the background profile, the DRY or FCs bean temperature used for the prediction is taken from the background profile.</source>
-      <translation type="unfinished" />
+      <translation>
+Se houver um perfil de fundo e houver um evento DRY ou FCs no perfil de fundo, a temperatura do feijão DRY ou FCs usada para a previsão é retirada do perfil de fundo.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="115" />
       <source>
 Exception to the above for DRY only: if AutoDRY is checked the DRY temperature used for the prediction is taken from the Config&gt;Phases setup.  This does not apply to FCs and AutoFCs.</source>
-      <translation type="unfinished" />
+      <translation>
+Exceção ao acima apenas para DRY: se AutoDRY for verificado, a temperatura DRY usada para a previsão é retirada da configuração Config&gt;Phases. Isso não se aplica a FCs e AutoFCs.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="115" />
       <source>
 The prediction value is the calculated time in seconds to reach the DRY or FCs temperature.</source>
-      <translation type="unfinished" />
+      <translation>
+O valor de previsão é o tempo calculado em segundos para atingir a temperatura DRY ou FCs.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="118" />
       <source>AMBIENT</source>
-      <translation type="unfinished" />
+      <translation>AMBIENTE</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="122" />
       <source>ambient temperature (default 0)</source>
-      <translation type="unfinished" />
+      <translation>temperatura ambiente (padrão 0)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="123" />
       <source>ambient humidity (default 0)</source>
-      <translation type="unfinished" />
+      <translation>umidade ambiente (padrão 0)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="124" />
       <source>ambient pressure (default 0)</source>
-      <translation type="unfinished" />
+      <translation>pressão ambiente (padrão 0)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="128" />
       <source>Note: The data is (re-)sampled some seconds after the start of recording</source>
-      <translation type="unfinished" />
+      <translation>Nota: Os dados são (re)amostrados alguns segundos após o início da gravação</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="131" />
       <source>ROAST PROPERTIES</source>
-      <translation type="unfinished" />
+      <translation>PROPRIEDADES DO ASSADO</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="135" />
       <source>batch size (g)</source>
-      <translation type="unfinished" />
+      <translation>tamanho do lote (g)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="136" />
       <source>green moisture (%)</source>
-      <translation type="unfinished" />
+      <translation>umidade verde (%)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="137" />
       <source>temperature unit (Celcius: 0, Fahrenheit: 1)</source>
-      <translation type="unfinished" />
+      <translation>unidade de temperatura (Celcius: 0, Fahrenheit: 1)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="140" />
       <source>EXPRESSIONS</source>
-      <translation type="unfinished" />
+      <translation>EXPRESSÕES</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="143" />
       <source>Expression</source>
-      <translation type="unfinished" />
+      <translation>Expressão</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="144" />
       <source>Conditional. Evaluates to the value of the expression &lt;true-expr&gt; if the condition &lt;cond&gt; holds, otherwise to the value of the expression &lt;false-expr&gt;. The rules of Python are applied to decide if a value holds or not. Thus the boolean values "True" and "False" have the obvious semantic. Any number unequal to 0 evaluates to True and 0 evaluates to False. The value "None" is also evaluated to False.</source>
-      <translation type="unfinished" />
+      <translation>Condicional. Avalia o valor da expressão &lt;true-expr&gt; se a condição &lt;cond&gt; for válida, caso contrário, o valor da expressão &lt;false-expr&gt;. As regras do Python são aplicadas para decidir se um valor é válido ou não. Assim, os valores booleanos "True" e "False" têm a semântica óbvia. Qualquer número diferente de 0 é avaliado como True e 0 é avaliado como False. O valor "None" também é avaliado como False.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="147" />
       <source>MATHEMATICAL FORMULAS</source>
-      <translation type="unfinished" />
+      <translation>FÓRMULAS MATEMÁTICAS</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="150" />
       <source>Formula</source>
-      <translation type="unfinished" />
+      <translation>Fórmula</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="151" />
@@ -10924,17 +10766,17 @@ The prediction value is the calculated time in seconds to reach the DRY or FCs t
     <message>
       <location filename="../help/symbolic_help.py" line="158" />
       <source>Return the logarithm of x to the given base.</source>
-      <translation type="unfinished" />
+      <translation>Retorne o logaritmo de x para a base dada.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="159" />
       <source>Return the minimum of the given values.</source>
-      <translation type="unfinished" />
+      <translation>Retorne o mínimo dos valores fornecidos.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="160" />
       <source>Return the maximum of the given values.</source>
-      <translation type="unfinished" />
+      <translation>Retorna o máximo dos valores fornecidos.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="161" />
@@ -10964,7 +10806,7 @@ The prediction value is the calculated time in seconds to reach the DRY or FCs t
     <message>
       <location filename="../help/symbolic_help.py" line="168" />
       <source>MATHEMATICAL CONSTANTS</source>
-      <translation type="unfinished" />
+      <translation>CONSTANTES MATEMÁTICAS</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="171" />
@@ -10974,23 +10816,28 @@ The prediction value is the calculated time in seconds to reach the DRY or FCs t
     <message>
       <location filename="../help/symbolic_help.py" line="176" />
       <source>PLOTTER EXTENSIONS</source>
-      <translation type="unfinished" />
+      <translation>EXTENSÕES DE PLOTTER</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="180" />
       <source>Note:  This section applies only to the Plotter
 Using math formulas in the plotter also allows to use the symbolic variables P and F (see Signals, Symbolic Assignments and the Plotter).</source>
-      <translation type="unfinished" />
+      <translation>Nota: Esta seção se aplica apenas à Plotter
+O uso de fórmulas matemáticas no plotter também permite o uso das variáveis simbólicas P e F (consulte Sinais, Atribuições Simbólicas e o Plotter).</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="184" />
       <source>The variables P1,..,P9 represent the results from plot #1,..,#9. You can perform calculations in a later plot on variables of an earlier plot. That way, the plot variables P1,..,P9 allow the cascading or intermediate results. For example, plot #3 can refer to the results of plot 1 using the variable P1.</source>
-      <translation type="unfinished" />
+      <translation>As variáveis P1,..,P9 representam os resultados da parcela #1,..,#9. Você pode realizar cálculos em um gráfico posterior em variáveis de um gráfico anterior. Dessa forma, as variáveis de plotagem P1,..,P9 permitem os resultados em cascata ou intermediários. Por exemplo, o gráfico #3 pode se referir aos resultados do gráfico 1 usando a variável P1.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="185" />
       <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
-      <translation type="unfinished" />
+      <translation>F1 refere-se ao resultado anterior da fórmula real para realizar um loop de feedback. Isso é útil em projetos de filtro. Da mesma forma, F2 refere-se ao segundo resultado anterior etc.</translation>
+    </message>
+    <message>
+      <source>I</source>
+      <translation type="vanished">eu</translation>
     </message>
     <message>
       <source>Kg</source>
@@ -11036,9 +10883,9 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
   <context>
     <name>Label</name>
     <message>
-      <location filename="../artisanlib/events.py" line="3373" />
-      <location filename="../artisanlib/events.py" line="887" />
-      <location filename="../artisanlib/events.py" line="640" />
+      <location filename="../artisanlib/events.py" line="3377" />
+      <location filename="../artisanlib/events.py" line="889" />
+      <location filename="../artisanlib/events.py" line="642" />
       <location filename="../artisanlib/pid_dialogs.py" line="345" />
       <location filename="../artisanlib/pid_dialogs.py" line="296" />
       <location filename="../artisanlib/axis.py" line="150" />
@@ -11049,9 +10896,9 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <translation type="unfinished">Máx</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3372" />
-      <location filename="../artisanlib/events.py" line="885" />
-      <location filename="../artisanlib/events.py" line="638" />
+      <location filename="../artisanlib/events.py" line="3376" />
+      <location filename="../artisanlib/events.py" line="887" />
+      <location filename="../artisanlib/events.py" line="640" />
       <location filename="../artisanlib/pid_dialogs.py" line="337" />
       <location filename="../artisanlib/pid_dialogs.py" line="288" />
       <location filename="../artisanlib/axis.py" line="160" />
@@ -11069,7 +10916,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/axis.py" line="160" />
       <source>RECORD</source>
-      <translation type="unfinished" />
+      <translation>REGISTRO</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="256" />
@@ -11135,7 +10982,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/canvas.py" line="15124" />
       <location filename="../artisanlib/canvas.py" line="7661" />
       <location filename="../artisanlib/canvas.py" line="7615" />
-      <location filename="../artisanlib/main.py" line="16156" />
+      <location filename="../artisanlib/main.py" line="16179" />
       <location filename="../artisanlib/main.py" line="5206" />
       <location filename="../artisanlib/main.py" line="5200" />
       <location filename="../artisanlib/main.py" line="5176" />
@@ -11169,7 +11016,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/canvas.py" line="15120" />
       <location filename="../artisanlib/canvas.py" line="7636" />
       <location filename="../artisanlib/canvas.py" line="7592" />
-      <location filename="../artisanlib/main.py" line="16150" />
+      <location filename="../artisanlib/main.py" line="16173" />
       <location filename="../artisanlib/main.py" line="5203" />
       <location filename="../artisanlib/main.py" line="5197" />
       <location filename="../artisanlib/main.py" line="5173" />
@@ -11216,7 +11063,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/designer.py" line="49" />
       <location filename="../artisanlib/roast_properties.py" line="599" />
       <location filename="../artisanlib/background.py" line="94" />
-      <location filename="../artisanlib/ports.py" line="1512" />
+      <location filename="../artisanlib/ports.py" line="1517" />
       <location filename="../artisanlib/comparator.py" line="840" />
       <source>CHARGE</source>
       <translation>CARREGAR</translation>
@@ -11241,7 +11088,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/main.py" line="6919" />
       <location filename="../artisanlib/main.py" line="3473" />
       <location filename="../artisanlib/background.py" line="95" />
-      <location filename="../artisanlib/ports.py" line="1577" />
+      <location filename="../artisanlib/ports.py" line="1582" />
       <location filename="../artisanlib/comparator.py" line="842" />
       <source>DRY</source>
       <translation>SECA</translation>
@@ -11258,7 +11105,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/main.py" line="6830" />
       <location filename="../artisanlib/main.py" line="3491" />
       <location filename="../artisanlib/background.py" line="96" />
-      <location filename="../artisanlib/ports.py" line="1579" />
+      <location filename="../artisanlib/ports.py" line="1584" />
       <location filename="../artisanlib/comparator.py" line="843" />
       <source>FCs</source>
       <translation>PEi</translation>
@@ -11266,7 +11113,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/canvas.py" line="1041" />
       <location filename="../artisanlib/background.py" line="97" />
-      <location filename="../artisanlib/ports.py" line="1581" />
+      <location filename="../artisanlib/ports.py" line="1586" />
       <location filename="../artisanlib/comparator.py" line="844" />
       <source>FCe</source>
       <translation type="unfinished">PEf</translation>
@@ -11274,7 +11121,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/canvas.py" line="1042" />
       <location filename="../artisanlib/background.py" line="98" />
-      <location filename="../artisanlib/ports.py" line="1583" />
+      <location filename="../artisanlib/ports.py" line="1588" />
       <location filename="../artisanlib/comparator.py" line="845" />
       <source>SCs</source>
       <translation type="unfinished">SEi</translation>
@@ -11282,7 +11129,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/canvas.py" line="1043" />
       <location filename="../artisanlib/background.py" line="99" />
-      <location filename="../artisanlib/ports.py" line="1585" />
+      <location filename="../artisanlib/ports.py" line="1590" />
       <location filename="../artisanlib/comparator.py" line="846" />
       <source>SCe</source>
       <translation type="unfinished">SEf</translation>
@@ -11295,7 +11142,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/designer.py" line="62" />
       <location filename="../artisanlib/roast_properties.py" line="701" />
       <location filename="../artisanlib/background.py" line="100" />
-      <location filename="../artisanlib/ports.py" line="1514" />
+      <location filename="../artisanlib/ports.py" line="1519" />
       <location filename="../artisanlib/comparator.py" line="847" />
       <source>DROP</source>
       <translation>RETIRAR</translation>
@@ -11306,16 +11153,16 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <translation>/ min</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1253" />
-      <location filename="../artisanlib/ports.py" line="700" />
-      <location filename="../artisanlib/events.py" line="1169" />
+      <location filename="../artisanlib/ports.py" line="1258" />
+      <location filename="../artisanlib/ports.py" line="705" />
+      <location filename="../artisanlib/events.py" line="1171" />
       <location filename="../artisanlib/comparator.py" line="1341" />
       <source>ON</source>
       <translation type="unfinished">LIGAR</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19907" />
-      <location filename="../artisanlib/main.py" line="18628" />
+      <location filename="../artisanlib/main.py" line="19930" />
+      <location filename="../artisanlib/main.py" line="18651" />
       <location filename="../artisanlib/main.py" line="5188" />
       <location filename="../artisanlib/roast_properties.py" line="792" />
       <location filename="../artisanlib/comparator.py" line="1342" />
@@ -11324,7 +11171,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="2725" />
-      <location filename="../artisanlib/events.py" line="883" />
+      <location filename="../artisanlib/events.py" line="885" />
       <location filename="../artisanlib/pid_dialogs.py" line="128" />
       <source>Source</source>
       <translation type="unfinished">Fonte</translation>
@@ -11350,9 +11197,9 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <translation>Inverter controle</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1167" />
-      <location filename="../artisanlib/ports.py" line="626" />
-      <location filename="../artisanlib/events.py" line="649" />
+      <location filename="../artisanlib/ports.py" line="1172" />
+      <location filename="../artisanlib/ports.py" line="631" />
+      <location filename="../artisanlib/events.py" line="651" />
       <location filename="../artisanlib/pid_dialogs.py" line="4003" />
       <location filename="../artisanlib/pid_dialogs.py" line="244" />
       <source>SV</source>
@@ -11372,9 +11219,9 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="786" />
-      <location filename="../artisanlib/ports.py" line="1606" />
-      <location filename="../artisanlib/ports.py" line="1081" />
-      <location filename="../artisanlib/ports.py" line="526" />
+      <location filename="../artisanlib/ports.py" line="1611" />
+      <location filename="../artisanlib/ports.py" line="1086" />
+      <location filename="../artisanlib/ports.py" line="531" />
       <location filename="../artisanlib/pid_dialogs.py" line="266" />
       <source>Mode</source>
       <translation type="unfinished">Modo</translation>
@@ -11462,7 +11309,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/pid_dialogs.py" line="2228" />
       <location filename="../artisanlib/pid_dialogs.py" line="1250" />
       <source>SV Slider</source>
-      <translation type="unfinished" />
+      <translation>Controle deslizante SV</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1264" />
@@ -11537,7 +11384,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2152" />
       <source>SV (7-0)</source>
-      <translation type="unfinished" />
+      <translation>VS (7-0)</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2287" />
@@ -11548,7 +11395,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2237" />
       <source>SV min</source>
-      <translation type="unfinished" />
+      <translation>VS min</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2244" />
@@ -11556,22 +11403,22 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <translation type="unfinished">SV máx</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1198" />
-      <location filename="../artisanlib/ports.py" line="648" />
+      <location filename="../artisanlib/ports.py" line="1203" />
+      <location filename="../artisanlib/ports.py" line="653" />
       <location filename="../artisanlib/pid_dialogs.py" line="2269" />
       <source>P</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1204" />
-      <location filename="../artisanlib/ports.py" line="654" />
+      <location filename="../artisanlib/ports.py" line="1209" />
+      <location filename="../artisanlib/ports.py" line="659" />
       <location filename="../artisanlib/pid_dialogs.py" line="2275" />
       <source>I</source>
       <translation>eu</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1210" />
-      <location filename="../artisanlib/ports.py" line="660" />
+      <location filename="../artisanlib/ports.py" line="1215" />
+      <location filename="../artisanlib/ports.py" line="665" />
       <location filename="../artisanlib/pid_dialogs.py" line="2281" />
       <source>D</source>
       <translation type="unfinished" />
@@ -11670,20 +11517,20 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/events.py" line="533" />
       <source>Max Buttons Per Row</source>
-      <translation type="unfinished" />
+      <translation>Máximo de Botões por Linha</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="540" />
       <source>Button Size</source>
-      <translation type="unfinished" />
+      <translation>Tamanho do botão</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="588" />
+      <location filename="../artisanlib/events.py" line="590" />
       <source>Color Pattern</source>
       <translation type="unfinished">Padrão de cor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="600" />
+      <location filename="../artisanlib/events.py" line="602" />
       <source>current:</source>
       <translation>atual:</translation>
     </message>
@@ -11692,79 +11539,79 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/main.py" line="5258" />
       <location filename="../artisanlib/main.py" line="5255" />
       <location filename="../artisanlib/roast_properties.py" line="2726" />
-      <location filename="../artisanlib/ports.py" line="1572" />
-      <location filename="../artisanlib/events.py" line="881" />
-      <location filename="../artisanlib/events.py" line="628" />
+      <location filename="../artisanlib/ports.py" line="1577" />
+      <location filename="../artisanlib/events.py" line="883" />
+      <location filename="../artisanlib/events.py" line="630" />
       <source>Event</source>
       <translation>Evento</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="646" />
-      <location filename="../artisanlib/events.py" line="630" />
+      <location filename="../artisanlib/events.py" line="648" />
+      <location filename="../artisanlib/events.py" line="632" />
       <source>Action</source>
       <translation type="unfinished">Ação</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1480" />
-      <location filename="../artisanlib/events.py" line="632" />
+      <location filename="../artisanlib/ports.py" line="1485" />
+      <location filename="../artisanlib/events.py" line="634" />
       <source>Command</source>
       <translation type="unfinished">Comando</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3377" />
-      <location filename="../artisanlib/events.py" line="634" />
+      <location filename="../artisanlib/events.py" line="3381" />
+      <location filename="../artisanlib/events.py" line="636" />
       <source>Offset</source>
       <translation type="unfinished">Compensação</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1082" />
-      <location filename="../artisanlib/events.py" line="3376" />
-      <location filename="../artisanlib/events.py" line="636" />
+      <location filename="../artisanlib/ports.py" line="1087" />
+      <location filename="../artisanlib/events.py" line="3380" />
+      <location filename="../artisanlib/events.py" line="638" />
       <source>Factor</source>
       <translation type="unfinished">Fator</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="642" />
+      <location filename="../artisanlib/events.py" line="644" />
       <source>Bernoulli</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="889" />
-      <location filename="../artisanlib/events.py" line="644" />
+      <location filename="../artisanlib/events.py" line="891" />
+      <location filename="../artisanlib/events.py" line="646" />
       <source>Coarse</source>
       <translation type="unfinished">Grosseiro</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="652" />
+      <location filename="../artisanlib/events.py" line="654" />
       <source>Temp</source>
       <translation type="unfinished">Temp</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="2724" />
       <location filename="../artisanlib/roast_properties.py" line="121" />
-      <location filename="../artisanlib/events.py" line="654" />
+      <location filename="../artisanlib/events.py" line="656" />
       <source>Unit</source>
       <translation type="unfinished">Unidade</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1007" />
+      <location filename="../artisanlib/events.py" line="1009" />
       <source>Cluster</source>
       <translation type="unfinished">Grupo</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1250" />
-      <location filename="../artisanlib/ports.py" line="697" />
-      <location filename="../artisanlib/events.py" line="1184" />
+      <location filename="../artisanlib/ports.py" line="1255" />
+      <location filename="../artisanlib/ports.py" line="702" />
+      <location filename="../artisanlib/events.py" line="1186" />
       <source>OFF</source>
       <translation type="unfinished">DESLIGAR</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1205" />
+      <location filename="../artisanlib/events.py" line="1207" />
       <source>RESET</source>
       <translation type="unfinished">ZERAR</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1213" />
+      <location filename="../artisanlib/events.py" line="1215" />
       <source>START</source>
       <translation type="unfinished">INICIAR</translation>
     </message>
@@ -11772,51 +11619,51 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/main.py" line="10502" />
       <location filename="../artisanlib/main.py" line="10487" />
       <location filename="../artisanlib/main.py" line="5270" />
-      <location filename="../artisanlib/events.py" line="2702" />
-      <location filename="../artisanlib/events.py" line="2687" />
+      <location filename="../artisanlib/events.py" line="2706" />
+      <location filename="../artisanlib/events.py" line="2691" />
       <source>Event button</source>
       <translation>Botão de evento</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="5270" />
-      <location filename="../artisanlib/events.py" line="2702" />
-      <location filename="../artisanlib/events.py" line="2687" />
+      <location filename="../artisanlib/events.py" line="2706" />
+      <location filename="../artisanlib/events.py" line="2691" />
       <source>its text</source>
       <translation>seu texto</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3374" />
+      <location filename="../artisanlib/events.py" line="3378" />
       <source>Slider Value</source>
-      <translation type="unfinished" />
+      <translation>Valor do controle deslizante</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3375" />
+      <location filename="../artisanlib/events.py" line="3379" />
       <source>Target Value</source>
-      <translation type="unfinished" />
+      <translation>Valor Alvo</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="621" />
-      <location filename="../artisanlib/ports.py" line="521" />
+      <location filename="../artisanlib/ports.py" line="626" />
+      <location filename="../artisanlib/ports.py" line="526" />
       <location filename="../artisanlib/ports.py" line="77" />
       <source>Slave</source>
       <translation type="unfinished">Escravo</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="522" />
+      <location filename="../artisanlib/ports.py" line="527" />
       <location filename="../artisanlib/ports.py" line="83" />
       <source>Register</source>
       <translation type="unfinished">Registrador</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1156" />
-      <location filename="../artisanlib/ports.py" line="1077" />
+      <location filename="../artisanlib/ports.py" line="1161" />
+      <location filename="../artisanlib/ports.py" line="1082" />
       <location filename="../artisanlib/ports.py" line="234" />
       <source>Area</source>
       <translation>Área</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1162" />
-      <location filename="../artisanlib/ports.py" line="1078" />
+      <location filename="../artisanlib/ports.py" line="1167" />
+      <location filename="../artisanlib/ports.py" line="1083" />
       <location filename="../artisanlib/ports.py" line="241" />
       <source>DB#</source>
       <translation>DB #</translation>
@@ -11824,82 +11671,82 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/main.py" line="6316" />
       <location filename="../artisanlib/curves.py" line="980" />
-      <location filename="../artisanlib/ports.py" line="1079" />
+      <location filename="../artisanlib/ports.py" line="1084" />
       <location filename="../artisanlib/ports.py" line="248" />
       <source>Start</source>
       <translation>Iníco</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="862" />
-      <location filename="../artisanlib/ports.py" line="815" />
-      <location filename="../artisanlib/ports.py" line="479" />
-      <location filename="../artisanlib/ports.py" line="438" />
+      <location filename="../artisanlib/ports.py" line="867" />
+      <location filename="../artisanlib/ports.py" line="820" />
+      <location filename="../artisanlib/ports.py" line="483" />
+      <location filename="../artisanlib/ports.py" line="442" />
       <source>Comm Port</source>
       <translation type="unfinished">Porta Comunicação</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="866" />
-      <location filename="../artisanlib/ports.py" line="819" />
-      <location filename="../artisanlib/ports.py" line="484" />
-      <location filename="../artisanlib/ports.py" line="442" />
+      <location filename="../artisanlib/ports.py" line="871" />
+      <location filename="../artisanlib/ports.py" line="824" />
+      <location filename="../artisanlib/ports.py" line="489" />
+      <location filename="../artisanlib/ports.py" line="446" />
       <source>Baud Rate</source>
       <translation type="unfinished">Taxa de Trasmissão</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="872" />
-      <location filename="../artisanlib/ports.py" line="828" />
-      <location filename="../artisanlib/ports.py" line="493" />
-      <location filename="../artisanlib/ports.py" line="448" />
+      <location filename="../artisanlib/ports.py" line="877" />
+      <location filename="../artisanlib/ports.py" line="833" />
+      <location filename="../artisanlib/ports.py" line="498" />
+      <location filename="../artisanlib/ports.py" line="452" />
       <source>Byte Size</source>
       <translation type="unfinished">Tamanho de Byte</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="878" />
-      <location filename="../artisanlib/ports.py" line="834" />
-      <location filename="../artisanlib/ports.py" line="499" />
-      <location filename="../artisanlib/ports.py" line="454" />
+      <location filename="../artisanlib/ports.py" line="883" />
+      <location filename="../artisanlib/ports.py" line="839" />
+      <location filename="../artisanlib/ports.py" line="504" />
+      <location filename="../artisanlib/ports.py" line="458" />
       <source>Parity</source>
       <translation type="unfinished">Paridade</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="885" />
-      <location filename="../artisanlib/ports.py" line="841" />
-      <location filename="../artisanlib/ports.py" line="506" />
-      <location filename="../artisanlib/ports.py" line="461" />
+      <location filename="../artisanlib/ports.py" line="890" />
+      <location filename="../artisanlib/ports.py" line="846" />
+      <location filename="../artisanlib/ports.py" line="511" />
+      <location filename="../artisanlib/ports.py" line="465" />
       <source>Stopbits</source>
       <translation type="unfinished">Bit de Parada</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="891" />
-      <location filename="../artisanlib/ports.py" line="847" />
-      <location filename="../artisanlib/ports.py" line="754" />
-      <location filename="../artisanlib/ports.py" line="512" />
-      <location filename="../artisanlib/ports.py" line="467" />
+      <location filename="../artisanlib/ports.py" line="896" />
+      <location filename="../artisanlib/ports.py" line="852" />
+      <location filename="../artisanlib/ports.py" line="759" />
+      <location filename="../artisanlib/ports.py" line="517" />
+      <location filename="../artisanlib/ports.py" line="471" />
       <source>Timeout</source>
       <translation type="unfinished">Expiração</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="470" />
+      <location filename="../artisanlib/ports.py" line="474" />
       <source>Settings for non-Modbus devices</source>
       <translation type="unfinished">Configuração para dispositivos não modbus</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="523" />
+      <location filename="../artisanlib/ports.py" line="528" />
       <source>Decode</source>
       <translation type="unfinished">Decodificador</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="524" />
+      <location filename="../artisanlib/ports.py" line="529" />
       <source>Function</source>
       <translation type="unfinished">Função</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="525" />
+      <location filename="../artisanlib/ports.py" line="530" />
       <source>Divider</source>
       <translation type="unfinished">Divisor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="590" />
+      <location filename="../artisanlib/ports.py" line="595" />
       <source>little-endian</source>
       <translation type="unfinished">little-endian</translation>
     </message>
@@ -11908,18 +11755,18 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/devices.py" line="710" />
       <location filename="../artisanlib/devices.py" line="365" />
       <location filename="../artisanlib/devices.py" line="161" />
-      <location filename="../artisanlib/ports.py" line="1175" />
-      <location filename="../artisanlib/ports.py" line="1080" />
-      <location filename="../artisanlib/ports.py" line="602" />
+      <location filename="../artisanlib/ports.py" line="1180" />
+      <location filename="../artisanlib/ports.py" line="1085" />
+      <location filename="../artisanlib/ports.py" line="607" />
       <source>Type</source>
       <translation type="unfinished">Tipo</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1119" />
       <location filename="../artisanlib/devices.py" line="943" />
-      <location filename="../artisanlib/ports.py" line="1375" />
-      <location filename="../artisanlib/ports.py" line="1039" />
-      <location filename="../artisanlib/ports.py" line="609" />
+      <location filename="../artisanlib/ports.py" line="1380" />
+      <location filename="../artisanlib/ports.py" line="1044" />
+      <location filename="../artisanlib/ports.py" line="614" />
       <source>Host</source>
       <translation type="unfinished">Rede</translation>
     </message>
@@ -11927,111 +11774,111 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../artisanlib/devices.py" line="1123" />
       <location filename="../artisanlib/devices.py" line="952" />
       <location filename="../artisanlib/curves.py" line="1205" />
-      <location filename="../artisanlib/ports.py" line="1380" />
-      <location filename="../artisanlib/ports.py" line="1044" />
-      <location filename="../artisanlib/ports.py" line="614" />
+      <location filename="../artisanlib/ports.py" line="1385" />
+      <location filename="../artisanlib/ports.py" line="1049" />
+      <location filename="../artisanlib/ports.py" line="619" />
       <source>Port</source>
       <translation type="unfinished">Porta</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1184" />
-      <location filename="../artisanlib/ports.py" line="634" />
+      <location filename="../artisanlib/ports.py" line="1189" />
+      <location filename="../artisanlib/ports.py" line="639" />
       <source>SV Factor</source>
       <translation>Fator SV</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1191" />
-      <location filename="../artisanlib/ports.py" line="641" />
+      <location filename="../artisanlib/ports.py" line="1196" />
+      <location filename="../artisanlib/ports.py" line="646" />
       <source>pid Factor</source>
       <translation>Fator pid</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="728" />
+      <location filename="../artisanlib/ports.py" line="733" />
       <source>Delay</source>
-      <translation type="unfinished" />
+      <translation>Atraso</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="760" />
-      <location filename="../artisanlib/ports.py" line="734" />
+      <location filename="../artisanlib/ports.py" line="765" />
+      <location filename="../artisanlib/ports.py" line="739" />
       <source>Retries</source>
-      <translation type="unfinished" />
+      <translation>Novas tentativas</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="851" />
-      <location filename="../artisanlib/ports.py" line="805" />
+      <location filename="../artisanlib/ports.py" line="856" />
+      <location filename="../artisanlib/ports.py" line="810" />
       <source>Device</source>
       <translation type="unfinished">Dispositivo</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1050" />
+      <location filename="../artisanlib/ports.py" line="1055" />
       <source>Rack</source>
       <translation>Prateleira</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1056" />
+      <location filename="../artisanlib/ports.py" line="1061" />
       <source>Slot</source>
-      <translation type="unfinished" />
+      <translation>slot</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1615" />
-      <location filename="../artisanlib/ports.py" line="1105" />
+      <location filename="../artisanlib/ports.py" line="1620" />
+      <location filename="../artisanlib/ports.py" line="1110" />
       <source>Input</source>
       <translation type="unfinished">Entrada</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1386" />
+      <location filename="../artisanlib/ports.py" line="1391" />
       <source>Path</source>
       <translation>Caminho</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1392" />
+      <location filename="../artisanlib/ports.py" line="1397" />
       <source>ID</source>
       <translation>EU IA</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1441" />
+      <location filename="../artisanlib/ports.py" line="1446" />
       <source>Connect</source>
       <translation>Conectar</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1444" />
+      <location filename="../artisanlib/ports.py" line="1449" />
       <source>Reconnect</source>
       <translation>Reconectar</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1604" />
-      <location filename="../artisanlib/ports.py" line="1447" />
+      <location filename="../artisanlib/ports.py" line="1609" />
+      <location filename="../artisanlib/ports.py" line="1452" />
       <source>Request</source>
       <translation>Solicitação</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1476" />
+      <location filename="../artisanlib/ports.py" line="1481" />
       <source>Message ID</source>
       <translation>ID da mensagem</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1478" />
+      <location filename="../artisanlib/ports.py" line="1483" />
       <source>Machine ID</source>
       <translation>ID da máquina</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1482" />
+      <location filename="../artisanlib/ports.py" line="1487" />
       <source>Data</source>
       <translation>Dados</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1484" />
+      <location filename="../artisanlib/ports.py" line="1489" />
       <source>Message</source>
       <translation>Mensagem</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1496" />
+      <location filename="../artisanlib/ports.py" line="1501" />
       <source>Data Request</source>
       <translation>Pedido de data</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1605" />
-      <location filename="../artisanlib/ports.py" line="1574" />
+      <location filename="../artisanlib/ports.py" line="1610" />
+      <location filename="../artisanlib/ports.py" line="1579" />
       <source>Node</source>
       <translation>Nó</translation>
     </message>
@@ -12044,12 +11891,12 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
       <location filename="../artisanlib/background.py" line="120" />
       <source>Extra 1</source>
-      <translation type="unfinished" />
+      <translation>Adicional 1</translation>
     </message>
     <message>
       <location filename="../artisanlib/background.py" line="129" />
       <source>Extra 2</source>
-      <translation type="unfinished" />
+      <translation>Adicional 2</translation>
     </message>
     <message>
       <location filename="../artisanlib/background.py" line="185" />
@@ -12459,7 +12306,7 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/designer.py" line="618" />
       <source>temp</source>
-      <translation type="unfinished" />
+      <translation>temperatura</translation>
     </message>
     <message>
       <location filename="../artisanlib/designer.py" line="623" />
@@ -12784,7 +12631,7 @@ Fases LCDs</translation>
       <translation>Cor da borda (RGBA)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20428" />
+      <location filename="../artisanlib/main.py" line="20451" />
       <location filename="../artisanlib/main.py" line="1175" />
       <source>roasted</source>
       <translation>assado</translation>
@@ -12906,7 +12753,7 @@ Fases LCDs</translation>
       <location filename="../artisanlib/main.py" line="5228" />
       <location filename="../artisanlib/main.py" line="5222" />
       <source>BT LCD Digits</source>
-      <translation type="unfinished" />
+      <translation>Dígitos BT LCD</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="5229" />
@@ -12931,22 +12778,22 @@ Fases LCDs</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="14537" />
-      <location filename="../artisanlib/main.py" line="23770" />
+      <location filename="../artisanlib/main.py" line="23793" />
       <location filename="../artisanlib/main.py" line="6294" />
       <source>ln()</source>
       <translation>ln ()</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23768" />
-      <location filename="../artisanlib/main.py" line="23766" />
+      <location filename="../artisanlib/main.py" line="23791" />
+      <location filename="../artisanlib/main.py" line="23789" />
       <location filename="../artisanlib/main.py" line="6297" />
       <location filename="../artisanlib/main.py" line="6296" />
       <source>x</source>
       <translation type="unfinished">x</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23764" />
-      <location filename="../artisanlib/main.py" line="23715" />
+      <location filename="../artisanlib/main.py" line="23787" />
+      <location filename="../artisanlib/main.py" line="23738" />
       <location filename="../artisanlib/main.py" line="6298" />
       <source>Bkgnd</source>
       <translation type="unfinished" />
@@ -12956,14 +12803,14 @@ Fases LCDs</translation>
       <location filename="../artisanlib/main.py" line="6305" />
       <location filename="../artisanlib/main.py" line="6301" />
       <source>On</source>
-      <translation type="unfinished" />
+      <translation>Sobre</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6311" />
       <location filename="../artisanlib/main.py" line="6307" />
       <location filename="../artisanlib/main.py" line="6303" />
       <source>Off</source>
-      <translation type="unfinished" />
+      <translation>Desligado</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6318" />
@@ -12988,12 +12835,12 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/main.py" line="6336" />
       <source>Background Align</source>
-      <translation type="unfinished" />
+      <translation>Alinhamento de fundo</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6349" />
       <source>Curve Fit</source>
-      <translation type="unfinished" />
+      <translation>Ajuste de Curva</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6350" />
@@ -13018,12 +12865,12 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/main.py" line="6352" />
       <source>Delta Span/Smoothing</source>
-      <translation type="unfinished" />
+      <translation>Delta Span/Suavização</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6352" />
       <source>Polyfit/Optimal Smoothing</source>
-      <translation type="unfinished" />
+      <translation>Polyfit/Otimal Smoothing</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6353" />
@@ -13085,48 +12932,48 @@ Fases LCDs</translation>
       <translation>MODO DE TEMP.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="12638" />
+      <location filename="../artisanlib/main.py" line="12661" />
       <source>Start recording</source>
       <translation type="unfinished">Inicia gravação</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="12652" />
+      <location filename="../artisanlib/main.py" line="12675" />
       <source>Charge the beans</source>
       <translation>Carregue os feijões</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20403" />
+      <location filename="../artisanlib/main.py" line="20426" />
       <source>/m</source>
       <translation>/ m</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20424" />
+      <location filename="../artisanlib/main.py" line="20447" />
       <source>greens</source>
       <translation>verdes</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23758" />
+      <location filename="../artisanlib/main.py" line="23781" />
       <source>RMSE BT</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23759" />
+      <location filename="../artisanlib/main.py" line="23782" />
       <source>MSE BT</source>
       <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="13521" />
-      <location filename="../artisanlib/main.py" line="23760" />
+      <location filename="../artisanlib/main.py" line="23783" />
       <source>RoR</source>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23760" />
+      <location filename="../artisanlib/main.py" line="23783" />
       <source>@FCs</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23761" />
+      <location filename="../artisanlib/main.py" line="23784" />
       <source>Max+/Max- RoR</source>
       <translation>Max + / Max- RoR</translation>
     </message>
@@ -13240,7 +13087,7 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/devices.py" line="929" />
       <source>Range</source>
-      <translation type="unfinished" />
+      <translation>Faixa</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="947" />
@@ -13325,7 +13172,7 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/canvas.py" line="2087" />
       <source>Roast Event</source>
-      <translation type="unfinished" />
+      <translation>Evento assado</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="2894" />
@@ -13353,7 +13200,7 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/canvas.py" line="8244" />
       <source>BackgroundYT</source>
-      <translation type="unfinished" />
+      <translation>Plano de fundoYT</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="15099" />
@@ -13380,7 +13227,7 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/canvas.py" line="9703" />
       <source>BTprojection</source>
-      <translation type="unfinished" />
+      <translation>BTprojeção</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="9708" />
@@ -13390,17 +13237,17 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/canvas.py" line="9717" />
       <source>DeltaBTprojection</source>
-      <translation type="unfinished" />
+      <translation>DeltaBTprojeção</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="9723" />
       <source>DeltaETprojection</source>
-      <translation type="unfinished" />
+      <translation>DeltaETprojeção</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="9728" />
       <source>AUCguide</source>
-      <translation type="unfinished" />
+      <translation>Guia AUC</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="10172" />
@@ -14411,12 +14258,12 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/wheels.py" line="636" />
       <source>Save Wheel graph</source>
-      <translation type="unfinished" />
+      <translation>Salvar gráfico de roda</translation>
     </message>
     <message>
       <location filename="../artisanlib/wheels.py" line="640" />
       <source>Wheel Graph saved</source>
-      <translation type="unfinished" />
+      <translation>Gráfico de roda salvo</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="15955" />
@@ -14427,22 +14274,22 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/wsport.py" line="192" />
       <source>WebSocket disconnected</source>
-      <translation type="unfinished" />
+      <translation>WebSocket desconectado</translation>
     </message>
     <message>
       <location filename="../artisanlib/wsport.py" line="199" />
       <source>WebSocket connected</source>
-      <translation type="unfinished" />
+      <translation>WebSocket conectado</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="743" />
       <source>Load Ramp/Soak Table</source>
-      <translation type="unfinished" />
+      <translation>Tabela de rampa/saturação de carga</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="830" />
       <source>Save Ramp/Soak Table</source>
-      <translation type="unfinished" />
+      <translation>Salvar tabela de rampa/saturação</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3645" />
@@ -14514,7 +14361,7 @@ Fases LCDs</translation>
       <location filename="../artisanlib/pid_dialogs.py" line="1675" />
       <location filename="../artisanlib/pid_dialogs.py" line="1674" />
       <source>CONTINUOUS CONTROL</source>
-      <translation type="unfinished" />
+      <translation>CONTROLE CONTÍNUO</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3651" />
@@ -14586,294 +14433,297 @@ Fases LCDs</translation>
       <location filename="../artisanlib/pid_dialogs.py" line="1693" />
       <location filename="../artisanlib/pid_dialogs.py" line="1687" />
       <source>STANDBY MODE</source>
-      <translation type="unfinished" />
+      <translation>MODO DE ESPERA</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1769" />
       <source>The rampsoak-mode tells how to start and end the ramp/soak</source>
-      <translation type="unfinished" />
+      <translation>O modo rampsoak informa como iniciar e terminar a rampa/soak</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1770" />
       <source>Your rampsoak mode in this pid is:</source>
-      <translation type="unfinished" />
+      <translation>Seu modo rampsoak neste pid é:</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1771" />
       <source>Mode = {0}</source>
-      <translation type="unfinished" />
+      <translation>Modo = {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1773" />
       <source>Start to run from PV value: {0}</source>
-      <translation type="unfinished" />
+      <translation>Comece a executar a partir do valor PV: {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1774" />
       <source>End output status at the end of ramp/soak: {0}</source>
-      <translation type="unfinished" />
+      <translation>Status de saída final no final da rampa/saturação: {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1775" />
       <source>Output status while ramp/soak operation set to OFF: {0}</source>
-      <translation type="unfinished" />
+      <translation>Status de saída durante a operação de rampa/saturação definida como OFF: {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1776" />
       <source>
 Repeat Operation at the end: {0}</source>
-      <translation type="unfinished" />
+      <translation>
+Repita a operação no final: {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1778" />
       <source>Recomended Mode = 0</source>
-      <translation type="unfinished" />
+      <translation>Modo recomendado = 0</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1779" />
       <source>If you need to change it, change it now and come back later</source>
-      <translation type="unfinished" />
+      <translation>Se precisar alterar, altere agora e volte mais tarde</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1780" />
       <source>Use the Parameter Loader Software by Fuji if you need to
 
 </source>
-      <translation type="unfinished" />
+      <translation>Use o Parameter Loader Software da Fuji se precisar
+
+</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1781" />
       <source>Continue?</source>
-      <translation type="unfinished" />
+      <translation>Continuar?</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3830" />
       <location filename="../artisanlib/pid_dialogs.py" line="3667" />
       <location filename="../artisanlib/pid_dialogs.py" line="1782" />
       <source>Ramp Soak start-end mode</source>
-      <translation type="unfinished" />
+      <translation>Modo de início e fim do Ramp Soak</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2661" />
       <source>Load PID Settings</source>
-      <translation type="unfinished" />
+      <translation>Carregar configurações de PID</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2749" />
       <source>Save PID Settings</source>
-      <translation type="unfinished" />
+      <translation>Salvar configurações de PID</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2957" />
       <source>Current sv = {0}. Change now to sv = {1}?</source>
-      <translation type="unfinished" />
+      <translation>SV atual = {0}. Mudar agora para sv = {1}?</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3040" />
       <location filename="../artisanlib/pid_dialogs.py" line="2958" />
       <source>Change svN</source>
-      <translation type="unfinished" />
+      <translation>Alterar svN</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3039" />
       <source>Current pid = {0}. Change now to pid ={1}?</source>
-      <translation type="unfinished" />
+      <translation>pid atual = {0}. Mude agora para pid ={1}?</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="2971" />
       <source>Phidget Temperature Sensor IR attached</source>
-      <translation type="unfinished" />
+      <translation>Sensor de temperatura Phidget IR conectado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="2974" />
       <source>Phidget Temperature Sensor 1-input attached</source>
-      <translation type="unfinished" />
+      <translation>Sensor de temperatura Phidget 1 entrada anexado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="2977" />
       <source>Phidget Isolated Thermocouple 1-input attached</source>
-      <translation type="unfinished" />
+      <translation>Termopar isolado Phidget de 1 entrada anexado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="2983" />
       <source>Phidget VINT RTD 1-input attached</source>
-      <translation type="unfinished" />
+      <translation>Phidget VINT RTD 1 entrada anexado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="2995" />
       <source>Phidget Temperature Sensor IR detached</source>
-      <translation type="unfinished" />
+      <translation>Sensor de temperatura Phidget IR desanexado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="2997" />
       <source>Phidget Temperature Sensor 1-input detached</source>
-      <translation type="unfinished" />
+      <translation>Sensor de temperatura Phidget 1 entrada separado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="2999" />
       <source>Phidget Isolated Thermocouple 1-input detached</source>
-      <translation type="unfinished" />
+      <translation>Fidget Isolado Termopar 1 entrada separado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="3001" />
       <source>Phidget VINT RTD 1-input detached</source>
-      <translation type="unfinished" />
+      <translation>Phidget VINT RTD 1 entrada separada</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="3287" />
       <source>Phidget Temperature Sensor 4-input attached</source>
-      <translation type="unfinished" />
+      <translation>Sensor de temperatura Phidget 4 entradas anexado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="3298" />
       <source>Phidget Temperature Sensor 4-input detached</source>
-      <translation type="unfinished" />
+      <translation>Sensor de temperatura Phidget de 4 entradas separado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="3599" />
       <source>Phidget 1046 attached</source>
-      <translation type="unfinished" />
+      <translation>Phidget 1046 anexado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="3601" />
       <source>Phidget DAQ1500 attached</source>
-      <translation type="unfinished" />
+      <translation>Phidget DAQ1500 anexado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="3613" />
       <source>Phidget 1046 detached</source>
-      <translation type="unfinished" />
+      <translation>Phidget 1046 separado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="3615" />
       <source>Phidget DAQ1500 detached</source>
-      <translation type="unfinished" />
+      <translation>Phidget DAQ1500 separado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5189" />
       <source>Phidget IO 2/2/2 attached</source>
-      <translation type="unfinished" />
+      <translation>Phidget IO 2/2/2 anexado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5191" />
       <source>Phidget IO 6/6/6 attached</source>
-      <translation type="unfinished" />
+      <translation>Phidget IO 6/6/6 anexado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5193" />
       <source>Phidget IO 8/8/8 attached</source>
-      <translation type="unfinished" />
+      <translation>Phidget IO 8/8/8 anexado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5195" />
       <source>Phidget DAQ1400 attached</source>
-      <translation type="unfinished" />
+      <translation>Phidget DAQ1400 anexado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5197" />
       <source>Phidget VCP1000 attached</source>
-      <translation type="unfinished" />
+      <translation>Phidget VCP1000 anexado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5199" />
       <source>Phidget VCP1001 attached</source>
-      <translation type="unfinished" />
+      <translation>Phidget VCP1001 anexado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5201" />
       <source>Phidget VCP1002 attached</source>
-      <translation type="unfinished" />
+      <translation>Phidget VCP1002 anexado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5203" />
       <source>Phidget IO attached</source>
-      <translation type="unfinished" />
+      <translation>Phidget IO anexado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5215" />
       <source>Phidget IO 2/2/2 detached</source>
-      <translation type="unfinished" />
+      <translation>Phidget IO 2/2/2 separado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5217" />
       <source>Phidget IO 6/6/6 detached</source>
-      <translation type="unfinished" />
+      <translation>Phidget IO 6/6/6 separado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5219" />
       <source>Phidget IO 8/8/8 detached</source>
-      <translation type="unfinished" />
+      <translation>Phidget IO 8/8/8 separado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5221" />
       <source>Phidget DAQ1400 detached</source>
-      <translation type="unfinished" />
+      <translation>Phidget DAQ1400 separado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5223" />
       <source>Phidget VCP1000 detached</source>
-      <translation type="unfinished" />
+      <translation>Phidget VCP1000 separado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5225" />
       <source>Phidget VCP1001 detached</source>
-      <translation type="unfinished" />
+      <translation>Phidget VCP1001 separado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5227" />
       <source>Phidget VCP1002 detached</source>
-      <translation type="unfinished" />
+      <translation>Phidget VCP1002 separado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5229" />
       <source>Phidget IO detached</source>
-      <translation type="unfinished" />
+      <translation>Phidget IO desanexado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5517" />
       <source>Yocto Thermocouple attached</source>
-      <translation type="unfinished" />
+      <translation>Termopar Yocto anexado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5519" />
       <source>Yocto IR attached</source>
-      <translation type="unfinished" />
+      <translation>Yocto IR anexado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5562" />
       <source>Yocto PT100 attached</source>
-      <translation type="unfinished" />
+      <translation>Yocto PT100 anexado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5649" />
       <location filename="../artisanlib/comm.py" line="5598" />
       <source>Yocto Sensor attached</source>
-      <translation type="unfinished" />
+      <translation>Sensor Yocto conectado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5604" />
       <source>Yocto Watt Power attached</source>
-      <translation type="unfinished" />
+      <translation>Yocto Watt Power anexado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5610" />
       <source>Yocto Watt Energy attached</source>
-      <translation type="unfinished" />
+      <translation>Yocto Watt Energy anexado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5622" />
       <source>Yocto Watt Voltage attached</source>
-      <translation type="unfinished" />
+      <translation>Tensão Yocto Watt anexada</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5634" />
       <source>Yocto Watt Current attached</source>
-      <translation type="unfinished" />
+      <translation>Yocto Watt atual anexado</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5911" />
       <source>TC4 initialized</source>
-      <translation type="unfinished" />
+      <translation>TC4 inicializado</translation>
     </message>
     <message>
       <location filename="../artisanlib/autosave.py" line="183" />
@@ -14883,33 +14733,33 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/autosave.py" line="188" />
       <source>Autosave OFF. Prefix: {0}</source>
-      <translation type="unfinished" />
+      <translation>Salvamento automático DESLIGADO. Prefixo: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23520" />
-      <location filename="../artisanlib/events.py" line="1588" />
+      <location filename="../artisanlib/main.py" line="23543" />
+      <location filename="../artisanlib/events.py" line="1590" />
       <source>Load Palettes</source>
       <translation>Carregar paletas</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2514" />
+      <location filename="../artisanlib/events.py" line="2518" />
       <source>Event Button table copied to clipboard</source>
-      <translation type="unfinished" />
+      <translation>Tabela de botões de evento copiada para a área de transferência</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3252" />
+      <location filename="../artisanlib/events.py" line="3256" />
       <source>Event configuration saved</source>
       <translation type="unfinished">Configuração de evento gravada</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3255" />
+      <location filename="../artisanlib/events.py" line="3259" />
       <source>Found empty event type box</source>
       <translation type="unfinished">Foi encontrada uma caixa de evento vazio</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1923" />
+      <location filename="../artisanlib/ports.py" line="1928" />
       <source>Serial Port Settings: {0}, {1}, {2}, {3}, {4}, {5}</source>
-      <translation type="unfinished" />
+      <translation>Configurações da porta serial: {0}, {1}, {2}, {3}, {4}, {5}</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="278" />
@@ -14919,7 +14769,7 @@ Repeat Operation at the end: {0}</source>
       <location filename="../artisanlib/background.py" line="967" />
       <location filename="../artisanlib/background.py" line="458" />
       <source>Data table copied to clipboard</source>
-      <translation type="unfinished" />
+      <translation>Tabela de dados copiada para a área de transferência</translation>
     </message>
     <message>
       <location filename="../artisanlib/background.py" line="489" />
@@ -14929,41 +14779,41 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/background.py" line="531" />
       <source>Playback DROP set ON</source>
-      <translation type="unfinished" />
+      <translation>Reprodução DROP definido como ON</translation>
     </message>
     <message>
       <location filename="../artisanlib/background.py" line="551" />
       <source>Playback Aid set ON at {0} secs</source>
-      <translation type="unfinished" />
+      <translation>Auxiliar de reprodução ativado em {0} segundos</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10263" />
       <location filename="../artisanlib/background.py" line="709" />
       <source>Load Background</source>
-      <translation type="unfinished" />
+      <translation>Carregar plano de fundo</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11691" />
+      <location filename="../artisanlib/main.py" line="11714" />
       <location filename="../artisanlib/background.py" line="712" />
       <source>Reading background profile...</source>
-      <translation type="unfinished" />
+      <translation>Lendo perfil de fundo...</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="4227" />
       <location filename="../artisanlib/background.py" line="972" />
       <source>Event table copied to clipboard</source>
-      <translation type="unfinished" />
+      <translation>Tabela de eventos copiada para a área de transferência</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="3462" />
       <source>The 0% value must be less than the 100% value.</source>
-      <translation type="unfinished" />
+      <translation>O valor de 0% deve ser menor que o valor de 100%.</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="4298" />
       <location filename="../artisanlib/roast_properties.py" line="4294" />
       <source>Alarms from events #{0} created</source>
-      <translation type="unfinished" />
+      <translation>Alarmes de eventos #{0} criados</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="4374" />
@@ -14984,7 +14834,7 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="4362" />
       <source> Events #{0} deleted</source>
-      <translation type="unfinished" />
+      <translation> Eventos #{0} excluídos</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="4368" />
@@ -14999,22 +14849,22 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/phases.py" line="359" />
       <source>Phases changed to {0} default: {1}</source>
-      <translation type="unfinished" />
+      <translation>Fases alteradas para {0} padrão: {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/modbusport.py" line="211" />
       <source>MODBUS disconnected</source>
-      <translation type="unfinished" />
+      <translation>MODBUS desconectado</translation>
     </message>
     <message>
-      <location filename="../artisanlib/modbusport.py" line="346" />
+      <location filename="../artisanlib/modbusport.py" line="352" />
       <source>Connected via MODBUS</source>
-      <translation type="unfinished" />
+      <translation>Conectado via MODBUS</translation>
     </message>
     <message>
       <location filename="../artisanlib/designer.py" line="321" />
       <source>Not enough time points for an ET curviness of {0}. Set curviness to {1}</source>
-      <translation type="unfinished" />
+      <translation>Pontos de tempo insuficientes para uma curvatura ET de {0}. Definir curvas para {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/designer.py" line="563" />
@@ -15028,7 +14878,7 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/designer.py" line="328" />
       <source>Not enough time points for an BT curviness of {0}. Set curviness to {1}</source>
-      <translation type="unfinished" />
+      <translation>Pontos de tempo insuficientes para uma curvatura BT de {0}. Defina a curvatura como {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/designer.py" line="555" />
@@ -15104,62 +14954,62 @@ Repeat Operation at the end: {0}</source>
       <location filename="../artisanlib/pid_control.py" line="660" />
       <location filename="../artisanlib/pid_control.py" line="646" />
       <source>RS on HOLD</source>
-      <translation type="unfinished" />
+      <translation>RS em ESPERA</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="750" />
       <source>PXG/PXF sv#{0} set to {1}</source>
-      <translation type="unfinished" />
+      <translation>PXG/PXF sv#{0} definido como {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="779" />
       <source>PXR sv set to {0}</source>
-      <translation type="unfinished" />
+      <translation>PXR sv definido como {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="828" />
       <source>SV{0} changed from {1} to {2})</source>
-      <translation type="unfinished" />
+      <translation>SV{0} alterado de {1} para {2})</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="838" />
       <source>Unable to set sv{0}</source>
-      <translation type="unfinished" />
+      <translation>Não foi possível definir sv{0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="850" />
       <source>SV changed from {0} to {1}</source>
-      <translation type="unfinished" />
+      <translation>SV alterado de {0} para {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="860" />
       <source>Unable to set sv</source>
-      <translation type="unfinished" />
+      <translation>Não é possível definir sv</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="862" />
       <source>Unable to set new sv</source>
-      <translation type="unfinished" />
+      <translation>Não é possível definir novo sv</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="1342" />
       <source>PID turned on</source>
-      <translation type="unfinished" />
+      <translation>PID ativado</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="1364" />
       <source>PID OFF</source>
-      <translation type="unfinished" />
+      <translation>PID DESLIGADO</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="1390" />
       <source>PID turned off</source>
-      <translation type="unfinished" />
+      <translation>PID desligado</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="1459" />
       <source>Ramp/Soak pattern finished</source>
-      <translation type="unfinished" />
+      <translation>Padrão de rampa/saturação concluído</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="1717" />
@@ -15167,41 +15017,41 @@ Repeat Operation at the end: {0}</source>
       <location filename="../artisanlib/pid_control.py" line="1679" />
       <location filename="../artisanlib/pid_control.py" line="1673" />
       <source>p-i-d values updated</source>
-      <translation type="unfinished" />
+      <translation>valores p-i-d atualizados</translation>
     </message>
     <message>
       <location filename="../artisanlib/sampling.py" line="35" />
       <source>Sampling</source>
-      <translation type="unfinished" />
+      <translation>Amostragem</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21592" />
-      <location filename="../artisanlib/main.py" line="12156" />
+      <location filename="../artisanlib/main.py" line="21615" />
+      <location filename="../artisanlib/main.py" line="12179" />
       <location filename="../artisanlib/sampling.py" line="120" />
       <source>Warning</source>
-      <translation type="unfinished" />
+      <translation>Aviso</translation>
     </message>
     <message>
       <location filename="../artisanlib/sampling.py" line="121" />
       <source>A tight sampling interval might lead to instability on some machines. We suggest a minimum of 1s.</source>
-      <translation type="unfinished" />
+      <translation>Um intervalo de amostragem apertado pode levar à instabilidade em algumas máquinas. Sugerimos um mínimo de 1s.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23961" />
+      <location filename="../artisanlib/main.py" line="23984" />
       <location filename="../artisanlib/curves.py" line="1658" />
       <source>Incompatible variables found in %s</source>
-      <translation type="unfinished" />
+      <translation>Variáveis incompatíveis encontradas em %s</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23962" />
+      <location filename="../artisanlib/main.py" line="23985" />
       <location filename="../artisanlib/curves.py" line="1659" />
       <source>Assignment problem</source>
-      <translation type="unfinished" />
+      <translation>problema de atribuição</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1694" />
       <source>New Extra Device: virtual: y1(x) =[%s]; y2(x)=[%s]</source>
-      <translation type="unfinished" />
+      <translation>Novo dispositivo extra: virtual: y1(x) =[%s]; y2(x)=[%s]</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="2196" />
@@ -15221,156 +15071,158 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/s7port.py" line="412" />
       <source>S7 connected</source>
-      <translation type="unfinished" />
+      <translation>S7 conectado</translation>
     </message>
     <message>
       <location filename="../artisanlib/s7port.py" line="432" />
       <source>S7 Connected</source>
-      <translation type="unfinished" />
+      <translation>S7 conectado</translation>
     </message>
     <message>
       <location filename="../artisanlib/s7port.py" line="438" />
       <source>S7 connection failed</source>
-      <translation type="unfinished" />
+      <translation>Falha na conexão S7</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10276" />
       <location filename="../artisanlib/alarms.py" line="608" />
       <source>Load Alarms</source>
-      <translation type="unfinished" />
+      <translation>Carregar Alarmes</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="649" />
       <source>Error loading alarm file</source>
-      <translation type="unfinished" />
+      <translation>Erro ao carregar arquivo de alarme</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="654" />
       <source>Save Alarms</source>
-      <translation type="unfinished" />
+      <translation>Salvar Alarmes</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="1103" />
       <source>Alarm table copied to clipboard</source>
-      <translation type="unfinished" />
+      <translation>Tabela de alarmes copiada para a área de transferência</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="336" />
       <location filename="../artisanlib/main.py" line="318" />
       <source>URL open profile: {0}</source>
-      <translation type="unfinished" />
+      <translation>URL de perfil aberto: {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="973" />
       <source>follow on</source>
-      <translation type="unfinished" />
+      <translation>seguir em frente</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="975" />
       <source>follow off</source>
-      <translation type="unfinished" />
+      <translation>seguir</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="1199" />
       <source>Subscription</source>
-      <translation type="unfinished" />
+      <translation>Inscrição</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3827" />
       <source>Welcome to version {0} of Artisan!</source>
-      <translation type="unfinished" />
+      <translation>Bem-vindo à versão {0} do Artisan!</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3828" />
       <source>This is a one time message to inform you about a change in Artisan.</source>
-      <translation type="unfinished" />
+      <translation>Esta é uma mensagem única para informá-lo sobre uma mudança no Artisan.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3829" />
       <source>If you never run older versions of Artisan you can skip this message, the change does not affect you.</source>
-      <translation type="unfinished" />
+      <translation>Se você nunca executou versões mais antigas do Artisan, pode pular esta mensagem, a alteração não afeta você.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3830" />
       <source>Artisan preserves all your configuration settings when you exit so they will automatically be available the next time you start Artisan.</source>
-      <translation type="unfinished" />
+      <translation>O Artisan preserva todas as suas definições de configuração quando você sai, para que elas estejam automaticamente disponíveis na próxima vez que você iniciar o Artisan.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3831" />
       <source>Beginning with release v2.0, settings will no longer be automatically shared at start-up with versions before v2.0.</source>
-      <translation type="unfinished" />
+      <translation>A partir da versão v2.0, as configurações não serão mais compartilhadas automaticamente na inicialização com versões anteriores à v2.0.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3832" />
       <source>Do not worry. Since this is the first time you opened this new version Artisan has already loaded your last used settings.</source>
-      <translation type="unfinished" />
+      <translation>Não se preocupe. Como esta é a primeira vez que você abriu esta nova versão, o Artisan já carregou suas últimas configurações usadas.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3833" />
       <source>To share settings between this version and Artisan versions before v2.0 use 'Help&gt;Save Settings' and 'Help&gt;Load Settings'.</source>
-      <translation type="unfinished" />
+      <translation>Para compartilhar as configurações entre esta versão e as versões do Artisan anteriores à v2.0, use 'Ajuda&gt;Salvar configurações' e 'Ajuda&gt;Carregar configurações'.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3834" />
       <source>Enjoy using Artisan, The Artisan Team</source>
-      <translation type="unfinished" />
+      <translation>Divirta-se usando Artisan, The Artisan Team</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3835" />
       <source>One time message about loading settings at start-up</source>
-      <translation type="unfinished" />
+      <translation>Mensagem única sobre o carregamento das configurações na inicialização</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3839" />
       <source>Welcome to the ArtisanViewer!</source>
-      <translation type="unfinished" />
+      <translation>Bem-vindo ao ArtisanViewer!</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3840" />
       <source>This is a one time message to introduce you to the ArtisanViewer.</source>
-      <translation type="unfinished" />
+      <translation>Esta é uma mensagem única para apresentá-lo ao ArtisanViewer.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3841" />
       <source>The ArtisanViewer opens whenever a copy of Artisan is already running.</source>
-      <translation type="unfinished" />
+      <translation>O ArtisanViewer é aberto sempre que uma cópia do Artisan já estiver em execução.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3842" />
       <source>ArtisanViewer will preserve all your configuration settings when you exit so they will automatically be available the next time you start ArtisanViewer.</source>
-      <translation type="unfinished" />
+      <translation>O ArtisanViewer preservará todas as suas definições de configuração quando você sair, para que elas estejam automaticamente disponíveis na próxima vez que você iniciar o ArtisanViewer.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3843" />
       <source>Caution, the only way to share settings between Artisan and ArtisanViewer is to explicitly save and load them using 'Help&gt;Save Settings' and 'Help&gt;Load Settings'.</source>
-      <translation type="unfinished" />
+      <translation>Cuidado, a única forma de compartilhar as configurações entre o Artisan e o ArtisanViewer é salvá-las e carregá-las explicitamente usando 'Ajuda&gt;Salvar configurações' e 'Ajuda&gt;Carregar configurações'.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3844" />
       <source>Enjoy using ArtisanViewer,</source>
-      <translation type="unfinished" />
+      <translation>Divirta-se usando o ArtisanViewer,</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3845" />
       <source>The Artisan Team</source>
-      <translation type="unfinished" />
+      <translation>A equipe do artesão</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3846" />
       <source>One time message about ArtisanViewer</source>
-      <translation type="unfinished" />
+      <translation>Mensagem única sobre o ArtisanViewer</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="4181" />
       <source>Artisan is free to use!
 
 To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
-      <translation type="unfinished" />
+      <translation>O uso do Artisan é gratuito!
+
+Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o craft.plus para suprimir este diálogo!</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="4921" />
       <source>Configure for&lt;br&gt;{0}?&lt;br&gt;&lt;br&gt;Your current settings will be overwritten!&lt;br&gt;&lt;br&gt;It is advisable to save your current settings beforehand via menu Help &gt;&gt; Save Settings.</source>
-      <translation type="unfinished" />
+      <translation>Configurar para&lt;br&gt;{0}?&lt;br&gt;&lt;br&gt;Suas configurações atuais serão substituídas!&lt;br&gt;&lt;br&gt;É aconselhável salvar suas configurações atuais com antecedência através do menu Ajuda &gt;&gt; Salvar configurações.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="4922" />
@@ -15385,7 +15237,7 @@ To keep it free and current please support us with your donation and subscribe t
     <message>
       <location filename="../artisanlib/main.py" line="4948" />
       <source>Elevation (MASL)</source>
-      <translation type="unfinished" />
+      <translation>Elevação (MASL)</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="6260" />
@@ -15423,52 +15275,52 @@ To keep it free and current please support us with your donation and subscribe t
     <message>
       <location filename="../artisanlib/main.py" line="5027" />
       <source>Machine Capacity (kg)</source>
-      <translation type="unfinished" />
+      <translation>Capacidade da máquina (kg)</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="5079" />
       <source>Energy loads configured for {0} {1}kg</source>
-      <translation type="unfinished" />
+      <translation>Cargas de energia configuradas para {0} {1}kg</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="5080" />
       <source>Artisan configured for {0}</source>
-      <translation type="unfinished" />
+      <translation>Artesão configurado para {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21907" />
+      <location filename="../artisanlib/main.py" line="21930" />
       <location filename="../artisanlib/main.py" line="5130" />
       <source>Load theme {0}?</source>
-      <translation type="unfinished" />
+      <translation>Carregar tema {0}?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21908" />
+      <location filename="../artisanlib/main.py" line="21931" />
       <location filename="../artisanlib/main.py" line="5131" />
       <source>Adjust Theme Related Settings</source>
-      <translation type="unfinished" />
+      <translation>Ajustar configurações relacionadas ao tema</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21914" />
+      <location filename="../artisanlib/main.py" line="21937" />
       <location filename="../artisanlib/main.py" line="5137" />
       <source>Loaded theme {0}</source>
-      <translation type="unfinished" />
+      <translation>Tema carregado {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="5329" />
       <source>Detected a color pair that may be hard to see: </source>
-      <translation type="unfinished" />
+      <translation>Detectado um par de cores que pode ser difícil de ver:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24131" />
-      <location filename="../artisanlib/main.py" line="24090" />
+      <location filename="../artisanlib/main.py" line="24154" />
+      <location filename="../artisanlib/main.py" line="24113" />
       <location filename="../artisanlib/main.py" line="5921" />
       <source>Simulator started @{}x</source>
-      <translation type="unfinished" />
+      <translation>Simulador iniciado @{}x</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="5932" />
       <source>super on</source>
-      <translation type="unfinished" />
+      <translation>super ligado</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="5934" />
@@ -15478,47 +15330,47 @@ To keep it free and current please support us with your donation and subscribe t
     <message>
       <location filename="../artisanlib/main.py" line="8055" />
       <source>Pulse out of range (%d)</source>
-      <translation type="unfinished" />
+      <translation>Pulso fora da faixa (%d)</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="8572" />
       <source>Alarms on</source>
-      <translation type="unfinished" />
+      <translation>Alarmes ativados</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="8575" />
       <source>Alarms off</source>
-      <translation type="unfinished" />
+      <translation>Alarmes desligados</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="8584" />
       <source>autoCHARGE on</source>
-      <translation type="unfinished" />
+      <translation>autoCHARGE ativado</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="8587" />
       <source>autoCHARGE off</source>
-      <translation type="unfinished" />
+      <translation>autoCHARGE desligado</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="8596" />
       <source>autoDROP on</source>
-      <translation type="unfinished" />
+      <translation>autoDROP ativado</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="8599" />
       <source>autoDROP off</source>
-      <translation type="unfinished" />
+      <translation>Desligamento automático</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21606" />
+      <location filename="../artisanlib/main.py" line="21629" />
       <location filename="../artisanlib/main.py" line="8644" />
       <location filename="../artisanlib/main.py" line="8625" />
       <source>PID set to OFF</source>
       <translation type="unfinished">PID definido para DESL</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21610" />
+      <location filename="../artisanlib/main.py" line="21633" />
       <location filename="../artisanlib/main.py" line="8641" />
       <location filename="../artisanlib/main.py" line="8633" />
       <source>PID set to ON</source>
@@ -15528,39 +15380,39 @@ To keep it free and current please support us with your donation and subscribe t
       <location filename="../artisanlib/main.py" line="8668" />
       <location filename="../artisanlib/main.py" line="8656" />
       <source>PID mode manual</source>
-      <translation type="unfinished" />
+      <translation>Manual do modo PID</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="8671" />
       <location filename="../artisanlib/main.py" line="8660" />
       <source>PID mode Ramp/Soak</source>
-      <translation type="unfinished" />
+      <translation>Rampa/Soak do modo PID</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="8674" />
       <location filename="../artisanlib/main.py" line="8664" />
       <source>PID mode background</source>
-      <translation type="unfinished" />
+      <translation>plano de fundo do modo PID</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="8684" />
       <source>playback off</source>
-      <translation type="unfinished" />
+      <translation>reprodução desligada</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="8688" />
       <source>playback by time</source>
-      <translation type="unfinished" />
+      <translation>reprodução por tempo</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="8692" />
       <source>playback by BT</source>
-      <translation type="unfinished" />
+      <translation>reprodução por BT</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="8696" />
       <source>playback by ET</source>
-      <translation type="unfinished" />
+      <translation>reprodução por ET</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="8759" />
@@ -15585,22 +15437,22 @@ To keep it free and current please support us with your donation and subscribe t
     <message>
       <location filename="../artisanlib/main.py" line="9001" />
       <source>Keep ON enabled</source>
-      <translation type="unfinished" />
+      <translation>Manter ativado ativado</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="9004" />
       <source>Keep ON disable</source>
-      <translation type="unfinished" />
+      <translation>Manter ON desativar</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="9565" />
       <source>Do you want to reset all settings?&lt;br&gt; ArtisanViewer has to be restarted!</source>
-      <translation type="unfinished" />
+      <translation>Deseja redefinir todas as configurações?&lt;br&gt; O ArtisanViewer deve ser reiniciado!</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="9567" />
       <source>Do you want to reset all settings?&lt;br&gt; Artisan has to be restarted!</source>
-      <translation type="unfinished" />
+      <translation>Deseja redefinir todas as configurações?&lt;br&gt; O Artisan precisa ser reiniciado!</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="9568" />
@@ -15610,35 +15462,35 @@ To keep it free and current please support us with your donation and subscribe t
     <message>
       <location filename="../artisanlib/main.py" line="10237" />
       <source>Auto Axis Graph Mode: Roast</source>
-      <translation type="unfinished" />
+      <translation>Modo de gráfico de eixo automático: Roast</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10239" />
       <source>Auto Axis Graph Mode: BBP+Roast</source>
-      <translation type="unfinished" />
+      <translation>Modo de gráfico de eixo automático: BBP + Roast</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10241" />
       <source>Auto Axis Graph Mode: BBP</source>
-      <translation type="unfinished" />
+      <translation>Modo de gráfico de eixo automático: BBP</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10307" />
       <location filename="../artisanlib/main.py" line="10291" />
       <source>PID Mode: Ramp/Soak</source>
-      <translation type="unfinished" />
+      <translation>Modo PID: Rampa/Soak</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10309" />
       <location filename="../artisanlib/main.py" line="10296" />
       <source>PID Mode: Background</source>
-      <translation type="unfinished" />
+      <translation>Modo PID: Plano de fundo</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10305" />
       <location filename="../artisanlib/main.py" line="10300" />
       <source>PID Mode: Manual</source>
-      <translation type="unfinished" />
+      <translation>Modo PID: Manual</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10366" />
@@ -15653,17 +15505,17 @@ To keep it free and current please support us with your donation and subscribe t
     <message>
       <location filename="../artisanlib/main.py" line="10430" />
       <source>LCD cursor on profile data</source>
-      <translation type="unfinished" />
+      <translation>Cursor LCD nos dados do perfil</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10433" />
       <source>LCD cursor on template data</source>
-      <translation type="unfinished" />
+      <translation>Cursor LCD nos dados do modelo</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10436" />
       <source>LCD cursor OFF</source>
-      <translation type="unfinished" />
+      <translation>Cursor LCD DESLIGADO</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10679" />
@@ -15676,591 +15528,592 @@ To keep it free and current please support us with your donation and subscribe t
       <translation>Ações de teclado DESLIGADAS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="10966" />
+      <location filename="../artisanlib/main.py" line="10989" />
       <source>Profile {0} saved in: {1}</source>
       <translation>Perfil {0} gravado em: {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11000" />
+      <location filename="../artisanlib/main.py" line="11023" />
       <source>Autosave path does not exist. Autosave failed.</source>
-      <translation type="unfinished" />
+      <translation>O caminho de salvamento automático não existe. O salvamento automático falhou.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11003" />
+      <location filename="../artisanlib/main.py" line="11026" />
       <source>Empty path or box unchecked in Autosave</source>
       <translation>Caminho vazio ou opção Auto-salvar desabilitada</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11117" />
+      <location filename="../artisanlib/main.py" line="11140" />
       <source>Event #{0}:  {1} has been updated</source>
       <translation>Evento #{0}:  {1} foi atualizado</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11192" />
+      <location filename="../artisanlib/main.py" line="11215" />
       <source>Select</source>
       <translation type="unfinished">Selecionar</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11217" />
-      <location filename="../artisanlib/main.py" line="11206" />
+      <location filename="../artisanlib/main.py" line="11240" />
+      <location filename="../artisanlib/main.py" line="11229" />
       <source>Open</source>
       <translation type="unfinished">Abrir</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11219" />
+      <location filename="../artisanlib/main.py" line="11242" />
       <source>URL</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11237" />
+      <location filename="../artisanlib/main.py" line="11260" />
       <source>Save</source>
       <translation>Salvar</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11248" />
+      <location filename="../artisanlib/main.py" line="11271" />
       <source>Select Directory</source>
       <translation>Selecionar pasta</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11289" />
+      <location filename="../artisanlib/main.py" line="11312" />
       <source>NEW ROAST canceled: incomplete profile lacking CHARGE and DROP found</source>
-      <translation type="unfinished" />
+      <translation>NEW ROAST cancelado: perfil incompleto sem CHARGE e DROP encontrado</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11294" />
+      <location filename="../artisanlib/main.py" line="11317" />
       <source>NEW ROAST canceled: incomplete profile lacking DROP found</source>
-      <translation type="unfinished" />
+      <translation>NEW ROAST cancelado: perfil incompleto sem DROP encontrado</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11304" />
+      <location filename="../artisanlib/main.py" line="11327" />
       <source>{0} has been saved. New roast has started</source>
       <translation>{0} foi gravado. Uma nova torra foi iniciada</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24134" />
-      <location filename="../artisanlib/main.py" line="11895" />
-      <location filename="../artisanlib/main.py" line="11341" />
+      <location filename="../artisanlib/main.py" line="24157" />
+      <location filename="../artisanlib/main.py" line="11918" />
+      <location filename="../artisanlib/main.py" line="11364" />
       <source>Invalid artisan format</source>
       <translation>Formato do Artisan inválido</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11423" />
+      <location filename="../artisanlib/main.py" line="11446" />
       <source>{0}  loaded </source>
       <translation>{0} carregado </translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11564" />
+      <location filename="../artisanlib/main.py" line="11587" />
       <source>No profile data.  ET/BT not recalculated</source>
-      <translation type="unfinished" />
+      <translation>Sem dados de perfil. ET/BT não recalculado</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11567" />
+      <location filename="../artisanlib/main.py" line="11590" />
       <source>Problem with the profile data.  ET/BT not recalculated</source>
-      <translation type="unfinished" />
+      <translation>Problema com os dados do perfil. ET/BT não recalculado</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11889" />
+      <location filename="../artisanlib/main.py" line="11912" />
       <source>Background {0} loaded successfully {1}</source>
       <translation>Plano de fundo {0} carregado com sucesso {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="12014" />
+      <location filename="../artisanlib/main.py" line="12037" />
       <source>Artisan CSV file loaded successfully</source>
       <translation>Arquivo CSV do Artisan carregado com sucesso</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="12156" />
+      <location filename="../artisanlib/main.py" line="12179" />
       <source>The Probat Shop Pilot Software expects files named &lt;Name&gt;_&lt;Index&gt;.xml like in Test_0.xml on import</source>
-      <translation type="unfinished" />
+      <translation>O Probat Shop Pilot Software espera arquivos nomeados &lt;Name&gt;_&lt;Index&gt;.xml como em Test_0.xml na importação</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="14680" />
+      <location filename="../artisanlib/main.py" line="14703" />
       <source>Save Profile</source>
       <translation>Salvar perfil</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="14699" />
+      <location filename="../artisanlib/main.py" line="14722" />
       <source>Profile saved</source>
       <translation>Perfil gravado</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21964" />
-      <location filename="../artisanlib/main.py" line="21894" />
-      <location filename="../artisanlib/main.py" line="21826" />
-      <location filename="../artisanlib/main.py" line="21754" />
-      <location filename="../artisanlib/main.py" line="15069" />
-      <location filename="../artisanlib/main.py" line="14750" />
-      <location filename="../artisanlib/main.py" line="14734" />
-      <location filename="../artisanlib/main.py" line="14732" />
+      <location filename="../artisanlib/main.py" line="21987" />
+      <location filename="../artisanlib/main.py" line="21917" />
+      <location filename="../artisanlib/main.py" line="21849" />
+      <location filename="../artisanlib/main.py" line="21777" />
+      <location filename="../artisanlib/main.py" line="15092" />
+      <location filename="../artisanlib/main.py" line="14773" />
+      <location filename="../artisanlib/main.py" line="14757" />
+      <location filename="../artisanlib/main.py" line="14755" />
       <source>Cancelled</source>
       <translation>Cancelado</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="14748" />
+      <location filename="../artisanlib/main.py" line="14771" />
       <source>Readings exported</source>
       <translation>Leituras exportadas</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="14759" />
+      <location filename="../artisanlib/main.py" line="14782" />
       <source>Export Excel</source>
-      <translation type="unfinished" />
+      <translation>Exportar Excel</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="14764" />
+      <location filename="../artisanlib/main.py" line="14787" />
       <source>Export CSV</source>
       <translation>Exportar CSV</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="14769" />
+      <location filename="../artisanlib/main.py" line="14792" />
       <source>Export JSON</source>
       <translation>Exportar JSON</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="14774" />
+      <location filename="../artisanlib/main.py" line="14797" />
       <source>Export RoastLogger</source>
       <translation>Exportar RoastLogger</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="14779" />
+      <location filename="../artisanlib/main.py" line="14802" />
       <source>Export Probat Pilot</source>
-      <translation type="unfinished" />
+      <translation>Exportar Probat Pilot</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15027" />
-      <location filename="../artisanlib/main.py" line="14976" />
-      <location filename="../artisanlib/main.py" line="14936" />
-      <location filename="../artisanlib/main.py" line="14875" />
-      <location filename="../artisanlib/main.py" line="14789" />
+      <location filename="../artisanlib/main.py" line="15050" />
+      <location filename="../artisanlib/main.py" line="14999" />
+      <location filename="../artisanlib/main.py" line="14959" />
+      <location filename="../artisanlib/main.py" line="14898" />
+      <location filename="../artisanlib/main.py" line="14812" />
       <source>Converting...</source>
-      <translation type="unfinished" />
+      <translation>Convertendo...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15047" />
-      <location filename="../artisanlib/main.py" line="14996" />
-      <location filename="../artisanlib/main.py" line="14956" />
-      <location filename="../artisanlib/main.py" line="14905" />
-      <location filename="../artisanlib/main.py" line="14809" />
+      <location filename="../artisanlib/main.py" line="15070" />
+      <location filename="../artisanlib/main.py" line="15019" />
+      <location filename="../artisanlib/main.py" line="14979" />
+      <location filename="../artisanlib/main.py" line="14928" />
+      <location filename="../artisanlib/main.py" line="14832" />
       <source>Target file {0} exists. {1} not converted.</source>
-      <translation type="unfinished" />
+      <translation>O arquivo de destino {0} existe. {1} não convertido.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15067" />
+      <location filename="../artisanlib/main.py" line="15090" />
       <source>Readings imported</source>
       <translation>Leituras importadas</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15090" />
+      <location filename="../artisanlib/main.py" line="15113" />
       <source>Import Artisan URL</source>
-      <translation type="unfinished" />
+      <translation>URL do artesão de importação</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15097" />
+      <location filename="../artisanlib/main.py" line="15120" />
       <source>Import CSV</source>
       <translation>Importar CSV</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15102" />
+      <location filename="../artisanlib/main.py" line="15125" />
       <source>Import JSON</source>
       <translation>Importar JSON</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15107" />
+      <location filename="../artisanlib/main.py" line="15130" />
       <source>Import RoastLogger</source>
       <translation>Importar RoastLogger</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15155" />
+      <location filename="../artisanlib/main.py" line="15178" />
       <source>Batch Counter</source>
       <translation type="unfinished">Contador de Lote</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15158" />
+      <location filename="../artisanlib/main.py" line="15181" />
       <source>Load Settings canceled</source>
-      <translation type="unfinished" />
+      <translation>Carregar configurações canceladas</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="18686" />
+      <location filename="../artisanlib/main.py" line="18709" />
       <source>No statistics found</source>
-      <translation type="unfinished" />
+      <translation>Nenhuma estatística encontrada</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="18700" />
+      <location filename="../artisanlib/main.py" line="18723" />
       <source>Save Statistics</source>
-      <translation type="unfinished" />
+      <translation>Salvar estatísticas</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="18705" />
+      <location filename="../artisanlib/main.py" line="18728" />
       <source>Statistics Saved</source>
-      <translation type="unfinished" />
+      <translation>Estatísticas salvas</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="18857" />
+      <location filename="../artisanlib/main.py" line="18880" />
       <source>Excel Production Report exported to {0}</source>
-      <translation type="unfinished" />
+      <translation>Relatório de produção do Excel exportado para {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19636" />
+      <location filename="../artisanlib/main.py" line="19659" />
       <source>Ranking Report</source>
-      <translation type="unfinished" />
+      <translation>Relatório de classificação</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19637" />
+      <location filename="../artisanlib/main.py" line="19660" />
       <source>Ranking graphs are only generated up to {0} profiles</source>
-      <translation type="unfinished" />
+      <translation>Os gráficos de classificação são gerados apenas até {0} perfis</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19848" />
+      <location filename="../artisanlib/main.py" line="19871" />
       <source>Profile missing DRY event</source>
-      <translation type="unfinished" />
+      <translation>Evento DRY ausente no perfil</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19863" />
+      <location filename="../artisanlib/main.py" line="19886" />
       <source>Profile missing phase events</source>
-      <translation type="unfinished" />
+      <translation>Perfilar eventos de fase ausentes</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19993" />
+      <location filename="../artisanlib/main.py" line="20016" />
       <source>CSV Ranking Report exported to {0}</source>
-      <translation type="unfinished" />
+      <translation>Relatório de classificação CSV exportado para {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20211" />
+      <location filename="../artisanlib/main.py" line="20234" />
       <source>Excel Ranking Report exported to {0}</source>
-      <translation type="unfinished" />
+      <translation>Relatório de classificação do Excel exportado para {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21572" />
+      <location filename="../artisanlib/main.py" line="21595" />
       <source>Hottop control turned off</source>
-      <translation type="unfinished" />
+      <translation>Controle Hottop desligado</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21589" />
+      <location filename="../artisanlib/main.py" line="21612" />
       <source>Hottop control turned on</source>
-      <translation type="unfinished" />
+      <translation>Controle Hottop ativado</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21592" />
+      <location filename="../artisanlib/main.py" line="21615" />
       <source>To control a Hottop you need to activate the super user mode via a right click on the timer LCD first!</source>
-      <translation type="unfinished" />
+      <translation>Para controlar um Hottop, primeiro você precisa ativar o modo superusuário clicando com o botão direito no LCD do timer!</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21866" />
-      <location filename="../artisanlib/main.py" line="21798" />
+      <location filename="../artisanlib/main.py" line="21889" />
+      <location filename="../artisanlib/main.py" line="21821" />
       <source>Settings not found</source>
-      <translation type="unfinished" />
+      <translation>Configurações não encontradas</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21805" />
+      <location filename="../artisanlib/main.py" line="21828" />
       <source>artisan-settings</source>
-      <translation type="unfinished" />
+      <translation>configurações artesanais</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21806" />
+      <location filename="../artisanlib/main.py" line="21829" />
       <source>Save Settings</source>
-      <translation type="unfinished" />
+      <translation>Salvar configurações</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21811" />
+      <location filename="../artisanlib/main.py" line="21834" />
       <source>Settings saved</source>
-      <translation type="unfinished" />
+      <translation>Configurações salvas</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21873" />
+      <location filename="../artisanlib/main.py" line="21896" />
       <source>artisan-theme</source>
-      <translation type="unfinished" />
+      <translation>tema artesanal</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21874" />
+      <location filename="../artisanlib/main.py" line="21897" />
       <source>Save Theme</source>
-      <translation type="unfinished" />
+      <translation>Salvar tema</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21877" />
+      <location filename="../artisanlib/main.py" line="21900" />
       <source>Theme saved</source>
-      <translation type="unfinished" />
+      <translation>Tema salvo</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21905" />
+      <location filename="../artisanlib/main.py" line="21928" />
       <source>Load Theme</source>
-      <translation type="unfinished" />
+      <translation>Carregar tema</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21931" />
+      <location filename="../artisanlib/main.py" line="21954" />
       <source>Theme loaded</source>
-      <translation type="unfinished" />
+      <translation>Tema carregado</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22257" />
+      <location filename="../artisanlib/main.py" line="22280" />
       <source>Alarm Config</source>
       <translation>Configuração de alarme</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22258" />
+      <location filename="../artisanlib/main.py" line="22281" />
       <source>Alarms are not available for device None</source>
       <translation>Não há disponibilidade de alarmes para o dispositivo NONE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22275" />
+      <location filename="../artisanlib/main.py" line="22298" />
       <source>Switching the language needs a restart. Restart now?</source>
-      <translation type="unfinished" />
+      <translation>Mudar o idioma precisa de uma reinicialização. Reinicie agora?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22276" />
+      <location filename="../artisanlib/main.py" line="22299" />
       <source>Restart</source>
-      <translation type="unfinished" />
+      <translation>Reiniciar</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22314" />
+      <location filename="../artisanlib/main.py" line="22337" />
       <source>Import K202 CSV</source>
       <translation>Importar K202 CSV</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22364" />
+      <location filename="../artisanlib/main.py" line="22387" />
       <source>K202 file loaded successfully</source>
       <translation>Arquivo K202 carregado com sucesso</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22380" />
+      <location filename="../artisanlib/main.py" line="22403" />
       <source>Import K204 CSV</source>
       <translation>Importar K204 CSV</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22444" />
+      <location filename="../artisanlib/main.py" line="22467" />
       <source>K204 file loaded successfully</source>
       <translation>Arquivo K204 carregado com sucesso</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22474" />
+      <location filename="../artisanlib/main.py" line="22497" />
       <source>Import Probat Recipe</source>
-      <translation type="unfinished" />
+      <translation>Importar Receita Probat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22647" />
+      <location filename="../artisanlib/main.py" line="22670" />
       <source>Probat Pilot data imported successfully</source>
-      <translation type="unfinished" />
+      <translation>Dados do Probat Pilot importados com sucesso</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22657" />
+      <location filename="../artisanlib/main.py" line="22680" />
       <source>Import Probat Pilot failed</source>
-      <translation type="unfinished" />
+      <translation>Falha na importação do Probat Pilot</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22665" />
+      <location filename="../artisanlib/main.py" line="22688" />
       <source>Import Aillio RoasTime</source>
-      <translation type="unfinished" />
+      <translation>Importar Aillio RoasTime</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22674" />
+      <location filename="../artisanlib/main.py" line="22697" />
       <source>Import Aillio Roast.World URL</source>
-      <translation type="unfinished" />
+      <translation>Importar Aillio Roast.World URL</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22743" />
-      <location filename="../artisanlib/main.py" line="22709" />
+      <location filename="../artisanlib/main.py" line="22766" />
+      <location filename="../artisanlib/main.py" line="22732" />
       <source>{0} imported</source>
-      <translation type="unfinished" />
+      <translation>{0} importado</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22712" />
+      <location filename="../artisanlib/main.py" line="22735" />
       <source>an error occurred on importing {0}</source>
-      <translation type="unfinished" />
+      <translation>ocorreu um erro ao importar {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22759" />
+      <location filename="../artisanlib/main.py" line="22782" />
       <source>Import Cropster XLS</source>
-      <translation type="unfinished" />
+      <translation>Importar Cropster XLS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22765" />
+      <location filename="../artisanlib/main.py" line="22788" />
       <source>Import RoastLog URL</source>
-      <translation type="unfinished" />
+      <translation>Importar URL do RoastLog</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22771" />
+      <location filename="../artisanlib/main.py" line="22794" />
       <source>Import RoastPATH URL</source>
-      <translation type="unfinished" />
+      <translation>URL RoastPATH de importação</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22777" />
+      <location filename="../artisanlib/main.py" line="22800" />
       <source>Import Giesen CSV</source>
-      <translation type="unfinished" />
+      <translation>Importar Giesen CSV</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22783" />
+      <location filename="../artisanlib/main.py" line="22806" />
       <source>Import Petroncini CSV</source>
-      <translation type="unfinished" />
+      <translation>Importar Petroncini CSV</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22789" />
+      <location filename="../artisanlib/main.py" line="22812" />
       <source>Import IKAWA CSV</source>
-      <translation type="unfinished" />
+      <translation>Importar IKAWA CSV</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22795" />
+      <location filename="../artisanlib/main.py" line="22818" />
       <source>Import Loring CSV</source>
-      <translation type="unfinished" />
+      <translation>Importar Loring CSV</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22801" />
+      <location filename="../artisanlib/main.py" line="22824" />
       <source>Import Rubasse CSV</source>
-      <translation type="unfinished" />
+      <translation>Importar Rubasse CSV</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22808" />
+      <location filename="../artisanlib/main.py" line="22831" />
       <source>Import HH506RA CSV</source>
       <translation>Importar HH506RA CSV</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22857" />
+      <location filename="../artisanlib/main.py" line="22880" />
       <source>HH506RA file loaded successfully</source>
       <translation>Arquivo HH506RA importado com sucesso</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22944" />
+      <location filename="../artisanlib/main.py" line="22967" />
       <source>Save Graph as</source>
-      <translation type="unfinished" />
+      <translation>Salvar gráfico como</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22994" />
+      <location filename="../artisanlib/main.py" line="23017" />
       <source>{0}  size({1},{2}) saved</source>
       <translation>{0}  tamanho({1}, {2}) gravado</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23005" />
+      <location filename="../artisanlib/main.py" line="23028" />
       <source>Save Graph as PDF</source>
-      <translation type="unfinished" />
+      <translation>Salvar gráfico como PDF</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23007" />
+      <location filename="../artisanlib/main.py" line="23030" />
       <source>Save Graph as SVG</source>
       <translation>Salvar gráficocomo SVG</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23025" />
+      <location filename="../artisanlib/main.py" line="23048" />
       <source>{0} saved</source>
       <translation>{0} gravado</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23086" />
+      <location filename="../artisanlib/main.py" line="23109" />
       <source>Wheel {0} loaded</source>
-      <translation type="unfinished" />
+      <translation>Roda {0} carregada</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23089" />
+      <location filename="../artisanlib/main.py" line="23112" />
       <source>Invalid Wheel graph format</source>
       <translation>Formato de gráfico roda inválido</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23297" />
+      <location filename="../artisanlib/main.py" line="23320" />
       <source>Buttons copied to Palette #</source>
-      <translation type="unfinished" />
+      <translation>Botões copiados para a Paleta #</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23344" />
+      <location filename="../artisanlib/main.py" line="23367" />
       <source>Palette #%i restored</source>
-      <translation type="unfinished" />
+      <translation>Paleta #%i restaurada</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23346" />
+      <location filename="../artisanlib/main.py" line="23369" />
       <source>Palette #%i empty</source>
-      <translation type="unfinished" />
+      <translation>Paleta #%i vazia</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23371" />
+      <location filename="../artisanlib/main.py" line="23394" />
       <source>Save Palettes</source>
       <translation>Salvar paletas</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23375" />
+      <location filename="../artisanlib/main.py" line="23398" />
       <source>Palettes saved</source>
       <translation>Paletas gravadas</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23503" />
+      <location filename="../artisanlib/main.py" line="23526" />
       <source>Palettes loaded</source>
       <translation>Paletas carregadas</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23506" />
+      <location filename="../artisanlib/main.py" line="23529" />
       <source>Invalid palettes file format</source>
       <translation>Formato de arquivo de paletas inválido</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23544" />
+      <location filename="../artisanlib/main.py" line="23567" />
       <source>Alarms loaded</source>
       <translation>Alarmes carregados</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23613" />
+      <location filename="../artisanlib/main.py" line="23636" />
       <source>Fitting curves...</source>
-      <translation type="unfinished" />
+      <translation>Ajustando as curvas...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23866" />
+      <location filename="../artisanlib/main.py" line="23889" />
       <source>Warning: The start of the analysis interval of interest is earlier than the start of curve fitting.
 Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
-      <translation type="unfinished" />
+      <translation>Aviso: O início do intervalo de análise de interesse é anterior ao início do ajuste da curva.
+Corrija isso na guia Config&gt;Curves&gt;Analyze.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23867" />
+      <location filename="../artisanlib/main.py" line="23890" />
       <source>Analysis earlier than Curve fit</source>
-      <translation type="unfinished" />
+      <translation>Análise antes do ajuste da curva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24100" />
+      <location filename="../artisanlib/main.py" line="24123" />
       <source>Simulator stopped</source>
-      <translation type="unfinished" />
+      <translation>Simulador parado</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24368" />
+      <location filename="../artisanlib/main.py" line="24402" />
       <source>debug logging ON</source>
       <translation type="unfinished">registro de depuração ATIVADO</translation>
     </message>
     <message>
       <location filename="../artisanlib/batches.py" line="55" />
       <source>Next batch: counter+1</source>
-      <translation type="unfinished" />
+      <translation>Próximo lote: contador+1</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1739" />
       <source>Device table copied to clipboard</source>
-      <translation type="unfinished" />
+      <translation>Tabela de dispositivos copiada para a área de transferência</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1983" />
       <source>Overwrite existing ET and BT values?</source>
-      <translation type="unfinished" />
+      <translation>Substituir os valores ET e BT existentes?</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1995" />
       <location filename="../artisanlib/devices.py" line="1984" />
       <source>Caution - About to overwrite profile data</source>
-      <translation type="unfinished" />
+      <translation>Cuidado - Prestes a substituir os dados do perfil</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1994" />
       <source>At least one Virtual Extra Device depends on ET or BT.  Do you want to update all the Virtual Extra Devices after ET and BT are updated?</source>
-      <translation type="unfinished" />
+      <translation>Pelo menos um Virtual Extra Device depende de ET ou BT. Deseja atualizar todos os Dispositivos Extras Virtuais após a atualização de ET e BT?</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2010" />
       <source>Symbolic values updated.</source>
-      <translation type="unfinished" />
+      <translation>Valores simbólicos atualizados.</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2012" />
       <source>Symbolic values were not updated.</source>
-      <translation type="unfinished" />
+      <translation>Os valores simbólicos não foram atualizados.</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2014" />
       <source>Nothing here to process.</source>
-      <translation type="unfinished" />
+      <translation>Nada aqui para processar.</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2151" />
       <source>Device not set</source>
-      <translation type="unfinished" />
+      <translation>Dispositivo não definido</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2432" />
@@ -16268,7 +16121,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
       <location filename="../artisanlib/devices.py" line="2240" />
       <location filename="../artisanlib/devices.py" line="2235" />
       <source>Device set to {0}. Now, check Serial Port settings</source>
-      <translation type="unfinished" />
+      <translation>Dispositivo definido como {0}. Agora, verifique as configurações da porta serial</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2874" />
@@ -16289,18 +16142,18 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
       <location filename="../artisanlib/devices.py" line="2261" />
       <location filename="../artisanlib/devices.py" line="2251" />
       <source>Device set to {0}. Now, choose serial port</source>
-      <translation type="unfinished" />
+      <translation>Dispositivo definido como {0}. Agora, escolha a porta serial</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2288" />
       <source>Device set to CENTER 305, which is equivalent to CENTER 306. Now, choose serial port</source>
-      <translation type="unfinished" />
+      <translation>Dispositivo definido como CENTER 305, que é equivalente a CENTER 306. Agora, escolha a porta serial</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2342" />
       <location filename="../artisanlib/devices.py" line="2297" />
       <source>Device set to {0}, which is equivalent to CENTER 309. Now, choose serial port</source>
-      <translation type="unfinished" />
+      <translation>Dispositivo definido como {0}, que é equivalente a CENTER 309. Agora, escolha a porta serial</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2369" />
@@ -16309,23 +16162,23 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
       <location filename="../artisanlib/devices.py" line="2324" />
       <location filename="../artisanlib/devices.py" line="2315" />
       <source>Device set to {0}, which is equivalent to CENTER 303. Now, choose serial port</source>
-      <translation type="unfinished" />
+      <translation>Dispositivo definido como {0}, que é equivalente a CENTER 303. Agora, escolha a porta serial</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2351" />
       <source>Device set to {0}, which is equivalent to CENTER 306. Now, choose serial port</source>
-      <translation type="unfinished" />
+      <translation>Dispositivo definido como {0}, que é equivalente a CENTER 306. Agora, escolha a porta serial</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2378" />
       <source>Device set to {0}, which is equivalent to Omega HH506RA. Now, choose serial port</source>
-      <translation type="unfinished" />
+      <translation>Dispositivo definido como {0}, que é equivalente a Omega HH506RA. Agora, escolha a porta serial</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2475" />
       <location filename="../artisanlib/devices.py" line="2387" />
       <source>Device set to {0}, which is equivalent to Omega HH806AU. Now, choose serial port</source>
-      <translation type="unfinished" />
+      <translation>Dispositivo definido como {0}, que é equivalente a Omega HH806AU. Agora, escolha a porta serial</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2927" />
@@ -16372,27 +16225,27 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
       <location filename="../artisanlib/devices.py" line="2484" />
       <location filename="../artisanlib/devices.py" line="2400" />
       <source>Device set to {0}</source>
-      <translation type="unfinished" />
+      <translation>Dispositivo definido como {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2405" />
       <source>Device set to {0}{1}</source>
-      <translation type="unfinished" />
+      <translation>Dispositivo definido como {0}{1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2457" />
       <source>Device set to {0}. Now, choose Modbus serial port or IP address</source>
-      <translation type="unfinished" />
+      <translation>Dispositivo definido como {0}. Agora, escolha a porta serial Modbus ou o endereço IP</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="2466" />
       <source>Device set to {0}, which is equivalent to CENTER 302. Now, choose serial port</source>
-      <translation type="unfinished" />
+      <translation>Dispositivo definido como {0}, que é equivalente a CENTER 302. Agora, escolha a porta serial</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="2212" />
       <source>set y-coordinate to {}</source>
-      <translation type="unfinished" />
+      <translation>defina a coordenada y para {}</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="2657" />
@@ -16417,33 +16270,33 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     <message>
       <location filename="../artisanlib/canvas.py" line="4834" />
       <source>Calling alarm failed on {0}</source>
-      <translation type="unfinished" />
+      <translation>Alarme de chamada falhou em {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="4844" />
       <source>Alarm trigger button error, description '{0}' not a number</source>
-      <translation type="unfinished" />
+      <translation>Erro no botão de acionamento do alarme, descrição '{0}' não é um número</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="4873" />
       <source>Alarm trigger slider error, description '{0}' not a valid number [0-100]</source>
-      <translation type="unfinished" />
+      <translation>Erro do controle deslizante de acionamento do alarme, descrição '{0}' não é um número válido [0-100]</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="4956" />
       <source>Alarm trigger SV slider error, description '{0}' not a valid number</source>
-      <translation type="unfinished" />
+      <translation>Erro do controle deslizante SV do acionador de alarme, descrição '{0}' não é um número válido</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="4990" />
       <source>Alarm {0} triggered</source>
-      <translation type="unfinished" />
+      <translation>Alarme {0} disparado</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="6251" />
       <location filename="../artisanlib/canvas.py" line="6248" />
       <source>Save profile?</source>
-      <translation type="unfinished" />
+      <translation>Salvar perfil?</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="6253" />
@@ -16458,17 +16311,17 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     <message>
       <location filename="../artisanlib/canvas.py" line="10099" />
       <source>Load Image File</source>
-      <translation type="unfinished" />
+      <translation>Carregar arquivo de imagem</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="10106" />
       <source>Loaded watermark image {0}</source>
-      <translation type="unfinished" />
+      <translation>Imagem de marca d'água carregada {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="10109" />
       <source>Unable to load watermark image {0}</source>
-      <translation type="unfinished" />
+      <translation>Não foi possível carregar a imagem da marca d'água {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="10516" />
@@ -16533,7 +16386,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     <message>
       <location filename="../artisanlib/canvas.py" line="10654" />
       <source>Colors set to Default Theme</source>
-      <translation type="unfinished" />
+      <translation>Cores definidas como tema padrão</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="10670" />
@@ -16544,22 +16397,22 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
       <location filename="../artisanlib/cup_profile.py" line="186" />
       <location filename="../artisanlib/canvas.py" line="10859" />
       <source>Background does not match number of labels</source>
-      <translation type="unfinished" />
+      <translation>O plano de fundo não corresponde ao número de rótulos</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="11055" />
       <source>Phidget service discovery started...</source>
-      <translation type="unfinished" />
+      <translation>A descoberta do serviço Phidget começou...</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="11225" />
       <source>Santoker connected</source>
-      <translation type="unfinished" />
+      <translation>Santoker conectado</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="11226" />
       <source>Santoker disconnected</source>
-      <translation type="unfinished" />
+      <translation>Santoker desconectado</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="11246" />
@@ -16574,17 +16427,17 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     <message>
       <location filename="../artisanlib/canvas.py" line="11465" />
       <source>Humidity: {}%</source>
-      <translation type="unfinished" />
+      <translation>Umidade: {}%</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="11473" />
       <source>Temperature: {}{}</source>
-      <translation type="unfinished" />
+      <translation>Temperatura: {}{}</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="11479" />
       <source>Pressure: {}hPa</source>
-      <translation type="unfinished" />
+      <translation>Pressão: {}hPa</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="11765" />
@@ -16599,12 +16452,12 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     <message>
       <location filename="../artisanlib/canvas.py" line="11972" />
       <source>Not enough data collected yet. Try again in a few seconds</source>
-      <translation type="unfinished" />
+      <translation>Ainda não há dados suficientes coletados. Tente novamente em alguns segundos</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="12029" />
       <source>CHARGE: Scope is not recording</source>
-      <translation type="unfinished" />
+      <translation>CHARGE: Scope não está gravando</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="12054" />
@@ -16614,12 +16467,12 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     <message>
       <location filename="../artisanlib/canvas.py" line="12081" />
       <source>[TP] recorded at {0} BT = {1}</source>
-      <translation type="unfinished" />
+      <translation>[TP] registrado em {0} BT = {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="12162" />
       <source>DRY END: Scope is not recording</source>
-      <translation type="unfinished" />
+      <translation>DRY END: Scope não está gravando</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="12198" />
@@ -16629,7 +16482,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     <message>
       <location filename="../artisanlib/canvas.py" line="12278" />
       <source>FC START: Scope is not recording</source>
-      <translation type="unfinished" />
+      <translation>FC START: Scope não está gravando</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="12316" />
@@ -16639,7 +16492,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     <message>
       <location filename="../artisanlib/canvas.py" line="12383" />
       <source>FC END: Scope is not recording</source>
-      <translation type="unfinished" />
+      <translation>FC END: Scope não está gravando</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="12424" />
@@ -16649,7 +16502,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     <message>
       <location filename="../artisanlib/canvas.py" line="12494" />
       <source>SC START: Scope is not recording</source>
-      <translation type="unfinished" />
+      <translation>SC START: Scope não está gravando</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="12542" />
@@ -16659,7 +16512,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     <message>
       <location filename="../artisanlib/canvas.py" line="12608" />
       <source>SC END: Scope is not recording</source>
-      <translation type="unfinished" />
+      <translation>SC END: Scope não está gravando</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="12655" />
@@ -16669,7 +16522,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     <message>
       <location filename="../artisanlib/canvas.py" line="12760" />
       <source>DROP: Scope is not recording</source>
-      <translation type="unfinished" />
+      <translation>DROP: Scope não está gravando</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="12813" />
@@ -16679,7 +16532,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     <message>
       <location filename="../artisanlib/canvas.py" line="12896" />
       <source>COOL: Scope is not recording</source>
-      <translation type="unfinished" />
+      <translation>COOL: Scope não está gravando</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="12945" />
@@ -16745,27 +16598,28 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
       <location filename="../artisanlib/canvas.py" line="14796" />
       <source>Importing a profile in to Designer will decimate all data except the main [points].
 Continue?</source>
-      <translation type="unfinished" />
+      <translation>A importação de um perfil para o Designer dizimará todos os dados, exceto os principais [pontos].
+Continuar?</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="14826" />
       <source>Save Points</source>
-      <translation type="unfinished" />
+      <translation>Salvar pontos</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="14836" />
       <source>Points saved</source>
-      <translation type="unfinished" />
+      <translation>Pontos salvos</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="14846" />
       <source>Load Points</source>
-      <translation type="unfinished" />
+      <translation>Pontos de Carregamento</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="14859" />
       <source>Points loaded</source>
-      <translation type="unfinished" />
+      <translation>Pontos carregados</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="14925" />
@@ -16816,7 +16670,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../artisanlib/canvas.py" line="15475" />
       <source>[ COOL ]</source>
-      <translation type="unfinished" />
+      <translation>[ LEGAL ]</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="15773" />
@@ -16847,22 +16701,22 @@ Profile missing [CHARGE] or [DROP]</source>
       <location filename="../artisanlib/colors.py" line="996" />
       <location filename="../artisanlib/colors.py" line="888" />
       <source>Color of {0} set to {1}</source>
-      <translation type="unfinished" />
+      <translation>Cor de {0} definida como {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="897" />
       <source>Config LCD colors</source>
-      <translation type="unfinished" />
+      <translation>Configurar as cores do LCD</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="898" />
       <source>LCD digits color and background color cannot be the same.</source>
-      <translation type="unfinished" />
+      <translation>A cor dos dígitos do LCD e a cor de fundo não podem ser iguais.</translation>
     </message>
     <message>
       <location filename="../artisanlib/cup_profile.py" line="182" />
       <source>Background profile not found</source>
-      <translation type="unfinished" />
+      <translation>Perfil de fundo não encontrado</translation>
     </message>
     <message>
       <source>Configure for {0}?&lt;br&gt;&lt;br&gt;Your current settings will be overwritten!&lt;br&gt;&lt;br&gt;It is advisable to save your current settings beforehand via menu Help &gt;&gt; Save Settings.</source>
@@ -17244,9 +17098,19 @@ Continuar?</translation>
       <translation>Visite nossa {0} loja {1} para estender sua assinatura</translation>
     </message>
     <message>
+      <location filename="../artisanlib/main.py" line="1206" />
+      <source>Do you want to extend your subscription?</source>
+      <translation>Quer estender sua assinatura?</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1207" />
+      <source>Your subscription ends on</source>
+      <translation>Sua assinatura termina em</translation>
+    </message>
+    <message>
       <location filename="../plus/queue.py" line="367" />
       <source>Queuing roast for upload to artisan.plus</source>
-      <translation type="unfinished">Enfileirando assado para upload para artisan.plus</translation>
+      <translation>Enfileirando assado para upload para artisan.plus</translation>
     </message>
     <message>
       <location filename="../plus/sync.py" line="637" />
@@ -17261,7 +17125,7 @@ Continuar?</translation>
     <message>
       <location filename="../plus/controller.py" line="223" />
       <source>Login aborted</source>
-      <translation type="unfinished">Login abortado</translation>
+      <translation>Login abortado</translation>
     </message>
     <message>
       <location filename="../plus/controller.py" line="232" />
@@ -17271,34 +17135,34 @@ Continuar?</translation>
     <message>
       <location filename="../plus/controller.py" line="237" />
       <source>Connected to artisan.plus</source>
-      <translation type="unfinished">Conectado a artisan.plus</translation>
+      <translation>Conectado a artisan.plus</translation>
     </message>
     <message>
       <location filename="../plus/controller.py" line="365" />
       <location filename="../plus/controller.py" line="281" />
       <location filename="../plus/controller.py" line="255" />
       <source>artisan.plus turned off</source>
-      <translation type="unfinished">artisan.plus desligado</translation>
+      <translation>artisan.plus desligado</translation>
     </message>
     <message>
       <location filename="../plus/controller.py" line="262" />
       <source>Authentication failed</source>
-      <translation type="unfinished">Autenticação falhou</translation>
+      <translation>Autenticação falhou</translation>
     </message>
     <message>
       <location filename="../plus/controller.py" line="290" />
       <source>Couldn't connect to artisan.plus</source>
-      <translation type="unfinished">Não foi possível conectar a artisan.plus</translation>
+      <translation>Não foi possível conectar a artisan.plus</translation>
     </message>
     <message>
       <location filename="../plus/controller.py" line="315" />
       <source>Disconnect artisan.plus?</source>
-      <translation type="unfinished">Desconectar do artisan.plus?</translation>
+      <translation>Desconectar do artisan.plus?</translation>
     </message>
     <message>
       <location filename="../plus/controller.py" line="373" />
       <source>artisan.plus disconnected</source>
-      <translation type="unfinished">artisan.plus desconectado</translation>
+      <translation>artisan.plus desconectado</translation>
     </message>
     <message>
       <location filename="../plus/stock.py" line="318" />
@@ -17548,7 +17412,7 @@ Continuar?</translation>
       <location filename="../artisanlib/canvas.py" line="7533" />
       <location filename="../artisanlib/canvas.py" line="6440" />
       <location filename="../artisanlib/canvas.py" line="1066" />
-      <location filename="../artisanlib/main.py" line="13563" />
+      <location filename="../artisanlib/main.py" line="13586" />
       <location filename="../artisanlib/main.py" line="10732" />
       <location filename="../artisanlib/roast_properties.py" line="2419" />
       <location filename="../artisanlib/roast_properties.py" line="2391" />
@@ -17570,52 +17434,52 @@ Continuar?</translation>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1054" />
       <source>Decimal position successfully set to 1</source>
-      <translation type="unfinished" />
+      <translation>Posição decimal definida com sucesso para 1</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1057" />
       <source>Problem setting decimal position</source>
-      <translation type="unfinished" />
+      <translation>Problema ao definir a posição decimal</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1111" />
       <source>Thermocouple type successfully set</source>
-      <translation type="unfinished" />
+      <translation>Tipo de termopar definido com sucesso</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1114" />
       <source>Problem setting thermocouple type</source>
-      <translation type="unfinished" />
+      <translation>Problema ao configurar o tipo de termopar</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2019" />
       <location filename="../artisanlib/pid_dialogs.py" line="1211" />
       <source>Ready</source>
-      <translation type="unfinished" />
+      <translation>Preparar</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3820" />
       <location filename="../artisanlib/pid_dialogs.py" line="1571" />
       <source>setting autotune...</source>
-      <translation type="unfinished" />
+      <translation>configurando autotune...</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3847" />
       <location filename="../artisanlib/pid_dialogs.py" line="1583" />
       <source>Autotune successfully turned OFF</source>
-      <translation type="unfinished" />
+      <translation>Autotune desativado com sucesso</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3850" />
       <location filename="../artisanlib/pid_dialogs.py" line="1586" />
       <source>Autotune successfully turned ON</source>
-      <translation type="unfinished" />
+      <translation>Autotune ativado com sucesso</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3775" />
       <location filename="../artisanlib/pid_dialogs.py" line="1604" />
       <source>wait...</source>
-      <translation type="unfinished" />
+      <translation>espere...</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1608" />
@@ -17632,29 +17496,29 @@ Continuar?</translation>
       <location filename="../artisanlib/pid_dialogs.py" line="1640" />
       <location filename="../artisanlib/pid_dialogs.py" line="1630" />
       <source>SV successfully set to {0}</source>
-      <translation type="unfinished" />
+      <translation>SV definido com sucesso para {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1651" />
       <source>Empty SV box</source>
-      <translation type="unfinished" />
+      <translation>Caixa SV vazia</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1661" />
       <source>Unable to read SV</source>
-      <translation type="unfinished" />
+      <translation>Não é possível ler SV</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3689" />
       <location filename="../artisanlib/pid_dialogs.py" line="1802" />
       <source>Ramp/Soak operation cancelled</source>
-      <translation type="unfinished" />
+      <translation>Operação de rampa/saturação cancelada</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3692" />
       <location filename="../artisanlib/pid_dialogs.py" line="1805" />
       <source>No RX data</source>
-      <translation type="unfinished" />
+      <translation>Sem dados RX</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3710" />
@@ -17668,19 +17532,19 @@ Continuar?</translation>
       <location filename="../artisanlib/pid_dialogs.py" line="3698" />
       <location filename="../artisanlib/pid_dialogs.py" line="1816" />
       <source>Need to change pattern mode...</source>
-      <translation type="unfinished" />
+      <translation>Precisa mudar o modo padrão...</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3701" />
       <location filename="../artisanlib/pid_dialogs.py" line="1819" />
       <source>Pattern has been changed. Wait 5 secs.</source>
-      <translation type="unfinished" />
+      <translation>O padrão foi alterado. Aguarde 5 segundos.</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3703" />
       <location filename="../artisanlib/pid_dialogs.py" line="1821" />
       <source>Pattern could not be changed</source>
-      <translation type="unfinished" />
+      <translation>O padrão não pôde ser alterado</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3732" />
@@ -17698,90 +17562,90 @@ Continuar?</translation>
       <location filename="../artisanlib/pid_dialogs.py" line="3796" />
       <location filename="../artisanlib/pid_dialogs.py" line="1859" />
       <source>Reading Ramp/Soak {0} ...</source>
-      <translation type="unfinished" />
+      <translation>Lendo rampa/saturação {0} ...</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3801" />
       <location filename="../artisanlib/pid_dialogs.py" line="1864" />
       <source>problem reading Ramp/Soak</source>
-      <translation type="unfinished" />
+      <translation>problema ao ler Ramp/Soak</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3804" />
       <location filename="../artisanlib/pid_dialogs.py" line="1867" />
       <source>Finished reading Ramp/Soak val.</source>
-      <translation type="unfinished" />
+      <translation>Terminei a leitura Ramp/Soak val.</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1904" />
       <source>Finished reading pid values</source>
-      <translation type="unfinished" />
+      <translation>Valores pid de leitura concluídos</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3985" />
       <location filename="../artisanlib/pid_dialogs.py" line="2001" />
       <source>Ramp/Soak successfully written</source>
-      <translation type="unfinished" />
+      <translation>Ramp/Soak escrito com sucesso</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2806" />
       <source>Time Units successfully set to MM:SS</source>
-      <translation type="unfinished" />
+      <translation>Unidades de tempo definidas com sucesso para MM:SS</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2809" />
       <source>Problem setting time units</source>
-      <translation type="unfinished" />
+      <translation>Problema ao definir unidades de tempo</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2974" />
       <source>SV{0} set to {1}</source>
-      <translation type="unfinished" />
+      <translation>SV{0} definido como {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2978" />
       <source>Problem setting SV</source>
-      <translation type="unfinished" />
+      <translation>Problema ao configurar SV</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2980" />
       <source>Cancelled svN change</source>
-      <translation type="unfinished" />
+      <translation>Alteração de svN cancelada</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2998" />
       <source>PID already using sv{0}</source>
-      <translation type="unfinished" />
+      <translation>PID já usando sv{0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3001" />
       <source>setNsv(): bad response</source>
-      <translation type="unfinished" />
+      <translation>setNsv(): resposta ruim</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3055" />
       <source>pid changed to {0}</source>
-      <translation type="unfinished" />
+      <translation>pid alterado para {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3058" />
       <source>setNpid(): bad confirmation</source>
-      <translation type="unfinished" />
+      <translation>setNpid(): confirmação inválida</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3062" />
       <source>Cancelled pid change</source>
-      <translation type="unfinished" />
+      <translation>Alteração pid cancelada</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3087" />
       <source>PID was already using pid {0}</source>
-      <translation type="unfinished" />
+      <translation>PID já estava usando pid {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3090" />
       <source>setNpid(): Unable to set pid {0} </source>
-      <translation type="unfinished" />
+      <translation>setNpid (): Não é possível definir pid {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3211" />
@@ -17792,12 +17656,12 @@ Continuar?</translation>
       <location filename="../artisanlib/pid_dialogs.py" line="3176" />
       <location filename="../artisanlib/pid_dialogs.py" line="3169" />
       <source>SV{0} successfully set to {1}</source>
-      <translation type="unfinished" />
+      <translation>SV{0} definido com sucesso como {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3222" />
       <source>setsv(): Unable to set SV</source>
-      <translation type="unfinished" />
+      <translation>setsv (): Não é possível definir SV</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="364" />
@@ -17810,39 +17674,39 @@ Continuar?</translation>
       <location filename="../artisanlib/pid_dialogs.py" line="3317" />
       <location filename="../artisanlib/pid_dialogs.py" line="3309" />
       <source>pid #{0} successfully set to ({1},{2},{3})</source>
-      <translation type="unfinished" />
+      <translation>pid #{0} definido com sucesso para ({1},{2},{3})</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="371" />
       <location filename="../artisanlib/pid_control.py" line="326" />
       <location filename="../artisanlib/pid_dialogs.py" line="3365" />
       <source>pid command failed. Bad data at pid{0} (8,8,8): ({1},{2},{3}) </source>
-      <translation type="unfinished" />
+      <translation>comando pid falhou. Dados incorretos no pid{0} (8,8,8): ({1},{2},{3})</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3380" />
       <source>sending commands for p{0} i{1} d{2}</source>
-      <translation type="unfinished" />
+      <translation>enviando comandos para p{0} i{1} d{2}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3450" />
       <source>getallpid(): Unable to read pid values</source>
-      <translation type="unfinished" />
+      <translation>getallpid (): Não é possível ler os valores pid</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3478" />
       <source>PID is using pid = {0}</source>
-      <translation type="unfinished" />
+      <translation>PID está usando pid = {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3481" />
       <source>getallpid(): Unable to read current sv</source>
-      <translation type="unfinished" />
+      <translation>getallpid (): Não é possível ler o sv atual</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3551" />
       <source>PID is using SV = {0}</source>
-      <translation type="unfinished" />
+      <translation>PID está usando SV = {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3779" />
@@ -17857,27 +17721,27 @@ Continuar?</translation>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3784" />
       <source>Unable</source>
-      <translation type="unfinished" />
+      <translation>Impossível</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3785" />
       <source>No data received</source>
-      <translation type="unfinished" />
+      <translation>nenhum dado recebido</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3829" />
       <source>Current pid = {0}. Proceed with autotune command?</source>
-      <translation type="unfinished" />
+      <translation>pid atual = {0}. Continuar com o comando autotune?</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3833" />
       <source>Autotune cancelled</source>
-      <translation type="unfinished" />
+      <translation>Autotune cancelado</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3852" />
       <source>UNABLE to set Autotune</source>
-      <translation type="unfinished" />
+      <translation>NÃO É POSSÍVEL definir o Autotune</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3908" />
@@ -17887,17 +17751,17 @@ Continuar?</translation>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3909" />
       <source>Ramp (MM:SS)</source>
-      <translation type="unfinished" />
+      <translation>Rampa (MM:SS)</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3910" />
       <source>Soak (MM:SS)</source>
-      <translation type="unfinished" />
+      <translation>Imersão (MM:SS)</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="4002" />
       <source>Work in Progress</source>
-      <translation type="unfinished" />
+      <translation>Trabalho em progresso</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="4038" />
@@ -17922,12 +17786,12 @@ Continuar?</translation>
     <message>
       <location filename="../artisanlib/pid_control.py" line="451" />
       <source>{0} successfully sent to pid </source>
-      <translation type="unfinished" />
+      <translation>{0} enviado com sucesso para pid</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="460" />
       <source>setpid(): There was a problem setting {0}</source>
-      <translation type="unfinished" />
+      <translation>setpid(): Ocorreu um problema ao definir {0}</translation>
     </message>
   </context>
   <context>
@@ -17964,7 +17828,7 @@ Continuar?</translation>
       <translation type="unfinished">Definir RS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1662" />
+      <location filename="../artisanlib/ports.py" line="1667" />
       <location filename="../artisanlib/pid_dialogs.py" line="2618" />
       <location filename="../artisanlib/pid_dialogs.py" line="1479" />
       <source>Extra</source>
@@ -17977,68 +17841,68 @@ Continuar?</translation>
     </message>
     <message>
       <location filename="../artisanlib/background.py" line="425" />
-      <location filename="../artisanlib/events.py" line="1510" />
+      <location filename="../artisanlib/events.py" line="1512" />
       <source>Config</source>
       <translation type="unfinished">Configuração</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1516" />
+      <location filename="../artisanlib/events.py" line="1518" />
       <source>Buttons</source>
       <translation type="unfinished">Botões</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1521" />
+      <location filename="../artisanlib/events.py" line="1523" />
       <source>Sliders</source>
       <translation type="unfinished">Deslizantes</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1524" />
+      <location filename="../artisanlib/events.py" line="1526" />
       <source>Quantifiers</source>
       <translation type="unfinished">Quantificadores</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1527" />
+      <location filename="../artisanlib/events.py" line="1529" />
       <source>Palettes</source>
       <translation type="unfinished">Paletas</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1533" />
+      <location filename="../artisanlib/events.py" line="1535" />
       <source>Style</source>
       <translation type="unfinished">Estilo</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1535" />
+      <location filename="../artisanlib/events.py" line="1537" />
       <source>Annotations</source>
       <translation type="unfinished">Anotações</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1299" />
-      <location filename="../artisanlib/ports.py" line="1659" />
+      <location filename="../artisanlib/ports.py" line="1664" />
       <source>ET/BT</source>
       <translation type="unfinished">ET/BT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1665" />
+      <location filename="../artisanlib/ports.py" line="1670" />
       <source>Modbus</source>
       <translation type="unfinished">Modbus</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1668" />
+      <location filename="../artisanlib/ports.py" line="1673" />
       <source>S7</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1671" />
+      <location filename="../artisanlib/ports.py" line="1676" />
       <source>Scale</source>
       <translation type="unfinished">Balança</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1674" />
+      <location filename="../artisanlib/ports.py" line="1679" />
       <source>Color</source>
       <translation type="unfinished">Cor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1677" />
+      <location filename="../artisanlib/ports.py" line="1682" />
       <source>WebSocket</source>
       <translation type="unfinished" />
     </message>
@@ -18169,7 +18033,7 @@ Continuar?</translation>
     <name>Table</name>
     <message>
       <location filename="../artisanlib/cup_profile.py" line="149" />
-      <location filename="../artisanlib/events.py" line="2263" />
+      <location filename="../artisanlib/events.py" line="2265" />
       <location filename="../artisanlib/wheels.py" line="201" />
       <source>Label</source>
       <translation type="unfinished">Etiqueta</translation>
@@ -18185,7 +18049,7 @@ Continuar?</translation>
       <translation type="unfinished">Largura</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2270" />
+      <location filename="../artisanlib/events.py" line="2272" />
       <location filename="../artisanlib/wheels.py" line="421" />
       <location filename="../artisanlib/wheels.py" line="204" />
       <source>Color</source>
@@ -18262,7 +18126,7 @@ Continuar?</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="968" />
-      <location filename="../artisanlib/events.py" line="2267" />
+      <location filename="../artisanlib/events.py" line="2269" />
       <location filename="../artisanlib/pid_dialogs.py" line="567" />
       <location filename="../artisanlib/pid_dialogs.py" line="415" />
       <source>Action</source>
@@ -18279,8 +18143,8 @@ Continuar?</translation>
       <location filename="../artisanlib/alarms.py" line="970" />
       <location filename="../artisanlib/roast_properties.py" line="4043" />
       <location filename="../artisanlib/background.py" line="756" />
-      <location filename="../artisanlib/events.py" line="3456" />
-      <location filename="../artisanlib/events.py" line="2264" />
+      <location filename="../artisanlib/events.py" line="3460" />
+      <location filename="../artisanlib/events.py" line="2266" />
       <location filename="../artisanlib/pid_dialogs.py" line="569" />
       <location filename="../artisanlib/pid_dialogs.py" line="417" />
       <source>Description</source>
@@ -18299,8 +18163,8 @@ Continuar?</translation>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="4044" />
       <location filename="../artisanlib/background.py" line="757" />
-      <location filename="../artisanlib/events.py" line="3458" />
-      <location filename="../artisanlib/events.py" line="2265" />
+      <location filename="../artisanlib/events.py" line="3462" />
+      <location filename="../artisanlib/events.py" line="2267" />
       <source>Type</source>
       <translation type="unfinished">Tipo</translation>
     </message>
@@ -18309,59 +18173,59 @@ Continuar?</translation>
       <location filename="../artisanlib/alarms.py" line="967" />
       <location filename="../artisanlib/roast_properties.py" line="4045" />
       <location filename="../artisanlib/background.py" line="758" />
-      <location filename="../artisanlib/events.py" line="3464" />
-      <location filename="../artisanlib/events.py" line="2266" />
+      <location filename="../artisanlib/events.py" line="3468" />
+      <location filename="../artisanlib/events.py" line="2268" />
       <source>Value</source>
       <translation type="unfinished">Valor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2268" />
+      <location filename="../artisanlib/events.py" line="2270" />
       <source>Documentation</source>
       <translation type="unfinished">Documentação</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2269" />
+      <location filename="../artisanlib/events.py" line="2271" />
       <source>Visibility</source>
       <translation type="unfinished">Visibilidade</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2271" />
+      <location filename="../artisanlib/events.py" line="2273" />
       <source>Text Color</source>
       <translation type="unfinished">Cor do texto</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1440" />
-      <location filename="../artisanlib/ports.py" line="1761" />
+      <location filename="../artisanlib/ports.py" line="1766" />
       <source>Device</source>
       <translation type="unfinished">Dispositivo</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1762" />
+      <location filename="../artisanlib/ports.py" line="1767" />
       <source>Comm Port</source>
       <translation type="unfinished">Porta Comunicação</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1763" />
+      <location filename="../artisanlib/ports.py" line="1768" />
       <source>Baud Rate</source>
       <translation type="unfinished">Taxa de Transmissão</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1764" />
+      <location filename="../artisanlib/ports.py" line="1769" />
       <source>Byte Size</source>
       <translation type="unfinished">Tamanho do Byte</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1765" />
+      <location filename="../artisanlib/ports.py" line="1770" />
       <source>Parity</source>
       <translation type="unfinished">Paridade</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1766" />
+      <location filename="../artisanlib/ports.py" line="1771" />
       <source>Stopbits</source>
       <translation type="unfinished">Bit de Parada</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1767" />
+      <location filename="../artisanlib/ports.py" line="1772" />
       <source>Timeout</source>
       <translation type="unfinished">Expiração</translation>
     </message>
@@ -19050,37 +18914,37 @@ aromática</translation>
     <message>
       <location filename="../artisanlib/axis.py" line="85" />
       <source>100% event values in step mode are aligned with the given y-axis value or the lowest phases limit if left empty</source>
-      <translation type="unfinished" />
+      <translation>Os valores de evento de 100% no modo de etapa são alinhados com o valor do eixo y fornecido ou o limite de fases mais baixo, se deixado em branco</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="158" />
       <source>Time axis max on start of a recording</source>
-      <translation type="unfinished" />
+      <translation>Eixo de tempo máximo no início de uma gravação</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="167" />
       <source>Time axis min on start of a recording</source>
-      <translation type="unfinished" />
+      <translation>Eixo de tempo mínimo no início de uma gravação</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="172" />
       <source>Automatically extend the time axis by 3min on need</source>
-      <translation type="unfinished" />
+      <translation>Aumente automaticamente o eixo do tempo em 3min quando necessário</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="177" />
       <source>Do not set time axis min and max from profile on load</source>
-      <translation type="unfinished" />
+      <translation>Não defina o eixo de tempo mínimo e máximo do perfil na carga</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="182" />
       <source>Automatically set time axis min and max from profile CHARGE/DROP events</source>
-      <translation type="unfinished" />
+      <translation>Defina automaticamente o eixo de tempo mínimo e máximo dos eventos CHARGE/DROP do perfil</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="194" />
       <source>Coverage of auto time axis mode</source>
-      <translation type="unfinished" />
+      <translation>Cobertura do modo de eixo de tempo automático</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="259" />
@@ -19090,37 +18954,37 @@ aromática</translation>
       <location filename="../artisanlib/axis.py" line="210" />
       <location filename="../artisanlib/axis.py" line="208" />
       <source>Distance of major tick labels</source>
-      <translation type="unfinished" />
+      <translation>Distância dos principais rótulos de escala</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="238" />
       <source>Show time grid</source>
-      <translation type="unfinished" />
+      <translation>Mostrar grade de tempo</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="242" />
       <source>Show temperature grid</source>
-      <translation type="unfinished" />
+      <translation>Mostrar grade de temperatura</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="272" />
       <source>Automatically set delta axis max from DeltaET</source>
-      <translation type="unfinished" />
+      <translation>Definir automaticamente o máximo do eixo delta do DeltaET</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="273" />
       <source>Automatically set delta axis max from DeltaBT</source>
-      <translation type="unfinished" />
+      <translation>Definir automaticamente o eixo delta máximo do DeltaBT</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="318" />
       <source>Reset axis settings to their defaults</source>
-      <translation type="unfinished" />
+      <translation>Redefina as configurações do eixo para seus padrões</translation>
     </message>
     <message>
       <location filename="../artisanlib/axis.py" line="322" />
       <source>Take axis settings from profile on load</source>
-      <translation type="unfinished" />
+      <translation>Pegue as configurações do eixo do perfil na carga</translation>
     </message>
     <message>
       <location filename="../artisanlib/cup_profile.py" line="87" />
@@ -19141,7 +19005,7 @@ aromática</translation>
     <message>
       <location filename="../artisanlib/wheels.py" line="82" />
       <source>Decorative edge between wheels</source>
-      <translation type="unfinished" />
+      <translation>Borda decorativa entre as rodas</translation>
     </message>
     <message>
       <location filename="../artisanlib/wheels.py" line="88" />
@@ -19156,7 +19020,7 @@ aromática</translation>
     <message>
       <location filename="../artisanlib/wheels.py" line="96" />
       <source>Text color</source>
-      <translation type="unfinished" />
+      <translation>Cor do texto</translation>
     </message>
     <message>
       <location filename="../artisanlib/wheels.py" line="100" />
@@ -19192,7 +19056,7 @@ aromática</translation>
     <message>
       <location filename="../artisanlib/wheels.py" line="129" />
       <source>open wheel graph file</source>
-      <translation type="unfinished" />
+      <translation>abrir arquivo de gráfico de roda</translation>
     </message>
     <message>
       <location filename="../artisanlib/wheels.py" line="133" />
@@ -19202,7 +19066,7 @@ aromática</translation>
     <message>
       <location filename="../artisanlib/autosave.py" line="46" />
       <source>Automatic generated name</source>
-      <translation type="unfinished" />
+      <translation>Nome gerado automaticamente</translation>
     </message>
     <message>
       <location filename="../artisanlib/autosave.py" line="59" />
@@ -19212,12 +19076,12 @@ aromática</translation>
     <message>
       <location filename="../artisanlib/autosave.py" line="64" />
       <source>Add auto saved file names to the recent files list</source>
-      <translation type="unfinished" />
+      <translation>Adicione nomes de arquivos salvos automaticamente à lista de arquivos recentes</translation>
     </message>
     <message>
       <location filename="../artisanlib/autosave.py" line="69" />
       <source>Save image alongside .alog profiles</source>
-      <translation type="unfinished" />
+      <translation>Salve a imagem junto com os perfis .alog</translation>
     </message>
     <message>
       <location filename="../artisanlib/autosave.py" line="96" />
@@ -19227,7 +19091,7 @@ aromática</translation>
     <message>
       <location filename="../artisanlib/autosave.py" line="102" />
       <source>Sets the directory to store the save also files</source>
-      <translation type="unfinished" />
+      <translation>Define o diretório para armazenar os arquivos salvos também</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="180" />
@@ -19235,7 +19099,17 @@ aromática</translation>
       <location filename="../artisanlib/events.py" line="166" />
       <location filename="../artisanlib/events.py" line="159" />
       <source>Definition string for special event annotation</source>
-      <translation type="unfinished" />
+      <translation>String de definição para anotação de evento especial</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/events.py" line="550" />
+      <source>Invert color of last button pressed</source>
+      <translation>Inverte a cor do último botão pressionado</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/events.py" line="554" />
+      <source>Show custom event button specification as button tooltip</source>
+      <translation>Mostrar especificação de botão de evento personalizado como dica de ferramenta de botão</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="251" />
@@ -19246,189 +19120,193 @@ aromática</translation>
       <location filename="../artisanlib/roast_properties.py" line="776" />
       <location filename="../artisanlib/background.py" line="176" />
       <location filename="../artisanlib/background.py" line="165" />
-      <location filename="../artisanlib/events.py" line="561" />
+      <location filename="../artisanlib/events.py" line="563" />
       <source>Copy table to clipboard, OPTION or ALT click for tabular text</source>
-      <translation type="unfinished" />
+      <translation>Copie a tabela para a área de transferência, clique em OPTION ou ALT para texto tabular</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="565" />
+      <location filename="../artisanlib/events.py" line="567" />
       <source>Add new extra Event button</source>
       <translation type="unfinished">Adiciona um novo botão de evento extra</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="570" />
+      <location filename="../artisanlib/events.py" line="572" />
       <source>Delete the last extra Event button</source>
       <translation type="unfinished">Remove o último botão de evento extra</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="109" />
-      <location filename="../artisanlib/ports.py" line="900" />
-      <location filename="../artisanlib/events.py" line="582" />
+      <location filename="../artisanlib/ports.py" line="905" />
+      <location filename="../artisanlib/events.py" line="584" />
       <source>Show help</source>
       <translation type="unfinished">Mostra ajuda</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="621" />
+      <location filename="../artisanlib/events.py" line="623" />
       <source>Backup all palettes to a text file</source>
       <translation type="unfinished">Guarda todas paletas em um arquivo texto</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="622" />
+      <location filename="../artisanlib/events.py" line="624" />
       <source>Restore all palettes from a text file</source>
       <translation type="unfinished">Recupera todas as paletas de um arquivo texto</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="648" />
+      <location filename="../artisanlib/events.py" line="650" />
       <source>Triggered quantifier fires slider action</source>
-      <translation type="unfinished" />
+      <translation>O quantificador acionado aciona a ação do controle deslizante</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="651" />
+      <location filename="../artisanlib/events.py" line="653" />
       <source>No processing delay if source delivers the set value (SV) instead of the process value (PV)</source>
-      <translation type="unfinished" />
+      <translation>Sem atraso de processamento se a fonte fornecer o valor definido (SV) em vez do valor do processo (PV)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1215" />
-      <location filename="../artisanlib/events.py" line="1207" />
-      <location filename="../artisanlib/events.py" line="1186" />
-      <location filename="../artisanlib/events.py" line="1178" />
-      <location filename="../artisanlib/events.py" line="1171" />
-      <location filename="../artisanlib/events.py" line="1163" />
-      <location filename="../artisanlib/events.py" line="1154" />
-      <location filename="../artisanlib/events.py" line="1145" />
-      <location filename="../artisanlib/events.py" line="1136" />
-      <location filename="../artisanlib/events.py" line="1127" />
-      <location filename="../artisanlib/events.py" line="1118" />
-      <location filename="../artisanlib/events.py" line="1109" />
-      <location filename="../artisanlib/events.py" line="1100" />
-      <location filename="../artisanlib/events.py" line="704" />
-      <location filename="../artisanlib/events.py" line="699" />
-      <location filename="../artisanlib/events.py" line="694" />
-      <location filename="../artisanlib/events.py" line="689" />
+      <location filename="../artisanlib/events.py" line="1217" />
+      <location filename="../artisanlib/events.py" line="1209" />
+      <location filename="../artisanlib/events.py" line="1188" />
+      <location filename="../artisanlib/events.py" line="1180" />
+      <location filename="../artisanlib/events.py" line="1173" />
+      <location filename="../artisanlib/events.py" line="1165" />
+      <location filename="../artisanlib/events.py" line="1156" />
+      <location filename="../artisanlib/events.py" line="1147" />
+      <location filename="../artisanlib/events.py" line="1138" />
+      <location filename="../artisanlib/events.py" line="1129" />
+      <location filename="../artisanlib/events.py" line="1120" />
+      <location filename="../artisanlib/events.py" line="1111" />
+      <location filename="../artisanlib/events.py" line="1102" />
+      <location filename="../artisanlib/events.py" line="706" />
+      <location filename="../artisanlib/events.py" line="701" />
+      <location filename="../artisanlib/events.py" line="696" />
+      <location filename="../artisanlib/events.py" line="691" />
       <source>Action Type</source>
       <translation type="unfinished">Tipo de ação</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="807" />
+      <location filename="../artisanlib/events.py" line="809" />
       <source>Applies the Bernoulli's gas law to the values computed
 by applying the given factor and offset to the slider value
 assuming that the gas pressureand not the gas flow is controlled.
 To reduce heat (or gas flow) by 50% the gas pressure
 has to be reduced by 4 times.</source>
-      <translation type="unfinished" />
+      <translation>Aplica a lei dos gases de Bernoulli aos valores calculados
+aplicando o fator e deslocamento fornecidos ao valor do controle deslizante
+assumindo que a pressão do gás e não o fluxo de gás é controlado.
+Para reduzir o calor (ou fluxo de gás) em 50% a pressão do gás
+tem que ser reduzido em 4 vezes.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="824" />
+      <location filename="../artisanlib/events.py" line="826" />
       <source>Slider steps in multiple of 10 otherwise 1</source>
-      <translation type="unfinished" />
+      <translation>Passos deslizantes em múltiplos de 10, caso contrário, 1</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="841" />
+      <location filename="../artisanlib/events.py" line="843" />
       <source>Slider values interpreted as temperatures</source>
-      <translation type="unfinished" />
+      <translation>Valores do controle deslizante interpretados como temperaturas</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="859" />
+      <location filename="../artisanlib/events.py" line="861" />
       <source>Unit to be added to generated event descriptions</source>
-      <translation type="unfinished" />
+      <translation>Unidade a ser adicionada às descrições de eventos gerados</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="878" />
+      <location filename="../artisanlib/events.py" line="880" />
       <source>Move slider under focus using the up/down cursor keys</source>
-      <translation type="unfinished" />
+      <translation>Mova o controle deslizante sob o foco usando as teclas de cursor para cima/para baixo</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="930" />
-      <location filename="../artisanlib/events.py" line="926" />
-      <location filename="../artisanlib/events.py" line="922" />
-      <location filename="../artisanlib/events.py" line="918" />
+      <location filename="../artisanlib/events.py" line="932" />
+      <location filename="../artisanlib/events.py" line="928" />
+      <location filename="../artisanlib/events.py" line="924" />
+      <location filename="../artisanlib/events.py" line="920" />
       <source>fire slider action</source>
-      <translation type="unfinished" />
+      <translation>ação deslizante de fogo</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="946" />
-      <location filename="../artisanlib/events.py" line="942" />
-      <location filename="../artisanlib/events.py" line="938" />
-      <location filename="../artisanlib/events.py" line="934" />
+      <location filename="../artisanlib/events.py" line="948" />
+      <location filename="../artisanlib/events.py" line="944" />
+      <location filename="../artisanlib/events.py" line="940" />
+      <location filename="../artisanlib/events.py" line="936" />
       <source>If source is a Set Value quantification gets never blocked</source>
-      <translation type="unfinished" />
+      <translation>Se a fonte for uma quantificação de valor definido nunca será bloqueada</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1220" />
-      <location filename="../artisanlib/events.py" line="1212" />
-      <location filename="../artisanlib/events.py" line="1193" />
-      <location filename="../artisanlib/events.py" line="1183" />
-      <location filename="../artisanlib/events.py" line="1176" />
-      <location filename="../artisanlib/events.py" line="1168" />
-      <location filename="../artisanlib/events.py" line="1159" />
-      <location filename="../artisanlib/events.py" line="1150" />
-      <location filename="../artisanlib/events.py" line="1141" />
-      <location filename="../artisanlib/events.py" line="1132" />
-      <location filename="../artisanlib/events.py" line="1123" />
-      <location filename="../artisanlib/events.py" line="1114" />
-      <location filename="../artisanlib/events.py" line="1105" />
+      <location filename="../artisanlib/events.py" line="1222" />
+      <location filename="../artisanlib/events.py" line="1214" />
+      <location filename="../artisanlib/events.py" line="1195" />
+      <location filename="../artisanlib/events.py" line="1185" />
+      <location filename="../artisanlib/events.py" line="1178" />
+      <location filename="../artisanlib/events.py" line="1170" />
+      <location filename="../artisanlib/events.py" line="1161" />
+      <location filename="../artisanlib/events.py" line="1152" />
+      <location filename="../artisanlib/events.py" line="1143" />
+      <location filename="../artisanlib/events.py" line="1134" />
+      <location filename="../artisanlib/events.py" line="1125" />
+      <location filename="../artisanlib/events.py" line="1116" />
+      <location filename="../artisanlib/events.py" line="1107" />
       <source>Action String</source>
       <translation type="unfinished">Texto de ação</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1195" />
+      <location filename="../artisanlib/events.py" line="1197" />
       <source>Interval</source>
-      <translation type="unfinished" />
+      <translation>Intervalo</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1252" />
-      <location filename="../artisanlib/ports.py" line="699" />
+      <location filename="../artisanlib/ports.py" line="1257" />
+      <location filename="../artisanlib/ports.py" line="704" />
       <source>OFF Action String</source>
-      <translation type="unfinished" />
+      <translation>Cadeia de ação DESLIGADA</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1255" />
-      <location filename="../artisanlib/ports.py" line="702" />
+      <location filename="../artisanlib/ports.py" line="1260" />
+      <location filename="../artisanlib/ports.py" line="707" />
       <source>ON Action String</source>
-      <translation type="unfinished" />
+      <translation>ON Cadeia de Ação</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="733" />
-      <location filename="../artisanlib/ports.py" line="729" />
+      <location filename="../artisanlib/ports.py" line="738" />
+      <location filename="../artisanlib/ports.py" line="734" />
       <source>Extra delay in Milliseconds between MODBUS Serial commands</source>
-      <translation type="unfinished" />
+      <translation>Atraso extra em milissegundos entre os comandos MODBUS Serial</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="759" />
-      <location filename="../artisanlib/ports.py" line="755" />
+      <location filename="../artisanlib/ports.py" line="764" />
+      <location filename="../artisanlib/ports.py" line="760" />
       <source>IP timeout in seconds, not larger than half of the sampling interval</source>
-      <translation type="unfinished" />
+      <translation>Tempo limite de IP em segundos, não maior que a metade do intervalo de amostragem</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="785" />
+      <location filename="../artisanlib/ports.py" line="790" />
       <source>Scan MODBUS</source>
       <translation type="unfinished">Escanear MODBUS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="802" />
+      <location filename="../artisanlib/ports.py" line="807" />
       <source>Reset socket connection on error</source>
-      <translation type="unfinished" />
+      <translation>Redefinir conexão de soquete em caso de erro</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1063" />
+      <location filename="../artisanlib/ports.py" line="1068" />
       <source>Scan S7</source>
-      <translation type="unfinished" />
+      <translation>Escanear S7</translation>
     </message>
     <message>
       <location filename="../artisanlib/background.py" line="71" />
       <source>Move the background profile using the cursor keys</source>
-      <translation type="unfinished" />
+      <translation>Mova o perfil de fundo usando as teclas do cursor</translation>
     </message>
     <message>
       <location filename="../artisanlib/background.py" line="131" />
       <location filename="../artisanlib/background.py" line="122" />
       <source>For loaded backgrounds with extra devices only</source>
-      <translation type="unfinished" />
+      <translation>Apenas para fundos carregados com dispositivos extras</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="3663" />
       <source>The maximum nominal batch size of the machine in kg</source>
-      <translation type="unfinished" />
+      <translation>O tamanho nominal máximo do lote da máquina em kg</translation>
     </message>
     <message>
       <location filename="../artisanlib/logs.py" line="42" />
@@ -19438,17 +19316,17 @@ has to be reduced by 4 times.</source>
     <message>
       <location filename="../artisanlib/curves.py" line="349" />
       <source>Use an optimal smoothing algorithm (only applicable offline, after recording)</source>
-      <translation type="unfinished" />
+      <translation>Use um algoritmo de suavização ideal (somente aplicável offline, após a gravação)</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="355" />
       <source>Compute the rate-of-rise over the delta span interval by a linear polyfit</source>
-      <translation type="unfinished" />
+      <translation>Calcule a taxa de aumento ao longo do intervalo delta span por um polyfit linear</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="782" />
       <source>Shows data table of plots</source>
-      <translation type="unfinished" />
+      <translation>Mostra a tabela de dados das parcelas</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="867" />
@@ -19462,17 +19340,17 @@ aproximada: valor y do ponto mais próximo</translation>
     <message>
       <location filename="../artisanlib/curves.py" line="909" />
       <source>Choose the start point of analysis interval of interest</source>
-      <translation type="unfinished" />
+      <translation>Escolha o ponto inicial do intervalo de análise de interesse</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="941" />
       <source>Choose the start point of curve fitting</source>
-      <translation type="unfinished" />
+      <translation>Escolha o ponto inicial do ajuste da curva</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1621" />
       <source>Add P1 and P2 as ET and BT</source>
-      <translation type="unfinished" />
+      <translation>Adicionar P1 e P2 como ET e BT</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1626" />
@@ -19481,65 +19359,71 @@ aproximada: valor y do ponto mais próximo</translation>
 1 an Extra virtual device if a profile is loaded
 2 or ET and BT if profile is not loaded
 </source>
-      <translation type="unfinished" />
+      <translation>Adicione P1 e P2 como:
+
+1 um dispositivo virtual extra se um perfil for carregado
+2 ou ET e BT se o perfil não estiver carregado
+</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1629" />
       <source>No more Virtual Extra Devices available</source>
-      <translation type="unfinished" />
+      <translation>Não há mais dispositivos extras virtuais disponíveis</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1634" />
       <location filename="../artisanlib/curves.py" line="1632" />
       <source>Not available during recording</source>
-      <translation type="unfinished" />
+      <translation>Não disponível durante a gravação</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="1637" />
       <source>Set P1 as ET background B1
 Set P2 as BT background B2
 Note: Erases all existing background curves.</source>
-      <translation type="unfinished" />
+      <translation>Definir P1 como fundo ET B1
+Definir P2 como fundo BT B2
+Nota: Apaga todas as curvas de fundo existentes.</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="114" />
       <source>Clear alarms table</source>
-      <translation type="unfinished" />
+      <translation>Limpar tabela de alarmes</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="709" />
       <source>Connect to plus service</source>
-      <translation type="unfinished" />
+      <translation>Conecte-se ao serviço plus</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="710" />
       <source>Subscription</source>
-      <translation type="unfinished" />
+      <translation>Inscrição</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="711" />
       <source>Reset original view</source>
-      <translation type="unfinished" />
+      <translation>Redefinir visualização original</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="712" />
       <source>Back to  previous view</source>
-      <translation type="unfinished" />
+      <translation>Voltar à visualização anterior</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="713" />
       <source>Forward to next view</source>
-      <translation type="unfinished" />
+      <translation>Avançar para a próxima visualização</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="715" />
       <source>Pan axes with left mouse, zoom with right</source>
-      <translation type="unfinished" />
+      <translation>Eixos panorâmicos com o botão esquerdo do mouse, zoom com o botão direito</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="716" />
       <source>Zoom to rectangle</source>
-      <translation type="unfinished" />
+      <translation>Zoom para retângulo</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="752" />
@@ -19560,22 +19444,22 @@ Note: Erases all existing background curves.</source>
     <message>
       <location filename="../artisanlib/main.py" line="2902" />
       <source>First Crack Start</source>
-      <translation type="unfinished" />
+      <translation>Início do primeiro crack</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2906" />
       <source>First Crack End</source>
-      <translation type="unfinished" />
+      <translation>Fim da Primeira Rachadura</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2910" />
       <source>Second Crack Start</source>
-      <translation type="unfinished" />
+      <translation>Início do segundo crack</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2914" />
       <source>Second Crack End</source>
-      <translation type="unfinished" />
+      <translation>Segunda Extremidade da Rachadura</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2926" />
@@ -19590,7 +19474,7 @@ Note: Erases all existing background curves.</source>
     <message>
       <location filename="../artisanlib/main.py" line="2936" />
       <source>Drop</source>
-      <translation type="unfinished" />
+      <translation>Derrubar</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2954" />
@@ -19695,80 +19579,84 @@ Note: Erases all existing background curves.</source>
     <message>
       <location filename="../artisanlib/main.py" line="3535" />
       <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE</source>
-      <translation type="unfinished" />
+      <translation>LCDs de fase: clique com o botão direito para alternar entre TIME, PERCENTAGE e TEMP MODE</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="4425" />
       <source>Syncing with artisan.plus</source>
-      <translation type="unfinished" />
+      <translation>Sincronizando com craft.plus</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="4464" />
       <location filename="../artisanlib/main.py" line="4428" />
       <source>Disconnect artisan.plus</source>
-      <translation type="unfinished" />
+      <translation>Desconectar craft.plus</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="4431" />
       <source>Upload to artisan.plus</source>
-      <translation type="unfinished" />
+      <translation>Carregar para craft.plus</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="4467" />
       <source>Connect artisan.plus</source>
-      <translation type="unfinished" />
+      <translation>Conectar artesão.plus</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6824" />
       <source>Phase LCDs
 Currently in ALL FINISHING MODE</source>
-      <translation type="unfinished" />
+      <translation>LCDs de fase
+Atualmente em TODO MODO DE ACABAMENTO</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6861" />
       <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE
 Currently in TIME MODE</source>
-      <translation type="unfinished" />
+      <translation>LCDs de fase: clique com o botão direito para alternar entre TIME, PERCENTAGE e TEMP MODE
+Atualmente no MODO TIME</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6879" />
       <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE
 Currently in PERCENTAGE MODE</source>
-      <translation type="unfinished" />
+      <translation>LCDs de fase: clique com o botão direito para alternar entre TIME, PERCENTAGE e TEMP MODE
+Atualmente no MODO PORCENTAGEM</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6893" />
       <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE
 Currently in TEMP MODE</source>
-      <translation type="unfinished" />
+      <translation>LCDs de fase: clique com o botão direito para alternar entre TIME, PERCENTAGE e TEMP MODE
+Atualmente no MODO TEMP</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23262" />
+      <location filename="../artisanlib/main.py" line="23285" />
       <source>&lt;b&gt;Label&lt;/b&gt;= </source>
       <translation>&lt;b&gt;Rótulo&lt;/b&gt;= </translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23263" />
+      <location filename="../artisanlib/main.py" line="23286" />
       <source>&lt;b&gt;Description &lt;/b&gt;= </source>
       <translation>&lt;b&gt;Descrição &lt;/b&gt;= </translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23264" />
+      <location filename="../artisanlib/main.py" line="23287" />
       <source>&lt;b&gt;Type &lt;/b&gt;= </source>
       <translation>&lt;b&gt;Tipo &lt;/b&gt;= </translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23266" />
+      <location filename="../artisanlib/main.py" line="23289" />
       <source>&lt;b&gt;Value &lt;/b&gt;= </source>
       <translation>&lt;b&gt;Valor &lt;/b&gt;= </translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23268" />
+      <location filename="../artisanlib/main.py" line="23291" />
       <source>&lt;b&gt;Documentation &lt;/b&gt;= </source>
       <translation>&lt;b&gt;Documentação &lt;/b&gt;= </translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23269" />
+      <location filename="../artisanlib/main.py" line="23292" />
       <source>&lt;b&gt;Button# &lt;/b&gt;= </source>
       <translation>&lt;b&gt;Botão# &lt;/b&gt;= </translation>
     </message>
@@ -19780,22 +19668,22 @@ Currently in TEMP MODE</source>
     <message>
       <location filename="../artisanlib/batches.py" line="44" />
       <source>ON/OFF batch counter</source>
-      <translation type="unfinished" />
+      <translation>Contador de lote ON/OFF</translation>
     </message>
     <message>
       <location filename="../artisanlib/batches.py" line="59" />
       <source>If ticked, the batch counter is never modified by loading a settings file</source>
-      <translation type="unfinished" />
+      <translation>Se marcado, o contador de lote nunca é modificado carregando um arquivo de configurações</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="280" />
       <source>Recaclulates all Virtual Devices and updates their values in the profile</source>
-      <translation type="unfinished" />
+      <translation>Recalcula todos os Dispositivos Virtuais e atualiza seus valores no perfil</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1207" />
       <source>Recaclulates ET and BT and updates their values in the profile</source>
-      <translation type="unfinished" />
+      <translation>Recalcula ET e BT e atualiza seus valores no perfil</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1502" />

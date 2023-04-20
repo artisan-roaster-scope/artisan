@@ -432,13 +432,16 @@ def debugLogLevelActive() -> bool:
         return False
 
 def setDeviceDebugLogLevel(state: bool) -> None:
+    import pymodbus
     if state:
         # debug logging on
-        setFileLogLevels(logging.DEBUG, ['pymodbus'])
+        pymodbus.pymodbus_apply_logging_config(logging.DEBUG)
+        #setFileLogLevels(logging.DEBUG, ['pymodbus'])
         _log.info('device debug logging ON')
     else:
         # debug logging off
-        setFileLogLevels(logging.INFO, ['pymodbus'])
+        pymodbus.pymodbus_apply_logging_config(logging.ERROR)
+        #setFileLogLevels(logging.INFO, ['pymodbus'])
         _log.info('device debug logging OFF')
 
 def setDebugLogLevel(state: bool) -> None:

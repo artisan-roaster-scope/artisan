@@ -367,25 +367,29 @@ class scanS7Dlg(ArtisanDialog):
 
 class PortComboBox(QComboBox):  # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
     __slots__ = ['selection','ports','edited'] # save some memory by using slots
-    def __init__(self, parent = None, selection = None) -> None:
+    def __init__(self, parent:Optional[QWidget] = None, selection:Optional[str] = None) -> None:
         super().__init__(parent)
         self.installEventFilter(self)
-        self.selection = selection # just the port name (first element of one of the triples in self.ports)
+        self.selection:Optional[str] = selection # just the port name (first element of one of the triples in self.ports)
+
+        self.setEditable(True)
+
         # a list of triples as returned by serial.tools.list_ports
         self.ports:List[Tuple[str, Optional[str], str]] = []  # list of tuples (port, desc, hwid)
         self.updateMenu()
-        self.edited = None
+        self.edited:Optional[str] = None
+        if self.selection is not None:
+            self.setCurrentText(self.selection)
         self.editTextChanged.connect(self.textEdited)
-        self.setEditable(True)
 
-    @pyqtSlot('QString')
-    def textEdited(self,txt):
+    @pyqtSlot(str)
+    def textEdited(self, txt:str) -> None:
         self.edited = txt
 
-    def getSelection(self):
+    def getSelection(self) -> Optional[str]:
         return self.edited or self.selection
 
-    def setSelection(self,i):
+    def setSelection(self, i:int) -> None:
         if i >= 0:
             try:
                 self.selection = self.ports[i][0]
@@ -401,7 +405,7 @@ class PortComboBox(QComboBox):  # pyright: ignore # Argument to class must be a 
             self.updateMenu()
         return super().eventFilter(obj, event)
 
-    def updateMenu(self):
+    def updateMenu(self) -> None:
         self.blockSignals(True)
         try:
             import serial.tools.list_ports
@@ -477,7 +481,8 @@ class comportDlg(ArtisanResizeablDialog):
         self.createserialTable()
         ##########################    TAB 3 WIDGETS   MODBUS
         modbus_comportlabel = QLabel(QApplication.translate('Label', 'Comm Port'))
-        self.modbus_comportEdit = PortComboBox(selection = self.aw.modbus.comport)
+        self.modbus_comportEdit = PortComboBox(self, selection = self.aw.modbus.comport)
+
 #        self.modbus_comportEdit.setFixedWidth(120)
         self.modbus_comportEdit.activated.connect(self.portComboBoxIndexChanged)
 #        modbus_comportlabel.setBuddy(self.modbus_comportEdit)
@@ -1781,7 +1786,7 @@ class comportDlg(ArtisanResizeablDialog):
                             devname = devicename
                         device = QTableWidgetItem(devname)    #type identification of the device. Non editable
                         self.serialtable.setItem(i,0,device)
-                        if (devid not in self.aw.qmc.nonSerialDevices) and devid != 29 and devicename[0] != '+': # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                        if (devid not in self.aw.qmc.nonSerialDevices) and devicename[0] != '+': # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                             comportComboBox = PortComboBox(selection = self.aw.extracomport[i])
                             comportComboBox.activated.connect(self.portComboBoxIndexChanged)
                             comportComboBox.setMinimumContentsLength(15)
@@ -1826,7 +1831,7 @@ class comportDlg(ArtisanResizeablDialog):
                 if len(self.aw.qmc.extradevices) > i:
                     devid = self.aw.qmc.extradevices[i]
                     devicename = self.aw.qmc.devices[devid-1]    #type identification of the device. Non editable
-                    if devid != 29 and devid != 33 and devicename[0] != '+': # hide serial confs for MODBUS and "+XX" extra devices
+                    if (devid not in self.aw.qmc.nonSerialDevices) and devicename[0] != '+': # hide serial confs for MODBUS and "+XX" extra devices
                         comportComboBox = self.serialtable.cellWidget(i,1)
                         assert isinstance(comportComboBox, PortComboBox)
                         self.aw.extracomport[i] = str(comportComboBox.getSelection())

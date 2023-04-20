@@ -156,7 +156,7 @@ for:
 
   environment:
     ARTISAN_OS: macos
-    MACOSX_DEPLOYMENT_TARGET: 10.15
+    MACOSX_DEPLOYMENT_TARGET: 11.0
     PYTHONSITEPKGS: /Users/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages
     QT_PATH: ${PYTHONSITEPKGS}/PyQt6/Qt6
     PYUIC: pyuic6

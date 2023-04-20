@@ -1203,8 +1203,8 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                 subscription_message_box.setIconPixmap(QPixmap(p))
                 if percent_used_formatted != '':
                     percent_used_formatted = '\n' + percent_used_formatted
-                subscription_message_box.setText('Do you want to extend your subscription?')
-                subscription_message_box.setInformativeText(f'Your subscription ends on {QDate(pu.year,pu.month,pu.day).toString(QLocale().dateFormat(QLocale.FormatType.ShortFormat))}\n{days}{percent_used_formatted}')
+                subscription_message_box.setText(QApplication.translate('Plus','Do you want to extend your subscription?'))
+                subscription_message_box.setInformativeText(QApplication.translate('Plus','Your subscription ends on') + f' {QDate(pu.year,pu.month,pu.day).toString(QLocale().dateFormat(QLocale.FormatType.ShortFormat))}\n{days}{percent_used_formatted}')
                 subscription_message_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
 #                subscription_message_box.show()
                 res = subscription_message_box.exec()
@@ -10821,7 +10821,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             def setdecimal(rawvalue:float) -> str:
                 return f'{rawvalue:.1f}' if self.qmc.LCDdecimalplaces else f'{rawvalue:.0f}'
 
-            #note: fields are delimited only at the start, to avoid ambiguity the shortest similar field string 
+            #note: fields are delimited only at the start, to avoid ambiguity the shortest similar field string
             #      must be last in the list.  Example, "date_time" must come before "date" in the list.
             fields : List[Tuple[str,str]]
             fields = [

@@ -547,9 +547,11 @@ class EventsDlg(ArtisanResizeablDialog):
         self.nbuttonsSizeBox.addItems(size_items)
         self.nbuttonsSizeBox.setCurrentIndex(self.aw.buttonsize)
         self.markLastButtonPressed = QCheckBox(QApplication.translate('CheckBox','Mark last pressed'))
+        self.markLastButtonPressed.setToolTip(QApplication.translate('Tooltip', 'Invert color of last button pressed'))
         self.markLastButtonPressed.setChecked(self.aw.mark_last_button_pressed)
         self.markLastButtonPressed.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.showExtraButtonTooltips = QCheckBox(QApplication.translate('CheckBox','Tooltips'))
+        self.showExtraButtonTooltips.setToolTip(QApplication.translate('Tooltip', 'Show custom event button specification as button tooltip'))
         self.showExtraButtonTooltips.setChecked(self.aw.show_extrabutton_tooltips)
         self.showExtraButtonTooltips.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         #table for showing events
@@ -2281,6 +2283,8 @@ class EventsDlg(ArtisanResizeablDialog):
         self.eventbuttontable.setDragEnabled(False) # content not draggable, only vertical header!
         self.eventbuttontable.verticalHeader().setSectionsMovable(True)
         self.eventbuttontable.verticalHeader().setDragDropMode(QTableWidget.DragDropMode.InternalMove)
+        self.eventbuttontable.setAutoScroll(False)
+        self.eventbuttontable.verticalHeader().setAutoScroll(False)
 
         visibility = [QApplication.translate('ComboBox','OFF'),
                       QApplication.translate('ComboBox','ON')]
