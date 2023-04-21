@@ -100,7 +100,7 @@ class modbusport():
     __slots__ = [ 'aw', 'modbus_serial_read_delay', 'modbus_serial_extra_read_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
         'timeout', 'IP_timeout', 'IP_retries', 'serial_readRetries', 'PID_slave_ID', 'PID_SV_register', 'PID_p_register', 'PID_i_register', 'PID_d_register', 'PID_ON_action', 'PID_OFF_action',
         'channels', 'inputSlaves', 'inputRegisters', 'inputFloats', 'inputBCDs', 'inputFloatsAsInt', 'inputBCDsAsInt', 'inputSigned', 'inputCodes', 'inputDivs',
-        'inputModes', 'optimizer', 'fetch_max_blocks', 'fail_on_cache_miss', 'disconnect_on_error', 'reset_socket', 'activeRegisters', 'readingsCache', 'SVmultiplier', 'PIDmultiplier',
+        'inputModes', 'optimizer', 'fetch_max_blocks', 'fail_on_cache_miss', 'disconnect_on_error', 'acceptable_errors', 'reset_socket', 'activeRegisters', 'readingsCache', 'SVmultiplier', 'PIDmultiplier',
         'byteorderLittle', 'wordorderLittle', 'master', 'COMsemaphore', 'host', 'port', 'type', 'lastReadResult', 'commError' ]
 
     def __init__(self, aw:'ApplicationWindow') -> None:
@@ -154,6 +154,7 @@ class modbusport():
             # send individual reading request; if set to True, never send individual data requests while optimizer is on
             # NOTE: if TRUE read requests with force=False (default) will fail
         self.disconnect_on_error:bool = True # if True we explicitly disconnect the MODBUS connection on IO errors (was: if on MODBUS serial and restart it on next request)
+        self.acceptable_errors = 2 # the number of errors that are acceptable without a disconnect/reconnect. If set to 0 every error triggers a reconnect if disconnect_on_error is True
 
         self.reset_socket:bool = False # reset socket connection on error (True by default in pymodbus>v2.5.2, False by default in pymodbus v2.3)
 
@@ -178,7 +179,7 @@ class modbusport():
         #    4: UDP
         self.lastReadResult:Optional[int] = 0 # this is set by eventaction following some custom button/slider Modbus actions with "read" command
 
-        self.commError:bool = False # True after a communication error was detected and not yet cleared by receiving proper data
+        self.commError:int = 0 # number of errors that occured after the last connect; cleared by receiving proper data
 
     # this guarantees a minimum of 30 milliseconds between readings and 80ms between writes (according to the Modbus spec) on serial connections
     # this sleep delays between requests seems to be beneficial on slow RTU serial connections like those of the FZ-94
@@ -215,10 +216,15 @@ class modbusport():
         self.master = None
         self.clearReadingsCache()
 
+    def clearCommError(self):
+        if self.commError>0:
+            self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
+        self.commError = 0
+
     def disconnectOnError(self) -> None:
         # we only disconnect on error if mechanism is active, we are no longer connected or there is a IO commError, [ and we are on serial MODBUS (IP MODBUS reconnects automtically) NOTE: this seems to succeed in any case!?]
-        if self.disconnect_on_error and (self.commError or not self.isConnected()): # and self.type < 3:
-            _log.info('MODBUS disconnectOnError')
+        if self.disconnect_on_error and (self.commError>self.acceptable_errors or not self.isConnected()): # and self.type < 3:
+            _log.info('MODBUS disconnectOnError: %s', self.commError)
             self.disconnect()
 
     # t a duration between start and end time in seconds to be formatted in a string as ms
@@ -234,7 +240,7 @@ class modbusport():
 #        if self.master and not self.master.socket:
 #            self.master = None
         if self.master is None or not self.master.socket:
-            self.commError = False
+            self.commError = 0
             try:
                 # as in the following the port is None, no port is opened on creation of the (py)serial object
                 if self.type == 1: # Serial ASCII
@@ -248,9 +254,9 @@ class modbusport():
                         bytesize=self.bytesize,
                         parity=self.parity,
                         stopbits=self.stopbits,
-                        retries=1,
-                        retry_on_empty=False,
-                        retry_on_invalid=False,
+                        retries=1,   # number of send retries
+                        retry_on_empty=True,     # retry on empty response, by default False for faster speed
+                        retry_on_invalid=True,  # retry on invalid response, by default False for faster speed # retired
                         reset_socket=self.reset_socket,
                         reconnect_delay=0, # avoid automatic reconnection
                         on_reconnect_callback=self.reconnect,
@@ -268,9 +274,9 @@ class modbusport():
                         bytesize=self.bytesize,
                         parity=self.parity,
                         stopbits=self.stopbits,
-                        retries=1,
-                        retry_on_empty=False,
-                        retry_on_invalid=False,
+                        retries=0,   # number of send retries
+                        retry_on_empty=True,     # retry on empty response, by default False for faster speed
+                        retry_on_invalid=True,  # retry on invalid response, by default False for faster speed # retired
                         reset_socket=self.reset_socket,
                         reconnect_delay=0, # avoid automatic reconnection
                         on_reconnect_callback=self.reconnect,
@@ -283,17 +289,17 @@ class modbusport():
                         self.master = ModbusTcpClient(
                                 host=self.host,
                                 port=self.port,
-                                retry_on_empty=True,   # only supported for serial clients in v2.5.2
-                                retry_on_invalid=True, # only supported for serial clients in v2.5.2
+                                retries=2, # number of send retries
+                                retry_on_empty=True,      # retry on empty response
+                                retry_on_invalid=True,   # retry on invalid response # retired
                                 close_comm_on_error=self.reset_socket,
                                 reset_socket=self.reset_socket,
-                                retries=self.IP_retries,
                                 reconnect_delay=0, # avoid automatic reconnection
                                 on_reconnect_callback=self.reconnect,
                                 # timeout is in seconds (int) and defaults to 3
                                 timeout=min((self.aw.qmc.delay/2000), self.IP_timeout) # the timeout should not be larger than half of the sampling interval
                                 )
-                        self.readRetries = 1
+                        self.readRetries = self.IP_retries
                     except Exception: # pylint: disable=broad-except
                         self.master = ModbusTcpClient(
                                 host=self.host,
@@ -305,17 +311,17 @@ class modbusport():
                         self.master = ModbusUdpClient(
                             host=self.host,
                             port=self.port,
-                            retry_on_empty=True,   # only supported for serial clients in v2.5.2
-                            retry_on_invalid=True, # only supported for serial clients in v2.5.2
+                            retries=2, # number of send retries
+                            retry_on_empty=True,      # retry on empty response
+                            retry_on_invalid=True,   # retry on invalid response # retired
                             close_comm_on_error=self.reset_socket,
                             reset_socket=self.reset_socket,
-                            retries=self.IP_retries,
                             reconnect_delay=0, # avoid automatic reconnection
                             on_reconnect_callback=self.reconnect,
                             # timeout is in seconds (int) and defaults to 3
                             timeout=min((self.aw.qmc.delay/2000), self.IP_timeout) # the timeout should not be larger than half of the sampling interval
                             )
-                        self.readRetries = 1
+                        self.readRetries = self.IP_retries
                     except Exception: # pylint: disable=broad-except # older versions of pymodbus don't support the retries, timeout nor the retry_on_empty arguments
                         self.master = ModbusUdpClient(
                             host=self.host,
@@ -332,23 +338,22 @@ class modbusport():
                         bytesize=self.bytesize,
                         parity=self.parity,
                         stopbits=self.stopbits,
-                        retries=1,
-                        retry_on_empty=False,  # by default False for faster speed
-                        retry_on_invalid=False, # by default False
+                        retries=1,              # number of send retries
+                        retry_on_empty=True,    # retry on empty response; by default False for faster speed
+                        retry_on_invalid=True,  # retry on invalid response; by default False  # retired
                         reset_socket=self.reset_socket,
                         strict=False, # settings this to False disables the inter char timeout restriction
                         reconnect_delay=0, # avoid automatic reconnection
                         on_reconnect_callback=self.reconnect,
                         timeout=min((self.aw.qmc.delay/2000), self.timeout)) # the timeout should not be larger than half of the sampling interval
-#                    self.master.inter_char_timeout = 0.05
                     self.readRetries = self.serial_readRetries
                 _log.debug('connect(): connecting')
-                time.sleep(.3) # avoid possible hickups on startup
+                time.sleep(.2) # avoid possible hickups on startup
                 self.master.connect()
                 if self.isConnected():
                     self.updateActiveRegisters()
                     self.clearReadingsCache()
-                    time.sleep(.2) # avoid possible hickups on startup
+                    time.sleep(.3) # avoid possible hickups on startup
                     self.aw.sendmessage(QApplication.translate('Message', 'Connected via MODBUS'))
                 else:
                     self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Error: failed to connect'))
@@ -484,12 +489,9 @@ class modbusport():
                                     _log.debug(ser_str)
                                     self.aw.addserial(ser_str)
 
-                                if res is not None:
-                                    if self.commError: # we clear the previous error and send a message
-                                        self.commError = False
-                                        self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
-                                    if hasattr(res, 'registers'):
-                                        self.cacheReadings(code,slave,register,res.registers)  # pyright: ignore # Cannot access member "registers" for type "ModbusResponse" Member "registers" is unknown (reportGeneralTypeIssues)
+                                if res is not None and hasattr(res, 'registers'):
+                                    self.clearCommError()
+                                    self.cacheReadings(code,slave,register,res.registers)  # pyright: ignore # Cannot access member "registers" for type "ModbusResponse" Member "registers" is unknown (reportGeneralTypeIssues)
 
         except Exception as ex: # pylint: disable=broad-except
             _log.debug(ex)
@@ -499,7 +501,8 @@ class modbusport():
 #            _, _, exc_tb = sys.exc_info()
 #            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:") + " readSingleRegister() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Error'))
-            self.commError = error_disconnect
+            if error_disconnect:
+                self.commError = self.commError + 1
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -802,9 +805,8 @@ class modbusport():
                 if res is not None and hasattr(res, 'registers'):
                     decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)  # pyright: ignore # Cannot access member "registers" for type "ModbusResponse"
                     r = decoder.decode_32bit_float()
-                    if self.commError: # we clear the previous error and send a message
-                        self.commError = False
-                        self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
+                    # we clear the previous error and send a message
+                    self.clearCommError()
                     time.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
                     return r
             return None
@@ -818,7 +820,8 @@ class modbusport():
 #            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:") + " readFloat() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             if self.aw.qmc.flagon:
                 self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Error'))
-            self.commError = error_disconnect
+            if error_disconnect:
+                self.commError = self.commError + 1
             return None
         finally:
             if self.COMsemaphore.available() < 1:
@@ -882,9 +885,7 @@ class modbusport():
                 if res is not None and hasattr(res, 'registers'):
                     decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)  # pyright: ignore # Cannot access member "registers" for type "ModbusResponse"
                     r = decoder.decode_32bit_uint()
-                    if self.commError: # we clear the previous error and send a message
-                        self.commError = False
-                        self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
+                    self.clearCommError()
                     time.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
                     return convert_from_bcd(r)
             return None
@@ -898,7 +899,8 @@ class modbusport():
 #            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:") + " readBCD() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             if self.aw.qmc.flagon:
                 self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Error'))
-            self.commError = error_disconnect
+            if error_disconnect:
+                self.commError = self.commError + 1
             return None
         finally:
             if self.COMsemaphore.available() < 1:
@@ -1011,9 +1013,8 @@ class modbusport():
                 if res is not None:
                     if code in [1,2] and hasattr(res, 'bits'):
                         r = 1 if res is not None and res.bits[0] else 0  # pyright: ignore # Cannot access member "registers" for type "bits"
-                        if self.commError: # we clear the previous error and send a message
-                            self.commError = False
-                            self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
+                        # we clear the previous error and send a message
+                        self.clearCommError()
                         return r
                     if hasattr(res, 'registers'):
                         decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle) # pyright: ignore # Cannot access member "registers" for type "ModbusResponse"
@@ -1021,9 +1022,8 @@ class modbusport():
                             r = decoder.decode_16bit_int()
                         else:
                             r = decoder.decode_16bit_uint()
-                        if self.commError: # we clear the previous error and send a message
-                            self.commError = False
-                            self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
+                        # we clear the previous error and send a message
+                        self.clearCommError()
                         return r
             return None
         except Exception as ex: # pylint: disable=broad-except
@@ -1036,7 +1036,8 @@ class modbusport():
 #            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:") + " readSingleRegister() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             if self.aw.qmc.flagon:
                 self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Error'))
-            self.commError = error_disconnect
+            if error_disconnect:
+                self.commError = self.commError + 1
             return None
         finally:
             if self.COMsemaphore.available() < 1:
@@ -1105,9 +1106,8 @@ class modbusport():
                         r = decoder.decode_32bit_int()
                     else:
                         r = decoder.decode_32bit_uint()
-                    if self.commError: # we clear the previous error and send a message
-                        self.commError = False
-                        self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
+                    # we clear the previous error and send a message
+                    self.clearCommError()
                     return r
             return None
         except Exception as ex: # pylint: disable=broad-except
@@ -1120,7 +1120,8 @@ class modbusport():
 #            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:") + " readFloat() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             if self.aw.qmc.flagon:
                 self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Error'))
-            self.commError = error_disconnect
+            if error_disconnect:
+                self.commError = self.commError + 1
             return None
         finally:
             if self.COMsemaphore.available() < 1:
@@ -1187,9 +1188,8 @@ class modbusport():
                 if res is not None and hasattr(res, 'registers'):
                     decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle) # pyright: ignore # Cannot access member "registers" for type "ModbusResponse"
                     r = decoder.decode_16bit_uint()
-                    if self.commError: # we clear the previous error and send a message
-                        self.commError = False
-                        self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
+                    # we clear the previous error and send a message
+                    self.clearCommError()
                     time.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
                     return convert_from_bcd(r)
             return None
@@ -1203,7 +1203,8 @@ class modbusport():
 #            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:") + " readBCDint() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             if self.aw.qmc.flagon:
                 self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Error'))
-            self.commError = error_disconnect
+            if error_disconnect:
+                self.commError = self.commError + 1
             return None
         finally:
             if self.COMsemaphore.available() < 1:

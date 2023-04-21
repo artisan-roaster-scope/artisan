@@ -440,7 +440,7 @@ def setDeviceDebugLogLevel(state: bool) -> None:
         _log.info('device debug logging ON')
     else:
         # debug logging off
-        pymodbus.pymodbus_apply_logging_config(logging.ERROR)
+        pymodbus.pymodbus_apply_logging_config(logging.INFO)
         #setFileLogLevels(logging.INFO, ['pymodbus'])
         _log.info('device debug logging OFF')
 

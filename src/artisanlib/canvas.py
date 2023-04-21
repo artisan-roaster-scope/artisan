@@ -14907,7 +14907,10 @@ class tgraphcanvas(FigureCanvas):
             elif self.timeindex[x] >= 1:
                 self.timeindex[x] += 1
 
+
         if not self.locktimex:
+            self.startofx = self.timex[0] -60
+            self.endofx = self.timex[-1] + 60
             self.xaxistosm(redraw=False)
 
 #        # import UnivariateSpline needed to draw the curve in designer
@@ -14958,9 +14961,17 @@ class tgraphcanvas(FigureCanvas):
                 t2.append(self.temp2[self.timeindex[i]])    #add temp2
                 timeindexhold[i] =  self.timex[self.timeindex[i]]
 
+        # we remember time axis limits to reconstruct after reset (which might alter them such that they do not fit to the profile data any longer!)
+        startofx = self.startofx
+        endofx = self.endofx
+
         res = self.reset()  #erase screen
         if not res:
             return False
+
+        # reconstruct timeaxis limits
+        self.startofx = startofx
+        self.endofx = endofx
 
         self.timex,self.temp1,self.temp2 = timez[:],t1[:],t2[:]  #copy lists back after reset() with the main points
 
@@ -14984,7 +14995,9 @@ class tgraphcanvas(FigureCanvas):
         self.designer_timez = list(numpy.arange(self.timex[0],self.timex[-1],self.time_step_size))
         # set initial RoR z-axis limits
         self.setDesignerDeltaAxisLimits(self.DeltaETflag, self.DeltaBTflag)
+
         self.redrawdesigner(force=True)                                   #redraw the designer screen
+
         return True
 
 
@@ -15067,10 +15080,6 @@ class tgraphcanvas(FigureCanvas):
 
                 # update z-axis limits if autoDelta is enabled
                 self.setDesignerDeltaAxisLimits(self.DeltaETflag and self.autodeltaxET, self.DeltaBTflag and self.autodeltaxBT)
-
-                if not self.locktimex and self.timex[-1] > self.endofx:
-                    self.endofx = self.timex[-1] + 120
-                    self.xaxistosm()
 
                 # init artists
                 rcParams['path.sketch'] = (0,0,0)
