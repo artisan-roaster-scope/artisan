@@ -1454,6 +1454,7 @@ class CurvesDlg(ArtisanDialog):
             self.exppower = power
             self.aw.qmc.resetlines()
             self.redraw_enabled_math_curves()
+            self.expvarCheck.setChecked(True)
             self.processExpvar()
 
     #watermark image

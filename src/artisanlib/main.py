@@ -22137,6 +22137,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.qmc.analysisresultsstr = ''
         self.qmc.resetlinecountcaches()
         self.qmc.deleteAnnoPositions(foreground=False, background=True)
+        self.sendmessage(QApplication.translate('Message', 'Background profile removed'))
 
     @pyqtSlot()
     @pyqtSlot(bool)
