@@ -5577,8 +5577,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     background = True
                 if background:
                     t_min,t_max = self.calcAutoAxisBackground()
-                    if self.qmc.timeindexB[0] != -1 and len(self.qmc.timeB) > self.qmc.timeindexB[0]:
-                        t_max = t_max - self.qmc.timeB[self.qmc.timeindexB[0]]
+                    if self.qmc.timeindex[0] != -1 and len(self.qmc.timex) > self.qmc.timeindex[0]:
+                        t_max = t_max - self.qmc.timex[self.qmc.timeindex[0]]
                 elif len(self.qmc.timex) > 3:
                     t_min,t_max = self.calcAutoAxisForeground()
                     if self.qmc.timeindex[0] != -1 and len(self.qmc.timex) > self.qmc.timeindex[0]:
@@ -5591,11 +5591,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                         t_max_b = t_max
                     else:
                         _,t_max_b = self.calcAutoAxisBackground()
-                        if self.qmc.timeindexB[0] != -1 and len(self.qmc.timeB) > self.qmc.timeindexB[0]:
-                            t_max_b = t_max_b - self.qmc.timeB[self.qmc.timeindexB[0]]
+                        if self.qmc.timeindex[0] != -1 and len(self.qmc.time) > self.qmc.timeindex[0]:
+                            t_max_b = t_max_b - self.qmc.time[self.qmc.timeindex[0]]
                     t_max = max(t_max,t_max_b)
 
-                if background and self.qmc.timeindexB[0] != -1:
+                if background and self.qmc.timeindexB[0] != -1 and len(self.qmc.timeB) > self.qmc.timeindexB[0]:
                     self.qmc.startofx = t_min - self.qmc.timeB[self.qmc.timeindexB[0]]
                 else:
                     self.qmc.startofx = t_min
@@ -24463,6 +24463,7 @@ def main():
                     appWindow.qmc.background = not appWindow.qmc.hideBgafterprofileload
                     if not appWindow.lastLoadedProfile and not(appWindow.logofilename != '' and appWindow.logoimgflag):
                         # this extra redraw is not needed if a watermark is loaded as it is triggered by the resize-redraw mechanism
+                        appWindow.qmc.timealign(redraw=False)
                         appWindow.autoAdjustAxis(background=appWindow.qmc.background and (not len(appWindow.qmc.timex) > 3))
                         appWindow.qmc.redraw()
                     else:

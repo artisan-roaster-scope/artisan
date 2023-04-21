@@ -14798,6 +14798,8 @@ class tgraphcanvas(FigureCanvas):
             if reply == QMessageBox.StandardButton.Yes:
                 res = self.initfromprofile()
                 if res:
+                    self.ax_lines_clear()
+                    self.ax_annotations_clear() # remove background profiles annotations (has to be done before reset!)
                     self.connect_designer()
                     self.aw.disableEditMenus(designer=True)
                     self.redraw()
@@ -14814,6 +14816,10 @@ class tgraphcanvas(FigureCanvas):
             self.specialeventsvaluecopy = []
             self.specialeventstypecopy = []
             #
+            #pylint: disable=E0611
+            #reset (clear) plot
+            self.ax_lines_clear()
+            self.ax_annotations_clear() # remove background profiles annotations (has to be done before reset!)
             self.reset(redraw=False,soundOn=False)
             self.connect_designer()
             self.aw.disableEditMenus(designer=True)
@@ -14907,6 +14913,7 @@ class tgraphcanvas(FigureCanvas):
             elif self.timeindex[x] >= 1:
                 self.timeindex[x] += 1
 
+        self.timealign(redraw=False)
 
         if not self.locktimex:
             self.startofx = self.timex[0] -60
@@ -14986,6 +14993,8 @@ class tgraphcanvas(FigureCanvas):
             self.currentx = 0
             self.currenty = 0
 
+        self.timealign(redraw=False)
+
         if not self.locktimex:
             self.xaxistosm(redraw=False)
 #        # import UnivariateSpline needed to draw the curve in designer
@@ -15063,10 +15072,6 @@ class tgraphcanvas(FigureCanvas):
                 # we first initialize the background canvas and the bitblit cache
                 self.designer_timez = list(numpy.arange(self.timex[0],self.timex[-1],self.time_step_size))
 
-                #pylint: disable=E0611
-                #reset (clear) plot
-                self.ax_lines_clear()
-                self.ax_annotations_clear() # remove background profiles annotations
 
                 # remove logo image while in Designer
                 if self.ai is not None:
@@ -15155,7 +15160,6 @@ class tgraphcanvas(FigureCanvas):
 
                 # initialize bitblit background
                 self.ax_background_designer = self.fig.canvas.copy_from_bbox(self.ax.get_figure().bbox)
-
 
 
             # restore background
