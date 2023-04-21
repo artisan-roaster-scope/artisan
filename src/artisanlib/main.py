@@ -5591,8 +5591,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                         t_max_b = t_max
                     else:
                         _,t_max_b = self.calcAutoAxisBackground()
-                        if self.qmc.timeindex[0] != -1 and len(self.qmc.time) > self.qmc.timeindex[0]:
-                            t_max_b = t_max_b - self.qmc.time[self.qmc.timeindex[0]]
+                        if self.qmc.timeindex[0] != -1 and len(self.qmc.timex) > self.qmc.timeindex[0]:
+                            t_max_b = t_max_b - self.qmc.timex[self.qmc.timeindex[0]]
                     t_max = max(t_max,t_max_b)
 
                 if background and self.qmc.timeindexB[0] != -1 and len(self.qmc.timeB) > self.qmc.timeindexB[0]:
