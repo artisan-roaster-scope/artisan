@@ -15072,6 +15072,10 @@ class tgraphcanvas(FigureCanvas):
                 # we first initialize the background canvas and the bitblit cache
                 self.designer_timez = list(numpy.arange(self.timex[0],self.timex[-1],self.time_step_size))
 
+                #pylint: disable=E0611
+                #reset (clear) plot
+                self.ax_lines_clear()
+                self.ax_annotations_clear() # remove background profiles annotations (has to be done before reset!)
 
                 # remove logo image while in Designer
                 if self.ai is not None:
