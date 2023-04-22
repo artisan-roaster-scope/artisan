@@ -225,11 +225,12 @@ reportMissingTypeStubs = false
 pythonVersion = "3.7"
 pythonPlatform = "All"
 
-#typeCheckingMode = "basic" # "off", "basic", "strict"
+#typeCheckingMode = "strict" # "off", "basic", "strict"
 
-# strict disabled checks
+# strict disabled checks # "error", "warning", false, true
+#reportUnboundVariable = "error"
 #reportUnknownParameterType = false
 #reportMissingParameterType = false
 #reportUnknownMemberType = false
 #reportUnknownArgumentType = false
-#reportGeneralTypeIssues = false # "error", false, true
+#reportGeneralTypeIssues = false

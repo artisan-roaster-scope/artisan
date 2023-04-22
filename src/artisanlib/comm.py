@@ -5878,7 +5878,11 @@ class serialport():
                     self.SP.write(str2cmd(command + '\n'))       #send command
                     self.SP.flush()
                     libtime.sleep(.1)
-                    result = self.SP.readline().decode('utf-8')[:-2]  #read
+                    result = ''
+                    try:
+                        result = self.SP.readline().decode('utf-8')[:-2]  #read
+                    except Exception: # pylint: disable=broad-except
+                        pass
                     if (not len(result) == 0 and not result.startswith('#')):
                         raise Exception(QApplication.translate('Error Message','Arduino could not set channels',None)) # pylint: disable=broad-exception-raised
 

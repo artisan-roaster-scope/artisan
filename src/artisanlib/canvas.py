@@ -4792,7 +4792,7 @@ class tgraphcanvas(FigureCanvas):
 
     # number is alarmnumber+1 (the 1-based alarm number the user sees), for alarms triggered from outside the alarmtable (like PID RS alarms) number is 0
     @pyqtSlot(int,bool,int,str)
-    def processAlarm(self,number,beep,action,string):
+    def processAlarm(self,number:int, beep:bool, action:int, string:str) -> None:
         if not self.silent_alarms:
             try:
                 if beep:
@@ -4864,7 +4864,7 @@ class tgraphcanvas(FigureCanvas):
                             self.aw.extraeventsactionslastvalue[slidernr] = int(round(slidervalue))
                             if self.flagstart:
                                 value = self.aw.float2float((slidervalue + 10.0) / 10.0)
-                                self.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,eventdescription=f'A{number:%d} (S{slidernr:%d})')
+                                self.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,eventdescription=f'A{number:d} (S{slidernr:d})')
                             self.aw.fireslideraction(slidernr)
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
