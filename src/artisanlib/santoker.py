@@ -24,6 +24,9 @@ from contextlib import suppress
 from threading import Thread
 
 from pymodbus.utilities import computeCRC
+from pymodbus.client.serial_asyncio import open_serial_connection
+
+from artisanlib.types import SerialSettings
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -243,8 +246,9 @@ class SantokerNetwork():
             with suppress(asyncio.CancelledError, ConnectionResetError):
                 await writer.drain()
 
-    async def connect(self, host:str, port:int,
-            connected_handler:Optional[Callable[[], None]] = None,
+    # if serial settings are given, host/port are ignore and communication handled by the given serial port
+    async def connect(self, host:str, port:int, serial:Optional[SerialSettings] = None,
+                connected_handler:Optional[Callable[[], None]] = None,
                 disconnected_handler:Optional[Callable[[], None]] = None,
                 charge_handler:Optional[Callable[[], None]] = None,
                 dry_handler:Optional[Callable[[], None]] = None,
@@ -253,9 +257,19 @@ class SantokerNetwork():
                 drop_handler:Optional[Callable[[], None]] = None) -> None:
         while True:
             try:
-                _log.debug('connecting to %s:%s ...',host,port)
-                connect = asyncio.open_connection(host, port)
-                # Wait for 1 seconds, then raise TimeoutError
+                if serial is not None:
+                    _log.debug('connecting to serial port: ...',serial['port'])
+                    connect = open_serial_connection(
+                        url=serial['port'],
+                        baudrate=serial['baudrate'],
+                        bytesize=serial['bytesize'],
+                        stopbits=serial['stopbits'],
+                        parity=serial['parity'],
+                        timeout=serial['timeout'])
+                else:
+                    _log.debug('connecting to %s:%s ...',host,port)
+                    connect = asyncio.open_connection(host, port)
+                # Wait for 2 seconds, then raise TimeoutError
                 reader, writer = await asyncio.wait_for(connect, timeout=2)
                 _log.debug('connected')
                 if connected_handler is not None:
@@ -319,6 +333,7 @@ class SantokerNetwork():
     # start/stop sample thread
 
     def start(self, host:str = '10.10.100.254', port:int = 20001,
+                serial:Optional[SerialSettings] = None,
                 connected_handler:Optional[Callable[[], None]] = None,
                 disconnected_handler:Optional[Callable[[], None]] = None,
                 charge_handler:Optional[Callable[[], None]] = None,
@@ -332,7 +347,7 @@ class SantokerNetwork():
             self._thread = Thread(target=self.start_background_loop, args=(self._loop,), daemon=True)
             self._thread.start()
             # run sample task in async loop
-            asyncio.run_coroutine_threadsafe(self.connect(host, port,
+            asyncio.run_coroutine_threadsafe(self.connect(host, port, serial,
                 connected_handler, disconnected_handler,
                 charge_handler, dry_handler, fcs_handler, scs_handler, drop_handler), self._loop)
         except Exception as e:  # pylint: disable=broad-except

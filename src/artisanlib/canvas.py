@@ -60,6 +60,7 @@ from artisanlib import pid
 from artisanlib.time import ArtisanTime
 from artisanlib.filters import LiveMedian
 from artisanlib.dialogs import ArtisanMessageBox
+from artisanlib.types import SerialSettings
 
 # import artisan.plus module
 from plus.util import roastLink
@@ -11221,7 +11222,17 @@ class tgraphcanvas(FigureCanvas):
                     from artisanlib.santoker import SantokerNetwork
                     self.aw.santoker = SantokerNetwork()
                     self.aw.santoker.setLogging(self.device_logging)
+                    santoker_serial:Optional[SerialSettings] = None
+                    if self.aw.santokerSerial:
+                        santoker_serial = {
+                                'port': self.aw.ser.comport,
+                                'baudrate': self.aw.ser.baudrate,
+                                'bytesize': self.aw.ser.bytesize,
+                                'stopbits': self.aw.ser.stopbits,
+                                'parity': self.aw.ser.parity,
+                                'timeout': self.aw.ser.timeout}
                     self.aw.santoker.start(self.aw.santokerHost, self.aw.santokerPort,
+                        santoker_serial,
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', 'Santoker connected'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', 'Santoker disconnected'),True,None),
                         charge_handler=lambda : (self.markChargeSignal.emit() if (self.timeindex[0] == -1) else None),

@@ -19,17 +19,17 @@ import sys
 import time
 import platform
 import logging
-from typing import List, Tuple, Optional
+from typing import List, Optional
 from typing_extensions import Final  # Python <=3.7
 
 from artisanlib.util import toFloat, uchr, comma2dot
-from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog
+from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog, PortComboBox
 from artisanlib.comm import serialport
 
 
 try:
     #pylint: disable = E, W, R, C
-    from PyQt6.QtCore import (Qt, pyqtSlot, QEvent, QSettings) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import (Qt, pyqtSlot, QSettings) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QIntValidator # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
@@ -37,7 +37,7 @@ try:
                                  QHeaderView)  # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #pylint: disable = E, W, R, C
-    from PyQt5.QtCore import (Qt, pyqtSlot, QEvent, QSettings) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import (Qt, pyqtSlot, QSettings) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QIntValidator # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
@@ -365,71 +365,6 @@ class scanS7Dlg(ArtisanDialog):
         self.stop = True
         self.accept()
 
-class PortComboBox(QComboBox):  # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
-    __slots__ = ['selection','ports','edited'] # save some memory by using slots
-    def __init__(self, parent:Optional[QWidget] = None, selection:Optional[str] = None) -> None:
-        super().__init__(parent)
-        self.installEventFilter(self)
-        self.selection:Optional[str] = selection # just the port name (first element of one of the triples in self.ports)
-
-        self.setEditable(True)
-
-        # a list of triples as returned by serial.tools.list_ports
-        self.ports:List[Tuple[str, Optional[str], str]] = []  # list of tuples (port, desc, hwid)
-        self.updateMenu()
-        self.edited:Optional[str] = None
-        if self.selection is not None:
-            self.setCurrentText(self.selection)
-        self.editTextChanged.connect(self.textEdited)
-
-    @pyqtSlot(str)
-    def textEdited(self, txt:str) -> None:
-        self.edited = txt
-
-    def getSelection(self) -> Optional[str]:
-        return self.edited or self.selection
-
-    def setSelection(self, i:int) -> None:
-        if i >= 0:
-            try:
-                self.selection = self.ports[i][0]
-                self.edited = None # reset the user text editing
-            except Exception: # pylint: disable=broad-except
-                pass
-
-    def eventFilter(self, obj, event):
-# the next prevents correct setSelection on Windows
-#        if event.type() == QEvent.Type.FocusIn:
-#            self.setSelection(self.currentIndex())
-        if event.type() == QEvent.Type.MouseButtonPress:
-            self.updateMenu()
-        return super().eventFilter(obj, event)
-
-    def updateMenu(self) -> None:
-        self.blockSignals(True)
-        try:
-            import serial.tools.list_ports
-            # on older versions of pyserial list_ports.comports() returned a list of tuples (port, desc, hwid), current versions return a list of ListPortInfo objects
-            comports = [(cp.device, cp.product, 'n/a') for cp in serial.tools.list_ports.comports()]
-            if platform.system() == 'Darwin':
-                self.ports = [p for p in comports if (p[0] not in ['/dev/cu.Bluetooth-PDA-Sync',
-                    '/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem','/dev/cu.Bluetooth-Incoming-Port','/dev/tty.Bluetooth-Incoming-Port'])]
-            else:
-                self.ports = list(comports)
-            if self.selection is not None and self.selection not in [p[0] for p in self.ports]:
-                self.ports.append((self.selection,'',''))
-            self.ports = sorted(self.ports,key=lambda p: p[0])
-            self.clear()
-            self.addItems([(p[1] if (p[1] is not None and p[1]!='n/a') else p[0]) for p in self.ports])
-            try:
-                if self.selection is not None:
-                    pos = [p[0] for p in self.ports].index(self.selection)
-                    self.setCurrentIndex(pos)
-            except Exception: # pylint: disable=broad-except
-                pass
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
-        self.blockSignals(False)
 
 class comportDlg(ArtisanResizeablDialog):
     def __init__(self, parent, aw) -> None:
@@ -914,7 +849,8 @@ class comportDlg(ArtisanResizeablDialog):
         tab1Layout = QVBoxLayout()
         tab1Layout.addWidget(etbt_help_label)
         devid = self.aw.qmc.device
-        if (devid not in self.aw.qmc.nonSerialDevices) and not(devid == 0 and self.aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
+        if (((devid not in self.aw.qmc.nonSerialDevices) or (devid == 134 and self.aw.santokerSerial)) and
+                not(devid == 0 and self.aw.ser.useModbusPort)): # hide serial confs for MODBUS, Phidget and Yocto devices (but enable for Santoker/Serial)
             grid = QGridLayout()
             grid.addWidget(comportlabel,0,0,Qt.AlignmentFlag.AlignRight)
             grid.addWidget(self.comportEdit,0,1)

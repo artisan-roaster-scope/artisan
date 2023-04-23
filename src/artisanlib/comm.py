@@ -3801,7 +3801,7 @@ class serialport():
                     ports = 8
                 # try to attach up to 16 IO channels of the first Phidget REL1101 module
                 if ser is None:
-                    ser,_ = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_REL1100,
+                    ser,_ = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_REL1101,
                                 remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
                     ports = 16
                 if ser is not None:

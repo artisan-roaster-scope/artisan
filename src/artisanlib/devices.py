@@ -55,6 +55,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
         self.helpdialog = None
 
+        self.org_phidgetRemoteFlag = self.aw.qmc.phidgetRemoteFlag
+        self.org_yoctoRemoteFlag = self.aw.qmc.yoctoRemoteFlag
+        self.org_santokerSerial = self.aw.santokerSerial
+
         ################ TAB 1   WIDGETS
         #ETcurve
         self.ETcurve = QCheckBox(QApplication.translate('CheckBox', 'ET'))
@@ -940,21 +944,26 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.phidgetBoxRemoteFlag = QCheckBox()
         self.phidgetBoxRemoteFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.phidgetBoxRemoteFlag.setChecked(self.aw.qmc.phidgetRemoteFlag)
+        self.phidgetBoxRemoteFlag.stateChanged.connect(self.phidgetRemoteStateChanged)
         phidgetServerIdLabel = QLabel(QApplication.translate('Label','Host'))
         self.phidgetServerId = QLineEdit(self.aw.qmc.phidgetServerID)
         self.phidgetServerId.textChanged.connect(self.phidgetHostChanged)
         self.phidgetServerId.setMinimumWidth(200)
+        self.phidgetServerId.setEnabled(self.aw.qmc.phidgetRemoteFlag)
         phidgetPasswordLabel = QLabel(QApplication.translate('Label','Password'))
         self.phidgetPassword = QLineEdit(self.aw.qmc.phidgetPassword)
         self.phidgetPassword.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
         self.phidgetPassword.setEnabled(self.aw.qmc.phidgetServerID != '')
         self.phidgetPassword.setMinimumWidth(100)
+        self.phidgetPassword.setEnabled(self.aw.qmc.phidgetRemoteFlag)
         phidgetPortLabel = QLabel(QApplication.translate('Label','Port'))
         self.phidgetPort = QLineEdit(str(self.aw.qmc.phidgetPort))
         self.phidgetPort.setMaximumWidth(70)
+        self.phidgetPort.setEnabled(self.aw.qmc.phidgetRemoteFlag)
         self.phidgetBoxRemoteOnlyFlag = QCheckBox(QApplication.translate('Label','Remote Only'))
         self.phidgetBoxRemoteOnlyFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.phidgetBoxRemoteOnlyFlag.setChecked(self.aw.qmc.phidgetRemoteOnlyFlag)
+        self.phidgetBoxRemoteOnlyFlag.setEnabled(self.aw.qmc.phidgetRemoteFlag)
         phidgetServerBox = QHBoxLayout()
         phidgetServerBox.addWidget(phidgetServerIdLabel)
         phidgetServerBox.addWidget(self.phidgetServerId)
@@ -998,8 +1007,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.yoctoBoxRemoteFlag = QCheckBox()
         self.yoctoBoxRemoteFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.yoctoBoxRemoteFlag.setChecked(self.aw.qmc.yoctoRemoteFlag)
+        self.yoctoBoxRemoteFlag.stateChanged.connect(self.yoctoBoxRemoteFlagStateChanged)
         yoctoServerIdLabel = QLabel(QApplication.translate('Label','VirtualHub'))
         self.yoctoServerId = QLineEdit(self.aw.qmc.yoctoServerID)
+        self.yoctoServerId.setEnabled(self.aw.qmc.yoctoRemoteFlag)
         YoctoEmissivityLabel = QLabel(QApplication.translate('Label','Emissivity'))
         self.yoctoEmissivitySpinBox = MyQDoubleSpinBox()
         self.yoctoEmissivitySpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -1115,20 +1126,25 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         ambientVBox.addLayout(ambientHBox)
         ambientVBox.addStretch()
         ambientVBox.setContentsMargins(0,0,0,0)
-
         santokerHostLabel = QLabel(QApplication.translate('Label','Host'))
         self.santokerHost = QLineEdit(self.aw.santokerHost)
         self.santokerHost.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.santokerHost.setFixedWidth(150)
+        self.santokerHost.setEnabled(not self.aw.santokerSerial)
         santokerPortLabel = QLabel(QApplication.translate('Label','Port'))
         self.santokerPort = QLineEdit(str(self.aw.santokerPort))
         self.santokerPort.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.santokerPort.setFixedWidth(150)
+        self.santokerPort.setEnabled(not self.aw.santokerSerial)
+        self.santokerSerialFlag = QCheckBox()
+        self.santokerSerialFlag.setChecked(not self.aw.santokerSerial)
+        self.santokerSerialFlag.stateChanged.connect(self.santokerSerialStateChanged)
         santokerNetworkGrid = QGridLayout()
-        santokerNetworkGrid.addWidget(santokerHostLabel,0,0)
-        santokerNetworkGrid.addWidget(self.santokerHost,0,1)
-        santokerNetworkGrid.addWidget(santokerPortLabel,1,0)
-        santokerNetworkGrid.addWidget(self.santokerPort,1,1)
+        santokerNetworkGrid.addWidget(self.santokerSerialFlag,0,0)
+        santokerNetworkGrid.addWidget(santokerHostLabel,0,1)
+        santokerNetworkGrid.addWidget(self.santokerHost,0,2)
+        santokerNetworkGrid.addWidget(santokerPortLabel,1,1)
+        santokerNetworkGrid.addWidget(self.santokerPort,1,2)
         santokerNetworkGrid.setSpacing(20)
         santokerNetworkGroupBox = QGroupBox(QApplication.translate('GroupBox','Network'))
         santokerNetworkGroupBox.setLayout(santokerNetworkGrid)
@@ -1332,6 +1348,24 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.restoreGeometry(settings.value('DeviceAssignmentGeometry'))
         self.TabWidget.setCurrentIndex(activeTab)
 
+    @pyqtSlot(int)
+    def yoctoBoxRemoteFlagStateChanged(self, _:int) -> None:
+        self.aw.qmc.yoctoRemoteFlag = not self.aw.qmc.yoctoRemoteFlag
+        self.yoctoServerId.setEnabled(self.aw.qmc.yoctoRemoteFlag)
+
+    @pyqtSlot(int)
+    def phidgetRemoteStateChanged(self, _:int) -> None:
+        self.aw.qmc.phidgetRemoteFlag = not self.aw.qmc.phidgetRemoteFlag
+        self.phidgetServerId.setEnabled(self.aw.qmc.phidgetRemoteFlag)
+        self.phidgetPassword.setEnabled(self.aw.qmc.phidgetRemoteFlag)
+        self.phidgetPort.setEnabled(self.aw.qmc.phidgetRemoteFlag)
+        self.phidgetBoxRemoteOnlyFlag.setEnabled(self.aw.qmc.phidgetRemoteFlag)
+
+    @pyqtSlot(int)
+    def santokerSerialStateChanged(self, _:int) -> None:
+        self.aw.santokerSerial = not self.aw.santokerSerial
+        self.santokerHost.setEnabled(not self.aw.santokerSerial)
+        self.santokerPort.setEnabled(not self.aw.santokerSerial)
 
     @pyqtSlot(str)
     def phidgetHostChanged(self,s):
@@ -1342,7 +1376,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.aw.ser.externaloutprogramFlag = not self.aw.ser.externaloutprogramFlag
 
     @pyqtSlot(int)
-    def asyncFlagStateChanged1048(self,x):
+    def asyncFlagStateChanged1048(self, x:int):
         try:
             sender = self.sender()
             assert isinstance(sender, QCheckBox)
@@ -2132,6 +2166,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     def cancelEvent(self):
         self.aw.DeviceAssignmentDlg_activeTab = self.TabWidget.currentIndex()
         self.close()
+        self.aw.qmc.phidgetRemoteFlag = self.org_phidgetRemoteFlag
+        self.aw.qmc.yoctoRemoteFlag = self.org_yoctoRemoteFlag
+        self.aw.santokerSerial = self.org_santokerSerial
         self.reject()
 
     @pyqtSlot()
@@ -3200,6 +3237,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 self.aw.santokerPort = int(self.santokerPort.text())
             except Exception: # pylint: disable=broad-except
                 pass
+
             for i in range(8):
                 self.aw.qmc.phidget1018_async[i] = self.asyncCheckBoxes[i].isChecked()
                 self.aw.qmc.phidget1018_ratio[i] = self.ratioCheckBoxes[i].isChecked()
@@ -3227,7 +3265,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.sendmessage(message)
             #open serial conf Dialog
             #if device is not None or not external-program (don't need serial settings config)
-            if self.aw.qmc.device not in self.aw.qmc.nonSerialDevices:
+            if self.aw.qmc.device not in self.aw.qmc.nonSerialDevices or (self.aw.qmc.device == 134 and self.aw.santokerSerial):
                 self.aw.setcommport()
             self.close()
             self.accept()

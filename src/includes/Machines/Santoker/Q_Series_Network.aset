@@ -6,6 +6,7 @@ roastertype_setup=Santoker Q Series
 id=134
 santokerHost=10.10.100.254
 santokerPort=20001
+santokerSerial=false
 
 [events]
 markTP=false

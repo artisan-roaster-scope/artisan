@@ -479,3 +479,11 @@ class RecentRoast(TypedDict, total=False):
     plus_blend_label:Optional[str]
     plus_blend_spec:Optional['Blend']
     plus_blend_spec_labels: List[str]
+
+class SerialSettings(TypedDict):
+    port: str
+    baudrate: int
+    bytesize: int
+    stopbits: int
+    parity: str
+    timeout: float

@@ -619,7 +619,7 @@ from artisanlib.modbusport import modbusport
 from artisanlib.slider_style import artisan_slider_style
 from artisanlib.event_button_style import artisan_event_button_style
 from artisanlib.simulator import Simulator
-from artisanlib.dialogs import ArtisanMessageBox, HelpDlg, ArtisanInputDialog, ArtisanComboBoxDialog
+from artisanlib.dialogs import ArtisanMessageBox, HelpDlg, ArtisanInputDialog, ArtisanComboBoxDialog, ArtisanPortsDialog
 from artisanlib.large_lcds import (LargeMainLCDs, LargeDeltaLCDs, LargePIDLCDs, LargeExtraLCDs, LargePhasesLCDs, LargeScaleLCDs)
 from artisanlib.logs import (serialLogDlg, errorDlg, messageDlg)
 from artisanlib.comm import serialport, colorport, scaleport
@@ -1355,7 +1355,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         'userprofilepath', 'printer', 'main_widget', 'defaultdpi', 'dpi', 'qmc', 'HottopControlActive', 'AsyncSamplingTimer', 'wheeldialog',
         'simulator', 'simulatorpath', 'comparator', 'stack', 'eventsbuttonflag', 'minieventsflags', 'seriallogflag',
         'seriallog', 'ser', 'modbus', 'extraMODBUStemps', 'extraMODBUStx', 's7', 'ws', 'scale', 'color', 'extraser', 'extracomport', 'extrabaudrate',
-        'extrabytesize', 'extraparity', 'extrastopbits', 'extratimeout', 'santokerHost', 'santokerPort', 'santoker', 'fujipid', 'dtapid', 'pidcontrol', 'soundflag', 'recentRoasts', 'maxRecentRoasts',
+        'extrabytesize', 'extraparity', 'extrastopbits', 'extratimeout', 'santokerHost', 'santokerPort', 'santokerSerial', 'santoker', 'fujipid', 'dtapid', 'pidcontrol', 'soundflag', 'recentRoasts', 'maxRecentRoasts',
         'lcdpaletteB', 'lcdpaletteF', 'extraeventsbuttonsflags', 'extraeventslabels', 'extraeventbuttoncolor', 'extraeventsactionstrings',
         'extraeventbuttonround', 'block_quantification_sampling_ticks', 'sampling_ticks_to_block_quantifiction', 'extraeventsactionslastvalue',
         'org_extradevicesettings', 'eventslidervalues', 'eventslidervisibilities', 'eventsliderKeyboardControl', 'eventslideractions', 'eventslidercommands', 'eventslideroffsets',
@@ -1617,6 +1617,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         # Santoker Network
         self.santokerHost:str = '10.10.100.254'
         self.santokerPort:int = 20001
+        self.santokerSerial:bool = False # if True connection is via the main serial port
         self.santoker:Optional['SantokerNetwork'] = None # holds the Santoker instance created on connect; reset to None on disconnect
 
         # create a ET control objects
@@ -4979,47 +4980,20 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                         QApplication.translate('Message', 'Network name or IP address'),text=self.ws.host) #"127.0.0.1"
                     if res:
                         self.ws.host = host
-                elif self.qmc.device in [0,9,19,53,101,115,126] or (self.qmc.device == 29 and self.modbus.type in [0,1,2]): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial, HB/ARC
-                    import serial.tools.list_ports
-                    comports:List[Tuple[Optional[str],Optional[str]]] = [(cp.device, cp.product) for cp in serial.tools.list_ports.comports()]
-                    ports:List[Tuple[Optional[str],Optional[str]]]
-                    if platform.system() == 'Darwin':
-                        ports = [p for p in comports if (p[0] not in ['/dev/cu.Bluetooth-PDA-Sync',
-                            '/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem','/dev/cu.Bluetooth-Incoming-Port','/dev/tty.Bluetooth-Incoming-Port'])]
-                        ports = list(filter (lambda x: x[0] is not None and 'Bluetooth-Inc' not in x[0], ports))
-                    else:
-                        ports = comports
-                    if self.ser.comport not in [p[0] for p in ports]:
-                        ports.append((self.ser.comport,''))
-                    ports = sorted(ports,key=lambda p: (p[0] if p[0] is not None else ''))
-                    items:List[str] = [(p[1] if (p[1] is not None and p[1]!='n/a') else (p[0] if p[0] is not None else '')) for p in ports]
-                    current = 0
-                    try:
-                        current = [p[0] for p in ports].index(self.ser.comport)
-                    except Exception: # pylint: disable=broad-except
-                        pass
-                    if self.qmc.device == 53: # Hottop 2k+
-                        try:
-                            current = [p[0] for p in ports].index('FT230X Basic UART')
-                        except Exception: # pylint: disable=broad-except
-                            pass
-                    port_name,res = QInputDialog.getItem(self,
-                        QApplication.translate('Message', 'Port Configuration'),
-                        QApplication.translate('Message', 'Comm Port'),
-                        items,
-                        current,
-                        False)
+                elif (self.qmc.device in [0,9,19,53,101,115,126] or (self.qmc.device == 29 and self.modbus.type in [0,1,2]) or
+                        (self.qmc.device == 134 and self.santokerSerial)): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial, HB/ARC
+                    select_device_name = None
+                    if self.qmc.device == 53: # Hottop 2k+:
+                        select_device_name = 'FT230X Basic UART'
+                    commPort_dlg:ArtisanPortsDialog = ArtisanPortsDialog(self, self, selection=self.ser.comport, select_device_name=select_device_name)
+                    res = bool(commPort_dlg.exec())
                     if res:
-                        try:
-                            pos = items.index(port_name)
-                            new_port = ports[pos][0]
-                            if new_port is not None:
-                                if self.qmc.device == 29: # MODBUS serial
-                                    self.modbus.comport = new_port
-                                else: # Fuji or HOTTOP
-                                    self.ser.comport = new_port
-                        except Exception: # pylint: disable=broad-except
-                            pass
+                        new_port = commPort_dlg.getSelection()
+                        if new_port is not None:
+                            if self.qmc.device == 29: # MODBUS serial
+                                self.modbus.comport = new_port
+                            else: # Fuji or HOTTOP
+                                self.ser.comport = new_port
                 if res:
                     if self.qmc.roastersize_setup == 0:
                         batchsize,res = QInputDialog.getDouble(self,
@@ -5568,7 +5542,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     # background: if True, adjust such that background from CHARGE to DROP is fully in view
     #      (automatic set if time axis adjust is active, timex=True, during sampling and recording)
     #      if background is False, the RESET min/max times are respected even if a background profile is loaded
-    def autoAdjustAxis(self, background=False,timex=True,deltas=True):
+    def autoAdjustAxis(self, background:bool = False, timex:bool = True, deltas:bool = True) -> None:
         try:
             if self.qmc.autotimex and timex:
                 # auto timex adjust
@@ -15342,8 +15316,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 self.qmc.ambient_humidity_device = toInt(settings.value('ambient_humidity_device',self.qmc.ambient_humidity_device))
                 self.qmc.ambient_pressure_device = toInt(settings.value('ambient_pressure_device',self.qmc.ambient_pressure_device))
                 self.qmc.elevation = toInt(settings.value('elevation',self.qmc.elevation))
-            self.santokerHost = toString(settings.value('santokerHost',self.santokerHost))
-            self.santokerPort = toInt(settings.value('santokerPort',self.santokerPort))
+            if settings.contains('santokerHost'):
+                self.santokerHost = toString(settings.value('santokerHost',self.santokerHost))
+            if settings.contains('santokerPort'):
+                self.santokerPort = toInt(settings.value('santokerPort',self.santokerPort))
+            if settings.contains('santokerSerial'):
+                self.santokerSerial = bool(toBool(settings.value('santokerSerial',self.santokerSerial)))
             # activate CONTROL BUTTON
             self.showControlButton()
             if settings.contains('controlETpid'):
@@ -17313,6 +17291,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             settings.setValue('elevation',self.qmc.elevation)
             settings.setValue('santokerHost',self.santokerHost)
             settings.setValue('santokerPort',self.santokerPort)
+            settings.setValue('santokerSerial',self.santokerSerial)
             settings.endGroup()
             settings.setValue('fmt_data_RoR',self.qmc.fmt_data_RoR)
             settings.setValue('fmt_data_ON',self.qmc.fmt_data_ON)

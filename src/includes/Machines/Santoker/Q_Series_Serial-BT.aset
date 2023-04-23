@@ -1,0 +1,75 @@
+[General]
+Delay=1000
+roastertype_setup=Santoker Q Series
+
+[Device]
+id=134
+santokerHost=10.10.100.254
+santokerPort=20001
+santokerSerial=true
+
+[events]
+markTP=false
+
+[ExtraComm]
+extrabaudrate=19200, 19200
+extrabytesize=8, 8
+extracomport=COM1, COM1
+extraparity=E, E
+extrastopbits=1, 1
+extratimeout=0.5, 0.5
+
+[ExtraDev]
+devicetablecolumnwidths=167, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100
+extraCurveVisibility1=false, false, true, true, true, true, true, true, true, true
+extraCurveVisibility2=false, false, true, true, true, true, true, true, true, true
+extraDelta1=false, false, false, false, false, false, false, false, false, false
+extraDelta2=false, false, false, false, false, false, false, false, false, false
+extraFill1=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+extraFill2=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+extraLCDvisibility1=false, false, false, false, false, false, false, false, false, false
+extraLCDvisibility2=false, false, false, false, false, false, false, false, false, false
+extradevicecolor1=#910113, #49b160
+extradevicecolor2=#4895ce, #800080
+extradevices=135, 136
+extramathexpression1=, 
+extramathexpression2=, 
+extraname1=Power, Drum
+extraname2=Fan, Extra 2
+
+
+[DefaultButtons]
+buttonactions=5, 5, 5, 0, 5, 0, 5, 0
+buttonactionstrings="santoker(80,1)", "santoker(81,1)", "santoker(82,1)", , "santoker(83,1)", , "santoker(84,1)", 
+buttonvisibility=true, true, true, true, true, false, true, false
+extrabuttonactions=0, 0, 0
+extrabuttonactionstrings=, , 
+xextrabuttonactions=0, 0
+xextrabuttonactionstrings=, 
+
+[Quantifiers]
+clusterEventsFlag=false
+eventquantifierSV=0, 0, 0, 0
+eventquantifieraction=0, 0, 0, 0
+quantifieractive=1, 0, 0, 1
+quantifiercoarse=0, 0, 0, 0
+quantifiermax=100, 100, 100, 100
+quantifiermin=0, 0, 0, 0
+quantifiersource=3, 4, 0, 2
+
+
+[Sliders]
+ModeTempSliders=C
+eventsliderBernoulli=0, 0, 0, 0
+eventsliderKeyboardControl=true
+eventslidercoarse=0, 0, 0, 0
+eventslidersflags=0, 1, 1
+eventslidertemp=0, 0, 0, 0
+eventsliderunits=, , , 
+slideractions=11, 11, 0, 11
+slidercommands="santoker(ca,{})", "santoker(c0,{})", , "santoker(fa,{})"
+sliderfactors=1, 1, 1, 1
+slidermax=100, 100, 100, 100
+slidermin=0, 0, 0, 0
+slideroffsets=0, 0, 0, 0
+slidervisibilities=1, 0, 0, 1
