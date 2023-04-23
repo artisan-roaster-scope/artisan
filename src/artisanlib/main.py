@@ -10863,9 +10863,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 ('devtime_long',devtime_long),
                 ('devtime',devtime),
                 ('dtr',dtr),
-                ('dryphasedeltatemp',setdecimal(cp['dry_phase_delta_temp']) if 'dry_phase_delta_temp' in cp else setdecimal(0.0)),  #dave NEW TODO add to help file
-                ('midphasedeltatemp',setdecimal(cp['mid_phase_delta_temp']) if 'mid_phase_delta_temp' in cp else setdecimal(0.0)),  #dave NEW TODO add to help file
-                ('finishphasedeltatemp',setdecimal(cp['finish_phase_delta_temp']) if 'finish_phase_delta_temp' in cp else setdecimal(0.0)),  #dave NEW TODO add to help file
+                ('dryphasedeltatemp',setdecimal(cp['dry_phase_delta_temp']) if 'dry_phase_delta_temp' in cp else setdecimal(0.0)),
+                ('midphasedeltatemp',setdecimal(cp['mid_phase_delta_temp']) if 'mid_phase_delta_temp' in cp else setdecimal(0.0)),
+                ('finishphasedeltatemp',setdecimal(cp['finish_phase_delta_temp']) if 'finish_phase_delta_temp' in cp else setdecimal(0.0)),
                 ('roastingnotes_line',roastingnotesline),
                 ('roastingnotes_10',roastingnotesline[:10]),
                 ('roastingnotes_15',roastingnotesline[:15]),
