@@ -258,7 +258,7 @@ class SantokerNetwork():
         while True:
             try:
                 if serial is not None:
-                    _log.debug('connecting to serial port: ...',serial['port'])
+                    _log.debug('connecting to serial port: %s ...',serial['port'])
                     connect = open_serial_connection(
                         url=serial['port'],
                         baudrate=serial['baudrate'],
