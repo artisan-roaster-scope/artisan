@@ -69,10 +69,8 @@ import sys
 import re
 
 try:
-    #pylint: disable = E, W, R, C
     from PyQt6.QtWidgets import QApplication  
-except Exception:
-    #pylint: disable = E, W, R, C
+except ImportError:
     from PyQt5.QtWidgets import QApplication # type: ignore # noqa: F401
 from openpyxl import load_workbook
 

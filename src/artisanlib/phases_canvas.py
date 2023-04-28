@@ -32,11 +32,9 @@ from artisanlib.util import toGrey, toDim, stringfromseconds
 
 
 try:
-    #pylint: disable-next = E, W, R, C
     from PyQt6.QtGui import QColor # @Reimport @UnresolvedImport @UnusedImport
     from PyQt6.QtCore import QSettings # @Reimport @UnresolvedImport @UnusedImport
-except Exception: # type: ignore # pylint: disable=broad-except
-    #pylint: disable = E, W, R, C
+except ImportError:
     from PyQt5.QtGui import QColor # type: ignore # @Reimport @UnresolvedImport @UnusedImport
     from PyQt5.QtCore import QSettings # type: ignore # @Reimport @UnresolvedImport @UnusedImport
 

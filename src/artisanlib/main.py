@@ -106,7 +106,6 @@ except Exception: # pylint: disable=broad-except
 QtWebEngineSupport:bool = False # set to True if the QtWebEngine was successfully imported
 
 try:
-    #pylint: disable-next = E, W, R, C
     from PyQt6.QtWidgets import (QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect, # @Reimport @UnresolvedImport @UnusedImport # pylint: disable=import-error
                              QInputDialog, QGroupBox, QLineEdit, # @Reimport @UnresolvedImport @UnusedImport
                              QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport @UnresolvedImport @UnusedImport
@@ -128,12 +127,11 @@ try:
     try:
         from PyQt6.QtWebEngineWidgets import QWebEngineView # @Reimport @UnresolvedImport @UnusedImport  # pylint: disable=import-error,no-name-in-module
         QtWebEngineSupport = True
-    except Exception: # pylint: disable=broad-except
+    except ImportError:
         # on the RPi platform there is no native package PyQt-WebEngine nor PyQt6-WebEngine for Raspebarry 32bit
         pass
     from PyQt6 import sip # @Reimport @UnresolvedImport @UnusedImport
-except Exception: # type: ignore # pylint: disable=broad-except
-    #pylint: disable = E, W, R, C
+except ImportError:
     from PyQt5.QtWidgets import (QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,  # type: ignore  # @Reimport @UnresolvedImport @UnusedImport
                              QInputDialog, QGroupBox, QLineEdit,  # type: ignore  # @Reimport @UnresolvedImport @UnusedImport
                              QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # type: ignore  # @Reimport @UnresolvedImport @UnusedImport
@@ -155,12 +153,12 @@ except Exception: # type: ignore # pylint: disable=broad-except
     try:
         from PyQt5.QtWebEngineWidgets import QWebEngineView # type: ignore # @Reimport @UnresolvedImport @UnusedImport # pylint: disable=import-error,no-name-in-module
         QtWebEngineSupport = True
-    except Exception: # pylint: disable=broad-except
+    except ImportError:
         # on the RPi platform there is no native package PyQt-WebEngine nor PyQt6-WebEngine for Raspebarry 32bit
         pass
     try:
         from PyQt5 import sip # type: ignore # @Reimport @UnresolvedImport @UnusedImport
-    except Exception: # type: ignore # pylint: disable=broad-except
+    except ImportError:
         import sip # type: ignore # @Reimport @UnresolvedImport @UnusedImport
 
 
@@ -232,7 +230,7 @@ from artisanlib.qtsingleapplication import QtSingleApplication
 try:
     # spanning a second multiprocessing instance (Hottop server) on macOS falils to import the YAPI interface
     from yoctopuce.yocto_api import YAPI # type: ignore
-except Exception: # pylint: disable=broad-except
+except ImportError:
     pass
 
 # platform dependent imports:
@@ -20302,13 +20300,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if self.pdf_page_layout is None:
                 # lazy imports
                 try:
-                    #pylint: disable = E, W, R, C
                     from PyQt6.QtCore import QMarginsF  # @UnusedImport @Reimport  @UnresolvedImport
-                    from PyQt6.QtGui import QPageLayout, QPageSize  # @UnusedImport @Reimport  @UnresolvedImport
-                except Exception:  # pylint: disable=broad-except
-                    #pylint: disable = E, W, R, C
+                    from PyQt6.QtGui import QPageSize  # @UnusedImport @Reimport  @UnresolvedImport
+                except ImportError:
                     from PyQt5.QtCore import QMarginsF # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                    from PyQt5.QtGui import QPageLayout, QPageSize  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                    from PyQt5.QtGui import QPageSize  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                 if QPrinter().pageLayout().pageSize().id() == QPageSize.PageSizeId.Letter:
                     # Letter
                     ps = QPageSize(QPageSize.PageSizeId.Letter)

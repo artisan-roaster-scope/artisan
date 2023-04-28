@@ -23,10 +23,8 @@ from artisanlib import __revision__
 from artisanlib.dialogs import ArtisanDialog
 
 try:
-    #pylint: disable = E, W, R, C
     from PyQt6.QtWidgets import QApplication, QVBoxLayout, QTextEdit # @UnusedImport @Reimport  @UnresolvedImport
-except Exception: # pylint: disable=broad-except
-    #pylint: disable = E, W, R, C
+except ImportError:
     from PyQt5.QtWidgets import QApplication, QVBoxLayout, QTextEdit # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 class platformDlg(ArtisanDialog):

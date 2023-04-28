@@ -41,11 +41,9 @@ application_organization_domain: Final[str] = 'artisan-scope.org'
 
 
 try:
-    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import QStandardPaths, QCoreApplication # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QColor  # @UnusedImport @Reimport  @UnresolvedImport
-except Exception: # pylint: disable=broad-except
-    #pylint: disable = E, W, R, C
+except ImportError:
     from PyQt5.QtCore import QStandardPaths, QCoreApplication  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QColor  # type: ignore  # @UnusedImport @Reimport  @UnresolvedImport
 

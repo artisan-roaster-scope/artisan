@@ -24,10 +24,8 @@ from typing import List, Optional
 from typing_extensions import Final  # Python <=3.7
 
 try:
-    #pylint: disable-next = E, W, R, C
     from PyQt6.QtCore import QSemaphore # @Reimport @UnresolvedImport @UnusedImport
-except Exception:  # pylint: disable=broad-except
-    #pylint: disable = E, W, R, C
+except ImportError:
     from PyQt5.QtCore import QSemaphore # type: ignore # @Reimport @UnresolvedImport @UnusedImport
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)

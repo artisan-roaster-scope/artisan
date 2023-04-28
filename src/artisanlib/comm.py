@@ -49,21 +49,19 @@ if TYPE_CHECKING:
 from artisanlib.util import cmd2str, RoRfromCtoF, fromCtoF, fromFtoC, hex2int, str2cmd, toFloat
 
 try:
-    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import Qt, QDateTime, QSemaphore, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QIntValidator # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QCheckBox, QDialog, QGridLayout, QHBoxLayout, QVBoxLayout, # @UnusedImport @Reimport  @UnresolvedImport
                                  QLabel, QLineEdit,QPushButton, QWidget) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6 import sip  # @UnusedImport @Reimport  @UnresolvedImport
-except Exception: # pylint: disable=broad-except
-    #pylint: disable = E, W, R, C
+except ImportError:
     from PyQt5.QtCore import Qt, QDateTime, QSemaphore, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QIntValidator # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QCheckBox, QDialog, QGridLayout, QHBoxLayout, QVBoxLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QLabel, QLineEdit,QPushButton, QWidget) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     try:
         from PyQt5 import sip # type: ignore # @Reimport @UnresolvedImport @UnusedImport
-    except Exception: # pylint: disable=broad-except
+    except ImportError:
         import sip  # type: ignore # @Reimport @UnresolvedImport @UnusedImport
 
 from Phidget22.DeviceID import DeviceID # type: ignore

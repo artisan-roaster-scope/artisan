@@ -36,16 +36,14 @@ from typing_extensions import Final  # Python <=3.7
 if TYPE_CHECKING:
     try:
         from multiprocessing.connection import PipeConnection as Connection # type: ignore # pylint: disable=unused-import
-    except Exception:  # pylint: disable=broad-except
+    except ImportError:
         from multiprocessing.connection import Connection # type:ignore # pylint: disable=unused-import
     from artisanlib.types import ProfileData # pylint: disable=unused-import
 
 
 try:
-    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
-except Exception:  # pylint: disable=broad-except
-    #pylint: disable = E, W, R, C
+except ImportError:
     from PyQt5.QtCore import QDateTime, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import encodeLocal

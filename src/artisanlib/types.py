@@ -19,10 +19,8 @@
 import datetime
 
 try:
-    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import QDateTime # @UnusedImport @Reimport  @UnresolvedImport
-except Exception: # pylint: disable=broad-except
-    #pylint: disable = E, W, R, C
+except ImportError:
     from PyQt5.QtCore import QDateTime  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from typing import Optional,  Tuple, List, Union, TYPE_CHECKING

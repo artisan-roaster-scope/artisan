@@ -22,11 +22,9 @@ from typing import Optional, Tuple, List
 from typing_extensions import Final  # Python <=3.7
 
 try:
-    #pylint: disable = E, W, R, C
     from PyQt6 import QtCore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6 import QtBluetooth # @UnusedImport @Reimport  @UnresolvedImport
-except Exception: # pylint: disable=broad-except
-    #pylint: disable = E, W, R, C
+except ImportError:
     from PyQt5 import QtCore # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5 import QtBluetooth # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 

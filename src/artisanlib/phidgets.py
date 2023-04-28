@@ -27,10 +27,8 @@ if TYPE_CHECKING:
     from Phidget22.Phidget import Phidget # type: ignore # pylint: disable=unused-import
 
 try:
-    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
-except Exception: # pylint: disable=broad-except
-    #pylint: disable = E, W, R, C
+except ImportError:
     from PyQt5.QtCore import QSemaphore # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 

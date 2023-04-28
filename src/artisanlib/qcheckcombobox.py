@@ -16,7 +16,6 @@ once.
 import sys
 
 try:
-    #pylint: disable = E, W, R, C
     from PyQt6.QtCore import Qt, QEvent, QTimer, pyqtSignal # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import ( QStandardItemModel,  # @UnusedImport @Reimport  @UnresolvedImport
         QPalette, QFontMetrics, QBrush, QColor, QPixmap, QIcon # @UnusedImport @Reimport  @UnresolvedImport
@@ -26,8 +25,7 @@ try:
         QApplication, QStyle, QStyleOptionComboBox, # @UnusedImport @Reimport  @UnresolvedImport
         QStyleOptionMenuItem, QStyleOptionViewItem, QStylePainter # @UnusedImport @Reimport  @UnresolvedImport
     )
-except Exception: # pylint: disable=broad-except
-    #pylint: disable = E, W, R, C
+except ImportError:
     from PyQt5.QtCore import Qt, QEvent, QTimer, pyqtSignal # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import ( QStandardItemModel, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QPalette, QFontMetrics, QBrush, QColor, QPixmap, QIcon # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
