@@ -1612,8 +1612,6 @@ class PXRpidDlgControl(PXpidDlgControl):
                 self.status.showMessage(mssg,5000)
                 self.aw.qmc.adderror(mssg)
         except Exception as e: # pylint: disable=broad-except
-            #import traceback
-            #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' setONOFFstandby() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -2716,8 +2714,6 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 self.aw.fujipid.PXG4[soakkey][0] = stringtoseconds(segments[soakkey])
             self.createsegmenttable()
         except Exception as ex: # pylint: disable=broad-except
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message','Exception:',None) + ' loadPIDJSON() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
@@ -3782,8 +3778,6 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 message = QApplication.translate('StatusBar','Unable',None)
                 self.status.showMessage(QApplication.translate('StatusBar','No data received',None),5000)
         except Exception as e: # pylint: disable=broad-except
-            #import traceback
-            #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message','Exception:',None) + ' setONOFFstandby() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 

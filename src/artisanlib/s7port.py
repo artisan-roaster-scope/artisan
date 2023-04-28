@@ -532,8 +532,6 @@ class s7port():
                                 self.aw.addserial(f'S7 read_area({area},{db_nr},{register},{count})')
         except Exception as e: # pylint: disable=broad-except
 #            self.disconnect()
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
 #            _, _, exc_tb = sys.exc_info()
 #            self.aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:") + " readSingleRegister() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             _, _, exc_tb = sys.exc_info()
@@ -825,8 +823,6 @@ class s7port():
         except Exception as e: # pylint: disable=broad-except
             _log.info('readInt(%d,%d,%d,%s) failed',area,dbnumber,start,force)
             _log.debug(e)
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
 #            _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:
                 _, _, exc_tb = sys.exc_info()

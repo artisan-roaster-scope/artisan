@@ -235,8 +235,6 @@ class equDataDlg(ArtisanDialog):
             header.setSectionResizeMode(len(columns) - 1, QHeaderView.ResizeMode.Stretch)
             self.datatable.resizeColumnsToContents()
         except Exception: # pylint: disable=broad-except
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
             pass
 
     @pyqtSlot(bool)
@@ -2180,8 +2178,6 @@ class CurvesDlg(ArtisanDialog):
                 self.aw.qmc.resetlines()
                 self.redraw_enabled_math_curves()
         except Exception: # pylint: disable=broad-except
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
             pass
 
     @pyqtSlot(int)

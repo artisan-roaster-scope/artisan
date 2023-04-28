@@ -1857,8 +1857,6 @@ class serialport():
                     self.aw.addserial('serial port opened: ' + settings)
                 libtime.sleep(.2) # avoid possible hickups on startup
         except Exception: # pylint: disable=broad-except
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
             self.SP.close()
             libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port gets disabled
             error = QApplication.translate('Error Message','Serial Exception:') + ' ' + QApplication.translate('Error Message','Unable to open serial port')
@@ -2116,8 +2114,6 @@ class serialport():
             return self.aw.qmc.hottop_BT,self.aw.qmc.hottop_ET
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' ser.HOTTOPtemperatures() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return -1,-1
@@ -3408,8 +3404,6 @@ class serialport():
             return -1,-1
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
             try:
                 if self.PhidgetTemperatureSensor and self.PhidgetTemperatureSensor[0].getAttached():
                     self.PhidgetTemperatureSensor[0].close()
@@ -3696,8 +3690,6 @@ class serialport():
             return -1,-1
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
             try:
                 if self.PhidgetBridgeSensor and self.PhidgetBridgeSensor[0].getAttached():
                     self.PhidgetBridgeSensor[0].close()
@@ -5368,8 +5360,6 @@ class serialport():
             return -1,-1
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
             try:
                 if self.PhidgetIO and self.PhidgetIO[0].getAttached():
                     self.PhidgetIO[0].close()
@@ -5807,8 +5797,6 @@ class serialport():
             return probe1, probe2
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
             try:
                 if self.YOCTOthread is not None:
                     self.YOCTOthread.join()

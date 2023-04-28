@@ -494,8 +494,6 @@ class modbusport():
         except Exception as ex: # pylint: disable=broad-except
             _log.debug(ex)
             self.disconnectOnError()
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
 #            _, _, exc_tb = sys.exc_info()
 #            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:") + " readSingleRegister() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Error'))
@@ -524,8 +522,6 @@ class modbusport():
             _log.info('writeCoils(%d,%d,%s)', slave, register, values)
             _log.debug(ex)
             self.disconnectOnError()
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:
                 self.aw.qmc.adderror((QApplication.translate('Error Message','Modbus Error:') + ' writeCoils() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -590,8 +586,6 @@ class modbusport():
             _log.info('writeSingleRegister(%d,%d,%s) failed', slave, register, value)
             _log.debug(ex)
 #            _logger.debug("writeSingleRegister exception: %s" % str(ex))
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
             self.disconnectOnError()
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:
@@ -619,8 +613,6 @@ class modbusport():
             _log.info('maskWriteRegister(%d,%d,%s,%s) failed', slave, register, and_mask, or_mask)
             if debugLogLevelActive():
                 _log.debug(ex)
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
             self.disconnectOnError()
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:
@@ -811,8 +803,6 @@ class modbusport():
         except Exception as ex: # pylint: disable=broad-except
             _log.info('readFloat(%d,%d,%d,%s) failed', slave, register, code, force)
             _log.debug(ex)
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
             self.disconnectOnError()
 #            _, _, exc_tb = sys.exc_info()
 #            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:") + " readFloat() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -890,8 +880,6 @@ class modbusport():
         except Exception as ex: # pylint: disable=broad-except
             _log.info('readBCD(%d,%d,%d,%s) failed', slave, register, code, force)
             _log.debug(ex)
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
             self.disconnectOnError()
 #            _, _, exc_tb = sys.exc_info()
 #            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:") + " readBCD() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -1028,8 +1016,6 @@ class modbusport():
             _log.info('readSingleRegister(%d,%d,%d,%s) failed', slave, register, code, force)
             _log.debug(ex)
             self.disconnectOnError()
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
 #            _, _, exc_tb = sys.exc_info()
 #            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:") + " readSingleRegister() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             if self.aw.qmc.flagon:
@@ -1111,8 +1097,6 @@ class modbusport():
         except Exception as ex: # pylint: disable=broad-except
             _log.info('readInt32(%d,%d,%d,%s) failed', slave, register, code, force)
             _log.debug(ex)
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
             self.disconnectOnError()
 #            _, _, exc_tb = sys.exc_info()
 #            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:") + " readFloat() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -1195,8 +1179,6 @@ class modbusport():
             _log.info('readBCDint(%d,%d,%d,%s) failed', slave, register, code, force)
             _log.debug(ex)
             self.disconnectOnError()
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
 #            _, _, exc_tb = sys.exc_info()
 #            self.aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:") + " readBCDint() {0}").format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             if self.aw.qmc.flagon:

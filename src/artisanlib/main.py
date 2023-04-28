@@ -1254,8 +1254,6 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 #                            line.set_drawstyle("steps-post")
 
                 except Exception: # pylint: disable=broad-except
-#                    import traceback
-#                    traceback.print_exc(file=sys.stdout)
                     pass
                 self.aw.fetchCurveStyles()
                 # the redraw is mostly necessary to force a redraw of the legend to reflect the changed colors/styles/labels
@@ -11429,7 +11427,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 self.checkColors(self.getcolorPairsToCheck())
 
         except OSError as ex:
-            #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             self.qmc.adderror((QApplication.translate('Error Message', 'IO Error:') + ' {0}: {1}').format(str(ex),str(filename)),getattr(exc_tb, 'tb_lineno', '?'))
             # remove file from the recent file list
@@ -11444,7 +11441,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 if isinstance(widget, ApplicationWindow):
                     widget.updateRecentFileActions()
         except ValueError as ex:
-            #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             self.qmc.adderror((QApplication.translate('Error Message', 'Value Error:') + ' fileload() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         except Exception as ex: # pylint: disable=broad-except
@@ -12988,7 +12984,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             _, _, exc_tb = sys.exc_info()
             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' deserialize() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return obj
-#            traceback.print_exc(file=sys.stdout)
 
     def ensureCorrectExtraDeviceListLenght(self):
         self.qmc.extraname1 = self.qmc.extraname1[:len(self.qmc.extradevices)]
@@ -19988,7 +19983,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                 writer.writerow(extendedRankingData)
                             except Exception as e: # pylint: disable=broad-except
                                 _, _, exc_tb = sys.exc_info()
-    #                            traceback.print_exc(file=sys.stdout)
                                 self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' rankingCSVReport() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
                     self.sendmessage(QApplication.translate('Message','CSV Ranking Report exported to {0}').format(filename))
                 except OSError as x:
