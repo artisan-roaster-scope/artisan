@@ -1183,13 +1183,14 @@ class PIDcontrol():
     def RStotalTime(ramps,soaks):
         return sum(ramps) + sum(soaks)
 
-    # returns True if an external PID controller is in use (MODBUS or TC4 PID firmware)
-    # and False if the internal software PID is in charge
+    # returns 1 (True) if an external PID controller is in use (MODBUS or TC4 PID firmware)
+    # and 0 (False) if the internal software PID is in charge
     # the returned value indicates the type of external PID control:
     #  0: internal PID
     #  1: MODBUS
     #  2: S7
     #  3: TC4
+    #  4: Kaleido
     def externalPIDControl(self):
         # TC4 with PID firmware or MODBUS and SV register set or S7 and SV area set
         if self.aw.modbus.PID_slave_ID != 0:
@@ -1198,6 +1199,8 @@ class PIDcontrol():
             return 2
         if (self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag):
             return 3
+        if (self.aw.qmc.device == 138 and self.aw.kaleidoPID):
+            return 4
         return 0
 
     # v is from [-min,max]
@@ -1295,7 +1298,7 @@ class PIDcontrol():
 
     # the internal software PID should be configured on ON, but not be activated yet to warm it up
     def confSoftwarePID(self):
-        if self.aw.pidcontrol.externalPIDControl() not in [1, 2] and not(self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag) and self.aw.qmc.Controlbuttonflag:
+        if self.aw.pidcontrol.externalPIDControl() not in [1, 2, 4] and not(self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag) and self.aw.qmc.Controlbuttonflag:
             # software PID
             self.aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd,self.pOnE)
             self.aw.qmc.pid.setLimits((-100 if self.aw.pidcontrol.pidNegativeTarget else 0),(100 if self.aw.pidcontrol.pidPositiveTarget else 0))
@@ -1341,8 +1344,14 @@ class PIDcontrol():
                     finally:
                         if self.aw.ser.COMsemaphore.available() < 1:
                             self.aw.ser.COMsemaphore.release(1)
-            # software PID
+            elif self.aw.qmc.Controlbuttonflag and self.externalPIDControl() == 4 and self.aw.kaleido is not None:
+                # Kaleido PID
+                self.aw.kaleido.pidON()
+                self.pidActive = True
+                self.aw.qmc.pid.on()
+                self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PIDactive'])
             elif self.aw.qmc.Controlbuttonflag:
+                # software PID
                 self.aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd,self.pOnE)
                 self.aw.qmc.pid.setLimits((-100 if self.aw.pidcontrol.pidNegativeTarget else 0),(100 if self.aw.pidcontrol.pidPositiveTarget else 0))
                 self.aw.qmc.pid.setDutySteps(self.aw.pidcontrol.dutySteps)
@@ -1392,8 +1401,14 @@ class PIDcontrol():
                 if not self.aw.HottopControlActive:
                     self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PID'])
                 self.pidActive = False
-        # software PID
+        elif self.aw.qmc.Controlbuttonflag and self.externalPIDControl() == 4 and self.aw.kaleido is not None:
+            # Kaleido PID
+            self.aw.kaleido.pidOFF()
+            self.pidActive = False
+            self.aw.qmc.pid.off()
+            self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PID'])
         elif self.aw.qmc.Controlbuttonflag:
+            # software PID
             self.aw.qmc.pid.setControl(lambda _: _)
             self.pidActive = False
             self.aw.qmc.pid.off()
@@ -1537,22 +1552,25 @@ class PIDcontrol():
             self.aw.qmc.pid.setDutySteps(dutySteps)
 
 
-    def setSV(self,sv,move:bool = True, init:bool = False):
+    def setSV(self, sv:float, move:bool = True, init:bool = False):
 #        if not move:
 #            self.aw.sendmessage(QApplication.translate("Message","SV set to %s"%sv))
-        if self.aw.pidcontrol.externalPIDControl() == 1: # MODBUS PID and Control ticked
+        if self.aw.pidcontrol.externalPIDControl() == 1:
+            # MODBUS PID and Control ticked
             self.sv = max(0,sv)
             if move:
                 self.aw.moveSVslider(sv,setValue=True)
             self.aw.modbus.setTarget(sv)
             self.sv = sv # remember last sv
-        elif self.aw.pidcontrol.externalPIDControl() == 2: # S7 PID and Control ticked
+        elif self.aw.pidcontrol.externalPIDControl() == 2:
+            # S7 PID and Control ticked
             self.sv = max(0,sv)
             if move:
                 self.aw.moveSVslider(sv,setValue=True)
             self.aw.s7.setTarget(sv,self.aw.s7.SVmultiplier)
             self.sv = sv # remember last sv
-        elif self.aw.qmc.device == 19 and self.aw.pidcontrol.externalPIDControl(): # ArduinoTC4 firmware PID
+        elif self.aw.qmc.device == 19 and self.aw.pidcontrol.externalPIDControl():
+            # ArduinoTC4 firmware PID
             if self.aw.ser.ArduinoIsInitialized:
                 sv = max(0,self.aw.float2float(sv,2))
                 if self.sv != sv: # nothing to do (avoid loops via moveslider!)
@@ -1570,7 +1588,14 @@ class PIDcontrol():
                     finally:
                         if self.aw.ser.COMsemaphore.available() < 1:
                             self.aw.ser.COMsemaphore.release(1)
-        elif self.aw.qmc.Controlbuttonflag: # in all other cases if the "Control" flag is ticked
+        elif self.externalPIDControl() == 4 and self.aw.kaleido is not None:
+            # Kaleido PID
+            if move and self.aw.pidcontrol.svSlider:
+                self.aw.moveSVslider(sv,setValue=True)
+            self.aw.kaleido.setSV(sv)
+            self.sv = sv # remember last sv
+        elif self.aw.qmc.Controlbuttonflag:
+            # in all other cases if the "Control" flag is ticked: software PID
             if move and self.aw.pidcontrol.svSlider:
                 self.aw.moveSVslider(sv,setValue=True)
             self.aw.qmc.pid.setTarget(sv,init=init)

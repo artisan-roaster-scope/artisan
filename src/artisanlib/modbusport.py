@@ -175,7 +175,7 @@ class modbusport():
         #    2: Serial Binary
         #    3: TCP
         #    4: UDP
-        self.lastReadResult:Optional[int] = 0 # this is set by eventaction following some custom button/slider Modbus actions with "read" command
+        self.lastReadResult:Optional[int] = None # this is set by eventaction following some custom button/slider Modbus actions with "read" command
 
         self.commError:int = 0 # number of errors that occured after the last connect; cleared by receiving proper data
 

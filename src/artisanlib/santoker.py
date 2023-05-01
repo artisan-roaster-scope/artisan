@@ -24,7 +24,7 @@ from contextlib import suppress
 from threading import Thread
 
 from pymodbus.utilities import computeCRC
-from pymodbus.client.serial_asyncio import open_serial_connection
+from pymodbus.client.serial_asyncio import open_serial_connection # patched pyserial-asyncio
 
 from artisanlib.types import SerialSettings
 
@@ -166,6 +166,10 @@ class SantokerNetwork():
         else:
             _log.debug('unknown data target %s', target)
 
+
+    # asyncio loop
+
+
     # https://www.oreilly.com/library/view/using-asyncio-in/9781492075325/ch04.html
     async def read_msg(self, stream: asyncio.StreamReader,
                 charge_handler:Optional[Callable[[], None]] = None,
@@ -203,9 +207,6 @@ class SantokerNetwork():
         # full message decoded
         self.register_reading(target, value, charge_handler, dry_handler,
                         fcs_handler, scs_handler, drop_handler)
-
-
-    # asyncio loop
 
     async def handle_reads(self, reader: asyncio.StreamReader,
                 charge_handler:Optional[Callable[[], None]] = None,

@@ -111,7 +111,7 @@ class PhidgetManager():
                 self.managersemaphore.release(1)
 
     def deleteChannel(self,channel:'Phidget') -> None:
-        _log.debug('deleteChannel: %s', channel)
+#        _log.debug('deleteChannel: %s', channel)
         try:
             self.managersemaphore.acquire(1)
             # if channel is a VINT device, release all HUBport channels that were blocked by this VINT device
@@ -173,7 +173,7 @@ class PhidgetManager():
 
     # should be called from the attach handler that binds this hardware channel to a software channel
     def reserveChannel(self,channel:'Phidget') -> None:
-        _log.debug('reserveChannel: %s', channel)
+#        _log.debug('reserveChannel: %s', channel)
         try:
             self.managersemaphore.acquire(1)
             if channel is not None and channel in self.attachedPhidgetChannels:
@@ -221,11 +221,11 @@ class PhidgetManager():
 
 #    def print_list(self,items):
 #        for k,v in items:
-#            print(v,k.getDeviceSerialNumber(),k.getDeviceClass(),k.getDeviceClassName(),k.getDeviceName(),k.getDeviceSKU(),k.getChannelClassName(),k.getDeviceID(),k.getIsHubPortDevice(),"port: ",k.getHubPort(),"ch: ", k.getChannel(), "local: ", k.getIsLocal())
+#            _log.info("v:%s, ser:%s, class:%s, classname:%s, device:%s, SKU:%s, chClassName:%s, id:%s,device:%s, port:%s, ch:%s, local:%s",v,k.getDeviceSerialNumber(),k.getDeviceClass(),k.getDeviceClassName(),k.getDeviceName(),k.getDeviceSKU(),k.getChannelClassName(),k.getDeviceID(),k.getIsHubPortDevice(),k.getHubPort(),k.getChannel(), k.getIsLocal())
 #
 #    def print_list2(self,items):
 #        for k in items:
-#            print(k.getDeviceSerialNumber(),k.getChannelClassName(),k.getDeviceID(),k.getIsHubPortDevice(),"port: ", k.getHubPort(),"ch: ",k.getChannel(), "local: ", k.getIsLocal())
+#            _log.info("ser:%s, class:%s, id:%s, device:%s, port:%s, ch:%s, local:%s",k.getDeviceSerialNumber(),k.getChannelClassName(),k.getDeviceID(),k.getIsHubPortDevice(),k.getHubPort(),k.getChannel(),k.getIsLocal())
 
     # returns the first matching Phidget channel (serial and port as integers) and reserves it
     def getFirstMatchingPhidget(self,
@@ -236,7 +236,7 @@ class PhidgetManager():
                 remoteOnly:bool=False,
                 serial:Optional[int]=None,
                 hubport:Optional[int]=None) -> Tuple[Optional[int],Optional[int]]:
-        _log.debug('getFirstMatchingPhidget(%s,%s,%s,%s,%s,%s,%s)',phidget_class_name,device_id,channel,remote,remoteOnly,serial,hubport)
+#        _log.debug('getFirstMatchingPhidget(%s,%s,%s,%s,%s,%s,%s)',phidget_class_name,device_id,channel,remote,remoteOnly,serial,hubport)
         try:
             self.managersemaphore.acquire(1)
             if device_id in [

@@ -847,7 +847,7 @@ class comportDlg(ArtisanResizeablDialog):
         tab1Layout = QVBoxLayout()
         tab1Layout.addWidget(etbt_help_label)
         devid = self.aw.qmc.device
-        if (((devid not in self.aw.qmc.nonSerialDevices) or (devid == 134 and self.aw.santokerSerial)) and
+        if (((devid not in self.aw.qmc.nonSerialDevices) or (devid == 134 and self.aw.santokerSerial) or (devid == 138 and self.aw.kaleidoSerial)) and
                 not(devid == 0 and self.aw.ser.useModbusPort)): # hide serial confs for MODBUS, Phidget and Yocto devices (but enable for Santoker/Serial)
             grid = QGridLayout()
             grid.addWidget(comportlabel,0,0,Qt.AlignmentFlag.AlignRight)

@@ -93,7 +93,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.eventquantifierSV:List[int] = [0,0,0,0]
         # palettes
         self.buttonpalette:List[Palette] = []
-        for _ in range(10):
+        for _ in range(self.aw.max_palettes):
             self.buttonpalette.append(self.aw.makePalette())
         self.buttonpalettemaxlen:List[int] = [14]*10
         self.buttonpalette_label:str = self.aw.buttonpalette_label
@@ -107,6 +107,29 @@ class EventsDlg(ArtisanResizeablDialog):
         self.specialeventannovisibilities:List[int] = [0,0,0,0]
         self.specialeventannotations:List[str] = ['','','','']
 
+        self.custom_button_actions:List[str] = ['',
+                                     QApplication.translate('ComboBox','Serial Command'),
+                                     QApplication.translate('ComboBox','Call Program'),
+                                     QApplication.translate('ComboBox','Multiple Event'),
+                                     QApplication.translate('ComboBox','Modbus Command'),
+                                     QApplication.translate('ComboBox','DTA Command'),
+                                     QApplication.translate('ComboBox','IO Command'),
+                                     QApplication.translate('ComboBox','Hottop Heater'),
+                                     QApplication.translate('ComboBox','Hottop Fan'),
+                                     QApplication.translate('ComboBox','Hottop Command'),
+                                     QApplication.translate('ComboBox','p-i-d'),
+                                     QApplication.translate('ComboBox','Fuji Command'),
+                                     QApplication.translate('ComboBox','PWM Command'),
+                                     QApplication.translate('ComboBox','VOUT Command'),
+                                     QApplication.translate('ComboBox','S7 Command'),
+                                     QApplication.translate('ComboBox','Aillio R1 Heater'),
+                                     QApplication.translate('ComboBox','Aillio R1 Fan'),
+                                     QApplication.translate('ComboBox','Aillio R1 Drum'),
+                                     QApplication.translate('ComboBox','Aillio R1 Command'),
+                                     QApplication.translate('ComboBox','Artisan Command'),
+                                     QApplication.translate('ComboBox','RC Command'),
+                                     QApplication.translate('ComboBox','WebSocket Command')]
+        self.custom_button_actions_sorted:List[str] = sorted(self.custom_button_actions)
 
         titlefont = QFont()
         titlefont.setBold(True)
@@ -544,7 +567,7 @@ class EventsDlg(ArtisanResizeablDialog):
                 ]
         self.nbuttonsSizeBox.addItems(size_items)
         self.nbuttonsSizeBox.setCurrentIndex(self.aw.buttonsize)
-        self.markLastButtonPressed = QCheckBox(QApplication.translate('CheckBox','Mark last pressed'))
+        self.markLastButtonPressed = QCheckBox(QApplication.translate('CheckBox','Mark Last Pressed'))
         self.markLastButtonPressed.setToolTip(QApplication.translate('Tooltip', 'Invert color of last button pressed'))
         self.markLastButtonPressed.setChecked(self.aw.mark_last_button_pressed)
         self.markLastButtonPressed.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -556,7 +579,8 @@ class EventsDlg(ArtisanResizeablDialog):
         self.eventbuttontable = QTableWidget()
         self.eventbuttontable.setTabKeyNavigation(True)
         self.eventbuttontable.itemSelectionChanged.connect(self.selectionChanged)
-        self.createEventbuttonTable()
+        self.eventbuttontable.verticalHeader().sectionMoved.connect(self.sectionMoved)
+#        self.createEventbuttonTable()
         self.copyeventbuttonTableButton = QPushButton(QApplication.translate('Button', 'Copy Table'))
         self.copyeventbuttonTableButton.setToolTip(QApplication.translate('Tooltip','Copy table to clipboard, OPTION or ALT click for tabular text'))
         self.copyeventbuttonTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -1592,6 +1616,43 @@ class EventsDlg(ArtisanResizeablDialog):
                 self.aw.buttonpalettemaxlen = maxlen
             self.updatePalettePopup()
 
+    @staticmethod
+    def swapItems(l:List, source:int, target:int) -> None:
+        l[target],l[source] = l[source],l[target]
+
+    @staticmethod
+    def moveItem(l:List, source:int, target:int) -> None:
+        l.insert(target, l.pop(source))
+
+    @pyqtSlot(int,int,int)
+    def sectionMoved(self, logicalIndex:int, _oldVisualIndex:int, newVisualIndex:int) -> None:
+        max_rows:int = len(self.extraeventstypes)
+
+
+        # adjust vertical headers # seems not to be required with the clearContent/setRowCount(0) below
+        self.eventbuttontable.setVerticalHeaderLabels([str(1 + self.eventbuttontable.visualRow(i)) for i in range(max_rows)])
+
+        # adjust datamodel
+        swap:bool = False # default action is to move item to new position
+        if QApplication.queryKeyboardModifiers() == Qt.KeyboardModifier.AltModifier:
+            # if ALT/OPTION key is hold, the items are swap
+            swap = True
+        l:List
+        event_data:List[List] = [self.extraeventslabels, self.extraeventsdescriptions, self.extraeventstypes, self.extraeventsvalues,
+                self.extraeventsactions, self.extraeventsactionstrings, self.extraeventsvisibility, self.extraeventbuttoncolor,
+                self.extraeventbuttontextcolor]
+        for l in event_data:
+            if swap:
+                self.swapItems(l, logicalIndex, newVisualIndex)
+            else:
+                self.moveItem(l, logicalIndex, newVisualIndex)
+
+        self.eventbuttontable.clearContents() # resets the view
+        self.eventbuttontable.setRowCount(0)  # resets the data model
+        self.createEventbuttonTable()
+
+
+    @pyqtSlot()
     def selectionChanged(self):
         selected = self.eventbuttontable.selectedRanges()
         if selected and len(selected) > 0:
@@ -2291,29 +2352,6 @@ class EventsDlg(ArtisanResizeablDialog):
         std_extra_events += [uchr(177) + e for e in std_extra_events[:-1]] # chr(241)
         std_extra_events.insert(0,QApplication.translate('Label', '')) # we prepend the empty item that does not create an event entry
 
-        self.custom_button_actions = ['',
-                                     QApplication.translate('ComboBox','Serial Command'),
-                                     QApplication.translate('ComboBox','Call Program'),
-                                     QApplication.translate('ComboBox','Multiple Event'),
-                                     QApplication.translate('ComboBox','Modbus Command'),
-                                     QApplication.translate('ComboBox','DTA Command'),
-                                     QApplication.translate('ComboBox','IO Command'),
-                                     QApplication.translate('ComboBox','Hottop Heater'),
-                                     QApplication.translate('ComboBox','Hottop Fan'),
-                                     QApplication.translate('ComboBox','Hottop Command'),
-                                     QApplication.translate('ComboBox','p-i-d'),
-                                     QApplication.translate('ComboBox','Fuji Command'),
-                                     QApplication.translate('ComboBox','PWM Command'),
-                                     QApplication.translate('ComboBox','VOUT Command'),
-                                     QApplication.translate('ComboBox','S7 Command'),
-                                     QApplication.translate('ComboBox','Aillio R1 Heater'),
-                                     QApplication.translate('ComboBox','Aillio R1 Fan'),
-                                     QApplication.translate('ComboBox','Aillio R1 Drum'),
-                                     QApplication.translate('ComboBox','Aillio R1 Command'),
-                                     QApplication.translate('ComboBox','Artisan Command'),
-                                     QApplication.translate('ComboBox','RC Command'),
-                                     QApplication.translate('ComboBox','WebSocket Command')]
-        self.custom_button_actions_sorted = sorted(self.custom_button_actions)
 
         for i in range(nbuttons):
             #0 label
@@ -2367,23 +2405,20 @@ class EventsDlg(ArtisanResizeablDialog):
             visibilityComboBox.setCurrentIndex(self.extraeventsvisibility[i])
             visibilityComboBox.currentIndexChanged.connect(self.setvisibilitytyeventbutton)
             #7 Color
-            self.colorButton = QPushButton('Select')
-            self.colorButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            self.colorButton.clicked.connect(self.setbuttoncolor)
+            colorButton = QPushButton('Select')
+            colorButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            colorButton.clicked.connect(self.setbuttoncolor)
             label = self.extraeventslabels[i][:]
             et = self.extraeventstypes[i]
-            if 4 < et < 9:
-                et = et - 5
-            if et < 4:
-                label = label.replace('\\t',self.aw.qmc.etypes[et])
-            self.colorButton.setText(label)
-            self.colorButton.setStyleSheet(f'background-color: {self.extraeventbuttoncolor[i]}; color: {self.extraeventbuttontextcolor[i]};')
+            label = self.aw.substButtonLabel(-1,label,et)
+            colorButton.setText(label)
+            colorButton.setStyleSheet(f'background-color: {self.extraeventbuttoncolor[i]}; color: {self.extraeventbuttontextcolor[i]};')
             #8 Text Color
-            self.colorTextButton = QPushButton('Select')
-            self.colorTextButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            self.colorTextButton.clicked.connect(self.setbuttontextcolor)
-            self.colorTextButton.setText(label)
-            self.colorTextButton.setStyleSheet(f'background-color: {self.extraeventbuttoncolor[i]}; color: {self.extraeventbuttontextcolor[i]};')
+            colorTextButton = QPushButton('Select')
+            colorTextButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            colorTextButton.clicked.connect(self.setbuttontextcolor)
+            colorTextButton.setText(label)
+            colorTextButton.setStyleSheet(f'background-color: {self.extraeventbuttoncolor[i]}; color: {self.extraeventbuttontextcolor[i]};')
             #9 Empty Cell
             emptyCell = QLabel('')
             #add widgets to the table
@@ -2394,8 +2429,8 @@ class EventsDlg(ArtisanResizeablDialog):
             self.eventbuttontable.setCellWidget(i,4,actionComboBox)
             self.eventbuttontable.setCellWidget(i,5,actiondescriptionedit)
             self.eventbuttontable.setCellWidget(i,6,visibilityComboBox)
-            self.eventbuttontable.setCellWidget(i,7,self.colorButton)
-            self.eventbuttontable.setCellWidget(i,8,self.colorTextButton)
+            self.eventbuttontable.setCellWidget(i,7,colorButton)
+            self.eventbuttontable.setCellWidget(i,8,colorTextButton)
             self.eventbuttontable.setCellWidget(i,9,emptyCell)
 
         self.eventbuttontable.horizontalHeader().setStretchLastSection(False)
@@ -2540,7 +2575,7 @@ class EventsDlg(ArtisanResizeablDialog):
 
         #Sorting buttons based on the visualRow
         for i in range(maxButton):
-            visualIndex = self.eventbuttontable.visualRow(i)
+            visualIndex = i #self.eventbuttontable.visualRow(i)
 
             #Labels
             self.aw.extraeventslabels[visualIndex]         = self.extraeventslabels[i]
@@ -2574,15 +2609,9 @@ class EventsDlg(ArtisanResizeablDialog):
             assert isinstance(labeledit, QLineEdit)
             label = labeledit.text()
             label = label.replace('\\n', chr(10))
-
             if i < len(self.extraeventslabels):
-                et = self.extraeventstypes[i]
-                if 4 < et < 9:
-                    et = et - 5
                 self.extraeventslabels[i] = label
-                if et < 4:
-                    label = label[:].replace('\\t',self.aw.qmc.etypes[et])
-
+                label = self.aw.substButtonLabel(-1, label, self.extraeventstypes[i])
             #Update Color Buttons
             colorButton = self.eventbuttontable.cellWidget(i,7)
             assert isinstance(colorButton, QPushButton)

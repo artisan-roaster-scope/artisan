@@ -335,7 +335,22 @@
         <tr>
             <td>&#160;</td>
             <td>button(i,c,b[,sn])</td>
-            <td>switches channel c off (b=0) and on (b=1) and sets button i to pressed or normal depending on the value b</td>
+            <td>switches PHIDGET Binary Output channel c off (b=0) and on (b=1) and sets button i to pressed or normal depending on the value b</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>button(i,b)</td>
+            <td>sets button i to pressed if value b is yes, true, t, or 1, otherwise to normal</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>button(b)</td>
+            <td>sets button to pressed if value b is yes, true, t, or 1, otherwise to normal</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>button()</td>
+            <td>toggles the state of the button</td>
         </tr>
         <tr>
             <td>&#160;</td>
@@ -346,6 +361,11 @@
             <td>&#160;</td>
             <td>santoker(&lt;target&gt;,&lt;value&gt;)</td>
             <td>sends integer &lt;value&gt; to &lt;target&gt; register specified by as byte in hex notation like “fa” via the Santoker Network protocol</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>kaleido(&lt;target&gt;,&lt;value&gt;)</td>
+            <td>sends &lt;value&gt; to &lt;target&gt; via the Kaleido Serial or Network protocol</td>
         </tr>
         <tr>
             <td>S7 Command</td>

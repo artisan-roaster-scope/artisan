@@ -447,6 +447,7 @@ class backgroundDlg(ArtisanResizeablDialog):
     @pyqtSlot(bool)
     def timealign(self,_):
         self.aw.qmc.timealign()
+        self.aw.autoAdjustAxis()
 
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work
     def keyPressEvent(self,event):

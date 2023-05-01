@@ -316,33 +316,33 @@ class ExtraDeviceSettings(TypedDict): #, total=False):
 
 Palette = Tuple[
     List[int],    # 0: event button types
-    List[float],  # 1: event button values
-    List[int],    # 2: event button actions
-    List[int],    # 3: event button visibility
-    List[str],    # 4: event button actions
-    List[str],    # 5: event button labels
-    List[str],    # 6: event button descriptons
-    List[str],    # 7: event button colors
-    List[str],    # 8: event button text colors
-    List[int],    # 9: slider visibilities
-    List[int],    # 10: slider actions
-    List[str],    # 11: slider commands
-    List[float],  # 12: slider offsets
-    List[float],  # 13: slider factors
-    List[int],    # 14: quantifier active
-    List[int],    # 15: quantifier sources
-    List[int],    # 16: quantifier min
-    List[int],    # 17: quantifier max
-    List[int],    # 18: quanfifier coarse
-    List[int],    # 19: slider min
-    List[int],    # 20: slider max
-    List[int],    # 21: slider coarse
-    List[int],    # 22: slider temp flags
-    List[str],    # 23: slider units
-    List[int],    # 24: slider bernoulli flags
+    List[float],  # 1: event button values (same length as event button types)
+    List[int],    # 2: event button actions (same length as event button actions)
+    List[int],    # 3: event button visibility (same length as event button actions)
+    List[str],    # 4: event button actions (same length as event button actions)
+    List[str],    # 5: event button labels (same length as event button actions)
+    List[str],    # 6: event button descriptons (same length as event button actions)
+    List[str],    # 7: event button colors (same length as event button actions)
+    List[str],    # 8: event button text colors (same length as event button actions)
+    List[int],    # 9: slider visibilities; len=self.eventsliders
+    List[int],    # 10: slider actions; len=self.eventsliders
+    List[str],    # 11: slider commands; len=self.eventsliders
+    List[float],  # 12: slider offsets; len=self.eventsliders
+    List[float],  # 13: slider factors; len=self.eventsliders
+    List[int],    # 14: quantifier active; len=self.eventsliders
+    List[int],    # 15: quantifier sources; len=self.eventsliders
+    List[int],    # 16: quantifier min; len=self.eventsliders
+    List[int],    # 17: quantifier max; len=self.eventsliders
+    List[int],    # 18: quanfifier coarse; len=self.eventsliders
+    List[int],    # 19: slider min; len=self.eventsliders
+    List[int],    # 20: slider max; len=self.eventsliders
+    List[int],    # 21: slider coarse; len=self.eventsliders
+    List[int],    # 22: slider temp flags; len=self.eventsliders
+    List[str],    # 23: slider units; len=self.eventsliders
+    List[int],    # 24: slider bernoulli flags; len=self.eventsliders
     str,          # 25: label
-    List[int],    # 26 quantifier action flags
-    List[int]     # 27 quantifier SV flags
+    List[int],    # 26 quantifier action flags; len=self.eventsliders
+    List[int]     # 27 quantifier SV flags; len=self.eventsliders
     ]
 
 class BTU(TypedDict, total=False):

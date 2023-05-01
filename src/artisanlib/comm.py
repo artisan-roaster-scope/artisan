@@ -499,7 +499,11 @@ class serialport():
                                    self.Santoker_BTET,        #134
                                    self.Santoker_PF,          #135
                                    self.Santoker_D,           #136
-                                   self.PHIDGET_DAQ1500       #137
+                                   self.PHIDGET_DAQ1500,      #137
+                                   self.Kaleido_BTET,         #138
+                                   self.Kaleido_SVDT,         #139
+                                   self.Kaleido_DrumAH,       #140
+                                   self.Kaleido_HeaterFan     #141
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -1510,6 +1514,38 @@ class serialport():
         else:
             t1 = t2 = -1
         return tx,t1,t2 # time, -1 (chan2), Drum (chan1)
+
+    def Kaleido_BTET(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        if self.aw.kaleido is not None:
+            t1,t2 = self.aw.kaleido.getBTET()
+        else:
+            t1 = t2 = -1
+        return tx,t2,t1 # time, ET (chan2), BT (chan1)
+
+    def Kaleido_SVDT(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        if self.aw.kaleido is not None:
+            t1,t2 = self.aw.kaleido.getSVDT()
+        else:
+            t1 = t2 = -1
+        return tx,t2,t1 # time, DT (chan2), SV (chan1)
+
+    def Kaleido_DrumAH(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        if self.aw.kaleido is not None:
+            t1,t2 = self.aw.kaleido.getDrumAH()
+        else:
+            t1 = t2 = -1
+        return tx,t2,t1 # time), AH (chan2), Drum (chan1)
+
+    def Kaleido_HeaterFan(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        if self.aw.kaleido is not None:
+            t1,t2 = self.aw.kaleido.getHeaterFan()
+        else:
+            t1 = t2 = -1
+        return tx,t2,t1 # time Fan (chan2), Heater (chan1)
 
     def TEVA18B(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()

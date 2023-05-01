@@ -205,10 +205,11 @@ def toFloat(x) -> float:
         return 0.
 def toBool(x) -> bool:
     if isinstance(x,str):
-        if x == 'false':
-            return False
-        if x == 'true':
+        x_lower = x.lower()
+        if x_lower in ('yes', 'true', 't', '1'):
             return True
+        if x_lower in ('no', 'false', 'f', '0'):
+            return False
         try:
             return bool(eval(x)) # pylint: disable=eval-used
         except Exception: # pylint: disable=broad-except

@@ -56,6 +56,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.org_phidgetRemoteFlag = self.aw.qmc.phidgetRemoteFlag
         self.org_yoctoRemoteFlag = self.aw.qmc.yoctoRemoteFlag
         self.org_santokerSerial = self.aw.santokerSerial
+        self.org_kaleidoSerial = self.aw.kaleidoSerial
 
         ################ TAB 1   WIDGETS
         #ETcurve
@@ -1137,6 +1138,23 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.santokerSerialFlag = QCheckBox()
         self.santokerSerialFlag.setChecked(not self.aw.santokerSerial)
         self.santokerSerialFlag.stateChanged.connect(self.santokerSerialStateChanged)
+        kaleidoHostLabel = QLabel(QApplication.translate('Label','Host'))
+        self.kaleidoHost = QLineEdit(self.aw.kaleidoHost)
+        self.kaleidoHost.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.kaleidoHost.setFixedWidth(150)
+        self.kaleidoHost.setEnabled(not self.aw.kaleidoSerial)
+        kaleidoPortLabel = QLabel(QApplication.translate('Label','Port'))
+        self.kaleidoPort = QLineEdit(str(self.aw.kaleidoPort))
+        self.kaleidoPort.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.kaleidoPort.setFixedWidth(150)
+        self.kaleidoPort.setEnabled(not self.aw.kaleidoSerial)
+        self.kaleidoSerialFlag = QCheckBox()
+        self.kaleidoSerialFlag.setChecked(not self.aw.kaleidoSerial)
+        self.kaleidoSerialFlag.stateChanged.connect(self.kaleidoSerialStateChanged)
+        kaleidoPIDLabel = QLabel('PID')
+        self.kaleidoPIDFlag = QCheckBox()
+        self.kaleidoPIDFlag.setChecked(self.aw.kaleidoPID)
+
         santokerNetworkGrid = QGridLayout()
         santokerNetworkGrid.addWidget(self.santokerSerialFlag,0,0)
         santokerNetworkGrid.addWidget(santokerHostLabel,0,1)
@@ -1144,7 +1162,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         santokerNetworkGrid.addWidget(santokerPortLabel,1,1)
         santokerNetworkGrid.addWidget(self.santokerPort,1,2)
         santokerNetworkGrid.setSpacing(20)
-        santokerNetworkGroupBox = QGroupBox(QApplication.translate('GroupBox','Network'))
+        santokerNetworkGroupBox = QGroupBox('Santoker')
         santokerNetworkGroupBox.setLayout(santokerNetworkGrid)
         santokerHBox = QHBoxLayout()
         santokerHBox.addStretch()
@@ -1155,6 +1173,27 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         santokerVBox.addStretch()
         santokerVBox.setSpacing(5)
         santokerVBox.setContentsMargins(0,0,0,0)
+
+        kaleidoNetworkGrid = QGridLayout()
+        kaleidoNetworkGrid.addWidget(self.kaleidoSerialFlag,0,0)
+        kaleidoNetworkGrid.addWidget(kaleidoHostLabel,0,1)
+        kaleidoNetworkGrid.addWidget(self.kaleidoHost,0,2)
+        kaleidoNetworkGrid.addWidget(kaleidoPortLabel,1,1)
+        kaleidoNetworkGrid.addWidget(self.kaleidoPort,1,2)
+        kaleidoNetworkGrid.addWidget(self.kaleidoPIDFlag,2,0)
+        kaleidoNetworkGrid.addWidget(kaleidoPIDLabel,2,1)
+        kaleidoNetworkGrid.setSpacing(20)
+        kaleidoNetworkGroupBox = QGroupBox('Kaleido')
+        kaleidoNetworkGroupBox.setLayout(kaleidoNetworkGrid)
+        kaleidoHBox = QHBoxLayout()
+        kaleidoHBox.addStretch()
+        kaleidoHBox.addWidget(kaleidoNetworkGroupBox)
+        kaleidoHBox.addStretch()
+        kaleidoVBox = QVBoxLayout()
+        kaleidoVBox.addLayout(kaleidoHBox)
+        kaleidoVBox.addStretch()
+        kaleidoVBox.setSpacing(5)
+        kaleidoVBox.setContentsMargins(0,0,0,0)
 
         # create pid box
         PIDgrid = QGridLayout()
@@ -1305,6 +1344,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         #LAYOUT TAB 7 (Santoker)
         tab7Layout = QVBoxLayout()
         tab7Layout.addLayout(santokerVBox)
+        tab7Layout.addLayout(kaleidoVBox)
+        tab7Layout.addStretch()
         tab7Layout.setContentsMargins(2,10,2,5)
         #main tab widget
         self.TabWidget = QTabWidget()
@@ -1328,7 +1369,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.TabWidget.addTab(C6Widget,QApplication.translate('Tab','Ambient'))
         C7Widget = QWidget()
         C7Widget.setLayout(tab7Layout)
-        self.TabWidget.addTab(C7Widget,'Santoker')
+        self.TabWidget.addTab(C7Widget,QApplication.translate('Tab','Networks'))
         self.TabWidget.currentChanged.connect(self.tabSwitched)
         #incorporate layouts
         Mlayout = QVBoxLayout()
@@ -1364,6 +1405,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.aw.santokerSerial = not self.aw.santokerSerial
         self.santokerHost.setEnabled(not self.aw.santokerSerial)
         self.santokerPort.setEnabled(not self.aw.santokerSerial)
+
+    @pyqtSlot(int)
+    def kaleidoSerialStateChanged(self, _:int) -> None:
+        self.aw.kaleidoSerial = not self.aw.kaleidoSerial
+        self.kaleidoHost.setEnabled(not self.aw.kaleidoSerial)
+        self.kaleidoPort.setEnabled(not self.aw.kaleidoSerial)
 
     @pyqtSlot(str)
     def phidgetHostChanged(self,s):
@@ -2165,6 +2212,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.aw.qmc.phidgetRemoteFlag = self.org_phidgetRemoteFlag
         self.aw.qmc.yoctoRemoteFlag = self.org_yoctoRemoteFlag
         self.aw.santokerSerial = self.org_santokerSerial
+        self.aw.kaleidoSerial = self.org_kaleidoSerial
         self.reject()
 
     @pyqtSlot()
@@ -2959,6 +3007,21 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.qmc.device = 137
                     message = QApplication.translate('Message','Device set to {0}').format(meter)
                 ##########################
+                ##########################
+                ####  DEVICE 138 is Kaleido BT/ET
+                elif meter == 'Kaleido BT/ET':
+                    self.aw.qmc.device = 138
+                    message = QApplication.translate('Message','Device set to {0}').format(meter)
+                ##########################
+                ##########################
+                ####  DEVICE 139 is +Kaleido ST/DT but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                ####  DEVICE 140 is +Kaleido Drum/AH but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                ####  DEVICE 141 is +Kaleido Heater/Fan but +DEVICE cannot be set as main device
+                ##########################
 
 
                 # ADD DEVICE:
@@ -2974,7 +3037,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             #extra devices serial config
             #set of different serial settings modes options
             ssettings: Final = [[9600,8,'O',1,0.5],[19200,8,'E',1,0.5],[2400,7,'E',1,1],[9600,8,'N',1,0.5],
-                         [19200,8,'N',1,0.5],[2400,8,'N',1,1],[9600,8,'E',1,0.5],[38400,8,'E',1,0.5],[115200,8,'N',1,0.4],[57600,8,'N',1,0.5]]
+                         [19200,8,'N',1,0.5],[2400,8,'N',1,1],[9600,8,'E',1,0.5],[38400,8,'E',1,0.5],[115200,8,'N',1,0.4],[57600,8,'N',1,0.4]]
             #map device index to a setting mode (choose the one that matches the device)
     # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
     # - add an entry to devsettings below (and potentially to ssettings above)
@@ -3116,7 +3179,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 134
                 1, # 135
                 1, # 136
-                1  # 137
+                1, # 137
+                9, # 138
+                9, # 139
+                9, # 140
+                9  # 141
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):
@@ -3233,7 +3300,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 self.aw.santokerPort = int(self.santokerPort.text())
             except Exception: # pylint: disable=broad-except
                 pass
-
+            self.aw.kaleidoHost = self.kaleidoHost.text().strip()
+            try:
+                self.aw.kaleidoPort = int(self.kaleidoPort.text())
+            except Exception: # pylint: disable=broad-except
+                pass
+            self.aw.kaleidoPID = self.kaleidoPIDFlag.isChecked()
             for i in range(8):
                 self.aw.qmc.phidget1018_async[i] = self.asyncCheckBoxes[i].isChecked()
                 self.aw.qmc.phidget1018_ratio[i] = self.ratioCheckBoxes[i].isChecked()
@@ -3261,7 +3333,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.sendmessage(message)
             #open serial conf Dialog
             #if device is not None or not external-program (don't need serial settings config)
-            if self.aw.qmc.device not in self.aw.qmc.nonSerialDevices or (self.aw.qmc.device == 134 and self.aw.santokerSerial):
+            if (self.aw.qmc.device not in self.aw.qmc.nonSerialDevices or (self.aw.qmc.device == 134 and self.aw.santokerSerial) or
+                (self.aw.qmc.device == 138 and self.aw.kaleidoSerial)):
                 self.aw.setcommport()
             self.close()
             self.accept()
