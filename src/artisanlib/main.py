@@ -9078,10 +9078,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                         self.lastbuttonpressed = -1 #block resetting style of last button
                                         if self.buttonStates[lastbuttonpressed]:
                                             self.buttonStates[lastbuttonpressed] = 0
-                                            self.setExtraEventButtonStyleSignal.emit(last, 'normal')
+                                            self.setExtraEventButtonStyleSignal.emit(lastbuttonpressed, 'normal')
                                         else:
                                             self.buttonStates[lastbuttonpressed] = 1
-                                            self.setExtraEventButtonStyleSignal.emit(last, 'pressed')
+                                            self.setExtraEventButtonStyleSignal.emit(lastbuttonpressed, 'pressed')
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
 
