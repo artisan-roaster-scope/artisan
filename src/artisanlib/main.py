@@ -15478,7 +15478,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             res:Optional[str] = self.kaleido.send_request(target, value)
             if res is not None:
                 try:
-                    self.lastIOResult = float(res)
+                    try:
+                        self.lastIOResult = float(res)
+                    except Exception: # pylint: disable=broad-except
+                        self.lastIOResult = None
                     if etype == -1:
                         if len(self.buttonlist)>lastbuttonpressed > -1:
                             # we got a valid lastbutton which triggered this action and we set its state according to our result
@@ -15490,7 +15493,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                 self.setExtraEventButtonStyleSignal.emit(lastbuttonpressed, 'pressed')
                             else:
                                 self.setExtraEventButtonStyleSignal.emit(lastbuttonpressed, 'normal')
-                    else:
+                    elif etype>-1:
                         new_value = int(round(float(res)))
                         # limit value by slider limits
                         new_value = min(self.eventslidermax[etype],max(self.eventslidermin[etype],new_value))

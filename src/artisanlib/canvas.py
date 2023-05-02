@@ -11343,6 +11343,7 @@ class tgraphcanvas(FigureCanvas):
                 # trigger event action before disconnecting from devices
                 if self.extrabuttonactions[1] != 18: # Artisan Commands are executed after the OFFMonitor action is fully executued as they might trigger another buttons
                     self.aw.eventactionx(self.extrabuttonactions[1],self.extrabuttonactionstrings[1])
+                    QApplication.processEvents()
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
 
@@ -11360,6 +11361,10 @@ class tgraphcanvas(FigureCanvas):
             self.aw.pidcontrol.pidOff()
 #            if self.device == 53:
 #                self.aw.HottopControlOff()
+
+            # we need to wait a moment and processEvents to give OFF actions using Qt signals the chance to still run correctly
+            libtime.sleep(0.2)
+            QApplication.processEvents()
 
             # disconnect Santoker
             if not bool(self.aw.simulator) and self.device == 134 and self.aw.santoker is not None:

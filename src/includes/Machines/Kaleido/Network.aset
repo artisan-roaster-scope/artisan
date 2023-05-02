@@ -61,8 +61,8 @@ svValues=0, 0, 0, 0, 0, 0, 0, 0
 buttonactions=5, 5, 5, 5, 5, 5, 5, 5
 buttonactionstrings="kaleido(EV,1)", "kaleido(EV,3)", "kaleido(EV,4)", "kaleido(EV,5)", "kaleido(EV,6)", "kaleido(EV,7)", "kaleido(EV,8)", "kaleido(EV,9)"
 buttonvisibility=true, true, true, true, true, true, true, true
-extrabuttonactions=0, 0, 0
-extrabuttonactionstrings=, , 
+extrabuttonactions=5, 5, 0
+extrabuttonactionstrings="kaleido(SC,AR)", "kaleido(CL,AR)", 
 xextrabuttonactions=0, 0
 xextrabuttonactionstrings=, 
 

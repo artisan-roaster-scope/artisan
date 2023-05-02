@@ -120,17 +120,19 @@ class KaleidoPort():
 
     @staticmethod
     def strVar(var):
-        return var == 'TU'
+        return var in ['TU', 'SC', 'CL']
 
 # -- Kaleido PID control
 
     def pidON(self) -> None:
-        _log.debug('Kaleido PID ON')
-        self.send_msg('AH', '1')
+#        _log.debug('Kaleido PID ON')
+#        self.send_msg('AH', '1')
+        pass
 
     def pidOFF(self) -> None:
-        _log.debug('Kaleido PID OFF')
-        self.send_msg('AH', '0')
+#        _log.debug('Kaleido PID OFF')
+#        self.send_msg('AH', '0')
+        pass
 
     def setSV(self, sv:float) -> None:
         _log.debug('setSV(%s)',sv)
@@ -140,11 +142,11 @@ class KaleidoPort():
 
 
     # sync version of the corresponding get_state_async variant below
-    # returns the current state of the given var or None (for sid/TU) and -1 (otherwise) if the state is unknown
+    # returns the current state of the given var or None (for sid/TU/SC/CL) and -1 (otherwise) if the state is unknown
     def get_state(self, var:str) -> Optional[Union[str,int,float]]:
         if var in self._state:
             return self._state[var] # type: ignore # TypedDict key must be a string literal
-        if var in ['sid', 'TU']:
+        if var in ['sid', 'TU', 'SC', 'CL']:
             return None
         if self.intVar(var):
             return -1
@@ -517,10 +519,10 @@ class KaleidoPort():
         # self._loop.stop() needs to be called as follows as the event loop class is not thread safe
         if self._loop is not None:
             self._loop.call_soon_threadsafe(self._loop.stop)
-            self._loop = None
         # wait for the thread to finish
         if self._thread is not None:
             self._thread.join()
             self._thread = None
         self._write_queue = None
+        self._loop = None
         self.resetReadings()
