@@ -1331,7 +1331,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     clearBackgroundSignal = pyqtSignal()
     setTareSignal = pyqtSignal(int)
     adjustSVSignal = pyqtSignal(int)
-    updateSerialLogSignal = pyqtSignal()
     fireslideractionSignal = pyqtSignal(int)
     moveButtonSignal = pyqtSignal(str)
     sendnotificationMessageSignal = pyqtSignal(str,str,NotificationType)
@@ -1345,6 +1344,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     santokerSendMessageSignal = pyqtSignal(bytes,int)
     kaleidoSendMessageSignal = pyqtSignal(str,str)
     kaleidoSendMessageAwaitSignal = pyqtSignal(str,str,int,int)
+    updateMessageLogSignal = pyqtSignal()
+    updateSerialLogSignal = pyqtSignal()
+    updateErrorLogSignal = pyqtSignal()
 
     __slots__ = [ 'locale_str', 'app', 'superusermode', 'sample_loop_running', 'time_stopped', 'plus_account', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription',
         'plus_paidUntil', 'plus_rlimit', 'plus_used', 'plus_readonly', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
@@ -3885,7 +3887,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.clearBackgroundSignal.connect(self.clearbackgroundRedraw)
         self.setTareSignal.connect(self.setTare)
         self.adjustSVSignal.connect(self.adjustPIDsv)
-        self.updateSerialLogSignal.connect(self.updateSerialLog)
         self.fireslideractionSignal.connect(self.fireslideraction)
         self.moveButtonSignal.connect(self.moveKbutton)
         self.sendnotificationMessageSignal.connect(self.sendNotificationMessage)
@@ -3899,6 +3900,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.santokerSendMessageSignal.connect(self.santokerSendMessage)
         self.kaleidoSendMessageSignal.connect(self.kaleidoSendMessage)
         self.kaleidoSendMessageAwaitSignal.connect(self.kaleidoSendMessageAwait)
+        self.updateMessageLogSignal.connect(self.updateMessageLog)
+        self.updateSerialLogSignal.connect(self.updateSerialLog)
+        self.updateErrorLogSignal.connect(self.updateErrorLog)
 
         self.notificationManager = None
         if not self.app.artisanviewerMode:
@@ -3919,6 +3923,20 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.zoomInShortcut.activated.connect(self.zoomIn)
         self.zoomOutShortcut = QShortcut(QKeySequence.StandardKey.ZoomOut, self)
         self.zoomOutShortcut.activated.connect(self.zoomOut)
+
+
+    @pyqtSlot()
+    def updateMessageLog(self):
+        if self.message_dlg:
+            self.message_dlg.update()
+    @pyqtSlot()
+    def updateSerialLog(self):
+        if self.serial_dlg:
+            self.serial_dlg.update()
+    @pyqtSlot()
+    def updateErrorLog(self):
+        if self.error_dlg:
+            self.error_dlg.update()
 
     @pyqtSlot()
     def pidOn(self):
@@ -5585,8 +5603,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     background = True
                 if background:
                     t_min,t_max = self.calcAutoAxisBackground()
-                    if self.qmc.timeindex[0] != -1 and len(self.qmc.time) > self.qmc.timeindex[0]:
-                        t_max = t_max - self.qmc.time[self.qmc.timeindex[0]]
+                    if self.qmc.timeindex[0] != -1 and len(self.qmc.timex) > self.qmc.timeindex[0]:
+                        t_max = t_max - self.qmc.timex[self.qmc.timeindex[0]]
                 elif len(self.qmc.timex) > 3:
                     t_min,t_max = self.calcAutoAxisForeground()
                     if self.qmc.timeindex[0] != -1 and len(self.qmc.timex) > self.qmc.timeindex[0]:
@@ -7517,11 +7535,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     def setLabelColor(label,color):
         label.setStyleSheet(f'QLabel {{ color: {color.name()}; }}')
 
-    @pyqtSlot()
-    def updateSerialLog(self):
-        if self.serial_dlg is not None:
-            self.serial_dlg.update()
-
     #adds to serial log
     def addserial(self,serialstring):
         if self.seriallogflag:
@@ -7534,7 +7547,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     self.seriallog = self.seriallog[1:]
                 self.seriallog.append(timez + ' ' + serialstring)
                 # if logging is not on, we have to update the serial log here:
-                if not self.qmc.flagon and self.serial_dlg is not None:
+                if self.serial_dlg is not None:
                     self.updateSerialLogSignal.emit() # as addserial might be called from another (samplinig) thread we need to ensure that this is processed this within the GUI thread via a signal
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
@@ -9961,6 +9974,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             self.messagelabel.setText(message)
             if repaint: # if repaint is executed in the main thread we receive "QWidget::repaint: Recursive repaint detected"
                 self.messagelabel.repaint()
+            # update messages window
+            if self.message_dlg:
+                self.updateMessageLogSignal.emit()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         finally:
@@ -13618,7 +13634,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.extrastopbits = [toInt(x) for x in toList(settings.value('extrastopbits',self.extrastopbits))]
         self.extratimeout = [self.float2float(toFloat(x)) for x in toList(settings.value('extratimeout',self.extratimeout))]
         lenextraports = len(self.extracomport)
-        self.extraser = [serialport(self)]*lenextraports
+        self.extraser = [serialport(self) for _ in range(lenextraports)]
         #populate self.extraser
         for i in range(lenextraports):
             self.extraser[i].comport = str(self.extracomport[i])
@@ -15523,6 +15539,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     #loads the settings at the start of application. See the oppposite closeEventSettings()
     def settingsLoad(self, filename=None, theme=False, machine=False, redraw=True): # pyright: ignore # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing
         res = False
+
         try:
             updateBatchCounter = True
             if filename is not None:
@@ -17332,6 +17349,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             res = False
             _, _, exc_tb = sys.exc_info()
             QMessageBox.information(self,QApplication.translate('Error Message', 'Error'),QApplication.translate('Error Message', 'Exception:') + ' settingsLoad()  @line ' + str(getattr(exc_tb, 'tb_lineno', '?')))
+
         return res
 
     def startWebLCDs(self,force=False):
@@ -22264,7 +22282,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             fname = toString(action.data())
             if os.path.isfile(fname):
                 _log.info('menu load recent settings: %s',fname)
-                self.loadSettings(fn=fname, remember=False)
+                self.loadSettings(fn=fname, remember=True)
             else:
                 settings = QSettings()
                 files = toStringList(settings.value('recentSettingList'))

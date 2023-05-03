@@ -240,7 +240,7 @@ class serialport():
         'Phidget1045semaphore','PhidgetBridgeSensor','Phidget1046values','Phidget1046lastvalues','Phidget1046semaphores',\
         'PhidgetIO','PhidgetIOvalues','PhidgetIOlastvalues','PhidgetIOsemaphores','PhidgetDigitalOut',\
         'PhidgetDigitalOutLastPWM','PhidgetDigitalOutLastToggle','PhidgetDigitalOutHub','PhidgetDigitalOutLastPWMhub',\
-        'PhidgetDigitalOutLastToggleHub','PhidgetAnalogOut','PhidgetDCMotor','PhidgetRCServo','PhidgetBinaryOut',\
+        'PhidgetDigitalOutLastToggleHub','PhidgetAnalogOut','PhidgetDCMotor','PhidgetRCServo',\
         'YOCTOlibImported','YOCTOsensor','YOCTOchan1','YOCTOchan2','YOCTOtempIRavg','YOCTOvalues','YOCTOlastvalues','YOCTOsemaphores',\
         'YOCTOthread','YOCTOvoltageOutputs','YOCTOcurrentOutputs','YOCTOrelays','YOCTOservos','YOCTOpwmOutputs','HH506RAid','MS6514PrevTemp1','MS6514PrevTemp2','DT301PrevTemp','EXTECH755PrevTemp',\
         'controlETpid','readBTpid','useModbusPort','showFujiLCDs','arduinoETChannel','arduinoBTChannel','arduinoATChannel',\
@@ -300,8 +300,6 @@ class serialport():
         self.PhidgetAnalogOut:Dict[Optional[str], List['Phidget']] = {} # a dict associating serials with lists of channels
         #store the servo objects
         self.PhidgetRCServo:Dict[Optional[str], List['Phidget']] = {} # a dict associating serials with lists of channels
-        #store the Phidget IO Binary Output objects
-        self.PhidgetBinaryOut:Dict[Optional[str], List['Phidget']] = {} # a dict associating binary out serials with lists of channels
         #store the Phidget DCMotor objects
         self.PhidgetDCMotor:Dict[Optional[str], List['Phidget']] = {} # a dict associating serials with lists of channels
         # Phidget Ambient Sensor Channels
@@ -3805,7 +3803,7 @@ class serialport():
     # serial: optional Phidget HUB serial number with optional port number as string of the form "<serial>[:<port>]"
     def phidgetBinaryOUTattach(self, channel:'Phidget', serial:Optional[str]=None) -> None:
         _log.debug('phidgetBinaryOUTattach(%s,%s)',channel,serial)
-        if serial not in self.aw.ser.PhidgetBinaryOut:
+        if serial not in self.aw.ser.PhidgetDigitalOut:
             if self.aw.qmc.phidgetManager is None:
                 self.aw.qmc.startPhidgetManager()
             if self.aw.qmc.phidgetManager is not None:
@@ -3831,7 +3829,7 @@ class serialport():
                                 remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
                     ports = 16
                 if ser is not None:
-                    self.aw.ser.PhidgetBinaryOut[serial] = []
+                    self.aw.ser.PhidgetDigitalOut[serial] = []
                     for i in range(ports):
                         do = DigitalOutput()
                         do.setChannel(i)
@@ -3842,12 +3840,12 @@ class serialport():
                         elif not self.aw.qmc.phidgetRemoteFlag:
                             do.setIsRemote(False)
                             do.setIsLocal(True)
-                        self.aw.ser.PhidgetBinaryOut[serial].append(do)
+                        self.aw.ser.PhidgetDigitalOut[serial].append(do)
                     if serial is None:
                         # we make this also accessible via its serial number
-                        self.aw.ser.PhidgetBinaryOut[str(ser)] = self.aw.ser.PhidgetBinaryOut[None]
+                        self.aw.ser.PhidgetDigitalOut[str(ser)] = self.aw.ser.PhidgetDigitalOut[None]
         try:
-            ch = self.aw.ser.PhidgetBinaryOut[serial][channel]
+            ch = self.aw.ser.PhidgetDigitalOut[serial][channel]
             ch.setOnAttachHandler(self.phidgetOUTattached)
             ch.setOnDetachHandler(self.phidgetOUTdetached)
             if not ch.getAttached():
@@ -3858,7 +3856,7 @@ class serialport():
                 if serial is None and ch.getAttached():
                     # we make this also accessible via its serial number + port
                     si = self.serialPort2serialString(ch.getDeviceSerialNumber(),ch.getHubPort()) # NOTE: ch.getHubPort() returns -1 if not yet attached
-                    self.aw.ser.PhidgetBinaryOut[str(si)] = self.aw.ser.PhidgetBinaryOut[None]
+                    self.aw.ser.PhidgetDigitalOut[str(si)] = self.aw.ser.PhidgetDigitalOut[None]
         except Exception: # pylint: disable=broad-except
             pass
 
@@ -3880,9 +3878,9 @@ class serialport():
         _log.debug('phidgetBinaryOUTset(%s,%s,%s)',channel,value,serial)
         res = False
         self.phidgetBinaryOUTattach(channel,serial)
-        if serial in self.aw.ser.PhidgetBinaryOut:
+        if serial in self.aw.ser.PhidgetDigitalOut:
             # set state of the given channel
-            out = self.aw.ser.PhidgetBinaryOut[serial]
+            out = self.aw.ser.PhidgetDigitalOut[serial]
             try:
                 if len(out) > channel and out[channel] and out[channel].getAttached():
                     out[channel].setState(value)
@@ -3897,9 +3895,9 @@ class serialport():
         _log.debug('phidgetBinaryOUTget(%s,%s)',channel,serial)
         self.phidgetBinaryOUTattach(channel,serial)
         res = False
-        if serial in self.aw.ser.PhidgetBinaryOut:
+        if serial in self.aw.ser.PhidgetDigitalOut:
             # get state of the given channel
-            out = self.aw.ser.PhidgetBinaryOut[serial]
+            out = self.aw.ser.PhidgetDigitalOut[serial]
             try:
                 if len(out) > channel and out[channel] and out[channel].getAttached():
                     res = out[channel].getState()
@@ -3914,8 +3912,8 @@ class serialport():
 
     def phidgetBinaryOUTclose(self) -> None:
         _log.debug('phidgetBinaryOUTclose')
-        for o in self.aw.ser.PhidgetBinaryOut:
-            out = self.aw.ser.PhidgetBinaryOut[o]
+        for o in self.aw.ser.PhidgetDigitalOut:
+            out = self.aw.ser.PhidgetDigitalOut[o]
             if out is not None:
                 for i, _ in enumerate(out):
                     try:
@@ -3924,7 +3922,7 @@ class serialport():
                         out[i].close()
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
-        self.aw.ser.PhidgetBinaryOut = {}
+        self.aw.ser.PhidgetDigitalOut = {}
 
 
 #--- Phidget Digital PWM Output

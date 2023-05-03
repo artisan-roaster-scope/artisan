@@ -4290,25 +4290,6 @@ class tgraphcanvas(FigureCanvas):
                 if self.temporary_error is not None:
                     self.aw.sendmessage(self.temporary_error)
                     self.temporary_error = None # clear flag
-                    # update error dlg
-                    if self.aw.error_dlg:
-                        self.aw.error_dlg.update()
-
-                #update serial_dlg
-                if self.aw.serial_dlg:
-                    try:
-                        #### lock shared resources #####
-                        self.seriallogsemaphore.acquire(1)
-                        self.aw.serial_dlg.update()
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.exception(e)
-                    finally:
-                        if self.seriallogsemaphore.available() < 1:
-                            self.seriallogsemaphore.release(1)
-
-                #update message_dlg
-                if self.aw.message_dlg:
-                    self.aw.message_dlg.update()
 
                 #check quantified events; do this before the canvas is redraw as additional annotations might be added here, but do not recursively call updategraphics
                 # NOTE: that EventRecordAction has to be called from outside the critical section protected by the profileDataSemaphore as it is itself accessing this section!!
@@ -11363,7 +11344,7 @@ class tgraphcanvas(FigureCanvas):
 #                self.aw.HottopControlOff()
 
             # we need to wait a moment and processEvents to give OFF actions using Qt signals the chance to still run correctly
-            libtime.sleep(0.2)
+            libtime.sleep(0.3)
             QApplication.processEvents()
 
             # disconnect Santoker
@@ -13130,7 +13111,6 @@ class tgraphcanvas(FigureCanvas):
     #Uses the position of the time index (variable self.timex) as location in time
     # extraevent is given when called from self.aw.recordextraevent() from an extra Event Button
     def EventRecordAction(self,extraevent=None,eventtype=None,eventvalue=None,eventdescription='',takeLock=True,doupdategraphics=True,doupdatebackground=True):
-        #_log.info("PRINT EventRecordAction(%s,%s,%s)", extraevent, eventtype, eventvalue)
         try:
             if takeLock:
                 self.profileDataSemaphore.acquire(1)
@@ -13197,7 +13177,7 @@ class tgraphcanvas(FigureCanvas):
                             index = self.specialevents[-1]
                             if etype < 4  and (not self.renderEventsDescr or len(self.specialeventsStrings[-1].strip()) == 0):
                                 firstletter = self.etypesf(etype)[0]
-                                secondletter = self.eventsvaluesShort(float(etype))
+                                secondletter = self.eventsvaluesShort(sevalue)
                                 if self.aw.eventslidertemp[etype]:
                                     thirdletter = self.mode # postfix
                                 else:
@@ -14826,6 +14806,9 @@ class tgraphcanvas(FigureCanvas):
                 error = error.splitlines()[0]
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
+            # update the error dlg
+            if self.aw.error_dlg:
+                self.aw.updateErrorLogSignal.emit()
             if self.flagon: # don't send message here, but cache it and send it from updategraphics from within the GUI thread
                 self.temporary_error = error
             else:

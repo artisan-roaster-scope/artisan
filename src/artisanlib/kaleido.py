@@ -17,7 +17,7 @@
 
 
 import asyncio
-from websockets.exceptions import ConnectionClosed
+from websockets.exceptions import ConnectionClosed, ConnectionClosedError
 import websockets.client
 from contextlib import suppress
 from threading import Thread
@@ -46,7 +46,7 @@ class State(TypedDict, total=False):
 class KaleidoPort():
 
     __slots__ = [ '_loop', '_thread', '_write_queue', '_RDreceived', '_default_data_stream', '_ping_timeout', '_open_timeout',
-            '_send_timeout', '_ping_retry_delay', '_state', '_pending_requests', '_logging' ]
+            '_send_timeout', '_read_timeout', '_ping_retry_delay', '_reconnect_delay', '_state', '_pending_requests', '_logging' ]
 
     def __init__(self) -> None:
         # internals
@@ -57,10 +57,12 @@ class KaleidoPort():
         self._RDreceived = asyncio.Event() # async state indicating that new data was received
 
         self._default_data_stream:Final[str] = 'A0'
-        self._open_timeout:Final[float] = 7
+        self._open_timeout:Final[float] = 5
         self._ping_timeout:Final[float] = 0.7
         self._send_timeout:Final[float] = 0.3
+        self._read_timeout:Final[float] = 4
         self._ping_retry_delay:Final[float] = 1
+        self._reconnect_delay:Final[float] = 0.5
 
         # _state holds the last received data of the corresponding for known all tags
         # if data for tag was not received yet, there its entry is still missing
@@ -126,12 +128,12 @@ class KaleidoPort():
 
     def pidON(self) -> None:
 #        _log.debug('Kaleido PID ON')
-#        self.send_msg('AH', '1')
+#        self.send_msg('AH', '1') # AH message is send via an ON IO Command action
         pass
 
     def pidOFF(self) -> None:
 #        _log.debug('Kaleido PID OFF')
-#        self.send_msg('AH', '0')
+#        self.send_msg('AH', '0') # AH message is send via an ON IO Command action
         pass
 
     def setSV(self, sv:float) -> None:
@@ -199,33 +201,25 @@ class KaleidoPort():
 #---- WebSocket transport
 
     async def ws_handle_reads(self, websocket:websockets.client.WebSocketClientProtocol) -> None:
-        try:
-            while True:
-                res:Union[str,bytes] = await websocket.recv()
-                message:str = (str(res, 'utf-8') if isinstance(res, bytes) else res)
-                if self._logging:
-                    _log.info('received: %s',message.strip())
-                await self.process_message(message)
-        except Exception as e: # pylint: disable=broad-except
-            _log.error(e)
+        while True:
+            res:Union[str,bytes] = await asyncio.wait_for(websocket.recv(), timeout=self._read_timeout)
+            message:str = (str(res, 'utf-8') if isinstance(res, bytes) else res)
+            if self._logging:
+                _log.info('received: %s',message.strip())
+            await self.process_message(message)
 
     async def ws_write(self, websocket: websockets.client.WebSocketClientProtocol, message: str) -> None:
-        try:
-            if self._logging:
-                _log.info('write: %s',message)
-            await websocket.send(message)
-        except Exception as e: # pylint: disable=broad-except
-            _log.error(e)
+        if self._logging:
+            _log.info('write: %s',message)
+        await websocket.send(message)
 
     async def ws_handle_writes(self, websocket: websockets.client.WebSocketClientProtocol, queue: 'asyncio.Queue[str]') -> None:
-        try:
-            with suppress(asyncio.CancelledError):
-                message = await queue.get()
-                while message != '':
-                    await self.ws_write(websocket, message)
-                    message = await queue.get()
-        except Exception as e: # pylint: disable=broad-except
-            _log.error(e)
+#        with suppress(asyncio.CancelledError):
+
+        message = await queue.get()
+        while message != '':
+            await self.ws_write(websocket, message)
+            message = await queue.get()
 
     # to initialize the connection we first successfully ping and then set the temperature mode
     async def ws_initialize(self, websocket: websockets.client.WebSocketClientProtocol, mode:str) -> None:
@@ -275,9 +269,16 @@ class KaleidoPort():
 
                 read_handler = asyncio.create_task(self.ws_handle_reads(websocket))
                 write_handler = asyncio.create_task(self.ws_handle_writes(websocket, self._write_queue))
-                await asyncio.wait([read_handler, write_handler], return_when=asyncio.FIRST_COMPLETED)
+                done, pending = await asyncio.wait([read_handler, write_handler], return_when=asyncio.FIRST_COMPLETED)
 
-            except ConnectionClosed:
+                for task in pending:
+                    task.cancel()
+                for task in done:
+                    exception = task.exception()
+                    if isinstance(exception, Exception):
+                        raise exception
+
+            except (ConnectionClosed, ConnectionClosedError):
                 _log.debug('disconnected')
                 self.resetReadings()
                 if disconnected_handler is not None:
@@ -291,42 +292,30 @@ class KaleidoPort():
                 _log.debug('connection timeout')
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)
-            await asyncio.sleep(1)
+            await asyncio.sleep(self._reconnect_delay)
 
 
 #---- Serial transport
 
     async def serial_handle_reads(self, reader: asyncio.StreamReader) -> None:
-        try:
-            while True:
-                message:str = str(await reader.readline(), 'utf-8').strip()
-                if self._logging:
-                    _log.info('received: %s',message)
-                await self.process_message(message.strip())
-        except Exception as e: # pylint: disable=broad-except
-            _log.error(e)
+        while True:
+            res = await asyncio.wait_for(reader.readline(), timeout=self._read_timeout)
+            message:str = str(res, 'utf-8').strip()
+            if self._logging:
+                _log.info('received: %s',message)
+            await self.process_message(message.strip())
 
     async def serial_write(self, writer: asyncio.StreamWriter, message: str) -> None:
-        try:
-            if self._logging:
-                _log.info('write: %s',message)
-            writer.write(str.encode(message))
-            await writer.drain()
-        except Exception as e: # pylint: disable=broad-except
-            _log.error(e)
+        if self._logging:
+            _log.info('write: %s',message)
+        writer.write(str.encode(message))
+        await asyncio.wait_for(writer.drain(), timeout=self._send_timeout)
 
     async def serial_handle_writes(self, writer: asyncio.StreamWriter, queue: 'asyncio.Queue[str]') -> None:
-        try:
-            with suppress(asyncio.CancelledError):
-                message = await queue.get()
-                while message != '':
-                    await self.serial_write(writer, message)
-                    message = await queue.get()
-        except Exception as e: # pylint: disable=broad-except
-            _log.error(e)
-        finally:
-            with suppress(asyncio.CancelledError, ConnectionResetError):
-                await writer.drain()
+        message = await queue.get()
+        while message != '':
+            await self.serial_write(writer, message)
+            message = await queue.get()
 
     # to initialize the connection we first successfully ping and then set the temperature mode
     async def serial_initialize(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter, mode:str) -> None:
@@ -370,31 +359,42 @@ class KaleidoPort():
                         parity=serial['parity'],
                         timeout=serial['timeout'])
                 # Wait for 2 seconds, then raise TimeoutError
-                reader, writer = await asyncio.wait_for(connect, timeout=2)
+                reader, writer = await asyncio.wait_for(connect, timeout=self._open_timeout)
+
+                self._write_queue = asyncio.Queue()
+                await self.serial_initialize(reader, writer, mode)
+
                 _log.debug('connected')
                 if connected_handler is not None:
                     try:
                         connected_handler()
                     except Exception as e: # pylint: disable=broad-except
                         _log.error(e)
-                self._write_queue = asyncio.Queue()
-                await self.serial_initialize(reader, writer, mode)
+
                 read_handler = asyncio.create_task(self.serial_handle_reads(reader))
                 write_handler = asyncio.create_task(self.serial_handle_writes(writer, self._write_queue))
-                await asyncio.wait([read_handler, write_handler], return_when=asyncio.FIRST_COMPLETED)
-                writer.close()
+                done, pending = await asyncio.wait([read_handler, write_handler], return_when=asyncio.FIRST_COMPLETED)
+
                 _log.debug('disconnected')
+                writer.close()
                 self.resetReadings()
                 if disconnected_handler is not None:
                     try:
                         disconnected_handler()
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
+
+                for task in pending:
+                    task.cancel()
+                for task in done:
+                    exception = task.exception()
+                    if isinstance(exception, Exception):
+                        raise exception
             except asyncio.TimeoutError:
                 _log.debug('connection timeout')
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)
-            await asyncio.sleep(1)
+            await asyncio.sleep(self._reconnect_delay)
 
     @staticmethod
     def start_background_loop(loop: asyncio.AbstractEventLoop) -> None:

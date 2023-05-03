@@ -173,7 +173,7 @@ class PhidgetManager():
 
     # should be called from the attach handler that binds this hardware channel to a software channel
     def reserveChannel(self,channel:'Phidget') -> None:
-#        _log.debug('reserveChannel: %s', channel)
+        _log.debug('reserveChannel: %s', channel)
         try:
             self.managersemaphore.acquire(1)
             if channel is not None and channel in self.attachedPhidgetChannels:
@@ -231,12 +231,12 @@ class PhidgetManager():
     def getFirstMatchingPhidget(self,
                 phidget_class_name:str,
                 device_id:int,
-                channel:Optional['Phidget']=None,
+                channel:Optional[int]=None,
                 remote:bool=False,
                 remoteOnly:bool=False,
                 serial:Optional[int]=None,
                 hubport:Optional[int]=None) -> Tuple[Optional[int],Optional[int]]:
-#        _log.debug('getFirstMatchingPhidget(%s,%s,%s,%s,%s,%s,%s)',phidget_class_name,device_id,channel,remote,remoteOnly,serial,hubport)
+        _log.debug('getFirstMatchingPhidget(%s,%s,%s,%s,%s,%s,%s)',phidget_class_name,device_id,channel,remote,remoteOnly,serial,hubport)
         try:
             self.managersemaphore.acquire(1)
             if device_id in [

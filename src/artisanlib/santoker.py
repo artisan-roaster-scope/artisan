@@ -282,7 +282,7 @@ class SantokerNetwork():
                 read_handler = asyncio.create_task(self.handle_reads(reader, charge_handler,
                                     dry_handler, fcs_handler, scs_handler, drop_handler))
                 write_handler = asyncio.create_task(self.handle_writes(writer, self._write_queue))
-                await asyncio.wait([read_handler, write_handler], return_when=asyncio.FIRST_COMPLETED)
+                done, pending = await asyncio.wait([read_handler, write_handler], return_when=asyncio.FIRST_COMPLETED)
                 writer.close()
                 _log.debug('disconnected')
                 self.resetReadings()
@@ -291,11 +291,19 @@ class SantokerNetwork():
                         disconnected_handler()
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
+
+                for task in pending:
+                    task.cancel()
+                for task in done:
+                    exception = task.exception()
+                    if isinstance(exception, Exception):
+                        raise exception
+
             except asyncio.TimeoutError:
                 _log.debug('connection timeout')
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.7)
 
     @staticmethod
     def start_background_loop(loop: asyncio.AbstractEventLoop) -> None:
