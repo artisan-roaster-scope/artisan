@@ -13,7 +13,7 @@ except ImportError:
 #####################     QR Image   #####################################
 ##########################################################################
 
-class QRImage(qrcode.image.base.BaseImage):
+class QRImage(qrcode.image.base.BaseImage): # type: ignore # pyright: "base" is not a known member of module "qrcode.image"
 
     def new_image(self, **_kwargs):
         img = QImage(self.pixel_size, self.pixel_size, QImage.Format.Format_RGB16)
@@ -43,7 +43,7 @@ class QRImage(qrcode.image.base.BaseImage):
 def QRlabel(url_str):
     qr = qrcode.QRCode(
         version=None, # 1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        error_correction=qrcode.constants.ERROR_CORRECT_L, # type:ignore # pyright: "constants" is not a known member of module "qrcode"
         box_size=4,
         border=1,
         image_factory=QRImage)

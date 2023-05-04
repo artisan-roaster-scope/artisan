@@ -17,7 +17,6 @@
 
 
 import asyncio
-from websockets.exceptions import ConnectionClosed, ConnectionClosedError
 import websockets.client
 from contextlib import suppress
 from threading import Thread
@@ -45,7 +44,7 @@ class State(TypedDict, total=False):
 
 class KaleidoPort():
 
-    __slots__ = [ '_loop', '_thread', '_write_queue', '_RDreceived', '_default_data_stream', '_ping_timeout', '_open_timeout',
+    __slots__ = [ '_loop', '_thread', '_write_queue', '_RDreceived', '_default_data_stream', '_ping_timeout', '_open_timeout', '_init_timeout',
             '_send_timeout', '_read_timeout', '_ping_retry_delay', '_reconnect_delay', '_state', '_pending_requests', '_logging' ]
 
     def __init__(self) -> None:
@@ -58,11 +57,12 @@ class KaleidoPort():
 
         self._default_data_stream:Final[str] = 'A0'
         self._open_timeout:Final[float] = 5
+        self._init_timeout:Final[float] = 5
         self._ping_timeout:Final[float] = 0.7
         self._send_timeout:Final[float] = 0.3
         self._read_timeout:Final[float] = 4
         self._ping_retry_delay:Final[float] = 1
-        self._reconnect_delay:Final[float] = 0.5
+        self._reconnect_delay:Final[float] = 1
 
         # _state holds the last received data of the corresponding for known all tags
         # if data for tag was not received yet, there its entry is still missing
@@ -255,21 +255,30 @@ class KaleidoPort():
                 disconnected_handler:Optional[Callable[[], None]] = None) -> None:
 
         _log.debug('connecting to %s:%s/%s ...',host,port,path)
-        async for websocket in websockets.client.connect(f'ws://{host}:{port}/{path}', open_timeout=self._open_timeout):
+
+        websocket = None
+        while True:
             try:
+                _log.debug('connecting to ws://%s:%s/%s ...',host, port, path)
+
+                websocket = await asyncio.wait_for(websockets.client.connect(f'ws://{host}:{port}/{path}'), timeout=self._open_timeout)
+
+                self._write_queue = asyncio.Queue()
+
+                await asyncio.wait_for(self.ws_initialize(websocket, mode), timeout=self._init_timeout)
+
+                _log.debug('connected')
                 if connected_handler is not None:
                     try:
                         connected_handler()
                     except Exception as e: # pylint: disable=broad-except
                         _log.error(e)
 
-                self._write_queue = asyncio.Queue()
-
-                await self.ws_initialize(websocket, mode)
-
                 read_handler = asyncio.create_task(self.ws_handle_reads(websocket))
                 write_handler = asyncio.create_task(self.ws_handle_writes(websocket, self._write_queue))
                 done, pending = await asyncio.wait([read_handler, write_handler], return_when=asyncio.FIRST_COMPLETED)
+
+                _log.debug('disconnected')
 
                 for task in pending:
                     task.cancel()
@@ -278,20 +287,25 @@ class KaleidoPort():
                     if isinstance(exception, Exception):
                         raise exception
 
-            except (ConnectionClosed, ConnectionClosedError):
-                _log.debug('disconnected')
-                self.resetReadings()
-                if disconnected_handler is not None:
-                    try:
-                        disconnected_handler()
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.error(e)
-                continue
-
             except asyncio.TimeoutError:
                 _log.debug('connection timeout')
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)
+            finally:
+                if websocket is not None:
+                    try:
+                        await websocket.close()
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.error(e)
+
+            self.resetReadings()
+
+            if disconnected_handler is not None:
+                try:
+                    disconnected_handler()
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
+
             await asyncio.sleep(self._reconnect_delay)
 
 
@@ -347,6 +361,7 @@ class KaleidoPort():
                 connected_handler:Optional[Callable[[], None]] = None,
                 disconnected_handler:Optional[Callable[[], None]] = None) -> None:
 
+        writer = None
         while True:
             try:
                 _log.debug('connecting to %s@%s ...',serial['port'],serial['baudrate'])
@@ -362,7 +377,7 @@ class KaleidoPort():
                 reader, writer = await asyncio.wait_for(connect, timeout=self._open_timeout)
 
                 self._write_queue = asyncio.Queue()
-                await self.serial_initialize(reader, writer, mode)
+                await asyncio.wait_for(self.serial_initialize(reader, writer, mode), timeout=self._init_timeout)
 
                 _log.debug('connected')
                 if connected_handler is not None:
@@ -376,13 +391,6 @@ class KaleidoPort():
                 done, pending = await asyncio.wait([read_handler, write_handler], return_when=asyncio.FIRST_COMPLETED)
 
                 _log.debug('disconnected')
-                writer.close()
-                self.resetReadings()
-                if disconnected_handler is not None:
-                    try:
-                        disconnected_handler()
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.exception(e)
 
                 for task in pending:
                     task.cancel()
@@ -394,6 +402,20 @@ class KaleidoPort():
                 _log.debug('connection timeout')
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)
+            finally:
+                if writer is not None:
+                    try:
+                        writer.close()
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.error(e)
+
+            self.resetReadings()
+            if disconnected_handler is not None:
+                try:
+                    disconnected_handler()
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
+
             await asyncio.sleep(self._reconnect_delay)
 
     @staticmethod

@@ -256,6 +256,7 @@ class SantokerNetwork():
                 fcs_handler:Optional[Callable[[], None]] = None,
                 scs_handler:Optional[Callable[[], None]] = None,
                 drop_handler:Optional[Callable[[], None]] = None) -> None:
+        writer = None
         while True:
             try:
                 if serial is not None:
@@ -283,14 +284,7 @@ class SantokerNetwork():
                                     dry_handler, fcs_handler, scs_handler, drop_handler))
                 write_handler = asyncio.create_task(self.handle_writes(writer, self._write_queue))
                 done, pending = await asyncio.wait([read_handler, write_handler], return_when=asyncio.FIRST_COMPLETED)
-                writer.close()
                 _log.debug('disconnected')
-                self.resetReadings()
-                if disconnected_handler is not None:
-                    try:
-                        disconnected_handler()
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.exception(e)
 
                 for task in pending:
                     task.cancel()
@@ -303,7 +297,21 @@ class SantokerNetwork():
                 _log.debug('connection timeout')
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)
-            await asyncio.sleep(0.7)
+            finally:
+                if writer is not None:
+                    try:
+                        writer.close()
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.error(e)
+
+            self.resetReadings()
+            if disconnected_handler is not None:
+                try:
+                    disconnected_handler()
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
+
+            await asyncio.sleep(1)
 
     @staticmethod
     def start_background_loop(loop: asyncio.AbstractEventLoop) -> None:

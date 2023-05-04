@@ -37,7 +37,7 @@ class QtSingleApplication(QApplication): # pyright: ignore # Argument to class m
 
         if sys.platform.startswith('darwin') and mp.current_process().name == 'WebLCDs':
             import AppKit # type: ignore # pylint: disable=import-error
-            info = AppKit.NSBundle.mainBundle().infoDictionary()  # @UndefinedVariable # pylint: disable=maybe-no-member
+            info = AppKit.NSBundle.mainBundle().infoDictionary()  # type:ignore # @UndefinedVariable # pylint: disable=maybe-no-member
             info['LSBackgroundOnly'] = '1'
 
         super().__init__(*argv)
