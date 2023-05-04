@@ -1533,6 +1533,18 @@ class serialport():
         tx = self.aw.qmc.timeclock.elapsedMilli()
         if self.aw.kaleido is not None:
             t1,t2 = self.aw.kaleido.getDrumAH()
+            # if in Kaleido PID mode, we turn ArtisanPID ON/OFF if AH signal changes
+            if self.aw.kaleidoPID:
+                try:
+                    ah = bool(round(t2))
+                    if ah and not self.aw.pidcontrol.pidActive:
+                        # machine says its PID is on, we reflect this on the Artisan side
+                        self.aw.pidOnSignal.emit()
+                    elif not ah and self.aw.pidcontrol.pidActive:
+                        # machine says its PID is off, we reflect this on the Artisan side
+                        self.aw.pidOffSignal.emit()
+                except Exception as e: # pylint: disable=broad-except
+                    _log.error(e)
         else:
             t1 = t2 = -1
         return tx,t2,t1 # time), AH (chan2), Drum (chan1)

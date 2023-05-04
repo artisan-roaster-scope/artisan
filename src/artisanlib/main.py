@@ -1632,8 +1632,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.santoker:Optional['SantokerNetwork'] = None # holds the Santoker instance created on connect; reset to None on disconnect
 
         # Kaleido Network
-        self.kaleidoHost:str = '10.10.100.254'
-        self.kaleidoPort:int = 20001
+        self.kaleidoHost:str = '127.0.0.1'
+        self.kaleidoPort:int = 80
         self.kaleidoSerial:bool = False # if True connection is via the main serial port
         self.kaleidoPID:bool = True # if True the external Kaleido PID is operated, otherwise the internal Artisan PID is active
         self.kaleido:Optional['KaleidoPort'] = None # holds the Kaleido instance created on connect; reset to None on disconnect
@@ -5031,6 +5031,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                         QApplication.translate('Message', 'Network name or IP address'),text=self.ws.host) #"127.0.0.1"
                     if res:
                         self.ws.host = host
+                elif self.qmc.device == 138 and not self.kaleidoSerial: # Kaleido Network
+                    host,res = QInputDialog.getText(self,
+                        QApplication.translate('Message', 'Machine'),
+                        QApplication.translate('Message', 'Network name or IP address'),text=self.kaleidoHost) #"127.0.0.1"
+                    if res:
+                        self.kaleidoHost = host
                 elif (self.qmc.device in [0,9,19,53,101,115,126] or (self.qmc.device == 29 and self.modbus.type in [0,1,2]) or
                         (self.qmc.device == 134 and self.santokerSerial) or
                         (self.qmc.device == 138 and self.kaleidoSerial)): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial, HB/ARC
@@ -20173,12 +20179,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 
                                 # we also have to remove those extra event annotations if in combo mode
                                 if self.qmc.eventsGraphflag == 4:
-                                    for child in self.qmc.ax.get_children():
-                                        if isinstance(child, mpl.text.Annotation):
-                                            try:
-                                                self.qmc.ax.texts.remove(child)
-                                            except Exception: # pylint: disable=broad-except
-                                                pass
+                                    self.qmc.ax_combo_text_annotations_clear()
                             except Exception as e: # pylint: disable=broad-except
                                 _log.exception(e)
                             # we only adjust the upper limit of the delta axis automatically

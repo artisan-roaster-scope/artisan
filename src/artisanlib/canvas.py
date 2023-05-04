@@ -2276,6 +2276,15 @@ class tgraphcanvas(FigureCanvas):
                 while len(self.ax.lines) > 0:
                     self.ax.lines[0].remove()
 
+    def ax_combo_text_annotations_clear(self):
+        if self.ax is not None:
+            for child in self.ax.get_children():
+                if isinstance(child, mpl.text.Annotation):
+                    try:
+                        child.remove()
+                    except Exception: # pylint: disable=broad-except
+                        pass
+
     def ax_annotations_clear(self):
         for la in self.l_annotations + self.l_background_annotations:
             if la:
@@ -2865,7 +2874,7 @@ class tgraphcanvas(FigureCanvas):
                 QDesktopServices.openUrl(QUrl(roastLink(self.roastUUID), QUrl.ParsingMode.TolerantMode))
                 return
 
-            if not self.designerflag and not self.wheelflag and event.inaxes is None and not self.flagstart and not self.flagon and event.button == 1 and event.dblclick and event.x > event.y:
+            if not self.wheelflag and event.inaxes is None and not self.flagstart and not self.flagon and event.button == 1 and event.dblclick and event.x > event.y:
                 fig = self.ax.get_figure()
                 s = fig.get_size_inches()*fig.dpi
                 if event.x > s[0]*2/3 and event.y > s[1]*2/3:
@@ -11245,8 +11254,7 @@ class tgraphcanvas(FigureCanvas):
                                 'parity': self.aw.ser.parity,
                                 'timeout': self.aw.ser.timeout}
                     self.aw.kaleido.start(self.aw.qmc.mode, self.aw.kaleidoHost, self.aw.kaleidoPort,
-                        '',
-                        kaleido_serial,
+                        serial=kaleido_serial,
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Kaleido'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Kaleido'),True,None))
             self.aw.initializedMonitoringExtraDeviceStructures()
@@ -11293,11 +11301,22 @@ class tgraphcanvas(FigureCanvas):
             self.aw.pidcontrol.activateSVSlider(self.aw.pidcontrol.svSlider and self.aw.buttonONOFF.isVisible())
             self.block_update = False # unblock the updating of the bitblit canvas
             self.aw.updateReadingsLCDsVisibility() # this one triggers the resize and the recreation of the bitblit canvas
+
+            if self.device == 138:
+                # if Kaleido Serial or Network is selected we run the ON action before starting the sample thread
+                try:
+                    self.aw.eventactionx(self.extrabuttonactions[0],self.extrabuttonactionstrings[0])
+                except Exception as e: # pylint: disable=broad-except
+                    _log.error(e)
+                QApplication.processEvents()
             self.threadserver.createSampleThread()
-            try:
-                self.aw.eventactionx(self.extrabuttonactions[0],self.extrabuttonactionstrings[0])
-            except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
+            if self.device != 138:
+                # if not Kaleido Serial or Network we run the ON action after starting the sample thread which might start the connectin in the first place
+                try:
+                    self.aw.eventactionx(self.extrabuttonactions[0],self.extrabuttonactionstrings[0])
+                except Exception as e: # pylint: disable=broad-except
+                    _log.error(e)
+
             if not bool(self.aw.simulator):
                 QTimer.singleShot(300,self.StartAsyncSamplingAction)
             _log.info('ON MONITOR (sampling @%ss)', self.aw.float2float(self.delay/1000))
@@ -14838,6 +14857,9 @@ class tgraphcanvas(FigureCanvas):
                 if res:
                     self.ax_lines_clear()
                     self.ax_annotations_clear() # remove background profiles annotations (has to be done before reset!)
+                    # we also have to remove those extra event annotations if in combo mode
+                    if self.eventsGraphflag == 4:
+                        self.ax_combo_text_annotations_clear()
                     self.connect_designer()
                     self.aw.disableEditMenus(designer=True)
                     self.redraw()
@@ -14858,6 +14880,9 @@ class tgraphcanvas(FigureCanvas):
             #reset (clear) plot
             self.ax_lines_clear()
             self.ax_annotations_clear() # remove background profiles annotations (has to be done before reset!)
+            # we also have to remove those extra event annotations if in combo mode
+            if self.eventsGraphflag == 4:
+                self.ax_combo_text_annotations_clear()
             self.reset(redraw=False,soundOn=False)
             self.connect_designer()
             self.aw.disableEditMenus(designer=True)

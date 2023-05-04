@@ -122,19 +122,17 @@ class KaleidoPort():
 
     @staticmethod
     def strVar(var):
-        return var in ['TU', 'SC', 'CL']
+        return var in ['TU', 'SC', 'CL', 'SN']
 
 # -- Kaleido PID control
 
     def pidON(self) -> None:
-#        _log.debug('Kaleido PID ON')
-#        self.send_msg('AH', '1') # AH message is send via an ON IO Command action
-        pass
+        _log.debug('Kaleido PID ON')
+        self.send_msg('AH', '1') # AH message can also be send via an ON IO Command action
 
     def pidOFF(self) -> None:
-#        _log.debug('Kaleido PID OFF')
-#        self.send_msg('AH', '0') # AH message is send via an ON IO Command action
-        pass
+        _log.debug('Kaleido PID OFF')
+        self.send_msg('AH', '0') # AH message can also be send via an ON IO Command action
 
     def setSV(self, sv:float) -> None:
         _log.debug('setSV(%s)',sv)
@@ -166,7 +164,11 @@ class KaleidoPort():
         elif self.strVar(var):
             self._state[var] = value # type: ignore # TypedDict key must be a string literal
         else:
-            self._state[var] = float(value) # type: ignore # TypedDict key must be a string literal
+            try:
+                self._state[var] = float(value) # type: ignore # TypedDict key must be a string literal
+            except Exception: # pylint: disable=broad-except
+                # if conversion to a float failed (maybe an unknown tag), we still keep the reading as original string
+                self._state[var] = value # type: ignore # TypedDict key must be a string literal
         await self.clear_request(var)
 
     async def process_message(self, message:str) -> None:
@@ -183,7 +185,7 @@ class KaleidoPort():
                     if len(comp) > 1:
                         await self.set_state(comp[0], comp[1])
             except Exception as e:  # pylint: disable=broad-except
-                _log.error(e)
+                _log.exception(e)
 
     async def add_request(self, var) -> asyncio.Event:
         if var in self._pending_requests:
@@ -253,8 +255,6 @@ class KaleidoPort():
     async def ws_connect(self, mode:str, host:str, port:int, path:str,
                 connected_handler:Optional[Callable[[], None]] = None,
                 disconnected_handler:Optional[Callable[[], None]] = None) -> None:
-
-        _log.debug('connecting to %s:%s/%s ...',host,port,path)
 
         websocket = None
         while True:
@@ -515,7 +515,7 @@ class KaleidoPort():
 
     # mode: temperature mode; either C or F
     # if serial settings are given, host/port are ignore and communication handled by the given serial port
-    def start(self, mode:str, host:str = '10.10.100.254', port:int = 20001, path:str = '',
+    def start(self, mode:str, host:str = '127.0.0.1', port:int = 80, path:str = 'ws',
                 serial:Optional[SerialSettings] = None,
                 connected_handler:Optional[Callable[[], None]] = None,
                 disconnected_handler:Optional[Callable[[], None]] = None) -> None:

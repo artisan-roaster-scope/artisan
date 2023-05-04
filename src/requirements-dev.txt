@@ -7,7 +7,7 @@ types-setuptools==67.7.0.1
 types-urllib3==1.26.25.12
 types-psutil==5.9.5.12
 mypy==1.2.0
-pyright==1.1.306
+pyright==1.1.305
 ruff
 pylint==2.17.3
 pre-commit
