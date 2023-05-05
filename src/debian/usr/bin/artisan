@@ -18,4 +18,4 @@ fi
 #	export GDK_BACKEND=x11
 #    fi
 #fi
-exec /usr/bin/env GDK_BACKEND=x11 PATH=${__dir}/../share/artisan:$PATH QT_PLUGIN_PATH=${__dir}/../share/artisan/PyQt6/Qt6/plugins LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/gtk-3.0/modules:${__dir}/../share/artisan:$LD_LIBRARY_PATH LIBOVERLAY_SCROLLBAR=0 GTK2_RC_FILES="$HOME/.gtkrc-2.0" ${__dir}/../share/artisan/artisan "$@" 2>/dev/null
+exec /usr/bin/env LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libwayland-client.so.0 GDK_BACKEND=x11 PATH=${__dir}/../share/artisan:$PATH QT_PLUGIN_PATH=${__dir}/../share/artisan/PyQt6/Qt6/plugins LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/gtk-3.0/modules:${__dir}/../share/artisan:$LD_LIBRARY_PATH LIBOVERLAY_SCROLLBAR=0 GTK2_RC_FILES="$HOME/.gtkrc-2.0" ${__dir}/../share/artisan/artisan "$@" 2>/dev/null
