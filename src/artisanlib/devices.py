@@ -3305,7 +3305,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 self.aw.kaleidoPort = int(self.kaleidoPort.text())
             except Exception: # pylint: disable=broad-except
                 pass
-            self.aw.kaleidoPID = self.kaleidoPIDFlag.isChecked()
+#            self.aw.kaleidoPID = self.kaleidoPIDFlag.isChecked()
             for i in range(8):
                 self.aw.qmc.phidget1018_async[i] = self.asyncCheckBoxes[i].isChecked()
                 self.aw.qmc.phidget1018_ratio[i] = self.ratioCheckBoxes[i].isChecked()
