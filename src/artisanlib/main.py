@@ -1367,7 +1367,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         'eventsliderfactors', 'eventslidermin', 'eventsMaxValue', 'eventslidermax', 'eventslidersflags', 'eventsliderBernoulli', 'eventslidercoarse',
         'eventslidertemp', 'eventsliderunits', 'eventslidermoved', 'SVslidermoved', 'eventquantifieractive', 'eventquantifiersource', 'eventquantifierSV',
         'eventquantifiermin', 'eventquantifiermax', 'eventquantifiercoarse', 'eventquantifieraction', 'clusterEventsFlag', 'eventquantifierlinspaces',
-        'eventquantifiersteps', 'eventquantifierthresholdfine', 'eventquantifierthresholdcoarse', 'lastdigitizedvalue', 'lastdigitizedtemp',
+        'eventquantifierthresholdfine', 'eventquantifierthresholdcoarse', 'eventquantifierthresholdmed', 'lastdigitizedvalue', 'lastdigitizedtemp',
         'readingslcdsflags', 'logoimgalpha', 'logoimgflag', 'logofilename', 'redrawOnResize', 'searchtextartisansettings', 'fileMenu', 'editMenu',
         'RoastMenu', 'ConfMenu', 'ToolkitMenu', 'viewMenu', 'helpMenu', 'newRoastMenu', 'fileLoadAction', 'openRecentMenu', 'importMenu',
         'fileSaveAction', 'fileSaveCopyAsAction', 'exportMenu', 'convMenu', 'saveGraphMenu', 'reportMenu', 'htmlAction', 'productionMenu',
@@ -1719,8 +1719,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.eventsMaxValue:Final[int] = 999
         self.eventslidermax:List[int] = [100]*self.eventsliders
         self.eventslidersflags:List[int] = [0,1,1] # slider visibility per state OFF, ON, START
-        self.eventsliderBernoulli:List[int] = [0]*self.eventsliders # if 1, sliders step in multiples of 10, otherwise 1
-        self.eventslidercoarse:List[int] = [0]*self.eventsliders # if 1, sliders step in multiples of 10, otherwise 1
+        self.eventsliderBernoulli:List[int] = [0]*self.eventsliders # if 1, the bernoulli formula is applied to slider values
+        self.eventslidercoarse:List[int] = [0]*self.eventsliders # if 1, sliders step in multiples of 10, if 2, slider steps in 5, otherwise 1
         self.eventslidertemp:List[int] = [0]*self.eventsliders # if 1, slider values are interpreted as temperatures and min/max limit are converted with the temp mode
         self.eventsliderunits:List[str] = ['']*self.eventsliders
         self.eventslidermoved:List[int] = [0]*self.eventsliders # just set on move and reset on release to avoid imprecise slider moves
@@ -1736,9 +1736,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.eventquantifieraction:List[int] = [0]*self.eventsliders
         self.clusterEventsFlag:bool = False
         self.eventquantifierlinspaces = [self.computeLinespace(0),self.computeLinespace(1),self.computeLinespace(2),self.computeLinespace(3)]
-        self.eventquantifiersteps:int = 10
-        self.eventquantifierthresholdfine:float = .5 # original: 1.5, changed to 0.5 for Probat Probatone
-        self.eventquantifierthresholdcoarse:float = .5
+        self.eventquantifierthresholdfine:float = .5 # original: 1.5, changed to 0.5 for Probat Probatone # for slider stepsize 1
+        self.eventquantifierthresholdmed:float = .5
+        self.eventquantifierthresholdcoarse:float = .5 # for slider stepsize 10
         self.lastdigitizedvalue:List[Optional[float]] = [None,None,None,None] # last digitized value per quantifier
         self.lastdigitizedtemp:List[Optional[float]] = [None,None,None,None] # last digitized temp value per quantifier
 
@@ -5551,10 +5551,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     temp,_ = self.quantifier2tempandtime(i)
                     if temp is not None and len(temp)>0: # corresponding curve is available
                         linespace = self.eventquantifierlinspaces[i]
-                        if self.eventquantifiercoarse[i]:
-                            linespacethreshold = abs(linespace[1] - linespace[0]) * self.eventquantifierthresholdcoarse
-                        else:
-                            linespacethreshold = abs(linespace[1] - linespace[0]) * self.eventquantifierthresholdfine
+                        if self.eventquantifiercoarse[i] == 1: # slider step size 10
+                            threshold = self.eventquantifierthresholdcoarse
+                        elif self.eventquantifiercoarse[i] == 2: # slider step size 5
+                            threshold = self.eventquantifierthresholdmed
+                        else:  # slider step size 1
+                            threshold = self.eventquantifierthresholdfine
+                        linespacethreshold = abs(linespace[1] - linespace[0]) * threshold
                         t = temp[-1]
                         if t != -1: # -1 is an error value
                             d = self.digitize(t,linespace,self.eventquantifiercoarse[i],i)
@@ -6032,11 +6035,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     def adjustPIDsv5m(self,_=False):
         self.adjustPIDsv(-5)
 
-    # compute the 12 or 102 event quantifier linespace for type n in [0,3]
+    # compute the 12 (if step size is 10) or 21 (if step size is 5) or 102 (if step size is 1) event quantifier linespace for type n in [0,3]
     def computeLinespace(self,n):
-        if self.eventquantifiercoarse[n]:
+        if self.eventquantifiercoarse[n] == 1: # step size 10
             num = int(round((self.eventslidermax[n] - self.eventslidermin[n])/10.)) + 1
-        else:
+        elif self.eventquantifiercoarse[n] == 2: # step size 5
+            num = int(round((self.eventslidermax[n] - self.eventslidermin[n])/5.)) + 1
+        else: # step size 1
             num = self.eventslidermax[n] - self.eventslidermin[n] + 1
         return numpy.linspace(self.eventquantifiermin[n], self.eventquantifiermax[n], num=num)
 
@@ -6088,14 +6093,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 pass
         return temp,timex
 
-    # returns min/max 0/(self.eventsMaxValue / 10) for values outside of the given linespace ls defining the interval
-    # note that the value returned is the event value divided by 10, but not with the internal offset of +1 !!
-    # otherwise the bin number from [0-self.eventquantifiersteps]
+    # returns as min/max the values  (self.eventslidermin / 10) and (self.eventslidermax / 10) for values outside of the given linespace ls defining the interval
+    # otherwise the bin number
+    # NOTE: the value returned is the event value divided by 10, but not with the internal offset of +1 !!
     def digitize(self, v, ls, coarse, i):
-        if coarse:
-            r = ((numpy.digitize([v],ls)[0] - 1) * 10. + self.eventslidermin[i]) / 10.
-        else:
-            r = (numpy.digitize([v],ls)[0]+self.eventslidermin[i] - 1) / 10.
+        factor:int = 1 # slider step size 1
+        if coarse == 1: # slider step size 10
+            factor = 10
+        elif coarse == 2: # slider step size 5
+            factor = 5
+        r = ((numpy.digitize([v],ls)[0] - 1) * factor + self.eventslidermin[i]) / 10.
         return max(self.eventslidermin[i]/10., min(self.eventslidermax[i] / 10.,r))
 
     def curveSimilarity2(self,exp:int=-1,analysis_starttime:float=0,analysis_endtime:float=0) -> 'CurveSimilarity': # pylint: disable=no-self-use
@@ -7292,12 +7299,28 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     def slider4released(self):
         self.sliderReleased(3,force=True,updateLCD=False)
 
+    # returns the step size (1, 5 or 10) of the eventslider of the given number n [0,..,3]
+    def eventSliderStepSize(self, n:int) -> int:
+        if self.eventslidercoarse[n] == 1:
+            return 10
+        if self.eventslidercoarse[n] == 2:
+            return 5
+        return 1
+
+    # n the slider number 0,..,3; v the slider value
+    # returns the slider value quantified by the sliders step size
+    def applySliderStepSize(self, n:int, v:int) -> int:
+        if self.eventslidercoarse[n] == 1: # step size is 10
+            return int(round(v / 10.))*10
+        if self.eventslidercoarse[n] == 2: # step size is 5
+            return int(round(v / 5.))*5
+        # otherwise slider step size is 1 and no quantification is applied
+        return v
+
 # required for the default tracking sliders
     @pyqtSlot(int)
-    def updateSlider1LCD(self,v):
-        if self.eventslidercoarse[0]:
-            v = int(round(v / 10.))*10
-        self.updateSliderLCD(0,v)
+    def updateSlider1LCD(self, v:int) -> None:
+        self.updateSliderLCD(0, self.applySliderStepSize(0,v))
         if self.eventslidermoved[0]:
             # if slider was moved by a keyboard action, we have to explicitly update the value and send the signals
             if self.sliderLCD1.intValue() != self.slider1.value():
@@ -7305,10 +7328,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             self.slider1released()
             self.eventslidermoved[0] = 0
     @pyqtSlot(int)
-    def updateSlider2LCD(self,v):
-        if self.eventslidercoarse[1]:
-            v = int(round(v / 10.))*10
-        self.updateSliderLCD(1,v)
+    def updateSlider2LCD(self,v:int) -> None:
+        self.updateSliderLCD(1, self.applySliderStepSize(1,v))
         if self.eventslidermoved[1]:
             # if slider was moved by a keyboard action, we have to explicitly update the value and send the signals
             if self.sliderLCD2.intValue() != self.slider2.value():
@@ -7316,10 +7337,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             self.slider2released()
             self.eventslidermoved[1] = 0
     @pyqtSlot(int)
-    def updateSlider3LCD(self,v):
-        if self.eventslidercoarse[2]:
-            v = int(round(v / 10.))*10
-        self.updateSliderLCD(2,v)
+    def updateSlider3LCD(self,v:int) -> None:
+        self.updateSliderLCD(2, self.applySliderStepSize(2,v))
         if self.eventslidermoved[2]:
             # if slider was moved by a keyboard action, we have to explicitly update the value and send the signals
             if self.sliderLCD3.intValue() != self.slider3.value():
@@ -7327,10 +7346,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             self.slider3released()
             self.eventslidermoved[2] = 0
     @pyqtSlot(int)
-    def updateSlider4LCD(self,v):
-        if self.eventslidercoarse[3]:
-            v = int(round(v / 10.))*10
-        self.updateSliderLCD(3,v)
+    def updateSlider4LCD(self,v:int) -> None:
+        self.updateSliderLCD(3, self.applySliderStepSize(3,v))
         if self.eventslidermoved[3]:
             # if slider was moved by a keyboard action, we have to explicitly update the value and send the signals
             if self.sliderLCD4.intValue() != self.slider4.value():
@@ -7373,9 +7390,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             sv1 = self.slider1.value()
             if force or (self.eventslidermoved[0] and sv1 != self.eventslidervalues[0]) or abs(sv1-self.eventslidervalues[0]) > 3:
                 self.eventslidermoved[0] = 0
-                if self.eventslidercoarse[0]:
-                    sv1 = int(round(sv1 / 10.))*10
-                self.eventslidervalues[0] = sv1
+                self.eventslidervalues[0] = self.applySliderStepSize(0,sv1)
                 if updateLCD or (self.eventslidercoarse[0] and sv1 != self.slider1.value()):
                     self.moveslider(0,sv1,forceLCDupdate=True) # move slider if need and update slider LCD
                 self.recordsliderevent(n)
@@ -7383,9 +7398,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             sv2 = self.slider2.value()
             if force or (self.eventslidermoved[1] and sv2 != self.eventslidervalues[1]) or abs(sv2-self.eventslidervalues[1]) > 3:
                 self.eventslidermoved[1] = 0
-                if self.eventslidercoarse[1]:
-                    sv2 = int(round(sv2 / 10.))*10
-                self.eventslidervalues[1] = sv2
+                self.eventslidervalues[1] = self.applySliderStepSize(1,sv2)
                 if updateLCD or (self.eventslidercoarse[1] and sv2 != self.slider2.value()):
                     self.moveslider(1,sv2,forceLCDupdate=True) # move slider if need and update slider LCD
                 self.recordsliderevent(n)
@@ -7393,9 +7406,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             sv3 = self.slider3.value()
             if force or (self.eventslidermoved[2] and sv3 != self.eventslidervalues[2]) or abs(sv3-self.eventslidervalues[2]) > 3:
                 self.eventslidermoved[2] = 0
-                if self.eventslidercoarse[2]:
-                    sv3 = int(round(sv3 / 10.))*10
-                self.eventslidervalues[2] = sv3
+                self.eventslidervalues[2] = self.applySliderStepSize(2,sv3)
                 if updateLCD or (self.eventslidercoarse[2] and sv3 != self.slider3.value()):
                     self.moveslider(2,sv3,forceLCDupdate=True) # move slider if need and update slider LCD
                 self.recordsliderevent(n)
@@ -7403,9 +7414,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             sv4 = self.slider4.value()
             if force or (self.eventslidermoved[3] and sv4 != self.eventslidervalues[3]) or abs(sv4-self.eventslidervalues[3]) > 3:
                 self.eventslidermoved[3] = 0
-                if self.eventslidercoarse[3]:
-                    sv4 = int(round(sv4 / 10.))*10
-                self.eventslidervalues[3] = sv4
+                self.eventslidervalues[3] = self.applySliderStepSize(3,sv4)
                 if updateLCD or (self.eventslidercoarse[3] and sv4 != self.slider4.value()):
                     self.moveslider(3,sv4,forceLCDupdate=True) # move slider if need and update slider LCD
                 self.recordsliderevent(n)
@@ -10099,22 +10108,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.sliderSV.setVisible(True)
         self.setSliderFocusPolicy(Qt.FocusPolicy.StrongFocus)
         # on "coarse" sliders we set the single step to 10, otherwise (default) to 1:
-        if self.eventslidercoarse[0]:
-            self.slider1.setSingleStep(10)
-        else:
-            self.slider1.setSingleStep(1)
-        if self.eventslidercoarse[1]:
-            self.slider2.setSingleStep(10)
-        else:
-            self.slider2.setSingleStep(1)
-        if self.eventslidercoarse[2]:
-            self.slider3.setSingleStep(10)
-        else:
-            self.slider3.setSingleStep(1)
-        if self.eventslidercoarse[3]:
-            self.slider4.setSingleStep(10)
-        else:
-            self.slider4.setSingleStep(1)
+        self.slider1.setSingleStep(self.eventSliderStepSize(0))
+        self.slider2.setSingleStep(self.eventSliderStepSize(1))
+        self.slider3.setSingleStep(self.eventSliderStepSize(2))
+        self.slider4.setSingleStep(self.eventSliderStepSize(0))
         #
         self.slidersAction.setChecked(True)
         if changeDefault:
