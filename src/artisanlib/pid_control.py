@@ -1232,6 +1232,7 @@ class PIDcontrol():
             # establish ne limits on sliders
             self.aw.sliderSV.setMinimum(self.svSliderMin)
             self.aw.sliderSV.setMaximum(self.svSliderMax)
+            self.aw.moveSVslider(self.svValue,setValue=False)
             self.pidKp = self.pidKp * (9/5.)
             self.pidKi = self.pidKi * (9/5.)
             self.pidKd = self.pidKd * (9/5.)
@@ -1257,6 +1258,7 @@ class PIDcontrol():
             # establish ne limits on sliders
             self.aw.sliderSV.setMinimum(int(round(self.svSliderMin)))
             self.aw.sliderSV.setMaximum(int(round(self.svSliderMax)))
+            self.aw.moveSVslider(self.svValue,setValue=False)
             self.pidKp = self.pidKp / (9/5.)
             self.pidKi = self.pidKi / (9/5.)
             self.pidKd = self.pidKd / (9/5.)
@@ -1309,7 +1311,8 @@ class PIDcontrol():
             if self.aw.pidcontrol.svMode == 0:
                 self.aw.pidcontrol.setSV(self.aw.sliderSV.value())
 
-    def pidOn(self):
+    # if send_command is False, the pidOn command is not forwarded to the external PID (TC4, Kaleido, ..)
+    def pidOn(self, send_command:bool = True) -> None:
         if self.aw.qmc.flagon:
             if not self.pidActive:
                 self.aw.sendmessage(QApplication.translate('StatusBar','PID ON'))
@@ -1328,7 +1331,7 @@ class PIDcontrol():
                 self.pidActive = True
                 self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PIDactive'])
             elif self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag: # ArduinoTC4 firmware PID
-                if self.aw.ser.ArduinoIsInitialized:
+                if send_command and self.aw.ser.ArduinoIsInitialized:
                     self.confPID(self.pidKp,self.pidKi,self.pidKd,self.pidSource,self.pidCycle,self.aw.pidcontrol.pOnE) # first configure PID according to the actual settings
                     try:
                         #### lock shared resources #####
@@ -1346,7 +1349,8 @@ class PIDcontrol():
                             self.aw.ser.COMsemaphore.release(1)
             elif self.aw.qmc.Controlbuttonflag and self.externalPIDControl() == 4 and self.aw.kaleido is not None:
                 # Kaleido PID
-                self.aw.kaleido.pidON()
+                if send_command:
+                    self.aw.kaleido.pidON()
                 self.pidActive = True
                 self.aw.qmc.pid.on()
                 self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PIDactive'])
@@ -1366,7 +1370,8 @@ class PIDcontrol():
             if self.sv is None and self.svMode == 0: # only in manual SV mode we initialize the SV on PID ON
                 self.setSV(self.svValue)
 
-    def pidOff(self):
+    # if send_command is False, the pidOff command is not forwarded to the external PID (TC4, Kaleido, ..)
+    def pidOff(self, send_command:bool = True) -> None:
         if self.pidActive:
             self.aw.sendmessage(QApplication.translate('Message','PID OFF'))
         self.aw.setTimerColor('timer')
@@ -1386,7 +1391,7 @@ class PIDcontrol():
             self.pidActive = False
         # TC4 hardware PID
         elif self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag and self.aw.qmc.Controlbuttonflag: # ArduinoTC4 firmware PID
-            if self.aw.ser.ArduinoIsInitialized:
+            if send_command and self.aw.ser.ArduinoIsInitialized:
                 try:
                     #### lock shared resources #####
                     self.aw.ser.COMsemaphore.acquire(1)
@@ -1403,7 +1408,8 @@ class PIDcontrol():
                 self.pidActive = False
         elif self.aw.qmc.Controlbuttonflag and self.externalPIDControl() == 4 and self.aw.kaleido is not None:
             # Kaleido PID
-            self.aw.kaleido.pidOFF()
+            if send_command:
+                self.aw.kaleido.pidOFF()
             self.pidActive = False
             self.aw.qmc.pid.off()
             self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PID'])

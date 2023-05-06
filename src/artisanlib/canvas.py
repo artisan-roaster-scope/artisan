@@ -10402,7 +10402,7 @@ class tgraphcanvas(FigureCanvas):
 
     # adjust min/max limits of temperature sliders to the actual temperature mode
     def adjustTempSliders(self):
-        if self.mode != self.mode_tempsliders:
+        if self.aw is not None and self.mode != self.mode_tempsliders:
             for i in range(4):
                 if self.aw.eventslidertemp[i]:
                     if self.mode == 'C':
@@ -10412,6 +10412,11 @@ class tgraphcanvas(FigureCanvas):
                         self.aw.eventslidermin[i] = int(round(fromCtoF(self.aw.eventslidermin[i])))
                         self.aw.eventslidermax[i] = int(round(fromCtoF(self.aw.eventslidermax[i])))
             self.aw.updateSliderMinMax()
+            # adjust SV slider limits
+            if self.mode == 'C':
+                self.aw.pidcontrol.conv2celsius()
+            else:
+                self.aw.pidcontrol.conv2fahrenheit()
             self.mode_tempsliders = self.mode
 
     #sets the graph display in Fahrenheit mode
@@ -10432,13 +10437,13 @@ class tgraphcanvas(FigureCanvas):
                 self.step100temp = int(round(fromCtoF(self.step100temp)))
             self.AUCbase = int(round(fromCtoF(self.AUCbase)))
             self.alarmtemperature = [(fromCtoF(t) if t != 500 else t) for t in self.alarmtemperature]
-            # conv Arduino mode
-            if self.aw:
-                self.aw.pidcontrol.conv2fahrenheit()
+#            # conv Arduino mode
+#            if self.aw:
+#                self.aw.pidcontrol.conv2fahrenheit()
         if self.ax is not None:
             self.ax.set_ylabel('F',size=16,color = self.palette['ylabel']) #Write "F" on Y axis
         self.mode = 'F'
-        if self.aw: # during initialization aw is still None!
+        if self.aw is not None: # during initialization aw is still None!
             self.aw.FahrenheitAction.setDisabled(True)
             self.aw.CelsiusAction.setEnabled(True)
             self.aw.ConvertToFahrenheitAction.setDisabled(True)
@@ -10466,12 +10471,12 @@ class tgraphcanvas(FigureCanvas):
                 self.step100temp = int(round(fromFtoC(self.step100temp)))
             self.AUCbase = int(round(fromFtoC(self.AUCbase)))
             self.alarmtemperature = [(fromFtoC(t) if t != 500 else t) for t in self.alarmtemperature]
-            # conv Arduino mode
-            self.aw.pidcontrol.conv2celsius()
+#            # conv Arduino mode
+#            self.aw.pidcontrol.conv2celsius()
         if self.ax is not None:
             self.ax.set_ylabel('C',size=16,color = self.palette['ylabel']) #Write "C" on Y axis
         self.mode = 'C'
-        if self.aw: # during initialization aw is still None
+        if self.aw is not None: # during initialization aw is still None
             self.aw.CelsiusAction.setDisabled(True)
             self.aw.FahrenheitAction.setEnabled(True)
             self.aw.ConvertToCelsiusAction.setDisabled(True)
@@ -11358,7 +11363,8 @@ class tgraphcanvas(FigureCanvas):
                 # we only reset the LCDs, but keep the readings
                 self.clearLCDs()
 
-            self.aw.pidcontrol.pidOff()
+            #if self.device != 138: # don't forward pidOff command to connected Kaleido machine
+            self.aw.pidcontrol.pidOff(send_command=self.device != 138)
 #            if self.device == 53:
 #                self.aw.HottopControlOff()
 

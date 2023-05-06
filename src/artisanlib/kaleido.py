@@ -128,15 +128,19 @@ class KaleidoPort():
 
     def pidON(self) -> None:
         _log.debug('Kaleido PID ON')
-        self.send_msg('AH', '1') # AH message can also be send via an ON IO Command action
+        if not self.get_state('AH'):
+            # only if the state changed we issue the command
+            self.send_msg('AH', '1') # AH message can also be send via an ON IO Command action
 
     def pidOFF(self) -> None:
         _log.debug('Kaleido PID OFF')
-        self.send_msg('AH', '0') # AH message can also be send via an ON IO Command action
+        if self.get_state('AH'):
+            self.send_msg('AH', '0') # AH message can also be send via an ON IO Command action
 
     def setSV(self, sv:float) -> None:
         _log.debug('setSV(%s)',sv)
-        self.send_msg('TS', f'{sv:0.1f}'.rstrip('0').rstrip('.'))
+        if self.get_state('TS') != sv:
+            self.send_msg('TS', f'{sv:0.1f}'.rstrip('0').rstrip('.'))
 
 # -- state management
 

@@ -52,9 +52,9 @@ svMode=2
 svRamps=0, 0, 0, 0, 0, 0, 0, 0
 svSlider=true
 svSliderMax=230
-svSliderMin=50
+svSliderMin=30
 svSoaks=0, 0, 0, 0, 0, 0, 0, 0
-svValue=180
+svValue=30
 svValues=0, 0, 0, 0, 0, 0, 0, 0
 
 [DefaultButtons]
@@ -86,8 +86,8 @@ extratimeout=0.4, 0.4, 0.4
 
 [ExtraDev]
 devicetablecolumnwidths=146, 76, 76, 126, 126, 126, 126, 40, 42, 51, 52, 54, 56, 42, 42
-extraCurveVisibility1=false, false, true, true, true, true, true, true, true, true
-extraCurveVisibility2=false, true, true, true, true, true, true, true, true, true
+extraCurveVisibility1=false, false, false, true, true, true, true, true, true, true
+extraCurveVisibility2=false, true, false, true, true, true, true, true, true, true
 extraDelta1=false, false, false, false, false, false, false, false, false, false
 extraDelta2=false, false, false, false, false, false, false, false, false, false
 extraFill1=0, 0, 0, 0, 0, 0, 0, 0, 0, 0

@@ -283,6 +283,7 @@ class PortComboBox(MyQComboBox):  # pyright: ignore # Argument to class must be 
         if self.selection is not None:
             self.setCurrentText(self.selection)
         self.editTextChanged.connect(self.textEdited)
+        self.currentIndexChanged.connect(self.setSelection)
 
         # we prefer the device name if available over the selection port
         try:
@@ -299,6 +300,7 @@ class PortComboBox(MyQComboBox):  # pyright: ignore # Argument to class must be 
     def getSelection(self) -> Optional[str]:
         return self.edited or self.selection
 
+    @pyqtSlot(int)
     def setSelection(self, i:int) -> None:
         if i >= 0:
             try:
