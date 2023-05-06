@@ -3014,7 +3014,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     message = QApplication.translate('Message','Device set to {0}').format(meter)
                 ##########################
                 ##########################
-                ####  DEVICE 139 is +Kaleido ST/DT but +DEVICE cannot be set as main device
+                ####  DEVICE 139 is +Kaleido ST/AT but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
                 ####  DEVICE 140 is +Kaleido Drum/AH but +DEVICE cannot be set as main device

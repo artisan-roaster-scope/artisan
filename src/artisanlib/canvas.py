@@ -828,7 +828,7 @@ class tgraphcanvas(FigureCanvas):
                        '+Santoker Drum',            #136
                        'Phidget DAQ1500',           #137
                        'Kaleido BT/ET',             #138
-                       '+Kaleido SV/DT',            #139
+                       '+Kaleido SV/AT',            #139
                        '+Kaleido Drum/AH',          #140
                        '+Kaleido Heater/Fan'        #141
                        ]

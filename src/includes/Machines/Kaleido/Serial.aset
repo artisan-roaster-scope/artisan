@@ -52,7 +52,7 @@ svMode=2
 svRamps=0, 0, 0, 0, 0, 0, 0, 0
 svSlider=true
 svSliderMax=230
-svSliderMin=30
+svSliderMin=0
 svSoaks=0, 0, 0, 0, 0, 0, 0, 0
 svValue=30
 svValues=0, 0, 0, 0, 0, 0, 0, 0
@@ -100,7 +100,7 @@ extradevices=141, 139, 140
 extramathexpression1=, , 
 extramathexpression2=, , 
 extraname1={3}, SV, {1}
-extraname2={0}, DT, AH
+extraname2={0}, AT, AH
 
 [ExtraEventButtons]
 buttonlistmaxlen=14

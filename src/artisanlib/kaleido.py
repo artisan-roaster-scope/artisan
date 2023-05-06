@@ -35,7 +35,7 @@ class State(TypedDict, total=False):
     TU:str     # temperature unit
     BT:float   # bean temperature
     ET:float   # environmental temperature
-    MT:float   # drum temperature
+    AT:float   # ambient temperature
     TS:float   # target temperature set
     HP:int     # heating power
     FC:int     # fan speed
@@ -88,12 +88,12 @@ class KaleidoPort():
         assert isinstance(et, float)
         return bt, et
 
-    def getSVDT(self) -> Tuple[float,float]:
+    def getSVAT(self) -> Tuple[float,float]:
         ts = self.get_state('TS')
-        mt = self.get_state('MT')
+        at = self.get_state('AT')
         assert isinstance(ts, float)
-        assert isinstance(mt, float)
-        return ts, mt
+        assert isinstance(at, float)
+        return ts, at
 
     def getDrumAH(self) -> Tuple[float,float]:
         rc = self.get_state('RC')
