@@ -113,6 +113,7 @@ def content():
     tbl_Commands.add_row(['&#160;','limit(c,v[,sn])',QApplication.translate('HelpDlg','PHIDGET DCMotor: sets current limit of channel c to v (float)')])
     tbl_Commands.add_row(['&#160;','on(c[,sn])',QApplication.translate('HelpDlg','YOCTOPUCE Relay Output: turn channel c of the relay module on')])
     tbl_Commands.add_row(['&#160;','off(c[,sn])',QApplication.translate('HelpDlg','YOCTOPUCE Relay Output: turn channel c of the relay module off')])
+    tbl_Commands.add_row(['&#160;','yset(c,b[,sn])',QApplication.translate('HelpDlg','YOCTOPUCE Relay Output: switches channel c of the relay module off (b=0) and on (b=1)')])
     tbl_Commands.add_row(['&#160;','flip(c[,sn])',QApplication.translate('HelpDlg','YOCTOPUCE Relay Output: toggle the state of channel c')])
     tbl_Commands.add_row(['&#160;','pip(c,delay,duration[,sn])',QApplication.translate('HelpDlg','YOCTOPUCE Relay Output: pulse the channel c on after a delay of delay milliseconds for the duration of duration milliseconds')])
     tbl_Commands.add_row(['&#160;','powerReset([sn])',QApplication.translate('HelpDlg','YOCTOPUCE resets the power counter of the Yocto-Watt module')])

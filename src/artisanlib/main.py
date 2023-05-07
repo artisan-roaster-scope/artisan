@@ -8086,6 +8086,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     # YOCTOPUCE
                     ##  on(c[,sn])   : turn channel c of the relay module on
                     ##  off(c[,sn])  : turn channel c of the relay module off
+                    ##  yset(c,b[,sn]) : switch channel c off (b=0) and on (b=1)
                     ##  flip(c[,sn]) : toggle the state of channel c
                     ##  pip(c,delay,duration[,sn]) : pulse the channel c on after a delay of delay milliseconds for the duration of duration milliseconds
                     ##  powerReset([,sn]) : reset the power meter of the Yocto Watt
@@ -8305,6 +8306,19 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                                 self.kaleidoSendMessageAwaitSignal.emit(target, vs, eventtype, lastbuttonpressed)
 
                                 # Yoctopuce Relay Command Actions
+                                # yset(c,b[,sn])
+                                elif c.startswith('yset'):
+                                    cs_a = re.findall(r'[0-9a-zA-Z-.:]+', c)
+                                    cs_len = len(cs_a)
+                                    if cs_len>2:
+                                        b = toBool(cs_a[2])
+                                    ser:Optional[str] = None
+                                    if cs_len == 4:
+                                        ser = cs_a[3]
+                                    if b:
+                                        self.ser.yoctoRELon(int(cs_a[1]),ser)
+                                    else:
+                                        self.ser.yoctoRELoff(int(cs_a[1]),ser)
                                 # on(c[,sn])
                                 elif c.startswith('on'):
                                     cs_a = re.findall(r'[0-9a-zA-Z-.:]+', c)
@@ -19514,7 +19528,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         res['AUC_num'] = (data['AUC'] if 'AUC' in data else '0')
         res['AUC'] = (data['AUC'] if 'AUC' in data else '')
         res['energy_num'] = (f"{data['energy']:.1f}" if 'energy' in data else '0')
-        res['energy'] = ("f{data['energy']:.1f}{'kWh' if units else ''}" if 'energy' in data else '')
+        res['energy'] = (f"{data['energy']:.1f}{'kWh' if units else ''}" if 'energy' in data else '')
         res['co2_num'] = (f"{data['co2']:.1f}" if 'co2' in data else '0')
         res['co2'] = (f"{data['co2']:.1f}{'g' if units else ''}" if 'co2' in data else '')
         res['co2kg_num'] = (f"{data['co2kg']:.1f}" if 'co2kg' in data else '0')
@@ -20163,9 +20177,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                         self.qmc.l_delta1B,
                                         self.qmc.l_delta2B
                                         ]:
+                                    _log.info('PRINT l: %s',l)
                                     if l:
                                         try:
-                                            self.qmc.ax.lines.remove(l)
+                                            if isinstance(self.qmc.ax.lines,list): # MPL < v3.5
+                                                self.qmc.ax.lines.remove(l)
+                                            else:
+                                                l.remove()
                                         except Exception: # pylint: disable=broad-except
                                             pass
                                 for a in [
@@ -20179,7 +20197,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                         self.qmc.l_backgroundeventtype4dots]:
                                     if a:
                                         try:
-                                            self.qmc.ax.lines.remove(a)
+                                            if isinstance(self.qmc.ax.lines,list): # MPL < v3.5
+                                                self.qmc.ax.lines.remove(a)
+                                            else:
+                                                a.remove()
                                         except Exception: # pylint: disable=broad-except
                                             pass
 
