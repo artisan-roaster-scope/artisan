@@ -7773,11 +7773,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                         for c in cmds:
                             cs = c.strip().replace('_',('0' if self.modbus.lastReadResult is None else str(self.modbus.lastReadResult))) # the last read value can be accessed via the "_" symbol
 
-                            # ^ is substituted by the state of the current button (1:pressed, 0:normal)
+                            # $ is substituted by the state of the current button (1:pressed, 0:normal)
                             last = 0 # defaults to 0
                             if lastbuttonpressed != -1 and len(self.buttonlist)>lastbuttonpressed:
                                 last = self.buttonStates[lastbuttonpressed]
-                            cs = cs.replace('^', str(last))
+                            cs = cs.replace('$', str(last))
                             if followupCmd:
                                 if followupCmd == 0.08:
                                     self.modbus.sleepBetween(write=True)
@@ -8105,11 +8105,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                         lastbuttonpressed = self.lastbuttonpressed # we rember that here as it might be reset to -1 by some button commands to avoid changing its state
                         for cs in cmds:
                             c = cs.strip().replace('_',('0' if self.lastIOResult is None else f'{self.lastIOResult:g}')) # the last read value can be accessed via the "_" symbol
-                            # ^ is substituted by the state of the current button (1:pressed, 0:normal)
+                            # $ is substituted by the state of the current button (1:pressed, 0:normal)
                             last = 0 # defaults to 0
                             if lastbuttonpressed != -1 and len(self.buttonlist)>lastbuttonpressed:
                                 last = self.buttonStates[lastbuttonpressed]
-                            c = c.replace('^', str(last))
+                            c = c.replace('$', str(last))
                             try:
                                 if c.startswith('set'):
                                     cs_a = re.findall(r'[0-9a-zA-Z-.:]+', c)
@@ -8694,11 +8694,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                         for c in cmds:
                             cs = c.strip().replace('_',str(self.s7.lastReadResult)) # the last read value can be accessed via the "_" symbol
 
-                            # ^ is substituted by the state of the current button (1:pressed, 0:normal)
+                            # $ is substituted by the state of the current button (1:pressed, 0:normal)
                             last = 0 # defaults to 0
                             if lastbuttonpressed != -1 and len(self.buttonlist)>lastbuttonpressed:
                                 last = self.buttonStates[lastbuttonpressed]
-                            cs = cs.replace('^', str(last))
+                            cs = cs.replace('$', str(last))
 
                             if cs.startswith('setDBint(') and len(cs) > 14:
                                 try:
@@ -8821,11 +8821,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                         lastbuttonpressed = self.lastbuttonpressed # we rember that here as it might be reset to -1 by some button commands to avoid changing its state
                         for c in cmds:
                             cs = c.strip().replace('_',('0' if self.lastArtisanResult is None else f'{self.lastArtisanResult:g}')) # the last read value can be accessed via the "_" symbol
-                            # ^ is substituted by the state of the current button (1:pressed, 0:normal)
+                            # $ is substituted by the state of the current button (1:pressed, 0:normal)
                             last = 0 # defaults to 0
                             if lastbuttonpressed != -1 and len(self.buttonlist)>lastbuttonpressed:
                                 last = self.buttonStates[lastbuttonpressed]
-                            cs = cs.replace('^', str(last))
+                            cs = cs.replace('$', str(last))
 
                             # alarms(<bool>) enable/disable alarms
                             if cs.startswith('alarms(') and cs.endswith(')'):
@@ -9564,11 +9564,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                         if self.ws.lastReadResult is not None:
                             cs = cs.replace('_',str(self.ws.lastReadResult)) # the last read value can be accessed via the "_" symbol
 
-                        # ^ is substituted by the state of the current button (1:pressed, 0:normal)
+                        # $ is substituted by the state of the current button (1:pressed, 0:normal)
                         last = 0 # defaults to 0
                         if lastbuttonpressed != -1 and len(self.buttonlist)>lastbuttonpressed:
                             last = self.buttonStates[lastbuttonpressed]
-                        cs = cs.replace('^', str(last))
+                        cs = cs.replace('$', str(last))
 
                         # send(<json>) : send <json> request to connected WebSocket
                         if cs.startswith('send') and cs.endswith(')'):

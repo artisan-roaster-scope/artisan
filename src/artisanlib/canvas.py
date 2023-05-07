@@ -11369,7 +11369,7 @@ class tgraphcanvas(FigureCanvas):
 #                self.aw.HottopControlOff()
 
             # we need to wait a moment and processEvents to give OFF actions using Qt signals the chance to still run correctly
-            libtime.sleep(0.3)
+            libtime.sleep(0.2)
             QApplication.processEvents()
 
             # disconnect Santoker
