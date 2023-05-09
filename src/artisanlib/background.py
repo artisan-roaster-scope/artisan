@@ -178,7 +178,6 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.copydataTableButton.clicked.connect(self.copyDataTabletoClipboard)
         #TAB 4
         self.replayComboBox = QComboBox()
-        self.replayComboBox.setEnabled(self.aw.qmc.backgroundPlaybackEvents)
         replayVariants = [
             QApplication.translate('Label','by time'),
             QApplication.translate('Label','by BT'),
@@ -502,7 +501,6 @@ class backgroundDlg(ArtisanResizeablDialog):
                 self.backgroundPlaybackEvent2Label,
                 self.backgroundPlaybackEvent3Label]:
             widget.setEnabled(self.aw.qmc.backgroundPlaybackEvents)
-        self.replayComboBox.setEnabled(self.aw.qmc.backgroundPlaybackEvents)
 
     @pyqtSlot(int)
     def setplaybackaideventtypeenabled(self,_):

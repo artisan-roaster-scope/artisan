@@ -3376,7 +3376,7 @@ class tgraphcanvas(FigureCanvas):
             wait_period = 10 # on tight sampling rate we only wait 10ms
         gotlock = self.profileDataSemaphore.tryAcquire(1, wait_period) # we try to catch the lock, if we fail we just skip this sampling round (prevents stacking of waiting calls)
         if not gotlock:
-            _log.info('sample_processing(): failed to get profileDataSemaphore lock')
+            _log.debug('sample_processing(): failed to get profileDataSemaphore lock')
         else:
             try:
                 # duplicate system state flag flagstart locally and only refer to this copy within this function to make it behaving uniquely (either append or overwrite mode)

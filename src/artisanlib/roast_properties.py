@@ -460,34 +460,35 @@ class volumeCalculatorDlg(ArtisanDialog):
 #####################  RECENT ROAST POPUP  #############################################
 
 class RoastsComboBox(QComboBox): # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
-    def __init__(self, parent:QWidget, aw:'ApplicationWindow', selection = None) -> None:
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow', selection:Optional[str] = None) -> None:
         super().__init__(parent)
-        self.aw = aw
+        self.aw:'ApplicationWindow' = aw
         self.installEventFilter(self)
-        self.selection = selection # just the roast title
-        self.edited = selection
+        self.selection:Optional[str] = selection # just the roast title
+        self.edited:Optional[str] = selection
         self.updateMenu()
         self.editTextChanged.connect(self.textEdited)
         self.setEditable(True)
         self.completer().setCaseSensitivity(Qt.CaseSensitivity.CaseSensitive)
 #        self.setMouseTracking(False)
 
-    @pyqtSlot('QString')
-    def textEdited(self,txt):
+#    @pyqtSlot('QString')
+    @pyqtSlot(str)
+    def textEdited(self, txt:str) -> None:
         cleaned = ' '.join(txt.split())
         self.edited = cleaned
 
-    def getSelection(self):
+    def getSelection(self) -> Optional[str]:
         return self.edited or self.selection
 
-    def setSelection(self,i):
+    def setSelection(self, i:int) -> None:
         if i >= 0:
             try:
                 self.edited = None # reset the user text editing
             except Exception: # pylint: disable=broad-except
                 pass
 
-    def eventFilter(self, _obj, event):
+    def eventFilter(self, _obj, event) -> bool:
 # the next prevents correct setSelection on Windows
 #        if event.type() == QEvent.Type.FocusIn:
 #            self.setSelection(self.currentIndex())
@@ -498,12 +499,15 @@ class RoastsComboBox(QComboBox): # pyright: ignore # Argument to class must be a
         return False # cont processing
 
     # the first entry is always just the current text edit line
-    def updateMenu(self):
+    def updateMenu(self) -> None:
         self.blockSignals(True)
         try:
             roasts = self.aw.recentRoastsMenuList()
             self.clear()
-            self.addItems([self.edited] + roasts)
+            if self.edited is None:
+                self.addItems(roasts)
+            else:
+                self.addItems([self.edited] + roasts)
         except Exception: # pylint: disable=broad-except
             pass
         self.blockSignals(False)

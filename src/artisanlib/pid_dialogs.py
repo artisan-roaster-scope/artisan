@@ -812,7 +812,6 @@ class PID_DlgControl(ArtisanDialog):
             self.aw.pidcontrol.svActions = rampsoaks['svActions']
             self.aw.pidcontrol.svBeeps = rampsoaks['svBeeps']
             self.aw.pidcontrol.svDescriptions = rampsoaks['svDescriptions']
-            self.setrampsoaks()
             self.aw.qmc.rsfile = filename
             self.rsfile.setText(self.aw.qmc.rsfile)
         except Exception as ex: # pylint: disable=broad-except
@@ -822,6 +821,7 @@ class PID_DlgControl(ArtisanDialog):
         finally:
             if self.aw.qmc.rampSoakSemaphore.available() < 1:
                 self.aw.qmc.rampSoakSemaphore.release(1)
+            self.setrampsoaks()
 
     @pyqtSlot(bool)
     def exportrampsoaks(self,_):

@@ -78,10 +78,10 @@ from functools import reduce as freduce
 ## on import with importlib.metadata.PackageNotFoundError: prettytable on __version__ = importlib_metadata.version(__name__)
 try:
     import importlib.metadata as importlib_metadata # @UnresolvedImport
-    def md_version(pkg_name):
-        if pkg_name == 'prettytable':
+    def md_version(distribution_name:str) -> str:
+        if distribution_name == 'prettytable':
             return '2.1.0'
-        return importlib_metadata.version(pkg_name)
+        return importlib_metadata.version(distribution_name)
     importlib_metadata.version = md_version
 except Exception: # pylint: disable=broad-except
     pass
@@ -207,6 +207,7 @@ if TYPE_CHECKING:
     from openpyxl.worksheet.worksheet import Worksheet # pylint: disable=unused-import
     import numpy.typing as npt # pylint: disable=unused-import
     from matplotlib.backend_bases import Event # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QTableWidget
 
 # fix socket.inet_pton on Windows (used by pymodbus TCP/UDP)
 try:
@@ -273,7 +274,7 @@ class Artisan(QtSingleApplication):
         self.focusChanged.connect(self.appRaised)
 
     @pyqtSlot('QWidget*','QWidget*')
-    def appRaised(self,oldFocusWidget,newFocusWidget):
+    def appRaised(self, oldFocusWidget:QWidget, newFocusWidget:QWidget) -> None:
         try:
             aw = self.activationWindow()
             if aw is not None and not sip.isdeleted(aw): # sip not supported on older PyQt versions (eg. RPi)
@@ -303,7 +304,7 @@ class Artisan(QtSingleApplication):
     # file://<path>                  : loads file from path
     #                                  if query is "background" Artisan is not raised to the foreground
     #                                  if query is "template" and the file has an .alog extension, the profile is loaded as background profile
-    def open_url(self, url):
+    def open_url(self, url:QUrl) -> None:
         _log.debug('open_url(%s)', url)
         aw = self.activationWindow()
         if aw is not None and not aw.qmc.flagon and not aw.qmc.designerflag and not aw.qmc.wheelflag and aw.qmc.flavorchart_plot is None: # only if not yet monitoring
@@ -339,8 +340,8 @@ class Artisan(QtSingleApplication):
                 if url_query is None or url_query != 'background':
                     # by default we raise Artisan to the foreground
                     QTimer.singleShot(20,self.activateWindow)
-                url.setQuery(None) # remove any query to get a valid file path
-                url.setFragment(None) # remove also any potential fragment
+                url.setQuery(None) # type:ignore # Argument 1 to "setQuery" of "QUrl" has incompatible type "None"; expected "str" # remove any query to get a valid file path
+                url.setFragment(None) # type:ignore # Argument 1 to "setFragment" of "QUrl" has incompatible type "None"; expected "str" # remove also any potential fragment
                 filename = url.toString(QUrl.UrlFormattingOption.PreferLocalFile)
                 qfile = QFileInfo(filename)
                 file_suffix = qfile.suffix()
@@ -365,14 +366,14 @@ class Artisan(QtSingleApplication):
             self.sendMessage2ArtisanInstance(msg,self._viewer_id)
 
     @pyqtSlot(str)
-    def receiveMessage(self,msg):
+    def receiveMessage(self, msg:str) -> None:
         url = QUrl()
         url.setUrl(msg)
         self.open_url(url)
 
     # to send message to main Artisan instance: id = appGuid
     # to send message to viewer:                id = viewerAppGuid
-    def sendMessage2ArtisanInstance(self,message,instance_id):
+    def sendMessage2ArtisanInstance(self, message:str, instance_id:str) -> None:
         if platform.system() == 'Windows':
             try:
                 res = None
@@ -397,10 +398,10 @@ class Artisan(QtSingleApplication):
         else:
             self._sendMessage2ArtisanInstance(message,instance_id)
 
-    def _sendMessage2ArtisanInstanceShot(self,message,instance_id) -> None:
+    def _sendMessage2ArtisanInstanceShot(self, message:str, instance_id:str) -> None:
         self._sendMessage2ArtisanInstance(message, instance_id)
 
-    def _sendMessage2ArtisanInstance(self,message,instance_id) -> bool:
+    def _sendMessage2ArtisanInstance(self, message:str, instance_id:str) -> bool:
         try:
             self._outSocket = QLocalSocket()
             self._outSocket.connectToServer(instance_id)
@@ -417,13 +418,13 @@ class Artisan(QtSingleApplication):
             self._outSocket = None
             self._outStream = None
 
-    def event(self, event):
+    def event(self, event) -> bool:
         file_open = QEvent.Type.FileOpen
         if event.type() == file_open:
             try:
                 aw = self.activationWindow()
                 if aw is not None:
-                    url = event.url()
+                    url = event.url() # type: ignore # "QEvent" has no attribute "url"
                     # files cannot be opend while
                     # - sampling
                     # - in Designer mode
@@ -447,7 +448,7 @@ class Artisan(QtSingleApplication):
                             self.sendMessage2ArtisanInstance(message,self._viewer_id)
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
-            return 1
+            return True
         return super().event(event)
 
 # configure multiprocessing
@@ -651,7 +652,7 @@ import plus.stock
 #######################################################################################
 
 
-def my_get_icon(name):
+def my_get_icon(name:str) -> Optional[QIcon]:
     basedir = os.path.join(mpl.rcParams['datapath'], 'images')
     p = os.path.join(basedir, name.replace('.svg','.png'))
     if os.path.exists(p):
@@ -661,43 +662,6 @@ def my_get_icon(name):
 
 
 #####
-
-## monkey patching MPL 3.5.1 _formlayout.py:ColorButton to work on Qt6 (not relevant on Qt5)
-## (see https://github.com/matplotlib/matplotlib/issues/22471)
-## to be removed on upgrading to 3.5.2 which fixes this
-#class MPLColorButtonPatched(QPushButton):
-#    """
-#    Color choosing push button
-#    """
-#    colorChanged = pyqtSignal(QColor)
-#
-#    def __init__(self, parent=None) -> None:
-#        super().__init__(parent)
-#        self.setFixedSize(20, 20)
-#        self.setIconSize(QSize(12, 12))
-#        self.clicked.connect(self.choose_color)
-#        self._color = QColor()
-#
-#    def choose_color(self):
-#        color = QColorDialog.getColor(
-#            self._color, self.parentWidget(), '',
-#            QColorDialog.ColorDialogOption.ShowAlphaChannel)
-#        if color.isValid():
-#            self.set_color(color)
-#
-#    def get_color(self):
-#        return self._color
-#
-#    @pyqtSlot(QColor)
-#    def set_color(self, color):
-#        if color != self._color:
-#            self._color = color
-#            self.colorChanged.emit(self._color)
-#            pixmap = QPixmap(self.iconSize())
-#            pixmap.fill(color)
-#            self.setIcon(QIcon(pixmap))
-#
-#    color = pyqtProperty(QColor, get_color, set_color)
 
 
 class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
@@ -904,13 +868,13 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
             self.edit_curve_parameters_action.setEnabled(False)
 
     # monkey patch matplotlib navigationbar zoom and pan to update background cache
-    def release_pan_new(self, event):
+    def release_pan_new(self, event) -> None:
         self.release_pan_org(event)
         # as since MPL 3.5 release_pan calls self.canvas.draw_idle() instead of _draw() we just invalidate the background here instead of
         # updating it
         self.qmc.updateBackground()
         #self.qmc.ax_background = None
-    def release_zoom_new(self, event):
+    def release_zoom_new(self, event) -> None:
         self.release_zoom_org(event)
         # as since MPL 3.5 release_pan calls self.canvas.draw_idle() instead of _draw() we just invalidate the background here instead of
         # updating it
@@ -918,11 +882,11 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         #self.qmc.ax_background = None
 
     # monkey patch matplotlib navigationbar zoom (release_zoom) and pan (release_pan) to update background cache
-    def update_view_new(self):
+    def update_view_new(self) -> None:
         self.update_view_org()
         self.qmc.updateBackground()
 
-    def getAxisRanges(self):
+    def getAxisRanges(self) -> List[float]:
         res = []
         for ax in self.canvas.figure.axes:
             xlim = ax.get_xlim()
@@ -931,34 +895,34 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
             res.append(ylim[1]-ylim[0])
         return res
 
-    def press_pan(self, event):
+    def press_pan(self, event) -> None:
         if self.qmc.ai is not None:
             # we remember the axis ranges before the pan-zoom to detect if it was zoomed
             self.axis_ranges = self.getAxisRanges()
         super().press_pan(event)
 
-    def release_pan(self, event):
+    def release_pan(self, event) -> None:
         if self.qmc.ai is not None and [round(r) for r in self.axis_ranges] != [round(r) for r in self.getAxisRanges()]:
             # only hide the background image if the axis ratio changed
             self.qmc.ai.set_visible(False)
         super().release_pan(event)
 
-    def release_zoom(self, event):
+    def release_zoom(self, event) -> None:
         if self.qmc.ai is not None:
             self.qmc.ai.set_visible(False)
         super().release_zoom(event)
 
-    def forward(self, *args):
+    def forward(self, *args) -> None:
         if self.qmc.ai is not None:
             self.qmc.ai.set_visible(False)  # whenever forward is pressed the image will be hidden
         super().forward(*args)
 
-    def back(self, *args):
+    def back(self, *args) -> None:
         if self.qmc.ai is not None and self._nav_stack._pos == 1: # pylint: disable=protected-access
             self.qmc.ai.set_visible(True)
         super().back(*args)
 
-    def home(self, *args):
+    def home(self, *args) -> None:
         """Restore the original view"""
         # show the background image again that was hidden on zoom-in
         if self.qmc.ai is not None:
@@ -977,7 +941,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         if self.qmc.zoom_follow:
             self.push_current()
 
-    def _icon(self, name):
+    def _icon(self, name:str) -> QIcon:
         if self.aw is not None and name.startswith('plus'):
             basedir = os.path.join(getResourcePath(),'Icons')
         else:
@@ -1012,7 +976,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         return QIcon(pm)
 
     @staticmethod
-    def recolorIcon(pixmap, color):
+    def recolorIcon(pixmap, color) -> QPixmap:
         tmp = pixmap.toImage()
         for y in range(tmp.height()):
             for x in range(tmp.width()):
@@ -1020,7 +984,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                 tmp.setPixelColor(x,y,color)
         return QPixmap.fromImage(tmp)
 
-    def update_message(self):
+    def update_message(self) -> None:
         if not self.qmc.twoAxisMode():
             self.qmc.fmt_data_RoR = False
         xs = None
@@ -1124,7 +1088,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                         _log.exception(e)
 
     # overwritten from MPL v3.2.2 to get rid of that extra data printed
-    def mouse_move(self, event):
+    def mouse_move(self, event) -> None:
         try:
             self._update_cursor(event) # not available in MPL v3.0.3 on Python3.5 for the RPi Stretch builds
         except Exception: # pylint: disable=broad-except
@@ -1136,7 +1100,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         self.update_message()
 
 #PLUS
-    def plus(self):
+    def plus(self) -> None:
         modifiers = QApplication.keyboardModifiers()
         if modifiers in [(Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ControlModifier), (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ShiftModifier)]:
             # ALT+CTR-CLICK (OPTION+COMMAND on macOS) toggles  or alternatively ALT-SHIFT-CLICK
@@ -1152,7 +1116,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         else:
             plus.controller.toggle(self.aw)
 
-    def subscription(self):
+    def subscription(self) -> None:
         if self.aw.plus_paidUntil is not None: # after reset and authentication, it might still take a moment until the paidUntil is set via its signal
             try:
                 remaining_days = max(0,(self.aw.plus_paidUntil.date() - datetime.datetime.now(datetime.timezone.utc).date()).days)
@@ -1203,7 +1167,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                 if percent_used_formatted != '':
                     percent_used_formatted = '\n' + percent_used_formatted
                 subscription_message_box.setText(QApplication.translate('Plus','Do you want to extend your subscription?'))
-                subscription_message_box.setInformativeText(QApplication.translate('Plus','Your subscription ends on') + f' {QDate(pu.year,pu.month,pu.day).toString(QLocale().dateFormat(QLocale.FormatType.ShortFormat))}\n{days}{percent_used_formatted}')
+                subscription_message_box.setInformativeText((QApplication.translate('Plus','Your subscription ends on') if remaining_days>0 else QApplication.translate('Plus','Your subscription ended on')) + f' {QDate(pu.year,pu.month,pu.day).toString(QLocale().dateFormat(QLocale.FormatType.ShortFormat))}\n{days}{percent_used_formatted}')
                 subscription_message_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
 #                subscription_message_box.show()
                 res = subscription_message_box.exec()
@@ -1222,7 +1186,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def my_edit_parameters(self,_=False):
+    def my_edit_parameters(self,_:bool=False) -> None:
         try:
             if self.qmc.ax is not None and not self.qmc.designerflag: # deactivate figure_options in designer mode due to all kind of side effects
                 allaxes = self.canvas.figure.get_axes()
@@ -1261,7 +1225,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                 self.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-            _, _, exc_tb = sys.exc_info()
+            _type, _exc, exc_tb = sys.exc_info()
             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' edit_parameters() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
 
@@ -1272,18 +1236,17 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 
 class EventActionThread(QThread): # pylint: disable=too-few-public-methods # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
 
-    def __init__(self, aw:'ApplicationWindow', action, command, eventtype) -> None:
+    def __init__(self, aw:'ApplicationWindow', action:int, command:str, eventtype:Optional[int]) -> None:
         super().__init__()
-        self.aw = aw
-        self.action = action
-        self.command = command
-        self.eventtype = eventtype
+        self.aw:'ApplicationWindow' = aw
+        self.action:int = action
+        self.command:str = command
+        self.eventtype:Optional[int] = eventtype
 
-    def run(self):
+    def run(self) -> None:
         # as eventaction_internal is not running in the GUI thread we avoid doing graphic updates and run them instead after thread termination within
         # the GUI thread
-        if self.aw is not None:
-            self.aw.eventaction_internal(self.action,self.command,self.eventtype)
+        self.aw.eventaction_internal(self.action,self.command,self.eventtype)
 
 
 #########################################################################################################
@@ -1291,17 +1254,13 @@ class EventActionThread(QThread): # pylint: disable=too-few-public-methods # pyr
 # applies comma2dot as fixup to automatically turn numbers like "1,2" into valid numbers like "1.0" and the empty entry into "0.0"
 class MyQDoubleValidator(QDoubleValidator): # pylint: disable=too-few-public-methods  # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
 
-    def __init__(self, bottom, top, decimals, lineedit) -> None:
+    def __init__(self, bottom:float, top:float, decimals:int, lineedit:QLineEdit) -> None:
         super().__init__(bottom, top, decimals, lineedit)
         self.lineedit = lineedit
 
-    def fixup(self, input_value):
+    def fixup(self, input_value:str):
         try:
-            if input_value is None or input_value == '':
-                input_value = '0'
-            else:
-                input_value = comma2dot(input_value)
-            self.lineedit.setText(input_value)
+            self.lineedit.setText('0' if input_value == '' else comma2dot(input_value))
 #            super().fixup(input_value)
         except Exception: # pylint: disable=broad-except
             pass
@@ -1409,7 +1368,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 
 
 
-    def __init__(self, parent = None, *, locale, WebEngineSupport, artisanviewerFirstStart) -> None:
+    def __init__(self, parent:Optional[QWidget] = None, *, locale:str, WebEngineSupport:bool, artisanviewerFirstStart:bool) -> None:
 
         self.locale_str = locale
         self.app = app
@@ -1836,10 +1795,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         importBulletAction = QAction('Aillio RoasTime...', self)
         importBulletAction.triggered.connect(self.importBullet)
         self.importMenu.addAction(importBulletAction)
+        importBulletAction.setEnabled(False)
 
         importBulletAction = QAction('Aillio Roast.World URL...', self)
         importBulletAction.triggered.connect(self.importBulletURL)
         self.importMenu.addAction(importBulletAction)
+        importBulletAction.setEnabled(False)
 
         importCropsterAction = QAction('Cropster XLS...', self)
         importCropsterAction.triggered.connect(self.importCropster)
@@ -4355,7 +4316,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     # search the given QTable table for a row with the given widget as cellWidget or item in column col or as a sub-widget contained in the layout of a widget in place
     # returns the row number if the widget was found or None
     @staticmethod
-    def findWidgetsRow(table,widget,col):
+    def findWidgetsRow(table:'QTableWidget', widget:QWidget, col:int) -> Optional[int]:
         for r in range(table.rowCount()):
             if table.cellWidget(r,col) == widget or table.item(r,col) == widget or \
                 (table.cellWidget(r,col) is not None and table.cellWidget(r,col).layout() is not None and table.cellWidget(r,col).layout().indexOf(widget) > -1):
@@ -4365,7 +4326,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     # search the given QTable table for a column with the given widget in row
     # returns the column number if the widget was found or None
     @staticmethod
-    def findWidgetsColumn(table,widget,row):
+    def findWidgetsColumn(table:'QTableWidget', widget:QWidget, row:int) -> Optional[int]:
         for c in range(table.columnCount()):
             if table.cellWidget(row,c) == widget or table.item(row,c) == widget or \
                 (table.cellWidget(row,c) is not None and table.cellWidget(row,c).layout() is not None and table.cellWidget(row,c).layout().indexOf(widget) > -1):
@@ -4389,7 +4350,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 
     # this is important to have . as decimal separator independent of the systems locale
     @staticmethod
-    def createCLocaleDoubleValidator(bot,top,dec,w):
+    def createCLocaleDoubleValidator(bot:float, top:float, dec:int, w:QLineEdit) -> MyQDoubleValidator:
         validator = MyQDoubleValidator(bot,top,dec,w)
         validator.setLocale(QLocale.c())
         validator.setNotation(QDoubleValidator.Notation.StandardNotation)
@@ -4404,21 +4365,21 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 #        self.sender().setGraphicsEffect(self.makeShadow())
 
     @pyqtSlot(QPoint)
-    def setTareET(self,_):
+    def setTareET(self,_:QPoint) -> None:
         if not self.qmc.swaplcds:
             self.setTare(0)
         else:
             self.setTare(1)
 
     @pyqtSlot(QPoint)
-    def setTareBT(self,_):
+    def setTareBT(self,_:QPoint) -> None:
         if not self.qmc.swaplcds:
             self.setTare(1)
         else:
             self.setTare(0)
 
     @pyqtSlot(QPoint)
-    def setTare_slot(self,_):
+    def setTare_slot(self,_:QPoint) -> None:
         sender = self.sender()
         try:
             assert isinstance(sender, ClickableLCDFrame)
@@ -4435,7 +4396,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 
     # set the tare values per channel (0: ET, 1:BT, 2:E1c0, 3:E1c1, 4:E1c0, 5:E1c1,...)
     @pyqtSlot(int)
-    def setTare(self,n:int):
+    def setTare(self,n:int) -> None:
         if self.qmc.flagon: # we set the tare value
             if n == 0:
                 temp = (self.qmc.temp1 if self.qmc.flagstart else self.qmc.on_temp1)
@@ -4463,10 +4424,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 
 #PLUS
     @pyqtSlot()
-    def updatePlusStatusSlot(self):
+    def updatePlusStatusSlot(self) -> None:
         self.updatePlusStatus()
 
-    def updatePlusStatus(self,ntb=None):
+    def updatePlusStatus(self,ntb:Optional[VMToolbar]=None) -> None:
         if ntb is None:
             ntb = self.ntb
         try:
@@ -7634,7 +7595,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     # in this case the event button is not generating an event entry during recording, but a button action could receive an event value from calling its action
     # and generate a corresponding event entry via a self.qmc.EventRecordActionSignal as done by the kaleido button IO Command action
     # eventtrype is -1 if the even action should await a result to be bound to _
-    def eventaction(self, action,cmd, parallel=True,eventtype:Optional[int]=None):
+    def eventaction(self, action:int, cmd:str, parallel=True,eventtype:Optional[int]=None):
         # split on an octothorpe '#' that is not inside parentheses '()'
         cmd = re.split(r'\#(?![^\(]*\))',cmd)[0].strip()
         if action:
@@ -13232,15 +13193,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     fieldlist = [
                         ['Date',   self.qmc.roastdate.date().toString("dd'.'MM'.'yyyy")   ],
                         ['Unit',   self.qmc.mode                                          ],
-                        ['CHARGE', self.eventtime2string(CHARGE)                          ],
-                        ['TP',     self.eventtime2string(TP)                              ],
-                        ['DRYe',   self.eventtime2string(DRYe)                            ],
-                        ['FCs',    self.eventtime2string(FCs)                             ],
-                        ['FCe',    self.eventtime2string(FCe)                             ],
-                        ['SCs',    self.eventtime2string(SCs)                             ],
-                        ['SCe',    self.eventtime2string(SCe)                             ],
-                        ['DROP',   self.eventtime2string(DROP)                            ],
-                        ['COOL',   self.eventtime2string(COOL)                            ],
+                        ['CHARGE', self.eventtime2string(max(0,CHARGE-CHARGE))            ],
+                        ['TP',     self.eventtime2string(max(0,TP-CHARGE))                ],
+                        ['DRYe',   self.eventtime2string(max(0,DRYe-CHARGE))              ],
+                        ['FCs',    self.eventtime2string(max(0,FCs-CHARGE))               ],
+                        ['FCe',    self.eventtime2string(max(0,FCe-CHARGE))               ],
+                        ['SCs',    self.eventtime2string(max(0,SCs-CHARGE))               ],
+                        ['SCe',    self.eventtime2string(max(0,SCe-CHARGE))               ],
+                        ['DROP',   self.eventtime2string(max(0,DROP-CHARGE))              ],
+                        ['COOL',   self.eventtime2string(max(0,COOL-CHARGE))              ],
                         ['Time',   self.qmc.roastdate.time().toString()[:-3]              ],
                         ]
                     for f, fe in enumerate(fieldlist):
@@ -13302,7 +13263,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                         event += self.qmc.etypesf(self.qmc.specialeventstype[n])[0] + self.qmc.eventsvalues(self.qmc.specialeventsvalue[n])
 
                         di,mo = divmod(tx,60)
-                        time1 = f'{di:02.0f}:{mo:%02.0f}'
+                        time1 = f'{di:02.0f}:{mo:02.0f}'
                         if last_time is None or last_time != time1:
                             extratemps = []
                             for j in range(len(self.qmc.extradevices)):
@@ -20177,7 +20138,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                         self.qmc.l_delta1B,
                                         self.qmc.l_delta2B
                                         ]:
-                                    _log.info('PRINT l: %s',l)
                                     if l:
                                         try:
                                             if isinstance(self.qmc.ax.lines,list): # MPL < v3.5
@@ -23980,7 +23940,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         )
 
 
-    def loadPalettes(self,filename,pal:List['Palette']) -> Optional[List[int]]:
+    def loadPalettes(self,filename,input_pal:List['Palette']) -> Optional[List[int]]:
         try:
             f = QFile(filename)
             if not f.open(QIODevice.OpenModeFlag.ReadOnly):
@@ -24060,7 +24020,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                     label,
                                     slider_quantifier_action_flags,
                                     slider_quantifier_SV_flags)
-                            pal[i] = nextpalette
+                            input_pal[i] = nextpalette
                 message =QApplication.translate('Message','Palettes loaded')
                 self.sendmessage(message)
                 return buttonpalettemaxlen

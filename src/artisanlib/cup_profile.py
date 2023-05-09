@@ -125,6 +125,7 @@ class flavorDlg(ArtisanResizeablDialog):
 #        mainLayout.addStretch()
         mainLayout.addLayout(mainButtonsLayout)
         self.setLayout(mainLayout)
+        self.aw.qmc.updateFlavorchartValues() # fast incremental redraw
         self.aw.qmc.flavorchart()
         self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
 
