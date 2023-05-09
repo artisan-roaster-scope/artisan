@@ -123,13 +123,11 @@ with open('Info.plist', 'r+b') as fp:
     try:
         plist['LSMinimumSystemVersion'] = os.environ['MACOSX_DEPLOYMENT_TARGET']
     except Exception: # pylint: disable=broad-except
-        plist['LSMinimumSystemVersion'] = '10.15'
+    	plist['LSMinimumSystemVersion'] = '11.0'
     plist['LSMultipleInstancesProhibited'] = 'false'
-#    plist['LSPrefersPPC'] = False # not in use longer
     plist['LSArchitecturePriority'] = ['x86_64']
     plist['NSHumanReadableCopyright'] = LICENSE
     plist['NSHighResolutionCapable'] = True
-#    plist['NSRequiresAquaSystemAppearance'] = False # important to activate the automatic dark mode of Qt on OS X 10.14 or later (with linked against macOS before 10.14, like with PyQt 5.13.1
     fp.seek(0, os.SEEK_SET)
     fp.truncate()
     plistlib.dump(plist, fp)

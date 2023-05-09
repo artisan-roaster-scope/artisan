@@ -22,7 +22,7 @@ else
     export PYRCC=pyrcc6
     export PYLUPDATE=./pylupdate6pro
 
-    export MACOSX_DEPLOYMENT_TARGET=10.15
+    export MACOSX_DEPLOYMENT_TARGET=11.0
     export DYLD_LIBRARY_PATH=$PYTHON/lib:$DYLD_LIBRARY_PATH
     export PATH=$PYTHON/bin:$PYTHON/lib:$PATH
     export PATH=$QT_PATH/bin:$QT_PATH/lib:$PATH
