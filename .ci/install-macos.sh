@@ -34,6 +34,7 @@ set -e # reduced logging
 #export PATH="/usr/local/opt/python@$3.10/bin:$PATH"
 
 brew update && brew upgrade python
+brew link --force --overwrite python@3.11
 
 hash -r
 which python3
