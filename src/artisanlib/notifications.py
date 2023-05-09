@@ -291,7 +291,7 @@ class NotificationManager(QObject): # pyright: ignore # Argument to class must b
                 try:
                     app = QApplication.instance()
                     app.setBadgeNumber(len(self.notifications_queue))
-                except Exception as e: # pylint: disable=broad-except
+                except Exception: # pylint: disable=broad-except
                     pass # setBadgeNumber only supported by Qt 6.5 and newer
 
                 for n in reversed(self.notifications_queue):
@@ -308,7 +308,7 @@ class NotificationManager(QObject): # pyright: ignore # Argument to class must b
                 try:
                     app = QApplication.instance()
                     app.setBadgeNumber(0)
-                except Exception as e: # pylint: disable=broad-except
+                except Exception: # pylint: disable=broad-except
                     pass # setBadgeNumber only supported by Qt 6.5 and newer
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
