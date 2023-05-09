@@ -123,7 +123,7 @@ with open('Info.plist', 'r+b') as fp:
     try:
         plist['LSMinimumSystemVersion'] = os.environ['MACOSX_DEPLOYMENT_TARGET']
     except Exception: # pylint: disable=broad-except
-    	plist['LSMinimumSystemVersion'] = '11.0'
+        plist['LSMinimumSystemVersion'] = '11.0'
     plist['LSMultipleInstancesProhibited'] = 'false'
     plist['LSArchitecturePriority'] = ['x86_64']
     plist['NSHumanReadableCopyright'] = LICENSE

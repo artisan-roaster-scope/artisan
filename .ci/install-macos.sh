@@ -13,7 +13,6 @@ set -e # reduced logging
 #HOMEBREW_NO_AUTO_UPDATE=1 brew install python
 
 #brew uninstall numpy gdal postgis
-#brew unlink python@2
 #brew unlink python
 #brew upgrade python
 
@@ -33,6 +32,8 @@ set -e # reduced logging
 #brew unlink python@3.9
 #brew link --force python@3.10
 #export PATH="/usr/local/opt/python@$3.10/bin:$PATH"
+
+brew update && brew upgrade python
 
 hash -r
 which python3

@@ -2384,8 +2384,9 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.sendmessage(QApplication.translate('Message',f"Recent roast properties '{self.aw.recentRoastLabel(rr)}' set"))
         self.recentRoastEnabled()
 
-    @pyqtSlot('QString')
-    def recentRoastEnabled(self,_=''):
+#    @pyqtSlot('QString')
+    @pyqtSlot(str)
+    def recentRoastEnabled(self,_:str='') -> None:
         try:
             title = self.titleedit.currentText()
             weightIn = float(comma2dot(self.weightinedit.text()))
