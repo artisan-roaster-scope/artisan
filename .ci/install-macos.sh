@@ -20,7 +20,7 @@ python3 -m venv /Users/appveyor/venv3.11.3
 source /Users/appveyor/venv3.11.3/bin/activate
 # update symbolic link venv3.11 to point to our new venv3.11.3
 ln -vfns /Users/appveyor/venv3.11.3 /Users/appveyor/venv3.11
-
+export PATH=/Users/appveyor/venv3.11.3/bin:$PATH # not exported?
 
 hash -r
 which python3
@@ -40,12 +40,8 @@ sudo -H python -m pip install --root-user-action=ignore -r src/requirements-${AR
 
 
 ls -la /usr/local/Cellar/python@3.11/3.11.3/bin
-echo $PATH
-ls -la /Users/appveyor/venv3.11.3
-echo $PYTHONSITEPKGS
-ls -la /Users/appveyor/venv3.11.3/bin
-echo $QT_PATH
-ls -la $QT_PATH/bin
+# echo $PATH
+# /Users/appveyor/venv3.11.3/bin:/usr/local/Cellar/python@3.11/3.11.3/bin:/Users/appveyor/venv3.11.0/bin: ...
 which pip3
 which pip
 which pylupdate6

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+echo $PATH
+
 #set -ex
 set -e  # reduced logging
 
