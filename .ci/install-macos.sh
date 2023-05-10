@@ -20,7 +20,6 @@ python3 -m venv /Users/appveyor/venv3.11.3
 source /Users/appveyor/venv3.11.3/bin/activate
 # update symbolic link venv3.11 to point to our new venv3.11.3
 ln -vfns /Users/appveyor/venv3.11.3 /Users/appveyor/venv3.11
-export PATH=/Users/appveyor/venv3.11.3/bin:$PATH # not exported?
 
 hash -r
 which python3
@@ -38,14 +37,6 @@ python -m pip install --upgrade pip
 sudo -H python -m pip install --root-user-action=ignore -r src/requirements.txt
 sudo -H python -m pip install --root-user-action=ignore -r src/requirements-${ARTISAN_OS}.txt
 
-
-ls -la /usr/local/Cellar/python@3.11/3.11.3/bin
-# echo $PATH
-# /Users/appveyor/venv3.11.3/bin:/usr/local/Cellar/python@3.11/3.11.3/bin:/Users/appveyor/venv3.11.0/bin: ...
-which pip3
-which pip
-which pylupdate6
-ls -la $PYTHONSITEPKGS
 
 # copy the snap7 binary installed by pip
 cp -f ${PYTHONSITEPKGS}/snap7/lib/libsnap7.dylib /usr/local/lib
