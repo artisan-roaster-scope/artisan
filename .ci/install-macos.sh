@@ -5,71 +5,21 @@ set -e # reduced logging
 
 #.ci/silence.sh brew update # this seems to help to work around some homebrew issues; and fails on others
 
-#------------
-# Python 3.7.5 is installed by default
-# to update use either:
-#brew upgrade python
-# or, to avoid issues with brew auto updates by deactivating them,
-#HOMEBREW_NO_AUTO_UPDATE=1 brew install python
-
-#brew uninstall numpy gdal postgis
-#brew unlink python
-#brew upgrade python
-
-#brew install python@3.8
-#brew link --force --overwrite python@3.8
-
-
-# following https://stackoverflow.com/questions/51125013/how-can-i-install-a-previous-version-of-python-3-in-macos-using-homebrew/51125014#51125014
-# to install Python 3.6.5
-#brew remove --ignore-dependencies python 1>/dev/null 2>&1
-#brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/f2a764ef944b1080be64bd88dca9a1d80130c558/Formula/python.rb 1>/dev/null 2>&1
-#------------
-
-## upgrade python from 3.9 to 3.10
-# 3.10.2 now already installed on AppVeyor
-#brew install python@3.10
-#brew unlink python@3.9
-#brew link --force python@3.10
-#export PATH="/usr/local/opt/python@$3.10/bin:$PATH"
-
-
-ls -la /Users/appveyor/
-
+## upgrade Python from 3.11.0 to 3.11.3
 # first deactivate current venv
 source $VIRTUAL_ENV/bin/activate
 deactivate
+# brew update Python
 brew update && brew upgrade python
+# relink Python
 brew unlink python@3.11 && brew link --force python@3.11
-# => /usr/local/Cellar/python@3.11/3.11.3
-which python3
-python3 --version
+# add path
 export PATH="$(brew --prefix)/Cellar/python@3.11/3.11.3/bin:$PATH"
-
-ls -la /usr/local/Cellar/python@3.11/
-
-which python3
-python3 --version
-
-# upgrade venv ..
-#we first need to deactivate the venv before upgrading
-#deactivate first!
-python3 -m venv --upgrade /Users/appveyor/venv3.11.0
-ls -al /Users/appveyor/venv3.11.0/bin | grep python
-# re-activate
-#source /Users/appveyor/venv3.11.0/bin/activate
-
-# ..or create new venv
+# create new venv
 python3 -m venv /Users/appveyor/venv3.11.3
 source /Users/appveyor/venv3.11.3/bin/activate
-
-echo $PATH
-ls -la /Users/appveyor/
-
-hash -r
-which python3
-python3 --version
-
+# update symbolic link venv3.11 to point to our new venv3.11.3
+ln -vfns /Users/appveyor/venv3.11.3 /Users/appveyor/venv3.11
 
 # to work around a wget open ssl issue: dyld: Library not loaded: /usr/local/opt/openssl/lib/libssl.1.0.0.dylib
 # however for now we settled to use curl instead to download the upload script
