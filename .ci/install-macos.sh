@@ -41,7 +41,7 @@ brew unlink python@3.11 && brew link --force python@3.11
 # => /usr/local/Cellar/python@3.11/3.11.3
 which python3
 python3 --version
-export PATH="$(brew --prefix)/Cellar/python@3.11.3/bin:$PATH"
+export PATH="$(brew --prefix)/Cellar/python@3.11/3.11.3/bin:$PATH"
 
 which python3
 python3 --version
@@ -51,11 +51,11 @@ python3 --version
 #deactivate first!
 python3 -m venv --upgrade /Users/appveyor/venv3.11.0
 # re-activate
-#source /Users/appveyor/venv3.11.0/bin/activate
+source /Users/appveyor/venv3.11.0/bin/activate
 
 # ..or create new venv
-##python3 -m venv /Users/appveyor/venv3.11.3
-##source /Users/appveyor/venv3.11.3/bin/activate
+#python3 -m venv /Users/appveyor/venv3.11.3
+#source /Users/appveyor/venv3.11.3/bin/activate
 
 echo $PATH
 
