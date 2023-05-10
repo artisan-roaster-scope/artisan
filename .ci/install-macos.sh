@@ -33,6 +33,9 @@ set -e # reduced logging
 #brew link --force python@3.10
 #export PATH="/usr/local/opt/python@$3.10/bin:$PATH"
 
+
+ls -la /Users/appveyor/
+
 # first deactivate current venv
 source $VIRTUAL_ENV/bin/activate
 deactivate
@@ -43,13 +46,16 @@ which python3
 python3 --version
 export PATH="$(brew --prefix)/Cellar/python@3.11/3.11.3/bin:$PATH"
 
+ls -la /usr/local/Cellar/python@3.11/
+
 which python3
 python3 --version
 
 # upgrade venv ..
 #we first need to deactivate the venv before upgrading
 #deactivate first!
-#python3 -m venv --upgrade /Users/appveyor/venv3.11.0
+python3 -m venv --upgrade /Users/appveyor/venv3.11.0
+ls -al /Users/appveyor/venv3.11.0/bin | grep python
 # re-activate
 #source /Users/appveyor/venv3.11.0/bin/activate
 
@@ -58,7 +64,7 @@ python3 -m venv /Users/appveyor/venv3.11.3
 source /Users/appveyor/venv3.11.3/bin/activate
 
 echo $PATH
-
+ls -la /Users/appveyor/
 
 hash -r
 which python3
