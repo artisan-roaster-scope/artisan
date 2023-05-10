@@ -33,13 +33,20 @@ set -e # reduced logging
 #brew link --force python@3.10
 #export PATH="/usr/local/opt/python@$3.10/bin:$PATH"
 
+# first deactivate current venv
+deactivate
 brew update && brew upgrade python
 brew unlink python@3.11 && brew link --force python@3.11
-#export PATH="/usr/local/Cellar/python@3.11/3.11.3bin:$PATH"
+#export PATH="/usr/local/Cellar/python@3.11/3.11.3/bin:$PATH"
+export PATH="$(brew --prefix)/opt/python@3.11/libexec/bin:$PATH"
 # upgrade venv
-python3 -m venv --upgrade /Users/appveyor/venv3.11.0
+#we first need to deactivate the venv before upgrading
+#deactivate
+#python3 -m venv --upgrade /Users/appveyor/venv3.11.0
 # or create new
-#python3.11 -m venv /Users/appveyor/venv3.11.3
+python3 -m venv /Users/appveyor/venv3.11.3
+source /Users/appveyor/venv3.11.3/bin/activate
+
 echo $PATH
 
 
