@@ -35,8 +35,13 @@ set -e # reduced logging
 
 brew update && brew upgrade python
 brew unlink python@3.11 && brew link --force python@3.11
-ls /usr/local/Cellar/python@3.11
-ls /Users/appveyor/
+#export PATH="/usr/local/Cellar/python@3.11/3.11.3bin:$PATH"
+# upgrade venv
+python3 -m venv --upgrade /Users/appveyor/venv3.11.0
+# or create new
+#python3.11 -m venv /Users/appveyor/venv3.11.3
+echo $PATH
+
 
 hash -r
 which python3

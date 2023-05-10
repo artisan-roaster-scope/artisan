@@ -290,7 +290,7 @@ class NotificationManager(QObject): # pyright: ignore # Argument to class must b
 
                 try:
                     app = QApplication.instance()
-                    app.setBadgeNumber(len(self.notifications_queue))
+                    app.setBadgeNumber(len(self.notifications_queue)) # type: ignore # "QCoreApplication" has no attribute "setBadgeNumber"
                 except Exception: # pylint: disable=broad-except
                     pass # setBadgeNumber only supported by Qt 6.5 and newer
 
@@ -307,7 +307,7 @@ class NotificationManager(QObject): # pyright: ignore # Argument to class must b
                 self.tray_icon.hide()
                 try:
                     app = QApplication.instance()
-                    app.setBadgeNumber(0)
+                    app.setBadgeNumber(0) # type: ignore # "QCoreApplication" has no attribute "setBadgeNumber"
                 except Exception: # pylint: disable=broad-except
                     pass # setBadgeNumber only supported by Qt 6.5 and newer
         except Exception as e: # pylint: disable=broad-except
