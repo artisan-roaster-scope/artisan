@@ -21,6 +21,11 @@ source /Users/appveyor/venv3.11.3/bin/activate
 # update symbolic link venv3.11 to point to our new venv3.11.3
 ln -vfns /Users/appveyor/venv3.11.3 /Users/appveyor/venv3.11
 
+
+hash -r
+which python3
+python3 --version
+
 # to work around a wget open ssl issue: dyld: Library not loaded: /usr/local/opt/openssl/lib/libssl.1.0.0.dylib
 # however for now we settled to use curl instead to download the upload script
 #brew uninstall wget
@@ -32,6 +37,19 @@ ln -vfns /Users/appveyor/venv3.11.3 /Users/appveyor/venv3.11
 python -m pip install --upgrade pip
 sudo -H python -m pip install --root-user-action=ignore -r src/requirements.txt
 sudo -H python -m pip install --root-user-action=ignore -r src/requirements-${ARTISAN_OS}.txt
+
+
+ls -la /usr/local/Cellar/python@3.11/3.11.3/bin
+echo $PATH
+ls -la /Users/appveyor/venv3.11.3
+echo $PYTHONSITEPKGS
+ls -la /Users/appveyor/venv3.11.3/bin
+echo $QT_PATH
+ls -la $QT_PATH/bin
+which pip3
+which pip
+which pylupdate6
+ls -la $PYTHONSITEPKGS
 
 # copy the snap7 binary installed by pip
 cp -f ${PYTHONSITEPKGS}/snap7/lib/libsnap7.dylib /usr/local/lib
