@@ -49,13 +49,13 @@ python3 --version
 # upgrade venv ..
 #we first need to deactivate the venv before upgrading
 #deactivate first!
-python3 -m venv --upgrade /Users/appveyor/venv3.11.0
+#python3 -m venv --upgrade /Users/appveyor/venv3.11.0
 # re-activate
-source /Users/appveyor/venv3.11.0/bin/activate
+#source /Users/appveyor/venv3.11.0/bin/activate
 
 # ..or create new venv
-#python3 -m venv /Users/appveyor/venv3.11.3
-#source /Users/appveyor/venv3.11.3/bin/activate
+python3 -m venv /Users/appveyor/venv3.11.3
+source /Users/appveyor/venv3.11.3/bin/activate
 
 echo $PATH
 
