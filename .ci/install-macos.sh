@@ -34,6 +34,7 @@ set -e # reduced logging
 #export PATH="/usr/local/opt/python@$3.10/bin:$PATH"
 
 # first deactivate current venv
+source $VIRTUAL_ENV/bin/activate
 deactivate
 brew update && brew upgrade python
 brew unlink python@3.11 && brew link --force python@3.11
