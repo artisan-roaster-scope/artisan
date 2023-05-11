@@ -8,7 +8,7 @@ environment:
   # Set the Appveyor Python version for windows, macos and linux here. Does not affect windows_legacy.
   PYTHON_V: 3.11
   # Upgrade to specific version (for platforms supporting upgrade). Upgrade skipped if missing or blank.
-  PYUPGRADE_V: 3.11.3
+#  PYUPGRADE_V: 3.11.3
 
   matrix:
   - job_name: windows_legacy
@@ -176,7 +176,7 @@ for:
     # run the install script
     - .ci/install-macos.sh
     - export PATH=/Users/appveyor/venv${PYTHON_V}/bin:${PATH} # required after updating Python in venv
-        
+
   build_script:
     - echo "MacOS Build"
     - chmod +x src/*.sh
