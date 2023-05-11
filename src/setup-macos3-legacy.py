@@ -187,12 +187,12 @@ os.chdir('./dist')
 try:
     PYTHONPATH = os.environ['PYTHONPATH'] + r'/'
 except Exception: # pylint: disable=broad-except
-    PYTHONPATH = r'/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/'
+    PYTHONPATH = r'/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/'
 
 #try:
 #    PYTHON_V = os.environ["PYTHON_V"]
 #except Exception: # pylint: disable=broad-except
-#    PYTHON_V = '3.10'
+#    PYTHON_V = '3.11'
 # (independent) matplotlib (installed via pip) shared libs are not copied by py2app (both cp are needed!)
 # UPDATE 9/2020: pip install of MPL v3.3.x does not come with a .dylibs directory any longer
 #subprocess.check_call(r'mkdir Artisan.app/Contents/Resources/lib/python' + PYTHON_V + '/lib-dynload/matplotlib/.dylibs',shell = True)
@@ -304,7 +304,7 @@ except Exception: # pylint: disable=broad-except
     pass
 
 
-for python_version in ['python3.8', 'python3.9', 'python3.10']:
+for python_version in ['python3.8', 'python3.9', 'python3.10', 'python3.11']:
     rootdir = f'./Artisan.app/Contents/Resources/lib/{python_version}'
 
     if os.path.isdir(f'{rootdir}/PyQt6'):
@@ -386,7 +386,7 @@ try:
 except Exception: # pylint: disable=broad-except
     pass
 try:
-    subprocess.check_call('rm -rf ./Artisan.app/Contents/Resources/lib/python3.10/matplotlib/mpl-data/sample_data',shell = True)
+    subprocess.check_call('rm -rf ./Artisan.app/Contents/Resources/lib/python3.11/matplotlib/mpl-data/sample_data',shell = True)
 except Exception: # pylint: disable=broad-except
     pass
 

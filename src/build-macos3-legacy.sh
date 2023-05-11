@@ -36,7 +36,7 @@ if [ ! -z $APPVEYOR ]; then
 else
     # standard local builds
     echo "NOTICE: Standard build"
-    export PYTHON_V=3.10
+    export PYTHON_V=3.11
     export PYTHON=/Library/Frameworks/Python.framework/Versions/${PYTHON_V}
     export PYTHONBIN=$PYTHON/bin
     export PYTHONPATH=$PYTHON/lib/python${PYTHON_V}

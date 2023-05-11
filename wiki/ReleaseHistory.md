@@ -2,6 +2,60 @@ Detailed Release History
 ========================
 
 ----
+v2.8.3 (beta)
+------------------
+
+* ADDITIONS
+  - adds support for [Kaleido](https://www.kaleido-roaster.com/) Network, Serial and Legacy protocols
+  - adds Santoker Q Series and R Series support over serial (USB/Bluetooth)
+  - adds support for Phidget TMP1200_1
+  - adds energy/CO2 data to characteristics line
+  - adds symbolic variables `WEIGHTin`, `MOISTUREin` and `TEMPunit` to access corresponding Roast Properties
+  - adds configuration "Mark last pressed" to event button configuration to control if the last button pressed should be marked (default) or not
+  - adds configuration "Tooltips" to toggle visibility of custom event buttons tooltips (default off)
+  - adds fields `~dryphasedeltatemp`, `~midphasedeltatemp`, `~finishphasedeltatemp`, `~fcstime`, and `~fcstime_long` to autosave
+  - adds translated and state aware custom event button label tags
+  - adds button action symbolic variable $ bound to button state
+  - adds additional Artisan Command, IO Command, MODBUS Command, S7 Command, WebSocket Command button actions to set button states
+  - adds slider step size 5
+
+* CHANGES
+  - makes title widgets autocompletion case sensitive in Roast Properties dialog
+  - improves CMS drum and air remove slider precision
+  - disconnect HOTTOP serial connection on changing serial port settings such that the changes can have an effect on reconnecting
+  - detects and adjusts to screen setup changes
+  - improved drag-and-drop action in custom event button table (hold ALT (Windows) or OPTION (macOS) key to swap instead of move)
+  - joins Phidget APIs such that PWM Command out() and IO Command set() commands can both be used on one attached module
+  - updated machine setups (Besca automatic and full automatic, Giesen, Hottop KN-8828B-2K+, Kuban Supreme Automatic, NOR A Series, Probat P Series III, Twino Ozstar) to take advantage of button label translations
+
+
+* FIXES
+  - fixes regression which broke MODBUS port scan ([Issue #1056](../../../issues/1056))
+  - makes designer respect the auto DeltaET and DeltaBT axis ([Issue #1062]((../../../issues/1062)))
+  - don't deactivate auto DeltaET/DeltaBT axis without changing the delta max limit ([Issue #1062](../../../issues/1062))
+  - fixes regression which broke channel tare function ([Issue #1063](../../../issues/1063))
+  - fixes Aillio R1: unable to detach kernel driver ([Issue #1065](../../../issues/1065))
+  - fixes pdf export unnecessary title abbreviation ([Issue #1077](../../../issues/1077))
+  - removes extra trailing newline from environment variables on calling scripts ([Issue #1092](../../../issues/1092))
+  - fixes startup issue under Linux Wayland ([Issue #1001](../../../issues/1001))
+  - fixes Ardino/TC PID source channel configuration in PID dialog ([Issue #1101](../../../issues/1101) & [Issue #1110](../../../issues/1110))
+  - fixes a rare redraw issue caused by setting linewidth of extra lines to 0 ([Issue #1121](../../../issues/1121))
+  - indicate slider focus also at 100% ([Issue #1126](../../../issues/1126))
+  - fixes IO Command support for Phidget REL1101 ([Issue #1141](../../../issues/1141))
+  - fixes MODBUS ASCII & BINARY communication and improves Arduino MODBUS RTU compatibility ([Issue #1145](../../../issues/1145))
+  - fixes missed picks in designer
+  - fixes desktop screenshot for Qt6
+  - fixes the +/- keyboard shortcuts for zooming to work accross all keyboard layouts
+  - fixes Probatone control token release under "Keep ON"
+  - fixes regression which allowed to define custom blends with total ratio larger than 100%
+  - further fixes for issues revealed by automatic static analyzers
+
+* REMOVALS
+  - removes support for original *.txt profile format of Artisan v0.4.0 (2011) and earlier
+  - Aillio imports until a proper export is provided
+
+
+----
 v2.8.2 (December 21, 2022)
 ------------------
 
