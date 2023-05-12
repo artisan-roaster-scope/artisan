@@ -10095,7 +10095,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.slider1.setSingleStep(self.eventSliderStepSize(0))
         self.slider2.setSingleStep(self.eventSliderStepSize(1))
         self.slider3.setSingleStep(self.eventSliderStepSize(2))
-        self.slider4.setSingleStep(self.eventSliderStepSize(0))
+        self.slider4.setSingleStep(self.eventSliderStepSize(3))
         #
         self.slidersAction.setChecked(True)
         if changeDefault:
