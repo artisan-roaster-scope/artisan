@@ -6,11 +6,11 @@ formatters:
     format: '%(asctime)s %(threadName)-10s %(name)-20s %(levelname)-7s: %(message)s'
     datefmt: '%m-%d %H:%M:%S'
 handlers:
-#  console:
-#    class: logging.StreamHandler
-#    level: ERROR
-#    formatter: simple
-#    stream: ext://sys.stdout
+  console:
+    class: logging.StreamHandler
+    level: ERROR
+    formatter: simple
+    stream: ext://sys.stdout
   file:
     class: logging.handlers.RotatingFileHandler
     level: INFO

@@ -431,16 +431,13 @@ def debugLogLevelActive() -> bool:
         return False
 
 def setDeviceDebugLogLevel(state: bool) -> None:
-    import pymodbus
     if state:
         # debug logging on
-#        pymodbus.pymodbus_apply_logging_config(logging.DEBUG) # logs to console on Windows
-        setFileLogLevel(logging.getLogger('pymodbus.logging'), logging.DEBUG)
+        logging.getLogger('pymodbus.logging').setLevel(logging.DEBUG)
         _log.info('device debug logging ON')
     else:
         # debug logging off
-#        pymodbus.pymodbus_apply_logging_config(logging.INFO)
-        setFileLogLevel(logging.getLogger('pymodbus.logging'), logging.ERROR)
+        logging.getLogger('pymodbus.logging').setLevel(logging.ERROR)
         _log.info('device debug logging OFF')
 
 def setDebugLogLevel(state: bool) -> None:
@@ -454,19 +451,15 @@ def setDebugLogLevel(state: bool) -> None:
         _log.info('debug logging OFF')
 
 def setFileLogLevel(logger, level) -> None:
-    _log.info('PRINT setFileLogLevel(%s,%s)',logger,level)
     logger.setLevel(level)
     for handler in logger.handlers:
         if handler.get_name() == 'file':
             handler.setLevel(level)
 
 def setFileLogLevels(level, logger_names) -> None:
-    _log.info('PRINT setFileLogLevels(%s,%s)',level,logger_names)
     loggers = getLoggers()
-    _log.info('PRINT loggers: %s',loggers)
     for logger in loggers:
         if logger.name in logger_names:
-            _log.info('PRINT in')
             setFileLogLevel(logger, level)
 
 # returns True if new log level of loggers is DEBUG, False otherwise
