@@ -34,11 +34,19 @@ except ImportError:
     from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 class wsport():
+
+    __slots__ = [ 'aw', 'default_host', 'host', 'port', 'path', 'machineID',  'lastReadResult', 'channels', 'readings', 'channel_requests', 'channel_nodes',
+                    'channel_modes', 'connect_timeout', 'request_timeout', 'reconnect_interval', 'ping_interval', 'ping_timeout', 'id_node', 'machine_node',
+                    'command_node', 'data_node', 'pushMessage_node', 'request_data_command', 'charge_message', 'drop_message', 'addEvent_message', 'event_node',
+                    'DRY_node', 'FCs_node', 'FCe_node', 'SCs_node', 'SCe_node', 'STARTonCHARGE', 'OFFonDROP', 'open_event', 'pending_events', 'active',
+                    'ws', 'wst' ]
+
     def __init__(self,aw) -> None:
         self.aw = aw
 
         # connects to "ws://<host>:<port>/<path>"
-        self.host:str = '127.0.0.1' # the TCP host
+        self.default_host:Final[str] = '127.0.0.1'
+        self.host:str = self.default_host # the TCP host
         self.port:int = 80          # the TCP port
         self.path:str = 'WebSocket' # the ws path
         self.machineID:int = 0
@@ -130,7 +138,7 @@ class wsport():
                         self.aw.addserial('wsport message: DROP')
                     if self.aw.qmc.flagstart and self.aw.qmc.timeindex[6] == 0:
                         # markDROP
-                        self.aw.qmc.markDropSignal.emit()
+                        self.aw.qmc.markDropSignal.emit(False)
                         if self.aw.seriallogflag:
                             self.aw.addserial('wsport markDROP signal sent')
                     if self.OFFonDROP and self.aw.qmc.flagstart:
@@ -150,27 +158,27 @@ class wsport():
                                 # addEvent(DRY) received
                                 if self.aw.seriallogflag:
                                     self.aw.addserial('wsport message: addEvent(DRY) processed')
-                                self.aw.qmc.markDRYSignal.emit()
+                                self.aw.qmc.markDRYSignal.emit(False)
                             elif self.aw.qmc.timeindex[2] == 0 and data[self.event_node] == self.FCs_node:
                                 # addEvent(FCs) received
                                 if self.aw.seriallogflag:
                                     self.aw.addserial('wsport message: addEvent(FCs) processed')
-                                self.aw.qmc.markFCsSignal.emit()
+                                self.aw.qmc.markFCsSignal.emit(False)
                             elif self.aw.qmc.timeindex[3] == 0 and data[self.event_node] == self.FCe_node:
                                 # addEvent(FCe) received
                                 if self.aw.seriallogflag:
                                     self.aw.addserial('wsport message: addEvent(FCe) processed')
-                                self.aw.qmc.markFCeSignal.emit()
+                                self.aw.qmc.markFCeSignal.emit(False)
                             elif self.aw.qmc.timeindex[4] == 0 and data[self.event_node] == self.SCs_node:
                                 # addEvent(SCs) received
                                 if self.aw.seriallogflag:
                                     self.aw.addserial('wsport message: addEvent(SCs) processed')
-                                self.aw.qmc.markSCsSignal.emit()
+                                self.aw.qmc.markSCsSignal.emit(False)
                             elif self.aw.qmc.timeindex[5] == 0 and data[self.event_node] == self.SCe_node:
                                 # addEvent(SCe) received
                                 if self.aw.seriallogflag:
                                     self.aw.addserial('wsport message: addEvent(SCe) processed')
-                                self.aw.qmc.markSCeSignal.emit()
+                                self.aw.qmc.markSCeSignal.emit(False)
                         elif self.aw.seriallogflag:
                             self.aw.addserial(f'wsport message: addEvent({data})')
                     elif self.aw.seriallogflag:

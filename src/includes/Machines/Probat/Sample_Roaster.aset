@@ -3,6 +3,8 @@ Delay=1000
 ExtraEventSamplingDelay=10000
 Oversampling=false
 roastertype_setup=Probat Sample
+roastersize_setup=0.2
+roasterheating_setup=3
 
 [DefaultButtons]
 buttonactions=0, 21, 21, 21, 21, 21, 0, 0

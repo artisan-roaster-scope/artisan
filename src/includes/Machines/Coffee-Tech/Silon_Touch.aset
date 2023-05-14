@@ -2,6 +2,7 @@
 Delay=1000
 Oversampling=false
 roastertype_setup=CTE Silon Touch
+roastersize_setup=7
 
 [Device]
 id=29

@@ -1,6 +1,7 @@
 [General]
 Delay=1000
 roastertype_setup=Sivetz SRM
+roastersize_setup_default=15
 
 [Device]
 id=29

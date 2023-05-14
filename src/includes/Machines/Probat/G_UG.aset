@@ -2,6 +2,7 @@
 Delay=2000
 Oversampling=false
 roastertype_setup=Probat G/UG
+roastersize_setup_default=15
 
 [Device]
 id=79

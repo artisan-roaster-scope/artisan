@@ -2,6 +2,7 @@
 Delay=2000
 Oversampling=false
 roastertype_setup=Loring
+roastersize_setup_default=7
 
 [CurveStyles]
 extradrawstyles1=default, default

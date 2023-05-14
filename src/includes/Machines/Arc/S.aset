@@ -6,6 +6,7 @@ dropDuplicates=true
 dropDuplicatesLimit=0.1
 roastertype_setup=Arc S
 ETfunction=
+roastersize_setup=0.2
 
 [Device]
 id=115

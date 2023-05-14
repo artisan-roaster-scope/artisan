@@ -4,6 +4,7 @@ Oversampling=false
 roastertype_setup=Giesen WxA IR Env
 dropDuplicates=true
 dropDuplicatesLimit=0.2
+roastersize_setup_default=6
 
 [ArduinoPID]
 dutyMax=100

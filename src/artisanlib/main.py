@@ -1171,7 +1171,6 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                 subscription_message_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
 #                subscription_message_box.show()
                 res = subscription_message_box.exec()
-                _log.info('PRINT res: %s',res)
                 plus_link = plus.config.shop_base_url
                 if self.aw.plus_subscription == 'PRO':
                     plus_link += '/shop/professional-roasters/'
@@ -1304,6 +1303,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     santokerSendMessageSignal = pyqtSignal(bytes,int)
     kaleidoSendMessageSignal = pyqtSignal(str,str)
     kaleidoSendMessageAwaitSignal = pyqtSignal(str,str,int,int)
+    addEventSignal = pyqtSignal(int,int)
     updateMessageLogSignal = pyqtSignal()
     updateSerialLogSignal = pyqtSignal()
     updateErrorLogSignal = pyqtSignal()
@@ -1592,7 +1592,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.santoker:Optional['SantokerNetwork'] = None # holds the Santoker instance created on connect; reset to None on disconnect
 
         # Kaleido Network
-        self.kaleidoHost:str = '127.0.0.1'
+        self.kaleido_default_host:Final[str] = '127.0.0.1'
+        self.kaleidoHost:str = self.kaleido_default_host
         self.kaleidoPort:int = 80
         self.kaleidoSerial:bool = False # if True connection is via the main serial port
         self.kaleidoPID:bool = True # if True the external Kaleido PID is operated, otherwise the internal Artisan PID is active
@@ -3741,7 +3742,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.sliderGrpBoxSV.setMinimumWidth(55)
         self.sliderGrpBoxSV.setMaximumWidth(55)
         self.sliderGrpBoxSV.setVisible(False)
-        self.sliderGrpBoxSV.setTitle('SV')
+        self.sliderGrpBoxSV.setTitle(QApplication.translate('Label','SV'))
         self.sliderGrpBoxSV.setFlat(True)
         self.sliderSV.valueChanged.connect(self.updateSVSliderLCD)
         self.sliderSV.sliderReleased.connect(self.sliderSVreleased)
@@ -3863,6 +3864,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.santokerSendMessageSignal.connect(self.santokerSendMessage)
         self.kaleidoSendMessageSignal.connect(self.kaleidoSendMessage)
         self.kaleidoSendMessageAwaitSignal.connect(self.kaleidoSendMessageAwait)
+        self.addEventSignal.connect(self.addEventSlot)
         self.updateMessageLogSignal.connect(self.updateMessageLog)
         self.updateSerialLogSignal.connect(self.updateSerialLog)
         self.updateErrorLogSignal.connect(self.updateErrorLog)
@@ -4947,12 +4949,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 org_modbus_host = self.modbus.host
                 org_s7_host = self.s7.host
                 org_ws_host = self.ws.host
+                org_kaleido_host = self.kaleidoHost
                 org_comport = self.ser.comport
+                org_modbus_comport = self.modbus.comport
                 org_roastersize_setup = self.qmc.roastersize_setup
                 org_last_batchsize = self.qmc.last_batchsize
                 org_roastersize = self.qmc.roastersize
                 org_roasterheating_setup = self.qmc.roasterheating_setup
                 org_roasterheating = self.qmc.roasterheating
+                # reset roaster_setup_default to ensure we do not offer a default from a previously loaded machine setup
+                self.qmc.roastersize_setup_default = 0
                 #
                 self.loadSettings(fn=action.data()[0],remember=False,machine=True,reload=False)
                 res:bool
@@ -4977,36 +4983,46 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     self.qmc.machinesetup = action.text()
                     res = True
                 if self.qmc.device == 29 and self.modbus.type in [3,4]: # MODBUS TCP or UDP
+                    # as default we offer the current settings MODBUS host, or if this is set to its default as after a factory reset (self.modbus.default_host) we take the one from the machine setup
+                    defaultModbusHost:str = (self.modbus.host if org_modbus_host == self.modbus.default_host else org_modbus_host)
                     host,res = QInputDialog.getText(self,
                         QApplication.translate('Message', 'Machine'),
-                        QApplication.translate('Message', 'Network name or IP address'),text=self.modbus.host) #"127.0.0.1"
+                        QApplication.translate('Message', 'Network name or IP address'),text=defaultModbusHost)
                     if res:
                         self.modbus.host = host
                 elif self.qmc.device == 79: # S7
+                    # as default we offer the current settings S7 host, or if this is set to its default as after a factory reset (self.s7.default_host) we take the one from the machine setup
+                    defaultS7Host:str = (self.s7.host if org_s7_host == self.s7.default_host else org_s7_host)
                     host,res = QInputDialog.getText(self,
                         QApplication.translate('Message', 'Machine'),
-                        QApplication.translate('Message', 'Network name or IP address'),text=self.s7.host) #"127.0.0.1"
+                        QApplication.translate('Message', 'Network name or IP address'),text=defaultS7Host)
                     if res:
                         self.s7.host = host
                 elif self.qmc.device == 111: # WebSocket
+                    # as default we offer the current settings WebSocket host, or if this is set to its default as after a factory reset (self.ws.default_host) we take the one from the machine setup
+                    defaultWSHost:str = (self.ws.host if org_ws_host == self.ws.default_host else org_ws_host)
                     host,res = QInputDialog.getText(self,
                         QApplication.translate('Message', 'Machine'),
-                        QApplication.translate('Message', 'Network name or IP address'),text=self.ws.host) #"127.0.0.1"
+                        QApplication.translate('Message', 'Network name or IP address'),text=defaultWSHost)
                     if res:
                         self.ws.host = host
                 elif self.qmc.device == 138 and not self.kaleidoSerial: # Kaleido Network
+                    # as default we offer the current settings kaleido host, or if this is set to its default as after a factory reset (self.kaleido_default_host) we take the one from the machine setup
+                    defaultKaleidoHost:str = (self.kaleidoHost if org_kaleido_host == self.kaleido_default_host else org_kaleido_host)
                     host,res = QInputDialog.getText(self,
                         QApplication.translate('Message', 'Machine'),
-                        QApplication.translate('Message', 'Network name or IP address'),text=self.kaleidoHost) #"127.0.0.1"
+                        QApplication.translate('Message', 'Network name or IP address'),text=defaultKaleidoHost)
                     if res:
                         self.kaleidoHost = host
                 elif (self.qmc.device in [0,9,19,53,101,115,126] or (self.qmc.device == 29 and self.modbus.type in [0,1,2]) or
                         (self.qmc.device == 134 and self.santokerSerial) or
                         (self.qmc.device == 138 and self.kaleidoSerial)): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial, HB/ARC
                     select_device_name = None
+                    # as default we offer the current settings serial/modbus port, or if this is set to its default as after a factory reset (self.ser.default_comport or self.modbus.default_comport) we take the one from the machine setup
+                    defaultComPort:str = ((self.modbus.comport if org_modbus_comport == self.modbus.default_comport else org_modbus_comport) if self.qmc.device == 29 else (self.ser.comport if org_comport == self.ser.default_comport else org_comport))
                     if self.qmc.device == 53: # Hottop 2k+:
                         select_device_name = 'FT230X Basic UART'
-                    commPort_dlg:ArtisanPortsDialog = ArtisanPortsDialog(self, self, selection=self.ser.comport, select_device_name=select_device_name)
+                    commPort_dlg:ArtisanPortsDialog = ArtisanPortsDialog(self, self, selection=defaultComPort, select_device_name=select_device_name)
                     res = bool(commPort_dlg.exec())
                     if res:
                         new_port = commPort_dlg.getSelection()
@@ -5020,7 +5036,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                         batchsize,res = QInputDialog.getDouble(self,
                             QApplication.translate('Message', 'Machine'),
                             QApplication.translate('Message', 'Machine Capacity (kg)'),
-                            0, # value
+                            self.qmc.roastersize_setup_default, # defaut value as loaded from the machine setup
                             0, # min
                             999, # max
                             1) # decimals
@@ -5084,7 +5100,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     self.modbus.host = org_modbus_host
                     self.s7.host = org_s7_host
                     self.ws.host = org_ws_host
+                    self.kaleidoHost = org_kaleido_host
                     self.ser.comport = org_comport
+                    self.modbus.comport = org_modbus_comport
                     self.qmc.roastersize_setup = org_roastersize_setup
                     self.qmc.last_batchsize = org_last_batchsize
                     self.qmc.roastersize = org_roastersize
@@ -8053,7 +8071,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     ##  powerReset([,sn]) : reset the power meter of the Yocto Watt
                     #
                     # OTHERS
-                    ##  slider(c,v)   : move slider c to value v
+                    ##  slider(c,v)   : move slider c to value v (c from [0,..3], zero based),
                     ##  button(i,c,b[,sn]) : switches channel c off (b=0) and on (b=1) and sets button i to pressed or normal depending on the value b (sn cannot contain port!)
                     ##  button(i,b): sets button i to pressed if b evals to True and normal else
                     ##  button(b): sets current button to pressed if b to True and normal else
@@ -8252,7 +8270,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                             target = args[1:comma_pos]
                                             vs:str = args[comma_pos+1:-1]
                                             try:
-                                                # <value> can be a formula like "1 - _"
+                                                # <value> can be a formula like "1 - _" or "1 - $"
                                                 vs = str(eval(vs)) # pylint: disable=eval-used
                                             except Exception:  # pylint: disable=broad-except
                                                 # or <value> is just a string like "UP", "DW"
@@ -8261,9 +8279,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                                 # send message without awaiting a result
                                                 self.kaleidoSendMessageSignal.emit(target, vs)
                                             else:
-                                                # button has relative event type and value set to 0 (decided in recordextraevent())!
+                                                # button has relative event type and value set to 0 (decided in recordextraevent())! # used in relative +- event buttons receiving change from machine
+                                                # or event type is set to -1 and result of event action should be awaited and bound to $ changing event button state # used by toggle buttons
                                                 # send message, await new value and create an event with the new value
-                                                # or event type is set to -1 and result of event action should be awaited and bound to _
                                                 self.kaleidoSendMessageAwaitSignal.emit(target, vs, eventtype, lastbuttonpressed)
 
                                 # Yoctopuce Relay Command Actions
@@ -9061,19 +9079,19 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                         elif event == 'CHARGE':
                                             self.qmc.markChargeSignal.emit(0)
                                         elif event == 'DRY':
-                                            self.qmc.markDRYSignal.emit()
+                                            self.qmc.markDRYSignal.emit(False)
                                         elif event == 'FCs':
-                                            self.qmc.markFCsSignal.emit()
+                                            self.qmc.markFCsSignal.emit(False)
                                         elif event == 'FCe':
-                                            self.qmc.markFCeSignal.emit()
+                                            self.qmc.markFCeSignal.emit(False)
                                         elif event == 'SCs':
-                                            self.qmc.markSCsSignal.emit()
+                                            self.qmc.markSCsSignal.emit(False)
                                         elif event == 'SCe':
-                                            self.qmc.markSCeSignal.emit()
+                                            self.qmc.markSCeSignal.emit(False)
                                         elif event == 'DROP':
-                                            self.qmc.markDropSignal.emit()
+                                            self.qmc.markDropSignal.emit(False)
                                         elif event == 'COOL':
-                                            self.qmc.markCoolSignal.emit()
+                                            self.qmc.markCoolSignal.emit(False)
                                         elif event == 'OFF' and self.qmc.flagon:
                                             self.qmc.toggleMonitorSignal.emit()
                                         else:
@@ -15474,9 +15492,26 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         if self.kaleido is not None:
             self.kaleido.send_msg(target, value)
 
+    @pyqtSlot(int,int)
+    def addEventSlot(self, value:int, etype:int) -> None:
+        # limit value by slider limits
+        if -1 < etype < 4:
+            new_value = min(self.eventslidermax[etype],max(self.eventslidermin[etype], value))
+            if self.extraeventsactionslastvalue[etype] is None or new_value != self.extraeventsactionslastvalue[etype]:
+                # new value is different thus we register this one
+                # remember the new value as the last value set for this event
+                self.block_quantification_sampling_ticks[etype] = self.sampling_ticks_to_block_quantifiction
+                self.extraeventsactionslastvalue[etype] = new_value
+                # move corresponding slider to new value:
+                self.moveslider(etype,new_value)
+                # create a new event
+                nv:float = self.qmc.eventsExternal2InternalValue(float(new_value))
+                if self.qmc.flagstart:
+                    self.qmc.eventRecordActionSignal.emit(etype,nv,'')
+
     # kaleidoSendMessageAwait() sends out the message to the machine, awaits the reply and creates a corresponding event entry
     @pyqtSlot(str,str,int,int)
-    def kaleidoSendMessageAwait(self, target:str, value:str, etype:int, lastbuttonpressed:int):
+    def kaleidoSendMessageAwait(self, target:str, value:str, etype:int, lastbuttonpressed:int) -> None:
         if self.kaleido is not None:
             res:Optional[str] = self.kaleido.send_request(target, value)
             if res is not None:
@@ -15498,17 +15533,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                 self.setExtraEventButtonStyleSignal.emit(lastbuttonpressed, 'normal')
                     elif etype>-1:
                         new_value = int(round(float(res)))
-                        # limit value by slider limits
-                        new_value = min(self.eventslidermax[etype],max(self.eventslidermin[etype],new_value))
-                        # remember the new value as the last value set for this event
-                        self.block_quantification_sampling_ticks[etype] = self.sampling_ticks_to_block_quantifiction
-                        self.extraeventsactionslastvalue[etype] = new_value
-                        # move corresponding slider to new value:
-                        self.moveslider(etype,new_value)
-                        # create a new event
-                        nv:float = self.qmc.eventsExternal2InternalValue(float(new_value))
-                        if self.qmc.flagstart:
-                            self.qmc.eventRecordActionSignal.emit(etype,nv,'')
+                        self.addEventSignal.emit(new_value, etype)
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
 
@@ -16674,6 +16699,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 self.qmc.operator_setup = toString(settings.value('operator_setup',self.qmc.operator_setup))
             if settings.contains('roastertype_setup'):
                 self.qmc.roastertype_setup = toString(settings.value('roastertype_setup',self.qmc.roastertype_setup))
+            if settings.contains('roastersize_setup_default'):
+                self.qmc.roastersize_setup_default = toFloat(settings.value('roastersize_setup_default',self.qmc.roastersize_setup_default))
             if settings.contains('roastersize_setup'):
                 self.qmc.roastersize_setup = toFloat(settings.value('roastersize_setup',self.qmc.roastersize_setup))
             if settings.contains('last_batchsize'):
@@ -17414,6 +17441,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 m = self.qmc.l_temp1.get_marker()
                 if not isinstance(m, (int)):
                     self.qmc.ETmarker = m
+                self.qmc.ETmarkersize = max(self.qmc.markersize_min, self.qmc.l_temp1.get_markersize())
                 self.qmc.palette['et'] = self.getColor(self.qmc.l_temp1)
             if self.qmc.l_temp2 is not None:
                 self.qmc.BTlinestyle = self.qmc.l_temp2.get_linestyle()
@@ -23643,7 +23671,18 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 ('\\o', QApplication.translate('Label','OPEN')),
                 ('\\c', QApplication.translate('Label','CLOSE')),
                 ('\\O', (QApplication.translate('Label','CLOSE') if state else QApplication.translate('Label','OPEN'))),
-                ('\\C', (QApplication.translate('Label','OPEN') if state else QApplication.translate('Label','CLOSE')))]:
+                ('\\C', (QApplication.translate('Label','OPEN') if state else QApplication.translate('Label','CLOSE'))),
+                ('\\a', QApplication.translate('Label','AUTO')),
+                ('\\m', QApplication.translate('Label','MANUAL')),
+                ('\\A', (QApplication.translate('Label','MANUAL') if state else QApplication.translate('Label','AUTO'))),
+                ('\\M', (QApplication.translate('Label','AUTO') if state else QApplication.translate('Label','MANUAL'))),
+                ('\\q', self.qmc.etypes[0]),
+                ('\\w', self.qmc.etypes[1]),
+                ('\\e', self.qmc.etypes[2]),
+                ('\\r', self.qmc.etypes[3]),
+                ('\\h', QApplication.translate('Label','HEATING')),
+                ('\\l', QApplication.translate('Label','COOLING'))
+                ]:
             res = res.replace(var,subst)
         return res
 

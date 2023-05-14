@@ -234,7 +234,7 @@ class nonedevDlg(QDialog): # pylint: disable=too-few-public-methods # pyright: i
 class serialport():
     """ this class handles the communications with all the devices"""
 
-    __slots__ = ['aw', 'platf', 'comport','baudrate','bytesize','parity','stopbits','timeout','SP','COMsemaphore', \
+    __slots__ = ['aw', 'platf', 'default_comport', 'comport','baudrate','bytesize','parity','stopbits','timeout','SP','COMsemaphore', \
         'PhidgetTemperatureSensor','Phidget1048values','Phidget1048lastvalues','Phidget1048semaphores',\
         'PhidgetIRSensor','PhidgetIRSensorIC','Phidget1045values','Phidget1045lastvalue','Phidget1045tempIRavg',\
         'Phidget1045semaphore','PhidgetBridgeSensor','Phidget1046values','Phidget1046lastvalues','Phidget1046semaphores',\
@@ -254,7 +254,8 @@ class serialport():
         self.platf = platform.system()
 
         #default initial settings. They are changed by settingsload() at initiation of program according to the device chosen
-        self.comport:str = 'COM4'      #NOTE: this string should not be translated. It is an argument for lib Pyserial
+        self.default_comport:Final[str] = 'COM4'
+        self.comport:str = self.default_comport      #NOTE: this string should not be translated. It is an argument for lib Pyserial
         self.baudrate:int = 9600
         self.bytesize:int = 8
         self.parity:str = 'O'
@@ -1515,10 +1516,33 @@ class serialport():
 
     def Kaleido_BTET(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
+        t1:float = -1
+        t2:float = -1
+        sid:int = 0
         if self.aw.kaleido is not None:
-            t1,t2 = self.aw.kaleido.getBTET()
-        else:
-            t1 = t2 = -1
+            t1, t2, sid = self.aw.kaleido.getBTET()
+            try:
+                event_flag:int = sid & 15 # last 4 bits of the sid
+                if event_flag == 1 and self.aw.qmc.timeindex[0] == -1:
+                    self.aw.qmc.markChargeNoactionSignal.emit(True) # CHARGE
+                elif event_flag == 2 and self.aw.qmc.TPalarmtimeindex is None:
+                    self.aw.qmc.markTPSignal.emit() # TP
+                elif event_flag == 3 and self.aw.qmc.timeindex[1] == 0:
+                    self.aw.qmc.markDRYSignal.emit(True) # DRY
+                elif event_flag == 4 and self.aw.qmc.timeindex[2] == 0:
+                    self.aw.qmc.markFCsSignal.emit(True) # FCs
+                elif event_flag == 5 and self.aw.qmc.timeindex[3] == 0:
+                    self.aw.qmc.markFCeSignal.emit(True) # FCe
+                elif event_flag == 6 and self.aw.qmc.timeindex[4] == 0:
+                    self.aw.qmc.markSCsSignal.emit(True) # SCs
+                elif event_flag == 7 and self.aw.qmc.timeindex[5] == 0:
+                    self.aw.qmc.markSCeSignal.emit(True) # SCe
+                elif event_flag == 8 and self.aw.qmc.timeindex[6] == 0:
+                    self.aw.qmc.markDropSignal.emit(True) # DROP
+                elif event_flag == 9 and self.aw.qmc.timeindex[7] == 0:
+                    self.aw.qmc.markCoolSignal.emit(True) # COOL
+            except Exception as e: # pylint: disable=broad-except
+                _log.error(e)
         return tx,t2,t1 # time, ET (chan2), BT (chan1)
 
     def Kaleido_SVAT(self) -> Tuple[float,float,float]:
@@ -2287,6 +2311,8 @@ class serialport():
     def processChannelData(self,x:Optional[float],d:int,m:str) -> float:
         if x is not None:
             res:float = x
+            if res == -1:
+                return -1
             # apply divider
             if d==1: # apply divider
                 res = x / 10.
@@ -2387,8 +2413,7 @@ class serialport():
                     if ri is not None:
                         res[i] = ri
                 rf = self.processChannelData(res[i],self.aw.modbus.inputDivs[i],self.aw.modbus.inputModes[i])
-                if rf is not None:
-                    res[i] = rf
+                res[i] = rf
 
         self.aw.qmc.extraMODBUStemps = res[:]
         self.aw.qmc.extraMODBUStx = self.aw.qmc.timeclock.elapsedMilli()

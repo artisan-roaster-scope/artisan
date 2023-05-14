@@ -1,5 +1,6 @@
 [General]
 roastertype_setup=CMS-6-30
+roastersize_setup_default=6
 
 [Device]
 id=29

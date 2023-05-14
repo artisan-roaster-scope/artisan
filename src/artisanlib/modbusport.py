@@ -95,11 +95,11 @@ def getBinaryPayloadDecoderFromRegisters(registers, byteorderLittle:bool = True,
 class modbusport():
     """ this class handles the communications with all the modbus devices"""
 
-    __slots__ = [ 'aw', 'modbus_serial_read_delay', 'modbus_serial_extra_read_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
+    __slots__ = [ 'aw', 'modbus_serial_read_delay', 'modbus_serial_extra_read_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'default_comport', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
         'timeout', 'IP_timeout', 'IP_retries', 'serial_readRetries', 'PID_slave_ID', 'PID_SV_register', 'PID_p_register', 'PID_i_register', 'PID_d_register', 'PID_ON_action', 'PID_OFF_action',
         'channels', 'inputSlaves', 'inputRegisters', 'inputFloats', 'inputBCDs', 'inputFloatsAsInt', 'inputBCDsAsInt', 'inputSigned', 'inputCodes', 'inputDivs',
         'inputModes', 'optimizer', 'fetch_max_blocks', 'fail_on_cache_miss', 'disconnect_on_error', 'acceptable_errors', 'reset_socket', 'activeRegisters', 'readingsCache', 'SVmultiplier', 'PIDmultiplier',
-        'byteorderLittle', 'wordorderLittle', 'master', 'COMsemaphore', 'host', 'port', 'type', 'lastReadResult', 'commError' ]
+        'byteorderLittle', 'wordorderLittle', 'master', 'COMsemaphore', 'default_host', 'host', 'port', 'type', 'lastReadResult', 'commError' ]
 
     def __init__(self, aw:'ApplicationWindow') -> None:
         self.aw = aw
@@ -111,7 +111,8 @@ class modbusport():
         self.maxCount:Final[int] = 125 # the maximum number of registers that can be fetched in one request according to the MODBUS spec
         self.readRetries:int = 0  # retries
         #default initial settings. They are changed by settingsload() at initiation of program according to the device chosen
-        self.comport:str = 'COM5'      #NOTE: this string should not be translated.
+        self.default_comport:Final[str] = 'COM5'      #NOTE: this string should not be translated.
+        self.comport:str = self.default_comport       #NOTE: this string should not be translated.
         self.baudrate:int = 115200
         self.bytesize:int = 8
         self.parity:str = 'N' # Literal['O','E','N']
@@ -166,7 +167,8 @@ class modbusport():
         self.wordorderLittle:bool = True
         self.master:Optional[Union['ModbusSerialClient', 'ModbusTcpClient', 'ModbusUdpClient']] = None
         self.COMsemaphore:QSemaphore = QSemaphore(1)
-        self.host:str = '127.0.0.1' # the TCP/UDP host
+        self.default_host:Final[str] = '127.0.0.1'
+        self.host:str = self.default_host # the TCP/UDP host
         self.port:int = 502 # the TCP/UDP port
         self.type:int = 0 # :Literal[0,1,2,3,4]
         # type =
@@ -214,7 +216,7 @@ class modbusport():
         self.master = None
         self.clearReadingsCache()
 
-    def clearCommError(self):
+    def clearCommError(self) -> None:
         if self.commError>0:
             self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Communication Resumed'))
         self.commError = 0
@@ -386,7 +388,7 @@ class modbusport():
         _log.debug('clearReadingsCache()')
         self.readingsCache = {}
 
-    def cacheReadings(self, code:int, slave:int, register:int, results:List[int]):
+    def cacheReadings(self, code:int, slave:int, register:int, results:List[int]) -> None:
         if code not in self.readingsCache:
             self.readingsCache[code] = {}
         if slave not in self.readingsCache[code]:

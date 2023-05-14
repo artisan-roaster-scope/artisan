@@ -4,6 +4,7 @@ Oversampling=false
 roastertype_setup=Giesen WxA
 dropDuplicates=true
 dropDuplicatesLimit=0.2
+roastersize_setup_default=6
 
 [ArduinoPID]
 RS_svActions0=-1, -1, -1, -1, -1, -1, -1, -1

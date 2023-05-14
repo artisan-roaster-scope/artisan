@@ -7,6 +7,7 @@ extrabuttonactionstrings="heatingmode,1,0\\r\\nheater,1,1\\r\\ndutycycle,1,0\\r\
 xextrabuttonactions=0, 0
 xextrabuttonactionstrings=, 
 roastertype_setup=Behmor Jake
+roastersize_setup=1
 
 [Device]
 id=101

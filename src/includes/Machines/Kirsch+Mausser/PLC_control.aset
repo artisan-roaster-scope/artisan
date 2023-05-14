@@ -3,6 +3,7 @@ Delay=2000
 Oversampling=false
 roastertype_setup=Probat G/UG control
 ExtraEventSamplingDelay=10000
+roastersize_setup_default=15
 
 [DefaultButtons]
 buttonactions=0, 0, 0, 0, 0, 0, 0, 0
@@ -67,6 +68,9 @@ quantifiercoarse=0, 0, 0, 0
 quantifiermax=100, 60, 100, 100
 quantifiermin=25, 25, 25, 0
 quantifiersource=5, 9, 8, 4
+
+[RoastProperties]
+roastertype=K+M UG retro ctrl
 
 [S7]
 PID_OFF_action=

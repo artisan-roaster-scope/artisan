@@ -2662,15 +2662,9 @@ class EventsDlg(ArtisanResizeablDialog):
             assert isinstance(labeledit, QLineEdit)
             label = labeledit.text()
             label = label.replace('\\n', chr(10))
-
             if i < len(self.extraeventslabels):
-                et = self.extraeventstypes[i]
-                if 4 < et < 9:
-                    et = et - 5
                 self.extraeventslabels[i] = label
-                if et < 4:
-                    label = label[:].replace('\\t',self.aw.qmc.etypes[et])
-
+                label = self.aw.substButtonLabel(-1, label, self.extraeventstypes[i])
             #Update Color Buttons
             colorButton = self.eventbuttontable.cellWidget(i,7)
             assert isinstance(colorButton, QPushButton)

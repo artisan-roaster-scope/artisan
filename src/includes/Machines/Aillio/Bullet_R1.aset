@@ -2,6 +2,7 @@
 Delay=1000
 Oversampling=true
 roastertype_setup=Aillio Bullet R1
+roastersize_setup=1
 
 [Style]
 ETname=DT

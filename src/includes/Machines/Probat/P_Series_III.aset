@@ -3,6 +3,7 @@ Delay=1000
 ExtraEventSamplingDelay=10000
 Oversampling=false
 roastertype_setup=Probat P Series
+roastersize_setup_default=5
 
 [DefaultButtons]
 buttonactions=0, 21, 21, 21, 21, 21, 0, 0

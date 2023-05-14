@@ -204,7 +204,7 @@ def set_real(bytearray_: bytearray, byte_index: int, real) -> bytearray:
 
 class s7port():
 
-    __slots__ = [ 'aw', 'readRetries', 'channels', 'host', 'port', 'rack', 'slot', 'lastReadResult', 'area', 'db_nr', 'start', 'type', 'mode',
+    __slots__ = [ 'aw', 'readRetries', 'channels', 'default_host', 'host', 'port', 'rack', 'slot', 'lastReadResult', 'area', 'db_nr', 'start', 'type', 'mode',
         'div', 'optimizer', 'fetch_max_blocks', 'fail_on_cache_miss', 'activeRegisters', 'readingsCache', 'PID_area', 'PID_db_nr', 'PID_SV_register', 'PID_p_register',
         'PID_i_register', 'PID_d_register', 'PID_ON_action', 'PID_OFF_action', 'PIDmultiplier', 'SVtype', 'SVmultiplier', 'COMsemaphore',
         'areas', 'last_request_timestamp', 'min_time_between_requests', 'is_connected', 'plc', 'commError', 'libLoaded' ]
@@ -214,7 +214,8 @@ class s7port():
 
         self.readRetries:int = 1
         self.channels:int = 10 # maximal number of S7 channels
-        self.host:str = '127.0.0.1' # the TCP host
+        self.default_host:Final[str] = '127.0.0.1'
+        self.host:str = self.default_host # the TCP host
         self.port:int = 102 # the TCP port
         self.rack:int = 0 # 0,..,7
         self.slot:int = 0 # 0,..,31

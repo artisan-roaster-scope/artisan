@@ -3,13 +3,14 @@ Delay=2000
 Oversampling=false
 roastertype_setup=Probat G/UG control
 ExtraEventSamplingDelay=10000
+roastersize_setup_default=15
 
 [DefaultButtons]
 buttonactions=0, 0, 0, 0, 0, 0, 0, 0
 buttonactionstrings=, , , , , , , 
 buttonvisibility=true, true, true, true, true, false, true, true
-extrabuttonactions=13, 0, 13
-extrabuttonactionstrings="setDBbool(200,116,0,True)", , "setDBbool(200,116,0,True)"
+extrabuttonactions=13, 13, 13
+extrabuttonactionstrings="setDBbool(200,116,0,True)", "setDBbool(200,116,0,False)", "setDBbool(200,116,0,True)"
 xextrabuttonactions=0, 0
 xextrabuttonactionstrings=, 
 
