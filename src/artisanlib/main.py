@@ -10882,10 +10882,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 #                       else:
 #                            if self.buttonpalette_shortcuts:
 #                               self.setbuttonsfrom(button.index(k))
-                elif k_txt == ';' and not self.qmc.flagon: #k == 58    # ";" (desktop screenshots only if not sampling)
-                    self.desktopscreenshot()
-                elif k_txt == ':' and not self.qmc.flagon:  #k == 59    # ":" (application screenshots only if not sampling)
+                # note Qt/PyQt maps the ';' and ',' keys reversed from the ASCII mapping
+                elif k_txt == ';' and not self.qmc.flagon: #k == 58    # ";" (application screenshots only if not sampling)
                     self.applicationscreenshot()
+                elif k_txt == ':' and not self.qmc.flagon:  #k == 59    # ":" (desktop screenshots only if not sampling)
+                    self.desktopscreenshot()
                 else:
                     QWidget.keyPressEvent(self, event)
             except Exception as e: # pylint: disable=broad-except
