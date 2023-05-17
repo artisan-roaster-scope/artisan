@@ -120,7 +120,7 @@ try:
     from PyQt6.QtPrintSupport import (QPrinter,QPrintDialog) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt6.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot, # type: ignore # @Reimport @UnresolvedImport @UnusedImport
 #                              QSize, pyqtProperty, # type: ignore # @Reimport @UnresolvedImport @UnusedImport
-                              qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, # @Reimport @UnresolvedImport @UnusedImport
+                              qVersion, QVersionNumber, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, # @Reimport @UnresolvedImport @UnusedImport
                               QRegularExpression, QDate, QUrl, QUrlQuery, QDir, Qt, QPoint, QEvent, QDateTime, QThread, qInstallMessageHandler) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt6.QtNetwork import QLocalSocket # @Reimport @UnresolvedImport @UnusedImport
     #QtWebEngineWidgets must be imported before a QCoreApplication instance is created
@@ -146,7 +146,7 @@ except ImportError:
     from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog) # type: ignore # @Reimport @UnresolvedImport @UnusedImport
     from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot, # type: ignore # @Reimport @UnresolvedImport @UnusedImport
 #                              QSize, pyqtProperty, # type: ignore # @Reimport @UnresolvedImport @UnusedImport
-                              qVersion, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, # type: ignore # @Reimport @UnresolvedImport @UnusedImport
+                              qVersion, QVersionNumber, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, # type: ignore # @Reimport @UnresolvedImport @UnusedImport
                               QRegularExpression, QDate, QUrl, QUrlQuery, QDir, Qt, QPoint, QEvent, QDateTime, QThread, qInstallMessageHandler) # type: ignore # @Reimport @UnresolvedImport @UnusedImport
     from PyQt5.QtNetwork import QLocalSocket # type: ignore # @Reimport @UnresolvedImport @UnusedImport
     #QtWebEngineWidgets must be imported before a QCoreApplication instance is created
@@ -239,8 +239,9 @@ except ImportError:
 if sys.platform.startswith('darwin'):
     # control app napping on OS X >= 10.9
     import appnope # type: ignore # @UnresolvedImport # type: ignore # pylint: disable=import-error
-    # import module to detect if OS X dark mode is active or not
-    import darkdetect # type: ignore # type: ignore # @UnresolvedImport # pylint: disable=import-error
+    if QVersionNumber.fromString(qVersion())[0] < QVersionNumber(6,5,0):
+        # import darkdetect module to detect if macOS dark mode is active or not if Qt < 6.5.0, otherwise we related to QTs ColorScheme() mechanism
+        import darkdetect # type: ignore # type: ignore # @UnresolvedImport # pylint: disable=import-error
 
 
 #######################################################################################
@@ -266,12 +267,24 @@ class Artisan(QtSingleApplication):
                 sys.exit(0) # there is already one ArtisanViewer running, we terminate
 
         self.darkmode:bool = False # holds current darkmode state
-        if sys.platform.startswith('darwin'):
-            # remember darkmode
-            self.darkmode = darkdetect.isDark()
+        if QVersionNumber.fromString(qVersion())[0] < QVersionNumber(6,5,0):
+            if sys.platform.startswith('darwin'):
+                # remember darkmode using darkdetect on macOS Legacy with older Qt versions
+                self.darkmode = darkdetect.isDark() # type: ignore # "isDark" is not a known member of module "darkdetect" # pylint: disable=c-extension-no-member
+            # otherwise we do not have any mean to detect the systems palette
+        else:
+            # we use the Qt 6.5 ColorScheme mechanism to detect dark mode
+            self.darkmode = self.styleHints().colorScheme() == Qt.ColorScheme.Dark
+
+# instead of using the colorSchemeChanged handler of Qt 6.5 we keep using the ApplicationWindow:eventFilter for compatibility with older Qt versions
+#        self.styleHints = self.styleHints()
+#        self.styleHints.colorSchemeChanged.connect(self.colorSchemeChanged)
+#    def colorSchemeChanged(self, colorScheme:Qt.ColorScheme):
+#        _log.info("PRINT colorScheme changed: %s", colorScheme)
 
         self.messageReceived.connect(self.receiveMessage)
         self.focusChanged.connect(self.appRaised)
+
 
     @pyqtSlot('QWidget*','QWidget*')
     def appRaised(self, oldFocusWidget:QWidget, newFocusWidget:QWidget) -> None:
@@ -1658,13 +1671,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.extraeventbuttonround:List[int] = [] # set by realignbuttons on rendering the button rows and read by setExtraEventButtonStyle to update the style
 
         # quantification is blocked if lock_quantification_sampling_ticks is not 0
-        # (eg. after a change of the event value by button or slider actions)
+        # (eg. after a change of the event value by button or slider actions as the machine, like a Probat might need some seconds to slowly
+        # adjust its machine slider step by step until reaching the set event value. We do not want to generate more events from those intermediate steps)
         self.block_quantification_sampling_ticks:List[int] = [0,0,0,0]
         # by default we block quantification for sampling_ticks_to_block_quantifiction sampling intervals after
         # a button/slider event
         self.sampling_ticks_to_block_quantifiction:Final[int] = 15
 
-        self.extraeventsactionslastvalue:List[Optional[int]] = [None,None,None,None]
+        self.extraeventsactionslastvalue:List[Optional[int]] = [None,None,None,None] # the last value to be used for relative +- button action as base
         self.org_extradevicesettings:Optional[ExtraDeviceSettings] = None
 
         #event sliders
@@ -1690,10 +1704,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         #event quantifiers
         self.eventquantifieractive:List[int] = [0]*self.eventsliders
         self.eventquantifiersource:List[int] = [0]*self.eventsliders
-        self.eventquantifierSV:List[int] = [0]*self.eventsliders
+        self.eventquantifierSV:List[int] = [0]*self.eventsliders # 1 (SV mode): quantification is never blocked; 0 (PV mode): quantification is blocked for a period as signal might still in move
         self.eventquantifiermin:List[int] = [0]*self.eventsliders
         self.eventquantifiermax:List[int] = [100]*self.eventsliders
-        self.eventquantifiercoarse:List[int] = [0]*self.eventsliders
+        self.eventquantifiercoarse:List[int] = [0]*self.eventsliders # 1: quantifiy in 10 steps, 2: quantify in steps of 5, otherwise quantify in steps of 1
         self.eventquantifieraction:List[int] = [0]*self.eventsliders
         self.clusterEventsFlag:bool = False
         self.eventquantifierlinspaces = [self.computeLinespace(0),self.computeLinespace(1),self.computeLinespace(2),self.computeLinespace(3)]
@@ -4309,10 +4323,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         return s
 
     def eventFilter(self, obj, event):
-        if event.type() == QEvent.Type.ApplicationPaletteChange and sys.platform.startswith('darwin') and self.app is not None and darkdetect.isDark() != self.app.darkmode:
-            # called if the palette changed (switch between dark and light mode on macOS)
-            self.app.darkmode = darkdetect.isDark() # type: ignore
-            self.updateCanvasColors()
+        if event.type() == QEvent.Type.ApplicationPaletteChange and self.app is not None:
+            if QVersionNumber.fromString(qVersion())[0] < QVersionNumber(6,5,0):
+                if sys.platform.startswith('darwin') and darkdetect.isDark() != self.app.darkmode: # type: ignore # "isDark" is not a known member of module "darkdetect" # pylint: disable=c-extension-no-member
+                    # called if the palette changed (switch between dark and light mode on macOS Legacy builds)
+                    self.app.darkmode = not self.app.darkmode
+                    self.updateCanvasColors()
+            else:
+                if self.app.darkmode != self.app.styleHints().colorScheme() == Qt.ColorScheme.Dark:
+                    self.app.darkmode = not self.app.darkmode
+                    self.updateCanvasColors()
         return super().eventFilter(obj, event)
 
     # search the given QTable table for a row with the given widget as cellWidget or item in column col or as a sub-widget contained in the layout of a widget in place
@@ -7378,7 +7398,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             sv1 = self.slider1.value()
             if force or (self.eventslidermoved[0] and sv1 != self.eventslidervalues[0]) or abs(sv1-self.eventslidervalues[0]) > 3:
                 self.eventslidermoved[0] = 0
-                self.eventslidervalues[0] = self.applySliderStepSize(0,sv1)
+                sv1 = self.applySliderStepSize(0,sv1)
+                self.eventslidervalues[0] = sv1
                 if updateLCD or (self.eventslidercoarse[0] and sv1 != self.slider1.value()):
                     self.moveslider(0,sv1,forceLCDupdate=True) # move slider if need and update slider LCD
                 self.recordsliderevent(n)
@@ -7386,7 +7407,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             sv2 = self.slider2.value()
             if force or (self.eventslidermoved[1] and sv2 != self.eventslidervalues[1]) or abs(sv2-self.eventslidervalues[1]) > 3:
                 self.eventslidermoved[1] = 0
-                self.eventslidervalues[1] = self.applySliderStepSize(1,sv2)
+                sv2 = self.applySliderStepSize(1,sv2)
+                self.eventslidervalues[1] = sv2
                 if updateLCD or (self.eventslidercoarse[1] and sv2 != self.slider2.value()):
                     self.moveslider(1,sv2,forceLCDupdate=True) # move slider if need and update slider LCD
                 self.recordsliderevent(n)
@@ -7394,7 +7416,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             sv3 = self.slider3.value()
             if force or (self.eventslidermoved[2] and sv3 != self.eventslidervalues[2]) or abs(sv3-self.eventslidervalues[2]) > 3:
                 self.eventslidermoved[2] = 0
-                self.eventslidervalues[2] = self.applySliderStepSize(2,sv3)
+                sv3 = self.applySliderStepSize(2,sv3)
+                self.eventslidervalues[2] = sv3
                 if updateLCD or (self.eventslidercoarse[2] and sv3 != self.slider3.value()):
                     self.moveslider(2,sv3,forceLCDupdate=True) # move slider if need and update slider LCD
                 self.recordsliderevent(n)
@@ -7402,7 +7425,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             sv4 = self.slider4.value()
             if force or (self.eventslidermoved[3] and sv4 != self.eventslidervalues[3]) or abs(sv4-self.eventslidervalues[3]) > 3:
                 self.eventslidermoved[3] = 0
-                self.eventslidervalues[3] = self.applySliderStepSize(3,sv4)
+                sv4 = self.applySliderStepSize(3,sv4)
+                self.eventslidervalues[3] = sv4
                 if updateLCD or (self.eventslidercoarse[3] and sv4 != self.slider4.value()):
                     self.moveslider(3,sv4,forceLCDupdate=True) # move slider if need and update slider LCD
                 self.recordsliderevent(n)
@@ -18877,9 +18901,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             data_roastdate = data['roastdate']
         data_date = data_roastdate.date()
         data_time = data_roastdate.time()
-        if data_date:
+        if data_date is not None:
             time = data_date.toString('yy-MM-dd') # Qt.DateFormat.SystemLocaleShortDate, Qt.DateFormat.ISODate
-            if data_time:
+            if data_time is not None:
                 time += time + data_time.toString('HH:mm') # Qt.DateFormat.SystemLocaleShortDate, Qt.DateFormat.ISODate
         # weight
         weight_in = ''
@@ -22843,13 +22867,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     for item in csvReader:
                         try:
                             #set date
-                            if not roastdate:
+                            if roastdate is None:
                                 roastdate = QDateTime(QDate.fromString(item['Date'],"dd'.'MM'.'yyyy"), QTime())
                                 self.qmc.roastdate = roastdate
                                 self.qmc.roastepoch = self.qmc.roastdate.toSecsSinceEpoch()
                                 self.qmc.roasttzoffset = 0
                             #set zero
-                            if not zero_t:
+                            if zero_t is None:
                                 date = QDate.fromString(item['Date'],"dd'.'MM'.'yyyy")
                                 zero = QDateTime()
                                 zero.setDate(date)
@@ -22911,13 +22935,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     for item in csvReader:
                         try:
                             #set date
-                            if not roastdate:
+                            if roastdate is None:
                                 roastdate = QDateTime(QDate.fromString(item['Date'],"dd'.'MM'.'yyyy"), QTime())
                                 self.qmc.roastdate = roastdate
                                 self.qmc.roastepoch = self.qmc.roastdate.toSecsSinceEpoch()
                                 self.qmc.roasttzoffset = 0
                             #set zero
-                            if not zero_t:
+                            if zero_t is None:
                                 date = QDate.fromString(item['Date'],"dd'.'MM'.'yyyy")
                                 zero = QDateTime()
                                 zero.setDate(date)

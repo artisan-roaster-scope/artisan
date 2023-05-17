@@ -16,12 +16,11 @@
 # Marko Luther, 2023
 
 import logging
-from typing import List, Optional, Tuple
-
+from typing import List, Optional, Union, Tuple, Callable
 from typing_extensions import Final  # Python <=3.7
 
-from artisanlib.ble import BLE_CHAR_TYPE
 
+from artisanlib.ble import UUID, BLE_CHAR_TYPE
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -29,94 +28,92 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 class AcaiaBLE():
 
     # Acaia Pearl, Lunar:
-    DEVICE_NAME_PEARL = 'PROCHBT'
-    DEVICE_NAME_LUNAR = 'ACAIA'
-    SERVICE_UUID_LEGACY = '00001820-0000-1000-8000-00805f9b34fb'
-    CHAR_UUID_LEGACY = ('00002a80-0000-1000-8000-00805f9b34fb', BLE_CHAR_TYPE.BLE_CHAR_NOTIFY_WRITE)
+    DEVICE_NAME_PEARL:Final[str] = 'PROCHBT'
+    DEVICE_NAME_LUNAR:Final[str] = 'ACAIA'
+    SERVICE_UUID_LEGACY:Final[UUID] = '00001820-0000-1000-8000-00805f9b34fb'
+    CHAR_UUID_LEGACY:Final[Tuple[str, BLE_CHAR_TYPE]] = ('00002a80-0000-1000-8000-00805f9b34fb', BLE_CHAR_TYPE.BLE_CHAR_NOTIFY_WRITE)
 
     # Acaia Pearl (2021):
-    DEVICE_NAME_PEARL2021 = 'PEARL-'
-    SERVICE_UUID = '49535343-FE7D-4AE5-8FA9-9FAFD205E455'
-    CHAR_UUID = ('49535343-1E4D-4BD9-BA61-23C647249616', BLE_CHAR_TYPE.BLE_CHAR_NOTIFY)
-    CHAR_UUID_WRITE = ('49535343-8841-43F4-A8D4-ECBE34729BB3', BLE_CHAR_TYPE.BLE_CHAR_WRITE)
+    DEVICE_NAME_PEARL2021:Final[str] = 'PEARL-'
+    SERVICE_UUID:Final[UUID] = '49535343-FE7D-4AE5-8FA9-9FAFD205E455'
+    CHAR_UUID:Final[Tuple[UUID, BLE_CHAR_TYPE]] = ('49535343-1E4D-4BD9-BA61-23C647249616', BLE_CHAR_TYPE.BLE_CHAR_NOTIFY)
+    CHAR_UUID_WRITE:Final[Tuple[UUID, BLE_CHAR_TYPE]] = ('49535343-8841-43F4-A8D4-ECBE34729BB3', BLE_CHAR_TYPE.BLE_CHAR_WRITE)
 
     # Acaia Pearl S:
-    DEVICE_NAME_PEARLS = 'PEARLS'
+    DEVICE_NAME_PEARLS:Final[str] = 'PEARLS'
 
     # Acaia Lunar (2021):
-    DEVICE_NAME_LUNAR2021 = 'LUNAR-'
+    DEVICE_NAME_LUNAR2021:Final[str] = 'LUNAR-'
 
     # Acaia Pyxis:
-    DEVICE_NAME_PYXIS = 'PYXIS'
+    DEVICE_NAME_PYXIS:Final[str] = 'PYXIS'
 
 
-    HEADER1      = 0xef
-    HEADER2      = 0xdd
+    HEADER1:Final[int]      = 0xef
+    HEADER2:Final[int]      = 0xdd
 
-    MSG_SYSTEM = 0
-    MSG_TARE = 4
-    MSG_INFO = 7
-    MSG_STATUS = 8
-    MSG_IDENTIFY = 11
-    MSG_EVENT = 12
-    MSG_TIMER = 13
+    MSG_SYSTEM:Final[int] = 0
+    MSG_TARE:Final[int] = 4
+    MSG_INFO:Final[int] = 7
+    MSG_STATUS:Final[int] = 8
+    MSG_IDENTIFY:Final[int] = 11
+    MSG_EVENT:Final[int] = 12
+    MSG_TIMER:Final[int] = 13
 
-    EVENT_WEIGHT = 5
-    EVENT_BATTERY = 6
-    EVENT_TIMER = 7
-    EVENT_KEY = 8
-    EVENT_ACK = 11
+    EVENT_WEIGHT:Final[int] = 5
+    EVENT_BATTERY:Final[int] = 6
+    EVENT_TIMER:Final[int] = 7
+    EVENT_KEY:Final[int] = 8
+    EVENT_ACK:Final[int] = 11
 
-    EVENT_WEIGHT_LEN = 6
-    EVENT_BATTERY_LEN = 1
-    EVENT_TIMER_LEN = 3
-    EVENT_KEY_LEN = 1
-    EVENT_ACK_LEN = 2
+    EVENT_WEIGHT_LEN:Final[int] = 6
+    EVENT_BATTERY_LEN:Final[int] = 1
+    EVENT_TIMER_LEN:Final[int] = 3
+    EVENT_KEY_LEN:Final[int] = 1
+    EVENT_ACK_LEN:Final[int] = 2
 
-    TIMER_START = 0
-    TIMER_STOP = 1
-    TIMER_PAUSE = 2
+    TIMER_START:Final[int] = 0
+    TIMER_STOP:Final[int] = 1
+    TIMER_PAUSE:Final[int] = 2
 
-    TIMER_STATE_STOPPED = 0
-    TIMER_STATE_STARTED = 1
-    TIMER_STATE_PAUSED = 2
+    TIMER_STATE_STOPPED:Final[int] = 0
+    TIMER_STATE_STARTED:Final[int] = 1
+    TIMER_STATE_PAUSED:Final[int] = 2
 
     # Acaia Protocol Parser
-    E_PRS_CHECKHEADER1 = 0
-    E_PRS_CHECKHEADER2 = 1
-    E_PRS_CMDID = 2
-    E_PRS_CMDDATA = 3
-    E_PRS_CHECKSUM1 = 4
-    E_PRS_CHECKSUM2 = 5
+    E_PRS_CHECKHEADER1:Final[int] = 0
+    E_PRS_CHECKHEADER2:Final[int] = 1
+    E_PRS_CMDID:Final[int] = 2
+    E_PRS_CMDDATA:Final[int] = 3
+    E_PRS_CHECKSUM1:Final[int] = 4
+    E_PRS_CHECKSUM2:Final[int] = 5
 
-    NEW_CMD_SYSTEM_SA = 0
-    NEW_CMD_INFO_A = 7
-    NEW_CMD_STATUS_A = 8
-    NEW_CMD_EVENT_SA = 12
+    NEW_CMD_SYSTEM_SA:Final[int] = 0
+    NEW_CMD_INFO_A:Final[int] = 7
+    NEW_CMD_STATUS_A:Final[int] = 8
+    NEW_CMD_EVENT_SA:Final[int] = 12
 
-    protocolParseStep=E_PRS_CHECKHEADER1
-    protocolParseBuf:List[int]=[]
-    protocolParseCMD=0
-    protocolParseDataIndex = 0
-    protocolParseDataLen = 0
-    protocolParseCRC:List[int]=[]
+    protocolParseStep:int = E_PRS_CHECKHEADER1
+    protocolParseBuf:List[int] = []
+    protocolParseCMD:int = 0
+    protocolParseDataIndex:int = 0
+    protocolParseDataLen:int = 0
+    protocolParseCRC:List[int] = []
 
 
     def __init__(self) -> None:
 
-        self.timeStart = None
-
-        self.notificationConfSentFast = False
-        self.notificationConfSentSlow = False
+        self.notificationConfSentFast:bool = False
+        self.notificationConfSentSlow:bool = False
         # holds msgType on messages split in header and payload
         self.msgType:Optional[int] = None
-        self.weight = None
+        self.weight:Optional[float] = None
         self.battery:Optional[int] = None
         self.firmware:Optional[Tuple[int,int,int]] = None # on connect this is set to a triple of integers, (major, minor, patch)-version
-        self.unit = 2 # 1: kg, 2: g, 5: ounce
-        self.max_weight = 0 # in g
+        self.unit:int = 2 # 1: kg, 2: g, 5: ounce
+        self.max_weight:int = 0 # in g
 
-    def resetProtocolParser(self):
+    def resetProtocolParser(self) -> None:
         self.protocolParseStep = self.E_PRS_CHECKHEADER1
         self.protocolParseBuf = []
         self.protocolParseCRC = []
@@ -124,7 +121,7 @@ class AcaiaBLE():
         self.protocolParseDataLen = 0
         self.protocolParseDataIndex = 0
 
-    def acaiaProtocolParser(self,write,dataIn):
+    def acaiaProtocolParser(self, write:Callable[[Optional[bytes]],None], dataIn) -> None:
         for c_in in dataIn:
             if self.protocolParseStep==self.E_PRS_CHECKHEADER1:
                 if c_in == self.HEADER1:
@@ -167,7 +164,7 @@ class AcaiaBLE():
                     data = self.protocolParseBuf[:] # copy buffer
                     self.resetProtocolParser() # reset buffer already before parseScaleData() as it might hang
                     # when protocol parsing success, call original data parser
-                    self.parseScaleData(write, self.msgType, data)
+                    self.parseScaleData(write, self.msgType, bytes(data))
                     self.msgType = None  # message consumed completely
 
                 self.resetProtocolParser()
@@ -178,7 +175,7 @@ class AcaiaBLE():
 
     # return a bytearray of len 2 containing the even and odd CRCs over the given payload
     @staticmethod
-    def crc(payload):
+    def crc(payload:Union[bytes,List[int]]) -> bytes:
         cksum1 = 0
         cksum2 = 0
         for i, _ in enumerate(payload):
@@ -189,36 +186,36 @@ class AcaiaBLE():
         return bytes([cksum1,cksum2])
 
     # constructs message bytearray of the given type (int) and payload (bytearray) by adding headers and CRCs
-    def message(self,tp, payload):
+    def message(self, tp:int, payload:bytes) -> bytes:
         return bytes([self.HEADER1,self.HEADER2,tp]) + payload + self.crc(payload)
 
-    def sendMessage(self,write,tp,payload):
+    def sendMessage(self, write:Callable[[Optional[bytes]],None], tp:int , payload:bytes) -> None:
         msg = self.message(tp,payload)
         write(msg)
 
     # should be send every 3-5sec
-    def sendHeartbeat(self,write):
-        self.sendMessage(write,self.MSG_SYSTEM,b'\x02\x00')
+    def sendHeartbeat(self, write:Callable[[Optional[bytes]],None]) -> None:
+        self.sendMessage(write, self.MSG_SYSTEM, b'\x02\x00')
 
-    def sendStop(self,write):
+    def sendStop(self, write:Callable[[Optional[bytes]],None]) -> None:
         self.sendMessage(write,self.MSG_SYSTEM,b'\x00\x00')
 
-    def sendTare(self,write):
+    def sendTare(self, write:Callable[[Optional[bytes]],None]) -> None:
         self.sendMessage(write,self.MSG_TARE,b'\x00')
 
-    def sendTimerCommand(self,write,cmd):
-        self.sendMessage(write,self.MSG_TIMER,b'\x00' + cmd)
+    def sendTimerCommand(self, write:Callable[[Optional[bytes]],None], cmd:bytes) -> None:
+        self.sendMessage(write, self.MSG_TIMER, b'\x00' + cmd)
 
-    def sendId(self,write):
+    def sendId(self, write:Callable[[Optional[bytes]],None]) -> None:
         self.sendMessage(write,self.MSG_IDENTIFY,b'\x2d\x2d\x2d\x2d\x2d\x2d\x2d\x2d\x2d\x2d\x2d\x2d\x2d\x2d\x2d')
         # non-legacy id message
         # self.sendMessage(write,self.MSG_IDENTIFY,b'\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x30\x31\x32\x33\x34')
 
-    def sendEvent(self,write,payload):
-        self.sendMessage(write,self.MSG_EVENT,bytes([len(payload)+1]) + payload)
+    def sendEvent(self, write:Callable[[Optional[bytes]],None], payload:bytes) -> None:
+        self.sendMessage(write, self.MSG_EVENT, bytes([len(payload)+1]) + payload)
 
     # configure notifications
-    def confNotificationsSlow(self,write):
+    def confNotificationsSlow(self, write:Callable[[Optional[bytes]],None]) -> None:
         _log.debug('confNotificationsSlow(_)')
         self.notificationConfSentSlow = True
         self.sendEvent(write,
@@ -234,7 +231,8 @@ class AcaiaBLE():
 #                    255, #4   # setting (not used)
                 ])
                 )
-    def confNotificationsFast(self,write):
+
+    def confNotificationsFast(self, write:Callable[[Optional[bytes]],None]) -> None:
         _log.debug('confNotificationsFast(_)')
         self.notificationConfSentFast = True
         self.sendEvent(write,
@@ -251,7 +249,7 @@ class AcaiaBLE():
                 ])
                 )
 
-    def parseInfo(self,data):
+    def parseInfo(self, data:bytes) -> None:
         _log.debug('parseInfo(_)')
 #        if len(data)>1:
 #            print(data[1])
@@ -266,11 +264,11 @@ class AcaiaBLE():
 #            print(data[6])
 
     # returns length of consumed data or -1 on error
-    def parseWeightEvent(self,payload):
+    def parseWeightEvent(self, payload:bytes) -> int:
         if len(payload) < self.EVENT_WEIGHT_LEN:
             return -1
         # first 4 bytes encode the weight as unsigned long
-        value = ((payload[3] & 0xff) << 24) + \
+        value:float = ((payload[3] & 0xff) << 24) + \
             ((payload[2] & 0xff) << 16) + ((payload[1] & 0xff) << 8) + (payload[0] & 0xff)
 
         div = payload[4]
@@ -303,7 +301,7 @@ class AcaiaBLE():
 
         return self.EVENT_WEIGHT_LEN
 
-    def parseBatteryEvent(self,payload):
+    def parseBatteryEvent(self, payload:bytes) -> int:
 #        _log.debug("parseBatteryEvent(_)")
         if len(payload) < self.EVENT_BATTERY_LEN:
             return -1
@@ -314,7 +312,7 @@ class AcaiaBLE():
             _log.debug('battery: %s', self.battery)
         return self.EVENT_BATTERY_LEN
 
-    def parseTimerEvent(self,payload):
+    def parseTimerEvent(self, payload:bytes) -> int:
         if len(payload) < self.EVENT_TIMER_LEN:
             return -1
 #            print("minutes",payload[0])
@@ -324,18 +322,18 @@ class AcaiaBLE():
         _log.debug('parseTimerEvent(_): %sm%s%sms, %s',payload[0],payload[1],payload[2], value)
         return self.EVENT_TIMER_LEN
 
-    def parseAckEvent(self,payload):
+    def parseAckEvent(self, payload:bytes) -> int:
         if len(payload) < self.EVENT_ACK_LEN:
             return -1
         return self.EVENT_ACK_LEN
 
-    def parseKeyEvent(self,payload):
+    def parseKeyEvent(self, payload:bytes) -> int:
         _log.debug('parseKeyEvent(_)')
         if len(payload) < self.EVENT_KEY_LEN:
             return -1
         return self.EVENT_KEY_LEN
 
-    def parseScaleEvent(self,payload,write):
+    def parseScaleEvent(self, payload:bytes, write:Callable[[Optional[bytes]],None]) -> int:
         if payload and len(payload) > 0:
             event = payload[1]
             payload = payload[2:]
@@ -361,13 +359,13 @@ class AcaiaBLE():
             return val + 1
         return -1
 
-    def parseScaleEvents(self,payload,write):
+    def parseScaleEvents(self, payload:bytes, write:Callable[[Optional[bytes]],None]) -> None:
         if payload and len(payload) > 0:
-            pos = self.parseScaleEvent(payload,write)
+            pos = self.parseScaleEvent(payload, write)
             if pos > -1:
-                self.parseScaleEvents(payload[pos+1:],write)
+                self.parseScaleEvents(payload[pos+1:], write)
 
-    def parseStatus(self,payload):
+    def parseStatus(self, payload:bytes) -> None:
         _log.debug('parseStatus(_,_)')
 
         # battery level (7 bits of first byte) + TIMER_START (1bit)
@@ -390,7 +388,7 @@ class AcaiaBLE():
             self.max_weight = (payload[7] + 1) * 1000
             _log.debug('max_weight: %s', self.max_weight)
 
-    def parseScaleData(self,write,msgType,data):
+    def parseScaleData(self, write:Callable[[Optional[bytes]],None], msgType:int, data:bytes) -> None:
         if msgType == self.MSG_INFO:
             self.parseInfo(data)
             if not self.notificationConfSentFast:
@@ -402,13 +400,12 @@ class AcaiaBLE():
                 # weight notification as fast as possible
                 self.confNotificationsFast(write)
         elif msgType == self.MSG_EVENT:
-            self.parseScaleEvents(data,write)
+            self.parseScaleEvents(data, write)
 
     # returns None or new weight data as first result and
     # None or new battery level as second result
-    def processData(self, write, data):
+    def processData(self, write:Callable[[Optional[bytes]],None], data:bytes) -> Tuple[Optional[float], Optional[int]]:
 
-        data = data.data() # convert QByteArray to Python byte array
         old_weight = self.weight
         old_battery = self.battery
         self.acaiaProtocolParser(write, data)

@@ -1249,7 +1249,7 @@ class PIDcontrol():
             if self.aw.qmc.rampSoakSemaphore.available() < 1:
                 self.aw.qmc.rampSoakSemaphore.release(1)
 
-    def conv2fahrenheit(self):
+    def conv2fahrenheit(self) -> None:
         try:
             self.aw.qmc.rampSoakSemaphore.acquire(1)
             self.svValue = fromCtoF(self.svValue)
@@ -1275,14 +1275,14 @@ class PIDcontrol():
             if self.aw.qmc.rampSoakSemaphore.available() < 1:
                 self.aw.qmc.rampSoakSemaphore.release(1)
 
-    def togglePID(self):
+    def togglePID(self) -> None:
         if self.pidActive:
             self.pidOff()
         else:
             self.pidOn()
 
     # initializes the PID mode on PID ON and switch of mode
-    def pidModeInit(self):
+    def pidModeInit(self) -> None:
         if self.aw.qmc.flagon:
             self.current_ramp_segment = 0
             self.current_soak_segment = 0
@@ -1299,7 +1299,7 @@ class PIDcontrol():
                     self.aw.setTimerColor('rstimer')
 
     # the internal software PID should be configured on ON, but not be activated yet to warm it up
-    def confSoftwarePID(self):
+    def confSoftwarePID(self) -> None:
         if self.aw.pidcontrol.externalPIDControl() not in [1, 2, 4] and not(self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag) and self.aw.qmc.Controlbuttonflag:
             # software PID
             self.aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd,self.pOnE)

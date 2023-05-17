@@ -27,10 +27,11 @@ import usb.util # type: ignore
 import requests
 from requests_file import FileAdapter # type: ignore # @UnresolvedImport
 import json
+import array
 from lxml import html # type: ignore
 
 import logging
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, Sequence, TYPE_CHECKING
 from typing_extensions import Final  # Python <=3.7
 
 if TYPE_CHECKING:
@@ -124,25 +125,25 @@ class AillioR1:
         if self.usbhandle is not None:
             return
         self.usbhandle = usb.core.find(idVendor=self.AILLIO_VID,
-                                       idProduct=self.AILLIO_PID)
+                                       idProduct=self.AILLIO_PID) # type: ignore # "Generator[Device, Any, None]" is incompatible with "Device"
         if self.usbhandle is None:
             self.usbhandle = usb.core.find(idVendor=self.AILLIO_VID,
-                                           idProduct=self.AILLIO_PID_REV3)
+                                           idProduct=self.AILLIO_PID_REV3) # type: ignore # "Generator[Device, Any, None]" is incompatible with "Device"
         if self.usbhandle is None:
             raise OSError('not found or no permission')
         self.__dbg('device found!')
-        if not system().startswith('Windows') and self.usbhandle.is_kernel_driver_active(self.AILLIO_INTERFACE):
+        if not system().startswith('Windows') and self.usbhandle.is_kernel_driver_active(self.AILLIO_INTERFACE): # type: ignore # Cannot access member "is_kernel_driver_active" for type "Generator[Device, Any, None]"
             try:
-                self.usbhandle.detach_kernel_driver(self.AILLIO_INTERFACE)
+                self.usbhandle.detach_kernel_driver(self.AILLIO_INTERFACE) # type: ignore # Cannot access member "detach_kernel_driver" for type "Generator[Device, Any, None]"
             except Exception: # pylint: disable=broad-except
                 pass
                 # detach fails on libusb 1.0.26 and newer on macOS >v12 if not running under sudo and seems not to be needed on those configurations
 #                self.usbhandle = None
 #                raise OSError('unable to detach kernel driver') from e
         try:
-            config = self.usbhandle.get_active_configuration()
+            config = self.usbhandle.get_active_configuration() # type: ignore # Cannot access member "get_active_configuration" for type "Generator[Device, Any, None]"
             if config.bConfigurationValue != self.AILLIO_CONFIGURATION:
-                self.usbhandle.set_configuration(configuration=self.AILLIO_CONFIGURATION)
+                self.usbhandle.set_configuration(configuration=self.AILLIO_CONFIGURATION) # type: ignore # Cannot access member "set_configuration" for type "Generator[Device, Any, None]"
         except Exception as e:  # pylint: disable=broad-except
             self.usbhandle = None
             raise OSError('unable to configure') from e
@@ -300,7 +301,8 @@ class AillioR1:
 
     def __updatestate(self, p):
         while self.worker_thread_run:
-            state1 = state2 = []
+            state1:array.array = array.array('B', bytes(0))
+            state2:array.array = array.array('B', bytes(0))
             try:
                 self.__dbg('updatestate')
                 self.__sendcmd(self.AILLIO_CMD_STATUS1)

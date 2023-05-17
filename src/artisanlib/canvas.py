@@ -2879,11 +2879,11 @@ class tgraphcanvas(FigureCanvas):
                 QDesktopServices.openUrl(QUrl(roastLink(self.roastUUID), QUrl.ParsingMode.TolerantMode))
                 return
 
-            if not self.wheelflag and event.inaxes is None and not self.flagstart and not self.flagon and event.button == 1 and event.dblclick and event.x > event.y:
+            if not self.wheelflag and event.inaxes is None and event.button == 1 and event.dblclick and event.x > event.y:
                 fig = self.ax.get_figure()
                 s = fig.get_size_inches()*fig.dpi
                 if event.x > s[0]*2/3 and event.y > s[1]*2/3:
-                    if self.backgroundprofile is None and __release_sponsor_domain__ and __release_sponsor_url__:
+                    if not self.flagstart and not self.flagon and self.backgroundprofile is None and __release_sponsor_domain__ and __release_sponsor_url__:
                         QDesktopServices.openUrl(QUrl(__release_sponsor_url__, QUrl.ParsingMode.TolerantMode))
                         return
                     if self.backgroundprofile is not None:
@@ -4284,7 +4284,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.profileDataSemaphore.available() < 1:
                         self.profileDataSemaphore.release(1)
 
-                #check move slider pending actions
+                #check move slider pending actions set by the Artisan Software PID
                 if self.temporarymovepositiveslider is not None:
                     slidernr,value = self.temporarymovepositiveslider # pylint: disable=unpacking-non-sequence
                     if self.aw.sliderpos(slidernr) != value or self.temporayslider_force_move:
@@ -6182,7 +6182,7 @@ class tgraphcanvas(FigureCanvas):
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
-    def fmt_timedata(self,x):
+    def fmt_timedata(self, x:float) -> str:
         starttime:float
 
         if bool(self.aw.comparator):
@@ -6192,7 +6192,7 @@ class tgraphcanvas(FigureCanvas):
         else:
             starttime = 0
         sign = '' if x >= starttime else '-'
-        m,s = divmod(abs(x - starttime), 60)
+        m,s = divmod(abs(x - starttime), 60.)
 #        return '%s%d:%02d'%(sign,m,s)
         return f'{sign}{m:.0f}:{s:02.0f}'
 
@@ -6210,7 +6210,7 @@ class tgraphcanvas(FigureCanvas):
         return int(round(res))
 
     #used by xaxistosm(). Provides also negative time
-    def formtime(self,x,_):
+    def formtime(self, x:float, _pos) -> str:
         starttime:float
         if bool(self.aw.comparator):
             starttime = 0
@@ -6233,7 +6233,7 @@ class tgraphcanvas(FigureCanvas):
                 return  f'{m:.0f}:{s:02.0f}'
             return f'{m:.0f}'
 
-        m,s = divmod(abs(x - round(starttime)), 60)
+        m,s = divmod(abs(x - round(starttime)), 60.)
         s = int(round(s))
         m = int(m)
 
@@ -7876,7 +7876,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.flagstart or self.xgrid == 0:
                         self.set_xlabel('')
                     else:
-                        self.set_xlabel(self.aw.arabicReshape(QApplication.translate('Label', 'min','abbrev. of minutes')))
+                        self.set_xlabel(f'{self.aw.qmc.roastertype_setup} {self.aw.qmc.roastersize_setup}kg')
 
                     try:
                         y_label.set_in_layout(False) # remove y-axis labels from tight_layout calculation
@@ -13688,7 +13688,7 @@ class tgraphcanvas(FigureCanvas):
             elif self.flagstart or self.xgrid == 0:
                 self.set_xlabel('')
             else:
-                self.set_xlabel(self.aw.arabicReshape(QApplication.translate('Label', 'min','abbrev. of minutes')))
+                self.set_xlabel(f'{self.aw.qmc.roastertype_setup} {self.aw.qmc.roastersize_setup}kg')
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()

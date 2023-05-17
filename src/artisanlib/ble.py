@@ -18,7 +18,7 @@
 
 from enum import Enum
 import logging
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List, Callable
 from typing_extensions import Final  # Python <=3.7
 
 try:
@@ -31,6 +31,7 @@ except ImportError:
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
+UUID = str
 
 class BLE_CHAR_TYPE(Enum):
     BLE_CHAR_NOTIFY = 'BLE_CHAR_NOTIFY'
@@ -42,14 +43,20 @@ class BleInterface(QtCore.QObject): # pyright: ignore # Argument to class must b
     weightChanged = QtCore.pyqtSignal(float)
     batteryChanged = QtCore.pyqtSignal(int)
     deviceDisconnected = QtCore.pyqtSignal()
-    dataReceived = QtCore.pyqtSignal(QtCore.QByteArray)
+    dataReceived = QtCore.pyqtSignal(bytes)
 
     # the uuid_service_char_tuples is a list of tuples of the form (service_uuid, char_uuid)
     # with service_uuid the services to connect to and char_uuid the characteristic uuid we register for write
     # at this service
     # if device_names are given, connections ar only made to devices with (partial-)matching names (fast)
     # if device_names are not given, connections are made to every discovered device with the required UUIDs (slow)
-    def __init__(self, uuid_service_char_tuples, processData, sendHeartbeat, sendStop, reset, device_names=None) -> None:
+    def __init__(self,
+                uuid_service_char_tuples:List[Tuple[UUID, List[Tuple[UUID, BLE_CHAR_TYPE]]]],
+                processData : Callable[[Callable[[Optional[bytes]], None], bytes], Tuple[Optional[float], Optional[int]]],
+                sendHeartbeat : Callable[[Callable[[Optional[bytes]],None]], None],
+                sendStop : Callable[[Callable[[Optional[bytes]],None]], None],
+                reset : Callable[[], None],
+                device_names:Optional[List[str]] = None) -> None:
         super().__init__()
 
         cp = QtBluetooth.QLowEnergyConnectionParameters()
@@ -58,7 +65,7 @@ class BleInterface(QtCore.QObject): # pyright: ignore # Argument to class must b
         _log.debug('supervisionTimeout: %s', cp.supervisionTimeout())
         _log.debug('latency: %s', cp.latency())
 
-        self.device_names = device_names
+        self.device_names:Optional[List[str]] = device_names
 
         self.UUID_SERVICE_CHAR_TUPLES=[]
         for (uuid_servive, uuid_char_list) in uuid_service_char_tuples:
@@ -68,15 +75,15 @@ class BleInterface(QtCore.QObject): # pyright: ignore # Argument to class must b
         self.service_uuid:Optional[QtBluetooth.QBluetoothUuid] = None
         self.char_uuid:List[Tuple[QtBluetooth.QBluetoothUuid, BLE_CHAR_TYPE]] = []
 
-        self.processData = processData
-        self.sendHeartbeat = sendHeartbeat
-        self.sendStop = sendStop
-        self.reset = reset
+        self.processData: Callable[[Callable[[Optional[bytes]], None], bytes], Tuple[Optional[float], Optional[int]]] = processData
+        self.sendHeartbeat: Callable[[Callable[[Optional[bytes]],None]], None] = sendHeartbeat
+        self.sendStop: Callable[[Callable[[Optional[bytes]],None]], None] = sendStop
+        self.reset: Callable[[], None] = reset
 
-        self.ENABLE_NOTIFICATION_VALUE = QtCore.QByteArray.fromHex(b'0100') # type: ignore
-        self.DISABLE_NOTIFICATION_VALUE = QtCore.QByteArray.fromHex(b'0000') # type: ignore
+        self.ENABLE_NOTIFICATION_VALUE:QtCore.QByteArray = QtCore.QByteArray.fromHex(b'0100') # type: ignore
+        self.DISABLE_NOTIFICATION_VALUE:QtCore.QByteArray = QtCore.QByteArray.fromHex(b'0000') # type: ignore
 
-        self.m_deviceDiscoveryAgent = QtBluetooth.QBluetoothDeviceDiscoveryAgent()
+        self.m_deviceDiscoveryAgent:QtBluetooth.QBluetoothDeviceDiscoveryAgent = QtBluetooth.QBluetoothDeviceDiscoveryAgent()
         self.m_deviceDiscoveryAgent.setLowEnergyDiscoveryTimeout(500)
         self.m_deviceDiscoveryAgent.deviceDiscovered.connect(self.addDevice)
         self.m_deviceDiscoveryAgent.finished.connect(self.onScanFinished)
@@ -86,22 +93,21 @@ class BleInterface(QtCore.QObject): # pyright: ignore # Argument to class must b
         self.m_control:Optional[QtBluetooth.QLowEnergyController] = None
         self.m_service:Optional[QtBluetooth.QLowEnergyService] = None
 
-        self.m_notificationDesc = QtBluetooth.QLowEnergyDescriptor()
-        self.m_readCharacteristic = QtBluetooth.QLowEnergyCharacteristic()
-        self.m_writeCharacteristic = QtBluetooth.QLowEnergyCharacteristic()
+        self.m_notificationDesc:QtBluetooth.QLowEnergyDescriptor = QtBluetooth.QLowEnergyDescriptor()
+        self.m_readCharacteristic:QtBluetooth.QLowEnergyCharacteristic = QtBluetooth.QLowEnergyCharacteristic()
+        self.m_writeCharacteristic:QtBluetooth.QLowEnergyCharacteristic = QtBluetooth.QLowEnergyCharacteristic()
         # plint: disable=maybe-no-member
-        self.m_writemode = QtBluetooth.QLowEnergyService.WriteMode.WriteWithoutResponse # was QtBluetooth.QLowEnergyService.WriteMode() => 0 in PyQt5, but fails on PyQt6
+        self.m_writemode:QtBluetooth.QLowEnergyService.WriteMode = QtBluetooth.QLowEnergyService.WriteMode.WriteWithoutResponse # was QtBluetooth.QLowEnergyService.WriteMode() => 0 in PyQt5, but fails on PyQt6
 
-        self.m_connected = False
-        self.m_readTimer = None
+        self.m_connected:bool = False
 
         self.dataReceived.connect(self.dataReceivedProcessing)
 
 
-    def removeDevice(self):
+    def removeDevice(self) -> None:
         self.m_device = None
 
-    def removeControl(self):
+    def removeControl(self) -> None:
         try:
             assert self.m_control is not None
             self.m_control.discoveryFinished.disconnect()
@@ -113,7 +119,7 @@ class BleInterface(QtCore.QObject): # pyright: ignore # Argument to class must b
         finally:
             self.m_control = None
 
-    def removeService(self):
+    def removeService(self) -> None:
         try:
             self.service_uuid = None
             self.char_uuid = []
@@ -129,25 +135,21 @@ class BleInterface(QtCore.QObject): # pyright: ignore # Argument to class must b
 
 #--------
 
-    @QtCore.pyqtSlot('QByteArray')
-    def dataReceivedProcessing(self,data=None):
+    @QtCore.pyqtSlot(bytes)
+    def dataReceivedProcessing(self, data:Optional[bytes] = None) -> None:
 #        _log.debug("data received: %s", data)
         if data is None:
-            data = QtCore.QByteArray()
+            data = b''
         res_w, res_b = self.processData(self.write, data)
         if res_w is not None:
             self.weightChanged.emit(res_w)
         if res_b is not None:
             self.batteryChanged.emit(res_b)
 
-    def read(self):
-        if(self.m_service and self.m_readCharacteristic.isValid()):
-            self.m_service.readCharacteristic(self.m_readCharacteristic)
-
-    def write(self,data:Optional[bytearray]=None):
+    def write(self, data:Optional[bytes] = None) -> None:
 #        _log.debug("write data: %s", data)
         if data is None:
-            data = bytearray()
+            data = b'' #bytearray()
         if (self.m_service and self.m_writeCharacteristic.isValid()):
             if len(data) > 20:
                 sentBytes = 0
@@ -171,14 +173,14 @@ class BleInterface(QtCore.QObject): # pyright: ignore # Argument to class must b
             elif self.m_device:
                 _log.info('disconnected from %s', self.m_device.name())
 
-    def heartbeat(self):
+    def heartbeat(self) -> None:
         if self.m_connected:
 #            _log.debug("send heartbeat")
             self.sendHeartbeat(self.write)
             QtCore.QTimer.singleShot(2000,self.heartbeat)
 
     @QtCore.pyqtSlot('QLowEnergyDescriptor','QByteArray')
-    def descriptorWrittenSlot(self,descriptor,newValue):
+    def descriptorWrittenSlot(self, descriptor:QtBluetooth.QLowEnergyDescriptor, newValue:QtCore.QByteArray) -> None:
         if descriptor.isValid():
             if newValue == self.ENABLE_NOTIFICATION_VALUE:
                 # notifications enabled
@@ -187,7 +189,7 @@ class BleInterface(QtCore.QObject): # pyright: ignore # Argument to class must b
                 # notifications disabled
                 self.m_control.disconnectFromDevice()
 
-    def searchCharacteristic(self):
+    def searchCharacteristic(self) -> None:
         # plint: disable=maybe-no-member
         _log.debug('searchCharacteristic()')
         if self.m_service:
@@ -224,19 +226,19 @@ class BleInterface(QtCore.QObject): # pyright: ignore # Argument to class must b
                                 self.m_service.writeDescriptor(self.m_notificationDesc,self.ENABLE_NOTIFICATION_VALUE)
 
     @QtCore.pyqtSlot('QLowEnergyCharacteristic','QByteArray')
-    def onCharacteristicChanged(self,_=QtBluetooth.QLowEnergyCharacteristic,value=QtCore.QByteArray):
+    def onCharacteristicChanged(self,_:QtBluetooth.QLowEnergyCharacteristic, value:QtCore.QByteArray) -> None:
 #        print("Characteristic Changed {values}".format(values=value))
-        self.dataReceived.emit(value)
+        self.dataReceived.emit(value.data()) # convert QByteArray to Python byte array
 
     @QtCore.pyqtSlot('QLowEnergyCharacteristic','QByteArray')
-    def onCharacteristicRead(self,_=QtBluetooth.QLowEnergyCharacteristic,value=QtCore.QByteArray):
+    def onCharacteristicRead(self,_:QtBluetooth.QLowEnergyCharacteristic, value:QtCore.QByteArray) -> None:
 #        print("Characteristic Read:  {values}".format(values=value))
         pass
 
     @QtCore.pyqtSlot('QLowEnergyService::ServiceState')
-    def onServiceStateChanged(self, s):
+    def onServiceStateChanged(self, s:QtBluetooth.QLowEnergyService.ServiceState) -> None:
         _log.debug('onServiceStateChanged(%s)',s)
-        # ylint: disable=maybe-no-member
+        # pylint: disable=maybe-no-member
         if s == QtBluetooth.QLowEnergyService.ServiceState.InvalidService:
             pass
         elif s == QtBluetooth.QLowEnergyService.ServiceState.DiscoveryRequired and self.m_service is not None:
@@ -249,7 +251,7 @@ class BleInterface(QtCore.QObject): # pyright: ignore # Argument to class must b
             pass
 
     @QtCore.pyqtSlot('QLowEnergyService::ServiceError')
-    def serviceError(self):
+    def serviceError(self, _error:QtBluetooth.QLowEnergyService.ServiceError) -> None:
         if self.m_service is not None:
             _log.debug('onSeviceErrorOccurred: %s', self.m_service.error())
             self.m_service.stateChanged.disconnect(self.onServiceStateChanged)
@@ -260,7 +262,7 @@ class BleInterface(QtCore.QObject): # pyright: ignore # Argument to class must b
         self.update_connected(False)
 
     @QtCore.pyqtSlot()
-    def onServiceScanDone(self):
+    def onServiceScanDone(self) -> None:
         _log.debug('onServiceScanDone()')
         if self.m_control is not None:
             for uuid in self.m_control.services():
@@ -275,20 +277,20 @@ class BleInterface(QtCore.QObject): # pyright: ignore # Argument to class must b
                             self.m_service.characteristicChanged.connect(self.onCharacteristicChanged)
                             self.m_service.characteristicRead.connect(self.onCharacteristicRead)
                             self.m_service.errorOccurred.connect(self.serviceError)
-        # ylint: disable=maybe-no-member
+        # pylint: disable=maybe-no-member
         if self.m_service is not None and self.m_service.state() == QtBluetooth.QLowEnergyService.ServiceState.DiscoveryRequired:
             self.m_service.discoverDetails() # this is required on PyQt 5.2.2 as onServiceStateChanged() is not called automatically
         else:
             self.searchCharacteristic()
 
     @QtCore.pyqtSlot()
-    def onDeviceConnected(self):
+    def onDeviceConnected(self) -> None:
         _log.debug('onDeviceConnected')
         if self.m_control is not None:
             self.m_control.discoverServices()
 
     @QtCore.pyqtSlot()
-    def onDeviceDisconnected(self):
+    def onDeviceDisconnected(self) -> None:
         _log.debug('onDeviceDisconnected')
         self.update_connected(False)
         self.removeService()
@@ -296,7 +298,7 @@ class BleInterface(QtCore.QObject): # pyright: ignore # Argument to class must b
         self.removeDevice()
         self.deviceDisconnected.emit()
 
-    def connectCurrentDevice(self):
+    def connectCurrentDevice(self) -> None:
         if self.m_device is not None:
             _log.debug('connectCurrentDevice: %s', self.m_device.name())
             self.m_control = QtBluetooth.QLowEnergyController.createCentral(self.m_device)
@@ -309,7 +311,7 @@ class BleInterface(QtCore.QObject): # pyright: ignore # Argument to class must b
             self.deviceDisconnected.emit()
 
     @QtCore.pyqtSlot()
-    def onScanFinished(self):
+    def onScanFinished(self) -> None:
         _log.debug('onScanFinished()')
         if self.m_device is None:
             self.onDeviceDisconnected()
@@ -317,7 +319,7 @@ class BleInterface(QtCore.QObject): # pyright: ignore # Argument to class must b
             self.connectCurrentDevice()
 
     @staticmethod
-    def deviceHasService(device, service_uuid):
+    def deviceHasService(device, service_uuid) -> bool:
         if device is None:
             return False
         services = device.serviceUuids()
@@ -327,9 +329,9 @@ class BleInterface(QtCore.QObject): # pyright: ignore # Argument to class must b
         return has_service
 
     @QtCore.pyqtSlot('QBluetoothDeviceInfo')
-    def addDevice(self, device):
+    def addDevice(self, device:QtBluetooth.QBluetoothDeviceInfo) -> None:
 #        _log.debug("addDevice(%s)", device)
-        # ylint: disable=maybe-no-member
+        # pylint: disable=maybe-no-member
         if self.m_device is None and device.coreConfigurations() & QtBluetooth.QBluetoothDeviceInfo.CoreConfiguration.LowEnergyCoreConfiguration:
             m_device = QtBluetooth.QBluetoothDeviceInfo(device)
 #            _log.debug("discovered LE Device name: '%s',  device: %s", device.name(), m_device.deviceUuid().toString())
@@ -350,7 +352,7 @@ class BleInterface(QtCore.QObject): # pyright: ignore # Argument to class must b
 
 #----------------
 
-    def disconnectDevice(self):
+    def disconnectDevice(self) -> None:
         _log.debug('disconnectDevice()')
         self.update_connected(False) # is this productive!?
         self.sendStop(self.write)
@@ -360,12 +362,12 @@ class BleInterface(QtCore.QObject): # pyright: ignore # Argument to class must b
         elif self.m_control is not None:
             self.m_control.disconnectFromDevice()
 
-    def scanDevices(self):
+    def scanDevices(self) -> None:
         _log.debug('scanDevices()')
         self.m_device = None
         try:
             # fails on PyQt5, works on PyQt6
-            # ylint: disable=maybe-no-member
+            # pylint: disable=maybe-no-member
             self.m_deviceDiscoveryAgent.start(QtBluetooth.QBluetoothDeviceDiscoveryAgent.DiscoveryMethod.LowEnergyMethod)
         except Exception: # pylint: disable=broad-except
             # works on PyQt5, fails on PyQt6

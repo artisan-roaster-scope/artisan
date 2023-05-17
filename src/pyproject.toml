@@ -234,3 +234,4 @@ pythonPlatform = "All"
 #reportUnknownMemberType = false
 #reportUnknownArgumentType = false
 #reportGeneralTypeIssues = false
+useLibraryCodeForTypes = false

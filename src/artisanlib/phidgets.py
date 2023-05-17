@@ -139,7 +139,7 @@ class PhidgetManager():
             if self.managersemaphore.available() < 1:
                 self.managersemaphore.release(1)
 
-    def getChannel(self,serial:int, port:Optional[int], channel:'Phidget', phidget_class_name:str, device_id:int, remote:bool, remoteOnly:bool) -> 'Phidget':
+    def getChannel(self,serial:int, port:Optional[int], channel:'Phidget', phidget_class_name:str, device_id:int, remote:bool, remoteOnly:bool) -> Optional['Phidget']:
         try:
             self.managersemaphore.acquire(1)
             # we are looking for HUB ports
@@ -165,11 +165,13 @@ class PhidgetManager():
 
     def reserveSerialPort(self, serial:int, port:Optional[int], channel:'Phidget', phidget_class_name:str, device_id:int, remote:bool = False, remoteOnly:bool = False) -> None:
         chnl = self.getChannel(serial, port, channel, phidget_class_name, device_id, remote, remoteOnly)
-        self.reserveChannel(chnl)
+        if chnl is not None:
+            self.reserveChannel(chnl)
 
     def releaseSerialPort(self, serial:int, port:Optional[int], channel:'Phidget', phidget_class_name:str, device_id:int, remote:bool = False, remoteOnly:bool = False) -> None:
         chnl = self.getChannel(serial, port, channel, phidget_class_name, device_id, remote, remoteOnly)
-        self.releaseChannel(chnl)
+        if chnl is not None:
+            self.releaseChannel(chnl)
 
     # should be called from the attach handler that binds this hardware channel to a software channel
     def reserveChannel(self,channel:'Phidget') -> None:
