@@ -31,7 +31,7 @@ import array
 from lxml import html # type: ignore
 
 import logging
-from typing import Optional, Sequence, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 from typing_extensions import Final  # Python <=3.7
 
 if TYPE_CHECKING:

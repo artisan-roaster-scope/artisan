@@ -4329,10 +4329,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     # called if the palette changed (switch between dark and light mode on macOS Legacy builds)
                     self.app.darkmode = not self.app.darkmode
                     self.updateCanvasColors()
-            else:
-                if self.app.darkmode != self.app.styleHints().colorScheme() == Qt.ColorScheme.Dark:
-                    self.app.darkmode = not self.app.darkmode
-                    self.updateCanvasColors()
+            elif self.app.darkmode != self.app.styleHints().colorScheme() == Qt.ColorScheme.Dark:
+                self.app.darkmode = not self.app.darkmode
+                self.updateCanvasColors()
         return super().eventFilter(obj, event)
 
     # search the given QTable table for a row with the given widget as cellWidget or item in column col or as a sub-widget contained in the layout of a widget in place
