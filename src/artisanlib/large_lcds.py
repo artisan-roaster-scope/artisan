@@ -200,7 +200,7 @@ class LargeLCDs(ArtisanDialog):
         return None
 
     def updateVisibilities(self,l1,l2):
-        self.visibleFrames = [val for pair in zip(l1,l2) for val in pair]
+        self.visibleFrames = [val for pair in zip(l1,l2) for val in pair] # type: ignore # pyright: error: "object*" is not iterable
         for i, lc in enumerate(l1):
             try:
                 self.lcds1frames[i].setVisible(lc)

@@ -155,7 +155,7 @@ class tphasescanvas(FigureCanvas):
                         starts = widths.cumsum() - widths
                         if active:
                             labels = [f"{str(round(percent,digits)).rstrip('0').rstrip('.')}%  {stringfromseconds(tx,leadingzero=False)}" if percent>20 else (f"{str(round(percent,digits)).rstrip('0').rstrip('.')}%" if percent>10 else '')
-                                    for (percent,tx) in zip(phases_percentages, phases_times)]
+                                    for (percent,tx) in zip(phases_percentages, phases_times)] # type: ignore # pyright: error: "object*" is not iterable
                         else:
                             labels = ['']*3
                         labels = [label, ''] + labels + ['', stringfromseconds(total_time,leadingzero=False)]

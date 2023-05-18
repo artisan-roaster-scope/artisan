@@ -208,6 +208,7 @@ if TYPE_CHECKING:
     import numpy.typing as npt # pylint: disable=unused-import
     from matplotlib.backend_bases import Event # pylint: disable=unused-import
     from PyQt6.QtWidgets import QTableWidget
+    from PyQt6.QtGui import QStyleHints
 
 # fix socket.inet_pton on Windows (used by pymodbus TCP/UDP)
 try:
@@ -252,10 +253,10 @@ appGuid:Final[str] = '9068bd2fa8e54945a6be1f1a0a589e92'
 viewerAppGuid:Final[str] = '9068bd2fa8e54945a6be1f1a0a589e93'
 
 class Artisan(QtSingleApplication):
-    __slots__ = [ 'sentToBackground', 'plus_sync_cache_expiration', 'artisanviewerMode', 'darkmode' ]
+    __slots__ = [ 'sentToBackground', 'plus_sync_cache_expiration', 'artisanviewerMode', 'darkmode', 'style_hints' ]
 
     def __init__(self, args) -> None:
-        super().__init__(appGuid,viewerAppGuid,args)
+        super().__init__(appGuid, viewerAppGuid, args)
 
         self.sentToBackground:Optional[float] = None # set to timestamp on putting app to background without any open dialog
         self.plus_sync_cache_expiration = 1*60 # how long a plus sync is valid in seconds
@@ -267,6 +268,7 @@ class Artisan(QtSingleApplication):
                 sys.exit(0) # there is already one ArtisanViewer running, we terminate
 
         self.darkmode:bool = False # holds current darkmode state
+        self.style_hints:Optional['QStyleHints'] = None # holds the styleHints instance on Qt 6.5 and higher
         if QVersionNumber.fromString(qVersion())[0] < QVersionNumber(6,5,0):
             if sys.platform.startswith('darwin'):
                 # remember darkmode using darkdetect on macOS Legacy with older Qt versions
@@ -274,22 +276,24 @@ class Artisan(QtSingleApplication):
             # otherwise we do not have any mean to detect the systems palette
         else:
             # we use the Qt 6.5 ColorScheme mechanism to detect dark mode
-            self.darkmode = self.styleHints().colorScheme() == Qt.ColorScheme.Dark
-
-# instead of using the colorSchemeChanged handler of Qt 6.5 we keep using the ApplicationWindow:eventFilter for compatibility with older Qt versions
-#        self.styleHints = self.styleHints()
-#        self.styleHints.colorSchemeChanged.connect(self.colorSchemeChanged)
-#    def colorSchemeChanged(self, colorScheme:Qt.ColorScheme):
-#        _log.info("PRINT colorScheme changed: %s", colorScheme)
+            self.style_hints = self.styleHints()
+            self.darkmode = self.style_hints.colorScheme() == Qt.ColorScheme.Dark
+            self.style_hints.colorSchemeChanged.connect(self.colorSchemeChanged)
 
         self.messageReceived.connect(self.receiveMessage)
         self.focusChanged.connect(self.appRaised)
 
+    @pyqtSlot('Qt::ColorScheme')
+    def colorSchemeChanged(self, colorScheme:Qt.ColorScheme) -> None:
+        aw:Optional['ApplicationWindow'] = self.activationWindow()
+        if aw is not None and self.darkmode != colorScheme == Qt.ColorScheme.Dark:
+            self.darkmode = not self.darkmode
+            aw.updateCanvasColors()
 
     @pyqtSlot('QWidget*','QWidget*')
     def appRaised(self, oldFocusWidget:QWidget, newFocusWidget:QWidget) -> None:
         try:
-            aw = self.activationWindow()
+            aw:Optional['ApplicationWindow'] = self.activationWindow()
             if aw is not None and not sip.isdeleted(aw): # sip not supported on older PyQt versions (eg. RPi)
                 if oldFocusWidget is None and newFocusWidget is not None and aw is not None and aw.centralWidget() == newFocusWidget and self.sentToBackground is not None:
                     #focus gained
@@ -319,7 +323,7 @@ class Artisan(QtSingleApplication):
     #                                  if query is "template" and the file has an .alog extension, the profile is loaded as background profile
     def open_url(self, url:QUrl) -> None:
         _log.debug('open_url(%s)', url)
-        aw = self.activationWindow()
+        aw:Optional['ApplicationWindow'] = self.activationWindow()
         if aw is not None and not aw.qmc.flagon and not aw.qmc.designerflag and not aw.qmc.wheelflag and aw.qmc.flavorchart_plot is None: # only if not yet monitoring
             if url.scheme() == 'artisan' and url.authority() in ['roast','template']:
                 # we try to resolve this one into a file URL and recurse
@@ -369,10 +373,10 @@ class Artisan(QtSingleApplication):
                         QTimer.singleShot(20,lambda : (aw.loadFile(filename) if aw is not None else None))
                 elif file_suffix == 'alrm':
                     # load Artisan alarms on double-click on *.alrm file
-                    QTimer.singleShot(20,lambda : aw.loadAlarms(filename))
+                    QTimer.singleShot(20,lambda : aw.loadAlarms(filename)) # type:ignore # mypy: Item "None" of "Optional[ApplicationWindow]" has no attribute "loadAlarms"
                 elif file_suffix == 'apal':
                     # load Artisan palettes on double-click on *.apal file
-                    QTimer.singleShot(20,lambda : aw.getPalettes(filename,aw.buttonpalette))
+                    QTimer.singleShot(20,lambda : aw.getPalettes(filename, aw.buttonpalette)) # type:ignore # mypy: Item "None" of "Optional[ApplicationWindow]" has no attribute "getPalettes"
 
         elif platform.system() == 'Windows' and not self.artisanviewerMode:
             msg = url.toString()  #here we don't want a local file, preserve the windows file:///
@@ -435,7 +439,7 @@ class Artisan(QtSingleApplication):
         file_open = QEvent.Type.FileOpen
         if event.type() == file_open:
             try:
-                aw = self.activationWindow()
+                aw:Optional['ApplicationWindow'] = self.activationWindow()
                 if aw is not None:
                     url = event.url() # type: ignore # "QEvent" has no attribute "url"
                     # files cannot be opend while
@@ -4323,15 +4327,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         return s
 
     def eventFilter(self, obj, event):
-        if event.type() == QEvent.Type.ApplicationPaletteChange and self.app is not None:
-            if QVersionNumber.fromString(qVersion())[0] < QVersionNumber(6,5,0):
-                if sys.platform.startswith('darwin') and darkdetect.isDark() != self.app.darkmode: # type: ignore # "isDark" is not a known member of module "darkdetect" # pylint: disable=c-extension-no-member
+        try:
+            if event.type() == QEvent.Type.ApplicationPaletteChange and self.app is not None and sys.platform.startswith('darwin') and QVersionNumber.fromString(qVersion())[0] < QVersionNumber(6,5,0) and darkdetect.isDark() != self.app.darkmode: # type: ignore # "isDark" is not a known member of module "darkdetect" # pylint: disable=c-extension-no-member
                     # called if the palette changed (switch between dark and light mode on macOS Legacy builds)
                     self.app.darkmode = not self.app.darkmode
                     self.updateCanvasColors()
-            elif self.app.darkmode != self.app.styleHints().colorScheme() == Qt.ColorScheme.Dark:
-                self.app.darkmode = not self.app.darkmode
-                self.updateCanvasColors()
+        except Exception: # pylint: disable=broad-except
+            pass
         return super().eventFilter(obj, event)
 
     # search the given QTable table for a row with the given widget as cellWidget or item in column col or as a sub-widget contained in the layout of a widget in place

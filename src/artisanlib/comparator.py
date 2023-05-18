@@ -545,7 +545,7 @@ class RoastProfile():
         if self.aw.qmc.swapdeltalcds:
             alpha[2] = self.alpha[3]
             alpha[3] = self.alpha[2]
-        for ll, a in zip(
+        for ll, a in zip( # type: ignore # pright: error: "object*" is not iterable
             [self.l_mainEvents2,self.l_temp2,self.l_mainEvents1,self.l_temp1,self.l_delta2,self.l_delta1,self.l_events1,self.l_events2,self.l_events3,self.l_events4],
             [alpha[0],alpha[0],alpha[1],alpha[1],alpha[2],alpha[3],alpha[4],alpha[4],alpha[4],alpha[4]]):
             if ll is not None:
@@ -730,7 +730,7 @@ class RoastProfile():
                 timex,values = zip(*events)
             else:
                 timex,values = [],[]
-            line, = self.aw.qmc.ax.plot(list(timex), list(values), color=(self.color if self.active else self.gray),
+            line, = self.aw.qmc.ax.plot(list(timex), list(values), color=(self.color if self.active else self.gray), # type: ignore # pyright: Argument of type "_T_co@zip | list[Unknown]" cannot be assigned to parameter "__iterable" of type "Iterable[_T@list]" in function "__init__"
                     linestyle='-',drawstyle='steps-post',linewidth = self.aw.qmc.Evaluelinethickness[n],
                     alpha = (self.alpha[4] if self.active else self.alpha[4]*self.alpha_dim_factor),
                     label = self.aw.qmc.etypesf(n))
@@ -1205,7 +1205,7 @@ class roastCompareDlg(ArtisanDialog):
                     frame.set_alpha(self.aw.qmc.alpha['legendbg'])
                     frame.set_edgecolor(self.aw.qmc.palette['legendborder'])
                     frame.set_linewidth(0.5)
-                    for line,text in zip(self.legend.get_lines(), self.legend.get_texts()):
+                    for line,text in zip(self.legend.get_lines(), self.legend.get_texts()): # type: ignore # pyright: error: "object*" is not iterable
                         text.set_color(line.get_color())
             elif self.legend is not None:
                 self.legend.remove()

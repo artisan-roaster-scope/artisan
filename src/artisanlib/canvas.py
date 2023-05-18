@@ -16244,7 +16244,7 @@ class tgraphcanvas(FigureCanvas):
                                             linewidth=self.wheellinewidth,picker=3))
                     count = 0
                     #set color, alpha, and text
-                    for _,barwheel[z] in zip(radii, barwheel[z]): # noqa: B020
+                    for _,barwheel[z] in zip(radii, barwheel[z]): # noqa: B020 # type:ignore # pyright: error: "object*" is not iterable
                         barwheel[z].set_facecolor(self.wheelcolor[z][count])
                         barwheel[z].set_alpha(max(min(self.segmentsalpha[z][count],1),0))
                         barwheel[z].set_url(str(z) + '-' + str(count))
