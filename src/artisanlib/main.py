@@ -21863,8 +21863,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 
     def desktopscreenshot(self):
         screen = QApplication.primaryScreen()
-#        imag = screen.grabWindow(QApplication.desktop().winId())
-        imag = screen.grabWindow() # QApplication.desktop() has been removed in Qt6
+        try:
+            imag = screen.grabWindow() # QApplication.desktop() has been removed in Qt6
+        except Exception: #pylint: disable-broad-except
+            imag = screen.grabWindow(QApplication.desktop().winId())  # type: ignore [attr-defined]  #PyQt5
         fmt = 'png'
         initialPath = QDir.currentPath() + '/DesktopScreenshot.' + fmt
         fileName = QFileDialog.getSaveFileName(self, 'Desktop ScreenShot',
