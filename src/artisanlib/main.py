@@ -283,12 +283,15 @@ class Artisan(QtSingleApplication):
         self.messageReceived.connect(self.receiveMessage)
         self.focusChanged.connect(self.appRaised)
 
-    @pyqtSlot('Qt::ColorScheme')
-    def colorSchemeChanged(self, colorScheme:Qt.ColorScheme) -> None:
-        aw:Optional['ApplicationWindow'] = self.activationWindow()
-        if aw is not None and self.darkmode != colorScheme == Qt.ColorScheme.Dark:
-            self.darkmode = not self.darkmode
-            aw.updateCanvasColors()
+    try:
+        @pyqtSlot('Qt::ColorScheme')
+        def colorSchemeChanged(self, colorScheme:'Qt.ColorScheme') -> None:
+            aw:Optional['ApplicationWindow'] = self.activationWindow()
+            if aw is not None and self.darkmode != colorScheme == Qt.ColorScheme.Dark:
+                self.darkmode = not self.darkmode
+                aw.updateCanvasColors()
+    except Exception: # pylint: disable=broad-except
+        pass
 
     @pyqtSlot('QWidget*','QWidget*')
     def appRaised(self, oldFocusWidget:QWidget, newFocusWidget:QWidget) -> None:
@@ -1320,7 +1323,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     santokerSendMessageSignal = pyqtSignal(bytes,int)
     kaleidoSendMessageSignal = pyqtSignal(str,str)
     kaleidoSendMessageAwaitSignal = pyqtSignal(str,str,int,int)
-    addEventSignal = pyqtSignal(int,int)
+    addEventSignal = pyqtSignal(int,int,bool,bool,bool)
     updateMessageLogSignal = pyqtSignal()
     updateSerialLogSignal = pyqtSignal()
     updateErrorLogSignal = pyqtSignal()
@@ -1339,7 +1342,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         'extrabytesize', 'extraparity', 'extrastopbits', 'extratimeout', 'santokerHost', 'santokerPort', 'santokerSerial', 'santoker', 'fujipid', 'dtapid', 'pidcontrol', 'soundflag', 'recentRoasts', 'maxRecentRoasts',
         'kaleidoHost', 'kaleidoPort', 'kaleidoSerial', 'kaleidoPID', 'kaleido',
         'lcdpaletteB', 'lcdpaletteF', 'extraeventsbuttonsflags', 'extraeventslabels', 'extraeventbuttoncolor', 'extraeventsactionstrings',
-        'extraeventbuttonround', 'block_quantification_sampling_ticks', 'sampling_ticks_to_block_quantifiction', 'extraeventsactionslastvalue',
+        'extraeventbuttonround', 'block_quantification_sampling_ticks', 'sampling_seconds_to_block_quantifiction', 'sampling_ticks_to_block_quantifiction', 'extraeventsactionslastvalue',
         'org_extradevicesettings', 'eventslidervalues', 'eventslidervisibilities', 'eventsliderKeyboardControl', 'eventslideractions', 'eventslidercommands', 'eventslideroffsets',
         'eventsliderfactors', 'eventslidermin', 'eventsMaxValue', 'eventslidermax', 'eventslidersflags', 'eventsliderBernoulli', 'eventslidercoarse',
         'eventslidertemp', 'eventsliderunits', 'eventslidermoved', 'SVslidermoved', 'eventquantifieractive', 'eventquantifiersource', 'eventquantifierSV',
@@ -1680,7 +1683,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.block_quantification_sampling_ticks:List[int] = [0,0,0,0]
         # by default we block quantification for sampling_ticks_to_block_quantifiction sampling intervals after
         # a button/slider event
-        self.sampling_ticks_to_block_quantifiction:Final[int] = 15
+        self.sampling_seconds_to_block_quantifiction:Final[int] = 15
+        self.sampling_ticks_to_block_quantifiction:int = self.blockTicks()
 
         self.extraeventsactionslastvalue:List[Optional[int]] = [None,None,None,None] # the last value to be used for relative +- button action as base
         self.org_extradevicesettings:Optional[ExtraDeviceSettings] = None
@@ -3875,14 +3879,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.updateSubscriptionSignal.connect(self.updateSubscription)
         self.updateLimitsSignal.connect(self.updateLimits)
         self.updatePlaybackIndicatorSignal.connect(self.updatePlaybackIndicator)
-        self.pidOnSignal.connect(self.pidcontrol.pidOn)
+        self.pidOnSignal.connect(self.pidOn)
         self.pidOffSignal.connect(self.pidOff)
         self.pidToggleSignal.connect(self.pidToggle)
         self.notificationsSetEnabledSignal.connect(self.notificationsSetEnabled)
         self.santokerSendMessageSignal.connect(self.santokerSendMessage)
         self.kaleidoSendMessageSignal.connect(self.kaleidoSendMessage)
         self.kaleidoSendMessageAwaitSignal.connect(self.kaleidoSendMessageAwait)
-        self.addEventSignal.connect(self.addEventSlot)
+        self.addEventSignal.connect(self.addEventSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
         self.updateMessageLogSignal.connect(self.updateMessageLog)
         self.updateSerialLogSignal.connect(self.updateSerialLog)
         self.updateErrorLogSignal.connect(self.updateErrorLog)
@@ -3907,6 +3911,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.zoomOutShortcut = QShortcut(QKeySequence.StandardKey.ZoomOut, self)
         self.zoomOutShortcut.activated.connect(self.zoomOut)
 
+    def blockTicks(self) -> int:
+        return max(1, int(round(self.sampling_seconds_to_block_quantifiction / (self.qmc.delay / 1000))) + 1)
+
+    def setSamplingRate(self, rate:int) -> None:
+        self.qmc.delay = max(self.qmc.min_delay, rate)
+        self.sampling_ticks_to_block_quantifiction = self.blockTicks() # we update the quantification block ticks
 
     @pyqtSlot()
     def updateMessageLog(self) -> None:
@@ -3963,6 +3973,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             self.releaseminieditor()
             self.releaseSliderFocus()
 
+    @pyqtSlot(str)
     def updateSubscription(self, subscription: str) -> None:
         _log.debug('updateSubscription(%s)', subscription)
         if subscription:
@@ -4259,13 +4270,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     def QTime2time(t: QTime) -> float:
         return t.minute() * 60 + t.second()
 
-    def dragEnterEvent(self, event) -> None: # pylint: disable=no-self-use # class method
+    def dragEnterEvent(self, event) -> None:
+        # pylint: disable=no-self-use # class method
         if event.mimeData().hasUrls():
             event.accept()
         else:
             event.ignore()
 
-    def dropEvent(self, event) -> None: # pylint: disable=no-self-use # class method
+    def dropEvent(self, event) -> None:
+        # pylint: disable=no-self-use # class method
         urls = event.mimeData().urls()
         if urls and len(urls)>0:
             self.app.open_url(urls[0])
@@ -4327,11 +4340,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         return s
 
     def eventFilter(self, obj, event):
+        # pylint: disable=c-extension-no-member
         try:
-            if event.type() == QEvent.Type.ApplicationPaletteChange and self.app is not None and sys.platform.startswith('darwin') and QVersionNumber.fromString(qVersion())[0] < QVersionNumber(6,5,0) and darkdetect.isDark() != self.app.darkmode: # type: ignore # "isDark" is not a known member of module "darkdetect" # pylint: disable=c-extension-no-member
+            if event.type() == QEvent.Type.ApplicationPaletteChange and self.app is not None and sys.platform.startswith('darwin') and QVersionNumber.fromString(qVersion())[0] < QVersionNumber(6,5,0) and darkdetect.isDark() != self.app.darkmode: # type: ignore # "isDark" is not a known member of module "darkdetect"
                     # called if the palette changed (switch between dark and light mode on macOS Legacy builds)
-                    self.app.darkmode = not self.app.darkmode
-                    self.updateCanvasColors()
+                self.app.darkmode = not self.app.darkmode
+                self.updateCanvasColors()
         except Exception: # pylint: disable=broad-except
             pass
         return super().eventFilter(obj, event)
@@ -4467,36 +4481,34 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     else:
                         plus_icon = 'plus-unsynced'
                         tooltip = QApplication.translate('Tooltip', 'Upload to artisan.plus')
-                    if True: # pylint: disable=using-constant-test
-                        #not self.plus_readonly: # we want to show the status also if read-only due to extension of the subscription limit
-                        if self.plus_subscription == 'HOME':
-                            subscription_icon = 'plus-home'
-                            if self.plus_paidUntil is not None:
-                                remaining_days = (self.plus_paidUntil.date() - datetime.datetime.now(datetime.timezone.utc).date()).days
-                                if remaining_days <= 0:
+                    if self.plus_subscription == 'HOME':
+                        subscription_icon = 'plus-home'
+                        if self.plus_paidUntil is not None:
+                            remaining_days = (self.plus_paidUntil.date() - datetime.datetime.now(datetime.timezone.utc).date()).days
+                            if remaining_days <= 0:
+                                subscription_icon = 'plus-home-off'
+                            elif remaining_days < 31:
+                                subscription_icon = 'plus-home-low'
+                            if self.plus_rlimit > 0:
+                                percent_used = self.plus_used/(self.plus_rlimit/100)
+                                if percent_used >= 100:
                                     subscription_icon = 'plus-home-off'
-                                elif remaining_days < 31:
+                                elif percent_used >= 90:
                                     subscription_icon = 'plus-home-low'
-                                if self.plus_rlimit > 0:
-                                    percent_used = self.plus_used/(self.plus_rlimit/100)
-                                    if percent_used >= 100:
-                                        subscription_icon = 'plus-home-off'
-                                    elif percent_used >= 90:
-                                        subscription_icon = 'plus-home-low'
-                        elif self.plus_subscription == 'PRO':
-                            subscription_icon = 'plus-pro'
-                            if self.plus_paidUntil is not None:
-                                remaining_days = (self.plus_paidUntil.date() - datetime.datetime.now(datetime.timezone.utc).date()).days
-                                if remaining_days <= 0:
+                    elif self.plus_subscription == 'PRO':
+                        subscription_icon = 'plus-pro'
+                        if self.plus_paidUntil is not None:
+                            remaining_days = (self.plus_paidUntil.date() - datetime.datetime.now(datetime.timezone.utc).date()).days
+                            if remaining_days <= 0:
+                                subscription_icon = 'plus-pro-off'
+                            elif remaining_days < 31:
+                                subscription_icon = 'plus-pro-low'
+                            if self.plus_rlimit > 0:
+                                percent_used = self.plus_used/(self.plus_rlimit/100)
+                                if percent_used >= 100:
                                     subscription_icon = 'plus-pro-off'
-                                elif remaining_days < 31:
+                                elif percent_used >= 90:
                                     subscription_icon = 'plus-pro-low'
-                                if self.plus_rlimit > 0:
-                                    percent_used = self.plus_used/(self.plus_rlimit/100)
-                                    if percent_used >= 100:
-                                        subscription_icon = 'plus-pro-off'
-                                    elif percent_used >= 90:
-                                        subscription_icon = 'plus-pro-low'
                 else:
                     plus_icon = 'plus-on'
                     tooltip = QApplication.translate('Tooltip', 'Disconnect artisan.plus')
@@ -5549,7 +5561,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 # we reduce the block values by one for each channel
                 self.block_quantification_sampling_ticks[i] = max(0, self.block_quantification_sampling_ticks[i] - 1)
 
-                if not self.block_quantification_sampling_ticks[i]:
+                # if source of event quantifier is a SV, we do not block further quantification for self.sampling_ticks_to_block_quantifiction (only for PV values that lag behind)
+                if self.eventquantifierSV[i] or not self.block_quantification_sampling_ticks[i]:
                     temp,_ = self.quantifier2tempandtime(i)
                     if temp is not None and len(temp)>0: # corresponding curve is available
                         linespace = self.eventquantifierlinspaces[i]
@@ -7316,6 +7329,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             return 5
         return 1
 
+    def eventSliderPageSize(self, n:int) -> int:
+        if self.eventslidercoarse[n] == 1:
+            # step size is 10
+            return 20
+        # step size is 1 or 5
+        return 10
+
     # n the slider number 0,..,3; v the slider value
     # returns the slider value quantified by the sliders step size
     def applySliderStepSize(self, n:int, v:int) -> int:
@@ -7482,15 +7502,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     def calcSliderSendValue(self,n):
         return self.calcEventValue(n, self.eventslidervalues[n])
 
-    def recordsliderevent(self,n):
-        if self.eventquantifierSV[n]:
-            # if source of event quantifier is a SV, we do not block further quantification for a period (only for PV values that lag behind)
-            self.block_quantification_sampling_ticks[n] = 0
-        else:
-            self.block_quantification_sampling_ticks[n] = self.sampling_ticks_to_block_quantifiction
+    def recordsliderevent(self,n:int) -> None:
+        self.block_quantification_sampling_ticks[n] = self.sampling_ticks_to_block_quantifiction
         self.extraeventsactionslastvalue[n] = self.eventslidervalues[n]
         if self.qmc.flagstart:
-            value = self.float2float((self.eventslidervalues[n] + 10.0) / 10.0)
+#            value = self.float2float((self.eventslidervalues[n] + 10.0) / 10.0)
+            value = self.qmc.eventsExternal2InternalValue(self.eventslidervalues[n])
             description = str(self.float2float(self.calcSliderSendValue(n),2)).rstrip('0').rstrip('.') + self.eventsliderunits[n]
             self.qmc.EventRecordAction(extraevent = 1,eventtype=n,eventvalue=value,eventdescription=description)
         self.fireslideraction(n)
@@ -7636,7 +7653,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     #         20= Artisan Command; 21= RC Command; 22= WebSocket Command
     # eventtype is one of the custom event types (0-3), only given if called for a button action with relative event type and event value 0
     # in this case the event button is not generating an event entry during recording, but a button action could receive an event value from calling its action
-    # and generate a corresponding event entry via a self.qmc.EventRecordActionSignal as done by the kaleido button IO Command action
+    # and generate a corresponding event entry via a self.qmc.eventRecordActionSignal as done by the kaleido button IO Command action
     # eventtrype is -1 if the even action should await a result to be bound to _
     def eventaction(self, action:int, cmd:str, parallel=True,eventtype:Optional[int]=None):
         # split on an octothorpe '#' that is not inside parentheses '()'
@@ -8586,7 +8603,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                     elif len(cs_split) == 3:
                                         self.ser.phidgetOUTpulsePWM(int(cs_split[0]),int(cs_split[1]),cs_split[2])
                                 elif cs.startswith('sleep') and cs.endswith(')'): # in seconds
-                                    cmds = eval(cs[len('sleep'):]) # pylint: disable=eval-used
+                                    cmds = eval(cs[len('sleep'):]) # pylint: disable=eval-used # pylint: disable=W0123
                                     if isinstance(cmds,(float,int)):
                                         # cmd has format "sleep(xx.yy)"
                                         libtime.sleep(cmds)
@@ -9205,9 +9222,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                     # might be a label
                                     try:
                                         label = str(eval(cs[len('pidRS('):-1])) # pylint: disable=eval-used
-                                        rs = self.pidcontrol.findRSset(label) # here rs is 0-based!!
-                                        if rs is not None:
-                                            self.pidcontrol.setRSpattern(rs)
+                                        rs2 = self.pidcontrol.findRSset(label) # here rs is 0-based!!
+                                        if rs2 is not None:
+                                            self.pidcontrol.setRSpattern(rs2)
                                             self.sendmessage(f'Artisan Command: {cs}')
                                     except Exception as e: # pylint: disable=broad-except
                                         _log.exception(e)
@@ -9833,6 +9850,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         return f'{plain_style}{hover_style}{pressed_style}'
 
     # style is one of 'pressed' or 'normal'
+    @pyqtSlot(int,str)
     def setExtraEventButtonStyle(self, tee:int, style:str):
         if len(self.extraeventstypes)>tee and len(self.buttonlist)>tee:
             button_style = self.extraEventButtonStyle(tee, style)
@@ -10134,11 +10152,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.slider4.setVisible(True)
         self.sliderSV.setVisible(True)
         self.setSliderFocusPolicy(Qt.FocusPolicy.StrongFocus)
-        # on "coarse" sliders we set the single step to 10, otherwise (default) to 1:
+        # set slider singleStep
         self.slider1.setSingleStep(self.eventSliderStepSize(0))
         self.slider2.setSingleStep(self.eventSliderStepSize(1))
         self.slider3.setSingleStep(self.eventSliderStepSize(2))
         self.slider4.setSingleStep(self.eventSliderStepSize(3))
+        # set slider pageStep
+        self.slider1.setPageStep(self.eventSliderPageSize(0))
+        self.slider2.setPageStep(self.eventSliderPageSize(1))
+        self.slider3.setPageStep(self.eventSliderPageSize(2))
+        self.slider4.setPageStep(self.eventSliderPageSize(3))
         #
         self.slidersAction.setChecked(True)
         if changeDefault:
@@ -10550,6 +10573,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             self.autoAdjustAxis(background=self.qmc.background and (not len(self.qmc.timex) > 3), deltas=False)
             self.qmc.redraw(recomputeAllDeltas=False)
 
+    @pyqtSlot()
     def updatePlaybackIndicator(self):
         if self.qmc.l_subtitle is not None and self.qmc.ax is not None:
             if self.qmc.backgroundprofile is not None and self.qmc.backgroundPlaybackEvents:
@@ -15518,21 +15542,28 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         if self.kaleido is not None:
             self.kaleido.send_msg(target, value)
 
-    @pyqtSlot(int,int)
-    def addEventSlot(self, value:int, etype:int) -> None:
+    # if record is True, an event is added during recording, otherwise only the slider is moved
+    # if fire_slider_action is True, the slider action is fired
+    # if force is True, process even if value is equal to the events lastvalue resp. the current slider value
+    @pyqtSlot(int,int,bool,bool,bool)
+    def addEventSlot(self, value:int, etype:int, record:bool, fire_slider_action:bool, force:bool) -> None:
         # limit value by slider limits
         if -1 < etype < 4:
             new_value = min(self.eventslidermax[etype],max(self.eventslidermin[etype], value))
-            if self.extraeventsactionslastvalue[etype] is None or new_value != self.extraeventsactionslastvalue[etype]:
-                # new value is different thus we register this one
-                # remember the new value as the last value set for this event
+            if force or (record and (self.extraeventsactionslastvalue[etype] is None or new_value != self.extraeventsactionslastvalue[etype])) or self.sliderpos(etype) != value:
+                # new value is different from the last recorded one or the slider position thus we register this one
+                # reset quantification block
                 self.block_quantification_sampling_ticks[etype] = self.sampling_ticks_to_block_quantifiction
+                # remember the new value as the last value set for this event
                 self.extraeventsactionslastvalue[etype] = new_value
                 # move corresponding slider to new value:
                 self.moveslider(etype,new_value)
+                # optionally we fire the sider action
+                if fire_slider_action:
+                    self.fireslideractionSignal.emit(etype)
                 # create a new event
                 nv:float = self.qmc.eventsExternal2InternalValue(float(new_value))
-                if self.qmc.flagstart:
+                if record and self.qmc.flagstart:
                     self.qmc.eventRecordActionSignal.emit(etype,nv,'')
 
     # kaleidoSendMessageAwait() sends out the message to the machine, awaits the reply and creates a corresponding event entry
@@ -15559,7 +15590,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                 self.setExtraEventButtonStyleSignal.emit(lastbuttonpressed, 'normal')
                     elif etype>-1:
                         new_value = int(round(float(res)))
-                        self.addEventSignal.emit(new_value, etype)
+                        self.addEventSignal.emit(new_value, etype, True, False, False)
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
 
@@ -15992,10 +16023,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 self.qmc.ambientTempSource = toInt(settings.value('AmbientTempSource',int(self.qmc.ambientTempSource)))
             #restore delay
             if settings.contains('Delay'):
-                self.qmc.delay = max(self.qmc.min_delay,toInt(settings.value('Delay',int(self.qmc.delay))))
-            else:
-                #self.qmc.delay = self.qmc.default_delay
-                pass
+                self.setSamplingRate(toInt(settings.value('Delay',int(self.qmc.delay))))
             # restore keepON flag
             if settings.contains('KeepON'):
                 self.qmc.flagKeepON = bool(toBool(settings.value('KeepON',self.qmc.flagKeepON)))
@@ -16444,6 +16472,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             settings.beginGroup('ArduinoPID')
             if settings.contains('pidOnCHARGE'):
                 self.pidcontrol.pidOnCHARGE = bool(toBool(settings.value('pidOnCHARGE',self.pidcontrol.pidOnCHARGE)))
+                if settings.contains('createEvents'):
+                    self.pidcontrol.createEvents = bool(toBool(settings.value('createEvents',self.pidcontrol.createEvents)))
                 self.pidcontrol.loadRampSoakFromProfile = bool(toBool(settings.value('loadRampSoakFromProfile',self.pidcontrol.loadRampSoakFromProfile)))
                 self.pidcontrol.svValues = [toInt(x) for x in toList(settings.value('svValues',self.pidcontrol.svValues))]
                 self.pidcontrol.svRamps = [toInt(x) for x in toList(settings.value('svRamps',self.pidcontrol.svRamps))]
@@ -18150,6 +18180,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             #save pid settings (only key and value[0])
             settings.beginGroup('ArduinoPID')
             settings.setValue('pidOnCHARGE',self.pidcontrol.pidOnCHARGE)
+            settings.setValue('createEvents',self.pidcontrol.createEvents)
             settings.setValue('loadRampSoakFromProfile',self.pidcontrol.loadRampSoakFromProfile)
             settings.setValue('loadRampSoakFromBackground',self.pidcontrol.loadRampSoakFromBackground)
             settings.setValue('svLabel',self.pidcontrol.svLabel)
@@ -21812,7 +21843,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def showAboutQt(self, _=False): # pylint: disable=no-self-use # used as slot
+    def showAboutQt(self, _=False):
+        # pylint: disable=no-self-use # used as slot
         self.app.aboutQt()
 
     @pyqtSlot()

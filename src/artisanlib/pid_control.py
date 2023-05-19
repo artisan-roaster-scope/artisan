@@ -29,8 +29,11 @@
 import time as libtime
 import numpy
 import logging
-from typing import Union, List, Dict, Optional
+from typing import Union, List, Dict, Optional, TYPE_CHECKING
 from typing_extensions import Final  # Python <=3.7
+
+if TYPE_CHECKING:
+    from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
 
 from artisanlib.util import decs2string, fromCtoF, fromFtoC, hex2int, str2cmd, stringfromseconds, cmd2str
 
@@ -1114,15 +1117,23 @@ class FujiPID():
 ###################################################################################
 
 class PIDcontrol():
-    def __init__(self,aw) -> None:
-        self.aw = aw
-        self.pidActive = False
+    __slots__ = [ 'aw', 'pidActive', 'sv', 'pidOnCHARGE', 'createEvents', 'loadRampSoakFromProfile', 'loadRampSoakFromBackground', 'svLen', 'svLabel',
+            'svValues', 'svRamps', 'svSoaks', 'svActions', 'svBeeps', 'svDescriptions','svTriggeredAlarms', 'RSLen', 'RS_svLabels', 'RS_svValues', 'RS_svRamps', 'RS_svSoaks',
+            'RS_svActions', 'RS_svBeeps', 'RS_svDescriptions', 'svSlider', 'svButtons', 'svMode', 'svLookahead', 'dutySteps', 'svSliderMin', 'svSliderMax', 'svValue',
+            'dutyMin', 'dutyMax', 'pidKp', 'pidKi', 'pidKd', 'pOnE', 'pidSource', 'pidCycle', 'pidPositiveTarget', 'pidNegativeTarget', 'invertControl',
+            'sv_smoothing_factor', 'sv_decay_weights', 'previous_svs', 'time_pidON', 'current_ramp_segment',  'current_soak_segment', 'ramp_soak_engaged',
+            'RS_total_time', 'slider_force_move' ]
+
+    def __init__(self, aw:'ApplicationWindow') -> None:
+        self.aw:'ApplicationWindow' = aw
+        self.pidActive:bool = False
         self.sv:Optional[float] = None # the last sv send to the Arduino
         #
-        self.pidOnCHARGE = False
-        self.loadRampSoakFromProfile = False
-        self.loadRampSoakFromBackground = False
-        self.svLen = 8 # should stay at 8 for compatibility reasons!
+        self.pidOnCHARGE:bool = False
+        self.createEvents:bool = False
+        self.loadRampSoakFromProfile:bool = False
+        self.loadRampSoakFromBackground:bool = False
+        self.svLen:Final[int] = 8 # should stay at 8 for compatibility reasons!
         self.svLabel:str = ''
         self.svValues: List[float]     = [0]*self.svLen      # sv temp as int per 8 channels
         self.svRamps: List[int]        = [0]*self.svLen      # seconds as int per 8 channels
@@ -1133,7 +1144,7 @@ class PIDcontrol():
         #
         self.svTriggeredAlarms = [False]*self.svLen # set to true once the corresponding alarm was triggered
         # extra RS sets:
-        self.RSLen = 3 # can be changed to have less or more RSn sets
+        self.RSLen:Final[int] = 3 # can be changed to have less or more RSn sets
         self.RS_svLabels: List[str]       = ['']*self.RSLen                  # label of the RS set
         self.RS_svValues: List[List[float]] = [[0]*self.svLen]*self.RSLen      # sv temp as int per 8 channels
         self.RS_svRamps: List[List[int]]  = [[0]*self.svLen]*self.RSLen      # seconds as int per 8 channels
@@ -1161,26 +1172,28 @@ class PIDcontrol():
         #   either the TC4 input channel from [1,..,4] if self.qmc.device == 19 (Arduino/TC4)
         #   in all other cases (HOTTOP, MODBUS,..), 1 is interpreted as BT and 2 as ET, 3 as 0xT1, 4 as 0xT2, 5 as 1xT1, ...
         self.pidSource:int = 1
-        self.pidCycle = 1000
+        self.pidCycle:int = 1000
         # the positive target should increase with positive PID duty
-        self.pidPositiveTarget = 0 # one of [0,1,..,4] with 0: None, 1,..,4: for slider event 1-4
+        self.pidPositiveTarget:int = 0 # one of [0,1,..,4] with 0: None, 1,..,4: for slider event 1-4
         # the negative target should decrease with negative PID duty
-        self.pidNegativeTarget = 0 # one of [0,1,..,4] with 0: None, 1,..,4: for slider event 1-4
+        self.pidNegativeTarget:int = 0 # one of [0,1,..,4] with 0: None, 1,..,4: for slider event 1-4
         # if invertControl is True, a PID duty of 100% delivers 0% positive duty and a 0% PID duty delivers 100% positive duty
-        self.invertControl = False
+        self.invertControl:bool = False
         # PID sv smoothing
-        self.sv_smoothing_factor = 0 # off if 0
+        self.sv_smoothing_factor:int = 0 # off if 0
         self.sv_decay_weights:Optional[List[float]] = None
         self.previous_svs:List[float] = []
         # time @ PID ON
-        self.time_pidON = 0 # in monitoring mode, ramp-soak times are interperted w.r.t. the time after the PID was turned on and not the time after CHARGE as during recording
-        self.current_ramp_segment = 0 # the RS segment currently active. Note that this is 1 based, 0 indicates that no segment has started yet
-        self.current_soak_segment = 0 # the RS segment currently active. Note that this is 1 based, 0 indicates that no segment has started yet
-        self.ramp_soak_engaged = 1 # set to 0, disengaged, after the RS pattern was processed fully
-        self.RS_total_time = 0 # holds the total time of the current Ramp/Soak pattern
+        self.time_pidON:float = 0 # in monitoring mode, ramp-soak times are interperted w.r.t. the time after the PID was turned on and not the time after CHARGE as during recording
+        self.current_ramp_segment:int = 0 # the RS segment currently active. Note that this is 1 based, 0 indicates that no segment has started yet
+        self.current_soak_segment:int = 0 # the RS segment currently active. Note that this is 1 based, 0 indicates that no segment has started yet
+        self.ramp_soak_engaged:int = 1 # set to 0, disengaged, after the RS pattern was processed fully
+        self.RS_total_time:float = 0 # holds the total time of the current Ramp/Soak pattern
+
+        self.slider_force_move:bool = True # if True move the slider independent of the slider position to fire slider action!
 
     @staticmethod
-    def RStotalTime(ramps,soaks):
+    def RStotalTime(ramps:List[int], soaks:List[int]) -> int:
         return sum(ramps) + sum(soaks)
 
     # returns 1 (True) if an external PID controller is in use (MODBUS or TC4 PID firmware)
@@ -1191,7 +1204,7 @@ class PIDcontrol():
     #  2: S7
     #  3: TC4
     #  4: Kaleido
-    def externalPIDControl(self):
+    def externalPIDControl(self) -> int:
         # TC4 with PID firmware or MODBUS and SV register set or S7 and SV area set
         if self.aw.modbus.PID_slave_ID != 0:
             return 1
@@ -1204,26 +1217,28 @@ class PIDcontrol():
         return 0
 
     # v is from [-min,max]
-    def setEnergy(self,v):
+    def setEnergy(self, v:float) -> None:
         try:
             if self.aw.pidcontrol.pidPositiveTarget:
                 slidernr = self.aw.pidcontrol.pidPositiveTarget - 1
                 vp = min(100,max(0,int(round(abs(100 - v) if self.aw.pidcontrol.invertControl else v))))
                 # we need to map the duty [0%,100%] to the [slidermin,slidermax] range
                 heat = int(round(float(numpy.interp(vp,[0,100],[self.aw.eventslidermin[slidernr],self.aw.eventslidermax[slidernr]]))))
-                self.aw.block_quantification_sampling_ticks[slidernr] = self.aw.sampling_ticks_to_block_quantifiction
-                self.aw.qmc.temporarymovepositiveslider = (slidernr,heat)
+                heat = self.aw.applySliderStepSize(slidernr, heat) # quantify by slider step size
+                self.aw.addEventSignal.emit(heat,slidernr,self.createEvents,True,self.slider_force_move)
+                self.aw.qmc.slider_force_move = False
             if self.aw.pidcontrol.pidNegativeTarget:
                 slidernr = self.aw.pidcontrol.pidNegativeTarget - 1
                 vn = min(0,max(-100,int(round(0 - v if self.aw.pidcontrol.invertControl else v))))
                 # we need to map the duty [0%,-100%] to the [slidermin,slidermax] range
-                self.aw.block_quantification_sampling_ticks[slidernr] = self.aw.sampling_ticks_to_block_quantifiction
                 cool = int(round(float(numpy.interp(vn,[-100,0],[self.aw.eventslidermax[slidernr],self.aw.eventslidermin[slidernr]]))))
-                self.aw.qmc.temporarymovenegativeslider = (slidernr,cool)
+                cool = self.aw.applySliderStepSize(slidernr, cool) # quantify by slider step size
+                self.aw.addEventSignal.emit(cool,slidernr,self.createEvents,True,self.slider_force_move)
+                self.slider_force_move = False
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
-    def conv2celsius(self):
+    def conv2celsius(self) -> None:
         try:
             self.aw.qmc.rampSoakSemaphore.acquire(1)
             self.svValue = int(round(fromFtoC(self.svValue)))
@@ -1318,7 +1333,7 @@ class PIDcontrol():
                 self.aw.sendmessage(QApplication.translate('StatusBar','PID ON'))
             self.pidModeInit()
 
-            self.aw.qmc.temporayslider_force_move = True
+            self.slider_force_move = True
             # TC4 hardware PID
             # MODBUS hardware PID
             if (self.aw.pidcontrol.externalPIDControl() == 1 and self.aw.modbus.PID_ON_action and self.aw.modbus.PID_ON_action != ''):
@@ -1336,7 +1351,7 @@ class PIDcontrol():
                     try:
                         #### lock shared resources #####
                         self.aw.ser.COMsemaphore.acquire(1)
-                        if self.aw.ser.SP.isOpen():
+                        if self.aw.ser.SP.is_open:
                             duty_min = min(100,max(0,self.aw.pidcontrol.dutyMin))
                             duty_max = min(100,max(0,self.aw.pidcontrol.dutyMax))
                             self.aw.ser.SP.write(str2cmd('PID;LIMIT;' + str(duty_min) + ';' + str(duty_max) + '\n'))
@@ -1395,7 +1410,7 @@ class PIDcontrol():
                 try:
                     #### lock shared resources #####
                     self.aw.ser.COMsemaphore.acquire(1)
-                    if self.aw.ser.SP.isOpen():
+                    if self.aw.ser.SP.is_open:
                         self.aw.ser.SP.reset_input_buffer() # self.aw.ser.SP.flushInput() # deprecated in v3
                         self.aw.ser.SP.reset_output_buffer() # self.aw.ser.SP.flushOutput() # deprecated in v3
                         self.aw.ser.SP.write(str2cmd('PID;OFF\n'))
@@ -1415,25 +1430,25 @@ class PIDcontrol():
             self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PID'])
         elif self.aw.qmc.Controlbuttonflag:
             # software PID
-            self.aw.qmc.pid.setControl(lambda _: _)
+            self.aw.qmc.pid.setControl(lambda _: None)
             self.pidActive = False
             self.aw.qmc.pid.off()
             if not self.aw.HottopControlActive:
                 self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PID'])
 
     @pyqtSlot(int)
-    def sliderMinValueChanged(self,i):
+    def sliderMinValueChanged(self, i:int) -> None:
         self.svSliderMin = i
         self.aw.sliderSV.setMinimum(self.svSliderMin)
 
     @pyqtSlot(int)
-    def sliderMaxValueChanged(self,i):
+    def sliderMaxValueChanged(self, i:int) -> None:
         self.svSliderMax = i
         self.aw.sliderSV.setMaximum(self.svSliderMax)
 
     # returns SV (or None) wrt. to the ramp-soak table and the given time t
     # (used only internally)
-    def svRampSoak(self,t):
+    def svRampSoak(self, t:float) -> Optional[float]:
         try:
             self.aw.qmc.rampSoakSemaphore.acquire(1)
             if self.ramp_soak_engaged == 0:
@@ -1483,7 +1498,7 @@ class PIDcontrol():
             if self.aw.qmc.rampSoakSemaphore.available() < 1:
                 self.aw.qmc.rampSoakSemaphore.release(1)
 
-    def smooth_sv(self,sv):
+    def smooth_sv(self, sv:float) -> float:
         if self.sv_smoothing_factor:
             # create or update smoothing decay weights
             if self.sv_decay_weights is None or len(self.sv_decay_weights) != self.sv_smoothing_factor: # recompute only on changes
@@ -1494,11 +1509,11 @@ class PIDcontrol():
             self.previous_svs = self.previous_svs[-self.sv_smoothing_factor:]
             # compute smoothed output
             if len(self.previous_svs) >= self.sv_smoothing_factor:
-                return numpy.average(self.previous_svs,weights=self.sv_decay_weights)
+                return float(numpy.average(self.previous_svs,weights=self.sv_decay_weights))
         return sv # no smoothing yet
 
     # returns None if in manual mode or no other sv (via ramp/soak or follow mode) defined
-    def calcSV(self,tx):
+    def calcSV(self, tx:float) -> Optional[float]:
         if self.svMode == 1:
             # Ramp/Soak mode
             # actual time (after CHARGE) on recording and time after PID ON on monitoring:
@@ -1553,12 +1568,12 @@ class PIDcontrol():
         # return None in manual mode
         return None
 
-    def setDutySteps(self,dutySteps):
+    def setDutySteps(self, dutySteps:int) -> None:
         if self.aw.qmc.Controlbuttonflag and not self.aw.pidcontrol.externalPIDControl():
             self.aw.qmc.pid.setDutySteps(dutySteps)
 
 
-    def setSV(self, sv:float, move:bool = True, init:bool = False):
+    def setSV(self, sv:float, move:bool = True, init:bool = False) -> None:
 #        if not move:
 #            self.aw.sendmessage(QApplication.translate("Message","SV set to %s"%sv))
         if self.aw.pidcontrol.externalPIDControl() == 1:
@@ -1586,7 +1601,7 @@ class PIDcontrol():
                     try:
                         #### lock shared resources #####
                         self.aw.ser.COMsemaphore.acquire(1)
-                        if self.aw.ser.SP.isOpen():
+                        if self.aw.ser.SP.is_open:
                             self.aw.ser.SP.reset_input_buffer() # self.aw.ser.SP.flushInput() # deprecated in v3
                             self.aw.ser.SP.reset_output_buffer() # self.aw.ser.SP.flushOutput() # deprecated in v3
                             self.aw.ser.SP.write(str2cmd('PID;SV;' + str(sv) +'\n'))
@@ -1608,7 +1623,7 @@ class PIDcontrol():
             self.sv = sv # remember last sv
 
     # set RS patterns from one of the RS sets
-    def setRSpattern(self,n):
+    def setRSpattern(self, n:int) -> None:
         try:
             self.aw.qmc.rampSoakSemaphore.acquire(1)
             if n < self.RSLen:
@@ -1626,7 +1641,7 @@ class PIDcontrol():
                 self.aw.qmc.rampSoakSemaphore.release(1)
 
     # returns the first RS patterrn idx with label or None
-    def findRSset(self,label):
+    def findRSset(self, label:str) -> Optional[int]:
         try:
             self.aw.qmc.rampSoakSemaphore.acquire(1)
             return self.RS_svLabels.index(label)
@@ -1637,12 +1652,12 @@ class PIDcontrol():
             if self.aw.qmc.rampSoakSemaphore.available() < 1:
                 self.aw.qmc.rampSoakSemaphore.release(1)
 
-    def adjustsv(self,diff):
+    def adjustsv(self, diff:float) -> None:
         if self.sv is None or self.sv<0:
             self.sv = 0
         self.setSV(self.sv + diff,move=True)
 
-    def activateSVSlider(self,flag):
+    def activateSVSlider(self, flag:bool) -> None:
         if flag:
             self.aw.sliderGrpBoxSV.setVisible(True)
             self.aw.sliderSV.blockSignals(True)
@@ -1664,7 +1679,7 @@ class PIDcontrol():
             self.svSlider = False
             self.aw.slidersAction.setEnabled(any(self.aw.eventslidervisibilities))
 
-    def activateONOFFeasySV(self,flag):
+    def activateONOFFeasySV(self, flag:bool) -> None:
         if flag:
             if self.aw.qmc.flagon:
                 self.aw.buttonSVp5.setVisible(True)
@@ -1682,7 +1697,7 @@ class PIDcontrol():
             self.aw.buttonSVm5.setVisible(False)
 
     # just store the p-i-d configuration
-    def setPID(self,kp,ki,kd,source=None,cycle=None,pOnE=True):
+    def setPID(self, kp:float, ki:float, kd:float, source:Optional[int] = None, cycle:Optional[int] = None, pOnE:bool = True) -> None:
         self.pidKp = kp
         self.pidKi = ki
         self.pidKd = kd
@@ -1693,7 +1708,7 @@ class PIDcontrol():
             self.pidCycle = cycle
 
     # send conf to connected PID
-    def confPID(self,kp,ki,kd,source=None,cycle=None,pOnE=True):
+    def confPID(self, kp:float, ki:float, kd:float, source:Optional[int] = None, cycle:Optional[int] = None, pOnE:bool = True) -> None:
         if self.aw.pidcontrol.externalPIDControl() == 1: # MODBUS (external) Control active
             self.aw.modbus.setPID(kp,ki,kd)
             self.pidKp = kp
@@ -1717,7 +1732,7 @@ class PIDcontrol():
                 try:
                     #### lock shared resources #####
                     self.aw.ser.COMsemaphore.acquire(1)
-                    if self.aw.ser.SP.isOpen():
+                    if self.aw.ser.SP.is_open:
                         self.aw.ser.SP.reset_input_buffer() # self.aw.ser.SP.flushInput() # deprecated in v3
                         self.aw.ser.SP.reset_output_buffer() # self.aw.ser.SP.flushOutput() # deprecated in v3
                         if pOnE:

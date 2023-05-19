@@ -256,8 +256,8 @@ class tgraphcanvas(FigureCanvas):
         'ETBdeltalinestyle', 'ETBdeltadrawstyle', 'ETBdeltalinewidth', 'ETBdeltamarker', 'ETBdeltamarkersize', 'alarmsetlabel', 'alarmflag', 'alarmguard', 'alarmnegguard', 'alarmtime', 'alarmoffset', 'alarmtime2menuidx', 'menuidx2alarmtime',
         'alarmcond', 'alarmstate', 'alarmsource', 'alarmtemperature', 'alarmaction', 'alarmbeep', 'alarmstrings', 'alarmtablecolumnwidths', 'silent_alarms',
         'alarmsets_count', 'alarmsets', 'loadalarmsfromprofile', 'loadalarmsfrombackground', 'alarmsfile', 'temporaryalarmflag', 'TPalarmtimeindex',
-        'rsfile', 'temporary_error', 'temporarymovepositiveslider', 'temporarymovenegativeslider',
-        'temporayslider_force_move', 'quantifiedEvent', 'loadaxisfromprofile', 'startofx_default', 'endofx_default', 'xgrid_default', 'ylimit_F_default',
+        'rsfile', 'temporary_error',
+        'quantifiedEvent', 'loadaxisfromprofile', 'startofx_default', 'endofx_default', 'xgrid_default', 'ylimit_F_default',
         'ylimit_min_F_default', 'ygrid_F_default', 'zlimit_F_default', 'zlimit_min_F_default', 'zgrid_F_default', 'ylimit_C_default', 'ylimit_min_C_default',
         'ygrid_C_default', 'zlimit_C_default', 'zlimit_min_C_default', 'zgrid_C_default', 'temp_grid', 'time_grid', 'zlimit_max', 'zlimit_min_max',
         'ylimit_max', 'ylimit_min_max', 'ylimit', 'ylimit_min', 'zlimit', 'zlimit_min', 'RoRlimitFlag', 'RoRlimit', 'RoRlimitm', 'maxRoRlimit',
@@ -1649,10 +1649,6 @@ class tgraphcanvas(FigureCanvas):
         self.rsfile:str = '' # filename Ramp/Soak patterns were loaded from
 
         self.temporary_error:Optional[str] = None # set by adderror() to a new error message, send to the message line by updategraphics()
-        self.temporarymovepositiveslider:Optional[Tuple[int,int]] = None # set by pidcontrol.setEnergy (indirectly called from sample())
-                # holds tuple (slidernr,value) and is executed and reset by updategraphics
-        self.temporarymovenegativeslider:Optional[Tuple[int,int]] = None
-        self.temporayslider_force_move:bool = True # if True move the slider independent of the slider position to fire slider action!
 
         self.quantifiedEvent:List = [] # holds an event quantified during sample(), a tuple [<eventnr>,<value>,<recordEvent>]
 
@@ -2194,7 +2190,7 @@ class tgraphcanvas(FigureCanvas):
         self.alarmsetSignal.connect(self.selectAlarmSet)
         self.moveBackgroundSignal.connect(self.moveBackgroundAndRedraw)
         self.eventRecordSignal.connect(self.EventRecordSlot)
-        self.eventRecordActionSignal.connect(self.EventRecordActionSlot)
+        self.eventRecordActionSignal.connect(self.EventRecordActionSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore # queued to avoid deadlock between PID processing and EventRecordAction, both accessing the same critical section protected by profileDataSemaphore
         self.showCurveSignal.connect(self.showCurve)
         self.showExtraCurveSignal.connect(self.showExtraCurve)
         self.showEventsSignal.connect(self.showEvents)
@@ -2547,7 +2543,7 @@ class tgraphcanvas(FigureCanvas):
     @staticmethod
     def eventsExternal2InternalValue(v:float) -> float:
         if -1.0 < v < 1.0:
-            return 1.0
+            return 1.0 # ML: should this be 0!?
         if v >= 1.0:
             return v/10. + 1.
         return v/10. - 1.
@@ -3096,8 +3092,7 @@ class tgraphcanvas(FigureCanvas):
 
     # note that partial values might be given here (time might update, but not the values)
     @pyqtSlot(str,str,str)
-    # pylint: disable=no-self-use # used as slot
-    def updateLargeLCDs(self, bt, et, time):
+    def updateLargeLCDs(self, bt, et, time): # pylint: disable=no-self-use # used as slot
         try:
             if self.aw.largeLCDs_dialog is not None:
                 if self.flagon and not self.flagstart:
@@ -3136,8 +3131,7 @@ class tgraphcanvas(FigureCanvas):
             _log.exception(e)
 
     @pyqtSlot(str)
-    # pylint: disable=no-self-use # used as slot
-    def updateLargeLCDsTime(self, time):
+    def updateLargeLCDsTime(self, time): # pylint: disable=no-self-use # used as slot
         try:
             if self.aw.largeLCDs_dialog is not None:
                 self.aw.largeLCDs_dialog.updateValues([],[],time=time)
@@ -4283,24 +4277,6 @@ class tgraphcanvas(FigureCanvas):
                 finally:
                     if self.profileDataSemaphore.available() < 1:
                         self.profileDataSemaphore.release(1)
-
-                #check move slider pending actions set by the Artisan Software PID
-                if self.temporarymovepositiveslider is not None:
-                    slidernr,value = self.temporarymovepositiveslider # pylint: disable=unpacking-non-sequence
-                    if self.aw.sliderpos(slidernr) != value or self.temporayslider_force_move:
-                        self.aw.moveslider(slidernr,value) # move slider
-                        self.aw.fireslideraction(slidernr) # fire action
-                        self.aw.extraeventsactionslastvalue[slidernr] = int(round(value)) # remember last value for relative event buttons
-                        self.temporayslider_force_move = False
-                self.temporarymovepositiveslider = None
-                if self.temporarymovenegativeslider is not None:
-                    slidernr,value = self.temporarymovenegativeslider # pylint: disable=unpacking-non-sequence
-                    if self.aw.sliderpos(slidernr) != value or self.temporayslider_force_move:
-                        self.aw.moveslider(slidernr,value) # move slider
-                        self.aw.fireslideraction(slidernr) # fire action
-                        self.aw.extraeventsactionslastvalue[slidernr] = int(round(value)) # remember last value for relative event buttons
-                        self.temporayslider_force_move = False
-                self.temporarymovenegativeslider = None
 
                 #write error message
                 if self.temporary_error is not None:

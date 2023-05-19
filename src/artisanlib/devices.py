@@ -1969,7 +1969,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             if len(self.aw.extratimeout) > x:
                 self.aw.extratimeout.pop(x)
             if len(self.aw.extraser) > x:
-                if self.aw.extraser[x].SP.isOpen():
+                if self.aw.extraser[x].SP.is_open:
                     self.aw.extraser[x].SP.close()
                     libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port gets disabled
                 self.aw.extraser.pop(x)

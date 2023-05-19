@@ -379,10 +379,19 @@ class PID_DlgControl(ArtisanDialog):
         self.startPIDonCHARGE = QCheckBox(QApplication.translate('CheckBox', 'Start PID on CHARGE'))
         self.startPIDonCHARGE.setChecked(self.aw.pidcontrol.pidOnCHARGE)
 
+        self.createEvents = QCheckBox(QApplication.translate('CheckBox', 'Create Events'))
+        self.createEvents.setChecked(self.aw.pidcontrol.createEvents)
+
+        flagsLayout = QHBoxLayout()
+        flagsLayout.addWidget(self.startPIDonCHARGE)
+        flagsLayout.addSpacing(10)
+        flagsLayout.addWidget(self.createEvents)
+        flagsLayout.addStretch()
+
         tab1Layout.addLayout(pidBox)
         tab1Layout.addLayout(svBox)
         tab1Layout.addStretch()
-        tab1Layout.addWidget(self.startPIDonCHARGE)
+        tab1Layout.addLayout(flagsLayout)
 
         labelLabel = QLabel(QApplication.translate('Label', 'Label'))
         self.labelEdit = QLineEdit()
@@ -968,6 +977,7 @@ class PID_DlgControl(ArtisanDialog):
         self.aw.pidcontrol.setPID(kp,ki,kd,source,cycle,pOnE)
         #
         self.aw.pidcontrol.pidOnCHARGE = self.startPIDonCHARGE.isChecked()
+        self.aw.pidcontrol.createEvents = self.createEvents.isChecked()
         self.aw.pidcontrol.loadRampSoakFromProfile = self.loadRampSoakFromProfile.isChecked()
         self.aw.pidcontrol.loadRampSoakFromBackground = self.loadRampSoakFromBackground.isChecked()
         self.aw.pidcontrol.svSliderMin = min(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())

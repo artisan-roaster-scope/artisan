@@ -61,14 +61,14 @@ def hex2int(h1,h2=None):
 
 def openport(p):
     try:
-        if p is not None and not p.isOpen():
+        if p is not None and not p.is_open:
             p.open()
     except Exception as e: # pylint: disable=broad-except
         _log.exception(e)
 
 def closeport(p):
     try:
-        if p is not None and p.isOpen():
+        if p is not None and p.is_open:
             p.close()
     except Exception as e: # pylint: disable=broad-except
         _log.exception(e)
@@ -85,7 +85,7 @@ def gettemperatures(p,retry=True):
     CHAFF_TRAY = -1
     try:
         openport(p)
-        if p.isOpen():
+        if p.is_open:
             #p.flushInput() # deprecated in v3
             p.reset_input_buffer()
             #p.flushOutput() # deprecated in v3
@@ -185,7 +185,7 @@ def sendControl(p,aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOT
         aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR):
     try:
         openport(SP)
-        if p.isOpen():
+        if p.is_open:
             cmd = HOTTOPcontrol(aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR,
                     aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR)
 #            print("".join("\\x%02x" % ord(i) for i in cmd))
