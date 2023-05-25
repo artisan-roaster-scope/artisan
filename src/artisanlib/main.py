@@ -6226,7 +6226,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     RoR_FCs_act_float = self.qmc.delta2[self.qmc.timeindex[2]]
                     try:
                         fcs_idx = self.qmc.timeindex[2]-analysis_start
-                        RoR_FCs_delta = str(RoR_FCs_act_float - np_dbtb[fcs_idx])
+                        RoR_FCs_delta = f'{RoR_FCs_act_float - np_dbtb[fcs_idx]:.2f}'
                     except Exception: # pylint: disable=broad-except
                         RoR_FCs_delta = str(float('nan'))
                     RoR_FCs_act = f'{RoR_FCs_act_float:.2f}'
