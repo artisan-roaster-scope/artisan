@@ -75,15 +75,7 @@ if [ -z $APPVEYOR ]; then
     done
 fi
 
-# patch google packages to help out py2app
 
-touch $PYTHONPATH/site-packages/google/__init__.py
-touch $PYTHONPATH/site-packages/google/protobuf/__init__.py
-touch $PYTHONPATH/site-packages/google/protobuf/internal/__init__.py
-
-ls $PYTHONPATH/site-packages/google/
-ls $PYTHONPATH/site-packages/google/protobuf/
-ls $PYTHONPATH/site-packages/google/protobuf/internal/
 
 # distribution
 rm -rf build dist

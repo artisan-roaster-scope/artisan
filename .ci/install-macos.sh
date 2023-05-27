@@ -22,7 +22,7 @@ if [ -n "${PYUPGRADE_V:-}" ]; then
     # update symbolic link to point to our new venv
     ln -vfns /Users/appveyor/venv${PYUPGRADE_V} /Users/appveyor/venv${PYTHON_V}
     export PATH=/Users/appveyor/venv${PYUPGRADE_V}/bin:${PATH} # not exported?
-fi 
+fi
 
 hash -r
 which python3
@@ -39,6 +39,15 @@ python3 --version
 python -m pip install --upgrade pip
 sudo -H python -m pip install --root-user-action=ignore -r src/requirements.txt
 sudo -H python -m pip install --root-user-action=ignore -r src/requirements-${ARTISAN_OS}.txt
+
+# patch google packages to help out py2app
+sudo -H touch ${PYTHONSITEPKGS}/google/__init__.py
+sudo -H touch ${PYTHONSITEPKGS}/google/protobuf/__init__.py
+sudo -H touch ${PYTHONSITEPKGS}/google/protobuf/internal/__init__.py
+
+ls ${PYTHONSITEPKGS}/google/
+ls ${PYTHONSITEPKGS}/google/protobuf/
+ls ${PYTHONSITEPKGS}/google/protobuf/internal/
 
 
 # copy the snap7 binary installed by pip
