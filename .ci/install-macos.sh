@@ -42,6 +42,7 @@ sudo -H python -m pip install --root-user-action=ignore -r src/requirements-${AR
 
 # patch google packages to help out py2app
 sudo -H touch ${PYTHONSITEPKGS}/google/__init__.py
+sudo -H touch ${PYTHONSITEPKGS}/google/_upb/__init__.py
 sudo -H touch ${PYTHONSITEPKGS}/google/protobuf/__init__.py
 sudo -H touch ${PYTHONSITEPKGS}/google/protobuf/internal/__init__.py
 

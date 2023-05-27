@@ -139,7 +139,7 @@ OPTIONS = {
     'semi_standalone': False,
     'site_packages': True,
     'packages': ['yoctopuce','gevent','openpyxl','numpy','scipy','certifi',
-        'matplotlib','PIL', 'lxml', 'snap7', 'google.protobuf'], # MPL and PIL added for mpl v3.3.x
+        'matplotlib','PIL', 'lxml', 'snap7', 'google.protobuf', 'google._upb'],
     'optimize':  2,
     'compressed': True,
     'iconfile': 'artisan.icns',
