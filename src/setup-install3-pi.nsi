@@ -325,6 +325,7 @@ Section Uninstall
   RMDir /r "$INSTDIR\charset_normalizer"
   RMDir /r "$INSTDIR\contourpy"
   RMDir /r "$INSTDIR\gevent"
+  RMDir /r "$INSTDIR\google"
   RMDir /r "$INSTDIR\greenlet"
   RMDir /r "$INSTDIR\Icons"
   RMDir /r "$INSTDIR\Include"
