@@ -605,8 +605,8 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1200_changeTriggersStrings.insert(1,'0.01C')
         self.phidget1200_changeTriggersStrings.insert(1,'0.005C')
         self.phidget1200_dataRate:int = 340
-        self.phidget1200_dataRatesStrings: Final[List[str]] = ['340ms','500ms','750ms','1s']
-        self.phidget1200_dataRatesValues: Final[List[int]] = [340,500,700,1024]
+        self.phidget1200_dataRatesStrings: Final[List[str]] = ['250ms','500ms','750ms','1s']
+        self.phidget1200_dataRatesValues: Final[List[int]] = [250,500,700,1024]
 
         self.phidget1200_2_async:bool = False
         self.phidget1200_2_formula:int = 0
@@ -832,7 +832,11 @@ class tgraphcanvas(FigureCanvas):
                        'Kaleido BT/ET',             #138
                        '+Kaleido SV/AT',            #139
                        '+Kaleido Drum/AH',          #140
-                       '+Kaleido Heater/Fan'        #141
+                       '+Kaleido Heater/Fan',       #141
+                       'IKAWA',                     #142
+                       '+IKAWA SET/RPM',            #143
+                       '+IKAWA Heater/Fan',         #144
+                       '+IKAWA State'               #145
                        ]
 
         # ADD DEVICE:
@@ -885,7 +889,8 @@ class tgraphcanvas(FigureCanvas):
             132, # Yocto Current
             133, # Yocto Sensor
             134, # Santoker BT/ET
-            138  # Kaleido BT/ET
+            138, # Kaleido BT/ET
+            142  # IKAWA
         ]
 
         # ADD DEVICE:
@@ -939,6 +944,9 @@ class tgraphcanvas(FigureCanvas):
             137, # Phidget DAQ1500
             140, # Kaleido Drum/AH
             141, # Kaleido Heater/Fan
+            143, # IKAWA Set/RPM
+            144, # IKAWA Heater/Fan
+            145  # IKAWA State
         ]
 
         #extra devices
@@ -3231,6 +3239,10 @@ class tgraphcanvas(FigureCanvas):
             if self.extradevices[n] in [54,90,91,135,136,140,141]: # Hottop Heater/Fan, Slider 12, Slider 34, Santoker Power / Fan, Kaleido Fan/Drum, Kaleido Heater/AH
                 return True
             if self.extradevices[n] == 136 and c == 0: # Santoker Drum
+                return True
+            if self.extradevices[n] in [140, 141]: # Kaleido drum/AH, heater/fan
+                return True
+            if self.extradevices[n] in [144, 145]: # IKAWA heater/fan, state
                 return True
             return False
         return False
@@ -11245,6 +11257,15 @@ class tgraphcanvas(FigureCanvas):
                         serial=kaleido_serial,
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Kaleido'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Kaleido'),True,None))
+                elif self.device == 142:
+                    from artisanlib.ikawa import IKAWA_BLE
+                    self.aw.ikawa = IKAWA_BLE(
+                        connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('IKAWA'),True,None),
+                        disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('IKAWA'),True,None))
+                    if self.aw.ikawa is not None:
+                        self.aw.ikawa.start()
+                        self.aw.sendmessageSignal.emit(QApplication.translate('Message', 'scanning for device'),True,None)
+
             self.aw.initializedMonitoringExtraDeviceStructures()
 
             #reset alarms
@@ -11364,6 +11385,11 @@ class tgraphcanvas(FigureCanvas):
             if not bool(self.aw.simulator) and self.device == 138 and self.aw.kaleido is not None:
                 self.aw.kaleido.stop()
                 self.aw.kaleido = None
+
+            # disconnect IKAWA
+            if not bool(self.aw.simulator) and self.device == 142 and self.aw.ikawa is not None:
+                self.aw.ikawa.stop()
+                self.aw.ikawa = None
 
             # at OFF we stop the follow-background on FujiPIDs and set the SV to 0
             if self.device == 0 and self.aw.fujipid.followBackground and self.aw.fujipid.sv and self.aw.fujipid.sv > 0:
@@ -15610,7 +15636,7 @@ class tgraphcanvas(FigureCanvas):
     def addpoint_action(self,_=False):
         self.addpoint()
 
-    def addpoint(self,manual=True):
+    def addpoint(self, manual:bool = True) -> Optional[int]:
         try:
             #current x, and y is obtained when doing right click in mouse: on_press()
             if manual:
@@ -15625,7 +15651,7 @@ class tgraphcanvas(FigureCanvas):
                     self.currentx = values[0] + offset
                     self.currenty = values[1]
                 else:
-                    return
+                    return None
 
 
             if self.currentx > self.timex[-1]:       #if point is beyond max timex (all the way to the right)
@@ -15644,7 +15670,7 @@ class tgraphcanvas(FigureCanvas):
                 #no need to update time index
 
                 self.redrawdesigner(force=True)
-                return # 0
+                return 0
 
             if self.currentx < self.timex[0]:         #if point is below min timex (all the way to the left)
                 #find closest line
@@ -15667,14 +15693,14 @@ class tgraphcanvas(FigureCanvas):
                         self.timeindex[u] += 1
 
                 self.redrawdesigner(force=True)
-                return # len(self.timex)-1   #return index received from Designer Dialog Config to assign index to timeindex)
+                return len(self.timex)-1   #return index received from Designer Dialog Config to assign index to timeindex)
 
             #mid range
             #find index
             i = next((x for x, val in enumerate(self.timex) if val > self.currentx), None) # returns None if no index exists with "self.timex[i] > self.currentx"
 
             if i is None:
-                return
+                return None
 
             #find closest line
             d1 = abs(self.temp1[i] - self.currenty)
@@ -15694,12 +15720,13 @@ class tgraphcanvas(FigureCanvas):
                         self.timeindex[x] += 1
 
             self.redrawdesigner(force=True)
-            return # i
+            return i
 
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             self.adderror((QApplication.translate('Error Message', 'Exception:') + ' addpoint() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+            return None
 
     #removes point
     @pyqtSlot()

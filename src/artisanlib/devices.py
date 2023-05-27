@@ -3022,6 +3022,20 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 141 is +Kaleido Heater/Fan but +DEVICE cannot be set as main device
                 ##########################
+                ##########################
+                ####  DEVICE 142 is IKAWA
+                elif meter == 'IKAWA':
+                    self.aw.qmc.device = 142
+                    message = QApplication.translate('Message','Device set to {0}').format(meter)
+                ##########################
+                ####  DEVICE 143 is +IKAWA SET/RPM but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                ####  DEVICE 144 is +IKAWA Heater/Fan but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                ####  DEVICE 145 is +IKAWA State but +DEVICE cannot be set as main device
+                ##########################
 
 
                 # ADD DEVICE:
@@ -3183,7 +3197,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 9, # 138
                 9, # 139
                 9, # 140
-                9  # 141
+                9, # 141
+                9, # 142
+                9, # 143
+                9, # 144
+                9  # 145
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):

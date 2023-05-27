@@ -8,7 +8,7 @@ import os
 import csv
 import re
 import logging
-from typing import Optional, List, TYPE_CHECKING
+from typing import Optional, List, Tuple, Callable, ClassVar, Generator, TYPE_CHECKING
 from typing_extensions import Final  # Python <=3.7
 
 
@@ -16,13 +16,15 @@ if TYPE_CHECKING:
     from artisanlib.types import ProfileData # pylint: disable=unused-import
 
 try:
-    from PyQt6.QtCore import QDateTime,Qt # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import QDateTime, Qt, QTimer, QMutex, QWaitCondition # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
-    from PyQt5.QtCore import QDateTime,Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QDateTime, Qt, QTimer, QMutex, QWaitCondition  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import encodeLocal
+from artisanlib.ble import BleInterface, BLE_CHAR_TYPE # noqa: F811
+from proto import IkawaCmd_pb2 # type: ignore
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -221,3 +223,203 @@ def extractProfileIkawaCSV(file,_):
             res['etypes'] = etypes
     res['title'] = Path(file).stem
     return res
+
+
+class IKAWA_BLE():
+
+    ###CmdType
+    BOOTLOADER_GET_VERSION:      ClassVar[int] = 0
+    MACH_PROP_GET_TYPE:          ClassVar[int] = 2
+    MACH_PROP_GET_ID:            ClassVar[int] = 3
+    MACH_STATUS_GET_ERROR_VALUE: ClassVar[int] = 10
+    MACH_STATUS_GET_ALL_VALUE:   ClassVar[int] = 11
+    HIST_GET_TOTAL_ROAST_COUNT:  ClassVar[int] = 13
+    PROFILE_GET:                 ClassVar[int] = 15
+    PROFILE_SET:                 ClassVar[int] = 16
+    SETTING_GET:                 ClassVar[int] = 17
+    MACH_PROP_GET_SUPPORT_INFO:  ClassVar[int] = 23
+
+
+    DEVICE_NAME_IKAWA:   ClassVar[str] = 'IKAWA'
+    IKAWA_SERVICE_UUID:  ClassVar[str] = 'C92A6046-6C8D-4116-9D1D-D20A8F6A245F'
+    IKAWA_SEND_CHAR_UUID: ClassVar[Tuple[str,BLE_CHAR_TYPE]] = ('851A4582-19C1-4E6C-AB37-E7A03766BA16', BLE_CHAR_TYPE.BLE_CHAR_WRITE)
+    IKAWA_RECEIVE_CHAR_UUID: ClassVar[Tuple[str,BLE_CHAR_TYPE]] = ('948C5059-7F00-46D9-AC55-BF090AE066E3', BLE_CHAR_TYPE.BLE_CHAR_NOTIFY)
+
+
+    def __init__(self,
+                connected_handler:Optional[Callable[[], None]] = None,
+                disconnected_handler:Optional[Callable[[], None]] = None) -> None:
+
+        self.connected_handler:Optional[Callable[[], None]] = connected_handler
+        self.disconnected_handler:Optional[Callable[[], None]] = disconnected_handler
+
+        self.receiveMutex:QMutex = QMutex()
+        self.dataReceived:QWaitCondition = QWaitCondition()
+        self.receiveTimeout:int = 400
+
+        self.connected_state:bool = False
+
+        self.ET:float = -1
+        self.BT:float = -1
+        self.SP:float = -1
+        self.RPM:float = -1 # fan speed in RPM
+        self.heater:int = -1
+        self.fan:int = -1
+        self.state:int = -1
+        # state is one of
+        #  0: on-roaster
+        #  1: pre-heating (START)
+        #  2: ready-to-roast
+        #  3: roasting
+        #  4: roaster-is-busy
+        #  5: cooling (DROP)
+        #  6: doser-open (CHARGE)
+        #  7: unexpected-problem
+        #  8: ready-to-blow
+        #  9: test-mode
+
+        self.seq:Generator[int, None, None] = self.seqNum() # message sequence number generator
+
+        self.ble:BleInterface = BleInterface(
+            [(IKAWA_BLE.IKAWA_SERVICE_UUID, [IKAWA_BLE.IKAWA_SEND_CHAR_UUID, IKAWA_BLE.IKAWA_RECEIVE_CHAR_UUID])],
+            self.processData,
+            sendStop = self.sendStop,
+            connected = self.connected,
+            #device_names = [ IKAWA_BLE.DEVICE_NAME_IKAWA ]
+            )
+
+        self.frame_char:Final[int]          = 126 # b'\x7e'
+        self.escape_char:Final[int]         = 125 # b'\x7d'
+        self.escape_offset:Final[int]       = 32
+        self.frame_char_escaped:Final[int]  = self.frame_char - self.escape_offset # 94 = b'\x5e'
+        self.escape_char_escaped:Final[int] = self.escape_char - self.escape_offset # 93 = b'\x5d'
+
+        # either empty, or contains a partial payload incl. the begining frame_char or contains the full payload incl. the begining and ending frame_char
+        self.rcv_buffer:Optional[bytes] = None
+
+    @staticmethod
+    def seqNum() -> Generator[int, None, None]:
+        num = 1
+        while True:
+            yield num
+            num = (num + 1) % 32767
+
+    @staticmethod
+    def crc16(bArr:bytes, i:int) -> bytes:
+        for i2 in bArr:
+            i3 = (i2 & 255) ^ (i & 255)
+            i4 = i3 ^ ((i3 << 4) & 255)
+            i = ((((i >> 8) & 255) | ((i4 << 8) & 65535)) ^ (i4 >> 4)) ^ ((i4 << 3) & 65535)
+        return int(i & 65535).to_bytes(2, byteorder='big')
+
+    def escape(self, msg:bytes) -> bytes:
+        message:bytes = b''
+        for i,_ in enumerate(msg):
+            if msg[i] == self.escape_char:
+                message += self.escape_char.to_bytes(length=1, byteorder='big')
+                message += self.escape_char_escaped.to_bytes(length=1, byteorder='big')
+            elif msg[i] == self.frame_char:
+                message += self.escape_char.to_bytes(length=1, byteorder='big')
+                message += self.frame_char_escaped.to_bytes(length=1, byteorder='big')
+            else:
+                message += msg[i:i+1]
+        return message
+
+    def unescape(self, msg:bytes) -> bytes:
+        unescaped_message = bytearray()
+        i = 0
+        while i < len(msg):
+            if msg[i] == self.escape_char and len(msg)>i+1:
+                unescaped_message.append(msg[i + 1] + self.escape_offset)
+                i += 1 # skip one
+            else:
+                unescaped_message.append(msg[i])
+            i += 1
+        return bytes(unescaped_message)
+
+#-----
+    def reset(self) -> None:
+        self.rcv_buffer = None
+
+    def start(self) -> None:
+        self.reset()
+        # start BLE loop
+        self.ble.deviceDisconnected.connect(self.ble_scan_failed)
+        self.ble.scanDevices()
+
+    def stop(self) -> None:
+        # disconnect signals
+        self.ble.deviceDisconnected.disconnect()
+        self.ble.disconnectDevice()
+
+    def ble_scan_failed(self) -> None:
+        if self.ble is not None:
+            QTimer.singleShot(200, self.ble.scanDevices)
+
+    def processData(self, _write:Callable[[Optional[bytes]],None], data:bytes) -> Tuple[Optional[float], Optional[int]]:
+        if len(data) > 0:
+            try:
+                if self.rcv_buffer is None and data[0] == self.frame_char:
+                    # we received the frame start
+                    self.rcv_buffer = b''
+                if self.rcv_buffer is not None:
+                    # add new data
+                    self.rcv_buffer += data
+                    if len(self.rcv_buffer)>3 and self.rcv_buffer[0] == self.frame_char and self.rcv_buffer[-1] == self.frame_char:
+                        # we received a full frame
+                        message = self.unescape(self.rcv_buffer[1:-1])
+                        crc = message[-2:]
+                        payload = message[:-2]
+                        # clear the buffer
+                        self.rcv_buffer = None
+                        # verify CRC
+                        if crc == self.crc16(payload, 65535):
+                            try:
+                                decoded_message = IkawaCmd_pb2.IkawaResponse().FromString(payload) # pylint: disable=no-member
+                                _log.debug('IKAWA response.resp: %s (%s)', decoded_message.resp, decoded_message.MACH_STATUS_GET_ALL)
+                                status_get_all = decoded_message.resp_mach_status_get_all
+                                self.ET = status_get_all.temp_below / 10
+                                self.BT = status_get_all.temp_above / 10
+                                self.SP = status_get_all.setpoint / 10
+                                self.RPM = (status_get_all.fan_measured / 12)*60 # RPM
+                                self.heater = status_get_all.heater * 2
+                                self.fan = int(round(status_get_all.fan / 2.55))
+                                self.state = status_get_all.state
+                                # add data received and registered, enable delivery
+                                self.dataReceived.wakeAll()
+                            except Exception as e: # pylint: disable=broad-except
+                                _log.error(e)
+                        else:
+                            _log.debug('processData() CRC check failed')
+            except Exception as e:  # pylint: disable=broad-except
+                _log.error(e)
+        return None, None
+
+    def connected(self) -> None:
+        self.connected_state = True
+        if self.connected_handler is not None:
+            self.connected_handler()
+
+    def sendStop(self, _write:Callable[[Optional[bytes]],None]) -> None:
+        self.connected_state = False
+        if self.disconnected_handler is not None:
+            self.disconnected_handler()
+
+#-----
+
+    def requestDataMessage(self) -> bytes:
+        message = IkawaCmd_pb2.Message() # pylint: disable=no-member
+        message.cmd_type = IKAWA_BLE.MACH_STATUS_GET_ALL_VALUE
+        message.seq = next(self.seq)
+        msg = message.SerializeToString()
+        crc = self.crc16(msg, 65535)
+        return self.frame_char.to_bytes(length=1, byteorder='big') + self.escape(msg + crc) + self.frame_char.to_bytes(length=1, byteorder='big')
+
+    def getData(self) -> None:
+        if self.connected_state:
+            request_data = self.requestDataMessage()
+            self.ble.write(request_data)
+            # wait for data to be delivered
+            self.receiveMutex.lock()
+            self.dataReceived.wait(self.receiveMutex, self.receiveTimeout)
+            self.receiveMutex.unlock()

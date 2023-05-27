@@ -1468,7 +1468,7 @@ class PIDcontrol():
                         # t is within the current segment
                         k = float(segment_start_sv - prev_segment_start_sv) / float(segment_end_time - prev_segment_end_time)
                         if self.current_ramp_segment != i+1:
-                            self.aw.sendmessage(QApplication.translate('Message',f'Ramp {i+1}: in {stringfromseconds(self.svRamps[i])} to SV {v}'))
+                            self.aw.sendmessage(QApplication.translate('Message',f'Ramp {i+1}: in {stringfromseconds(self.svRamps[i])} to SV {int(round(v))}'))
                             self.current_ramp_segment = i+1
                         return prev_segment_start_sv + k*(t - prev_segment_end_time)
                 prev_segment_end_time = segment_end_time
@@ -1482,7 +1482,7 @@ class PIDcontrol():
                         # t is within the current segment
                         if self.current_soak_segment != i+1:
                             self.current_soak_segment = i+1
-                            self.aw.sendmessage(QApplication.translate('Message',f'Soak {i+1}: for {stringfromseconds(self.svSoaks[i])} at SV {v}'))
+                            self.aw.sendmessage(QApplication.translate('Message',f'Soak {i+1}: for {stringfromseconds(self.svSoaks[i])} at SV {int(round(v))}'))
                         return prev_segment_start_sv
                 prev_segment_end_time = segment_end_time
                 prev_segment_start_sv = segment_start_sv

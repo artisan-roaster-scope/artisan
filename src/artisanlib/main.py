@@ -203,6 +203,7 @@ if TYPE_CHECKING:
     from artisanlib.wheels import WheelDlg # pylint: disable=unused-import
     from artisanlib.santoker import SantokerNetwork # pylint: disable=unused-import
     from artisanlib.kaleido import KaleidoPort # pylint: disable=unused-import
+    from artisanlib.ikawa import IKAWA_BLE # pylint: disable=unused-import
     from matplotlib.text import Annotation # pylint: disable=unused-import
     from openpyxl.worksheet.worksheet import Worksheet # pylint: disable=unused-import
     import numpy.typing as npt # pylint: disable=unused-import
@@ -1123,7 +1124,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
     def plus(self) -> None:
         modifiers = QApplication.keyboardModifiers()
         if modifiers in [(Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ControlModifier), (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ShiftModifier)]:
-            # ALT+CTR-CLICK (OPTION+COMMAND on macOS) toggles  or alternatively ALT-SHIFT-CLICK
+            # ALT+CTRL-CLICK (OPTION+COMMAND on macOS) toggles  or alternatively ALT-SHIFT-CLICK
             # toggle debug logging
             debug_level = debugLogLevelToggle()
             self.aw.sendmessage(
@@ -1618,6 +1619,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.kaleidoSerial:bool = False # if True connection is via the main serial port
         self.kaleidoPID:bool = True # if True the external Kaleido PID is operated, otherwise the internal Artisan PID is active
         self.kaleido:Optional['KaleidoPort'] = None # holds the Kaleido instance created on connect; reset to None on disconnect
+
+        # Ikawa BLE
+        self.ikawa:Optional['IKAWA_BLE'] = None
 
         # create a ET control objects
         self.fujipid = FujiPID(self)
@@ -4381,7 +4385,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     # c a QColor instance, returns the standard W3C value for the perceived brightness of an RGB color in the range of 0-255, ignoring the alpha channel
     # see https://www.w3.org/TR/AERT/#color-contrast
     @staticmethod
-    def QColorBrightness(c):
+    def QColorBrightness(c:QColor) -> float:
         r,g,b,_ = c.getRgb()
         return ((r*299) + (g*587) + (b*114)) / 1000
 
@@ -6714,7 +6718,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             rcParams['font.family'] = ['Comic Sans MS','Humor Sans']
             self.mpl_fontproperties = mpl.font_manager.FontProperties()
         if redraw:
-            self.qmc.redraw(recomputeAllDeltas=False)
+            self.qmc.redraw(recomputeAllDeltas=False, forceRenewAxis=True)
 
     def set_mpl_fontproperties(self,fontpath):
         if os.path.exists(fontpath):
@@ -9190,6 +9194,18 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                         else:
                                             self.pidcontrol.confPID(kp,ki,kd,pOnE=self.pidcontrol.pOnE)
                                             self.sendmessage(f'Artisan Command: {cs}')
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            # pidSVC(<n>) with <n> a number in C to be used as PID SV (if temperature mode is F, n will be first converted to F
+                            elif cs.startswith('pidSVC(') and cs.endswith(')'):
+                                try:
+                                    sv = max(0,int(round(convertTemp(float(eval(cs[len('pidSVC('):-1])), 'C', self.qmc.mode)))) # we don't send SV < 0 # pylint: disable=eval-used
+                                    if self.qmc.device == 0 and sv != self.fujipid.sv:
+                                        self.fujipid.setsv(sv,silent=True)
+                                        self.sendmessage(f'Artisan Command: {cs}')
+                                    elif sv != self.pidcontrol.sv:
+                                        self.pidcontrol.setSV(sv,init=False)
+                                        self.sendmessage(f'Artisan Command: {cs}')
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             # pidSV(<n>) with <n> a number to be used as PID SV

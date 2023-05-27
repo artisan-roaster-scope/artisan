@@ -358,7 +358,7 @@ class serialport():
         # device 1 (with index 1 below) is Omega HH806
         # device 2 (with index 2 below) is omega HH506
         # etc
-        # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:" in the code (main.py, comm.py, devices.py)
+        # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:" in the code (canvas.py, comm.py, devices.py)
         # - add to self.devicefunctionlist
         self.devicefunctionlist:List[Callable[..., Tuple[float,float,float]]] = [
                                    self.fujitemperature,    #0
@@ -502,7 +502,11 @@ class serialport():
                                    self.Kaleido_BTET,         #138
                                    self.Kaleido_SVAT,         #139
                                    self.Kaleido_DrumAH,       #140
-                                   self.Kaleido_HeaterFan     #141
+                                   self.Kaleido_HeaterFan,    #141
+                                   self.Ikawa,                #142
+                                   self.Ikawa_SetRpm,         #143
+                                   self.Ikawa_HeaterFan,      #144
+                                   self.Ikawa_State           #145
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -1492,6 +1496,9 @@ class serialport():
         if self.aw.santoker is not None:
             t1 = self.aw.santoker.getET()
             t2 = self.aw.santoker.getBT()
+            if self.aw.qmc.mode == 'F':
+                t1 = fromCtoF(t1)
+                t2 = fromCtoF(t2)
         else:
             t1 = t2 = -1
         return tx,t1,t2 # time, ET (chan2), BT (chan1)
@@ -1587,6 +1594,47 @@ class serialport():
         else:
             t1 = t2 = -1
         return tx,t2,t1 # time Fan (chan2), Heater (chan1)
+
+    def Ikawa(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        t1:float = -1
+        t2:float = -1
+        if self.aw.ikawa is not None:
+            self.aw.ikawa.getData()
+            t1 = self.aw.ikawa.ET
+            t2 = self.aw.ikawa.BT
+            if self.aw.qmc.mode == 'F':
+                t1 = fromCtoF(t1)
+                t2 = fromCtoF(t2)
+        return tx,t1,t2 # time, ET (chan2), BT (chan1)
+
+    def Ikawa_SetRpm(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        t1:float = -1
+        t2:float = -1
+        if self.aw.ikawa is not None:
+            t1 = self.aw.ikawa.RPM
+            t2 = self.aw.ikawa.SP
+            if self.aw.qmc.mode == 'F':
+                t2 = fromCtoF(t2)
+        return tx,t1,t2 # time, RPM (chan2), SET (chan1)
+
+    def Ikawa_HeaterFan(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        t1:float = -1
+        t2:float = -1
+        if self.aw.ikawa is not None:
+            t1 = self.aw.ikawa.fan
+            t2 = self.aw.ikawa.heater
+        return tx,t1,t2 # time, Fan (chan2), Heater (chan1)
+
+    def Ikawa_State(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        t1:float = -1
+        t2:float = -1
+        if self.aw.ikawa is not None:
+            t2 = self.aw.ikawa.state
+        return tx,t1,t2 # time, _ (chan2), State (chan1)
 
     def TEVA18B(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
@@ -3003,7 +3051,7 @@ class serialport():
                 self.PhidgetIRSensor.setOnTemperatureChangeHandler(lambda *_:None)
             # set rate
             try:
-                self.PhidgetIRSensor.setDataInterval(self.aw.qmc.phidget1200_dataRate)
+                self.PhidgetIRSensor.setDataInterval(max(self.PhidgetIRSensor.getMinDataInterval(),self.aw.qmc.phidget1200_dataRate))
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
 

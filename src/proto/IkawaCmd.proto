@@ -1,0 +1,160 @@
+syntax = "proto2";
+
+package ikawa;
+
+
+message Message {
+	required int32 cmd_type = 1;
+	required int32 seq = 2;
+	optional CmdProfileSet  profile_set = 4;
+	optional CmdSettingGet  setting_get = 5;
+
+
+}
+message CmdProfileSet  {
+    required RoastProfile profile = 1;
+}
+
+
+message CmdSettingGet  {
+    required int32 field = 1;
+}
+
+
+
+message IkawaResponse {
+    required int32 seq = 1;
+    enum Resp {
+        A = 0;
+        UNKNOWN = 1;
+        BOOTLOADER_GET_VERSION = 3;
+        HIST_GET_PROFILE_ROAST_COUNT = 14;
+        HIST_GET_TOTAL_ROAST_COUNT = 15;
+        MACH_ID = 5;
+        MACH_PROP_GET_NAME = 24;
+        MACH_PROP_GET_SUPPORT_INFO = 21;
+        MACH_PROP_TYPE = 4;
+        MACH_STATUS_GET_ALL = 13;
+        MACH_STATUS_GET_ERROR = 12;
+        MACH_STATUS_GET_SENSORS = 20;
+        MACH_STATUS_GET_TIME = 23;
+        PROFILE_GET = 16;
+        ROAST_SUMMARY_GET = 25;
+        SETTING_GET = 17;
+        SETTING_GET_INFO = 18;
+        SETTING_GET_LIST = 19;
+        TEST_STATUS_GET = 22;
+    }
+    required Resp resp = 2;
+    optional RespBootloaderGetVersion resp_bootloader_get_version = 3;
+    optional RespMachPropGetType resp_mach_prop_type = 4;
+    optional RespMachPropGetID resp_mach_id = 5;
+
+
+    optional RespMachStatusGetError resp_mach_status_get_error = 12;
+    optional RespMachStatusGetAll resp_mach_status_get_all = 13;
+
+    optional RespHistGetTotalRoastCount resp_hist_get_total_roast_count = 15;
+
+    optional RespProfileGet resp_profile_get = 16;
+    optional RespSettingGet resp_setting_get = 17;
+    optional RespMachPropGetSupportInfo resp_mach_prop_get_support_info = 21;
+
+
+}
+
+message RespMachStatusGetAll{
+    required int32 time = 1;
+    optional int32 temp_above = 2;
+    required int32 fan = 3;
+    required int32 state = 4;
+    required int32 heater = 5;
+    required int32 p = 6;
+    required int32 i = 7;
+    required int32 d = 8;
+    required int32 setpoint = 9;
+    required int32 fan_measured = 10;
+    optional int32 board_temp = 11;
+    optional int32 temp_below = 12;
+    optional int32 fan_rpm_measured = 13;
+    optional int32 fan_rpm_setpoint = 14;
+    optional int32 fan_i = 16;
+    optional int32 fan_p = 15;
+    optional int32 fan_d = 17;
+    optional int32 fan_power = 18;
+    optional int32 j = 19;
+    optional int32 relay_state = 20;
+    optional int32 pid_sensor = 21;
+    optional int32 temp_above_filtered = 22;
+    optional int32 temp_below_filtered = 23;
+    optional int32 ror_above = 24;
+    optional int32 ror_below = 25;
+}
+
+message RespMachStatusGetError{
+    required int32 error = 1;
+}
+
+message RespProfileGet {
+    // fields and nested messages for the RespProfileGet message
+    required RoastProfile profile = 1;
+ }
+
+message RoastProfile {
+    required int32 schema = 1;
+    required bytes id = 2;
+    required string name = 3;
+    repeated TempPoint temp_points = 4;
+    repeated FanPoint fan_points = 5;
+    required int32 temp_sensor = 6;
+
+    required FanPoint cooldown_fan = 7;
+    required string coffee_name = 8;
+    required string user_id = 9;
+    required string coffee_id = 10;
+    required string coffee_web_url = 11;
+    required string profile_type = 12;
+}
+message FanPoint {
+    required int32 time = 1;
+    required int32 power = 2;
+    }
+message TempPoint {
+    required int32 time = 1;
+    required int32 temp = 2;
+}
+
+
+message RespSettingGet {
+    // fields and nested messages for the RespSettingGet message
+    optional int32 field = 1;
+    optional int32 value = 2;
+
+}
+
+
+
+message RespHistGetTotalRoastCount {
+    // fields and nested messages for the RespHistGetTotalRoastCount message
+    required int32 total_roast_count = 1;
+}
+
+
+
+message RespMachPropGetSupportInfo{
+    required int32 profile_schema = 1;
+}
+
+message RespBootloaderGetVersion {
+    required int32 version = 1;
+    required string revision = 2;
+}
+
+message RespMachPropGetType{
+    required int32 type_ = 1;
+    required int32 variant = 2;
+}
+
+message RespMachPropGetID{
+    required int32 id_ = 1;
+}

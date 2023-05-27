@@ -65,7 +65,7 @@ xextrabuttonactionstrings=,
 
 [Quantifiers]
 clusterEventsFlag=false
-eventquantifierSV=0, 0, 0, 0
+eventquantifierSV=1, 1, 0, 1
 eventquantifieraction=0, 0, 0, 0
 quantifieractive=0, 0, 0, 1
 quantifiercoarse=0, 0, 0, 0

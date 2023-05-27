@@ -33,7 +33,6 @@ except ImportError:
         QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QDialogButtonBox, QGridLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QGroupBox, QLineEdit, QMessageBox, QLayout) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
-
 #########################################################################
 #############  DESIGNER CONFIG DIALOG ###################################
 #########################################################################
@@ -428,13 +427,13 @@ class designerconfigDlg(ArtisanDialog):
     def validatetimeorder(self):
         time = []
         checks = self.readchecks()
-        time.append(stringtoseconds(str(self.Edit0.text())) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]])
-        time.append(stringtoseconds(str(self.Edit1.text())) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]])
-        time.append(stringtoseconds(str(self.Edit2.text())) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]])
-        time.append(stringtoseconds(str(self.Edit3.text())) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]])
-        time.append(stringtoseconds(str(self.Edit4.text())) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]])
-        time.append(stringtoseconds(str(self.Edit5.text())) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]])
-        time.append(stringtoseconds(str(self.Edit6.text())) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]])
+        time.append(stringtoseconds(str(self.Edit0.text())))
+        time.append(stringtoseconds(str(self.Edit1.text())))
+        time.append(stringtoseconds(str(self.Edit2.text())))
+        time.append(stringtoseconds(str(self.Edit3.text())))
+        time.append(stringtoseconds(str(self.Edit4.text())))
+        time.append(stringtoseconds(str(self.Edit5.text())))
+        time.append(stringtoseconds(str(self.Edit6.text())))
         for i in range(len(time)-1):
             if time[i+1] <= time[i] and checks[i+1] != 0:
                 return i
@@ -457,7 +456,7 @@ class designerconfigDlg(ArtisanDialog):
     #supporting function for settimes()
     @pyqtSlot(bool)
     def readchecks(self,_=False):
-        checks = [0,0,0,0,0,0,0]
+        checks = [0,0,0,0,0,0,1]
         if self.dryend.isChecked():
             checks[1] = 1
         if self.fcs.isChecked():
@@ -595,11 +594,12 @@ class designerconfigDlg(ArtisanDialog):
                 self.aw.qmc.currentx = timez
                 self.aw.qmc.currenty = bt
                 newindex = self.aw.qmc.addpoint(manual=False)
-                self.aw.qmc.timeindex[idi] = newindex
-                self.aw.qmc.temp2[self.aw.qmc.timeindex[idi]] = bt
-                self.aw.qmc.temp1[self.aw.qmc.timeindex[idi]] = et
-                self.aw.qmc.xaxistosm(redraw=False)
-                self.aw.qmc.redrawdesigner()
+                if newindex is not None:
+                    self.aw.qmc.timeindex[idi] = newindex
+                    self.aw.qmc.temp2[self.aw.qmc.timeindex[idi]] = bt
+                    self.aw.qmc.temp1[self.aw.qmc.timeindex[idi]] = et
+                    self.aw.qmc.xaxistosm(redraw=False)
+                    self.aw.qmc.redrawdesigner()
 
 class pointDlg(ArtisanDialog):
     def __init__(self,parent, aw, values = None) -> None:

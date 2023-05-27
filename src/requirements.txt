@@ -18,3 +18,4 @@ websockets==11.0.3 #11.0.2
 PyYAML==6.0 # 5.4.1
 psutil==5.9.4
 typing-extensions==4.5.0 # required for supporting Final and TypeDict on Python 3.7, NotRequired on Python <3.11
+protobuf==4.23.1

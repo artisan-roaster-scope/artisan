@@ -139,7 +139,7 @@ OPTIONS = {
     'semi_standalone': False,
     'site_packages': True,
     'packages': ['yoctopuce','gevent','openpyxl','numpy','scipy','certifi',
-        'matplotlib','PIL', 'lxml', 'snap7'], # MPL and PIL added for mpl v3.3.x
+        'matplotlib','PIL', 'lxml', 'snap7', 'google.protobuf'], # MPL and PIL added for mpl v3.3.x
     'optimize':  2,
     'compressed': True,
     'iconfile': 'artisan.icns',
@@ -161,7 +161,7 @@ setup(
     app=APP,
     data_files=DATA_FILES,
     options={'py2app': OPTIONS},
-    setup_requires=['py2app']
+    setup_requires=['py2app'],
 )
 
 

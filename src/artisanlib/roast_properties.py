@@ -568,7 +568,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         self.ble:Optional['BleInterface'] = None # the BLE interface
         self.scale_weight:Optional[float] = None # weight received from a connected scale
-        self.scale_battery = None # battery level of the connected scale in %
+        self.scale_battery:Optional[int] = None # battery level of the connected scale in %
         self.scale_set:Optional[float] = None # set weight for accumulation in g
 
         self.disconnecting = False # this is set to True to terminate the scale connection
@@ -1354,6 +1354,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     from artisanlib.ble import BleInterface # noqa: F811
                     from artisanlib.acaia import AcaiaBLE
                     acaia = AcaiaBLE()
+
                     self.ble = BleInterface(
                         [(acaia.SERVICE_UUID_LEGACY, [AcaiaBLE.CHAR_UUID_LEGACY]),
                          (acaia.SERVICE_UUID, [AcaiaBLE.CHAR_UUID, AcaiaBLE.CHAR_UUID_WRITE])],
@@ -1368,7 +1369,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                             acaia.DEVICE_NAME_PEARLS,
                             acaia.DEVICE_NAME_LUNAR2021,
                             acaia.DEVICE_NAME_PYXIS
-                        ])
+                        ]
+                        )
                     # start BLE loop
                     self.ble.deviceDisconnected.connect(self.ble_scan_failed)
                     self.ble.weightChanged.connect(self.ble_weight_changed)
@@ -1746,6 +1748,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 unit = self.aw.qmc.weight[2]
         return v_formatted, unit
 
+    @pyqtSlot()
     def ble_scan_failed(self):
 #        import datetime
 #        ts = libtime.time()
@@ -1757,12 +1760,14 @@ class editGraphDlg(ArtisanResizeablDialog):
         if self.ble is not None:
             QTimer.singleShot(200, self.ble.scanDevices)
 
-    def ble_weight_changed(self,w):
+    @pyqtSlot(float)
+    def ble_weight_changed(self, w:float) -> None:
         if w is not None:
             self.scale_weight = w
             self.update_scale_weight()
 
-    def ble_battery_changed(self,b):
+    @pyqtSlot(int)
+    def ble_battery_changed(self, b:int) -> None:
         if b is not None:
             self.scale_battery = b
             self.update_scale_weight()

@@ -45,7 +45,7 @@ class State(TypedDict, total=False):
 
 class KaleidoPort():
 
-    __slots__ = [ '_loop', '_thread', '_write_queue', '_RDreceived', '_default_data_stream', '_ping_timeout', '_open_timeout', '_init_timeout',
+    __slots__ = [ '_loop', '_thread', '_write_queue', '_default_data_stream', '_ping_timeout', '_open_timeout', '_init_timeout',
             '_send_timeout', '_read_timeout', '_ping_retry_delay', '_reconnect_delay', '_state', '_pending_requests', '_logging' ]
 
     def __init__(self) -> None:
@@ -53,8 +53,6 @@ class KaleidoPort():
         self._loop:        Optional[asyncio.AbstractEventLoop] = None # the asyncio loop
         self._thread:      Optional[Thread]                    = None # the thread running the asyncio loop
         self._write_queue: Optional['asyncio.Queue[str]']      = None # the write queue
-
-        self._RDreceived = asyncio.Event() # async state indicating that new data was received
 
         self._default_data_stream:Final[str] = 'A0'
         self._open_timeout:Final[float] = 5
