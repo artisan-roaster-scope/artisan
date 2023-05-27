@@ -45,10 +45,6 @@ sudo -H touch ${PYTHONSITEPKGS}/google/__init__.py
 sudo -H touch ${PYTHONSITEPKGS}/google/protobuf/__init__.py
 sudo -H touch ${PYTHONSITEPKGS}/google/protobuf/internal/__init__.py
 
-ls ${PYTHONSITEPKGS}/google/
-ls ${PYTHONSITEPKGS}/google/protobuf/
-ls ${PYTHONSITEPKGS}/google/protobuf/internal/
-
 
 # copy the snap7 binary installed by pip
 cp -f ${PYTHONSITEPKGS}/snap7/lib/libsnap7.dylib /usr/local/lib
