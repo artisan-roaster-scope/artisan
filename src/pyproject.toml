@@ -217,7 +217,7 @@ target-version = "py37"
 
 [tool.pyright]
 include = ["artisanlib", "plus" ]
-#exclude = []
+exclude = ["proto"]
 # ignore = ["src/oldstuff"]
 
 reportMissingImports = true

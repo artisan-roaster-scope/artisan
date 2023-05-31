@@ -5085,8 +5085,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     # first establish roastersize_setup batchsizes as default batchsize (potentially unit converted)
                     if self.qmc.roastersize_setup > 0:
                         weight_unit = self.qmc.weight[2]
-                        if self.qmc.roastersize_setup > 1 and self.qmc.weight[2] == 'g':
-                            weight_unit = 'Kg'
                         nominal_batch_size = self.convertWeight(self.qmc.roastersize_setup,1,self.qmc.weight_units.index(self.qmc.weight[2]))
                         self.qmc.last_batchsize = nominal_batch_size
                         self.qmc.weight = (nominal_batch_size,0,weight_unit)
@@ -5151,7 +5149,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     # setup not canceled, we establish the last_batchsize
                     self.qmc.weight = (self.qmc.last_batchsize,0,self.qmc.weight[2])
                 self.establish_etypes()
-
+            self.qmc.redraw(False,False)
 
     def populateThemeMenu(self):
         self.themeMenu.clear()
@@ -18387,6 +18385,22 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     settings.setValue('plus_custom_blend_name', self.qmc.plus_custom_blend.name)
                     settings.setValue('plus_custom_blend_coffees', [c.coffee for c in self.qmc.plus_custom_blend.components])
                     settings.setValue('plus_custom_blend_ratios',  [c.ratio for c in self.qmc.plus_custom_blend.components])
+            #remove pre v2.0 settings no longer used
+            try:
+                if settings.contains('organization'):
+                    settings.remove('organization')
+                if settings.contains('operator'):
+                    settings.remove('operator')
+                if settings.contains('roastertype'):
+                    settings.remove('roastertype')
+                if settings.contains('roastersize'):
+                    settings.remove('roastersize')
+                if settings.contains('drumspeed'):
+                    settings.remove('drumspeed')
+                if settings.contains('beansize'):
+                    settings.remove('beansize')
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
             settings.endGroup()
             settings.beginGroup('XT')
             settings.setValue('color',self.qmc.backgroundxtcolor)
