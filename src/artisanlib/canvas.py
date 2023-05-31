@@ -13609,8 +13609,8 @@ class tgraphcanvas(FigureCanvas):
                     # total energy/CO2
                     energy_label = QApplication.translate('GroupBox','Energy')
                     CO2_label = QApplication.translate('GroupBox','CO2')
-                    if not (platform.system() == 'Windows' and int(platform.release()) < 10):
-                        # no subscript for legacy Windows
+                    if not (platform.system() == 'Windows' and int(platform.release()) < 10) and self.graphfont in [0,3]:
+                        # no subscript for legacy Windows, or graph fonts different to default and WenQuanYi
                         CO2_label = CO2_label.replace('CO2','CO₂')
                     energy_unit = self.energyunits[self.energyresultunit_setup]
                     energymetrics,_ = self.calcEnergyuse()
@@ -13631,9 +13631,9 @@ class tgraphcanvas(FigureCanvas):
                     # CO2 per kg
                     if CO2_per_green > 0:
                         if CO2_per_green < 1000:
-                            scaled_co2_kg = scaleFloat2String(CO2_per_green) + 'g/kh'
+                            scaled_co2_kg = scaleFloat2String(CO2_per_green) + 'g/kg'
                         else:
-                            scaled_co2_kg = scaleFloat2String(CO2_per_green/1000.) + 'kg/kh'
+                            scaled_co2_kg = scaleFloat2String(CO2_per_green/1000.) + 'kg/kg'
                         CO2perKgCoffeeLabel = f'  ({scaled_co2_kg})'
                     # no weight is available
                     else:
@@ -13649,8 +13649,8 @@ class tgraphcanvas(FigureCanvas):
                     # just roast energy/CO2
                     energy_label = QApplication.translate('GroupBox','Energy')
                     CO2_label = QApplication.translate('GroupBox','CO2')
-                    if not (platform.system() == 'Windows' and int(platform.release()) < 10):
-                        # no subscript for legacy Windows
+                    if not (platform.system() == 'Windows' and int(platform.release()) < 10) and self.graphfont in [0,3]:
+                        # no subscript for legacy Windows, or graph fonts different to default and WenQuanYi
                         CO2_label = CO2_label.replace('CO2','CO₂')
                     energy_unit = self.energyunits[self.energyresultunit_setup]
                     roast_label = QApplication.translate('Label','Roast')
@@ -13672,9 +13672,9 @@ class tgraphcanvas(FigureCanvas):
                     # CO2 per kg
                     if CO2_per_green_roast > 0:
                         if CO2_per_green_roast < 1000:
-                            scaled_co2_kg = scaleFloat2String(CO2_per_green_roast) + 'g/kh'
+                            scaled_co2_kg = scaleFloat2String(CO2_per_green_roast) + 'g/kg'
                         else:
-                            scaled_co2_kg = scaleFloat2String(CO2_per_green_roast/1000.) + 'kg/kh'
+                            scaled_co2_kg = scaleFloat2String(CO2_per_green_roast/1000.) + 'kg/kg'
                         CO2perKgCoffeeLabel = f'  ({scaled_co2_kg})'
                     # no weight is available
                     else:

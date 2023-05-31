@@ -2,22 +2,28 @@ Detailed Release History
 ========================
 
 ----
-v2.8.3 (beta)
+v2.8.3 (RC)
 ------------------
 
 * ADDITIONS
+  - adds support for [IKAWA HOME/PRO](https://www.ikawacoffee.com/)
   - adds support for [Kaleido](https://www.kaleido-roaster.com/) Network, Serial and Legacy protocols
   - adds Santoker Q Series and R Series support over serial (USB/Bluetooth)
   - adds support for Phidget TMP1200_1
-  - adds energy/CO2 data to characteristics line
+  - adds dark mode support for Windows 10 (1607+), Windows 11 and Linux under Gnome (not available with UI style WindowsVista)
   - adds symbolic variables `WEIGHTin`, `MOISTUREin` and `TEMPunit` to access corresponding Roast Properties
-  - adds configuration "Mark last pressed" to event button configuration to control if the last button pressed should be marked (default) or not
+  - adds configuration `Mark last pressed` to event button configuration to control if the last button pressed should be marked (default) or not
   - adds configuration "Tooltips" to toggle visibility of custom event buttons tooltips (default off)
   - adds fields `~dryphasedeltatemp`, `~midphasedeltatemp`, `~finishphasedeltatemp`, `~fcstime`, and `~fcstime_long` to autosave
   - adds translated and state aware custom event button label tags
   - adds button action symbolic variable $ bound to button state
   - adds additional Artisan Command, IO Command, MODBUS Command, S7 Command, WebSocket Command button actions to set button states
-  - adds slider step size 5
+  - adds Artisan Command pidSVC(<n>) allowing to specify the SV in C which get's correctly converted to F in Fahrenheit mode
+  - adds slider and quantifier step size 5
+  - adds `Create Events` flag to Software PID
+  - adds energy/CO2 data to characteristics line
+  - display configured roaster name and batch size as x-axis label if no profile is loaded
+  - toggle hide-background per click on background profile name (subtitle) during roasting
 
 * CHANGES
   - makes title widgets autocompletion case sensitive in Roast Properties dialog
@@ -27,7 +33,11 @@ v2.8.3 (beta)
   - improved drag-and-drop action in custom event button table (hold ALT (Windows) or OPTION (macOS) key to swap instead of move)
   - joins Phidget APIs such that PWM Command out() and IO Command set() commands can both be used on one attached module
   - updated machine setups (Besca automatic and full automatic, Giesen, Hottop KN-8828B-2K+, Kuban Supreme Automatic, NOR A Series, Probat P Series III, Twino Ozstar) to take advantage of button label translations
-
+  - updates machine settings to take advantage of translated button label substitutions
+  - adds roaster batch size defaults for machine setups
+  - if different from the system default, use current serial port or current IP host as default on running a machine setup
+  - extended localizations
+  - upgrade to pymodbus 3.2, Qt/PyQt 6.5, matplotlib 3.7
 
 * FIXES
   - fixes regression which broke MODBUS port scan ([Issue #1056](../../../issues/1056))
@@ -43,12 +53,20 @@ v2.8.3 (beta)
   - indicate slider focus also at 100% ([Issue #1126](../../../issues/1126))
   - fixes IO Command support for Phidget REL1101 ([Issue #1141](../../../issues/1141))
   - fixes MODBUS ASCII & BINARY communication and improves Arduino MODBUS RTU compatibility ([Issue #1145](../../../issues/1145))
+  - fixes issues with the Designer config table ([Issue #1173](../../../issues/1173))
+  - fixes TMP1200_0 noise issue ([Issue #1175](../../../issues/1175))
+  - render Ramp/Soak info messages without decimals ([Issue #1176](../../../issues/1176))
+  - fixes missing event name translations ([Issue #1181](../../../issues/1181))
+  - fixes Santoker Series Fahrenheit mode
+  - fixes Santoker Series machine setup quantifiers to use SV mode
   - fixes missed picks in designer
   - fixes desktop screenshot for Qt6
   - fixes the +/- keyboard shortcuts for zooming to work accross all keyboard layouts
   - fixes Probatone control token release under "Keep ON"
   - fixes regression which allowed to define custom blends with total ratio larger than 100%
-  - further fixes for issues revealed by automatic static analyzers
+  - ensures that rendering of axis respects curve style setting
+  - persist ET marker size changes correctly
+  - fixes of issues revealed by automatic static analyzers ([pylint](https://github.com/pylint-dev/pylint), [ruff](https://github.com/charliermarsh/ruff), [mypy](https://github.com/python/mypy), [pyright](https://github.com/microsoft/pyright))
 
 * REMOVALS
   - removes support for original *.txt profile format of Artisan v0.4.0 (2011) and earlier

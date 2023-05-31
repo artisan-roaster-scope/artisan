@@ -208,8 +208,8 @@ if TYPE_CHECKING:
     from openpyxl.worksheet.worksheet import Worksheet # pylint: disable=unused-import
     import numpy.typing as npt # pylint: disable=unused-import
     from matplotlib.backend_bases import Event # pylint: disable=unused-import
-    from PyQt6.QtWidgets import QTableWidget
-    from PyQt6.QtGui import QStyleHints
+    from PyQt6.QtWidgets import QTableWidget # pylint: disable=unused-import
+    from PyQt6.QtGui import QStyleHints # pylint: disable=unused-import
 
 # fix socket.inet_pton on Windows (used by pymodbus TCP/UDP)
 try:
@@ -288,8 +288,8 @@ class Artisan(QtSingleApplication):
         @pyqtSlot('Qt::ColorScheme')
         def colorSchemeChanged(self, colorScheme:'Qt.ColorScheme') -> None:
             aw:Optional['ApplicationWindow'] = self.activationWindow()
-            if aw is not None and self.darkmode != colorScheme == Qt.ColorScheme.Dark:
-                self.darkmode = not self.darkmode
+            if aw is not None and self.darkmode != bool(colorScheme == Qt.ColorScheme.Dark):
+                self.darkmode = bool(colorScheme == Qt.ColorScheme.Dark)
                 aw.updateCanvasColors()
     except Exception: # pylint: disable=broad-except
         pass
@@ -3899,7 +3899,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         if not self.app.artisanviewerMode:
             self.notificationManager = NotificationManager()
 
-        if sys.platform.startswith('darwin'):
+        if sys.platform.startswith('darwin') and QVersionNumber.fromString(qVersion())[0] < QVersionNumber(6,5,0):
             # only on macOS we install the eventFilter to catch the signal on switching between light and dark modes
             self.installEventFilter(self)
 

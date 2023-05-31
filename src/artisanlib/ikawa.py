@@ -338,6 +338,15 @@ class IKAWA_BLE():
         return bytes(unescaped_message)
 
 #-----
+    def clearData(self) -> None:
+        self.ET = -1
+        self.BT = -1
+        self.SP = -1
+        self.RPM = -1
+        self.heater = -1
+        self.fan = -1
+        self.state = -1
+
     def reset(self) -> None:
         self.rcv_buffer = None
 
@@ -421,5 +430,8 @@ class IKAWA_BLE():
             self.ble.write(request_data)
             # wait for data to be delivered
             self.receiveMutex.lock()
-            self.dataReceived.wait(self.receiveMutex, self.receiveTimeout)
+            res = self.dataReceived.wait(self.receiveMutex, self.receiveTimeout)
+            if not res:
+                # timeout, no data received
+                self.clearData()
             self.receiveMutex.unlock()
