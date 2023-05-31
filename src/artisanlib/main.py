@@ -18661,6 +18661,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 _log.error('Failed to save settings')
                 QMessageBox.information(self, QApplication.translate('Error Message', 'Error',None),QApplication.translate('Error Message', 'Failed to save settings'))
                 return False
+            return True
 
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)

@@ -1441,7 +1441,7 @@ class tgraphcanvas(FigureCanvas):
 
         self.weight_units:List[str] = ['g','Kg','lb','oz']
         #[0]weight in, [1]weight out, [2]units (string)
-        self.weight:Tuple[float,float,str] = (0,0,self.weight_units[0])
+        self.weight:Tuple[float,float,str] = (0,0,self.weight_units[1])
 
         self.volume_units:List[str] = ['l','gal','qt','pt','cup','ml']
         #[0]volume in, [1]volume out, [2]units (string)
