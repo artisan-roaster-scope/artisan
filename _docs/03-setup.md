@@ -46,7 +46,7 @@ Prior toArtisan 2.6, you were asked what to do on loading a profile with a diffe
 
 Menu `Config` >> `Temperature` and `Config`>> `Language` are where you go to choose your language and Celsius or Fahrenheit and switch between the two if you like.  
 
-If you want to change a profile you receive from Celsius or Fahrenheit to the other, first set Artisan to the desired display mode, Fahrenheit Mode or Celsius Mode using Config>> Temperature. Then open the profile and/or background profile you want to view. The temperatures are automatically converted when the profile is opened. Note that any profiles open when the mode is changed will need to be reopened because the temperature conversion happens while opening the profile.
+If you want to change a profile from Celsius or Fahrenheit to the other, first set Artisan to the desired display mode, Fahrenheit Mode or Celsius Mode using Config>> Temperature. Then open the profile and/or background profile you want to view. The temperatures are automatically converted when the profile is opened. Note that any profiles open when the mode is changed will need to be reopened because the temperature conversion happens while opening the profile.
 
 If you want to permanently save a converted profile there are three ways to do it.
 File>> Save As works when viewing a profile as described above.
