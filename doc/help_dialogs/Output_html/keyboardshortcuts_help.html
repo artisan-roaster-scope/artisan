@@ -15,8 +15,12 @@
             <td>When Keyboard Shortcuts are ON chooses the current button<br>When Keyboard Shortcuts are OFF adds a custom event</td>
         </tr>
         <tr>
+            <td>LEFT,RIGHT</td>
+            <td>Change roast event key focus</td>
+        </tr>
+        <tr>
             <td>LEFT,RIGHT,UP,DOWN</td>
-            <td>Move background or key focus</td>
+            <td>Move background (when sliders not visible or when Config&gt;&gt; Events&gt;&gt; Sliders tab&gt;&gt; Keyboard Control is not selected)</td>
         </tr>
         <tr>
             <td>A</td>
@@ -120,7 +124,7 @@
         </tr>
         <tr>
             <td>Q,W,E,R + &lt;value&gt;</td>
-            <td>Quick Special Event Entry.  The keys q,w,e, and r correspond to special events 1,2,3 and 4.  A two digit numeric value must follow the shortcut letter, e.g. &#39;q75&#39;, when the correspoding event slider max value is 100 or less (default setting).   When the slider max value is greater than 100, three digits must be entered and for values less that 100 a leading zero is required, e.g. &#39;q075&#39;.  </td>
+            <td>Quick Special Event Entry.  The keys q,w,e, and r correspond to special events 1,2,3 and 4.  A two digit numeric value must follow the shortcut letter, e.g. &#39;q75&#39;, when the correspoding event slider max value is 100 or less (default setting).   When the slider max value is greater than 100, three digits must be entered and for values less than 100 a leading zero is required, e.g. &#39;q075&#39;.  </td>
         </tr>
         <tr>
             <td>V +  &lt;value&gt;</td>
@@ -152,8 +156,8 @@
             <td>Requires an artisan.plus account</td>
         </tr>
         <tr>
-            <td>Click on Background Profile Title</td>
-            <td>Graph</td>
+            <td>Double Click on Background Profile Title</td>
+            <td>Graph & Designer</td>
             <td>Toggle Show/Hide Background Profile</td>
             <td>Only when a Background profile is loaded</td>
         </tr>
@@ -206,24 +210,6 @@
             <td>&#160;</td>
         </tr>
         <tr>
-            <td>Click on timer</td>
-            <td>Simulator</td>
-            <td>Toggle Pause/Continue Simulation</td>
-            <td>Simulator speed may be changd while paused.  See next two shortcuts.</td>
-        </tr>
-        <tr>
-            <td>OPTION Tools&gt;&gt;Simulator [Mac]<br>ALT Tools&gt;&gt;Simulator [Win]</td>
-            <td>Graph/Simulator</td>
-            <td>Start or change Simulator speed to 2x mode</td>
-            <td>&#160;</td>
-        </tr>
-        <tr>
-            <td>⌘ Tools&gt;&gt;Simulator [Mac]<br>CTRL Tools&gt;&gt;Simulator [Win]</td>
-            <td>Graph/Simulator</td>
-            <td>Start or change Simulator speed to 4x mode</td>
-            <td>&#160;</td>
-        </tr>
-        <tr>
             <td>Click on LCD</td>
             <td>Graph</td>
             <td>Hide or Show corresponding Curve</td>
@@ -258,6 +244,48 @@
             <td>Graph</td>
             <td>Toggle PID</td>
             <td>Device = &lt;all others&gt;, Control enabled in Config&gt;&gt; Device</td>
+        </tr>
+        <tr>
+            <td>TAB</td>
+            <td>Graph when Sliders visible</td>
+            <td>Sequence slider select</td>
+            <td>Requires Keyboard Control enabled in Config&gt;&gt; Events<br>Keyboard Shortcuts must be turned off (ENTER)</td>
+        </tr>
+        <tr>
+            <td>UP,DOWN,RIGHT,LEFT</td>
+            <td>Graph when Sliders visible</td>
+            <td>Increment selected slider up or down by step amount</td>
+            <td>Requires Keyboard Control enabled in Config&gt;&gt; Events<br>Keyboard Shortcuts must be turned off (ENTER)</td>
+        </tr>
+        <tr>
+            <td>OPTION+UP, OPTION+DOWN [Mac]<br>PAGEUP,PAGEDOWN [Win]</td>
+            <td>Graph when Sliders visible</td>
+            <td>Increment selected slider up or down by 10</td>
+            <td>Requires Keyboard Control enabled in Config&gt;&gt; Events<br>Keyboard Shortcuts must be turned off (ENTER)</td>
+        </tr>
+        <tr>
+            <td>HOME,END</td>
+            <td>Graph when Sliders visible</td>
+            <td>Set selected slider to minimum or maximum value</td>
+            <td>Requires Keyboard Control enabled in Config&gt;&gt; Events<br>Keyboard Shortcuts must be disabled (ENTER)</td>
+        </tr>
+        <tr>
+            <td>OPTION Tools&gt;&gt;Simulator [Mac]<br>ALT Tools&gt;&gt;Simulator [Win]</td>
+            <td>Graph/Simulator</td>
+            <td>Start or change Simulator speed to 2x mode</td>
+            <td>&#160;</td>
+        </tr>
+        <tr>
+            <td>⌘ Tools&gt;&gt;Simulator [Mac]<br>CTRL Tools&gt;&gt;Simulator [Win]</td>
+            <td>Graph/Simulator</td>
+            <td>Start or change Simulator speed to 4x mode</td>
+            <td>&#160;</td>
+        </tr>
+        <tr>
+            <td>Click on timer</td>
+            <td>Simulator</td>
+            <td>Toggle Pause/Continue Simulation</td>
+            <td>Simulator speed may be changd while paused.  See next two shortcuts.</td>
         </tr>
         <tr>
             <td>⌘+C [Mac]<br>CTRL+C [Win]</td>

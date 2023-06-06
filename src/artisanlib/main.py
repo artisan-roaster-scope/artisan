@@ -10166,7 +10166,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.slider3.setVisible(True)
         self.slider4.setVisible(True)
         self.sliderSV.setVisible(True)
-        self.setSliderFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        if self.keyboardmoveflag == 0:
+            self.setSliderFocusPolicy(Qt.FocusPolicy.StrongFocus)
         # set slider singleStep
         self.slider1.setSingleStep(self.eventSliderStepSize(0))
         self.slider2.setSingleStep(self.eventSliderStepSize(1))
