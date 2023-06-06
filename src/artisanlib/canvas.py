@@ -2209,7 +2209,7 @@ class tgraphcanvas(FigureCanvas):
     #####################################################################################
 
     # toggles the y cursor coordinate see self.qmc.fmt_data_curve
-    def nextFmtDataCurve(self):
+    def nextFmtDataCurve(self) -> None:
         self.fmt_data_curve = (self.fmt_data_curve+1) % 5
         if self.backgroundprofile is None and self.fmt_data_curve in [3,4]:
             self.fmt_data_curve = 0
@@ -2231,7 +2231,7 @@ class tgraphcanvas(FigureCanvas):
         self.aw.sendmessage(QApplication.translate('Message', 'set y-coordinate to {}').format(s))
 
     @pyqtSlot(str, bool)
-    def showCurve(self, name: str, state: bool):
+    def showCurve(self, name: str, state: bool) -> None:
         changed:bool = False
         if name == 'ET' and self.ETcurve != state:
             self.ETcurve = state
@@ -2255,7 +2255,7 @@ class tgraphcanvas(FigureCanvas):
             self.redraw(recomputeAllDeltas=False,smooth=False)
 
     @pyqtSlot(int, str, bool)
-    def showExtraCurve(self, extra_device: int, curve: str, state: bool):
+    def showExtraCurve(self, extra_device: int, curve: str, state: bool) -> None:
         assert self.aw is not None
         if curve.strip() == 'T1' and len(self.aw.extraCurveVisibility1) > extra_device and self.aw.extraCurveVisibility1[extra_device] != state:
             self.aw.extraCurveVisibility1[extra_device] = state
@@ -2265,19 +2265,19 @@ class tgraphcanvas(FigureCanvas):
             self.redraw(recomputeAllDeltas=False,smooth=False)
 
     @pyqtSlot(int, bool)
-    def showEvents(self, event_type: int, state: bool):
+    def showEvents(self, event_type: int, state: bool) -> None:
         event_type -= 1
         if len(self.showEtypes) > event_type > 0 and self.showEtypes[event_type] != state:
             self.showEtypes[event_type] = state
             self.redraw(recomputeAllDeltas=False,smooth=False)
 
     @pyqtSlot(bool)
-    def showBackgroundEvents(self, state: bool):
+    def showBackgroundEvents(self, state: bool) -> None:
         if state != self.backgroundeventsflag:
             self.backgroundeventsflag = state
             self.redraw(recomputeAllDeltas=False,smooth=False)
 
-    def ax_lines_clear(self):
+    def ax_lines_clear(self) -> None:
         if self.ax is not None:
             if isinstance(self.ax.lines,list): # MPL < v3.5
                 self.ax.lines = []
@@ -2285,7 +2285,7 @@ class tgraphcanvas(FigureCanvas):
                 while len(self.ax.lines) > 0:
                     self.ax.lines[0].remove()
 
-    def ax_combo_text_annotations_clear(self):
+    def ax_combo_text_annotations_clear(self) -> None:
         if self.ax is not None:
             for child in self.ax.get_children():
                 if isinstance(child, mpl.text.Annotation):
@@ -2294,7 +2294,7 @@ class tgraphcanvas(FigureCanvas):
                     except Exception: # pylint: disable=broad-except
                         pass
 
-    def ax_annotations_clear(self):
+    def ax_annotations_clear(self) -> None:
         for la in self.l_annotations + self.l_background_annotations:
             if la:
                 try:
@@ -2303,7 +2303,7 @@ class tgraphcanvas(FigureCanvas):
                     pass
 
     # set current burner settings as defaults
-    def setEnergyLoadDefaults(self):
+    def setEnergyLoadDefaults(self) -> None:
         self.loadlabels_setup = self.loadlabels[:]
         self.loadratings_setup = self.loadratings[:]
         self.ratingunits_setup = self.ratingunits[:]
@@ -2315,7 +2315,7 @@ class tgraphcanvas(FigureCanvas):
         self.electricEnergyMix_setup = self.electricEnergyMix
 
     # restore burner settings to their defaults
-    def restoreEnergyLoadDefaults(self):
+    def restoreEnergyLoadDefaults(self) -> None:
         self.loadlabels = self.loadlabels_setup[:]
         self.loadratings = self.loadratings_setup[:]
         self.ratingunits = self.ratingunits_setup[:]
@@ -2327,7 +2327,7 @@ class tgraphcanvas(FigureCanvas):
         self.electricEnergyMix = self.electricEnergyMix_setup
 
     # set current protocol settings as defaults
-    def setEnergyProtocolDefaults(self):
+    def setEnergyProtocolDefaults(self) -> None:
         self.preheatDuration_setup = self.preheatDuration
         self.preheatenergies_setup = self.preheatenergies[:]
         self.betweenbatchDuration_setup = self.betweenbatchDuration
@@ -2337,7 +2337,7 @@ class tgraphcanvas(FigureCanvas):
         self.betweenbatch_after_preheat_setup = self.betweenbatch_after_preheat
 
     # restore protocol settings to their defaults
-    def restoreEnergyProtocolDefaults(self):
+    def restoreEnergyProtocolDefaults(self) -> None:
         self.preheatDuration = self.preheatDuration_setup
         self.preheatenergies = self.preheatenergies_setup[:]
         self.betweenbatchDuration = self.betweenbatchDuration_setup
@@ -2347,19 +2347,19 @@ class tgraphcanvas(FigureCanvas):
         self.betweenbatch_after_preheat = self.betweenbatch_after_preheat_setup
 
     @pyqtSlot()
-    def fileDirty(self):
+    def fileDirty(self) -> None:
         self.safesaveflag = True
         self.aw.updateWindowTitle()
 
     @pyqtSlot()
-    def fileClean(self):
+    def fileClean(self) -> None:
         self.safesaveflag = False
         self.aw.updateWindowTitle()
 
-    def lazyredraw_on_resize(self):
+    def lazyredraw_on_resize(self) -> None:
         self.lazyredraw(recomputeAllDeltas=False)
 
-    def resizeEvent(self, event):
+    def resizeEvent(self, event) -> None:
         super().resizeEvent(event)
         # we only trigger a redraw on resize if a watermark is displayed to fix its aspect ratio
         if self.aw.redrawOnResize and self.aw.logofilename != '':
@@ -2377,7 +2377,7 @@ class tgraphcanvas(FigureCanvas):
     # update the self.deltaBTspan and deltaETspan from the given sampling interval, self.deltaETsamples and self.deltaBTsamples
     # interval is expected in seconds (either from the profile on load or from the sampling interval set for recording)
     # both deltaBTsamples and deltaETsamples are at least one
-    def updateDeltaSamples(self):
+    def updateDeltaSamples(self) -> None:
         if self.flagstart or self.profile_sampling_interval is None:
             speed = self.timeclock.getBase()/1000
             interval = speed * (self.delay / 1000)
@@ -2386,7 +2386,7 @@ class tgraphcanvas(FigureCanvas):
         self.deltaBTsamples = max(1,int(round(self.deltaBTspan / interval)))
         self.deltaETsamples = max(1,int(round(self.deltaETspan / interval)))
 
-    def updateBackground(self):
+    def updateBackground(self) -> None:
         if not self.block_update and self.ax is not None:
             try:
                 self.updateBackgroundSemaphore.acquire(1)
@@ -2396,7 +2396,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.updateBackgroundSemaphore.available() < 1:
                     self.updateBackgroundSemaphore.release(1)
 
-    def doUpdate(self):
+    def doUpdate(self) -> None:
         if not self.designerflag:
             self.resetlinecountcaches() # ensure that the line counts are up to date
             self.resetlines() # get rid of projection, cross lines and AUC line
@@ -2420,7 +2420,7 @@ class tgraphcanvas(FigureCanvas):
 
         self.block_update = False
 
-    def getetypes(self):
+    def getetypes(self) -> List[str]:
         if len(self.etypes) == 4:
             self.etypes.append('--')
         return self.etypes
@@ -2432,7 +2432,7 @@ class tgraphcanvas(FigureCanvas):
             return self.etypes[i-5]
         return self.etypes[i]
 
-    def Betypesf(self, i, prefix=False):
+    def Betypesf(self, i:int, prefix:bool = False) -> str:
         if len(self.Betypes) == 4:
             self.Betypes.append('--')
         if prefix and i < 4:
@@ -2465,7 +2465,7 @@ class tgraphcanvas(FigureCanvas):
             res = self.aw.float2float(res)
         return res
 
-    def updateAmbientTempFromPhidgetModulesOrCurve(self):
+    def updateAmbientTempFromPhidgetModulesOrCurve(self) -> None:
         if not self.ambientTempSource:
             AT_device = None
             try:
@@ -2515,7 +2515,7 @@ class tgraphcanvas(FigureCanvas):
         if res is not None and (isinstance(res, (float,int))) and not math.isnan(res):
             self.ambientTemp = self.aw.float2float(float(res))
 
-    def updateAmbientTemp(self):
+    def updateAmbientTemp(self) -> None:
         self.updateAmbientTempFromPhidgetModulesOrCurve()
         try:
             self.startPhidgetManager()
@@ -2584,7 +2584,7 @@ class tgraphcanvas(FigureCanvas):
             return -1
         return self.eventsExternal2InternalValue(float(st))
 
-    def fit_titles(self):
+    def fit_titles(self) -> None:
         #truncate title and statistic line to width of axis system to avoid that the MPL canvas goes into miser mode
         try:
             if self.ax is not None:
@@ -2655,7 +2655,7 @@ class tgraphcanvas(FigureCanvas):
         self.fit_titles()
 
     @pyqtSlot()
-    def sendeventmessage(self):
+    def sendeventmessage(self) -> None:
         self.eventmessagetimer = None
         if len(self.backgroundeventmessage) != 0:
             self.aw.sendmessage(self.backgroundeventmessage,append=True)
@@ -2666,7 +2666,7 @@ class tgraphcanvas(FigureCanvas):
             self.aw.sendmessage(self.eventmessage,append=True)
             self.eventmessage = ''
 
-    def starteventmessagetimer(self,time=120):
+    def starteventmessagetimer(self,time:int = 120) -> None:
         if self.eventmessagetimer is not None:
             self.eventmessagetimer.stop()
             self.eventmessagetimer.deleteLater()
@@ -2962,7 +2962,7 @@ class tgraphcanvas(FigureCanvas):
             self.adderror((QApplication.translate('Error Message','Exception:') + ' onclick() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot('QAction*')
-    def event_popup_action(self,action):
+    def event_popup_action(self, action):
         if action.key[0] >= 0:
             # we check if this is the first DROP mark on this roast
             firstDROP = (action.key[0] == 6 and self.timeindex[6] == 0)
@@ -3120,8 +3120,7 @@ class tgraphcanvas(FigureCanvas):
             _log.exception(e)
 
     @pyqtSlot(str,int)
-    # pylint: disable=no-self-use # used as slot
-    def showAlarmPopup(self, message, timeout):
+    def showAlarmPopup(self, message:str, timeout:int) -> None: # pylint: disable=no-self-use # used as slot
         # alarm popup message with <self.alarm_popup_timout>sec timeout
         amb = ArtisanMessageBox(self.aw, QApplication.translate('Message', 'Alarm notice'),message,timeout=timeout,modal=True) # modal=False prevent rendering as native message box on macOS
         amb.show()
@@ -3130,8 +3129,7 @@ class tgraphcanvas(FigureCanvas):
             self.updateWebLCDs(alertText=message,alertTimeout=timeout)
 
     @pyqtSlot(str,str)
-    # pylint: disable=no-self-use # used as slot
-    def updateLargeLCDsReadings(self, bt, et):
+    def updateLargeLCDsReadings(self, bt:str, et:str) -> None: # pylint: disable=no-self-use # used as slot
         try:
             if self.aw.largeLCDs_dialog is not None:
                 self.aw.largeLCDs_dialog.updateValues([et],[bt])
@@ -3139,7 +3137,7 @@ class tgraphcanvas(FigureCanvas):
             _log.exception(e)
 
     @pyqtSlot(str)
-    def updateLargeLCDsTime(self, time): # pylint: disable=no-self-use # used as slot
+    def updateLargeLCDsTime(self, time:str) -> None: # pylint: disable=no-self-use # used as slot
         try:
             if self.aw.largeLCDs_dialog is not None:
                 self.aw.largeLCDs_dialog.updateValues([],[],time=time)
@@ -3147,7 +3145,7 @@ class tgraphcanvas(FigureCanvas):
             _log.exception(e)
 
     # note that partial values might be given here
-    def updateLargeDeltaLCDs(self, deltabt=None, deltaet=None):
+    def updateLargeDeltaLCDs(self, deltabt=None, deltaet=None) -> None:
         try:
             if self.aw.largeDeltaLCDs_dialog is not None:
                 self.aw.largeDeltaLCDs_dialog.updateValues([deltaet],[deltabt])
@@ -3155,7 +3153,7 @@ class tgraphcanvas(FigureCanvas):
             _log.exception(e)
 
     # note that partial values might be given here
-    def updateLargePIDLCDs(self, sv=None, duty=None):
+    def updateLargePIDLCDs(self, sv=None, duty=None) -> None:
         try:
             if self.aw.largePIDLCDs_dialog is not None:
                 self.aw.largePIDLCDs_dialog.updateValues([sv],[duty])
@@ -3163,14 +3161,14 @@ class tgraphcanvas(FigureCanvas):
             _log.exception(e)
 
     # note that partial values might be given here
-    def updateLargeScaleLCDs(self, weight=None, total=None):
+    def updateLargeScaleLCDs(self, weight=None, total=None) -> None:
         try:
             if self.aw.largeScaleLCDs_dialog is not None:
                 self.aw.largeScaleLCDs_dialog.updateValues([weight],[total])
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
-    def updateLargeExtraLCDs(self, extra1=None, extra2=None):
+    def updateLargeExtraLCDs(self, extra1=None, extra2=None) -> None:
         try:
             if self.aw.largeExtraLCDs_dialog is not None:
                 self.aw.largeExtraLCDs_dialog.updateValues(extra1,extra2)
@@ -3179,7 +3177,7 @@ class tgraphcanvas(FigureCanvas):
 
     # returns True if the extra device n, channel c, is of type MODBUS or S7, has no factor defined, nor any math formula, and is of type int
     # channel c is either 0 or 1
-    def intChannel(self,n,c):
+    def intChannel(self, n:int, c:int) -> bool:
         if self.aw is not None and len(self.extradevices) > n:
             no_math_formula_defined:bool = False
             if c == 0:
@@ -3247,7 +3245,7 @@ class tgraphcanvas(FigureCanvas):
             return False
         return False
 
-    def update_additional_artists(self):
+    def update_additional_artists(self) -> None:
         if self.ax is not None:
             if self.flagstart and ((self.device == 18 and self.aw.simulator is None) or self.showtimeguide): # not NONE device
                 tx = self.timeclock.elapsedMilli()
@@ -4243,7 +4241,7 @@ class tgraphcanvas(FigureCanvas):
     # this function is called by a signal at the end of the thread sample()
     # during sample, updates to GUI widgets or anything GUI must be done here (never from thread)
     @pyqtSlot()
-    def updategraphics(self):
+    def updategraphics(self) -> None:
         QApplication.processEvents() # without this we see some flickers (canvas redraws) on using multiple button event actions on macOS!?
         try:
             if self.flagon and self.ax is not None:

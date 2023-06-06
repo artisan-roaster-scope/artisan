@@ -4972,7 +4972,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         if action and hasattr(action,'data') and hasattr(action,'text'):
             label = (action.text() if action.data()[1] == '' else f'{action.data()[1]} {action.text()}')
             label = label.replace('&&','&') # we reduce those && again to & that were introduced to have the & rendered in the menu entry
-            string = QApplication.translate('Message', 'Configure for<br>{0}?<br><br>Your current settings will be overwritten!<br><br>It is advisable to save your current settings beforehand via menu Help >> Save Settings.').format(label)
+#            string = QApplication.translate('Message', 'Configure for<br>{0}?<br><br>Your current settings will be overwritten!<br><br>It is advisable to save your current settings beforehand via menu Help >> Save Settings.').format(label)
+            string = QApplication.translate('Message', 'Configure for<br>{0}?<br><br>Some of your settings will be modified!<br><br>Before proceeding it is best to save your current settings and reset Artisan<br>(first menu {1} >> {2} then {1} >> {3})').format(label, QApplication.translate('Menu', 'Help'),QApplication.translate('Menu', 'Save Settings...'),QApplication.translate('Menu', 'Factory Reset'))
             reply = QMessageBox.question(self, QApplication.translate('Message', 'Adjust Settings'),string,
                 QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
             if reply == QMessageBox.StandardButton.Cancel:

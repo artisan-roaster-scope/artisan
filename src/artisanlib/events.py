@@ -54,7 +54,7 @@ except ImportError:
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 class EventsDlg(ArtisanResizeablDialog):
-    def __init__(self, parent:QWidget, aw:'ApplicationWindow', activeTab = 0) -> None:
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow', activeTab:int = 0) -> None:
         super().__init__(parent, aw)
 
         self.aw = aw
@@ -1573,8 +1573,6 @@ class EventsDlg(ArtisanResizeablDialog):
 
         self.TabWidget.addTab(C7Widget,QApplication.translate('Tab','Annotations'))
 
-        self.TabWidget.setCurrentIndex(activeTab)
-
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(self.TabWidget)
         mainLayout.setSpacing(5)
@@ -1585,6 +1583,8 @@ class EventsDlg(ArtisanResizeablDialog):
             self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
         else:
             self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
+
+        self.TabWidget.setCurrentIndex(activeTab)
 
     # returns the position in self.sliderStepSizes corresponding to the given eventslidercoarse setting n
     @staticmethod
