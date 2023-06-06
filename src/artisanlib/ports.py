@@ -326,7 +326,7 @@ class scanS7Dlg(ArtisanDialog):
                     self.S7Edit.setHtml(result)
                     break
                 if self.typeFloat:
-                    res = self.aw.s7.peakFloat(self.area,self.DBnr,register)
+                    res = self.aw.s7.peekFloat(self.area,self.DBnr,register)
                 else:
                     res = self.aw.s7.peekInt(self.area,self.DBnr,register)
                 if res is not None:

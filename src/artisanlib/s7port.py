@@ -547,7 +547,7 @@ class s7port():
 ##########
 
 
-    def writeFloat(self, area:int, dbnumber:int, start:int, value:float):
+    def writeFloat(self, area:int, dbnumber:int, start:int, value:float) -> None:
         _log.debug('writeFloat(%d,%d,%d,%.3f)',area,dbnumber,start,value)
         try:
             #### lock shared resources #####
@@ -578,7 +578,7 @@ class s7port():
             if self.aw.seriallogflag:
                 self.aw.addserial(f'S7 writeFloat({area},{dbnumber},{start},{value})')
 
-    def writeInt(self, area:int, dbnumber:int, start:int, value:float):
+    def writeInt(self, area:int, dbnumber:int, start:int, value:float) -> None:
         _log.debug('writeInt(%d,%d,%d,%d)',area,dbnumber,start,value)
         try:
             #### lock shared resources #####
@@ -609,7 +609,7 @@ class s7port():
             if self.aw.seriallogflag:
                 self.aw.addserial(f'S7 writeInt({area},{dbnumber},{start},{value})')
 
-    def maskWriteInt(self, area:int, dbnumber:int, start:int, and_mask:int, or_mask,value:int):
+    def maskWriteInt(self, area:int, dbnumber:int, start:int, and_mask:int, or_mask,value:int) -> None:
         _log.debug('maskWriteInt(%d,%d,%d,%s,%s,%d)',area,dbnumber,start,and_mask,or_mask,value)
         try:
             #### lock shared resources #####
@@ -641,7 +641,7 @@ class s7port():
             if self.aw.seriallogflag:
                 self.aw.addserial(f'S7 writeInt({area},{dbnumber},{start},{value})')
 
-    def writeBool(self, area:int, dbnumber:int, start:int, index:int, value:bool):
+    def writeBool(self, area:int, dbnumber:int, start:int, index:int, value:bool) -> None:
         _log.debug('writeInt(%d,%d,%d,%d,%s)',area,dbnumber,start,index,value)
         try:
             #### lock shared resources #####
@@ -746,8 +746,8 @@ class s7port():
 
     # as readFloat, but does not retry nor raise and error and returns a None instead
     # also does not reserve the port via a semaphore nor uses the cache!
-    def peakFloat(self, area:int, dbnumber:int, start:int) -> Optional[float]:
-        _log.debug('peakFloat(%d,%d,%d)',area,dbnumber,start)
+    def peekFloat(self, area:int, dbnumber:int, start:int) -> Optional[float]:
+        _log.debug('peekFloat(%d,%d,%d)',area,dbnumber,start)
         if area == 0:
             return None
         try:
@@ -762,7 +762,7 @@ class s7port():
                 return get_real(res,0)
             return None
         except Exception as e: # pylint: disable=broad-except
-            _log.info('peakFloat(%d,%d,%d) failed',area,dbnumber,start)
+            _log.info('peekFloat(%d,%d,%d) failed',area,dbnumber,start)
             _log.debug(e)
             return None
 

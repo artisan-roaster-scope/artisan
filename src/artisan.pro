@@ -23,6 +23,7 @@ SOURCES = \
     artisanlib/background.py \
     artisanlib/batches.py \
     artisanlib/calculator.py \
+    artisanlib/canvas.py \
     artisanlib/colors.py \
     artisanlib/comm.py \
     artisanlib/comparator.py \
@@ -37,9 +38,12 @@ SOURCES = \
     artisanlib/ikawa.py \
     artisanlib/large_lcds.py \
     artisanlib/logs.py \
+    artisanlib/loring.py \
     artisanlib/main.py \
     artisanlib/modbusport.py \
+    artisanlib/petroncini.py \
     artisanlib/phases.py \
+    artisanlib/phases_canvas.py \
     artisanlib/pid_control.py \
     artisanlib/pid_dialogs.py \
     artisanlib/platformdlg.py \

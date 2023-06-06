@@ -675,7 +675,7 @@ class modbusport():
                 builder.add_32bit_float(float(value))
                 payload = builder.build()
                 #payload:List[int] = [int.from_bytes(b,("little" if self.byteorderLittle else "big")) for b in builder.build()]
-                self.master.write_registers(int(register),payload,slave=int(slave),skip_encode=True)  # pyright: ignore # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"
+                self.master.write_registers(int(register),payload,slave=int(slave),skip_encode=True) # type: ignore # mypy/pyright: ignore # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"
                 time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeWord(%d,%d,%s) failed', slave, register, value)
@@ -704,7 +704,7 @@ class modbusport():
                 builder.add_16bit_uint(r)
                 payload = builder.build()
                 #payload:List[int] = [int.from_bytes(b,("little" if self.byteorderLittle else "big")) for b in builder.build()]
-                self.master.write_registers(int(register),payload,slave=int(slave),skip_encode=True)  # pyright: ignore # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"
+                self.master.write_registers(int(register),payload,slave=int(slave),skip_encode=True) # type:ignore # mypy/pyright: ignore # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"
                 time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeBCD(%d,%d,%s) failed', slave, register, value)
@@ -734,7 +734,7 @@ class modbusport():
                 builder.add_32bit_int(int(value))
                 payload = builder.build()
                 #payload:List[int] = [int.from_bytes(b,("little" if self.byteorderLittle else "big")) for b in builder.build()]
-                self.master.write_registers(int(register),payload,slave=int(slave),skip_encode=True)  # pyright: ignore # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"
+                self.master.write_registers(int(register),payload,slave=int(slave),skip_encode=True) # type: ignore # mypy/pyright: ignore # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"
                 time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeLong(%d,%d,%s) failed', slave, register, value)

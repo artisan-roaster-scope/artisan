@@ -10120,7 +10120,7 @@ class tgraphcanvas(FigureCanvas):
             else:
                 prefix = '#'
                 suffix = ''
-            return f'{prefix}{roastbatchpos}{suffix} {QApplication.translate("AddlInfo", "Roast of the Day")}'
+            return f'{prefix}{roastbatchpos}{suffix} {self.__dijstra_to_ascii(QApplication.translate("AddlInfo", "Roast of the Day"))}'
         return '' #return an empty string if roastbatchpos is None
 
     #add stats summary to graph
@@ -10140,7 +10140,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.title != QApplication.translate('Scope Title', 'Roaster Scope'):
                     if statstr_segments != []:
                         statstr_segments.append(' ')
-                    statstr_segments.append(self.title)
+                    statstr_segments.append(self.__dijstra_to_ascii(self.title))
                 statstr_segments += [
                     skipline,
                     self.roastdate.date().toString(),
@@ -10178,7 +10178,7 @@ class tgraphcanvas(FigureCanvas):
                             statstr_segments.append('..')
 
                 if self.beansize_min or self.beansize_max:
-                    statstr_segments += ['\n',  QApplication.translate('AddlInfo', 'Screen Size'), ': ']
+                    statstr_segments += ['\n',  self.__dijstra_to_ascii(QApplication.translate('AddlInfo', 'Screen Size')), ': ']
                     if self.beansize_min:
                         statstr_segments.append(str(int(round(self.beansize_min))))
                     if self.beansize_max:
@@ -10196,17 +10196,17 @@ class tgraphcanvas(FigureCanvas):
                         w =str(self.aw.float2float(self.weight[0],0))
                     else:
                         w = str(self.aw.float2float(self.weight[0],2))
-                    statstr_segments += ['\n', QApplication.translate('AddlInfo', 'Batch Size') , ': ', w, self.weight[2], ' ']
+                    statstr_segments += ['\n', self.__dijstra_to_ascii(QApplication.translate('AddlInfo', 'Batch Size')) , ': ', w, self.weight[2], ' ']
                     if self.weight[1]:
                         statstr_segments += ['(-', str(self.aw.float2float(self.aw.weight_loss(self.weight[0],self.weight[1]),1)), '%)']
 
                 # Roast Info Section
                 statstr_segments.append(skipline)
                 if 'roasted_density' in cp:
-                    statstr_segments += ['\n', QApplication.translate('AddlInfo', 'Density Roasted'), ': ', str(cp['roasted_density']),
+                    statstr_segments += ['\n', self.__dijstra_to_ascii(QApplication.translate('AddlInfo', 'Density Roasted')), ': ', str(cp['roasted_density']),
                         ' ', self.density[1], '/', self.density[3]]
                 if self.moisture_roasted:
-                    statstr_segments += ['\n', QApplication.translate('AddlInfo', 'Moisture Roasted'), ': ', str(self.aw.float2float(self.moisture_roasted,1)), '%']
+                    statstr_segments += ['\n', self.__dijstra_to_ascii(QApplication.translate('AddlInfo', 'Moisture Roasted')), ': ', str(self.aw.float2float(self.moisture_roasted,1)), '%']
                 if self.whole_color > 0:
                     statstr_segments += ['\n', QApplication.translate('AddlInfo', 'Whole Color'), ': #', str(self.whole_color), ' ',
                         str(self.color_systems[self.color_system_idx])]
@@ -13653,7 +13653,7 @@ class tgraphcanvas(FigureCanvas):
                         # no subscript for legacy Windows, or graph fonts different to default and WenQuanYi
                         CO2_label = CO2_label.replace('CO2','CO₂')
                     energy_unit = self.energyunits[self.energyresultunit_setup]
-                    roast_label = QApplication.translate('Label','Roast')
+                    roast_label = self.__dijstra_to_ascii(QApplication.translate('Label','Roast'))
                     energymetrics,_ = self.calcEnergyuse()
                     KWH_per_green_roast = energymetrics['KWH_roast_per_green_kg']
                     CO2_per_green_roast = energymetrics['CO2_roast_per_green_kg']
@@ -16417,6 +16417,12 @@ class tgraphcanvas(FigureCanvas):
                 utf8_string = utf8_string.replace(k, uml)
         from unidecode import unidecode
         return unidecode(utf8_string)
+
+    # convert German Umlauts if Dijkstra font is selected
+    def __dijstra_to_ascii(self, s:str) -> str:
+        if self.graphfont == 9: # font Dijkstra selected
+            return self.__to_ascii(s)
+        return s
 
 
 
