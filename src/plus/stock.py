@@ -195,7 +195,7 @@ class Worker(QObject): # pyright: ignore # Argument to class must be a base clas
             controller.disconnect(remove_credentials=False, stop_queue=False)
             return False
 
-
+@pyqtSlot()
 def update() -> None:
     _log.debug('update()')
     global worker, worker_thread  # pylint: disable=global-statement

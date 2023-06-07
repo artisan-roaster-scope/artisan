@@ -23,10 +23,10 @@
 
 try:
     #pylint: disable = E, W, R, C
-    from PyQt6.QtCore import QSemaphore, QTimer # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import QSemaphore, QTimer, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # type: ignore # pylint: disable=broad-except
     #pylint: disable = E, W, R, C
-    from PyQt5.QtCore import QSemaphore, QTimer # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QSemaphore, QTimer, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from typing import List, Dict, Any
 from typing_extensions import Final  # Python <=3.7
@@ -61,6 +61,7 @@ def updateNotifications(notifications: int, machines:List[str]) -> None:
 
 # fetches new notifications and forward them to the Artisan notification system
 # sidecondition: at this point all pending notifications are delivered and the "notification" count on the server can be assumed to be 0
+@pyqtSlot()
 def retrieveNotifications() -> None:
     gotlock = get_notifications_semaphore.tryAcquire(1,0)
     # we try to catch a lock if available but we do not wait, if we fail we just skip this sampling round (prevents stacking of waiting calls)

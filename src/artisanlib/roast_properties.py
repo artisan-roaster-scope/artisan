@@ -369,14 +369,14 @@ class volumeCalculatorDlg(ArtisanDialog):
 
     @pyqtSlot(bool)
     def inWeight(self,_):
-        QTimer.singleShot(1,lambda : self.widgetWeight(self.coffeeinweightEdit))
-        QTimer.singleShot(10,self.resetInVolume)
+        QTimer.singleShot(1, self.setWidgetInWeight)
+        QTimer.singleShot(10, self.resetInVolume)
         QApplication.processEvents()
 
     @pyqtSlot(bool)
     def outWeight(self,_):
-        QTimer.singleShot(1,lambda : self.widgetWeight(self.coffeeoutweightEdit))
-        QTimer.singleShot(10,self.resetOutVolume)
+        QTimer.singleShot(1, self.setWidgetOutWeight)
+        QTimer.singleShot(10, self.resetOutVolume)
         QApplication.processEvents()
 
     def retrieveWeight(self):
@@ -390,6 +390,14 @@ class volumeCalculatorDlg(ArtisanDialog):
     def resetVolume(self):
         self.resetInVolume()
         self.resetOutVolume()
+
+    @pyqtSlot()
+    def setWidgetInWeight(self):
+        self.widgetWeight(self.coffeeinweightEdit)
+
+    @pyqtSlot()
+    def setWidgetOutWeight(self):
+        self.widgetWeight(self.coffeeoutweightEdit)
 
     @pyqtSlot()
     def resetInVolume(self):
@@ -1584,7 +1592,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 else: # we are in ON mode, but not connected, we connect which triggers a stock update if successful
                     plus.controller.connect(interactive=False)
                 if plus.controller.is_connected():
-                    QTimer.singleShot(1500,self.populatePlusCoffeeBlendCombos)
+                    QTimer.singleShot(1500, self.populatePlusCoffeeBlendCombos)
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
         if platform.system() == 'Windows':
@@ -1685,6 +1693,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.batchLayout.addWidget(self.batchcounterSpinBox)
         self.batchLayout.addWidget(self.batchposSpinBox)
 
+    @pyqtSlot()
     def readScale(self):
         if self.disconnecting:
             self.aw.scale.closeport()
@@ -1711,6 +1720,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     def connectScaleLoop(self):
         QTimer.singleShot(2000,self.connectScale)
 
+    @pyqtSlot()
     def connectScale(self):
         if self.disconnecting:
             self.aw.scale.closeport()
@@ -1864,6 +1874,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                 _log.exception(e)
 
     # storeIndex is the index of the selected entry in the popup
+    @pyqtSlot()
+    @pyqtSlot(int)
     def populatePlusCoffeeBlendCombos(self,storeIndex=None):
         if self.aw.plus_account is not None:
             try: # this can crash if dialog got closed while this is processed in a different thread!

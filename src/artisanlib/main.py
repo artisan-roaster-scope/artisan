@@ -3908,7 +3908,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 
         QTimer.singleShot(2000,self.donate)
 
-        QTimer.singleShot(0,lambda : _log.info('startup time: %.2f', libtime.process_time() - startup_time))
+        QTimer.singleShot(0, self.logStartupTime)
 
         self.zoomInShortcut = QShortcut(QKeySequence.StandardKey.ZoomIn, self)
         self.zoomInShortcut.activated.connect(self.zoomIn)
@@ -4209,6 +4209,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         if settings.status() != QSettings.Status.NoError:
             _log.error('Failed to save lastdonationpopup settings')
 
+    @pyqtSlot()
+    def logStartupTime(self) -> None: # pylint: disable=no-self-use # used as slot
+        _log.info('startup time: %.2f', libtime.process_time() - startup_time)
+
+    @pyqtSlot()
     def donate(self) -> None:
         try:
             everytime = 4*30*24*60*60 # 4 month in seconds
@@ -15535,6 +15540,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 
     @pyqtSlot(bool)
     def notificationsSetEnabled(self,enabled:bool):
+        if self.notificationsflag != enabled:
+            _log.info('notifications: %s',self.notificationsflag)
         self.notificationsflag = enabled
         if self.notificationManager:
             if self.notificationsflag:
@@ -15543,8 +15550,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             else:
                 self.notificationManager.disableNotifications()
                 self.notificationManager.hideNotifications()
-        _log.info('notifications: %s',self.notificationsflag)
-
 
     @pyqtSlot(bytes,int)
     def santokerSendMessage(self, target:bytes, value:int):

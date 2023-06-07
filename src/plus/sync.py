@@ -23,11 +23,11 @@
 
 try:
     #pylint: disable = E, W, R, C
-    from PyQt6.QtCore import QSemaphore, QTimer # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import QSemaphore, QTimer, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #pylint: disable = E, W, R, C
-    from PyQt5.QtCore import QSemaphore, QTimer # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QSemaphore, QTimer, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from pathlib import Path
@@ -806,7 +806,7 @@ def getUpdate(uuid: Optional[str], file=None) -> None:
 
 # Sync Action as issued on profile load and turning plus on
 
-
+@pyqtSlot()
 def sync() -> None:
     try:
         _log.debug('sync()')

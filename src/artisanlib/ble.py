@@ -191,11 +191,12 @@ class BleInterface(QtCore.QObject): # pyright: ignore # Argument to class must b
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
+    @QtCore.pyqtSlot()
     def heartbeat(self) -> None:
         if self.m_connected and self.sendHeartbeat is not None:
 #            _log.debug("send heartbeat")
             self.sendHeartbeat(self.write)
-            QtCore.QTimer.singleShot(2000,self.heartbeat)
+            QtCore.QTimer.singleShot(2000, self.heartbeat)
 
     @QtCore.pyqtSlot('QLowEnergyDescriptor','QByteArray')
     def descriptorWrittenSlot(self, descriptor:QtBluetooth.QLowEnergyDescriptor, newValue:QtCore.QByteArray) -> None:
@@ -394,6 +395,7 @@ class BleInterface(QtCore.QObject): # pyright: ignore # Argument to class must b
         self.disconnectDiscovery()
         self.dataReceived.disconnect()
 
+    @QtCore.pyqtSlot()
     def scanDevices(self) -> None:
         _log.debug('scanDevices()')
         self.m_device = None

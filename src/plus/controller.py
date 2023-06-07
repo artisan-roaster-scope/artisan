@@ -24,12 +24,12 @@
 try:
     #pylint: disable = E, W, R, C
     from PyQt6.QtGui import QPixmap # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtCore import QSemaphore, QTimer, Qt # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import QSemaphore, QTimer, Qt, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import QWidget,QApplication, QMessageBox # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #pylint: disable = E, W, R, C
     from PyQt5.QtGui import QPixmap # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtCore import QSemaphore, QTimer, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QSemaphore, QTimer, Qt, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QWidget, QApplication, QMessageBox # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
@@ -117,6 +117,7 @@ def toggle(app_window):
 
 # if clear_on_failure is set, credentials are removed if connect fails
 # NOTE: authentify might be called from outside the GUI thread (interactive must be False in this case!)
+@pyqtSlot()
 def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
     if not is_connected():
         _log.debug(

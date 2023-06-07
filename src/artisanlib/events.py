@@ -33,14 +33,14 @@ from uic import SliderCalculatorDialog
 
 
 try:
-    from PyQt6.QtCore import (Qt, pyqtSlot, QSettings) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import (Qt, pyqtSlot, QSettings, QTimer) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import (QColor, QFont, QIntValidator) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QCheckBox, QComboBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QWidget, QTabWidget, QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGridLayout, QGroupBox, QTableWidget, QHeaderView, QToolButton) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6 import sip # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
-    from PyQt5.QtCore import (Qt, pyqtSlot, QSettings) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QTimer) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import (QColor, QFont, QIntValidator) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QWidget, QTabWidget, QDialogButtonBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
@@ -59,6 +59,7 @@ class EventsDlg(ArtisanResizeablDialog):
 
         self.aw = aw
         self.app = aw.app
+        self.activeTab = activeTab
 
         self.buttonlistmaxlen:int = self.aw.buttonlistmaxlen
 
@@ -1581,9 +1582,13 @@ class EventsDlg(ArtisanResizeablDialog):
         else:
             self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
 
-        self.createEventbuttonTable()
-        self.TabWidget.setCurrentIndex(activeTab)
         self.TabWidget.currentChanged.connect(self.tabSwitched)
+
+        QTimer.singleShot(50, self.setActiveTab)
+
+    @pyqtSlot()
+    def setActiveTab(self) -> None:
+        self.TabWidget.setCurrentIndex(self.activeTab)
 
     # returns the position in self.sliderStepSizes corresponding to the given eventslidercoarse setting n
     @staticmethod

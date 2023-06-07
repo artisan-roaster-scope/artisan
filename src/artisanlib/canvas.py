@@ -181,9 +181,9 @@ class tgraphcanvas(FigureCanvas):
        uchr(228): 'ae',  # U+00E4   \xc3\xa4
        uchr(246): 'oe',  # U+00F6   \xc3\xb6
        uchr(252): 'ue',  # U+00FC   \xc3\xbc
-       uchr(196): 'Ae',  # U+00C4   \xc3\x84
-       uchr(214): 'Oe',  # U+00D6   \xc3\x96
-       uchr(220): 'Ue',  # U+00DC   \xc3\x9c
+       uchr(196): 'AE',  # U+00C4   \xc3\x84
+       uchr(214): 'OE',  # U+00D6   \xc3\x96
+       uchr(220): 'UE',  # U+00DC   \xc3\x9c
        uchr(223): 'ss',  # U+00DF   \xc3\x9f
     }
 
@@ -2356,6 +2356,7 @@ class tgraphcanvas(FigureCanvas):
         self.safesaveflag = False
         self.aw.updateWindowTitle()
 
+    @pyqtSlot()
     def lazyredraw_on_resize(self) -> None:
         self.lazyredraw(recomputeAllDeltas=False)
 
@@ -2386,6 +2387,7 @@ class tgraphcanvas(FigureCanvas):
         self.deltaBTsamples = max(1,int(round(self.deltaBTspan / interval)))
         self.deltaETsamples = max(1,int(round(self.deltaETspan / interval)))
 
+    @pyqtSlot()
     def updateBackground(self) -> None:
         if not self.block_update and self.ax is not None:
             try:
@@ -4548,6 +4550,7 @@ class tgraphcanvas(FigureCanvas):
         timestr = stringfromseconds(ts)
         self.setLCDtimestr(timestr)
 
+    @pyqtSlot()
     def updateLCDtime(self):
         if self.flagstart and self.flagon:
             tx = self.timeclock.elapsedMilli()
@@ -7084,10 +7087,12 @@ class tgraphcanvas(FigureCanvas):
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,y,y,d)
                     if startB is not None:
                         st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation', 'CHARGE'))
+                        st1 = self.__dijstra_to_ascii(st1)
                         e = 0
                         a = self.backgroundalpha
                     else:
                         st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation', 'CHARGE'))
+                        st1 = self.__dijstra_to_ascii(st1)
                         if self.graphfont == 1:
                             st1 = self.__to_ascii(st1)
                         e = 0
@@ -10958,6 +10963,7 @@ class tgraphcanvas(FigureCanvas):
             if self.profileDataSemaphore.available() < 1:
                 self.profileDataSemaphore.release(1)
 
+    @pyqtSlot()
     def AsyncSamplingActionTrigger(self):
         if self.extra_event_sampling_delay and self.extrabuttonactions[2]:
             if self.flagon:
@@ -10968,6 +10974,7 @@ class tgraphcanvas(FigureCanvas):
             self.aw.AsyncSamplingTimer.setSingleShot(True)
             self.aw.AsyncSamplingTimer.start(int(round(self.extra_event_sampling_delay)))
 
+    @pyqtSlot()
     def StartAsyncSamplingAction(self):
         if self.aw.AsyncSamplingTimer is None and self.flagon and self.extra_event_sampling_delay != 0:
             self.AsyncSamplingActionTrigger()
@@ -11125,7 +11132,8 @@ class tgraphcanvas(FigureCanvas):
     # the PhidgetManager needs to run to allow Phidgets to attach
     # the PhidgetManager is only started if self.PhidgetsConfigured() returns True signaling
     # that Phidget modules are configured as main/extra devices, ambient devices, or in button/slider actions
-    def startPhidgetManager(self):
+    @pyqtSlot()
+    def startPhidgetManager(self) -> None:
         # this is needed to suppress the message on the ignored Exception
         #                            # Phidget that is raised on starting the PhidgetManager without installed
         #                            # Phidget driver (artisanlib/suppress_error.py fails to suppress this)
@@ -11184,6 +11192,7 @@ class tgraphcanvas(FigureCanvas):
             if self.samplingSemaphore.available() < 1:
                 self.samplingSemaphore.release(1)
 
+    @pyqtSlot()
     def OnMonitor(self):
         try:
             if self.aw.simulator is None:
@@ -11722,6 +11731,7 @@ class tgraphcanvas(FigureCanvas):
             _log.exception(e)
 
 
+    @pyqtSlot()
     def disconnectProbes(self):
         # close ports of main device
         self.disconnectProbesFromSerialDevice(self.aw.ser)
@@ -11759,6 +11769,7 @@ class tgraphcanvas(FigureCanvas):
                 pass
             self.OffMonitor()
 
+    @pyqtSlot()
     def fireChargeTimer(self): #profileDataSemaphore
         #### lock shared resources #####
         try:
@@ -11975,6 +11986,7 @@ class tgraphcanvas(FigureCanvas):
         else:
             QTimer.singleShot(delay,self.markChargeTrigger)
 
+    @pyqtSlot()
     def markChargeTrigger(self):
         self.markCharge()
 
@@ -11995,6 +12007,7 @@ class tgraphcanvas(FigureCanvas):
                         ## deactivate autoCHARGE
                         ##self.autoCHARGEenabled = False
                         st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation', 'CHARGE'))
+                        st1 = self.__dijstra_to_ascii(st1)
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             try:
                                 self.l_annotations[-1].remove()
@@ -12060,6 +12073,7 @@ class tgraphcanvas(FigureCanvas):
                             # only if BT is shown we place the annotation:
                             d = self.ylimit - self.ylimit_min
                             st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation', 'CHARGE'))
+                            st1 = self.__dijstra_to_ascii(st1)
                             t2 = self.temp2[self.timeindex[0]]
                             tx = self.timex[self.timeindex[0]]
                             self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,t2,t2,d)
