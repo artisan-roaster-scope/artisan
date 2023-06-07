@@ -3,7 +3,7 @@
 #     for Windows, Windows legacy, macOS, and Linux
 ###################################################################
 # Include "skip ci" in the commit message to prevent this build process from running
-
+#
 environment:
   # Set the Appveyor Python version for windows, macos and linux here. Does not affect windows_legacy.
   PYTHON_V: 3.11
