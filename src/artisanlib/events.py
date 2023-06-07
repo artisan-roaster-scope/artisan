@@ -260,9 +260,6 @@ class EventsDlg(ArtisanResizeablDialog):
         tab7Layout.addSpacing(10)
         tab7Layout.addLayout(buttonLayout)
 
-        C7Widget = QWidget()
-        C7Widget.setLayout(tab7Layout)
-
         ## TAB 1
         self.eventsbuttonflag = QCheckBox(QApplication.translate('ComboBox','Event Button'))
         self.eventsbuttonflag.setChecked(bool(self.aw.eventsbuttonflag))
@@ -1543,7 +1540,6 @@ class EventsDlg(ArtisanResizeablDialog):
 ###########################################
         #tab layout
         self.TabWidget = QTabWidget()
-        self.TabWidget.currentChanged.connect(self.tabSwitched)
         C1Widget = QWidget()
         C1Widget.setLayout(tab1layout)
         self.TabWidget.addTab(C1Widget,QApplication.translate('Tab','Config'))
@@ -1570,7 +1566,8 @@ class EventsDlg(ArtisanResizeablDialog):
         C4Widget = QWidget()
         C4Widget.setLayout(valueVLayout)
         self.TabWidget.addTab(C4Widget,QApplication.translate('Tab','Style'))
-
+        C7Widget = QWidget()
+        C7Widget.setLayout(tab7Layout)
         self.TabWidget.addTab(C7Widget,QApplication.translate('Tab','Annotations'))
 
         mainLayout = QVBoxLayout()
@@ -1584,7 +1581,9 @@ class EventsDlg(ArtisanResizeablDialog):
         else:
             self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
 
+        self.createEventbuttonTable()
         self.TabWidget.setCurrentIndex(activeTab)
+        self.TabWidget.currentChanged.connect(self.tabSwitched)
 
     # returns the position in self.sliderStepSizes corresponding to the given eventslidercoarse setting n
     @staticmethod
