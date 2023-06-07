@@ -24,7 +24,7 @@ matplotlib==3.7.0 #3.7.1 has an issue on Windows with the click handler # 3.4.1 
 wquantiles==0.6 # 0.5 depends on numpy thus we have to put it after numpy
 colorspacious==1.1.2 # depends on numpy thus we have to put it after numpy
 PyQt6==6.5.1
-PyQt6-WebEngine==6.5.1
+PyQt6-WebEngine==6.5.0
 #PyQt6-Qt6==6.5.0  #revert from 6.5.1 installed by PyQt6 to mitigate events tab issue
 openpyxl==3.1.2 #3.1.1
 keyring==23.13.1 #23.9.3 # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller

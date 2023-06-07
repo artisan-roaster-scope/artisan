@@ -9,7 +9,7 @@
 ######
 # platform specifics
 #
-pywin32==305 #304
+pywin32==306 #305
 pyinstaller-versionfile==2.1.1 #2.0.0
 #
 ######
