@@ -528,10 +528,10 @@ class editGraphDlg(ArtisanResizeablDialog):
     connectScaleSignal = pyqtSignal()
     readScaleSignal = pyqtSignal()
 
-    def __init__(self, parent, aw, activeTab = 0) -> None:
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow', activeTab:int = 0) -> None:
         super().__init__(parent, aw)
 
-        self.aw = aw
+        self.activeTab = activeTab
 
         self.setModal(True)
 #        self.setWindowModality(Qt.WindowModality.WindowModal)
@@ -1564,8 +1564,6 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.volume_percent()
         self.setLayout(totallayout)
 
-        self.TabWidget.setCurrentIndex(activeTab)
-
         self.titleedit.setFocus()
 
         self.updateTemplateLine()
@@ -1599,6 +1597,15 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
         else:
             self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
+
+        # we set the active tab with a QTimer after the tabbar has been rendered once, as otherwise
+        # some tabs are not rendered at all on Winwos using Qt v6.5.1 (https://bugreports.qt.io/projects/QTBUG/issues/QTBUG-114204?filter=allissues)
+        QTimer.singleShot(50, self.setActiveTab)
+
+    @pyqtSlot()
+    def setActiveTab(self) -> None:
+        self.TabWidget.setCurrentIndex(self.activeTab)
+
 
 ## CUSTOM BLEND DIALOG
 
@@ -3987,37 +3994,34 @@ class editGraphDlg(ArtisanResizeablDialog):
             if i in self.aw.qmc.specialevents:
                 self.datatable.item(i,0).setBackground(QColor('yellow'))
 
-            if i:
-                    #identify by color and add notation
-                if i == self.aw.qmc.timeindex[0]:
-                    self.datatable.item(i,0).setBackground(QColor('#f07800'))
-                    text = QApplication.translate('Table', 'CHARGE')
-                elif i == self.aw.qmc.timeindex[1]:
-                    self.datatable.item(i,0).setBackground(QColor('orange'))
-                    text = QApplication.translate('Table', 'DRY END')
-                elif i == self.aw.qmc.timeindex[2]:
-                    self.datatable.item(i,0).setBackground(QColor('orange'))
-                    text = QApplication.translate('Table', 'FC START')
-                elif i == self.aw.qmc.timeindex[3]:
-                    self.datatable.item(i,0).setBackground(QColor('orange'))
-                    text = QApplication.translate('Table', 'FC END')
-                elif i == self.aw.qmc.timeindex[4]:
-                    self.datatable.item(i,0).setBackground(QColor('orange'))
-                    text = QApplication.translate('Table', 'SC START')
-                elif i == self.aw.qmc.timeindex[5]:
-                    self.datatable.item(i,0).setBackground(QColor('orange'))
-                    text = QApplication.translate('Table', 'SC END')
-                elif i == self.aw.qmc.timeindex[6]:
-                    self.datatable.item(i,0).setBackground(QColor('#f07800'))
-                    text = QApplication.translate('Table', 'DROP')
-                elif i == self.aw.qmc.timeindex[7]:
-                    self.datatable.item(i,0).setBackground(QColor('orange'))
-                    text = QApplication.translate('Table', 'COOL')
-                else:
-                    text = ''
-                Rtime.setText(text + ' ' + Rtime.text())
+            #identify by color and add notation
+            if i == self.aw.qmc.timeindex[0]:
+                self.datatable.item(i,0).setBackground(QColor('#f07800'))
+                text = QApplication.translate('Table', 'CHARGE')
+            elif i == self.aw.qmc.timeindex[1]:
+                self.datatable.item(i,0).setBackground(QColor('orange'))
+                text = QApplication.translate('Table', 'DRY END')
+            elif i == self.aw.qmc.timeindex[2]:
+                self.datatable.item(i,0).setBackground(QColor('orange'))
+                text = QApplication.translate('Table', 'FC START')
+            elif i == self.aw.qmc.timeindex[3]:
+                self.datatable.item(i,0).setBackground(QColor('orange'))
+                text = QApplication.translate('Table', 'FC END')
+            elif i == self.aw.qmc.timeindex[4]:
+                self.datatable.item(i,0).setBackground(QColor('orange'))
+                text = QApplication.translate('Table', 'SC START')
+            elif i == self.aw.qmc.timeindex[5]:
+                self.datatable.item(i,0).setBackground(QColor('orange'))
+                text = QApplication.translate('Table', 'SC END')
+            elif i == self.aw.qmc.timeindex[6]:
+                self.datatable.item(i,0).setBackground(QColor('#f07800'))
+                text = QApplication.translate('Table', 'DROP')
+            elif i == self.aw.qmc.timeindex[7]:
+                self.datatable.item(i,0).setBackground(QColor('orange'))
+                text = QApplication.translate('Table', 'COOL')
             else:
-                Rtime.setText(' ' + Rtime.text())
+                text = ''
+            Rtime.setText(text + ' ' + Rtime.text())
 
             self.datatable.setItem(i,1,ET)
             self.datatable.setItem(i,2,BT)

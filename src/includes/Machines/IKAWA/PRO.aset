@@ -52,8 +52,8 @@ extradevicecolor2=#33983c, #45a6cf, black
 extradevices=143, 144, 145
 extramathexpression1=, , 
 extramathexpression2=x/100, , 
-extraname1=SET, Heater, State
-extraname2=RPM, Fan, Extra 2
+extraname1=SET, {3}, State
+extraname2=RPM, {0}, Extra 2
 
 [Quantifiers]
 clusterEventsFlag=false

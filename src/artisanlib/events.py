@@ -56,9 +56,7 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 class EventsDlg(ArtisanResizeablDialog):
     def __init__(self, parent:QWidget, aw:'ApplicationWindow', activeTab:int = 0) -> None:
         super().__init__(parent, aw)
-
-        self.aw = aw
-        self.app = aw.app
+        self.app = self.aw.app
         self.activeTab = activeTab
 
         self.buttonlistmaxlen:int = self.aw.buttonlistmaxlen
@@ -1584,6 +1582,8 @@ class EventsDlg(ArtisanResizeablDialog):
 
         self.TabWidget.currentChanged.connect(self.tabSwitched)
 
+        # we set the active tab with a QTimer after the tabbar has been rendered once, as otherwise
+        # some tabs are not rendered at all on Winwos using Qt v6.5.1 (https://bugreports.qt.io/projects/QTBUG/issues/QTBUG-114204?filter=allissues)
         QTimer.singleShot(50, self.setActiveTab)
 
     @pyqtSlot()

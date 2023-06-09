@@ -5,6 +5,7 @@
 from pathlib import Path
 import time as libtime
 import os
+import base64
 import csv
 import re
 import logging
@@ -14,13 +15,12 @@ from typing_extensions import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.types import ProfileData # pylint: disable=unused-import
+    from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
 
 try:
-    from PyQt6.QtCore import QDateTime, Qt, QTimer, QMutex, QWaitCondition # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import QDateTime, Qt, QTimer, QMutex, QWaitCondition, QUrl # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
-    from PyQt5.QtCore import QDateTime, Qt, QTimer, QMutex, QWaitCondition  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QDateTime, Qt, QTimer, QMutex, QWaitCondition, QUrl  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import encodeLocal
 from artisanlib.ble import BleInterface, BLE_CHAR_TYPE # noqa: F811
@@ -29,8 +29,123 @@ from proto import IkawaCmd_pb2 # type: ignore
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
+
+def url_to_profile(url:str) -> IkawaCmd_pb2.RoastProfile: # pylint: disable=no-member
+    url += '=='
+    base64_bytes = url.encode('ascii')
+    message_bytes = base64.b64decode(base64_bytes)
+    return IkawaCmd_pb2.RoastProfile().FromString(message_bytes) # pylint: disable=no-member
+
+def extractProfileIkawaURL(url:QUrl, aw:'ApplicationWindow') -> 'ProfileData':
+    ikawa_profile = url_to_profile(url.query())
+    res:ProfileData = {} # the interpreted data set
+    res['samplinginterval'] = 1.0
+
+    specialevents:List[int] = []
+    specialeventstype:List[int] = []
+    specialeventsvalue:List[float] = []
+    specialeventsStrings:List[str] = []
+
+    timex:List[float] = []
+    temp1:List[float] = []
+    temp2:List[float] = []
+    extra1:List[float] = []
+    extra2:List[float] = []
+    extra3:List[float] = []
+    extra4:List[float] = []
+    extra5:List[float] = []
+    extra6:List[float] = []
+    timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
+
+    fan_points:List = list(ikawa_profile.fan_points)
+    for idx, p in enumerate(ikawa_profile.temp_points):
+        if idx != 0:
+            # add additional fan_point before this temp point
+            for fp in fan_points:
+                if fp.time < p.time:
+                    timex.append(fp.time/10+30)
+                    temp1.append(-1.0)
+                    temp2.append(-1.0)
+                    extra1.append(-1)
+                    extra2.append(-1.0)
+                    extra3.append(-1.0)
+                    fan = round(fp.power / 2.55)
+                    extra4.append(fan)
+                    extra5.append(-1.0)
+                    extra6.append(-1.0)
+                    v = fan/10. + 1
+                    specialeventsvalue.append(v)
+                    specialevents.append(idx)
+                    specialeventstype.append(0)
+                    specialeventsStrings.append(f'{int(fan)}' + '%')
+                    fan_points = fan_points[1:]
+                else:
+                    break
+
+        timex.append(p.time / 10 if idx == 0 else p.time / 10 + 30)
+        temp1.append(-1.0)
+        temp2.append(-1.0)
+        extra1.append(p.temp/10)
+        extra2.append(-1.0)
+        extra3.append(-1.0)
+        if fan_points and fan_points[0].time == p.time:
+            # we add the fan information
+            fan = round(fan_points[0].power / 2.55)
+            extra4.append(fan)
+            v = fan/10. + 1
+            specialeventsvalue.append(v)
+            specialevents.append(idx)
+            specialeventstype.append(0)
+            specialeventsStrings.append(f'{int(fan)}' + '%')
+            # and remove the fan point from the list of fan points to be processed
+            fan_points = fan_points[1:]
+        else:
+            extra4.append(-1.0)
+        extra5.append(-1.0)
+        extra6.append(-1.0)
+
+    cooldown_fan = round(ikawa_profile.cooldown_fan.power / 2.55)
+    v = cooldown_fan/10. + 1
+    specialeventsvalue.append(v)
+    specialevents.append(len(timex)-1)
+    specialeventstype.append(0)
+    specialeventsStrings.append(f'{int(cooldown_fan)}' + '%')
+
+
+    res['title'] = ikawa_profile.name
+    res['beans'] = ikawa_profile.coffee_name
+    res['mode'] = 'C'
+
+    timeindex = [0,0,0,0,0,0,len(timex)-1,0]
+    res['timex'] = timex
+    res['temp1'] = temp1
+    res['temp2'] = temp2
+    res['timeindex'] = timeindex
+
+    res['extradevices'] = [143, 144, 145]
+    res['extratimex'] = [timex[:],timex[:],timex[:]]
+
+    res['extraname1'] = ['SET', '{3}', 'State']
+    res['extratemp1'] = [extra1, extra3, extra5]
+    res['extramathexpression1'] = ['', '', '']
+
+    res['extraname2'] = ['RPM', '{0}', 'Extra 2']
+    res['extratemp2'] = [extra2, extra4, extra6]
+    res['extramathexpression2'] = ['x/100', '', '']
+
+    if len(specialevents) > 0:
+        res['specialevents'] = specialevents
+        res['specialeventstype'] = specialeventstype
+        res['specialeventsvalue'] = specialeventsvalue
+        res['specialeventsStrings'] = specialeventsStrings
+
+    res['etypes'] = aw.qmc.etypesdefault
+
+    return res
+
+
 # returns a dict containing all profile information contained in the given IKAWA CSV file
-def extractProfileIkawaCSV(file,_):
+def extractProfileIkawaCSV(file, aw:'ApplicationWindow') -> 'ProfileData':
     res:ProfileData = {} # the interpreted data set
 
     res['samplinginterval'] = 1.0
@@ -65,8 +180,8 @@ def extractProfileIkawaCSV(file,_):
         fan_last:Optional[float] = None # holds the fan event value before the last one
         heater:Optional[float] = None # holds last processed heater event value
         heater_last:Optional[float] = None # holds the heater event value before the last one
-        fan_event:bool = False # set to True if a fan event exists
-        heater_event:bool = False # set to True if a heater event exists
+#        fan_event:bool = False # set to True if a fan event exists
+#        heater_event:bool = False # set to True if a heater event exists
         specialevents:List[int] = []
         specialeventstype:List[int] = []
         specialeventsvalue:List[float] = []
@@ -76,6 +191,10 @@ def extractProfileIkawaCSV(file,_):
         temp2:List[float] = []
         extra1:List[float] = []
         extra2:List[float] = []
+        extra3:List[float] = []
+        extra4:List[float] = []
+        extra5:List[float] = []
+        extra6:List[float] = []
         timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
         i:int = 0
         v:Optional[float]
@@ -121,6 +240,10 @@ def extractProfileIkawaCSV(file,_):
                 extra2.append(rpm/100)
             else:
                 extra2.append(-1)
+            extra3.append(-1)
+            extra4.append(-1)
+            extra5.append(-1)
+            extra6.append(-1)
 
             if 'fan set (%)' in item or 'fan set' in item:
                 try:
@@ -143,7 +266,7 @@ def extractProfileIkawaCSV(file,_):
                         else:
                             fan_last = fan
                             fan = v
-                            fan_event = True
+#                            fan_event = True
                             v = v/10. + 1
                             specialeventsvalue.append(v)
                             specialevents.append(i-1)
@@ -174,7 +297,7 @@ def extractProfileIkawaCSV(file,_):
                         else:
                             heater_last = heater
                             heater = v
-                            heater_event = True
+#                            heater_event = True
                             v = v/10. + 1
                             specialeventsvalue.append(v)
                             specialevents.append(i-1)
@@ -192,35 +315,24 @@ def extractProfileIkawaCSV(file,_):
     res['temp2'] = temp2
     res['timeindex'] = timeindex
 
-    res['extradevices'] = [25]
-    res['extratimex'] = [timex[:]]
+    res['extradevices'] = [143, 144, 145]
+    res['extratimex'] = [timex[:],timex[:],timex[:]]
 
-    res['extraname1'] = ['SET']
-    res['extratemp1'] = [extra1]
-    res['extramathexpression1'] = ['']
+    res['extraname1'] = ['SET', '{3}', 'State']
+    res['extratemp1'] = [extra1, extra3, extra5]
+    res['extramathexpression1'] = ['', '', '']
 
-    res['extraname2'] = ['RPM']
-    res['extratemp2'] = [extra2]
-    res['extramathexpression2'] = ['x/100']
+    res['extraname2'] = ['RPM', '{0}', 'Extra 2']
+    res['extratemp2'] = [extra2, extra4, extra6]
+    res['extramathexpression2'] = ['x/100', '', '']
 
     if len(specialevents) > 0:
         res['specialevents'] = specialevents
         res['specialeventstype'] = specialeventstype
         res['specialeventsvalue'] = specialeventsvalue
         res['specialeventsStrings'] = specialeventsStrings
-        if heater_event or fan_event:
-            # first set etypes to defaults
-            etypes:List[str] = [QApplication.translate('ComboBox', 'Air'),
-                             QApplication.translate('ComboBox', 'Drum'),
-                             QApplication.translate('ComboBox', 'Damper'),
-                             QApplication.translate('ComboBox', 'Burner'),
-                             '--']
-            # update
-            if fan_event:
-                etypes[0] = 'Fan'
-            if heater_event:
-                etypes[3] = 'Heater'
-            res['etypes'] = etypes
+
+    res['etypes'] = aw.qmc.etypesdefault
     res['title'] = Path(file).stem
     return res
 

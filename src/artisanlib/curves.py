@@ -36,14 +36,14 @@ from artisanlib.widgets import MyQDoubleSpinBox
 from help import symbolic_help
 
 try:
-    from PyQt6.QtCore import (Qt, pyqtSlot, QSettings, QRegularExpression) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import (Qt, pyqtSlot, QSettings, QRegularExpression, QTimer) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import (QColor, QIntValidator, QRegularExpressionValidator, QPixmap) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QLayout, QMessageBox, QRadioButton, QStyleFactory, QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
                                  QTableWidget, QTableWidgetItem, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
-    from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QRegularExpression) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QRegularExpression, QTimer) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import (QColor, QIntValidator, QRegularExpressionValidator, QPixmap) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
@@ -276,9 +276,12 @@ class equDataDlg(ArtisanDialog):
 
 
 class CurvesDlg(ArtisanDialog):
-    def __init__(self, parent:QWidget, aw:'ApplicationWindow', activeTab = 0) -> None:
-        super().__init__(parent, aw)
 
+    #__slots__ = ['activeTab', 'helpdialog']
+
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow', activeTab:int = 0) -> None:
+        super().__init__(parent, aw)
+        self.activeTab = activeTab
         self.app = aw.app
 
         self.setWindowTitle(QApplication.translate('Form Caption','Curves'))
@@ -477,7 +480,7 @@ class CurvesDlg(ArtisanDialog):
         self.swapdeltalcds.setChecked(self.aw.qmc.swapdeltalcds)
         DeltaBTlcdLabel = QLabel(deltaLabelPrefix + QApplication.translate('Label', 'BT'))
         self.DecimalPlaceslcd = QCheckBox(QApplication.translate('CheckBox', 'Decimal Places'))
-        self.DecimalPlaceslcd.setChecked(self.aw.qmc.LCDdecimalplaces)
+        self.DecimalPlaceslcd.setChecked(bool(self.aw.qmc.LCDdecimalplaces))
         self.DeltaETlcd.stateChanged.connect(self.changeDeltaETlcd)         #toggle
         self.DeltaBTlcd.stateChanged.connect(self.changeDeltaBTlcd)         #toggle
         lcdsLayout = QHBoxLayout()
@@ -1149,7 +1152,7 @@ class CurvesDlg(ArtisanDialog):
         resButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         resButton.clicked.connect(lambda _:self.changedpi())
         self.soundCheck = QCheckBox(QApplication.translate('CheckBox', 'Beep'))
-        self.soundCheck.setChecked(self.aw.soundflag)
+        self.soundCheck.setChecked(bool(self.aw.soundflag))
         self.soundCheck.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.soundCheck.stateChanged.connect(self.soundset) #toggle
         self.notifications = QCheckBox(QApplication.translate('CheckBox', 'Notifications'))
@@ -1379,9 +1382,15 @@ class CurvesDlg(ArtisanDialog):
         if settings.contains('CurvesPosition'):
             self.move(settings.value('CurvesPosition'))
 
-        self.TabWidget.setCurrentIndex(activeTab)
-
         Slayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
+
+        # we set the active tab with a QTimer after the tabbar has been rendered once, as otherwise
+        # some tabs are not rendered at all on Winwos using Qt v6.5.1 (https://bugreports.qt.io/projects/QTBUG/issues/QTBUG-114204?filter=allissues)
+        QTimer.singleShot(50, self.setActiveTab)
+
+    @pyqtSlot()
+    def setActiveTab(self) -> None:
+        self.TabWidget.setCurrentIndex(self.activeTab)
 
     @pyqtSlot(bool)
     def fittoBackground(self,_):
@@ -2401,6 +2410,7 @@ class CurvesDlg(ArtisanDialog):
     def closeHelp(self):
         self.aw.closeHelpDialog(self.helpdialog)
 
+    @pyqtSlot('QCloseEvent')
     def closeEvent(self,_):
         self.close()
 

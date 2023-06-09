@@ -472,6 +472,28 @@ class Artisan(QtSingleApplication):
             return True
         return super().event(event)
 
+    # Requests the permission to communicate via Bluetooth if not yet granted. Returns the current permission status otherwise.
+    # Currently this API is only supported on macOS. On all other platforms this returns always True
+    def getBluetoothPermission(self, request:bool = False) -> bool:
+        if sys.platform.startswith('darwin') and QVersionNumber.fromString(qVersion())[0] > QVersionNumber(6,5,0):
+            from PyQt6.QtCore import QBluetoothPermission
+            try:
+                def permissionUpdated(permission) -> None:
+                    if permission.status() == Qt.PermissionStatus.Granted:
+                        _log.info('Bluetooth permission updated: granted')
+                    else:
+                        _log.info('Bluetooth permission updated: denied')
+                bluetoothPermission = QBluetoothPermission()
+                res:Qt.PermissionStatus = self.checkPermission(bluetoothPermission)
+                if res != Qt.PermissionStatus.Granted:
+                    _log.info('Bluetooth permission not granted. Requesting permission...')
+                    if request:
+                        self.requestPermission(bluetoothPermission, permissionUpdated)
+                    return False
+            except Exception as e:
+                _log.exception(e)
+        return True
+
 # configure multiprocessing
 if sys.platform.startswith('darwin'):
     try:
@@ -1840,6 +1862,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         importHH506RAAction = QAction('HH506RA...', self)
         importHH506RAAction.triggered.connect(self.importHH506RA)
         self.importMenu.addAction(importHH506RAAction)
+
+        importIkawaURLAction = QAction('IKAWA URL...', self)
+        importIkawaURLAction.triggered.connect(self.importIkawaURL)
+        self.importMenu.addAction(importIkawaURLAction)
 
         importIkawaAction = QAction('IKAWA CSV...', self)
         importIkawaAction.triggered.connect(self.importIkawa)
@@ -5074,6 +5100,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                 self.modbus.comport = new_port
                             else: # Fuji or HOTTOP
                                 self.ser.comport = new_port
+                elif self.qmc.device == 142: # IKAWA
+                    # we request Bluetooth permission
+                    self.app.getBluetoothPermission(request=True)
                 if res:
                     if self.qmc.roastersize_setup == 0:
                         batchsize,res = QInputDialog.getDouble(self,
@@ -11509,7 +11538,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' changeEventNumber() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
             self.eNumberSpinBox.setDisabled(False)
-            self.eNumberSpinBox.setFocus()
+            if self.EventsGroupLayout.isVisible():
+                self.eNumberSpinBox.setFocus()
 
 
     #updates events from mini edtitor
@@ -13765,7 +13795,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     # check for difference in the Data values between the profile and current settings
                     settingdev = ''.join([str(self.qmc.extradevices), str([encodeLocal(n) for n in self.qmc.extraname1]), str([encodeLocal(n) for n in self.qmc.extraname2]),
                                         str([encodeLocal(x) for x in self.qmc.extramathexpression1]), str([encodeLocal(x) for x in self.qmc.extramathexpression2]),
-                                        str([encodeLocal(x) for x in self.qmc.etypes])
+                                        str([encodeLocal(x) for x in self.qmc.etypes[:4]])
                                         ])
                     # fix missing extramathexpression arrays on import
                     if 'extramathexpression1' not in profile:
@@ -13775,12 +13805,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     try:
                         profiledev = ''.join([str(profile['extradevices']), str(profile['extraname1']), str(profile['extraname2']),
                                             str(profile['extramathexpression1']), str(profile['extramathexpression2']),
-                                            str(profile['etypes'])
+                                            str(profile['etypes'][:4])
                                             ])
                     except Exception: # pylint: disable=broad-except
                         profiledev = ''
                     if settingdev != profiledev:
-
 # we don't ask the user to adjust or not the extra device setup. Instead, now we backup the current settings via createExtraDeviceSettingsBackup() always and reset back to the original state
 # on reset, thus we default to StandardButton.Yes instead of asking in the dialog:
 
@@ -22146,6 +22175,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 
             # set scale port
             self.scale.device = str(dialog.scale_deviceEdit.currentText())                #unicode() changes QString to a python string
+            if self.scale.device in self.scale.bluetooth_devices and not self.app.getBluetoothPermission():
+                self.scale.device = None
+                message:str = QApplication.translate('Message','Bluetooth scale cannot be connected while permission for Artsian to access Bluetooth is denied')
+                QMessageBox.information(self, QApplication.translate('Message','Bluetooth access denied'), message)
             self.scale.comport = str(dialog.scale_comportEdit.getSelection())
             self.scale.baudrate = int(str(dialog.scale_baudrateComboBox.currentText()))              #int changes QString to int
             self.scale.bytesize = int(str(dialog.scale_bytesizeComboBox.currentText()))
@@ -23291,7 +23324,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 
     # url a QUrl
     def importExternalURL(self,extractor,message='',url=None):
-        _log.info('importExternalURL(%s)', url)
         try:
             res:bool = self.qmc.reset(redraw=True,soundOn=False)
             if not res:
@@ -23395,6 +23427,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     def importPetroncini(self,_=False):
         from artisanlib.petroncini import extractProfilePetronciniCSV
         self.importExternal(extractProfilePetronciniCSV,QApplication.translate('Message','Import Petroncini CSV'),'*.csv')
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def importIkawaURL(self,_=False):
+        from artisanlib.ikawa import extractProfileIkawaURL
+        self.importExternalURL(extractProfileIkawaURL,QApplication.translate('Message','Import IKAWA URL'))
 
     @pyqtSlot()
     @pyqtSlot(bool)

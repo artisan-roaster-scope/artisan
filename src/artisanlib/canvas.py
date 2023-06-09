@@ -96,8 +96,6 @@ except Exception: # type: ignore # pylint: disable=broad-except
     except Exception: # type: ignore # pylint: disable=broad-except
         import sip # type: ignore # @Reimport @UnresolvedImport @UnusedImport
 
-
-
 with suppress_stdout_stderr():
     import matplotlib as mpl
 

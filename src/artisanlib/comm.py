@@ -6560,7 +6560,7 @@ class extraserialport():
 class scaleport(extraserialport):
     """ this class handles the communications with the scale"""
 
-    __slots__ = []
+    __slots__ = ['bluetooth_devices']
 
     def __init__(self, aw:'ApplicationWindow') -> None:
         super().__init__(aw)
@@ -6578,6 +6578,7 @@ class scaleport(extraserialport):
             'acaia' : self.readAcaia,
             #"Shore 930" : self.readShore930,
         }
+        self.bluetooth_devices:List[str] = ['acaia']
 
     def closeport(self) -> None:
         if self.device == 'acaia':

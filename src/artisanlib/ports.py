@@ -742,13 +742,14 @@ class comportDlg(ArtisanResizeablDialog):
         ##########################    TAB 4 WIDGETS   SCALE
         scale_devicelabel = QLabel(QApplication.translate('Label', 'Device'))
         self.scale_deviceEdit = QComboBox()
-        supported_scales = list(self.aw.scale.devicefunctionlist.keys())
-        self.scale_deviceEdit.addItems(supported_scales)
+        self.supported_scales = list(self.aw.scale.devicefunctionlist.keys())
+        self.scale_deviceEdit.addItems(self.supported_scales)
         try:
-            self.scale_deviceEdit.setCurrentIndex(supported_scales.index(self.aw.scale.device))
+            self.scale_deviceEdit.setCurrentIndex(self.supported_scales.index(self.aw.scale.device))
         except Exception: # pylint: disable=broad-except
             self.scale_deviceEdit.setCurrentIndex(0)
         self.scale_deviceEdit.setEditable(False)
+        self.scale_deviceEdit.activated.connect(self.scaleDeviceIndexChanged)
 #        scale_devicelabel.setBuddy(self.scale_deviceEdit)
         scale_comportlabel = QLabel(QApplication.translate('Label', 'Comm Port'))
         self.scale_comportEdit = PortComboBox(selection = self.aw.scale.comport)
@@ -1635,6 +1636,11 @@ class comportDlg(ArtisanResizeablDialog):
         settings = QSettings()
         if settings.contains('PortsGeometry'):
             self.restoreGeometry(settings.value('PortsGeometry'))
+
+    @pyqtSlot(int)
+    def scaleDeviceIndexChanged(self,i):
+        if self.supported_scales[i] in self.aw.scale.bluetooth_devices:
+            self.aw.app.getBluetoothPermission(request=True)
 
     @pyqtSlot(int)
     def s7_optimize_toggle(self,i):
