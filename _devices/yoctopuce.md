@@ -119,6 +119,7 @@ The supported commands are:
 
 * `on(c[,sn])` : turn channel c of the relay module on  
 * `off(c[,sn])` : turn channel c of the relay module off
+* `yset(c,b[,sn])` : set channel c of the relay module to on (b=1) or off (b=0)
 * `flip(c[,sn])` : toggle the state of channel c
 * `pip(c,delay,duration[,sn])` : pulse the channel c on after a delay of `delay` milliseconds for the duration of `duration` milliseconds
 
