@@ -476,7 +476,7 @@ class Artisan(QtSingleApplication):
     # Currently this API is only supported on macOS. On all other platforms this returns always True
     def getBluetoothPermission(self, request:bool = False) -> bool:
         if sys.platform.startswith('darwin') and QVersionNumber.fromString(qVersion())[0] > QVersionNumber(6,5,0):
-            from PyQt6.QtCore import QBluetoothPermission
+            from PyQt6.QtCore import QBluetoothPermission # pylint: disable=no-name-in-module
             try:
                 def permissionUpdated(permission) -> None:
                     if permission.status() == Qt.PermissionStatus.Granted:
