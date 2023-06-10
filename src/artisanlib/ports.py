@@ -33,14 +33,14 @@ try:
     from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QTextEdit, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QHeaderView)  # @UnusedImport @Reimport  @UnresolvedImport
+                                 QHeaderView, QMessageBox)  # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import (Qt, pyqtSlot, QSettings) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QIntValidator # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QTextEdit, QDoubleSpinBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                                 QHeaderView) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                                 QHeaderView, QMessageBox) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -1640,7 +1640,11 @@ class comportDlg(ArtisanResizeablDialog):
     @pyqtSlot(int)
     def scaleDeviceIndexChanged(self,i):
         if self.supported_scales[i] in self.aw.scale.bluetooth_devices:
-            self.aw.app.getBluetoothPermission(request=True)
+            permission_status:Optional[bool] = self.aw.app.getBluetoothPermission(request=True)
+            if permission_status is False:
+                message:str = QApplication.translate('Message','Bluetootooth access denied')
+                QMessageBox.warning(self, message, message)
+
 
     @pyqtSlot(int)
     def s7_optimize_toggle(self,i):

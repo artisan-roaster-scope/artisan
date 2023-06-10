@@ -472,9 +472,9 @@ class Artisan(QtSingleApplication):
             return True
         return super().event(event)
 
-    # Requests the permission to communicate via Bluetooth if not yet granted. Returns the current permission status otherwise.
+    # Requests the permission to communicate via Bluetooth, True or False, or if not yet granted, None. Returns the current permission status otherwise.
     # Currently this API is only supported on macOS. On all other platforms this returns always True
-    def getBluetoothPermission(self, request:bool = False) -> bool:
+    def getBluetoothPermission(self, request:bool = False) -> Optional[bool]:
         if sys.platform.startswith('darwin') and QVersionNumber.fromString(qVersion())[0] > QVersionNumber(6,5,0):
             from PyQt6.QtCore import QBluetoothPermission # pylint: disable=no-name-in-module
             try:
@@ -485,11 +485,12 @@ class Artisan(QtSingleApplication):
                         _log.info('Bluetooth permission updated: denied')
                 bluetoothPermission = QBluetoothPermission()
                 res:Qt.PermissionStatus = self.checkPermission(bluetoothPermission)
-                if res != Qt.PermissionStatus.Granted:
+                if res == Qt.PermissionStatus.Undetermined:
                     _log.info('Bluetooth permission not granted. Requesting permission...')
                     if request:
                         self.requestPermission(bluetoothPermission, permissionUpdated)
-                    return False
+                    return None
+                return res == Qt.PermissionStatus.Granted
             except Exception as e:
                 _log.exception(e)
         return True
@@ -5102,7 +5103,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                 self.ser.comport = new_port
                 elif self.qmc.device == 142: # IKAWA
                     # we request Bluetooth permission
-                    self.app.getBluetoothPermission(request=True)
+                    permission_status:Optional[bool] = self.app.getBluetoothPermission(request=True)
+                    if permission_status is False:
+                        message:str = QApplication.translate('Message','Bluetootooth access denied')
+                        QMessageBox.warning(self, message, message)
                 if res:
                     if self.qmc.roastersize_setup == 0:
                         batchsize,res = QInputDialog.getDouble(self,

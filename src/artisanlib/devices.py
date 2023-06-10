@@ -20,7 +20,7 @@ import time as libtime
 import re
 import platform
 import logging
-from typing import TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 from typing_extensions import Final  # Python <=3.7
 
 if TYPE_CHECKING:
@@ -3038,8 +3038,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ####  DEVICE 142 is IKAWA
                 elif meter == 'IKAWA':
                     self.aw.qmc.device = 142
-                    self.aw.app.getBluetoothPermission(request=True)
                     message = QApplication.translate('Message','Device set to {0}').format(meter)
+                    permission_status:Optional[bool] = self.aw.app.getBluetoothPermission(request=True)
+                    if permission_status is False:
+                        msg:str = QApplication.translate('Message','Bluetootooth access denied')
+                        QMessageBox.warning(self, msg, msg)
                 ##########################
                 ####  DEVICE 143 is +IKAWA SET/RPM but +DEVICE cannot be set as main device
                 ##########################
