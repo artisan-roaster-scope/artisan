@@ -377,7 +377,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         alarm_temperature = 500.
         alarm_action = 0
         alarm_beep = 0
-        alarm_string = QApplication.translate('Label','Enter description')
+        alarm_string = ''
         selected = self.alarmtable.selectedRanges()
         if len(selected) > 0:
             self.savealarms() # we first "save" the alarmtable to be able to pick up the values of the selected row
@@ -923,6 +923,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         #11: text description
         descriptionedit = QLineEdit(self.aw.qmc.alarmstrings[i])
         descriptionedit.setCursorPosition(0)
+        descriptionedit.setPlaceholderText(QApplication.translate('Label','Enter description'))
         self.alarmtable.setItem(i, 0, MyTableWidgetItemNumber(str(i+1),i))
         self.alarmtable.setCellWidget(i,1,flagComboBox)
         self.alarmtable.setItem(i, 1, MyTableWidgetItemQCheckBox(flagComboBox))

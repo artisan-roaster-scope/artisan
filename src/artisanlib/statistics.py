@@ -43,25 +43,16 @@ class StatisticsDlg(ArtisanDialog):
         self.ShowStatsSummary = QCheckBox(QApplication.translate('CheckBox', 'Summary'))
         self.ShowStatsSummary.setChecked(self.aw.qmc.statssummary)
         self.ShowStatsSummary.stateChanged.connect(self.changeStatsSummary)         #toggle
-        #temp fix for possible bug self.aw.qmc.statisticsflags=[] > empty list out of range
-        if self.aw.qmc.statisticsflags:
-            if self.aw.qmc.statisticsflags[0]:
-                self.timez.setChecked(True)
-            if self.aw.qmc.statisticsflags[1]:
-                self.barb.setChecked(True)
-            if self.aw.qmc.statisticsflags[3]:
-                self.area.setChecked(True)
-            if self.aw.qmc.statisticsflags[4]:
-                self.ror.setChecked(True)
-            if self.aw.qmc.statisticsflags[6]:
-                self.dt.setChecked(True)
-        else:
-            self.aw.qmc.statisticsflags = [1,1,0,1,1,0,1]
+        if self.aw.qmc.statisticsflags[0]:
             self.timez.setChecked(True)
+        if self.aw.qmc.statisticsflags[1]:
             self.barb.setChecked(True)
+        if self.aw.qmc.statisticsflags[3]:
             self.area.setChecked(True)
+        if self.aw.qmc.statisticsflags[4]:
             self.ror.setChecked(True)
-            self.dt.setChecked(False)
+        if self.aw.qmc.statisticsflags[6]:
+            self.dt.setChecked(True)
         self.timez.stateChanged.connect(self.changeStatisticsflag)
         self.barb.stateChanged.connect(self.changeStatisticsflag)
         # flag 2 not used anymore

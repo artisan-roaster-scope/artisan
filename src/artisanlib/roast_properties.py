@@ -3995,28 +3995,28 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.datatable.item(i,0).setBackground(QColor('yellow'))
 
             #identify by color and add notation
-            if i == self.aw.qmc.timeindex[0]:
+            if i == self.aw.qmc.timeindex[0] and i != -1:
                 self.datatable.item(i,0).setBackground(QColor('#f07800'))
                 text = QApplication.translate('Table', 'CHARGE')
-            elif i == self.aw.qmc.timeindex[1]:
+            elif i == self.aw.qmc.timeindex[1] and i != 0:
                 self.datatable.item(i,0).setBackground(QColor('orange'))
                 text = QApplication.translate('Table', 'DRY END')
-            elif i == self.aw.qmc.timeindex[2]:
+            elif i == self.aw.qmc.timeindex[2] and i != 0:
                 self.datatable.item(i,0).setBackground(QColor('orange'))
                 text = QApplication.translate('Table', 'FC START')
-            elif i == self.aw.qmc.timeindex[3]:
+            elif i == self.aw.qmc.timeindex[3] and i != 0:
                 self.datatable.item(i,0).setBackground(QColor('orange'))
                 text = QApplication.translate('Table', 'FC END')
-            elif i == self.aw.qmc.timeindex[4]:
+            elif i == self.aw.qmc.timeindex[4] and i != 0:
                 self.datatable.item(i,0).setBackground(QColor('orange'))
                 text = QApplication.translate('Table', 'SC START')
-            elif i == self.aw.qmc.timeindex[5]:
+            elif i == self.aw.qmc.timeindex[5] and i != 0:
                 self.datatable.item(i,0).setBackground(QColor('orange'))
                 text = QApplication.translate('Table', 'SC END')
-            elif i == self.aw.qmc.timeindex[6]:
+            elif i == self.aw.qmc.timeindex[6] and i != 0:
                 self.datatable.item(i,0).setBackground(QColor('#f07800'))
                 text = QApplication.translate('Table', 'DROP')
-            elif i == self.aw.qmc.timeindex[7]:
+            elif i == self.aw.qmc.timeindex[7] and i != 0:
                 self.datatable.item(i,0).setBackground(QColor('orange'))
                 text = QApplication.translate('Table', 'COOL')
             else:

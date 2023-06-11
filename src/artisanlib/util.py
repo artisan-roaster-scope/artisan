@@ -104,6 +104,10 @@ def cmd2str(c:bytes) -> str:
 def s2a(s):
     return s.encode('ascii','ignore').decode('ascii')
 
+# returns True if x is not None, not NaN and not the error value -1 or 0
+def is_proper_temp(x):
+    return x is not None and not numpy.isnan(x) and isinstance(x, (int, float)) and x not in [0, -1]
+
 # returns the prefix of length ll of s and adds eclipse
 def abbrevString(s:str, ll:int) -> str:
     if len(s) > ll:

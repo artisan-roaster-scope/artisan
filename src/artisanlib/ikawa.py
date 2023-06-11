@@ -500,8 +500,14 @@ class IKAWA_BLE():
                                 _log.debug('IKAWA response.resp: %s (%s)', decoded_message.resp, decoded_message.MACH_STATUS_GET_ALL)
                                 status_get_all = decoded_message.resp_mach_status_get_all
                                 self.ET = status_get_all.temp_below / 10
+                                if self.ET == 0:
+                                    self.ET = -1
                                 self.BT = status_get_all.temp_above / 10
+                                if self.BT == 0:
+                                    self.BT = -1
                                 self.SP = status_get_all.setpoint / 10
+                                if self.SP == 0:
+                                    self.SP = -1
                                 self.RPM = (status_get_all.fan_measured / 12)*60 # RPM
                                 self.heater = status_get_all.heater * 2
                                 self.fan = int(round(status_get_all.fan / 2.55))

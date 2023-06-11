@@ -226,7 +226,7 @@ from artisanlib.util import (appFrozen, uchr, decodeLocal, decodeLocalStrict, en
         toBool, toStringList, toMap, removeAll, application_name, application_viewer_name, application_organization_name,
         application_organization_domain, getDataDirectory, getAppPath, getResourcePath, debugLogLevelToggle,
         debugLogLevelActive, setDebugLogLevel, createGradient, natsort, setDeviceDebugLogLevel,
-        comma2dot)
+        comma2dot, is_proper_temp)
 
 from artisanlib.qtsingleapplication import QtSingleApplication
 
@@ -4080,6 +4080,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             self.qmc.ETcurve = not self.qmc.ETcurve
         else:
             self.qmc.BTcurve = not self.qmc.BTcurve
+        # we reset the chached main event annotation positions as those annotations are now rendered on the other curve
+        self.qmc.l_annotations_dict = {}
+        # and redraw
         self.qmc.redraw(recomputeAllDeltas=False)
 
     @pyqtSlot()
@@ -10790,9 +10793,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                             self.qmc.EventRecord()
                     elif self.qmc.flagon:
                         self.qmc.toggleRecorderSignal.emit()
-                elif k == 16777220:                 #ENTER (turns ON/OFF keyboard moves)
-                    self.releaseminieditor()
-                    self.moveKbutton('enter')
+                elif k == 16777220:                 #ENTER (turns ON/OFF keyboard moves; COMMAND+ENTER starts record, SHIFT+ENTER turns Artisan OFF)
+                    if shift_modifier and self.qmc.flagon:
+                        self.qmc.OffMonitor()
+                    elif control_modifier and not self.qmc.flagstart:
+                        self.qmc.OnRecorder()
+                    else:
+                        self.releaseminieditor()
+                        self.moveKbutton('enter')
                 elif k == 16777216:                 #ESCAPE (exists full screen mode / clears message line / resets event short cut / exixts designer/wheel graph / releases minieditor)
                     self.quickEventShortCut = None
                     self.clearMessageLine()
@@ -11831,6 +11839,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     self.curFile = None
                 else:
                     self.qmc.fileCleanSignal.emit()
+                # clear LCDs as the number of decimals based on self.qmc.intChannel() might have changed
+                self.qmc.clearLCDs()
                 if self.qmc.hideBgafterprofileload:
                     self.qmc.background = False
                     self.autoAdjustAxis()
@@ -14701,9 +14711,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     fcs_ror = self.qmc.delta2[self.qmc.timeindex[2]]
                     if fcs_ror is not None:
                         computedProfile['fcs_ror'] = self.float2float(fcs_ror)
-                computedProfile['dry_phase_delta_temp'] = self.float2float(ror[3])
-                computedProfile['mid_phase_delta_temp'] = self.float2float(ror[4])
-                computedProfile['finish_phase_delta_temp'] = self.float2float(ror[5])
+                if ror[3] != -1:
+                    computedProfile['dry_phase_delta_temp'] = self.float2float(ror[3])
+                if ror[4] != -1:
+                    computedProfile['mid_phase_delta_temp'] = self.float2float(ror[4])
+                if ror[5] != -1:
+                    computedProfile['finish_phase_delta_temp'] = self.float2float(ror[5])
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
@@ -15676,6 +15689,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 if self.qmc.neverUpdateBatchCounter or self.app.artisanviewerMode:
                     updateBatchCounter = False
                 else:
+
+#--- BEGIN GROUP Batch
                     settings.beginGroup('Batch')
                     if settings.contains('batchcounter'):
                         files_batchcounter = toInt(settings.value('batchcounter',self.qmc.batchcounter))
@@ -15697,6 +15712,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                 updateBatchCounter = False
                             updateBatchCounter = True
                     settings.endGroup()
+#--- END GROUP Batch
+
                 # on explicit settings load we remove the ExtraDeviceBackup to prevent later restoreExtraDeviceSettingsBackup()
                 self.clearExtraDeviceSettingsBackup()
             else:
@@ -15724,24 +15741,30 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             # but not for loading of settings fragments like themes or machines
             if filename:
                 if updateBatchCounter:
+
+#--- BEGIN GROUP Batch
                     settings.beginGroup('Batch')
                     if settings.contains('batchcounter'):
                         self.settingspath = filename
                     else:
                         self.settingspath = ''
                     settings.endGroup()
+#--- END GROUP Batch
+
                 else:
                     self.settingspath = ''
             else:
                 # the neverUpdateBatchCounter flag is never changed on loading a settings file!
+
+#--- BEGIN GROUP Batch
                 settings.beginGroup('Batch')
                 if settings.contains('neverUpdateBatchCounter'):
                     self.qmc.neverUpdateBatchCounter = toBool(settings.value('neverUpdateBatchCounter',self.qmc.neverUpdateBatchCounter))
                 settings.endGroup()
+#--- END GROUP Batch
 
             if filename is None and settings.contains('fullscreen'):
                 self.full_screen_mode_active = bool(toBool(settings.value('fullscreen',self.full_screen_mode_active)))
-
             if filename is None and settings.contains('plus_account'):
                 self.plus_account = settings.value('plus_account',self.plus_account)
                 if settings.contains('plus_remember_credentials'):
@@ -15750,7 +15773,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     self.plus_email = settings.value('plus_email',self.plus_email)
                 if settings.contains('plus_language'):
                     self.plus_language = settings.value('plus_language',self.plus_language)
-
             #remember swaplcds and swapdeltalcds
             old_swaplcds = self.qmc.swaplcds
             old_swapdeltalcds = self.qmc.swapdeltalcds
@@ -15763,13 +15785,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 self.qmc.fahrenheitMode()
             if self.qmc.mode == 'C' and old_mode == 'F':
                 self.qmc.celsiusMode()
-
             if settings.contains('DebugLogLevel'):
                 try:
                     setDebugLogLevel(bool(toBool(settings.value('DebugLogLevel',False))))
                 except Exception: # pylint: disable=broad-except
                     pass
-
             # if screen setup changed (main screen size or pixel ratio or number of screens) we remove the
             # window geometry and splitter settings on load to prevent dialog open issues on different multiple screen setups
             # we use saved window positions only if we are sure that the screen setup did not change
@@ -15792,6 +15812,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 self.clearWindowGeometry(settings)
 
             #restore device
+
+#--- BEGIN GROUP Device
             settings.beginGroup('Device')
             if settings.contains('device_logging'):
                 self.qmc.device_logging = bool(toBool(settings.value('device_logging',self.qmc.device_logging)))
@@ -15906,6 +15928,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if settings.contains('showFujiLCDs'):
                 self.ser.showFujiLCDs = bool(toBool(settings.value('showFujiLCDs',self.ser.showFujiLCDs)))
             settings.endGroup()
+#--- END GROUP Device
+
             #restore x,y formatting mode
             if settings.contains('fmt_data_RoR'):
                 self.qmc.fmt_data_RoR = bool(toBool(settings.value('fmt_data_RoR',self.qmc.fmt_data_RoR)))
@@ -15960,6 +15984,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 self.qmc.autoDRYflag = bool(toBool(settings.value('autoDry',self.qmc.autoDRYflag)))
             if settings.contains('autoFCs'):
                 self.qmc.autoFCsFlag = bool(toBool(settings.value('autoFCs',self.qmc.autoFCsFlag)))
+
+#--- BEGIN GROUP events
             #restore Events settings
             settings.beginGroup('events')
             if settings.contains('eventsbuttonflag'):
@@ -16027,6 +16053,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if settings.contains('overlappct'):
                 self.qmc.overlappct = toInt(settings.value('overlappct',int(self.qmc.overlappct)))
             settings.endGroup()
+#--- END GROUP events
+
             #restore statistics
             if settings.contains('Statistics'):
                 self.qmc.statisticsflags = [toInt(x) for x in toList(settings.value('Statistics',self.qmc.statisticsflags))]
@@ -16127,7 +16155,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if settings.contains('Alphas'):
                 for (k, v) in list(toMap(settings.value('Alphas')).items()):
                     self.qmc.alpha[str(k)] = v
-
             #restore colors
             self.lcd1.setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {self.lcdpaletteF['timer']}; background: {self.lcdpaletteB['timer']};}}")
             self.lcd2.setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {self.lcdpaletteF['et']}; background: {self.lcdpaletteB['et']};}}")
@@ -16136,10 +16163,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             self.lcd5.setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {self.lcdpaletteF['deltabt']}; background: {self.lcdpaletteB['deltabt']};}}")
             self.lcd6.setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {self.lcdpaletteF['sv']}; background: {self.lcdpaletteB['sv']};}}")
             self.lcd7.setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {self.lcdpaletteF['sv']}; background: {self.lcdpaletteB['sv']};}}")
-
             if settings.contains('readingslcdsflags'):
                 self.readingslcdsflags = [toInt(x) for x in toList(settings.value('readingslcdsflags',self.readingslcdsflags))]
-
             #restore flavors
             self.qmc.flavorlabels = toStringList(settings.value('Flavors',self.qmc.flavorlabels))
             self.qmc.flavors = [5.]*len(self.qmc.flavorlabels)
@@ -16148,6 +16173,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             #restore roast color system
             if settings.contains('colorsystem'):
                 self.qmc.color_system_idx = toInt(settings.value('colorsystem',int(self.qmc.color_system_idx)))
+
+#--- BEGIN GROUP XT
             #restore extra background curve color and index
             settings.beginGroup('XT')
             if settings.contains('color'):
@@ -16159,6 +16186,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if settings.contains('index2'):
                 self.qmc.ytcurveidx = toInt(settings.value('index2',int(self.qmc.ytcurveidx)))
             settings.endGroup()
+#--- END GROUP XT
+
+#--- BEGIN GROUP Units
             #restore units
             settings.beginGroup('Units')
             if settings.contains('weight'):
@@ -16170,6 +16200,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if settings.contains('volumeCalcUnit'):
                 self.qmc.volumeCalcUnit = self.float2float(toFloat(settings.value('volumeCalcUnit',self.qmc.volumeCalcUnit)))
             settings.endGroup()
+#--- END GROUP Units
+
+#--- BEGIN GROUP Tare
             settings.beginGroup('Tare')
             if settings.contains('names'):
                 self.qmc.container_names = list(map(str,list(toStringList(settings.value('names',self.qmc.container_names)))))
@@ -16178,6 +16211,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if settings.contains('idx'):
                 self.qmc.container_idx = toInt(settings.value('idx',int(self.qmc.container_idx)))
             settings.endGroup()
+#--- END GROUP Tare
+
+#--- BEGIN GROUP SerialPort
             #restore serial port
             settings.beginGroup('SerialPort')
             self.ser.comport = s2a(toString(settings.value('comport',self.ser.comport)))
@@ -16191,6 +16227,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if settings.contains('timeout'):
                 self.ser.timeout = self.float2float(toFloat(settings.value('timeout',self.ser.timeout)))
             settings.endGroup()
+#--- END GROUP SerialPort
+
+#--- BEGIN GROUP WebSocket
             #restorer WebSocket port
             settings.beginGroup('WebSocket')
             self.ws.host = toString(settings.value('host',self.ws.host))
@@ -16224,6 +16263,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             self.ws.channel_modes = [toInt(x) for x in toList(settings.value('channel_modes',self.ws.channel_modes))]
             self.ws.channel_modes = self.ws.channel_modes + [0]*(max(0,self.ws.channels - len(self.ws.channel_modes)))
             settings.endGroup()
+#--- END GROUP WebSocket
+
+#--- BEGIN GROUP S7
             #restore s7 port
             settings.beginGroup('S7')
             if settings.contains('area'):
@@ -16261,6 +16303,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if settings.contains('fetch_max_blocks'):
                 self.s7.fetch_max_blocks = bool(toBool(settings.value('fetch_max_blocks',self.s7.fetch_max_blocks)))
             settings.endGroup()
+#--- END GROUP S7
+
+#--- BEGIN GROUP Modbus
             #restore modbus port
             settings.beginGroup('Modbus')
             self.modbus.comport = s2a(toString(settings.value('comport',self.modbus.comport)))
@@ -16437,6 +16482,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if settings.contains('reset_socket'):
                 self.modbus.reset_socket = bool(toBool(settings.value('reset_socket',self.modbus.reset_socket)))
             settings.endGroup()
+#--- END GROUP Modbus
+
+#--- BEGIN GROUP Scale
             #restore scale port
             settings.beginGroup('Scale')
             self.scale.device = toString(settings.value('device',self.scale.device))
@@ -16447,6 +16495,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             self.scale.parity = s2a(toString(settings.value('parity',self.scale.parity)))
             self.scale.timeout = self.float2float(toFloat(settings.value('timeout',self.scale.timeout)))
             settings.endGroup()
+#--- END GROUP Scale
+
+#--- BEGIN GROUP Color
             #restore color port
             settings.beginGroup('Color')
             self.color.device = toString(settings.value('device',self.color.device))
@@ -16457,6 +16508,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             self.color.parity = s2a(toString(settings.value('parity',self.color.parity)))
             self.color.timeout = self.float2float(toFloat(settings.value('timeout',self.color.timeout)))
             settings.endGroup()
+#--- END GROUP Color
+
+#--- BEGIN GROUP Alarms
             #restore alarms
             settings.beginGroup('Alarms')
             if settings.contains('alarmtime'):
@@ -16522,6 +16576,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 if settings.contains('alarmsetlabel'):
                     self.qmc.alarmsetlabel = toString(settings.value('alarmsetlabel',self.qmc.alarmsetlabel))
             settings.endGroup()
+#--- END GROUP Alarms
+
+#--- BEGIN GROUP ArduinoPID
             #restore TC4/Arduino PID settings
             settings.beginGroup('ArduinoPID')
             if settings.contains('pidOnCHARGE'):
@@ -16592,9 +16649,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     svDescriptionsLabel = 'RS_svDescriptions'+str(n)
                     if settings.contains(svDescriptionsLabel):
                         self.pidcontrol.RS_svDescriptions[n] = list(toStringList(settings.value(svDescriptionsLabel,self.pidcontrol.RS_svDescriptions[n])))
-
             settings.endGroup()
+#--- END GROUP ArduinoPID
 
+#--- BEGIN GROUP PXR
             #restore pid settings
             settings.beginGroup('PXR')
             for k in list(self.fujipid.PXR.keys()):
@@ -16603,13 +16661,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 elif isinstance(self.fujipid.PXR[k][0], int):
                     self.fujipid.PXR[k][0] = toInt(settings.value(k,self.fujipid.PXR[k][0]))
             settings.endGroup()
+#--- END GROUP PXR
+
+#--- BEGIN GROUP PXG4
             settings.beginGroup('PXG4')
             for k in list(self.fujipid.PXG4.keys()):
                 if isinstance(self.fujipid.PXG4[k][0], float):
                     self.fujipid.PXG4[k][0] = toFloat(settings.value(k,self.fujipid.PXG4[k][0]))
                 elif isinstance(self.fujipid.PXG4[k][0], int):
                     self.fujipid.PXG4[k][0] = toInt(settings.value(k,self.fujipid.PXG4[k][0]))
-
             if self.fujipid.PXG4['selectsv'][0] < 1:
                 self.fujipid.PXG4['selectsv'][0] = 1
             if settings.contains('followBackground'):
@@ -16617,6 +16677,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if settings.contains('lookahead'):
                 self.fujipid.lookahead = toInt(settings.value('lookahead',self.fujipid.lookahead))
             settings.endGroup()
+#--- END GROUP PXG4
+
+#--- BEGIN GROUP deltaDTA
             if settings.contains('deltaDTA'):
                 settings.beginGroup('deltaDTA')
                 for k in list(self.dtapid.dtamem.keys()):
@@ -16625,6 +16688,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     elif isinstance(self.dtapid.dtamem[k][0], int):
                         self.dtapid.dtamem[k][0] = toInt(settings.value(k,self.dtapid.dtamem[k][0]))
                 settings.endGroup()
+#--- END GROUP deltaDTA
+
             if settings.contains('filterDropOuts'):
                 self.qmc.filterDropOuts = bool(toBool(settings.value('filterDropOuts',self.qmc.filterDropOuts)))
             if settings.contains('dropSpikes'):
@@ -16645,6 +16710,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 self.qmc.filterDropOut_tmax = toInt(settings.value('maxLimit',self.qmc.filterDropOut_tmax))
             if settings.contains('foregroundShowFullflag'):
                 self.qmc.foregroundShowFullflag = bool(toBool(settings.value('foregroundShowFullflag',self.qmc.foregroundShowFullflag)))
+
+#--- BEGIN GROUP RoC
             settings.beginGroup('RoC')
             self.qmc.DeltaETflag = bool(toBool(settings.value('DeltaET',self.qmc.DeltaETflag)))
             self.qmc.DeltaBTflag = bool(toBool(settings.value('DeltaBT',self.qmc.DeltaBTflag)))
@@ -16669,6 +16736,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if settings.contains('swapdeltalcds'):
                 self.qmc.swapdeltalcds = bool(toBool(settings.value('swapdeltalcds',self.qmc.swapdeltalcds)))
             settings.endGroup()
+#--- END GROUP RoC
+
             if settings.contains('curvefilter'):
                 self.qmc.curvefilter = toInt(settings.value('curvefilter',self.qmc.curvefilter))
 #            if settings.contains("smoothingwindowsize"):
@@ -16683,6 +16752,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 self.qmc.BTlcd = bool(toBool(settings.value('BTlcd',self.qmc.BTlcd)))
             if settings.contains('swaplcds'):
                 self.qmc.swaplcds = bool(toBool(settings.value('swaplcds',self.qmc.swaplcds)))
+
+#--- BEGIN GROUP DefaultButtons
             settings.beginGroup('DefaultButtons')
             if settings.contains('buttonvisibility'):
                 self.qmc.buttonvisibility = [toBool(x) for x in toList(settings.value('buttonvisibility'))]
@@ -16699,7 +16770,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if settings.contains('xextrabuttonactionstrings'):
                 self.qmc.xextrabuttonactionstrings = list(map(str,list(toStringList(settings.value('xextrabuttonactionstrings',self.qmc.xextrabuttonactionstrings)))))
             settings.endGroup()
+#--- END GROUP DefaultButtons
+
             self.qmc.transMappingMode = toInt(settings.value('transMappingMode',self.qmc.transMappingMode))
+
+#--- BEGIN GROUP Style
             settings.beginGroup('Style')
             if settings.contains('patheffects'):
                 self.qmc.patheffects = toInt(settings.value('patheffects',self.qmc.patheffects))
@@ -16720,9 +16795,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             else:
                 self.BTname = QApplication.translate('Label', 'BT')
             settings.endGroup()
+#--- END GROUP Style
+
+#--- BEGIN GROUP Sound
             settings.beginGroup('Sound')
             self.soundflag = toInt(settings.value('Beep',self.soundflag))
             settings.endGroup()
+#--- END GROUP Sound
+
+#--- BEGIN GROUP Notifications
             if filename is None:
                 settings.beginGroup('Notifications')
                 if self.notificationManager:
@@ -16744,9 +16825,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                         _log.exception(e)
                 notifications_enabled = toBool(settings.value('notificationsflag',self.notificationsflag))
                 self.notificationsSetEnabledSignal.emit(notifications_enabled)
-
                 settings.endGroup()
+#--- END GROUP Notifications
 
+#--- BEGIN GROUP Axis
             #loads max-min temp limits of graph
             settings.beginGroup('Axis')
             if settings.contains('loadAxisFromProfile'):
@@ -16789,7 +16871,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if settings.contains('time_grid'):
                 self.qmc.time_grid = bool(toBool(settings.value('time_grid',self.qmc.time_grid)))
             settings.endGroup()
+#--- END GROUP Axis
 
+#--- BEGIN GROUP MachineSetup
             # only set in (some) predefined machine setups:
             if filename and machine:
                 settings.beginGroup('MachineSetup')
@@ -16802,6 +16886,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 else:
                     self.qmc.roasterheating_setup = 0
                 settings.endGroup()
+#--- END GROUP MachineSetup
 
             if settings.contains('organization_setup'):
                 self.qmc.organization_setup = toString(settings.value('organization_setup',self.qmc.organization_setup))
@@ -16822,6 +16907,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if settings.contains('drumspeed_setup'):
                 self.qmc.drumspeed_setup = toString(settings.value('drumspeed_setup',self.qmc.drumspeed_setup))
 
+#--- BEGIN GROUP EnergyUse
             settings.beginGroup('EnergyUse')
             if settings.contains('loadlabels_setup'):
                 self.qmc.loadlabels_setup = [toString(x) for x in toList(settings.value('loadlabels_setup'))]
@@ -16862,14 +16948,18 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             settings.endGroup()
             self.qmc.restoreEnergyLoadDefaults()
             self.qmc.restoreEnergyProtocolDefaults()
+#--- END GROUP EnergyUse
 
+#--- BEGIN GROUP EnergyDefaults
             settings.beginGroup('EnergyDefaults')
             if settings.contains('ratings'):
                 self.qmc.machinesetup_energy_ratings = settings.value('ratings',self.qmc.machinesetup_energy_ratings)
             else:
                 self.qmc.machinesetup_energy_ratings = None
             settings.endGroup()
+#--- END GROUP EnergyDefaults
 
+#--- BEGIN GROUP RoastProperties
             settings.beginGroup('RoastProperties')
             # copy setup from pre v1.4.6 RoastProperties organization,operator,roastertype,roastersize
             if self.qmc.organization_setup == '' and settings.contains('organization'):
@@ -16919,6 +17009,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 else:
                     self.qmc.plus_custom_blend = None
             settings.endGroup()
+#--- END GROUP RoastProperties
 
             self.userprofilepath = toString(settings.value('profilepath',self.userprofilepath))
             if settings.contains('settingspath') and not filename:
@@ -16938,10 +17029,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if settings.contains('externaloutprogramFlag'):
                 self.ser.externaloutprogramFlag = bool(toBool(settings.value('externaloutprogramFlag',self.ser.externaloutprogramFlag)))
             if not theme:
+#--- BEGIN GROUP ExtraDev
                 settings.beginGroup('ExtraDev')
                 if settings.contains('extradevices'):
                     self.getExtraDeviceSettings(settings)
                 settings.endGroup()
+#--- END GROUP ExtraDev
                 # ensure that extra list length are of the size of the extradevices:
                 self.ensureCorrectExtraDeviceListLenght()
                 self.updateExtradeviceSettings()
@@ -16956,6 +17049,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)
 
+#--- BEGIN GROUP CurveStyles
             #restore curve styles
             settings.beginGroup('CurveStyles')
             if settings.contains('BTlinestyle'):
@@ -17001,7 +17095,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 self.qmc.ETbacklinewidth = max(0.1,self.float2float(toFloat(settings.value('ETbacklinewidth',self.qmc.ETbacklinewidth))))
                 self.qmc.ETbackmarker = s2a(toString(settings.value('ETbackmarker',self.qmc.ETbackmarker)))
                 self.qmc.ETbackmarkersize = max(0.1,self.float2float(toFloat(settings.value('ETbackmarkersize',self.qmc.ETbackmarkersize))))
-
                 self.qmc.XTbacklinestyle = s2a(toString(settings.value('XTbacklinestyle',self.qmc.XTbacklinestyle)))
                 self.qmc.XTbackdrawstyle = s2a(toString(settings.value('XTbackdrawstyle',self.qmc.XTbackdrawstyle)))
                 if self.qmc.XTbackdrawstyle == '-':
@@ -17016,28 +17109,28 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 self.qmc.YTbacklinewidth = max(0.1,self.float2float(toFloat(settings.value('YTbacklinewidth',self.qmc.YTbacklinewidth))))
                 self.qmc.YTbackmarker = s2a(toString(settings.value('YTbackmarker',self.qmc.YTbackmarker)))
                 self.qmc.YTbackmarkersize = max(0.1,self.float2float(toFloat(settings.value('YTbackmarkersize',self.qmc.YTbackmarkersize))))
-
                 self.getExtraDeviceCurveStyles(settings)
-
                 self.qmc.BTBdeltalinestyle = s2a(toString(settings.value('BTBdeltalinestyle',self.qmc.BTBdeltalinestyle)))
                 self.qmc.BTBdeltadrawstyle = s2a(toString(settings.value('BTBdeltadrawstyle',self.qmc.BTBdeltadrawstyle)))
-
                 self.qmc.BTBdeltalinewidth = max(0.1,self.float2float(toFloat(settings.value('BTBdeltalinewidth',self.qmc.BTBdeltalinewidth))))
                 self.qmc.BTBdeltamarker = s2a(toString(settings.value('BTBdeltamarker',self.qmc.BTBdeltamarker)))
                 self.qmc.BTBdeltamarkersize = max(0.1,self.float2float(toFloat(settings.value('BTBdeltamarkersize',self.qmc.BTBdeltamarkersize))))
                 self.qmc.ETBdeltalinestyle = s2a(toString(settings.value('ETBdeltalinestyle',self.qmc.ETBdeltalinestyle)))
                 self.qmc.ETBdeltadrawstyle = s2a(toString(settings.value('ETBdeltadrawstyle',self.qmc.ETBdeltadrawstyle)))
-
                 self.qmc.ETBdeltalinewidth = max(0.1,self.float2float(toFloat(settings.value('ETBdeltalinewidth',self.qmc.ETBdeltalinewidth))))
                 self.qmc.ETBdeltamarker = s2a(toString(settings.value('ETBdeltamarker',self.qmc.ETBdeltamarker)))
                 self.qmc.ETBdeltamarkersize = max(0.1,self.float2float(toFloat(settings.value('ETBdeltamarkersize',self.qmc.ETBdeltamarkersize))))
             settings.endGroup()
+#--- END GROUP CurveStyles
 
+#--- BEGIN GROUP ExtraComm
             # Extra com ports
             settings.beginGroup('ExtraComm')
             if settings.contains('extracomport'):
                 self.getExtraDeviceCommSettings(settings)
             settings.endGroup()
+#--- END GROUP ExtraComm
+
             if settings.contains('ChannelTares'):
                 self.channel_tare_values = [toFloat(x) for x in toList(settings.value('ChannelTares',self.channel_tare_values))]
             if settings.contains('BTfunction'):
@@ -17054,12 +17147,17 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 if len(self.qmc.plotcurves) == 6:
                     self.qmc.plotcurves += ['','','']
                     self.qmc.plotcurvecolor += ['black','black','black']
+
+#--- BEGIN GROUP RoRlimits
             settings.beginGroup('RoRlimits')
             if settings.contains('RoRlimitFlag'):
                 self.qmc.RoRlimitFlag = bool(toBool(settings.value('RoRlimitFlag',self.qmc.RoRlimitFlag)))
                 self.qmc.RoRlimit = toInt(settings.value('RoRlimit',self.qmc.RoRlimit))
                 self.qmc.RoRlimitm = toInt(settings.value('RoRlimitm',self.qmc.RoRlimitm))
             settings.endGroup()
+#--- END GROUP RoRlimits
+
+#--- BEGIN GROUP grid
             settings.beginGroup('grid')
             if settings.contains('xgrid'):
                 self.qmc.xgrid = toInt(settings.value('xgrid',self.qmc.xgrid))
@@ -17070,6 +17168,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 self.qmc.gridlinestyle = toInt(settings.value('gridlinestyle',self.qmc.gridlinestyle))
                 self.qmc.gridalpha = toFloat(settings.value('gridalpha',self.qmc.gridalpha))
             settings.endGroup()
+#--- END GROUP grid
+
             if settings.contains('titleshowalways'):
                 self.qmc.title_show_always = bool(toBool(settings.value('titleshowalways',self.qmc.title_show_always)))
             if settings.contains('roastpropertiesflag'):
@@ -17080,6 +17180,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 self.qmc.roastpropertiesAutoOpenDropFlag = toInt(settings.value('roastpropertiesAutoOpenDropFlag',self.qmc.roastpropertiesAutoOpenDropFlag))
             if settings.contains('customflavorlabels'):
                 self.qmc.customflavorlabels = list(map(str,list(toStringList(settings.value('customflavorlabels',self.qmc.customflavorlabels)))))
+
+#--- BEGIN GROUP Sliders
             #restore sliders
             settings.beginGroup('Sliders')
             if settings.contains('slidervisibilities'):
@@ -17130,11 +17232,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     self.eventsliderunits = eventsliderunits
             if settings.contains('ModeTempSliders'):
                 self.qmc.mode_tempsliders = str(settings.value('ModeTempSliders',self.qmc.mode_tempsliders))
-                settings.endGroup()
-                self.qmc.adjustTempSliders() # adjust min/max slider limits of temperature sliders to correspond to the current temp mode
+            settings.endGroup()
+            self.qmc.adjustTempSliders() # adjust min/max slider limits of temperature sliders to correspond to the current temp mode
             self.slidersAction.setEnabled(any(self.eventslidervisibilities) or self.pidcontrol.svSlider)
             if self.app.artisanviewerMode:
                 self.slidersAction.setEnabled(False)
+#--- END GROUP Sliders
+
+#--- BEGIN GROUP Quantifiers
             #restore quantifier
             settings.beginGroup('Quantifiers')
             if settings.contains('quantifieractive'):
@@ -17165,6 +17270,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     if len(eventquantifierSV) == self.eventsliders:
                         self.eventquantifierSV = eventquantifierSV
             settings.endGroup()
+#--- END GROUP Quantifiers
+
+#--- BEGIN GROUP Batch
             settings.beginGroup('Batch')
             if settings.contains('batchcounter'):
                 if updateBatchCounter:
@@ -17175,8 +17283,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     self.qmc.batchsequence = toInt(settings.value('batchsequence',self.qmc.batchsequence))
                     self.qmc.lastroastepoch = toInt(settings.value('lastroastepoch',self.qmc.lastroastepoch))
             settings.endGroup()
+#--- END GROUP Batch
+
             self.computeLinespaces()
             self.updateSlidersProperties()
+
+#--- BEGIN GROUP background
             #restore background profile settings
             settings.beginGroup('background')
             if settings.contains('backgrounddetails'):
@@ -17200,6 +17312,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if settings.contains('hideBgafterprofileload'):
                 self.qmc.hideBgafterprofileload = bool(toBool(settings.value('hideBgafterprofileload',self.qmc.hideBgafterprofileload)))
             settings.endGroup()
+#--- END GROUP background
+
             if settings.contains('compareAlignEvent'):
                 self.qmc.compareAlignEvent = toInt(settings.value('compareAlignEvent',self.qmc.compareAlignEvent))
             if settings.contains('compareEvents'):
@@ -17228,6 +17342,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 self.qmc.autosaveimageformat = toString(settings.value('autosaveimageformat',self.qmc.autosaveimageformat))
             if settings.contains('autosaveprefix'):
                 self.qmc.autosaveprefix = toString(settings.value('autosaveprefix',self.qmc.autosaveprefix))
+
+#--- BEGIN GROUP WebLCDs
             # WebLCDs
             settings.beginGroup('WebLCDs')
             if settings.contains('active'):
@@ -17235,6 +17351,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 self.WebLCDsPort = toInt(settings.value('port',self.WebLCDsPort))
                 self.WebLCDsAlerts = bool(toBool(settings.value('alerts',self.WebLCDsAlerts)))
             settings.endGroup()
+#--- END GROUP WebLCDs
+
             if settings.contains('LargeLCDs'):
                 self.LargeLCDsFlag = toBool(settings.value('LargeLCDs',self.LargeLCDsFlag))
             if self.LargeLCDsFlag:
@@ -17262,6 +17380,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             # start server if needed
             if self.WebLCDs:
                 self.startWebLCDs(force=True)
+
+#--- BEGIN GROUP ExtraEventButtons
             #restore buttons
             settings.beginGroup('ExtraEventButtons')
             if settings.contains('extraeventsactions'):
@@ -17269,7 +17389,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     self.buttonlistmaxlen = toInt(settings.value('buttonlistmaxlen',self.buttonlistmaxlen))
                 if settings.contains('extraeventsbuttonsflags'):
                     self.extraeventsbuttonsflags = [toInt(x) for x in toList(settings.value('extraeventsbuttonsflags',self.extraeventsbuttonsflags))]
-
                 extraeventstypes = [toInt(x) for x in toList(settings.value('extraeventstypes',self.extraeventstypes))]
                 extraeventsvalues = [toFloat(x) for x in toList(settings.value('extraeventsvalues',self.extraeventsvalues))]
                 extraeventsactions = [toInt(x) for x in toList(settings.value('extraeventsactions',self.extraeventsactions))]
@@ -17295,7 +17414,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     self.extraeventsdescriptions = extraeventsdescriptions
                     self.extraeventbuttoncolor = extraeventbuttoncolor
                     self.extraeventbuttontextcolor = extraeventbuttontextcolor
-
                 if settings.contains('buttonpalette'):
                     self.buttonpalettemaxlen = [min(30,max(6,toInt(x))) for x in toList(settings.value('buttonpalettemaxlen',self.buttonpalettemaxlen))]
                     bp = toList(settings.value('buttonpalette',self.buttonpalette))
@@ -17331,6 +17449,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 if settings.contains('buttonpalette_label'):
                     self.buttonpalette_label = toString(settings.value('buttonpalette_label',self.buttonpalette_label))
             settings.endGroup()
+#--- END GROUP ExtraEventButtons
+
+#--- BEGIN GROUP ExtrasMoreInfo
             # Extras more info
             settings.beginGroup('ExtrasMoreInfo')
             if settings.contains('showmet'):
@@ -17346,6 +17467,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             if settings.contains('showtimeguide'):
                 self.qmc.showtimeguide = bool(toBool(settings.value('showtimeguide',self.qmc.showtimeguide)))
             settings.endGroup()
+#--- END GROUP ExtrasMoreInfo
 
             # recent roasts
             if settings.contains('recentRoasts'):
@@ -21751,34 +21873,39 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 
     #Find rate of change of each phase. TP_index (by self.findTP()) is the index of the TP and dryEndIndex that of the end of drying (by self.findDryEnd())
     #Note: For the dryphase, the RoR for the dryphase is calculated for the segment starting from TP ending at DE
+    # returns -1 if data is not available
     def RoR(self,TP_index,dryEndIndex):
         midphasetime = self.qmc.statisticstimes[2]
         finishphasetime = self.qmc.statisticstimes[3]
         BTdrycross = None
         rc1 = rc2 = rc3 = 0.
-        dt1 = dt2 = dt3 = 0.
+        dt1 = dt2 = dt3 = -1.
         divisor:float = 0
         LP:float = 0.
-        if -1 < dryEndIndex < len(self.qmc.temp2):
-            BTdrycross = self.qmc.temp2[dryEndIndex]
+        temp:List[float] = self.qmc.temp2
+        if not self.qmc.BTcurve and self.qmc.ETcurve:
+            # if just the ET curve is shown we report based on ET data
+            temp = self.qmc.temp1
+        if -1 < dryEndIndex < len(temp):
+            BTdrycross = temp[dryEndIndex]
         if BTdrycross is not None and self.qmc.greens_temp > 0:
             LP = self.qmc.greens_temp
             #avoid dividing by zero
             divisor = self.qmc.timex[dryEndIndex] - self.qmc.timex[self.qmc.timeindex[0]]
-        elif BTdrycross is not None and -1 < TP_index < min(1000, len(self.qmc.temp2)) and dryEndIndex:
-            LP = self.qmc.temp2[TP_index]
+        elif BTdrycross is not None and -1 < TP_index < min(1000, len(temp)) and dryEndIndex:
+            LP = temp[TP_index]
             #avoid dividing by zero
             divisor = self.qmc.timex[dryEndIndex] - self.qmc.timex[TP_index]
-        if BTdrycross is not None and divisor != 0:
+        if BTdrycross is not None and divisor != 0 and is_proper_temp(BTdrycross):
             rc1 = ((BTdrycross - LP) / divisor)*60.
             dt1 = BTdrycross - LP
         if self.qmc.timeindex[2]:
-            if midphasetime and BTdrycross:
-                rc2 = ((self.qmc.temp2[self.qmc.timeindex[2]] - BTdrycross)/midphasetime)*60.
-                dt2 = self.qmc.temp2[self.qmc.timeindex[2]] - BTdrycross
-            if finishphasetime:
-                rc3 = ((self.qmc.temp2[self.qmc.timeindex[6]]- self.qmc.temp2[self.qmc.timeindex[2]])/finishphasetime)*60.
-                dt3 = self.qmc.temp2[self.qmc.timeindex[6]]- self.qmc.temp2[self.qmc.timeindex[2]]
+            if midphasetime and BTdrycross and is_proper_temp(BTdrycross) and is_proper_temp(temp[self.qmc.timeindex[2]]):
+                rc2 = ((temp[self.qmc.timeindex[2]] - BTdrycross)/midphasetime)*60.
+                dt2 = temp[self.qmc.timeindex[2]] - BTdrycross
+            if finishphasetime and is_proper_temp(temp[self.qmc.timeindex[6]]) and is_proper_temp(temp[self.qmc.timeindex[2]]):
+                rc3 = ((temp[self.qmc.timeindex[6]]- temp[self.qmc.timeindex[2]])/finishphasetime)*60.
+                dt3 = temp[self.qmc.timeindex[6]]- temp[self.qmc.timeindex[2]]
         return (rc1,rc2,rc3,dt1,dt2,dt3)
 
     @pyqtSlot()

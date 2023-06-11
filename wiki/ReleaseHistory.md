@@ -2,13 +2,14 @@ Detailed Release History
 ========================
 
 ----
-v2.8.3 (RC)
+v2.8.4 (June X, 2023)
 ------------------
 
 * ADDITIONS
   - adds support for [IKAWA HOME/PRO](https://www.ikawacoffee.com/)
   - adds support for [Kaleido](https://www.kaleido-roaster.com/) Network, Serial and Legacy protocols
   - adds Santoker Q Series and R Series support over serial (USB/Bluetooth)
+  - adds IKAWA URL import
   - adds support for Phidget TMP1200_1
   - adds dark mode support for Windows 10 (1607+), Windows 11 and Linux under Gnome (not available with UI style WindowsVista)
   - adds symbolic variables `WEIGHTin`, `MOISTUREin` and `TEMPunit` to access corresponding Roast Properties
@@ -22,6 +23,7 @@ v2.8.3 (RC)
   - adds slider and quantifier step size 5
   - adds `Create Events` flag to Software PID
   - adds energy/CO2 data to characteristics line
+  - adds keyboard shortcuts CTRL+ENTER (on macOS COMMAND+ENTER) to start recording and SHIFT+ENTER to stop logging
   - display configured roaster name and batch size as x-axis label if no profile is loaded
   - toggle hide-background per click on background profile name (subtitle) during roasting
 
@@ -37,7 +39,9 @@ v2.8.3 (RC)
   - adds roaster batch size defaults for machine setups
   - if different from the system default, use current serial port or current IP host as default on running a machine setup
   - extended localizations
-  - upgrade to pymodbus 3.2, Qt/PyQt 6.5, matplotlib 3.7
+  - places event annotations on ET if BT is hidden
+  - pushes default max temperature axis limit to 275C / 527F (was 250C / 500F)
+  - upgrade to pymodbus 3.3, Qt/PyQt 6.5, matplotlib 3.7
 
 * FIXES
   - fixes regression which broke MODBUS port scan ([Issue #1056](../../../issues/1056))
@@ -67,6 +71,7 @@ v2.8.3 (RC)
   - ensures that rendering of axis respects curve style setting
   - persist ET marker size changes correctly
   - fixes of issues revealed by automatic static analyzers ([pylint](https://github.com/pylint-dev/pylint), [ruff](https://github.com/charliermarsh/ruff), [mypy](https://github.com/python/mypy), [pyright](https://github.com/microsoft/pyright))
+  - fixes a regression where events generated on CHARGE could be rendered at the wrong position
 
 * REMOVALS
   - removes support for original *.txt profile format of Artisan v0.4.0 (2011) and earlier

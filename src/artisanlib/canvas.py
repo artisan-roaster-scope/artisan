@@ -55,7 +55,7 @@ if TYPE_CHECKING:
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.util import (uchr, fill_gaps, deltaLabelPrefix, deltaLabelUTF8, deltaLabelMathPrefix, stringfromseconds,
         fromFtoC, fromCtoF, RoRfromFtoC, RoRfromCtoF, toInt, toString, toFloat, application_name, getResourcePath, getDirectory,
-        abbrevString, scaleFloat2String)
+        abbrevString, scaleFloat2String, is_proper_temp)
 from artisanlib import pid
 from artisanlib.time import ArtisanTime
 from artisanlib.filters import LiveMedian
@@ -521,11 +521,12 @@ class tgraphcanvas(FigureCanvas):
         self.phasesLCDmode_all:List[bool] = [False,False,True]
 
 
-        #statistics flags selects to display: stat. time, stat. bar, (stat. flavors), stat. area, stat. deg/min, stat. ETBTarea
+        #statistics flags selects to display:
+        #  0: stat. time, 1: stat. bar, 2: (stat. flavors), 3: characteristics line, 4: stat. deg/min, 5: (stat. ETBTarea), 6: stat. delta temp
         # NOTE: stat. flavors not used anymore. The code has been removed.
         #       statisticsflags[5] area is not used anymore
-        self.statisticsflags = [1,1,0,1,0,0,1]
-        self.statisticsmode = 1 # one of 0: standard computed values, 1: roast properties, 2: total energy/CO2 data, 3: just roast energy/CO2 data
+        self.statisticsflags:List[int] = [1,1,0,1,0,0,1]
+        self.statisticsmode:int = 1 # one of 0: standard computed values, 1: roast properties, 2: total energy/CO2 data, 3: just roast energy/CO2 data
 
         # Area Under Curve (AUC)
         self.AUCbegin:int = 1 # counting begins after 0: CHARGE, 1: TP (default), 2: DE, 3: FCs
@@ -602,7 +603,7 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1200_changeTriggersStrings.insert(1,'0.02C')
         self.phidget1200_changeTriggersStrings.insert(1,'0.01C')
         self.phidget1200_changeTriggersStrings.insert(1,'0.005C')
-        self.phidget1200_dataRate:int = 340
+        self.phidget1200_dataRate:int = 250
         self.phidget1200_dataRatesStrings: Final[List[str]] = ['250ms','500ms','750ms','1s']
         self.phidget1200_dataRatesValues: Final[List[int]] = [250,500,700,1024]
 
@@ -610,7 +611,7 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1200_2_formula:int = 0
         self.phidget1200_2_wire:int = 0
         self.phidget1200_2_changeTrigger:float = 0
-        self.phidget1200_2_dataRate:int = 340
+        self.phidget1200_2_dataRate:int = 250
 
         self.phidget1046_async: List[bool] = [False]*4
         self.phidget1046_gain: List[int] = [2]*4 # defaults to gain 8 (values are 1-based index into gainValues) # 0 is not value
@@ -1666,14 +1667,14 @@ class tgraphcanvas(FigureCanvas):
 
         self.xgrid_default: Final[int] = 120
 
-        self.ylimit_F_default: Final[int] = 500
+        self.ylimit_F_default: Final[int] = 527# 500
         self.ylimit_min_F_default: Final[int] = 100
         self.ygrid_F_default: Final[int] = 100
         self.zlimit_F_default: Final[int] = 45
         self.zlimit_min_F_default: Final[int] = 0
         self.zgrid_F_default: Final[int] = 10
 
-        self.ylimit_C_default: Final[int] = 250
+        self.ylimit_C_default: Final[int] = 275 #250
         self.ylimit_min_C_default: Final[int] = 0
         self.ygrid_C_default: Final[int] = 50
         self.zlimit_C_default: Final[int] = 25
@@ -2913,6 +2914,9 @@ class tgraphcanvas(FigureCanvas):
                     # populate menu
                     ac = QAction(menu)
                     bt = self.temp2[timex]
+                    if not self.BTcurve and self.ETcurve:
+                        # we allow click to ET if BT is hidden and ET is shown
+                        bt = self.temp1[timex]
                     btdelta = 50 if self.mode == 'C' else 70
                     if bt != -1 and abs(bt-event.ydata) < btdelta:
                         # we suppress the popup if not clicked close enough to the BT curve
@@ -7027,7 +7031,8 @@ class tgraphcanvas(FigureCanvas):
             xytext = self.l_annotations_dict[draggable_anno_key][0].xyann
         else:
             xytext = (x+e,y + yup)
-        temp_anno = self.ax.annotate(fmtstr%(temp), xy=(x,y),xytext=xytext,
+        temp_str = ('' if temp == -1 else fmtstr%(temp))
+        temp_anno = self.ax.annotate(temp_str, xy=(x,y),xytext=xytext,
                             color=self.palette['text'],
                             arrowprops={'arrowstyle':'-','color':self.palette['text'],'alpha':a},
                             fontsize=fontsize,
@@ -7082,22 +7087,23 @@ class tgraphcanvas(FigureCanvas):
                     t0 = 0
                 if timeindex[0] != -1:
                     y = stemp[t0idx]
-                    ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,y,y,d)
-                    if startB is not None:
-                        st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation', 'CHARGE'))
-                        st1 = self.__dijstra_to_ascii(st1)
-                        e = 0
-                        a = self.backgroundalpha
-                    else:
-                        st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation', 'CHARGE'))
-                        st1 = self.__dijstra_to_ascii(st1)
-                        if self.graphfont == 1:
-                            st1 = self.__to_ascii(st1)
-                        e = 0
-                        a = 1.
-                    time_temp_annos = self.annotate(temp[t0idx],st1,t0,y,ystep_up,ystep_down,e,a,draggable,0+anno_key_offset)
-                    if time_temp_annos is not None:
-                        anno_artists += time_temp_annos
+                    if is_proper_temp(y):
+                        ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,y,y,d)
+                        if startB is not None:
+                            st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation', 'CHARGE'))
+                            st1 = self.__dijstra_to_ascii(st1)
+                            e = 0
+                            a = self.backgroundalpha
+                        else:
+                            st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation', 'CHARGE'))
+                            st1 = self.__dijstra_to_ascii(st1)
+                            if self.graphfont == 1:
+                                st1 = self.__to_ascii(st1)
+                            e = 0
+                            a = 1.
+                        time_temp_annos = self.annotate(temp[t0idx],st1,t0,y,ystep_up,ystep_down,e,a,draggable,0+anno_key_offset)
+                        if time_temp_annos is not None:
+                            anno_artists += time_temp_annos
 
                 #Add TP marker
                 if self.markTPflag:
@@ -7122,92 +7128,114 @@ class tgraphcanvas(FigureCanvas):
                 #Add Dry End markers
                 if timeindex[1]:
                     tidx = timeindex[1]
-                    ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[tidx],d)
-                    st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','DE {0}'),stringfromseconds(timex[tidx]-t0,False))
-                    a = self.backgroundalpha if timeindex2 else 1.0
-                    e = 0
-                    time_temp_annos = self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,1+anno_key_offset)
-                    if time_temp_annos is not None:
-                        anno_artists += time_temp_annos
+                    y0 = stemp[t0idx]
+                    y = stemp[tidx]
+                    if is_proper_temp(y):
+                        if timeindex[0] != -1 and is_proper_temp(y0):
+                            ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,y0,y,d)
+                        else:
+                            ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,y,y,d)
+                        st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','DE {0}'),stringfromseconds(timex[tidx]-t0,False))
+                        a = self.backgroundalpha if timeindex2 else 1.0
+                        e = 0
+                        time_temp_annos = self.annotate(temp[tidx],st1,timex[tidx],y,ystep_up,ystep_down,e,a,draggable,1+anno_key_offset)
+                        if time_temp_annos is not None:
+                            anno_artists += time_temp_annos
 
                 #Add 1Cs markers
                 if timeindex[2]:
                     tidx = timeindex[2]
-                    if timeindex[1]: #if dryend
-                        ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[timeindex[1]],stemp[tidx],d)
-                    else:
-                        ystep_down,ystep_up = self.findtextgap(0,0,stemp[tidx],stemp[tidx],d)
-                    st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','FCs {0}'),stringfromseconds(timex[tidx]-t0,False))
-                    a = self.backgroundalpha if timeindex2 else 1.0
-                    e = 0
-                    time_temp_annos = self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,2+anno_key_offset)
-                    if time_temp_annos is not None:
-                        anno_artists += time_temp_annos
+                    if is_proper_temp(stemp[tidx]):
+                        if timeindex[1] and is_proper_temp(stemp[timeindex[1]]): #if dryend
+                            ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[timeindex[1]],stemp[tidx],d)
+                        else:
+                            ystep_down,ystep_up = self.findtextgap(0,0,stemp[tidx],stemp[tidx],d)
+                        st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','FCs {0}'),stringfromseconds(timex[tidx]-t0,False))
+                        a = self.backgroundalpha if timeindex2 else 1.0
+                        e = 0
+                        time_temp_annos = self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,2+anno_key_offset)
+                        if time_temp_annos is not None:
+                            anno_artists += time_temp_annos
                 #Add 1Ce markers
                 if timeindex[3]:
                     tidx = timeindex[3]
-                    ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[timeindex[2]],stemp[tidx],d)
-                    st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','FCe {0}'),stringfromseconds(timex[tidx]-t0,False))
-                    a = self.backgroundalpha if timeindex2 else 1.0
-                    e = 0
-                    time_temp_annos = self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,3+anno_key_offset)
-                    if time_temp_annos is not None:
-                        anno_artists += time_temp_annos
-                    #add a water mark if FCs
-                    if timeindex[2] and not timeindex2 and self.watermarksflag:
-                        self.ax.axvspan(timex[timeindex[2]],timex[tidx], facecolor=self.palette['watermarks'], alpha=0.2)
+                    if is_proper_temp(stemp[tidx]):
+                        if timeindex[2] and is_proper_temp(stemp[timeindex[2]]):
+                            ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[timeindex[2]],stemp[tidx],d)
+                        else:
+                            ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[tidx],stemp[tidx],d)
+                        st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','FCe {0}'),stringfromseconds(timex[tidx]-t0,False))
+                        a = self.backgroundalpha if timeindex2 else 1.0
+                        e = 0
+                        time_temp_annos = self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,3+anno_key_offset)
+                        if time_temp_annos is not None:
+                            anno_artists += time_temp_annos
+                        #add a water mark if FCs
+                        if timeindex[2] and not timeindex2 and self.watermarksflag:
+                            self.ax.axvspan(timex[timeindex[2]],timex[tidx], facecolor=self.palette['watermarks'], alpha=0.2)
                 #Add 2Cs markers
                 if timeindex[4]:
                     tidx = timeindex[4]
-                    if timeindex[3]:
-                        ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[timeindex[3]],stemp[tidx],d)
-                    else:
-                        ystep_down,ystep_up = self.findtextgap(0,0,stemp[tidx],stemp[tidx],d)
-                    st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','SCs {0}'),stringfromseconds(timex[tidx]-t0,False))
-                    a = self.backgroundalpha if timeindex2 else 1.0
-                    e = 0
-                    time_temp_annos = self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,4+anno_key_offset)
-                    if time_temp_annos is not None:
-                        anno_artists += time_temp_annos
+                    if is_proper_temp(stemp[tidx]):
+                        if timeindex[3] and is_proper_temp(stemp[timeindex[3]]):
+                            ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[timeindex[3]],stemp[tidx],d)
+                        else:
+                            ystep_down,ystep_up = self.findtextgap(0,0,stemp[tidx],stemp[tidx],d)
+                        st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','SCs {0}'),stringfromseconds(timex[tidx]-t0,False))
+                        a = self.backgroundalpha if timeindex2 else 1.0
+                        e = 0
+                        time_temp_annos = self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,4+anno_key_offset)
+                        if time_temp_annos is not None:
+                            anno_artists += time_temp_annos
                 #Add 2Ce markers
                 if timeindex[5]:
                     tidx = timeindex[5]
-                    ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[timeindex[4]],stemp[tidx],d)
-                    st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','SCe {0}'),stringfromseconds(timex[tidx]-t0,False))
-                    a = self.backgroundalpha if timeindex2 else 1.0
-                    e = 0
-                    time_temp_annos = self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,5+anno_key_offset)
-                    if time_temp_annos is not None:
-                        anno_artists += time_temp_annos
-                    #do water mark if SCs
-                    if timeindex[4] and not timeindex2 and self.watermarksflag:
-                        self.ax.axvspan(timex[timeindex[4]],timex[tidx], facecolor=self.palette['watermarks'], alpha=0.2)
+                    if is_proper_temp(stemp[tidx]):
+                        if timeindex[4] and is_proper_temp(stemp[timeindex[4]]):
+                            ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[timeindex[4]],stemp[tidx],d)
+                        else:
+                            ystep_down,ystep_up = self.findtextgap(ystep_down,stemp[tidx],stemp[tidx],d)
+                        st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','SCe {0}'),stringfromseconds(timex[tidx]-t0,False))
+                        a = self.backgroundalpha if timeindex2 else 1.0
+                        e = 0
+                        time_temp_annos = self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,5+anno_key_offset)
+                        if time_temp_annos is not None:
+                            anno_artists += time_temp_annos
+                        #do water mark if SCs
+                        if timeindex[4] and not timeindex2 and self.watermarksflag:
+                            self.ax.axvspan(timex[timeindex[4]],timex[tidx], facecolor=self.palette['watermarks'], alpha=0.2)
                 #Add DROP markers
                 if timeindex[6]:
                     tidx = timeindex[6]
-                    if timeindex[5]:
-                        tx = timeindex[5]
-                    elif timeindex[4]:
-                        tx = timeindex[4]
-                    elif timeindex[3]:
-                        tx = timeindex[3]
-                    elif timeindex[2]:
-                        tx = timeindex[2]
-                    elif timeindex[1]:
-                        tx = timeindex[1]
-                    else:
-                        tx = t0idx
-                    ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[tx],stemp[tidx],d)
-                    st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','DROP {0}'),stringfromseconds(timex[tidx]-t0,False))
-                    if self.graphfont == 1:
-                        st1 = self.__to_ascii(st1)
-                    a = self.backgroundalpha if timeindex2 else 1.0
-                    e = 0
+                    if is_proper_temp(stemp[tidx]):
+                        if timeindex[5]:
+                            tx = timeindex[5]
+                        elif timeindex[4]:
+                            tx = timeindex[4]
+                        elif timeindex[3]:
+                            tx = timeindex[3]
+                        elif timeindex[2]:
+                            tx = timeindex[2]
+                        elif timeindex[1]:
+                            tx = timeindex[1]
+                        else:
+                            tx = t0idx
+                        if is_proper_temp(stemp[tx]):
+                            ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[tx],stemp[tidx],d)
+                        else:
+                            ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[tidx],stemp[tidx],d)
+                        st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','DROP {0}'),stringfromseconds(timex[tidx]-t0,False))
+                        if self.graphfont == 1:
+                            st1 = self.__to_ascii(st1)
+                        a = self.backgroundalpha if timeindex2 else 1.0
+                        e = 0
 
-                    time_temp_annos = self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,6+anno_key_offset)
-                    if time_temp_annos is not None:
-                        anno_artists += time_temp_annos
-
+                        time_temp_annos = self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a,draggable,6+anno_key_offset)
+                        if time_temp_annos is not None:
+                            anno_artists += time_temp_annos
+                    if len(anno_artists) == 0: # HACK: if add a fake anno if None was added up to here to avoid this fc axvspan to render in darker yellow
+                        fake_anno = self.annotate(-1, '', 0,0,0,0)
+                        anno_artists += fake_anno
                     #do water mark if FCs, but no FCe nor SCs nor SCe
                     if timeindex[2] and not timeindex[3] and not timeindex[4] and not timeindex[5] and not timeindex2 and self.watermarksflag:
                         fc_artist = self.ax.axvspan(timex[timeindex[2]],timex[tidx], facecolor=self.palette['watermarks'], alpha=0.2)
@@ -7222,6 +7250,11 @@ class tgraphcanvas(FigureCanvas):
                             sc_artist.set_in_layout(False) # remove title from tight_layout calculation
                         except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
                             pass
+
+                if len(anno_artists) == 0: # HACK: if add a fake anno if None was added up to here to avoid this fc axvspan to render in darker yellow
+                    fake_anno = self.annotate(-1, '', 0,0,0,0)
+                    anno_artists += fake_anno
+
                 # add COOL mark
                 if timeindex[7] and not timeindex2:
                     tidx = timeindex[7]
@@ -7234,6 +7267,7 @@ class tgraphcanvas(FigureCanvas):
                             cool_mark.set_in_layout(False) # remove title from tight_layout calculation
                         except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
                             pass
+
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
@@ -8753,17 +8787,24 @@ class tgraphcanvas(FigureCanvas):
                                 startB = 0
                             try:
                                 # background annotations are not draggable
-                                self.l_background_annotations.extend(self.place_annotations(
-                                    -1, # TP_index
-                                    d,
-                                    self.timeB,
-                                    self.timeindexB,
-                                    self.temp2B,
-                                    self.stemp2B,
-                                    startB,
-                                    self.timeindex, # timeindex2
-                                    TP_time_loaded=self.TP_time_B_loaded,
-                                    draggable=True))
+                                if self.backgroundETcurve or self.backgroundBTcurve:
+                                    if self.backgroundBTcurve:
+                                        temp_curve = self.temp2B
+                                        stemp_curve = self.stemp2B
+                                    else:
+                                        temp_curve = self.temp1B
+                                        stemp_curve = self.stemp1B
+                                    self.l_background_annotations.extend(self.place_annotations(
+                                        -1, # TP_index
+                                        d,
+                                        self.timeB,
+                                        self.timeindexB,
+                                        temp_curve,
+                                        stemp_curve,
+                                        startB,
+                                        self.timeindex, # timeindex2
+                                        TP_time_loaded=self.TP_time_B_loaded,
+                                        draggable=True))
                             except Exception: # pylint: disable=broad-except
                                 pass
 
@@ -9284,6 +9325,8 @@ class tgraphcanvas(FigureCanvas):
                                         if self.eventsGraphflag == 4 and self.specialeventstype[i] < 4 and self.showEtypes[self.specialeventstype[i]] and len(evalues[self.specialeventstype[i]])>0:
                                             tempo = evalues[self.specialeventstype[i]][0]
                                             evalues[self.specialeventstype[i]] = evalues[self.specialeventstype[i]][1:]
+                                        else:
+                                            break # no more events to be drawn
 
                                         if tempo is not None and self.showEtypes[self.specialeventstype[i]]:
                                             if self.specialeventstype[i] == 0:
@@ -9574,13 +9617,19 @@ class tgraphcanvas(FigureCanvas):
                             self.labels.append(self.aw.arabicReshape(self.etypesf(3)))
 
                     if not self.designerflag:
-                        if self.BTcurve:
+                        if self.BTcurve or self.ETcurve:
+                            if self.BTcurve:
+                                temp_curve = self.temp2
+                                stemp_curve_foreground = self.stemp2
+                            else:
+                                temp_curve = self.temp1
+                                stemp_curve_foreground = self.stemp1
                             if self.flagstart: # no smoothed lines in this case, pass normal BT
                                 self.l_annotations = self.place_annotations(
                                     self.TPalarmtimeindex,
                                     self.ylimit - self.ylimit_min,
                                     self.timex,self.timeindex,
-                                    self.temp2,self.temp2)
+                                    temp_curve, temp_curve)
                             else:
                                 TP_index = self.aw.findTP()
                                 if self.annotationsflag != 0:
@@ -9588,8 +9637,8 @@ class tgraphcanvas(FigureCanvas):
                                         TP_index,self.ylimit - self.ylimit_min,
                                         self.timex,
                                         self.timeindex,
-                                        self.temp2,
-                                        self.stemp2)
+                                        temp_curve,
+                                        stemp_curve_foreground)
                                 if self.timeindex[6]:
                                     self.writestatistics(TP_index)
                             #add the time and temp annotations to the bt list
@@ -12007,6 +12056,7 @@ class tgraphcanvas(FigureCanvas):
                         st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation', 'CHARGE'))
                         st1 = self.__dijstra_to_ascii(st1)
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
+                            self.ystep_down, self.ystep_up = 0, 0
                             try:
                                 self.l_annotations[-1].remove()
                             except Exception: # pylint: disable=broad-except
@@ -12067,17 +12117,17 @@ class tgraphcanvas(FigureCanvas):
                             pass
                         self.xaxistosm(redraw=False) # need to fix uneven x-axis labels like -0:13
 
-                        if self.BTcurve:
-                            # only if BT is shown we place the annotation:
-                            d = self.ylimit - self.ylimit_min
-                            st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation', 'CHARGE'))
-                            st1 = self.__dijstra_to_ascii(st1)
-                            t2 = self.temp2[self.timeindex[0]]
-                            tx = self.timex[self.timeindex[0]]
-                            self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,t2,t2,d)
-                            time_temp_annos = self.annotate(t2,st1,tx,t2,self.ystep_up,self.ystep_down,draggable_anno_key=0)
-                            if time_temp_annos is not None:
-                                self.l_annotations += time_temp_annos
+                        if self.BTcurve or self.ETcurve:
+                            temp = (self.temp2[self.timeindex[0]] if self.BTcurve else self.temp1[self.timeindex[0]])
+                            if is_proper_temp(temp):
+                                d = self.ylimit - self.ylimit_min
+                                st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation', 'CHARGE'))
+                                st1 = self.__dijstra_to_ascii(st1)
+                                tx = self.timex[self.timeindex[0]]
+                                self.ystep_down,self.ystep_up = self.findtextgap(0,0,temp,temp,d)
+                                time_temp_annos = self.annotate(temp,st1,tx,temp,self.ystep_up,self.ystep_down,draggable_anno_key=0)
+                                if time_temp_annos is not None:
+                                    self.l_annotations += time_temp_annos
 
                         # mark active slider values that are not zero
                         for slidernr in range(4):
@@ -12149,21 +12199,23 @@ class tgraphcanvas(FigureCanvas):
     def markTP(self):
         try:
             self.profileDataSemaphore.acquire(1)
-            if self.flagstart and self.markTPflag and self.TPalarmtimeindex is not None and self.timeindex[0] != -1 and len(self.timex) > self.TPalarmtimeindex:
-                st = stringfromseconds(self.timex[self.TPalarmtimeindex]-self.timex[self.timeindex[0]],False)
-                st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','TP {0}').format(st))
-                #anotate temperature
-                d = self.ylimit - self.ylimit_min
-                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.TPalarmtimeindex],d)
-                time_temp_annos = self.annotate(self.temp2[self.TPalarmtimeindex],st1,self.timex[self.TPalarmtimeindex],self.temp2[self.TPalarmtimeindex],self.ystep_up,self.ystep_down,0,1.,draggable_anno_key=-1)
-                if time_temp_annos is not None:
-                    self.l_annotations += time_temp_annos
-                #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                self.updateBackground() # but we need to update the background cache with the new annotation
-                st2 = f'{self.temp2[self.TPalarmtimeindex]:.1f} {self.mode}'
-                message = QApplication.translate('Message','[TP] recorded at {0} BT = {1}').format(st,st2)
-                #set message at bottom
-                self.aw.sendmessage(message)
+            if self.flagstart and self.markTPflag and self.TPalarmtimeindex is not None and self.timeindex[0] != -1 and len(self.timex) > self.TPalarmtimeindex and (self.BTcurve or self.ETcurve):
+                temp = (self.temp2[self.TPalarmtimeindex] if self.BTcurve else self.temp1[self.TPalarmtimeindex])
+                if is_proper_temp(temp):
+                    st = stringfromseconds(self.timex[self.TPalarmtimeindex]-self.timex[self.timeindex[0]],False)
+                    st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','TP {0}').format(st))
+                    #anotate temperature
+                    d = self.ylimit - self.ylimit_min
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,temp,temp,d)
+                    time_temp_annos = self.annotate(temp,st1,self.timex[self.TPalarmtimeindex],temp,self.ystep_up,self.ystep_down,0,1.,draggable_anno_key=-1)
+                    if time_temp_annos is not None:
+                        self.l_annotations += time_temp_annos
+                    #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
+                    self.updateBackground() # but we need to update the background cache with the new annotation
+                    st2 = f'{temp:.1f} {self.mode}'
+                    message = QApplication.translate('Message','[TP] recorded at {0} BT = {1}').format(st,st2)
+                    #set message at bottom
+                    self.aw.sendmessage(message)
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
@@ -12198,6 +12250,7 @@ class tgraphcanvas(FigureCanvas):
                         st = stringfromseconds(self.timex[self.timeindex[1]]-start,False)
                         DE_str = self.aw.arabicReshape(QApplication.translate('Scope Annotation','DE {0}').format(st))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == DE_str:
+                            self.ystep_down, self.ystep_up = 0, 0
                             try:
                                 self.l_annotations[-1].remove()
                             except Exception: # pylint: disable=broad-except
@@ -12221,21 +12274,27 @@ class tgraphcanvas(FigureCanvas):
                                 self.timeindex[1] = max(0,len(self.timex)-1)
                             else:
                                 return
-                        if self.phasesbuttonflag:
+                        if self.phasesbuttonflag and is_proper_temp(self.temp2[self.timeindex[1]]):
                             self.phases[1] = int(round(self.temp2[self.timeindex[1]]))
-                        if self.BTcurve:
-                            # only if BT is shown we place the annotation:
-                            #calculate time elapsed since charge time
-                            st = stringfromseconds(self.timex[self.timeindex[1]]-start,False)
-                            st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','DE {0}').format(st))
-                            #anotate temperature
-                            d = self.ylimit - self.ylimit_min
-                            self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]],d)
-                            time_temp_annos = self.annotate(self.temp2[self.timeindex[1]],st1,self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]],self.ystep_up,self.ystep_down,draggable_anno_key=1)
-                            if time_temp_annos is not None:
-                                self.l_annotations += time_temp_annos
-                            #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                            self.updateBackground() # but we need
+                        if self.BTcurve or self.ETcurve:
+                            temp_CHARGE = ((self.temp2[self.timeindex[0]] if self.BTcurve else self.temp1[self.timeindex[0]]) if self.timeindex[0] != -1 else -1)
+                            temp = (self.temp2[self.timeindex[1]] if self.BTcurve else self.temp1[self.timeindex[1]])
+                            if is_proper_temp(temp):
+                                # only if BT is shown we place the annotation:
+                                #calculate time elapsed since charge time
+                                st = stringfromseconds(self.timex[self.timeindex[1]]-start,False)
+                                st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','DE {0}').format(st))
+                                #anotate temperature
+                                d = self.ylimit - self.ylimit_min
+                                if self.timeindex[0] != -1 and is_proper_temp(temp_CHARGE):
+                                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,temp_CHARGE,temp,d)
+                                else:
+                                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,temp,temp,d)
+                                time_temp_annos = self.annotate(temp,st1,self.timex[self.timeindex[1]],temp,self.ystep_up,self.ystep_down,draggable_anno_key=1)
+                                if time_temp_annos is not None:
+                                    self.l_annotations += time_temp_annos
+                                #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
+                                self.updateBackground() # but we need
 
                         self.phasesLCDmode = self.phasesLCDmode_l[1]
 
@@ -12310,6 +12369,7 @@ class tgraphcanvas(FigureCanvas):
                         self.autoFCsenabled = False
                         st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','FCs {0}').format(stringfromseconds(self.timex[self.timeindex[2]]-start,False)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
+                            self.ystep_down, self.ystep_up = 0, 0
                             try:
                                 self.l_annotations[-1].remove()
                             except Exception: # pylint: disable=broad-except
@@ -12334,22 +12394,25 @@ class tgraphcanvas(FigureCanvas):
                                 self.timeindex[2] = max(0,len(self.timex)-1)
                             else:
                                 return
-                        if self.phasesbuttonflag:
+                        if self.phasesbuttonflag and is_proper_temp(self.temp2[self.timeindex[2]]):
                             self.phases[2] = int(round(self.temp2[self.timeindex[2]]))
-                        if self.BTcurve:
-                            # only if BT is shown we place the annotation:
-                            #calculate time elapsed since charge time
-                            st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','FCs {0}').format(stringfromseconds(self.timex[self.timeindex[2]]-start,False)))
-                            d = self.ylimit - self.ylimit_min
-                            if self.timeindex[1]:
-                                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]],d)
-                            else:
-                                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[2]],d)
-                            time_temp_annos = self.annotate(self.temp2[self.timeindex[2]],st1,self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]],self.ystep_up,self.ystep_down,draggable_anno_key=2)
-                            if time_temp_annos is not None:
-                                self.l_annotations += time_temp_annos
-                            #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                            self.updateBackground() # but we need
+                        if self.BTcurve or self.ETcurve:
+                            temp_DRY = ((self.temp2[self.timeindex[1]] if self.BTcurve else self.temp1[self.timeindex[1]]) if self.timeindex[1] else -1)
+                            temp = (self.temp2[self.timeindex[2]] if self.BTcurve else self.temp1[self.timeindex[2]])
+                            if is_proper_temp(temp):
+                                # only if BT is shown we place the annotation:
+                                #calculate time elapsed since charge time
+                                st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','FCs {0}').format(stringfromseconds(self.timex[self.timeindex[2]]-start,False)))
+                                d = self.ylimit - self.ylimit_min
+                                if self.timeindex[1] and is_proper_temp(temp_DRY):
+                                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,temp_DRY,temp,d)
+                                else:
+                                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,temp,temp,d)
+                                time_temp_annos = self.annotate(temp,st1,self.timex[self.timeindex[2]],temp,self.ystep_up,self.ystep_down,draggable_anno_key=2)
+                                if time_temp_annos is not None:
+                                    self.l_annotations += time_temp_annos
+                                #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
+                                self.updateBackground() # but we need
 
                         self.phasesLCDmode = self.phasesLCDmode_l[2]
                 else:
@@ -12421,6 +12484,7 @@ class tgraphcanvas(FigureCanvas):
                         # undo wrongly set FCe
                         st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','FCe {0}').format(stringfromseconds(self.timex[self.timeindex[3]]-start,False)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
+                            self.ystep_down, self.ystep_up = 0, 0
                             try:
                                 self.l_annotations[-1].remove()
                             except Exception: # pylint: disable=broad-except
@@ -12444,17 +12508,23 @@ class tgraphcanvas(FigureCanvas):
                                 self.timeindex[3] = max(0,len(self.timex)-1)
                             else:
                                 return
-                        if self.BTcurve:
-                            # only if BT is shown we place the annotation:
-                            #calculate time elapsed since charge time
-                            st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','FCe {0}').format(stringfromseconds(self.timex[self.timeindex[3]]-start,False)))
-                            d = self.ylimit - self.ylimit_min
-                            self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]],d)
-                            time_temp_annos = self.annotate(self.temp2[self.timeindex[3]],st1,self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]],self.ystep_up,self.ystep_down,draggable_anno_key=3)
-                            if time_temp_annos is not None:
-                                self.l_annotations += time_temp_annos
-                            #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                            self.updateBackground() # but we need
+                        if self.BTcurve or self.ETcurve:
+                            temp_FCs = ((self.temp2[self.timeindex[2]] if self.BTcurve else self.temp1[self.timeindex[2]]) if self.timeindex[2] else -1)
+                            temp = (self.temp2[self.timeindex[3]] if self.BTcurve else self.temp1[self.timeindex[3]])
+                            if is_proper_temp(temp):
+                                # only if BT is shown we place the annotation:
+                                #calculate time elapsed since charge time
+                                st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','FCe {0}').format(stringfromseconds(self.timex[self.timeindex[3]]-start,False)))
+                                d = self.ylimit - self.ylimit_min
+                                if self.timeindex[2] and is_proper_temp(temp_FCs):
+                                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,temp_FCs,temp,d)
+                                else:
+                                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,temp,temp,d)
+                                time_temp_annos = self.annotate(temp,st1,self.timex[self.timeindex[3]],temp,self.ystep_up,self.ystep_down,draggable_anno_key=3)
+                                if time_temp_annos is not None:
+                                    self.l_annotations += time_temp_annos
+                                #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
+                                self.updateBackground() # but we need
                 else:
                     message = QApplication.translate('Message','FC END: Scope is not recording')
                     self.aw.sendmessage(message)
@@ -12526,6 +12596,7 @@ class tgraphcanvas(FigureCanvas):
                         # undo wrongly set FCs
                         st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','SCs {0}').format(stringfromseconds(self.timex[self.timeindex[4]]-start,False)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
+                            self.ystep_down, self.ystep_up = 0, 0
                             try:
                                 self.l_annotations[-1].remove()
                             except Exception: # pylint: disable=broad-except
@@ -12549,19 +12620,22 @@ class tgraphcanvas(FigureCanvas):
                                 self.timeindex[4] = max(0,len(self.timex)-1)
                             else:
                                 return
-                        if self.BTcurve:
-                            # only if BT is shown we place the annotation:
-                            st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','SCs {0}').format(stringfromseconds(self.timex[self.timeindex[4]]-start,False)))
-                            d = self.ylimit - self.ylimit_min
-                            if self.timeindex[3]:
-                                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[3]],self.temp2[self.timeindex[4]],d)
-                            else:
-                                self.ystep_down,self.ystep_up = self.findtextgap(0,0,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[4]],d)
-                            time_temp_annos = self.annotate(self.temp2[self.timeindex[4]],st1,self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]],self.ystep_up,self.ystep_down,draggable_anno_key=4)
-                            if time_temp_annos is not None:
-                                self.l_annotations += time_temp_annos
-                            #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                            self.updateBackground() # but we need
+                        if self.BTcurve or self.ETcurve:
+                            temp_FCe = ((self.temp2[self.timeindex[3]] if self.BTcurve else self.temp1[self.timeindex[3]]) if self.timeindex[3] else -1)
+                            temp = (self.temp2[self.timeindex[4]] if self.BTcurve else self.temp1[self.timeindex[4]])
+                            if is_proper_temp(temp):
+                                # only if BT is shown we place the annotation:
+                                st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','SCs {0}').format(stringfromseconds(self.timex[self.timeindex[4]]-start,False)))
+                                d = self.ylimit - self.ylimit_min
+                                if self.timeindex[3] and is_proper_temp(temp_FCe):
+                                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,temp_FCe,temp,d)
+                                else:
+                                    self.ystep_down,self.ystep_up = self.findtextgap(0,0,temp,temp,d)
+                                time_temp_annos = self.annotate(temp,st1,self.timex[self.timeindex[4]],temp,self.ystep_up,self.ystep_down,draggable_anno_key=4)
+                                if time_temp_annos is not None:
+                                    self.l_annotations += time_temp_annos
+                                #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
+                                self.updateBackground() # but we need
                 else:
                     message = QApplication.translate('Message','SC START: Scope is not recording')
                     self.aw.sendmessage(message)
@@ -12640,6 +12714,7 @@ class tgraphcanvas(FigureCanvas):
                         # undo wrongly set FCs
                         st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','SCe {0}').format(stringfromseconds(self.timex[self.timeindex[5]]-start,False)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
+                            self.ystep_down, self.ystep_up = 0, 0
                             try:
                                 self.l_annotations[-1].remove()
                             except Exception: # pylint: disable=broad-except
@@ -12663,16 +12738,22 @@ class tgraphcanvas(FigureCanvas):
                                 self.timeindex[5] = max(0,len(self.timex)-1)
                             else:
                                 return
-                        if self.BTcurve:
-                            # only if BT is shown we place the annotation:
-                            st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','SCe {0}').format(stringfromseconds(self.timex[self.timeindex[5]]-start,False)))
-                            d = self.ylimit - self.ylimit_min
-                            self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]],d)
-                            time_temp_annos = self.annotate(self.temp2[self.timeindex[5]],st1,self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]],self.ystep_up,self.ystep_down,draggable_anno_key=5)
-                            if time_temp_annos is not None:
-                                self.l_annotations += time_temp_annos
-                            #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                            self.updateBackground() # but we need
+                        if self.BTcurve or self.ETcurve:
+                            temp_SCs = ((self.temp2[self.timeindex[4]] if self.BTcurve else self.temp1[self.timeindex[4]]) if self.timeindex[4] else -1)
+                            temp = (self.temp2[self.timeindex[5]] if self.BTcurve else self.temp1[self.timeindex[5]])
+                            if is_proper_temp(temp):
+                                # only if BT is shown we place the annotation:
+                                st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','SCe {0}').format(stringfromseconds(self.timex[self.timeindex[5]]-start,False)))
+                                d = self.ylimit - self.ylimit_min
+                                if self.timeindex[4] and is_proper_temp(self.temp2[self.timeindex[4]]):
+                                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,temp_SCs,temp,d)
+                                else:
+                                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,temp,temp,d)
+                                time_temp_annos = self.annotate(temp,st1,self.timex[self.timeindex[5]],temp,self.ystep_up,self.ystep_down,draggable_anno_key=5)
+                                if time_temp_annos is not None:
+                                    self.l_annotations += time_temp_annos
+                                #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
+                                self.updateBackground() # but we need
                 else:
                     message = QApplication.translate('Message','SC END: Scope is not recording')
                     self.aw.sendmessage(message)
@@ -12752,6 +12833,7 @@ class tgraphcanvas(FigureCanvas):
                         self.autoDROPenabled = False
                         st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','DROP {0}').format(stringfromseconds(self.timex[self.timeindex[6]]-start,False)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
+                            self.ystep_down, self.ystep_up = 0, 0
                             try:
                                 self.l_annotations[-1].remove()
                             except Exception: # pylint: disable=broad-except
@@ -12785,25 +12867,38 @@ class tgraphcanvas(FigureCanvas):
                                 self.timeindex[6] = max(0,len(self.timex)-1)
                             else:
                                 return
-                        if self.BTcurve:
-                            # only if BT is shown we place the annotation:
-                            st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','DROP {0}').format(stringfromseconds(self.timex[self.timeindex[6]]-start,False)))
-                            d = self.ylimit - self.ylimit_min
-                            if self.timeindex[5]:
-                                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[5]],self.temp2[self.timeindex[6]],d)
-                            elif self.timeindex[4]:
-                                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[6]],d)
-                            elif self.timeindex[3]:
-                                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[3]],self.temp2[self.timeindex[6]],d)
-                            elif self.timeindex[2]:
-                                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[6]],d)
-                            elif self.timeindex[1]:
-                                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]],d)
-                            time_temp_annos = self.annotate(self.temp2[self.timeindex[6]],st1,self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]],19,19,draggable_anno_key=6)
-                            if time_temp_annos is not None:
-                                self.l_annotations += time_temp_annos
-                            #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                            self.updateBackground() # but we need
+                        if self.BTcurve or self.ETcurve:
+                            temp = (self.temp2[self.timeindex[6]] if self.BTcurve else self.temp1[self.timeindex[6]])
+                            if is_proper_temp(temp):
+                                # only if BT is shown we place the annotation:
+                                st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','DROP {0}').format(stringfromseconds(self.timex[self.timeindex[6]]-start,False)))
+                                d = self.ylimit - self.ylimit_min
+
+                                tx = -1
+                                if self.timeindex[5] and is_proper_temp(self.temp2[self.timeindex[5]]):
+                                    tx = self.timeindex[5]
+                                elif self.timeindex[4] and is_proper_temp(self.temp2[self.timeindex[4]]):
+                                    tx = self.timeindex[4]
+                                elif self.timeindex[3] and is_proper_temp(self.temp2[self.timeindex[3]]):
+                                    tx = self.timeindex[3]
+                                elif self.timeindex[2] and is_proper_temp(self.temp2[self.timeindex[2]]):
+                                    tx = self.timeindex[2]
+                                elif self.timeindex[1] and is_proper_temp(self.temp2[self.timeindex[1]]):
+                                    tx = self.timeindex[1]
+                                if tx == -1:
+                                    self.ystep_down = 19
+                                    self.ystep_up = 19
+                                else:
+                                    temp_event = (self.temp2[tx] if self.BTcurve else self.temp1[tx])
+                                    if is_proper_temp(temp_event):
+                                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,temp_event,temp,d)
+                                    else:
+                                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,temp,temp,d)
+                                time_temp_annos = self.annotate(temp,st1,self.timex[self.timeindex[6]],temp,self.ystep_up,self.ystep_down,draggable_anno_key=6)
+                                if time_temp_annos is not None:
+                                    self.l_annotations += time_temp_annos
+                                #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
+                                self.updateBackground() # but we need to update the background!
 
                         try:
                             # update ambient temperature if a ambient temperature source is configured and no value yet established
@@ -12919,6 +13014,7 @@ class tgraphcanvas(FigureCanvas):
                         st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','CE {0}').format(stringfromseconds(self.timex[self.timeindex[7]] - start)))
 
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
+                            self.ystep_down, self.ystep_up = 0, 0
                             try:
                                 self.l_annotations[-1].remove()
                             except Exception: # pylint: disable=broad-except
@@ -12943,18 +13039,24 @@ class tgraphcanvas(FigureCanvas):
                                 self.timeindex[7] = max(0,len(self.timex)-1)
                             else:
                                 return
-                        if self.BTcurve:
-                            # only if BT is shown we place the annotation:
-                            #calculate time elapsed since charge time
-                            st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','CE {0}').format(stringfromseconds(self.timex[self.timeindex[7]] - start)))
-                            #anotate temperature
-                            d = self.ylimit - self.ylimit_min
-                            self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[6]],self.temp2[self.timeindex[7]],d)
-                            time_temp_annos = self.annotate(self.temp2[self.timeindex[7]],st1,self.timex[self.timeindex[7]],self.temp2[self.timeindex[7]],self.ystep_up,self.ystep_down,draggable_anno_key=7)
-                            if time_temp_annos is not None:
-                                self.l_annotations += time_temp_annos
-                            #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                            self.updateBackground() # but we need
+                        if self.BTcurve or self.ETcurve:
+                            temp_DROP = ((self.temp2[self.timeindex[6]] if self.BTcurve else self.temp1[self.timeindex[6]]) if self.timeindex[6] else -1)
+                            temp = (self.temp2[self.timeindex[7]] if self.BTcurve else self.temp1[self.timeindex[7]])
+                            if is_proper_temp(temp):
+                                # only if BT is shown we place the annotation:
+                                #calculate time elapsed since charge time
+                                st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','CE {0}').format(stringfromseconds(self.timex[self.timeindex[7]] - start)))
+                                #anotate temperature
+                                d = self.ylimit - self.ylimit_min
+                                if self.timeindex[6] and is_proper_temp(temp_DROP):
+                                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,temp_DROP,temp,d)
+                                else:
+                                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,temp,temp,d)
+                                time_temp_annos = self.annotate(temp,st1,self.timex[self.timeindex[7]],temp,self.ystep_up,self.ystep_down,draggable_anno_key=7)
+                                if time_temp_annos is not None:
+                                    self.l_annotations += time_temp_annos
+                                #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
+                                self.updateBackground() # but we need
                 else:
                     message = QApplication.translate('Message','COOL: Scope is not recording')
                     self.aw.sendmessage(message)
@@ -13881,9 +13983,12 @@ class tgraphcanvas(FigureCanvas):
                         fmtstr = '{2:.' + d + 'f}{3}'
 
                     unit = self.aw.arabicReshape(self.mode + '/min')
-                    st1 = st1 + fmtstr.format(rates_of_changes[3], self.mode, rates_of_changes[0], unit)
-                    st2 = st2 + fmtstr.format(rates_of_changes[4], self.mode, rates_of_changes[1], unit)
-                    st3 = st3 + fmtstr.format(rates_of_changes[5], self.mode, rates_of_changes[2], unit)
+                    if rates_of_changes[3] != -1:
+                        st1 = st1 + fmtstr.format(rates_of_changes[3], self.mode, rates_of_changes[0], unit)
+                    if rates_of_changes[4] != -1:
+                        st2 = st2 + fmtstr.format(rates_of_changes[4], self.mode, rates_of_changes[1], unit)
+                    if rates_of_changes[5] != -1:
+                        st3 = st3 + fmtstr.format(rates_of_changes[5], self.mode, rates_of_changes[2], unit)
 
                     text = self.ax.text(self.timex[self.timeindex[0]] + self.statisticstimes[1]/2.,statisticslower,st1,
                         color=self.palette['text'],
