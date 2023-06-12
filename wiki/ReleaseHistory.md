@@ -35,7 +35,6 @@ v2.8.4 (June X, 2023)
   - improved drag-and-drop action in custom event button table (hold ALT (Windows) or OPTION (macOS) key to swap instead of move)
   - joins Phidget APIs such that PWM Command out() and IO Command set() commands can both be used on one attached module
   - updated machine setups (Besca automatic and full automatic, Giesen, Hottop KN-8828B-2K+, Kuban Supreme Automatic, NOR A Series, Probat P Series III, Twino Ozstar) to take advantage of button label translations
-  - updates machine settings to take advantage of translated button label substitutions
   - adds roaster batch size defaults for machine setups
   - if different from the system default, use current serial port or current IP host as default on running a machine setup
   - extended localizations

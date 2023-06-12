@@ -8988,7 +8988,7 @@ class tgraphcanvas(FigureCanvas):
                             for i in range(Nevents):
                                 pos = max(0,int(round((self.specialeventsvalue[i]-1)*10)))
                                 txx = self.timex[self.specialevents[i]]
-                                skip_event = ((not self.foregroundShowFullflag and (not self.autotimex or self.autotimexMode == 0) and self.timeindex[0] > -1 and txx < self.timex[self.timeindex[0]]) or
+                                skip_event = not self.flagstart and ((not self.foregroundShowFullflag and (not self.autotimex or self.autotimexMode == 0) and self.timeindex[0] > -1 and txx < self.timex[self.timeindex[0]]) or
                                             (not self.foregroundShowFullflag and self.timeindex[6] > 0 and txx > self.timex[self.timeindex[6]]))
                                 try:
                                     if self.specialeventstype[i] == 0 and self.showEtypes[0]:
@@ -9325,8 +9325,6 @@ class tgraphcanvas(FigureCanvas):
                                         if self.eventsGraphflag == 4 and self.specialeventstype[i] < 4 and self.showEtypes[self.specialeventstype[i]] and len(evalues[self.specialeventstype[i]])>0:
                                             tempo = evalues[self.specialeventstype[i]][0]
                                             evalues[self.specialeventstype[i]] = evalues[self.specialeventstype[i]][1:]
-                                        else:
-                                            break # no more events to be drawn
 
                                         if tempo is not None and self.showEtypes[self.specialeventstype[i]]:
                                             if self.specialeventstype[i] == 0:

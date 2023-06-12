@@ -29,7 +29,7 @@ pyinstaller==5.10.1 #5.9.0 # binary build with pyinstaller 4.8 fails on setuptoo
 keyring==23.13.1 #23.9.3  # builds with 19.3.0 and 20.0.0 fail with py2app/pyinstaller
 SecretStorage==3.3.3 #3.3.1
 lxml==4.9.2 #4.7.1
-prettytable==3.7.0 #3.5.0 # >1.0.0 fail to be packed by py2app, but a monkey patch in main.py helps
+prettytable==3.8.0 #3.7.0 # >1.0.0 fail to be packed by py2app, but a monkey patch in main.py helps
 #
 # NOTES:
 # keyring needs the GnomeKeyring package installed for plus to remember the passwords
