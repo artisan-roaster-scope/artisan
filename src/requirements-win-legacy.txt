@@ -3,7 +3,7 @@
 ######
 # the following commented package versions are read by appveyor.
 #
-# pyinstaller==5.11.0 #5.10.1  #built during the appveyor ci process
+# pyinstaller==5.12.0 #5.10.1  #built during the appveyor ci process
 # libusb==1.2.6.0     #downloaded during the appveyor ci process
 #
 ######
