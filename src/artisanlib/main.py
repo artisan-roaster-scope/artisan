@@ -615,7 +615,9 @@ _log.info(
 _log.info('platform: %s',str(platform.platform()))
 
 
-if platform.system() == 'Windows':
+if platform.system().startswith('Windows'):
+    # on Windows we use the Fusion style per default which supports the dark mode
+    app.setStyle('Fusion')
     app.setWindowIcon(QIcon(os.path.join(getAppPath(),'artisan.png')))
 #    try:
 #        # activate scaling for hiDPI screen support on Windows

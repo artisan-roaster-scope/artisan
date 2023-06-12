@@ -2,7 +2,7 @@
 ; .nsi command line options:
 ;    /DPRODUCT_VERSION=ww.xx.yy.zz  -explicitly set the product version, default is 0.0.0.0
 ;    /DLEGACY=True|False            -True is a build for legacy Windows, default is False
-;    /DSIGN=True|False              -True if the build is part of the process to sign files, default is False 
+;    /DSIGN=True|False              -True if the build is part of the process to sign files, default is False
 ;                                    Note: SignArtisan is not a part of the ci process
 ;
 ; installer command line options
@@ -128,7 +128,7 @@ VIProductVersion ${PRODUCT_VERSION}
 VIAddVersionKey ProductName "${PRODUCT_NAME}"
 VIAddVersionKey Comments "Installer for Artisan"
 VIAddVersionKey CompanyName ""
-VIAddVersionKey LegalCopyright "Copyright 2010-2022, Artisan developers. GNU General Public License"
+VIAddVersionKey LegalCopyright "Copyright 2010-2023, Artisan developers. GNU General Public License"
 VIAddVersionKey FileVersion "${PRODUCT_VERSION}"
 VIAddVersionKey FileDescription "${PRODUCT_NAME} Installer"
 VIAddVersionKey ProductVersion "${PRODUCT_VERSION}"
