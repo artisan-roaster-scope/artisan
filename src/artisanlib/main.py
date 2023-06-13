@@ -1439,6 +1439,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.plus_readonly:bool = False # True if the plus user has only read rights to the plus account (account might be deactivated, or user might be a read-only user)
 
         self.appearance:str = ''
+        # on Windows we use the Fusion style per default which supports the dark mode
+        if platform.system().startswith('Windows'):
+            self.appearance = 'fusion'
 
         # matplotlib font properties:
         self.mpl_fontproperties = mpl.font_manager.FontProperties()
@@ -17526,6 +17529,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             # set window appearances (style)
             if settings.contains('appearance'):
                 try:
+                    # on Windows we use the Fusion style per default which supports the dark mode
+                    if settings.value('appearance') == '':
+                        settings.setValue('appearance', 'fusion')
                     available = list(map(str, list(QStyleFactory.keys())))
                     i = [x.lower() for x in available].index(toString(settings.value('appearance')))
                     self.app.setStyle(available[i])

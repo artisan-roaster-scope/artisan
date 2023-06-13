@@ -1137,7 +1137,6 @@ class CurvesDlg(ArtisanDialog):
         self.styleComboBox.addItems(available)
         self.styleComboBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         try:
-            #ylint: disable=E1102
             self.styleComboBox.setCurrentIndex([x.lower() for x in available].index(self.aw.appearance.lower()))
         except Exception: # pylint: disable=broad-except
             pass
