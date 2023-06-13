@@ -21588,6 +21588,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     #find index with smallest abs() difference between self.qmc.phases[1] and BT (temp2)
     # phasesindex=1 => find DRY
     # phasesindex=2 => find FCs
+    # NOTE: if there is no BT, this fails to deliver proper results!
     def findDryEnd(self,TP_index=None,phasesindex=1):
         sd = 1000
         nsd = 1000

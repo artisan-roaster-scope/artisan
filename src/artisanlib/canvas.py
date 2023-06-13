@@ -13700,7 +13700,7 @@ class tgraphcanvas(FigureCanvas):
                     if tm != '00:00':
                         msg = f'{msg}, {tm}'
                     if self.beans and self.beans != '':
-                        msg = f'{msg} {abbrevString(self.beans,25)}'
+                        msg = f"{msg} {abbrevString(self.beans.replace(chr(10),' '),25)}"
                     if self.weight[0]:
                         if self.weight[2] in ['g','oz']:
                             msg += f'{sep}{self.aw.float2float(self.weight[0],0)}{self.weight[2]}'
@@ -13945,13 +13945,14 @@ class tgraphcanvas(FigureCanvas):
                     except Exception: # pylint: disable=broad-except
                         pass
                     if self.timeindex[2]: # only if FCs exists
-                        text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]/2.,statisticsupper,st2+ '  ' + midphaseP+'%',color=self.palette['text'],ha='center',
-                            fontsize='medium'
-                            )
-                        try:
-                            text.set_in_layout(False)
-                        except Exception: # pylint: disable=broad-except
-                            pass
+                        if self.statisticstimes[2]*100./self.statisticstimes[0]>1: # annotate only if mid phase is at least 1% of the total
+                            text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]/2.,statisticsupper,st2+ '  ' + midphaseP+'%',color=self.palette['text'],ha='center',
+                                fontsize='medium'
+                                )
+                            try:
+                                text.set_in_layout(False)
+                            except Exception: # pylint: disable=broad-except
+                                pass
                         text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]/2.,statisticsupper,st3 + '  ' + finishphaseP+ '%',color=self.palette['text'],ha='center',
                             fontsize='medium'
                             )
@@ -13997,14 +13998,15 @@ class tgraphcanvas(FigureCanvas):
                     except Exception: # pylint: disable=broad-except
                         pass
                     if self.timeindex[2]: # only if FCs exists
-                        text = self.ax.text(self.timex[self.timeindex[0]] + self.statisticstimes[1]+self.statisticstimes[2]/2.,statisticslower,st2,color=self.palette['text'],ha='center',
-                            #fontproperties=statsprop # fails be rendered in PDF exports on MPL v3.4.x
-                            fontsize='medium'
-                            )
-                        try:
-                            text.set_in_layout(False)
-                        except Exception: # pylint: disable=broad-except
-                            pass
+                        if self.statisticstimes[2]*100./self.statisticstimes[0]>1: # annotate only if mid phase is at least 1% of the total
+                            text = self.ax.text(self.timex[self.timeindex[0]] + self.statisticstimes[1]+self.statisticstimes[2]/2.,statisticslower,st2,color=self.palette['text'],ha='center',
+                                #fontproperties=statsprop # fails be rendered in PDF exports on MPL v3.4.x
+                                fontsize='medium'
+                                )
+                            try:
+                                text.set_in_layout(False)
+                            except Exception: # pylint: disable=broad-except
+                                pass
                         text = self.ax.text(self.timex[self.timeindex[0]] + self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]/2.,statisticslower,st3,color=self.palette['text'],ha='center',
                             #fontproperties=statsprop # fails be rendered in PDF exports on MPL v3.4.x
                             fontsize='medium'
