@@ -15650,7 +15650,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 # we block all signals emitted from this button until we received a response
                 self.buttonlist[lastbuttonpressed].blockSignals(True)
             try:
-                res:Optional[str] = self.kaleido.send_request(target, value, timeout=self.kaleido._send_button_timeout)
+                res:Optional[str] = self.kaleido.send_request(target, value, timeout=self.kaleido.send_button_timeout)
                 QApplication.processEvents() # let's consume events received after blocking
                 if res is not None:
                     try:
