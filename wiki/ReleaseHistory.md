@@ -66,10 +66,11 @@ v2.8.4 (June X, 2023)
   - fixes the +/- keyboard shortcuts for zooming to work accross all keyboard layouts
   - fixes Probatone control token release under "Keep ON"
   - fixes regression which allowed to define custom blends with total ratio larger than 100%
+  - fixes an issue sending multiple S7 commands via buttons as used in the Probat UG setups which could lead to a crash
   - ensures that rendering of axis respects curve style setting
   - persist ET marker size changes correctly
   - fixes of issues revealed by automatic static analyzers ([pylint](https://github.com/pylint-dev/pylint), [ruff](https://github.com/charliermarsh/ruff), [mypy](https://github.com/python/mypy), [pyright](https://github.com/microsoft/pyright))
-  - fixes a regression where events generated on CHARGE could be rendered at the wrong position
+  - fixes a regression where events generated on CHARGE could be rendered at wrong positions
 
 * REMOVALS
   - removes support for original *.txt profile format of Artisan v0.4.0 (2011) and earlier

@@ -8358,8 +8358,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                         args = c[len('kaleido'):]
                                         if args.startswith('(') and args.endswith(')'):
                                             comma_pos = args.index(',')
-                                            target = args[1:comma_pos]
-                                            vs:str = args[comma_pos+1:-1]
+                                            target = args[1:comma_pos].strip()
+                                            vs:str = args[comma_pos+1:-1].strip()
                                             try:
                                                 # <value> can be a formula like "1 - _" or "1 - $"
                                                 vs = str(eval(vs)) # pylint: disable=eval-used
@@ -8368,7 +8368,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                                 pass
                                             if eventtype is None:
                                                 # send message without awaiting a result
-                                                self.kaleidoSendMessageSignal.emit(target, vs)
+                                                if target in ['CS', 'HS']:
+                                                    # by clamping event type to -1 we fore kaleidoSendMessageAwait() to not generate an event, but just update the button state based on the response received
+                                                    self.kaleidoSendMessageAwaitSignal.emit(target, vs, -1, lastbuttonpressed)
+                                                else:
+                                                    self.kaleidoSendMessageSignal.emit(target, vs)
                                             else:
                                                 # button has relative event type and value set to 0 (decided in recordextraevent())! # used in relative +- event buttons receiving change from machine
                                                 # or event type is set to -1 and result of event action should be awaited and bound to $ changing event button state # used by toggle buttons
