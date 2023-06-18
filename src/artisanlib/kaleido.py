@@ -46,7 +46,7 @@ class State(TypedDict, total=False):
 class KaleidoPort():
 
     __slots__ = [ '_loop', '_thread', '_write_queue', '_default_data_stream', '_ping_timeout', '_open_timeout', '_init_timeout',
-            '_send_timeout', '_read_timeout', '_ping_retry_delay', '_reconnect_delay', '_state', '_pending_requests', '_logging' ]
+            '_send_timeout', '_send_button_timeout', '_read_timeout', '_ping_retry_delay', '_reconnect_delay', '_state', '_pending_requests', '_logging' ]
 
     def __init__(self) -> None:
         # internals
@@ -59,6 +59,7 @@ class KaleidoPort():
         self._init_timeout:Final[float] = 5
         self._ping_timeout:Final[float] = 0.7
         self._send_timeout:Final[float] = 0.3
+        self._send_button_timeout:Final[float] = 0.6
         self._read_timeout:Final[float] = 4
         self._ping_retry_delay:Final[float] = 1
         self._reconnect_delay:Final[float] = 1

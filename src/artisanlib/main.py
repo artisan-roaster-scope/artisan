@@ -15646,29 +15646,38 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     @pyqtSlot(str,str,int,int)
     def kaleidoSendMessageAwait(self, target:str, value:str, etype:int, lastbuttonpressed:int) -> None:
         if self.kaleido is not None:
-            res:Optional[str] = self.kaleido.send_request(target, value)
-            if res is not None:
-                try:
+            if etype == -1 and len(self.buttonlist)>lastbuttonpressed > -1:
+                # we block all signals emitted from this button until we received a response
+                self.buttonlist[lastbuttonpressed].blockSignals(True)
+            try:
+                res:Optional[str] = self.kaleido.send_request(target, value, timeout=self.kaleido._send_button_timeout)
+                QApplication.processEvents() # let's consume events received after blocking
+                if res is not None:
                     try:
-                        self.lastIOResult = float(res)
-                    except Exception: # pylint: disable=broad-except
-                        self.lastIOResult = None
-                    if etype == -1:
-                        if len(self.buttonlist)>lastbuttonpressed > -1:
-                            # we got a valid lastbutton which triggered this action and we set its state according to our result
-                            bv = toBool(res)
-                            #block resetting style of last button
-                            self.lastbuttonpressed = -1
-                            self.buttonStates[lastbuttonpressed] = int(bv)
-                            if bv:
-                                self.setExtraEventButtonStyleSignal.emit(lastbuttonpressed, 'pressed')
-                            else:
-                                self.setExtraEventButtonStyleSignal.emit(lastbuttonpressed, 'normal')
-                    elif etype>-1:
-                        new_value = int(round(float(res)))
-                        self.addEventSignal.emit(new_value, etype, True, False, False)
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
+                        try:
+                            self.lastIOResult = float(res)
+                        except Exception: # pylint: disable=broad-except
+                            self.lastIOResult = None
+                        if etype == -1:
+                            if len(self.buttonlist)>lastbuttonpressed > -1:
+                                # we got a valid lastbutton which triggered this action and we set its state according to our result
+                                bv = toBool(res)
+                                #block resetting style of last button
+                                self.lastbuttonpressed = -1
+                                self.buttonStates[lastbuttonpressed] = int(bv)
+                                if bv:
+                                    self.setExtraEventButtonStyleSignal.emit(lastbuttonpressed, 'pressed')
+                                else:
+                                    self.setExtraEventButtonStyleSignal.emit(lastbuttonpressed, 'normal')
+                        elif etype>-1:
+                            new_value = int(round(float(res)))
+                            self.addEventSignal.emit(new_value, etype, True, False, False)
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
+            finally:
+                if etype == -1 and len(self.buttonlist)>lastbuttonpressed > -1:
+                    # we unblock all signals emitted from this button until we received a response
+                    self.buttonlist[lastbuttonpressed].blockSignals(False)
 
     # removes window geometry and splitter settings from the given settings
     @staticmethod
