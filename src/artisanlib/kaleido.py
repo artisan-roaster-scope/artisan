@@ -46,7 +46,8 @@ class State(TypedDict, total=False):
 class KaleidoPort():
 
     __slots__ = [ '_loop', '_thread', '_write_queue', '_default_data_stream', '_ping_timeout', '_open_timeout', '_init_timeout',
-            '_send_timeout', 'send_button_timeout', '_read_timeout', '_ping_retry_delay', '_reconnect_delay', '_state', '_pending_requests', '_logging' ]
+            '_send_timeout', '_read_timeout', '_ping_retry_delay', '_reconnect_delay', 'send_button_timeout', '_single_await_var_prefix',
+            '_state', '_pending_requests', '_logging' ]
 
     def __init__(self) -> None:
         # internals
@@ -55,19 +56,24 @@ class KaleidoPort():
         self._write_queue: Optional['asyncio.Queue[str]']      = None # the write queue
 
         self._default_data_stream:Final[str] = 'A0'
-        self._open_timeout:Final[float] = 6
-        self._init_timeout:Final[float] = 6
-        self._ping_timeout:Final[float] = 0.8
-        self._send_timeout:Final[float] = 0.4
-        self._read_timeout:Final[float] = 4
-        self._ping_retry_delay:Final[float] = 1
-        self._reconnect_delay:Final[float] = 1
+        self._open_timeout:Final[float] = 6      # in seconds
+        self._init_timeout:Final[float] = 6      # in seconds
+        self._ping_timeout:Final[float] = 0.8    # in seconds
+        self._send_timeout:Final[float] = 0.4    # in seconds
+        self._read_timeout:Final[float] = 4      # in seconds
+        self._ping_retry_delay:Final[float] = 1  # in seconds
+        self._reconnect_delay:Final[float] = 1   # in seconds
 
-        self.send_button_timeout:Final[float] = 1.2
+        self.send_button_timeout:Final[float] = 1.2  # in seconds
 
-        # _state holds the last received data of the corresponding for known all tags
-        # if data for tag was not received yet, there its entry is still missing
+        # _state holds the last received data of the corresponding var for known all tags
+        # if data for tag was not received yet, its entry is still missing
         self._state:State = {}
+
+        # requests send via send_request with var=None use target as await_var prefixed with this string
+        # such requests are awating responses with a single var/value pair (but for sid) by using those prefixed vars
+        # to block request/reply processing via asyncio.Event locks until a corresponding response is received (with timeout)
+        self._single_await_var_prefix = '!'
 
         # associates var names to pending request asyncio.Event locks
         self._pending_requests: Dict[str, asyncio.Event] = {}
@@ -167,7 +173,8 @@ class KaleidoPort():
     async def get_state_async(self, var:str) -> Optional[Union[str,int,float]]:
         return self.get_state(var)
 
-    async def set_state(self, var:str, value:str) -> None:
+    # if single_res is True we assume the state is set from a single var/value pair response and thus we clear the var prefixed by _single_await_var_prefix
+    async def set_state(self, var:str, value:str, single_res:bool) -> None:
         if self.intVar(var):
             self._state[var] = int(round(float(value))) # type: ignore # TypedDict key must be a string literal
         elif self.strVar(var):
@@ -178,7 +185,11 @@ class KaleidoPort():
             except Exception: # pylint: disable=broad-except
                 # if conversion to a float failed (maybe an unknown tag), we still keep the reading as original string
                 self._state[var] = value # type: ignore # TypedDict key must be a string literal
-        await self.clear_request(var)
+        clear_var = var
+        if single_res:
+            # value received by a response with a single var/value pair thus we clear the prefixed variable
+            clear_var = self._single_await_var_prefix + var
+        await self.clear_request(clear_var)
 
     async def process_message(self, message:str) -> None:
         # message format '{<sid>[,<var>:<value>]*}'
@@ -189,11 +200,12 @@ class KaleidoPort():
             elems = message[1:-1].split(',')
             try:
                 sid:int = int(round(float(elems[0])))
-                await self.set_state('sid',str(sid))
+                await self.set_state('sid',str(sid),False)
+                single_res:bool = len(elems[1:]) == 1 # true if the response contains only one var/value pair
                 for el in elems[1:]:
                     comp = el.split(':')
                     if len(comp) > 1:
-                        await self.set_state(comp[0], comp[1])
+                        await self.set_state(comp[0], comp[1], single_res)
             except Exception as e:  # pylint: disable=broad-except
                 _log.exception(e)
 
@@ -203,12 +215,10 @@ class KaleidoPort():
         self._pending_requests[var] = asyncio.Event()
         return self._pending_requests[var]
 
-    async def clear_request(self, var) -> Optional[Union[str,int,float]]:
+    async def clear_request(self, var) -> None:
         if var in self._pending_requests:
             # clear and remove lock
             self._pending_requests.pop(var).set()
-        # return current value
-        return self.get_state(var)
 
 #---- WebSocket transport
 
@@ -504,27 +514,29 @@ class KaleidoPort():
                     _log.error(ex)
 
     # adds message to write queue and awaits new data for var
-    async def write_await(self, message:str, var:str) -> Optional[str]:
+    async def write_await(self, message:str, var:str, await_var:str) -> Optional[str]:
         if self._write_queue is None:
             return None
-        task = await self.add_request(var)
+        task = await self.add_request(await_var)
         await self._write_queue.put(message)
-        await task.wait()
+        await task.wait() # await a response containing a new value for var
         res = await self.get_state_async(var)
         return str(res)
 
     # <target> is the tag indicating the receiver of the <value>
-    # will await new data assigned to given <var>, if <var> is not given <var> is set to <target>
+    # will await new data assigned to given <var>, if <var> is not given, a response with a single <target>/value pair is awaited
+    # using the target prefixed by _single_await_var_prefix as async.Event lock variable
     def send_request(self, target:str, value:Optional[str] = None, var:Optional[str] = None, timeout:Optional[float] = None) -> Optional[str]:
         send_timeout:float = self._send_timeout
-        await_var:str
         if timeout is not None:
             send_timeout = timeout
-        await_var = (target if var is None else var)
+        # await_var is prefixed by _single_await_var_prefix to ensure that a response with a single <target>/value pair is awaited
+        variable:str = (target if var is None else var)
+        await_var:str = (self._single_await_var_prefix + target if var is None else var)
         if self._loop is not None:
             msg = self.create_msg(target, value)
             if self._write_queue is not None:
-                task = self.write_await(msg, await_var)
+                task = self.write_await(msg, variable, await_var)
                 if task is None:
                     return None
                 future = asyncio.run_coroutine_threadsafe(task, self._loop)
