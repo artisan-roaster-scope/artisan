@@ -500,6 +500,7 @@ class FujiPID():
         self.aw.pidcontrol.activateSVSlider(flag)
 
     def readcurrentsv(self):
+        val:float = -0.1
         if self.aw.ser.useModbusPort:
             reg = None
             #if control pid is fuji PXG4
@@ -512,9 +513,9 @@ class FujiPID():
             elif self.aw.ser.controlETpid[0] == 4:
                 reg = self.aw.modbus.address2register(self.PXF['sv?'][1],4)
             if reg is not None:
-                val = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,4)/10.
-            else:
-                val = -0.1
+                res = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,4)
+                if res is not None:
+                    val = res/10.
         else:
             command = ''
             #if control pid is fuji PXG4
@@ -525,7 +526,9 @@ class FujiPID():
                 command = self.message2send(self.aw.ser.controlETpid[1],4,self.PXR['sv?'][1],1)
             elif self.aw.ser.controlETpid[0] == 4:
                 command = self.message2send(self.aw.ser.controlETpid[1],4,self.PXF['sv?'][1],1)
-            val = self.readoneword(command)/10.
+            res = self.readoneword(command)
+            if res is not None:
+                val = res/10.
         if val != -0.1:
             return val
         return -1

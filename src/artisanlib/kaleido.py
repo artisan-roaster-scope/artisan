@@ -55,15 +55,15 @@ class KaleidoPort():
         self._write_queue: Optional['asyncio.Queue[str]']      = None # the write queue
 
         self._default_data_stream:Final[str] = 'A0'
-        self._open_timeout:Final[float] = 5
-        self._init_timeout:Final[float] = 5
-        self._ping_timeout:Final[float] = 0.7
-        self._send_timeout:Final[float] = 0.3
+        self._open_timeout:Final[float] = 6
+        self._init_timeout:Final[float] = 6
+        self._ping_timeout:Final[float] = 0.8
+        self._send_timeout:Final[float] = 0.4
         self._read_timeout:Final[float] = 4
         self._ping_retry_delay:Final[float] = 1
         self._reconnect_delay:Final[float] = 1
 
-        self.send_button_timeout:Final[float] = 0.6
+        self.send_button_timeout:Final[float] = 1.2
 
         # _state holds the last received data of the corresponding for known all tags
         # if data for tag was not received yet, there its entry is still missing
@@ -533,6 +533,8 @@ class KaleidoPort():
                     return res
                 except TimeoutError:
                     # the coroutine took too long, cancelling the task...
+                    if self._logging:
+                        _log.info('send_request timeout (msg=%s, timeout:%s)',msg.strip(),timeout)
                     future.cancel()
                 except Exception as ex: # pylint: disable=broad-except
                     _log.error(ex)
