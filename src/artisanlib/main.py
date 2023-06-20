@@ -5013,7 +5013,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             label = (action.text() if action.data()[1] == '' else f'{action.data()[1]} {action.text()}')
             label = label.replace('&&','&') # we reduce those && again to & that were introduced to have the & rendered in the menu entry
 #            string = QApplication.translate('Message', 'Configure for<br>{0}?<br><br>Your current settings will be overwritten!<br><br>It is advisable to save your current settings beforehand via menu Help >> Save Settings.').format(label)
-            string = QApplication.translate('Message', 'Configure for<br>{0}?<br><br>Some of your settings will be modified!<br><br>Before proceeding it is best to save your current settings and reset Artisan<br>(first menu {1} >> {2} then {1} >> {3})').format(label, QApplication.translate('Menu', 'Help'),QApplication.translate('Menu', 'Save Settings...'),QApplication.translate('Menu', 'Factory Reset'))
+            help_menu = QApplication.translate('Menu', 'Help')
+            string = QApplication.translate('Message', 'Configure for<br>{0}?<br><br>Some of your settings will be modified!<br><br>Before proceeding it is best to save your current settings and reset Artisan<br>(first menu {1} >> {2} then {4} >> {3})').format(label, help_menu, QApplication.translate('Menu', 'Save Settings...'),QApplication.translate('Menu', 'Factory Reset'),help_menu)
+#            string = QApplication.translate('Message', 'Configure for<br>{0}?<br><br>Some of your settings will be modified!<br><br>Before proceeding it is best to save your current settings and reset Artisan<br>(first menu {1} >> {2} then {1} >> {3})').format(label, QApplication.translate('Menu', 'Help'),QApplication.translate('Menu', 'Save Settings...'),QApplication.translate('Menu', 'Factory Reset'))
             reply = QMessageBox.question(self, QApplication.translate('Message', 'Adjust Settings'),string,
                 QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
             if reply == QMessageBox.StandardButton.Cancel:
@@ -8093,7 +8095,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                     try:
                                         args = eval(cs[len('button'):]) # pylint: disable=eval-used
                                     except Exception: # pylint: disable=broad-except
-                                        args = [c[len('button('):-1].strip()] # just a tag like True would fail to eval
+                                        arg = cs[len('button('):-1]
+                                        if ',' in arg and '(' not in arg:
+                                            # no function definition in arg, and exactly on comma, we split into the two args (could be just "button(1,false)" which does not eval above)
+                                            cs_a = [a.strip() for a in arg.split(',')]
+                                        else:
+                                            args = [c[len('button('):-1].strip()] # just a tag like true would fail to eval
                                     cs_len = 1
                                     if isinstance(args, (list, tuple)):
                                         cs_len = len(args)
@@ -8280,7 +8287,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                     try:
                                         cs_a = eval(c[len('button'):])  # pylint: disable=eval-used
                                     except Exception: # pylint: disable=broad-except
-                                        cs_a = [c[len('button('):-1].strip()]
+                                        arg = cs[len('button('):-1]
+                                        if ',' in arg and '(' not in arg:
+                                            # no function definition in arg, and exactly on comma, we split into the two args (could be just "button(1,false)" which does not eval above)
+                                            cs_a = [a.strip() for a in arg.split(',')]
+                                        else:
+                                            cs_a = [c[len('button('):-1].strip()]
                                     cs_len = 1
                                     if isinstance(cs_a, (list, tuple)):
                                         cs_len = len(cs_a)
@@ -8843,7 +8855,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                     try:
                                         args = eval(cs[len('button'):]) # pylint: disable=eval-used
                                     except Exception: # pylint: disable=broad-except
-                                        args = [c[len('button('):-1].strip()] # just a tag like True would fail to eval
+                                        arg = cs[len('button('):-1]
+                                        if ',' in arg and '(' not in arg:
+                                            # no function definition in arg, and exactly on comma, we split into the two args (could be just "button(1,false)" which does not eval above)
+                                            cs_a = [a.strip() for a in arg.split(',')]
+                                        else:
+                                            args = [c[len('button('):-1].strip()] # just a tag like True would fail to eval
                                     cs_len = 1
                                     if isinstance(args, (list, tuple)):
                                         cs_len = len(args)
@@ -9144,7 +9161,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                     try:
                                         cs_a = eval(cs[len('button'):])  # pylint: disable=eval-used
                                     except Exception: # pylint: disable=broad-except
-                                        cs_a = [cs[len('button('):-1].strip()]
+                                        arg = cs[len('button('):-1]
+                                        if ',' in arg and '(' not in arg:
+                                            # no function definition in arg, and exactly on comma, we split into the two args (could be just "button(1,false)" which does not eval above)
+                                            cs_a = [a.strip() for a in arg.split(',')]
+                                        else:
+                                            cs_a = [cs[len('button('):-1].strip()]
                                     cs_len = 1
                                     if isinstance(cs_a, (list, tuple)):
                                         cs_len = len(cs_a)
@@ -9699,7 +9721,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                 try:
                                     args = eval(cs[len('button'):]) # pylint: disable=eval-used
                                 except Exception: # pylint: disable=broad-except
-                                    args = [c[len('button('):-1].strip()] # just a tag like True would fail to eval
+                                    arg = cs[len('button('):-1]
+                                    if ',' in arg and '(' not in arg:
+                                        # no function definition in arg, and exactly on comma, we split into the two args (could be just "button(1,false)" which does not eval above)
+                                        cs_a = [a.strip() for a in arg.split(',')]
+                                    else:
+                                        args = [c[len('button('):-1].strip()] # just a tag like True would fail to eval
                                 cs_len = 1
                                 if isinstance(args, (list, tuple)):
                                     cs_len = len(args)
@@ -17542,8 +17569,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             # set window appearances (style)
             if settings.contains('appearance'):
                 try:
-                    # on Windows we use the Fusion style per default which supports the dark mode
-                    if settings.value('appearance') == '':
+                    # on Windows/Linux we use the Fusion style per default which supports the dark mode
+                    if not sys.platform.startswith('darwin') and settings.value('appearance') == '':
                         settings.setValue('appearance', 'fusion')
                     available = list(map(str, list(QStyleFactory.keys())))
                     i = [x.lower() for x in available].index(toString(settings.value('appearance')))

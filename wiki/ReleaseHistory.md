@@ -2,16 +2,16 @@ Detailed Release History
 ========================
 
 ----
-v2.8.4 (June X, 2023)
+v2.8.4 (June 21, 2023)
 ------------------
 
 
 * ADDITIONS
-  - adds support for [Kaleido](https://www.kaleido-roaster.com/) Network, Serial and Legacy protocols
-  - adds support for [IKAWA HOME/PRO](https://www.ikawacoffee.com/)
-  - adds Santoker Q Series and R Series support over serial (USB/Bluetooth)
+  - adds official support for [Kaleido]([https://www.kaleido-roaster.com/](https://artisan-scope.org/machines/kaleido/)) Network, Serial and Legacy protocols
+  - adds experimental support for [IKAWA HOME/PRO]([https://www.ikawacoffee.com/](https://artisan-scope.org/machines/ikawa/))
+  - adds [Santoker Q Series and R Series](https://artisan-scope.org/machines/santoker/) support over serial (USB/Bluetooth)
   - adds IKAWA URL import
-  - adds support for Phidget TMP1200_1
+  - adds support for [Phidget TMP1200_1](https://phidgets.com/?view=search&q=TMP1200)
   - adds keyboard shortcuts CTRL+ENTER (on macOS COMMAND+ENTER) to start recording and SHIFT+ENTER to stop logging
   - adds slider and quantifier step size 5
   - adds `Create Events` flag to Software PID
@@ -42,7 +42,7 @@ v2.8.4 (June X, 2023)
   - if different from the system default, use current serial port or current IP host as default on running a machine setup
   - extended localizations
   - pushes default max temperature axis limit to 275C / 527F (was 250C / 500F)
-  - upgrade to pymodbus 3.3, Qt/PyQt 6.5, matplotlib 3.7
+  - upgrade to [pymodbus 3.3](https://github.com/pymodbus-dev/pymodbus), [Qt/PyQt 6.5](https://riverbankcomputing.com/software/pyqt/intro), [matplotlib 3.7](https://github.com/matplotlib/matplotlib)
 
 * FIXES
   - fixes regression which broke MODBUS port scan ([Issue #1056](../../../issues/1056))
@@ -53,7 +53,7 @@ v2.8.4 (June X, 2023)
   - fixes pdf export unnecessary title abbreviation ([Issue #1077](../../../issues/1077))
   - removes extra trailing newline from environment variables on calling scripts ([Issue #1092](../../../issues/1092))
   - fixes startup issue under Linux Wayland ([Issue #1001](../../../issues/1001))
-  - fixes Ardino/TC PID source channel configuration in PID dialog ([Issue #1101](../../../issues/1101) & [Issue #1110](../../../issues/1110))
+  - fixes Arduino/TC4 PID source channel configuration in PID dialog ([Issue #1101](../../../issues/1101) & [Issue #1110](../../../issues/1110))
   - fixes a rare redraw issue caused by setting linewidth of extra lines to 0 ([Issue #1121](../../../issues/1121))
   - indicate slider focus also at 100% ([Issue #1126](../../../issues/1126))
   - fixes IO Command support for Phidget REL1101 ([Issue #1141](../../../issues/1141))
