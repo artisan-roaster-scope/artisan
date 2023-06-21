@@ -149,7 +149,7 @@ There are also legacy builds for Windows 8 (x64) and macOS 10.13.
   
 ## Cast
 
-__Rafael Cobo__ –– brain behind the project
+__Rafael Cobo__ –– initator of the project
 
 __[Marko Luther](/authors/luther/)__ –– maintainer
 
