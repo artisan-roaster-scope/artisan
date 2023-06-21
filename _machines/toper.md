@@ -10,7 +10,7 @@ header:
 sidebar:
   nav: "machines"
 ---
-<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge-grey.png" width="150px">
 
 * __Producer:__ [Toper](http://www.toper.com){:target="_blank"}, Turkey
 * __Machines:__ the "Toper PLC" setup works via a network connection with machines featuring an Omron PLC (Toper TKM-SX) or the Schneider Modicon PLC (Cafemino). The "Toper USB" setup works with some other Toper roasters that feature an USB connector.

@@ -10,8 +10,7 @@ header:
 sidebar:
   nav: "machines"
 ---
-
-<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge-grey.png" width="150px">
 
 * __Producer:__ [Roastmax Roasters](http://www.roastmaxroasters.com.au/){:target="_blank"}, Australia
 * __Machine:__ all machines

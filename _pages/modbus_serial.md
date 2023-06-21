@@ -52,6 +52,7 @@ Machine                         | Driver | Remarks
 [Golden Roasters](/machines/goldenroasters/) | CH34x
 [Has Garanti](/machines/hasgaranti/) | FTDI
 [HB](/machines/hb/) | CP210x
+[Kaleido](/machines/kaleido/) | CH34x
 [KapoK](/machines/kapok/) | CH34x
 [NOR](/machines/nor/) | FTDI | CH34x (on N Series V.4 old machines)
 [Nordic](/machines/nordic/) | PL2303

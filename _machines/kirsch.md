@@ -10,8 +10,7 @@ header:
 sidebar:
   nav: "machines"
 ---
-
-<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge-grey.png" width="150px">
 
 * __Producer:__ [KIRSCH + MAUSER](https://www.kirschundmausser.de){:target="_blank"}, Germany
 * __Machines:__ UG15/UG22 retro, G45 retro, and G Series machines with networked PLC

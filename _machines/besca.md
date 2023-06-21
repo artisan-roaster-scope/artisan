@@ -10,8 +10,7 @@ header:
 sidebar:
   nav: "machines"
 ---
-
-<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge-grey.png" width="150px">
 
 * __Producer:__ [Besca](https://www.bescaroasters.com){:target="_blank"}, Turkey
 * __Machine:__ all Shop and Industrial BSC Roasters as well as the Bee sample roasters

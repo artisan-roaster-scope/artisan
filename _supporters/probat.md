@@ -2,7 +2,7 @@
 layout: single
 permalink: /machines/probat/
 title: "Probat"
-excerpt: "Probatone 5/12/25, P Series"
+excerpt: "Probatone 5/12/25, P, G & UG"
 header:
   overlay_image: /assets/images/probat.jpg
   image: /assets/images/probat.jpg
@@ -19,8 +19,9 @@ sidebar:
   - Probatone Series II 5Kg/12Kg/25Kg with software option
      - small touch display (Wago PLC)
      - 7" touch display (Beckhof PLC)
-  - P Series ([Sample Roaster](https://www.probat.com/en/products/shoproaster/produkte/roasters/sample-roaster/), [1kg/5kg/12kg/25kg](https://www.probat.com/en/products/shoproaster/produkte/roasters/p-series-probatino/)) 
-* __Connection:__ MODBUS TCP or WebSocckets via the network
+  - P Series ([Sample Roaster](https://www.probat.com/en/products/shoproaster/produkte/roasters/sample-roaster/), [1kg/5kg/12kg/25kg](https://www.probat.com/en/products/shoproaster/produkte/roasters/p-series-probatino/))
+  - UG15/UG22 retro, G45 retro, and G Series machines with networked PLC
+* __Connection:__ MODBUS TCP, Siemens S7 or WebSocckets via the network
 * __Features:__ 
   - logging of environmental temperature (ET), bean temperature (BT), air pressure and related rate-of-rise curves
   - control of burner level, drum- and fan speed

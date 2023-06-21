@@ -31,22 +31,10 @@ gallery:
     image_path: /assets/images/bc-logo.jpg
     alt: "Buckeye Coffee"
     title: "Buckeye Coffee"
-  - url: http://www.roastmaxroasters.com.au
-    image_path: /assets/images/roastmax_logo.jpg
-    alt: "Roastmax"
-    title: "Roastmax"
-  - url: https://www.bescaroasters.com/
-    image_path: /assets/images/besca-logo.jpg
-    alt: "Besca Roasters"
-    title: "Besca Roasters"
-  - url: https://www.toper.com/
-    image_path: /assets/images/toper-logo.jpg
-    alt: "Toper"
-    title: "Toper"
-  - url: https://coffed.pl/
-    image_path: /assets/images/coffed-logo-light.png
-    alt: "Coffed"
-    title: "Coffed"
+  - url: https://sniper-kaleido.com/
+    image_path: /assets/images/kaleido-logo.jpg
+    alt: "Kaleido"
+    title: "Kalaido"
   - url: https://acaia.co/
     image_path: /assets/images/acaia-logo.jpeg
     alt: "acaia"
@@ -63,6 +51,22 @@ gallery:
 ---
 
 <!--
+  - url: http://www.roastmaxroasters.com.au
+    image_path: /assets/images/roastmax_logo.jpg
+    alt: "Roastmax"
+    title: "Roastmax"
+  - url: https://www.bescaroasters.com/
+    image_path: /assets/images/besca-logo.jpg
+    alt: "Besca Roasters"
+    title: "Besca Roasters"
+  - url: https://www.toper.com/
+    image_path: /assets/images/toper-logo.jpg
+    alt: "Toper"
+    title: "Toper"
+  - url: https://coffed.pl/
+    image_path: /assets/images/coffed-logo-light.png
+    alt: "Coffed"
+    title: "Coffed"
   - url: https://www.ingnapoli.com/
     image_path: /assets/images/tostabar-logo.png
     alt: "Tostabar"

@@ -78,8 +78,12 @@ machines:
         url: /machines/hive/
       - title: "Hottop"
         url: /machines/hottop/
+      - title: "IKAWA"
+        url: /machines/ikawa/
       - title: "IMF"
         url: /machines/imf/
+      - title: "Kaleido"
+        url: /machines/kaleido/
       - title: "IP-CC"
         url: /machines/ip-cc/
       - title: "Kaldi"

@@ -10,7 +10,7 @@ header:
 sidebar:
   nav: "machines"
 ---
-<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge-grey.png" width="150px">
 
 * __Producer:__ [Coffed](http://coffed.pl){:target="_blank"}, Poland
 * __Machine:__ SR3, SR5, SR15, SR25, SR60 (manual, manual delta, and automatic variants)
