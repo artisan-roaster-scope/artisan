@@ -25,7 +25,7 @@ from artisanlib.ble import UUID, BLE_CHAR_TYPE
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
-class AcaiaBLE():
+class AcaiaBLE:
 
     # Acaia Pearl, Lunar:
     DEVICE_NAME_PEARL:Final[str] = 'PROCHBT'

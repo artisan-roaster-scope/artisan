@@ -337,7 +337,7 @@ def extractProfileIkawaCSV(file, aw:'ApplicationWindow') -> 'ProfileData':
     return res
 
 
-class IKAWA_BLE():
+class IKAWA_BLE:
 
     ###CmdType
     BOOTLOADER_GET_VERSION:      ClassVar[int] = 0

@@ -17,7 +17,7 @@ v2.8.4 (June 21, 2023)
   - adds `Create Events` flag to Software PID
   - adds energy/CO2 data to characteristics line
   - display configured roaster name and batch size as x-axis label if no profile is loaded
-  - toggle hide-background per click on background profile name (subtitle) during roasting
+  - toggle hide-background per double-click on background profile name (subtitle) during roasting
   - adds dark mode support for Windows 10 (1607+), Windows 11 and Linux under Gnome (not available with UI style WindowsVista, best with Fusion)
   - adds configuration `Mark last pressed` to event button configuration to control if the last button pressed should be marked (default) or not
   - adds configuration "Tooltips" to toggle visibility of custom event buttons tooltips (default off)

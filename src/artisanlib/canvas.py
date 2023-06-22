@@ -14331,8 +14331,7 @@ class tgraphcanvas(FigureCanvas):
                         factor = math.sqrt(load_pct / 100)
                     else:
                         factor = load_pct / 100
-                    energy = self.loadratings[i] * factor * (duration / 3600) #* self.convertHeat(1,self.ratingunits[i],0)
-                    return energy
+                    return self.loadratings[i] * factor * (duration / 3600) #* self.convertHeat(1,self.ratingunits[i],0)
                 except Exception as ex: # pylint: disable=broad-except
                     _log.exception(ex)
                     _, _, exc_tb = sys.exc_info()

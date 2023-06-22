@@ -231,7 +231,7 @@ class nonedevDlg(QDialog): # pylint: disable=too-few-public-methods # pyright: i
 ##################### SERIAL PORT #########################################################
 ###########################################################################################
 
-class serialport():
+class serialport:
     """ this class handles the communications with all the devices"""
 
     __slots__ = ['aw', 'platf', 'default_comport', 'comport','baudrate','bytesize','parity','stopbits','timeout','SP','COMsemaphore', \
@@ -693,8 +693,7 @@ class serialport():
                         #CRCreceived = int(r[13:15],16)  #bytes 14&15
                         #CRCcalculated = self.aw.dtapid.DTACalcChecksum(r[1:11]) #bytes 1-10
                         #if CRCreceived == CRCcalculated:
-                        t1 = float(int(r[7:11], 16))*0.1    #convert ascii string from bytes 8-11 (4 bytes) to a float
-                        return t1
+                        return float(int(r[7:11], 16))*0.1    #convert ascii string from bytes 8-11 (4 bytes) to a float
                     return -1
 ##                        else:
 ##                            self.aw.qmc.adderror(QApplication.translate("Error Message","DTAtemperature(): Data corruption. Check wiring"))
@@ -6489,7 +6488,7 @@ class serialport():
 #############  Extra Serial Ports #######################################
 #########################################################################
 
-class extraserialport():
+class extraserialport:
 
     __slots__ = ['aw', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits', 'timeout', 'devicefunctionlist', 'device', 'SP']
 
@@ -6742,8 +6741,7 @@ class colorport(extraserialport):
                     #self.SP.flush()
                     v = self.readline_terminated(b'\n').decode('ascii')
                     if 'SCAN' in v:
-                        n = int(v.split(':')[1]) # response should have format "SCAN:128"
-                        return n
+                        return int(v.split(':')[1]) # response should have format "SCAN:128"
                     if retry > 0:
                         return self.readTonino(retry-1)
             return -1

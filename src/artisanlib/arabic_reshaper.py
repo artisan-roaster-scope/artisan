@@ -200,7 +200,7 @@ def get_lam_alef(candidate_alef, candidate_lam, is_end_of_word):
 
     return ''
 
-class DecomposedWord(): # pylint: disable=too-few-public-methods
+class DecomposedWord: # pylint: disable=too-few-public-methods
     def __init__(self, word) -> None:
         self.stripped_harakat = []
         self.harakat_positions = []
