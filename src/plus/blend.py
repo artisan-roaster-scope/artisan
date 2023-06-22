@@ -74,7 +74,7 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 #####################  Component  ######################################################
 
 # coffee is given by its hr_id
-class Component():
+class Component:
     def __init__(self, coffee: str, ratio: float) -> None:
         self._coffee = coffee
         self._ratio = ratio
@@ -99,7 +99,7 @@ class Component():
 ########################################################################################
 #######################  CustomBlend  ##################################################
 
-class CustomBlend():
+class CustomBlend:
     def __init__(self, name: str, components: List[Component]) -> None:
         self._name:str = name
         self._components:List[Component] = components

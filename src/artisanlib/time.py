@@ -4,7 +4,7 @@ import time
 
 # higher resolution time signal (at least on macOS)
 # base can change (eg. depending on the simulator mode)
-class ArtisanTime():
+class ArtisanTime:
 
     __slots__ = ['clock','base']
 

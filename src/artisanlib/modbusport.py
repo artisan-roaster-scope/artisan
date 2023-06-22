@@ -92,7 +92,7 @@ def getBinaryPayloadDecoderFromRegisters(registers, byteorderLittle:bool = True,
 
 
 # pymodbus version
-class modbusport():
+class modbusport:
     """ this class handles the communications with all the modbus devices"""
 
     __slots__ = [ 'aw', 'modbus_serial_read_delay', 'modbus_serial_extra_read_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'default_comport', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',

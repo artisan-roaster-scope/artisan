@@ -26,7 +26,7 @@ from typing_extensions import Final  # Python <=3.7
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
-class Simulator():
+class Simulator:
     __slots__ = [ 'profile', 'temp1', 'temp2', 'timex', 'extratemp1', 'extratemp2', 'extratimex',
         'extraDelta1', 'extraDelta2', 'extraNoneTempHint1', 'extraNoneTempHint2' ]
 

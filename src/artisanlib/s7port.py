@@ -202,7 +202,7 @@ def set_real(bytearray_: bytearray, byte_index: int, real) -> bytearray:
         bytearray_[byte_index + i] = b
     return bytearray_
 
-class s7port():
+class s7port:
 
     __slots__ = [ 'aw', 'readRetries', 'channels', 'default_host', 'host', 'port', 'rack', 'slot', 'lastReadResult', 'area', 'db_nr', 'start', 'type', 'mode',
         'div', 'optimizer', 'fetch_max_blocks', 'fail_on_cache_miss', 'activeRegisters', 'readingsCache', 'PID_area', 'PID_db_nr', 'PID_SV_register', 'PID_p_register',

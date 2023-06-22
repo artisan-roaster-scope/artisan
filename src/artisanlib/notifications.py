@@ -62,7 +62,7 @@ def ntype2NotificationType(ntype:str) -> NotificationType:
 
 # for notifications received from artisan.plus id is set to the notifications hr_id to be able to confirm its processing on click
 # created is the timestamp as EPOCH indicating when this notification was created
-class Notification():
+class Notification:
     def __init__(self, title: str, message: str, notification_type: NotificationType, created: Optional[float] = None, hr_id: Optional[str] = None, link: Optional[str] = None) -> None:
         self._title = title
         self._message = message

@@ -47,7 +47,7 @@ except ImportError:
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
-class FujiPID():
+class FujiPID:
     def __init__(self,aw) -> None:
         self.aw = aw
 
@@ -1079,9 +1079,7 @@ class FujiPID():
         r = self.aw.ser.sendFUJIcommand(command,7)
         if len(r) == 7:
             # EVERYTHINK OK: convert data part binary string to hex representation
-            s1 = hex2int(r[3],r[4])
-            #conversion from hex to dec
-            return s1
+            return hex2int(r[3],r[4]) #conversion from hex to dec
         #bad number of RX bytes
         errorcode = QApplication.translate('Error Message','pid.readoneword(): {0} RX bytes received (7 needed) for unit ID={1}').format(len(r),command[0])
         self.aw.qmc.adderror(errorcode)
@@ -1119,7 +1117,7 @@ class FujiPID():
 ##########################  ARDUINO CLASS DEFINITION  ############################
 ###################################################################################
 
-class PIDcontrol():
+class PIDcontrol:
     __slots__ = [ 'aw', 'pidActive', 'sv', 'pidOnCHARGE', 'createEvents', 'loadRampSoakFromProfile', 'loadRampSoakFromBackground', 'svLen', 'svLabel',
             'svValues', 'svRamps', 'svSoaks', 'svActions', 'svBeeps', 'svDescriptions','svTriggeredAlarms', 'RSLen', 'RS_svLabels', 'RS_svValues', 'RS_svRamps', 'RS_svSoaks',
             'RS_svActions', 'RS_svBeeps', 'RS_svDescriptions', 'svSlider', 'svButtons', 'svMode', 'svLookahead', 'dutySteps', 'svSliderMin', 'svSliderMax', 'svValue',
@@ -1768,7 +1766,7 @@ class PIDcontrol():
 ###################################################################################
 # documentation
 # http://www.deltaww.hu/homersekletszabalyozok/DTA_series_temperature_controller_instruction_sheet_English.pdf
-class DtaPID():
+class DtaPID:
     def __init__(self,aw) -> None:
         self.aw = aw
 

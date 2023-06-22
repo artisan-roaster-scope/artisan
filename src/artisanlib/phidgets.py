@@ -35,7 +35,7 @@ except ImportError:
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
-class PhidgetManager():
+class PhidgetManager:
 
     __slots__ = [ 'attachedPhidgetChannels', 'managersemaphore', 'manager' ]
 

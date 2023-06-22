@@ -33,7 +33,7 @@ try:
 except ImportError:
     from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
-class wsport():
+class wsport:
 
     __slots__ = [ 'aw', 'default_host', 'host', 'port', 'path', 'machineID',  'lastReadResult', 'channels', 'readings', 'channel_requests', 'channel_nodes',
                     'channel_modes', 'connect_timeout', 'request_timeout', 'reconnect_interval', 'ping_interval', 'ping_timeout', 'id_node', 'machine_node',

@@ -31,7 +31,7 @@ except ImportError:
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # expects a function control that takes a value from [<outMin>,<outMax>] to control the heater as called on each update()
-class PID():
+class PID:
 
     __slots__ = [ 'pidSemaphore', 'outMin', 'outMax', 'dutySteps', 'dutyMin', 'dutyMax', 'control', 'Kp',
             'Ki', 'Kd', 'pOnE', 'Pterm', 'errSum', 'Iterm', 'lastError', 'lastInput', 'lastOutput', 'lastTime',

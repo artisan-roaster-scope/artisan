@@ -30,7 +30,7 @@ from artisanlib.types import SerialSettings
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
-class SantokerNetwork():
+class SantokerNetwork:
 
     HEADER:Final[bytes] = b'\xEE\xA5'
     CODE_HEADER:Final[bytes] = b'\x02\x04'

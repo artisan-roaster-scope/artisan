@@ -5015,7 +5015,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 #            string = QApplication.translate('Message', 'Configure for<br>{0}?<br><br>Your current settings will be overwritten!<br><br>It is advisable to save your current settings beforehand via menu Help >> Save Settings.').format(label)
             help_menu = QApplication.translate('Menu', 'Help')
             string = QApplication.translate('Message', 'Configure for<br>{0}?<br><br>Some of your settings will be modified!<br><br>Before proceeding it is best to save your current settings and reset Artisan<br>(first menu {1} >> {2} then {4} >> {3})').format(label, help_menu, QApplication.translate('Menu', 'Save Settings...'),QApplication.translate('Menu', 'Factory Reset'),help_menu)
-#            string = QApplication.translate('Message', 'Configure for<br>{0}?<br><br>Some of your settings will be modified!<br><br>Before proceeding it is best to save your current settings and reset Artisan<br>(first menu {1} >> {2} then {1} >> {3})').format(label, QApplication.translate('Menu', 'Help'),QApplication.translate('Menu', 'Save Settings...'),QApplication.translate('Menu', 'Factory Reset'))
             reply = QMessageBox.question(self, QApplication.translate('Message', 'Adjust Settings'),string,
                 QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
             if reply == QMessageBox.StandardButton.Cancel:
@@ -6065,8 +6064,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             #cd.setOption(QColorDialog.ColorDialogOption.NoButtons | QColorDialog.ColorDialogOption.ShowAlphaChannel,True)
             cd.setCurrentColor(c)
             cd.exec()
-            cr = cd.currentColor()
-            return cr
+            return cd.currentColor()
         return QColorDialog.getColor(c)
 
     @pyqtSlot(int)
