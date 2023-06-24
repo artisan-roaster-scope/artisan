@@ -12263,6 +12263,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 names2x = [decodeLocalStrict(x) for x in profile['extraname2']]
                 timex = profile['extratimex']
                 self.qmc.temp1B,self.qmc.temp2B,self.qmc.timeB, self.qmc.temp1BX, self.qmc.temp2BX = t1,t2,tb,t1x,t2x
+                self.qmc.abs_timeB = tb.copy()  #invariant copy of timeB
                 self.qmc.extratimexB = timex
 
                 if 'extraDelta1' in profile:

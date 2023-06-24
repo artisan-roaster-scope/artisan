@@ -1227,6 +1227,7 @@ class tgraphcanvas(FigureCanvas):
         self.temp1BX:List['npt.NDArray[numpy.floating]'] = []
         self.temp2BX:List['npt.NDArray[numpy.floating]'] = []
         self.timeB:List[float] = []
+        self.abs_timeB:List[float] = []
         self.temp1Bdelta:List[float] = []
         self.temp2Bdelta:List[float] = []
         # smoothed versions of the background curves
@@ -5793,7 +5794,7 @@ class tgraphcanvas(FigureCanvas):
                         if mathexpression[i] == 't':
                             timex = sample_timex
                         else:
-                            timex = self.timeB
+                            timex = self.abs_timeB
                         seconddigitstr = ''
                         if i+4 < len(mathexpression) and mathexpression[i+1] == '[':
                             Yshiftval = int(mathexpression[i+3])
@@ -5816,6 +5817,8 @@ class tgraphcanvas(FigureCanvas):
                         elif i+3 < len(mathexpression) and mathexpression[i+1] == '{' and mathexpression.find('}',i+2) > -1:
                             end_idx = mathexpression.index('}',i+2)
                             body = mathexpression[i+2:end_idx]
+                            if mathexpression[i]=='b':
+                                body = 'b' + body
                             val = -1
                             try:
                                 absolute_index = eval(body,{'__builtins__':None},mathdictionary)  # pylint: disable=eval-used
