@@ -27,10 +27,10 @@ environment:
     appveyor_build_worker_image: Visual Studio 2019
   - job_name: windows
     appveyor_build_worker_image: Visual Studio 2022
-  - job_name: macos
-    appveyor_build_worker_image: macos-bigsur
-  - job_name: linux
-    appveyor_build_worker_image: Ubuntu2004
+#  - job_name: macos
+#    appveyor_build_worker_image: macos-bigsur
+#  - job_name: linux
+#    appveyor_build_worker_image: Ubuntu2004
 
 
 # Generic build number, later set to commit hash by init
@@ -59,13 +59,15 @@ for:
     fast_finish: false
 
   environment:
-    PYTHON_PATH: "C:/Python38-x64"
-    QT_PATH: "c:/qt/5.15/msvc2019_64"
+    PYTHON_PATH: "C:\\Python38-x64"
+    QT_PATH: "C:/qt/5.15/msvc2019_64"
     PYUIC: "pyuic5.exe"
-    BUILD_PYINSTALLER: "True"
+    PYQT: "5"
+    BUILD_PYINSTALLER: "False"
     ARTISAN_LEGACY: "True"
     VC_REDIST: "https://aka.ms/vs/16/release/vc_redist.x64.exe"
     VCVARSALL: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Auxiliary/Build/vcvarsall.bat"
+    QT_TRANSL: "C:\\Qt\\Tools\\QtCreator\\share\\qtcreator\\translations"
 
   install:
     - cmd: echo Windows Legacy Install
@@ -114,12 +116,15 @@ for:
     fast_finish: false
 
   environment:
+    PYTHON_PATH: "C:\\Python311-x64"
     QT_PATH: "C:/qt/6.5.0/msvc2019_64"  #there is no msvc2022_64 under /qt*
+    PYQT: "6"
     PYUIC: "pyuic6.exe"
-    BUILD_PYINSTALLER: "True"
+    BUILD_PYINSTALLER: "False"
     ARTISAN_LEGACY: "False"
     VC_REDIST: "https://aka.ms/vs/17/release/vc_redist.x64.exe"  #redistributable for VS 2015-2022
     VCVARSALL: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Auxiliary/Build/vcvarsall.bat"
+    QT_TRANSL: "C:\\Qt\\Tools\\QtCreator\\share\\qtcreator\\translations"
 
   install:
     - cmd: echo Windows Install
@@ -136,7 +141,7 @@ for:
     - cmd: set PATH=%PYTHON_PATH%;%PYTHON_PATH%\Scripts;%PATH%
 
     # run the install script
-    - cmd: .ci\install-win.bat
+    - cmd: .ci/install-win.bat
 
   build_script:
     - cmd: echo Windows Build
