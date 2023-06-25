@@ -11,6 +11,7 @@
 #
 pywin32==306 #305
 pyinstaller-versionfile==2.1.1 #2.0.0
+build==0.10.0  # required to build pyinstaller bootloader
 #
 ######
 # packages that differ per platform:

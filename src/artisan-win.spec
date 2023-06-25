@@ -1,4 +1,76 @@
+# ABOUT
+# Artisan pyinstaller specification file
+
+# LICENSE
+# This program or module is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 2 of the License, or
+# version 3 of the License, or (at your option) any later version. It is
+# provided for educational purposes and is distributed in the hope that
+# it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
+# the GNU General Public License for more details.
+
+# AUTHOR
+# Marko Luther, 2023
+
 # -*- mode: python -*-
+
+import logging
+import sys
+
+# Set up the logger
+logging.basicConfig(level=logging.INFO)
+
+# Function to perform file copy
+def copy_file(source_file, destination_file, fatal=True):
+    #logging.info("Copying %s",source_file)
+    copy_command = f'copy "{source_file}" "{destination_file}"'
+    exit_code = os.system(copy_command)
+    if exit_code != 0:
+        msg = f'Copy operation failed {source_file} {destination_file}'
+        logging.error(msg)
+        if fatal:
+            sys.exit('Fatal Error')
+
+# Function to perform xcopy
+def xcopy_files(source_dir, destination_dir, fatal=True):
+    #logging.info("Copying %s",source_file)
+    xcopy_command = f'xcopy "{source_dir}" "{destination_dir}"  /y /S'
+    exit_code = os.system(xcopy_command)
+    if exit_code != 0:
+        msg =f'Xcopy operation failed {source_dir} {destination_dir}'
+        logging.error(msg)
+        if fatal:
+            sys.exit('Fatal Error')
+
+# Function to make dir
+def make_dir(source_dir, fatal=True):
+    mkdir_command = f'mkdir "{source_dir}"'
+    exit_code = os.system(mkdir_command)
+    if exit_code != 0:
+        msg =f'mkdir operation failed {source_dir}'
+        logging.error(msg)
+        if fatal:
+            sys.exit('Fatal Error')
+
+# Function to remove diir
+def remove_dir(source_dir, fatal=True):
+    rmdir_command = f'rmdir /q /s {source_dir}'
+    exit_code = os.system(rmdir_command)
+    if exit_code != 0:
+        msg =f'rmdir operation failed {source_dir}'
+        logging.error(msg)
+        if fatal:
+            sys.exit('Fatal Error')
+
+# Function to check if a file exists
+def check_file_exists(file_path, fatal=True):
+    if not os.path.isfile(file_path):
+        msg = f'File does not exist: {file_path} '
+        logging.error(msg)
+        if fatal:
+            sys.exit('Fatal Error')
 
 block_cipher = None
 
@@ -6,17 +78,24 @@ import os
 if os.environ.get('APPVEYOR'):
   ARTISAN_SRC = r'C:\projects\artisan\src'
   PYTHON = os.environ.get('PYTHON_PATH')
+  PYQT = os.environ.get('PYQT')
+  QT_TRANSL = os.environ.get('QT_TRANSL')
+  ARTISAN_LEGACY = os.environ.get('ARTISAN_LEGACY')
 else:
   ARTISAN_SRC = r'C:\Users\roast\Documents\artisan-roaster-scope\src'
-  PYTHON = r'C:\Program Files\Python311-x64'
+  PYTHON = r'C:\Program Files\Python38'
 NAME = 'artisan'
+
+logging.info("** ARTISAN_LEGACY: %s", ARTISAN_LEGACY)
+logging.info("** QT_TRANSL: %s",QT_TRANSL)
 
 ##
 TARGET = 'dist\\' + NAME + '\\'
 PYTHON_PACKAGES = PYTHON + r'\Lib\site-packages'
-PYQT_QT = PYTHON_PACKAGES + r'\PyQt6\Qt'
+PYQT_QT = PYTHON_PACKAGES + r'\PyQt5\Qt'
 PYQT_QT_BIN = PYQT_QT + r'\bin'
-PYQT_QT_TRANSLATIONS = PYQT_QT + r'\translations'
+PYQT_QT_TRANSLATIONS =QT_TRANSL
+#PYQT_QT_TRANSLATIONS = PYQT_QT + r'\translations'
 YOCTO_BIN = PYTHON_PACKAGES + r'\yoctopuce\cdll'
 SNAP7_BIN = r'C:\Windows'
 LIBUSB_BIN = r'C:\Windows\SysWOW64'
@@ -29,6 +108,25 @@ else:
 
 #os.system(PYTHON + r'\Scripts\pylupdate5 artisan.pro')
 
+hiddenimports_list=['charset_normalizer.md__mypyc', # part of requests 2.28.2 # see https://github.com/pyinstaller/pyinstaller-hooks-contrib/issues/534
+                            'matplotlib.backends.backend_pdf',
+                            'matplotlib.backends.backend_svg',
+                            'scipy.spatial.transform._rotation_groups',
+                            'scipy.special.cython_special',
+                            'scipy._lib.messagestream',
+                            'pywintypes',
+                            'win32cred',
+                            'win32timezone'
+                            ]
+# Add the hidden imports not required by legacy Windows.  
+if not ARTISAN_LEGACY=='True':
+    logging.info(">>>>> Appending hidden imports")
+    hiddenimports_list[len(hiddenimports_list):] = [
+                            'PyQt6.QtWebChannel',
+                            'PyQt6.QtWebEngineCore'
+                            ]
+
+
 a = Analysis(['artisan.py'],
              pathex=[PYQT_QT_BIN, ARTISAN_SRC, SCIPY_BIN],
              binaries=[],
@@ -36,19 +134,7 @@ a = Analysis(['artisan.py'],
              hookspath=[],
              runtime_hooks=[],
              excludes=[],
-             hiddenimports=['charset_normalizer.md__mypyc', # part of requests 2.28.2 # see https://github.com/pyinstaller/pyinstaller-hooks-contrib/issues/534
-                            'PyQt6.QtWebChannel',
-                            'PyQt6.QtWebEngineCore',
-                            'matplotlib.backends.backend_pdf',
-                            'matplotlib.backends.backend_svg',
-                            'scipy.spatial.transform._rotation_groups',
-                            'scipy.special.cython_special',
-                            'scipy._lib.messagestream',
-                            'pkg_resources.py2_warn',
-                            'pywintypes',
-                            'win32cred',
-                            'win32timezone'
-                            ],
+             hiddenimports=hiddenimports_list,
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher)
@@ -75,22 +161,22 @@ coll = COLLECT(exe,
                name=NAME)
 
 
-# assumes the Microsoft Visual C++ Redistributable Package (x64), vc_redist.x64.exe, is located above the source directory
-os.system(r'copy ..\vc_redist.x64.exe ' + TARGET)
+# assumes the Microsoft Visual C++ 2015 Redistributable Package (x64), vc_redist.x64.exe, is located above the source directory
+copy_file(r'..\vc_redist.x64.exe', TARGET)
 
-os.system('copy README.txt ' + TARGET)
-os.system(r'copy ..\LICENSE ' + TARGET + r'\LICENSE.txt')
+copy_file('README.txt',TARGET)
+copy_file(r'..\LICENSE', TARGET + r'\LICENSE.txt')
 #os.system('copy qt-win.conf ' + TARGET + 'qt.conf')
-os.system('mkdir ' + TARGET + 'Wheels')
-os.system('mkdir ' + TARGET + r'Wheels\Cupping')
-os.system('mkdir ' + TARGET + r'Wheels\Other')
-os.system('mkdir ' + TARGET + r'Wheels\Roasting')
-os.system(r'copy Wheels\Cupping\* ' + TARGET + r'Wheels\Cupping')
-os.system(r'copy Wheels\Other\* ' + TARGET + r'Wheels\Other')
-os.system(r'copy Wheels\Roasting\* ' + TARGET + r'Wheels\Roasting')
+make_dir(TARGET + 'Wheels')
+make_dir(TARGET + r'Wheels\Cupping')
+make_dir(TARGET + r'Wheels\Other')
+make_dir(TARGET + r'Wheels\Roasting')
+copy_file(r'Wheels\Cupping\*', TARGET + r'Wheels\Cupping')
+copy_file(r'Wheels\Other\*', TARGET + r'Wheels\Other')
+copy_file(r'Wheels\Roasting\*', TARGET + r'Wheels\Roasting')
 
-os.system('mkdir ' + TARGET + 'translations')
-os.system(r'copy translations\*.qm ' + TARGET + 'translations')
+make_dir(TARGET + 'translations')
+copy_file(r'translations\*.qm', TARGET + 'translations')
 for tr in [
     'qtbase_ar.qm',
     'qtbase_de.qm',
@@ -108,21 +194,23 @@ for tr in [
     'qtbase_tr.qm',
     'qtbase_zh_TW.qm',
     ]:
-  os.system(r'copy "' + PYQT_QT_TRANSLATIONS + '\\' + tr + '" ' + TARGET + 'translations')
+  copy_file(QT_TRANSL + '\\' + tr, TARGET + 'translations')
 
-os.system('rmdir /q /s ' + TARGET + 'mpl-data\\sample_data')
+# this directory no longer exists
+remove_dir(TARGET + 'mpl-data\sample_data',False)
+
 # YOCTO HACK BEGIN: manually copy over the dlls
-os.system(r'mkdir ' + TARGET + 'yoctopuce\cdll')
-os.system(r'copy "' + YOCTO_BIN + r'\yapi.dll" ' + TARGET + 'yoctopuce\cdll')
-os.system(r'copy "' + YOCTO_BIN + r'\yapi64.dll" ' + TARGET + 'yoctopuce\cdll')
+make_dir(TARGET + 'yoctopuce\cdll')
+copy_file(YOCTO_BIN + r'\yapi.dll', TARGET + 'yoctopuce\cdll')
+copy_file(YOCTO_BIN + r'\yapi64.dll', TARGET + 'yoctopuce\cdll')
 # YOCTO HACK END
 
 # copy Snap7 lib
-os.system('copy "' + SNAP7_BIN + r'\snap7.dll" ' + TARGET)
+copy_file(SNAP7_BIN + r'\snap7.dll', TARGET)
 
 # copy libusb0.1 lib
 
-os.system('copy "' + LIBUSB_BIN + r'\libusb0.dll" ' + TARGET)
+copy_file(LIBUSB_BIN + r'\libusb0.dll', TARGET)
 
 for fn in [
     'artisan.png',
@@ -154,13 +242,13 @@ for fn in [
     r'includes\jquery-1.11.1.min.js',
     r'includes\logging.yaml',
     ]:
-  os.system('copy ' + fn + ' ' + TARGET)
+  copy_file(fn, TARGET)
 
-os.system(r'mkdir ' +  TARGET + 'Machines')
-os.system(r'xcopy includes\Machines ' + TARGET + 'Machines /y /S')
+make_dir(TARGET + 'Machines')
+xcopy_files('includes\Machines', TARGET + 'Machines')
 
-os.system(r'mkdir ' +  TARGET + 'Themes')
-os.system(r'xcopy includes\Themes ' + TARGET + 'Themes /y /S')
+make_dir(TARGET + 'Themes')
+xcopy_files('includes\Themes', TARGET + 'Themes')
 
-os.system(r'mkdir ' +  TARGET + 'Icons')
-os.system(r'xcopy includes\Icons ' + TARGET + 'Icons /y /S')
+make_dir(TARGET + 'Icons')
+xcopy_files('includes\Icons', TARGET + 'Icons')

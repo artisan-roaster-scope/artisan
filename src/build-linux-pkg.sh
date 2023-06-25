@@ -1,4 +1,19 @@
 #!/bin/sh
+# ABOUT
+# build packaging shell script for Artisan Linux builds
+#
+# LICENSE
+# This program or module is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 2 of the License, or
+# version 3 of the License, or (at your option) any later versison. It is
+# provided for educational purposes and is distributed in the hope that
+# it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
+# the GNU General Public License for more details.
+#
+# AUTHOR
+# Dave Baxter, Marko Luther 2023
 
 #set -ex
 set -e  # reduced logging
@@ -84,3 +99,19 @@ ARCH=x86_64 ./pkg2appimage-*.AppImage artisan-AppImage.yml
 mv ./out/*.AppImage ${NAME}.AppImage
 
 ls -lh *.deb *.rpm
+
+# Check that the packaged files are above an expected size
+basename=${NAME}
+suffixes=".deb .rpm .AppImage" # separate statements for suffixes to check
+min_size=270000000
+for suffix in $suffixes; do
+    filename="$basename$suffix"
+    size=$(($(du -k "$filename" | cut -f1) * 1024)) # returns kB so multiply by 1024 (du works on macOS)
+    echo "$filename size: $size bytes"
+    if [ "$size" -lt "$min_size" ]; then
+        echo "$filename is smaller than minimum $min_size bytes"
+        exit 1
+    else
+        echo "**** Success: $filename is larger than minimum $min_size bytes"
+    fi
+done

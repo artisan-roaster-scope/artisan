@@ -21,3 +21,12 @@ simple.log
 artisan_plus.log
 outbox/
 *flycheck_*.py
+
+#Keeps derived files out of the Artisan repository
+#   To remove these files from the repository a commit must first be made 
+#   with the these files deleted, then this section should be uncommented.
+#to remove initially make a commit with thee files deleted then uncomment this section
+#src/uic/[!_]*.py
+#src/translations/*.qm
+#src/help/[!_]*.py
+#doc/help_dialogs/Output_html/[!_]*.html

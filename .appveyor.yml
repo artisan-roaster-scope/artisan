@@ -1,13 +1,25 @@
-###################################################################
+# ABOUT
 # Appveyor CI configuration to build Artisan install packages
 #     for Windows, Windows legacy, macOS, and Linux
-###################################################################
-# Include "skip ci" in the commit message to prevent this build process from running
 #
+# LICENSE
+# This program or module is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 2 of the License, or
+# version 3 of the License, or (at your option) any later versison. It is
+# provided for educational purposes and is distributed in the hope that
+# it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
+# the GNU General Public License for more details.
+#
+# AUTHOR
+# Dave Baxter, Marko Luther 2023
+
+# Include "skip ci" in the commit message to prevent this build process from running
 environment:
   # Set the Appveyor Python version for windows, macos and linux here. Does not affect windows_legacy.
   PYTHON_V: 3.11
-  # Upgrade to specific version (for platforms supporting upgrade). Upgrade skipped if missing or blank.
+  # Upgrade to specific version (for platforms supporting upgrade). Upgrade skipped if env var is missing or blank.
 #  PYUPGRADE_V: 3.11.3
 
   matrix:
@@ -47,12 +59,13 @@ for:
     fast_finish: false
 
   environment:
-    PYTHON_PATH: "C:\\Python38-x64"
-    QT_PATH: "c:\\qt\\5.15\\msvc2019_64"
+    PYTHON_PATH: "C:/Python38-x64"
+    QT_PATH: "c:/qt/5.15/msvc2019_64"
     PYUIC: "pyuic5.exe"
     BUILD_PYINSTALLER: "True"
     ARTISAN_LEGACY: "True"
     VC_REDIST: "https://aka.ms/vs/16/release/vc_redist.x64.exe"
+    VCVARSALL: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Auxiliary/Build/vcvarsall.bat"
 
   install:
     - cmd: echo Windows Legacy Install
@@ -87,7 +100,8 @@ for:
 #  test_script:
 #    - cmd: python -m unittest discover
 
-#  artifacts:
+  artifacts:
+    - path: 'generated-win-legacy.zip'
 #    - path: 'src\artisan-*.zip'
 
   deploy_script:
@@ -100,17 +114,18 @@ for:
     fast_finish: false
 
   environment:
-    QT_PATH: "C:\\qt\\6.4\\msvc2022_64"
+    QT_PATH: "C:/qt/6.5.0/msvc2019_64"  #there is no msvc2022_64 under /qt*
     PYUIC: "pyuic6.exe"
     BUILD_PYINSTALLER: "True"
     ARTISAN_LEGACY: "False"
     VC_REDIST: "https://aka.ms/vs/17/release/vc_redist.x64.exe"  #redistributable for VS 2015-2022
+    VCVARSALL: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Auxiliary/Build/vcvarsall.bat"
 
   install:
     - cmd: echo Windows Install
 
     # derive the python path from the version number
-    - ps: $env:PYTHON_PATH = "C:\\Python$($env:PYTHON_V -replace '\.','')-x64"
+    - ps: $env:PYTHON_PATH = "C:/Python$($env:PYTHON_V -replace '\.','')-x64"
     - ps: Write-Host $env:PYTHON_PATH
 
     # pull library versions from requirments file
@@ -143,7 +158,8 @@ for:
 #  test_script:
 #    - cmd: python -m unittest discover
 
-#  artifacts:
+  artifacts:
+    - path: 'generated-win.zip'
 #    - path: 'src\artisan-*.zip'
 
   deploy_script:
@@ -161,9 +177,9 @@ for:
     MACOSX_DEPLOYMENT_TARGET: 11.0
     PYTHONSITEPKGS: /Users/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages
     QT_PATH: ${PYTHONSITEPKGS}/PyQt6/Qt6
+    QT_SRC_PATH: /Users/appveyor/Qt/6.4/macos
     PYUIC: pyuic6
-    PYRCC: pyrcc6
-    PYLUPDATE: ./pylupdate6pro  #the dot slash is necessary
+    PYLUPDATE: ./pylupdate6pro.py  #the dot slash is necessary
 
   install:
     - echo "MacOS Install"
@@ -180,7 +196,7 @@ for:
   build_script:
     - echo "MacOS Build"
     - chmod +x src/*.sh
-    - chmod +x src/pylupdate6pro
+    - chmod +x src/pylupdate6pro.py
 
     # run the build script
     - cd src
@@ -190,7 +206,8 @@ for:
 #  test_script:
 #    - python -m unittest discover -s src
 
-#  artifacts:
+  artifacts:
+    - path: 'generated-macos.zip'
 #    - path: 'src/artisan-*.dmg'
 
   deploy_script:
@@ -205,11 +222,15 @@ for:
 
   environment:
     ARTISAN_OS: linux
-    PYTHON_PATH: /home/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages
+    PYTHONSITEPKGS: /home/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages
     QT_PATH: $PYTHON_PATH/PyQt6/Qt6
+    QT_SRC_PATH: /home/appveyor/Qt/6.4/gcc_64
+    PYUIC: pyuic6
+    PYLUPDATE: ./pylupdate6pro.py  #the dot slash is necessary
 
   install:
     - echo "Linux Install"
+        
     - chmod +x .ci/*.sh
 
     # pull library versions from requirments file
@@ -234,7 +255,8 @@ for:
 #  test_script:
 #    - QT_QPA_PLATFORM=offscreen python -m unittest discover -s src
 
-#  artifacts:
+  artifacts:
+    - path: 'generated-linux.zip'
 #    - path: 'src/artisan-*.deb'
 #    - path: 'src/artisan-*.rpm'
 #    - path: 'src/artisan-*.AppImage'

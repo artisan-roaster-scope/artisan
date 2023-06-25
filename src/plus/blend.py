@@ -59,7 +59,7 @@ import logging
 from artisanlib.util import comma2dot
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
-from uic import BlendDialog
+from uic import BlendDialog # type: ignore [attr-defined] # pylint: disable=no-name-in-module
 from typing import Optional, List, Dict, Tuple, Any, TYPE_CHECKING
 from typing_extensions import Final  # Python <=3.7
 

@@ -1,3 +1,18 @@
+; ABOUT
+; NSIS script file for Artisan Windows installer.
+;
+; LICENSE
+; This program or module is free software: you can redistribute it and/or
+; modify it under the terms of the GNU General Public License as published
+; by the Free Software Foundation, either version 2 of the License, or
+; version 3 of the License, or (at your option) any later versison. It is
+; provided for educational purposes and is distributed in the hope that
+; it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+; warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
+; the GNU General Public License for more details.
+;
+; AUTHOR
+; Dave Baxter, Marko Luther 2023
 ;
 ; .nsi command line options:
 ;    /DPRODUCT_VERSION=ww.xx.yy.zz  -explicitly set the product version, default is 0.0.0.0
@@ -123,12 +138,13 @@ RequestExecutionLevel admin
 !define /ifndef SIGN "False"
 !define /ifndef LEGACY "False"
 
+!define /date CUR_YEAR "%Y"
 Caption "${PRODUCT_NAME} Installer"
 VIProductVersion ${PRODUCT_VERSION}
 VIAddVersionKey ProductName "${PRODUCT_NAME}"
 VIAddVersionKey Comments "Installer for Artisan"
 VIAddVersionKey CompanyName ""
-VIAddVersionKey LegalCopyright "Copyright 2010-2023, Artisan developers. GNU General Public License"
+VIAddVersionKey LegalCopyright "Copyright 2010-${CUR_YEAR}, Artisan developers. GNU General Public License"
 VIAddVersionKey FileVersion "${PRODUCT_VERSION}"
 VIAddVersionKey FileDescription "${PRODUCT_NAME} Installer"
 VIAddVersionKey ProductVersion "${PRODUCT_VERSION}"

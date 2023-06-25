@@ -1,4 +1,19 @@
 #!/bin/sh
+# ABOUT
+# Build shell script for Artisan Linux builds
+#
+# LICENSE
+# This program or module is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 2 of the License, or
+# version 3 of the License, or (at your option) any later versison. It is
+# provided for educational purposes and is distributed in the hope that
+# it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
+# the GNU General Public License for more details.
+#
+# AUTHOR
+# Dave Baxter, Marko Luther 2023
 
 #set -ex
 set -e  # reduced logging
@@ -13,13 +28,20 @@ if [ ! -z $APPVEYOR ]; then
 elif [ -d /usr/lib/python3/dist-packages/PyQt5 ]; then
     # ARM builds
     export PYTHON_PATH=`python3 -m site --user-site`
+    export PYTHONSITEPKGS=`python3 -m site --user-site`
     export QT_PATH=/usr/share/qt5
+    export QT_SRC_PATH=/usr/share/Qt/6.4/gcc_64
+    export PYLUPDATE=./pylupdate6pro.py
 else
     # Other builds
     export PYTHON_PATH=`python3 -m site --user-site`
     export QT_PATH=$PYTHON_PATH/PyQt5/Qt
 fi
 
+echo "************* build derived files **************"
+./build-derived.sh linux  #generate the derived files
+if [ $? -ne 0 ]; then echo "Failed in build-derived.sh"; exit $?; else (echo "** Finished build-derived.sh"); fi
+    
 rm -rf build
 rm -rf dist
 
@@ -107,7 +129,8 @@ cp -R includes/Icons/* dist/Icons
 
 mkdir dist/yoctopuce
 mkdir dist/yoctopuce/cdll
-cp $PYTHON_PATH/yoctopuce/cdll/*64.so dist/yoctopuce/cdll
+# dave cp $PYTHON_PATH/yoctopuce/cdll/*64.so dist/yoctopuce/cdll
+cp $PYTHONSITEPKGS/yoctopuce/cdll/*64.so dist/yoctopuce/cdll
 
 cp /usr/lib/libsnap7.so dist
 
