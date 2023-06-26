@@ -13828,6 +13828,17 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     settings.endGroup()
                     # now remove the settings file
                     self.clearExtraDeviceSettingsBackup(filename)
+
+                    # etypes might have been changed thus we need to update the slider labels
+                    self.updateSlidersProperties()
+                    # update extra device lcds which might use event types as part of their labels
+                    self.establish_etypes()
+                    # as well as the large extra LCDs
+                    if self.largeExtraLCDs_dialog is not None:
+                        self.largeExtraLCDs_dialog.reLayout()
+                    # update extra event button which might use event types as part of their labels
+                    self.realignbuttons()
+
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
 
@@ -14267,6 +14278,17 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 self.qmc.specialeventsStrings = []
             if 'etypes' in profile:
                 self.qmc.etypes = [decodeLocalStrict(x) for x in profile['etypes']]
+
+            if updateRender:
+                # etypes might have been changed thus we need to update the slider labels
+                self.updateSlidersProperties()
+                # update extra device lcds which might use event types as part of their labels
+                self.establish_etypes()
+                # as well as the large extra LCDs
+                if self.largeExtraLCDs_dialog is not None:
+                    self.largeExtraLCDs_dialog.reLayout()
+                # update extra event button which might use event types as part of their labels
+                self.realignbuttons()
 
             if 'roastingnotes' in profile:
                 self.qmc.roastingnotes = decodeLocalStrict(profile['roastingnotes'])

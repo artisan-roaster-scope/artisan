@@ -8,7 +8,7 @@ types-urllib3==1.26.25.13
 types-psutil==5.9.5.15
 types-protobuf==4.23.0.1
 mypy==1.3.0
-pyright==1.1.314
+pyright==1.1.316
 ruff
-pylint==2.17.3
+pylint==2.17.4
 pre-commit

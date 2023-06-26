@@ -1740,6 +1740,12 @@ class EventsDlg(ArtisanResizeablDialog):
         if redraw:
             self.aw.qmc.redraw(recomputeAllDeltas=False)
 
+    def saveEventTypes(self):
+        self.aw.qmc.etypes[0] = self.etype0.text()
+        self.aw.qmc.etypes[1] = self.etype1.text()
+        self.aw.qmc.etypes[2] = self.etype2.text()
+        self.aw.qmc.etypes[3] = self.etype3.text()
+
     @pyqtSlot(int)
     def tabSwitched(self,i):
         self.closeHelp()
@@ -1747,6 +1753,7 @@ class EventsDlg(ArtisanResizeablDialog):
             self.saveSliderSettings()
             self.saveQuantifierSettings()
         elif i == 1: # switched to Button tab
+            self.saveEventTypes()
             self.createEventbuttonTable()
             self.saveSliderSettings()
             self.saveQuantifierSettings()
@@ -3311,6 +3318,11 @@ class EventsDlg(ArtisanResizeablDialog):
             self.saveAnnotationsSettings()
             self.savetableextraeventbutton()
 #            self.aw.closeEventSettings()
+            # we need to update the ExtraLCDs as they might use event types in their names via substitutions
+            if self.aw.largeExtraLCDs_dialog is not None:
+                self.aw.largeExtraLCDs_dialog.reLayout()
+            # we need to update the DeviceLCDs as they might use event types in their names via substitutions
+            self.aw.establish_etypes()
             # restart PhidgetManager
             try:
                 self.aw.qmc.restartPhidgetManager()
