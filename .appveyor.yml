@@ -63,7 +63,7 @@ for:
     QT_PATH: "C:/qt/5.15/msvc2019_64"
     PYUIC: "pyuic5.exe"
     PYQT: "5"
-    BUILD_PYINSTALLER: "False"
+    BUILD_PYINSTALLER: "True"
     ARTISAN_LEGACY: "True"
     VC_REDIST: "https://aka.ms/vs/16/release/vc_redist.x64.exe"
     VCVARSALL: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Auxiliary/Build/vcvarsall.bat"
@@ -120,7 +120,7 @@ for:
     QT_PATH: "C:/qt/6.5.0/msvc2019_64"  #there is no msvc2022_64 under /qt*
     PYQT: "6"
     PYUIC: "pyuic6.exe"
-    BUILD_PYINSTALLER: "False"
+    BUILD_PYINSTALLER: "True"
     ARTISAN_LEGACY: "False"
     VC_REDIST: "https://aka.ms/vs/17/release/vc_redist.x64.exe"  #redistributable for VS 2015-2022
     VCVARSALL: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Auxiliary/Build/vcvarsall.bat"
