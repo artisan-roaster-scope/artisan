@@ -1,6 +1,21 @@
-'''
-Program to take an Excel input file and generate Artisan help dialog code.
+#
+# ABOUT
+# Script to take an Excel input file and generate Artisan help dialog code.
 
+# LICENSE
+# This program or module is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 2 of the License, or
+# version 3 of the License, or (at your option) any later version. It is
+# provided for educational purposes and is distributed in the hope that
+# it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
+# the GNU General Public License for more details.
+
+# AUTHOR
+# Dave Baxter, 2023
+
+'''
 Command line:  xlsx_to_artisan_help.py <filename>|all
 **Note that filename should have no suffix, file name only.
 
@@ -65,8 +80,10 @@ Must be replaced with three periods "..." in the Excel file.
 from os.path import dirname, abspath, split, splitext
 from os import listdir
 import importlib
-import sys
 import re
+from time import sleep
+import sys
+sys.dont_write_bytecode = True  #prevents __pycache__ folder written to help/ 
 
 try:
     from PyQt6.QtWidgets import QApplication  
@@ -118,11 +135,11 @@ def generateRows(ws):
 def getTitle(all_rows,_,nsheet):
     del _
     if nsheet == 0:
-        title = nlind + "strlist.append('<b>')"
+        title = nlind + 'strlist.append("<b>")'
     else:
-        title = nlind + "strlist.append('<br/><br/><b>')"
+        title = nlind + 'strlist.append("<br/><br/><b>")'
     title +=  nlind + 'strlist.append(' + str(all_rows[0][0]) + ')'
-    title +=  nlind + "strlist.append('</b>')"
+    title +=  nlind + 'strlist.append("</b>")'
     return title
 
 def getNotes(all_rows,nrows,tbl_name,notetype='top'):
@@ -158,8 +175,8 @@ def getAddrows(all_rows,tbl_name):
     return addrows
 
 def buildpyCode(filename_in):
-    data_table_attributes = "'width':'100%','border':'1','padding':'1','border-collapse':'collapse'"
-    note_table_attributes = "'width':'100%','border':'1','padding':'1','border-collapse':'collapse'"
+    data_table_attributes = '"width":"100%","border":"1","padding":"1","border-collapse":"collapse"'
+    note_table_attributes = '"width":"100%","border":"1","padding":"1","border-collapse":"collapse"'
 
     outstr = ''
 
@@ -239,13 +256,12 @@ def buildpyCode(filename_in):
             outstr += nlind + 'strlist.append(' + tbl_name + 'bottom' + '.get_html_string(attributes={' + note_table_attributes + '}))'
 
     # finalize outstr - py code
-    outstr += nlind + "strlist.append('</body>')"
+    outstr += nlind + 'strlist.append("</body>")'
 
-    outstr += nlind + "helpstr = ''.join(strlist)"
+    outstr += nlind + 'helpstr = "".join(strlist)'
 
     # clean any html entities that get escaped by PrettyTable in its html output
-    outstr += nlind + "return re.sub(r'&amp;', r'&',helpstr)"
-    outstr += '\n'
+    outstr += nlind + 'return re.sub(r"&amp;", r"&",helpstr)'
 
     return outstr
 
@@ -253,9 +269,9 @@ def writepyFile(filename_in, filename_out):
     outstr = buildpyCode(filename_in)
 
     # write outstr (py code) to the specified filename
-    with open(filename_out,'w', encoding='utf-8', newline='\n') as file_object:
+    with open(filename_out,'w', encoding='utf-8') as file_object:
         file_object.write(outstr)
-    return
+    sleep(0.01)  #allow the previous write to settle, resolves appveyor file read fail
 
 def writehtmlFile(_fname_in, filename_out, filename_htm):
     del _fname_in
@@ -267,16 +283,15 @@ def writehtmlFile(_fname_in, filename_out, filename_htm):
     htmstr = var.content()
 
     # write htmlstr (html) to the specified filename
-    with open(filename_htm,'w', encoding='utf-8', newline='\n') as file_object:
+    with open(filename_htm,'w', encoding='utf-8') as file_object:
         file_object.write(htmstr)
-    return
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         currPath = (dirname(__file__)) + '/'
         #print(f"{currPath=}")
         if sys.argv[1] == 'all':
-            #for filename in os.listdir(currPath + '../input_files/'):
+            #for filename in os.listdir(currPath + '../Input_files/'):
             for filename in listdir(currPath + '../Input_files/'):
                 if filename.endswith('.xlsx'):
                     fn = filename.replace('.xlsx','')

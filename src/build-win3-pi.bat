@@ -1,4 +1,19 @@
 @echo off
+:: ABOUT
+:: Windows build file for Artisan
+::
+:: LICENSE
+:: This program or module is free software: you can redistribute it and/or
+:: modify it under the terms of the GNU General Public License as published
+:: by the Free Software Foundation, either version 2 of the License, or
+:: version 3 of the License, or (at your option) any later versison. It is
+:: provided for educational purposes and is distributed in the hope that
+:: it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+:: warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
+:: the GNU General Public License for more details.
+::
+:: AUTHOR
+:: Dave Baxter, Marko Luther 2023
 :: on entry to this script the current path must be the src folder
 ::
 :: script comandline option LEGACY used to flag a legacy build
@@ -7,7 +22,7 @@
 :: ----------------------------------------------------------------------
 :: normally these paths are set in appveyor.yml
 :: when running locally these paths must be set here 
-:: CAUTION: the paths in this section are not gurantted to be up to date!! 
+:: CAUTION: the paths in this section are not guranteed to be up to date!! 
 :: ----------------------------------------------------------------------
 setlocal enabledelayedexpansion
 if /i "%APPVEYOR%" NEQ "True" (
@@ -34,33 +49,18 @@ if /i "%APPVEYOR%" NEQ "True" (
 )
 :: ----------------------------------------------------------------------
 
-::
-:: convert .ui files to .py files
-::
-for /r %%a IN (ui\*.ui) DO (
-    echo %%~na
-    rem %PYUIC% -o uic\%%~na.py --from-imports ui\%%~na.ui
-    %PYUIC% -o uic\%%~na.py ui\%%~na.ui
-)
+python -V
 
 ::
-:: convert help files from .xlsx to .py
+:: build derived files
 ::
-%PYTHON_PATH%\python.exe ..\doc\help_dialogs\Script\xlsx_to_artisan_help.py all
+echo ""************* build derived files **************"
+
+call build-derived-win.bat
+if ERRORLEVEL 1 (echo ** Failed in build-derived-win.bat & exit /b 1) else (echo ** Finished build-dependant-win.bat)
 
 ::
-:: Process translation files
-::
-call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x86_amd64
-echo Processing translation files defined in artisan.pro
-%QT_PATH%\bin\lrelease -verbose artisan.pro
-echo Processing translation qtbase_*.ts files
-for /r %%a IN (translations\qtbase_*.ts) DO (
-    %QT_PATH%\bin\lrelease -verbose %%~a
-)
-
-::
-:: run pyinstaller and NSIS to gnerate the install .exe
+:: run pyinstaller and NSIS to generate the install .exe
 ::
 :: set environment variables for version and build
 for /f "usebackq delims==" %%a IN (`python -c "import artisanlib; print(artisanlib.__version__)"`) DO (set ARTISAN_VERSION=%%~a)
@@ -68,39 +68,46 @@ for /f "usebackq delims==" %%a IN (`python -c "import artisanlib; print(artisanl
 ::
 :: create a version file for pyinstaller
 create-version-file version-metadata.yml --outfile version_info-win.txt --version %ARTISAN_VERSION%.%ARTISAN_BUILD%
+
 ::
 :: run pyinstaller
-pyinstaller --noconfirm artisan-%ARTISAN_SPEC%.spec
+:: Choose log-level from 'TRACE', 'DEBUG', 'INFO', 'WARN', 'DEPRECATION', 'ERROR', 'FATAL'
+echo **** Running pyinstaller
+pyinstaller --noconfirm --log-level=WARN artisan-win.spec
+if ERRORLEVEL 1 (echo ** Failed in pyinstaller & exit /b 1) else (echo ** Success)
+
 ::
 :: Don't make assumptions as to where the 'makensis.exe' is - look in the obvious places
-if exist "C:\Program Files (x86)\NSIS\makensis.exe" set NSIS_EXE="C:\Program Files (x86)\NSIS\makensis.exe"
-if exist "C:\Program Files\NSIS\makensis.exe"       set NSIS_EXE="C:\Program Files\NSIS\makensis.exe"
-if exist "%ProgramFiles%\NSIS\makensis.exe"         set NSIS_EXE="%ProgramFiles%\NSIS\makensis.exe"
-if exist "%ProgramFiles(x86)%\NSIS\makensis.exe"    set NSIS_EXE="%ProgramFiles(x86)%\NSIS\makensis.exe"
+if exist "/Program Files (x86)/NSIS/makensis.exe"   set NSIS_EXE="/Program Files (x86)/NSIS/makensis.exe"
+if exist "/Program Files/NSIS/makensis.exe"         set NSIS_EXE="/Program Files/NSIS/makensis.exe"
+if exist "%ProgramFiles%/NSIS/makensis.exe"         set NSIS_EXE="%ProgramFiles%/NSIS/makensis.exe"
+if exist "%ProgramFiles(x86)%/NSIS/makensis.exe"    set NSIS_EXE="%ProgramFiles(x86)%/NSIS/makensis.exe"
 ::
 :: echo the file date since makensis does not have a version command
 for %%x in (%NSIS_EXE%) do set NSIS_DATE=%%~tx
-echo NSIS makensis.exe file date %NSIS_DATE%
+echo **** Running NSIS makensis.exe file date %NSIS_DATE%
 ::
 :: run NSIS to build the install .exe file
 %NSIS_EXE% /DPRODUCT_VERSION=%ARTISAN_VERSION%.%ARTISAN_BUILD% /DLEGACY=%ARTISAN_LEGACY% setup-install3-pi.nsi
-if ERRORLEVEL 1 (exit /b 1)
+if ERRORLEVEL 1 (echo ** Failed in NSIS & exit /b 1) else (echo ** Success)
 
 ::
-:: package the zip file
+:: package the installation zip file
 ::
 if /i "%APPVEYOR%" == "True" (
-    copy ..\LICENSE LICENSE.txt
+    copy "..\LICENSE" "LICENSE.txt"
     7z a artisan-%ARTISAN_SPEC%-%ARTISAN_VERSION%.zip Setup*.exe LICENSE.txt README.txt
 )
 
 ::
-:: check the approximate size of the zip file  
+:: check that the packaged files are above an expected size
 ::
 set file=artisan-%ARTISAN_SPEC%-%ARTISAN_VERSION%.zip
 set expectedbytesize=170000000
 for %%A in (%file%) do set size=%%~zA
 if %size% LSS %expectedbytesize% (
-    echo ***Zip file is smaller than expected
+    echo *** Zip file is smaller than expected
     exit /b 1
+) else (
+    echo **** Success: %file% is larger than minimum %expectedbytesize% bytes
 )
