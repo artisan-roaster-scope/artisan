@@ -61,9 +61,8 @@ lxml==4.9.2
 # packages that differ per platform
 #
 ## install gevent only on macOS higher than 10.13 to deactivate WebLCDs on macOS legacy builds
-gevent==22.10.2; sys_platform!='darwin' and platform_release>='18.0' # WebLCDs not supported on macOS 10.13
-gevent-websocket==0.10.1; sys_platform!='darwin' and platform_release>='18.0' # WebLCDs not supported on macOS 10.13
-gevent==22.10.2; sys_platform!='darwin'
+gevent==22.10.2; sys_platform!='darwin' or platform_release>='18.0' # WebLCDs not supported on macOS 10.13
+gevent-websocket==0.10.1; sys_platform!='darwin' or platform_release>='18.0' # WebLCDs not supported on macOS 10.13
 ##
 ### yoctopuce 1.10.42060 on macOS 10.13
 yoctopuce==1.10.42060; sys_platform=='darwin' and python_version<'3.9' # last version supporting macOS 10.13
