@@ -54,8 +54,9 @@ python3 --version
 #brew install p7zip
 
 python -m pip install --upgrade pip
-sudo -H python -m pip install --root-user-action=ignore -r src/requirements.txt
-sudo -H python -m pip install --root-user-action=ignore -r src/requirements-${ARTISAN_OS}.txt
+sudo -H python -m pip install --root-user-action=ignore -r src/requirements-new.txt | sed '/^Ignoring/d'
+#sudo -H python -m pip install --root-user-action=ignore -r src/requirements.txt
+#sudo -H python -m pip install --root-user-action=ignore -r src/requirements-${ARTISAN_OS}.txt
 
 # patch google packages to help out py2app
 sudo -H touch ${PYTHONSITEPKGS}/google/__init__.py
@@ -66,3 +67,8 @@ sudo -H touch ${PYTHONSITEPKGS}/google/protobuf/internal/__init__.py
 
 # copy the snap7 binary installed by pip
 cp -f ${PYTHONSITEPKGS}/snap7/lib/libsnap7.dylib /usr/local/lib
+
+# show set of libraries are installed
+echo "**** pip freeze ****"
+python3 -m pip freeze
+
