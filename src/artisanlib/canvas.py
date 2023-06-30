@@ -230,7 +230,7 @@ class tgraphcanvas(FigureCanvas):
         'E4backgroundvalues', 'l_backgroundeventtype1dots', 'l_backgroundeventtype2dots', 'l_backgroundeventtype3dots', 'l_backgroundeventtype4dots',
         'DeltaETBflag', 'DeltaBTBflag', 'clearBgbeforeprofileload', 'hideBgafterprofileload', 'heating_types', 'operator', 'organization', 'roastertype', 'roastersize', 'roasterheating', 'drumspeed',
         'organization_setup', 'operator_setup', 'roastertype_setup', 'roastersize_setup', 'roastersize_setup_default', 'roasterheating_setup', 'drumspeed_setup', 'last_batchsize', 'machinesetup_energy_ratings',
-        'machinesetup', 'roastingnotes', 'cuppingnotes', 'roastdate', 'roastepoch', 'lastroastepoch', 'batchcounter', 'batchsequence', 'batchprefix', 'neverUpdateBatchCounter',
+        'machinesetup', 'roastingnotes', 'cuppingnotes', 'roastdate', 'roastepoch', 'roastepoch_timeout', 'lastroastepoch', 'batchcounter', 'batchsequence', 'batchprefix', 'neverUpdateBatchCounter',
         'roastbatchnr', 'roastbatchprefix', 'roastbatchpos', 'roasttzoffset', 'roastUUID', 'plus_default_store', 'plus_store', 'plus_store_label', 'plus_coffee',
         'plus_coffee_label', 'plus_blend_spec', 'plus_blend_spec_labels', 'plus_blend_label', 'plus_custom_blend', 'plus_sync_record_hash', 'plus_file_last_modified', 'beans', 'projectFlag', 'curveVisibilityCache', 'ETcurve', 'BTcurve',
         'ETlcd', 'BTlcd', 'swaplcds', 'LCDdecimalplaces', 'foregroundShowFullflag', 'DeltaETflag', 'DeltaBTflag', 'DeltaETlcdflag', 'DeltaBTlcdflag',
@@ -1322,7 +1322,8 @@ class tgraphcanvas(FigureCanvas):
         self.roastdate:QDateTime = QDateTime.currentDateTime()
         # system batch nr system
         self.roastepoch:int = self.roastdate.toSecsSinceEpoch() # in seconds
-        self.lastroastepoch:int = self.roastepoch # the epoch of the last roast in seconds
+        self.roastepoch_timeout:Final[int] = 90*60  # in seconds; period after last roast which starts a new roasting session
+        self.lastroastepoch:int = self.roastepoch - self.roastepoch_timeout - 1 # the epoch of the last roast in seconds, initialized such that a new roast session can start
         self.batchcounter:int = -1 # global batch counter; if batchcounter is -1, batchcounter system is inactive
         self.batchsequence:int = 1 # global counter of position in sequence of batches of one session
         self.batchprefix:str = ''
@@ -13117,7 +13118,7 @@ class tgraphcanvas(FigureCanvas):
 
     def decBatchCounter(self):
         if not bool(self.aw.simulator):
-            if self.lastroastepoch + 5400 < self.roastepoch:
+            if self.lastroastepoch + self.roastepoch_timeout < self.roastepoch:
                 # reset the sequence counter
                 self.batchsequence = 1
             elif self.batchsequence > 1:

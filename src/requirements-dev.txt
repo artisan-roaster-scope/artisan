@@ -12,3 +12,7 @@ pyright==1.1.316
 ruff
 pylint==2.17.4
 pre-commit
+#pytest==7.4.0
+#pytest-qt==4.2.0
+#pytest-xdist==3.3.1
+#pytest-cov==4.1.0

@@ -14483,8 +14483,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 self.qmc.backgroundpath = decodeLocalStrict(profile['backgroundpath'])
                 if os.path.isfile(self.qmc.backgroundpath):
                     try:
+                        background_hidden = self.qmc.backgroundprofile is not None and not self.qmc.background # before loading this new profile, a background was loaded but hidden
                         self.loadbackground(self.qmc.backgroundpath)
-                        self.qmc.background = not self.qmc.hideBgafterprofileload
+                        self.qmc.background = not self.qmc.hideBgafterprofileload and not background_hidden # if before the loaded background was hidden, we again hide the background on loading this profile
                         self.qmc.timealign(redraw=False) # there will be a later redraw triggered that also recomputes the deltas
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
@@ -15803,7 +15804,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     return True  #don't load any more settings. They could be bad (corrupted). Stop here.
 
             # we remember from which location we loaded the last settings file
-            # to be able to update the batch counter in this file from incBatchCounter()/decBatchCounter()
+            # to be able to update the batch counter in this file from qmc.incBatchCounter()/qmc.decBatchCounter()
             # but not for loading of settings fragments like themes or machines
             if filename:
                 if updateBatchCounter:

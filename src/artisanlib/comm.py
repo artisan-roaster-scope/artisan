@@ -5122,7 +5122,7 @@ class serialport:
                     rc[i].close()
                 except Exception: # pylint: disable=broad-except
                     pass
-            self.aw.ser.PhidgetRCServo = {}
+        self.aw.ser.PhidgetRCServo = {}
 
 #---
 

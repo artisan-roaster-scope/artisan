@@ -46,8 +46,9 @@ lxml==4.9.2
 # packages that differ per platform
 #
 ## install gevent only on macOS higher than 10.13 to deactivate WebLCDs on macOS legacy builds
-gevent==22.10.2; sys_platform=='darwin' and python_version>'3.10' # WebLCDs not supported on macOS 10.13
-gevent-websocket==0.10.1; sys_platform=='darwin' and python_version>'3.10' # WebLCDs not supported on macOS 10.13
+gevent==22.10.2; sys_platform!='darwin' and platform_release>='18.0' # WebLCDs not supported on macOS 10.13
+gevent-websocket==0.10.1; sys_platform!='darwin' and platform_release>='18.0' # WebLCDs not supported on macOS 10.13
+gevent==22.10.2; sys_platform!='darwin'
 ##
 ### yoctopuce 1.10.42060 on macOS 10.13
 yoctopuce==1.10.42060; sys_platform=='darwin' and python_version<'3.9' # last version supporting macOS 10.13
@@ -58,11 +59,11 @@ yoctopuce==1.10.54852; sys_platform!='darwin' or python_version>'3.10'
 ## Qt 6.5.x supports macOS 11 (Darwin 20.x) and higher as well as Windows 10/11
 ##
 ## Qt5 on macOS <11 and Windows 7/8
-PyQt5==5.15.9; (sys_platform=='darwin' and python_version<'3.9') or (platform_system=='Windows' and python_version<'3.9')
-PyQtWebEngine==5.15.6; (sys_platform=='darwin' and python_version<'3.9') or (platform_system=='Windows' and python_version<'3.9')
+PyQt5==5.15.9; (sys_platform=='darwin' and platform_release<'20.0') or (platform_system=='Windows' and python_version<'3.9')
+PyQtWebEngine==5.15.6; (sys_platform=='darwin' and platform_release<'20.0') or (platform_system=='Windows' and python_version<'3.9')
 # Qt6 on macOS 11+, Windows 10/11 and Linux
-PyQt6==6.5.1; (sys_platform=='darwin' and python_version>'3.10') or (platform_system=='Windows' and python_version>'3.10') or platform_system=='Linux'
-PyQt6-WebEngine==6.5.0; (sys_platform=='darwin' and python_version>'3.10') or (platform_system=='Windows' and python_version>'3.10') or platform_system=='Linux'
+PyQt6==6.5.1; (sys_platform=='darwin' and platform_release>='20.0) or (platform_system=='Windows' and python_version>'3.10') or platform_system=='Linux'
+PyQt6-WebEngine==6.5.0; (sys_platform=='darwin' and platform_release>='20.0) or (platform_system=='Windows' and python_version>'3.10') or platform_system=='Linux'
 ##
 matplotlib==3.7.0; platform_system=='Windows' #3.7.1 has an issue with the click handle on Windows
 matplotlib==3.7.1; platform_system!='Windows'
@@ -78,6 +79,7 @@ pyobjc-core==9.2; sys_platform=='darwin'
 pyobjc-framework-Cocoa==9.2; sys_platform=='darwin'
 py2app==0.28.6; sys_platform=='darwin'
 py-cpuinfo==9.0.0; sys_platform=='darwin' # used for proper CPU arch detection running under Rosetta2
+darkdetect==0.8.0; sys_platform=='darwin' and platform_release<'20.0' # detect if dark mode is active (only used by macOS legacy builds)
 ###
 ########
 ### Linux specific packages
