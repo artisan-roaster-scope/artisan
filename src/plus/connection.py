@@ -150,7 +150,7 @@ def setKeyring() -> None:
             try:
                 keyring.set_keyring(keyring.backends.macOS.Keyring())
             except Exception:  # pylint: disable=broad-except
-                keyring.set_keyring(keyring.backends.OS_X.Keyring())   # type: ignore
+                keyring.set_keyring(keyring.backends.OS_X.Keyring())   # type: ignore  # pylint: disable=no-member
         else:  # Linux
             keyring.set_keyring(keyring.backends.SecretService.Keyring())
         # _log.debug("keyring: %s",str(keyring.get_keyring()))
