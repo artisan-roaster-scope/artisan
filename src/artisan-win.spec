@@ -12,7 +12,7 @@
 # the GNU General Public License for more details.
 
 # AUTHOR
-# Marko Luther, 2023
+# Marko Luther, Dave Baxter 2023
 
 # -*- mode: python -*-
 
@@ -54,7 +54,7 @@ def make_dir(source_dir, fatal=True):
         if fatal:
             sys.exit('Fatal Error')
 
-# Function to remove diir
+# Function to remove dir
 def remove_dir(source_dir, fatal=True):
     rmdir_command = f'rmdir /q /s {source_dir}'
     exit_code = os.system(rmdir_command)
@@ -76,14 +76,16 @@ block_cipher = None
 
 import os
 if os.environ.get('APPVEYOR'):
-  ARTISAN_SRC = r'C:\projects\artisan\src'
-  PYTHON = os.environ.get('PYTHON_PATH')
-  PYQT = os.environ.get('PYQT')
-  QT_TRANSL = os.environ.get('QT_TRANSL')
-  ARTISAN_LEGACY = os.environ.get('ARTISAN_LEGACY')
+    ARTISAN_SRC = r'C:\projects\artisan\src'
+    PYTHON = os.environ.get('PYTHON_PATH')
+    PYQT = os.environ.get('PYQT')
+    QT_TRANSL = os.environ.get('QT_TRANSL')
+    ARTISAN_LEGACY = os.environ.get('ARTISAN_LEGACY')
 else:
-  ARTISAN_SRC = r'C:\Users\roast\Documents\artisan-roaster-scope\src'
-  PYTHON = r'C:\Program Files\Python38'
+    msg =f'artisan-win.spec is intended only to run on Appveyor CI.'
+    logging.error(msg)
+    sys.exit('Fatal Error')
+
 NAME = 'artisan'
 
 logging.info("** ARTISAN_LEGACY: %s", ARTISAN_LEGACY)
@@ -94,17 +96,16 @@ TARGET = 'dist\\' + NAME + '\\'
 PYTHON_PACKAGES = PYTHON + r'\Lib\site-packages'
 PYQT_QT = PYTHON_PACKAGES + r'\PyQt5\Qt'
 PYQT_QT_BIN = PYQT_QT + r'\bin'
-PYQT_QT_TRANSLATIONS =QT_TRANSL
-#PYQT_QT_TRANSLATIONS = PYQT_QT + r'\translations'
+PYQT_QT_TRANSLATIONS = QT_TRANSL
 YOCTO_BIN = PYTHON_PACKAGES + r'\yoctopuce\cdll'
 SNAP7_BIN = r'C:\Windows'
 LIBUSB_BIN = r'C:\Windows\SysWOW64'
 
 from PyInstaller.utils.hooks import is_module_satisfies
 if is_module_satisfies('scipy >= 1.3.2'):
-  SCIPY_BIN = PYTHON_PACKAGES + r'\scipy\.libs'
+    SCIPY_BIN = PYTHON_PACKAGES + r'\scipy\.libs'
 else:
-  SCIPY_BIN = PYTHON_PACKAGES + r'\scipy\extra-dll'
+    SCIPY_BIN = PYTHON_PACKAGES + r'\scipy\extra-dll'
 
 #os.system(PYTHON + r'\Scripts\pylupdate5 artisan.pro')
 
@@ -193,11 +194,24 @@ for tr in [
     'qtbase_uk.qm',
     'qtbase_tr.qm',
     'qtbase_zh_TW.qm',
+    'qtconnectivity_de.qm',
+    'qtconnectivity_en.qm',
+    'qtconnectivity_es.qm',
+    'qtconnectivity_hu.qm',
+    'qtconnectivity_ko.qm',
+    'qtconnectivity_tr.qm',
     ]:
-  copy_file(QT_TRANSL + '\\' + tr, TARGET + 'translations')
+    copy_file(QT_TRANSL + '\\' + tr, TARGET + 'translations',False)
+# Add the translations not available in PyQt5 for legacy Windows.  
+if not ARTISAN_LEGACY=='True':
+    for tr in [
+        'qtconnectivity_zh_CN.qm',
+        ]:
+        copy_file(QT_TRANSL + '\\' + tr, TARGET + 'translations',False)
+
 
 # this directory no longer exists
-remove_dir(TARGET + 'mpl-data\sample_data',False)
+#remove_dir(TARGET + 'mpl-data\sample_data',False)
 
 # YOCTO HACK BEGIN: manually copy over the dlls
 make_dir(TARGET + 'yoctopuce\cdll')

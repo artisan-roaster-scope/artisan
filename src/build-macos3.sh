@@ -1,6 +1,6 @@
 #!/bin/sh
 # ABOUT
-# Build shell script for Artisan macOS builds
+# Build shell script for Artisan macOS CI builds
 #
 # LICENSE
 # This program or module is free software: you can redistribute it and/or
@@ -21,32 +21,10 @@ echo $PATH
 set -e  # reduced logging
 python3 -V
 
-if [ ! -z $APPVEYOR ]; then
-    # Appveyor CI builds
-    echo "NOTICE: Appveyor build"
-
-else
-    # standard local builds
-    echo "NOTICE: Standard build"
-    export PYTHON_V=3.11
-    export PYTHON=/Library/Frameworks/Python.framework/Versions/${PYTHON_V}
-    export PYTHONBIN=$PYTHON/bin
-    export PYTHONPATH=$PYTHON/lib/python${PYTHON_V}
-
-# for PyQt6:
-    export QT_PATH=${PYTHONPATH}/site-packages/PyQt6/Qt6
-    export QT_SRC_PATH=~/Qt/6.5.1/macos
-    export PYUIC=pyuic6
-    #remove export PYRCC=pyrcc6
-    export PYLUPDATE=./pylupdate6pro
-
-    export MACOSX_DEPLOYMENT_TARGET=11.0
-    export DYLD_LIBRARY_PATH=$PYTHON/lib:$DYLD_LIBRARY_PATH
-    export PATH=$PYTHON/bin:$PYTHON/lib:$PATH
-    export PATH=$QT_PATH/bin:$QT_PATH/lib:$PATH
-
-    #export DYLD_FRAMEWORK_PATH=$QT_PATH/lib # with this line all Qt libs are copied into Contents/Frameworks. Why?
-
+# check that we are running on Appveyor
+if [ -z $APPVEYOR ]; then
+    echo "This file is for use on Appveyor CI only."
+    exit 1
 fi
 
 echo "************* build derived files **************"
