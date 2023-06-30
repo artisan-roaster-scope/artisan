@@ -12348,7 +12348,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                         self.qmc.backgroundFlavors[i] *= 10.
                     self.qmc.backgroundFlavors = self.qmc.backgroundFlavors[:(l-1)]
                 if 'etypes' in profile:
-                    self.qmc.Betypes = profile['etypes']
+                    self.qmc.Betypes = [decodeLocalStrict(x) for x in profile['etypes']]
                 if 'timeindex' in profile:
                     self.qmc.timeindexB = [max(0,v) if i>0 else max(-1,v) for i,v in enumerate(profile['timeindex'])]          #if new profile found with variable timeindex
                     if self.qmc.phasesfromBackgroundflag:
