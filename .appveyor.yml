@@ -75,8 +75,8 @@ for:
     - ps: $env:QT_TRANSL = "$env:PYTHON_PATH/Lib/site-packages/PyQt5/Qt5/translations"
 
     # pull library versions from requirments file
-    - ps: $env:PYINSTALLER_VER = Select-String -Path ./src/requirements-new.txt "pyinstaller==([\d\.]*).*platform_system='Windows'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
-    - ps: $env:LIBUSB_VER = Select-String -Path ./src/requirements-new.txt "libusb==([\d\.]*).*platform_system='Windows'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
+    - ps: $env:PYINSTALLER_VER = Select-String -Path ./src/requirements.txt "pyinstaller==([\d\.]*).*platform_system='Windows'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
+    - ps: $env:LIBUSB_VER = Select-String -Path ./src/requirements.txt "libusb==([\d\.]*).*platform_system='Windows'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
     - ps: Write-Host "PYINSTALLER_VER= $env:PYINSTALLER_VER"
     - ps: Write-Host "LIBUSB_VER= $env:LIBUSB_VER"
 
@@ -85,7 +85,7 @@ for:
 
     # run the install script
     - cmd: .ci\install-win.bat
-        
+
   build_script:
     - cmd: echo Windows Legacy Build
     - cmd: cd src
@@ -135,13 +135,13 @@ for:
     # derive the python path from the version number
     - ps: $env:PYTHON_PATH = "C:/Python$($env:PYTHON_V -replace '\.','')-x64"
     - ps: Write-Host $env:PYTHON_PATH
-        
+
     # generate the path to PyQt translations files
     - ps: $env:QT_TRANSL = "$env:PYTHON_PATH/Lib/site-packages/PyQt6/Qt6/translations"
 
-    # pull library versions from requirments file 
-    - ps: $env:PYINSTALLER_VER = Select-String -Path ./src/requirements-new.txt "pyinstaller==([\d\.]*).*platform_system='Windows'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
-    - ps: $env:LIBUSB_VER = Select-String -Path ./src/requirements-new.txt "libusb==([\d\.]*).*platform_system='Windows'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
+    # pull library versions from requirments file
+    - ps: $env:PYINSTALLER_VER = Select-String -Path ./src/requirements.txt "pyinstaller==([\d\.]*).*platform_system='Windows'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
+    - ps: $env:LIBUSB_VER = Select-String -Path ./src/requirements.txt "libusb==([\d\.]*).*platform_system='Windows'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
     - ps: Write-Host "PYINSTALLER_VER= $env:PYINSTALLER_VER"
     - ps: Write-Host "LIBUSB_VER= $env:LIBUSB_VER"
 
@@ -243,12 +243,12 @@ for:
 
   install:
     - echo "Linux Install"
-        
+
     - chmod +x .ci/*.sh
 
     # pull library versions from requirments file
-#    - ps: $env:LIBUSB_VER = Select-String -Path ./src/requirements-linux.txt 'libusb==([\d\.]*)' -List | ForEach-Object {$_.Matches.Groups[1].Value}
-    - ps: $env:LIBUSB_VER = Select-String -Path ./src/requirements-new.txt "libusb==([\d\.]*).*platform_system='Linux'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
+#    - ps: $env:LIBUSB_VER = Select-String -Path ./src/requirements.txt 'libusb==([\d\.]*)' -List | ForEach-Object {$_.Matches.Groups[1].Value}
+    - ps: $env:LIBUSB_VER = Select-String -Path ./src/requirements.txt "libusb==([\d\.]*).*platform_system='Linux'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
     - ps: Write-Host "LIBUSB_VER= $env:LIBUSB_VER"
 
     # update the __revision__ field with the left seven of the GIT commit hash

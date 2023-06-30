@@ -1,10 +1,25 @@
 ######
+#
+# This document describes the dependencies to run and build Artisan on the following platforms
+#
+# macOS (11.x; Darwin 20.x)
+#   Python 3.11
+# Windows (10/11)
+#   Python 3.11
+# Linux (Ubuntu 22.04+; GCC11, Red Hat 8.4+; GCC10)
+#   Python 3.11
+#--
+# Windows Legacy (Windows 7/8)
+#   Python 3.8
+# macOS Legacy (macOS 10.13; Darwin 17.x)
+#   Python 3.11
+#
+######
 # the following commented package versions are read by appveyor.yml and downloaded outside of pip.
 #
 # pyinstaller==5.13.0; platform_system='Windows'
 # libusb==1.2.7.3; platform_system='Windows'  #1.2.6.0
 # libusb==1.0.26;  platform_system='Linux'
-#
 #
 ######
 # packages that are required on all platforms
@@ -32,7 +47,7 @@ typing-extensions==4.6.3; python_version < '3.8' # required for supporting Final
 protobuf==4.23.3
 numpy==1.24.3; python_version < '3.9' # last Python 3.8 release
 numpy==1.25.0; python_version >= '3.9'
-scipy==1.10.1; python_version < '3.9'
+scipy==1.10.1; python_version < '3.9' # last Python 3.8 release
 scipy==1.11.1; python_version >= '3.9'
 wquantiles==0.6
 colorspacious==1.1.2
@@ -62,8 +77,8 @@ yoctopuce==1.10.54852; sys_platform!='darwin' or python_version>'3.10'
 PyQt5==5.15.9; (sys_platform=='darwin' and platform_release<'20.0') or (platform_system=='Windows' and python_version<'3.9')
 PyQtWebEngine==5.15.6; (sys_platform=='darwin' and platform_release<'20.0') or (platform_system=='Windows' and python_version<'3.9')
 # Qt6 on macOS 11+, Windows 10/11 and Linux
-PyQt6==6.5.1; (sys_platform=='darwin' and platform_release>='20.0) or (platform_system=='Windows' and python_version>'3.10') or platform_system=='Linux'
-PyQt6-WebEngine==6.5.0; (sys_platform=='darwin' and platform_release>='20.0) or (platform_system=='Windows' and python_version>'3.10') or platform_system=='Linux'
+PyQt6==6.5.1; (sys_platform=='darwin' and platform_release>='20.0') or (platform_system=='Windows' and python_version>'3.10') or platform_system=='Linux'
+PyQt6-WebEngine==6.5.0; (sys_platform=='darwin' and platform_release>='20.0') or (platform_system=='Windows' and python_version>'3.10') or platform_system=='Linux'
 ##
 matplotlib==3.7.0; platform_system=='Windows' #3.7.1 has an issue with the click handle on Windows
 matplotlib==3.7.1; platform_system!='Windows'

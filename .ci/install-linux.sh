@@ -29,9 +29,7 @@ sudo apt-get install -y -q libdbus-1-3 libxkbcommon-x11-0 libxcb-icccm4 libxcb-i
 
 gem install fpm -v 1.12.0 # Linux build fails using 1.13.0
 pip install --upgrade pip
-pip install -r src/requirements-new.txt | sed '/^Ignoring/d'
-#pip install -r src/requirements.txt
-#pip install -r src/requirements-${ARTISAN_OS}.txt
+pip install -r src/requirements.txt | sed '/^Ignoring/d'
 
 # copy the snap7 binary installed by pip
 sudo cp -f ${PYTHONSITEPKGS}/snap7/lib/libsnap7.so /usr/lib
@@ -41,5 +39,3 @@ sudo cp -f ${PYTHONSITEPKGS}/snap7/lib/libsnap7.so /usr/lib
 # show set of libraries are installed
 echo "**** pip freeze ****"
 pip freeze
-
-

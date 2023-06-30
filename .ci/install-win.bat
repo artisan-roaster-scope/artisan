@@ -43,9 +43,7 @@ python -m pip install wheel
 ::
 :: install Artisan required libraries from pip
 ::
-python -m pip install -r src\requirements-new.txt | findstr /v /b "Ignoring"
-rem python -m pip install -r src\requirements.txt
-rem python -m pip install -r src\requirements-%ARTISAN_SPEC%.txt
+python -m pip install -r src\requirements.txt | findstr /v /b "Ignoring"
 
 ::
 :: custom build the pyinstaller bootloader or install a prebuilt
