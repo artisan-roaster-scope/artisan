@@ -22,7 +22,7 @@
 # libusb==1.0.26;  platform_system='Linux'
 #
 # HACK: temporary require an older version of Pillow (PIL) as the current v10.0.0 breaks py2app on macOS
-Pillow==9.5.0; sys_platform!='darwin'
+Pillow==9.5.0; sys_platform=='darwin'
 #
 ######
 # packages that are required on all platforms
