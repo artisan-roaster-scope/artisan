@@ -1,3 +1,45 @@
+[project]
+name = 'Artisan'
+dynamic = ['version']
+description = "Artisan is a software that helps coffee roasters record, analyze, and control roast profiles."
+readme = {file = 'README.md', content-type='text/markdown'}
+authors = [
+    {name = 'Rafael Cobo'},
+    {name = 'Marko Luther'},
+    {name = 'Dave Baxter'}
+]
+maintainers = [
+    {name = 'Marko Luther'},
+    {name = 'Dave Baxter'}
+]
+license = {file = 'LICENSE'}
+requires-python = '>=3.8'
+keywords = ['markdown', 'markdown-parser', 'python-markdown', 'markdown-to-html']
+classifiers = [
+    'Development Status :: 5 - Production/Stable',
+    'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+    "Operating System :: Windows",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux"
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3 :: Only',
+    'Programming Language :: Python :: Implementation :: CPython',
+    'Topic :: Other/Nonlisted Topic'
+]
+
+[project.urls]
+'Homepage' = 'https://artisan-scope.org/'
+'Documentation' = 'https://artisan-scope.org/docs/quick-start-guide/'
+'Repository' = 'https://github.com/artisan-roaster-scope/artisan'
+'Issue Tracker' = 'https://github.com/artisan-roaster-scope/artisan/issues'
+'Changelog' = 'https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/ReleaseHistory.md'
+
+
 ## black
 
 [tool.black]

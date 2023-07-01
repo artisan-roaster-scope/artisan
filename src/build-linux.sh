@@ -41,7 +41,7 @@ fi
 echo "************* build derived files **************"
 ./build-derived.sh linux  #generate the derived files
 if [ $? -ne 0 ]; then echo "Failed in build-derived.sh"; exit $?; else (echo "** Finished build-derived.sh"); fi
-    
+
 rm -rf build
 rm -rf dist
 
@@ -67,12 +67,16 @@ mkdir dist/translations
 for lan in ar, da, de, en, el, es, fa, fi, fr, gd, he, hu, id, it, ja, ko, lv, nl, no, pl, pt_BR, pt, sk, sv, th, tr, uk, vi, zh_CN, zh_TW; do
      QTBASE_FILE=$QT_PATH/translations/qtbase_${lan}.qm
      QT_FILE=$QT_PATH/translations/qt_${lan}.qm
+#     QTCONNECTIVITY_FILE=$QT_PATH/translations/qtconnectivity_${lan}.qm
      if [ -e ${QTBASE_FILE} ]
           then cp ${QTBASE_FILE} dist/translations
      fi
      if [ -e ${QT_FILE} ]
           then cp ${QT_FILE} dist/translations
      fi
+#     if [ -e ${QTCONNECTIVITY_FILE} ]
+#          then cp ${QTCONNECTIVITY_FILE} dist/translations
+#     fi
 done
 
 cp translations/*.qm dist/translations

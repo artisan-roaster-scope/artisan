@@ -1356,7 +1356,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 
     __slots__ = [ 'locale_str', 'app', 'superusermode', 'sample_loop_running', 'time_stopped', 'plus_account', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription',
         'plus_paidUntil', 'plus_rlimit', 'plus_used', 'plus_readonly', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
-        'eventaction_running_threads', 'qtbase_additional_locales', 'qtbase_locales', 'curFile', 'MaxRecentFiles', 'recentFileActs', 'recentSettingActs',
+        'eventaction_running_threads', 'curFile', 'MaxRecentFiles', 'recentFileActs', 'recentSettingActs',
         'recentThemeActs', 'applicationDirectory', 'helpdialog', 'redrawTimer', 'lastLoadedProfile', 'lastLoadedBackground', 'LargeScaleLCDsFlag', 'largeScaleLCDs_dialog',
         'analysisresultsanno', 'segmentresultsanno', 'largeLCDs_dialog', 'LargeLCDsFlag', 'largeDeltaLCDs_dialog', 'LargeDeltaLCDsFlag', 'largePIDLCDs_dialog',
         'LargePIDLCDsFlag', 'largeExtraLCDs_dialog', 'LargeExtraLCDsFlag', 'largePhasesLCDs_dialog', 'LargePhasesLCDsFlag', 'WebLCDs', 'WebLCDsPort',
@@ -1459,13 +1459,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.pdf_rendering:bool = False # True while PDF is rendered by QWebEngineView
 
         self.eventaction_running_threads:List[EventActionThread] = []
-
-        # locales that come with a standard qtbase translation for standard elements/buttons
-        # for other locales standard OK/Cancel buttons created in dialogs via QDialogButtonBoxes should be
-        # renamed via setText to link them to artisan translations (which hopefully provides those translations)
-
-        self.qtbase_additional_locales = ['da','el','fa','gd','lv','nl','pt_BR','pt','sk','sv','zh_CN'] # additionally added to /translations
-        self.qtbase_locales = ['ar','de','en','es','fi','fr','he','hu','it','ja','ko','pl','uk','tr','zh_TW'] # from Qt distribution
 
         #############################  Define variables that need to exist before calling settingsload()
         self.curFile:Optional[str] = None

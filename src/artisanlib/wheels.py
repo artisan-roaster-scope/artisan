@@ -131,9 +131,8 @@ class WheelDlg(ArtisanDialog):
         viewModeButton.setToolTip(QApplication.translate('Tooltip','Sets Wheel graph to view mode'))
         viewModeButton.clicked.connect(self.viewmode)
 
-        if self.aw.locale_str not in self.aw.qtbase_locales:
-            self.main_buttons.button(QDialogButtonBox.StandardButton.Close).setText(QApplication.translate('Button','Close'))
-            self.main_buttons.button(QDialogButtonBox.StandardButton.Open).setText(QApplication.translate('Button','Open'))
+        self.setButtonTranslations(self.main_buttons.button(QDialogButtonBox.StandardButton.Close),'Close', QApplication.translate('Button','Close'))
+        self.setButtonTranslations(self.main_buttons.button(QDialogButtonBox.StandardButton.Open),'Open', QApplication.translate('Button','Open'))
 
         self.aw.qmc.drawWheel()
         label1layout = QVBoxLayout()

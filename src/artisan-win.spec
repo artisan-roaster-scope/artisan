@@ -119,7 +119,7 @@ hiddenimports_list=['charset_normalizer.md__mypyc', # part of requests 2.28.2 # 
                             'win32cred',
                             'win32timezone'
                             ]
-# Add the hidden imports not required by legacy Windows.  
+# Add the hidden imports not required by legacy Windows.
 if not ARTISAN_LEGACY=='True':
     logging.info(">>>>> Appending hidden imports")
     hiddenimports_list[len(hiddenimports_list):] = [
@@ -194,18 +194,29 @@ for tr in [
     'qtbase_uk.qm',
     'qtbase_tr.qm',
     'qtbase_zh_TW.qm',
-    'qtconnectivity_de.qm',
-    'qtconnectivity_en.qm',
-    'qtconnectivity_es.qm',
-    'qtconnectivity_hu.qm',
-    'qtconnectivity_ko.qm',
-    'qtconnectivity_tr.qm',
+#    'qtconnectivity_de.qm',
+#    'qtconnectivity_en.qm',
+#    'qtconnectivity_es.qm',
+#    'qtconnectivity_hu.qm',
+#    'qtconnectivity_ko.qm',
+#    'qtconnectivity_tr.qm',
     ]:
     copy_file(QT_TRANSL + '\\' + tr, TARGET + 'translations',False)
-# Add the translations not available in PyQt5 for legacy Windows.  
+# Add the translations not available in PyQt5 for legacy Windows.
 if not ARTISAN_LEGACY=='True':
     for tr in [
-        'qtconnectivity_zh_CN.qm',
+        'qtbase_da.qm',
+        'qtbase_fa.qm',
+        'qtbase_gd.qm',
+        'qtbase_lv.qm',
+        'qtbase_nl.qm',
+        'qtbase_pt_BR.qm',
+        'qtbase_zh_CN.qm',
+#        'qtconnectivity_da.qm',
+#        'qtconnectivity_ko.qm',
+#        'qtconnectivity_nl.qm',
+#        'qtconnectivity_pt_BR.qm',
+#        'qtconnectivity_zh_CN.qm',
         ]:
         copy_file(QT_TRANSL + '\\' + tr, TARGET + 'translations',False)
 

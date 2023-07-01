@@ -40,24 +40,42 @@ DATA_FILES = [
 # standard QT translation needed to get the Application menu bar and
 # the standard dialog elements translated
     ('../translations', [QTDIR + r'/translations/qtbase_ar.qm']),
+    ('../translations', [QTDIR + r'/translations/qtbase_da.qm']),     # new in Qt 6.5
     ('../translations', [QTDIR + r'/translations/qtbase_de.qm']),
     ('../translations', [QTDIR + r'/translations/qtbase_en.qm']),
     ('../translations', [QTDIR + r'/translations/qtbase_es.qm']),
+    ('../translations', [QTDIR + r'/translations/qtbase_fa.qm']),     # new in Qt 6.5
     ('../translations', [QTDIR + r'/translations/qtbase_fi.qm']),
     ('../translations', [QTDIR + r'/translations/qtbase_fr.qm']),
+    ('../translations', [QTDIR + r'/translations/qtbase_gd.qm']),     # new in Qt 6.5
     ('../translations', [QTDIR + r'/translations/qtbase_he.qm']),
     ('../translations', [QTDIR + r'/translations/qtbase_hu.qm']),
     ('../translations', [QTDIR + r'/translations/qtbase_it.qm']),
     ('../translations', [QTDIR + r'/translations/qtbase_ja.qm']),
     ('../translations', [QTDIR + r'/translations/qtbase_ko.qm']),
+    ('../translations', [QTDIR + r'/translations/qtbase_lv.qm']),     # new in Qt 6.5
+    ('../translations', [QTDIR + r'/translations/qtbase_nl.qm']),     # new in Qt 6.5
 #    ("../translations", [QTDIR + r'/translations/qtbase_pt.qm']),    # empty/missing
+    ('../translations', [QTDIR + r'/translations/qtbase_pt_BR.qm']),  # new in Qt 6.5
     ('../translations', [QTDIR + r'/translations/qtbase_pl.qm']),
-    ('../translations', [QTDIR + r'/translations/qtbase_ru.qm']),
+#    ('../translations', [QTDIR + r'/translations/qtbase_ru.qm']),    # deactivated
+    ('../translations', [QTDIR + r'/translations/qtbase_sk.qm']),     # new in Qt 6.5
     ('../translations', [QTDIR + r'/translations/qtbase_uk.qm']),
 #    ("../translations", [QTDIR + r'/translations/qtbase_sv.qm']),    # empty/missing
     ('../translations', [QTDIR + r'/translations/qtbase_tr.qm']),     # new in Qt 5.15.2
-#    ("../translations", [QTDIR + r'/translations/qtbase_zh_CN.qm']), # empty/missing
+    ('../translations', [QTDIR + r'/translations/qtbase_zh_CN.qm']),  # new in Qt 6.5
     ('../translations', [QTDIR + r'/translations/qtbase_zh_TW.qm']),
+# qtconnectivity translations not in PyQt/Qt package
+#    ('../translations', [QTDIR + r'/translations/qtconnectivity_da.qm']),
+#    ('../translations', [QTDIR + r'/translations/qtconnectivity_de.qm']),
+#    ('../translations', [QTDIR + r'/translations/qtconnectivity_en.qm']),
+#    ('../translations', [QTDIR + r'/translations/qtconnectivity_es.qm']),
+#    ('../translations', [QTDIR + r'/translations/qtconnectivity_hu.qm']),
+#    ('../translations', [QTDIR + r'/translations/qtconnectivity_ko.qm']),
+#    ('../translations', [QTDIR + r'/translations/qtconnectivity_nl.qm']),
+#    ('../translations', [QTDIR + r'/translations/qtconnectivity_pt_BR.qm']),
+#    ('../translations', [QTDIR + r'/translations/qtconnectivity_tr.qm']),
+#    ('../translations', [QTDIR + r'/translations/qtconnectivity_zh_CN.qm']),
     ('../translations', [r'translations/artisan_ar.qm']),
     ('../translations', [r'translations/artisan_de.qm']),
     ('../translations', [r'translations/artisan_el.qm']),
@@ -84,17 +102,9 @@ DATA_FILES = [
     ('../translations', [r'translations/artisan_vi.qm']),
     ('../translations', [r'translations/artisan_zh_CN.qm']),
     ('../translations', [r'translations/artisan_zh_TW.qm']),
-    ('../translations', [r'translations/qtbase_da.qm']), # from Qt 6.1
     ('../translations', [r'translations/qtbase_el.qm']), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
-    ('../translations', [r'translations/qtbase_fa.qm']), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
-    ('../translations', [r'translations/qtbase_gd.qm']), # from Qt 6.1
-    ('../translations', [r'translations/qtbase_lv.qm']), # from Qt 6.1
-    ('../translations', [r'translations/qtbase_nl.qm']), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
     ('../translations', [r'translations/qtbase_pt.qm']), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
-    ('../translations', [r'translations/qtbase_sk.qm']), # from Qt 6.1
-    ('../translations', [r'translations/qtbase_pt_BR.qm']), # from Qt 6.1
     ('../translations', [r'translations/qtbase_sv.qm']), # unfinished translations from https://code.qt.io/cgit/qt/qttranslations.git/
-    ('../translations', [r'translations/qtbase_zh_CN.qm']), # from Qt 6.1
 #    ("../Resources", [r"qt.conf"]), # uncomment in QT Framework variant
     ('../Resources', [r'artisanProfile.icns']),
     ('../Resources', [r'artisanAlarms.icns']),
