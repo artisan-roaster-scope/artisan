@@ -20,7 +20,7 @@ classifiers = [
     'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
     "Operating System :: Windows",
     "Operating System :: MacOS",
-    "Operating System :: POSIX :: Linux"
+    "Operating System :: POSIX :: Linux",
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
     'Programming Language :: Python :: 3.8',
