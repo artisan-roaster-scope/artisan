@@ -38,4 +38,4 @@ If you run into any merge issues, checkout this git tutorial to help you resolve
 
 ## Coding conventions
 
-We are using the code analyzer ruff and pylint and the type checkers mypy and pyright to verify code quality as configured in [`src/pyproject.toml`](https://github.com/artisan-roaster-scope/artisan/blob/master/src/pyproject.toml).
+We are using the code analyzer [ruff](https://github.com/astral-sh/ruff) and [pylint](https://github.com/pylint-dev/pylint) and the type checkers [mypy](https://github.com/python/mypy) and [pyright](https://github.com/microsoft/pyright) to verify code quality as configured in [`src/pyproject.toml`](https://github.com/artisan-roaster-scope/artisan/blob/master/src/pyproject.toml).
