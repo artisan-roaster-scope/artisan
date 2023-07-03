@@ -16,8 +16,6 @@
 # Marko Luther, 2023
 
 import time
-import platform
-import os
 import sys
 import struct
 import logging

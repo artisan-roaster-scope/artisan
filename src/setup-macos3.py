@@ -72,7 +72,7 @@ DATA_FILES = [
   ]
 
 # add Artisan translations to DATA_FILES
-for subdir, _dirs, files in os.walk('translations'):
+for _subdir, _dirs, files in os.walk('translations'):
     for file in files:
         filename, ext = file.split('.')
         if ext == 'qm':
