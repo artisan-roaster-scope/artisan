@@ -63,9 +63,6 @@ sudo -H touch ${PYTHONSITEPKGS}/google/protobuf/__init__.py
 sudo -H touch ${PYTHONSITEPKGS}/google/protobuf/internal/__init__.py
 
 
-# copy the snap7 binary installed by pip
-cp -f ${PYTHONSITEPKGS}/snap7/lib/libsnap7.dylib /usr/local/lib
-
 # show set of libraries are installed
 echo "**** pip freeze ****"
 python3 -m pip freeze

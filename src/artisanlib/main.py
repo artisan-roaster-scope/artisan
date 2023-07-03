@@ -15735,11 +15735,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     #loads the settings at the start of application. See the oppposite closeEventSettings()
     def settingsLoad(self, filename=None, theme=False, machine=False, redraw=True): # pyright: ignore # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing
         res = False
-
         try:
             updateBatchCounter = True
             if filename is not None:
-                settings = QSettings(filename,QSettings.Format.IniFormat)
+                settings = QSettings(filename, QSettings.Format.IniFormat)
 
                 # a proper artisan-settings.aset file needs at least to contain a Mode tag
                 if not (theme or machine) and not settings.contains('Mode'):
@@ -25131,6 +25130,12 @@ def initialize_locale(my_app) -> str:
     else:
         locale = ''
 
+    qt_translation_modules:List[str] = [
+        'qtbase',
+        'qtconnectivity',
+        'qtwebengine'
+    ]
+
     supported_languages:List[str] = [
         'ar',
         'da',
@@ -25196,35 +25201,43 @@ def initialize_locale(my_app) -> str:
     if locale is None or len(locale) == 0:
         locale = 'en'
 
+
     #load Qt default translations from QLibrary
-    qtTranslator = QTranslator(my_app)
     try:
-        qt_trans_path = QLibraryInfo.path(QLibraryInfo.LibraryPath.TranslationsPath)
-    except Exception: # pylint: disable=broad-except
-        qt_trans_path = QLibraryInfo.location(QLibraryInfo.TranslationsPath) # type: ignore
-    if qtTranslator.load('qtbase_' + locale, qt_trans_path):
-        my_app.installTranslator(qtTranslator)
-    #find Qt default translations in Unix binaries
-    elif qtTranslator.load('qtbase_' + locale, QApplication.applicationDirPath() + '/translations'):
-        my_app.installTranslator(qtTranslator)
-    #find Qt default translations in Mac binary
-    elif qtTranslator.load('qtbase_' + locale, QApplication.applicationDirPath() + '/../translations'):
-        my_app.installTranslator(qtTranslator)
-    # qtbase_ translations added to the Artisan source as they are not in the official Qt builds
-    elif qtTranslator.load('qtbase_' + locale, 'translations'):
+        try:
+            qt_trans_path = QLibraryInfo.path(QLibraryInfo.LibraryPath.TranslationsPath)
+        except Exception: # pylint: disable=broad-except
+            qt_trans_path = QLibraryInfo.location(QLibraryInfo.TranslationsPath) # type: ignore
+
+        trans_paths:List[str] = []
+        # add the translations path for binary installations
+        if sys.platform.startswith('darwin'):
+            trans_paths.append(QApplication.applicationDirPath() + '/../translations')
+        else:
+            trans_paths.append(QApplication.applicationDirPath() + '/translations')
+        # add the translations path for source installations
+        trans_paths.append('translations')
+
+        #load Qt translations
+        qtTranslator:QTranslator = QTranslator(my_app)
+        for qt_trans_module in qt_translation_modules:
+            qt_qm_file:str = f'{qt_trans_module}_{locale}'
+            for trans_path in [qt_trans_path] + trans_paths: # start with the default PyQt/Qt translations location
+                if qtTranslator.load(qt_qm_file, trans_path):
+                    _log.info('loading qt translations %s from %s', qt_qm_file, trans_path)
+                    break
         my_app.installTranslator(qtTranslator)
 
-    #load Artisan translations
-    appTranslator = QTranslator(my_app)
-    #find application translations in source folder
-    if appTranslator.load('artisan_' + locale, 'translations'):
+        #load Artisan translations
+        appTranslator:QTranslator = QTranslator(my_app)
+        artisan_qm_file:str = f'artisan_{locale}'
+        for trans_path in trans_paths:
+            if qtTranslator.load(artisan_qm_file, trans_path):
+                _log.info('loading Artisan translations %s from %s', artisan_qm_file, trans_path)
+                break
         my_app.installTranslator(appTranslator)
-    #find application translations in Unix binaries
-    elif appTranslator.load('artisan_' + locale, QApplication.applicationDirPath() + '/translations'):
-        my_app.installTranslator(appTranslator)
-    #find application translations in Mac binary
-    elif appTranslator.load('artisan_' + locale, QApplication.applicationDirPath() + '/../translations'):
-        my_app.installTranslator(appTranslator)
+    except Exception as e:
+        _log.exception(e)
 
     return locale
 
