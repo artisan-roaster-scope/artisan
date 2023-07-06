@@ -12,6 +12,7 @@ Visual scope for coffee roasters
 [![pylint](https://github.com/artisan-roaster-scope/artisan/actions/workflows/pylint.yaml/badge.svg?branch=master&event=push)](https://github.com/artisan-roaster-scope/artisan/actions?query=workflow:pylint+event:push+branch:master)
 [![Mypy](https://github.com/artisan-roaster-scope/artisan/actions/workflows/mypy.yml/badge.svg?branch=master)](https://github.com/artisan-roaster-scope/artisan/actions/workflows/mypy.yml)
 [![Ruff](https://github.com/artisan-roaster-scope/artisan/actions/workflows/ruff.yaml/badge.svg?branch=master)](https://github.com/artisan-roaster-scope/artisan/actions/workflows/ruff.yaml)
+[![pytest](https://github.com/artisan-roaster-scope/artisan/actions/workflows/pytest.yaml/badge.svg?branch=master)](https://github.com/artisan-roaster-scope/artisan/actions/workflows/pytest.yaml)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 

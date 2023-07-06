@@ -9,9 +9,9 @@ on:
       - master
   workflow_dispatch:
     inputs:
-      ### Flags for mypy ###
-      mypy_flags:
-        description: 'mypy options (default: <none>)'
+      ### Flags for pytest ###
+      pytest_flags:
+        description: 'pytest options (default: <none>)'
         required: false
         default: ''
       tool_name:
@@ -20,7 +20,7 @@ on:
       ignore_note:
         description: |
           Ignore note entry.
-          mypy report some error with optional note entry.
+          pytest report some error with optional note entry.
           This option is workaround.
         default: 'false'
 
@@ -40,11 +40,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r src/requirements-dev.txt
           pip install -r src/requirements.txt
-      - uses: tsuyoshicho/action-mypy@v3
+      - uses: reviewdog/action-pytest@v1
         with:
           github_token: ${{ secrets.github_token }}
           # Change reviewdog reporter if you need [github-pr-check,github-check,github-pr-review].
-          reporter: github-check # github-pr-review # reporter: github-pr-check
+          reporter: github-pr-review # reporter: github-pr-check
           # Change reporter level if you need.
           # GitHub Status Check won't become failure with warning.
           level: info # info, warning, error
