@@ -10,7 +10,7 @@ on:
 
 jobs:
   pytest:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     name: runner / pytest
     steps:
       - uses: actions/checkout@v3
