@@ -18,6 +18,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
+          cache: 'pip' # caching pip dependencies
 
 #      - name: Install Linux Qt system dependencies
 #        if: runner.os == 'Linux'
@@ -41,13 +42,20 @@ jobs:
 #            libatspi2.0-dev \
 #            '^libxcb.*-dev'
 
-      - uses: actions/cache@v3
-        id: cache
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.*') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+# actions/setup-python@v4 commes with an automatic pip cache
+#      - name: Get pip cache dir
+#        id: pip-cache
+#        run: |
+#          echo "::set-output name=dir::$(pip cache dir)"
+#      - uses: actions/cache@v3
+#        id: cache
+#        with:
+##          path: ~/.cache/pip # ubuntu
+##          path: ~/Library/Caches/pip # macos
+#          path: ${{ steps.pip-cache.outputs.dir }} # generic
+#          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.*') }}
+#          restore-keys: |
+#            ${{ runner.os }}-pip-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
