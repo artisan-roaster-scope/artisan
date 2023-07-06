@@ -24,10 +24,6 @@ jobs:
           pip install -r src/requirements-dev.txt
           pip install -r src/requirements.txt
           pip install pytest-md
-      - uses: pavelzw/pytest-action@v2.1.0
-        with:
-          emoji: false
-          verbose: false
-          job-summary: true
-          click-to-expand: true
-          report-title: 'Test Report'
+      - name: Test with pytest
+        run: |
+          pytest
