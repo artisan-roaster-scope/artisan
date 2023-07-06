@@ -18,14 +18,15 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - name: Install dependencies
+      - name: Install dependencies pytest-qt
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgl1-mesa-glx
+          sudo apt-get install -y libgl1-mesa-dev
+      - name: Install dependencies
+        run: |
           python -m pip install --upgrade pip
           pip install -r src/requirements-dev.txt
           pip install -r src/requirements.txt
-          pip install pytest-md
       - name: Test with pytest
         run: |
           pytest
