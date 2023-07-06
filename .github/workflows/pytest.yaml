@@ -7,23 +7,6 @@ on:
   pull_request:
     branches:
       - master
-  workflow_dispatch:
-    inputs:
-      ### Flags for pytest ###
-      pytest_flags:
-        description: 'pytest options (default: <none>)'
-        required: false
-        default: ''
-      tool_name:
-        description: 'Tool name to use for reviewdog reporter'
-        default: 'pytest'
-      ignore_note:
-        description: |
-          Ignore note entry.
-          pytest report some error with optional note entry.
-          This option is workaround.
-        default: 'false'
-
 
 jobs:
   pytest:
@@ -40,18 +23,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r src/requirements-dev.txt
           pip install -r src/requirements.txt
-      - uses: reviewdog/action-pytest@v1
+          pip install pytest-md
+      - uses: pavelzw/pytest-action@v2.1.0
         with:
-          github_token: ${{ secrets.github_token }}
-          # Change reviewdog reporter if you need [github-pr-check,github-check,github-pr-review].
-          reporter: github-pr-review # reporter: github-pr-check
-          # Change reporter level if you need.
-          # GitHub Status Check won't become failure with warning.
-          level: info # info, warning, error
-          # Change the current directory to run pytest command.
-          # pytest command reads setup.cfg or other settings file in this path.
-          workdir: ./src/
-
-          reviewdog_flags: -filter-mode=file -fail-on-error
-          filter_mode: nofilter
-          fail_on_error: true
+          emoji: false
+          verbose: false
+          job-summary: true
+          click-to-expand: true
+          report-title: 'Test Report'
