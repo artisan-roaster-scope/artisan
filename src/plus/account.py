@@ -36,7 +36,7 @@ from plus import config
 
 import os
 import logging
-from typing import Optional
+from typing import Optional, TextIO
 from typing_extensions import Final  # Python <=3.7
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -56,11 +56,12 @@ account_cache_lock_path:str = getDirectory(
 )
 
 
-def setAccountShelve(account_id: str, fh) -> Optional[int]:
+def setAccountShelve(account_id: str, fh:TextIO) -> Optional[int]:
     _log.debug('setAccountShelve(%s,_fh_)', account_id)
     import dbm
     import shelve
     try:
+        db:shelve.Shelf[int]
         with shelve.open(account_cache_path) as db:
             if account_id in db:
                 return db[account_id]
@@ -119,6 +120,7 @@ def setAccountShelve(account_id: str, fh) -> Optional[int]:
 def setAccount(account_id: str) -> Optional[int]:
     import portalocker
     try:
+        fh:TextIO
         account_cache_semaphore.acquire(1)
         _log.debug('setAccount(%s)', account_id)
         with portalocker.Lock(account_cache_lock_path, timeout=0.5) as fh:

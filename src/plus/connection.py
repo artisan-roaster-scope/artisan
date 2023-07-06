@@ -29,7 +29,7 @@ except Exception: # pylint: disable=broad-except
     from PyQt5.QtCore import QSemaphore  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib import __version__
-from typing import Any, Optional, Dict  #for Python >= 3.9: can remove 'Dict' since type hints can now use the generic 'dict'
+from typing import Any, Optional, Dict, Tuple  #for Python >= 3.9: can remove 'Dict' since type hints can now use the generic 'dict'
 from typing_extensions import Final  # Python <=3.7
 
 import datetime
@@ -144,15 +144,15 @@ def setKeyring() -> None:
         # HACK set keyring backend explicitly
         if platform.system().startswith('Windows'):
             keyring.set_keyring(
-                keyring.backends.Windows.WinVaultKeyring()
+                keyring.backends.Windows.WinVaultKeyring() # type:ignore[no-untyped-call]
             )  # @UndefinedVariable
         elif platform.system() == 'Darwin':
             try:
-                keyring.set_keyring(keyring.backends.macOS.Keyring())
+                keyring.set_keyring(keyring.backends.macOS.Keyring()) # type:ignore[no-untyped-call]
             except Exception:  # pylint: disable=broad-except
                 keyring.set_keyring(keyring.backends.OS_X.Keyring())   # type: ignore  # pylint: disable=no-member
         else:  # Linux
-            keyring.set_keyring(keyring.backends.SecretService.Keyring())
+            keyring.set_keyring(keyring.backends.SecretService.Keyring()) # type:ignore[no-untyped-call]
         # _log.debug("keyring: %s",str(keyring.get_keyring()))
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
@@ -344,7 +344,7 @@ def getHeaders(
     return headers
 
 
-def getHeadersAndData(authorized: bool, compress: bool, jsondata: JSON):
+def getHeadersAndData(authorized: bool, compress: bool, jsondata: JSON) -> Tuple[Dict[str, str],bytes]:
     headers = getHeaders(authorized, decompress=compress)
     headers['Content-Type'] = 'application/json'
     if compress and len(jsondata) > config.post_compression_threshold:
@@ -413,7 +413,7 @@ def sendData(
     return r
 
 
-def getData(url: str, authorized: bool = True, params=None) -> Any:
+def getData(url: str, authorized: bool = True, params:Optional[Dict[str,str]]=None) -> Any:
     _log.debug('getData(%s,%s,%s)', url, authorized, params)
     headers = getHeaders(authorized)
     params = params or {}

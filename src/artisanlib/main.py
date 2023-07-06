@@ -118,7 +118,7 @@ try:
                                 QPixmap,QColor,QDesktopServices,QIcon, # @Reimport @UnresolvedImport @UnusedImport
                                 QRegularExpressionValidator,QDoubleValidator, QPainter, QCursor, QFont) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt6.QtPrintSupport import (QPrinter,QPrintDialog) # @Reimport @UnresolvedImport @UnusedImport
-    from PyQt6.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot, # type: ignore # @Reimport @UnresolvedImport @UnusedImport
+    from PyQt6.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot, # @Reimport @UnresolvedImport @UnusedImport
 #                              QSize, pyqtProperty, # type: ignore # @Reimport @UnresolvedImport @UnusedImport
                               qVersion, QVersionNumber, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, # @Reimport @UnresolvedImport @UnusedImport
                               QRegularExpression, QDate, QUrl, QUrlQuery, QDir, Qt, QPoint, QEvent, QDateTime, QThread, qInstallMessageHandler) # @Reimport @UnresolvedImport @UnusedImport
@@ -133,21 +133,20 @@ try:
     from PyQt6 import sip # @Reimport @UnresolvedImport @UnusedImport
 except ImportError:
     from PyQt5.QtWidgets import (QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,  # type: ignore  # @Reimport @UnresolvedImport @UnusedImport
-                             QInputDialog, QGroupBox, QLineEdit,  # type: ignore  # @Reimport @UnresolvedImport @UnusedImport
-                             QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # type: ignore  # @Reimport @UnresolvedImport @UnusedImport
-                             QLCDNumber, QSpinBox, QComboBox,  # type: ignore  # @Reimport @UnresolvedImport @UnusedImport
-                             QSlider, # type: ignore # @Reimport @UnresolvedImport @UnusedImport
-                             QColorDialog, QFrame, QSplitter, QScrollArea, QProgressDialog, # type: ignore # @Reimport @UnresolvedImport @UnusedImport
-                             QStyleFactory, QMenu, QLayout, QShortcut) # type: ignore # @Reimport @UnresolvedImport @UnusedImport
+                             QInputDialog, QGroupBox, QLineEdit, # @Reimport @UnresolvedImport @UnusedImport
+                             QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport @UnresolvedImport @UnusedImport
+                             QLCDNumber, QSpinBox, QComboBox, # @Reimport @UnresolvedImport @UnusedImport
+                             QSlider, # @Reimport @UnresolvedImport @UnusedImport
+                             QColorDialog, QFrame, QSplitter, QScrollArea, QProgressDialog, # @Reimport @UnresolvedImport @UnusedImport
+                             QStyleFactory, QMenu, QLayout, QShortcut) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt5.QtGui import (QScreen, QPageLayout, QImageReader, QWindow,  # type: ignore # @Reimport @UnresolvedImport @UnusedImport
-                                QKeySequence, # type: ignore # @Reimport @UnresolvedImport @UnusedImport
-                                QPixmap,QColor,QDesktopServices,QIcon, # type: ignore # @Reimport @UnresolvedImport @UnusedImport
-                                QRegularExpressionValidator,QDoubleValidator, QPainter, QCursor, QFont) # type: ignore # @Reimport @UnresolvedImport @UnusedImport
+                                QKeySequence, # @Reimport @UnresolvedImport @UnusedImport
+                                QPixmap,QColor,QDesktopServices,QIcon, # @Reimport @UnresolvedImport @UnusedImport
+                                QRegularExpressionValidator,QDoubleValidator, QPainter, QCursor, QFont) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog) # type: ignore # @Reimport @UnresolvedImport @UnusedImport
     from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot, # type: ignore # @Reimport @UnresolvedImport @UnusedImport
-#                              QSize, pyqtProperty, # type: ignore # @Reimport @UnresolvedImport @UnusedImport
-                              qVersion, QVersionNumber, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, # type: ignore # @Reimport @UnresolvedImport @UnusedImport
-                              QRegularExpression, QDate, QUrl, QUrlQuery, QDir, Qt, QPoint, QEvent, QDateTime, QThread, qInstallMessageHandler) # type: ignore # @Reimport @UnresolvedImport @UnusedImport
+                              qVersion, QVersionNumber, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, # @Reimport @UnresolvedImport @UnusedImport
+                              QRegularExpression, QDate, QUrl, QUrlQuery, QDir, Qt, QPoint, QEvent, QDateTime, QThread, qInstallMessageHandler) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt5.QtNetwork import QLocalSocket # type: ignore # @Reimport @UnresolvedImport @UnusedImport
     #QtWebEngineWidgets must be imported before a QCoreApplication instance is created
     try:
@@ -1504,25 +1503,25 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.WebLCDsAlerts:bool = False
 
         # active tab
-        self.EventsDlg_activeTab = 0
-        self.graphColorDlg_activeTab = 0
-        self.PID_DlgControl_activeTab = 0
-        self.CurveDlg_activeTab = 0 # curves dialog
-        self.editGraphDlg_activeTab = 0 # roast properties dialog
-        self.backgroundDlg_activeTab = 0
-        self.DeviceAssignmentDlg_activeTab = 0
-        self.AlarmDlg_activeTab = 0
+        self.EventsDlg_activeTab:int = 0
+        self.graphColorDlg_activeTab:int = 0
+        self.PID_DlgControl_activeTab:int = 0
+        self.CurveDlg_activeTab:int = 0 # curves dialog
+        self.editGraphDlg_activeTab:int = 0 # roast properties dialog
+        self.backgroundDlg_activeTab:int = 0
+        self.DeviceAssignmentDlg_activeTab:int = 0
+        self.AlarmDlg_activeTab:int = 0
 
         #flag to reset Qsettings
-        self.resetqsettings = 0
+        self.resetqsettings:int = 0
         #path of last loadded QSettings
-        self.settingspath = '' # if empty string, the settingspath will be ignored, otherwise it will be used to update the batchcounter of those settings
+        self.settingspath:str = '' # if empty string, the settingspath will be ignored, otherwise it will be used to update the batchcounter of those settings
 
         # path of last loaded WheelGraph
-        self.wheelpath = ''
+        self.wheelpath:str = ''
 
         # self.profilepath is obteined at dirstruct() and points to profiles/year/month file-open/save will point to profilepath
-        self.profilepath = ''
+        self.profilepath:str = ''
         if platform.system() in ['Darwin', 'Linux']:
             self.profilepath = QDir().homePath() + '/Documents/'
         else:
@@ -1539,7 +1538,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 
 
         #defaults the users profile path to the standard profilepath (incl. month/year subdirectories)
-        self.userprofilepath = self.profilepath
+        self.userprofilepath:str = self.profilepath
 
         self.printer:Optional[QPrinter] = None
 
@@ -11680,7 +11679,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             else:
                 self.loadFile(filename)
 
-    def getDefaultPath(self):
+    def getDefaultPath(self) -> str:
         #compare profilepath with userprofilepath (modulo the last two segments which are month/year respectively)
         return self.userprofilepath
 
@@ -13476,7 +13475,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             pass
 
     #Read object from file
-    def deserialize(self, filename) -> Dict[str, Any]:
+    def deserialize(self, filename:str) -> Dict[str, Any]:
         obj:Dict[str,Any] = {}
         try:
             fn = str(filename)
@@ -25115,7 +25114,7 @@ if sys.platform.startswith('darwin'):
     class Document(NSDocument): # pylint: disable= too-few-public-methods
 #        def windowNibName(self):
 #            return None #"Document"
-        def makeWindowControllers(self):
+        def makeWindowControllers(self) -> None:
             pass
 
 def qt_message_handler(_msg_type, _msg_log_context, _msg_string):
@@ -25241,7 +25240,7 @@ def initialize_locale(my_app) -> str:
 
     return locale
 
-def main():
+def main() -> None:
 
     locale_str = initialize_locale(app)
     _log.info('locale: %s',locale_str)

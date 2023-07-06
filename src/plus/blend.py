@@ -39,14 +39,14 @@ try:
 except Exception: # pylint: disable=broad-except
     #pylint: disable = E, W, R, C
     from PyQt5.QtWidgets import (  # type: ignore
-        QApplication, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QComboBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QDialogButtonBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QToolButton, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QTableWidget, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QStyle, # type: ignore#  @UnusedImport @Reimport  @UnresolvedImport
-        QHeaderView, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QApplication, # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, # @UnusedImport @Reimport  @UnresolvedImport
+        QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
+        QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
+        QToolButton, # @UnusedImport @Reimport  @UnresolvedImport
+        QTableWidget, # @UnusedImport @Reimport  @UnresolvedImport
+        QStyle, # @UnusedImport @Reimport  @UnresolvedImport
+        QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
     )
     from PyQt5.QtCore import Qt, pyqtSlot, QSize, QSettings # type: ignore  # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QIcon # type: ignore  # @UnusedImport @Reimport  @UnresolvedImport
@@ -59,12 +59,13 @@ import logging
 from artisanlib.util import comma2dot
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
-from uic import BlendDialog # type: ignore [attr-defined] # pylint: disable=no-name-in-module
+from uic import BlendDialog # type: ignore[attr-defined] # pylint: disable=no-name-in-module
 from typing import Optional, List, Dict, Tuple, Any, TYPE_CHECKING
 from typing_extensions import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QWidget # noqa: F401 # pylint: disable=unused-import
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -109,7 +110,7 @@ class CustomBlend:
         return self._name
 
     @name.setter
-    def name(self, value:str):
+    def name(self, value:str) -> None:
         self._name = value
 
     @property
@@ -125,7 +126,7 @@ class CustomBlend:
     #  - the component ratios of all ingredients sum up to 1,
     #  - there are no duplicates in the list of component coffees, and,
     #  - all component coffees are contained in the list of available_coffees (list of hr_ids as strings), if given
-    def isValid(self, available_coffees: Optional[List] = None) -> bool:
+    def isValid(self, available_coffees: Optional[List[str]] = None) -> bool:
         component_coffees = [c.coffee for c in self._components]
         return (
             len(component_coffees)>1 and
@@ -137,7 +138,7 @@ class CustomBlend:
 #####################  Custom CustomBlend Dialog  ######################################
 
 class CustomBlendDialog(ArtisanDialog):
-    def __init__(self, parent, aw:'ApplicationWindow', inWeight:float, weightUnit:str, coffees:Dict[str, str], blend:CustomBlend) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow', inWeight:float, weightUnit:str, coffees:Dict[str, str], blend:CustomBlend) -> None:
         super().__init__(parent, aw)
         self.initialTotalWeight:float = inWeight
         self.inWeight:float = inWeight
@@ -151,7 +152,7 @@ class CustomBlendDialog(ArtisanDialog):
 
         # configure UI
         self.ui = BlendDialog.Ui_customBlendDialog()
-        self.ui.setupUi(self)
+        self.ui.setupUi(self) # type:ignore[no-untyped-call]
         self.setWindowTitle(QApplication.translate('Form Caption','Custom Blend'))
         self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Apply)
         # hack to assign the Apply button the AcceptRole without losing default system translations
@@ -393,7 +394,7 @@ class CustomBlendDialog(ArtisanDialog):
             _log.exception(e)
 
 
-def openCustomBlendDialog(window, aw:'ApplicationWindow', inWeight:float, weightUnit:str, coffees:Dict[str, str], blend:CustomBlend) -> Tuple[Optional[CustomBlend], float]:
+def openCustomBlendDialog(window:'QWidget', aw:'ApplicationWindow', inWeight:float, weightUnit:str, coffees:Dict[str, str], blend:CustomBlend) -> Tuple[Optional[CustomBlend], float]:
     dialog = CustomBlendDialog(window, aw, inWeight, weightUnit, coffees, blend)
     res = dialog.exec()
     blend_res:Optional[CustomBlend]

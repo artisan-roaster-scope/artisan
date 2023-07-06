@@ -14931,7 +14931,7 @@ class tgraphcanvas(FigureCanvas):
 
 
     #adds errors (can be called also outside the GUI thread, eg. from the sampling thread as actual message is written by updategraphics in the GUI thread)
-    def adderror(self,error,line=None):
+    def adderror(self,error:str,line:Optional[Any]=None) -> None:
         try:
             #### lock shared resources #####
             self.errorsemaphore.acquire(1)

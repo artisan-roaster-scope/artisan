@@ -36,7 +36,7 @@ from plus import config, util, connection, controller, roast, stock
 import os
 import time
 import logging
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, TextIO
 from typing_extensions import Final  # Python <=3.7
 
 
@@ -62,10 +62,11 @@ def getSyncPath(lock: bool = False) -> str:
     return getDirectory(fn, share=True)
 
 
-def addSyncShelve(uuid: str, modified_at:float, fh) -> None:
+def addSyncShelve(uuid: str, modified_at:float, fh:TextIO) -> None:
     _log.debug('addSyncShelve(%s,%s,_fh_)', uuid, modified_at)
     import dbm
     import shelve
+    db:shelve.Shelf[float]
     try:
         with shelve.open(getSyncPath()) as db:
             db[uuid] = modified_at
@@ -109,6 +110,7 @@ def addSyncShelve(uuid: str, modified_at:float, fh) -> None:
 # last synced with the server
 def addSync(uuid:str, modified_at:float) -> None:
     import portalocker
+    fh:TextIO
     try:
         sync_cache_semaphore.acquire(1)
         _log.debug('addSync(%s,%s)', uuid, modified_at)
@@ -139,6 +141,8 @@ def addSync(uuid:str, modified_at:float) -> None:
 def getSync(uuid:str) -> Optional[float]:
     import portalocker
     import shelve
+    fh:TextIO
+    db:shelve.Shelf[float]
     try:
         sync_cache_semaphore.acquire(1)
         _log.debug('getSync(%s)', str(uuid))
@@ -194,6 +198,7 @@ def getSync(uuid:str) -> Optional[float]:
 def delSync(uuid:str) -> None:
     import portalocker
     import shelve
+    fh:TextIO
     try:
         sync_cache_semaphore.acquire(1)
         _log.debug('delSync(%s)', str(uuid))
@@ -650,7 +655,7 @@ def applyServerUpdates(data:Dict[str, Any]) -> None:
 
 # internal function fetching the update from server and then unblock the
 # Properties Dialog and update the plus icon
-def fetchServerUpdate(uuid: str, file=None) -> None:
+def fetchServerUpdate(uuid: str, file:Optional[str]=None) -> None:
     assert config.app_window is not None
     aw = config.app_window
     import requests
@@ -789,7 +794,7 @@ def fetchServerUpdate(uuid: str, file=None) -> None:
 # it but there is already a record on the platform"
 
 # this function might be called from a thread (eg. via QTimer)
-def getUpdate(uuid: Optional[str], file=None) -> None:
+def getUpdate(uuid: Optional[str], file:Optional[str]=None) -> None:
     _log.debug('getUpdate(%s,%s)', uuid, file)
     if uuid is not None and config.app_window is not None:
         aw = config.app_window

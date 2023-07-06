@@ -29,9 +29,9 @@ if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
 
 # Constants
-app_name: Final = 'artisan.plus'
-profile_ext: Final = 'alog'
-uuid_tag: Final = 'roastUUID'
+app_name: Final[str] = 'artisan.plus'
+profile_ext: Final[str] = 'alog'
+uuid_tag: Final[str] = 'roastUUID'
 
 # Service URLs
 

@@ -256,7 +256,7 @@ def start() -> None:
 
     if queue is None:
         # we initialize the queue
-        import persistqueue # type: ignore
+        import persistqueue
         queue = persistqueue.SQLiteQueue(
             queue_path, multithreading=True, auto_commit=False
         )

@@ -32,7 +32,7 @@ except Exception: # pylint: disable=broad-except
 
 from artisanlib.util import decodeLocal, encodeLocal, getDirectory, is_int_list, is_float_list
 from plus import config, connection, controller, util
-from typing import List, Union, Optional, Tuple, Dict
+from typing import List, Union, Optional, Tuple, Dict, TextIO
 from typing_extensions import NotRequired # Python <=3.10
 from typing_extensions import Final, TypedDict  # Python <=3.7
 
@@ -224,6 +224,7 @@ def save() -> None:
     try:
         stock_semaphore.acquire(1)
         if stock is not None:
+            f:TextIO
             with open(stock_cache_path, 'w', encoding='utf-8') as f:
                 json.dump(stock, f)
     except Exception as e:  # pylint: disable=broad-except
@@ -244,6 +245,7 @@ def load() -> None:
     _log.debug('load()')
     try:
         stock_semaphore.acquire(1)
+        f:TextIO
         with open(stock_cache_path, encoding='utf-8') as f:
             stock = json.load(f)
     except Exception as e:  # pylint: disable=broad-except
@@ -326,7 +328,7 @@ unit_translations_plural = {
 }
 
 
-def renderAmount(amount, default_unit=None, target_unit_idx=0):
+def renderAmount(amount:float, default_unit:Optional[CoffeeUnit]=None, target_unit_idx:int=0) -> str:
     res = ''
     # first try to convert to default_unit (like "bags")
     try:
@@ -669,16 +671,16 @@ def getCoffees(weight_unit_idx:int, store:Optional[str]=None) -> List[Tuple[str,
             stock_semaphore.release(1)
 
 
-# returns the position of coffee hr_id in coffees or
-# None if coffee not in the coffees
-def getCoffeePosition(coffeeId, coffees):
-    try:
-        return [getCoffeeId(c) for c in coffees].index(coffeeId)
-    except Exception as e:  # pylint: disable=broad-except
-        _log.exception(e)
-        return None
-        # returns the position of coffee id in coffees or
-        # None if store not in the stores
+## returns the position of coffee hr_id in coffees or
+## None if coffee not in the coffees
+#def getCoffeePosition(coffeeId:str, coffees:Optional[List[Tuple[str, Tuple[Coffee, StockItem]]]]) -> Optional[int]:
+#    try:
+#        return [getCoffeeId(c) for c in coffees].index(coffeeId)
+#    except Exception as e:  # pylint: disable=broad-except
+#        _log.exception(e)
+#        return None
+#        # returns the position of coffee id in coffees or
+#        # None if store not in the stores
 
 
 # returns the position in coffees which matches the given coffeeId and
@@ -937,8 +939,7 @@ def getBlendReplaceMaxAmount(blend:BlendStructure) -> float:
         return blend[1][4]
     return 0
 
-
-def getBlendReplacementBlends(blend:BlendStructure):
+def getBlendReplacementBlends(blend:BlendStructure) -> List[ReplacementBlend]:
     if hasBlendReplace(blend):
         return blend[1][5]
     return []

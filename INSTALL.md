@@ -23,7 +23,7 @@
 
     ```
     # cd artisan/src
-    # python3 -m pip install -r requirements.txt
+    # pip install -r requirements.txt
     ```
 
 5. Build derived artefacts
@@ -40,8 +40,6 @@
 
 ### Application log
 
-Open a second shell with
-
 - macOS
 
    ```
@@ -53,6 +51,44 @@ Open a second shell with
    ```
    # tail -f ~/.local/shared/artisan-scope/Artisan/artisan.log
    ```
+
+
+### Installing and running dev tools
+
+```
+# pip install -r requirements-dev.txt
+```
+
+Linting
+
+
+```
+# ruff check .
+# pylint */*.py
+```
+
+Typing
+
+```
+# mypy
+# pyright
+# mypy --strict
+```
+
+Testing
+
+
+```
+# pytest
+```
+
+Coverage (types, tests)
+
+```
+# mypy --xslt-html-report coverage
+# pytest --cov
+# pytest --hypothesis-show-statistics
+```
 
 
 

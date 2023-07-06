@@ -34,7 +34,7 @@ from plus import config
 import os
 import logging
 
-from typing import Optional
+from typing import Optional, TextIO
 from typing_extensions import Final  # Python <=3.7
 
 
@@ -48,10 +48,11 @@ uuid_cache_path_lock = getDirectory(
 )
 
 
-def addPathShelve(uuid: str, path: str, fh) -> None:
+def addPathShelve(uuid: str, path: str, fh:TextIO) -> None:
     _log.debug('addPathShelve(%s,%s,_fh_)', uuid, path)
     import dbm
     import shelve
+    db:shelve.Shelf[str]
     try:
         with shelve.open(uuid_cache_path) as db:
             db[uuid] = str(path)
@@ -95,6 +96,7 @@ def addPathShelve(uuid: str, path: str, fh) -> None:
 def addPath(uuid: str, path: str) -> None:
     _log.debug('addPath(%s,%s)', uuid, path)
     import portalocker
+    fh:TextIO
     try:
         register_semaphore.acquire(1)
         with portalocker.Lock(uuid_cache_path_lock, timeout=0.5) as fh:
@@ -126,6 +128,8 @@ def getPath(uuid: str) -> Optional[str]:
     _log.debug('getPath(%s)', uuid)
     import portalocker
     import shelve
+    fh:TextIO
+    db:shelve.Shelf[str]
     try:
         register_semaphore.acquire(1)
         with portalocker.Lock(uuid_cache_path_lock, timeout=0.5) as fh:
@@ -198,9 +202,9 @@ def scanDir(path: Optional[str] = None) -> None:
             currentDictory = Path(path)
         for currentFile in currentDictory.glob(f'*.{config.profile_ext}'):
             d = config.app_window.deserialize(
-                currentFile
+                str(currentFile)
             )  # @UndefinedVariable
-            if d is not None and config.uuid_tag in d:
+            if d is not None and isinstance(d, str) and config.uuid_tag in d:
                 addPath(d[config.uuid_tag], str(currentFile))  # @UndefinedVariable
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)

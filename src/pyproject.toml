@@ -278,3 +278,16 @@ pythonPlatform = "All"
 #reportUnknownArgumentType = false
 #reportGeneralTypeIssues = false
 useLibraryCodeForTypes = false
+
+
+## pytest conf
+
+[tool.pytest.ini_options]
+minversion = "7.4"
+addopts = "-ra -v"
+testpaths = [
+    "test",
+]
+pythonpath = [
+  "."
+]

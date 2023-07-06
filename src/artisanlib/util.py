@@ -150,6 +150,14 @@ def fromFtoC(Ffloat) -> float:
     return (Ffloat-32.0)*(5.0/9.0)
 
 def fromCtoF(Cfloat) -> float:
+    """
+    >>> fromCtoF(-1)
+    -1
+    >>> fromCtoF(None)
+    None
+    >>> fromCtoF(32)
+    89.6
+    """
     if Cfloat in [-1,None] or numpy.isnan(Cfloat):
         return Cfloat
     return (Cfloat*9.0/5.0)+32.0
