@@ -1,4 +1,4 @@
-name: Mypy
+name: Pytest
 
 on:
   push:
@@ -16,7 +16,7 @@ on:
         default: ''
       tool_name:
         description: 'Tool name to use for reviewdog reporter'
-        default: 'mypy'
+        default: 'pytest'
       ignore_note:
         description: |
           Ignore note entry.
@@ -26,9 +26,9 @@ on:
 
 
 jobs:
-  mypy:
+  pytest:
     runs-on: ubuntu-latest
-    name: runner / mypy
+    name: runner / pytest
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.11
@@ -48,8 +48,8 @@ jobs:
           # Change reporter level if you need.
           # GitHub Status Check won't become failure with warning.
           level: info # info, warning, error
-          # Change the current directory to run mypy command.
-          # mypy command reads setup.cfg or other settings file in this path.
+          # Change the current directory to run pytest command.
+          # pytest command reads setup.cfg or other settings file in this path.
           workdir: ./src/
 
           reviewdog_flags: -filter-mode=file -fail-on-error
