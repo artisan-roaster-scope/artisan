@@ -86,8 +86,10 @@ Coverage (types, tests)
 
 ```
 # mypy --xslt-html-report coverage
-# pytest --cov
+# pytest --cov --cov-report=html
 # pytest --hypothesis-show-statistics
+# coverage run -m pytest
+# coverage-badge -o coverage.svg
 ```
 
 
