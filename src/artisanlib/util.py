@@ -484,7 +484,7 @@ def debugLogLevelToggle() -> bool:
 def natsort(s):
     return [int(t) if t.isdigit() else t.lower() for t in re.split(r'(\d+)', s)]
 
-#convert number to string an auto set the number of decimal places 0, 0.999, 9.99, 999.9, 9999
+#convert number to string and auto set the number of decimal places 0, 0.999, 9.99, 999.9, 9999
 def scaleFloat2String(num):
     n = toFloat(num)
     if n == 0:

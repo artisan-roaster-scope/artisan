@@ -15679,7 +15679,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                 if fire_slider_action:
                     self.fireslideractionSignal.emit(etype)
                 # create a new event
-                nv:float = self.qmc.eventsExternal2InternalValue(float(new_value))
+                nv:float = self.qmc.eventsExternal2InternalValue(new_value)
                 if record and self.qmc.flagstart:
                     self.qmc.eventRecordActionSignal.emit(etype,nv,'')
 

@@ -2527,7 +2527,9 @@ class tgraphcanvas(FigureCanvas):
             _log.exception(e)
 
     # eventsvalues maps the given internal event value v to an external event int value as displayed to the user as special event value
-    # v is expected to be float value of range [-11.0,11.0]
+    # historicaly internal event values ranged from [1-11] and external event values from [0-10]
+    #   that range was extended to 0-100 in later Artisan versions
+    # v is expected to be float value of range [-11.0,11.0] or None (interpreted as 0)
     # negative values are not used as event values, but as step arguments in extra button definitions
     #   11.0 => 100
     #   10.1 => 91
@@ -2551,11 +2553,12 @@ class tgraphcanvas(FigureCanvas):
         return int(round(v*10)) - 10
 
     # the inverse of eventsInternal2ExternalValue, converting an external to an internal event value
+    # v from [-100,100]
     @staticmethod
-    def eventsExternal2InternalValue(v:float) -> float:
-        if -1.0 < v < 1.0:
-            return 1.0 # ML: should this be 0!?
-        if v >= 1.0:
+    def eventsExternal2InternalValue(v:int) -> float:
+        if v == 0:
+            return 0.
+        if v >= 1:
             return v/10. + 1.
         return v/10. - 1.
 
@@ -2585,7 +2588,7 @@ class tgraphcanvas(FigureCanvas):
         st = s.strip()
         if st is None or len(st) == 0:
             return -1
-        return self.eventsExternal2InternalValue(float(st))
+        return self.eventsExternal2InternalValue(int(st))
 
     def fit_titles(self) -> None:
         #truncate title and statistic line to width of axis system to avoid that the MPL canvas goes into miser mode
