@@ -71,11 +71,6 @@ for /r %%a IN (ui\*.ui) DO (
 echo ** Success
  
 :: Process translation files
-call "%VCVARSALL%" x86_amd64
-if ERRORLEVEL 1 (
-    echo ERROR: vcvarsall.bat does not exist
-    exit /b 1
-)
 echo ************* pylupdate **************
 if /i "%ARTISAN_LEGACY%" == "True" (
     echo *** Processing translation files defined in artisan.pro with pylupdate5.py
@@ -87,20 +82,13 @@ if /i "%ARTISAN_LEGACY%" == "True" (
     if ERRORLEVEL 1 (echo ** Failed in pylupdate6pro.py & exit /b 1) else (echo ** Success)
 )
 echo ************* lrelease **************
-echo *** Processing artisan.pro
-if exist "%QT_PATH%\bin\lrelease.exe" (
-    %QT_PATH%\bin\lrelease.exe -verbose artisan.pro
-    if ERRORLEVEL 1 (echo ** Failed in lrelease step 1 & exit /b 1) else (echo ** Success)
-    echo *** Processing translation qtbase_*.ts files
-    for /r %%a IN (translations\qtbase_*.ts) DO (
-        %QT_PATH%\bin\lrelease.exe -verbose %%~a
-        if ERRORLEVEL 1 (echo ** Failed in lrelease step 2 & exit /b 1)
-    )
-    echo ** Success
-) else (
-    echo %Error: QT_PATH%\bin\lrelease.exe does not exist
-    exit /b 1
-)   
+cd translations   
+for /r %%a IN (*.ts) DO (
+    qt%PYQT%-tools lrelease %%~a
+    if ERRORLEVEL 1 (echo ** Failed in qt%PYQT%-tools lrelease step 2 & exit /b 1)
+)
+echo ** Success
+cd ..
 
 :: Zip the generated files
 7z a ..\generated-%ARTISAN_SPEC%.zip ..\doc\help_dialogs\Output_html\ help\ translations\ uic\

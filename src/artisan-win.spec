@@ -94,7 +94,7 @@ logging.info("** QT_TRANSL: %s",QT_TRANSL)
 ##
 TARGET = 'dist\\' + NAME + '\\'
 PYTHON_PACKAGES = PYTHON + r'\Lib\site-packages'
-PYQT_QT = PYTHON_PACKAGES + r'\PyQt5\Qt'
+PYQT_QT = PYTHON_PACKAGES + r'\PyQt' + PYQT + r'\Qt'
 PYQT_QT_BIN = PYQT_QT + r'\bin'
 PYQT_QT_TRANSLATIONS = QT_TRANSL
 YOCTO_BIN = PYTHON_PACKAGES + r'\yoctopuce\cdll'
