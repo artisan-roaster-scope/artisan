@@ -1,6 +1,6 @@
 import pytest
 import hypothesis.strategies as st
-from hypothesis import given, example, settings
+from hypothesis import given, settings
 
 from artisanlib.canvas import tgraphcanvas
 
