@@ -102,7 +102,29 @@ Artisan v1.4 adds support for the following ambient sensors that allow to automa
 
 Artisan can attach to all Phidgets IO ports. The input ports are configured as (extra) devices and are handled as temperature curves. 
 
-* [Phidget  HUB0000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643){:target="_blank"} (VINT HUB): 6x analog/digital in
+* [Phidget 1010](https://phidgets.com/?tier=3&catid=105&pcid=85&prodid=4){:target="_blank"}  
+  [Phidget 1013](https://phidgets.com/?prodid=8){:target="_blank"}  
+  [Phidget 1018](https://phidgets.com/?tier=3&catid=105&pcid=85&prodid=1198){:target="_blank"}  
+  [Phidget 1019](https://phidgets.com/?tier=3&catid=96&pcid=76&prodid=1035){:target="_blank"}  
+  [Phidget SBC](https://phidgets.com/?tier=3&catid=64&pcid=57&prodid=969){:target="_blank"} : analog/digital in
+	* `Phidget IO 01` : analog input (0-5V), ports 0 and 1
+	* `Phidget IO 23` : analog input (0-5V), ports 2 and 3
+	* `Phidget IO 45` : analog input (0-5V), ports 4 and 5
+	* `Phidget IO 67` : analog input (0-5V), ports 6 and 7
+	
+	* `Phidget IO Digital 01` : digital input (0 or 1), ports 2 and 3
+	* `Phidget IO Digital 23` : digital input (0 or 1), ports 2 and 3
+	* `Phidget IO Digital 45` : digital input (0 or 1), ports 4 and 5
+	* `Phidget IO Digital 67` : digital input (0 or 1), ports 6 and 7
+
+
+* [Phidget 1011](https://phidgets.com/?tier=3&catid=105&pcid=85&prodid=4){:target="_blank"}  (2x Analog, 2x Digital)   
+	* `Phidget 1011 IO 01` : analog input (0-5V), ports 0 and 1
+	* `Phidget 1011 IO Digital 01` : digital input (0 or 1), ports 0 and 1
+
+
+* [Phidget  HUB0000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643){:target="_blank"}   
+  [Phidget HUB5000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=1143){:target="_blank"} (VINT HUB): 6x analog/digital in
 
 	* `Phidget HUB IO 0` : analog input (0-5V); attaches only port 0
 	* `Phidget HUB IO 01` : analog input (0-5V), ports 0 and 1
@@ -114,12 +136,29 @@ Artisan can attach to all Phidgets IO ports. The input ports are configured as (
 	* `Phidget HUB IO Digital 23` : digital input (0 or 1), port 2 and 3
 	* `Phidget HUB IO Digital 45` : digital input (0 or 1), port 4 and 5
 
+* [Phidget DAQ1000](https://phidgets.com/?tier=3&catid=106&pcid=86&prodid=622){:target="_blank"}: 8x analog in
+	* `Phidget DAQ1000 01` : analog input (0-5V), ports 0 and 1
+	* `Phidget DAQ1000 23` : analog input (0-5V), ports 2 and 3
+	* `Phidget DAQ1000 45` : analog input (0-5V), ports 4 and 5
+	* `Phidget DAQ1000 67` : analog input (0-5V), ports 6 and 7
+
 * [Phidget DAQ1400](https://www.phidgets.com/?tier=3&catid=49&pcid=42&prodid=961){:target="_blank"} (VINT): 1x versatile input (current, digital , frequency, voltage)
 
 	* `Phidget DAQ1400 Current` : current input (A, 20mA max)
 	* `Phidget DAQ1400 Digital` : digital input (0 or 1, 24V max)
 	* `Phidget DAQ1400 Frequency` : frequency input (hz, 2Mhz max)
-	* `Phidget DAQ1400 Voltage` : voltage (0-5V)
+	* `Phidget DAQ1400 Voltage` : voltage input (0-5V)
+
+
+* [Phidget VCP1000](https://phidgets.com/?tier=3&catid=16&pcid=14&prodid=953){:target="_blank"}: 1x 20-bit ±40V Voltage Input Phidget 
+	* `Phidget VCP1000 ` : analog input (±312mV, ±40V)
+
+* [Phidget VCP1001](https://phidgets.com/?tier=3&catid=16&pcid=14&prodid=954){:target="_blank"}: 1x ±40V Voltage Input Phidget; ±5V 
+	* `Phidget VCP1001 ` : analog input (±15V or ±40V) 
+
+* [Phidget VCP1002](https://phidgets.com/?tier=3&catid=16&pcid=14&prodid=955){:target="_blank"}: 1x ±1V Voltage Input Phidget 
+	* `Phidget VCP1002 ` : analog input (±10mV -- ±1V)
+
 
 
 ## 4. Analog/Digital Output
@@ -244,8 +283,8 @@ with
 
 Artisan v2.4 adds support for DC motor control.
 
-* [DCC1000](){:target="_blank"} and [DCC1002](){:target="_blank"} (1x VINT)
-* [DCC1003](){:target="_blank"} (2x VINT)
+* [DCC1000](https://www.phidgets.com/?tier=3&catid=18&pcid=15&prodid=965){:target="_blank"} and [DCC1002](https://www.phidgets.com/?tier=3&catid=18&pcid=15&prodid=1117){:target="_blank"} (1x VINT)
+* [DCC1003](https://www.phidgets.com/?tier=3&catid=18&pcid=15&prodid=1118){:target="_blank"} (2x VINT)
 
 Phidget DC Motor Control modules can be controlled via `IO Command` actions triggered by buttons or sliders configured in the Events tab (menu `Config >> Events`). The following commands are supported:
 
