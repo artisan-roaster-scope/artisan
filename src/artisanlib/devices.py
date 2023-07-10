@@ -942,7 +942,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         phidgetBox1018.addWidget(ratioLabel,6,0,Qt.AlignmentFlag.AlignRight)
         phidget1018HBox = QVBoxLayout()
         phidget1018HBox.addLayout(phidgetBox1018)
-        phidget1018GroupBox = QGroupBox('1010/1011/1013/1018/1019/HUB0000/SBC/DAQ1400/VCP100x IO')
+        phidget1018GroupBox = QGroupBox('1010/1011/1013/1018/1019/HUB0000/SBC/DAQ1000/DAQ1400/VCP100x IO')
         phidget1018GroupBox.setLayout(phidget1018HBox)
         phidget1018HBox.setContentsMargins(0,0,0,0)
         self.phidgetBoxRemoteFlag = QCheckBox()
@@ -3052,6 +3052,18 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 145 is +IKAWA State but +DEVICE cannot be set as main device
                 ##########################
+                ##########################
+                elif meter == 'Phidget DAQ1000 01':
+                    self.aw.qmc.device = 146
+                    message = QApplication.translate('Message','Device set to {0}').format(meter)
+                ##########################
+                ####  DEVICE 147 is +Phidget DAQ1000 23 but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                ####  DEVICE 148 is +Phidget DAQ1000 45 but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                ####  DEVICE 149 is +Phidget DAQ1000 67 but +DEVICE cannot be set as main device
 
 
                 # ADD DEVICE:
@@ -3217,7 +3229,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 9, # 142
                 9, # 143
                 9, # 144
-                9  # 145
+                9, # 145
+                1, # 146
+                1, # 147
+                1, # 148
+                1  # 149
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):

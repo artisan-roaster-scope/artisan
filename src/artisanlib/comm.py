@@ -506,7 +506,11 @@ class serialport:
                                    self.Ikawa,                #142
                                    self.Ikawa_SetRpm,         #143
                                    self.Ikawa_HeaterFan,      #144
-                                   self.Ikawa_State           #145
+                                   self.Ikawa_State,          #145
+                                   self.PHIDGET_DAQ1000_01,   #146
+                                   self.PHIDGET_DAQ1000_23,   #147
+                                   self.PHIDGET_DAQ1000_45,   #148
+                                   self.PHIDGET_DAQ1000_67    #149
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -921,6 +925,26 @@ class serialport:
     def PHIDGET1018_78(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,3,'voltage')
+        return tx,v1,v2
+
+    def PHIDGET_DAQ1000_01(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1000,0,'voltage')
+        return tx,v1,v2
+
+    def PHIDGET_DAQ1000_23(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1000,1,'voltage')
+        return tx,v1,v2
+
+    def PHIDGET_DAQ1000_45(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1000,2,'voltage')
+        return tx,v1,v2
+
+    def PHIDGET_DAQ1000_67(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1000,3,'voltage')
         return tx,v1,v2
 
     def PHIDGET1011_D(self) -> Tuple[float,float,float]:
@@ -5306,6 +5330,8 @@ class serialport:
                         self.aw.sendmessage(QApplication.translate('Message','Phidget IO 6/6/6 attached'))
                     elif deviceType == DeviceID.PHIDID_1010_1013_1018_1019:
                         self.aw.sendmessage(QApplication.translate('Message','Phidget IO 8/8/8 attached'))
+                    elif deviceType == DeviceID.PHIDID_DAQ1000:
+                        self.aw.sendmessage(QApplication.translate('Message','Phidget DAQ1000 attached'))
                     elif deviceType == DeviceID.PHIDID_DAQ1400:
                         self.aw.sendmessage(QApplication.translate('Message','Phidget DAQ1400 attached'))
                     elif deviceType == DeviceID.PHIDID_VCP1000:
@@ -5332,6 +5358,8 @@ class serialport:
                         self.aw.sendmessage(QApplication.translate('Message','Phidget IO 6/6/6 detached'))
                     elif deviceType == DeviceID.PHIDID_1010_1013_1018_1019:
                         self.aw.sendmessage(QApplication.translate('Message','Phidget IO 8/8/8 detached'))
+                    elif deviceType == DeviceID.PHIDID_DAQ1000:
+                        self.aw.sendmessage(QApplication.translate('Message','Phidget DAQ1000 detached'))
                     elif deviceType == DeviceID.PHIDID_DAQ1400:
                         self.aw.sendmessage(QApplication.translate('Message','Phidget DAQ1400 detached'))
                     elif deviceType == DeviceID.PHIDID_VCP1000:
@@ -5350,7 +5378,8 @@ class serialport:
     #  - Phidget IO 8/8/8 (1010,1013,1018,1019,SBC): DeviceID.PHIDID_1010_1013_1018_1019
     #  - Phidget IO 6/6/6 (HUB0000): DeviceID.PHIDID_HUB0000
     #  - Phidget IO 2/2/2 (1011): DeviceID.PHIDID_1011
-    #  - Phidget Phidget DAQ1400 Current/Frequency/Digital/VOLTAGE  (DAQ1400): PHIDID_DAQ1400
+    #  - Phidget DAQ1000 8x VoltageInput: PHIDID_DAQ1000
+    #  - Phidget DAQ1400 Current/Frequency/Digital/VOLTAGE: PHIDID_DAQ1400
     #  - Phidget VCP1000: PHIDID_VCP1000 (20-bit ±40V Voltage Input Phidget; ±312mV, ±40V)
     #  - Phidget VCP1001: PHIDID_VCP1001 (±40V Voltage Input Phidget; ±5V, ±15V or ±40V)
     #  - Phidget VCP1002: PHIDID_VCP1002 (±1V Voltage Input Phidget; ±10mV -- ±1V)

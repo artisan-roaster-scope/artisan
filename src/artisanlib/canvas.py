@@ -690,7 +690,8 @@ class tgraphcanvas(FigureCanvas):
         # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:" in the code
         # (check also the tags in comm.py and devices.py!!)
         # - add to self.devices
-        self.devices: Final[List[str]] = [#Fuji PID        #0
+        self.devices: Final[List[str]] = [
+                        #Fuji PID               #0
                        'Omega HH806AU',         #1
                        'Omega HH506RA',         #2
                        'CENTER 309',            #3
@@ -835,7 +836,11 @@ class tgraphcanvas(FigureCanvas):
                        'IKAWA',                     #142
                        '+IKAWA SET/RPM',            #143
                        '+IKAWA Heater/Fan',         #144
-                       '+IKAWA State'               #145
+                       '+IKAWA State',              #145
+                       'Phidget DAQ1000 01',        #146
+                       '+Phidget DAQ1000 23',       #147
+                       '+Phidget DAQ1000 45',       #148
+                       '+Phidget DAQ1000 67'        #149
                        ]
 
         # ADD DEVICE:
@@ -863,7 +868,8 @@ class tgraphcanvas(FigureCanvas):
             123, # Phidget VCP1000
             124, # Phidget VCP1001
             125, # Phidget VCP1002
-            137  # Phidget DAQ1500
+            137, # Phidget DAQ1500
+            146  # Phidget DAQ1000 01
         ]
 
         # ADD DEVICE:
@@ -945,7 +951,11 @@ class tgraphcanvas(FigureCanvas):
             141, # Kaleido Heater/Fan
             143, # IKAWA Set/RPM
             144, # IKAWA Heater/Fan
-            145  # IKAWA State
+            145, # IKAWA State
+            146, # Phidget DAQ1000 01
+            147, # +Phidget DAQ1000 23
+            148, # +Phidget DAQ1000 45
+            149  # +Phidget DAQ1000 67
         ]
 
         #extra devices
