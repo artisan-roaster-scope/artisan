@@ -136,7 +136,7 @@ Artisan can attach to all Phidgets IO ports. The input ports are configured as (
 	* `Phidget HUB IO Digital 23` : digital input (0 or 1), port 2 and 3
 	* `Phidget HUB IO Digital 45` : digital input (0 or 1), port 4 and 5
 
-* [Phidget DAQ1000](https://phidgets.com/?tier=3&catid=106&pcid=86&prodid=622){:target="_blank"}: 8x analog in
+* [Phidget DAQ1000](https://phidgets.com/?tier=3&catid=106&pcid=86&prodid=622){:target="_blank"} (VINT): 8x analog in
 	* `Phidget DAQ1000 01` : analog input (0-5V), ports 0 and 1
 	* `Phidget DAQ1000 23` : analog input (0-5V), ports 2 and 3
 	* `Phidget DAQ1000 45` : analog input (0-5V), ports 4 and 5
@@ -150,13 +150,13 @@ Artisan can attach to all Phidgets IO ports. The input ports are configured as (
 	* `Phidget DAQ1400 Voltage` : voltage input (0-5V)
 
 
-* [Phidget VCP1000](https://phidgets.com/?tier=3&catid=16&pcid=14&prodid=953){:target="_blank"}: 1x 20-bit ±40V Voltage Input Phidget 
+* [Phidget VCP1000](https://phidgets.com/?tier=3&catid=16&pcid=14&prodid=953){:target="_blank"} (VINT): 1x 20-bit ±40V Voltage Input Phidget 
 	* `Phidget VCP1000 ` : analog input (±312mV, ±40V)
 
-* [Phidget VCP1001](https://phidgets.com/?tier=3&catid=16&pcid=14&prodid=954){:target="_blank"}: 1x ±40V Voltage Input Phidget; ±5V 
+* [Phidget VCP1001](https://phidgets.com/?tier=3&catid=16&pcid=14&prodid=954){:target="_blank"} (VINT): 1x ±40V Voltage Input Phidget; ±5V 
 	* `Phidget VCP1001 ` : analog input (±15V or ±40V) 
 
-* [Phidget VCP1002](https://phidgets.com/?tier=3&catid=16&pcid=14&prodid=955){:target="_blank"}: 1x ±1V Voltage Input Phidget 
+* [Phidget VCP1002](https://phidgets.com/?tier=3&catid=16&pcid=14&prodid=955){:target="_blank"} (VINT): 1x ±1V Voltage Input Phidget 
 	* `Phidget VCP1002 ` : analog input (±10mV -- ±1V)
 
 
