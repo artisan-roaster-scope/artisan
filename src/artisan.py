@@ -76,7 +76,37 @@ else: # Linux
 from artisanlib import main, command_utility
 from multiprocessing import freeze_support
 
+# from pyinstaller 5.8:
+class NullWriter:
+  softspace = 0
+  encoding:str = 'UTF-8'
+
+  def write(*args):
+      pass
+
+  def flush(*args):
+      pass
+
+  # Some packages are checking if stdout/stderr is available (e.g., youtube-dl). For details, see #1883.
+  def isatty(self):
+      return False
+
 if system() == 'Windows' and hasattr(sys, 'frozen'): # tools/freeze
+    # to (re-)set sys.stdout/sys.stderr on Windows builds under PyInstaller >= 5.8.0 (set to None under --noconsole using pythonw)
+    # which is assumed by bottle.py (used by WebLCDs) to exists (Issue #1229)
+    # see also
+    #   https://github.com/bottlepy/bottle/issues/1104#issuecomment-1195740112
+    #   https://github.com/bottlepy/bottle/issues/1401#issuecomment-1284450625
+    #   https://github.com/r0x0r/pywebview/pull/1048/files
+    #   https://stackoverflow.com/questions/19425736/how-to-redirect-stdout-and-stderr-to-logger-in-python
+    try:
+        if sys.stdout is None:
+            sys.stdout = NullWriter()
+        if sys.stderr is None:
+            sys.stderr = NullWriter()
+    except Exception: # pylint: disable=broad-except
+        pass
+
     from multiprocessing import set_executable
     executable = os.path.join(os.path.dirname(sys.executable), 'artisan.exe')
     set_executable(executable)
