@@ -7135,7 +7135,7 @@ class tgraphcanvas(FigureCanvas):
                     elif TP_time_loaded is not None:
                         a = self.backgroundalpha if timeindex2 else 1.0
                         e = 0
-                        shift = timex[timeindex[0]] if timeindex[0] > 0 else 0
+                        shift = timex[timeindex[0]]
                         TP_index = self.backgroundtime2index(TP_time_loaded + shift)
                         ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[TP_index],d)
                         st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','TP {0}'),stringfromseconds(TP_time_loaded,False))
