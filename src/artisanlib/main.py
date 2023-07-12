@@ -11428,7 +11428,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     od=offDelim),r'',fn)
             #replace the fields with content
             for fi in fields:
-                fn = re.sub(fr'{fieldDelim}{fi[0]}', fr'{str(fi[1])}', fn, 0, _ignorecase)
+                fn = re.sub(fr'{fieldDelim}{fi[0]}', fr'{str(fi[1])}', fn, count=0, flags=_ignorecase)
 
             #cleaning is performed in generateFilename()
             #fn = self.removeDisallowedFilenameChars(str(fn))
