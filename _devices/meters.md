@@ -48,7 +48,7 @@ The single temperature meters listed above are rather simple and cost-efficient.
   - 9V Battery only
   - Software included
   - Minimal stable sampling rate in Artisan: 4sec
-* [Apollo I DT301](http://www.ueitest.com/products/temperature-humidity/dt301) (discontinued)
+* Apollo I DT301 (discontinued)
   - Single K/J-Type
   - Built in USB to serial converter (9600-8N1)
 
@@ -107,7 +107,7 @@ Those 4 channel meters in the list below are all basically identical. Just that 
   - Software optional
   - 9V Battery or external power
   - Minimal stable sampling rate in Artisan: 4sec
-* [CENTER 309](http://www.centertek.com/product_d.php?lang=en&tb=1&id=79&cid=67) / VOLTCRAFT K204 / [Omega HH309](https://www.omega.com/en-us/control-and-monitoring-devices/data-loggers/p/HH309A-Series) / [General Tools DT309DL](http://www.tequipment.net/GeneralDT309DL.html)
+* [CENTER 309](http://www.centertek.com/product_d.php?lang=en&tb=1&id=79&cid=67) / VOLTCRAFT K204 / [Omega HH309](https://www.omega.com/en-us/test-inspection/handheld-meters/temperature-and-humidity-and-dew-point-meters/hh309a-tc-logger/p/HH309A) / [General Tools DT309DL](http://www.tequipment.net/GeneralDT309DL.html)
   - Four K-Type
   - RS232 Interface (9600-8N1)
   - Internal memory
@@ -127,7 +127,7 @@ Multi-meters allow to read different types of sensors by measuring a voltage or 
   - AC/DC volts and current
   - RS232 Interface (2400-8N1)
   - 9V Battery only
-* [TE VA18B](http://www.mastech.com.cn/html/en/products-va18b.htm)
+* TE VA18B
   - single K-Type TC
   - AC/DC volts and current
   - optical-isolated USB Interface (2400-8N1)

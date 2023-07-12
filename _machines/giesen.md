@@ -11,7 +11,7 @@ sidebar:
   nav: "machines"
 ---
 
-* __Producer:__ [GIESEN coffee-roasters](http://www.giesencoffeeroasters.eu){:target="_blank"}, The Netherlands
+* __Producer:__ [GIESEN coffee-roasters](https://www.giesen.com/){:target="_blank"}, The Netherlands
 * __Machines:__ WPG/WPE/W1/W6/W15/W30/W45/W60 with networked PLC (6/2014 and later)
 * __Connection:__ Siemens S7 network
 * __Features:__

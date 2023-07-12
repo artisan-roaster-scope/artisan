@@ -26,11 +26,6 @@ author_profile: true
 *  [How to Make an Arduino Controlled Coffee Roaster](https://medium.com/@lukasgrasse/how-to-make-an-arduino-controlled-coffee-roaster-f6a3334fd7d5) by [Lukas Grasse](https://medium.com/@lukasgrasse?source=user_popover)
 *  [Huky 500 Automation](https://github.com/phischmi/HukyAutomation)
 
-* Artisan on Raspberry Pi 3 and Zero using Phidgets by Tsai Sam
-  - [Install Phidgets22 Drivers on Raspberry Pi 3 and Zero](https://wbcoffee.blogspot.de/2018/03/install-phidgets22-drivers-on-raspberry.html)
-  - [Building a Phidget Network server on Raspberry Pi](https://wbcoffee.blogspot.tw/2018/03/building-phidgets-network-server-on.html)
-  - [Using Phidget Network Server](https://wbcoffee.blogspot.tw/2018/03/using-phidgets-network-server.html)
-
 
 * Measuring Air pressure in Artisan
    - [Installing Phidget 1136 Differential Air Pressure Sensor in Artisan](https://wbcoffee.blogspot.com/2018/04/installing-phidget-1136-differential.html)
