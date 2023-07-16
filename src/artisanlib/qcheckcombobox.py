@@ -37,7 +37,7 @@ except ImportError:
     )
 
 
-class CheckComboBox(QComboBox): # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     """
     A QComboBox allowing multiple item selection.
     """
@@ -45,7 +45,7 @@ class CheckComboBox(QComboBox): # pyright: ignore # Argument to class must be a 
     flagChanged=pyqtSignal(int,bool)
 
 
-    class ComboItemDelegate(QStyledItemDelegate): # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+    class ComboItemDelegate(QStyledItemDelegate): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
         """
         Helper styled delegate (mostly based on existing private Qt's
         delegate used by the QComboBox). Used to style the popup like a
@@ -75,7 +75,7 @@ class CheckComboBox(QComboBox): # pyright: ignore # Argument to class must be a 
             else:
                 super().paint(painter, option, index)
 
-    class ComboMenuDelegate(QAbstractItemDelegate): # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+    class ComboMenuDelegate(QAbstractItemDelegate): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
         """
         Helper styled delegate (mostly based on existing private Qt's
         delegate used by the QComboBox). Used to style the popup like a

@@ -39,7 +39,7 @@ class BLE_CHAR_TYPE(Enum):
     BLE_CHAR_NOTIFY_WRITE = 'BLE_CHAR_NOTIFY_WRITE'
 
 
-class BleInterface(QtCore.QObject): # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class BleInterface(QtCore.QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class ()
     weightChanged = QtCore.pyqtSignal(float)
     batteryChanged = QtCore.pyqtSignal(int)
     deviceDisconnected = QtCore.pyqtSignal()

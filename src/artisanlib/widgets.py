@@ -31,7 +31,8 @@ except ImportError:
         QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QFontMetrics, QColor, QCursor # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
-class MyQComboBox(QComboBox): # pylint: disable=too-few-public-methods  # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+
+class MyQComboBox(QComboBox): # pylint: disable=too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues]# Argument to class must be a base class
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
@@ -42,7 +43,7 @@ class MyQComboBox(QComboBox): # pylint: disable=too-few-public-methods  # pyrigh
             return QComboBox.wheelEvent(self, *args, **kwargs)
         return None
 
-class MyQDoubleSpinBox(QDoubleSpinBox):  # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class MyQDoubleSpinBox(QDoubleSpinBox):  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
@@ -63,7 +64,7 @@ class MyQDoubleSpinBox(QDoubleSpinBox):  # pyright: ignore # Argument to class m
         super().mouseDoubleClickEvent(event)
         super().mouseReleaseEvent(event)
 
-class MyTableWidgetItemQLineEdit(QTableWidgetItem): # pylint: disable= too-few-public-methods  # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class MyTableWidgetItemQLineEdit(QTableWidgetItem): # pylint: disable= too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, sortKey) -> None:
         #call custom constructor with UserType item type
@@ -84,7 +85,7 @@ class MyTableWidgetItemQLineEdit(QTableWidgetItem): # pylint: disable= too-few-p
             # else we do a string compare
             return a < b
 
-class MyTableWidgetItemQTime(QTableWidgetItem): # pylint: disable= too-few-public-methods  # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class MyTableWidgetItemQTime(QTableWidgetItem): # pylint: disable= too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, sortKey) -> None:
         #call custom constructor with UserType item type
@@ -97,7 +98,7 @@ class MyTableWidgetItemQTime(QTableWidgetItem): # pylint: disable= too-few-publi
         b = other.sortKey.time().minute() * 60 + other.sortKey.time().second()
         return a < b
 
-class MyTableWidgetItemNumber(QTableWidgetItem): # pylint: disable= too-few-public-methods  # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class MyTableWidgetItemNumber(QTableWidgetItem): # pylint: disable= too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, text, sortKey) -> None:
         super().__init__(text, 1003) #QTableWidgetItem.ItemType.UserType)
@@ -107,7 +108,7 @@ class MyTableWidgetItemNumber(QTableWidgetItem): # pylint: disable= too-few-publ
     def __lt__(self, other):
         return self.sortKey < other.sortKey
 
-class MyTableWidgetItemQCheckBox(QTableWidgetItem): # pylint: disable= too-few-public-methods  # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class MyTableWidgetItemQCheckBox(QTableWidgetItem): # pylint: disable= too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base clas
     __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, sortKey) -> None:
         #call custom constructor with UserType item type
@@ -118,7 +119,7 @@ class MyTableWidgetItemQCheckBox(QTableWidgetItem): # pylint: disable= too-few-p
     def __lt__(self, other):
         return self.sortKey.isChecked() < other.sortKey.isChecked()
 
-class MyTableWidgetItemQComboBox(QTableWidgetItem): # pylint: disable= too-few-public-methods  # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class MyTableWidgetItemQComboBox(QTableWidgetItem): # pylint: disable= too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, sortKey) -> None:
         #call custom constructor with UserType item type
@@ -130,7 +131,7 @@ class MyTableWidgetItemQComboBox(QTableWidgetItem): # pylint: disable= too-few-p
         return str(self.sortKey.currentText()) < str(other.sortKey.currentText())
 
 # QLabel that automatically resizes its text font
-class MyQLabel(QLabel):  # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class MyQLabel(QLabel):  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     def __init__(self, *args, **kargs) -> None:
         super().__init__(*args, **kargs)
         self.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Ignored,QSizePolicy.Policy.Ignored))
@@ -173,7 +174,7 @@ class MyQLabel(QLabel):  # pyright: ignore # Argument to class must be a base cl
         self.setFont(f)
 
 
-class ClickableQLabel(QLabel): # pylint: disable=too-few-public-methods # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class ClickableQLabel(QLabel): # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     clicked = pyqtSignal()
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
@@ -186,7 +187,7 @@ class ClickableQLabel(QLabel): # pylint: disable=too-few-public-methods # pyrigh
         elif event.button() == Qt.MouseButton.RightButton:
             self.right_clicked.emit()
 
-class ClickableQGroupBox(QGroupBox): # pylint: disable=too-few-public-methods # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class ClickableQGroupBox(QGroupBox): # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     clicked = pyqtSignal()
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
@@ -199,7 +200,7 @@ class ClickableQGroupBox(QGroupBox): # pylint: disable=too-few-public-methods # 
         elif event.button() == Qt.MouseButton.RightButton:
             self.right_clicked.emit()
 
-class MyQLCDNumber(QLCDNumber): # pylint: disable=too-few-public-methods # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class MyQLCDNumber(QLCDNumber): # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     clicked = pyqtSignal()
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
@@ -212,7 +213,7 @@ class MyQLCDNumber(QLCDNumber): # pylint: disable=too-few-public-methods # pyrig
         elif event.button() == Qt.MouseButton.RightButton:
             self.right_clicked.emit()
 
-class ClickableLCDFrame(QFrame): # pylint: disable=too-few-public-methods # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class ClickableLCDFrame(QFrame): # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     clicked = pyqtSignal()
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
@@ -227,7 +228,7 @@ class ClickableLCDFrame(QFrame): # pylint: disable=too-few-public-methods # pyri
 
 
 # this one emits a clicked event on right-clicks and an editingFinished event when the text was changed and the focus got lost
-class ClickableTextEdit(QTextEdit): # pylint: disable=too-few-public-methods # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class ClickableTextEdit(QTextEdit): # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     clicked = pyqtSignal()
     editingFinished = pyqtSignal()
     receivedFocus = pyqtSignal()
@@ -283,7 +284,7 @@ def pushButtonColorStyle(
     font_size_str = ('' if font_size is None else f'font-size:{font_size}pt;')
     return f'{class_name}{selector}{state}{{{color}{background}{font_size_str}}}'
 
-class EventPushButton(QPushButton): # pylint: disable=too-few-public-methods # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class EventPushButton(QPushButton): # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     def __init__(self, background_color, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.default_background_color = background_color

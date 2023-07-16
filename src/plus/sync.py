@@ -409,10 +409,10 @@ def getApplidedServerUpdatesModifiedAt() -> Optional[float]:
 def applyServerUpdates(data:Dict[str, Any]) -> None:
     dirty = False
     title_changed = False
+    aw = config.app_window
     try:
         _log.debug('applyServerUpdates()')
         _log.debug('-> apply: %s', data)
-        aw = config.app_window
 
         if aw is not None:
             win:float = aw.qmc.weight[0]
@@ -632,13 +632,13 @@ def applyServerUpdates(data:Dict[str, Any]) -> None:
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
     finally:
-        if aw is not None and title_changed: # pyright: ignore # "aw" is possibly unbound (reportUnboundVariable)
-            aw.setTitleSignal.emit( # pyright: ignore # "aw" is possibly unbound (reportUnboundVariable)
-                aw.qmc.title, True # pyright: ignore # "aw" is possibly unbound (reportUnboundVariable)
+        if aw is not None and title_changed:
+            aw.setTitleSignal.emit(
+                aw.qmc.title, True
             )  # we force an updatebackground to ensure proper repainting
-        if aw is not None and dirty: # pyright: ignore # "aw" is possibly unbound (reportUnboundVariable)
-            aw.qmc.fileDirty() # pyright: ignore # "aw" is possibly unbound (reportUnboundVariable)
-            aw.sendmessageSignal.emit( # pyright: ignore # "aw" is possibly unbound (reportUnboundVariable)
+        if aw is not None and dirty:
+            aw.qmc.fileDirty()
+            aw.sendmessageSignal.emit(
                 QApplication.translate(
                     'Plus', 'Updated data received from artisan.plus'
                 ),

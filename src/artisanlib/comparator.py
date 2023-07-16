@@ -730,7 +730,7 @@ class RoastProfile:
                 timex,values = zip(*events)
             else:
                 timex,values = [],[]
-            line, = self.aw.qmc.ax.plot(list(timex), list(values), color=(self.color if self.active else self.gray), # type: ignore # pyright: Argument of type "_T_co@zip | list[Unknown]" cannot be assigned to parameter "__iterable" of type "Iterable[_T@list]" in function "__init__"
+            line, = self.aw.qmc.ax.plot(list(timex), list(values), color=(self.color if self.active else self.gray),
                     linestyle='-',drawstyle='steps-post',linewidth = self.aw.qmc.Evaluelinethickness[n],
                     alpha = (self.alpha[4] if self.active else self.alpha[4]*self.alpha_dim_factor),
                     label = self.aw.qmc.etypesf(n))
@@ -754,7 +754,7 @@ class RoastProfile:
             self.l_events4 =  self.drawEvents(self.E4,3)
 
 
-class CompareTableWidget(QTableWidget): # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class CompareTableWidget(QTableWidget): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     deleteKeyPressed = pyqtSignal()
 
     def keyPressEvent(self, event):
@@ -1205,7 +1205,7 @@ class roastCompareDlg(ArtisanDialog):
                     frame.set_alpha(self.aw.qmc.alpha['legendbg'])
                     frame.set_edgecolor(self.aw.qmc.palette['legendborder'])
                     frame.set_linewidth(0.5)
-                    for line,text in zip(self.legend.get_lines(), self.legend.get_texts()): # type: ignore # pyright: error: "object*" is not iterable
+                    for line,text in zip(self.legend.get_lines(), self.legend.get_texts()):
                         text.set_color(line.get_color())
             elif self.legend is not None:
                 self.legend.remove()

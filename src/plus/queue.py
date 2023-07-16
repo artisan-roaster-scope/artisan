@@ -61,7 +61,7 @@ worker:Optional['Worker'] = None
 worker_thread:Optional[QThread] = None
 
 
-class Worker(QObject): # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     startSignal = pyqtSignal()
     replySignal = pyqtSignal(float, float, str, int, list) # rlimit:float, rused:float, pu:str, notifications:int, machines:List[str]
 

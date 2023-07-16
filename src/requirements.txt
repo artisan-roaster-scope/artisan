@@ -32,7 +32,7 @@ wheel==0.40.0
 pyserial==3.5
 pymodbus==3.3.2
 python-snap7==1.3
-Phidget22== 1.15.20230616
+Phidget22==1.16.20230707
 Unidecode==1.3.6
 bottle==0.12.25
 qrcode==7.4.2
@@ -46,10 +46,10 @@ websocket-client==1.6.1
 websockets==11.0.3
 PyYAML==6.0
 psutil==5.9.4
-typing-extensions==4.6.3; python_version < '3.8' # required for supporting Final and TypeDict on Python <3.8
-protobuf==4.23.3
+typing-extensions==4.71; python_version < '3.8' # required for supporting Final and TypeDict on Python <3.8
+protobuf==4.23.4
 numpy==1.24.3; python_version < '3.9' # last Python 3.8 release
-numpy==1.25.0; python_version >= '3.9'
+numpy==1.25.1; python_version >= '3.9'
 scipy==1.10.1; python_version < '3.9' # last Python 3.8 release
 scipy==1.11.1; python_version >= '3.9'
 wquantiles==0.6
@@ -57,7 +57,7 @@ colorspacious==1.1.2
 openpyxl==3.1.2
 keyring==24.2.0
 prettytable==3.8.0
-lxml==4.9.2
+lxml==4.9.3
 matplotlib==3.7.2
 #
 #
@@ -65,7 +65,7 @@ matplotlib==3.7.2
 # packages that differ per platform
 #
 ## install gevent only on macOS higher than 10.13 to deactivate WebLCDs on macOS legacy builds
-gevent==22.10.2; sys_platform!='darwin' or platform_release>='18.0' # WebLCDs not supported on macOS 10.13
+gevent==23.7.0; sys_platform!='darwin' or platform_release>='18.0' # WebLCDs not supported on macOS 10.13
 gevent-websocket==0.10.1; sys_platform!='darwin' or platform_release>='18.0' # WebLCDs not supported on macOS 10.13
 ##
 ### yoctopuce 1.10.42060 on macOS 10.13

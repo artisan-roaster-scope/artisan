@@ -483,15 +483,15 @@ class modbusport:
                                 #note: logged chars should be unicode not binary
                                 if self.aw.seriallogflag and res is not None and hasattr(res, 'registers'):
                                     if self.type < 3: # serial MODBUS
-                                        ser_str = f'MODBUS readActiveregisters : {self.formatMS(tx,time.time())}ms => {self.comport},{self.baudrate},{self.bytesize},{self.parity},{self.stopbits},{self.timeout} || Slave = {slave} || Register = {register} || Code = {code} || Rx# = {len(res.registers)}' # pyright: ignore # Cannot access member "registers" for type "ModbusResponse"  Member "registers" is unknown (reportGeneralTypeIssues)
+                                        ser_str = f'MODBUS readActiveregisters : {self.formatMS(tx,time.time())}ms => {self.comport},{self.baudrate},{self.bytesize},{self.parity},{self.stopbits},{self.timeout} || Slave = {slave} || Register = {register} || Code = {code} || Rx# = {len(res.registers)}'
                                     else: # IP MODBUS
-                                        ser_str = f'MODBUS readActiveregisters : {self.formatMS(tx,time.time())}ms => {self.host}:{self.port} || Slave = {slave} || Register = {register} || Code = {code} || Rx# = {len(res.registers)}' # pyright: ignore # Cannot access member "registers" for type "ModbusResponse" Member "registers" is unknown (reportGeneralTypeIssues)
+                                        ser_str = f'MODBUS readActiveregisters : {self.formatMS(tx,time.time())}ms => {self.host}:{self.port} || Slave = {slave} || Register = {register} || Code = {code} || Rx# = {len(res.registers)}'
                                     _log.debug(ser_str)
                                     self.aw.addserial(ser_str)
 
                                 if res is not None and hasattr(res, 'registers'):
                                     self.clearCommError()
-                                    self.cacheReadings(code,slave,register,res.registers)  # pyright: ignore # Cannot access member "registers" for type "ModbusResponse" Member "registers" is unknown (reportGeneralTypeIssues)
+                                    self.cacheReadings(code,slave,register,res.registers)
 
         except Exception as ex: # pylint: disable=broad-except
             _log.debug(ex)
@@ -675,7 +675,7 @@ class modbusport:
                 builder.add_32bit_float(float(value))
                 payload = builder.build()
                 #payload:List[int] = [int.from_bytes(b,("little" if self.byteorderLittle else "big")) for b in builder.build()]
-                self.master.write_registers(int(register),payload,slave=int(slave),skip_encode=True) # type: ignore # mypy/pyright: ignore # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"
+                self.master.write_registers(int(register),payload,slave=int(slave),skip_encode=True) # type: ignore # pyright: ignore [reportGeneralTypeIssues] # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"
                 time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeWord(%d,%d,%s) failed', slave, register, value)
@@ -704,7 +704,7 @@ class modbusport:
                 builder.add_16bit_uint(r)
                 payload = builder.build()
                 #payload:List[int] = [int.from_bytes(b,("little" if self.byteorderLittle else "big")) for b in builder.build()]
-                self.master.write_registers(int(register),payload,slave=int(slave),skip_encode=True) # type:ignore # mypy/pyright: ignore # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"
+                self.master.write_registers(int(register),payload,slave=int(slave),skip_encode=True) # type:ignore # pyright: ignore [reportGeneralTypeIssues] # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"
                 time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeBCD(%d,%d,%s) failed', slave, register, value)
@@ -734,7 +734,7 @@ class modbusport:
                 builder.add_32bit_int(int(value))
                 payload = builder.build()
                 #payload:List[int] = [int.from_bytes(b,("little" if self.byteorderLittle else "big")) for b in builder.build()]
-                self.master.write_registers(int(register),payload,slave=int(slave),skip_encode=True) # type: ignore # mypy/pyright: ignore # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"
+                self.master.write_registers(int(register),payload,slave=int(slave),skip_encode=True) # type: ignore # pyright: ignore [reportGeneralTypeIssues] # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"
                 time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeLong(%d,%d,%s) failed', slave, register, value)
@@ -795,7 +795,7 @@ class modbusport:
                     else:
                         break
                 if res is not None and hasattr(res, 'registers'):
-                    decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)  # pyright: ignore # Cannot access member "registers" for type "ModbusResponse"
+                    decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
                     r = decoder.decode_32bit_float()
                     # we clear the previous error and send a message
                     self.clearCommError()
@@ -873,7 +873,7 @@ class modbusport:
                     else:
                         break
                 if res is not None and hasattr(res, 'registers'):
-                    decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)  # pyright: ignore # Cannot access member "registers" for type "ModbusResponse"
+                    decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
                     r = decoder.decode_32bit_uint()
                     self.clearCommError()
                     time.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
@@ -926,11 +926,11 @@ class modbusport:
         error, _ = self.invalidResult(res,1)
         if res is not None and not error:
             if code in [1,2]:
-                if hasattr(res, 'bits') and res.bits[0]:  # pyright: ignore # Cannot access member "bits" for type "ModbusResponse"
+                if hasattr(res, 'bits') and res.bits[0]:
                     return 1
                 return 0
             if hasattr(res, 'registers'):
-                decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)  # pyright: ignore # Cannot access member "registers" for type "ModbusResponse"
+                decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
                 r = decoder.decode_16bit_uint()
 #                _log.debug('  res.registers => %s', res.registers)
                 _log.debug('  decoder.decode_16bit_uint() => %s', r)
@@ -1000,12 +1000,12 @@ class modbusport:
                         break
                 if res is not None:
                     if code in [1,2] and hasattr(res, 'bits'):
-                        r = 1 if res is not None and res.bits[0] else 0  # pyright: ignore # Cannot access member "registers" for type "bits"
+                        r = 1 if res is not None and res.bits[0] else 0
                         # we clear the previous error and send a message
                         self.clearCommError()
                         return r
                     if hasattr(res, 'registers'):
-                        decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle) # pyright: ignore # Cannot access member "registers" for type "ModbusResponse"
+                        decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
                         if signed:
                             r = decoder.decode_16bit_int()
                         else:
@@ -1087,7 +1087,7 @@ class modbusport:
                     else:
                         break
                 if res is not None and hasattr(res, 'registers'):
-                    decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle) # pyright: ignore # Cannot access member "registers" for type "ModbusResponse"
+                    decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
                     if signed:
                         r = decoder.decode_32bit_int()
                     else:
@@ -1170,7 +1170,7 @@ class modbusport:
                     else:
                         break
                 if res is not None and hasattr(res, 'registers'):
-                    decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle) # pyright: ignore # Cannot access member "registers" for type "ModbusResponse"
+                    decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
                     r = decoder.decode_16bit_uint()
                     # we clear the previous error and send a message
                     self.clearCommError()

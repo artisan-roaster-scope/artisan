@@ -1278,7 +1278,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 ###     Event Action Thread
 #########################################################################################################
 
-class EventActionThread(QThread): # pylint: disable=too-few-public-methods # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class EventActionThread(QThread): # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
     def __init__(self, aw:'ApplicationWindow', action:int, command:str, eventtype:Optional[int]) -> None:
         super().__init__()
@@ -1296,7 +1296,7 @@ class EventActionThread(QThread): # pylint: disable=too-few-public-methods # pyr
 #########################################################################################################
 
 # applies comma2dot as fixup to automatically turn numbers like "1,2" into valid numbers like "1.0" and the empty entry into "0.0"
-class MyQDoubleValidator(QDoubleValidator): # pylint: disable=too-few-public-methods  # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class MyQDoubleValidator(QDoubleValidator): # pylint: disable=too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
     def __init__(self, bottom:float, top:float, decimals:int, lineedit:QLineEdit) -> None:
         super().__init__(bottom, top, decimals, lineedit)
@@ -1316,7 +1316,7 @@ class MyQDoubleValidator(QDoubleValidator): # pylint: disable=too-few-public-met
 
 # NOTE: to have pylint to verify proper __slot__ definitions one has to remove the super class QMainWindow here temporarily
 #   as this does not has __slot__ definitions and thus __dict__ is contained which suppresses the warnings
-class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
     singleShotPhidgetsPulseOFF = pyqtSignal(int,int,str) # signal to be called from the eventaction thread to realise Phidgets pulse via QTimer in the main thread
     singleShotPhidgetsPulseOFFSerial = pyqtSignal(int,int,str,str)
@@ -1368,7 +1368,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         'kaleidoHost', 'kaleidoPort', 'kaleidoSerial', 'kaleidoPID', 'kaleido',
         'lcdpaletteB', 'lcdpaletteF', 'extraeventsbuttonsflags', 'extraeventslabels', 'extraeventbuttoncolor', 'extraeventsactionstrings',
         'extraeventbuttonround', 'block_quantification_sampling_ticks', 'sampling_seconds_to_block_quantifiction', 'sampling_ticks_to_block_quantifiction', 'extraeventsactionslastvalue',
-        'org_extradevicesettings', 'eventslidervalues', 'eventslidervisibilities', 'eventsliderKeyboardControl', 'eventslideractions', 'eventslidercommands', 'eventslideroffsets',
+        'org_extradevicesettings', 'eventslidervalues', 'eventslidervisibilities', 'eventsliderKeyboardControl', 'eventsliderAlternativeLayout', 'eventslideractions', 'eventslidercommands', 'eventslideroffsets',
         'eventsliderfactors', 'eventslidermin', 'eventsMaxValue', 'eventslidermax', 'eventslidersflags', 'eventsliderBernoulli', 'eventslidercoarse',
         'eventslidertemp', 'eventsliderunits', 'eventslidermoved', 'SVslidermoved', 'eventquantifieractive', 'eventquantifiersource', 'eventquantifierSV',
         'eventquantifiermin', 'eventquantifiermax', 'eventquantifiercoarse', 'eventquantifieraction', 'clusterEventsFlag', 'eventquantifierlinspaces',
@@ -1407,7 +1407,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         'buttonpalette', 'extraeventbuttontextcolor', 'extraeventsactions', 'extraeventsdescriptions', 'extraeventstypes', 'extraeventsvalues',
         'extraeventsvisibility', 'fileSaveAction', 'fileSaveAsAction', 'keyboardButtonStyles', 'language_menu_actions', 'loadThemeAction', 'main_button_min_width_str',
         'minieventleft', 'minieventright', 'nLCDS', 'notificationManager', 'notificationsflag', 'ntb', 'pdf_page_layout', 'pdf_rendering', 'productionPDFAction',
-        'rankingPDFAction', 'roastReportMenu', 'roastReportPDFAction', 'saveAsThemeAction', 'sliderGrpBox1x', 'sliderGrpBox2x', 'sliderGrpBox3x', 'sliderGrpBox4x',
+        'rankingPDFAction', 'roastReportMenu', 'roastReportPDFAction', 'saveAsThemeAction', 'sliderGrp12', 'sliderGrp34', 'sliderGrpBox1x', 'sliderGrpBox2x', 'sliderGrpBox3x', 'sliderGrpBox4x',
         'small_button_min_width_str', 'standard_button_min_width_px', 'tiny_button_min_width_str', 'recording_version', 'recording_revision', 'recording_build',
         'lastIOResult', 'max_palettes', 'palette_entries', 'eventsliders' ]
 
@@ -1718,6 +1718,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.eventslidervalues:List[int] = [0]*self.eventsliders
         self.eventslidervisibilities:List[int] = [0]*self.eventsliders
         self.eventsliderKeyboardControl = True # if false sliders cannot be moved using up/down keys
+        self.eventsliderAlternativeLayout = False # if True group slider 1+4 and 2+3 instead of slider 1+2 and 3+4
         self.eventslideractions:List[int] = [0]*self.eventsliders # 0: None, 1: Serial Command, 2: Modbus Command, 3: DTA Command, 4: Call Program, 5: Hottop Heater, 6: Hottop Fan
         self.eventslidercommands:List[str] = ['']*self.eventsliders
         self.eventslideroffsets:List[float] = [0]*self.eventsliders
@@ -3799,16 +3800,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.sliderSV.actionTriggered.connect(self.sliderSVactionTriggered)
         self.sliderSV.setFocusPolicy(Qt.FocusPolicy.StrongFocus) # ClickFocus TabFocus StrongFocus
 
-        sliderGrp12 = QVBoxLayout()
-        sliderGrp12.setSpacing(0)
-        sliderGrp12.setContentsMargins(0,0,0,0)
-        sliderGrp12.addLayout(self.sliderGrpBox1x)
-        sliderGrp12.addLayout(self.sliderGrpBox2x)
-        sliderGrp34 = QVBoxLayout()
-        sliderGrp34.setSpacing(0)
-        sliderGrp34.setContentsMargins(0,0,0,0)
-        sliderGrp34.addLayout(self.sliderGrpBox3x)
-        sliderGrp34.addLayout(self.sliderGrpBox4x)
+        self.sliderGrp12 = QVBoxLayout()
+        self.sliderGrp12.setSpacing(0)
+        self.sliderGrp12.setContentsMargins(0,0,0,0)
+        self.sliderGrp12.addLayout(self.sliderGrpBox1x)
+        self.sliderGrp12.addLayout(self.sliderGrpBox2x)
+        self.sliderGrp34 = QVBoxLayout()
+        self.sliderGrp34.setSpacing(0)
+        self.sliderGrp34.setContentsMargins(0,0,0,0)
+        self.sliderGrp34.addLayout(self.sliderGrpBox3x)
+        self.sliderGrp34.addLayout(self.sliderGrpBox4x)
         sliderGrpSV = QVBoxLayout()
         sliderGrpSV.setSpacing(0)
         sliderGrpSV.setContentsMargins(0,0,0,0)
@@ -3817,8 +3818,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.leftlayout = QHBoxLayout()
         self.leftlayout.setSpacing(0)
         self.leftlayout.setContentsMargins(0,0,0,0)
-        self.leftlayout.addLayout(sliderGrp12)
-        self.leftlayout.addLayout(sliderGrp34)
+        self.leftlayout.addLayout(self.sliderGrp12)
+        self.leftlayout.addLayout(self.sliderGrp34)
         self.leftlayout.addLayout(sliderGrpSV)
 
         self.sliderFrame = QFrame()
@@ -4891,7 +4892,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         # add NEW menu item
         newRoastAction = QAction(QApplication.translate('Menu', 'New'), self)
         newRoastAction.setShortcut(QKeySequence.StandardKey.New)
-        newRoastAction.triggered.connect(self.newRoast)  # pyright: ignore # error: Argument of type "(_: bool = False) -> bool" cannot be assigned to parameter "slot" of type "PYQT_SLOT" in function "connect"
+        newRoastAction.triggered.connect(self.newRoast)  # pyright: ignore [reportGeneralTypeIssues] # error: Argument of type "(_: bool = False) -> bool" cannot be assigned to parameter "slot" of type "PYQT_SLOT" in function "connect"
         self.newRoastMenu.addAction(newRoastAction)
         # add recent roasts items
         if len(self.recentRoasts) > 0:
@@ -5478,6 +5479,34 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
         self.lcd6.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.lcdpaletteF['sv']}; background-color: {self.lcdpaletteB['sv']};}}")
         self.lcd7.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.lcdpaletteF['sv']}; background-color: {self.lcdpaletteB['sv']};}}")
         self.updateExtraLCDvisibility()
+
+    # switches slider layout to its alternative layout if 'alternativeLayout' is True,
+    # other wise to standard layout
+    def updateSliderLayout(self, alternativeLayout:bool) -> None:
+        if alternativeLayout != self.eventsliderAlternativeLayout:
+            if self.eventsliderAlternativeLayout:
+                # remove alternative layout sliders
+                self.sliderGrp12.removeItem(self.sliderGrpBox1x)
+                self.sliderGrp12.removeItem(self.sliderGrpBox4x)
+                self.sliderGrp34.removeItem(self.sliderGrpBox2x)
+                self.sliderGrp34.removeItem(self.sliderGrpBox3x)
+                # add standard layout sliders
+                self.sliderGrp12.addLayout(self.sliderGrpBox1x)
+                self.sliderGrp12.addLayout(self.sliderGrpBox2x)
+                self.sliderGrp34.addLayout(self.sliderGrpBox3x)
+                self.sliderGrp34.addLayout(self.sliderGrpBox4x)
+            else:
+                # remove standard layout sliders
+                self.sliderGrp12.removeItem(self.sliderGrpBox1x)
+                self.sliderGrp12.removeItem(self.sliderGrpBox2x)
+                self.sliderGrp34.removeItem(self.sliderGrpBox3x)
+                self.sliderGrp34.removeItem(self.sliderGrpBox4x)
+                # add alternative layout sliders
+                self.sliderGrp12.addLayout(self.sliderGrpBox1x)
+                self.sliderGrp12.addLayout(self.sliderGrpBox4x)
+                self.sliderGrp34.addLayout(self.sliderGrpBox2x)
+                self.sliderGrp34.addLayout(self.sliderGrpBox3x)
+            self.eventsliderAlternativeLayout = alternativeLayout
 
     def updateCanvasColors(self, checkColors=True):
         canvas_color = self.qmc.palette['canvas']
@@ -7731,7 +7760,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 
     # NOTE: this may runs in a separate EventActionThread and not in the GUI thread thus actions modifying the GUI might need to use signals to
     # ensure that they run in the GUI thread to avoid hard crashes (see pidON/pidOFF)
-    def eventaction_internal(self,action,cmd,eventtype:Optional[int]): # pyright: ignore # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths (reportGeneralTypeIssues)
+    def eventaction_internal(self,action,cmd,eventtype:Optional[int]): # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths
         if action:
             try:
                 if self.simulator and action not in [2,3,20]:  # 2 (Call Program) 3 (Multiple Event), 20 (Artisan Command)
@@ -9786,7 +9815,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                                     k = kb.decode('UTF-8')
                                     value = valueb.decode('UTF-8')
 #                                else: # this branch is most likely never reached
-#                                    (k, _, value) = line.partition('=') # pyright: ignore # "Never" is not iterable (reportGeneralTypeIssues)
+#                                    (k, _, value) = line.partition('=') # pyright: ignore [reportGeneralTypeIssues] # "Never" is not iterable
                                     # don't copy PYTHONHOME nor PYTHONPATH if it points to the Artisan.app
                                     if not ((k in ['PYTHONHOME','PYTHONPATH']) and (('Artisan.app' in value) or 'artisan' in value)):
                                         my_env[k] = value.rstrip('\n')
@@ -13837,7 +13866,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
     #called by fileLoad() and various import functions
     # we assume that before a reset action was issues and among others timeindex got initialized to its defaults
     # returns False if action was canceled, True otherwise
-    def setProfile(self,filename, profile:'ProfileData', quiet=False,reset=True) -> bool: # pyright: ignore # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths (reportGeneralTypeIssues)
+    def setProfile(self,filename, profile:'ProfileData', quiet=False,reset=True) -> bool: # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths
         try:
             updateRender = False
             #extra devices load and check
@@ -15732,7 +15761,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             settings.remove(s)
 
     #loads the settings at the start of application. See the oppposite closeEventSettings()
-    def settingsLoad(self, filename=None, theme=False, machine=False, redraw=True): # pyright: ignore # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing
+    def settingsLoad(self, filename=None, theme=False, machine=False, redraw=True): # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing
         res = False
         try:
             updateBatchCounter = True
@@ -17260,6 +17289,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
                     self.eventsliderfactors = eventsliderfactors
             if settings.contains('eventsliderKeyboardControl'):
                 self.eventsliderKeyboardControl = bool(toBool(settings.value('eventsliderKeyboardControl',self.eventsliderKeyboardControl)))
+            if settings.contains('eventsliderAlternativeLayout'):
+                new_eventsliderAlternativeLayout = bool(toBool(settings.value('eventsliderAlternativeLayout',self.eventsliderAlternativeLayout)))
+                self.updateSliderLayout(new_eventsliderAlternativeLayout)
             if settings.contains('slidermin'):
                 eventslidermin = [toInt(x) for x in toList(settings.value('slidermin',self.eventslidermin))]
                 if len(eventslidermin) == self.eventsliders:
@@ -17981,7 +18013,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             return '','',''
 
 
-    def closeEventSettings(self, filename=None) -> bool: # pyright: ignore #  Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths (reportGeneralTypeIssues)
+    def closeEventSettings(self, filename=None) -> bool: # pyright: ignore [reportGeneralTypeIssues| #  Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths
         #save window geometry and position. See QSettings documentation.
         #This information is often stored in the system registry on Windows,
         #and in XML preferences files on Mac OS X. On Unix systems, in the absence of a standard,
@@ -18818,6 +18850,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
             settings.beginGroup('Sliders')
             settings.setValue('slidervisibilities',self.eventslidervisibilities)
             settings.setValue('eventsliderKeyboardControl',self.eventsliderKeyboardControl)
+            settings.setValue('eventsliderAlternativeLayout',self.eventsliderAlternativeLayout)
             settings.setValue('slideractions',self.eventslideractions)
             settings.setValue('slidercommands',self.eventslidercommands)
             settings.setValue('slideroffsets',self.eventslideroffsets)
@@ -23308,7 +23341,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore # Argument to class mus
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def importPilot(self,_=False): # pyright: ignore # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing
+    def importPilot(self,_=False): # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing
         try:
             import xml.etree.ElementTree as ET
             filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Import Probat Recipe'))

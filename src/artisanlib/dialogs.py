@@ -39,7 +39,7 @@ if TYPE_CHECKING:
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
-class ArtisanDialog(QDialog): # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class ArtisanDialog(QDialog): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
     __slots__ = ['aw', 'dialogbuttons']
 
@@ -124,7 +124,7 @@ class ArtisanResizeablDialog(ArtisanDialog):
             self.setWindowFlags(windowFlags)
 
 # if modal=False the message box is not rendered as native dialog on macOS!
-class ArtisanMessageBox(QMessageBox): # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class ArtisanMessageBox(QMessageBox): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
     __slots__ = ['timeout', 'currentTime']
 
@@ -264,7 +264,7 @@ class ArtisanComboBoxDialog(ArtisanDialog):
         QDialog.accept(self)
 
 
-class PortComboBox(MyQComboBox):  # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class PortComboBox(MyQComboBox):  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
     __slots__ = ['selection', 'select_device_name', 'ports','edited'] # save some memory by using slots
 

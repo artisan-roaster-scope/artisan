@@ -467,7 +467,7 @@ class volumeCalculatorDlg(ArtisanDialog):
 ########################################################################################
 #####################  RECENT ROAST POPUP  #############################################
 
-class RoastsComboBox(QComboBox): # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class RoastsComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     def __init__(self, parent:QWidget, aw:'ApplicationWindow', selection:Optional[str] = None) -> None:
         super().__init__(parent)
         self.aw:'ApplicationWindow' = aw
@@ -520,8 +520,10 @@ class RoastsComboBox(QComboBox): # pyright: ignore # Argument to class must be a
             pass
         self.blockSignals(False)
 
+
 ########################################################################################
 #####################  Roast Properties Dialog  ########################################
+
 
 class editGraphDlg(ArtisanResizeablDialog):
     scaleWeightUpdated = pyqtSignal(float)
@@ -1272,9 +1274,9 @@ class editGraphDlg(ArtisanResizeablDialog):
             plusCoffeeslabel = QLabel('<b>' + QApplication.translate('Label', 'Stock') + '</b>')
             self.plusStoreslabel = QLabel('<b>' + QApplication.translate('Label', 'Store') + '</b>')
             self.plusBlendslabel = QLabel('<b>' + QApplication.translate('Label', 'Blend') + '</b>')
-            self.plus_stores_combo = MyQComboBox()
-            self.plus_coffees_combo = MyQComboBox()
-            self.plus_blends_combo = MyQComboBox()
+            self.plus_stores_combo = MyQComboBox(self)
+            self.plus_coffees_combo = CoffeesComboBox(self)
+            self.plus_blends_combo = BlendsComboBox(self)
             self.plus_stores_combo.currentIndexChanged.connect(self.storeSelectionChanged)
             self.plus_coffees_combo.currentIndexChanged.connect(self.coffeeSelectionChanged)
             self.plus_blends_combo.currentIndexChanged.connect(self.blendSelectionChanged)
@@ -1606,7 +1608,6 @@ class editGraphDlg(ArtisanResizeablDialog):
     def setActiveTab(self) -> None:
         self.TabWidget.setCurrentIndex(self.activeTab)
 
-
 ## CUSTOM BLEND DIALOG
 
     @pyqtSlot(bool)
@@ -1906,9 +1907,6 @@ class editGraphDlg(ArtisanResizeablDialog):
                     self.plus_stores_combo.blockSignals(True)
                     self.plus_stores_combo.clear()
                     store_items = plus.stock.getStoreLabels(self.plus_stores)
-    #                # HACK to prevent those cut menu items on macOS and Qt 5.15.1:
-    #                if sys.platform.startswith("darwin"):
-    #                    store_items = [l + "  " for l in store_items]
                     self.plus_stores_combo.addItems([''] + store_items)
                     p = (plus.stock.getStorePosition(self.plus_default_store,self.plus_stores) if self.plus_default_store is not None else None)
                     if p is None:
@@ -1948,10 +1946,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.plus_coffees = plus.stock.getCoffees(self.unitsComboBox.currentIndex(),self.plus_default_store)
                 self.plus_coffees_combo.blockSignals(True)
                 self.plus_coffees_combo.clear()
+                self.plus_coffees_combo.resetInverted()
                 coffee_items = plus.stock.getCoffeesLabels(self.plus_coffees)
-    #            # HACK to prevent those cut menu items on macOS and Qt 5.15.1:
-    #            if sys.platform.startswith("darwin"):
-    #                coffee_items = [l + "  " for l in coffee_items]
                 self.plus_coffees_combo.addItems([''] + coffee_items)
 
                 p = None
@@ -1988,11 +1984,9 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.plus_blends = plus.stock.getBlends(self.unitsComboBox.currentIndex(),self.plus_default_store, custom_blend)
                 self.plus_blends_combo.blockSignals(True)
                 self.plus_blends_combo.clear()
+                self.plus_blends_combo.resetInverted()
                 blend_items = plus.stock.getBlendLabels(self.plus_blends)
 
-    #            # HACK to prevent those cut menu items on macOS and Qt 5.15.1:
-    #            if sys.platform.startswith("darwin"):
-    #                blend_items = [l + "  " for l in blend_items]
                 self.plus_blends_combo.addItems([''] + blend_items)
 
                 if len(self.plus_blends) == 0:
@@ -5091,6 +5085,64 @@ class editGraphDlg(ArtisanResizeablDialog):
         except Exception: # pylint: disable=broad-except
             pass
         return res
+
+class StockComboBox(MyQComboBox):
+    def __init__(self, unitsComboBox:QComboBox, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.inverted:bool = False # is True if the weight units were inverted before
+        self.unitsComboBox:QComboBox = unitsComboBox
+
+    # to be overwritten by subclasses
+    def getItems(self, _unit:int) -> List[str]:
+        return []
+
+    def resetInverted(self):
+        self.inverted = False
+
+    def mousePressEvent(self, event):
+        if self.unitsComboBox is not None and QApplication.keyboardModifiers() == Qt.KeyboardModifier.AltModifier or self.inverted:
+            # with ALT (Win) / OPTION (macOS) pressed we rewrite the popup menu indicating weights in imperial units if metric units were selected and vise versa
+            default_unit:int = self.unitsComboBox.currentIndex()
+            unit:int = 0 # g
+            if self.inverted:
+                # we revert to the original units
+                unit = default_unit
+            elif default_unit < 2:
+                # if default unit is g or kg we convert to oz, otherwise to g
+                unit = 3
+            items = self.getItems(unit)
+            for i in range(self.count()):
+                if len(items) > i:
+                    self.setItemText(i, items[i])
+            self.inverted = not self.inverted
+        super().mousePressEvent(event)
+
+class CoffeesComboBox(StockComboBox):
+    def __init__(self, parent:editGraphDlg, *args, **kwargs) -> None:
+        super().__init__(parent.unitsComboBox, *args, **kwargs)
+        self.parentDialog = parent
+
+    def getItems(self, unit:int):
+        plus_coffees = plus.stock.getCoffees(unit, self.parentDialog.plus_default_store)
+        return [''] + plus.stock.getCoffeesLabels(plus_coffees)
+
+class BlendsComboBox(StockComboBox):
+    def __init__(self, parent:editGraphDlg, *args, **kwargs) -> None:
+        super().__init__(parent.unitsComboBox, *args, **kwargs)
+        self.parentDialog:editGraphDlg = parent
+
+    def getItems(self, unit:int):
+        custom_blend:Optional[plus.stock.Blend] = None
+        if self.parentDialog.aw.qmc.plus_custom_blend is not None and self.parentDialog.aw.qmc.plus_custom_blend.name.strip() != '':
+            coffees = plus.stock.getCoffeeLabels()
+            if len(coffees)>2 and self.parentDialog.aw.qmc.plus_custom_blend.isValid(coffees.values()):
+                custom_blend = {
+                    'hr_id': '',
+                    'label': self.parentDialog.aw.qmc.plus_custom_blend.name.strip(),
+                    'ingredients': [{'ratio': c.ratio, 'coffee': c.coffee} for c in self.parentDialog.aw.qmc.plus_custom_blend.components]}
+        plus_blends = plus.stock.getBlends(unit,self.parentDialog.plus_default_store, custom_blend)
+        blend_items:List[str] = plus.stock.getBlendLabels(plus_blends)
+        return [''] + blend_items
 
 ##########################################################################
 #####################  VIEW Tare  ########################################

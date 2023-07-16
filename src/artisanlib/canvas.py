@@ -124,7 +124,7 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 #################### Ambient Data Collection  #########################################
 #######################################################################################
 
-class AmbientWorker(QObject): # pylint: disable=too-few-public-methods # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class AmbientWorker(QObject): # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     finished = pyqtSignal()
 
     def __init__(self, aw:'ApplicationWindow') -> None:
@@ -3397,7 +3397,7 @@ class tgraphcanvas(FigureCanvas):
     # sample devices at interval self.delay milliseconds.
     # we can assume within the processing of sample_processing() that flagon=True
     # NOTE: sample_processing is processed in the GUI thread NOT the sample thread!
-    def sample_processing(self, local_flagstart:bool, temp1_readings:List[float], temp2_readings:List[float], timex_readings:List[float]): # pyright: ignore # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths (reportGeneralTypeIssues)
+    def sample_processing(self, local_flagstart:bool, temp1_readings:List[float], temp2_readings:List[float], timex_readings:List[float]): # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths
         ##### (try to) lock resources  #########
         wait_period = 200  # we try to catch a lock within the next 200ms
         if self.delay < 500:
@@ -7807,7 +7807,7 @@ class tgraphcanvas(FigureCanvas):
 
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed (incl. those of the background curves)
-    def redraw(self, recomputeAllDeltas=True, smooth=True, sampling=False, takelock=True, forceRenewAxis=False): # pyright: ignore # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths (reportGeneralTypeIssues)
+    def redraw(self, recomputeAllDeltas=True, smooth=True, sampling=False, takelock=True, forceRenewAxis=False): # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths
         if self.designerflag:
             self.redrawdesigner(force=True)
         elif self.aw.comparator is not None:
@@ -16561,7 +16561,7 @@ class tgraphcanvas(FigureCanvas):
 ###     Sample thread
 ########################################################################################
 
-class SampleThread(QThread): # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class SampleThread(QThread): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     sample_processingSignal = pyqtSignal(bool,list,list,list)
 
     def __init__(self, aw:'ApplicationWindow') -> None:
@@ -16726,7 +16726,7 @@ class SampleThread(QThread): # pyright: ignore # Argument to class must be a bas
 ###     Artisan thread Server
 #########################################################################################################
 
-class Athreadserver(QWidget): # pylint: disable=too-few-public-methods # pyright: ignore # Argument to class must be a base class (reportGeneralTypeIssues)
+class Athreadserver(QWidget): # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     def __init__(self, aw:'ApplicationWindow') -> None:
         super().__init__()
         self.aw = aw

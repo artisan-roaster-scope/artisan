@@ -73,7 +73,7 @@ class autosaveDlg(ArtisanDialog):
                 # disable "PDF Report" item if QtWebEngine Support is not available
                 model = self.imageTypesComboBox.model()
                 assert isinstance(model, QStandardItemModel)
-                model.item(self.aw.qmc.autoasaveimageformat_types.index('PDF Report')).setEnabled(False) # pyright: ignore # Cannot access member "item" for type "QAbstractItemModel"
+                model.item(self.aw.qmc.autoasaveimageformat_types.index('PDF Report')).setEnabled(False)
         except Exception: # pylint: disable=broad-except
             pass
         self.imageTypesComboBox.setCurrentIndex(self.aw.qmc.autoasaveimageformat_types.index(self.aw.qmc.autosaveimageformat))
