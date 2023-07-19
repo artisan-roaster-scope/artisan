@@ -163,6 +163,7 @@ class tgraphcanvas(FigureCanvas):
     markSCeSignal = pyqtSignal(bool)
     markDropSignal = pyqtSignal(bool)
     markCoolSignal = pyqtSignal(bool)
+    onMonitorSignal = pyqtSignal()
     toggleMonitorSignal = pyqtSignal()
     toggleRecorderSignal = pyqtSignal()
     processAlarmSignal = pyqtSignal(int, bool, int, str)
@@ -2203,6 +2204,7 @@ class tgraphcanvas(FigureCanvas):
         self.markSCeSignal.connect(self.mark2Cend)
         self.markDropSignal.connect(self.markDrop)
         self.markCoolSignal.connect(self.markCoolEnd)
+        self.onMonitorSignal.connect(self.OnMonitor, type=Qt.ConnectionType.QueuedConnection) # type: ignore
         self.toggleMonitorSignal.connect(self.toggleMonitorTigger)
         self.toggleRecorderSignal.connect(self.toggleRecorderTigger)
         self.processAlarmSignal.connect(self.processAlarm, type=Qt.ConnectionType.QueuedConnection) # type: ignore # queued to avoid deadlock between RampSoak processing and EventRecordAction, both accessing the same critical section protected by profileDataSemaphore
@@ -7503,12 +7505,13 @@ class tgraphcanvas(FigureCanvas):
             iy = self.stemp2[idx:self.timeindex[6]+1]
 
             # Create the shaded region
-            a = ix[0]
-            b = ix[-1]
-            verts = [ xy for xy in [(a, rtbt)] + list(zip(ix, iy)) + [(b, rtbt)] if xy[1] > 0 ]
-            if verts:
-                poly = Polygon(verts, facecolor=self.palette['aucarea'], edgecolor='0.5', alpha=0.3)
-                self.ax.add_patch(poly)
+            if len(ix)>1:
+                a = ix[0]
+                b = ix[-1]
+                verts = [ xy for xy in [(a, rtbt)] + list(zip(ix, iy)) + [(b, rtbt)] if xy[1] > 0 ]
+                if verts:
+                    poly = Polygon(verts, facecolor=self.palette['aucarea'], edgecolor='0.5', alpha=0.3)
+                    self.ax.add_patch(poly)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
@@ -11199,9 +11202,6 @@ class tgraphcanvas(FigureCanvas):
         # this is needed to suppress the message on the ignored Exception
         #                            # Phidget that is raised on starting the PhidgetManager without installed
         #                            # Phidget driver (artisanlib/suppress_error.py fails to suppress this)
-#        _stderr = sys.stderr
-#        sys.stderr = object
-#        try:
         if not self.aw.app.artisanviewerMode and self.PhidgetsConfigured():
             # Phidget server is only started if any device or action addressing Phidgets is configured
             if self.phidgetManager is None:
@@ -11227,23 +11227,23 @@ class tgraphcanvas(FigureCanvas):
                 except Exception: # pylint: disable=broad-except
                     if self.device in self.phidgetDevices:
                         self.adderror(QApplication.translate('Error Message',"Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!"))
-#        finally:
-#            sys.stderr = _stderr
 
     def stopPhidgetManager(self):
-        if self.phidgetManager is not None:
-            self.phidgetManager.close()
-            self.phidgetManager = None
-        self.removePhidgetServer()
-        try:
-            from Phidget22.Devices.Log import Log as PhidgetLog # type: ignore
-            PhidgetLog.disable()
-        except Exception: # pylint: disable=broad-except
-            pass
+        if not self.flagon:
+            if self.phidgetManager is not None:
+                self.phidgetManager.close()
+                self.phidgetManager = None
+            self.removePhidgetServer()
+            try:
+                from Phidget22.Devices.Log import Log as PhidgetLog # type: ignore
+                PhidgetLog.disable()
+            except Exception: # pylint: disable=broad-except
+                pass
 
     def restartPhidgetManager(self):
-        self.stopPhidgetManager()
-        self.startPhidgetManager()
+        if not self.flagon:
+            self.stopPhidgetManager()
+            self.startPhidgetManager()
 
     # this one is protected by the sampleSemaphore not to mess up with the timex during sampling
     def resetTimer(self):
@@ -11544,7 +11544,8 @@ class tgraphcanvas(FigureCanvas):
                 _log.exception(e)
 
             if recording and self.flagKeepON and len(self.timex) > 10:
-                QTimer.singleShot(300,self.OnMonitor)
+#                QTimer.singleShot(300, self.OnMonitor)
+                QTimer.singleShot(300, self.onMonitorSignal.emit)
 
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
@@ -15217,13 +15218,21 @@ class tgraphcanvas(FigureCanvas):
             # we have first to calculate the delta data
             # returns the max ET/BT RoR between CHARGE and DROP
             if setET:
-                func1 = UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree)
-                funcDelta1 = func1.derivative()
-                delta1_max = max(funcDelta1(self.designer_timez) * 60)
+                try:
+                    func1 = UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree)
+                    funcDelta1 = func1.derivative()
+                    delta1_max = max(funcDelta1(self.designer_timez) * 60)
+                except Exception: # pylint: disable=broad-except
+                    # scipy interpolate might fail for certain k
+                    pass
             if setBT:
-                func2 = UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree)
-                funcDelta2 = func2.derivative()
-                delta2_max = max(funcDelta2(self.designer_timez) * 60)
+                try:
+                    func2 = UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree)
+                    funcDelta2 = func2.derivative()
+                    delta2_max = max(funcDelta2(self.designer_timez) * 60)
+                except Exception: # pylint: disable=broad-except
+                    # scipy interpolate might fail for certain k
+                    pass
             dmax = max(delta1_max, delta2_max)
             # we only adjust the upper limit automatically
             assert self.aw is not None
@@ -15415,7 +15424,7 @@ class tgraphcanvas(FigureCanvas):
                 func1 = UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree)
                 etvals = func1(self.designer_timez)
             except Exception: # pylint: disable=broad-except
-                self.adderror(QApplication.translate('Error Message', 'Exception: redrawdesigner() Roast events may be out of order. Restting Designer.'))
+                self.adderror(QApplication.translate('Error Message', 'Exception: redrawdesigner() Roast events may be out of order. Resetting Designer.'))
                 self.reset_designer()
                 return
 

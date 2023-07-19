@@ -3916,6 +3916,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.kaleidoSendMessageSignal.connect(self.kaleidoSendMessage)
         self.kaleidoSendMessageAwaitSignal.connect(self.kaleidoSendMessageAwait)
         self.addEventSignal.connect(self.addEventSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
+           # by default the connection type is AutoConnection (If the emitter & receiver are in the same thread, a DirectConnection is used. Otherwise, a QueuedConnection is used.)
+           # if the signal is send/receveid in the same thread a direct connection equals to a direct function call, the event is NOT put on the event loop and this not potentially processed delays
+           # explicitly specifying QueuedConnection puts the message on the event loop and delays the processing potentially also if running in the same thread as the sender
         self.updateMessageLogSignal.connect(self.updateMessageLog)
         self.updateSerialLogSignal.connect(self.updateSerialLog)
         self.updateErrorLogSignal.connect(self.updateErrorLog)
@@ -5484,7 +5487,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     # other wise to standard layout
     def updateSliderLayout(self, alternativeLayout:bool) -> None:
         if alternativeLayout != self.eventsliderAlternativeLayout:
-            if self.eventsliderAlternativeLayout:
+            if self.eventsliderAlternativeLayout: # we activate standard layout
                 # remove alternative layout sliders
                 self.sliderGrp12.removeItem(self.sliderGrpBox1x)
                 self.sliderGrp12.removeItem(self.sliderGrpBox4x)
@@ -5495,7 +5498,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.sliderGrp12.addLayout(self.sliderGrpBox2x)
                 self.sliderGrp34.addLayout(self.sliderGrpBox3x)
                 self.sliderGrp34.addLayout(self.sliderGrpBox4x)
-            else:
+            else: # we activate alternative layout
                 # remove standard layout sliders
                 self.sliderGrp12.removeItem(self.sliderGrpBox1x)
                 self.sliderGrp12.removeItem(self.sliderGrpBox2x)

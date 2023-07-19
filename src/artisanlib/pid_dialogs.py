@@ -775,8 +775,8 @@ class PID_DlgControl(ArtisanDialog):
             self.aw.pidcontrol.svBeeps = self.getRSnSVbeeps(n)
             self.aw.pidcontrol.svDescriptions = self.getRSnSVdescriptions(n)
             self.setrampsoaks()
-            self.aw.pidcontrol.rsfile = ''
-            self.rsfile.setText(self.aw.pidcontrol.rsfile)
+            self.aw.qmc.rsfile = ''
+            self.rsfile.setText(self.aw.qmc.rsfile)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 

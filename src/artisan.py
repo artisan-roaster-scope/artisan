@@ -10,6 +10,10 @@ import sys
 import os
 from platform import system
 
+# limit the number of numpy threads to 1 to limit the total number of threads taking into account a potential performance reduction on array operations using blas,
+# which should not be significant
+os.environ['OMP_NUM_THREADS'] = '1'
+
 # highDPI support must be set before creating the Application instance
 try:
     if system() == 'Darwin':

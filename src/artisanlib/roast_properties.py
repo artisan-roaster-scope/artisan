@@ -5093,7 +5093,7 @@ class StockComboBox(MyQComboBox):
         self.unitsComboBox:QComboBox = unitsComboBox
 
     # to be overwritten by subclasses
-    def getItems(self, _unit:int) -> List[str]:
+    def getItems(self, _unit:int) -> List[str]: # pylint: disable=no-self-use
         return []
 
     def resetInverted(self):
