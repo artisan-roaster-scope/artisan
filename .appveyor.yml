@@ -65,7 +65,7 @@ for:
     PYQT: "5"
     BUILD_PYINSTALLER: "True"
     ARTISAN_LEGACY: "True"
-    VC_REDIST: "https://aka.ms/vs/16/release/vc_redist.x64.exe"
+    VC_REDIST: "https://aka.ms/vs/16/release/vc_redist.x64.exe"  #redistributable for VS 2015-2019
     VCVARSALL: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Auxiliary/Build/vcvarsall.bat"
 
   install:
@@ -112,6 +112,11 @@ for:
 
   deploy_script:
     - cmd: bash ../.ci/upload.sh artisan-*.zip
+
+#  # uncomment this section for remote desktop connection to build image
+#  on_finish:
+#    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
 
 -
   matrix:
@@ -177,6 +182,10 @@ for:
 
   deploy_script:
     - cmd: bash ../.ci/upload.sh artisan-*.zip
+        
+#  # uncomment this section for remote desktop connection to build image
+#  on_finish:
+#    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 
 -
@@ -226,6 +235,12 @@ for:
   deploy_script:
     - ../.ci/upload.sh artisan-*.dmg
 
+#  # uncomment this section for vnc or ssh connection to the build image
+#  on_finish:
+#    - sh: export APPVEYOR_VNC_BLOCK=true
+#    - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-vnc.sh' | bash -e -
+#    #- sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
+
 
 -
   matrix:
@@ -243,7 +258,6 @@ for:
 
   install:
     - echo "Linux Install"
-
     - chmod +x .ci/*.sh
 
     # pull library versions from requirments file
@@ -280,3 +294,9 @@ for:
     - ../.ci/upload.sh artisan-*.deb
     - ../.ci/upload.sh artisan-*.rpm
     - ../.ci/upload.sh artisan-*.AppImage
+
+#  # uncomment this section for ssh connection to build image
+#  on_finish:
+#    - sh: export APPVEYOR_SSH_BLOCK=true
+#    - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
+
