@@ -37,7 +37,7 @@ import logging
 import os
 import numpy
 from typing import Optional, Union, Any, Dict, List, Tuple, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.types import ProfileData, ComputedProfileInformation # pylint: disable=unused-import
@@ -233,7 +233,7 @@ def addNum2dict(
 ) -> None:
     if key_source in dict_source and dict_source[key_source]: # type: ignore # TypedDict key must be a string literal; expected one of
         n = dict_source[key_source]  # type:ignore # TypedDict key must be a string literal; expected one of
-        if n is not None and factor is not None:
+        if n is not None and factor is not None and isinstance(n, (float, int)):
             n = n * factor
         n = limitnum(minn, maxn, n)  # may return None
         if n:

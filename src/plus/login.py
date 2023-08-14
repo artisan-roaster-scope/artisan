@@ -57,7 +57,7 @@ import logging
 from artisanlib.dialogs import ArtisanDialog
 from plus import config
 from typing import Optional, Tuple, TYPE_CHECKING
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -108,19 +108,26 @@ class Login(ArtisanDialog):
 
         self.dialogbuttons.accepted.connect(self.setCredentials)
         self.dialogbuttons.rejected.connect(self.reject)
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setEnabled(False)
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).setDefault(True)
-        # add additional CMD-. shortcut to close the dialog
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).setShortcut(
-            QKeySequence('Ctrl+.')
-        )
-        # add additional CMD-W shortcut to close this dialog
-        cancelAction:QAction = QAction(self)
-        cancelAction.triggered.connect(self.reject)
-        cancelAction.setShortcut(QKeySequence.StandardKey.Cancel)
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).addActions(
-            [cancelAction]
-        )
+        self.ok_button = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        if self.ok_button is not None:
+            self.ok_button.setEnabled(False)
+            self.ok_button.setFocusPolicy(
+                Qt.FocusPolicy.StrongFocus
+            )
+        self.cancel_button = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel)
+        if self.cancel_button is not None:
+            self.cancel_button.setDefault(True)
+            # add additional CMD-. shortcut to close the dialog
+            self.cancel_button.setShortcut(
+                QKeySequence('Ctrl+.')
+            )
+            # add additional CMD-W shortcut to close this dialog
+            cancelAction:QAction = QAction(self)
+            cancelAction.triggered.connect(self.reject)
+            cancelAction.setShortcut(QKeySequence.StandardKey.Cancel)
+            self.cancel_button.addActions(
+                [cancelAction]
+            )
 
         self.textPass:QLineEdit = QLineEdit(self)
         self.textPass.setEchoMode(QLineEdit.EchoMode.Password)
@@ -171,18 +178,14 @@ class Login(ArtisanDialog):
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setSpacing(5)
 
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocusPolicy(
-            Qt.FocusPolicy.StrongFocus
-        )
-
         if saved_password is not None:
             self.passwd = saved_password
             self.textPass.setText(self.passwd)
-            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).setDefault(
-                False
-            )
-            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setDefault(True)
-            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setEnabled(True)
+            if self.cancel_button is not None:
+                self.cancel_button.setDefault(False)
+            if self.ok_button is not None:
+                self.ok_button.setDefault(True)
+                self.ok_button.setEnabled(True)
 
     @pyqtSlot()
     def reject(self) -> None:
@@ -206,15 +209,17 @@ class Login(ArtisanDialog):
     @pyqtSlot(str)
     def textChanged(self, _:str) -> None:
         if self.isInputReasonable():
-            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).setDefault(
-                False
-            )
-            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setDefault(True)
-            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setEnabled(True)
+            if self.cancel_button is not None:
+                self.cancel_button.setDefault(False)
+            if self.ok_button is not None:
+                self.ok_button.setDefault(True)
+                self.ok_button.setEnabled(True)
         else:
-            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).setDefault(True)
-            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setDefault(False)
-            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setEnabled(False)
+            if self.cancel_button is not None:
+                self.cancel_button.setDefault(True)
+            if self.ok_button is not None:
+                self.ok_button.setDefault(False)
+                self.ok_button.setEnabled(False)
 
     @pyqtSlot()
     def setCredentials(self) -> None:

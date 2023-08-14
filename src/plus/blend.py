@@ -61,7 +61,7 @@ from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
 from uic import BlendDialog # type: ignore[attr-defined] # pylint: disable=no-name-in-module
 from typing import Optional, List, Dict, Tuple, Any, TYPE_CHECKING
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -305,8 +305,9 @@ class CustomBlendDialog(ArtisanDialog):
         super().reject()
 
     @pyqtSlot()
-    def close(self) -> None:
+    def close(self) -> bool:
         self.closeEvent(None)
+        return True
 
     def updateAddButton(self) -> None:
         self.ui.pushButton_add.setEnabled(len(self.coffees)>len(self.blend.components))
@@ -376,7 +377,9 @@ class CustomBlendDialog(ArtisanDialog):
                 #delete
                 if rows>2:
                     deleteButton = QToolButton()
-                    deleteButton.setIcon(QIcon(QApplication.style().standardIcon(QStyle.StandardPixmap.SP_DialogDiscardButton))) #SP_TitleBarCloseButton
+                    app_style = QApplication.style()
+                    if app_style is not None:
+                        deleteButton.setIcon(QIcon(app_style.standardIcon(QStyle.StandardPixmap.SP_DialogDiscardButton))) #SP_TitleBarCloseButton
                     deleteButton.setIconSize(QSize(16,16))
                     deleteButton.setFixedSize(QSize(22, 22))
                     deleteButton.clicked.connect(self.deleteComponent)

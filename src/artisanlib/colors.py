@@ -570,9 +570,10 @@ class graphColorDlg(ArtisanDialog):
         self.dialogbuttons.accepted.connect(self.accept)
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel))
         resetButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
-        resetButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.RestoreDefaults).clicked.connect(self.recolor1)
-        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.RestoreDefaults),'Restore Defaults',QApplication.translate('Button','Restore Defaults'))
+        if resetButton is not None:
+            resetButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            resetButton.clicked.connect(self.recolor1)
+            self.setButtonTranslations(resetButton,'Restore Defaults',QApplication.translate('Button','Restore Defaults'))
 
         greyButton = QPushButton(QApplication.translate('Button','Grey'))
         greyButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -597,11 +598,13 @@ class graphColorDlg(ArtisanDialog):
         Mlayout.setSpacing(0)
         self.setLayout(Mlayout)
         self.setColorButtons()
-        if platform.system() == 'Windows':
-            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
-        else:
-            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
-        self.layout().setSizeConstraint(QLayout.SizeConstraint.SetFixedSize) # don't allow resizing
+        if platform.system() != 'Windows':
+            ok_button = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+            if ok_button is not None:
+                ok_button.setFocus()
+        layout = self.layout()
+        if layout is not None:
+            layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize) # don't allow resizing
 
         # we set the active tab with a QTimer after the tabbar has been rendered once, as otherwise
         # some tabs are not rendered at all on Winwos using Qt v6.5.1 (https://bugreports.qt.io/projects/QTBUG/issues/QTBUG-114204?filter=allissues)

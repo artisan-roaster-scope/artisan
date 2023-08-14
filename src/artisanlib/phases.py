@@ -15,6 +15,7 @@
 # AUTHOR
 # Marko Luther, 2023
 
+from typing import Optional, TYPE_CHECKING
 from artisanlib.dialogs import ArtisanDialog
 
 try:
@@ -25,6 +26,9 @@ except ImportError:
     from PyQt5.QtCore import Qt, pyqtSlot, QSettings # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QLayout, QSpinBox) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+
+if TYPE_CHECKING:
+    from PyQt6.QtWidgets import QPushButton # pylint: disable=unused-import
 
 class phasesGraphDlg(ArtisanDialog):
     def __init__(self, parent, aw) -> None:
@@ -111,10 +115,11 @@ class phasesGraphDlg(ArtisanDialog):
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.updatephases)
         self.dialogbuttons.rejected.connect(self.cancel)
-        setDefaultButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
-        setDefaultButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        setDefaultButton.clicked.connect(self.setdefault)
-        self.setButtonTranslations(setDefaultButton,'Restore Defaults',QApplication.translate('Button','Restore Defaults'))
+        setDefaultButton: Optional['QPushButton'] = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
+        if setDefaultButton is not None:
+            setDefaultButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            setDefaultButton.clicked.connect(self.setdefault)
+            self.setButtonTranslations(setDefaultButton,'Restore Defaults',QApplication.translate('Button','Restore Defaults'))
 
         phaseLayout = QGridLayout()
         phaseLayout.addWidget(minf,0,1,Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignBottom)
@@ -194,7 +199,9 @@ class phasesGraphDlg(ArtisanDialog):
         mainLayout.addLayout(buttonsLayout)
         self.setLayout(mainLayout)
         self.getphases()
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
+        ok_button: Optional['QPushButton'] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        if ok_button is not None:
+            ok_button.setFocus()
 
         settings = QSettings()
         if settings.contains('PhasesPosition'):

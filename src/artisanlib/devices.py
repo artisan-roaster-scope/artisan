@@ -21,7 +21,7 @@ import re
 import platform
 import logging
 from typing import Optional, TYPE_CHECKING
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -118,7 +118,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         limit = len(dev)
         for _ in range(limit):
             for i, _ in enumerate(dev):
-                if dev[i][0] == '+' or dev[i][0] == '-':
+                if dev[i][0] in ('+', '-'):
                     dev.pop(i)              #note: pop() makes the list smaller that's why there are 2 FOR statements
                     break
         self.sorted_devices = sorted(dev)
@@ -144,11 +144,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
         # hack to access the Qt automatic translation of the RestoreDefaults button
         db_help = QDialogButtonBox(QDialogButtonBox.StandardButton.Help)
-        help_text_translated = db_help.button(QDialogButtonBox.StandardButton.Help).text()
-        helpprogrambutton =  QPushButton(help_text_translated)
-        self.setButtonTranslations(helpprogrambutton,'Help',QApplication.translate('Button','Help'))
-        helpprogrambutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        helpprogrambutton.clicked.connect(self.showhelpprogram)
+        help_button = db_help.button(QDialogButtonBox.StandardButton.Help)
+        if help_button is not None:
+            help_text_translated = help_button.text()
+            helpprogrambutton =  QPushButton(help_text_translated)
+            self.setButtonTranslations(helpprogrambutton,'Help',QApplication.translate('Button','Help'))
+            helpprogrambutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            helpprogrambutton.clicked.connect(self.showhelpprogram)
         selectoutprogrambutton =  QPushButton(QApplication.translate('Button','Select'))
         selectoutprogrambutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         selectoutprogrambutton.clicked.connect(self.loadoutprogramname)
@@ -266,12 +268,14 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.addButton.clicked.connect(self.adddevice)
         # hack to access the Qt automatic translation of the RestoreDefaults button
         db_reset = QDialogButtonBox(QDialogButtonBox.StandardButton.Reset)
-        reset_text_translated = db_reset.button(QDialogButtonBox.StandardButton.Reset).text()
-        resetButton =  QPushButton(reset_text_translated)
-        self.setButtonTranslations(resetButton,'Reset',QApplication.translate('Button','Reset'))
-        resetButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        resetButton.setMinimumWidth(100)
-        resetButton.clicked.connect(self.resetextradevices)
+        db_reset_button = db_reset.button(QDialogButtonBox.StandardButton.Reset)
+        if db_reset_button is not None:
+            reset_text_translated = db_reset_button.text()
+            resetButton =  QPushButton(reset_text_translated)
+            self.setButtonTranslations(resetButton,'Reset',QApplication.translate('Button','Reset'))
+            resetButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            resetButton.setMinimumWidth(100)
+            resetButton.clicked.connect(self.resetextradevices)
         extradevHelpButton = QPushButton(help_text_translated)
         self.setButtonTranslations(extradevHelpButton,'Help',QApplication.translate('Button','Help'))
         extradevHelpButton.setMinimumWidth(100)
@@ -1383,10 +1387,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         Mlayout.setSpacing(0)
         Mlayout.setContentsMargins(5,10,5,5)
         self.setLayout(Mlayout)
-        if platform.system() == 'Windows':
-            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
-        else:
-            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
+        if platform.system() != 'Windows':
+            ok_button = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+            if ok_button is not None:
+                ok_button.setFocus()
         settings = QSettings()
         if settings.contains('DeviceAssignmentGeometry'):
             self.restoreGeometry(settings.value('DeviceAssignmentGeometry'))
@@ -1548,7 +1552,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.devicetable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
             self.devicetable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
             self.devicetable.setShowGrid(True)
-            self.devicetable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+            vheader = self.devicetable.verticalHeader()
+            if vheader is not None:
+                vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
             if nddevices:
                 dev = self.aw.qmc.devices[:]             #deep copy
                 limit = len(dev)
@@ -1667,7 +1673,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
                 header = self.devicetable.horizontalHeader()
-                header.setStretchLastSection(True)
+                if header is not None:
+                    header.setStretchLastSection(True)
                 self.devicetable.resizeColumnsToContents()
                 # remember the columnwidth
                 for i, _ in enumerate(self.aw.qmc.devicetablecolumnwidths):
@@ -1691,7 +1698,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             fields = []
             re_strip = re.compile('[\u2009]')  #thin space is not read properly by prettytable
             for c in range(ncols):
-                fields.append(re_strip.sub('',self.devicetable.horizontalHeaderItem(c).text()))
+                item = self.devicetable.horizontalHeaderItem(c)
+                if item is not None:
+                    fields.append(re_strip.sub('',item.text()))
             tbl.field_names = fields
             for r in range(nrows):
                 rows = []
@@ -1759,9 +1768,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             clipboard = tbl.get_string()
         else:
             for c in range(ncols):
-                clipboard += self.devicetable.horizontalHeaderItem(c).text()
-                if c != (ncols-1):
-                    clipboard += '\t'
+                item = self.devicetable.horizontalHeaderItem(c)
+                if item is not None:
+                    clipboard += item.text()
+                    if c != (ncols-1):
+                        clipboard += '\t'
             clipboard += '\n'
             for r in range(nrows):
                 # device type
@@ -1826,7 +1837,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 clipboard += str(Fill2SpinBox.value()) + '\n'
         # copy to the system clipboard
         sys_clip = QApplication.clipboard()
-        sys_clip.setText(clipboard)
+        if sys_clip is not None:
+            sys_clip.setText(clipboard)
         self.aw.sendmessage(QApplication.translate('Message','Device table copied to clipboard'))
 
     @pyqtSlot(bool)

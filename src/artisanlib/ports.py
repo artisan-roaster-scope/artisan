@@ -20,7 +20,7 @@ import time
 import platform
 import logging
 from typing import List, Optional
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 from artisanlib.util import toFloat, uchr, comma2dot
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog, PortComboBox
@@ -409,8 +409,10 @@ class comportDlg(ArtisanResizeablDialog):
         self.serialtable = QTableWidget()
         self.serialtable.setTabKeyNavigation(True)
         self.serialtable.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Expanding)
-        self.serialtable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
-        self.serialtable.horizontalHeader().setStretchLastSection(True)
+        hheader: Optional[QHeaderView] = self.serialtable.horizontalHeader()
+        if hheader is not None:
+            hheader.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
+            hheader.setStretchLastSection(True)
         self.createserialTable()
         ##########################    TAB 3 WIDGETS   MODBUS
         modbus_comportlabel = QLabel(QApplication.translate('Label', 'Comm Port'))
@@ -835,11 +837,12 @@ class comportDlg(ArtisanResizeablDialog):
         self.dialogbuttons.accepted.connect(self.accept)
         self.dialogbuttons.rejected.connect(self.reject)
 
-        helpButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Help)
-        helpButton.setToolTip(QApplication.translate('Tooltip','Show help'))
-        self.setButtonTranslations(helpButton,'Help',QApplication.translate('Button','Help'))
-        helpButton.clicked.connect(self.showModbusbuttonhelp)
-        helpButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        helpButton: Optional[QPushButton] = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Help)
+        if helpButton is not None:
+            helpButton.setToolTip(QApplication.translate('Tooltip','Show help'))
+            self.setButtonTranslations(helpButton,'Help',QApplication.translate('Button','Help'))
+            helpButton.clicked.connect(self.showModbusbuttonhelp)
+            helpButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         #button layout
         buttonLayout = QHBoxLayout()
@@ -1629,10 +1632,10 @@ class comportDlg(ArtisanResizeablDialog):
         Mlayout.setContentsMargins(5,15,5,5)
         Mlayout.setSpacing(5)
         self.setLayout(Mlayout)
-        if platform.system() == 'Windows':
-            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
-        else:
-            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
+        if platform.system() != 'Windows':
+            ok_button: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+            if ok_button is not None:
+                ok_button.setFocus()
         settings = QSettings()
         if settings.contains('PortsGeometry'):
             self.restoreGeometry(settings.value('PortsGeometry'))
@@ -1719,7 +1722,9 @@ class comportDlg(ArtisanResizeablDialog):
                 self.serialtable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
                 self.serialtable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
                 self.serialtable.setShowGrid(True)
-                self.serialtable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+                vheader: Optional[QHeaderView] = self.serialtable.verticalHeader()
+                if vheader is not None:
+                    vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
                 for i in range(nssdevices):
                     if len(self.aw.qmc.extradevices) > i:
                         devid = self.aw.qmc.extradevices[i]

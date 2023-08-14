@@ -18,8 +18,8 @@
 import sys
 import time as libtime
 import logging
-from typing import TYPE_CHECKING
-from typing_extensions import Final  # Python <=3.7
+from typing import Optional, TYPE_CHECKING
+from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -881,9 +881,13 @@ class PID_DlgControl(ArtisanDialog):
                 self.aw.pidcontrol.svRamps[i] = self.aw.QTime2time(self.RampWidgets[i].time())
                 self.aw.pidcontrol.svSoaks[i] = self.aw.QTime2time(self.SoakWidgets[i].time())
                 self.aw.pidcontrol.svActions[i] = int(self.ActionWidgets[i].currentIndex()) - 1
-                beep = self.BeepWidgets[i].layout().itemAt(1).widget()
-                assert isinstance(beep, QCheckBox)
-                self.aw.pidcontrol.svBeeps[i] = bool(beep.isChecked())
+                layout = self.BeepWidgets[i].layout()
+                if layout is not None:
+                    layoutItem = layout.itemAt(1)
+                    if layoutItem is not None:
+                        beep = layoutItem.widget()
+                        assert isinstance(beep, QCheckBox)
+                        self.aw.pidcontrol.svBeeps[i] = bool(beep.isChecked())
                 self.aw.pidcontrol.svDescriptions[i] = self.DescriptionWidgets[i].text()
         finally:
             if self.aw.qmc.rampSoakSemaphore.available() < 1:
@@ -898,12 +902,16 @@ class PID_DlgControl(ArtisanDialog):
                 self.RampWidgets[i].setTime(self.aw.time2QTime(self.aw.pidcontrol.svRamps[i]))
                 self.SoakWidgets[i].setTime(self.aw.time2QTime(self.aw.pidcontrol.svSoaks[i]))
                 self.ActionWidgets[i].setCurrentIndex(self.aw.pidcontrol.svActions[i] + 1)
-                beep = self.BeepWidgets[i].layout().itemAt(1).widget()
-                assert isinstance(beep, QCheckBox)
-                if self.aw.pidcontrol.svBeeps[i]:
-                    beep.setCheckState(Qt.CheckState.Checked)
-                else:
-                    beep.setCheckState(Qt.CheckState.Unchecked)
+                layout = self.BeepWidgets[i].layout()
+                if layout is not None:
+                    layoutItem = layout.itemAt(1)
+                    if layoutItem is not None:
+                        beep = layoutItem.widget()
+                        assert isinstance(beep, QCheckBox)
+                        if self.aw.pidcontrol.svBeeps[i]:
+                            beep.setCheckState(Qt.CheckState.Checked)
+                        else:
+                            beep.setCheckState(Qt.CheckState.Unchecked)
                 self.DescriptionWidgets[i].setText(self.aw.pidcontrol.svDescriptions[i])
         finally:
             if self.aw.qmc.rampSoakSemaphore.available() < 1:
@@ -1950,7 +1958,9 @@ class PXRpidDlgControl(PXpidDlgControl):
         self.segmenttable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.segmenttable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.segmenttable.setShowGrid(True)
-        self.segmenttable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+        vheader: Optional[QHeaderView] = self.segmenttable.verticalHeader()
+        if vheader is not None:
+            vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         regextime = QRegularExpression(r'^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$')
         #populate table
         for i in range(8):
@@ -3927,7 +3937,9 @@ class PXG4pidDlgControl(PXpidDlgControl):
         self.segmenttable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.segmenttable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.segmenttable.setShowGrid(True)
-        self.segmenttable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+        vheader: Optional[QHeaderView] = self.segmenttable.verticalHeader()
+        if vheader is not None:
+            vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         regextime = QRegularExpression(r'^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$')
         #populate table
         for i in range(16):

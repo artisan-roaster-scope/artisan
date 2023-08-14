@@ -23,8 +23,8 @@ import sys
 import platform
 import numpy
 import logging
-from typing import List, TYPE_CHECKING
-from typing_extensions import Final  # Python <=3.7
+from typing import List, Optional, TYPE_CHECKING
+from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -71,7 +71,8 @@ class equDataDlg(ArtisanDialog):
         self.datatable = QTableWidget()
         self.datatable.setTabKeyNavigation(True)
         header = self.datatable.horizontalHeader()
-        header.setStretchLastSection(True)
+        if header is not None:
+            header.setStretchLastSection(True)
         self.datatable.setMinimumSize(self.datatable.minimumSizeHint())
 
         self.copydataTableButton = QPushButton(QApplication.translate('Button', 'Copy Table'))
@@ -148,7 +149,9 @@ class equDataDlg(ArtisanDialog):
             self.datatable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
             self.datatable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
             self.datatable.setShowGrid(True)
-            self.datatable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+            vheader = self.datatable.verticalHeader()
+            if vheader is not None:
+                vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
 
             for i in range(ndata):
 
@@ -227,12 +230,13 @@ class equDataDlg(ArtisanDialog):
                 self.datatable.setItem(i,10,P9)
 
             header = self.datatable.horizontalHeader()
-            header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
-            header.setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)
-            header.setSectionResizeMode(2, QHeaderView.ResizeMode.Fixed)
-            header.setSectionResizeMode(3, QHeaderView.ResizeMode.Fixed)
-            header.setSectionResizeMode(4, QHeaderView.ResizeMode.Fixed)
-            header.setSectionResizeMode(len(columns) - 1, QHeaderView.ResizeMode.Stretch)
+            if header is not None:
+                header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
+                header.setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)
+                header.setSectionResizeMode(2, QHeaderView.ResizeMode.Fixed)
+                header.setSectionResizeMode(3, QHeaderView.ResizeMode.Fixed)
+                header.setSectionResizeMode(4, QHeaderView.ResizeMode.Fixed)
+                header.setSectionResizeMode(len(columns) - 1, QHeaderView.ResizeMode.Stretch)
             self.datatable.resizeColumnsToContents()
         except Exception: # pylint: disable=broad-except
             pass
@@ -248,30 +252,39 @@ class equDataDlg(ArtisanDialog):
             tbl = prettytable.PrettyTable()
             fields = []
             for c in range(ncols):
-                fields.append(self.datatable.horizontalHeaderItem(c).text())
+                item = self.datatable.horizontalHeaderItem(c)
+                if item is not None:
+                    fields.append(item.text())
             tbl.field_names = fields
             for r in range(nrows):
                 rows = []
                 for c in range(ncols):
-                    rows.append(self.datatable.item(r,c).text())
+                    item = self.datatable.item(r,c)
+                    if item is not None:
+                        rows.append(item.text())
                 tbl.add_row(rows)
             clipboard = tbl.get_string()
         else:
             for c in range(ncols):
-                clipboard += self.datatable.horizontalHeaderItem(c).text()
-                if c != (ncols-1):
-                    clipboard += '\t'
+                item = self.datatable.horizontalHeaderItem(c)
+                if item is not None:
+                    clipboard += item.text()
+                    if c != (ncols-1):
+                        clipboard += '\t'
             clipboard += '\n'
             for r in range(nrows):
                 for c in range(ncols):
-                    clipboard += self.datatable.item(r,c).text()
-                    if c != (ncols-1):
-                        clipboard += '\t'
+                    item = self.datatable.item(r,c)
+                    if item is not None:
+                        clipboard += item.text()
+                        if c != (ncols-1):
+                            clipboard += '\t'
                 clipboard += '\n'
         # copy to the system clipboard
         sys_clip = QApplication.clipboard()
-        sys_clip.setText(clipboard)
-        self.aw.sendmessage(QApplication.translate('Message','Data table copied to clipboard'))
+        if sys_clip is not None:
+            sys_clip.setText(clipboard)
+            self.aw.sendmessage(QApplication.translate('Message','Data table copied to clipboard'))
 
 
 
@@ -791,10 +804,11 @@ class CurvesDlg(ArtisanDialog):
         saveImgButton.setToolTip(QApplication.translate('Tooltip','Save image using current graph size to a png format'))
         saveImgButton.clicked.connect(self.aw.resizeImg_0_1)
         helpcurveDialogButton = QDialogButtonBox()
-        helpcurveButton = helpcurveDialogButton.addButton(QDialogButtonBox.StandardButton.Help)
-        helpcurveButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.setButtonTranslations(helpcurveButton,'Help',QApplication.translate('Button','Help'))
-        helpcurveButton.clicked.connect(self.showSymbolicHelp)
+        helpcurveButton: Optional[QPushButton] = helpcurveDialogButton.addButton(QDialogButtonBox.StandardButton.Help)
+        if helpcurveButton is not None:
+            helpcurveButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.setButtonTranslations(helpcurveButton,'Help',QApplication.translate('Button','Help'))
+            helpcurveButton.clicked.connect(self.showSymbolicHelp)
         curve1Layout = QGridLayout()
         curve1Layout.setSpacing(5)
         curve1Layout.addWidget(self.equc1label,0,0)
@@ -1375,7 +1389,9 @@ class CurvesDlg(ArtisanDialog):
         self.c1ComboBox.currentIndexChanged.connect(self.polyfitcurveschanged)
         self.c2ComboBox.currentIndexChanged.connect(self.polyfitcurveschanged)
         if platform.system() != 'Windows':
-            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
+            ok_button: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+            if ok_button is not None:
+                ok_button.setFocus()
 
         settings = QSettings()
         if settings.contains('CurvesPosition'):

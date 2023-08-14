@@ -153,7 +153,8 @@ class QtSingleApplication(QApplication): # pyright: ignore [reportGeneralTypeIss
             self._inStream.setCodec('UTF-8') # type: ignore # setCodec not available in PyQt6, but UTF-8 the default encoding
         except Exception: # pylint: disable=broad-except
             pass
-        self._inSocket.readyRead.connect(self._onReadyRead)
+        if self._inSocket is not None:
+            self._inSocket.readyRead.connect(self._onReadyRead)
         if self._activateOnMessage and self._isRunning:
             self.activateWindow()
 

@@ -37,7 +37,7 @@ import plus.connection
 import plus.config
 
 from typing import Optional
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -316,7 +316,7 @@ class NotificationManager(QObject): # pyright: ignore [reportGeneralTypeIssues]
     @pyqtSlot(bool)
     def notificationItemSelected(self, _checked:bool = False):
         action = self.sender()
-        if hasattr(action, 'data'):
+        if action is not None and hasattr(action, 'data'):
             n = action.data()
             self.setNotification(n, addToQueue=False)
 

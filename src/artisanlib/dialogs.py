@@ -32,7 +32,7 @@ except ImportError:
 from artisanlib.widgets import MyQComboBox
 
 from typing import Optional, List, Tuple, TYPE_CHECKING
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from PyQt6.QtWidgets import QPushButton # pylint: disable=unused-import
@@ -66,26 +66,30 @@ class ArtisanDialog(QDialog): # pyright: ignore [reportGeneralTypeIssues] # Argu
 
         # configure standard dialog buttons
         self.dialogbuttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel,Qt.Orientation.Horizontal)
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setDefault(True)
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setAutoDefault(True)
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).setDefault(False)
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).setAutoDefault(False)
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocusPolicy(Qt.FocusPolicy.StrongFocus) # to add to tab focus switch
+        okButton: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        if okButton is not None:
+            okButton.setDefault(True)
+            okButton.setAutoDefault(True)
+            okButton.setFocusPolicy(Qt.FocusPolicy.StrongFocus) # to add to tab focus switch
+        cancelButton: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel)
+        if cancelButton is not None:
+            cancelButton.setDefault(False)
+            cancelButton.setAutoDefault(False)
+            # add additional CMD-. shortcut to close the dialog
+            cancelButton.setShortcut(QKeySequence('Ctrl+.'))
+            # add additional CMD-W shortcut to close this dialog (ESC on Mac OS X)
+    #        cancelAction = QAction(self, triggered=lambda _:self.dialogbuttons.rejected.emit())
+            cancelAction = QAction(self)
+            cancelAction.triggered.connect(self.cancelDialog)
+            try:
+                cancelAction.setShortcut(QKeySequence.StandardKey.Cancel)
+            except Exception: # pylint: disable=broad-except
+                pass
+            cancelButton.addActions([cancelAction])
         for btn,txt,trans in [
-            (self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok),'OK', QApplication.translate('Button','OK')),
-            (self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel),'Cancel',QApplication.translate('Button','Cancel'))]:
+                (okButton,'OK', QApplication.translate('Button','OK')),
+                (cancelButton,'Cancel',QApplication.translate('Button','Cancel'))]:
             self.setButtonTranslations(btn,txt,trans)
-        # add additional CMD-. shortcut to close the dialog
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).setShortcut(QKeySequence('Ctrl+.'))
-        # add additional CMD-W shortcut to close this dialog (ESC on Mac OS X)
-#        cancelAction = QAction(self, triggered=lambda _:self.dialogbuttons.rejected.emit())
-        cancelAction = QAction(self)
-        cancelAction.triggered.connect(self.cancelDialog)
-        try:
-            cancelAction.setShortcut(QKeySequence.StandardKey.Cancel)
-        except Exception: # pylint: disable=broad-except
-            pass
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel).addActions([cancelAction])
 
     @pyqtSlot()
     def cancelDialog(self) -> None:
@@ -93,13 +97,14 @@ class ArtisanDialog(QDialog): # pyright: ignore [reportGeneralTypeIssues] # Argu
         self.reject()
 
     @staticmethod
-    def setButtonTranslations(btn:'QPushButton', txt:str, trans:str):
-        current_trans = btn.text()
-        if txt == current_trans:
-            # if standard qtbase translations fail, revert to artisan translations
-            current_trans = trans
-        if txt != current_trans:
-            btn.setText(current_trans)
+    def setButtonTranslations(btn: Optional['QPushButton'], txt:str, trans:str):
+        if btn is not None:
+            current_trans = btn.text()
+            if txt == current_trans:
+                # if standard qtbase translations fail, revert to artisan translations
+                current_trans = trans
+            if txt != current_trans:
+                btn.setText(current_trans)
 
     def closeEvent(self,_):
         self.dialogbuttons.rejected.emit()
@@ -179,7 +184,9 @@ class HelpDlg(ArtisanDialog):
         hLayout.addWidget(phelp)
         hLayout.addLayout(buttonLayout)
         self.setLayout(hLayout)
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
+        okButton: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        if okButton is not None:
+            okButton.setFocus()
 
     def closeEvent(self, _):
         settings = QSettings()
@@ -212,7 +219,9 @@ class ArtisanInputDialog(ArtisanDialog):
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.rejected.connect(self.reject)
         self.dialogbuttons.accepted.connect(self.accept)
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
+        okButton: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        if okButton is not None:
+            okButton.setFocus()
 
     @pyqtSlot()
     def accept(self):
@@ -256,7 +265,9 @@ class ArtisanComboBoxDialog(ArtisanDialog):
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.rejected.connect(self.reject)
         self.dialogbuttons.accepted.connect(self.accept)
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
+        okButton: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        if okButton is not None:
+            okButton.setFocus()
 
     @pyqtSlot()
     def accept(self):
@@ -368,7 +379,9 @@ class ArtisanPortsDialog(ArtisanDialog):
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.rejected.connect(self.reject)
         self.dialogbuttons.accepted.connect(self.accept)
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
+        okButton: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        if okButton is not None:
+            okButton.setFocus()
 
     def getSelection(self) -> Optional[str]:
         return self.comboBox.getSelection()

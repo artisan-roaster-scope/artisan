@@ -26,7 +26,7 @@ import threading
 import platform
 import logging
 from typing import Optional, List, Tuple, Dict, Callable, Union, TYPE_CHECKING
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
@@ -2035,7 +2035,7 @@ class serialport:
 
     @staticmethod
     def binary(n, digits=8):
-        return '{0:0>{1}}'.format(bin(n)[2:], digits) # pylint: disable=consider-using-f-string
+        return '{0:0>{1}}'.format(bin(n)[2:], digits) # pylint: disable=consider-using-f-string # noqa: PLE1300
 
     #similar to Omega HH806
     def MS6514temperature(self, retry:int=2) -> Tuple[float, float]:
@@ -2091,7 +2091,7 @@ class serialport:
 
                     #return original T1 T2
                     ts1:float
-                    if(r[index+11] == 9 or r[index+11] == 65): # 9="\x09" 65="\x41"
+                    if r[index+11] in (9, 65): # 9="\x09" 65="\x41"
                         ts1 = s1 # pylint: disable=consider-swap-variables # Consider using tuple unpacking for swapping variables consider-swap-variables # tuple unpacking not used here to make pyright happy
                         s1 = s2
                         s2 = ts1
@@ -2103,7 +2103,7 @@ class serialport:
                         ts1 = s1
                         s1 = s2
                         s2 = s1 + s2
-                    elif r[index+11] == 66 or r[index+11] == 194:  # 66="\x42" and 194="\xc2"
+                    elif r[index+11] in (66, 194):  # 66="\x42" and 194="\xc2"
                         s1 = s2
                         s2 = -1.
                     elif r[index+11] == 11: # 11="\x0b"

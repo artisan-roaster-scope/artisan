@@ -15,9 +15,11 @@
 # AUTHOR
 # Marko Luther, 2023
 
+from typing import Optional
+from matplotlib import rcParams
+
 from artisanlib.dialogs import ArtisanDialog
 
-from matplotlib import rcParams
 
 try:
     from PyQt6.QtCore import Qt, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
@@ -53,7 +55,9 @@ class WheelDlg(ArtisanDialog):
         self.setButtonTranslations(self.subdialogbuttons.button(QDialogButtonBox.StandardButton.Close),'Close',QApplication.translate('Button','Close'))
 
         self.subdialogbuttons.rejected.connect(self.closelabels)
-        self.subdialogbuttons.button(QDialogButtonBox.StandardButton.RestoreDefaults).clicked.connect(self.resetlabelparents)
+        restoreButton: Optional[QPushButton] = self.subdialogbuttons.button(QDialogButtonBox.StandardButton.RestoreDefaults)
+        if restoreButton is not None:
+            restoreButton.clicked.connect(self.resetlabelparents)
 
         self.labelwheelx = 0   #index of wheel being edited on labeltable
 #        self.hierarchyButton = QPushButton(QApplication.translate("Button","Reverse Hierarchy"))
@@ -100,36 +104,43 @@ class WheelDlg(ArtisanDialog):
         self.colorSpinBox.setValue(int(round(self.aw.qmc.wheelcolorpattern)))
         self.colorSpinBox.setWrapping(True)
         self.colorSpinBox.valueChanged.connect(self.setcolorpattern)
-        addButton = QPushButton(QApplication.translate('Button','Add'))
-        addButton.setToolTip(QApplication.translate('Tooltip','Add new wheel'))
-        addButton.clicked.connect(self.insertwheel)
-        rotateLeftButton = QPushButton('<')
-        rotateLeftButton.setToolTip(QApplication.translate('Tooltip','Rotate graph 1 degree counter clockwise'))
-        rotateLeftButton.clicked.connect(self.rotatewheels1)
-        rotateRightButton = QPushButton('>')
-        rotateRightButton.setToolTip(QApplication.translate('Tooltip','Rotate graph 1 degree clockwise'))
-        rotateRightButton.clicked.connect(self.rotatewheels0)
+        addButton: Optional[QPushButton] = QPushButton(QApplication.translate('Button','Add'))
+        if addButton is not None:
+            addButton.setToolTip(QApplication.translate('Tooltip','Add new wheel'))
+            addButton.clicked.connect(self.insertwheel)
+        rotateLeftButton: Optional[QPushButton] = QPushButton('<')
+        if rotateLeftButton is not None:
+            rotateLeftButton.setToolTip(QApplication.translate('Tooltip','Rotate graph 1 degree counter clockwise'))
+            rotateLeftButton.clicked.connect(self.rotatewheels1)
+        rotateRightButton: Optional[QPushButton] = QPushButton('>')
+        if rotateRightButton is not None:
+            rotateRightButton.setToolTip(QApplication.translate('Tooltip','Rotate graph 1 degree clockwise'))
+            rotateRightButton.clicked.connect(self.rotatewheels0)
 
         self.main_buttons = QDialogButtonBox()
 
-        saveButton = QPushButton(QApplication.translate('Button','Save File'))
-        saveButton.clicked.connect(self.fileSave)
-        saveButton.setToolTip(QApplication.translate('Tooltip','Save graph to a text file.wg'))
-        self.main_buttons.addButton(saveButton,QDialogButtonBox.ButtonRole.ActionRole)
+        saveButton: Optional[QPushButton] = QPushButton(QApplication.translate('Button','Save File'))
+        if saveButton is not None:
+            saveButton.clicked.connect(self.fileSave)
+            saveButton.setToolTip(QApplication.translate('Tooltip','Save graph to a text file.wg'))
+            self.main_buttons.addButton(saveButton,QDialogButtonBox.ButtonRole.ActionRole)
 
-        saveImgButton = QPushButton(QApplication.translate('Button','Save Img'))
-        saveImgButton.setToolTip(QApplication.translate('Tooltip','Save image using current graph size to a png format'))
-        #saveImgButton.clicked.connect(self.aw.resizeImg_0_1) # save as PNG (raster)
-        saveImgButton.clicked.connect(self.aw.saveVectorGraph_PDF) # save as PDF (vector)
-        self.main_buttons.addButton(saveImgButton,QDialogButtonBox.ButtonRole.ActionRole)
+        saveImgButton: Optional[QPushButton] = QPushButton(QApplication.translate('Button','Save Img'))
+        if saveImgButton is not None:
+            saveImgButton.setToolTip(QApplication.translate('Tooltip','Save image using current graph size to a png format'))
+            #saveImgButton.clicked.connect(self.aw.resizeImg_0_1) # save as PNG (raster)
+            saveImgButton.clicked.connect(self.aw.saveVectorGraph_PDF) # save as PDF (vector)
+            self.main_buttons.addButton(saveImgButton,QDialogButtonBox.ButtonRole.ActionRole)
 
-        openButton = self.main_buttons.addButton(QDialogButtonBox.StandardButton.Open)
-        openButton.setToolTip(QApplication.translate('Tooltip','open wheel graph file'))
-        openButton.clicked.connect(self.loadWheel)
+        openButton: Optional[QPushButton] = self.main_buttons.addButton(QDialogButtonBox.StandardButton.Open)
+        if openButton is not None:
+            openButton.setToolTip(QApplication.translate('Tooltip','open wheel graph file'))
+            openButton.clicked.connect(self.loadWheel)
 
-        viewModeButton = self.main_buttons.addButton(QDialogButtonBox.StandardButton.Close)
-        viewModeButton.setToolTip(QApplication.translate('Tooltip','Sets Wheel graph to view mode'))
-        viewModeButton.clicked.connect(self.viewmode)
+        viewModeButton: Optional[QPushButton] = self.main_buttons.addButton(QDialogButtonBox.StandardButton.Close)
+        if viewModeButton is not None:
+            viewModeButton.setToolTip(QApplication.translate('Tooltip','Sets Wheel graph to view mode'))
+            viewModeButton.clicked.connect(self.viewmode)
 
         self.setButtonTranslations(self.main_buttons.button(QDialogButtonBox.StandardButton.Close),'Close', QApplication.translate('Button','Close'))
         self.setButtonTranslations(self.main_buttons.button(QDialogButtonBox.StandardButton.Open),'Open', QApplication.translate('Button','Open'))
@@ -205,7 +216,9 @@ class WheelDlg(ArtisanDialog):
             self.labeltable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
             self.labeltable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
             self.labeltable.setShowGrid(True)
-            self.labeltable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+            vheader: Optional['QHeaderView'] = self.labeltable.verticalHeader()
+            if vheader is not None:
+                vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
             #populate table
             for i in range(nlabels):
                 label = QTableWidgetItem(self.aw.qmc.wheelnames[x][i])
@@ -422,7 +435,9 @@ class WheelDlg(ArtisanDialog):
         self.datatable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.datatable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.datatable.setShowGrid(True)
-        self.datatable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+        vheader: Optional[QHeaderView] = self.datatable.verticalHeader()
+        if vheader is not None:
+            vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         #populate table
         for i in range(ndata):
             delButton = QPushButton(QApplication.translate('Button','Delete'))

@@ -20,11 +20,13 @@ import asyncio
 import websockets.client
 from contextlib import suppress
 from threading import Thread
-from pymodbus.client.serial_asyncio import open_serial_connection # patched pyserial-asyncio
+#from pymodbus.client.serial_asyncio import open_serial_connection # patched pyserial-asyncio
+from pymodbus.transport.transport_serial import create_serial_connection # patched pyserial-asyncio
 
 import logging
 from typing import Optional, Union, Callable, Dict, Tuple  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
-from typing_extensions import Final, TypedDict  # Python <=3.7
+from typing_extensions import TypedDict  # Python <=3.7
+from typing import Final
 
 from artisanlib.types import SerialSettings
 
@@ -338,6 +340,34 @@ class KaleidoPort:
 
 #---- Serial transport
 
+    @staticmethod
+    async def open_serial_connection(*, loop=None, limit=None, **kwargs):
+        """A wrapper for create_serial_connection() returning a (reader,
+        writer) pair.
+
+        The reader returned is a StreamReader instance; the writer is a
+        StreamWriter instance.
+
+        The arguments are all the usual arguments to Serial(). Additional
+        optional keyword arguments are loop (to set the event loop instance
+        to use) and limit (to set the buffer limit passed to the
+        StreamReader.
+
+        This function is a coroutine.
+        """
+        if loop is None:
+            loop = asyncio.get_event_loop()
+        if limit is None:
+            limit = 2 ** 16  # 64 KiB
+        reader = asyncio.StreamReader(limit=limit, loop=loop)
+        protocol = asyncio.StreamReaderProtocol(reader, loop=loop)
+        transport, _ = await create_serial_connection(
+            loop=loop, protocol_factory=lambda: protocol, **kwargs
+        )
+        writer = asyncio.StreamWriter(transport, protocol, reader, loop)
+        return reader, writer
+
+
     async def serial_handle_reads(self, reader: asyncio.StreamReader) -> None:
         while True:
             res = await asyncio.wait_for(reader.readline(), timeout=self._read_timeout)
@@ -403,7 +433,7 @@ class KaleidoPort:
             try:
                 _log.debug('connecting to %s@%s ...',serial['port'],serial['baudrate'])
 
-                connect = open_serial_connection(
+                connect = self.open_serial_connection(
                         url=serial['port'],
                         baudrate=serial['baudrate'],
                         bytesize=serial['bytesize'],

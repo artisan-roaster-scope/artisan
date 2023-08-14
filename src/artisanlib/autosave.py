@@ -15,6 +15,7 @@
 # AUTHOR
 # Marko Luther, 2023
 
+from typing import Optional, TYPE_CHECKING
 from artisanlib.dialogs import ArtisanDialog
 
 try:
@@ -27,6 +28,10 @@ except ImportError:
     from PyQt5.QtWidgets import (QApplication, QLabel, QPushButton, QDialogButtonBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QLineEdit) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QStandardItemModel # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+
+
+if TYPE_CHECKING:
+    from PyQt6.QtGui import QStandardItem # pylint: disable=unused-import
 
 class autosaveDlg(ArtisanDialog):
     def __init__(self, parent, aw) -> None:
@@ -73,7 +78,9 @@ class autosaveDlg(ArtisanDialog):
                 # disable "PDF Report" item if QtWebEngine Support is not available
                 model = self.imageTypesComboBox.model()
                 assert isinstance(model, QStandardItemModel)
-                model.item(self.aw.qmc.autoasaveimageformat_types.index('PDF Report')).setEnabled(False)
+                item: Optional['QStandardItem'] = model.item(self.aw.qmc.autoasaveimageformat_types.index('PDF Report'))
+                if item is not None:
+                    item.setEnabled(False)
         except Exception: # pylint: disable=broad-except
             pass
         self.imageTypesComboBox.setCurrentIndex(self.aw.qmc.autoasaveimageformat_types.index(self.aw.qmc.autosaveimageformat))
@@ -85,8 +92,9 @@ class autosaveDlg(ArtisanDialog):
         self.dialogbuttons.accepted.connect(self.autoChanged)
         self.dialogbuttons.rejected.connect(lambda : (None if self.close() else None)) # lambda to make mypy happy, turning close from None->bool into None->None
         self.helpButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Help)
-        self.setButtonTranslations(self.helpButton,'Help',QApplication.translate('Button','Help'))
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Help).clicked.connect(self.showautosavehelp)
+        if self.helpButton is not None:
+            self.setButtonTranslations(self.helpButton,'Help',QApplication.translate('Button','Help'))
+            self.helpButton.clicked.connect(self.showautosavehelp)
 
         pathButton = QPushButton(QApplication.translate('Button','Path'))
         pathButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -134,7 +142,9 @@ class autosaveDlg(ArtisanDialog):
         mainLayout.addSpacing(10)
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
+        okButton: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        if okButton is not None:
+            okButton.setFocus()
         self.setFixedHeight(self.sizeHint().height())
 
     @pyqtSlot(bool)

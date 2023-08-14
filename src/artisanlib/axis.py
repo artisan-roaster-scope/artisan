@@ -16,6 +16,7 @@
 # Marko Luther, 2023
 
 import platform
+from typing import Optional, TYPE_CHECKING
 
 from artisanlib.util import deltaLabelUTF8, stringfromseconds, stringtoseconds
 from artisanlib.dialogs import ArtisanDialog
@@ -32,6 +33,9 @@ except ImportError:
     from PyQt5.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QFrame, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit, QLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QSpinBox) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+
+if TYPE_CHECKING:
+    from PyQt6.QtWidgets import QPushButton # pylint: disable=unused-import
 
 class WindowsDlg(ArtisanDialog):
     def __init__(self, parent, aw) -> None:
@@ -309,11 +313,12 @@ class WindowsDlg(ArtisanDialog):
         self.dialogbuttons.accepted.connect(self.updatewindow)
         self.dialogbuttons.rejected.connect(self.restoreState)
 
-        resetButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
-        resetButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        resetButton.clicked.connect(self.reset)
-        self.setButtonTranslations(resetButton,'Restore Defaults',QApplication.translate('Button','Restore Defaults'))
-        resetButton.setToolTip(QApplication.translate('Tooltip', 'Reset axis settings to their defaults'))
+        resetButton: Optional['QPushButton'] = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
+        if resetButton is not None:
+            resetButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            resetButton.clicked.connect(self.reset)
+            self.setButtonTranslations(resetButton,'Restore Defaults',QApplication.translate('Button','Restore Defaults'))
+            resetButton.setToolTip(QApplication.translate('Tooltip', 'Reset axis settings to their defaults'))
 
         self.loadAxisFromProfile = QCheckBox(QApplication.translate('CheckBox', 'Load from profile'))
         self.loadAxisFromProfile.setChecked(self.aw.qmc.loadaxisfromprofile)
@@ -450,10 +455,10 @@ class WindowsDlg(ArtisanDialog):
         mainLayout.addStretch()
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
-        if platform.system() == 'Windows':
-            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
-        else:
-            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
+        if platform.system() != 'Windows':
+            ok_button: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+            if ok_button is not None:
+                ok_button.setFocus()
 
         if self.aw.qmc.locktimex:
             self.disableXAxisControls()

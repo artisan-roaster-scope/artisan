@@ -27,7 +27,7 @@ import functools
 from pathlib import Path
 from matplotlib import colors
 from typing import Optional, Tuple, List, Union, Any
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 from typing_extensions import TypeGuard  # Python <=3.10
 
 ##
@@ -180,7 +180,7 @@ def convertRoR(r,source_unit,target_unit):
     return RoRfromFtoC(r)
 
 def convertTemp(t:float, source_unit:str, target_unit:str) -> float:
-    if source_unit == '' or target_unit == '' or source_unit == target_unit:
+    if source_unit in ('', target_unit) or target_unit == '':
         return t
     if source_unit == 'C':
         return fromCtoF(t)
@@ -375,14 +375,20 @@ def getDirectory(filename: str, ext: Optional[str] = None, share: bool = False) 
 
 # takes a hex color string and returns the same color as hex string with staturation set to 0 and incr. lightness
 def toGrey(color):
-    hslf = QColor(color).getHslF()
-    gray = QColor.fromHslF(hslf[0],0,(1-hslf[2])/1.7+hslf[2],hslf[3]) # saturation set to 0
+    h, _s, l, a = QColor(color).getHslF()
+    if h is not None and l is not None and a is not None:
+        gray = QColor.fromHslF(h,0,(1-l)/1.7+l,a) # saturation set to 0
+    else:
+        gray = QColor.fromHslF(0.5,0,0.5,1.0)
     return gray.name()
 
 # takes a hex color string and returns the same color as hex string with reduced staturation and incr. lightness
 def toDim(color):
-    hslf = QColor(color).getHslF()
-    gray = QColor.fromHslF(hslf[0],hslf[1]/4,(1-hslf[2])/1.7+hslf[2],hslf[3])
+    h, s, l, a = QColor(color).getHslF()
+    if h is not None and s is not None and l is not None and a is not None:
+        gray = QColor.fromHslF(h,s/4,(1-l)/1.7+l,a)
+    else:
+        gray = QColor.fromHslF(0.5,0,0.5,1.0)
     return gray.name()
 
 # creates QLinearGradient style from light to dark by default, or from dark to light if reverse is True
@@ -400,7 +406,10 @@ def createRGBGradient(rgb, tint_factor=0.3, shade_factor=0.3):
         rgb_tuple: Tuple[float, float, float]
         if isinstance(rgb, QColor):
             r,g,b,_ = rgb.getRgbF()
-            rgb_tuple = (r,g,b)
+            if r is not None and g is not None and b is not None:
+                rgb_tuple = (r,g,b)
+            else:
+                rgb_tuple = (0.5,0.5,0.5)
         elif rgb[0:1] == '#':   # hex input like "#ffaa00"
 #            rgb_tuple = tuple(int(rgb[i:i+2], 16)/255 for i in (1, 3 ,5))
             rgb_tuple = (float(int(rgb[1:3], 16)/255),float(int(rgb[3:5], 16)/255),float(int(rgb[5:7], 16)/255))

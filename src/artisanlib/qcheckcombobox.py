@@ -217,68 +217,79 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
         """Reimplemented."""
         super().showPopup()
         view = self.view()
-        view.installEventFilter(self)
-        view.viewport().installEventFilter(self)
-        self.__popupIsShown = True
+        if view is not None:
+            view.installEventFilter(self)
+            vp = view.viewport()
+            if vp is not None:
+                vp.installEventFilter(self)
+                self.__popupIsShown = True
 
     def hidePopup(self):
         """Reimplemented."""
-        self.view().removeEventFilter(self)
-        self.view().viewport().removeEventFilter(self)
-        self.__popupIsShown = False
-        self.__initialMousePos = None
-        super().hidePopup()
-        self.view().clearFocus()
+        view = self.view()
+        if view is not None:
+            view.removeEventFilter(self)
+            vp = view.viewport()
+            if vp is not None:
+                vp.removeEventFilter(self)
+            self.__popupIsShown = False
+            self.__initialMousePos = None
+            super().hidePopup()
+            view.clearFocus()
 
     def eventFilter(self, obj, event):
         """Reimplemented."""
-        if self.__popupIsShown and \
-                event.type() == QEvent.Type.MouseMove and \
-                self.view().isVisible() and self.__initialMousePos is not None:
-            diff = obj.mapToGlobal(event.pos()) - self.__initialMousePos # type: ignore # mypy: Statement is unreachable
-            if diff.manhattanLength() > 9 and \
-                    self.__blockMouseReleaseTimer.isActive():
-                self.__blockMouseReleaseTimer.stop()
-            # pass through
+        view = self.view()
+        if view is not None:
+            if self.__popupIsShown and \
+                    event.type() == QEvent.Type.MouseMove and \
+                    view.isVisible() and self.__initialMousePos is not None:
+                diff = obj.mapToGlobal(event.pos()) - self.__initialMousePos # type: ignore # mypy: Statement is unreachable
+                if diff.manhattanLength() > 9 and \
+                        self.__blockMouseReleaseTimer.isActive():
+                    self.__blockMouseReleaseTimer.stop()
+                # pass through
 
-        if self.__popupIsShown and \
-                event.type() == QEvent.Type.MouseButtonRelease and \
-                self.view().isVisible() and \
-                self.view().rect().contains(event.pos()) and \
-                self.view().currentIndex().isValid() and \
-                self.view().currentIndex().flags() & Qt.ItemFlag.ItemIsSelectable and \
-                self.view().currentIndex().flags() & Qt.ItemFlag.ItemIsEnabled and \
-                self.view().currentIndex().flags() & Qt.ItemFlag.ItemIsUserCheckable and \
-                self.view().visualRect(self.view().currentIndex()).contains(event.pos()) and \
-                not self.__blockMouseReleaseTimer.isActive():
-            model = self.model()
-            index = self.view().currentIndex()
-            state = model.data(index, Qt.ItemDataRole.CheckStateRole)
-            model.setData(index,
-                          Qt.CheckState.Checked if state == Qt.CheckState.Unchecked else Qt.CheckState.Unchecked,
-                          Qt.ItemDataRole.CheckStateRole)
-            self.view().update(index)
-            self.update()
-            self.flagChanged.emit(index.row(),state == Qt.CheckState.Unchecked)
-            return True
+            if self.__popupIsShown and \
+                    event.type() == QEvent.Type.MouseButtonRelease and \
+                    view.isVisible() and \
+                    view.rect().contains(event.pos()) and \
+                    view.currentIndex().isValid() and \
+                    view.currentIndex().flags() & Qt.ItemFlag.ItemIsSelectable and \
+                    view.currentIndex().flags() & Qt.ItemFlag.ItemIsEnabled and \
+                    view.currentIndex().flags() & Qt.ItemFlag.ItemIsUserCheckable and \
+                    view.visualRect(view.currentIndex()).contains(event.pos()) and \
+                    not self.__blockMouseReleaseTimer.isActive():
+                index = view.currentIndex()
+                model = self.model()
+                if model is not None:
+                    state = model.data(index, Qt.ItemDataRole.CheckStateRole)
+                    model.setData(index,
+                                  Qt.CheckState.Checked if state == Qt.CheckState.Unchecked else Qt.CheckState.Unchecked,
+                                  Qt.ItemDataRole.CheckStateRole)
+                    view.update(index)
+                    self.update()
+                    self.flagChanged.emit(index.row(),state == Qt.CheckState.Unchecked)
+                    return True
 
-        if self.__popupIsShown and event.type() == QEvent.Type.KeyPress and event.key() == Qt.Key.Key_Space:
-            # toggle the current items check state
-            model = self.model()
-            index = self.view().currentIndex()
-            flags = model.flags(index)
-            state = model.data(index, Qt.ItemDataRole.CheckStateRole)
-            if flags & Qt.ItemFlag.ItemIsUserCheckable and \
-                    flags & Qt.ItemFlag.ItemIsAutoTristate:
-                state = Qt.CheckState((int(state) + 1) % 3)
-            elif flags & Qt.ItemFlag.ItemIsUserCheckable:
-                state = Qt.CheckState.Checked if state != Qt.CheckState.Checked else Qt.CheckState.Unchecked
-            model.setData(index, state, Qt.ItemDataRole.CheckStateRole)
-            self.view().update(index)
-            self.update()
-            self.flagChanged.emit(index.row(),state != Qt.CheckState.Unchecked)
-            return True
-            # TODO: handle Qt.Key.Key_Enter, Key_Return? # pylint: disable=fixme
+            if self.__popupIsShown and event.type() == QEvent.Type.KeyPress and event.key() == Qt.Key.Key_Space:
+                # toggle the current items check state
+                index = view.currentIndex()
+                model = self.model()
+                if model is not None:
+                    flags = model.flags(index)
+                    state = model.data(index, Qt.ItemDataRole.CheckStateRole)
+                    if flags & Qt.ItemFlag.ItemIsUserCheckable and \
+                            flags & Qt.ItemFlag.ItemIsAutoTristate:
+                        state = Qt.CheckState((int(state) + 1) % 3)
+                    elif flags & Qt.ItemFlag.ItemIsUserCheckable:
+                        state = Qt.CheckState.Checked if state != Qt.CheckState.Checked else Qt.CheckState.Unchecked
+                    model.setData(index, state, Qt.ItemDataRole.CheckStateRole)
+                    view.update(index)
+                    self.update()
+                    self.flagChanged.emit(index.row(),state != Qt.CheckState.Unchecked)
+                    return True
+                    # TODO: handle Qt.Key.Key_Enter, Key_Return? # pylint: disable=fixme
 
         return super().eventFilter(obj, event)
 
@@ -381,28 +392,38 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
     def __updateItemDelegate(self):
         opt = QStyleOptionComboBox()
         opt.initFrom(self)
-        if self.style().styleHint(QStyle.StyleHint.SH_ComboBox_Popup, opt, self):
-            self.setItemDelegate(CheckComboBox.ComboMenuDelegate(self))
-        else:
-            self.setItemDelegate(CheckComboBox.ComboItemDelegate(self))
-
+        style = self.style()
+        if style is not None:
+            if style.styleHint(QStyle.StyleHint.SH_ComboBox_Popup, opt, self):
+                self.setItemDelegate(CheckComboBox.ComboMenuDelegate(self))
+            else:
+                self.setItemDelegate(CheckComboBox.ComboItemDelegate(self))
 
 def example():
     app = QApplication(list(sys.argv))
     cb = CheckComboBox(placeholderText='None')
     model = cb.model()
-    assert isinstance(model, QStandardItemModel)
-    cb.addItem('First')
-    model.item(0).setCheckable(True)
-    cb.addItem('Second')
-    model.item(1).setCheckable(True)
-    cb.addItem('Third')
-    model.item(2).setCheckable(True)
-    cb.insertSeparator(3)
-    cb.addItem('Fourth - Disabled')
-    model.item(4).setEnabled(False)
-    cb.show()
-    cb.raise_()
+    if model is not None:
+        assert isinstance(model, QStandardItemModel)
+        cb.addItem('First')
+        item0 = model.item(0)
+        if item0 is not None:
+            item0.setCheckable(True)
+        cb.addItem('Second')
+        item1 = model.item(1)
+        if item1 is not None:
+            item1.setCheckable(True)
+        cb.addItem('Third')
+        item2 = model.item(2)
+        if item2 is not None:
+            item2.setCheckable(True)
+        cb.insertSeparator(3)
+        cb.addItem('Fourth - Disabled')
+        item4 = model.item(4)
+        if item4 is not None:
+            item4.setEnabled(False)
+        cb.show()
+        cb.raise_()
 
     return app.exec()
 

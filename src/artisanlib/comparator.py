@@ -23,12 +23,15 @@ import matplotlib.patheffects as PathEffects
 from matplotlib import rcParams
 import logging
 from typing import Sequence, List, Tuple, Optional, TYPE_CHECKING
-from typing_extensions import TypedDict, Final  # Python <=3.7
+from typing_extensions import TypedDict  # Python <=3.7
+from typing import Final
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from matplotlib.lines import Line2D # pylint: disable=unused-import
     import matplotlib as mpl # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QLayoutItem, QLayout, QScrollBar # pylint: disable=unused-import
+    from PyQt6.QtGui import QStandardItem # pylint: disable=unused-import
 
 from artisanlib.util import deltaLabelUTF8, decodeLocal, stringfromseconds, fromFtoC, fromCtoF, fill_gaps
 from artisanlib.suppress_errors import suppress_stdout_stderr
@@ -87,7 +90,10 @@ class RoastProfile:
         self.active:bool = True # if selected or all are unselected; active profiles are drawn in color, inactive profiles in gray
         self.color = color
         hslf = QColor.fromRgbF(*color).getHslF()
-        self.gray = QColor.fromHslF(hslf[0],0,hslf[2],hslf[3]).getRgbF() # saturation set to 0
+        if hslf[0] is not None and hslf[2] is not None and hslf[3] is not None:
+            self.gray = QColor.fromHslF(hslf[0],0,hslf[2],hslf[3]).getRgbF() # saturation set to 0
+        else:
+            self.gray = QColor.fromHslF(0.5,0,0.5,0.5).getRgbF() # saturation set to 0
         self.label:str = ''
         self.title:str = ''
         #
@@ -870,20 +876,30 @@ class roastCompareDlg(ArtisanDialog):
         self.model = self.cb.model()
         assert isinstance(self.model, QStandardItemModel)
         self.cb.addItem(QApplication.translate('Label','ET'))
-        self.model.item(0).setCheckable(True)
+        item0 = self.model.item(0)
+        if item0 is not None:
+            item0.setCheckable(True)
         self.cb.setItemCheckState(0,(Qt.CheckState.Checked if self.aw.qmc.compareET else Qt.CheckState.Unchecked))
         self.cb.addItem(QApplication.translate('Label','BT'))
-        self.model.item(1).setCheckable(True)
+        item1 = self.model.item(1)
+        if item1 is not None:
+            item1.setCheckable(True)
         self.cb.setItemCheckState(1,(Qt.CheckState.Checked if self.aw.qmc.compareBT else Qt.CheckState.Unchecked))
         self.cb.addItem(deltaLabelUTF8 + QApplication.translate('Label','ET'))
-        self.model.item(2).setCheckable(True)
+        item2 = self.model.item(2)
+        if item2 is not None:
+            item2.setCheckable(True)
         self.cb.setItemCheckState(2,(Qt.CheckState.Checked if self.aw.qmc.compareDeltaET else Qt.CheckState.Unchecked))
         self.cb.addItem(deltaLabelUTF8 + QApplication.translate('Label','BT'))
-        self.model.item(3).setCheckable(True)
+        item3 = self.model.item(3)
+        if item3 is not None:
+            item3.setCheckable(True)
         self.cb.setItemCheckState(3,(Qt.CheckState.Checked if self.aw.qmc.compareDeltaBT else Qt.CheckState.Unchecked))
         self.cb.insertSeparator(4)
         self.cb.addItem(QApplication.translate('CheckBox','Events'))
-        self.model.item(5).setCheckable(True)
+        item5 = self.model.item(5)
+        if item5 is not None:
+            item5.setCheckable(True)
         self.cb.setItemCheckState(5,(Qt.CheckState.Checked if self.aw.qmc.compareMainEvents else Qt.CheckState.Unchecked))
         self.cb.flagChanged.connect(self.flagChanged)
 
@@ -1329,37 +1345,45 @@ class roastCompareDlg(ArtisanDialog):
             self.profileTable.setTabKeyNavigation(True)
             self.profileTable.setColumnCount(3)
             self.profileTable.setAlternatingRowColors(True)
-#            self.profileTable.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers) # we allow the editing/renaming of items
             self.profileTable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
             self.profileTable.setSelectionMode(QTableWidget.SelectionMode.MultiSelection)
             self.profileTable.setShowGrid(False)
-            self.profileTable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
-#            self.profileTable.horizontalHeader().setVisible(False)
+            vheader: Optional[QHeaderView] = self.profileTable.verticalHeader()
+            if vheader is not None:
+                vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
             self.profileTable.setHorizontalHeaderLabels(['',
                                                          QApplication.translate('Label','ON'),
                                                          QApplication.translate('Label','Title')])
-            self.profileTable.horizontalHeader().sectionClicked.connect(self.columnHeaderClicked)
+            hheader: Optional[QHeaderView] = self.profileTable.horizontalHeader()
+            if hheader is not None:
+                hheader.sectionClicked.connect(self.columnHeaderClicked)
             self.profileTable.setCornerButtonEnabled(True) # click in the left header corner selects all entries in the table
             self.profileTable.setSortingEnabled(False)
 
-            self.profileTable.verticalHeader().setSectionsMovable(True)
-            self.profileTable.verticalHeader().setDragDropMode(QTableWidget.DragDropMode.InternalMove)
-            self.profileTable.verticalHeader().sectionMoved.connect(self.sectionMoved)
-            self.profileTable.verticalHeader().sectionDoubleClicked.connect(self.tableSectionClicked)
+            vheader = self.profileTable.verticalHeader()
+            if vheader is not None:
+                vheader.setSectionsMovable(True)
+                vheader.setDragDropMode(QTableWidget.DragDropMode.InternalMove)
+                vheader.sectionMoved.connect(self.sectionMoved)
+                vheader.sectionDoubleClicked.connect(self.tableSectionClicked)
 
             self.profileTable.itemSelectionChanged.connect(self.selectionChanged)
             self.profileTable.deleteKeyPressed.connect(self.deleteSelected)
 
-            header = self.profileTable.horizontalHeader()
-            header.setStretchLastSection(True)
-            header.setMinimumSectionSize(10)       # color column size
-            self.profileTable.setColumnWidth(0,10) # color column size
-            header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
-            header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
-            header.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
+            header: Optional[QHeaderView] = self.profileTable.horizontalHeader()
+            if header is not None:
+                header.setStretchLastSection(True)
+                header.setMinimumSectionSize(10)       # color column size
+                header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
+                header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
+                header.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
 
+            self.profileTable.setColumnWidth(0,10) # color column size
             self.profileTable.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-            self.profileTable.horizontalScrollBar().setEnabled(False)
+
+            horizontalScrollBar: Optional[QScrollBar] = self.profileTable.horizontalScrollBar()
+            if horizontalScrollBar is not None:
+                horizontalScrollBar.setEnabled(False)
             self.profileTable.setAutoScroll(False) # disable scrolling to selected cell
 
         except Exception as ex: # pylint: disable=broad-except
@@ -1374,12 +1398,17 @@ class roastCompareDlg(ArtisanDialog):
         if i == 1: # flag header clicked
             new_state = not all(p.visible for p in self.profiles)
             for r in range(self.profileTable.rowCount()):
-                layout = self.profileTable.cellWidget(r,1).layout()
-                flag = layout.itemAt(0).widget()
-                assert isinstance(flag, QCheckBox)
-                flag.blockSignals(True)
-                flag.setChecked(new_state)
-                flag.blockSignals(False)
+                widget: Optional[QWidget] = self.profileTable.cellWidget(r,1)
+                if widget is not None:
+                    layout: Optional[QLayout] = widget.layout()
+                    if layout is not None:
+                        layoutItem: Optional['QLayoutItem'] = layout.itemAt(0)
+                        if layoutItem is not None:
+                            flag = layoutItem.widget()
+                            assert isinstance(flag, QCheckBox)
+                            flag.blockSignals(True)
+                            flag.setChecked(new_state)
+                            flag.blockSignals(False)
                 self.profiles[r].setVisible(new_state)
             # update chart
             self.updateDeltaLimits()
@@ -1480,7 +1509,7 @@ class roastCompareDlg(ArtisanDialog):
         self.repaint()
 
     @pyqtSlot(int)
-    def tableSectionClicked(self,i):
+    def tableSectionClicked(self, i:int) -> None:
         fileURL = QUrl.fromLocalFile(self.profiles[i].filepath)
         if platform.system() == 'Windows' and not self.aw.app.artisanviewerMode:
             self.aw.app.sendMessage2ArtisanInstance(fileURL.toString(),self.aw.app._viewer_id) # pylint: disable=protected-access
@@ -1548,10 +1577,12 @@ class roastCompareDlg(ArtisanDialog):
             model = self.alignComboBox.model()
             assert isinstance(model, QStandardItemModel)
             for i in range(model.rowCount()):
-                if len(top.timeindex) > i and ((i == 0 and top.timeindex[i] != -1) or (i==1 and top.TP != 0) or (i>1 and top.timeindex[i-1] > 0)):
-                    model.item(i).setEnabled(True)
-                else:
-                    model.item(i).setEnabled(False)
+                item: Optional[QStandardItem] = model.item(i)
+                if item is not None:
+                    if len(top.timeindex) > i and ((i == 0 and top.timeindex[i] != -1) or (i==1 and top.TP != 0) or (i>1 and top.timeindex[i-1] > 0)):
+                        item.setEnabled(True)
+                    else:
+                        item.setEnabled(False)
 
     def updateProfileTableItems(self):
         for i,p in enumerate(self.profiles):
@@ -1570,9 +1601,17 @@ class roastCompareDlg(ArtisanDialog):
             w = self.profileTable.item(i,0)
             if w is not None:
                 if p.active:
-                    c = QColor.fromRgbF(*p.color)
+                    r,g,b,a = p.color
+                    if r is not None and g is not None and b is not None and a is not None:
+                        c = p.color
+                    else:
+                        c = QColor.fromRgbF(r,g,b,a)
                 else:
-                    c = QColor.fromRgbF(*p.gray).lighter()
+                    r,g,b,a = p.gray
+                    if r is not None and g is not None and b is not None and a is not None:
+                        c = p.gray
+                    else:
+                        c = QColor.fromRgbF(r,g,b,a).lighter()
                 w.setBackground(c)
         self.aw.qpc.update_phases(self.getPhasesData())
 

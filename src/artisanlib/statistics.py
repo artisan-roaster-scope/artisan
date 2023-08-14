@@ -15,7 +15,9 @@
 # AUTHOR
 # Marko Luther, 2023
 
+from typing import Optional, TYPE_CHECKING
 from artisanlib.dialogs import ArtisanDialog
+from artisanlib.util import deltaLabelUTF8
 
 try:
     from PyQt6.QtCore import Qt, pyqtSlot, QSettings # @UnusedImport @Reimport  @UnresolvedImport
@@ -28,7 +30,9 @@ except ImportError:
         QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGroupBox, QLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QSpinBox) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
-from artisanlib.util import deltaLabelUTF8
+if TYPE_CHECKING:
+    from PyQt6.QtWidgets import QPushButton # pylint: disable=unused-import
+
 
 class StatisticsDlg(ArtisanDialog):
     def __init__(self, parent, aw) -> None:
@@ -167,7 +171,9 @@ class StatisticsDlg(ArtisanDialog):
         mainLayout.addLayout(buttonsLayout)
         mainLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
         self.setLayout(mainLayout)
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
+        ok_button: Optional['QPushButton'] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        if ok_button is not None:
+            ok_button.setFocus()
 
         settings = QSettings()
         if settings.contains('StatisticsPosition'):

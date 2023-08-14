@@ -41,7 +41,7 @@ from typing import Any, List, Dict, Optional, TYPE_CHECKING  #for Python >= 3.9:
 if TYPE_CHECKING:
     import persistqueue # type:ignore # pylint: disable=unused-import
 
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -135,7 +135,6 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                                 r.raise_for_status()
                                 # successfully transmitted, we add/update the
                                 # roasts UUID sync-cache
-                                iters = 0
                                 self.addSyncItem(item)
                                 # if current roast was just successfully uploaded,
                                 # we set the syncRecordHash to the full sync record
@@ -152,10 +151,9 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                                         self.replySignal.emit(rlimit,rused,pu,notifications,machines)
                                 except Exception as e:  # pylint: disable=broad-except
                                     _log.exception(e)
-                            else:
-                                # partial sync updates for roasts not registered
-                                # for syncing are ignored
-                                iters = 0
+                            # partial sync updates for roasts not registered
+                            # for syncing are ignored
+                            iters = 0
                         except RequestsConnectionError as e:
                             try:
                                 if controller.is_connected():
@@ -216,7 +214,7 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                                 # or others something went wrong we don't mark
                                 # this task as done and retry
                                 iters = iters - 1
-                                time.sleep(config.queue_retry_delay)
+                                time.sleep(2*config.queue_retry_delay)
                     # we call task_done to remove the item from the queue
                     queue.task_done()
                     item = None

@@ -15,7 +15,7 @@
 # AUTHOR
 # Marko Luther, 2023
 
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, TYPE_CHECKING
 
 from artisanlib.util import stringfromseconds, stringtoseconds
 from artisanlib.dialogs import ArtisanDialog
@@ -33,6 +33,8 @@ except ImportError:
         QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QDialogButtonBox, QGridLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QGroupBox, QLineEdit, QMessageBox, QLayout) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
+if TYPE_CHECKING:
+    from PyQt6.QtWidgets import QPushButton # pylint: disable=unused-import
 
 #########################################################################
 #############  DESIGNER CONFIG DIALOG ###################################
@@ -238,16 +240,19 @@ class designerconfigDlg(ArtisanDialog):
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok))
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel))
 
-        self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Close)
-        self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Apply)
-        self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
-        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Close),'Close',QApplication.translate('Button','Close'))
-        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Apply),'Apply',QApplication.translate('Button','Apply'))
-        self.setButtonTranslations(self.dialogbuttons.button(QDialogButtonBox.StandardButton.RestoreDefaults),'Restore Defaults',QApplication.translate('Button','Restore Defaults'))
+        close_button: Optional['QPushButton'] = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Close)
+        apply_button: Optional['QPushButton'] = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Apply)
+        defaults_button: Optional['QPushButton'] = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
+        if close_button is not None:
+            self.setButtonTranslations(close_button,'Close',QApplication.translate('Button','Close'))
+        if apply_button is not None:
+            self.setButtonTranslations(apply_button,'Apply',QApplication.translate('Button','Apply'))
+            apply_button.clicked.connect(self.settimes)
+        if defaults_button is not None:
+            self.setButtonTranslations(defaults_button,'Restore Defaults',QApplication.translate('Button','Restore Defaults'))
+            defaults_button.clicked.connect(self.reset)
 
         self.dialogbuttons.rejected.connect(self.accept)
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.RestoreDefaults).clicked.connect(self.reset)
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Apply).clicked.connect(self.settimes)
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
@@ -302,7 +307,8 @@ class designerconfigDlg(ArtisanDialog):
         mainLayout.addLayout(modLayout)
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Close).setFocus()
+        if close_button is not None:
+            close_button.setFocus()
 
         settings = QSettings()
         if settings.contains('DesignerPosition'):
@@ -733,7 +739,9 @@ class pointDlg(ArtisanDialog):
         mainLayout.addStretch()
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
-        self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok).setFocus()
+        ok_button: Optional['QPushButton'] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        if ok_button is not None:
+            ok_button.setFocus()
 
     @pyqtSlot()
     def return_values(self):

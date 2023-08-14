@@ -19,7 +19,7 @@
 from enum import Enum
 import logging
 from typing import Optional, Tuple, List, Callable
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 try:
     from PyQt6 import QtCore # @UnusedImport @Reimport  @UnresolvedImport
@@ -296,10 +296,11 @@ class BleInterface(QtCore.QObject): # pyright: ignore [reportGeneralTypeIssues] 
                         self.char_uuid.append((uuid_char, ble_write_type))
                         if self.m_control is not None:
                             self.m_service = self.m_control.createServiceObject(uuid)
-                            self.m_service.stateChanged.connect(self.onServiceStateChanged)
-                            self.m_service.characteristicChanged.connect(self.onCharacteristicChanged)
-                            self.m_service.characteristicRead.connect(self.onCharacteristicRead)
-                            self.m_service.errorOccurred.connect(self.serviceError)
+                            if self.m_service is not None:
+                                self.m_service.stateChanged.connect(self.onServiceStateChanged)
+                                self.m_service.characteristicChanged.connect(self.onCharacteristicChanged)
+                                self.m_service.characteristicRead.connect(self.onCharacteristicRead)
+                                self.m_service.errorOccurred.connect(self.serviceError)
         # pylint: disable=maybe-no-member
         if self.m_service is not None and self.m_service.state() == QtBluetooth.QLowEnergyService.ServiceState.DiscoveryRequired:
             self.m_service.discoverDetails() # this is required on PyQt 5.2.2 as onServiceStateChanged() is not called automatically
@@ -325,11 +326,12 @@ class BleInterface(QtCore.QObject): # pyright: ignore [reportGeneralTypeIssues] 
         if self.m_device is not None:
             _log.debug('connectCurrentDevice: %s', self.m_device.name())
             self.m_control = QtBluetooth.QLowEnergyController.createCentral(self.m_device)
-            # QueuedConnection required in the following for Windows. See: https://forum.qt.io/topic/109558/bluetooth-low-energy-scanner-discover-service-details/9
-            self.m_control.discoveryFinished.connect(self.onServiceScanDone, type=QtCore.Qt.ConnectionType.QueuedConnection) # type: ignore
-            self.m_control.connected.connect(self.onDeviceConnected)
-            self.m_control.disconnected.connect(self.onDeviceDisconnected)
-            self.m_control.connectToDevice()
+            if self.m_control is not None:
+                # QueuedConnection required in the following for Windows. See: https://forum.qt.io/topic/109558/bluetooth-low-energy-scanner-discover-service-details/9
+                self.m_control.discoveryFinished.connect(self.onServiceScanDone, type=QtCore.Qt.ConnectionType.QueuedConnection) # type: ignore
+                self.m_control.connected.connect(self.onDeviceConnected)
+                self.m_control.disconnected.connect(self.onDeviceDisconnected)
+                self.m_control.connectToDevice()
         else:
             self.deviceDisconnected.emit()
 

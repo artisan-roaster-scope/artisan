@@ -17,14 +17,15 @@
 
 import logging
 from typing import Optional, Callable
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 import asyncio
 from contextlib import suppress
 from threading import Thread
 
 from pymodbus.utilities import computeCRC
-from pymodbus.client.serial_asyncio import open_serial_connection # patched pyserial-asyncio
+#from pymodbus.client.serial_asyncio import open_serial_connection # patched pyserial-asyncio
+from pymodbus.transport.transport_serial import create_serial_connection # patched pyserial-asyncio
 
 from artisanlib.types import SerialSettings
 
@@ -169,6 +170,32 @@ class SantokerNetwork:
 
     # asyncio loop
 
+    @staticmethod
+    async def open_serial_connection(*, loop=None, limit=None, **kwargs):
+        """A wrapper for create_serial_connection() returning a (reader,
+        writer) pair.
+
+        The reader returned is a StreamReader instance; the writer is a
+        StreamWriter instance.
+
+        The arguments are all the usual arguments to Serial(). Additional
+        optional keyword arguments are loop (to set the event loop instance
+        to use) and limit (to set the buffer limit passed to the
+        StreamReader.
+
+        This function is a coroutine.
+        """
+        if loop is None:
+            loop = asyncio.get_event_loop()
+        if limit is None:
+            limit = 2 ** 16  # 64 KiB
+        reader = asyncio.StreamReader(limit=limit, loop=loop)
+        protocol = asyncio.StreamReaderProtocol(reader, loop=loop)
+        transport, _ = await create_serial_connection(
+            loop=loop, protocol_factory=lambda: protocol, **kwargs
+        )
+        writer = asyncio.StreamWriter(transport, protocol, reader, loop)
+        return reader, writer
 
     # https://www.oreilly.com/library/view/using-asyncio-in/9781492075325/ch04.html
     async def read_msg(self, stream: asyncio.StreamReader,
@@ -261,7 +288,7 @@ class SantokerNetwork:
             try:
                 if serial is not None:
                     _log.debug('connecting to serial port: %s ...',serial['port'])
-                    connect = open_serial_connection(
+                    connect = self.open_serial_connection(
                         url=serial['port'],
                         baudrate=serial['baudrate'],
                         bytesize=serial['bytesize'],
