@@ -157,8 +157,9 @@ class CustomBlendDialog(ArtisanDialog):
         self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Apply)
         # hack to assign the Apply button the AcceptRole without losing default system translations
         applyButton = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Apply)
-        self.ui.buttonBox.removeButton(applyButton)
-        self.applyButton = self.ui.buttonBox.addButton(applyButton.text(), QDialogButtonBox.ButtonRole.AcceptRole)
+        if applyButton is not None:
+            self.ui.buttonBox.removeButton(applyButton)
+            self.applyButton = self.ui.buttonBox.addButton(applyButton.text(), QDialogButtonBox.ButtonRole.AcceptRole)
 
         # populate widgets
         self.ui.lineEdit_name.setText(self.blend.name)
@@ -340,7 +341,8 @@ class CustomBlendDialog(ArtisanDialog):
 
             ratio_correct = self.checkRatio()
 
-            self.applyButton.setEnabled(ratio_correct)
+            if self.applyButton is not None:
+                self.applyButton.setEnabled(ratio_correct)
 
             for i, c in enumerate(self.blend.components):
                 #ratio
@@ -387,11 +389,12 @@ class CustomBlendDialog(ArtisanDialog):
 
             header = self.ui.tableWidget.horizontalHeader()
             self.ui.tableWidget.resizeColumnsToContents()
-            header.setStretchLastSection(False)
-            header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
-            header.setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)
-            header.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
-            header.setSectionResizeMode(3, QHeaderView.ResizeMode.Fixed)
+            if header is not None:
+                header.setStretchLastSection(False)
+                header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
+                header.setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)
+                header.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
+                header.setSectionResizeMode(3, QHeaderView.ResizeMode.Fixed)
             self.ui.tableWidget.setColumnWidth(3,22)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)

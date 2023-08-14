@@ -2734,14 +2734,30 @@ class editGraphDlg(ArtisanResizeablDialog):
             # Details tab
             self.energy_ui.copyTableButton.setText(QApplication.translate('Button','Copy Table'))
             self.energy_ui.copyTableButton.setToolTip(QApplication.translate('Tooltip','Copy table to clipboard, OPTION or ALT click for tabular text'))
-            self.energy_ui.datatable.horizontalHeaderItem(0).setText(QApplication.translate('Table','Power'))
-            self.energy_ui.datatable.horizontalHeaderItem(1).setText(QApplication.translate('Table','Duration'))
-            self.energy_ui.datatable.horizontalHeaderItem(2).setText('BTU')
-            self.energy_ui.datatable.horizontalHeaderItem(3).setText(QApplication.translate('Table','CO2').replace('CO2','CO₂') + ' (g)')
-            self.energy_ui.datatable.horizontalHeaderItem(4).setText(QApplication.translate('Table','Load'))
-            self.energy_ui.datatable.horizontalHeaderItem(5).setText(QApplication.translate('Table','Source'))
-            self.energy_ui.datatable.horizontalHeaderItem(6).setText(QApplication.translate('Table','Kind'))
-            self.energy_ui.datatable.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+            item0 = self.energy_ui.datatable.horizontalHeaderItem(0)
+            if item0 is not None:
+                item0.setText(QApplication.translate('Table','Power'))
+            item1 = self.energy_ui.datatable.horizontalHeaderItem(1)
+            if item1 is not None:
+                item1.setText(QApplication.translate('Table','Duration'))
+            item2 = self.energy_ui.datatable.horizontalHeaderItem(2)
+            if item2 is not None:
+                item2.setText('BTU')
+            item3 = self.energy_ui.datatable.horizontalHeaderItem(3)
+            if item3 is not None:
+                item3.setText(QApplication.translate('Table','CO2').replace('CO2','CO₂') + ' (g)')
+            item4 = self.energy_ui.datatable.horizontalHeaderItem(4)
+            if item4 is not None:
+                item4.setText(QApplication.translate('Table','Load'))
+            item5 = self.energy_ui.datatable.horizontalHeaderItem(5)
+            if item5 is not None:
+                item5.setText(QApplication.translate('Table','Source'))
+            item6 = self.energy_ui.datatable.horizontalHeaderItem(6)
+            if item6 is not None:
+                item6.setText(QApplication.translate('Table','Kind'))
+            vheader = self.energy_ui.datatable.verticalHeader()
+            if vheader is not None:
+                vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
             # Loads tab
             self.energy_ui.loadsSetDefaultsButton.setText(QApplication.translate('Button','Save Defaults'))
             # hack to access the Qt automatic translation of the RestoreDefaults button
@@ -2917,7 +2933,9 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.energy_ui.datatable.setRowCount(0) # clears the table, but keeps the header intact
         self.energy_ui.datatable.setRowCount(ndata)
 
-        self.energy_ui.datatable.horizontalHeaderItem(2).setText(self.aw.qmc.energyunits[self.aw.qmc.energyresultunit_setup])
+        item2 = self.energy_ui.datatable.horizontalHeaderItem(2)
+        if item2 is not None:
+            item2.setText(self.aw.qmc.energyunits[self.aw.qmc.energyresultunit_setup])
 
         for i in range(ndata):
             if self.btu_list[i]['Kind'] in [0, 2]:  #Preheat Measured, BBP Measured
@@ -2958,7 +2976,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.datatable.setItem(i,6,Kind_widget)
 
         header = self.energy_ui.datatable.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
+        if header is not None:
+            header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
 #        header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 #        self.energy_ui.datatable.resizeColumnsToContents()
 

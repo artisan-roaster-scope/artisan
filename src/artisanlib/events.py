@@ -3442,7 +3442,8 @@ class EventsDlg(ArtisanResizeablDialog):
 
         offset = ''
         factor = ''
-        dialog.applyButton.setEnabled(False)
+        if dialog.applyButton is not None:
+            dialog.applyButton.setEnabled(False)
         if min_text != '' and max_text != '':
             try:
                 min_slider = min(self.E1_min.value(), self.E1_max.value())
@@ -3457,7 +3458,8 @@ class EventsDlg(ArtisanResizeablDialog):
                     if len(res) == 2:
                         factor = f'{res[0]:.4f}'
                         offset = f'{res[1]:.2f}'
-                        dialog.applyButton.setEnabled(True)
+                        if dialog.applyButton is not None:
+                            dialog.applyButton.setEnabled(True)
             except Exception: # pylint: disable=broad-except
                 pass
         dialog.ui.lineEdit_Factor.setText(factor)
@@ -3469,7 +3471,8 @@ class EventsDlg(ArtisanResizeablDialog):
         dialog.ui.lineEdit_SliderValue_min.setText(str(sliderMin))
         dialog.ui.lineEdit_SliderValue_max.setText(str(sliderMax))
         #
-        dialog.applyButton.setEnabled(False)
+        if dialog.applyButton is not None:
+            dialog.applyButton.setEnabled(False)
         # translations
         dialog.ui.label_min.setText(QApplication.translate('Label','Min'))
         dialog.ui.label_max.setText(QApplication.translate('Label','Max'))
@@ -3516,8 +3519,9 @@ class SliderCalculator(ArtisanDialog):
         self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Apply)
         # hack to assign the Apply button the AcceptRole without losing default system translations
         applyButton = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Apply)
-        self.ui.buttonBox.removeButton(applyButton)
-        self.applyButton = self.ui.buttonBox.addButton(applyButton.text(), QDialogButtonBox.ButtonRole.AcceptRole)
+        if applyButton is not None:
+            self.ui.buttonBox.removeButton(applyButton)
+            self.applyButton = self.ui.buttonBox.addButton(applyButton.text(), QDialogButtonBox.ButtonRole.AcceptRole)
 
     @pyqtSlot()
     def accept(self):

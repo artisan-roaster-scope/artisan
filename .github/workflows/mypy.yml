@@ -51,7 +51,7 @@ jobs:
           level: info # info, warning, error
           # Change the current directory to run mypy command.
           # mypy command reads setup.cfg or other settings file in this path.
-          workdir: ./src/
+          workdir: src
 
           reviewdog_flags: -filter-mode=file -fail-on-error
           filter_mode: nofilter
