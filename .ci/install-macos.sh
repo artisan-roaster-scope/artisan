@@ -33,9 +33,9 @@ if [ -n "${PYUPGRADE_V:-}" ]; then
     # add path
     export PATH="$(brew --prefix)/Cellar/python@${PYTHON_V}/${PYUPGRADE_V}/bin:${PATH}"
 
-    ls -l /usr/local/Cellar/python@3.11/3.11.4/
-    ls -l /usr/local/Cellar/python@3.11/3.11.4/bin
-    ls -l /usr/local/Cellar/python@3.11/3.11.4/Frameworks
+    ls -l "$(brew --prefix)/Cellar/python@${PYTHON_V}/${PYUPGRADE_V}"
+    ls -l "$(brew --prefix)/Cellar/python@${PYTHON_V}/${PYUPGRADE_V}/bin"
+    ls -l "$(brew --prefix)/Cellar/python@${PYTHON_V}/${PYUPGRADE_V}/Frameworks"
     echo $PATH
     which python3
     python3 --version
