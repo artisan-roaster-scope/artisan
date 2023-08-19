@@ -31,9 +31,10 @@ if [ -n "${PYUPGRADE_V:-}" ]; then
     # relink Python
     brew unlink python@${PYTHON_V} && brew link --force --overwrite python@${PYTHON_V}
     hash -r
+    brew install jq
     # add path
 #    export PATH="$(brew --prefix)/Cellar/python@${PYTHON_V}/${PYUPGRADE_V}/bin:${PATH}"
-    export PATH="$(brew --cellar python@${PYTHON_V})/bin:${PATH}"
+    export PATH="$(brew --cellar python@${PYTHON_V})/$(brew info --json python@${PYTHON_V} | jq -r '.[0].installed[0].version')/bin:${PATH}"
     echo $PATH
     which python3
     python3 --version
