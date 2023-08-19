@@ -141,11 +141,11 @@ subprocess.check_call(r'cp Wheels/Other/* dist/Wheels/Other',shell = True)
 subprocess.check_call(r'cp Wheels/Roasting/* dist/Wheels/Roasting',shell = True)
 os.chdir('./dist')
 
-try:
-    PYTHONPATH = os.environ['PYTHONPATH'] + r'/'
-except Exception: # pylint: disable=broad-except
-    PYTHONPATH = r'/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/'
-
+#try:
+#    PYTHONPATH = os.environ['PYTHONPATH'] + r'/'
+#except Exception: # pylint: disable=broad-except
+#    PYTHONPATH = r'/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/'
+#
 #try:
 #    PYTHON_V = os.environ["PYTHON_V"]
 #except:

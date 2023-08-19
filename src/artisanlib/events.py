@@ -38,17 +38,17 @@ try:
     from PyQt6.QtWidgets import (QApplication, QCheckBox, QComboBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QWidget, QTabWidget, QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGridLayout, QGroupBox, QTableWidget, QHeaderView, QToolButton) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6 import sip # @UnusedImport @Reimport  @UnresolvedImport
+#    from PyQt6 import sip # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QTimer) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import (QColor, QFont, QIntValidator) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QWidget, QTabWidget, QDialogButtonBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QGridLayout, QGroupBox, QTableWidget, QHeaderView, QToolButton) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    try:
-        from PyQt5 import sip # type: ignore # @Reimport @UnresolvedImport @UnusedImport
-    except ImportError:
-        import sip  # type: ignore # @Reimport @UnresolvedImport @UnusedImport
+#    try:
+#        from PyQt5 import sip # type: ignore # @Reimport @UnresolvedImport @UnusedImport
+#    except ImportError:
+#        import sip  # type: ignore # @Reimport @UnresolvedImport @UnusedImport
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -3492,17 +3492,18 @@ class EventsDlg(ArtisanResizeablDialog):
             layout.setSpacing(7)
         dialog.setFixedHeight(dialog.sizeHint().height())
         dialog.setFixedWidth(dialog.sizeHint().width())
-        res = dialog.exec()
-        #deleteLater() will not work here as the dialog is still bound via the parent
-        #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
-        # the following will immediately release the memory despite this parent link
-        QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
-        try: # sip not supported on older PyQt versions (RPi!)
-            sip.delete(dialog)
-            #print(sip.isdeleted(dialog))
-        except Exception: # pylint: disable=broad-except
-            pass
-        return res
+#        res = dialog.exec()
+#        #deleteLater() will not work here as the dialog is still bound via the parent
+#        #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
+#        # the following will immediately release the memory despite this parent link
+#        QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
+#        try: # sip not supported on older PyQt versions (RPi!)
+#            sip.delete(dialog)
+#            #print(sip.isdeleted(dialog))
+#        except Exception: # pylint: disable=broad-except
+#            pass
+#        return res
+        return dialog.exec()
 
 #########################################################################
 #############  SLIDER Calculator Dialog  ################################

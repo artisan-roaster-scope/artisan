@@ -56,7 +56,7 @@ try:
                                  QHBoxLayout, QVBoxLayout, QHeaderView, QLabel, QLineEdit, QTextEdit, QListView,  # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QToolButton) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6 import sip # @UnusedImport @Reimport  @UnresolvedImport
+#    from PyQt6 import sip # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent, QLocale # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QColor, QIntValidator, QRegularExpressionValidator, QKeySequence, QPalette # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
@@ -64,10 +64,10 @@ except ImportError:
                                  QHBoxLayout, QVBoxLayout, QHeaderView, QLabel, QLineEdit, QTextEdit, QListView, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QSizePolicy, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QToolButton) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    try:
-        from PyQt5 import sip # type: ignore # @Reimport @UnresolvedImport @UnusedImport
-    except ImportError:
-        import sip  # type: ignore # @Reimport @UnresolvedImport @UnusedImport
+#    try:
+#        from PyQt5 import sip # type: ignore # @Reimport @UnresolvedImport @UnusedImport
+#    except ImportError:
+#        import sip  # type: ignore # @Reimport @UnresolvedImport @UnusedImport
 
 
 ########################################################################################
@@ -374,13 +374,13 @@ class volumeCalculatorDlg(ArtisanDialog):
     def inWeight(self,_):
         QTimer.singleShot(1, self.setWidgetInWeight)
         QTimer.singleShot(10, self.resetInVolume)
-        QApplication.processEvents()
+#        QApplication.processEvents()
 
     @pyqtSlot(bool)
     def outWeight(self,_):
         QTimer.singleShot(1, self.setWidgetOutWeight)
         QTimer.singleShot(10, self.resetOutVolume)
-        QApplication.processEvents()
+#        QApplication.processEvents()
 
     def retrieveWeight(self):
         v = self.scale_weight
@@ -5123,17 +5123,18 @@ class editGraphDlg(ArtisanResizeablDialog):
         if layout is not None:
             layout.setSpacing(5)
         dialog.setFixedHeight(dialog.sizeHint().height())
-        res = dialog.exec()
-        #deleteLater() will not work here as the dialog is still bound via the parent
-        #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
-        # the following will immediately release the memory despite this parent link
-        QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
-        try: # sip not supported on older PyQt versions (RPi!)
-            sip.delete(dialog)
-            #print(sip.isdeleted(dialog))
-        except Exception: # pylint: disable=broad-except
-            pass
-        return res
+#        res = dialog.exec()
+#        #deleteLater() will not work here as the dialog is still bound via the parent
+#        #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
+#        # the following will immediately release the memory despite this parent link
+#        QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
+#        try: # sip not supported on older PyQt versions (RPi!)
+#            sip.delete(dialog)
+#            #print(sip.isdeleted(dialog))
+#        except Exception: # pylint: disable=broad-except
+#            pass
+#        return res
+        return dialog.exec()
 
 class StockComboBox(MyQComboBox):
     def __init__(self, unitsComboBox:QComboBox, *args, **kwargs) -> None:

@@ -35,7 +35,7 @@ try:
     )
     from PyQt6.QtCore import Qt, pyqtSlot, QSize, QSettings # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QIcon # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6 import sip # @UnusedImport @Reimport  @UnresolvedImport
+#    from PyQt6 import sip # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #pylint: disable = E, W, R, C
     from PyQt5.QtWidgets import (  # type: ignore
@@ -50,10 +50,10 @@ except Exception: # pylint: disable=broad-except
     )
     from PyQt5.QtCore import Qt, pyqtSlot, QSize, QSettings # type: ignore  # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QIcon # type: ignore  # @UnusedImport @Reimport  @UnresolvedImport
-    try:
-        from PyQt5 import sip # type: ignore  # @Reimport @UnresolvedImport @UnusedImport
-    except Exception: # pylint: disable=broad-except
-        import sip  # type: ignore # @Reimport @UnresolvedImport @UnusedImport
+#    try:
+#        from PyQt5 import sip # type: ignore  # @Reimport @UnresolvedImport @UnusedImport
+#    except Exception: # pylint: disable=broad-except
+#        import sip  # type: ignore # @Reimport @UnresolvedImport @UnusedImport
 
 import logging
 from artisanlib.util import comma2dot
@@ -411,13 +411,14 @@ def openCustomBlendDialog(window:'QWidget', aw:'ApplicationWindow', inWeight:flo
         blend_res = None
         total_weight = inWeight
 
-    #deleteLater() will not work here as the dialog is still bound via the parent
-    #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
-    # the following will immediately release the memory despite this parent link
-    QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
-    try: # sip not supported on older PyQt versions (RPi!)
-        sip.delete(dialog)
-        #print(sip.isdeleted(dialog))
-    except Exception: # pylint: disable=broad-except
-        pass
+#    #deleteLater() will not work here as the dialog is still bound via the parent
+#    #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
+#    # the following will immediately release the memory despite this parent link
+#    QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
+#    try: # sip not supported on older PyQt versions (RPi!)
+#        sip.delete(dialog)
+#        #print(sip.isdeleted(dialog))
+#    except Exception: # pylint: disable=broad-except
+#        pass
+
     return blend_res, total_weight

@@ -2102,14 +2102,14 @@ class CurvesDlg(ArtisanDialog):
         self.endEdit.setDisabled(True)
         try:
             if self.polyfitCheck.isChecked() and len(self.aw.qmc.timex) > 2:
-                QApplication.processEvents()
+#                QApplication.processEvents()
                 res = self.doPolyfit()
                 if not res:
                     self.polyfitCheck.setChecked(False)
                     self.resultWidget.setText('')
                     self.resultWidget.repaint()
                     self.aw.qmc.resetlines()
-                QApplication.processEvents()
+#                QApplication.processEvents()
             else:
                 self.polyfitCheck.setChecked(False)
                 self.resultWidget.setText('')

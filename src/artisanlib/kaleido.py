@@ -276,7 +276,7 @@ class KaleidoPort:
             _log.debug('TU response timeout')
         # send SC (start guard)
         try:
-            # ping was successfull, now we send the temperature mode via the queue
+            # ping was successfull, now we send the start guard via the queue
             await self.ws_write_process(websocket, self.create_msg('SC', 'AR'))
         except asyncio.TimeoutError:
             _log.debug('SC AR timeout')

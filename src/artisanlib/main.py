@@ -2650,6 +2650,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     color: '#147bb3';
                     background-color: white;
                 }
+                QPushButton:!enabled {
+                    color: darkgrey;
+                    background-color: #E0E0E0;
+                }
                 QPushButton:pressed {
                     color: 116D98;
                     background-color: #EEEEEE;
@@ -2668,6 +2672,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     color: #cc0f50;
                     background-color: white;
 
+                }
+                QPushButton:!enabled {
+                    color: darkgrey;
+                    background-color: #E0E0E0;
                 }
                 QPushButton:pressed {
                     color: #c70d49;
@@ -2756,6 +2764,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     color: white;
                     background-color: #147bb3;
                 }
+                QPushButton:!enabled {
+                    color: darkgrey;
+                    background-color: #E0E0E0;
+                }
                 QPushButton:pressed {
                     color: #EEEEEE;
                     background-color: #116D98;
@@ -2773,6 +2785,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     font-weight: bold;
                     color: white;
                     background-color: #cc0f50;
+                }
+                QPushButton:!enabled {
+                    color: darkgrey;
+                    background-color: #E0E0E0;
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
@@ -19161,7 +19177,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         # now wait until the current sampling thread is terminated
         while self.qmc.flagsamplingthreadrunning:
             QApplication.processEvents()
-            libtime.sleep(.1)
+            libtime.sleep(.01)
         if self.ser.R1 is not None:
             self.ser.R1 = None
         try:
@@ -22119,7 +22135,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         if self.error_dlg is not None:
             self.error_dlg.raise_()
             self.error_dlg.activateWindow()
-            QApplication.processEvents()
+#            QApplication.processEvents()
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -22132,7 +22148,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         if self.serial_dlg is not None:
             self.serial_dlg.raise_()
             self.serial_dlg.activateWindow()
-            QApplication.processEvents()
+#            QApplication.processEvents()
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -22142,7 +22158,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         platformDLG.setModal(False)
         platformDLG.show()
         platformDLG.activateWindow()
-        QApplication.processEvents()
+#        QApplication.processEvents()
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -22155,7 +22171,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         if self.message_dlg is not None:
             self.message_dlg.raise_()
             self.message_dlg.activateWindow()
-            QApplication.processEvents()
+#            QApplication.processEvents()
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -22525,16 +22541,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.color.stopbits = int(str(dialog.color_stopbitsComboBox.currentText()))
             self.color.parity = str(dialog.color_parityComboBox.currentText())
             self.color.timeout = self.float2float(toFloat(comma2dot(str(dialog.color_timeoutEdit.text()))))
-        # deleteLater() will not work here as the dialog is still bound via the parent
-        dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
-        # the following will immediately release the memory despite this parent link
-        QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
-        try:
-            sip.delete(dialog)
-            #print(sip.isdeleted(dialog))
-        except Exception: # pylint: disable=broad-except
-            pass
-        #self.closeEventSettings() # save all app settings
+#        # deleteLater() will not work here as the dialog is still bound via the parent
+#        dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
+#        # the following will immediately release the memory despite this parent link
+#        QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
+#        try:
+#            sip.delete(dialog)
+#            #print(sip.isdeleted(dialog))
+#        except Exception: # pylint: disable=broad-except
+#            pass
+#        #self.closeEventSettings() # save all app settings
 
     def toggleHottopControl(self):
         if self.HottopControlActive:
@@ -22600,7 +22616,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 dialog.setModal(False)
                 dialog.show()
                 dialog.setFixedSize(dialog.size())
-                QApplication.processEvents()
+#                QApplication.processEvents()
         # Hottop
         elif self.qmc.device == 53:
             modifiers = QApplication.keyboardModifiers()
@@ -22665,7 +22681,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         dialog = calculatorDlg(self,self)
         dialog.setModal(False)
         dialog.show()
-        QApplication.processEvents()
+#        QApplication.processEvents()
 
     @pyqtSlot()
     @pyqtSlot(bool)
