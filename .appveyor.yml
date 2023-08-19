@@ -20,7 +20,7 @@ environment:
   # Set the Appveyor Python version for windows, macos and linux here. Does not affect windows_legacy.
   PYTHON_V: 3.11
   # Upgrade to specific version (for platforms supporting upgrade). Upgrade skipped if env var is missing or blank.
-#  PYUPGRADE_V: 3.11.3
+  PYUPGRADE_V: 3.11.4
 
   matrix:
   - job_name: windows_legacy
@@ -182,7 +182,7 @@ for:
 
   deploy_script:
     - cmd: bash ../.ci/upload.sh artisan-*.zip
-        
+
 #  # uncomment this section for remote desktop connection to build image
 #  on_finish:
 #    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
@@ -299,4 +299,3 @@ for:
 #  on_finish:
 #    - sh: export APPVEYOR_SSH_BLOCK=true
 #    - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
-
