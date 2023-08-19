@@ -32,9 +32,10 @@ if [ -n "${PYUPGRADE_V:-}" ]; then
     brew unlink python@${PYTHON_V} && brew link --force --overwrite python@${PYTHON_V}
     hash -r
     # add path
-    export PATH="$(brew --prefix)/Cellar/python@${PYTHON_V}/${PYUPGRADE_V}/bin:${PATH}"
+#    export PATH="$(brew --prefix)/Cellar/python@${PYTHON_V}/${PYUPGRADE_V}/bin:${PATH}"
+    export PATH="$(brew --cellar python@${PYTHON_V}/${PYUPGRADE_V})/bin:${PATH}"
 
-    ls -l "$(brew --prefix)/Cellar/python@${PYTHON_V}/"
+#    ls -l "$(brew --prefix)/Cellar/python@${PYTHON_V}/"
 #    ls -l "$(brew --prefix)/Cellar/python@${PYTHON_V}/${PYUPGRADE_V}"
 #    ls -l "$(brew --prefix)/Cellar/python@${PYTHON_V}/${PYUPGRADE_V}/bin"
 #    ls -l "$(brew --prefix)/Cellar/python@${PYTHON_V}/${PYUPGRADE_V}/Frameworks"
