@@ -29,9 +29,14 @@ if [ -n "${PYUPGRADE_V:-}" ]; then
     # brew update Python
     brew update && brew upgrade python
     # relink Python
-    brew unlink python@${PYTHON_V} && brew link --force python@${PYTHON_V}
+    brew unlink python@${PYTHON_V} && brew link --force --overwrite python@${PYTHON_V}
     # add path
     export PATH="$(brew --prefix)/Cellar/python@${PYTHON_V}/${PYUPGRADE_V}/bin:${PATH}"
+
+    echo $PATH
+    which python3
+    python3 --version
+
     # create new venv
     python3 -m venv /Users/appveyor/venv${PYUPGRADE_V}
     source /Users/appveyor/venv${PYUPGRADE_V}/bin/activate
