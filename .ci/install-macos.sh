@@ -34,7 +34,7 @@ if [ -n "${PYUPGRADE_V:-}" ]; then
     # add path
     export PATH="$(brew --prefix)/Cellar/python@${PYTHON_V}/${PYUPGRADE_V}/bin:${PATH}"
 
-    ls -l "$(brew --prefix)/Cellar/python@${PYTHON_V}/
+    ls -l "$(brew --prefix)/Cellar/python@${PYTHON_V}/"
 #    ls -l "$(brew --prefix)/Cellar/python@${PYTHON_V}/${PYUPGRADE_V}"
 #    ls -l "$(brew --prefix)/Cellar/python@${PYTHON_V}/${PYUPGRADE_V}/bin"
 #    ls -l "$(brew --prefix)/Cellar/python@${PYTHON_V}/${PYUPGRADE_V}/Frameworks"
