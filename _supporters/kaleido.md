@@ -33,3 +33,6 @@ Press CMD-2 to switch to the reduced button set; CMD-1 switches back to the full
 
 **Watch out!** The legacy settings do not apply for the `Pro`version. Please use the configuration file provided by the manufacturer for connecting those machines.
 {: .notice--primary}
+
+**Watch out!** The legacy settings of Artisan use a serial speed of 9600. Some of the newer legacy machines instead communicate at 57600 baud. Change the baudrate using menu `Config >> Port` to 57600 if needed.
+{: .notice--primary}
