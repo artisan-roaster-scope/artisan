@@ -10,9 +10,9 @@ Artisan official and continuous install packages for **Windows**, **macOS** and 
 
 Users may [fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) the Artisan repository to their own GitHub account and then build Artisan install packages using their own AppVeyor account.
 
-Since Artisan is officially built and packaged on AppVeyor, the process works straight out of the box using the files in the Artisan repository.  Follow the instructions below. 
+Since Artisan is officially built and packaged on AppVeyor, the process works straight out of the box using the files in the Artisan repository.  Follow the instructions below.  They apply to public GitHub repositories. 
 
-While this document is presumed free of errors as of July 2023, there is no guarantee that is is correct as you read it.  If you find an error or discrepancy please start a [new general discussion](https://github.com/artisan-roaster-scope/artisan/discussions/new?category=general) on GitHub.
+While this document is presumed free of errors as of August 2023, there is no guarantee that it is correct as you read it.  If you find an error or discrepancy please start a [new general discussion](https://github.com/artisan-roaster-scope/artisan/discussions/new?category=general) on GitHub.
 
 *Note: Building Artisan install packages on a local machine cannot be done without modifying the repository files. The Artisan team does not have the resources to support users making local builds.*
 
@@ -33,10 +33,11 @@ Whenever a commit is made to the repository a number of actions occur. On GitHub
 1. [Create](https://ci.appveyor.com/signup) an account on AppVeyor.  There are multiple ways to create an account, it is recommended to select the plan "FREE - for open-source projects" then click the GitHub button.  A confirmation window will open.  Click **Authorize AppVeyor**.
 1. Click **NEW PROJECT**.  On the next page click **Authorize GitHub** under "Authorize as OAuth App".  Click **Authorize AppVeyor** in the confirmation page that opens.  
 1. Appveyor should now ask "Select repository for your new project".  Click on the repository created earlier by the fork.
+1. To publish the build files to the GitHub releases page requires generating a GitHub personal access token and storing it in the Appveyor project's environment.  [Generate a new token](https://github.com/settings/tokens) with minimally **repo:status**, **repo_deployment** and **public_repo** permissions.  Copy the token.  Go now to [Appveyor projects](https://ci.appveyor.com/projects), click on the project, then click **Settings** followed by **Environment**.  Under "Environment Variables" click **Add Variable**.  Set the **name** field to "GITHUB_TOKEN" and paste the token into the **value** field.  Scroll to the bottom of the page and click **Save**.
 1. This completes the setup required to build installation packages on AppVeyor.
 
 #### Start a CI Build.
-Make a commit to your GitHub repository.  If working ina locl clone do not forget to push the commit.  This will trigger the GitHub actions listed above including starting the CI build.    
+Make a commit to your GitHub repository.  If working in a local clone do not forget to push the commit.  This will trigger the GitHub actions listed above including starting the CI build.    
 
 If you encounter this message on AppVeyor: *"There was an error while trying to complete the current operation. Please contact AppVeyor support."* you must send an email to support@appveyor.com asking to have your account enabled.
 
