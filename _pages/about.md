@@ -19,10 +19,6 @@ gallery:
     image_path: /assets/images/phidgets-logo.jpg
     alt: "Phidgets"
     title: "Phidgets"
-  - url: https://www.probat.com/
-    image_path: /assets/images/probat-logo.jpg
-    alt: "Probat"
-    title: "Probat"
   - url: https://www.yoctopuce.com/
     image_path: /assets/images/yoctopuce-logo.png
     alt: "Yoctopuce"
@@ -103,6 +99,10 @@ gallery:
     image_path: /assets/images/typhoon-logo.png
     alt: "Typhoon"
     title: "Typhoon"
+  - url: https://www.probat.com/
+    image_path: /assets/images/probat-logo.jpg
+    alt: "Probat"
+    title: "Probat"
 -->
 
 Artisan is an open-source software that helps coffee roasters record, analyze, and control roast profiles. This software can automate the creation of roasting metrics to help make decisions that influence the final coffee flavor.
