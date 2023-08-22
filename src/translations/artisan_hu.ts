@@ -4,72 +4,72 @@
   <context>
     <name>About</name>
     <message>
-      <location filename="../artisanlib/main.py" line="4225" />
+      <location filename="../artisanlib/main.py" line="4268" />
       <source>Release Sponsor</source>
       <translation>Engedje el a Szponzort</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22107" />
+      <location filename="../artisanlib/main.py" line="22235" />
       <source>About</source>
       <translation>Névjegy</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22126" />
+      <location filename="../artisanlib/main.py" line="22254" />
       <source>Core Developers</source>
       <translation>Vezető Fejlesztők</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22128" />
+      <location filename="../artisanlib/main.py" line="22256" />
       <source>Contributors</source>
       <translation>Közreműködők</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22131" />
+      <location filename="../artisanlib/main.py" line="22259" />
       <source>License</source>
       <translation>Engedély</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22152" />
+      <location filename="../artisanlib/main.py" line="22280" />
       <source>There was a problem retrieving the latest version information.  Please check your Internet connection, try again later, or check manually.</source>
       <translation>Hiba történt a legfrissebb verzióinformációk lekérése során. Kérjük, ellenőrizze internetkapcsolatát, próbálkozzon újra később, vagy ellenőrizze manuálisan.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22161" />
+      <location filename="../artisanlib/main.py" line="22289" />
       <source>A new release is available.</source>
       <translation>Új kiadás érhető el.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22163" />
+      <location filename="../artisanlib/main.py" line="22291" />
       <source>Show Change list</source>
       <translation>A Változtatási lista megjelenítése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22165" />
+      <location filename="../artisanlib/main.py" line="22293" />
       <source>Download Release</source>
       <translation>Letöltés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22167" />
+      <location filename="../artisanlib/main.py" line="22295" />
       <source>You are using the latest release.</source>
       <translation>Ön a legújabb kiadást használja.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22169" />
+      <location filename="../artisanlib/main.py" line="22297" />
       <source>You are using a beta continuous build.</source>
       <translation>Béta folyamatos felépítést használ.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22170" />
+      <location filename="../artisanlib/main.py" line="22298" />
       <source>You will see a notice here once a new official release is available.</source>
       <translation>Ha megjelenik egy új hivatalos kiadás, itt értesítést fog látni.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22178" />
+      <location filename="../artisanlib/main.py" line="22306" />
       <source>Update status</source>
       <translation>Állapot frissítése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="7938" />
+      <location filename="../artisanlib/canvas.py" line="7945" />
       <source>sponsored by {}</source>
       <translation>támogatta {}</translation>
     </message>
@@ -81,62 +81,62 @@
   <context>
     <name>AddlInfo</name>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10188" />
+      <location filename="../artisanlib/canvas.py" line="10196" />
       <source>Roast of the Day</source>
       <translation>A nap sültje</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10246" />
+      <location filename="../artisanlib/canvas.py" line="10254" />
       <source>Screen Size</source>
       <translation>Kijelzo méret</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10255" />
+      <location filename="../artisanlib/canvas.py" line="10263" />
       <source>Density Green</source>
       <translation>Sűrűség zöld</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10258" />
+      <location filename="../artisanlib/canvas.py" line="10266" />
       <source>Moisture Green</source>
       <translation>Nedvességzöld</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10264" />
+      <location filename="../artisanlib/canvas.py" line="10272" />
       <source>Batch Size</source>
       <translation>Csomó méret</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10271" />
+      <location filename="../artisanlib/canvas.py" line="10279" />
       <source>Density Roasted</source>
       <translation>Sűrűség sült</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10274" />
+      <location filename="../artisanlib/canvas.py" line="10282" />
       <source>Moisture Roasted</source>
       <translation>Párolt pára</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10276" />
+      <location filename="../artisanlib/canvas.py" line="10284" />
       <source>Whole Color</source>
       <translation>Teljes szín</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10279" />
+      <location filename="../artisanlib/canvas.py" line="10287" />
       <source>Ground Color</source>
       <translation>Alapszín</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10282" />
+      <location filename="../artisanlib/canvas.py" line="10290" />
       <source>Energy</source>
       <translation>Energia</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10287" />
+      <location filename="../artisanlib/canvas.py" line="10295" />
       <source>CO2</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10291" />
+      <location filename="../artisanlib/canvas.py" line="10299" />
       <source>AUC</source>
       <translation type="unfinished" />
     </message>
@@ -148,101 +148,101 @@
   <context>
     <name>Button</name>
     <message>
-      <location filename="../artisanlib/colors.py" line="575" />
-      <location filename="../artisanlib/designer.py" line="241" />
-      <location filename="../artisanlib/phases.py" line="117" />
-      <location filename="../artisanlib/roast_properties.py" line="3700" />
-      <location filename="../artisanlib/roast_properties.py" line="2755" />
-      <location filename="../artisanlib/roast_properties.py" line="2753" />
-      <location filename="../artisanlib/roast_properties.py" line="2742" />
-      <location filename="../artisanlib/wheels.py" line="52" />
-      <location filename="../artisanlib/axis.py" line="315" />
+      <location filename="../artisanlib/colors.py" line="576" />
+      <location filename="../artisanlib/designer.py" line="252" />
+      <location filename="../artisanlib/phases.py" line="122" />
+      <location filename="../artisanlib/roast_properties.py" line="3733" />
+      <location filename="../artisanlib/roast_properties.py" line="2782" />
+      <location filename="../artisanlib/roast_properties.py" line="2780" />
+      <location filename="../artisanlib/roast_properties.py" line="2769" />
+      <location filename="../artisanlib/wheels.py" line="54" />
+      <location filename="../artisanlib/axis.py" line="320" />
       <source>Restore Defaults</source>
       <translation>Alapértékek visszaállítása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="239" />
-      <location filename="../artisanlib/wheels.py" line="134" />
-      <location filename="../artisanlib/wheels.py" line="53" />
+      <location filename="../artisanlib/designer.py" line="247" />
+      <location filename="../artisanlib/wheels.py" line="145" />
+      <location filename="../artisanlib/wheels.py" line="55" />
       <source>Close</source>
       <translation type="unfinished">Bezárás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="90" />
+      <location filename="../artisanlib/wheels.py" line="94" />
       <source>Line Color</source>
       <translation type="unfinished">Vonal színe</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="93" />
+      <location filename="../artisanlib/wheels.py" line="97" />
       <source>Text Color</source>
       <translation>Szöveg szín</translation>
     </message>
     <message>
       <location filename="../artisanlib/cup_profile.py" line="65" />
-      <location filename="../artisanlib/devices.py" line="262" />
+      <location filename="../artisanlib/devices.py" line="264" />
       <location filename="../artisanlib/alarms.py" line="74" />
-      <location filename="../artisanlib/roast_properties.py" line="5166" />
-      <location filename="../artisanlib/roast_properties.py" line="777" />
-      <location filename="../artisanlib/events.py" line="584" />
-      <location filename="../artisanlib/comparator.py" line="813" />
-      <location filename="../artisanlib/wheels.py" line="103" />
+      <location filename="../artisanlib/roast_properties.py" line="5216" />
+      <location filename="../artisanlib/roast_properties.py" line="782" />
+      <location filename="../artisanlib/events.py" line="587" />
+      <location filename="../artisanlib/comparator.py" line="819" />
+      <location filename="../artisanlib/wheels.py" line="107" />
       <source>Add</source>
       <translation type="unfinished">Hozzáadás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="115" />
+      <location filename="../artisanlib/wheels.py" line="122" />
       <source>Save File</source>
       <translation type="unfinished">File Mentése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="120" />
+      <location filename="../artisanlib/wheels.py" line="128" />
       <source>Save Img</source>
       <translation type="unfinished">Kép Mentése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="135" />
+      <location filename="../artisanlib/wheels.py" line="146" />
       <source>Open</source>
       <translation type="unfinished">Megnyitás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="280" />
+      <location filename="../artisanlib/devices.py" line="284" />
       <location filename="../artisanlib/alarms.py" line="85" />
-      <location filename="../artisanlib/curves.py" line="1285" />
-      <location filename="../artisanlib/roast_properties.py" line="5168" />
-      <location filename="../artisanlib/roast_properties.py" line="782" />
+      <location filename="../artisanlib/curves.py" line="1299" />
+      <location filename="../artisanlib/roast_properties.py" line="5218" />
+      <location filename="../artisanlib/roast_properties.py" line="787" />
       <location filename="../artisanlib/background.py" line="87" />
-      <location filename="../artisanlib/events.py" line="589" />
-      <location filename="../artisanlib/comparator.py" line="816" />
-      <location filename="../artisanlib/wheels.py" line="428" />
+      <location filename="../artisanlib/events.py" line="593" />
+      <location filename="../artisanlib/comparator.py" line="822" />
+      <location filename="../artisanlib/wheels.py" line="443" />
       <source>Delete</source>
       <translation type="unfinished">Törlés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3251" />
-      <location filename="../artisanlib/wheels.py" line="431" />
+      <location filename="../artisanlib/main.py" line="3288" />
+      <location filename="../artisanlib/wheels.py" line="446" />
       <source>Update</source>
       <translation>Frissítés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="152" />
+      <location filename="../artisanlib/devices.py" line="154" />
       <location filename="../artisanlib/devices.py" line="141" />
-      <location filename="../artisanlib/wheels.py" line="433" />
+      <location filename="../artisanlib/wheels.py" line="448" />
       <source>Select</source>
       <translation type="unfinished">Kiválasztás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="456" />
+      <location filename="../artisanlib/wheels.py" line="471" />
       <source>Set Color</source>
       <translation type="unfinished">Szín beállítás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1150" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3944" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2447" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2445" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1968" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1341" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1339" />
+      <location filename="../artisanlib/curves.py" line="1164" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3956" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2457" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2455" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1978" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1349" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1347" />
       <location filename="../artisanlib/pid_dialogs.py" line="265" />
       <location filename="../artisanlib/pid_dialogs.py" line="95" />
       <source>Set</source>
@@ -250,29 +250,29 @@
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="95" />
-      <location filename="../artisanlib/curves.py" line="1283" />
+      <location filename="../artisanlib/curves.py" line="1297" />
       <location filename="../artisanlib/background.py" line="85" />
-      <location filename="../artisanlib/events.py" line="639" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2093" />
+      <location filename="../artisanlib/events.py" line="646" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2103" />
       <location filename="../artisanlib/pid_dialogs.py" line="505" />
       <source>Load</source>
       <translation type="unfinished">Megnyitás</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="99" />
-      <location filename="../artisanlib/events.py" line="637" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2095" />
+      <location filename="../artisanlib/events.py" line="644" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2105" />
       <location filename="../artisanlib/pid_dialogs.py" line="509" />
       <source>Save</source>
       <translation type="unfinished">Mentés</translation>
     </message>
     <message>
       <location filename="../plus/login.py" line="101" />
-      <location filename="../artisanlib/dialogs.py" line="75" />
-      <location filename="../artisanlib/roast_properties.py" line="5175" />
+      <location filename="../artisanlib/dialogs.py" line="90" />
+      <location filename="../artisanlib/roast_properties.py" line="5225" />
       <location filename="../artisanlib/comm.py" line="198" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2109" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1254" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2119" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1262" />
       <location filename="../artisanlib/pid_dialogs.py" line="529" />
       <source>OK</source>
       <translation>OK</translation>
@@ -293,276 +293,276 @@
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1243" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1251" />
       <source>Read Ra/So values</source>
       <translation type="unfinished">Ra/So értékek Olvasása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2105" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1245" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2115" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1253" />
       <source>RampSoak ON</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2107" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1247" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2117" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1255" />
       <source>RampSoak OFF</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2110" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1249" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2120" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1257" />
       <source>PID OFF</source>
       <translation type="unfinished">PID KI</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2112" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1251" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2122" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1259" />
       <source>PID ON</source>
       <translation type="unfinished">PID BE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1265" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1273" />
       <source>Write SV</source>
       <translation type="unfinished">SV Írása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1276" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1284" />
       <source>Read SV</source>
       <translation type="unfinished">SV Olvasása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1291" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1299" />
       <source>Set p</source>
       <translation type="unfinished">p Beállítása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1293" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1301" />
       <source>Set i</source>
       <translation type="unfinished">i Beállítása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1295" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1303" />
       <source>Set d</source>
       <translation type="unfinished">d Beállítása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2393" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1309" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2403" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1317" />
       <source>Autotune ON</source>
       <translation type="unfinished">Autotune BE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2395" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1311" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2405" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1319" />
       <source>Autotune OFF</source>
       <translation type="unfinished">Autotune KI</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1313" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1321" />
       <source>Read PID Values</source>
       <translation type="unfinished">PID Értékek beolvasása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="4021" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2451" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2449" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1345" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1343" />
+      <location filename="../artisanlib/pid_dialogs.py" line="4033" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2461" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2459" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1353" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1351" />
       <source>Read</source>
       <translation type="unfinished">Olvasás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2461" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1355" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2471" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1363" />
       <source>Set ET PID to 1 decimal point</source>
       <translation>Állítsa az ET PID értékét 1 tizedesjegyre</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2463" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1357" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2473" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1365" />
       <source>Set BT PID to 1 decimal point</source>
       <translation>Állítsa a BT PID értékét 1 tizedesjegyre</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2097" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2107" />
       <source>Write All</source>
       <translation>Írj mindent</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2101" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2111" />
       <source>Read RS values</source>
       <translation>Olvassa el az RS értékeket</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2103" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2113" />
       <source>Write RS values</source>
       <translation>Írjon RS értékeket</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2180" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2190" />
       <source>Write SV1</source>
       <translation>Írja SV1</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2182" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2192" />
       <source>Write SV2</source>
       <translation>Írja SV2</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2184" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2194" />
       <source>Write SV3</source>
       <translation>Írja SV3</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2186" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2196" />
       <source>Write SV4</source>
       <translation>Írj SV4-et</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2188" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2198" />
       <source>Write SV5</source>
       <translation>Írja SV5</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2190" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2200" />
       <source>Write SV6</source>
       <translation>Írja az SV6-ot</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2192" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2202" />
       <source>Write SV7</source>
       <translation>Írj SV7-et</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2271" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2281" />
       <source>Read SV (7-0)</source>
       <translation>Olvassa el az SV-t (7-0)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2273" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2283" />
       <source>Write SV (7-0)</source>
       <translation>Írjon SV (7-0)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2375" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2385" />
       <source>pid 1</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2377" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2387" />
       <source>pid 2</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2379" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2389" />
       <source>pid 3</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2381" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2391" />
       <source>pid 4</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2383" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2393" />
       <source>pid 5</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2385" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2395" />
       <source>pid 6</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2387" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2397" />
       <source>pid 7</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2389" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2399" />
       <source>Read PIDs</source>
       <translation>Olvassa el a PID-ket</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2391" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2401" />
       <source>Write PIDs</source>
       <translation>PID-k írása</translation>
     </message>
     <message>
       <location filename="../plus/login.py" line="106" />
-      <location filename="../artisanlib/dialogs.py" line="76" />
-      <location filename="../artisanlib/roast_properties.py" line="5176" />
+      <location filename="../artisanlib/dialogs.py" line="91" />
+      <location filename="../artisanlib/roast_properties.py" line="5226" />
       <location filename="../artisanlib/comm.py" line="199" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2397" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2407" />
       <source>Cancel</source>
       <translation>Mégsem</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2465" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2475" />
       <source>Set ET PID to MM:SS time units</source>
       <translation type="unfinished">KÖRNY. HŐ PID beállítása PP:MM időformátumba</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="4022" />
+      <location filename="../artisanlib/pid_dialogs.py" line="4034" />
       <source>Write</source>
       <translation>Írás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/transposer.py" line="130" />
-      <location filename="../artisanlib/devices.py" line="276" />
-      <location filename="../artisanlib/devices.py" line="248" />
-      <location filename="../artisanlib/devices.py" line="149" />
-      <location filename="../artisanlib/alarms.py" line="110" />
-      <location filename="../artisanlib/curves.py" line="796" />
-      <location filename="../artisanlib/roast_properties.py" line="2718" />
-      <location filename="../artisanlib/ports.py" line="840" />
-      <location filename="../artisanlib/events.py" line="901" />
-      <location filename="../artisanlib/events.py" line="603" />
-      <location filename="../artisanlib/events.py" line="244" />
-      <location filename="../artisanlib/autosave.py" line="88" />
+      <location filename="../artisanlib/transposer.py" line="132" />
+      <location filename="../artisanlib/devices.py" line="280" />
+      <location filename="../artisanlib/devices.py" line="250" />
+      <location filename="../artisanlib/devices.py" line="151" />
+      <location filename="../artisanlib/alarms.py" line="111" />
+      <location filename="../artisanlib/curves.py" line="810" />
+      <location filename="../artisanlib/roast_properties.py" line="2727" />
+      <location filename="../artisanlib/ports.py" line="843" />
+      <location filename="../artisanlib/events.py" line="909" />
+      <location filename="../artisanlib/events.py" line="610" />
+      <location filename="../artisanlib/events.py" line="245" />
+      <location filename="../artisanlib/autosave.py" line="96" />
       <source>Help</source>
       <translation type="unfinished">Súgó</translation>
     </message>
     <message>
-      <location filename="../artisanlib/autosave.py" line="97" />
-      <location filename="../artisanlib/autosave.py" line="91" />
+      <location filename="../artisanlib/autosave.py" line="105" />
+      <location filename="../artisanlib/autosave.py" line="99" />
       <source>Path</source>
       <translation type="unfinished">Elérési út</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="258" />
+      <location filename="../artisanlib/devices.py" line="260" />
       <location filename="../artisanlib/alarms.py" line="90" />
-      <location filename="../artisanlib/curves.py" line="77" />
-      <location filename="../artisanlib/roast_properties.py" line="2726" />
-      <location filename="../artisanlib/roast_properties.py" line="797" />
-      <location filename="../artisanlib/roast_properties.py" line="787" />
+      <location filename="../artisanlib/curves.py" line="78" />
+      <location filename="../artisanlib/roast_properties.py" line="2735" />
+      <location filename="../artisanlib/roast_properties.py" line="802" />
+      <location filename="../artisanlib/roast_properties.py" line="792" />
       <location filename="../artisanlib/background.py" line="179" />
       <location filename="../artisanlib/background.py" line="168" />
-      <location filename="../artisanlib/events.py" line="580" />
+      <location filename="../artisanlib/events.py" line="583" />
       <source>Copy Table</source>
       <translation>Táblázat másolása</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="79" />
-      <location filename="../artisanlib/events.py" line="594" />
+      <location filename="../artisanlib/events.py" line="599" />
       <source>Insert</source>
       <translation>Helyezze be</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="616" />
+      <location filename="../artisanlib/events.py" line="623" />
       <source>&lt;&lt; Store Palette</source>
       <translation>&lt;&lt; Paletta tárolása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="618" />
+      <location filename="../artisanlib/events.py" line="625" />
       <source>Activate Palette &gt;&gt;</source>
       <translation>Aktiválja a palettát &gt;&gt;</translation>
     </message>
     <message>
-      <location filename="../artisanlib/transposer.py" line="128" />
-      <location filename="../artisanlib/designer.py" line="240" />
-      <location filename="../artisanlib/events.py" line="1042" />
+      <location filename="../artisanlib/transposer.py" line="126" />
+      <location filename="../artisanlib/designer.py" line="249" />
+      <location filename="../artisanlib/events.py" line="1051" />
       <source>Apply</source>
       <translation>Alkalmaz</translation>
     </message>
@@ -573,8 +573,8 @@
       <translation>Rajt</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1002" />
-      <location filename="../artisanlib/ports.py" line="722" />
+      <location filename="../artisanlib/ports.py" line="1005" />
+      <location filename="../artisanlib/ports.py" line="724" />
       <source>Scan</source>
       <translation>Letapogatás</translation>
     </message>
@@ -604,86 +604,86 @@
       <translation type="unfinished">Jobbra</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="129" />
+      <location filename="../artisanlib/roast_properties.py" line="132" />
       <source>unit</source>
       <translation>Mértékegység</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1159" />
-      <location filename="../artisanlib/roast_properties.py" line="183" />
+      <location filename="../artisanlib/roast_properties.py" line="1166" />
+      <location filename="../artisanlib/roast_properties.py" line="186" />
       <source>in</source>
       <translation type="unfinished">be</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1169" />
-      <location filename="../artisanlib/roast_properties.py" line="256" />
+      <location filename="../artisanlib/roast_properties.py" line="1176" />
+      <location filename="../artisanlib/roast_properties.py" line="259" />
       <source>out</source>
       <translation type="unfinished">ki</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="757" />
+      <location filename="../artisanlib/roast_properties.py" line="762" />
       <source>Cluster</source>
       <translation>Fürt</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="115" />
-      <location filename="../artisanlib/roast_properties.py" line="762" />
+      <location filename="../artisanlib/alarms.py" line="116" />
+      <location filename="../artisanlib/roast_properties.py" line="767" />
       <source>Clear</source>
       <translation>Egyértelmű</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="767" />
+      <location filename="../artisanlib/roast_properties.py" line="772" />
       <source>Create Alarms</source>
       <translation>Riasztások létrehozása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="772" />
+      <location filename="../artisanlib/roast_properties.py" line="777" />
       <source>Order</source>
       <translation type="unfinished">Sorrend</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="967" />
+      <location filename="../artisanlib/roast_properties.py" line="972" />
       <source>calc</source>
       <translation>számított</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1185" />
-      <location filename="../artisanlib/roast_properties.py" line="1179" />
+      <location filename="../artisanlib/roast_properties.py" line="1192" />
+      <location filename="../artisanlib/roast_properties.py" line="1186" />
       <source>scan</source>
       <translation>letapogatás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1196" />
+      <location filename="../artisanlib/roast_properties.py" line="1203" />
       <source>update</source>
       <translation>frissítés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="3695" />
-      <location filename="../artisanlib/roast_properties.py" line="2752" />
-      <location filename="../artisanlib/roast_properties.py" line="2737" />
+      <location filename="../artisanlib/roast_properties.py" line="3726" />
+      <location filename="../artisanlib/roast_properties.py" line="2779" />
+      <location filename="../artisanlib/roast_properties.py" line="2762" />
       <source>Save Defaults</source>
       <translation>Alapértelmezések mentése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="754" />
-      <location filename="../artisanlib/curves.py" line="751" />
-      <location filename="../artisanlib/curves.py" line="748" />
-      <location filename="../artisanlib/curves.py" line="745" />
-      <location filename="../artisanlib/curves.py" line="742" />
-      <location filename="../artisanlib/curves.py" line="739" />
-      <location filename="../artisanlib/curves.py" line="736" />
-      <location filename="../artisanlib/curves.py" line="733" />
-      <location filename="../artisanlib/curves.py" line="730" />
+      <location filename="../artisanlib/curves.py" line="767" />
+      <location filename="../artisanlib/curves.py" line="764" />
+      <location filename="../artisanlib/curves.py" line="761" />
+      <location filename="../artisanlib/curves.py" line="758" />
+      <location filename="../artisanlib/curves.py" line="755" />
+      <location filename="../artisanlib/curves.py" line="752" />
+      <location filename="../artisanlib/curves.py" line="749" />
+      <location filename="../artisanlib/curves.py" line="746" />
+      <location filename="../artisanlib/curves.py" line="743" />
       <source>Color</source>
       <translation type="unfinished">Szín</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="776" />
+      <location filename="../artisanlib/curves.py" line="789" />
       <source>Plot</source>
       <translation type="unfinished">Rajz</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="779" />
+      <location filename="../artisanlib/curves.py" line="792" />
       <source>Data</source>
       <translation type="unfinished">Adat</translation>
     </message>
@@ -697,33 +697,33 @@
       <location filename="../artisanlib/colors.py" line="350" />
       <location filename="../artisanlib/colors.py" line="348" />
       <location filename="../artisanlib/colors.py" line="130" />
-      <location filename="../artisanlib/curves.py" line="783" />
+      <location filename="../artisanlib/curves.py" line="796" />
       <source>Background</source>
       <translation type="unfinished">Háttér</translation>
     </message>
     <message>
       <location filename="../artisanlib/cup_profile.py" line="71" />
-      <location filename="../artisanlib/curves.py" line="789" />
+      <location filename="../artisanlib/curves.py" line="802" />
       <source>Save Image</source>
       <translation type="unfinished">Kép mentése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="875" />
+      <location filename="../artisanlib/curves.py" line="889" />
       <source>Info</source>
       <translation type="unfinished">Információ</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="954" />
+      <location filename="../artisanlib/curves.py" line="968" />
       <source>Create Background Curve</source>
       <translation>Háttérgörbe létrehozása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1625" />
+      <location filename="../artisanlib/curves.py" line="1641" />
       <source>ET/BT</source>
       <translation>ET / BT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1628" />
+      <location filename="../artisanlib/curves.py" line="1644" />
       <source>Create Virtual
 Extra Device</source>
       <translation>Hozzon létre virtuális
@@ -740,119 +740,119 @@ Extra eszköz</translation>
       <translation type="unfinished">Minden Ki</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="179" />
+      <location filename="../artisanlib/alarms.py" line="180" />
       <source>&lt;&lt; Store Alarm Set</source>
       <translation>&lt;&lt; Riasztási készlet tárolása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="181" />
+      <location filename="../artisanlib/alarms.py" line="182" />
       <source>Activate Alarm Set &gt;&gt;</source>
       <translation>Aktiválja a Riasztás &gt;&gt; elemet</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11496" />
-      <location filename="../artisanlib/canvas.py" line="6428" />
-      <location filename="../artisanlib/main.py" line="2906" />
+      <location filename="../artisanlib/canvas.py" line="11477" />
+      <location filename="../artisanlib/canvas.py" line="6434" />
+      <location filename="../artisanlib/main.py" line="2943" />
       <source>ON</source>
       <translation>BE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11990" />
-      <location filename="../artisanlib/canvas.py" line="6433" />
-      <location filename="../artisanlib/main.py" line="2920" />
+      <location filename="../artisanlib/canvas.py" line="12012" />
+      <location filename="../artisanlib/canvas.py" line="6439" />
+      <location filename="../artisanlib/main.py" line="2957" />
       <source>START</source>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2935" />
+      <location filename="../artisanlib/main.py" line="2972" />
       <source>FC
 START</source>
       <translation>FC
 KEZD</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2939" />
+      <location filename="../artisanlib/main.py" line="2976" />
       <source>FC
 END</source>
       <translation>FC
 VÉGE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2943" />
+      <location filename="../artisanlib/main.py" line="2980" />
       <source>SC
 START</source>
       <translation>SC KEZD</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2947" />
+      <location filename="../artisanlib/main.py" line="2984" />
       <source>SC
 END</source>
       <translation>SC VÉGE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2952" />
+      <location filename="../artisanlib/main.py" line="2989" />
       <source>RESET</source>
       <translation>VISSZA</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2964" />
+      <location filename="../artisanlib/main.py" line="3001" />
       <source>CHARGE</source>
       <translation>TÖLTÉS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2969" />
+      <location filename="../artisanlib/main.py" line="3006" />
       <source>DROP</source>
       <translation>ÜRÍTÉS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2974" />
+      <location filename="../artisanlib/main.py" line="3011" />
       <source>Control</source>
       <translation>Vezérlés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2987" />
+      <location filename="../artisanlib/main.py" line="3024" />
       <source>EVENT</source>
       <translation>ESEMÉNY</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2992" />
+      <location filename="../artisanlib/main.py" line="3029" />
       <source>SV +5</source>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3001" />
+      <location filename="../artisanlib/main.py" line="3038" />
       <source>SV +10</source>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3010" />
+      <location filename="../artisanlib/main.py" line="3047" />
       <source>SV +20</source>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3019" />
+      <location filename="../artisanlib/main.py" line="3056" />
       <source>SV -20</source>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3028" />
+      <location filename="../artisanlib/main.py" line="3065" />
       <source>SV -10</source>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3037" />
+      <location filename="../artisanlib/main.py" line="3074" />
       <source>SV -5</source>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3048" />
+      <location filename="../artisanlib/main.py" line="3085" />
       <source>DRY
 END</source>
       <translation>SZÁRÍTÁS
 VÉGE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3053" />
+      <location filename="../artisanlib/main.py" line="3090" />
       <source>COOL
 END</source>
       <translation>HŰTÉS
@@ -860,19 +860,19 @@ VÉGE</translation>
     </message>
     <message>
       <location filename="../artisanlib/transposer.py" line="129" />
-      <location filename="../artisanlib/devices.py" line="271" />
+      <location filename="../artisanlib/devices.py" line="275" />
       <source>Reset</source>
       <translation type="unfinished">Gyári beállítások visszaállítása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1263" />
-      <location filename="../artisanlib/devices.py" line="285" />
+      <location filename="../artisanlib/devices.py" line="1267" />
+      <location filename="../artisanlib/devices.py" line="289" />
       <source>Update Profile</source>
       <translation>Profil frissítése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11906" />
-      <location filename="../artisanlib/canvas.py" line="11370" />
+      <location filename="../artisanlib/canvas.py" line="11927" />
+      <location filename="../artisanlib/canvas.py" line="11374" />
       <source>OFF</source>
       <translation>KI</translation>
     </message>
@@ -1050,7 +1050,7 @@ VÉGE</translation>
       <translation type="unfinished">Fekete-fehér</translation>
     </message>
     <message>
-      <location filename="../artisanlib/colors.py" line="577" />
+      <location filename="../artisanlib/colors.py" line="578" />
       <source>Grey</source>
       <translation type="unfinished">Szürke</translation>
     </message>
@@ -1139,29 +1139,29 @@ VÉGE</translation>
   <context>
     <name>CheckBox</name>
     <message>
-      <location filename="../artisanlib/axis.py" line="168" />
+      <location filename="../artisanlib/axis.py" line="172" />
       <source>Expand</source>
       <translation>Kiterjed</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="172" />
+      <location filename="../artisanlib/axis.py" line="176" />
       <source>Lock</source>
       <translation>Zár</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="265" />
-      <location filename="../artisanlib/axis.py" line="177" />
+      <location filename="../artisanlib/axis.py" line="269" />
+      <location filename="../artisanlib/axis.py" line="181" />
       <source>Auto</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/statistics.py" line="38" />
-      <location filename="../artisanlib/axis.py" line="234" />
+      <location filename="../artisanlib/statistics.py" line="42" />
+      <location filename="../artisanlib/axis.py" line="238" />
       <source>Time</source>
       <translation type="unfinished">Idő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="239" />
+      <location filename="../artisanlib/axis.py" line="243" />
       <source>Temp</source>
       <translation type="unfinished">Hőmérséklet</translation>
     </message>
@@ -1170,7 +1170,7 @@ VÉGE</translation>
       <location filename="../artisanlib/devices.py" line="68" />
       <location filename="../artisanlib/background.py" line="71" />
       <location filename="../artisanlib/comm.py" line="191" />
-      <location filename="../artisanlib/axis.py" line="266" />
+      <location filename="../artisanlib/axis.py" line="270" />
       <source>ET</source>
       <translation type="unfinished">KÖRNY. HŐ</translation>
     </message>
@@ -1178,20 +1178,20 @@ VÉGE</translation>
       <location filename="../artisanlib/devices.py" line="77" />
       <location filename="../artisanlib/devices.py" line="71" />
       <location filename="../artisanlib/background.py" line="72" />
-      <location filename="../artisanlib/axis.py" line="268" />
+      <location filename="../artisanlib/axis.py" line="272" />
       <source>BT</source>
       <translation type="unfinished">BAB HŐ</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="120" />
+      <location filename="../artisanlib/alarms.py" line="121" />
       <location filename="../artisanlib/pid_dialogs.py" line="513" />
-      <location filename="../artisanlib/axis.py" line="318" />
+      <location filename="../artisanlib/axis.py" line="323" />
       <source>Load from profile</source>
       <translation>Betöltés a profilból</translation>
     </message>
     <message>
       <location filename="../artisanlib/background.py" line="66" />
-      <location filename="../artisanlib/comparator.py" line="885" />
+      <location filename="../artisanlib/comparator.py" line="899" />
       <source>Events</source>
       <translation type="unfinished">Események</translation>
     </message>
@@ -1206,151 +1206,151 @@ VÉGE</translation>
       <translation>Események létrehozása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="122" />
+      <location filename="../artisanlib/alarms.py" line="123" />
       <location filename="../artisanlib/pid_dialogs.py" line="516" />
       <source>Load from background</source>
       <translation>Betöltés a háttérből</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2152" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1367" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2162" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1375" />
       <source>Follow Background</source>
       <translation>A háttér követése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/autosave.py" line="55" />
+      <location filename="../artisanlib/autosave.py" line="60" />
       <source>Autosave [a]</source>
       <translation>Automatikus mentés [a]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/autosave.py" line="60" />
+      <location filename="../artisanlib/autosave.py" line="65" />
       <source>Add to recent file list</source>
       <translation>Hozzáadás a legutóbbi fájllistához</translation>
     </message>
     <message>
-      <location filename="../artisanlib/autosave.py" line="65" />
+      <location filename="../artisanlib/autosave.py" line="70" />
       <source>Save also</source>
       <translation>Mentse is</translation>
     </message>
     <message>
       <location filename="../artisanlib/background.py" line="65" />
-      <location filename="../artisanlib/events.py" line="266" />
+      <location filename="../artisanlib/events.py" line="267" />
       <source>Annotations</source>
       <translation>Megjegyzések</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="269" />
+      <location filename="../artisanlib/events.py" line="270" />
       <source>Show on BT</source>
       <translation>Műsor a BT-n</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="273" />
+      <location filename="../artisanlib/events.py" line="274" />
       <source>Snap</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="276" />
+      <location filename="../artisanlib/events.py" line="277" />
       <source>Descr.</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="508" />
+      <location filename="../artisanlib/events.py" line="509" />
       <source>Auto CHARGE</source>
       <translation>Automatikus töltés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="513" />
+      <location filename="../artisanlib/events.py" line="514" />
       <source>CHARGE Timer</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="525" />
+      <location filename="../artisanlib/events.py" line="526" />
       <source>Auto DROP</source>
       <translation>Automatikus DROP</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="530" />
+      <location filename="../artisanlib/events.py" line="531" />
       <source>Mark TP</source>
       <translation>Jelöld TP-t</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="534" />
+      <location filename="../artisanlib/events.py" line="535" />
       <source>Mark MET</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="538" />
+      <location filename="../artisanlib/events.py" line="539" />
       <source>Show Time Guide</source>
       <translation>Időmutató megjelenítése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="566" />
+      <location filename="../artisanlib/events.py" line="567" />
       <source>Mark Last Pressed</source>
       <translation>Utoljára nyomott megjelölés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="570" />
+      <location filename="../artisanlib/events.py" line="571" />
       <source>Tooltips</source>
       <translation>Eszköztippek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="632" />
+      <location filename="../artisanlib/events.py" line="639" />
       <source>Switch Using Number Keys + Cmd</source>
       <translation>Váltás a számgombokkal + Cmd</translation>
     </message>
     <message>
       <location filename="../artisanlib/background.py" line="74" />
-      <location filename="../artisanlib/events.py" line="903" />
+      <location filename="../artisanlib/events.py" line="911" />
       <source>Keyboard Control</source>
       <translation>Billentyűzet vezérlés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="906" />
+      <location filename="../artisanlib/events.py" line="914" />
       <source>Alternative Layout</source>
-      <translation type="unfinished" />
+      <translation>Alternatív elrendezés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1135" />
+      <location filename="../artisanlib/events.py" line="1144" />
       <source>CHARGE</source>
       <translation type="unfinished">TÖLTÉS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="49" />
-      <location filename="../artisanlib/events.py" line="1144" />
+      <location filename="../artisanlib/designer.py" line="54" />
+      <location filename="../artisanlib/events.py" line="1153" />
       <source>DRY END</source>
       <translation type="unfinished">SZÁRÍTÁS VÉGE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="51" />
-      <location filename="../artisanlib/events.py" line="1153" />
+      <location filename="../artisanlib/designer.py" line="56" />
+      <location filename="../artisanlib/events.py" line="1162" />
       <source>FC START</source>
       <translation type="unfinished">FC KEZD</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="53" />
-      <location filename="../artisanlib/events.py" line="1162" />
+      <location filename="../artisanlib/designer.py" line="58" />
+      <location filename="../artisanlib/events.py" line="1171" />
       <source>FC END</source>
       <translation type="unfinished">FC VÉGE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="55" />
-      <location filename="../artisanlib/events.py" line="1171" />
+      <location filename="../artisanlib/designer.py" line="60" />
+      <location filename="../artisanlib/events.py" line="1180" />
       <source>SC START</source>
       <translation type="unfinished">SC KEZD</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="57" />
-      <location filename="../artisanlib/events.py" line="1180" />
+      <location filename="../artisanlib/designer.py" line="62" />
+      <location filename="../artisanlib/events.py" line="1189" />
       <source>SC END</source>
       <translation type="unfinished">SC VÉGE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1189" />
+      <location filename="../artisanlib/events.py" line="1198" />
       <source>DROP</source>
       <translation type="unfinished">ÜRÍTÉS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1198" />
+      <location filename="../artisanlib/events.py" line="1207" />
       <source>COOL END</source>
       <translation type="unfinished">HŰTÉS VÉGE</translation>
     </message>
@@ -1375,27 +1375,27 @@ VÉGE</translation>
       <translation>Úszó</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1462" />
+      <location filename="../artisanlib/ports.py" line="1465" />
       <source>START on CHARGE</source>
       <translation>INDÍTÁS CHARGE-on</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1464" />
+      <location filename="../artisanlib/ports.py" line="1467" />
       <source>OFF on DROP</source>
       <translation>KI a DROP-on</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="973" />
-      <location filename="../artisanlib/curves.py" line="885" />
-      <location filename="../artisanlib/curves.py" line="879" />
-      <location filename="../artisanlib/curves.py" line="872" />
-      <location filename="../artisanlib/curves.py" line="857" />
+      <location filename="../artisanlib/curves.py" line="987" />
+      <location filename="../artisanlib/curves.py" line="899" />
+      <location filename="../artisanlib/curves.py" line="893" />
+      <location filename="../artisanlib/curves.py" line="886" />
+      <location filename="../artisanlib/curves.py" line="871" />
       <location filename="../artisanlib/background.py" line="64" />
       <source>Show</source>
       <translation>Előadás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="389" />
+      <location filename="../artisanlib/curves.py" line="402" />
       <location filename="../artisanlib/background.py" line="73" />
       <source>Show Full</source>
       <translation>Teljes megjelenítése</translation>
@@ -1406,7 +1406,7 @@ VÉGE</translation>
       <translation type="unfinished">Visszajátszási Segítség</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1153" />
+      <location filename="../artisanlib/curves.py" line="1167" />
       <location filename="../artisanlib/background.py" line="200" />
       <source>Beep</source>
       <translation>Hangjelzés</translation>
@@ -1432,112 +1432,112 @@ VÉGE</translation>
       <translation>A profil betöltése közben mindig rejtse el a hátteret</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="744" />
+      <location filename="../artisanlib/roast_properties.py" line="749" />
       <source>Delete roast properties on RESET</source>
       <translation>Törölje a sült tulajdonságokat a RESET alkalmazásból</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="747" />
+      <location filename="../artisanlib/roast_properties.py" line="752" />
       <source>Open on CHARGE</source>
       <translation>Nyissa meg: CHARGE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="750" />
+      <location filename="../artisanlib/roast_properties.py" line="755" />
       <source>Open on DROP</source>
       <translation>Nyissa meg a DROP-on</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="836" />
+      <location filename="../artisanlib/roast_properties.py" line="841" />
       <source>Show Always</source>
       <translation>Mutasd mindig</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21490" />
-      <location filename="../artisanlib/roast_properties.py" line="1113" />
+      <location filename="../artisanlib/main.py" line="21618" />
+      <location filename="../artisanlib/roast_properties.py" line="1118" />
       <source>Heavy FC</source>
       <translation>Nehéz FC</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21492" />
-      <location filename="../artisanlib/roast_properties.py" line="1116" />
+      <location filename="../artisanlib/main.py" line="21620" />
+      <location filename="../artisanlib/roast_properties.py" line="1121" />
       <source>Low FC</source>
       <translation>Alacsony FC</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21494" />
-      <location filename="../artisanlib/roast_properties.py" line="1119" />
+      <location filename="../artisanlib/main.py" line="21622" />
+      <location filename="../artisanlib/roast_properties.py" line="1124" />
       <source>Light Cut</source>
       <translation>Könnyű vágás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21496" />
-      <location filename="../artisanlib/roast_properties.py" line="1122" />
+      <location filename="../artisanlib/main.py" line="21624" />
+      <location filename="../artisanlib/roast_properties.py" line="1127" />
       <source>Dark Cut</source>
       <translation>Sötét vágás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21498" />
-      <location filename="../artisanlib/roast_properties.py" line="1125" />
+      <location filename="../artisanlib/main.py" line="21626" />
+      <location filename="../artisanlib/roast_properties.py" line="1130" />
       <source>Drops</source>
       <translation>Cseppek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21500" />
-      <location filename="../artisanlib/roast_properties.py" line="1128" />
+      <location filename="../artisanlib/main.py" line="21628" />
+      <location filename="../artisanlib/roast_properties.py" line="1133" />
       <source>Oily</source>
       <translation>Olajos</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21502" />
-      <location filename="../artisanlib/roast_properties.py" line="1131" />
+      <location filename="../artisanlib/main.py" line="21630" />
+      <location filename="../artisanlib/roast_properties.py" line="1136" />
       <source>Uneven</source>
       <translation>Egyenetlen</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21504" />
-      <location filename="../artisanlib/roast_properties.py" line="1133" />
+      <location filename="../artisanlib/main.py" line="21632" />
+      <location filename="../artisanlib/roast_properties.py" line="1138" />
       <source>Tipping</source>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21506" />
-      <location filename="../artisanlib/roast_properties.py" line="1135" />
+      <location filename="../artisanlib/main.py" line="21634" />
+      <location filename="../artisanlib/roast_properties.py" line="1140" />
       <source>Scorching</source>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21508" />
-      <location filename="../artisanlib/roast_properties.py" line="1137" />
+      <location filename="../artisanlib/main.py" line="21636" />
+      <location filename="../artisanlib/roast_properties.py" line="1142" />
       <source>Divots</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/phases.py" line="92" />
+      <location filename="../artisanlib/phases.py" line="96" />
       <source>Auto Adjusted</source>
       <translation>Automatikusan beállítva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/phases.py" line="95" />
+      <location filename="../artisanlib/phases.py" line="99" />
       <source>From Background</source>
       <translation>Háttérből</translation>
     </message>
     <message>
-      <location filename="../artisanlib/phases.py" line="98" />
+      <location filename="../artisanlib/phases.py" line="102" />
       <source>Watermarks</source>
       <translation type="unfinished">VÍzjelek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/phases.py" line="100" />
+      <location filename="../artisanlib/phases.py" line="104" />
       <source>Phases LCDs</source>
       <translation>Fázisok LCD-k</translation>
     </message>
     <message>
-      <location filename="../artisanlib/phases.py" line="102" />
+      <location filename="../artisanlib/phases.py" line="106" />
       <source>Auto DRY</source>
       <translation>Automatikus SZÁRÍTÁS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/phases.py" line="104" />
+      <location filename="../artisanlib/phases.py" line="108" />
       <source>Auto FCs</source>
       <translation>Auto FC-k</translation>
     </message>
@@ -1547,111 +1547,111 @@ VÉGE</translation>
       <translation>Soros napló BE / KI</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="347" />
+      <location filename="../artisanlib/curves.py" line="360" />
       <source>Optimal Smoothing Post Roast</source>
       <translation>Optimális simító oszlop pörkölt</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="353" />
+      <location filename="../artisanlib/curves.py" line="366" />
       <source>Polyfit computation</source>
       <translation>Polyfit számítás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="367" />
+      <location filename="../artisanlib/curves.py" line="380" />
       <source>Smooth Spikes</source>
       <translation>Sima tüskék</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="372" />
+      <location filename="../artisanlib/curves.py" line="385" />
       <source>Interpolate Duplicates</source>
       <translation>Interpolálja a másolatokat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="395" />
+      <location filename="../artisanlib/curves.py" line="408" />
       <source>Drop Spikes</source>
       <translation>Csepp tüskék</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="590" />
-      <location filename="../artisanlib/curves.py" line="400" />
+      <location filename="../artisanlib/curves.py" line="603" />
+      <location filename="../artisanlib/curves.py" line="413" />
       <source>Limits</source>
       <translation>Határértékek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="424" />
-      <location filename="../artisanlib/curves.py" line="423" />
+      <location filename="../artisanlib/curves.py" line="437" />
+      <location filename="../artisanlib/curves.py" line="436" />
       <source>Projection</source>
       <translation>Kivetítés</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="80" />
-      <location filename="../artisanlib/curves.py" line="479" />
+      <location filename="../artisanlib/curves.py" line="492" />
       <source>Swap</source>
       <translation>Csere</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="482" />
+      <location filename="../artisanlib/curves.py" line="495" />
       <source>Decimal Places</source>
       <translation>Tizedes jel</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1157" />
+      <location filename="../artisanlib/curves.py" line="1171" />
       <source>Notifications</source>
       <translation>Értesítések</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1219" />
+      <location filename="../artisanlib/curves.py" line="1233" />
       <source>Alarm Popups</source>
       <translation>Riasztás felugró ablakok</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1279" />
+      <location filename="../artisanlib/curves.py" line="1293" />
       <source>Hide Image During Roast</source>
       <translation>Kép elrejtése pörkölés közben</translation>
     </message>
     <message>
-      <location filename="../artisanlib/statistics.py" line="39" />
+      <location filename="../artisanlib/statistics.py" line="43" />
       <source>Bar</source>
       <translation>Rúd</translation>
     </message>
     <message>
-      <location filename="../artisanlib/statistics.py" line="41" />
+      <location filename="../artisanlib/statistics.py" line="45" />
       <source>/min</source>
       <translation>/ perc</translation>
     </message>
     <message>
-      <location filename="../artisanlib/statistics.py" line="42" />
+      <location filename="../artisanlib/statistics.py" line="46" />
       <source>Characteristics</source>
       <translation type="unfinished">Karakterisztika</translation>
     </message>
     <message>
-      <location filename="../artisanlib/statistics.py" line="43" />
+      <location filename="../artisanlib/statistics.py" line="47" />
       <source>Summary</source>
       <translation>Összegzés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/statistics.py" line="95" />
+      <location filename="../artisanlib/statistics.py" line="99" />
       <source>From Event</source>
       <translation>Eseményből</translation>
     </message>
     <message>
       <location filename="../artisanlib/cup_profile.py" line="79" />
-      <location filename="../artisanlib/statistics.py" line="104" />
+      <location filename="../artisanlib/statistics.py" line="108" />
       <source>Background</source>
       <translation type="unfinished">Háttér</translation>
     </message>
     <message>
-      <location filename="../artisanlib/statistics.py" line="108" />
+      <location filename="../artisanlib/statistics.py" line="112" />
       <source>Guide</source>
       <translation>Útmutató</translation>
     </message>
     <message>
-      <location filename="../artisanlib/statistics.py" line="110" />
+      <location filename="../artisanlib/statistics.py" line="114" />
       <source>LCD</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/statistics.py" line="113" />
+      <location filename="../artisanlib/statistics.py" line="117" />
       <source>Show Area</source>
       <translation>Terület megjelenítése</translation>
     </message>
@@ -1671,17 +1671,17 @@ VÉGE</translation>
       <translation>Kimenet</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="181" />
+      <location filename="../artisanlib/devices.py" line="183" />
       <source>PID Duty/Power LCDs</source>
       <translation>PID Duty / Power LCD-k</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="184" />
+      <location filename="../artisanlib/devices.py" line="186" />
       <source>Modbus Port</source>
       <translation>Modbus port</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="224" />
+      <location filename="../artisanlib/devices.py" line="226" />
       <source>PID Firmware</source>
       <translation>PID firmware</translation>
     </message>
@@ -1709,11 +1709,11 @@ VÉGE</translation>
   <context>
     <name>ComboBox</name>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1498" />
-      <location filename="../artisanlib/canvas.py" line="1492" />
-      <location filename="../artisanlib/canvas.py" line="1274" />
-      <location filename="../artisanlib/main.py" line="18189" />
-      <location filename="../artisanlib/main.py" line="16092" />
+      <location filename="../artisanlib/canvas.py" line="1499" />
+      <location filename="../artisanlib/canvas.py" line="1493" />
+      <location filename="../artisanlib/canvas.py" line="1275" />
+      <location filename="../artisanlib/main.py" line="18317" />
+      <location filename="../artisanlib/main.py" line="16215" />
       <location filename="../artisanlib/rubasse.py" line="249" />
       <location filename="../artisanlib/cropster.py" line="963" />
       <location filename="../artisanlib/giesen.py" line="186" />
@@ -1723,11 +1723,11 @@ VÉGE</translation>
       <translation>Levegő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1499" />
-      <location filename="../artisanlib/canvas.py" line="1493" />
-      <location filename="../artisanlib/canvas.py" line="1275" />
-      <location filename="../artisanlib/main.py" line="18190" />
-      <location filename="../artisanlib/main.py" line="16093" />
+      <location filename="../artisanlib/canvas.py" line="1500" />
+      <location filename="../artisanlib/canvas.py" line="1494" />
+      <location filename="../artisanlib/canvas.py" line="1276" />
+      <location filename="../artisanlib/main.py" line="18318" />
+      <location filename="../artisanlib/main.py" line="16216" />
       <location filename="../artisanlib/rubasse.py" line="250" />
       <location filename="../artisanlib/cropster.py" line="964" />
       <location filename="../artisanlib/giesen.py" line="187" />
@@ -1737,11 +1737,11 @@ VÉGE</translation>
       <translation>Dob</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1500" />
-      <location filename="../artisanlib/canvas.py" line="1494" />
-      <location filename="../artisanlib/canvas.py" line="1276" />
-      <location filename="../artisanlib/main.py" line="18191" />
-      <location filename="../artisanlib/main.py" line="16094" />
+      <location filename="../artisanlib/canvas.py" line="1501" />
+      <location filename="../artisanlib/canvas.py" line="1495" />
+      <location filename="../artisanlib/canvas.py" line="1277" />
+      <location filename="../artisanlib/main.py" line="18319" />
+      <location filename="../artisanlib/main.py" line="16217" />
       <location filename="../artisanlib/rubasse.py" line="251" />
       <location filename="../artisanlib/cropster.py" line="965" />
       <location filename="../artisanlib/giesen.py" line="188" />
@@ -1751,11 +1751,11 @@ VÉGE</translation>
       <translation>Csillapító</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1501" />
-      <location filename="../artisanlib/canvas.py" line="1495" />
-      <location filename="../artisanlib/canvas.py" line="1277" />
-      <location filename="../artisanlib/main.py" line="18192" />
-      <location filename="../artisanlib/main.py" line="16095" />
+      <location filename="../artisanlib/canvas.py" line="1502" />
+      <location filename="../artisanlib/canvas.py" line="1496" />
+      <location filename="../artisanlib/canvas.py" line="1278" />
+      <location filename="../artisanlib/main.py" line="18320" />
+      <location filename="../artisanlib/main.py" line="16218" />
       <location filename="../artisanlib/rubasse.py" line="252" />
       <location filename="../artisanlib/cropster.py" line="966" />
       <location filename="../artisanlib/giesen.py" line="189" />
@@ -1765,193 +1765,193 @@ VÉGE</translation>
       <translation>égő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="135" />
+      <location filename="../artisanlib/axis.py" line="139" />
       <source>upper right</source>
       <translation type="unfinished">jobb felső</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="136" />
+      <location filename="../artisanlib/axis.py" line="140" />
       <source>upper left</source>
       <translation type="unfinished">bal felső</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="137" />
+      <location filename="../artisanlib/axis.py" line="141" />
       <source>lower left</source>
       <translation type="unfinished">bal alsó</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="138" />
+      <location filename="../artisanlib/axis.py" line="142" />
       <source>lower right</source>
       <translation type="unfinished">jobb alsó</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="139" />
+      <location filename="../artisanlib/axis.py" line="143" />
       <source>right</source>
       <translation type="unfinished">jobb</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="140" />
+      <location filename="../artisanlib/axis.py" line="144" />
       <source>center left</source>
       <translation type="unfinished">középen balra</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="141" />
+      <location filename="../artisanlib/axis.py" line="145" />
       <source>center right</source>
       <translation type="unfinished">középen jobbra</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="142" />
+      <location filename="../artisanlib/axis.py" line="146" />
       <source>lower center</source>
       <translation type="unfinished">középen alul</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="143" />
+      <location filename="../artisanlib/axis.py" line="147" />
       <source>upper center</source>
       <translation type="unfinished">középen felül</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="144" />
+      <location filename="../artisanlib/axis.py" line="148" />
       <source>center</source>
       <translation type="unfinished">középen</translation>
     </message>
     <message>
-      <location filename="../artisanlib/comparator.py" line="821" />
-      <location filename="../artisanlib/axis.py" line="194" />
+      <location filename="../artisanlib/comparator.py" line="827" />
+      <location filename="../artisanlib/axis.py" line="198" />
       <source>Roast</source>
       <translation type="unfinished">Pörkölés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/comparator.py" line="822" />
-      <location filename="../artisanlib/axis.py" line="195" />
+      <location filename="../artisanlib/comparator.py" line="828" />
+      <location filename="../artisanlib/axis.py" line="199" />
       <source>BBP+Roast</source>
       <translation>BBP+sült</translation>
     </message>
     <message>
-      <location filename="../artisanlib/comparator.py" line="823" />
-      <location filename="../artisanlib/axis.py" line="196" />
+      <location filename="../artisanlib/comparator.py" line="829" />
+      <location filename="../artisanlib/axis.py" line="200" />
       <source>BBP</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="211" />
+      <location filename="../artisanlib/axis.py" line="215" />
       <source>1 minute</source>
       <translation type="unfinished">1 perc</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="212" />
+      <location filename="../artisanlib/axis.py" line="216" />
       <source>2 minutes</source>
       <translation>2 perc</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="213" />
+      <location filename="../artisanlib/axis.py" line="217" />
       <source>3 minutes</source>
       <translation>3 perc</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="214" />
+      <location filename="../artisanlib/axis.py" line="218" />
       <source>4 minutes</source>
       <translation>4 percig</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="215" />
+      <location filename="../artisanlib/axis.py" line="219" />
       <source>5 minutes</source>
       <translation>5 perc</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="216" />
+      <location filename="../artisanlib/axis.py" line="220" />
       <source>10 minutes</source>
       <translation>10 perc</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="217" />
+      <location filename="../artisanlib/axis.py" line="221" />
       <source>30 minutes</source>
       <translation>30 perc</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="218" />
+      <location filename="../artisanlib/axis.py" line="222" />
       <source>1 hour</source>
       <translation>1 óra</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="282" />
+      <location filename="../artisanlib/axis.py" line="286" />
       <source>solid</source>
       <translation type="unfinished">egyenes</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="283" />
+      <location filename="../artisanlib/axis.py" line="287" />
       <source>dashed</source>
       <translation type="unfinished">szaggatott</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="284" />
+      <location filename="../artisanlib/axis.py" line="288" />
       <source>dashed-dot</source>
       <translation type="unfinished">szaggatott-pontozott</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="285" />
+      <location filename="../artisanlib/axis.py" line="289" />
       <source>dotted</source>
       <translation type="unfinished">pontozott</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="447" />
+      <location filename="../artisanlib/wheels.py" line="462" />
       <source>Flat</source>
       <translation type="unfinished">Lapos</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="448" />
+      <location filename="../artisanlib/wheels.py" line="463" />
       <source>Perpendicular</source>
       <translation type="unfinished">Függőleges</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="449" />
+      <location filename="../artisanlib/wheels.py" line="464" />
       <source>Radial</source>
       <translation type="unfinished">Sugárirányú</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="805" />
-      <location filename="../artisanlib/curves.py" line="2145" />
-      <location filename="../artisanlib/roast_properties.py" line="3775" />
-      <location filename="../artisanlib/events.py" line="987" />
+      <location filename="../artisanlib/alarms.py" line="818" />
+      <location filename="../artisanlib/curves.py" line="2161" />
+      <location filename="../artisanlib/roast_properties.py" line="3808" />
+      <location filename="../artisanlib/events.py" line="995" />
       <location filename="../artisanlib/pid_dialogs.py" line="116" />
       <source>ET</source>
       <translation type="unfinished">KÖRNY. HŐ</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="806" />
-      <location filename="../artisanlib/curves.py" line="2146" />
-      <location filename="../artisanlib/roast_properties.py" line="3776" />
-      <location filename="../artisanlib/events.py" line="988" />
+      <location filename="../artisanlib/alarms.py" line="819" />
+      <location filename="../artisanlib/curves.py" line="2162" />
+      <location filename="../artisanlib/roast_properties.py" line="3809" />
+      <location filename="../artisanlib/events.py" line="996" />
       <location filename="../artisanlib/pid_dialogs.py" line="117" />
       <source>BT</source>
       <translation type="unfinished">BAB HŐ</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="880" />
+      <location filename="../artisanlib/alarms.py" line="893" />
       <location filename="../artisanlib/pid_dialogs.py" line="431" />
       <source>Pop Up</source>
       <translation type="unfinished">Felugrik</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="881" />
-      <location filename="../artisanlib/events.py" line="1114" />
-      <location filename="../artisanlib/events.py" line="692" />
+      <location filename="../artisanlib/alarms.py" line="894" />
+      <location filename="../artisanlib/events.py" line="1123" />
+      <location filename="../artisanlib/events.py" line="699" />
       <location filename="../artisanlib/events.py" line="111" />
       <location filename="../artisanlib/pid_dialogs.py" line="432" />
       <source>Call Program</source>
       <translation type="unfinished">Program Hívása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="882" />
-      <location filename="../artisanlib/events.py" line="263" />
+      <location filename="../artisanlib/alarms.py" line="895" />
+      <location filename="../artisanlib/events.py" line="264" />
       <location filename="../artisanlib/pid_dialogs.py" line="433" />
       <source>Event Button</source>
       <translation type="unfinished">Esemény Gomb</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="886" />
-      <location filename="../artisanlib/alarms.py" line="885" />
-      <location filename="../artisanlib/alarms.py" line="884" />
-      <location filename="../artisanlib/alarms.py" line="883" />
+      <location filename="../artisanlib/alarms.py" line="899" />
+      <location filename="../artisanlib/alarms.py" line="898" />
+      <location filename="../artisanlib/alarms.py" line="897" />
+      <location filename="../artisanlib/alarms.py" line="896" />
       <location filename="../artisanlib/pid_dialogs.py" line="437" />
       <location filename="../artisanlib/pid_dialogs.py" line="436" />
       <location filename="../artisanlib/pid_dialogs.py" line="435" />
@@ -1960,348 +1960,348 @@ VÉGE</translation>
       <translation type="unfinished">Csúszka</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="887" />
-      <location filename="../artisanlib/alarms.py" line="838" />
+      <location filename="../artisanlib/alarms.py" line="900" />
+      <location filename="../artisanlib/alarms.py" line="851" />
       <location filename="../artisanlib/pid_dialogs.py" line="438" />
       <source>START</source>
       <translation type="unfinished">INDÍT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="888" />
+      <location filename="../artisanlib/alarms.py" line="901" />
       <location filename="../artisanlib/pid_dialogs.py" line="439" />
       <source>DRY</source>
       <translation>SZÁRAZ</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="889" />
+      <location filename="../artisanlib/alarms.py" line="902" />
       <location filename="../artisanlib/pid_dialogs.py" line="440" />
       <source>FCs</source>
       <translation>FC-k</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="890" />
+      <location filename="../artisanlib/alarms.py" line="903" />
       <location filename="../artisanlib/pid_dialogs.py" line="441" />
       <source>FCe</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="891" />
+      <location filename="../artisanlib/alarms.py" line="904" />
       <location filename="../artisanlib/pid_dialogs.py" line="442" />
       <source>SCs</source>
       <translation>SC-k</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="892" />
+      <location filename="../artisanlib/alarms.py" line="905" />
       <location filename="../artisanlib/pid_dialogs.py" line="443" />
       <source>SCe</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="893" />
-      <location filename="../artisanlib/alarms.py" line="846" />
+      <location filename="../artisanlib/alarms.py" line="906" />
+      <location filename="../artisanlib/alarms.py" line="859" />
       <location filename="../artisanlib/pid_dialogs.py" line="444" />
       <source>DROP</source>
       <translation type="unfinished">ÜRÍTÉS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="894" />
+      <location filename="../artisanlib/alarms.py" line="907" />
       <location filename="../artisanlib/pid_dialogs.py" line="445" />
       <source>COOL END</source>
       <translation type="unfinished">HŰTÉS VÉGE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="895" />
-      <location filename="../artisanlib/events.py" line="2388" />
+      <location filename="../artisanlib/alarms.py" line="908" />
+      <location filename="../artisanlib/events.py" line="2405" />
       <location filename="../artisanlib/pid_dialogs.py" line="446" />
       <source>OFF</source>
       <translation type="unfinished">KI</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="896" />
-      <location filename="../artisanlib/alarms.py" line="839" />
+      <location filename="../artisanlib/alarms.py" line="909" />
+      <location filename="../artisanlib/alarms.py" line="852" />
       <location filename="../artisanlib/pid_dialogs.py" line="447" />
       <source>CHARGE</source>
       <translation type="unfinished">BETÖLT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="897" />
+      <location filename="../artisanlib/alarms.py" line="910" />
       <location filename="../artisanlib/pid_dialogs.py" line="448" />
       <source>RampSoak ON</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="898" />
+      <location filename="../artisanlib/alarms.py" line="911" />
       <location filename="../artisanlib/pid_dialogs.py" line="449" />
       <source>RampSoak OFF</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="899" />
+      <location filename="../artisanlib/alarms.py" line="912" />
       <location filename="../artisanlib/pid_dialogs.py" line="450" />
       <source>PID ON</source>
       <translation type="unfinished">PID BE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="900" />
+      <location filename="../artisanlib/alarms.py" line="913" />
       <location filename="../artisanlib/pid_dialogs.py" line="451" />
       <source>PID OFF</source>
       <translation type="unfinished">PID KI</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="901" />
+      <location filename="../artisanlib/alarms.py" line="914" />
       <location filename="../artisanlib/pid_dialogs.py" line="452" />
       <source>SV</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="10703" />
-      <location filename="../artisanlib/alarms.py" line="902" />
+      <location filename="../artisanlib/main.py" line="10811" />
+      <location filename="../artisanlib/alarms.py" line="915" />
       <location filename="../artisanlib/pid_dialogs.py" line="453" />
       <source>Playback ON</source>
       <translation>A lejátszás BE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="10705" />
-      <location filename="../artisanlib/alarms.py" line="903" />
+      <location filename="../artisanlib/main.py" line="10813" />
+      <location filename="../artisanlib/alarms.py" line="916" />
       <location filename="../artisanlib/pid_dialogs.py" line="454" />
       <source>Playback OFF</source>
       <translation>A lejátszás KI</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="904" />
+      <location filename="../artisanlib/alarms.py" line="917" />
       <location filename="../artisanlib/pid_dialogs.py" line="455" />
       <source>Set Canvas Color</source>
       <translation>Állítsa be a vászon színét</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="905" />
+      <location filename="../artisanlib/alarms.py" line="918" />
       <location filename="../artisanlib/pid_dialogs.py" line="456" />
       <source>Reset Canvas Color</source>
       <translation>A vászon színének visszaállítása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1113" />
-      <location filename="../artisanlib/events.py" line="689" />
+      <location filename="../artisanlib/events.py" line="1122" />
+      <location filename="../artisanlib/events.py" line="696" />
       <location filename="../artisanlib/events.py" line="110" />
       <source>Serial Command</source>
       <translation type="unfinished">Soros Parancs</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1132" />
+      <location filename="../artisanlib/events.py" line="1141" />
       <location filename="../artisanlib/events.py" line="112" />
       <source>Multiple Event</source>
       <translation type="unfinished">Többszörös Esemény</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1115" />
-      <location filename="../artisanlib/events.py" line="690" />
+      <location filename="../artisanlib/events.py" line="1124" />
+      <location filename="../artisanlib/events.py" line="697" />
       <location filename="../artisanlib/events.py" line="113" />
       <source>Modbus Command</source>
       <translation type="unfinished">Modbus Parancs</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1116" />
-      <location filename="../artisanlib/events.py" line="691" />
+      <location filename="../artisanlib/events.py" line="1125" />
+      <location filename="../artisanlib/events.py" line="698" />
       <location filename="../artisanlib/events.py" line="114" />
       <source>DTA Command</source>
       <translation type="unfinished">DTA Parancs</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1117" />
-      <location filename="../artisanlib/events.py" line="699" />
+      <location filename="../artisanlib/events.py" line="1126" />
+      <location filename="../artisanlib/events.py" line="706" />
       <location filename="../artisanlib/events.py" line="115" />
       <source>IO Command</source>
       <translation>IO parancs</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1118" />
-      <location filename="../artisanlib/events.py" line="693" />
+      <location filename="../artisanlib/events.py" line="1127" />
+      <location filename="../artisanlib/events.py" line="700" />
       <location filename="../artisanlib/events.py" line="116" />
       <source>Hottop Heater</source>
       <translation>Hottop fűtés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1119" />
-      <location filename="../artisanlib/events.py" line="694" />
+      <location filename="../artisanlib/events.py" line="1128" />
+      <location filename="../artisanlib/events.py" line="701" />
       <location filename="../artisanlib/events.py" line="117" />
       <source>Hottop Fan</source>
       <translation>Hottop ventilátor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1120" />
-      <location filename="../artisanlib/events.py" line="695" />
+      <location filename="../artisanlib/events.py" line="1129" />
+      <location filename="../artisanlib/events.py" line="702" />
       <location filename="../artisanlib/events.py" line="118" />
       <source>Hottop Command</source>
       <translation>Hottop parancs</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1121" />
+      <location filename="../artisanlib/events.py" line="1130" />
       <location filename="../artisanlib/events.py" line="119" />
       <source>p-i-d</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1122" />
-      <location filename="../artisanlib/events.py" line="696" />
+      <location filename="../artisanlib/events.py" line="1131" />
+      <location filename="../artisanlib/events.py" line="703" />
       <location filename="../artisanlib/events.py" line="120" />
       <source>Fuji Command</source>
       <translation>Fuji parancsnokság</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1123" />
-      <location filename="../artisanlib/events.py" line="697" />
+      <location filename="../artisanlib/events.py" line="1132" />
+      <location filename="../artisanlib/events.py" line="704" />
       <location filename="../artisanlib/events.py" line="121" />
       <source>PWM Command</source>
       <translation>PWM parancs</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1124" />
-      <location filename="../artisanlib/events.py" line="698" />
+      <location filename="../artisanlib/events.py" line="1133" />
+      <location filename="../artisanlib/events.py" line="705" />
       <location filename="../artisanlib/events.py" line="122" />
       <source>VOUT Command</source>
       <translation>VOUT parancs</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1125" />
-      <location filename="../artisanlib/events.py" line="700" />
+      <location filename="../artisanlib/events.py" line="1134" />
+      <location filename="../artisanlib/events.py" line="707" />
       <location filename="../artisanlib/events.py" line="123" />
       <source>S7 Command</source>
       <translation>S7 parancs</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1126" />
-      <location filename="../artisanlib/events.py" line="701" />
+      <location filename="../artisanlib/events.py" line="1135" />
+      <location filename="../artisanlib/events.py" line="708" />
       <location filename="../artisanlib/events.py" line="124" />
       <source>Aillio R1 Heater</source>
       <translation>Aillio R1 fűtés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1127" />
-      <location filename="../artisanlib/events.py" line="702" />
+      <location filename="../artisanlib/events.py" line="1136" />
+      <location filename="../artisanlib/events.py" line="709" />
       <location filename="../artisanlib/events.py" line="125" />
       <source>Aillio R1 Fan</source>
       <translation>Aillio R1 ventilátor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1128" />
-      <location filename="../artisanlib/events.py" line="703" />
+      <location filename="../artisanlib/events.py" line="1137" />
+      <location filename="../artisanlib/events.py" line="710" />
       <location filename="../artisanlib/events.py" line="126" />
       <source>Aillio R1 Drum</source>
       <translation>Aillio R1 dob</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1129" />
+      <location filename="../artisanlib/events.py" line="1138" />
       <location filename="../artisanlib/events.py" line="127" />
       <source>Aillio R1 Command</source>
       <translation>Aillio R1 parancs</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1130" />
-      <location filename="../artisanlib/events.py" line="704" />
+      <location filename="../artisanlib/events.py" line="1139" />
+      <location filename="../artisanlib/events.py" line="711" />
       <location filename="../artisanlib/events.py" line="128" />
       <source>Artisan Command</source>
       <translation>Kézműves parancsnokság</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1131" />
-      <location filename="../artisanlib/events.py" line="705" />
+      <location filename="../artisanlib/events.py" line="1140" />
+      <location filename="../artisanlib/events.py" line="712" />
       <location filename="../artisanlib/events.py" line="129" />
       <source>RC Command</source>
       <translation>RC parancs</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1133" />
-      <location filename="../artisanlib/events.py" line="706" />
+      <location filename="../artisanlib/events.py" line="1142" />
+      <location filename="../artisanlib/events.py" line="713" />
       <location filename="../artisanlib/events.py" line="130" />
       <source>WebSocket Command</source>
       <translation>WebSocket parancs</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="290" />
+      <location filename="../artisanlib/events.py" line="291" />
       <source>Flag</source>
       <translation>Zászló</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="291" />
+      <location filename="../artisanlib/events.py" line="292" />
       <source>Bar</source>
       <translation>Rúd</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="292" />
+      <location filename="../artisanlib/events.py" line="293" />
       <source>Step</source>
       <translation>Lépés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="293" />
+      <location filename="../artisanlib/events.py" line="294" />
       <source>Step+</source>
       <translation>+ Lépés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="294" />
+      <location filename="../artisanlib/events.py" line="295" />
       <source>Combo</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="560" />
+      <location filename="../artisanlib/events.py" line="561" />
       <source>tiny</source>
       <translation>apró</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="561" />
+      <location filename="../artisanlib/events.py" line="562" />
       <source>small</source>
       <translation>kicsi</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="562" />
+      <location filename="../artisanlib/events.py" line="563" />
       <source>large</source>
       <translation>nagy</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="837" />
-      <location filename="../artisanlib/alarms.py" line="813" />
-      <location filename="../artisanlib/events.py" line="2389" />
+      <location filename="../artisanlib/alarms.py" line="850" />
+      <location filename="../artisanlib/alarms.py" line="826" />
+      <location filename="../artisanlib/events.py" line="2406" />
       <source>ON</source>
       <translation type="unfinished">BE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="530" />
+      <location filename="../artisanlib/ports.py" line="532" />
       <source>bytes</source>
       <translation>bájtokat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="534" />
+      <location filename="../artisanlib/ports.py" line="536" />
       <source>words</source>
       <translation>szavak</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1007" />
-      <location filename="../artisanlib/ports.py" line="727" />
+      <location filename="../artisanlib/ports.py" line="1010" />
+      <location filename="../artisanlib/ports.py" line="729" />
       <source>optimize</source>
       <translation>optimalizálni</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1012" />
-      <location filename="../artisanlib/ports.py" line="732" />
+      <location filename="../artisanlib/ports.py" line="1015" />
+      <location filename="../artisanlib/ports.py" line="734" />
       <source>fetch full blocks</source>
       <translation>töltse le a teljes blokkot</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="737" />
+      <location filename="../artisanlib/ports.py" line="739" />
       <source>reset</source>
       <translation>Visszaállítás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/phases.py" line="132" />
+      <location filename="../artisanlib/phases.py" line="137" />
       <source>Time</source>
       <translation type="unfinished">Idő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/phases.py" line="133" />
+      <location filename="../artisanlib/phases.py" line="138" />
       <source>Percentage</source>
       <translation>Százalék</translation>
     </message>
     <message>
-      <location filename="../artisanlib/phases.py" line="134" />
+      <location filename="../artisanlib/phases.py" line="139" />
       <source>Temp</source>
       <translation type="unfinished">Hőmérséklet</translation>
     </message>
@@ -2336,129 +2336,129 @@ VÉGE</translation>
       <translation>cm ^ 3</translation>
     </message>
     <message>
-      <location filename="../artisanlib/transposer.py" line="139" />
-      <location filename="../artisanlib/curves.py" line="863" />
-      <location filename="../artisanlib/curves.py" line="426" />
+      <location filename="../artisanlib/transposer.py" line="141" />
+      <location filename="../artisanlib/curves.py" line="877" />
+      <location filename="../artisanlib/curves.py" line="439" />
       <source>linear</source>
       <translation type="unfinished">lineáris</translation>
     </message>
     <message>
-      <location filename="../artisanlib/transposer.py" line="140" />
-      <location filename="../artisanlib/curves.py" line="427" />
+      <location filename="../artisanlib/transposer.py" line="142" />
+      <location filename="../artisanlib/curves.py" line="440" />
       <source>quadratic</source>
       <translation>négyzetes</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="655" />
+      <location filename="../artisanlib/curves.py" line="668" />
       <source>classic</source>
       <translation>klasszikus</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="656" />
+      <location filename="../artisanlib/curves.py" line="669" />
       <source>xkcd</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="663" />
+      <location filename="../artisanlib/curves.py" line="676" />
       <source>Default</source>
       <translation>Alapértelmezett</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="864" />
+      <location filename="../artisanlib/curves.py" line="878" />
       <source>cubic</source>
       <translation type="unfinished">kubikus</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="865" />
+      <location filename="../artisanlib/curves.py" line="879" />
       <source>nearest</source>
       <translation type="unfinished">legközelebbi</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="841" />
-      <location filename="../artisanlib/curves.py" line="935" />
-      <location filename="../artisanlib/curves.py" line="903" />
+      <location filename="../artisanlib/alarms.py" line="854" />
+      <location filename="../artisanlib/curves.py" line="949" />
+      <location filename="../artisanlib/curves.py" line="917" />
       <source>DRY END</source>
       <translation type="unfinished">SZÁRÍTÁS VÉGE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="936" />
-      <location filename="../artisanlib/curves.py" line="904" />
+      <location filename="../artisanlib/curves.py" line="950" />
+      <location filename="../artisanlib/curves.py" line="918" />
       <source>120 secs before FCs</source>
       <translation>120 mp az FC-k előtt</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="937" />
-      <location filename="../artisanlib/curves.py" line="905" />
+      <location filename="../artisanlib/curves.py" line="951" />
+      <location filename="../artisanlib/curves.py" line="919" />
       <source>Custom</source>
       <translation>Egyedi</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="840" />
+      <location filename="../artisanlib/alarms.py" line="853" />
       <source>TP</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="842" />
+      <location filename="../artisanlib/alarms.py" line="855" />
       <source>FC START</source>
       <translation type="unfinished">FC KEZD</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="843" />
+      <location filename="../artisanlib/alarms.py" line="856" />
       <source>FC END</source>
       <translation type="unfinished">FC VÉGE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="844" />
+      <location filename="../artisanlib/alarms.py" line="857" />
       <source>SC START</source>
       <translation type="unfinished">SC KEZD</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="845" />
+      <location filename="../artisanlib/alarms.py" line="858" />
       <source>SC END</source>
       <translation type="unfinished">SC VÉGE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="847" />
+      <location filename="../artisanlib/alarms.py" line="860" />
       <source>COOL</source>
       <translation type="unfinished">HŰTÉS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="848" />
+      <location filename="../artisanlib/alarms.py" line="861" />
       <source>If Alarm</source>
       <translation>Ha Riasztás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="867" />
+      <location filename="../artisanlib/alarms.py" line="880" />
       <source>below</source>
       <translation type="unfinished">alatt</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="868" />
+      <location filename="../artisanlib/alarms.py" line="881" />
       <source>above</source>
       <translation type="unfinished">felett</translation>
     </message>
     <message>
-      <location filename="../artisanlib/transposer.py" line="138" />
+      <location filename="../artisanlib/transposer.py" line="140" />
       <source>discrete</source>
       <translation>diszkrét</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1303" />
+      <location filename="../artisanlib/canvas.py" line="1304" />
       <source>Propane Gas (LPG)</source>
       <translation>Propángáz (LPG)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1304" />
+      <location filename="../artisanlib/canvas.py" line="1305" />
       <source>Natural Gas (NG)</source>
       <translation>Földgáz (NG)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1305" />
+      <location filename="../artisanlib/canvas.py" line="1306" />
       <source>Electric</source>
       <translation>Elektromos</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2085" />
+      <location filename="../artisanlib/canvas.py" line="2086" />
       <source>Elec</source>
       <translation type="unfinished" />
     </message>
@@ -2574,47 +2574,47 @@ VÉGE</translation>
   <context>
     <name>Contextual Menu</name>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15481" />
+      <location filename="../artisanlib/canvas.py" line="15512" />
       <source>Add point</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15485" />
+      <location filename="../artisanlib/canvas.py" line="15516" />
       <source>Remove point</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15491" />
+      <location filename="../artisanlib/canvas.py" line="15522" />
       <source>Load points</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15495" />
+      <location filename="../artisanlib/canvas.py" line="15526" />
       <source>Save points</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15501" />
+      <location filename="../artisanlib/canvas.py" line="15532" />
       <source>Reset Designer</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15505" />
+      <location filename="../artisanlib/canvas.py" line="15536" />
       <source>Config...</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16226" />
+      <location filename="../artisanlib/canvas.py" line="16257" />
       <source>Add to Cupping Notes</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16230" />
+      <location filename="../artisanlib/canvas.py" line="16261" />
       <source>Add to Roasting Notes</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16236" />
+      <location filename="../artisanlib/canvas.py" line="16267" />
       <source>Edit</source>
       <translation>Szerkesztés</translation>
     </message>
@@ -3971,24 +3971,24 @@ VÉGE</translation>
   <context>
     <name>Error Message</name>
     <message>
-      <location filename="../artisanlib/main.py" line="24470" />
-      <location filename="../artisanlib/main.py" line="24433" />
-      <location filename="../artisanlib/main.py" line="24295" />
-      <location filename="../artisanlib/main.py" line="23975" />
-      <location filename="../artisanlib/main.py" line="23905" />
-      <location filename="../artisanlib/main.py" line="23875" />
-      <location filename="../artisanlib/main.py" line="23738" />
-      <location filename="../artisanlib/main.py" line="23619" />
-      <location filename="../artisanlib/main.py" line="23524" />
-      <location filename="../artisanlib/main.py" line="23320" />
-      <location filename="../artisanlib/main.py" line="23240" />
-      <location filename="../artisanlib/main.py" line="21473" />
-      <location filename="../artisanlib/main.py" line="20819" />
-      <location filename="../artisanlib/main.py" line="19523" />
-      <location filename="../artisanlib/main.py" line="15310" />
-      <location filename="../artisanlib/main.py" line="12431" />
-      <location filename="../artisanlib/main.py" line="11972" />
-      <location filename="../artisanlib/wheels.py" line="639" />
+      <location filename="../artisanlib/main.py" line="24602" />
+      <location filename="../artisanlib/main.py" line="24565" />
+      <location filename="../artisanlib/main.py" line="24427" />
+      <location filename="../artisanlib/main.py" line="24104" />
+      <location filename="../artisanlib/main.py" line="24034" />
+      <location filename="../artisanlib/main.py" line="24004" />
+      <location filename="../artisanlib/main.py" line="23867" />
+      <location filename="../artisanlib/main.py" line="23748" />
+      <location filename="../artisanlib/main.py" line="23653" />
+      <location filename="../artisanlib/main.py" line="23449" />
+      <location filename="../artisanlib/main.py" line="23369" />
+      <location filename="../artisanlib/main.py" line="21601" />
+      <location filename="../artisanlib/main.py" line="20947" />
+      <location filename="../artisanlib/main.py" line="19651" />
+      <location filename="../artisanlib/main.py" line="15433" />
+      <location filename="../artisanlib/main.py" line="12539" />
+      <location filename="../artisanlib/main.py" line="12080" />
+      <location filename="../artisanlib/wheels.py" line="654" />
       <source>IO Error:</source>
       <translation>IO hiba:</translation>
     </message>
@@ -4004,192 +4004,193 @@ VÉGE</translation>
       <translation>A WebSocket újracsatlakozása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16410" />
-      <location filename="../artisanlib/canvas.py" line="16000" />
-      <location filename="../artisanlib/canvas.py" line="15901" />
-      <location filename="../artisanlib/canvas.py" line="15859" />
-      <location filename="../artisanlib/canvas.py" line="15754" />
-      <location filename="../artisanlib/canvas.py" line="15736" />
+      <location filename="../artisanlib/canvas.py" line="16441" />
+      <location filename="../artisanlib/canvas.py" line="16031" />
+      <location filename="../artisanlib/canvas.py" line="15932" />
+      <location filename="../artisanlib/canvas.py" line="15890" />
+      <location filename="../artisanlib/canvas.py" line="15785" />
+      <location filename="../artisanlib/canvas.py" line="15767" />
+      <location filename="../artisanlib/canvas.py" line="15091" />
       <location filename="../artisanlib/canvas.py" line="15068" />
-      <location filename="../artisanlib/canvas.py" line="15045" />
-      <location filename="../artisanlib/canvas.py" line="14784" />
-      <location filename="../artisanlib/canvas.py" line="14760" />
-      <location filename="../artisanlib/canvas.py" line="14575" />
-      <location filename="../artisanlib/canvas.py" line="14412" />
-      <location filename="../artisanlib/canvas.py" line="14355" />
-      <location filename="../artisanlib/canvas.py" line="14325" />
-      <location filename="../artisanlib/canvas.py" line="14048" />
-      <location filename="../artisanlib/canvas.py" line="13824" />
-      <location filename="../artisanlib/canvas.py" line="13594" />
-      <location filename="../artisanlib/canvas.py" line="13492" />
-      <location filename="../artisanlib/canvas.py" line="13259" />
-      <location filename="../artisanlib/canvas.py" line="13081" />
-      <location filename="../artisanlib/canvas.py" line="12941" />
-      <location filename="../artisanlib/canvas.py" line="12778" />
-      <location filename="../artisanlib/canvas.py" line="12660" />
-      <location filename="../artisanlib/canvas.py" line="12549" />
-      <location filename="../artisanlib/canvas.py" line="12439" />
-      <location filename="../artisanlib/canvas.py" line="12322" />
-      <location filename="../artisanlib/canvas.py" line="12237" />
-      <location filename="../artisanlib/canvas.py" line="12174" />
-      <location filename="../artisanlib/canvas.py" line="12005" />
-      <location filename="../artisanlib/canvas.py" line="11948" />
-      <location filename="../artisanlib/canvas.py" line="11552" />
-      <location filename="../artisanlib/canvas.py" line="11404" />
-      <location filename="../artisanlib/canvas.py" line="10401" />
-      <location filename="../artisanlib/canvas.py" line="10175" />
-      <location filename="../artisanlib/canvas.py" line="10140" />
-      <location filename="../artisanlib/canvas.py" line="10097" />
-      <location filename="../artisanlib/canvas.py" line="9858" />
-      <location filename="../artisanlib/canvas.py" line="9805" />
-      <location filename="../artisanlib/canvas.py" line="9546" />
-      <location filename="../artisanlib/canvas.py" line="9514" />
-      <location filename="../artisanlib/canvas.py" line="9178" />
-      <location filename="../artisanlib/canvas.py" line="9136" />
-      <location filename="../artisanlib/canvas.py" line="9094" />
-      <location filename="../artisanlib/canvas.py" line="9051" />
-      <location filename="../artisanlib/canvas.py" line="8620" />
-      <location filename="../artisanlib/canvas.py" line="8578" />
-      <location filename="../artisanlib/canvas.py" line="8536" />
-      <location filename="../artisanlib/canvas.py" line="8494" />
-      <location filename="../artisanlib/canvas.py" line="7802" />
-      <location filename="../artisanlib/canvas.py" line="7766" />
-      <location filename="../artisanlib/canvas.py" line="7457" />
-      <location filename="../artisanlib/canvas.py" line="7291" />
-      <location filename="../artisanlib/canvas.py" line="6768" />
-      <location filename="../artisanlib/canvas.py" line="6657" />
-      <location filename="../artisanlib/canvas.py" line="6339" />
-      <location filename="../artisanlib/canvas.py" line="6115" />
-      <location filename="../artisanlib/canvas.py" line="5313" />
-      <location filename="../artisanlib/canvas.py" line="5132" />
-      <location filename="../artisanlib/canvas.py" line="5018" />
-      <location filename="../artisanlib/canvas.py" line="4990" />
-      <location filename="../artisanlib/canvas.py" line="4968" />
-      <location filename="../artisanlib/canvas.py" line="4885" />
-      <location filename="../artisanlib/canvas.py" line="4662" />
-      <location filename="../artisanlib/canvas.py" line="4556" />
-      <location filename="../artisanlib/canvas.py" line="4534" />
-      <location filename="../artisanlib/canvas.py" line="4523" />
-      <location filename="../artisanlib/canvas.py" line="4095" />
-      <location filename="../artisanlib/canvas.py" line="3352" />
-      <location filename="../artisanlib/canvas.py" line="2981" />
-      <location filename="../artisanlib/canvas.py" line="2866" />
-      <location filename="../artisanlib/canvas.py" line="2832" />
-      <location filename="../artisanlib/devices.py" line="3397" />
-      <location filename="../artisanlib/devices.py" line="2210" />
-      <location filename="../artisanlib/devices.py" line="2106" />
-      <location filename="../artisanlib/devices.py" line="2061" />
-      <location filename="../artisanlib/devices.py" line="2048" />
-      <location filename="../artisanlib/devices.py" line="1993" />
-      <location filename="../artisanlib/devices.py" line="1909" />
-      <location filename="../artisanlib/devices.py" line="1895" />
-      <location filename="../artisanlib/devices.py" line="1878" />
-      <location filename="../artisanlib/devices.py" line="1680" />
-      <location filename="../artisanlib/main.py" line="24957" />
-      <location filename="../artisanlib/main.py" line="24854" />
-      <location filename="../artisanlib/main.py" line="24715" />
-      <location filename="../artisanlib/main.py" line="24701" />
-      <location filename="../artisanlib/main.py" line="24475" />
-      <location filename="../artisanlib/main.py" line="24438" />
-      <location filename="../artisanlib/main.py" line="23985" />
-      <location filename="../artisanlib/main.py" line="23744" />
-      <location filename="../artisanlib/main.py" line="23625" />
-      <location filename="../artisanlib/main.py" line="23590" />
-      <location filename="../artisanlib/main.py" line="23531" />
-      <location filename="../artisanlib/main.py" line="23326" />
-      <location filename="../artisanlib/main.py" line="23246" />
-      <location filename="../artisanlib/main.py" line="22840" />
-      <location filename="../artisanlib/main.py" line="22630" />
-      <location filename="../artisanlib/main.py" line="22174" />
-      <location filename="../artisanlib/main.py" line="21966" />
-      <location filename="../artisanlib/main.py" line="21484" />
-      <location filename="../artisanlib/main.py" line="21080" />
-      <location filename="../artisanlib/main.py" line="21075" />
-      <location filename="../artisanlib/main.py" line="21010" />
-      <location filename="../artisanlib/main.py" line="20856" />
-      <location filename="../artisanlib/main.py" line="20853" />
-      <location filename="../artisanlib/main.py" line="20751" />
-      <location filename="../artisanlib/main.py" line="20605" />
-      <location filename="../artisanlib/main.py" line="20474" />
-      <location filename="../artisanlib/main.py" line="20110" />
-      <location filename="../artisanlib/main.py" line="19722" />
-      <location filename="../artisanlib/main.py" line="19571" />
-      <location filename="../artisanlib/main.py" line="19530" />
-      <location filename="../artisanlib/main.py" line="18968" />
-      <location filename="../artisanlib/main.py" line="18925" />
-      <location filename="../artisanlib/main.py" line="17958" />
-      <location filename="../artisanlib/main.py" line="17725" />
-      <location filename="../artisanlib/main.py" line="17690" />
-      <location filename="../artisanlib/main.py" line="17604" />
-      <location filename="../artisanlib/main.py" line="15630" />
-      <location filename="../artisanlib/main.py" line="15296" />
-      <location filename="../artisanlib/main.py" line="15203" />
-      <location filename="../artisanlib/main.py" line="15196" />
-      <location filename="../artisanlib/main.py" line="14970" />
-      <location filename="../artisanlib/main.py" line="14915" />
-      <location filename="../artisanlib/main.py" line="14899" />
-      <location filename="../artisanlib/main.py" line="14802" />
-      <location filename="../artisanlib/main.py" line="14778" />
-      <location filename="../artisanlib/main.py" line="14760" />
-      <location filename="../artisanlib/main.py" line="14543" />
-      <location filename="../artisanlib/main.py" line="13527" />
-      <location filename="../artisanlib/main.py" line="13488" />
-      <location filename="../artisanlib/main.py" line="13314" />
-      <location filename="../artisanlib/main.py" line="12952" />
-      <location filename="../artisanlib/main.py" line="12916" />
-      <location filename="../artisanlib/main.py" line="12902" />
-      <location filename="../artisanlib/main.py" line="12883" />
-      <location filename="../artisanlib/main.py" line="12807" />
-      <location filename="../artisanlib/main.py" line="12666" />
-      <location filename="../artisanlib/main.py" line="12554" />
-      <location filename="../artisanlib/main.py" line="12442" />
-      <location filename="../artisanlib/main.py" line="12181" />
-      <location filename="../artisanlib/main.py" line="12130" />
-      <location filename="../artisanlib/main.py" line="11990" />
-      <location filename="../artisanlib/main.py" line="11859" />
-      <location filename="../artisanlib/main.py" line="11605" />
-      <location filename="../artisanlib/main.py" line="8486" />
-      <location filename="../artisanlib/main.py" line="7844" />
-      <location filename="../artisanlib/main.py" line="7559" />
-      <location filename="../artisanlib/main.py" line="7270" />
-      <location filename="../artisanlib/main.py" line="7208" />
-      <location filename="../artisanlib/main.py" line="6910" />
-      <location filename="../artisanlib/main.py" line="6596" />
-      <location filename="../artisanlib/main.py" line="6492" />
-      <location filename="../artisanlib/main.py" line="5760" />
-      <location filename="../artisanlib/main.py" line="5448" />
-      <location filename="../artisanlib/main.py" line="5425" />
-      <location filename="../artisanlib/main.py" line="5396" />
-      <location filename="../artisanlib/main.py" line="5365" />
-      <location filename="../artisanlib/main.py" line="4853" />
-      <location filename="../artisanlib/main.py" line="4579" />
-      <location filename="../artisanlib/main.py" line="1273" />
-      <location filename="../artisanlib/alarms.py" line="1012" />
-      <location filename="../artisanlib/alarms.py" line="795" />
-      <location filename="../artisanlib/alarms.py" line="688" />
-      <location filename="../artisanlib/alarms.py" line="659" />
-      <location filename="../artisanlib/curves.py" line="2374" />
-      <location filename="../artisanlib/curves.py" line="2319" />
-      <location filename="../artisanlib/curves.py" line="2301" />
-      <location filename="../artisanlib/curves.py" line="2273" />
-      <location filename="../artisanlib/curves.py" line="1890" />
-      <location filename="../artisanlib/curves.py" line="1881" />
-      <location filename="../artisanlib/curves.py" line="1815" />
-      <location filename="../artisanlib/curves.py" line="1802" />
-      <location filename="../artisanlib/curves.py" line="1790" />
-      <location filename="../artisanlib/curves.py" line="1619" />
-      <location filename="../artisanlib/curves.py" line="1569" />
+      <location filename="../artisanlib/canvas.py" line="14807" />
+      <location filename="../artisanlib/canvas.py" line="14783" />
+      <location filename="../artisanlib/canvas.py" line="14598" />
+      <location filename="../artisanlib/canvas.py" line="14435" />
+      <location filename="../artisanlib/canvas.py" line="14378" />
+      <location filename="../artisanlib/canvas.py" line="14348" />
+      <location filename="../artisanlib/canvas.py" line="14071" />
+      <location filename="../artisanlib/canvas.py" line="13847" />
+      <location filename="../artisanlib/canvas.py" line="13617" />
+      <location filename="../artisanlib/canvas.py" line="13515" />
+      <location filename="../artisanlib/canvas.py" line="13282" />
+      <location filename="../artisanlib/canvas.py" line="13104" />
+      <location filename="../artisanlib/canvas.py" line="12964" />
+      <location filename="../artisanlib/canvas.py" line="12801" />
+      <location filename="../artisanlib/canvas.py" line="12683" />
+      <location filename="../artisanlib/canvas.py" line="12572" />
+      <location filename="../artisanlib/canvas.py" line="12462" />
+      <location filename="../artisanlib/canvas.py" line="12345" />
+      <location filename="../artisanlib/canvas.py" line="12259" />
+      <location filename="../artisanlib/canvas.py" line="12196" />
+      <location filename="../artisanlib/canvas.py" line="12027" />
+      <location filename="../artisanlib/canvas.py" line="11969" />
+      <location filename="../artisanlib/canvas.py" line="11573" />
+      <location filename="../artisanlib/canvas.py" line="11539" />
+      <location filename="../artisanlib/canvas.py" line="11408" />
+      <location filename="../artisanlib/canvas.py" line="10409" />
+      <location filename="../artisanlib/canvas.py" line="10183" />
+      <location filename="../artisanlib/canvas.py" line="10148" />
+      <location filename="../artisanlib/canvas.py" line="10105" />
+      <location filename="../artisanlib/canvas.py" line="9865" />
+      <location filename="../artisanlib/canvas.py" line="9812" />
+      <location filename="../artisanlib/canvas.py" line="9553" />
+      <location filename="../artisanlib/canvas.py" line="9521" />
+      <location filename="../artisanlib/canvas.py" line="9185" />
+      <location filename="../artisanlib/canvas.py" line="9143" />
+      <location filename="../artisanlib/canvas.py" line="9101" />
+      <location filename="../artisanlib/canvas.py" line="9058" />
+      <location filename="../artisanlib/canvas.py" line="8627" />
+      <location filename="../artisanlib/canvas.py" line="8585" />
+      <location filename="../artisanlib/canvas.py" line="8543" />
+      <location filename="../artisanlib/canvas.py" line="8501" />
+      <location filename="../artisanlib/canvas.py" line="7809" />
+      <location filename="../artisanlib/canvas.py" line="7773" />
+      <location filename="../artisanlib/canvas.py" line="7463" />
+      <location filename="../artisanlib/canvas.py" line="7297" />
+      <location filename="../artisanlib/canvas.py" line="6774" />
+      <location filename="../artisanlib/canvas.py" line="6663" />
+      <location filename="../artisanlib/canvas.py" line="6345" />
+      <location filename="../artisanlib/canvas.py" line="6121" />
+      <location filename="../artisanlib/canvas.py" line="5319" />
+      <location filename="../artisanlib/canvas.py" line="5138" />
+      <location filename="../artisanlib/canvas.py" line="5024" />
+      <location filename="../artisanlib/canvas.py" line="4996" />
+      <location filename="../artisanlib/canvas.py" line="4974" />
+      <location filename="../artisanlib/canvas.py" line="4891" />
+      <location filename="../artisanlib/canvas.py" line="4664" />
+      <location filename="../artisanlib/canvas.py" line="4558" />
+      <location filename="../artisanlib/canvas.py" line="4536" />
+      <location filename="../artisanlib/canvas.py" line="4525" />
+      <location filename="../artisanlib/canvas.py" line="4097" />
+      <location filename="../artisanlib/canvas.py" line="3354" />
+      <location filename="../artisanlib/canvas.py" line="2983" />
+      <location filename="../artisanlib/canvas.py" line="2868" />
+      <location filename="../artisanlib/canvas.py" line="2834" />
+      <location filename="../artisanlib/devices.py" line="3409" />
+      <location filename="../artisanlib/devices.py" line="2222" />
+      <location filename="../artisanlib/devices.py" line="2118" />
+      <location filename="../artisanlib/devices.py" line="2073" />
+      <location filename="../artisanlib/devices.py" line="2060" />
+      <location filename="../artisanlib/devices.py" line="2005" />
+      <location filename="../artisanlib/devices.py" line="1921" />
+      <location filename="../artisanlib/devices.py" line="1907" />
+      <location filename="../artisanlib/devices.py" line="1890" />
+      <location filename="../artisanlib/devices.py" line="1687" />
+      <location filename="../artisanlib/main.py" line="25089" />
+      <location filename="../artisanlib/main.py" line="24986" />
+      <location filename="../artisanlib/main.py" line="24847" />
+      <location filename="../artisanlib/main.py" line="24833" />
+      <location filename="../artisanlib/main.py" line="24607" />
+      <location filename="../artisanlib/main.py" line="24570" />
+      <location filename="../artisanlib/main.py" line="24114" />
+      <location filename="../artisanlib/main.py" line="23873" />
+      <location filename="../artisanlib/main.py" line="23754" />
+      <location filename="../artisanlib/main.py" line="23719" />
+      <location filename="../artisanlib/main.py" line="23660" />
+      <location filename="../artisanlib/main.py" line="23455" />
+      <location filename="../artisanlib/main.py" line="23375" />
+      <location filename="../artisanlib/main.py" line="22969" />
+      <location filename="../artisanlib/main.py" line="22759" />
+      <location filename="../artisanlib/main.py" line="22302" />
+      <location filename="../artisanlib/main.py" line="22094" />
+      <location filename="../artisanlib/main.py" line="21612" />
+      <location filename="../artisanlib/main.py" line="21208" />
+      <location filename="../artisanlib/main.py" line="21203" />
+      <location filename="../artisanlib/main.py" line="21138" />
+      <location filename="../artisanlib/main.py" line="20984" />
+      <location filename="../artisanlib/main.py" line="20981" />
+      <location filename="../artisanlib/main.py" line="20879" />
+      <location filename="../artisanlib/main.py" line="20733" />
+      <location filename="../artisanlib/main.py" line="20602" />
+      <location filename="../artisanlib/main.py" line="20238" />
+      <location filename="../artisanlib/main.py" line="19850" />
+      <location filename="../artisanlib/main.py" line="19699" />
+      <location filename="../artisanlib/main.py" line="19658" />
+      <location filename="../artisanlib/main.py" line="19096" />
+      <location filename="../artisanlib/main.py" line="19053" />
+      <location filename="../artisanlib/main.py" line="18085" />
+      <location filename="../artisanlib/main.py" line="17852" />
+      <location filename="../artisanlib/main.py" line="17813" />
+      <location filename="../artisanlib/main.py" line="17727" />
+      <location filename="../artisanlib/main.py" line="15753" />
+      <location filename="../artisanlib/main.py" line="15419" />
+      <location filename="../artisanlib/main.py" line="15326" />
+      <location filename="../artisanlib/main.py" line="15319" />
+      <location filename="../artisanlib/main.py" line="15092" />
+      <location filename="../artisanlib/main.py" line="15037" />
+      <location filename="../artisanlib/main.py" line="15021" />
+      <location filename="../artisanlib/main.py" line="14924" />
+      <location filename="../artisanlib/main.py" line="14900" />
+      <location filename="../artisanlib/main.py" line="14882" />
+      <location filename="../artisanlib/main.py" line="14665" />
+      <location filename="../artisanlib/main.py" line="13635" />
+      <location filename="../artisanlib/main.py" line="13596" />
+      <location filename="../artisanlib/main.py" line="13422" />
+      <location filename="../artisanlib/main.py" line="13060" />
+      <location filename="../artisanlib/main.py" line="13024" />
+      <location filename="../artisanlib/main.py" line="13010" />
+      <location filename="../artisanlib/main.py" line="12991" />
+      <location filename="../artisanlib/main.py" line="12915" />
+      <location filename="../artisanlib/main.py" line="12774" />
+      <location filename="../artisanlib/main.py" line="12662" />
+      <location filename="../artisanlib/main.py" line="12550" />
+      <location filename="../artisanlib/main.py" line="12289" />
+      <location filename="../artisanlib/main.py" line="12238" />
+      <location filename="../artisanlib/main.py" line="12098" />
+      <location filename="../artisanlib/main.py" line="11967" />
+      <location filename="../artisanlib/main.py" line="11713" />
+      <location filename="../artisanlib/main.py" line="8552" />
+      <location filename="../artisanlib/main.py" line="7910" />
+      <location filename="../artisanlib/main.py" line="7625" />
+      <location filename="../artisanlib/main.py" line="7336" />
+      <location filename="../artisanlib/main.py" line="7274" />
+      <location filename="../artisanlib/main.py" line="6976" />
+      <location filename="../artisanlib/main.py" line="6662" />
+      <location filename="../artisanlib/main.py" line="6558" />
+      <location filename="../artisanlib/main.py" line="5826" />
+      <location filename="../artisanlib/main.py" line="5514" />
+      <location filename="../artisanlib/main.py" line="5491" />
+      <location filename="../artisanlib/main.py" line="5462" />
+      <location filename="../artisanlib/main.py" line="5431" />
+      <location filename="../artisanlib/main.py" line="4907" />
+      <location filename="../artisanlib/main.py" line="4632" />
+      <location filename="../artisanlib/main.py" line="1274" />
+      <location filename="../artisanlib/alarms.py" line="1033" />
+      <location filename="../artisanlib/alarms.py" line="808" />
+      <location filename="../artisanlib/alarms.py" line="697" />
+      <location filename="../artisanlib/alarms.py" line="668" />
+      <location filename="../artisanlib/curves.py" line="2390" />
+      <location filename="../artisanlib/curves.py" line="2335" />
+      <location filename="../artisanlib/curves.py" line="2317" />
+      <location filename="../artisanlib/curves.py" line="2289" />
+      <location filename="../artisanlib/curves.py" line="1906" />
+      <location filename="../artisanlib/curves.py" line="1897" />
+      <location filename="../artisanlib/curves.py" line="1831" />
+      <location filename="../artisanlib/curves.py" line="1818" />
+      <location filename="../artisanlib/curves.py" line="1806" />
+      <location filename="../artisanlib/curves.py" line="1635" />
+      <location filename="../artisanlib/curves.py" line="1585" />
       <location filename="../artisanlib/pid_control.py" line="941" />
       <location filename="../artisanlib/pid_control.py" line="926" />
       <location filename="../artisanlib/pid_control.py" line="910" />
       <location filename="../artisanlib/pid_control.py" line="793" />
       <location filename="../artisanlib/pid_control.py" line="769" />
       <location filename="../artisanlib/pid_control.py" line="701" />
-      <location filename="../artisanlib/roast_properties.py" line="3276" />
-      <location filename="../artisanlib/roast_properties.py" line="2512" />
-      <location filename="../artisanlib/ports.py" line="1817" />
-      <location filename="../artisanlib/ports.py" line="1768" />
-      <location filename="../artisanlib/events.py" line="3341" />
+      <location filename="../artisanlib/roast_properties.py" line="3306" />
+      <location filename="../artisanlib/roast_properties.py" line="2519" />
+      <location filename="../artisanlib/ports.py" line="1822" />
+      <location filename="../artisanlib/ports.py" line="1773" />
+      <location filename="../artisanlib/events.py" line="3373" />
       <location filename="../artisanlib/comm.py" line="6505" />
       <location filename="../artisanlib/comm.py" line="6472" />
       <location filename="../artisanlib/comm.py" line="6361" />
@@ -4221,30 +4222,30 @@ VÉGE</translation>
       <location filename="../artisanlib/comm.py" line="552" />
       <location filename="../artisanlib/comm.py" line="548" />
       <location filename="../artisanlib/comm.py" line="544" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3805" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2829" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2804" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2741" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1866" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1666" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1639" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1634" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1611" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1609" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1205" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1138" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1081" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3815" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2839" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2814" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2751" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1874" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1674" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1647" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1642" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1619" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1617" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1213" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1146" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1089" />
       <location filename="../artisanlib/pid_dialogs.py" line="872" />
       <location filename="../artisanlib/pid_dialogs.py" line="841" />
-      <location filename="../artisanlib/comparator.py" line="1368" />
+      <location filename="../artisanlib/comparator.py" line="1392" />
       <location filename="../artisanlib/wsport.py" line="345" />
       <source>Exception:</source>
       <translation>Kivétel:</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="1034" />
-      <location filename="../artisanlib/pid_dialogs.py" line="4002" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2022" />
+      <location filename="../artisanlib/pid_dialogs.py" line="4014" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2032" />
       <source>Segment values could not be written into PID</source>
       <translation>A szegmensértékek nem írhatók be a PID-be</translation>
     </message>
@@ -4381,36 +4382,36 @@ VÉGE</translation>
       <translation>Az Arduino nem tudott szűrőket beállítani</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16404" />
-      <location filename="../artisanlib/canvas.py" line="15994" />
-      <location filename="../artisanlib/canvas.py" line="14779" />
-      <location filename="../artisanlib/canvas.py" line="14755" />
-      <location filename="../artisanlib/canvas.py" line="14569" />
-      <location filename="../artisanlib/main.py" line="23980" />
-      <location filename="../artisanlib/main.py" line="23740" />
-      <location filename="../artisanlib/main.py" line="23621" />
-      <location filename="../artisanlib/main.py" line="23526" />
-      <location filename="../artisanlib/main.py" line="23322" />
-      <location filename="../artisanlib/main.py" line="23242" />
-      <location filename="../artisanlib/main.py" line="12436" />
-      <location filename="../artisanlib/main.py" line="11986" />
+      <location filename="../artisanlib/canvas.py" line="16435" />
+      <location filename="../artisanlib/canvas.py" line="16025" />
+      <location filename="../artisanlib/canvas.py" line="14802" />
+      <location filename="../artisanlib/canvas.py" line="14778" />
+      <location filename="../artisanlib/canvas.py" line="14592" />
+      <location filename="../artisanlib/main.py" line="24109" />
+      <location filename="../artisanlib/main.py" line="23869" />
+      <location filename="../artisanlib/main.py" line="23750" />
+      <location filename="../artisanlib/main.py" line="23655" />
+      <location filename="../artisanlib/main.py" line="23451" />
+      <location filename="../artisanlib/main.py" line="23371" />
+      <location filename="../artisanlib/main.py" line="12544" />
+      <location filename="../artisanlib/main.py" line="12094" />
       <location filename="../artisanlib/comm.py" line="6455" />
       <location filename="../artisanlib/comm.py" line="6352" />
       <source>Value Error:</source>
       <translation>Értékhiba:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1874" />
+      <location filename="../artisanlib/ports.py" line="1879" />
       <source>Serial Exception: invalid comm port</source>
       <translation>Soros kivétel: érvénytelen kommunikációs port</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1878" />
+      <location filename="../artisanlib/ports.py" line="1883" />
       <source>Serial Exception: timeout</source>
       <translation>Sorozat kivétel: időtúllépés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="4706" />
+      <location filename="../artisanlib/roast_properties.py" line="4754" />
       <source>Unable to move CHARGE to a value that does not exist</source>
       <translation>A CHARGE nem helyezhető át nem létező értékre</translation>
     </message>
@@ -4458,23 +4459,23 @@ VÉGE</translation>
       <translation>pid.readoneword(): {0} RX bájt érkezett (7 szükséges) az egységazonosítóhoz={1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1952" />
-      <location filename="../artisanlib/curves.py" line="1897" />
+      <location filename="../artisanlib/curves.py" line="1968" />
+      <location filename="../artisanlib/curves.py" line="1913" />
       <source>Univariate: no profile data available</source>
       <translation>Egyváltozós: nem állnak rendelkezésre profiladatok</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1911" />
+      <location filename="../artisanlib/curves.py" line="1927" />
       <source>ln(): no profile data available</source>
       <translation>ln(): nem állnak rendelkezésre profiladatok</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1930" />
+      <location filename="../artisanlib/curves.py" line="1946" />
       <source>expvar(): no profile data available</source>
       <translation>expvar(): nem állnak rendelkezésre profiladatok</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="2181" />
+      <location filename="../artisanlib/curves.py" line="2197" />
       <source>Polyfit: no profile data available</source>
       <translation>Polyfit: nem állnak rendelkezésre profiladatok</translation>
     </message>
@@ -4514,76 +4515,80 @@ VÉGE</translation>
       <translation>S7 kommunikációs hiba</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11540" />
-      <location filename="../artisanlib/main.py" line="11468" />
+      <location filename="../artisanlib/main.py" line="11648" />
+      <location filename="../artisanlib/main.py" line="11576" />
       <source>Error:</source>
       <translation>Hiba:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15773" />
+      <location filename="../artisanlib/main.py" line="15896" />
       <source>Exception: {} not a valid settings file</source>
       <translation>Kivétel: {} nem érvényes beállítási fájl</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="18968" />
-      <location filename="../artisanlib/main.py" line="18925" />
-      <location filename="../artisanlib/main.py" line="18918" />
-      <location filename="../artisanlib/main.py" line="17690" />
-      <location filename="../artisanlib/main.py" line="17604" />
+      <location filename="../artisanlib/main.py" line="19096" />
+      <location filename="../artisanlib/main.py" line="19053" />
+      <location filename="../artisanlib/main.py" line="19046" />
+      <location filename="../artisanlib/main.py" line="17813" />
+      <location filename="../artisanlib/main.py" line="17727" />
       <source>Error</source>
       <translation>Hiba</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="17718" />
+      <location filename="../artisanlib/main.py" line="17845" />
       <source>Exception: WebLCDs not supported by this build</source>
       <translation>Kivétel: Ez a build nem támogatja a WebLCD-ket</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="18918" />
+      <location filename="../artisanlib/main.py" line="19046" />
       <source>Failed to save settings</source>
       <translation>Nem sikerült menteni a beállításokat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20683" />
-      <location filename="../artisanlib/main.py" line="20310" />
+      <location filename="../artisanlib/main.py" line="20811" />
+      <location filename="../artisanlib/main.py" line="20438" />
       <source>Exception (probably due to an empty profile):</source>
       <translation>Kivétel (valószínűleg üres profil miatt):</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24519" />
+      <location filename="../artisanlib/main.py" line="24651" />
       <source>Analyze: CHARGE event required, none found</source>
       <translation>Elemzés: CHARGE esemény szükséges, egyik sem található</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24523" />
+      <location filename="../artisanlib/main.py" line="24655" />
       <source>Analyze: DROP event required, none found</source>
       <translation>Elemzés: DROP esemény szükséges, egyik sem található</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24612" />
+      <location filename="../artisanlib/main.py" line="24744" />
       <source>Analyze: no background profile data available</source>
       <translation>Elemzés: nem állnak rendelkezésre háttérprofil adatok</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24615" />
+      <location filename="../artisanlib/main.py" line="24747" />
       <source>Analyze: background profile requires CHARGE and DROP events</source>
       <translation>Elemzés: a háttérprofilhoz CHARGE és DROP események szükségesek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11229" />
-      <location filename="../artisanlib/canvas.py" line="11222" />
+      <location filename="../artisanlib/canvas.py" line="11234" />
+      <location filename="../artisanlib/canvas.py" line="11227" />
       <source>Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!</source>
       <translation>Kivétel: a PhidgetManager nem indítható el. Ellenőrizze, hogy a Phidget illesztőprogram megfelelően van-e telepítve!</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14721" />
+      <location filename="../artisanlib/canvas.py" line="14744" />
       <source>Error in lnRegression:</source>
       <translation>Hiba az lnRegresszióban:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15418" />
+      <location filename="../artisanlib/canvas.py" line="15449" />
+      <source>Exception: redrawdesigner() Roast events may be out of order. Resetting Designer.</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
       <source>Exception: redrawdesigner() Roast events may be out of order. Restting Designer.</source>
-      <translation>Kivétel: redrawdesigner() A roast események esetleg nem megfelelőek. Pihenő tervező.</translation>
+      <translation type="vanished">Kivétel: redrawdesigner() A roast események esetleg nem megfelelőek. Pihenő tervező.</translation>
     </message>
   </context>
   <context>
@@ -4628,17 +4633,17 @@ VÉGE</translation>
   <context>
     <name>Form Caption</name>
     <message>
-      <location filename="../artisanlib/axis.py" line="70" />
+      <location filename="../artisanlib/axis.py" line="74" />
       <source>Axes</source>
       <translation type="unfinished">Tengelyek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="44" />
+      <location filename="../artisanlib/wheels.py" line="46" />
       <source>Wheel Graph Editor</source>
       <translation type="unfinished">Ízkör Szerkesztő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/comparator.py" line="799" />
+      <location filename="../artisanlib/comparator.py" line="805" />
       <source>Comparator</source>
       <translation>Összehasonlító</translation>
     </message>
@@ -4663,22 +4668,22 @@ VÉGE</translation>
       <translation>PID vezérlés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1218" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1226" />
       <source>Fuji PXR PID Control</source>
       <translation type="unfinished">Fuji PXR PID Vezérlés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2035" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2045" />
       <source>Fuji PXG PID Control</source>
       <translation type="unfinished">Fuji PXG PID Vezérlés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2037" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2047" />
       <source>Fuji PXF PID Control</source>
       <translation>Fuji PXF PID vezérlés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="4014" />
+      <location filename="../artisanlib/pid_dialogs.py" line="4026" />
       <source>Delta DTA PID Control</source>
       <translation>Delta DTA PID Vezérlés</translation>
     </message>
@@ -4688,22 +4693,22 @@ VÉGE</translation>
       <translation type="unfinished">Kézi hőmérő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/autosave.py" line="35" />
+      <location filename="../artisanlib/autosave.py" line="40" />
       <source>Autosave</source>
       <translation>Automatikus mentés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/autosave.py" line="146" />
+      <location filename="../artisanlib/autosave.py" line="156" />
       <source>Autosave Fields Help</source>
       <translation>Mezők automatikus mentése súgó</translation>
     </message>
     <message>
-      <location filename="../artisanlib/autosave.py" line="166" />
+      <location filename="../artisanlib/autosave.py" line="176" />
       <source>AutoSave Path</source>
       <translation type="unfinished">Automatikus Mentés Elérési Útja</translation>
     </message>
     <message>
-      <location filename="../artisanlib/autosave.py" line="171" />
+      <location filename="../artisanlib/autosave.py" line="181" />
       <source>AutoSave Save Also Path</source>
       <translation>Automatikus mentés útvonal mentése</translation>
     </message>
@@ -4713,35 +4718,35 @@ VÉGE</translation>
       <translation type="unfinished">Események</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3482" />
-      <location filename="../artisanlib/events.py" line="824" />
-      <location filename="../artisanlib/events.py" line="819" />
-      <location filename="../artisanlib/events.py" line="815" />
-      <location filename="../artisanlib/events.py" line="810" />
+      <location filename="../artisanlib/events.py" line="3519" />
+      <location filename="../artisanlib/events.py" line="831" />
+      <location filename="../artisanlib/events.py" line="826" />
+      <location filename="../artisanlib/events.py" line="822" />
+      <location filename="../artisanlib/events.py" line="817" />
       <source>Slider Calculator</source>
       <translation>Csúszka számológép</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3357" />
+      <location filename="../artisanlib/events.py" line="3389" />
       <source>Event Custom Buttons Help</source>
       <translation>Esemény egyéni gombjai súgó</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3366" />
+      <location filename="../artisanlib/events.py" line="3398" />
       <source>Event Custom Sliders Help</source>
       <translation>Esemény egyéni csúszkák súgó</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3375" />
+      <location filename="../artisanlib/events.py" line="3407" />
       <source>Event Annotations Help</source>
       <translation>Eseményjegyzetek Segítség</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11571" />
-      <location filename="../artisanlib/main.py" line="3213" />
+      <location filename="../artisanlib/main.py" line="11679" />
+      <location filename="../artisanlib/main.py" line="3250" />
       <location filename="../artisanlib/calculator.py" line="58" />
       <location filename="../artisanlib/calculator.py" line="56" />
-      <location filename="../artisanlib/events.py" line="3518" />
+      <location filename="../artisanlib/events.py" line="3556" />
       <source>Event</source>
       <translation>Esemény</translation>
     </message>
@@ -4761,12 +4766,12 @@ VÉGE</translation>
       <translation type="unfinished">Soros Port Konfig</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1826" />
+      <location filename="../artisanlib/ports.py" line="1831" />
       <source>MODBUS Help</source>
       <translation>MODBUS súgó</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1833" />
+      <location filename="../artisanlib/ports.py" line="1838" />
       <source>S7 Help</source>
       <translation>S7 Súgó</translation>
     </message>
@@ -4776,33 +4781,33 @@ VÉGE</translation>
       <translation type="unfinished">Profil háttér</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="83" />
+      <location filename="../artisanlib/roast_properties.py" line="86" />
       <source>Volume Calculator</source>
       <translation>Hangerő kalkulátor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="541" />
+      <location filename="../artisanlib/roast_properties.py" line="546" />
       <source>Roast Properties</source>
       <translation>Pörkölés Beállításai</translation>
     </message>
     <message>
       <location filename="../plus/blend.py" line="156" />
-      <location filename="../artisanlib/roast_properties.py" line="1625" />
+      <location filename="../artisanlib/roast_properties.py" line="1632" />
       <source>Custom Blend</source>
       <translation>Egyedi keverék</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="3734" />
+      <location filename="../artisanlib/roast_properties.py" line="3767" />
       <source>Energy Help</source>
       <translation>Energia Segítség</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="5158" />
+      <location filename="../artisanlib/roast_properties.py" line="5208" />
       <source>Tare Setup</source>
       <translation>Tára beállítás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="5304" />
+      <location filename="../artisanlib/roast_properties.py" line="5359" />
       <source>Set Measure from Profile</source>
       <translation>Állítsa be a Mérés profilból lehetőséget</translation>
     </message>
@@ -4812,7 +4817,7 @@ VÉGE</translation>
       <translation>Kézműves platform</translation>
     </message>
     <message>
-      <location filename="../artisanlib/phases.py" line="32" />
+      <location filename="../artisanlib/phases.py" line="36" />
       <source>Roast Phases</source>
       <translation type="unfinished">Pörkölési fázisok</translation>
     </message>
@@ -4832,12 +4837,12 @@ VÉGE</translation>
       <translation type="unfinished">Üzenet Előzmények</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="43" />
+      <location filename="../artisanlib/designer.py" line="46" />
       <source>Designer Config</source>
       <translation type="unfinished">Tervező Konfig</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="611" />
+      <location filename="../artisanlib/designer.py" line="713" />
       <source>Add Point</source>
       <translation>Add pont</translation>
     </message>
@@ -4852,19 +4857,19 @@ VÉGE</translation>
       <translation>Plotter adatok</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="287" />
+      <location filename="../artisanlib/curves.py" line="300" />
       <source>Curves</source>
       <translation>Görbék</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="3414" />
-      <location filename="../artisanlib/devices.py" line="3405" />
-      <location filename="../artisanlib/curves.py" line="2406" />
+      <location filename="../artisanlib/devices.py" line="3426" />
+      <location filename="../artisanlib/devices.py" line="3417" />
+      <location filename="../artisanlib/curves.py" line="2422" />
       <source>Symbolic Formulas Help</source>
       <translation>A szimbolikus képletek segítenek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/statistics.py" line="36" />
+      <location filename="../artisanlib/statistics.py" line="40" />
       <source>Statistics</source>
       <translation type="unfinished">Statisztika</translation>
     </message>
@@ -4874,12 +4879,12 @@ VÉGE</translation>
       <translation type="unfinished">Riasztások</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="1121" />
+      <location filename="../artisanlib/alarms.py" line="1159" />
       <source>Alarms Help</source>
       <translation>Riasztások Segítség</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11550" />
+      <location filename="../artisanlib/main.py" line="11658" />
       <source>Keyboard Shortcuts Help</source>
       <translation>Billentyűparancsok súgó</translation>
     </message>
@@ -4894,7 +4899,7 @@ VÉGE</translation>
       <translation type="unfinished">Eszköz Hozzárendelés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="3423" />
+      <location filename="../artisanlib/devices.py" line="3435" />
       <source>External Programs Help</source>
       <translation>Külső programok súgója</translation>
     </message>
@@ -4904,7 +4909,7 @@ VÉGE</translation>
       <translation>Profil transzponzor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/transposer.py" line="603" />
+      <location filename="../artisanlib/transposer.py" line="607" />
       <source>Profile Transposer Help</source>
       <translation>A profilátültető súgója</translation>
     </message>
@@ -4934,35 +4939,35 @@ VÉGE</translation>
   <context>
     <name>GroupBox</name>
     <message>
-      <location filename="../artisanlib/axis.py" line="422" />
+      <location filename="../artisanlib/axis.py" line="427" />
       <source>Time Axis</source>
       <translation>Időtengely</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="424" />
+      <location filename="../artisanlib/axis.py" line="429" />
       <source>Temperature Axis</source>
       <translation>Hőmérséklet-tengely</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1543" />
-      <location filename="../artisanlib/devices.py" line="1542" />
-      <location filename="../artisanlib/curves.py" line="988" />
-      <location filename="../artisanlib/axis.py" line="426" />
+      <location filename="../artisanlib/devices.py" line="1547" />
+      <location filename="../artisanlib/devices.py" line="1546" />
+      <location filename="../artisanlib/curves.py" line="1002" />
+      <location filename="../artisanlib/axis.py" line="431" />
       <source>Axis</source>
       <translation>Tengely</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="428" />
+      <location filename="../artisanlib/axis.py" line="433" />
       <source>Legend Location</source>
       <translation>Jelmagyarázat helye</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="430" />
+      <location filename="../artisanlib/axis.py" line="435" />
       <source>Grid</source>
       <translation type="unfinished">Háló</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="143" />
+      <location filename="../artisanlib/wheels.py" line="154" />
       <source>Label Properties</source>
       <translation>Címke tulajdonságai</translation>
     </message>
@@ -4987,89 +4992,89 @@ VÉGE</translation>
       <translation>Kötelesség</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1110" />
+      <location filename="../artisanlib/events.py" line="1119" />
       <source>Event Types</source>
       <translation>Eseménytípusok</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1300" />
+      <location filename="../artisanlib/events.py" line="1309" />
       <source>Default Buttons</source>
       <translation>Alapértelmezett gombok</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1311" />
+      <location filename="../artisanlib/events.py" line="1320" />
       <source>Sampling</source>
       <translation>Mintavétel</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="209" />
-      <location filename="../artisanlib/events.py" line="1374" />
+      <location filename="../artisanlib/alarms.py" line="210" />
+      <location filename="../artisanlib/events.py" line="1383" />
       <source>Management</source>
       <translation>Menedzsment</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1186" />
-      <location filename="../artisanlib/ports.py" line="631" />
+      <location filename="../artisanlib/ports.py" line="1189" />
+      <location filename="../artisanlib/ports.py" line="633" />
       <source>Registers</source>
       <translation>Nyilvántartások</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1441" />
-      <location filename="../artisanlib/ports.py" line="1203" />
-      <location filename="../artisanlib/ports.py" line="648" />
+      <location filename="../artisanlib/ports.py" line="1444" />
+      <location filename="../artisanlib/ports.py" line="1206" />
+      <location filename="../artisanlib/ports.py" line="650" />
       <source>Commands</source>
       <translation>Parancsok</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1219" />
-      <location filename="../artisanlib/ports.py" line="1226" />
-      <location filename="../artisanlib/ports.py" line="660" />
+      <location filename="../artisanlib/devices.py" line="1223" />
+      <location filename="../artisanlib/ports.py" line="1229" />
+      <location filename="../artisanlib/ports.py" line="662" />
       <source>PID</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="895" />
-      <location filename="../artisanlib/ports.py" line="688" />
+      <location filename="../artisanlib/ports.py" line="898" />
+      <location filename="../artisanlib/ports.py" line="690" />
       <source>Serial</source>
       <translation type="unfinished">Soros</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="714" />
+      <location filename="../artisanlib/ports.py" line="716" />
       <source>UDP/TCP</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="914" />
+      <location filename="../artisanlib/ports.py" line="917" />
       <source>Input</source>
       <translation>Bemenet</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1353" />
+      <location filename="../artisanlib/ports.py" line="1356" />
       <source>Machine</source>
       <translation type="unfinished">Gép</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1392" />
+      <location filename="../artisanlib/ports.py" line="1395" />
       <source>Timeout</source>
       <translation>Időtúllépés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1429" />
+      <location filename="../artisanlib/ports.py" line="1432" />
       <source>Nodes</source>
       <translation>Csomópontok</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1459" />
+      <location filename="../artisanlib/ports.py" line="1462" />
       <source>Messages</source>
       <translation type="unfinished">Üzenetek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1472" />
+      <location filename="../artisanlib/ports.py" line="1475" />
       <source>Flags</source>
       <translation>Zászlók</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1531" />
+      <location filename="../artisanlib/ports.py" line="1534" />
       <source>Events</source>
       <translation>Események</translation>
     </message>
@@ -5079,21 +5084,21 @@ VÉGE</translation>
       <translation>Lejátszás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13777" />
-      <location filename="../artisanlib/canvas.py" line="13737" />
-      <location filename="../artisanlib/roast_properties.py" line="2723" />
+      <location filename="../artisanlib/canvas.py" line="13800" />
+      <location filename="../artisanlib/canvas.py" line="13760" />
+      <location filename="../artisanlib/roast_properties.py" line="2732" />
       <source>Energy</source>
       <translation>Energia</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13778" />
-      <location filename="../artisanlib/canvas.py" line="13738" />
-      <location filename="../artisanlib/roast_properties.py" line="2724" />
+      <location filename="../artisanlib/canvas.py" line="13801" />
+      <location filename="../artisanlib/canvas.py" line="13761" />
+      <location filename="../artisanlib/roast_properties.py" line="2733" />
       <source>CO2</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="293" />
+      <location filename="../artisanlib/designer.py" line="303" />
       <source>Initial Settings</source>
       <translation>Kezdeti beállítások</translation>
     </message>
@@ -5123,117 +5128,117 @@ VÉGE</translation>
       <translation>Extrakciós hozam</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="517" />
+      <location filename="../artisanlib/curves.py" line="530" />
       <source>Rate of Rise Curves</source>
       <translation>Az emelkedési görbék aránya</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="519" />
+      <location filename="../artisanlib/curves.py" line="532" />
       <source>Rate of Rise LCDs</source>
       <translation>Rise LCD-k</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="538" />
+      <location filename="../artisanlib/curves.py" line="551" />
       <source>Rate of Rise Symbolic Assignments</source>
       <translation>Szimbolikus hozzárendelések emelkedése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="564" />
+      <location filename="../artisanlib/curves.py" line="577" />
       <source>Input Filter</source>
       <translation>Bemeneti szűrő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="576" />
+      <location filename="../artisanlib/curves.py" line="589" />
       <source>Curve Filter</source>
       <translation>Görbe szűrő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="584" />
+      <location filename="../artisanlib/curves.py" line="597" />
       <source>Display Filter</source>
       <translation>Kijelző szűrő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="633" />
+      <location filename="../artisanlib/curves.py" line="646" />
       <source>Rate of Rise Filter</source>
       <translation>Rise Rise Filter</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1015" />
+      <location filename="../artisanlib/curves.py" line="1029" />
       <source>Interpolate</source>
       <translation>Interpolál</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1021" />
+      <location filename="../artisanlib/curves.py" line="1035" />
       <source>Univariate</source>
       <translation>Egyváltozós</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1029" />
+      <location filename="../artisanlib/curves.py" line="1043" />
       <source>ln()</source>
       <translation>ln ()</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1044" />
+      <location filename="../artisanlib/curves.py" line="1058" />
       <source>Exponent</source>
       <translation>Kitevő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1076" />
+      <location filename="../artisanlib/curves.py" line="1090" />
       <source>Polyfit</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1100" />
+      <location filename="../artisanlib/curves.py" line="1114" />
       <source>Curve Fit Options</source>
       <translation>Görbe illesztési opciók</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1113" />
+      <location filename="../artisanlib/curves.py" line="1127" />
       <source>Interval of Interest Options</source>
       <translation>Intervallum opciók</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1127" />
+      <location filename="../artisanlib/curves.py" line="1141" />
       <source>Analyze Options</source>
       <translation>Elemezze az opciókat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1179" />
+      <location filename="../artisanlib/curves.py" line="1193" />
       <source>Appearance</source>
       <translation>Megjelenés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1190" />
+      <location filename="../artisanlib/curves.py" line="1204" />
       <source>Resolution</source>
       <translation>Felbontás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1247" />
+      <location filename="../artisanlib/curves.py" line="1261" />
       <source>WebLCDs</source>
       <translation>WebLCD-k</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1262" />
+      <location filename="../artisanlib/curves.py" line="1276" />
       <source>Rename ET and BT</source>
       <translation>Nevezze át az ET és a BT nevet</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1301" />
+      <location filename="../artisanlib/curves.py" line="1315" />
       <source>Logo Image File</source>
       <translation>Logó képfájl</translation>
     </message>
     <message>
-      <location filename="../artisanlib/statistics.py" line="127" />
+      <location filename="../artisanlib/statistics.py" line="131" />
       <source>Stats Summary</source>
       <translation>Statisztikai összefoglaló</translation>
     </message>
     <message>
-      <location filename="../artisanlib/statistics.py" line="154" />
+      <location filename="../artisanlib/statistics.py" line="158" />
       <source>AUC</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/statistics.py" line="156" />
+      <location filename="../artisanlib/statistics.py" line="160" />
       <source>Display</source>
       <translation>Kijelző</translation>
     </message>
@@ -5248,33 +5253,33 @@ VÉGE</translation>
       <translation type="unfinished">LCDk</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1035" />
-      <location filename="../artisanlib/devices.py" line="997" />
+      <location filename="../artisanlib/devices.py" line="1039" />
+      <location filename="../artisanlib/devices.py" line="1001" />
       <source>Network</source>
       <translation>Hálózat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1067" />
+      <location filename="../artisanlib/devices.py" line="1071" />
       <source>Async</source>
       <translation>Aszinkron</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1069" />
+      <location filename="../artisanlib/devices.py" line="1073" />
       <source>IR</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1246" />
+      <location filename="../artisanlib/devices.py" line="1250" />
       <source>Arduino TC4</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1258" />
+      <location filename="../artisanlib/devices.py" line="1262" />
       <source>External Program</source>
       <translation>Külső program</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1272" />
+      <location filename="../artisanlib/devices.py" line="1276" />
       <source>Symbolic Assignments</source>
       <translation>Szimbolikus feladatok</translation>
     </message>
@@ -5326,818 +5331,818 @@ VÉGE</translation>
   <context>
     <name>HTML Report Template</name>
     <message>
-      <location filename="../artisanlib/main.py" line="19885" />
-      <location filename="../artisanlib/main.py" line="19659" />
-      <location filename="../artisanlib/main.py" line="13377" />
+      <location filename="../artisanlib/main.py" line="20013" />
+      <location filename="../artisanlib/main.py" line="19787" />
+      <location filename="../artisanlib/main.py" line="13485" />
       <source>Profile</source>
       <translation type="unfinished">Profil</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19481" />
+      <location filename="../artisanlib/main.py" line="19609" />
       <source>Roast Batches</source>
       <translation>Sült tételek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19883" />
-      <location filename="../artisanlib/main.py" line="19654" />
-      <location filename="../artisanlib/main.py" line="19487" />
+      <location filename="../artisanlib/main.py" line="20011" />
+      <location filename="../artisanlib/main.py" line="19782" />
+      <location filename="../artisanlib/main.py" line="19615" />
       <source>Batch</source>
       <translation type="unfinished">Köteg</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20768" />
-      <location filename="../artisanlib/main.py" line="19488" />
+      <location filename="../artisanlib/main.py" line="20896" />
+      <location filename="../artisanlib/main.py" line="19616" />
       <source>Date</source>
       <translation type="unfinished">Dátum</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19971" />
-      <location filename="../artisanlib/main.py" line="19662" />
-      <location filename="../artisanlib/main.py" line="19490" />
+      <location filename="../artisanlib/main.py" line="20099" />
+      <location filename="../artisanlib/main.py" line="19790" />
+      <location filename="../artisanlib/main.py" line="19618" />
       <source>Beans</source>
       <translation type="unfinished">Bab</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20770" />
-      <location filename="../artisanlib/main.py" line="19665" />
-      <location filename="../artisanlib/main.py" line="19491" />
+      <location filename="../artisanlib/main.py" line="20898" />
+      <location filename="../artisanlib/main.py" line="19793" />
+      <location filename="../artisanlib/main.py" line="19619" />
       <source>In</source>
       <translation>Ban ben</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19667" />
-      <location filename="../artisanlib/main.py" line="19492" />
+      <location filename="../artisanlib/main.py" line="19795" />
+      <location filename="../artisanlib/main.py" line="19620" />
       <source>Out</source>
       <translation>Ki</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20771" />
-      <location filename="../artisanlib/main.py" line="19669" />
-      <location filename="../artisanlib/main.py" line="19493" />
+      <location filename="../artisanlib/main.py" line="20899" />
+      <location filename="../artisanlib/main.py" line="19797" />
+      <location filename="../artisanlib/main.py" line="19621" />
       <source>Loss</source>
       <translation>Veszteség</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19706" />
-      <location filename="../artisanlib/main.py" line="19494" />
+      <location filename="../artisanlib/main.py" line="19834" />
+      <location filename="../artisanlib/main.py" line="19622" />
       <source>SUM</source>
       <translation>ÖSSZEG</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19648" />
+      <location filename="../artisanlib/main.py" line="19776" />
       <source>Production Report</source>
       <translation>Gyártási jelentés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19884" />
-      <location filename="../artisanlib/main.py" line="19656" />
+      <location filename="../artisanlib/main.py" line="20012" />
+      <location filename="../artisanlib/main.py" line="19784" />
       <source>Time</source>
       <translation type="unfinished">Idő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19956" />
-      <location filename="../artisanlib/main.py" line="19886" />
+      <location filename="../artisanlib/main.py" line="20084" />
+      <location filename="../artisanlib/main.py" line="20014" />
       <source>Weight In</source>
       <translation>Súlyt</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19911" />
-      <location filename="../artisanlib/main.py" line="19887" />
+      <location filename="../artisanlib/main.py" line="20039" />
+      <location filename="../artisanlib/main.py" line="20015" />
       <source>CHARGE BT</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19918" />
-      <location filename="../artisanlib/main.py" line="19888" />
+      <location filename="../artisanlib/main.py" line="20046" />
+      <location filename="../artisanlib/main.py" line="20016" />
       <source>FCs Time</source>
       <translation>FCs idő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19920" />
-      <location filename="../artisanlib/main.py" line="19889" />
+      <location filename="../artisanlib/main.py" line="20048" />
+      <location filename="../artisanlib/main.py" line="20017" />
       <source>FCs BT</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19930" />
-      <location filename="../artisanlib/main.py" line="19890" />
+      <location filename="../artisanlib/main.py" line="20058" />
+      <location filename="../artisanlib/main.py" line="20018" />
       <source>DROP Time</source>
       <translation>DROP idő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19932" />
-      <location filename="../artisanlib/main.py" line="19891" />
+      <location filename="../artisanlib/main.py" line="20060" />
+      <location filename="../artisanlib/main.py" line="20019" />
       <source>DROP BT</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19892" />
+      <location filename="../artisanlib/main.py" line="20020" />
       <source>Dry Percent</source>
       <translation>Száraz százalék</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19893" />
+      <location filename="../artisanlib/main.py" line="20021" />
       <source>MAI Percent</source>
       <translation>MAI százalék</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19894" />
+      <location filename="../artisanlib/main.py" line="20022" />
       <source>Dev Percent</source>
       <translation>Dev százalék</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19950" />
-      <location filename="../artisanlib/main.py" line="19895" />
+      <location filename="../artisanlib/main.py" line="20078" />
+      <location filename="../artisanlib/main.py" line="20023" />
       <source>AUC</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19958" />
-      <location filename="../artisanlib/main.py" line="19896" />
+      <location filename="../artisanlib/main.py" line="20086" />
+      <location filename="../artisanlib/main.py" line="20024" />
       <source>Weight Loss</source>
       <translation>Fogyás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20772" />
-      <location filename="../artisanlib/main.py" line="19897" />
+      <location filename="../artisanlib/main.py" line="20900" />
+      <location filename="../artisanlib/main.py" line="20025" />
       <source>Color</source>
       <translation type="unfinished">Szín</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19898" />
+      <location filename="../artisanlib/main.py" line="20026" />
       <source>Cupping</source>
       <translation>Köpölyözés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19899" />
+      <location filename="../artisanlib/main.py" line="20027" />
       <source>Roaster</source>
       <translation>Pecsenyesütő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19900" />
+      <location filename="../artisanlib/main.py" line="20028" />
       <source>Capacity</source>
       <translation>Kapacitás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19901" />
+      <location filename="../artisanlib/main.py" line="20029" />
       <source>Operator</source>
       <translation type="unfinished">Operátor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19902" />
+      <location filename="../artisanlib/main.py" line="20030" />
       <source>Organization</source>
       <translation type="unfinished">Szervezet</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19903" />
+      <location filename="../artisanlib/main.py" line="20031" />
       <source>Drum Speed</source>
       <translation type="unfinished">Dobsebesség</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19904" />
+      <location filename="../artisanlib/main.py" line="20032" />
       <source>Whole Color</source>
       <translation type="unfinished">Teljes szín</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19905" />
+      <location filename="../artisanlib/main.py" line="20033" />
       <source>Ground Color</source>
       <translation type="unfinished">Alapszín</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19906" />
+      <location filename="../artisanlib/main.py" line="20034" />
       <source>Color System</source>
       <translation>Színrendszer</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19907" />
+      <location filename="../artisanlib/main.py" line="20035" />
       <source>Screen Min</source>
       <translation>Képernyő min</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19908" />
+      <location filename="../artisanlib/main.py" line="20036" />
       <source>Screen Max</source>
       <translation>Képernyő max</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19909" />
+      <location filename="../artisanlib/main.py" line="20037" />
       <source>Bean Temp</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19910" />
+      <location filename="../artisanlib/main.py" line="20038" />
       <source>CHARGE ET</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19912" />
+      <location filename="../artisanlib/main.py" line="20040" />
       <source>TP Time</source>
       <translation>TP idő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19913" />
+      <location filename="../artisanlib/main.py" line="20041" />
       <source>TP ET</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19914" />
+      <location filename="../artisanlib/main.py" line="20042" />
       <source>TP BT</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19915" />
+      <location filename="../artisanlib/main.py" line="20043" />
       <source>DRY Time</source>
       <translation>SZÁRAZÁSI idő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19916" />
+      <location filename="../artisanlib/main.py" line="20044" />
       <source>DRY ET</source>
       <translation>SZÁRAZ ET</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19917" />
+      <location filename="../artisanlib/main.py" line="20045" />
       <source>DRY BT</source>
       <translation>SZÁRAZ BT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19919" />
+      <location filename="../artisanlib/main.py" line="20047" />
       <source>FCs ET</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19921" />
+      <location filename="../artisanlib/main.py" line="20049" />
       <source>FCe Time</source>
       <translation>FCe idő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19922" />
+      <location filename="../artisanlib/main.py" line="20050" />
       <source>FCe ET</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19923" />
+      <location filename="../artisanlib/main.py" line="20051" />
       <source>FCe BT</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19924" />
+      <location filename="../artisanlib/main.py" line="20052" />
       <source>SCs Time</source>
       <translation>SCs idő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19925" />
+      <location filename="../artisanlib/main.py" line="20053" />
       <source>SCs ET</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19926" />
+      <location filename="../artisanlib/main.py" line="20054" />
       <source>SCs BT</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19927" />
+      <location filename="../artisanlib/main.py" line="20055" />
       <source>SCe Time</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19928" />
+      <location filename="../artisanlib/main.py" line="20056" />
       <source>SCe ET</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19929" />
+      <location filename="../artisanlib/main.py" line="20057" />
       <source>SCe BT</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19931" />
+      <location filename="../artisanlib/main.py" line="20059" />
       <source>DROP ET</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19933" />
+      <location filename="../artisanlib/main.py" line="20061" />
       <source>COOL Time</source>
       <translation>Hűvös idő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19934" />
+      <location filename="../artisanlib/main.py" line="20062" />
       <source>COOL ET</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19935" />
+      <location filename="../artisanlib/main.py" line="20063" />
       <source>COOL BT</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19936" />
+      <location filename="../artisanlib/main.py" line="20064" />
       <source>Total Time</source>
       <translation>Teljes idő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19937" />
+      <location filename="../artisanlib/main.py" line="20065" />
       <source>Dry Phase Time</source>
       <translation>Száraz fázis ideje</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19938" />
+      <location filename="../artisanlib/main.py" line="20066" />
       <source>Mid Phase Time</source>
       <translation>Középfázis idő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19939" />
+      <location filename="../artisanlib/main.py" line="20067" />
       <source>Finish Phase Time</source>
       <translation>Fázis befejezési ideje</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19940" />
+      <location filename="../artisanlib/main.py" line="20068" />
       <source>Dry Phase RoR</source>
       <translation>Száraz fázisú RoR</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19941" />
+      <location filename="../artisanlib/main.py" line="20069" />
       <source>Mid Phase RoR</source>
       <translation>Középfázisú RoR</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19942" />
+      <location filename="../artisanlib/main.py" line="20070" />
       <source>Finish Phase RoR</source>
       <translation>Fejezd be a RoR fázist</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19943" />
+      <location filename="../artisanlib/main.py" line="20071" />
       <source>Dry Phase Delta BT</source>
       <translation>Száraz fázisú Delta BT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19944" />
+      <location filename="../artisanlib/main.py" line="20072" />
       <source>Mid Phase Delta BT</source>
       <translation>Középfázisú Delta BT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19945" />
+      <location filename="../artisanlib/main.py" line="20073" />
       <source>Finish Phase Delta BT</source>
       <translation>Fázis befejezése Delta BT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19946" />
+      <location filename="../artisanlib/main.py" line="20074" />
       <source>Finish Phase Rise</source>
       <translation>Fejezd be az emelkedési fázist</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19947" />
+      <location filename="../artisanlib/main.py" line="20075" />
       <source>Total RoR</source>
       <translation>Teljes RoR</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19948" />
+      <location filename="../artisanlib/main.py" line="20076" />
       <source>FCs RoR</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19949" />
+      <location filename="../artisanlib/main.py" line="20077" />
       <source>MET</source>
       <translation type="unfinished">TALÁLKOZOTT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19951" />
+      <location filename="../artisanlib/main.py" line="20079" />
       <source>AUC Begin</source>
       <translation>AUC Kezdje</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19952" />
+      <location filename="../artisanlib/main.py" line="20080" />
       <source>AUC Base</source>
       <translation>AUC alap</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19953" />
+      <location filename="../artisanlib/main.py" line="20081" />
       <source>Dry Phase AUC</source>
       <translation>Száraz fázis AUC</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19954" />
+      <location filename="../artisanlib/main.py" line="20082" />
       <source>Mid Phase AUC</source>
       <translation>Középfázis AUC</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19955" />
+      <location filename="../artisanlib/main.py" line="20083" />
       <source>Finish Phase AUC</source>
       <translation>Fázis befejezése AUC</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19957" />
+      <location filename="../artisanlib/main.py" line="20085" />
       <source>Weight Out</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19959" />
+      <location filename="../artisanlib/main.py" line="20087" />
       <source>Volume In</source>
       <translation>Hangerő be</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19960" />
+      <location filename="../artisanlib/main.py" line="20088" />
       <source>Volume Out</source>
       <translation>Hangerő ki</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19961" />
+      <location filename="../artisanlib/main.py" line="20089" />
       <source>Volume Gain</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19962" />
+      <location filename="../artisanlib/main.py" line="20090" />
       <source>Green Density</source>
       <translation>Zöld sűrűség</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19963" />
+      <location filename="../artisanlib/main.py" line="20091" />
       <source>Roasted Density</source>
       <translation>Pörkölt sűrűség</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19964" />
+      <location filename="../artisanlib/main.py" line="20092" />
       <source>Moisture Greens</source>
       <translation>Nedvesség zöldek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19965" />
+      <location filename="../artisanlib/main.py" line="20093" />
       <source>Moisture Roasted</source>
       <translation type="unfinished">Párolt pára</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19966" />
+      <location filename="../artisanlib/main.py" line="20094" />
       <source>Moisture Loss</source>
       <translation>Nedvességveszteség</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19967" />
+      <location filename="../artisanlib/main.py" line="20095" />
       <source>Organic Loss</source>
       <translation>Szerves veszteség</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19968" />
+      <location filename="../artisanlib/main.py" line="20096" />
       <source>Ambient Humidity</source>
       <translation>Környezeti páratartalom</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19969" />
+      <location filename="../artisanlib/main.py" line="20097" />
       <source>Ambient Pressure</source>
       <translation>Környezeti nyomás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19970" />
+      <location filename="../artisanlib/main.py" line="20098" />
       <source>Ambient Temperature</source>
       <translation>Környezeti hőmérséklet</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21440" />
-      <location filename="../artisanlib/main.py" line="19972" />
+      <location filename="../artisanlib/main.py" line="21568" />
+      <location filename="../artisanlib/main.py" line="20100" />
       <source>Roasting Notes</source>
       <translation type="unfinished">Sütési jegyzetek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21449" />
-      <location filename="../artisanlib/main.py" line="19973" />
+      <location filename="../artisanlib/main.py" line="21577" />
+      <location filename="../artisanlib/main.py" line="20101" />
       <source>Cupping Notes</source>
       <translation type="unfinished">Köpölyözés jegyzetek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19974" />
+      <location filename="../artisanlib/main.py" line="20102" />
       <source>Heavy FC</source>
       <translation type="unfinished">Nehéz FC</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19975" />
+      <location filename="../artisanlib/main.py" line="20103" />
       <source>Low FC</source>
       <translation type="unfinished">Alacsony FC</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19976" />
+      <location filename="../artisanlib/main.py" line="20104" />
       <source>Light Cut</source>
       <translation>Könnyű vágás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19977" />
+      <location filename="../artisanlib/main.py" line="20105" />
       <source>Dark Cut</source>
       <translation type="unfinished">Sötét vágás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19978" />
+      <location filename="../artisanlib/main.py" line="20106" />
       <source>Drops</source>
       <translation type="unfinished">Cseppek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19979" />
+      <location filename="../artisanlib/main.py" line="20107" />
       <source>Oily</source>
       <translation type="unfinished">Olajos</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19980" />
+      <location filename="../artisanlib/main.py" line="20108" />
       <source>Uneven</source>
       <translation type="unfinished">Egyenetlen</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19981" />
+      <location filename="../artisanlib/main.py" line="20109" />
       <source>Tipping</source>
       <translation>Borravaló</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19982" />
+      <location filename="../artisanlib/main.py" line="20110" />
       <source>Scorching</source>
       <translation>Perzselő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19983" />
+      <location filename="../artisanlib/main.py" line="20111" />
       <source>Divots</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19984" />
+      <location filename="../artisanlib/main.py" line="20112" />
       <source>Mode</source>
       <translation type="unfinished">Mód</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19985" />
+      <location filename="../artisanlib/main.py" line="20113" />
       <source>BTU Batch</source>
       <translation>BTU köteg</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19986" />
+      <location filename="../artisanlib/main.py" line="20114" />
       <source>BTU Batch per green kg</source>
       <translation>BTU tétel zöld kg-onként</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19987" />
+      <location filename="../artisanlib/main.py" line="20115" />
       <source>CO2 Batch</source>
       <translation>CO2 tétel</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19988" />
+      <location filename="../artisanlib/main.py" line="20116" />
       <source>BTU Preheat</source>
       <translation>BTU előmelegítés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19989" />
+      <location filename="../artisanlib/main.py" line="20117" />
       <source>CO2 Preheat</source>
       <translation>CO2 Előmelegítés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19990" />
+      <location filename="../artisanlib/main.py" line="20118" />
       <source>BTU BBP</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19991" />
+      <location filename="../artisanlib/main.py" line="20119" />
       <source>CO2 BBP</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19992" />
+      <location filename="../artisanlib/main.py" line="20120" />
       <source>BTU Cooling</source>
       <translation>BTU hűtés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19993" />
+      <location filename="../artisanlib/main.py" line="20121" />
       <source>CO2 Cooling</source>
       <translation>CO2 hűtés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19994" />
+      <location filename="../artisanlib/main.py" line="20122" />
       <source>BTU Roast</source>
       <translation>BTU sült</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19995" />
+      <location filename="../artisanlib/main.py" line="20123" />
       <source>BTU Roast per green kg</source>
       <translation>BTU Pörkölt per zöld kg</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19996" />
+      <location filename="../artisanlib/main.py" line="20124" />
       <source>CO2 Roast</source>
       <translation>CO2 Pörkölt</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19997" />
+      <location filename="../artisanlib/main.py" line="20125" />
       <source>CO2 Batch per green kg</source>
       <translation>CO2 Tétel/zöld kg</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19998" />
+      <location filename="../artisanlib/main.py" line="20126" />
       <source>BTU LPG</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19999" />
+      <location filename="../artisanlib/main.py" line="20127" />
       <source>BTU NG</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20000" />
+      <location filename="../artisanlib/main.py" line="20128" />
       <source>BTU ELEC</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20001" />
+      <location filename="../artisanlib/main.py" line="20129" />
       <source>Efficiency Batch</source>
       <translation>Hatékonysági köteg</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20002" />
+      <location filename="../artisanlib/main.py" line="20130" />
       <source>Efficiency Roast</source>
       <translation>Hatékonyság sült</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20767" />
+      <location filename="../artisanlib/main.py" line="20895" />
       <source>Roast Ranking</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20877" />
+      <location filename="../artisanlib/main.py" line="21005" />
       <source>Ranking Report</source>
       <translation>Rangsor jelentés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21018" />
+      <location filename="../artisanlib/main.py" line="21146" />
       <source>AVG</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21368" />
+      <location filename="../artisanlib/main.py" line="21496" />
       <source>Roasting Report</source>
       <translation type="unfinished">Pörkölési jegyzőkönyv</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21369" />
+      <location filename="../artisanlib/main.py" line="21497" />
       <source>Date:</source>
       <translation>Dátum:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21371" />
+      <location filename="../artisanlib/main.py" line="21499" />
       <source>Beans:</source>
       <translation>Bab:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21373" />
+      <location filename="../artisanlib/main.py" line="21501" />
       <source>Weight:</source>
       <translation>Súly:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21377" />
+      <location filename="../artisanlib/main.py" line="21505" />
       <source>Volume:</source>
       <translation>Hangerő:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21379" />
+      <location filename="../artisanlib/main.py" line="21507" />
       <source>Roaster:</source>
       <translation>Pecsenyesütő:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21381" />
+      <location filename="../artisanlib/main.py" line="21509" />
       <source>Operator:</source>
       <translation>Operátor:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21383" />
+      <location filename="../artisanlib/main.py" line="21511" />
       <source>Organization:</source>
       <translation>Szervezet:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10307" />
-      <location filename="../artisanlib/main.py" line="21385" />
+      <location filename="../artisanlib/canvas.py" line="10315" />
+      <location filename="../artisanlib/main.py" line="21513" />
       <source>Cupping:</source>
       <translation>Köpölyözés:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21387" />
+      <location filename="../artisanlib/main.py" line="21515" />
       <source>Color:</source>
       <translation>Szín:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21389" />
+      <location filename="../artisanlib/main.py" line="21517" />
       <source>Energy:</source>
       <translation>Energia:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21391" />
+      <location filename="../artisanlib/main.py" line="21519" />
       <source>CO2:</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21393" />
+      <location filename="../artisanlib/main.py" line="21521" />
       <source>CHARGE:</source>
       <translation>DÍJ:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21395" />
+      <location filename="../artisanlib/main.py" line="21523" />
       <source>Size:</source>
       <translation>Méret:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21398" />
+      <location filename="../artisanlib/main.py" line="21526" />
       <source>Density:</source>
       <translation>Sűrűség:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21400" />
+      <location filename="../artisanlib/main.py" line="21528" />
       <source>Moisture:</source>
       <translation>Nedvesség:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21402" />
+      <location filename="../artisanlib/main.py" line="21530" />
       <source>Ambient:</source>
       <translation>Környező:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21404" />
+      <location filename="../artisanlib/main.py" line="21532" />
       <source>TP:</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21406" />
+      <location filename="../artisanlib/main.py" line="21534" />
       <source>DRY:</source>
       <translation>SZÁRAZ:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21408" />
+      <location filename="../artisanlib/main.py" line="21536" />
       <source>FCs:</source>
       <translation>FC:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21410" />
+      <location filename="../artisanlib/main.py" line="21538" />
       <source>FCe:</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21412" />
+      <location filename="../artisanlib/main.py" line="21540" />
       <source>SCs:</source>
       <translation>SC-k:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21414" />
+      <location filename="../artisanlib/main.py" line="21542" />
       <source>SCe:</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21416" />
+      <location filename="../artisanlib/main.py" line="21544" />
       <source>DROP:</source>
       <translation>CSEPP:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21418" />
+      <location filename="../artisanlib/main.py" line="21546" />
       <source>COOL:</source>
       <translation>MENŐ:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21420" />
+      <location filename="../artisanlib/main.py" line="21548" />
       <source>MET:</source>
       <translation>TALÁLKOZOTT:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21422" />
+      <location filename="../artisanlib/main.py" line="21550" />
       <source>CM:</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21424" />
+      <location filename="../artisanlib/main.py" line="21552" />
       <source>Drying:</source>
       <translation>Szárítás:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21426" />
+      <location filename="../artisanlib/main.py" line="21554" />
       <source>Maillard:</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21428" />
+      <location filename="../artisanlib/main.py" line="21556" />
       <source>Finishing:</source>
       <translation>Végső:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21430" />
+      <location filename="../artisanlib/main.py" line="21558" />
       <source>Cooling:</source>
       <translation>Hűtés:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21432" />
+      <location filename="../artisanlib/main.py" line="21560" />
       <source>Background:</source>
       <translation>Háttér:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21434" />
+      <location filename="../artisanlib/main.py" line="21562" />
       <source>Alarms:</source>
       <translation>Riasztások:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21436" />
+      <location filename="../artisanlib/main.py" line="21564" />
       <source>RoR:</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21438" />
+      <location filename="../artisanlib/main.py" line="21566" />
       <source>AUC:</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21446" />
+      <location filename="../artisanlib/main.py" line="21574" />
       <source>Events</source>
       <translation type="unfinished">Események</translation>
     </message>
@@ -6188,7 +6193,7 @@ A riasztásokat a rendszer az asztal tetejétől az aljáig sorrendben szkenneli
       <location filename="../help/energy_help.py" line="64" />
       <location filename="../help/energy_help.py" line="43" />
       <location filename="../help/energy_help.py" line="32" />
-      <location filename="../help/eventbuttons_help.py" line="88" />
+      <location filename="../help/eventbuttons_help.py" line="91" />
       <location filename="../help/eventbuttons_help.py" line="34" />
       <location filename="../help/eventbuttons_help.py" line="21" />
       <location filename="../help/eventsliders_help.py" line="37" />
@@ -6294,11 +6299,11 @@ A riasztásokat a rendszer az asztal tetejétől az aljáig sorrendben szkenneli
       <translation>A megadott hőmérsékleti határérték.</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="88" />
+      <location filename="../help/eventbuttons_help.py" line="91" />
       <location filename="../help/eventbuttons_help.py" line="26" />
       <location filename="../help/eventsliders_help.py" line="37" />
       <location filename="../help/eventsliders_help.py" line="19" />
-      <location filename="../help/keyboardshortcuts_help.py" line="98" />
+      <location filename="../help/keyboardshortcuts_help.py" line="99" />
       <location filename="../help/keyboardshortcuts_help.py" line="58" />
       <location filename="../help/alarms_help.py" line="61" />
       <location filename="../help/alarms_help.py" line="31" />
@@ -6401,7 +6406,7 @@ A riasztásokat a rendszer az asztal tetejétől az aljáig sorrendben szkenneli
       <translation>Riasztásdefiníció betöltése fájlból.</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="100" />
+      <location filename="../help/keyboardshortcuts_help.py" line="101" />
       <location filename="../help/alarms_help.py" line="46" />
       <source>Save</source>
       <translation type="unfinished">Mentés</translation>
@@ -6423,7 +6428,7 @@ A riasztásokat a rendszer az asztal tetejétől az aljáig sorrendben szkenneli
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="44" />
-      <location filename="../help/keyboardshortcuts_help.py" line="117" />
+      <location filename="../help/keyboardshortcuts_help.py" line="118" />
       <location filename="../help/alarms_help.py" line="48" />
       <source>Help</source>
       <translation type="unfinished">Súgó</translation>
@@ -6475,7 +6480,7 @@ A riasztásokat a rendszer az asztal tetejétől az aljáig sorrendben szkenneli
       <translation>Írja be a parancsot a riasztás Leírás mezőjébe.</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="88" />
+      <location filename="../help/eventbuttons_help.py" line="91" />
       <location filename="../help/eventsliders_help.py" line="37" />
       <location filename="../help/eventsliders_help.py" line="20" />
       <location filename="../help/alarms_help.py" line="61" />
@@ -6504,21 +6509,21 @@ A riasztásokat a rendszer az asztal tetejétől az aljáig sorrendben szkenneli
       <translation>a felugró ablakban megjelenítendő szöveget</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="90" />
+      <location filename="../help/eventbuttons_help.py" line="93" />
       <location filename="../help/eventsliders_help.py" line="59" />
       <location filename="../help/alarms_help.py" line="63" />
       <source>Call Program</source>
       <translation type="unfinished">Program Hívása</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="90" />
+      <location filename="../help/eventbuttons_help.py" line="93" />
       <location filename="../help/eventsliders_help.py" line="59" />
       <location filename="../help/alarms_help.py" line="63" />
       <source>A program/script path (absolute or relative)</source>
       <translation>Program/szkript elérési útja (abszolút vagy relatív)</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="90" />
+      <location filename="../help/eventbuttons_help.py" line="93" />
       <location filename="../help/alarms_help.py" line="63" />
       <source>start an external program</source>
       <translation>indítson el egy külső programot</translation>
@@ -6852,7 +6857,7 @@ Az Artisan minden mintaidőszakban elindítja a programot. A program kimeneténe
       <translation>GYORSBILLENTYŰKET</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="98" />
+      <location filename="../help/keyboardshortcuts_help.py" line="99" />
       <location filename="../help/keyboardshortcuts_help.py" line="17" />
       <source>Keys</source>
       <translation>Kulcsok</translation>
@@ -7394,79 +7399,66 @@ CTRL Eszközök&gt;&gt; Szimulátor [Win]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="82" />
-      <source>⌘+C [Mac]
-CTRL+C [Win]</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="82" />
-      <source>Roast Properties Data tab</source>
-      <translation>Roast Properties Data fülre</translation>
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="82" />
-      <source>Copy table</source>
-      <translation>Táblázat másolása</translation>
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="83" />
       <source>⌘+L [Mac]
 CTRL+L [Win]</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="90" />
-      <location filename="../help/keyboardshortcuts_help.py" line="89" />
       <location filename="../help/keyboardshortcuts_help.py" line="88" />
       <location filename="../help/keyboardshortcuts_help.py" line="87" />
       <location filename="../help/keyboardshortcuts_help.py" line="86" />
+      <location filename="../help/keyboardshortcuts_help.py" line="85" />
+      <location filename="../help/keyboardshortcuts_help.py" line="84" />
       <location filename="../help/keyboardshortcuts_help.py" line="83" />
+      <location filename="../help/keyboardshortcuts_help.py" line="82" />
       <source>Roast Properties Roast tab</source>
       <translation>Roast Properties Roast fül</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="83" />
+      <location filename="../help/keyboardshortcuts_help.py" line="82" />
       <source>Open volume calculator</source>
       <translation>Nyissa meg a térfogat-kalkulátort</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="85" />
-      <location filename="../help/keyboardshortcuts_help.py" line="84" />
-      <source>Enter</source>
-      <translation>Belép</translation>
+      <location filename="../help/keyboardshortcuts_help.py" line="83" />
+      <source>OPTION click Stock [Mac]
+ALT click Stock [Win]</source>
+      <translation>OPTION kattintás Raktár [Mac]
+ALT kattintás Részvény [Win]</translation>
+    </message>
+    <message>
+      <location filename="../help/keyboardshortcuts_help.py" line="83" />
+      <source>Show plus Stock in alternate weight unit from Artisan setting (imperial &lt;-&gt; metric)</source>
+      <translation>A plusz készlet megjelenítése alternatív súlyegységben a kézműves beállításból (birodalmi &lt;-&gt; metrika)</translation>
+    </message>
+    <message>
+      <location filename="../help/keyboardshortcuts_help.py" line="83" />
+      <source>Requires a connection to plus</source>
+      <translation>Plusz csatlakozást igényel</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="84" />
-      <source>Roast Properties Roast Tab
-Volume Calculator Unit, Green Unit  Weight or Roasted Unit Weight field</source>
-      <translation>Roast Properties Roast Tab
-Térfogat-kalkulátor egység, Zöld egységsúly vagy Pörkölt egységsúly mező</translation>
+      <source>OPTION click  &amp;#39;+&amp;#39;  button [Mac]
+ALT click  &amp;#39;+&amp;#39;  button [Win]</source>
+      <translation>OPTION kattintson a &amp;#39;+&amp;#39; gomb [Mac]
+Az ALT gombbal kattintson a &amp;#39;+&amp;#39; gomb [Win]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="84" />
-      <source>Overwrite with current scale weight (same action as &amp;#39;unit&amp;#39;, &amp;#39;in&amp;#39;, &amp;#39;out&amp;#39; buttons)</source>
-      <translation>Felülírás az aktuális mérlegsúllyal (ugyanaz a művelet, mint az &amp;#39;egység&amp;#39;, &amp;#39;be&amp;#39;, &amp;#39;kifelé&amp;#39; gombokkal)</translation>
-    </message>
-    <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="88" />
-      <location filename="../help/keyboardshortcuts_help.py" line="87" />
-      <location filename="../help/keyboardshortcuts_help.py" line="86" />
-      <location filename="../help/keyboardshortcuts_help.py" line="85" />
-      <location filename="../help/keyboardshortcuts_help.py" line="84" />
-      <source>Requires a connected scale</source>
-      <translation>Csatlakoztatott mérleg szükséges</translation>
+      <source>Adds Weight Roasted, Volume Roasted, Moisture Roasted, ColorWhole, and Color Ground to the recent roast</source>
+      <translation>Hozzáadja a pörkölt súlyt, a pörkölt mennyiséget, a nedves pörkölést, a ColorWhole-t és a színes őröltet a legutóbbi pörköléshez</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="85" />
-      <source>Roast Properties Roast tab
-Green Weight  or Roasted Weight field</source>
-      <translation>Roast Properties Roast fül
-Zöld súly vagy pörkölt súly mező</translation>
+      <source>OPTION File&gt;&gt; New&gt;&gt; &lt;recent-roast&gt; [Mac]
+ALT File&gt;&gt; New&gt;&gt; &lt;recent-roast&gt; [Win]</source>
+      <translation>OPTION Fájl&gt;&gt; Új&gt;&gt; &lt;recent-roast&gt; [Mac]
+ALT-fájl&gt;&gt; Új&gt;&gt; &lt;recent-roast&gt; [Győzelem]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="85" />
-      <source>Overwrite with current scale weight</source>
-      <translation>Felülírás az aktuális mérlegsúllyal</translation>
+      <source>Sets roast properties to &lt;recent-roast&gt; without starting a new roast</source>
+      <translation>A pörkölés tulajdonságait a &lt;recent-roast&gt; értékre állítja anélkül, hogy új pörkölést kezdene</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="86" />
@@ -7479,6 +7471,15 @@ CTRL+I [Győzelem]</translation>
       <location filename="../help/keyboardshortcuts_help.py" line="86" />
       <source>Adds scale weight to Green Weight field (same action as &amp;#39;in&amp;#39; button)</source>
       <translation>Skálasúly hozzáadása a zöld súly mezőhöz (ugyanaz a művelet, mint a &amp;#39;gombban)</translation>
+    </message>
+    <message>
+      <location filename="../help/keyboardshortcuts_help.py" line="90" />
+      <location filename="../help/keyboardshortcuts_help.py" line="89" />
+      <location filename="../help/keyboardshortcuts_help.py" line="88" />
+      <location filename="../help/keyboardshortcuts_help.py" line="87" />
+      <location filename="../help/keyboardshortcuts_help.py" line="86" />
+      <source>Requires a connected scale</source>
+      <translation>Csatlakoztatott mérleg szükséges</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="87" />
@@ -7503,207 +7504,229 @@ CTRL+P [Win]</source>
       <translation>A halmozott mérleg súlyának előnézeti képernyőjének törlése (ugyanúgy, mintha az előnézeti képernyőre kattintana)</translation>
     </message>
     <message>
+      <location filename="../help/keyboardshortcuts_help.py" line="90" />
       <location filename="../help/keyboardshortcuts_help.py" line="89" />
-      <source>OPTION click  &amp;#39;+&amp;#39;  button [Mac]
-ALT click  &amp;#39;+&amp;#39;  button [Win]</source>
-      <translation>OPTION kattintson a &amp;#39;+&amp;#39; gomb [Mac]
-Az ALT gombbal kattintson a &amp;#39;+&amp;#39; gomb [Win]</translation>
+      <source>Enter</source>
+      <translation>Belép</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="89" />
-      <source>Adds Weight Roasted, Volume Roasted, Moisture Roasted, ColorWhole, and Color Ground to the recent roast</source>
-      <translation>Hozzáadja a pörkölt súlyt, a pörkölt mennyiséget, a nedves pörkölést, a ColorWhole-t és a színes őröltet a legutóbbi pörköléshez</translation>
+      <source>Roast Properties Roast Tab
+Volume Calculator Unit, Green Unit  Weight or Roasted Unit Weight field</source>
+      <translation>Roast Properties Roast Tab
+Térfogat-kalkulátor egység, Zöld egységsúly vagy Pörkölt egységsúly mező</translation>
+    </message>
+    <message>
+      <location filename="../help/keyboardshortcuts_help.py" line="89" />
+      <source>Overwrite with current scale weight (same action as &amp;#39;unit&amp;#39;, &amp;#39;in&amp;#39;, &amp;#39;out&amp;#39; buttons)</source>
+      <translation>Felülírás az aktuális mérlegsúllyal (ugyanaz a művelet, mint az &amp;#39;egység&amp;#39;, &amp;#39;be&amp;#39;, &amp;#39;kifelé&amp;#39; gombokkal)</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="90" />
-      <source>OPTION File&gt;&gt; New&gt;&gt; &lt;recent-roast&gt; [Mac]
-ALT File&gt;&gt; New&gt;&gt; &lt;recent-roast&gt; [Win]</source>
-      <translation>OPTION Fájl&gt;&gt; Új&gt;&gt; &lt;recent-roast&gt; [Mac]
-ALT-fájl&gt;&gt; Új&gt;&gt; &lt;recent-roast&gt; [Győzelem]</translation>
+      <source>Roast Properties Roast tab
+Green Weight  or Roasted Weight field</source>
+      <translation>Roast Properties Roast fül
+Zöld súly vagy pörkölt súly mező</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="90" />
-      <source>Sets roast properties to &lt;recent-roast&gt; without starting a new roast</source>
-      <translation>A pörkölés tulajdonságait a &lt;recent-roast&gt; értékre állítja anélkül, hogy új pörkölést kezdene</translation>
+      <source>Overwrite with current scale weight</source>
+      <translation>Felülírás az aktuális mérlegsúllyal</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="91" />
+      <source>⌘+C [Mac]
+CTRL+C [Win]</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../help/keyboardshortcuts_help.py" line="91" />
+      <source>Roast Properties Data tab</source>
+      <translation>Roast Properties Data fülre</translation>
+    </message>
+    <message>
+      <location filename="../help/keyboardshortcuts_help.py" line="91" />
+      <source>Copy table</source>
+      <translation>Táblázat másolása</translation>
+    </message>
+    <message>
+      <location filename="../help/keyboardshortcuts_help.py" line="92" />
       <source>OPTION click &amp;#39;Copy Table&amp;#39; Button [Mac]
 ALT click &amp;#39;Copy Table&amp;#39; Button [Win]</source>
       <translation>OPTION kattintson a &amp;#39;Táblázat másolása&amp;#39; Gomb [Mac]
 Az ALT gombbal kattintson a &amp;#39;Táblázat másolása&amp;#39; Gomb [Győzelem]</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="91" />
+      <location filename="../help/keyboardshortcuts_help.py" line="92" />
       <source>Various</source>
       <translation>Különféle</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="91" />
+      <location filename="../help/keyboardshortcuts_help.py" line="92" />
       <source>For various tables this copies the table in tabular form</source>
       <translation>Különféle táblázatok esetén ez táblázatos formában másolja a táblázatot</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="92" />
+      <location filename="../help/keyboardshortcuts_help.py" line="93" />
       <source>Click on Home Icon
 While recording only</source>
       <translation>Kattintson a Kezdőlap ikonra
 Csak felvétel közben</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="92" />
+      <location filename="../help/keyboardshortcuts_help.py" line="93" />
       <source>Navigation Toolbar</source>
       <translation>Navigációs eszköztár</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="92" />
+      <location filename="../help/keyboardshortcuts_help.py" line="93" />
       <source>Toggle Zoom Follow (automatic panning)</source>
       <translation>Zoom Követés váltása (automatikus pásztázás)</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="92" />
+      <location filename="../help/keyboardshortcuts_help.py" line="93" />
       <source>Zoom action while recording sets Follow ON</source>
       <translation>Zoom művelet rögzítés közben Kövesse BE</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="95" />
+      <location filename="../help/keyboardshortcuts_help.py" line="96" />
       <source>MENU SHORTCUTS</source>
       <translation>MENÜ GYORSÍTVÁNYOK</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="98" />
+      <location filename="../help/keyboardshortcuts_help.py" line="99" />
       <source>Menu</source>
       <translation>Menü</translation>
     </message>
     <message>
+      <location filename="../help/keyboardshortcuts_help.py" line="102" />
       <location filename="../help/keyboardshortcuts_help.py" line="101" />
       <location filename="../help/keyboardshortcuts_help.py" line="100" />
-      <location filename="../help/keyboardshortcuts_help.py" line="99" />
       <source>File</source>
       <translation type="unfinished">Fájl</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="99" />
+      <location filename="../help/keyboardshortcuts_help.py" line="100" />
       <source>Open</source>
       <translation type="unfinished">Megnyitás</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="101" />
+      <location filename="../help/keyboardshortcuts_help.py" line="102" />
       <source>Print</source>
       <translation>Nyomtatás</translation>
     </message>
     <message>
+      <location filename="../help/keyboardshortcuts_help.py" line="105" />
       <location filename="../help/keyboardshortcuts_help.py" line="104" />
       <location filename="../help/keyboardshortcuts_help.py" line="103" />
-      <location filename="../help/keyboardshortcuts_help.py" line="102" />
       <source>Edit</source>
       <translation type="unfinished">Szerkesztés</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="102" />
+      <location filename="../help/keyboardshortcuts_help.py" line="103" />
       <source>Cut</source>
       <translation type="unfinished">Kivágás</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="103" />
+      <location filename="../help/keyboardshortcuts_help.py" line="104" />
       <source>Copy</source>
       <translation type="unfinished">Másolás</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="104" />
+      <location filename="../help/keyboardshortcuts_help.py" line="105" />
       <source>Paste</source>
       <translation type="unfinished">Beillesztés</translation>
     </message>
     <message>
+      <location filename="../help/keyboardshortcuts_help.py" line="108" />
       <location filename="../help/keyboardshortcuts_help.py" line="107" />
       <location filename="../help/keyboardshortcuts_help.py" line="106" />
-      <location filename="../help/keyboardshortcuts_help.py" line="105" />
       <source>Roast</source>
       <translation type="unfinished">Pörkölés</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="105" />
+      <location filename="../help/keyboardshortcuts_help.py" line="106" />
       <source>Open Roast Properties dialog</source>
       <translation>Nyissa meg a Pörkölés tulajdonságai párbeszédpanelt</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="106" />
+      <location filename="../help/keyboardshortcuts_help.py" line="107" />
       <source>Open Profile Background dialog</source>
       <translation>Nyissa meg a Profil háttere párbeszédpanelt</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="107" />
+      <location filename="../help/keyboardshortcuts_help.py" line="108" />
       <source>Switch Profiles (Foreground&lt;=&gt;Background)</source>
       <translation>Profilok váltása (előtérben&lt;=&gt;háttérben)</translation>
     </message>
     <message>
+      <location filename="../help/keyboardshortcuts_help.py" line="113" />
       <location filename="../help/keyboardshortcuts_help.py" line="112" />
       <location filename="../help/keyboardshortcuts_help.py" line="111" />
       <location filename="../help/keyboardshortcuts_help.py" line="110" />
       <location filename="../help/keyboardshortcuts_help.py" line="109" />
-      <location filename="../help/keyboardshortcuts_help.py" line="108" />
       <source>Config</source>
       <translation type="unfinished">Konfiguráció</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="108" />
+      <location filename="../help/keyboardshortcuts_help.py" line="109" />
       <source>Open Devices dialog</source>
       <translation>Nyissa meg az Eszközök párbeszédpanelt</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="109" />
+      <location filename="../help/keyboardshortcuts_help.py" line="110" />
       <source>Open Curves dialog</source>
       <translation>Nyissa meg a Görbék párbeszédpanelt</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="110" />
+      <location filename="../help/keyboardshortcuts_help.py" line="111" />
       <source>Open Events dialog</source>
       <translation>Nyissa meg az Események párbeszédpanelt</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="111" />
+      <location filename="../help/keyboardshortcuts_help.py" line="112" />
       <source>Open Alarms dialog</source>
       <translation>Nyissa meg a Riasztások párbeszédpanelt</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="112" />
+      <location filename="../help/keyboardshortcuts_help.py" line="113" />
       <source>Open Axes dialog</source>
       <translation>Nyissa meg a Tengelyek párbeszédpanelt</translation>
     </message>
     <message>
+      <location filename="../help/keyboardshortcuts_help.py" line="115" />
       <location filename="../help/keyboardshortcuts_help.py" line="114" />
-      <location filename="../help/keyboardshortcuts_help.py" line="113" />
       <source>Tools</source>
       <translation type="unfinished">Eszközök</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="113" />
+      <location filename="../help/keyboardshortcuts_help.py" line="114" />
       <source>Analyzer Auto All</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="114" />
+      <location filename="../help/keyboardshortcuts_help.py" line="115" />
       <source>Analyzer Clear Results</source>
       <translation>Elemző tiszta eredmények</translation>
     </message>
     <message>
+      <location filename="../help/keyboardshortcuts_help.py" line="117" />
       <location filename="../help/keyboardshortcuts_help.py" line="116" />
-      <location filename="../help/keyboardshortcuts_help.py" line="115" />
       <source>View</source>
       <translation type="unfinished">Kilátás</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="115" />
+      <location filename="../help/keyboardshortcuts_help.py" line="116" />
       <source>Show/Hide Large Main LCDs</source>
       <translation>A nagy fő LCD-k megjelenítése/elrejtése</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="116" />
+      <location filename="../help/keyboardshortcuts_help.py" line="117" />
       <source>Toggle Full Screen Mode                                                                                                                                             </source>
       <translation>Teljes képernyős mód váltása</translation>
     </message>
     <message>
-      <location filename="../help/keyboardshortcuts_help.py" line="117" />
+      <location filename="../help/keyboardshortcuts_help.py" line="118" />
       <source>Open QuickStart Guide in the system browser</source>
       <translation>Nyissa meg a Gyorsindítási útmutatót a rendszerböngészőben</translation>
     </message>
@@ -7852,7 +7875,7 @@ Töltse be a kisebb gépre rögzített profilt, és nyissa meg a Transzponálót
       <translation>A csúszka értékéhez használt mértékegységek megjegyzéseiben használt opcionális szöveg.</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="81" />
+      <location filename="../help/eventbuttons_help.py" line="84" />
       <location filename="../help/eventsliders_help.py" line="30" />
       <source>COMMANDS</source>
       <translation>PARANCSOK</translation>
@@ -7865,7 +7888,7 @@ Töltse be a kisebb gépre rögzített profilt, és nyissa meg a Transzponálót
 </translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="85" />
+      <location filename="../help/eventbuttons_help.py" line="88" />
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: The placeholders {ET}, {BT}, {time}, {ETB}, {BTB} will be substituted by the current ET, BT, time, ET background, BT background value in Serial/CallProgram/MODBUS/S7/WebSocket commands
 </source>
@@ -7873,7 +7896,7 @@ Töltse be a kisebb gépre rögzített profilt, és nyissa meg a Transzponálót
 </translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="85" />
+      <location filename="../help/eventbuttons_help.py" line="88" />
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: commands can be sequenced, separated by semicolons like in “&lt;cmd1&gt;;&lt;cmd2&gt;;&lt;cmd3&gt;”
 </source>
@@ -7881,7 +7904,7 @@ Töltse be a kisebb gépre rögzített profilt, és nyissa meg a Transzponálót
 </translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="85" />
+      <location filename="../help/eventbuttons_help.py" line="88" />
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: in PHIDGET commands, the optional parameter &lt;sn&gt; has the form &lt;hub_serial&gt;[:&lt;hub_port&gt;] allows to refer to a specific Phidget HUB by given its serial number, and optionally specifying the port number the addressed module is connected to.
 </source>
@@ -7894,36 +7917,36 @@ Töltse be a kisebb gépre rögzített profilt, és nyissa meg a Transzponálót
       <translation>Megjegyzés: a YOCTOPUCE parancsokban az opcionális &lt;sn&gt; paraméter vagy a modul sorozatszámát vagy nevét tartalmazza</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="89" />
+      <location filename="../help/eventbuttons_help.py" line="92" />
       <location filename="../help/eventsliders_help.py" line="38" />
       <source>Serial Command</source>
       <translation>Soros parancs</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="89" />
+      <location filename="../help/eventbuttons_help.py" line="92" />
       <location filename="../help/eventsliders_help.py" line="38" />
       <source>ASCII serial command or binary a2b_uu(serial command)</source>
       <translation>ASCII soros parancs vagy bináris a2b_uu(soros parancs)</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="92" />
+      <location filename="../help/eventbuttons_help.py" line="95" />
       <location filename="../help/eventsliders_help.py" line="39" />
       <source>Modbus Command</source>
       <translation>Modbus parancs</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="92" />
+      <location filename="../help/eventbuttons_help.py" line="95" />
       <location filename="../help/eventsliders_help.py" line="39" />
       <source>variable holding the last value read via MODBUS</source>
       <translation>változó, amely a MODBUS-on keresztül olvasott utolsó értéket tartalmazza</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="228" />
-      <location filename="../help/eventbuttons_help.py" line="179" />
+      <location filename="../help/eventbuttons_help.py" line="231" />
+      <location filename="../help/eventbuttons_help.py" line="182" />
+      <location filename="../help/eventbuttons_help.py" line="163" />
       <location filename="../help/eventbuttons_help.py" line="160" />
-      <location filename="../help/eventbuttons_help.py" line="157" />
-      <location filename="../help/eventbuttons_help.py" line="135" />
-      <location filename="../help/eventbuttons_help.py" line="94" />
+      <location filename="../help/eventbuttons_help.py" line="138" />
+      <location filename="../help/eventbuttons_help.py" line="97" />
       <location filename="../help/eventsliders_help.py" line="161" />
       <location filename="../help/eventsliders_help.py" line="115" />
       <location filename="../help/eventsliders_help.py" line="101" />
@@ -7934,8 +7957,8 @@ Töltse be a kisebb gépre rögzített profilt, és nyissa meg a Transzponálót
       <translation>alvás: &lt;float&gt; másodperc késleltetés hozzáadása</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="162" />
-      <location filename="../help/eventbuttons_help.py" line="96" />
+      <location filename="../help/eventbuttons_help.py" line="165" />
+      <location filename="../help/eventbuttons_help.py" line="99" />
       <location filename="../help/eventsliders_help.py" line="41" />
       <source>sets calling button to “pressed” if argument is 1 or True</source>
       <translation>a hívógombot „lenyomva”-ra állítja, ha az argumentum 1 vagy True</translation>
@@ -7946,55 +7969,55 @@ Töltse be a kisebb gépre rögzített profilt, és nyissa meg a Transzponálót
       <translation>beolvassa a regisztert a slave slaveID-ből a 3. funkcióval (Több tárolóregiszter olvasása). Az eredmény a `_` helyőrzőhöz van kötve, így későbbi parancsokkal is elérhető.</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="99" />
+      <location filename="../help/eventbuttons_help.py" line="102" />
       <location filename="../help/eventsliders_help.py" line="43" />
       <source>reads 1 16bit register from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as signed integer. The result is bound to the placeholder `_` and thus can be accessed in later commands.</source>
       <translation>beolvas 1 16 bites regisztert a slave slaveID-ből a 3. (Többszörös tárolóregiszter olvasása) függvény segítségével, amelyet előjeles egész számként értelmez. Az eredmény a `_` helyőrzőhöz van kötve, így későbbi parancsokkal is elérhető.</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="100" />
+      <location filename="../help/eventbuttons_help.py" line="103" />
       <location filename="../help/eventsliders_help.py" line="44" />
       <source>reads 1 16bit register from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as BCD. The result is bound to the placeholder `_` and thus can be accessed in later commands.</source>
       <translation>beolvas 1 16 bites regisztert a slave slaveID-ből a BCD-ként értelmezett 3. funkcióval (Read Multiple Holding Registers). Az eredmény a `_` helyőrzőhöz van kötve, így későbbi parancsokkal is elérhető.</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="101" />
+      <location filename="../help/eventbuttons_help.py" line="104" />
       <location filename="../help/eventsliders_help.py" line="45" />
       <source>reads 2 16bit registers from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as unsigned integer. The result is bound to the placeholder `_` and thus can be accessed in later commands.</source>
       <translation>beolvas 2 16 bites regisztert a slave slave ID-ből a 3. funkcióval (Read Multiple Holding Registers), amelyet előjel nélküli egész számként értelmez. Az eredmény a `_` helyőrzőhöz van kötve, így későbbi parancsokkal is elérhető.</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="102" />
+      <location filename="../help/eventbuttons_help.py" line="105" />
       <location filename="../help/eventsliders_help.py" line="46" />
       <source>reads 2 16bit registers from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as signed integer. The result is bound to the placeholder `_` and thus can be accessed in later commands.</source>
       <translation>beolvas 2 16 bites regisztert a slave slaveID-ből a 3-as (Read Multiple Holding Registers) függvény segítségével, amelyet előjeles egész számként értelmez. Az eredmény a `_` helyőrzőhöz van kötve, így későbbi parancsokkal is elérhető.</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="103" />
+      <location filename="../help/eventbuttons_help.py" line="106" />
       <location filename="../help/eventsliders_help.py" line="47" />
       <source>reads 2 16bit register from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as BCD. The result is bound to the placeholder `_` and thus can be accessed in later commands.</source>
       <translation>beolvas 2 16 bites regisztert a slave slaveID-ből a 3. funkcióval (Read Multiple Holding Registers), amelyet BCD-ként értelmezünk. Az eredmény a `_` helyőrzőhöz van kötve, így későbbi parancsokkal is elérhető.</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="104" />
+      <location filename="../help/eventbuttons_help.py" line="107" />
       <location filename="../help/eventsliders_help.py" line="48" />
       <source>reads 2 16bit registers from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as float. The result is bound to the placeholder `_` and thus can be accessed in later commands.</source>
       <translation>beolvas 2 16 bites regisztert a slave slaveID-ből a 3-as funkcióval (Read Multiple Holding Registers), amelyet floatként értelmezünk. Az eredmény a `_` helyőrzőhöz van kötve, így későbbi parancsokkal is elérhető.</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="105" />
+      <location filename="../help/eventbuttons_help.py" line="108" />
       <location filename="../help/eventsliders_help.py" line="49" />
       <source>write register: MODBUS function 6 (int) or function 16 (float)</source>
       <translation>írási regiszter: MODBUS 6-os funkció (int) vagy 16-os funkció (float)</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="106" />
+      <location filename="../help/eventbuttons_help.py" line="109" />
       <location filename="../help/eventsliders_help.py" line="50" />
       <source>write coil: MODBUS function 5</source>
       <translation>Írótekercs: MODBUS funkció 5</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="107" />
+      <location filename="../help/eventbuttons_help.py" line="110" />
       <location filename="../help/eventsliders_help.py" line="51" />
       <source>write coils: MODBUS function 15</source>
       <translation>írási tekercsek: MODBUS funkció 15</translation>
@@ -8005,43 +8028,43 @@ Töltse be a kisebb gépre rögzített profilt, és nyissa meg a Transzponálót
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="108" />
+      <location filename="../help/eventbuttons_help.py" line="111" />
       <location filename="../help/eventsliders_help.py" line="52" />
       <source>mask write register: MODBUS function 22 or simulates function 22 with function 6 and the given value v</source>
       <translation>maszk írási regiszter: MODBUS 22 függvény vagy szimulálja a 22-es függvényt a 6-os függvénnyel és a megadott v értékkel</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="109" />
+      <location filename="../help/eventbuttons_help.py" line="112" />
       <location filename="../help/eventsliders_help.py" line="53" />
       <source>write registers: MODBUS function 16</source>
       <translation>regiszterek írása: MODBUS funkció 16</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="110" />
+      <location filename="../help/eventbuttons_help.py" line="113" />
       <location filename="../help/eventsliders_help.py" line="54" />
       <source>write 16bit BCD encoded value v to register r of slave s </source>
       <translation>írjon 16 bites BCD kódolt v értéket a slave s r regiszterébe</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="111" />
+      <location filename="../help/eventbuttons_help.py" line="114" />
       <location filename="../help/eventsliders_help.py" line="55" />
       <source>write 32bit float to two 16bit int registers: MODBUS function 16</source>
       <translation>32 bites float írása két 16 bites int regiszterbe: MODBUS függvény 16</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="112" />
+      <location filename="../help/eventbuttons_help.py" line="115" />
       <location filename="../help/eventsliders_help.py" line="56" />
       <source>write 32bit integer to two 16bit int registers: MODBUS function 16</source>
       <translation>írjon 32 bites egész számot két 16 bites int regiszterbe: MODBUS függvény 16</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="113" />
+      <location filename="../help/eventbuttons_help.py" line="116" />
       <location filename="../help/eventsliders_help.py" line="57" />
       <source>write 16bit integer to a single 16bit register: MODBUS function 6 (int)</source>
       <translation>16 bites egész szám írása egyetlen 16 bites regiszterbe: MODBUS függvény 6 (int)</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="114" />
+      <location filename="../help/eventbuttons_help.py" line="117" />
       <location filename="../help/eventsliders_help.py" line="58" />
       <source>DTA Command</source>
       <translation>DTA parancs</translation>
@@ -8062,119 +8085,119 @@ Töltse be a kisebb gépre rögzített profilt, és nyissa meg a Transzponálót
       <translation>start és külső program</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="138" />
+      <location filename="../help/eventbuttons_help.py" line="141" />
       <location filename="../help/eventsliders_help.py" line="60" />
       <source>Hottop Heater</source>
       <translation type="unfinished">Hottop fűtés</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="171" />
-      <location filename="../help/eventbuttons_help.py" line="138" />
+      <location filename="../help/eventbuttons_help.py" line="174" />
+      <location filename="../help/eventbuttons_help.py" line="141" />
       <location filename="../help/eventsliders_help.py" line="109" />
       <location filename="../help/eventsliders_help.py" line="60" />
       <source>sets heater to value</source>
       <translation>értékre állítja a fűtést</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="139" />
+      <location filename="../help/eventbuttons_help.py" line="142" />
       <location filename="../help/eventsliders_help.py" line="61" />
       <source>Hottop Fan</source>
       <translation>Hottop ventilátor</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="172" />
-      <location filename="../help/eventbuttons_help.py" line="139" />
+      <location filename="../help/eventbuttons_help.py" line="175" />
+      <location filename="../help/eventbuttons_help.py" line="142" />
       <location filename="../help/eventsliders_help.py" line="110" />
       <location filename="../help/eventsliders_help.py" line="61" />
       <source>sets fan to value</source>
       <translation>értékre állítja a ventilátort</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="140" />
+      <location filename="../help/eventbuttons_help.py" line="143" />
       <location filename="../help/eventsliders_help.py" line="62" />
       <source>Hottop Command</source>
       <translation type="unfinished">Hottop parancs</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="140" />
+      <location filename="../help/eventbuttons_help.py" line="143" />
       <location filename="../help/eventsliders_help.py" line="62" />
       <source>with n={0 ,1},h={0,..100},f={0,..10}</source>
       <translation>n={0 ,1},h={0,..100},f={0,..10}</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="142" />
+      <location filename="../help/eventbuttons_help.py" line="145" />
       <location filename="../help/eventsliders_help.py" line="63" />
       <source>Fuji Command</source>
       <translation type="unfinished">Fuji parancsnokság</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="143" />
+      <location filename="../help/eventbuttons_help.py" line="146" />
       <location filename="../help/eventsliders_help.py" line="64" />
       <source>PWM Command</source>
       <translation type="unfinished">PWM parancs</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="143" />
+      <location filename="../help/eventbuttons_help.py" line="146" />
       <location filename="../help/eventsliders_help.py" line="64" />
       <source>PHIDGET PWM Output: &lt;value&gt; in [0-100]</source>
       <translation>PHIDGET PWM kimenet: &lt;érték&gt; in [0-100]</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="144" />
+      <location filename="../help/eventbuttons_help.py" line="147" />
       <location filename="../help/eventsliders_help.py" line="65" />
       <source>PHIDGET PWM Output: toggles &lt;channel&gt;</source>
       <translation>PHIDGET PWM kimenet: átkapcsolja a &lt;csatornát&gt;</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="145" />
+      <location filename="../help/eventbuttons_help.py" line="148" />
       <location filename="../help/eventsliders_help.py" line="66" />
       <source>PHIDGET PWM Output: turn &lt;channel&gt; on for &lt;millis&gt; milliseconds</source>
       <translation>PHIDGET PWM kimenet: a &lt;csatorna&gt; bekapcsolása &lt;millis&gt; ezredmásodpercig</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="146" />
+      <location filename="../help/eventbuttons_help.py" line="149" />
       <location filename="../help/eventsliders_help.py" line="67" />
       <source>PHIDGET HUB PWM Output: &lt;value&gt; in [0-100]</source>
       <translation>PHIDGET HUB PWM kimenet: &lt;érték&gt; in [0-100]</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="147" />
+      <location filename="../help/eventbuttons_help.py" line="150" />
       <location filename="../help/eventsliders_help.py" line="68" />
       <source>PHIDGET HUB PWM Output: toggles &lt;channel&gt;</source>
       <translation>PHIDGET HUB PWM kimenet: a &lt;csatorna&gt; váltása</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="148" />
+      <location filename="../help/eventbuttons_help.py" line="151" />
       <location filename="../help/eventsliders_help.py" line="69" />
       <source>PHIDGET HUB PWM Output:  turn &lt;channel&gt; on for &lt;millis&gt; milliseconds</source>
       <translation>PHIDGET HUB PWM kimenet: a &lt;csatorna&gt; bekapcsolása &lt;millis&gt; ezredmásodpercig</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="149" />
+      <location filename="../help/eventbuttons_help.py" line="152" />
       <location filename="../help/eventsliders_help.py" line="70" />
       <source>YOCTOPUCE PWM Output: PWM running state</source>
       <translation>YOCTOPUCE PWM kimenet: PWM működési állapot</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="150" />
+      <location filename="../help/eventbuttons_help.py" line="153" />
       <location filename="../help/eventsliders_help.py" line="71" />
       <source>YOCTOPUCE PWM Output: set PWM frequency to f (Hz)</source>
       <translation>YOCTOPUCE PWM kimenet: állítsa a PWM frekvenciát f-re (Hz)</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="151" />
+      <location filename="../help/eventbuttons_help.py" line="154" />
       <location filename="../help/eventsliders_help.py" line="72" />
       <source>YOCTOPUCE PWM Output: set PWM period with the duty cycle in % as a float [0.0-100.0]</source>
       <translation>YOCTOPUCE PWM kimenet: állítsa be a PWM periódust a %-os terhelési ciklussal lebegőként [0,0-100,0]</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="152" />
+      <location filename="../help/eventbuttons_help.py" line="155" />
       <location filename="../help/eventsliders_help.py" line="73" />
       <source>YOCTOPUCE PWM Output: changes progressively the PWM to the specified value over the given time interval</source>
       <translation>YOCTOPUCE PWM kimenet: fokozatosan módosítja a PWM-et a megadott értékre a megadott időintervallumon belül</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="153" />
+      <location filename="../help/eventbuttons_help.py" line="156" />
       <location filename="../help/eventsliders_help.py" line="74" />
       <source>VOUT Command</source>
       <translation type="unfinished">VOUT parancs</translation>
@@ -8185,364 +8208,364 @@ Töltse be a kisebb gépre rögzített profilt, és nyissa meg a Transzponálót
       <translation>PHIDGET OUTPUT modulokhoz: beállítja a feszültség tartományt (r=5 r5V és r=10 10V esetén)</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="154" />
+      <location filename="../help/eventbuttons_help.py" line="157" />
       <location filename="../help/eventsliders_help.py" line="75" />
       <source>for PHIDGET OUTPUT modules: set analog output channel n to output voltage value v in V (eg. 5.5 for 5.5V)</source>
       <translation>PHIDGET OUTPUT modulok esetén: állítsa az n analóg kimeneti csatornát v kimeneti feszültség értékre V-ban (pl. 5,5 5,5 V esetén)</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="155" />
+      <location filename="../help/eventbuttons_help.py" line="158" />
       <location filename="../help/eventsliders_help.py" line="76" />
       <source>for YOCTOPUCE VOLTAGE OUT modules with c the channel (1 or 2),v the voltage as float [0.0-10.0]</source>
       <translation>YOCTOPUCE VOLTAGE OUT moduloknál c a csatorna (1 vagy 2),v a feszültség lebegő [0.0-10.0]</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="156" />
+      <location filename="../help/eventbuttons_help.py" line="159" />
       <location filename="../help/eventsliders_help.py" line="77" />
       <source>for YOCTOPUCE CURRENT OUT modules with c the current as float [3.0-21.0]</source>
       <translation>YOCTOPUCE CURRENT OUT modulokhoz, ahol c az áram lebegőként [3.0-21.0]</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="115" />
+      <location filename="../help/eventbuttons_help.py" line="118" />
       <location filename="../help/eventsliders_help.py" line="79" />
       <source>IO Command</source>
       <translation type="unfinished">IO parancs</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="117" />
+      <location filename="../help/eventbuttons_help.py" line="120" />
       <location filename="../help/eventsliders_help.py" line="79" />
       <source>PHIDGET Binary Output: switches channel c off (b=0) and on (b=1)</source>
       <translation>PHIDGET bináris kimenet: a c csatornát kikapcsolja (b=0) és be (b=1)</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="118" />
+      <location filename="../help/eventbuttons_help.py" line="121" />
       <location filename="../help/eventsliders_help.py" line="80" />
       <source>PHIDGET Binary Output: toggles channel c</source>
       <translation>PHIDGET bináris kimenet: váltja a c csatornát</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="119" />
+      <location filename="../help/eventbuttons_help.py" line="122" />
       <location filename="../help/eventsliders_help.py" line="81" />
       <source>PHIDGET Binary Output: sets the output of channel c to on for time t in milliseconds</source>
       <translation>PHIDGET bináris kimenet: a c csatorna kimenetét bekapcsolja t időre ezredmásodpercben</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="120" />
+      <location filename="../help/eventbuttons_help.py" line="123" />
       <location filename="../help/eventsliders_help.py" line="82" />
       <source>PHIDGET Voltage Output: sets voltage output of channel c to v (float)</source>
       <translation>PHIDGET Voltage Output: a c csatorna kimeneti feszültségét v-re állítja (lebegő)</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="121" />
+      <location filename="../help/eventbuttons_help.py" line="124" />
       <location filename="../help/eventsliders_help.py" line="83" />
       <source>PHIDGET DCMotor: sets acceleration of channel c to v (float)</source>
       <translation>PHIDGET DCMotor: a c csatorna gyorsulását v-re állítja (lebegés)</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="122" />
+      <location filename="../help/eventbuttons_help.py" line="125" />
       <location filename="../help/eventsliders_help.py" line="84" />
       <source>PHIDGET DCMotor: sets target velocity of channel c to v (float)</source>
       <translation>PHIDGET DCMotor: a c csatorna célsebességét v-re állítja (lebegés)</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="123" />
+      <location filename="../help/eventbuttons_help.py" line="126" />
       <location filename="../help/eventsliders_help.py" line="85" />
       <source>PHIDGET DCMotor: sets current limit of channel c to v (float)</source>
       <translation>PHIDGET DCMotor: a c csatorna áramkorlátját v-re állítja (lebegő)</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="124" />
+      <location filename="../help/eventbuttons_help.py" line="127" />
       <location filename="../help/eventsliders_help.py" line="86" />
       <source>YOCTOPUCE Relay Output: turn channel c of the relay module on</source>
       <translation>YOCTOPUCE relé kimenet: kapcsolja be a relémodul c csatornáját</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="125" />
+      <location filename="../help/eventbuttons_help.py" line="128" />
       <location filename="../help/eventsliders_help.py" line="87" />
       <source>YOCTOPUCE Relay Output: turn channel c of the relay module off</source>
       <translation>YOCTOPUCE relé kimenet: kapcsolja ki a relémodul c csatornáját</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="126" />
+      <location filename="../help/eventbuttons_help.py" line="129" />
       <location filename="../help/eventsliders_help.py" line="88" />
       <source>YOCTOPUCE Relay Output: switches channel c of the relay module off (b=0) and on (b=1)</source>
       <translation>YOCTOPUCE relé kimenet: a relémodul c csatornáját kapcsolja ki (b=0) és be (b=1)</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="127" />
+      <location filename="../help/eventbuttons_help.py" line="130" />
       <location filename="../help/eventsliders_help.py" line="89" />
       <source>YOCTOPUCE Relay Output: toggle the state of channel c</source>
       <translation>YOCTOPUCE relé kimenet: a c csatorna állapotának váltása</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="128" />
+      <location filename="../help/eventbuttons_help.py" line="131" />
       <location filename="../help/eventsliders_help.py" line="90" />
       <source>YOCTOPUCE Relay Output: pulse the channel c on after a delay of delay milliseconds for the duration of duration milliseconds</source>
       <translation>YOCTOPUCE relé kimenet: impulzálja a c csatornát ezredmásodperc késleltetés után, ezredmásodperc időtartamig</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="129" />
+      <location filename="../help/eventbuttons_help.py" line="132" />
       <location filename="../help/eventsliders_help.py" line="91" />
       <source>YOCTOPUCE resets the power counter of the Yocto-Watt module</source>
       <translation>A YOCTOPUCE alaphelyzetbe állítja a Yocto-Watt modul teljesítményszámlálóját</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="130" />
+      <location filename="../help/eventbuttons_help.py" line="133" />
       <location filename="../help/eventsliders_help.py" line="92" />
       <source>move slider c to value v</source>
       <translation>mozgassa a c csúszkát a v értékre</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="131" />
+      <location filename="../help/eventbuttons_help.py" line="134" />
       <location filename="../help/eventsliders_help.py" line="93" />
       <source>switches PHIDGET Binary Output channel c off (b=0) and on (b=1) and sets button i to pressed or normal depending on the value b</source>
       <translation>a PHIDGET bináris kimeneti csatornát c kikapcsolja (b=0) és be (b=1), és az i gombot nyomva vagy normál állásba állítja a b értéktől függően</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="229" />
-      <location filename="../help/eventbuttons_help.py" line="198" />
-      <location filename="../help/eventbuttons_help.py" line="161" />
-      <location filename="../help/eventbuttons_help.py" line="132" />
-      <location filename="../help/eventbuttons_help.py" line="95" />
+      <location filename="../help/eventbuttons_help.py" line="232" />
+      <location filename="../help/eventbuttons_help.py" line="201" />
+      <location filename="../help/eventbuttons_help.py" line="164" />
+      <location filename="../help/eventbuttons_help.py" line="135" />
+      <location filename="../help/eventbuttons_help.py" line="98" />
       <location filename="../help/eventsliders_help.py" line="94" />
       <source>sets button i to pressed if value b is yes, true, t, or 1, otherwise to normal</source>
       <translation>az i gombot lenyomva állítja, ha a b érték igen, igaz, t vagy 1, egyébként normálra</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="133" />
+      <location filename="../help/eventbuttons_help.py" line="136" />
       <location filename="../help/eventsliders_help.py" line="95" />
       <source>sets button to pressed if value b is yes, true, t, or 1, otherwise to normal</source>
       <translation>beállítja a gombot lenyomva, ha a b érték igen, igaz, t vagy 1, egyébként normálra</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="231" />
-      <location filename="../help/eventbuttons_help.py" line="200" />
-      <location filename="../help/eventbuttons_help.py" line="163" />
-      <location filename="../help/eventbuttons_help.py" line="134" />
-      <location filename="../help/eventbuttons_help.py" line="97" />
+      <location filename="../help/eventbuttons_help.py" line="234" />
+      <location filename="../help/eventbuttons_help.py" line="203" />
+      <location filename="../help/eventbuttons_help.py" line="166" />
+      <location filename="../help/eventbuttons_help.py" line="137" />
+      <location filename="../help/eventbuttons_help.py" line="100" />
       <location filename="../help/eventsliders_help.py" line="96" />
       <source>toggles the state of the button</source>
       <translation>átkapcsolja a gomb állapotát</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="136" />
+      <location filename="../help/eventbuttons_help.py" line="139" />
       <location filename="../help/eventsliders_help.py" line="98" />
       <source>sends integer &lt;value&gt; to &lt;target&gt; register specified by as byte in hex notation like “fa” via the Santoker Network protocol</source>
       <translation>egész &lt;érték&gt; számot küld a &lt;target&gt; regiszterbe, amelyet bájtként határoz meg hexadecimális jelöléssel, például „fa” a Santoker Network protokollon keresztül</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="137" />
+      <location filename="../help/eventbuttons_help.py" line="140" />
       <location filename="../help/eventsliders_help.py" line="99" />
       <source>sends &lt;value&gt; to &lt;target&gt; via the Kaleido Serial or Network protocol</source>
       <translation>elküldi az &lt;értéket&gt; a &lt;cél&gt;-nak a Kaleido soros vagy hálózati protokollon keresztül</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="158" />
+      <location filename="../help/eventbuttons_help.py" line="161" />
       <location filename="../help/eventsliders_help.py" line="100" />
       <source>S7 Command</source>
       <translation type="unfinished">S7 parancs</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="158" />
+      <location filename="../help/eventbuttons_help.py" line="161" />
       <location filename="../help/eventsliders_help.py" line="100" />
       <source>variable holding the last value read via S7</source>
       <translation>az S7-en keresztül olvasott utolsó értéket tároló változó</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="230" />
+      <location filename="../help/eventbuttons_help.py" line="233" />
       <location filename="../help/eventsliders_help.py" line="162" />
       <location filename="../help/eventsliders_help.py" line="102" />
       <source>sets calling button to “pressed” if argument evaluates to 1 or True</source>
       <translation>a hívógombot „lenyomva” értékre állítja, ha az argumentum értéke 1 vagy igaz</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="164" />
+      <location filename="../help/eventbuttons_help.py" line="167" />
       <location filename="../help/eventsliders_help.py" line="103" />
       <source>read bool from S7 DB</source>
       <translation>bool olvasása az S7 DB-ből</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="165" />
+      <location filename="../help/eventbuttons_help.py" line="168" />
       <location filename="../help/eventsliders_help.py" line="104" />
       <source>read int from S7 DB</source>
       <translation>beolvasni az S7 DB-ből</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="166" />
+      <location filename="../help/eventbuttons_help.py" line="169" />
       <location filename="../help/eventsliders_help.py" line="105" />
       <source>read float from S7 DB</source>
       <translation>float olvasása az S7 DB-ből</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="167" />
+      <location filename="../help/eventbuttons_help.py" line="170" />
       <location filename="../help/eventsliders_help.py" line="106" />
       <source>write bool to S7 DB</source>
       <translation>bool írása S7 DB-be</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="168" />
+      <location filename="../help/eventbuttons_help.py" line="171" />
       <location filename="../help/eventsliders_help.py" line="107" />
       <source>write int to S7 DB</source>
       <translation>írja be az S7 DB-be</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="170" />
+      <location filename="../help/eventbuttons_help.py" line="173" />
       <location filename="../help/eventsliders_help.py" line="108" />
       <source>write float to S7 DB</source>
       <translation>float írása S7 DB-be</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="171" />
+      <location filename="../help/eventbuttons_help.py" line="174" />
       <location filename="../help/eventsliders_help.py" line="109" />
       <source>Aillio R1 Heater</source>
       <translation type="unfinished">Aillio R1 fűtés</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="172" />
+      <location filename="../help/eventbuttons_help.py" line="175" />
       <location filename="../help/eventsliders_help.py" line="110" />
       <source>Aillio R1 Fan</source>
       <translation type="unfinished">Aillio R1 ventilátor</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="173" />
+      <location filename="../help/eventbuttons_help.py" line="176" />
       <location filename="../help/eventsliders_help.py" line="111" />
       <source>Aillio R1 Drum</source>
       <translation type="unfinished">Aillio R1 dob</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="173" />
+      <location filename="../help/eventbuttons_help.py" line="176" />
       <location filename="../help/eventsliders_help.py" line="111" />
       <source>sets drum speed to value</source>
       <translation>értékre állítja a dob sebességét</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="175" />
+      <location filename="../help/eventbuttons_help.py" line="178" />
       <location filename="../help/eventsliders_help.py" line="112" />
       <source>Artisan Command</source>
       <translation type="unfinished">Kézműves parancsnokság</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="176" />
+      <location filename="../help/eventbuttons_help.py" line="179" />
       <location filename="../help/eventsliders_help.py" line="112" />
       <source>enables/disables alarms</source>
       <translation>engedélyezi/letiltja a riasztásokat</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="177" />
+      <location filename="../help/eventbuttons_help.py" line="180" />
       <location filename="../help/eventsliders_help.py" line="113" />
       <source>enables/disables autoCHARGE</source>
       <translation>engedélyezi/letiltja az autoCHARGE funkciót</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="178" />
+      <location filename="../help/eventbuttons_help.py" line="181" />
       <location filename="../help/eventsliders_help.py" line="114" />
       <source>enables/disables autoDROP</source>
       <translation>az autoDROP engedélyezése/letiltása</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="180" />
+      <location filename="../help/eventbuttons_help.py" line="183" />
       <location filename="../help/eventsliders_help.py" line="116" />
       <source>tare channel &lt;int&gt; with 1 =&gt; ET, 2 =&gt; BT, 3 =&gt; E1c1, 4: E1c2,..</source>
       <translation>tára csatorna &lt;int&gt; 1 =&gt; ET, 2 =&gt; BT, 3 =&gt; E1c1, 4: E1c2,..</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="181" />
+      <location filename="../help/eventbuttons_help.py" line="184" />
       <location filename="../help/eventsliders_help.py" line="117" />
       <source>turns PID on</source>
       <translation>bekapcsolja a PID-t</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="182" />
+      <location filename="../help/eventbuttons_help.py" line="185" />
       <location filename="../help/eventsliders_help.py" line="118" />
       <source>turns PID off</source>
       <translation>kikapcsolja a PID-t</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="183" />
+      <location filename="../help/eventbuttons_help.py" line="186" />
       <location filename="../help/eventsliders_help.py" line="119" />
       <source>toggles the PID state</source>
       <translation>átkapcsolja a PID állapotot</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="184" />
+      <location filename="../help/eventbuttons_help.py" line="187" />
       <location filename="../help/eventsliders_help.py" line="120" />
       <source>sets PID mode to 0: manual, 1: RS, 2: background follow</source>
       <translation>a PID módot 0-ra állítja: kézi, 1: RS, 2: háttérkövetés</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="185" />
+      <location filename="../help/eventbuttons_help.py" line="188" />
       <location filename="../help/eventsliders_help.py" line="121" />
       <source>sets the p-i-d parameters of the PID</source>
       <translation>beállítja a PID p-i-d paramétereit</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="186" />
+      <location filename="../help/eventbuttons_help.py" line="189" />
       <location filename="../help/eventsliders_help.py" line="122" />
       <source>increases or decreases the current target SV value by &lt;int&gt;</source>
       <translation>&lt;int&gt;-kal növeli vagy csökkenti az aktuális SV célértéket</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="187" />
+      <location filename="../help/eventbuttons_help.py" line="190" />
       <location filename="../help/eventsliders_help.py" line="123" />
       <source>sets the PID target set value SV</source>
       <translation>beállítja a PID célértéket SV</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="188" />
+      <location filename="../help/eventbuttons_help.py" line="191" />
       <location filename="../help/eventsliders_help.py" line="124" />
       <source>sets the PID target set value SV given in C</source>
       <translation>beállítja a C-ben megadott SV PID célértéket</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="189" />
+      <location filename="../help/eventbuttons_help.py" line="192" />
       <location filename="../help/eventsliders_help.py" line="125" />
       <source>activates the PID Ramp-Soak pattern number &lt;rs&gt; (1-based!) or the one labeled &lt;rs&gt;</source>
       <translation>aktiválja a PID Ramp-Soak mintát &lt;rs&gt; (1 alapú!) vagy az &lt;rs&gt; címkét</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="190" />
+      <location filename="../help/eventbuttons_help.py" line="193" />
       <location filename="../help/eventsliders_help.py" line="126" />
       <source>selects the PID input source with &lt;n&gt; 0: BT, 1: ET (Software PID); &lt;n&gt; in {0,..,3} (Arduino PID)</source>
       <translation>kiválasztja a PID bemeneti forrást a &lt;n&gt; értékkel 0: BT, 1: ET (Szoftver PID); &lt;n&gt; itt: {0,...,3} (Arduino PID)</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="191" />
+      <location filename="../help/eventbuttons_help.py" line="194" />
       <location filename="../help/eventsliders_help.py" line="127" />
       <source>sets the PID lookahead</source>
       <translation>beállítja a PID előretekintést</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="192" />
+      <location filename="../help/eventbuttons_help.py" line="195" />
       <location filename="../help/eventsliders_help.py" line="128" />
       <source>shows popup with message &lt;msg&gt; which optionally automatically closes after &lt;int&gt; seconds</source>
       <translation>megjelenik egy felugró ablak az &lt;msg&gt; üzenettel, amely opcionálisan automatikusan bezárul &lt;int&gt; másodperc után</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="193" />
+      <location filename="../help/eventbuttons_help.py" line="196" />
       <location filename="../help/eventsliders_help.py" line="129" />
       <source>shows message &lt;msg&gt; in the message line</source>
       <translation>az &lt;msg&gt; üzenetet mutatja az üzenetsorban</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="194" />
+      <location filename="../help/eventbuttons_help.py" line="197" />
       <location filename="../help/eventsliders_help.py" line="130" />
       <source>enables/disables notifications; while disabled issued notifications are ignored</source>
       <translation>engedélyezi/letiltja az értesítéseket; míg a letiltott kiadott értesítéseket figyelmen kívül hagyja</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="195" />
+      <location filename="../help/eventbuttons_help.py" line="198" />
       <location filename="../help/eventsliders_help.py" line="131" />
       <source>sends notification with title &lt;title&gt; and optional message &lt;msg&gt;</source>
       <translation>értesítést küld &lt;title&gt; címmel és opcionális &lt;msg&gt; üzenettel</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="196" />
+      <location filename="../help/eventbuttons_help.py" line="199" />
       <location filename="../help/eventsliders_help.py" line="132" />
       <source>sets canvas color to the RGB-hex &lt;color&gt; like #27f1d3</source>
       <translation>beállítja a vászon színét az RGB-hex &lt;színre, például #27f1d3</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="197" />
+      <location filename="../help/eventbuttons_help.py" line="200" />
       <location filename="../help/eventsliders_help.py" line="133" />
       <source>resets canvas color</source>
       <translation>visszaállítja a vászon színét</translation>
@@ -8553,139 +8576,139 @@ Töltse be a kisebb gépre rögzített profilt, és nyissa meg a Transzponálót
       <translation>aktiválja a &lt;név&gt; gombot a következőkről: { START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF }</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="201" />
+      <location filename="../help/eventbuttons_help.py" line="204" />
       <location filename="../help/eventsliders_help.py" line="135" />
       <source>activates palette &lt;p&gt; with &lt;p&gt; either a number 0-9 or a palette label</source>
       <translation>aktiválja a &lt;p&gt; palettát a &lt;p&gt; 0-9 számmal vagy egy palettacímkével</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="202" />
+      <location filename="../help/eventbuttons_help.py" line="205" />
       <location filename="../help/eventsliders_help.py" line="136" />
       <source>sets playback mode to 0: off, 1: time, 2: BT, 3: ET</source>
       <translation>a lejátszási módot 0: off, 1: time, 2: BT, 3: ET értékre állítja</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="203" />
+      <location filename="../help/eventbuttons_help.py" line="206" />
       <location filename="../help/eventsliders_help.py" line="137" />
       <source>opens the Roast Properties dialog</source>
       <translation>megnyitja a Roast Properties párbeszédablakot</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="204" />
+      <location filename="../help/eventbuttons_help.py" line="207" />
       <location filename="../help/eventsliders_help.py" line="138" />
       <source>loads the .alog profile at the given filepath as background profile</source>
       <translation>betölti az .alog profilt a megadott fájlútvonalon háttérprofilként</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="205" />
+      <location filename="../help/eventbuttons_help.py" line="208" />
       <location filename="../help/eventsliders_help.py" line="139" />
       <source>clears the current background profile</source>
       <translation>törli az aktuális háttérprofilt</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="206" />
+      <location filename="../help/eventbuttons_help.py" line="209" />
       <location filename="../help/eventsliders_help.py" line="140" />
       <source>activates the alarmset with the given number or label</source>
       <translation>aktiválja a riasztókészletet a megadott számmal vagy címkével</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="207" />
+      <location filename="../help/eventbuttons_help.py" line="210" />
       <location filename="../help/eventsliders_help.py" line="141" />
       <source>moves the background profile the indicated number of steps towards &lt;direction&gt;, with &lt;direction&gt; one of up, down, left, right</source>
       <translation>mozgatja a háttérprofilt a megadott számú lépéssel &lt;irány&gt; felé, az &lt;irány&gt; egyikével fel, le, balra, jobbra</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="208" />
+      <location filename="../help/eventbuttons_help.py" line="211" />
       <location filename="../help/eventsliders_help.py" line="142" />
       <source>enables/disables keyboard mode</source>
       <translation>engedélyezi/letiltja a billentyűzet módot</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="209" />
+      <location filename="../help/eventbuttons_help.py" line="212" />
       <location filename="../help/eventsliders_help.py" line="143" />
       <source>enables/disables the Keep ON flag</source>
       <translation>engedélyezi/letiltja a Keep ON jelzőt</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="210" />
+      <location filename="../help/eventbuttons_help.py" line="213" />
       <location filename="../help/eventsliders_help.py" line="144" />
       <source>shows/hides the curve indicated by &lt;name&gt; which is one of { ET, BT, DeltaET, DeltaBT, BackgroundET, BackgroundBT}</source>
       <translation>megjeleníti/elrejti a &lt;név&gt; által jelzett görbét, amely a következők egyike: { ET, BT, DeltaET, DeltaBT, BackgroundET, BackgroundBT}</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="211" />
+      <location filename="../help/eventbuttons_help.py" line="214" />
       <location filename="../help/eventsliders_help.py" line="145" />
       <source>shows/hides the &lt;curve&gt; (one of {T1,T2}) of the zero-based &lt;extra_device&gt; number</source>
       <translation>megjeleníti/elrejti a nulla alapú &lt;extra_device&gt; szám &lt;görbéjét&gt; ({T1,T2} egyike)</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="212" />
+      <location filename="../help/eventbuttons_help.py" line="215" />
       <location filename="../help/eventsliders_help.py" line="146" />
       <source>shows/hides the events of &lt;event_type&gt; in [1,..,5]</source>
       <translation>megjeleníti/elrejti az &lt;event_type&gt; eseményeit az [1,..,5]-ben</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="213" />
+      <location filename="../help/eventbuttons_help.py" line="216" />
       <location filename="../help/eventsliders_help.py" line="147" />
       <source>shows/hides the events of the background profile</source>
       <translation>megjeleníti/elrejti a háttérprofil eseményeit</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="214" />
+      <location filename="../help/eventbuttons_help.py" line="217" />
       <location filename="../help/eventsliders_help.py" line="148" />
       <source>RC Command</source>
       <translation type="unfinished">RC parancs</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="214" />
+      <location filename="../help/eventbuttons_help.py" line="217" />
       <location filename="../help/eventsliders_help.py" line="148" />
       <source>for PHIDGET RC modules: sets the min/max pulse width in microseconds</source>
       <translation>PHIDGET RC modulokhoz: beállítja a min/max impulzusszélességet mikroszekundumban</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="215" />
+      <location filename="../help/eventbuttons_help.py" line="218" />
       <location filename="../help/eventsliders_help.py" line="149" />
       <source>for PHIDGET RC modules: sets the min/max position</source>
       <translation>PHIDGET RC modulokhoz: beállítja a min/max pozíciót</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="216" />
+      <location filename="../help/eventbuttons_help.py" line="219" />
       <location filename="../help/eventsliders_help.py" line="150" />
       <source>for PHIDGET RC modules: engage (b=1) or disengage (b = 0)</source>
       <translation>PHIDGET RC modulokhoz: kapcsolja be (b=1) vagy kapcsolja ki (b = 0)</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="217" />
+      <location filename="../help/eventbuttons_help.py" line="220" />
       <location filename="../help/eventsliders_help.py" line="151" />
       <source>for PHIDGET RC modules: activates or deactivates the speed ramping state</source>
       <translation>PHIDGET RC modulokhoz: aktiválja vagy deaktiválja a sebességnövelő állapotot</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="218" />
+      <location filename="../help/eventbuttons_help.py" line="221" />
       <location filename="../help/eventsliders_help.py" line="152" />
       <source>for PHIDGET RC modules: set the voltage to one of 5, 6 or 7.4 in Volt</source>
       <translation>PHIDGET RC modulok esetén: állítsa a feszültséget 5, 6 vagy 7,4 voltra</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="219" />
+      <location filename="../help/eventbuttons_help.py" line="222" />
       <location filename="../help/eventsliders_help.py" line="153" />
       <source>for PHIDGET RC modules: set the acceleration</source>
       <translation>PHIDGET RC modulokhoz: állítsa be a gyorsulást</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="220" />
+      <location filename="../help/eventbuttons_help.py" line="223" />
       <location filename="../help/eventsliders_help.py" line="154" />
       <source>for PHIDGET RC modules: set the velocity</source>
       <translation>PHIDGET RC modulokhoz: állítsa be a sebességet</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="221" />
+      <location filename="../help/eventbuttons_help.py" line="224" />
       <location filename="../help/eventsliders_help.py" line="155" />
       <source>for PHIDGET RC modules: set the target position</source>
       <translation>PHIDGET RC modulokhoz: állítsa be a célpozíciót</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="222" />
+      <location filename="../help/eventbuttons_help.py" line="225" />
       <location filename="../help/eventsliders_help.py" line="156" />
       <source>for YOCTOPUCE RC modules: with c:int the channel, b a bool (eg. enabled(0,1) or enabled(0,True))</source>
       <translation>YOCTOPUCE RC modulokhoz: c:int a csatornával, b a bool (pl. enabled(0,1) vagy enabled(0,True))</translation>
@@ -8696,31 +8719,31 @@ Töltse be a kisebb gépre rögzített profilt, és nyissa meg a Transzponálót
       <translation>YOCTOPUCE RC modulokhoz: a c:int a csatornát, a p:int a célpozíciót, az opcionális t az időtartamot ms-ban</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="224" />
+      <location filename="../help/eventbuttons_help.py" line="227" />
       <location filename="../help/eventsliders_help.py" line="158" />
       <source>for YOCTOPUCE RC modules: with n an int [0..65000] in us</source>
       <translation>YOCTOPUCE RC modulokhoz: n an int [0..65000] bennünk</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="225" />
+      <location filename="../help/eventbuttons_help.py" line="228" />
       <location filename="../help/eventsliders_help.py" line="159" />
       <source>for YOCTOPUCE RC modules: with r an int in %</source>
       <translation>YOCTOPUCE RC modulokhoz: r an int-vel %-ban</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="226" />
+      <location filename="../help/eventbuttons_help.py" line="229" />
       <location filename="../help/eventsliders_help.py" line="160" />
       <source>WebSocket Command</source>
       <translation type="unfinished">WebSocket parancs</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="227" />
+      <location filename="../help/eventbuttons_help.py" line="230" />
       <location filename="../help/eventsliders_help.py" line="160" />
       <source>If {} substitutions are used, json brackets need to be duplicated to escape them like in send({{ “value”: {}}})</source>
       <translation>Ha {} helyettesítést használ, akkor a json zárójeleket meg kell duplikálni, hogy elkerülje őket, mint a send({{ “value”: {}}}) esetén.</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="232" />
+      <location filename="../help/eventbuttons_help.py" line="235" />
       <location filename="../help/eventsliders_help.py" line="163" />
       <source>if the `&lt;json&gt;` text respects the JSON format it is send to the connected WebSocket server and the response is bound to the variable `_`</source>
       <translation>ha a `&lt;json&gt;` szöveg tiszteletben tartja a JSON formátumot, akkor a rendszer elküldi a csatlakoztatott WebSocket szervernek, és a válasz a `_` változóhoz van kötve</translation>
@@ -8922,7 +8945,7 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
       <location filename="../help/eventbuttons_help.py" line="39" />
       <source>Show button specification as tooltips on hovering a button</source>
-      <translation type="unfinished" />
+      <translation>A gomb specifikációinak megjelenítése eszközleírásként a gomb lebegtetésekor</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="40" />
@@ -9078,104 +9101,119 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="77" />
+      <source>STIRRER</source>
+      <translation>KEVERŐ</translation>
+    </message>
+    <message>
+      <location filename="../help/eventbuttons_help.py" line="78" />
+      <source>FILL</source>
+      <translation>TÖLT</translation>
+    </message>
+    <message>
+      <location filename="../help/eventbuttons_help.py" line="79" />
+      <source>RELEASE</source>
+      <translation>KIADÁS</translation>
+    </message>
+    <message>
+      <location filename="../help/eventbuttons_help.py" line="80" />
       <source>HEATING</source>
       <translation type="unfinished">FŰTÉS</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="78" />
+      <location filename="../help/eventbuttons_help.py" line="81" />
       <source>COOLING</source>
       <translation type="unfinished">HŰTÉS</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="85" />
+      <location filename="../help/eventbuttons_help.py" line="88" />
       <source>Note: "{}" can be used as a placeholder, it will be substituted by the current button value plus the offset for ± event types.  If a placeholder occurs several times in a description/command, all those occurrences are replaced by the value.
 </source>
       <translation>Megjegyzés: A "{}" helyőrzőként használható, és az aktuális gombértékkel, valamint a ± eseménytípusok eltolásával helyettesíti. Ha egy helyőrző többször előfordul egy leírásban/parancsban, akkor az összes előfordulást az érték helyettesíti.
 </translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="85" />
+      <location filename="../help/eventbuttons_help.py" line="88" />
       <source>Note: in YOCTOPUCE commands, the optional parameter &lt;sn&gt; holds either the modules serial number or its name</source>
       <translation>Megjegyzés: a YOCTOPUCE parancsokban az opcionális &lt;sn&gt; paraméter vagy a modul sorozatszámát vagy nevét tartalmazza</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="91" />
+      <location filename="../help/eventbuttons_help.py" line="94" />
       <source>Multiple Event</source>
       <translation type="unfinished">Többszörös Esemény</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="91" />
+      <location filename="../help/eventbuttons_help.py" line="94" />
       <source>button numbers separated by a comma: 1,2,..</source>
       <translation>a gombok számai vesszővel elválasztva: 1,2,..</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="91" />
+      <location filename="../help/eventbuttons_help.py" line="94" />
       <source>triggers other buttons</source>
       <translation>más gombokat indít el</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="226" />
-      <location filename="../help/eventbuttons_help.py" line="175" />
-      <location filename="../help/eventbuttons_help.py" line="159" />
-      <location filename="../help/eventbuttons_help.py" line="116" />
-      <location filename="../help/eventbuttons_help.py" line="93" />
+      <location filename="../help/eventbuttons_help.py" line="229" />
+      <location filename="../help/eventbuttons_help.py" line="178" />
+      <location filename="../help/eventbuttons_help.py" line="162" />
+      <location filename="../help/eventbuttons_help.py" line="119" />
+      <location filename="../help/eventbuttons_help.py" line="96" />
       <source>variable holding the last state of the button pressed (1 or 0)</source>
       <translation>változó, amely a gomb utolsó lenyomott állapotát tartja (1 vagy 0)</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="98" />
+      <location filename="../help/eventbuttons_help.py" line="101" />
       <source>reads 1 16bit register from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as unsigned integer. The result is bound to the placeholder `_` and thus can be accessed in later commands.</source>
       <translation>beolvas 1 16 bites regisztert a slave slaveID-ből a 3. funkcióval (Read Multiple Holding Registers) előjel nélküli egész számként értelmezve. Az eredmény a `_` helyőrzőhöz van kötve, így későbbi parancsokkal is elérhető.</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="114" />
+      <location filename="../help/eventbuttons_help.py" line="117" />
       <source>Insert Data address : value, ex. 4701:1000 and sv is 100. 
 Always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating</source>
       <translation>Adatcím beszúrása: érték, pl. 4701:1000, az sv pedig 100.
 Mindig szorozzon 10-zel, ha az érték Mértékegység: 0,1 / pl. 4719:0 leállítja a fűtést</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="115" />
+      <location filename="../help/eventbuttons_help.py" line="118" />
       <source>variable holding the last result value</source>
       <translation>az utolsó eredményértéket hordozó változó</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="141" />
+      <location filename="../help/eventbuttons_help.py" line="144" />
       <source>p-i-d</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="141" />
+      <location filename="../help/eventbuttons_help.py" line="144" />
       <source>configures PID to the values &lt;p&gt;;&lt;i&gt;;&lt;d&gt;</source>
       <translation>beállítja a PID-t a &lt;p&gt;;&lt;i&gt;;&lt;d&gt; értékekre</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="153" />
+      <location filename="../help/eventbuttons_help.py" line="156" />
       <source>for PHIDGET OUTPUT modules: sets voltage voltage range (r=5 for 5V and r=10 for 10V)</source>
       <translation>PHIDGET OUTPUT modulokhoz: beállítja a feszültség tartományt (r=5 5V és r=10 10V)</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="169" />
+      <location filename="../help/eventbuttons_help.py" line="172" />
       <source>write value where bits are replaced by those from orMask at positions where andMask bits are not set</source>
       <translation>írjon értéket, ahol a biteket az orMask bitjei helyettesítik azokon a helyeken, ahol az andMask bitek nincsenek beállítva</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="174" />
+      <location filename="../help/eventbuttons_help.py" line="177" />
       <source>Aillio R1 Command</source>
       <translation type="unfinished">Aillio R1 parancs</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="174" />
+      <location filename="../help/eventbuttons_help.py" line="177" />
       <source>Sends PRS command</source>
       <translation>PRS parancsot küld</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="199" />
+      <location filename="../help/eventbuttons_help.py" line="202" />
       <source>activates button &lt;name&gt; from { START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF } ; sets calling button to “pressed” if argument is 1 or True</source>
       <translation>aktiválja a &lt;név&gt; gombot a következőkről: { START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF } ; a hívógombot „lenyomva”-ra állítja, ha az argumentum 1 vagy True</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="223" />
+      <location filename="../help/eventbuttons_help.py" line="226" />
       <source>for YOCTOPUCE RC modules: with c:int the channel, p:int the target position, the optional t the duration in ms, sn the optional modules serial number or logical name</source>
       <translation>YOCTOPUCE RC modulok esetén: c:int a csatorna, p:int a célpozíció, az opcionális t az időtartam ms-ban, az sn az opcionális modulok sorozatszáma vagy logikai neve</translation>
     </message>
@@ -11318,300 +11356,300 @@ Az Artisan minden mintaidőszakban elindítja a programot. A program kimeneténe
   <context>
     <name>Label</name>
     <message>
-      <location filename="../artisanlib/events.py" line="3444" />
-      <location filename="../artisanlib/events.py" line="916" />
-      <location filename="../artisanlib/events.py" line="660" />
+      <location filename="../artisanlib/events.py" line="3478" />
+      <location filename="../artisanlib/events.py" line="924" />
+      <location filename="../artisanlib/events.py" line="667" />
       <location filename="../artisanlib/pid_dialogs.py" line="348" />
       <location filename="../artisanlib/pid_dialogs.py" line="299" />
-      <location filename="../artisanlib/axis.py" line="148" />
+      <location filename="../artisanlib/axis.py" line="152" />
+      <location filename="../artisanlib/axis.py" line="80" />
+      <location filename="../artisanlib/axis.py" line="78" />
       <location filename="../artisanlib/axis.py" line="76" />
-      <location filename="../artisanlib/axis.py" line="74" />
-      <location filename="../artisanlib/axis.py" line="72" />
       <source>Max</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3443" />
-      <location filename="../artisanlib/events.py" line="914" />
-      <location filename="../artisanlib/events.py" line="658" />
+      <location filename="../artisanlib/events.py" line="3477" />
+      <location filename="../artisanlib/events.py" line="922" />
+      <location filename="../artisanlib/events.py" line="665" />
       <location filename="../artisanlib/pid_dialogs.py" line="340" />
       <location filename="../artisanlib/pid_dialogs.py" line="291" />
-      <location filename="../artisanlib/axis.py" line="158" />
+      <location filename="../artisanlib/axis.py" line="162" />
+      <location filename="../artisanlib/axis.py" line="81" />
+      <location filename="../artisanlib/axis.py" line="79" />
       <location filename="../artisanlib/axis.py" line="77" />
-      <location filename="../artisanlib/axis.py" line="75" />
-      <location filename="../artisanlib/axis.py" line="73" />
       <source>Min</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="78" />
+      <location filename="../artisanlib/axis.py" line="82" />
       <source>100% Event Step</source>
       <translation>100% esemény lépés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="158" />
+      <location filename="../artisanlib/axis.py" line="162" />
       <source>RECORD</source>
       <translation>REKORD</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="918" />
-      <location filename="../artisanlib/events.py" line="664" />
-      <location filename="../artisanlib/axis.py" line="254" />
-      <location filename="../artisanlib/axis.py" line="244" />
-      <location filename="../artisanlib/axis.py" line="205" />
+      <location filename="../artisanlib/events.py" line="926" />
+      <location filename="../artisanlib/events.py" line="671" />
+      <location filename="../artisanlib/axis.py" line="258" />
+      <location filename="../artisanlib/axis.py" line="248" />
+      <location filename="../artisanlib/axis.py" line="209" />
       <source>Step</source>
       <translation>Lépés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="653" />
-      <location filename="../artisanlib/axis.py" line="280" />
+      <location filename="../artisanlib/curves.py" line="666" />
+      <location filename="../artisanlib/axis.py" line="284" />
       <source>Style</source>
       <translation type="unfinished">Stílus</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="840" />
-      <location filename="../artisanlib/axis.py" line="293" />
+      <location filename="../artisanlib/main.py" line="841" />
+      <location filename="../artisanlib/axis.py" line="297" />
       <source>Width</source>
       <translation>Szélesség</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="116" />
-      <location filename="../artisanlib/axis.py" line="300" />
+      <location filename="../artisanlib/axis.py" line="304" />
       <source>Opaqueness</source>
       <translation>Átlátszatlanság</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="936" />
-      <location filename="../artisanlib/wheels.py" line="64" />
+      <location filename="../artisanlib/devices.py" line="940" />
+      <location filename="../artisanlib/wheels.py" line="68" />
       <source>Ratio</source>
       <translation>Hányados</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5353" />
-      <location filename="../artisanlib/main.py" line="5250" />
-      <location filename="../artisanlib/wheels.py" line="71" />
+      <location filename="../artisanlib/main.py" line="5419" />
+      <location filename="../artisanlib/main.py" line="5316" />
+      <location filename="../artisanlib/wheels.py" line="75" />
       <source>Text</source>
       <translation>Szöveg</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="78" />
+      <location filename="../artisanlib/wheels.py" line="82" />
       <source>Edge</source>
       <translation>Él</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="837" />
-      <location filename="../artisanlib/wheels.py" line="84" />
+      <location filename="../artisanlib/main.py" line="838" />
+      <location filename="../artisanlib/wheels.py" line="88" />
       <source>Line</source>
       <translation>Vonal</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="96" />
+      <location filename="../artisanlib/wheels.py" line="100" />
       <source>Color pattern</source>
       <translation>Színes minta</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="441" />
+      <location filename="../artisanlib/wheels.py" line="456" />
       <source> dg</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15351" />
-      <location filename="../artisanlib/canvas.py" line="15341" />
-      <location filename="../artisanlib/canvas.py" line="7708" />
-      <location filename="../artisanlib/canvas.py" line="7662" />
-      <location filename="../artisanlib/main.py" line="16883" />
-      <location filename="../artisanlib/main.py" line="5295" />
-      <location filename="../artisanlib/main.py" line="5289" />
-      <location filename="../artisanlib/main.py" line="5265" />
-      <location filename="../artisanlib/main.py" line="5241" />
-      <location filename="../artisanlib/main.py" line="5235" />
-      <location filename="../artisanlib/main.py" line="3384" />
-      <location filename="../artisanlib/main.py" line="3130" />
-      <location filename="../artisanlib/main.py" line="3120" />
-      <location filename="../artisanlib/alarms.py" line="804" />
-      <location filename="../artisanlib/curves.py" line="2141" />
-      <location filename="../artisanlib/curves.py" line="1490" />
-      <location filename="../artisanlib/curves.py" line="1254" />
-      <location filename="../artisanlib/curves.py" line="495" />
-      <location filename="../artisanlib/curves.py" line="481" />
-      <location filename="../artisanlib/curves.py" line="405" />
-      <location filename="../artisanlib/curves.py" line="331" />
-      <location filename="../artisanlib/designer.py" line="220" />
-      <location filename="../artisanlib/designer.py" line="76" />
-      <location filename="../artisanlib/roast_properties.py" line="3922" />
+      <location filename="../artisanlib/canvas.py" line="15382" />
+      <location filename="../artisanlib/canvas.py" line="15372" />
+      <location filename="../artisanlib/canvas.py" line="7715" />
+      <location filename="../artisanlib/canvas.py" line="7669" />
+      <location filename="../artisanlib/main.py" line="17006" />
+      <location filename="../artisanlib/main.py" line="5361" />
+      <location filename="../artisanlib/main.py" line="5355" />
+      <location filename="../artisanlib/main.py" line="5331" />
+      <location filename="../artisanlib/main.py" line="5307" />
+      <location filename="../artisanlib/main.py" line="5301" />
+      <location filename="../artisanlib/main.py" line="3421" />
+      <location filename="../artisanlib/main.py" line="3167" />
+      <location filename="../artisanlib/main.py" line="3157" />
+      <location filename="../artisanlib/alarms.py" line="817" />
+      <location filename="../artisanlib/curves.py" line="2157" />
+      <location filename="../artisanlib/curves.py" line="1506" />
+      <location filename="../artisanlib/curves.py" line="1268" />
+      <location filename="../artisanlib/curves.py" line="508" />
+      <location filename="../artisanlib/curves.py" line="494" />
+      <location filename="../artisanlib/curves.py" line="418" />
+      <location filename="../artisanlib/curves.py" line="344" />
+      <location filename="../artisanlib/designer.py" line="227" />
+      <location filename="../artisanlib/designer.py" line="81" />
+      <location filename="../artisanlib/roast_properties.py" line="3955" />
       <location filename="../artisanlib/background.py" line="70" />
       <location filename="../artisanlib/comm.py" line="186" />
-      <location filename="../artisanlib/comparator.py" line="881" />
-      <location filename="../artisanlib/comparator.py" line="875" />
-      <location filename="../artisanlib/comparator.py" line="679" />
-      <location filename="../artisanlib/comparator.py" line="658" />
+      <location filename="../artisanlib/comparator.py" line="893" />
+      <location filename="../artisanlib/comparator.py" line="883" />
+      <location filename="../artisanlib/comparator.py" line="685" />
+      <location filename="../artisanlib/comparator.py" line="664" />
       <source>BT</source>
       <translation>BAB HŐ</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15348" />
-      <location filename="../artisanlib/canvas.py" line="15337" />
-      <location filename="../artisanlib/canvas.py" line="7683" />
-      <location filename="../artisanlib/canvas.py" line="7639" />
-      <location filename="../artisanlib/main.py" line="16877" />
-      <location filename="../artisanlib/main.py" line="5292" />
-      <location filename="../artisanlib/main.py" line="5286" />
-      <location filename="../artisanlib/main.py" line="5262" />
-      <location filename="../artisanlib/main.py" line="5244" />
-      <location filename="../artisanlib/main.py" line="5238" />
-      <location filename="../artisanlib/main.py" line="3383" />
-      <location filename="../artisanlib/main.py" line="3125" />
-      <location filename="../artisanlib/main.py" line="3115" />
-      <location filename="../artisanlib/alarms.py" line="803" />
-      <location filename="../artisanlib/curves.py" line="2136" />
-      <location filename="../artisanlib/curves.py" line="1498" />
-      <location filename="../artisanlib/curves.py" line="1251" />
-      <location filename="../artisanlib/curves.py" line="494" />
-      <location filename="../artisanlib/curves.py" line="475" />
-      <location filename="../artisanlib/curves.py" line="405" />
-      <location filename="../artisanlib/curves.py" line="326" />
-      <location filename="../artisanlib/designer.py" line="219" />
-      <location filename="../artisanlib/designer.py" line="78" />
-      <location filename="../artisanlib/roast_properties.py" line="3921" />
+      <location filename="../artisanlib/canvas.py" line="15379" />
+      <location filename="../artisanlib/canvas.py" line="15368" />
+      <location filename="../artisanlib/canvas.py" line="7690" />
+      <location filename="../artisanlib/canvas.py" line="7646" />
+      <location filename="../artisanlib/main.py" line="17000" />
+      <location filename="../artisanlib/main.py" line="5358" />
+      <location filename="../artisanlib/main.py" line="5352" />
+      <location filename="../artisanlib/main.py" line="5328" />
+      <location filename="../artisanlib/main.py" line="5310" />
+      <location filename="../artisanlib/main.py" line="5304" />
+      <location filename="../artisanlib/main.py" line="3420" />
+      <location filename="../artisanlib/main.py" line="3162" />
+      <location filename="../artisanlib/main.py" line="3152" />
+      <location filename="../artisanlib/alarms.py" line="816" />
+      <location filename="../artisanlib/curves.py" line="2152" />
+      <location filename="../artisanlib/curves.py" line="1514" />
+      <location filename="../artisanlib/curves.py" line="1265" />
+      <location filename="../artisanlib/curves.py" line="507" />
+      <location filename="../artisanlib/curves.py" line="488" />
+      <location filename="../artisanlib/curves.py" line="418" />
+      <location filename="../artisanlib/curves.py" line="339" />
+      <location filename="../artisanlib/designer.py" line="226" />
+      <location filename="../artisanlib/designer.py" line="83" />
+      <location filename="../artisanlib/roast_properties.py" line="3954" />
       <location filename="../artisanlib/background.py" line="68" />
+      <location filename="../artisanlib/comparator.py" line="888" />
       <location filename="../artisanlib/comparator.py" line="878" />
-      <location filename="../artisanlib/comparator.py" line="872" />
-      <location filename="../artisanlib/comparator.py" line="691" />
-      <location filename="../artisanlib/comparator.py" line="667" />
+      <location filename="../artisanlib/comparator.py" line="697" />
+      <location filename="../artisanlib/comparator.py" line="673" />
       <source>ET</source>
       <translation>KÖRNY. HŐ</translation>
     </message>
     <message>
-      <location filename="../artisanlib/comparator.py" line="721" />
-      <location filename="../artisanlib/comparator.py" line="705" />
+      <location filename="../artisanlib/comparator.py" line="727" />
+      <location filename="../artisanlib/comparator.py" line="711" />
       <source>Events</source>
       <translation>Események</translation>
     </message>
     <message>
-      <location filename="../artisanlib/comparator.py" line="836" />
+      <location filename="../artisanlib/comparator.py" line="842" />
       <source>Align</source>
       <translation type="unfinished">Igazítás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2944" />
-      <location filename="../artisanlib/canvas.py" line="1066" />
-      <location filename="../artisanlib/transposer.py" line="1137" />
-      <location filename="../artisanlib/statistics.py" line="77" />
-      <location filename="../artisanlib/designer.py" line="46" />
-      <location filename="../artisanlib/roast_properties.py" line="611" />
+      <location filename="../artisanlib/canvas.py" line="2946" />
+      <location filename="../artisanlib/canvas.py" line="1067" />
+      <location filename="../artisanlib/transposer.py" line="1156" />
+      <location filename="../artisanlib/statistics.py" line="81" />
+      <location filename="../artisanlib/designer.py" line="51" />
+      <location filename="../artisanlib/roast_properties.py" line="616" />
       <location filename="../artisanlib/background.py" line="98" />
-      <location filename="../artisanlib/ports.py" line="1452" />
-      <location filename="../artisanlib/comparator.py" line="838" />
+      <location filename="../artisanlib/ports.py" line="1455" />
+      <location filename="../artisanlib/comparator.py" line="844" />
       <source>CHARGE</source>
       <translation>TÖLTÉS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="7198" />
-      <location filename="../artisanlib/main.py" line="7192" />
-      <location filename="../artisanlib/main.py" line="7025" />
-      <location filename="../artisanlib/main.py" line="6993" />
-      <location filename="../artisanlib/main.py" line="3491" />
-      <location filename="../artisanlib/statistics.py" line="78" />
-      <location filename="../artisanlib/comparator.py" line="839" />
+      <location filename="../artisanlib/main.py" line="7264" />
+      <location filename="../artisanlib/main.py" line="7258" />
+      <location filename="../artisanlib/main.py" line="7091" />
+      <location filename="../artisanlib/main.py" line="7059" />
+      <location filename="../artisanlib/main.py" line="3528" />
+      <location filename="../artisanlib/statistics.py" line="82" />
+      <location filename="../artisanlib/comparator.py" line="845" />
       <source>TP</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1067" />
-      <location filename="../artisanlib/main.py" line="7199" />
-      <location filename="../artisanlib/main.py" line="7085" />
-      <location filename="../artisanlib/main.py" line="7083" />
-      <location filename="../artisanlib/main.py" line="7071" />
-      <location filename="../artisanlib/main.py" line="7050" />
-      <location filename="../artisanlib/main.py" line="3509" />
+      <location filename="../artisanlib/canvas.py" line="1068" />
+      <location filename="../artisanlib/main.py" line="7265" />
+      <location filename="../artisanlib/main.py" line="7151" />
+      <location filename="../artisanlib/main.py" line="7149" />
+      <location filename="../artisanlib/main.py" line="7137" />
+      <location filename="../artisanlib/main.py" line="7116" />
+      <location filename="../artisanlib/main.py" line="3546" />
       <location filename="../artisanlib/background.py" line="99" />
-      <location filename="../artisanlib/ports.py" line="1517" />
-      <location filename="../artisanlib/comparator.py" line="840" />
+      <location filename="../artisanlib/ports.py" line="1520" />
+      <location filename="../artisanlib/comparator.py" line="846" />
       <source>DRY</source>
       <translation>SZÁRAZ</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1068" />
-      <location filename="../artisanlib/main.py" line="7200" />
-      <location filename="../artisanlib/main.py" line="7163" />
-      <location filename="../artisanlib/main.py" line="7159" />
-      <location filename="../artisanlib/main.py" line="7155" />
-      <location filename="../artisanlib/main.py" line="7136" />
-      <location filename="../artisanlib/main.py" line="7120" />
-      <location filename="../artisanlib/main.py" line="6970" />
-      <location filename="../artisanlib/main.py" line="6961" />
-      <location filename="../artisanlib/main.py" line="3527" />
+      <location filename="../artisanlib/canvas.py" line="1069" />
+      <location filename="../artisanlib/main.py" line="7266" />
+      <location filename="../artisanlib/main.py" line="7229" />
+      <location filename="../artisanlib/main.py" line="7225" />
+      <location filename="../artisanlib/main.py" line="7221" />
+      <location filename="../artisanlib/main.py" line="7202" />
+      <location filename="../artisanlib/main.py" line="7186" />
+      <location filename="../artisanlib/main.py" line="7036" />
+      <location filename="../artisanlib/main.py" line="7027" />
+      <location filename="../artisanlib/main.py" line="3564" />
       <location filename="../artisanlib/background.py" line="100" />
-      <location filename="../artisanlib/ports.py" line="1519" />
-      <location filename="../artisanlib/comparator.py" line="841" />
+      <location filename="../artisanlib/ports.py" line="1522" />
+      <location filename="../artisanlib/comparator.py" line="847" />
       <source>FCs</source>
       <translation>FC-k</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1069" />
+      <location filename="../artisanlib/canvas.py" line="1070" />
       <location filename="../artisanlib/background.py" line="101" />
-      <location filename="../artisanlib/ports.py" line="1521" />
-      <location filename="../artisanlib/comparator.py" line="842" />
+      <location filename="../artisanlib/ports.py" line="1524" />
+      <location filename="../artisanlib/comparator.py" line="848" />
       <source>FCe</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1070" />
+      <location filename="../artisanlib/canvas.py" line="1071" />
       <location filename="../artisanlib/background.py" line="102" />
-      <location filename="../artisanlib/ports.py" line="1523" />
-      <location filename="../artisanlib/comparator.py" line="843" />
+      <location filename="../artisanlib/ports.py" line="1526" />
+      <location filename="../artisanlib/comparator.py" line="849" />
       <source>SCs</source>
       <translation>SC-k</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1071" />
+      <location filename="../artisanlib/canvas.py" line="1072" />
       <location filename="../artisanlib/background.py" line="103" />
-      <location filename="../artisanlib/ports.py" line="1525" />
-      <location filename="../artisanlib/comparator.py" line="844" />
+      <location filename="../artisanlib/ports.py" line="1528" />
+      <location filename="../artisanlib/comparator.py" line="850" />
       <source>SCe</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2950" />
-      <location filename="../artisanlib/canvas.py" line="1072" />
-      <location filename="../artisanlib/transposer.py" line="1141" />
-      <location filename="../artisanlib/transposer.py" line="1075" />
-      <location filename="../artisanlib/designer.py" line="59" />
-      <location filename="../artisanlib/roast_properties.py" line="713" />
+      <location filename="../artisanlib/canvas.py" line="2952" />
+      <location filename="../artisanlib/canvas.py" line="1073" />
+      <location filename="../artisanlib/transposer.py" line="1160" />
+      <location filename="../artisanlib/transposer.py" line="1089" />
+      <location filename="../artisanlib/designer.py" line="64" />
+      <location filename="../artisanlib/roast_properties.py" line="718" />
       <location filename="../artisanlib/background.py" line="104" />
-      <location filename="../artisanlib/ports.py" line="1454" />
-      <location filename="../artisanlib/comparator.py" line="845" />
+      <location filename="../artisanlib/ports.py" line="1457" />
+      <location filename="../artisanlib/comparator.py" line="851" />
       <source>DROP</source>
       <translation>ÜRÍTÉS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/comparator.py" line="1109" />
+      <location filename="../artisanlib/comparator.py" line="1125" />
       <source>/min</source>
       <translation>/ perc</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24028" />
-      <location filename="../artisanlib/main.py" line="24027" />
-      <location filename="../artisanlib/main.py" line="24026" />
-      <location filename="../artisanlib/ports.py" line="1193" />
-      <location filename="../artisanlib/ports.py" line="638" />
-      <location filename="../artisanlib/events.py" line="1207" />
-      <location filename="../artisanlib/comparator.py" line="1339" />
+      <location filename="../artisanlib/main.py" line="24157" />
+      <location filename="../artisanlib/main.py" line="24156" />
+      <location filename="../artisanlib/main.py" line="24155" />
+      <location filename="../artisanlib/ports.py" line="1196" />
+      <location filename="../artisanlib/ports.py" line="640" />
+      <location filename="../artisanlib/events.py" line="1216" />
+      <location filename="../artisanlib/comparator.py" line="1355" />
       <source>ON</source>
       <translation type="unfinished">BE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20769" />
-      <location filename="../artisanlib/main.py" line="19489" />
-      <location filename="../artisanlib/main.py" line="5277" />
-      <location filename="../artisanlib/roast_properties.py" line="804" />
-      <location filename="../artisanlib/comparator.py" line="1340" />
+      <location filename="../artisanlib/main.py" line="20897" />
+      <location filename="../artisanlib/main.py" line="19617" />
+      <location filename="../artisanlib/main.py" line="5343" />
+      <location filename="../artisanlib/roast_properties.py" line="809" />
+      <location filename="../artisanlib/comparator.py" line="1356" />
       <source>Title</source>
       <translation>Cím</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="2746" />
-      <location filename="../artisanlib/events.py" line="912" />
+      <location filename="../artisanlib/roast_properties.py" line="2773" />
+      <location filename="../artisanlib/events.py" line="920" />
       <location filename="../artisanlib/pid_dialogs.py" line="131" />
       <source>Source</source>
       <translation>Forrás</translation>
@@ -11637,18 +11675,18 @@ Az Artisan minden mintaidőszakban elindítja a programot. A program kimeneténe
       <translation>Invert vezérlés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3796" />
-      <location filename="../artisanlib/ports.py" line="1107" />
-      <location filename="../artisanlib/ports.py" line="564" />
-      <location filename="../artisanlib/events.py" line="669" />
-      <location filename="../artisanlib/pid_dialogs.py" line="4018" />
+      <location filename="../artisanlib/main.py" line="3833" />
+      <location filename="../artisanlib/ports.py" line="1110" />
+      <location filename="../artisanlib/ports.py" line="566" />
+      <location filename="../artisanlib/events.py" line="676" />
+      <location filename="../artisanlib/pid_dialogs.py" line="4030" />
       <location filename="../artisanlib/pid_dialogs.py" line="247" />
       <source>SV</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2165" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1380" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2175" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1388" />
       <location filename="../artisanlib/pid_dialogs.py" line="255" />
       <source>Lookahead</source>
       <translation>Előretekint</translation>
@@ -11659,10 +11697,10 @@ Az Artisan minden mintaidőszakban elindítja a programot. A program kimeneténe
       <translation>Lépések</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="794" />
-      <location filename="../artisanlib/ports.py" line="1546" />
-      <location filename="../artisanlib/ports.py" line="1021" />
-      <location filename="../artisanlib/ports.py" line="464" />
+      <location filename="../artisanlib/devices.py" line="798" />
+      <location filename="../artisanlib/ports.py" line="1549" />
+      <location filename="../artisanlib/ports.py" line="1024" />
+      <location filename="../artisanlib/ports.py" line="466" />
       <location filename="../artisanlib/pid_dialogs.py" line="269" />
       <source>Mode</source>
       <translation>Mód</translation>
@@ -11678,29 +11716,29 @@ Az Artisan minden mintaidőszakban elindítja a programot. A program kimeneténe
       <translation>Rámpa / áztatás</translation>
     </message>
     <message>
+      <location filename="../artisanlib/canvas.py" line="2242" />
       <location filename="../artisanlib/canvas.py" line="2240" />
-      <location filename="../artisanlib/canvas.py" line="2238" />
-      <location filename="../artisanlib/devices.py" line="2206" />
-      <location filename="../artisanlib/devices.py" line="2191" />
-      <location filename="../artisanlib/main.py" line="5350" />
-      <location filename="../artisanlib/main.py" line="5344" />
+      <location filename="../artisanlib/devices.py" line="2218" />
+      <location filename="../artisanlib/devices.py" line="2203" />
+      <location filename="../artisanlib/main.py" line="5416" />
+      <location filename="../artisanlib/main.py" line="5410" />
+      <location filename="../artisanlib/main.py" line="5401" />
+      <location filename="../artisanlib/main.py" line="5394" />
+      <location filename="../artisanlib/main.py" line="5368" />
       <location filename="../artisanlib/main.py" line="5335" />
+      <location filename="../artisanlib/main.py" line="5332" />
+      <location filename="../artisanlib/main.py" line="5331" />
+      <location filename="../artisanlib/main.py" line="5329" />
       <location filename="../artisanlib/main.py" line="5328" />
+      <location filename="../artisanlib/main.py" line="5326" />
+      <location filename="../artisanlib/main.py" line="5323" />
+      <location filename="../artisanlib/main.py" line="5320" />
+      <location filename="../artisanlib/main.py" line="5317" />
+      <location filename="../artisanlib/main.py" line="5314" />
+      <location filename="../artisanlib/main.py" line="5311" />
+      <location filename="../artisanlib/main.py" line="5308" />
+      <location filename="../artisanlib/main.py" line="5305" />
       <location filename="../artisanlib/main.py" line="5302" />
-      <location filename="../artisanlib/main.py" line="5269" />
-      <location filename="../artisanlib/main.py" line="5266" />
-      <location filename="../artisanlib/main.py" line="5265" />
-      <location filename="../artisanlib/main.py" line="5263" />
-      <location filename="../artisanlib/main.py" line="5262" />
-      <location filename="../artisanlib/main.py" line="5260" />
-      <location filename="../artisanlib/main.py" line="5257" />
-      <location filename="../artisanlib/main.py" line="5254" />
-      <location filename="../artisanlib/main.py" line="5251" />
-      <location filename="../artisanlib/main.py" line="5248" />
-      <location filename="../artisanlib/main.py" line="5245" />
-      <location filename="../artisanlib/main.py" line="5242" />
-      <location filename="../artisanlib/main.py" line="5239" />
-      <location filename="../artisanlib/main.py" line="5236" />
       <location filename="../artisanlib/pid_dialogs.py" line="273" />
       <source>Background</source>
       <translation type="unfinished">Háttér</translation>
@@ -11711,181 +11749,181 @@ Az Artisan minden mintaidőszakban elindítja a programot. A program kimeneténe
       <translation type="unfinished">Gombok</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5350" />
+      <location filename="../artisanlib/main.py" line="5416" />
       <location filename="../artisanlib/pid_dialogs.py" line="282" />
       <source>Slider</source>
       <translation type="unfinished">Csúszka</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="836" />
-      <location filename="../artisanlib/alarms.py" line="133" />
-      <location filename="../artisanlib/roast_properties.py" line="2743" />
+      <location filename="../artisanlib/main.py" line="837" />
+      <location filename="../artisanlib/alarms.py" line="134" />
+      <location filename="../artisanlib/roast_properties.py" line="2770" />
       <location filename="../artisanlib/pid_dialogs.py" line="588" />
       <location filename="../artisanlib/pid_dialogs.py" line="401" />
       <source>Label</source>
       <translation>Címke</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1223" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1231" />
       <source>Ramp Soak HH:MM&lt;BR&gt;(1-4)</source>
       <translation>Rámpás áztatás ÓÓ: MM &lt;BR&gt; (1-4)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1227" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1235" />
       <source>Ramp Soak HH:MM&lt;BR&gt;(5-8)</source>
       <translation>Rámpás áztatás ÓÓ: MM &lt;BR&gt; (5-8)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1228" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1236" />
       <source>Ramp/Soak Pattern</source>
       <translation>Rámpa / áztatási minta</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2244" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1268" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2254" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1276" />
       <source>SV Buttons</source>
       <translation>SV gombok</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2247" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1271" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2257" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1279" />
       <source>SV Slider</source>
       <translation>SV csúszka</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1285" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1281" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1293" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1289" />
       <source>WARNING</source>
       <translation>FIGYELEM</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1282" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1290" />
       <source>Writing eeprom memory</source>
       <translation>Eeprom memória írása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1283" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1291" />
       <source>&lt;u&gt;Max life&lt;/u&gt; 10,000 writes</source>
       <translation>&lt;u&gt; Max. élet &lt;/u&gt; 10.000 ír</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1284" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1292" />
       <source>Infinite read life.</source>
       <translation>Végtelen olvasási élet.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1286" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1294" />
       <source>After &lt;u&gt;writing&lt;/u&gt; an adjustment,&lt;br&gt;never power down the pid&lt;br&gt;for the next 5 seconds &lt;br&gt;or the pid may never recover.</source>
       <translation>A kiigazítás &lt;u&gt; írása &lt;/u&gt; után &lt;br&gt; a következő 5 másodpercig soha ne kapcsolja le a pid pultot, különben a pid soha nem állhat helyre.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1287" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1295" />
       <source>Read operations manual</source>
       <translation>Olvassa el a kezelési kézikönyvet</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2430" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1326" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2440" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1334" />
       <source>NOTE: BT Thermocouple type is not stored in the Artisan settings</source>
       <translation>MEGJEGYZÉS: A BT hőelem típusa nincs tárolva az Artisan beállításokban</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2467" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1361" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2477" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1369" />
       <source>Artisan uses 1 decimal point</source>
       <translation>A kézműves 1 tizedesjegyet használ</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2583" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1458" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2593" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1466" />
       <source>ET Thermocouple type</source>
       <translation>ET hőelem típus</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2590" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1465" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2600" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1473" />
       <source>BT Thermocouple type</source>
       <translation>BT hőelem típus</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2043" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2053" />
       <source>Ramp Soak (MM:SS)&lt;br&gt;(1-7)</source>
       <translation>Rámpás áztatás (MM: SS) &lt;br&gt; (1-7)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2049" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2059" />
       <source>Ramp Soak (MM:SS)&lt;br&gt;(8-16)</source>
       <translation>Rámpás áztatás (MM: SS) &lt;br&gt; (8-16)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2099" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2109" />
       <source>Pattern</source>
       <translation>Minta</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2171" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2181" />
       <source>SV (7-0)</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2306" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2177" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2316" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2187" />
       <source>Write</source>
       <translation type="unfinished">Írás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2256" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2266" />
       <source>SV min</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2263" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2273" />
       <source>SV max</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1138" />
-      <location filename="../artisanlib/ports.py" line="586" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2288" />
+      <location filename="../artisanlib/ports.py" line="1141" />
+      <location filename="../artisanlib/ports.py" line="588" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2298" />
       <source>P</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1144" />
-      <location filename="../artisanlib/ports.py" line="592" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2294" />
+      <location filename="../artisanlib/ports.py" line="1147" />
+      <location filename="../artisanlib/ports.py" line="594" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2304" />
       <source>I</source>
       <translation>én</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1150" />
-      <location filename="../artisanlib/ports.py" line="598" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2300" />
+      <location filename="../artisanlib/ports.py" line="1153" />
+      <location filename="../artisanlib/ports.py" line="600" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2310" />
       <source>D</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2469" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2479" />
       <source>Artisan Fuji PXG uses MINUTES:SECONDS units in Ramp/Soaks</source>
       <translation>Az Artisan Fuji PXG MINUTES: SECONDS egységet használ Ramp / Soaks-ban</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2471" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2481" />
       <source>Artisan Fuji PXF uses MINUTES:SECONDS units in Ramp/Soaks</source>
       <translation>Az Artisan Fuji PXF MINUTES: SECONDS egységet használ Ramp / Soaks-ban</translation>
     </message>
     <message>
-      <location filename="../artisanlib/autosave.py" line="48" />
+      <location filename="../artisanlib/autosave.py" line="53" />
       <source>Preview:</source>
       <translation>Előnézet:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/autosave.py" line="82" />
+      <location filename="../artisanlib/autosave.py" line="89" />
       <source>File Name Prefix</source>
       <translation>Fájlnév előtag</translation>
     </message>
     <message>
-      <location filename="../artisanlib/autosave.py" line="161" />
+      <location filename="../artisanlib/autosave.py" line="171" />
       <source>While recording:</source>
       <translation>Felvétel közben:</translation>
     </message>
@@ -11915,253 +11953,253 @@ Az Artisan minden mintaidőszakban elindítja a programot. A program kimeneténe
       <translation>Engedélyezett kommentár átfedés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5247" />
-      <location filename="../artisanlib/events.py" line="288" />
+      <location filename="../artisanlib/main.py" line="5313" />
+      <location filename="../artisanlib/events.py" line="289" />
       <source>Markers</source>
       <translation type="unfinished">Markerek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1001" />
-      <location filename="../artisanlib/events.py" line="409" />
+      <location filename="../artisanlib/roast_properties.py" line="1006" />
+      <location filename="../artisanlib/events.py" line="410" />
       <source>Color</source>
       <translation type="unfinished">Szín</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="411" />
+      <location filename="../artisanlib/events.py" line="412" />
       <source>Text Color</source>
       <translation>Szöveg szín</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="842" />
-      <location filename="../artisanlib/designer.py" line="72" />
-      <location filename="../artisanlib/events.py" line="413" />
+      <location filename="../artisanlib/main.py" line="843" />
+      <location filename="../artisanlib/designer.py" line="77" />
+      <location filename="../artisanlib/events.py" line="414" />
       <source>Marker</source>
       <translation>Jelző</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="415" />
+      <location filename="../artisanlib/events.py" line="416" />
       <source>Thickness</source>
       <translation>Vastagság</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1270" />
-      <location filename="../artisanlib/events.py" line="417" />
+      <location filename="../artisanlib/curves.py" line="1284" />
+      <location filename="../artisanlib/events.py" line="418" />
       <source>Opacity</source>
       <translation>Átlátszatlanság</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="844" />
-      <location filename="../artisanlib/events.py" line="419" />
+      <location filename="../artisanlib/main.py" line="845" />
+      <location filename="../artisanlib/events.py" line="420" />
       <source>Size</source>
       <translation>Méret</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="550" />
+      <location filename="../artisanlib/events.py" line="551" />
       <source>Max Buttons Per Row</source>
       <translation>Max gombok soronként</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="557" />
+      <location filename="../artisanlib/events.py" line="558" />
       <source>Button Size</source>
       <translation>Gomb méret</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="608" />
+      <location filename="../artisanlib/events.py" line="615" />
       <source>Color Pattern</source>
       <translation>Színminta</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="620" />
+      <location filename="../artisanlib/events.py" line="627" />
       <source>current:</source>
       <translation>jelenlegi:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5353" />
-      <location filename="../artisanlib/main.py" line="5347" />
-      <location filename="../artisanlib/main.py" line="5344" />
-      <location filename="../artisanlib/roast_properties.py" line="2747" />
-      <location filename="../artisanlib/ports.py" line="1512" />
-      <location filename="../artisanlib/events.py" line="910" />
-      <location filename="../artisanlib/events.py" line="648" />
+      <location filename="../artisanlib/main.py" line="5419" />
+      <location filename="../artisanlib/main.py" line="5413" />
+      <location filename="../artisanlib/main.py" line="5410" />
+      <location filename="../artisanlib/roast_properties.py" line="2774" />
+      <location filename="../artisanlib/ports.py" line="1515" />
+      <location filename="../artisanlib/events.py" line="918" />
+      <location filename="../artisanlib/events.py" line="655" />
       <source>Event</source>
       <translation>Esemény</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="666" />
-      <location filename="../artisanlib/events.py" line="650" />
+      <location filename="../artisanlib/events.py" line="673" />
+      <location filename="../artisanlib/events.py" line="657" />
       <source>Action</source>
       <translation>Akció</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1420" />
-      <location filename="../artisanlib/events.py" line="652" />
+      <location filename="../artisanlib/ports.py" line="1423" />
+      <location filename="../artisanlib/events.py" line="659" />
       <source>Command</source>
       <translation>Parancs</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3448" />
-      <location filename="../artisanlib/events.py" line="654" />
+      <location filename="../artisanlib/events.py" line="3482" />
+      <location filename="../artisanlib/events.py" line="661" />
       <source>Offset</source>
       <translation>Eltolás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1022" />
-      <location filename="../artisanlib/events.py" line="3447" />
-      <location filename="../artisanlib/events.py" line="656" />
+      <location filename="../artisanlib/ports.py" line="1025" />
+      <location filename="../artisanlib/events.py" line="3481" />
+      <location filename="../artisanlib/events.py" line="663" />
       <source>Factor</source>
       <translation>Tényező</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="662" />
+      <location filename="../artisanlib/events.py" line="669" />
       <source>Bernoulli</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="672" />
+      <location filename="../artisanlib/events.py" line="679" />
       <source>Temp</source>
       <translation>Hőmérséklet</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="2745" />
-      <location filename="../artisanlib/roast_properties.py" line="119" />
-      <location filename="../artisanlib/events.py" line="674" />
+      <location filename="../artisanlib/roast_properties.py" line="2772" />
+      <location filename="../artisanlib/roast_properties.py" line="122" />
+      <location filename="../artisanlib/events.py" line="681" />
       <source>Unit</source>
       <translation>Mértékegység</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1045" />
+      <location filename="../artisanlib/events.py" line="1054" />
       <source>Cluster</source>
       <translation>Fürt</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24028" />
-      <location filename="../artisanlib/main.py" line="24027" />
-      <location filename="../artisanlib/main.py" line="24025" />
-      <location filename="../artisanlib/ports.py" line="1190" />
-      <location filename="../artisanlib/ports.py" line="635" />
-      <location filename="../artisanlib/events.py" line="1222" />
+      <location filename="../artisanlib/main.py" line="24157" />
+      <location filename="../artisanlib/main.py" line="24156" />
+      <location filename="../artisanlib/main.py" line="24154" />
+      <location filename="../artisanlib/ports.py" line="1193" />
+      <location filename="../artisanlib/ports.py" line="637" />
+      <location filename="../artisanlib/events.py" line="1231" />
       <source>OFF</source>
       <translation type="unfinished">KI</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1243" />
+      <location filename="../artisanlib/events.py" line="1252" />
       <source>RESET</source>
       <translation type="unfinished">VISSZA</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24032" />
-      <location filename="../artisanlib/main.py" line="24031" />
-      <location filename="../artisanlib/main.py" line="24029" />
-      <location filename="../artisanlib/events.py" line="1251" />
+      <location filename="../artisanlib/main.py" line="24161" />
+      <location filename="../artisanlib/main.py" line="24160" />
+      <location filename="../artisanlib/main.py" line="24158" />
+      <location filename="../artisanlib/events.py" line="1260" />
       <source>START</source>
       <translation type="unfinished">INDÍT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11009" />
-      <location filename="../artisanlib/main.py" line="10994" />
-      <location filename="../artisanlib/main.py" line="5359" />
-      <location filename="../artisanlib/events.py" line="2767" />
-      <location filename="../artisanlib/events.py" line="2752" />
+      <location filename="../artisanlib/main.py" line="11117" />
+      <location filename="../artisanlib/main.py" line="11102" />
+      <location filename="../artisanlib/main.py" line="5425" />
+      <location filename="../artisanlib/events.py" line="2799" />
+      <location filename="../artisanlib/events.py" line="2780" />
       <source>Event button</source>
       <translation>Esemény gomb</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5359" />
-      <location filename="../artisanlib/events.py" line="2767" />
-      <location filename="../artisanlib/events.py" line="2752" />
+      <location filename="../artisanlib/main.py" line="5425" />
+      <location filename="../artisanlib/events.py" line="2799" />
+      <location filename="../artisanlib/events.py" line="2780" />
       <source>its text</source>
       <translation>annak szövege</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3445" />
+      <location filename="../artisanlib/events.py" line="3479" />
       <source>Slider Value</source>
       <translation>Csúszka értéke</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3446" />
+      <location filename="../artisanlib/events.py" line="3480" />
       <source>Target Value</source>
       <translation>Célérték</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="559" />
-      <location filename="../artisanlib/ports.py" line="459" />
+      <location filename="../artisanlib/ports.py" line="561" />
+      <location filename="../artisanlib/ports.py" line="461" />
       <location filename="../artisanlib/ports.py" line="75" />
       <source>Slave</source>
       <translation>Rabszolga</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="460" />
+      <location filename="../artisanlib/ports.py" line="462" />
       <location filename="../artisanlib/ports.py" line="81" />
       <source>Register</source>
       <translation>Regisztráció</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1096" />
-      <location filename="../artisanlib/ports.py" line="1017" />
+      <location filename="../artisanlib/ports.py" line="1099" />
+      <location filename="../artisanlib/ports.py" line="1020" />
       <location filename="../artisanlib/ports.py" line="232" />
       <source>Area</source>
       <translation>Terület</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1102" />
-      <location filename="../artisanlib/ports.py" line="1018" />
+      <location filename="../artisanlib/ports.py" line="1105" />
+      <location filename="../artisanlib/ports.py" line="1021" />
       <location filename="../artisanlib/ports.py" line="239" />
       <source>DB#</source>
       <translation>DB #</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6447" />
-      <location filename="../artisanlib/curves.py" line="979" />
-      <location filename="../artisanlib/ports.py" line="1019" />
+      <location filename="../artisanlib/main.py" line="6513" />
+      <location filename="../artisanlib/curves.py" line="993" />
+      <location filename="../artisanlib/ports.py" line="1022" />
       <location filename="../artisanlib/ports.py" line="246" />
       <source>Start</source>
       <translation>Rajt</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="801" />
-      <location filename="../artisanlib/ports.py" line="754" />
-      <location filename="../artisanlib/ports.py" line="416" />
+      <location filename="../artisanlib/ports.py" line="803" />
+      <location filename="../artisanlib/ports.py" line="756" />
+      <location filename="../artisanlib/ports.py" line="418" />
       <location filename="../artisanlib/ports.py" line="375" />
       <source>Comm Port</source>
       <translation>Kommunikációs port</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="805" />
-      <location filename="../artisanlib/ports.py" line="758" />
-      <location filename="../artisanlib/ports.py" line="422" />
+      <location filename="../artisanlib/ports.py" line="807" />
+      <location filename="../artisanlib/ports.py" line="760" />
+      <location filename="../artisanlib/ports.py" line="424" />
       <location filename="../artisanlib/ports.py" line="379" />
       <source>Baud Rate</source>
       <translation>Átviteli sebesség</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="811" />
-      <location filename="../artisanlib/ports.py" line="767" />
-      <location filename="../artisanlib/ports.py" line="431" />
+      <location filename="../artisanlib/ports.py" line="813" />
+      <location filename="../artisanlib/ports.py" line="769" />
+      <location filename="../artisanlib/ports.py" line="433" />
       <location filename="../artisanlib/ports.py" line="385" />
       <source>Byte Size</source>
       <translation>Bájtméret</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="817" />
-      <location filename="../artisanlib/ports.py" line="773" />
-      <location filename="../artisanlib/ports.py" line="437" />
+      <location filename="../artisanlib/ports.py" line="819" />
+      <location filename="../artisanlib/ports.py" line="775" />
+      <location filename="../artisanlib/ports.py" line="439" />
       <location filename="../artisanlib/ports.py" line="391" />
       <source>Parity</source>
       <translation>Paritás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="824" />
-      <location filename="../artisanlib/ports.py" line="780" />
-      <location filename="../artisanlib/ports.py" line="444" />
+      <location filename="../artisanlib/ports.py" line="826" />
+      <location filename="../artisanlib/ports.py" line="782" />
+      <location filename="../artisanlib/ports.py" line="446" />
       <location filename="../artisanlib/ports.py" line="398" />
       <source>Stopbits</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="830" />
-      <location filename="../artisanlib/ports.py" line="786" />
-      <location filename="../artisanlib/ports.py" line="692" />
-      <location filename="../artisanlib/ports.py" line="450" />
+      <location filename="../artisanlib/ports.py" line="832" />
+      <location filename="../artisanlib/ports.py" line="788" />
+      <location filename="../artisanlib/ports.py" line="694" />
+      <location filename="../artisanlib/ports.py" line="452" />
       <location filename="../artisanlib/ports.py" line="404" />
       <source>Timeout</source>
       <translation>Időtúllépés</translation>
@@ -12172,161 +12210,161 @@ Az Artisan minden mintaidőszakban elindítja a programot. A program kimeneténe
       <translation>Beállítások nem Modbus eszközökhöz</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="461" />
+      <location filename="../artisanlib/ports.py" line="463" />
       <source>Decode</source>
       <translation>Dekódoljon</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="462" />
+      <location filename="../artisanlib/ports.py" line="464" />
       <source>Function</source>
       <translation>Funkció</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="463" />
+      <location filename="../artisanlib/ports.py" line="465" />
       <source>Divider</source>
       <translation>Osztó</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="528" />
+      <location filename="../artisanlib/ports.py" line="530" />
       <source>little-endian</source>
       <translation>kis-endian</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="724" />
-      <location filename="../artisanlib/devices.py" line="718" />
-      <location filename="../artisanlib/devices.py" line="373" />
-      <location filename="../artisanlib/devices.py" line="169" />
-      <location filename="../artisanlib/ports.py" line="1115" />
-      <location filename="../artisanlib/ports.py" line="1020" />
-      <location filename="../artisanlib/ports.py" line="540" />
+      <location filename="../artisanlib/devices.py" line="728" />
+      <location filename="../artisanlib/devices.py" line="722" />
+      <location filename="../artisanlib/devices.py" line="377" />
+      <location filename="../artisanlib/devices.py" line="171" />
+      <location filename="../artisanlib/ports.py" line="1118" />
+      <location filename="../artisanlib/ports.py" line="1023" />
+      <location filename="../artisanlib/ports.py" line="542" />
       <source>Type</source>
       <translation type="unfinished">Típus</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1146" />
-      <location filename="../artisanlib/devices.py" line="1133" />
-      <location filename="../artisanlib/devices.py" line="952" />
-      <location filename="../artisanlib/ports.py" line="1315" />
-      <location filename="../artisanlib/ports.py" line="979" />
-      <location filename="../artisanlib/ports.py" line="547" />
+      <location filename="../artisanlib/devices.py" line="1150" />
+      <location filename="../artisanlib/devices.py" line="1137" />
+      <location filename="../artisanlib/devices.py" line="956" />
+      <location filename="../artisanlib/ports.py" line="1318" />
+      <location filename="../artisanlib/ports.py" line="982" />
+      <location filename="../artisanlib/ports.py" line="549" />
       <source>Host</source>
       <translation type="unfinished">Hálózat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1151" />
-      <location filename="../artisanlib/devices.py" line="1138" />
-      <location filename="../artisanlib/devices.py" line="963" />
-      <location filename="../artisanlib/curves.py" line="1203" />
-      <location filename="../artisanlib/ports.py" line="1320" />
-      <location filename="../artisanlib/ports.py" line="984" />
-      <location filename="../artisanlib/ports.py" line="552" />
+      <location filename="../artisanlib/devices.py" line="1155" />
+      <location filename="../artisanlib/devices.py" line="1142" />
+      <location filename="../artisanlib/devices.py" line="967" />
+      <location filename="../artisanlib/curves.py" line="1217" />
+      <location filename="../artisanlib/ports.py" line="1323" />
+      <location filename="../artisanlib/ports.py" line="987" />
+      <location filename="../artisanlib/ports.py" line="554" />
       <source>Port</source>
       <translation>Kikötő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1124" />
-      <location filename="../artisanlib/ports.py" line="572" />
+      <location filename="../artisanlib/ports.py" line="1127" />
+      <location filename="../artisanlib/ports.py" line="574" />
       <source>SV Factor</source>
       <translation>SV Faktor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1131" />
-      <location filename="../artisanlib/ports.py" line="579" />
+      <location filename="../artisanlib/ports.py" line="1134" />
+      <location filename="../artisanlib/ports.py" line="581" />
       <source>pid Factor</source>
       <translation>pid Faktor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="666" />
+      <location filename="../artisanlib/ports.py" line="668" />
       <source>Delay</source>
       <translation>Késleltetés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="698" />
-      <location filename="../artisanlib/ports.py" line="672" />
+      <location filename="../artisanlib/ports.py" line="700" />
+      <location filename="../artisanlib/ports.py" line="674" />
       <source>Retries</source>
       <translation>Újrapróbálkozások</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="790" />
-      <location filename="../artisanlib/ports.py" line="743" />
+      <location filename="../artisanlib/ports.py" line="792" />
+      <location filename="../artisanlib/ports.py" line="745" />
       <source>Device</source>
       <translation>Eszköz</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="990" />
+      <location filename="../artisanlib/ports.py" line="993" />
       <source>Rack</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="996" />
+      <location filename="../artisanlib/ports.py" line="999" />
       <source>Slot</source>
       <translation>Rés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1555" />
-      <location filename="../artisanlib/ports.py" line="1045" />
+      <location filename="../artisanlib/ports.py" line="1558" />
+      <location filename="../artisanlib/ports.py" line="1048" />
       <source>Input</source>
       <translation>Bemenet</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1326" />
+      <location filename="../artisanlib/ports.py" line="1329" />
       <source>Path</source>
       <translation>Pálya</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1332" />
+      <location filename="../artisanlib/ports.py" line="1335" />
       <source>ID</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1381" />
+      <location filename="../artisanlib/ports.py" line="1384" />
       <source>Connect</source>
       <translation>Csatlakozás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1384" />
+      <location filename="../artisanlib/ports.py" line="1387" />
       <source>Reconnect</source>
       <translation>Csatlakozzon újra</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1544" />
-      <location filename="../artisanlib/ports.py" line="1387" />
+      <location filename="../artisanlib/ports.py" line="1547" />
+      <location filename="../artisanlib/ports.py" line="1390" />
       <source>Request</source>
       <translation>Kérés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1416" />
+      <location filename="../artisanlib/ports.py" line="1419" />
       <source>Message ID</source>
       <translation>Üzenet azonosítója</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1418" />
+      <location filename="../artisanlib/ports.py" line="1421" />
       <source>Machine ID</source>
       <translation>Gép azonosítója</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1422" />
+      <location filename="../artisanlib/ports.py" line="1425" />
       <source>Data</source>
       <translation>Adat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1424" />
+      <location filename="../artisanlib/ports.py" line="1427" />
       <source>Message</source>
       <translation>Üzenet</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1436" />
+      <location filename="../artisanlib/ports.py" line="1439" />
       <source>Data Request</source>
       <translation>Adatkérés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1545" />
-      <location filename="../artisanlib/ports.py" line="1514" />
+      <location filename="../artisanlib/ports.py" line="1548" />
+      <location filename="../artisanlib/ports.py" line="1517" />
       <source>Node</source>
       <translation>Csomópont</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1073" />
+      <location filename="../artisanlib/canvas.py" line="1074" />
       <location filename="../artisanlib/background.py" line="105" />
       <source>ALL</source>
       <translation>MINDEN</translation>
@@ -12367,364 +12405,364 @@ Az Artisan minden mintaidőszakban elindítja a programot. A program kimeneténe
       <translation>mp</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="126" />
+      <location filename="../artisanlib/roast_properties.py" line="129" />
       <source>ml</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="219" />
-      <location filename="../artisanlib/roast_properties.py" line="146" />
+      <location filename="../artisanlib/roast_properties.py" line="222" />
+      <location filename="../artisanlib/roast_properties.py" line="149" />
       <source>Unit Weight</source>
       <translation>Egység súlya</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="224" />
-      <location filename="../artisanlib/roast_properties.py" line="151" />
+      <location filename="../artisanlib/roast_properties.py" line="227" />
+      <location filename="../artisanlib/roast_properties.py" line="154" />
       <source>g</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../plus/blend.py" line="165" />
+      <location filename="../plus/blend.py" line="166" />
       <location filename="../artisanlib/large_lcds.py" line="771" />
-      <location filename="../artisanlib/roast_properties.py" line="883" />
-      <location filename="../artisanlib/roast_properties.py" line="226" />
-      <location filename="../artisanlib/roast_properties.py" line="153" />
+      <location filename="../artisanlib/roast_properties.py" line="888" />
+      <location filename="../artisanlib/roast_properties.py" line="229" />
+      <location filename="../artisanlib/roast_properties.py" line="156" />
       <source>Weight</source>
       <translation>Súly</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="915" />
-      <location filename="../artisanlib/roast_properties.py" line="241" />
-      <location filename="../artisanlib/roast_properties.py" line="168" />
+      <location filename="../artisanlib/roast_properties.py" line="920" />
+      <location filename="../artisanlib/roast_properties.py" line="244" />
+      <location filename="../artisanlib/roast_properties.py" line="171" />
       <source>Volume</source>
       <translation>Hangerő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="884" />
-      <location filename="../artisanlib/roast_properties.py" line="211" />
+      <location filename="../artisanlib/roast_properties.py" line="889" />
+      <location filename="../artisanlib/roast_properties.py" line="214" />
       <source>Green</source>
       <translation>Zöld</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1040" />
-      <location filename="../artisanlib/roast_properties.py" line="885" />
-      <location filename="../artisanlib/roast_properties.py" line="284" />
+      <location filename="../artisanlib/roast_properties.py" line="1045" />
+      <location filename="../artisanlib/roast_properties.py" line="890" />
+      <location filename="../artisanlib/roast_properties.py" line="287" />
       <source>Roasted</source>
       <translation>Sült</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2945" />
-      <location filename="../artisanlib/transposer.py" line="1138" />
-      <location filename="../artisanlib/transposer.py" line="1072" />
-      <location filename="../artisanlib/statistics.py" line="79" />
-      <location filename="../artisanlib/roast_properties.py" line="638" />
+      <location filename="../artisanlib/canvas.py" line="2947" />
+      <location filename="../artisanlib/transposer.py" line="1157" />
+      <location filename="../artisanlib/transposer.py" line="1086" />
+      <location filename="../artisanlib/statistics.py" line="83" />
+      <location filename="../artisanlib/roast_properties.py" line="643" />
       <source>DRY END</source>
       <translation>SZÁRÍTÁS VÉGE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2946" />
-      <location filename="../artisanlib/transposer.py" line="1139" />
-      <location filename="../artisanlib/transposer.py" line="1073" />
-      <location filename="../artisanlib/statistics.py" line="80" />
-      <location filename="../artisanlib/roast_properties.py" line="652" />
+      <location filename="../artisanlib/canvas.py" line="2948" />
+      <location filename="../artisanlib/transposer.py" line="1158" />
+      <location filename="../artisanlib/transposer.py" line="1087" />
+      <location filename="../artisanlib/statistics.py" line="84" />
+      <location filename="../artisanlib/roast_properties.py" line="657" />
       <source>FC START</source>
       <translation>FC KEZD</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2947" />
-      <location filename="../artisanlib/roast_properties.py" line="668" />
+      <location filename="../artisanlib/canvas.py" line="2949" />
+      <location filename="../artisanlib/roast_properties.py" line="673" />
       <source>FC END</source>
       <translation>FC VÉGE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2948" />
-      <location filename="../artisanlib/transposer.py" line="1140" />
-      <location filename="../artisanlib/transposer.py" line="1074" />
-      <location filename="../artisanlib/roast_properties.py" line="683" />
+      <location filename="../artisanlib/canvas.py" line="2950" />
+      <location filename="../artisanlib/transposer.py" line="1159" />
+      <location filename="../artisanlib/transposer.py" line="1088" />
+      <location filename="../artisanlib/roast_properties.py" line="688" />
       <source>SC START</source>
       <translation>SC KEZD</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2949" />
-      <location filename="../artisanlib/roast_properties.py" line="698" />
+      <location filename="../artisanlib/canvas.py" line="2951" />
+      <location filename="../artisanlib/roast_properties.py" line="703" />
       <source>SC END</source>
       <translation>SC VÉGE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2951" />
-      <location filename="../artisanlib/roast_properties.py" line="729" />
+      <location filename="../artisanlib/canvas.py" line="2953" />
+      <location filename="../artisanlib/roast_properties.py" line="734" />
       <source>COOL</source>
       <translation>HŰTÉS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="840" />
+      <location filename="../artisanlib/roast_properties.py" line="845" />
       <source>Date</source>
       <translation>Dátum</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="2900" />
-      <location filename="../artisanlib/roast_properties.py" line="851" />
+      <location filename="../artisanlib/roast_properties.py" line="2927" />
+      <location filename="../artisanlib/roast_properties.py" line="856" />
       <source>Batch</source>
       <translation>Köteg</translation>
     </message>
     <message>
-      <location filename="../plus/blend.py" line="331" />
-      <location filename="../artisanlib/roast_properties.py" line="1020" />
-      <location filename="../artisanlib/roast_properties.py" line="875" />
+      <location filename="../plus/blend.py" line="333" />
+      <location filename="../artisanlib/roast_properties.py" line="1025" />
+      <location filename="../artisanlib/roast_properties.py" line="880" />
       <source>Beans</source>
       <translation>Bab</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="928" />
+      <location filename="../artisanlib/roast_properties.py" line="933" />
       <source> %</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="942" />
+      <location filename="../artisanlib/roast_properties.py" line="947" />
       <source>Density</source>
       <translation>Sűrűség</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="985" />
+      <location filename="../artisanlib/roast_properties.py" line="990" />
       <source>Screen</source>
       <translation>Képernyő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1002" />
+      <location filename="../artisanlib/roast_properties.py" line="1007" />
       <source>Whole</source>
       <translation>Egész</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1008" />
+      <location filename="../artisanlib/roast_properties.py" line="1013" />
       <source>Ground</source>
       <translation>Talaj</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1031" />
+      <location filename="../artisanlib/roast_properties.py" line="1036" />
       <source>Moisture</source>
       <translation>Nedvesség</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1061" />
-      <location filename="../artisanlib/roast_properties.py" line="1041" />
-      <location filename="../artisanlib/roast_properties.py" line="1032" />
+      <location filename="../artisanlib/roast_properties.py" line="1066" />
+      <location filename="../artisanlib/roast_properties.py" line="1046" />
+      <location filename="../artisanlib/roast_properties.py" line="1037" />
       <source>%</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1059" />
+      <location filename="../artisanlib/roast_properties.py" line="1064" />
       <source>Ambient Conditions</source>
       <translation>Környezeti feltételek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1102" />
+      <location filename="../artisanlib/roast_properties.py" line="1107" />
       <source>Roasting Notes</source>
       <translation>Sütési jegyzetek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1107" />
+      <location filename="../artisanlib/roast_properties.py" line="1112" />
       <source>Cupping Notes</source>
       <translation>Köpölyözés jegyzetek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1195" />
+      <location filename="../artisanlib/roast_properties.py" line="1202" />
       <source>Ambient Source</source>
       <translation>Környezeti forrás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1274" />
+      <location filename="../artisanlib/roast_properties.py" line="1281" />
       <source>Stock</source>
       <translation>Készlet</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1275" />
+      <location filename="../artisanlib/roast_properties.py" line="1282" />
       <source>Store</source>
       <translation>Bolt</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1276" />
+      <location filename="../artisanlib/roast_properties.py" line="1283" />
       <source>Blend</source>
       <translation>Keverék</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1830" />
+      <location filename="../artisanlib/roast_properties.py" line="1837" />
       <source>Template</source>
       <translation>Sablon</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="2722" />
+      <location filename="../artisanlib/roast_properties.py" line="2731" />
       <source>Results in</source>
       <translation>Eredmények</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="2744" />
+      <location filename="../artisanlib/roast_properties.py" line="2771" />
       <source>Rating</source>
       <translation>Értékelés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="2748" />
+      <location filename="../artisanlib/roast_properties.py" line="2775" />
       <source>Pressure %</source>
       <translation>Nyomás%</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="2749" />
+      <location filename="../artisanlib/roast_properties.py" line="2776" />
       <source>Electric Energy Mix:</source>
       <translation>Elektromos energia keverék:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="2750" />
+      <location filename="../artisanlib/roast_properties.py" line="2777" />
       <source>Renewable</source>
       <translation>Megújuló</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="5028" />
-      <location filename="../artisanlib/roast_properties.py" line="2756" />
+      <location filename="../artisanlib/roast_properties.py" line="5076" />
+      <location filename="../artisanlib/roast_properties.py" line="2783" />
       <source>Pre-Heating</source>
       <translation>Előmelegítés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="5038" />
-      <location filename="../artisanlib/roast_properties.py" line="2757" />
+      <location filename="../artisanlib/roast_properties.py" line="5086" />
+      <location filename="../artisanlib/roast_properties.py" line="2784" />
       <source>Between Batches</source>
       <translation>Tételek között</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="5048" />
-      <location filename="../artisanlib/roast_properties.py" line="2758" />
+      <location filename="../artisanlib/roast_properties.py" line="5096" />
+      <location filename="../artisanlib/roast_properties.py" line="2785" />
       <source>Cooling</source>
       <translation>Hűtés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="2759" />
+      <location filename="../artisanlib/roast_properties.py" line="2786" />
       <source>Between Batches after Pre-Heating</source>
       <translation>Tételek között előmelegítés után</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="2764" />
+      <location filename="../artisanlib/roast_properties.py" line="2791" />
       <source>(mm:ss)</source>
       <translation>(mm: ss)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6448" />
-      <location filename="../artisanlib/roast_properties.py" line="2769" />
+      <location filename="../artisanlib/main.py" line="6514" />
+      <location filename="../artisanlib/roast_properties.py" line="2796" />
       <source>Duration</source>
       <translation>Időtartam</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="2770" />
+      <location filename="../artisanlib/roast_properties.py" line="2797" />
       <source>Measured Energy or Output %</source>
       <translation>Mért energia vagy teljesítmény%</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="3233" />
-      <location filename="../artisanlib/roast_properties.py" line="3204" />
+      <location filename="../artisanlib/roast_properties.py" line="3263" />
+      <location filename="../artisanlib/roast_properties.py" line="3234" />
       <source>Preheat</source>
       <translation>Előmelegítés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="3235" />
-      <location filename="../artisanlib/roast_properties.py" line="3206" />
+      <location filename="../artisanlib/roast_properties.py" line="3265" />
+      <location filename="../artisanlib/roast_properties.py" line="3236" />
       <source>BBP</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13783" />
-      <location filename="../artisanlib/roast_properties.py" line="3242" />
-      <location filename="../artisanlib/roast_properties.py" line="3237" />
-      <location filename="../artisanlib/roast_properties.py" line="3213" />
-      <location filename="../artisanlib/roast_properties.py" line="3208" />
+      <location filename="../artisanlib/canvas.py" line="13806" />
+      <location filename="../artisanlib/roast_properties.py" line="3272" />
+      <location filename="../artisanlib/roast_properties.py" line="3267" />
+      <location filename="../artisanlib/roast_properties.py" line="3243" />
+      <location filename="../artisanlib/roast_properties.py" line="3238" />
       <source>Roast</source>
       <translation>Pörkölés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="3251" />
-      <location filename="../artisanlib/roast_properties.py" line="3222" />
+      <location filename="../artisanlib/roast_properties.py" line="3281" />
+      <location filename="../artisanlib/roast_properties.py" line="3252" />
       <source>per kg green coffee</source>
       <translation>kg zöld kávé</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="3282" />
+      <location filename="../artisanlib/roast_properties.py" line="3312" />
       <source>Load</source>
       <translation>Megnyitás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="3685" />
+      <location filename="../artisanlib/roast_properties.py" line="3716" />
       <source>Organization</source>
       <translation>Szervezet</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="3686" />
+      <location filename="../artisanlib/roast_properties.py" line="3717" />
       <source>Operator</source>
       <translation>Operátor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="3687" />
+      <location filename="../artisanlib/roast_properties.py" line="3718" />
       <source>Machine</source>
       <translation type="unfinished">Gép</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="3688" />
+      <location filename="../artisanlib/roast_properties.py" line="3719" />
       <source>Model</source>
       <translation>Modell</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5136" />
-      <location filename="../artisanlib/roast_properties.py" line="3689" />
+      <location filename="../artisanlib/main.py" line="5199" />
+      <location filename="../artisanlib/roast_properties.py" line="3720" />
       <source>Heating</source>
       <translation>Fűtés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="3690" />
+      <location filename="../artisanlib/roast_properties.py" line="3721" />
       <source>Drum Speed</source>
       <translation>Dobsebesség</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="4621" />
+      <location filename="../artisanlib/roast_properties.py" line="4669" />
       <source>organic material</source>
       <translation>organikus anyag</translation>
     </message>
     <message>
-      <location filename="../artisanlib/transposer.py" line="978" />
-      <location filename="../artisanlib/phases.py" line="45" />
+      <location filename="../artisanlib/transposer.py" line="987" />
+      <location filename="../artisanlib/phases.py" line="49" />
       <source>Drying</source>
       <translation>Szárítás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/transposer.py" line="979" />
-      <location filename="../artisanlib/phases.py" line="46" />
+      <location filename="../artisanlib/transposer.py" line="988" />
+      <location filename="../artisanlib/phases.py" line="50" />
       <source>Maillard</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/transposer.py" line="980" />
-      <location filename="../artisanlib/phases.py" line="47" />
+      <location filename="../artisanlib/transposer.py" line="989" />
+      <location filename="../artisanlib/phases.py" line="51" />
       <source>Finishing</source>
       <translation>Végső</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="593" />
-      <location filename="../artisanlib/curves.py" line="410" />
-      <location filename="../artisanlib/phases.py" line="48" />
+      <location filename="../artisanlib/curves.py" line="606" />
+      <location filename="../artisanlib/curves.py" line="423" />
+      <location filename="../artisanlib/phases.py" line="52" />
       <source>min</source>
       <comment>abbrev of minimum</comment>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="594" />
-      <location filename="../artisanlib/curves.py" line="411" />
-      <location filename="../artisanlib/phases.py" line="49" />
+      <location filename="../artisanlib/curves.py" line="607" />
+      <location filename="../artisanlib/curves.py" line="424" />
+      <location filename="../artisanlib/phases.py" line="53" />
       <source>max</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/phases.py" line="136" />
+      <location filename="../artisanlib/phases.py" line="141" />
       <source>Phases
 LCDs Mode</source>
       <translation>Fázisok
 LCD mód</translation>
     </message>
     <message>
-      <location filename="../artisanlib/phases.py" line="138" />
+      <location filename="../artisanlib/phases.py" line="143" />
       <source>Phases
 LCDs All</source>
       <translation>Fázisok
@@ -12736,23 +12774,23 @@ LCD-k Mind</translation>
       <translation>A talált hibák száma {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1241" />
-      <location filename="../artisanlib/designer.py" line="74" />
+      <location filename="../artisanlib/main.py" line="1242" />
+      <location filename="../artisanlib/designer.py" line="79" />
       <source>Time</source>
       <translation>Idő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="218" />
+      <location filename="../artisanlib/designer.py" line="225" />
       <source>Curviness</source>
       <translation>Kanyarodás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="616" />
+      <location filename="../artisanlib/designer.py" line="718" />
       <source>temp</source>
       <translation>hőm</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="621" />
+      <location filename="../artisanlib/designer.py" line="723" />
       <source>time</source>
       <translation>idő</translation>
     </message>
@@ -12827,12 +12865,12 @@ LCD-k Mind</translation>
       <translation>Nem található profil</translation>
     </message>
     <message>
-      <location filename="../artisanlib/sampling.py" line="36" />
+      <location filename="../artisanlib/sampling.py" line="41" />
       <source>Keep ON</source>
       <translation>Tovább</translation>
     </message>
     <message>
-      <location filename="../artisanlib/sampling.py" line="40" />
+      <location filename="../artisanlib/sampling.py" line="45" />
       <source>Open Completed Roast in Viewer</source>
       <translation>Nyissa meg a Teljes sültet a Viewerben</translation>
     </message>
@@ -12842,198 +12880,198 @@ LCD-k Mind</translation>
       <translation>Adatok pontossága</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="127" />
+      <location filename="../artisanlib/curves.py" line="128" />
       <source>No plotter data found.</source>
       <translation>Nem találhatók plotter adatok.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="332" />
+      <location filename="../artisanlib/curves.py" line="345" />
       <source>Smoothing</source>
       <translation>Simítás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="358" />
+      <location filename="../artisanlib/curves.py" line="371" />
       <source>Smooth Curves</source>
       <translation>Sima görbék</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="440" />
+      <location filename="../artisanlib/curves.py" line="453" />
       <source>Delta Span</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="243" />
-      <location filename="../artisanlib/curves.py" line="523" />
+      <location filename="../artisanlib/devices.py" line="245" />
+      <location filename="../artisanlib/curves.py" line="536" />
       <source>ET Y(x)</source>
       <translation>ET Y (x)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="244" />
-      <location filename="../artisanlib/curves.py" line="524" />
+      <location filename="../artisanlib/devices.py" line="246" />
+      <location filename="../artisanlib/curves.py" line="537" />
       <source>BT Y(x)</source>
       <translation>BT Y (x)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="641" />
+      <location filename="../artisanlib/curves.py" line="654" />
       <source>Path Effects</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="660" />
+      <location filename="../artisanlib/curves.py" line="673" />
       <source>Font</source>
       <translation>Betűtípus</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="702" />
+      <location filename="../artisanlib/curves.py" line="715" />
       <source>P1</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="703" />
+      <location filename="../artisanlib/curves.py" line="716" />
       <source>P2</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="704" />
+      <location filename="../artisanlib/curves.py" line="717" />
       <source>P3</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="705" />
+      <location filename="../artisanlib/curves.py" line="718" />
       <source>P4</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="706" />
+      <location filename="../artisanlib/curves.py" line="719" />
       <source>P5</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="707" />
+      <location filename="../artisanlib/curves.py" line="720" />
       <source>P6</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="708" />
+      <location filename="../artisanlib/curves.py" line="721" />
       <source>P7</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="709" />
+      <location filename="../artisanlib/curves.py" line="722" />
       <source>P8</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="710" />
+      <location filename="../artisanlib/curves.py" line="723" />
       <source>P9</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="897" />
+      <location filename="../artisanlib/curves.py" line="911" />
       <source>Offset seconds from CHARGE</source>
       <translation>Eltolt másodpercek a CHARGE-tól</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="902" />
+      <location filename="../artisanlib/curves.py" line="916" />
       <source>Start of Analyze interval of interest</source>
       <translation>Az érdeklődés intervallumának elemzése kezdete</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="944" />
-      <location filename="../artisanlib/curves.py" line="912" />
+      <location filename="../artisanlib/curves.py" line="958" />
+      <location filename="../artisanlib/curves.py" line="926" />
       <source>Custom offset seconds from CHARGE</source>
       <translation>Egyedi eltolási másodperc a CHARGE-tól</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="921" />
+      <location filename="../artisanlib/curves.py" line="935" />
       <source>Number of samples considered significant</source>
       <translation>Jelentősnek tekintett minták száma</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="927" />
+      <location filename="../artisanlib/curves.py" line="941" />
       <source>Delta RoR Actual-to-Fit considered significant</source>
       <translation>A Delta RoR Actual-to-Fit jelentősnek tekinthető</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="934" />
+      <location filename="../artisanlib/curves.py" line="948" />
       <source>Start of Curve Fit window</source>
       <translation>A Curve Fit ablak kezdete</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="960" />
+      <location filename="../artisanlib/curves.py" line="974" />
       <source>deg</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="980" />
+      <location filename="../artisanlib/curves.py" line="994" />
       <source>End</source>
       <translation>Vége</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1242" />
+      <location filename="../artisanlib/curves.py" line="1256" />
       <source>Not available in ArtisanViewer</source>
       <translation>Nem érhető el az ArtisanViewer alkalmazásban</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2967" />
-      <location filename="../artisanlib/curves.py" line="2038" />
+      <location filename="../artisanlib/canvas.py" line="2969" />
+      <location filename="../artisanlib/curves.py" line="2054" />
       <source>EVENT</source>
       <translation>ESEMÉNY</translation>
     </message>
     <message>
-      <location filename="../artisanlib/statistics.py" line="75" />
+      <location filename="../artisanlib/statistics.py" line="79" />
       <source>From</source>
       <translation>Tól től</translation>
     </message>
     <message>
-      <location filename="../artisanlib/statistics.py" line="86" />
+      <location filename="../artisanlib/statistics.py" line="90" />
       <source>Base</source>
       <translation>Bázis</translation>
     </message>
     <message>
-      <location filename="../artisanlib/statistics.py" line="99" />
+      <location filename="../artisanlib/statistics.py" line="103" />
       <source>Target</source>
       <translation>Cél</translation>
     </message>
     <message>
-      <location filename="../artisanlib/statistics.py" line="117" />
+      <location filename="../artisanlib/statistics.py" line="121" />
       <source>Max characters per line</source>
       <translation>Soronként legfeljebb karakter</translation>
     </message>
     <message>
-      <location filename="../artisanlib/dialogs.py" line="172" />
+      <location filename="../artisanlib/dialogs.py" line="177" />
       <source>For more details visit</source>
       <translation>További részletekért látogasson el</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="131" />
+      <location filename="../artisanlib/alarms.py" line="132" />
       <source>Pop Up Timeout</source>
       <translation>Felbukkanó időkorlát</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="178" />
+      <location filename="../artisanlib/alarms.py" line="179" />
       <source>Alarm Sets</source>
       <translation>Riasztási szettek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="183" />
+      <location filename="../artisanlib/alarms.py" line="184" />
       <source>Current Alarm Set</source>
       <translation>Az aktuális riasztás beállítása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="926" />
-      <location filename="../artisanlib/alarms.py" line="467" />
+      <location filename="../artisanlib/alarms.py" line="939" />
+      <location filename="../artisanlib/alarms.py" line="471" />
       <source>Enter description</source>
       <translation>Írja be a leírást</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3135" />
+      <location filename="../artisanlib/main.py" line="3172" />
       <location filename="../artisanlib/large_lcds.py" line="540" />
       <source>PID SV</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3139" />
+      <location filename="../artisanlib/main.py" line="3176" />
       <location filename="../artisanlib/large_lcds.py" line="548" />
       <source>PID %</source>
       <translation>PID%</translation>
@@ -13044,424 +13082,439 @@ LCD-k Mind</translation>
       <translation>Teljes</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="838" />
+      <location filename="../artisanlib/main.py" line="839" />
       <source>Line style</source>
       <translation>Vonalstílus</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="839" />
+      <location filename="../artisanlib/main.py" line="840" />
       <source>Draw style</source>
       <translation>Rajzstílus</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="841" />
+      <location filename="../artisanlib/main.py" line="842" />
       <source>Color (RGBA)</source>
       <translation>Szín (RGBA)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="843" />
+      <location filename="../artisanlib/main.py" line="844" />
       <source>Symbol</source>
       <translation>Szimbólum</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="845" />
+      <location filename="../artisanlib/main.py" line="846" />
       <source>Face color (RGBA)</source>
       <translation>Arcszín (RGBA)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="846" />
+      <location filename="../artisanlib/main.py" line="847" />
       <source>Edge color (RGBA)</source>
       <translation>Szél színe (RGBA)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21287" />
-      <location filename="../artisanlib/main.py" line="1183" />
+      <location filename="../artisanlib/main.py" line="21415" />
+      <location filename="../artisanlib/main.py" line="1184" />
       <source>roasted</source>
       <translation>sült</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13707" />
-      <location filename="../artisanlib/canvas.py" line="13694" />
-      <location filename="../artisanlib/main.py" line="6874" />
-      <location filename="../artisanlib/main.py" line="6068" />
-      <location filename="../artisanlib/main.py" line="6066" />
-      <location filename="../artisanlib/main.py" line="3536" />
+      <location filename="../artisanlib/canvas.py" line="13730" />
+      <location filename="../artisanlib/canvas.py" line="13717" />
+      <location filename="../artisanlib/main.py" line="6940" />
+      <location filename="../artisanlib/main.py" line="6134" />
+      <location filename="../artisanlib/main.py" line="6132" />
+      <location filename="../artisanlib/main.py" line="3573" />
       <source>AUC</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5253" />
+      <location filename="../artisanlib/main.py" line="5319" />
       <source>Time Guide</source>
       <translation>Idő kalauz</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5256" />
+      <location filename="../artisanlib/main.py" line="5322" />
       <source>Background ET</source>
       <translation>Háttér ET</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5259" />
+      <location filename="../artisanlib/main.py" line="5325" />
       <source>Background BT</source>
       <translation>Háttér BT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5268" />
+      <location filename="../artisanlib/main.py" line="5334" />
       <source>Background Extra</source>
       <translation>Háttér Extra</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5271" />
+      <location filename="../artisanlib/main.py" line="5337" />
       <source>X Label</source>
       <translation type="unfinished">X címke</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5278" />
-      <location filename="../artisanlib/main.py" line="5275" />
-      <location filename="../artisanlib/main.py" line="5272" />
+      <location filename="../artisanlib/main.py" line="5344" />
+      <location filename="../artisanlib/main.py" line="5341" />
+      <location filename="../artisanlib/main.py" line="5338" />
       <source>Canvas</source>
       <translation>Vászon</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5274" />
+      <location filename="../artisanlib/main.py" line="5340" />
       <source>Y Label</source>
       <translation type="unfinished">Y címke</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5280" />
+      <location filename="../artisanlib/main.py" line="5346" />
       <source>SpecialEventText</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5281" />
+      <location filename="../artisanlib/main.py" line="5347" />
       <source>SpecialEventBox</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5283" />
+      <location filename="../artisanlib/main.py" line="5349" />
       <source>Bg SpecialEventText</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5284" />
+      <location filename="../artisanlib/main.py" line="5350" />
       <source>Bg SpecialEventBox</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="2207" />
-      <location filename="../artisanlib/devices.py" line="2192" />
-      <location filename="../artisanlib/main.py" line="5347" />
-      <location filename="../artisanlib/main.py" line="5338" />
-      <location filename="../artisanlib/main.py" line="5331" />
-      <location filename="../artisanlib/main.py" line="5296" />
-      <location filename="../artisanlib/main.py" line="5293" />
-      <location filename="../artisanlib/main.py" line="5290" />
-      <location filename="../artisanlib/main.py" line="5287" />
+      <location filename="../artisanlib/devices.py" line="2219" />
+      <location filename="../artisanlib/devices.py" line="2204" />
+      <location filename="../artisanlib/main.py" line="5413" />
+      <location filename="../artisanlib/main.py" line="5404" />
+      <location filename="../artisanlib/main.py" line="5397" />
+      <location filename="../artisanlib/main.py" line="5362" />
+      <location filename="../artisanlib/main.py" line="5359" />
+      <location filename="../artisanlib/main.py" line="5356" />
+      <location filename="../artisanlib/main.py" line="5353" />
       <source>Legend bkgnd</source>
       <translation>Legenda bkgnd</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5298" />
+      <location filename="../artisanlib/main.py" line="5364" />
       <source>MET Text</source>
       <translation>MET szöveg</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5301" />
-      <location filename="../artisanlib/main.py" line="5299" />
+      <location filename="../artisanlib/main.py" line="5367" />
+      <location filename="../artisanlib/main.py" line="5365" />
       <source>MET Box</source>
       <translation>MET doboz</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5305" />
+      <location filename="../artisanlib/main.py" line="5371" />
       <source>Timer LCD Digits</source>
       <translation>Időzített LCD számjegyek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5306" />
+      <location filename="../artisanlib/main.py" line="5372" />
       <source>Timer LCD Background</source>
       <translation>Időzítő LCD háttér</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5314" />
-      <location filename="../artisanlib/main.py" line="5308" />
+      <location filename="../artisanlib/main.py" line="5380" />
+      <location filename="../artisanlib/main.py" line="5374" />
       <source>ET LCD Digits</source>
       <translation>ET LCD számjegyek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5315" />
-      <location filename="../artisanlib/main.py" line="5309" />
+      <location filename="../artisanlib/main.py" line="5381" />
+      <location filename="../artisanlib/main.py" line="5375" />
       <source>ET LCD Background</source>
       <translation>ET LCD háttér</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5317" />
-      <location filename="../artisanlib/main.py" line="5311" />
+      <location filename="../artisanlib/main.py" line="5383" />
+      <location filename="../artisanlib/main.py" line="5377" />
       <source>BT LCD Digits</source>
       <translation>BT LCD számjegyek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5318" />
-      <location filename="../artisanlib/main.py" line="5312" />
+      <location filename="../artisanlib/main.py" line="5384" />
+      <location filename="../artisanlib/main.py" line="5378" />
       <source>BT LCD Background</source>
       <translation>BT LCD háttér</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5320" />
+      <location filename="../artisanlib/main.py" line="5386" />
       <source>Extra/PID LCD Digits</source>
       <translation>Extra / PID LCD számjegyek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5321" />
+      <location filename="../artisanlib/main.py" line="5387" />
       <source>Extra/PID LCD Background</source>
       <translation>Extra / PID LCD háttér</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6070" />
+      <location filename="../artisanlib/main.py" line="6136" />
       <source>AUC FCs</source>
       <translation>AUC FC-k</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14727" />
-      <location filename="../artisanlib/main.py" line="24692" />
-      <location filename="../artisanlib/main.py" line="6425" />
+      <location filename="../artisanlib/canvas.py" line="14750" />
+      <location filename="../artisanlib/main.py" line="24824" />
+      <location filename="../artisanlib/main.py" line="6491" />
       <source>ln()</source>
       <translation>ln ()</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24690" />
-      <location filename="../artisanlib/main.py" line="24688" />
-      <location filename="../artisanlib/main.py" line="6428" />
-      <location filename="../artisanlib/main.py" line="6427" />
+      <location filename="../artisanlib/main.py" line="24822" />
+      <location filename="../artisanlib/main.py" line="24820" />
+      <location filename="../artisanlib/main.py" line="6494" />
+      <location filename="../artisanlib/main.py" line="6493" />
       <source>x</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24686" />
-      <location filename="../artisanlib/main.py" line="24637" />
-      <location filename="../artisanlib/main.py" line="6429" />
+      <location filename="../artisanlib/main.py" line="24818" />
+      <location filename="../artisanlib/main.py" line="24769" />
+      <location filename="../artisanlib/main.py" line="6495" />
       <source>Bkgnd</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6440" />
-      <location filename="../artisanlib/main.py" line="6436" />
-      <location filename="../artisanlib/main.py" line="6432" />
+      <location filename="../artisanlib/main.py" line="6506" />
+      <location filename="../artisanlib/main.py" line="6502" />
+      <location filename="../artisanlib/main.py" line="6498" />
       <source>On</source>
       <translation type="unfinished">Tovább</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6442" />
-      <location filename="../artisanlib/main.py" line="6438" />
-      <location filename="../artisanlib/main.py" line="6434" />
+      <location filename="../artisanlib/main.py" line="6508" />
+      <location filename="../artisanlib/main.py" line="6504" />
+      <location filename="../artisanlib/main.py" line="6500" />
       <source>Off</source>
       <translation type="unfinished">Ki</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6449" />
+      <location filename="../artisanlib/main.py" line="6515" />
       <source>Max Delta</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6450" />
+      <location filename="../artisanlib/main.py" line="6516" />
       <source>Swing</source>
       <translation>Hinta</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6451" />
+      <location filename="../artisanlib/main.py" line="6517" />
       <source>ABC/secs</source>
       <translation>ABC / mp</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6462" />
+      <location filename="../artisanlib/main.py" line="6528" />
       <source>Segment Analysis (rise, crash and flick)</source>
       <translation>Szegmenselemzés (emelkedés, összeomlás és pöccintés)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6467" />
+      <location filename="../artisanlib/main.py" line="6533" />
       <source>Background Align</source>
       <translation>Háttér igazítása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6480" />
+      <location filename="../artisanlib/main.py" line="6546" />
       <source>Curve Fit</source>
       <translation>Görbe illesztés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6481" />
+      <location filename="../artisanlib/main.py" line="6547" />
       <source>Samples Threshold</source>
       <translation>Minták küszöbértéke</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6481" />
+      <location filename="../artisanlib/main.py" line="6547" />
       <source>Delta Threshold</source>
       <translation>Delta küszöb</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6482" />
+      <location filename="../artisanlib/main.py" line="6548" />
       <source>Sample rate (secs)</source>
       <translation>Mintavételi arány (mp)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6482" />
+      <location filename="../artisanlib/main.py" line="6548" />
       <source>Smooth Curves/Spikes</source>
       <translation>Sima görbék / tüskék</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6483" />
+      <location filename="../artisanlib/main.py" line="6549" />
       <source>Delta Span/Smoothing</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6483" />
+      <location filename="../artisanlib/main.py" line="6549" />
       <source>Polyfit/Optimal Smoothing</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6484" />
+      <location filename="../artisanlib/main.py" line="6550" />
       <source>Fit RoRoR (C/min/min)</source>
       <translation>Fit RoRoR (C / perc / perc)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6484" />
+      <location filename="../artisanlib/main.py" line="6550" />
       <source>Actual RoR at FCs</source>
       <translation>Tényleges RoR az FC-knél</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6960" />
+      <location filename="../artisanlib/main.py" line="7026" />
       <source>ALL FINISHING MODE</source>
       <translation>MINDEN VIZSGÁLATI MÓD</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="7125" />
-      <location filename="../artisanlib/main.py" line="6979" />
+      <location filename="../artisanlib/main.py" line="7191" />
+      <location filename="../artisanlib/main.py" line="7045" />
       <source>DEV%</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="7195" />
-      <location filename="../artisanlib/main.py" line="7011" />
+      <location filename="../artisanlib/main.py" line="7261" />
+      <location filename="../artisanlib/main.py" line="7077" />
       <source>DRY%</source>
       <translation>SZÁRAZ%</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="7154" />
-      <location filename="../artisanlib/main.py" line="7153" />
-      <location filename="../artisanlib/main.py" line="7119" />
-      <location filename="../artisanlib/main.py" line="7118" />
-      <location filename="../artisanlib/main.py" line="7049" />
+      <location filename="../artisanlib/main.py" line="7220" />
+      <location filename="../artisanlib/main.py" line="7219" />
+      <location filename="../artisanlib/main.py" line="7185" />
+      <location filename="../artisanlib/main.py" line="7184" />
+      <location filename="../artisanlib/main.py" line="7115" />
       <source>TIME MODE</source>
       <translation>IDŐ MÓD</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="7158" />
-      <location filename="../artisanlib/main.py" line="7157" />
-      <location filename="../artisanlib/main.py" line="7124" />
-      <location filename="../artisanlib/main.py" line="7123" />
-      <location filename="../artisanlib/main.py" line="7053" />
+      <location filename="../artisanlib/main.py" line="7224" />
+      <location filename="../artisanlib/main.py" line="7223" />
+      <location filename="../artisanlib/main.py" line="7190" />
+      <location filename="../artisanlib/main.py" line="7189" />
+      <location filename="../artisanlib/main.py" line="7119" />
       <source>PERCENTAGE MODE</source>
       <translation>SZÁZALÉKOS MÓD</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="7062" />
+      <location filename="../artisanlib/main.py" line="7128" />
       <source>RAMP%</source>
       <translation>RÁMPA%</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="7162" />
-      <location filename="../artisanlib/main.py" line="7161" />
-      <location filename="../artisanlib/main.py" line="7135" />
-      <location filename="../artisanlib/main.py" line="7134" />
-      <location filename="../artisanlib/main.py" line="7065" />
+      <location filename="../artisanlib/main.py" line="7228" />
+      <location filename="../artisanlib/main.py" line="7227" />
+      <location filename="../artisanlib/main.py" line="7201" />
+      <location filename="../artisanlib/main.py" line="7200" />
+      <location filename="../artisanlib/main.py" line="7131" />
       <source>TEMP MODE</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="13171" />
+      <location filename="../artisanlib/main.py" line="13279" />
       <source>Start recording</source>
       <translation>Felvétel megkezdése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="13185" />
+      <location filename="../artisanlib/main.py" line="13293" />
       <source>Charge the beans</source>
       <translation>Töltse fel a babot</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21262" />
+      <location filename="../artisanlib/main.py" line="21390" />
       <source>/m</source>
       <translation>/ m</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21283" />
+      <location filename="../artisanlib/main.py" line="21411" />
       <source>greens</source>
       <translation>zöldek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24032" />
-      <location filename="../artisanlib/main.py" line="24031" />
-      <location filename="../artisanlib/main.py" line="24030" />
+      <location filename="../artisanlib/main.py" line="24161" />
+      <location filename="../artisanlib/main.py" line="24160" />
+      <location filename="../artisanlib/main.py" line="24159" />
       <source>STOP</source>
       <translation>ÁLLJ MEG</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24036" />
-      <location filename="../artisanlib/main.py" line="24035" />
-      <location filename="../artisanlib/main.py" line="24033" />
+      <location filename="../artisanlib/main.py" line="24165" />
+      <location filename="../artisanlib/main.py" line="24164" />
+      <location filename="../artisanlib/main.py" line="24162" />
       <source>OPEN</source>
       <translation>NYISD KI</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24036" />
-      <location filename="../artisanlib/main.py" line="24035" />
-      <location filename="../artisanlib/main.py" line="24034" />
+      <location filename="../artisanlib/main.py" line="24165" />
+      <location filename="../artisanlib/main.py" line="24164" />
+      <location filename="../artisanlib/main.py" line="24163" />
       <source>CLOSE</source>
       <translation>BEZÁRÁS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24040" />
-      <location filename="../artisanlib/main.py" line="24039" />
-      <location filename="../artisanlib/main.py" line="24037" />
+      <location filename="../artisanlib/main.py" line="24169" />
+      <location filename="../artisanlib/main.py" line="24168" />
+      <location filename="../artisanlib/main.py" line="24166" />
       <source>AUTO</source>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24040" />
-      <location filename="../artisanlib/main.py" line="24039" />
-      <location filename="../artisanlib/main.py" line="24038" />
+      <location filename="../artisanlib/main.py" line="24169" />
+      <location filename="../artisanlib/main.py" line="24168" />
+      <location filename="../artisanlib/main.py" line="24167" />
       <source>MANUAL</source>
       <translation>KÉZIKÖNYV</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24045" />
+      <location filename="../artisanlib/main.py" line="24174" />
+      <source>STIRRER</source>
+      <translation>KEVERŐ</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="24175" />
+      <source>FILL</source>
+      <translation>TÖLT</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="24176" />
+      <source>RELEASE</source>
+      <translation>KIADÁS</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="24177" />
       <source>HEATING</source>
       <translation>FŰTÉS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24046" />
+      <location filename="../artisanlib/main.py" line="24178" />
       <source>COOLING</source>
       <translation>HŰTÉS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24680" />
+      <location filename="../artisanlib/main.py" line="24812" />
       <source>RMSE BT</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24681" />
+      <location filename="../artisanlib/main.py" line="24813" />
       <source>MSE BT</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13707" />
-      <location filename="../artisanlib/main.py" line="24682" />
+      <location filename="../artisanlib/canvas.py" line="13730" />
+      <location filename="../artisanlib/main.py" line="24814" />
       <source>RoR</source>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24682" />
+      <location filename="../artisanlib/main.py" line="24814" />
       <source>@FCs</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24683" />
+      <location filename="../artisanlib/main.py" line="24815" />
       <source>Max+/Max- RoR</source>
       <translation>Max + / Max- RoR</translation>
     </message>
@@ -13486,289 +13539,289 @@ LCD-k Mind</translation>
       <translation type="unfinished">Vezérlés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="157" />
+      <location filename="../artisanlib/devices.py" line="159" />
       <source>Control ET</source>
       <translation>Vezérlés ET</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="164" />
+      <location filename="../artisanlib/devices.py" line="166" />
       <source>Read BT</source>
       <translation>Olvassa el a BT-t</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="170" />
+      <location filename="../artisanlib/devices.py" line="172" />
       <source>RS485 Unit ID</source>
       <translation>RS485 egység azonosítója</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="189" />
+      <location filename="../artisanlib/devices.py" line="191" />
       <source>ET Channel</source>
       <translation>ET csatorna</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="192" />
+      <location filename="../artisanlib/devices.py" line="194" />
       <source>BT Channel</source>
       <translation>BT csatorna</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="218" />
+      <location filename="../artisanlib/devices.py" line="220" />
       <source>AT Channel</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="227" />
+      <location filename="../artisanlib/devices.py" line="229" />
       <source>Filter</source>
       <translation>Szűrő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="933" />
-      <location filename="../artisanlib/devices.py" line="726" />
-      <location filename="../artisanlib/devices.py" line="720" />
-      <location filename="../artisanlib/devices.py" line="552" />
-      <location filename="../artisanlib/devices.py" line="423" />
-      <location filename="../artisanlib/devices.py" line="374" />
+      <location filename="../artisanlib/devices.py" line="937" />
+      <location filename="../artisanlib/devices.py" line="730" />
+      <location filename="../artisanlib/devices.py" line="724" />
+      <location filename="../artisanlib/devices.py" line="556" />
+      <location filename="../artisanlib/devices.py" line="427" />
+      <location filename="../artisanlib/devices.py" line="378" />
       <source>Async</source>
       <translation>Aszinkron</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="935" />
-      <location filename="../artisanlib/devices.py" line="727" />
-      <location filename="../artisanlib/devices.py" line="721" />
-      <location filename="../artisanlib/devices.py" line="424" />
-      <location filename="../artisanlib/devices.py" line="375" />
+      <location filename="../artisanlib/devices.py" line="939" />
+      <location filename="../artisanlib/devices.py" line="731" />
+      <location filename="../artisanlib/devices.py" line="725" />
+      <location filename="../artisanlib/devices.py" line="428" />
+      <location filename="../artisanlib/devices.py" line="379" />
       <source>Change</source>
       <translation>változás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="934" />
-      <location filename="../artisanlib/devices.py" line="728" />
-      <location filename="../artisanlib/devices.py" line="722" />
-      <location filename="../artisanlib/devices.py" line="553" />
-      <location filename="../artisanlib/devices.py" line="425" />
-      <location filename="../artisanlib/devices.py" line="376" />
+      <location filename="../artisanlib/devices.py" line="938" />
+      <location filename="../artisanlib/devices.py" line="732" />
+      <location filename="../artisanlib/devices.py" line="726" />
+      <location filename="../artisanlib/devices.py" line="557" />
+      <location filename="../artisanlib/devices.py" line="429" />
+      <location filename="../artisanlib/devices.py" line="380" />
       <source>Rate</source>
       <translation>Mérték</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1018" />
-      <location filename="../artisanlib/devices.py" line="445" />
+      <location filename="../artisanlib/devices.py" line="1022" />
+      <location filename="../artisanlib/devices.py" line="449" />
       <source>Emissivity</source>
       <translation>Kibocsátási képesség</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="550" />
+      <location filename="../artisanlib/devices.py" line="554" />
       <source>Gain</source>
       <translation>Nyereség</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="725" />
-      <location filename="../artisanlib/devices.py" line="719" />
-      <location filename="../artisanlib/devices.py" line="551" />
+      <location filename="../artisanlib/devices.py" line="729" />
+      <location filename="../artisanlib/devices.py" line="723" />
+      <location filename="../artisanlib/devices.py" line="555" />
       <source>Wiring</source>
       <translation>Vezeték</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="793" />
+      <location filename="../artisanlib/devices.py" line="797" />
       <source>Power</source>
       <translation type="unfinished">Fűtés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="937" />
+      <location filename="../artisanlib/devices.py" line="941" />
       <source>Range</source>
       <translation>Hatótávolság</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="957" />
+      <location filename="../artisanlib/devices.py" line="961" />
       <source>Password</source>
       <translation>Jelszó</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="967" />
+      <location filename="../artisanlib/devices.py" line="971" />
       <source>Remote Only</source>
       <translation>Csak távoli</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1015" />
+      <location filename="../artisanlib/devices.py" line="1019" />
       <source>VirtualHub</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1110" />
+      <location filename="../artisanlib/devices.py" line="1114" />
       <source>MASL</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1111" />
+      <location filename="../artisanlib/devices.py" line="1115" />
       <source>Temperature</source>
       <translation type="unfinished">Hőmérséklet</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1112" />
+      <location filename="../artisanlib/devices.py" line="1116" />
       <source>Humidity</source>
       <translation>páratartalom</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1113" />
+      <location filename="../artisanlib/devices.py" line="1117" />
       <source>Pressure</source>
       <translation>Nyomás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1114" />
+      <location filename="../artisanlib/devices.py" line="1118" />
       <source>Elevation</source>
       <translation>Magasság</translation>
     </message>
     <message>
-      <location filename="../artisanlib/transposer.py" line="136" />
+      <location filename="../artisanlib/transposer.py" line="138" />
       <source>Mapping</source>
       <translation>Térképezés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2107" />
+      <location filename="../artisanlib/canvas.py" line="2108" />
       <source>Preheat Measured</source>
       <translation>Előmelegítés mért</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2108" />
+      <location filename="../artisanlib/canvas.py" line="2109" />
       <source>Preheat %</source>
       <translation>Előmelegítés%</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2109" />
+      <location filename="../artisanlib/canvas.py" line="2110" />
       <source>BBP Measured</source>
       <translation>BBP mért</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2110" />
+      <location filename="../artisanlib/canvas.py" line="2111" />
       <source>BBP %</source>
       <translation>BBP%</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2111" />
+      <location filename="../artisanlib/canvas.py" line="2112" />
       <source>Cooling Measured</source>
       <translation>Hűtés Mért</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2112" />
+      <location filename="../artisanlib/canvas.py" line="2113" />
       <source>Cooling %</source>
       <translation>Hűtés%</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2113" />
+      <location filename="../artisanlib/canvas.py" line="2114" />
       <source>Continuous</source>
       <translation>Folyamatos</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2114" />
+      <location filename="../artisanlib/canvas.py" line="2115" />
       <source>Roast Event</source>
       <translation>Sült esemény</translation>
     </message>
     <message>
+      <location filename="../artisanlib/canvas.py" line="2943" />
       <location filename="../artisanlib/canvas.py" line="2941" />
-      <location filename="../artisanlib/canvas.py" line="2939" />
       <source>at</source>
       <translation>nál nél</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="3273" />
+      <location filename="../artisanlib/canvas.py" line="3275" />
       <source>TIMEguide</source>
       <translation>IDŐÚTMUTATÓ</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="8243" />
+      <location filename="../artisanlib/canvas.py" line="8250" />
       <source>BackgroundXT</source>
       <translation>HáttérXT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="8291" />
+      <location filename="../artisanlib/canvas.py" line="8298" />
       <source>BackgroundYT</source>
       <translation>HáttérYT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15316" />
-      <location filename="../artisanlib/canvas.py" line="8321" />
+      <location filename="../artisanlib/canvas.py" line="15347" />
+      <location filename="../artisanlib/canvas.py" line="8328" />
       <source>BackgroundET</source>
       <translation>HáttérET</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15320" />
-      <location filename="../artisanlib/canvas.py" line="8349" />
+      <location filename="../artisanlib/canvas.py" line="15351" />
+      <location filename="../artisanlib/canvas.py" line="8356" />
       <source>BackgroundBT</source>
       <translation>HáttérBT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="8375" />
+      <location filename="../artisanlib/canvas.py" line="8382" />
       <source>BackgroundDeltaET</source>
       <translation>HáttérDeltaET</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="8394" />
+      <location filename="../artisanlib/canvas.py" line="8401" />
       <source>BackgroundDeltaBT</source>
       <translation>HáttérDeltaBT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="9763" />
+      <location filename="../artisanlib/canvas.py" line="9770" />
       <source>BTprojection</source>
       <translation>BTvetítés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="9768" />
+      <location filename="../artisanlib/canvas.py" line="9775" />
       <source>ETprojection</source>
       <translation>ETprojekció</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="9777" />
+      <location filename="../artisanlib/canvas.py" line="9784" />
       <source>DeltaBTprojection</source>
       <translation>DeltaBT-vetítés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="9783" />
+      <location filename="../artisanlib/canvas.py" line="9790" />
       <source>DeltaETprojection</source>
       <translation>DeltaET-projekció</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="9788" />
+      <location filename="../artisanlib/canvas.py" line="9795" />
       <source>AUCguide</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10232" />
+      <location filename="../artisanlib/canvas.py" line="10240" />
       <source>RPM</source>
       <translation>FORDULAT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13471" />
+      <location filename="../artisanlib/canvas.py" line="13494" />
       <source>Event #&lt;b&gt;{0} &lt;/b&gt;</source>
       <translation>&lt;b&gt; {0} &lt;/b&gt;. Esemény</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13709" />
-      <location filename="../artisanlib/canvas.py" line="13700" />
+      <location filename="../artisanlib/canvas.py" line="13732" />
+      <location filename="../artisanlib/canvas.py" line="13723" />
       <source>CM</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13711" />
-      <location filename="../artisanlib/canvas.py" line="13702" />
+      <location filename="../artisanlib/canvas.py" line="13734" />
+      <location filename="../artisanlib/canvas.py" line="13725" />
       <source>FC</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13706" />
+      <location filename="../artisanlib/canvas.py" line="13729" />
       <source>MET</source>
       <translation>TALÁLKOZOTT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15287" />
+      <location filename="../artisanlib/canvas.py" line="15318" />
       <source>Designer</source>
       <translation>Tervező</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16054" />
+      <location filename="../artisanlib/canvas.py" line="16085" />
       <source>BT {0} {1}/min for {2}</source>
       <translation>BT {0} {1} / perc {2}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16070" />
+      <location filename="../artisanlib/canvas.py" line="16101" />
       <source>ET {0} {1}/min for {2}</source>
       <translation>ET {0} {1} / perc: {2}</translation>
     </message>
@@ -13908,40 +13961,40 @@ LCD-k Mind</translation>
   <context>
     <name>MAC_APPLICATION_MENU</name>
     <message>
-      <location filename="../artisanlib/main.py" line="1797" />
+      <location filename="../artisanlib/main.py" line="1799" />
       <source>Services</source>
       <translation>Szolgáltatások</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1798" />
+      <location filename="../artisanlib/main.py" line="1800" />
       <source>Hide {0}</source>
       <translation>{0} elrejtése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1799" />
+      <location filename="../artisanlib/main.py" line="1801" />
       <source>Hide Others</source>
       <translation>Elrejteni a többieket</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1800" />
+      <location filename="../artisanlib/main.py" line="1802" />
       <source>Show All</source>
       <translation>Mutasd az összeset</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1801" />
+      <location filename="../artisanlib/main.py" line="1803" />
       <source>Preferences...</source>
       <translation>Preferenciák...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2145" />
-      <location filename="../artisanlib/main.py" line="1802" />
+      <location filename="../artisanlib/main.py" line="2153" />
+      <location filename="../artisanlib/main.py" line="1804" />
       <source>Quit {0}</source>
       <translation>Kilépés a következőből: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2487" />
-      <location filename="../artisanlib/main.py" line="2485" />
-      <location filename="../artisanlib/main.py" line="1803" />
+      <location filename="../artisanlib/main.py" line="2508" />
+      <location filename="../artisanlib/main.py" line="2506" />
+      <location filename="../artisanlib/main.py" line="1805" />
       <source>About {0}</source>
       <translation>A (z) {0}</translation>
     </message>
@@ -13949,52 +14002,52 @@ LCD-k Mind</translation>
   <context>
     <name>Marker</name>
     <message>
-      <location filename="../artisanlib/events.py" line="364" />
+      <location filename="../artisanlib/events.py" line="365" />
       <source>Circle</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="365" />
+      <location filename="../artisanlib/events.py" line="366" />
       <source>Square</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="366" />
+      <location filename="../artisanlib/events.py" line="367" />
       <source>Pentagon</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="367" />
+      <location filename="../artisanlib/events.py" line="368" />
       <source>Diamond</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="368" />
+      <location filename="../artisanlib/events.py" line="369" />
       <source>Star</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="369" />
+      <location filename="../artisanlib/events.py" line="370" />
       <source>Hexagon 1</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="370" />
+      <location filename="../artisanlib/events.py" line="371" />
       <source>Hexagon 2</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="371" />
+      <location filename="../artisanlib/events.py" line="372" />
       <source>+</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="372" />
+      <location filename="../artisanlib/events.py" line="373" />
       <source>x</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="373" />
+      <location filename="../artisanlib/events.py" line="374" />
       <source>None</source>
       <translation type="unfinished">Semmi</translation>
     </message>
@@ -14002,544 +14055,544 @@ LCD-k Mind</translation>
   <context>
     <name>Menu</name>
     <message>
-      <location filename="../artisanlib/main.py" line="2435" />
+      <location filename="../artisanlib/main.py" line="2455" />
       <location filename="../artisanlib/large_lcds.py" line="338" />
       <source>Main LCDs</source>
       <translation>Fő LCD-k</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2442" />
+      <location filename="../artisanlib/main.py" line="2462" />
       <location filename="../artisanlib/large_lcds.py" line="487" />
       <source>Delta LCDs</source>
       <translation>Delta LCD-k</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2448" />
+      <location filename="../artisanlib/main.py" line="2468" />
       <location filename="../artisanlib/large_lcds.py" line="534" />
       <source>PID LCDs</source>
       <translation>PID LCD-k</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2454" />
+      <location filename="../artisanlib/main.py" line="2474" />
       <location filename="../artisanlib/large_lcds.py" line="581" />
       <source>Extra LCDs</source>
       <translation>Extra LCD-k</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2460" />
+      <location filename="../artisanlib/main.py" line="2480" />
       <location filename="../artisanlib/large_lcds.py" line="668" />
       <source>Phases LCDs</source>
       <translation>Fázisok LCD-k</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2466" />
+      <location filename="../artisanlib/main.py" line="2486" />
       <location filename="../artisanlib/large_lcds.py" line="764" />
       <source>Scale LCDs</source>
       <translation>Skála LCD-k</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1806" />
+      <location filename="../artisanlib/main.py" line="1818" />
       <source>File</source>
       <translation>Fájl</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1807" />
+      <location filename="../artisanlib/main.py" line="1819" />
       <source>Edit</source>
       <translation>Szerkesztés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2078" />
-      <location filename="../artisanlib/main.py" line="1808" />
+      <location filename="../artisanlib/main.py" line="2092" />
+      <location filename="../artisanlib/main.py" line="1820" />
       <source>Roast</source>
       <translation>Pörkölés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1809" />
+      <location filename="../artisanlib/main.py" line="1821" />
       <source>Config</source>
       <translation>Konfiguráció</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1810" />
+      <location filename="../artisanlib/main.py" line="1822" />
       <source>Tools</source>
       <translation>Eszközök</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1811" />
+      <location filename="../artisanlib/main.py" line="1823" />
       <source>View</source>
       <translation>Kilátás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5009" />
-      <location filename="../artisanlib/main.py" line="1812" />
+      <location filename="../artisanlib/main.py" line="5065" />
+      <location filename="../artisanlib/main.py" line="1824" />
       <source>Help</source>
       <translation>Súgó</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="4893" />
-      <location filename="../artisanlib/main.py" line="1815" />
+      <location filename="../artisanlib/main.py" line="4948" />
+      <location filename="../artisanlib/main.py" line="1828" />
       <source>New</source>
       <translation>Új</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1817" />
+      <location filename="../artisanlib/main.py" line="1830" />
       <source>Open...</source>
       <translation>Megnyitás...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1822" />
+      <location filename="../artisanlib/main.py" line="1835" />
       <source>Open Recent</source>
       <translation>Legutóbbi Megnyitása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1827" />
+      <location filename="../artisanlib/main.py" line="1841" />
       <source>Import</source>
       <translation>Importálás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1912" />
+      <location filename="../artisanlib/main.py" line="1926" />
       <source>Save</source>
       <translation>Mentés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1917" />
+      <location filename="../artisanlib/main.py" line="1931" />
       <source>Save As...</source>
       <translation>Mentés másként...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1923" />
+      <location filename="../artisanlib/main.py" line="1937" />
       <source>Save a Copy As...</source>
       <translation>Másolat mentése másként ...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1929" />
+      <location filename="../artisanlib/main.py" line="1943" />
       <source>Export</source>
       <translation>Exportálás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1973" />
-      <location filename="../artisanlib/main.py" line="1931" />
+      <location filename="../artisanlib/main.py" line="1987" />
+      <location filename="../artisanlib/main.py" line="1945" />
       <source>Artisan CSV...</source>
       <translation>CSV kézműves ...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1977" />
-      <location filename="../artisanlib/main.py" line="1935" />
+      <location filename="../artisanlib/main.py" line="1991" />
+      <location filename="../artisanlib/main.py" line="1949" />
       <source>Artisan JSON...</source>
       <translation>JSON kézműves ...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2127" />
-      <location filename="../artisanlib/main.py" line="2107" />
-      <location filename="../artisanlib/main.py" line="1967" />
-      <location filename="../artisanlib/main.py" line="1941" />
+      <location filename="../artisanlib/main.py" line="2135" />
+      <location filename="../artisanlib/main.py" line="2118" />
+      <location filename="../artisanlib/main.py" line="1981" />
+      <location filename="../artisanlib/main.py" line="1955" />
       <source>Excel...</source>
       <translation>Excel ...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1983" />
-      <location filename="../artisanlib/main.py" line="1947" />
+      <location filename="../artisanlib/main.py" line="1997" />
+      <location filename="../artisanlib/main.py" line="1961" />
       <source>Probat Pilot...</source>
       <translation>Probat Pilot ...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1987" />
-      <location filename="../artisanlib/main.py" line="1951" />
+      <location filename="../artisanlib/main.py" line="2001" />
+      <location filename="../artisanlib/main.py" line="1965" />
       <source>RoastLogger...</source>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1955" />
+      <location filename="../artisanlib/main.py" line="1969" />
       <source>Convert To</source>
       <translation>Konvertálás ide</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1957" />
+      <location filename="../artisanlib/main.py" line="1971" />
       <source>Fahrenheit...</source>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1961" />
+      <location filename="../artisanlib/main.py" line="1975" />
       <source>Celsius...</source>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2031" />
-      <location filename="../artisanlib/main.py" line="1993" />
+      <location filename="../artisanlib/main.py" line="2045" />
+      <location filename="../artisanlib/main.py" line="2007" />
       <source>PNG...</source>
       <translation>PNG ...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1997" />
+      <location filename="../artisanlib/main.py" line="2011" />
       <source>JPEG...</source>
       <translation>JPEG ...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2001" />
+      <location filename="../artisanlib/main.py" line="2015" />
       <source>BMP...</source>
       <translation>BMP ...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2005" />
+      <location filename="../artisanlib/main.py" line="2019" />
       <source>SVG...</source>
       <translation>SVG ...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2113" />
-      <location filename="../artisanlib/main.py" line="2093" />
-      <location filename="../artisanlib/main.py" line="2080" />
-      <location filename="../artisanlib/main.py" line="2009" />
+      <location filename="../artisanlib/main.py" line="2124" />
+      <location filename="../artisanlib/main.py" line="2107" />
+      <location filename="../artisanlib/main.py" line="2094" />
+      <location filename="../artisanlib/main.py" line="2023" />
       <source>PDF...</source>
       <translation>PDF ...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2013" />
+      <location filename="../artisanlib/main.py" line="2027" />
       <source>Roast Report PDF...</source>
       <translation>Pörkölt jelentés PDF...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2021" />
+      <location filename="../artisanlib/main.py" line="2035" />
       <source>Save Graph</source>
       <translation>Grafikon mentése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2075" />
+      <location filename="../artisanlib/main.py" line="2089" />
       <source>Report</source>
       <translation>Jelentés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2119" />
-      <location filename="../artisanlib/main.py" line="2099" />
-      <location filename="../artisanlib/main.py" line="2086" />
+      <location filename="../artisanlib/main.py" line="2129" />
+      <location filename="../artisanlib/main.py" line="2112" />
+      <location filename="../artisanlib/main.py" line="2100" />
       <source>Web...</source>
       <translation>Web ...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2091" />
+      <location filename="../artisanlib/main.py" line="2105" />
       <source>Batches</source>
       <translation>Tételek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2123" />
-      <location filename="../artisanlib/main.py" line="2103" />
+      <location filename="../artisanlib/main.py" line="2132" />
+      <location filename="../artisanlib/main.py" line="2115" />
       <source>CSV...</source>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2111" />
+      <location filename="../artisanlib/main.py" line="2122" />
       <source>Ranking</source>
       <translation>Rangsorolás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2131" />
+      <location filename="../artisanlib/main.py" line="2139" />
       <source>Save Statistics...</source>
       <translation>Statisztikák mentése ...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2137" />
+      <location filename="../artisanlib/main.py" line="2145" />
       <source>Print...</source>
       <translation>Nyomtatás...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2152" />
+      <location filename="../artisanlib/main.py" line="2161" />
       <source>Cut</source>
       <translation>Kivágás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2156" />
+      <location filename="../artisanlib/main.py" line="2165" />
       <source>Copy</source>
       <translation>Másolás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2160" />
+      <location filename="../artisanlib/main.py" line="2169" />
       <source>Paste</source>
       <translation>Beillesztés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2166" />
+      <location filename="../artisanlib/main.py" line="2176" />
       <source>Properties...</source>
       <translation>Beállítások...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2172" />
+      <location filename="../artisanlib/main.py" line="2182" />
       <source>Background...</source>
       <translation>Háttér...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2177" />
+      <location filename="../artisanlib/main.py" line="2187" />
       <source>Cup Profile...</source>
       <translation>Ízprofil...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2183" />
+      <location filename="../artisanlib/main.py" line="2193" />
       <source>Switch Profiles</source>
       <translation>Profilok váltása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2188" />
+      <location filename="../artisanlib/main.py" line="2198" />
       <source>Switch ET&lt;-&gt;BT</source>
       <translation>Váltás ET &lt;-&gt; BT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2193" />
+      <location filename="../artisanlib/main.py" line="2204" />
       <source>Machine</source>
       <translation>Gép</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2197" />
+      <location filename="../artisanlib/main.py" line="2208" />
       <source>Device...</source>
       <translation>Eszköz...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2202" />
+      <location filename="../artisanlib/main.py" line="2213" />
       <source>Port...</source>
       <translation>Port...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2208" />
+      <location filename="../artisanlib/main.py" line="2219" />
       <source>Sampling...</source>
       <translation>Mintavétel...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2214" />
+      <location filename="../artisanlib/main.py" line="2225" />
       <source>Curves...</source>
       <translation>Görbék ...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2221" />
+      <location filename="../artisanlib/main.py" line="2232" />
       <source>Events...</source>
       <translation>Események...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2226" />
+      <location filename="../artisanlib/main.py" line="2237" />
       <source>Alarms...</source>
       <translation>Riasztások...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2233" />
+      <location filename="../artisanlib/main.py" line="2244" />
       <source>Phases...</source>
       <translation>Fázisok...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2237" />
+      <location filename="../artisanlib/main.py" line="2248" />
       <source>Statistics...</source>
       <translation>Statisztika...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2241" />
+      <location filename="../artisanlib/main.py" line="2252" />
       <source>Axes...</source>
       <translation>Tengelyek...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2248" />
+      <location filename="../artisanlib/main.py" line="2259" />
       <source>Colors...</source>
       <translation>Színek...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2252" />
+      <location filename="../artisanlib/main.py" line="2263" />
       <source>Themes</source>
       <translation>Témák</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2259" />
+      <location filename="../artisanlib/main.py" line="2270" />
       <source>Autosave...</source>
       <translation>Automatikus Mentés...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2263" />
+      <location filename="../artisanlib/main.py" line="2274" />
       <source>Batch...</source>
       <translation>Köteg ...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2269" />
+      <location filename="../artisanlib/main.py" line="2280" />
       <source>Temperature</source>
       <translation>Hőmérséklet</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2271" />
+      <location filename="../artisanlib/main.py" line="2284" />
       <source>Fahrenheit Mode</source>
       <translation>Fahrenheit Mód</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2275" />
+      <location filename="../artisanlib/main.py" line="2287" />
       <source>Celsius Mode</source>
       <translation>Celsius Mód</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2279" />
+      <location filename="../artisanlib/main.py" line="2293" />
       <source>Language</source>
       <translation>Nyelv</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2322" />
+      <location filename="../artisanlib/main.py" line="2337" />
       <source>Analyzer</source>
       <translation>Elemző</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2323" />
+      <location filename="../artisanlib/main.py" line="2339" />
       <source>Auto All</source>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2334" />
-      <location filename="../artisanlib/main.py" line="2331" />
-      <location filename="../artisanlib/main.py" line="2328" />
+      <location filename="../artisanlib/main.py" line="2350" />
+      <location filename="../artisanlib/main.py" line="2347" />
+      <location filename="../artisanlib/main.py" line="2344" />
       <source>Fit BT to</source>
       <translation>Illessze a BT-t</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2338" />
+      <location filename="../artisanlib/main.py" line="2354" />
       <source>Fit BT to Bkgnd</source>
       <translation>Illessze a BT-t a Bkgnd-hez</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2342" />
+      <location filename="../artisanlib/main.py" line="2358" />
       <source>Clear results</source>
       <translation>Világos eredmények</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2347" />
+      <location filename="../artisanlib/main.py" line="2363" />
       <source>Comparator</source>
       <translation>Összehasonlító</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2353" />
+      <location filename="../artisanlib/main.py" line="2369" />
       <source>Designer</source>
       <translation>Tervező</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2359" />
+      <location filename="../artisanlib/main.py" line="2375" />
       <source>Simulator</source>
       <translation>Szimulátor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2365" />
+      <location filename="../artisanlib/main.py" line="2381" />
       <source>Wheel Graph</source>
       <translation>Körgrafikon</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2373" />
+      <location filename="../artisanlib/main.py" line="2389" />
       <source>Transposer</source>
       <translation>Átültető</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2377" />
+      <location filename="../artisanlib/main.py" line="2393" />
       <source>Convert Profile Temperature</source>
       <translation>Profil hőmérsékletének konvertálása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2379" />
+      <location filename="../artisanlib/main.py" line="2398" />
       <source>Convert to Fahrenheit</source>
       <translation>Konvertálás Fahrenheitbe</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2383" />
+      <location filename="../artisanlib/main.py" line="2402" />
       <source>Convert to Celsius</source>
       <translation>Konvertálás Celsiusba</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2396" />
+      <location filename="../artisanlib/main.py" line="2415" />
       <source>Calculator</source>
       <translation>Számológép</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2403" />
+      <location filename="../artisanlib/main.py" line="2423" />
       <source>Controls</source>
       <translation>Vezérlők</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2409" />
+      <location filename="../artisanlib/main.py" line="2429" />
       <source>Readings</source>
       <translation>Olvasmányok</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2415" />
+      <location filename="../artisanlib/main.py" line="2435" />
       <source>Events Editor</source>
       <translation>Eseményszerkesztő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2421" />
+      <location filename="../artisanlib/main.py" line="2441" />
       <source>Buttons</source>
       <translation>Gombok</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2427" />
+      <location filename="../artisanlib/main.py" line="2447" />
       <source>Sliders</source>
       <translation>Csúszkák</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2475" />
+      <location filename="../artisanlib/main.py" line="2495" />
       <source>Full Screen</source>
       <translation>Teljes képernyő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2492" />
+      <location filename="../artisanlib/main.py" line="2513" />
       <source>About Qt</source>
       <translation>A Qt-ről</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2497" />
+      <location filename="../artisanlib/main.py" line="2518" />
       <source>Documentation</source>
       <translation>Leírás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2502" />
+      <location filename="../artisanlib/main.py" line="2523" />
       <source>Keyboard Shortcuts</source>
       <translation>Gyorsbillentyűk</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2508" />
+      <location filename="../artisanlib/main.py" line="2529" />
       <source>Check for Updates</source>
       <translation>Frissítések keresése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2515" />
+      <location filename="../artisanlib/main.py" line="2536" />
       <source>Errors</source>
       <translation>Hibák</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2519" />
+      <location filename="../artisanlib/main.py" line="2540" />
       <source>Messages</source>
       <translation>Üzenetek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2523" />
+      <location filename="../artisanlib/main.py" line="2544" />
       <source>Serial</source>
       <translation>Soros</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2528" />
+      <location filename="../artisanlib/main.py" line="2549" />
       <source>Platform</source>
       <translation>Platform</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2536" />
+      <location filename="../artisanlib/main.py" line="2557" />
       <source>Load Settings...</source>
       <translation>Beállítások betöltése ...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2541" />
+      <location filename="../artisanlib/main.py" line="2562" />
       <source>Load Recent Settings</source>
       <translation>Legutóbbi beállítások betöltése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5010" />
-      <location filename="../artisanlib/main.py" line="2546" />
+      <location filename="../artisanlib/main.py" line="5066" />
+      <location filename="../artisanlib/main.py" line="2568" />
       <source>Save Settings...</source>
       <translation>Beállítások mentése...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5010" />
-      <location filename="../artisanlib/main.py" line="2553" />
+      <location filename="../artisanlib/main.py" line="5066" />
+      <location filename="../artisanlib/main.py" line="2574" />
       <source>Factory Reset</source>
       <translation>Gyári beállítások visszaállítása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5202" />
+      <location filename="../artisanlib/main.py" line="5268" />
       <source>Load Theme...</source>
       <translation>Téma betöltése ...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5206" />
+      <location filename="../artisanlib/main.py" line="5272" />
       <source>Save Theme...</source>
       <translation>Téma mentése ...</translation>
     </message>
@@ -14587,23 +14640,23 @@ LCD-k Mind</translation>
   <context>
     <name>Message</name>
     <message>
-      <location filename="../artisanlib/axis.py" line="874" />
+      <location filename="../artisanlib/axis.py" line="879" />
       <source>xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="633" />
+      <location filename="../artisanlib/wheels.py" line="648" />
       <source>Save Wheel graph</source>
       <translation>Mentse a kerékdiagramot</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="637" />
+      <location filename="../artisanlib/wheels.py" line="652" />
       <source>Wheel Graph saved</source>
       <translation>Kerékgrafikon mentve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16172" />
-      <location filename="../artisanlib/wheels.py" line="644" />
+      <location filename="../artisanlib/canvas.py" line="16203" />
+      <location filename="../artisanlib/wheels.py" line="659" />
       <source>Open Wheel Graph</source>
       <translation>Nyissa meg a kerékdiagramot</translation>
     </message>
@@ -14628,198 +14681,198 @@ LCD-k Mind</translation>
       <translation>Mentse a rámpa/áztatási táblázatot</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3662" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3650" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3638" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3626" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3617" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3614" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3611" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3605" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3602" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3599" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3593" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3590" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3587" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3581" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3578" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3575" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1779" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1767" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1755" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1743" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1734" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1731" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1728" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1722" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1719" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1716" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1710" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1707" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1704" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1698" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1695" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1692" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3672" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3660" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3648" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3636" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3627" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3624" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3621" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3615" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3612" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3609" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3603" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3600" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3597" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3591" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3588" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3585" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1787" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1775" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1763" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1751" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1742" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1739" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1736" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1730" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1727" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1724" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1718" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1715" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1712" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1706" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1703" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1700" />
       <source>OFF</source>
       <translation type="unfinished">KI</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3655" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3649" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3642" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3636" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3631" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3630" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3625" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3624" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3607" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3601" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3594" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3588" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3583" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3582" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3577" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3576" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1772" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1766" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1759" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1753" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1748" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1747" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1742" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1741" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1724" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1718" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1711" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1705" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1700" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1699" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1694" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1693" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3665" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3659" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3652" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3646" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3641" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3640" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3635" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3634" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3617" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3611" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3604" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3598" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3593" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3592" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3587" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3586" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1780" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1774" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1767" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1761" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1756" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1755" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1750" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1749" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1732" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1726" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1719" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1713" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1708" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1707" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1702" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1701" />
       <source>CONTINUOUS CONTROL</source>
       <translation>FOLYAMATOS VEZÉRLÉS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3668" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3665" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3659" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3656" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3653" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3647" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3644" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3641" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3635" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3632" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3629" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3623" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3620" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3608" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3596" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3584" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1785" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1782" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1776" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1773" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1770" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1764" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1761" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1758" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1752" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1749" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1746" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1740" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1737" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1725" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1713" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1701" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3678" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3675" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3669" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3666" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3663" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3657" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3654" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3651" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3645" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3642" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3639" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3633" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3630" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3618" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3606" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3594" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1793" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1790" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1784" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1781" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1778" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1772" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1769" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1766" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1760" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1757" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1754" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1748" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1745" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1733" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1721" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1709" />
       <source>ON</source>
       <translation type="unfinished">BE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3667" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3666" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3661" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3660" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3654" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3648" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3643" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3637" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3619" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3618" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3613" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3612" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3606" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3600" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3595" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3589" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1784" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1783" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1778" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1777" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1771" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1765" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1760" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1754" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1736" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1735" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1730" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1729" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1723" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1717" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1712" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1706" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3677" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3676" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3671" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3670" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3664" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3658" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3653" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3647" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3629" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3628" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3623" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3622" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3616" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3610" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3605" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3599" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1792" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1791" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1786" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1785" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1779" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1773" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1768" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1762" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1744" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1743" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1738" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1737" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1731" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1725" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1720" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1714" />
       <source>STANDBY MODE</source>
       <translation>KÉSZENLÉTI MÓD</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1788" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1796" />
       <source>The rampsoak-mode tells how to start and end the ramp/soak</source>
       <translation>A rámpa/áztatási mód megmondja, hogyan kell elindítani és befejezni a rámpa/áztatást</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1789" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1797" />
       <source>Your rampsoak mode in this pid is:</source>
       <translation>Ebben a pid-ben a rampsoak módod a következő:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1790" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1798" />
       <source>Mode = {0}</source>
       <translation>Mód = {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1792" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1800" />
       <source>Start to run from PV value: {0}</source>
       <translation>Indítsa el a futást a PV értéktől: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1793" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1801" />
       <source>End output status at the end of ramp/soak: {0}</source>
       <translation>Végkimeneti állapot a rámpa/szivárgás végén: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1794" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1802" />
       <source>Output status while ramp/soak operation set to OFF: {0}</source>
       <translation>Kimeneti állapot, miközben a rámpa/áztatás működése KI állásban van: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1795" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1803" />
       <source>
 Repeat Operation at the end: {0}</source>
       <translation>
 Ismételje meg a műveletet a végén: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1797" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1805" />
       <source>Recomended Mode = 0</source>
       <translation>Ajánlott mód = 0</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1798" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1806" />
       <source>If you need to change it, change it now and come back later</source>
       <translation>Ha módosítania kell, változtassa meg most, és térjen vissza később</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1799" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1807" />
       <source>Use the Parameter Loader Software by Fuji if you need to
 
 </source>
@@ -14828,40 +14881,40 @@ Ismételje meg a műveletet a végén: {0}</translation>
 </translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1800" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1808" />
       <source>Continue?</source>
       <translation>Folytatni?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3845" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3684" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1801" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3855" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3694" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1809" />
       <source>Ramp Soak start-end mode</source>
       <translation>Rámpa áztatás kezdet-vége mód</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2680" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2690" />
       <source>Load PID Settings</source>
       <translation>PID beállítások betöltése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2766" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2776" />
       <source>Save PID Settings</source>
       <translation>Mentse el a PID beállításokat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2974" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2984" />
       <source>Current sv = {0}. Change now to sv = {1}?</source>
       <translation>Jelenlegi sv = {0}. Módosít most erre: sv = {1}?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3057" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2975" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3067" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2985" />
       <source>Change svN</source>
       <translation>SvN módosítása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3056" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3066" />
       <source>Current pid = {0}. Change now to pid ={1}?</source>
       <translation>Jelenlegi pid = {0}. Módosít most erre: pid ={1}?</translation>
     </message>
@@ -14953,7 +15006,7 @@ Ismételje meg a műveletet a végén: {0}</translation>
     <message>
       <location filename="../artisanlib/comm.py" line="5334" />
       <source>Phidget DAQ1000 attached</source>
-      <translation type="unfinished" />
+      <translation>Phidget DAQ1000 csatolva</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5336" />
@@ -14998,7 +15051,7 @@ Ismételje meg a műveletet a végén: {0}</translation>
     <message>
       <location filename="../artisanlib/comm.py" line="5362" />
       <source>Phidget DAQ1000 detached</source>
-      <translation type="unfinished" />
+      <translation>Phidget DAQ1000 leválasztva</translation>
     </message>
     <message>
       <location filename="../artisanlib/comm.py" line="5364" />
@@ -15072,54 +15125,54 @@ Ismételje meg a műveletet a végén: {0}</translation>
       <translation>A TC4 inicializálva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/autosave.py" line="181" />
+      <location filename="../artisanlib/autosave.py" line="191" />
       <source>Autosave ON. Prefix: {0}</source>
       <translation>Automatikus mentés BE. Előtag: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/autosave.py" line="186" />
+      <location filename="../artisanlib/autosave.py" line="196" />
       <source>Autosave OFF. Prefix: {0}</source>
       <translation>Automatikus mentés KI. Előtag: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24442" />
-      <location filename="../artisanlib/events.py" line="1645" />
+      <location filename="../artisanlib/main.py" line="24574" />
+      <location filename="../artisanlib/events.py" line="1654" />
       <source>Load Palettes</source>
       <translation>Paletták betöltése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2591" />
+      <location filename="../artisanlib/events.py" line="2615" />
       <source>Event Button table copied to clipboard</source>
       <translation>Eseménygomb táblázat a vágólapra másolva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3319" />
+      <location filename="../artisanlib/events.py" line="3351" />
       <source>Event configuration saved</source>
       <translation>Eseménykonfiguráció mentve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="3322" />
+      <location filename="../artisanlib/events.py" line="3354" />
       <source>Found empty event type box</source>
       <translation>Üres eseménytípus mezőt találtunk</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="3044" />
-      <location filename="../artisanlib/main.py" line="5110" />
-      <location filename="../artisanlib/ports.py" line="1645" />
+      <location filename="../artisanlib/devices.py" line="3056" />
+      <location filename="../artisanlib/main.py" line="5172" />
+      <location filename="../artisanlib/ports.py" line="1648" />
       <source>Bluetootooth access denied</source>
       <translation>Bluetooth hozzáférés megtagadva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1872" />
+      <location filename="../artisanlib/ports.py" line="1877" />
       <source>Serial Port Settings: {0}, {1}, {2}, {3}, {4}, {5}</source>
       <translation>Soros port beállításai: {0}, {1}, {2}, {3}, {4}, {5}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="274" />
-      <location filename="../artisanlib/roast_properties.py" line="4180" />
-      <location filename="../artisanlib/roast_properties.py" line="3385" />
-      <location filename="../artisanlib/roast_properties.py" line="2600" />
-      <location filename="../artisanlib/background.py" line="978" />
+      <location filename="../artisanlib/curves.py" line="287" />
+      <location filename="../artisanlib/roast_properties.py" line="4223" />
+      <location filename="../artisanlib/roast_properties.py" line="3416" />
+      <location filename="../artisanlib/roast_properties.py" line="2607" />
+      <location filename="../artisanlib/background.py" line="988" />
       <location filename="../artisanlib/background.py" line="469" />
       <source>Data table copied to clipboard</source>
       <translation>Adattábla a vágólapra másolva</translation>
@@ -15140,67 +15193,67 @@ Ismételje meg a műveletet a végén: {0}</translation>
       <translation>Lejátszási segédlet bekapcsolva {0} másodpercnél</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="10765" />
+      <location filename="../artisanlib/main.py" line="10873" />
       <location filename="../artisanlib/background.py" line="720" />
       <source>Load Background</source>
       <translation>Háttér betöltése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="12223" />
+      <location filename="../artisanlib/main.py" line="12331" />
       <location filename="../artisanlib/background.py" line="723" />
       <source>Reading background profile...</source>
       <translation>Háttérprofil olvasása...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="4245" />
-      <location filename="../artisanlib/background.py" line="983" />
+      <location filename="../artisanlib/roast_properties.py" line="4293" />
+      <location filename="../artisanlib/background.py" line="993" />
       <source>Event table copied to clipboard</source>
       <translation>Az eseménytáblázat a vágólapra másolva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="3483" />
+      <location filename="../artisanlib/roast_properties.py" line="3514" />
       <source>The 0% value must be less than the 100% value.</source>
       <translation>A 0%-os értéknek kisebbnek kell lennie, mint a 100%-os érték.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="4316" />
-      <location filename="../artisanlib/roast_properties.py" line="4312" />
+      <location filename="../artisanlib/roast_properties.py" line="4364" />
+      <location filename="../artisanlib/roast_properties.py" line="4360" />
       <source>Alarms from events #{0} created</source>
       <translation>Riasztások a(z) #{0} eseményből létrehozva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="4392" />
-      <location filename="../artisanlib/roast_properties.py" line="4319" />
+      <location filename="../artisanlib/roast_properties.py" line="4440" />
+      <location filename="../artisanlib/roast_properties.py" line="4367" />
       <source>No events found</source>
       <translation>Nem található események</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="4345" />
+      <location filename="../artisanlib/roast_properties.py" line="4393" />
       <source>Event #{0} added</source>
       <translation>{0}. esemény hozzáadva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="4348" />
+      <location filename="../artisanlib/roast_properties.py" line="4396" />
       <source>No profile found</source>
       <translation type="unfinished">Nem található profil</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="4380" />
+      <location filename="../artisanlib/roast_properties.py" line="4428" />
       <source> Events #{0} deleted</source>
       <translation> A(z) {0}. számú esemény törölve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="4386" />
+      <location filename="../artisanlib/roast_properties.py" line="4434" />
       <source> Event #{0} deleted</source>
       <translation> {0}. esemény törölve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="4987" />
+      <location filename="../artisanlib/roast_properties.py" line="5035" />
       <source>Roast properties updated but profile not saved to disk</source>
       <translation>A pörkölés tulajdonságai frissítve, de a profil nincs lemezre mentve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/phases.py" line="357" />
+      <location filename="../artisanlib/phases.py" line="364" />
       <source>Phases changed to {0} default: {1}</source>
       <translation>Fázisok módosítva a következőre: {0}, alapértelmezett: {1}</translation>
     </message>
@@ -15215,79 +15268,79 @@ Ismételje meg a műveletet a végén: {0}</translation>
       <translation>MODBUS-on keresztül csatlakozik</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="318" />
+      <location filename="../artisanlib/designer.py" line="329" />
       <source>Not enough time points for an ET curviness of {0}. Set curviness to {1}</source>
       <translation>Nincs elég időpont a(z) {0} ET görbülethez. A görbület beállítása {1}-ra</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="560" />
-      <location filename="../artisanlib/designer.py" line="347" />
-      <location filename="../artisanlib/designer.py" line="342" />
-      <location filename="../artisanlib/designer.py" line="326" />
-      <location filename="../artisanlib/designer.py" line="319" />
+      <location filename="../artisanlib/designer.py" line="636" />
+      <location filename="../artisanlib/designer.py" line="358" />
+      <location filename="../artisanlib/designer.py" line="353" />
+      <location filename="../artisanlib/designer.py" line="337" />
+      <location filename="../artisanlib/designer.py" line="330" />
       <source>Designer Config</source>
       <translation type="unfinished">Tervező Konfig</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="325" />
+      <location filename="../artisanlib/designer.py" line="336" />
       <source>Not enough time points for an BT curviness of {0}. Set curviness to {1}</source>
       <translation>Nincs elég időpont egy {0} BT-görbülethez. A görbület beállítása {1}-ra</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="552" />
-      <location filename="../artisanlib/designer.py" line="332" />
+      <location filename="../artisanlib/designer.py" line="628" />
+      <location filename="../artisanlib/designer.py" line="343" />
       <source>CHARGE</source>
       <translation type="unfinished">TÖLTÉS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="553" />
-      <location filename="../artisanlib/designer.py" line="333" />
+      <location filename="../artisanlib/designer.py" line="629" />
+      <location filename="../artisanlib/designer.py" line="344" />
       <source>DRY END</source>
       <translation type="unfinished">SZÁRÍTÁS VÉGE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="554" />
-      <location filename="../artisanlib/designer.py" line="334" />
+      <location filename="../artisanlib/designer.py" line="630" />
+      <location filename="../artisanlib/designer.py" line="345" />
       <source>FC START</source>
       <translation type="unfinished">FC KEZD</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="555" />
-      <location filename="../artisanlib/designer.py" line="335" />
+      <location filename="../artisanlib/designer.py" line="631" />
+      <location filename="../artisanlib/designer.py" line="346" />
       <source>FC END</source>
       <translation type="unfinished">FC VÉGE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="556" />
-      <location filename="../artisanlib/designer.py" line="336" />
+      <location filename="../artisanlib/designer.py" line="632" />
+      <location filename="../artisanlib/designer.py" line="347" />
       <source>SC START</source>
       <translation type="unfinished">SC KEZD</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="557" />
-      <location filename="../artisanlib/designer.py" line="337" />
+      <location filename="../artisanlib/designer.py" line="633" />
+      <location filename="../artisanlib/designer.py" line="348" />
       <source>SC END</source>
       <translation type="unfinished">SC VÉGE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="558" />
-      <location filename="../artisanlib/designer.py" line="338" />
+      <location filename="../artisanlib/designer.py" line="634" />
+      <location filename="../artisanlib/designer.py" line="349" />
       <source>DROP</source>
       <translation type="unfinished">ÜRÍTÉS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="341" />
+      <location filename="../artisanlib/designer.py" line="352" />
       <source>Incorrect time format. Please recheck {0} time</source>
       <translation>Helytelen időformátum. Kérjük, ellenőrizze újra {0} alkalommal</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="559" />
-      <location filename="../artisanlib/designer.py" line="346" />
+      <location filename="../artisanlib/designer.py" line="635" />
+      <location filename="../artisanlib/designer.py" line="357" />
       <source>Times need to be in ascending order. Please recheck {0} time</source>
       <translation>Az időket növekvő sorrendben kell megadni. Kérjük, ellenőrizze újra {0} alkalommal</translation>
     </message>
     <message>
-      <location filename="../artisanlib/designer.py" line="515" />
+      <location filename="../artisanlib/designer.py" line="591" />
       <source>Designer has been reset</source>
       <translation>A tervező visszaállítva</translation>
     </message>
@@ -15373,51 +15426,51 @@ Ismételje meg a műveletet a végén: {0}</translation>
       <translation>p-i-d értékek frissítve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/sampling.py" line="33" />
+      <location filename="../artisanlib/sampling.py" line="38" />
       <source>Sampling</source>
       <translation type="unfinished">Mintavétel</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22464" />
-      <location filename="../artisanlib/main.py" line="12689" />
-      <location filename="../artisanlib/sampling.py" line="111" />
+      <location filename="../artisanlib/main.py" line="22593" />
+      <location filename="../artisanlib/main.py" line="12797" />
+      <location filename="../artisanlib/sampling.py" line="118" />
       <source>Warning</source>
       <translation>Figyelem</translation>
     </message>
     <message>
-      <location filename="../artisanlib/sampling.py" line="112" />
+      <location filename="../artisanlib/sampling.py" line="119" />
       <source>A tight sampling interval might lead to instability on some machines. We suggest a minimum of 1s.</source>
       <translation>A szűk mintavételi intervallum bizonyos gépeken instabilitást okozhat. Javasoljuk, hogy minimum 1 másodperc.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24883" />
-      <location filename="../artisanlib/curves.py" line="1663" />
+      <location filename="../artisanlib/main.py" line="25015" />
+      <location filename="../artisanlib/curves.py" line="1679" />
       <source>Incompatible variables found in %s</source>
       <translation>Nem kompatibilis változók találhatók itt: %s</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24884" />
-      <location filename="../artisanlib/curves.py" line="1664" />
+      <location filename="../artisanlib/main.py" line="25016" />
+      <location filename="../artisanlib/curves.py" line="1680" />
       <source>Assignment problem</source>
       <translation>Hozzárendelési probléma</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1699" />
+      <location filename="../artisanlib/curves.py" line="1715" />
       <source>New Extra Device: virtual: y1(x) =[%s]; y2(x)=[%s]</source>
       <translation>Új extra eszköz: virtuális: y1(x) =[%s]; y2(x)=[%s]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="2199" />
+      <location filename="../artisanlib/curves.py" line="2215" />
       <source>Interpolation failed: no profile available</source>
       <translation>Az interpoláció sikertelen: nincs elérhető profil</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="2209" />
+      <location filename="../artisanlib/curves.py" line="2225" />
       <source>Sound turned ON</source>
       <translation>A hang be van kapcsolva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="2213" />
+      <location filename="../artisanlib/curves.py" line="2229" />
       <source>Sound turned OFF</source>
       <translation>Hang kikapcsolva</translation>
     </message>
@@ -15437,144 +15490,144 @@ Ismételje meg a műveletet a végén: {0}</translation>
       <translation>Az S7 csatlakozás sikertelen</translation>
     </message>
     <message>
-      <location filename="../artisanlib/dialogs.py" line="360" />
+      <location filename="../artisanlib/dialogs.py" line="371" />
       <source>Port Configuration</source>
       <translation>Port konfiguráció</translation>
     </message>
     <message>
-      <location filename="../artisanlib/dialogs.py" line="363" />
+      <location filename="../artisanlib/dialogs.py" line="374" />
       <source>Comm Port</source>
       <translation>Kommunikációs port</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="10778" />
-      <location filename="../artisanlib/alarms.py" line="617" />
+      <location filename="../artisanlib/main.py" line="10886" />
+      <location filename="../artisanlib/alarms.py" line="626" />
       <source>Load Alarms</source>
       <translation>Betöltési riasztások</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="658" />
+      <location filename="../artisanlib/alarms.py" line="667" />
       <source>Error loading alarm file</source>
       <translation>Hiba a riasztási fájl betöltésekor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="663" />
+      <location filename="../artisanlib/alarms.py" line="672" />
       <source>Save Alarms</source>
       <translation>Riasztások mentése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="1113" />
+      <location filename="../artisanlib/alarms.py" line="1151" />
       <source>Alarm table copied to clipboard</source>
       <translation>Riasztási táblázat a vágólapra másolva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="356" />
-      <location filename="../artisanlib/main.py" line="338" />
+      <location filename="../artisanlib/main.py" line="357" />
+      <location filename="../artisanlib/main.py" line="339" />
       <source>URL open profile: {0}</source>
       <translation>URL megnyitott profil: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="981" />
+      <location filename="../artisanlib/main.py" line="982" />
       <source>follow on</source>
       <translation>követni</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="983" />
+      <location filename="../artisanlib/main.py" line="984" />
       <source>follow off</source>
       <translation>kövesd</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1207" />
+      <location filename="../artisanlib/main.py" line="1208" />
       <source>Subscription</source>
       <translation>Feliratkozás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3863" />
+      <location filename="../artisanlib/main.py" line="3900" />
       <source>Welcome to version {0} of Artisan!</source>
       <translation>Üdvözöljük az Artisan {0}. verziójában!</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3864" />
+      <location filename="../artisanlib/main.py" line="3901" />
       <source>This is a one time message to inform you about a change in Artisan.</source>
       <translation>Ez egy egyszeri üzenet, amely az Artisan változásáról tájékoztat.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3865" />
+      <location filename="../artisanlib/main.py" line="3902" />
       <source>If you never run older versions of Artisan you can skip this message, the change does not affect you.</source>
       <translation>Ha soha nem futtatja az Artisan régebbi verzióit, kihagyhatja ezt az üzenetet, a változás nem érinti Önt.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3866" />
+      <location filename="../artisanlib/main.py" line="3903" />
       <source>Artisan preserves all your configuration settings when you exit so they will automatically be available the next time you start Artisan.</source>
       <translation>Az Artisan megőrzi az összes konfigurációs beállítást, amikor kilép, így azok automatikusan elérhetők lesznek az Artisan következő indításakor.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3867" />
+      <location filename="../artisanlib/main.py" line="3904" />
       <source>Beginning with release v2.0, settings will no longer be automatically shared at start-up with versions before v2.0.</source>
       <translation>A v2.0 kiadástól kezdődően a beállítások már nem lesznek automatikusan megosztva indításkor a 2.0 előtti verziókkal.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3868" />
+      <location filename="../artisanlib/main.py" line="3905" />
       <source>Do not worry. Since this is the first time you opened this new version Artisan has already loaded your last used settings.</source>
       <translation>Ne aggódj. Mivel ez az első alkalom, amikor megnyitotta ezt az új verziót, az Artisan már betöltötte a legutóbb használt beállításait.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3869" />
+      <location filename="../artisanlib/main.py" line="3906" />
       <source>To share settings between this version and Artisan versions before v2.0 use 'Help&gt;Save Settings' and 'Help&gt;Load Settings'.</source>
       <translation>A beállítások megosztásához ez a verzió és a v2.0 előtti Artisan verziók között használja a „Súgó&gt;Beállítások mentése” és a „Súgó&gt;Beállítások betöltése” menüpontot.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3870" />
+      <location filename="../artisanlib/main.py" line="3907" />
       <source>Enjoy using Artisan, The Artisan Team</source>
       <translation>Élvezze az Artisan, The Artisan Team használatát</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3871" />
+      <location filename="../artisanlib/main.py" line="3908" />
       <source>One time message about loading settings at start-up</source>
       <translation>Egyszeri üzenet a beállítások betöltésekor az indításkor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3875" />
+      <location filename="../artisanlib/main.py" line="3912" />
       <source>Welcome to the ArtisanViewer!</source>
       <translation>Üdvözöljük az ArtisanViewerben!</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3876" />
+      <location filename="../artisanlib/main.py" line="3913" />
       <source>This is a one time message to introduce you to the ArtisanViewer.</source>
       <translation>Ez egy egyszeri üzenet, amely bemutatja Önnek az ArtisanViewert.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3877" />
+      <location filename="../artisanlib/main.py" line="3914" />
       <source>The ArtisanViewer opens whenever a copy of Artisan is already running.</source>
       <translation>Az ArtisanViewer megnyílik, amikor az Artisan egy példánya már fut.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3878" />
+      <location filename="../artisanlib/main.py" line="3915" />
       <source>ArtisanViewer will preserve all your configuration settings when you exit so they will automatically be available the next time you start ArtisanViewer.</source>
       <translation>Az ArtisanViewer megőrzi az összes konfigurációs beállítást, amikor kilép, így azok automatikusan elérhetők lesznek az ArtisanViewer következő indításakor.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3879" />
+      <location filename="../artisanlib/main.py" line="3916" />
       <source>Caution, the only way to share settings between Artisan and ArtisanViewer is to explicitly save and load them using 'Help&gt;Save Settings' and 'Help&gt;Load Settings'.</source>
       <translation>Vigyázat, a beállítások megosztásának egyetlen módja az Artisan és az ArtisanViewer között, ha kifejezetten elmenti és betölti azokat a „Súgó&gt;Beállítások mentése” és a „Súgó&gt;Beállítások betöltése” menüpontban.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3880" />
+      <location filename="../artisanlib/main.py" line="3917" />
       <source>Enjoy using ArtisanViewer,</source>
       <translation>Élvezze az ArtisanViewer használatát,</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3881" />
+      <location filename="../artisanlib/main.py" line="3918" />
       <source>The Artisan Team</source>
       <translation>A kézműves csapat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3882" />
+      <location filename="../artisanlib/main.py" line="3919" />
       <source>One time message about ArtisanViewer</source>
       <translation>Egyszeri üzenet az ArtisanViewerről</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="4264" />
+      <location filename="../artisanlib/main.py" line="4307" />
       <source>Artisan is free to use!
 
 To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
@@ -15583,864 +15636,864 @@ To keep it free and current please support us with your donation and subscribe t
 Annak érdekében, hogy ingyenes és naprakész legyen, kérjük, támogasson minket adományával, és iratkozzon fel az artisan.plus oldalra, hogy leállítsa ezt a párbeszédpanelt!</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5010" />
+      <location filename="../artisanlib/main.py" line="5066" />
       <source>Configure for&lt;br&gt;{0}?&lt;br&gt;&lt;br&gt;Some of your settings will be modified!&lt;br&gt;&lt;br&gt;Before proceeding it is best to save your current settings and reset Artisan&lt;br&gt;(first menu {1} &gt;&gt; {2} then {4} &gt;&gt; {3})</source>
-      <translation type="unfinished" />
+      <translation>Konfigurálja a következőhöz:&lt;br&gt;{0}?&lt;br&gt;&lt;br&gt;Egyes beállításai módosulnak!&lt;br&gt;&lt;br&gt;A folytatás előtt a legjobb, ha menti jelenlegi beállításait, és alaphelyzetbe állítja az Artisan&lt;br&gt;(első menü: {1} &gt;&gt; {2}, majd {4} &gt;&gt; {3})</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5011" />
+      <location filename="../artisanlib/main.py" line="5067" />
       <source>Adjust Settings</source>
       <translation>Állítsa be a beállításokat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5040" />
+      <location filename="../artisanlib/main.py" line="5097" />
       <source>Ambient</source>
       <translation type="unfinished">Környező</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5041" />
+      <location filename="../artisanlib/main.py" line="5098" />
       <source>Elevation (MASL)</source>
       <translation>Magasság (MASL)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="6275" />
-      <location filename="../artisanlib/main.py" line="5188" />
-      <location filename="../artisanlib/main.py" line="5048" />
+      <location filename="../artisanlib/canvas.py" line="6281" />
+      <location filename="../artisanlib/main.py" line="5251" />
+      <location filename="../artisanlib/main.py" line="5106" />
       <source>Action canceled</source>
       <translation>Akció megszakítva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5135" />
-      <location filename="../artisanlib/main.py" line="5115" />
-      <location filename="../artisanlib/main.py" line="5085" />
-      <location filename="../artisanlib/main.py" line="5077" />
-      <location filename="../artisanlib/main.py" line="5069" />
-      <location filename="../artisanlib/main.py" line="5061" />
+      <location filename="../artisanlib/main.py" line="5198" />
+      <location filename="../artisanlib/main.py" line="5177" />
+      <location filename="../artisanlib/main.py" line="5146" />
+      <location filename="../artisanlib/main.py" line="5137" />
+      <location filename="../artisanlib/main.py" line="5128" />
+      <location filename="../artisanlib/main.py" line="5119" />
       <source>Machine</source>
       <translation>Gép</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5086" />
-      <location filename="../artisanlib/main.py" line="5078" />
-      <location filename="../artisanlib/main.py" line="5070" />
-      <location filename="../artisanlib/main.py" line="5062" />
+      <location filename="../artisanlib/main.py" line="5147" />
+      <location filename="../artisanlib/main.py" line="5138" />
+      <location filename="../artisanlib/main.py" line="5129" />
+      <location filename="../artisanlib/main.py" line="5120" />
       <source>Network name or IP address</source>
       <translation>Hálózati név vagy IP-cím</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5116" />
+      <location filename="../artisanlib/main.py" line="5178" />
       <source>Machine Capacity (kg)</source>
       <translation>A gép kapacitása (kg)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5166" />
+      <location filename="../artisanlib/main.py" line="5229" />
       <source>Energy loads configured for {0} {1}kg</source>
       <translation>Energiaterhelések konfigurálva {0} {1} kg-hoz</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5167" />
+      <location filename="../artisanlib/main.py" line="5230" />
       <source>Artisan configured for {0}</source>
       <translation>Kézműves konfigurálva a következőhöz: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22779" />
-      <location filename="../artisanlib/main.py" line="5219" />
+      <location filename="../artisanlib/main.py" line="22908" />
+      <location filename="../artisanlib/main.py" line="5285" />
       <source>Load theme {0}?</source>
       <translation>Betölti a(z) {0} témát?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22780" />
-      <location filename="../artisanlib/main.py" line="5220" />
+      <location filename="../artisanlib/main.py" line="22909" />
+      <location filename="../artisanlib/main.py" line="5286" />
       <source>Adjust Theme Related Settings</source>
       <translation>Témával kapcsolatos beállítások módosítása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22786" />
-      <location filename="../artisanlib/main.py" line="5226" />
+      <location filename="../artisanlib/main.py" line="22915" />
+      <location filename="../artisanlib/main.py" line="5292" />
       <source>Loaded theme {0}</source>
       <translation>Téma betöltve: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="5418" />
+      <location filename="../artisanlib/main.py" line="5484" />
       <source>Detected a color pair that may be hard to see: </source>
       <translation>Olyan színpárt észlelt, amelyet nehéz lehet látni:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25053" />
-      <location filename="../artisanlib/main.py" line="25012" />
-      <location filename="../artisanlib/main.py" line="6042" />
+      <location filename="../artisanlib/main.py" line="25185" />
+      <location filename="../artisanlib/main.py" line="25144" />
+      <location filename="../artisanlib/main.py" line="6108" />
       <source>Simulator started @{}x</source>
       <translation>A szimulátor elindult @{}x</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6053" />
+      <location filename="../artisanlib/main.py" line="6119" />
       <source>super on</source>
       <translation>szuper rajta</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6055" />
+      <location filename="../artisanlib/main.py" line="6121" />
       <source>super off</source>
       <translation>szuper kikapcsolva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="8267" />
+      <location filename="../artisanlib/main.py" line="8333" />
       <source>Pulse out of range (%d)</source>
       <translation>Impulzus tartományon kívül (%d)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="8960" />
+      <location filename="../artisanlib/main.py" line="9026" />
       <source>Alarms on</source>
       <translation>Riasztások bekapcsolva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="8963" />
+      <location filename="../artisanlib/main.py" line="9029" />
       <source>Alarms off</source>
       <translation>Riasztók kikapcsolva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="8972" />
+      <location filename="../artisanlib/main.py" line="9038" />
       <source>autoCHARGE on</source>
       <translation>automatikus töltés bekapcsolva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="8975" />
+      <location filename="../artisanlib/main.py" line="9041" />
       <source>autoCHARGE off</source>
       <translation>autoCHARGE kikapcsolva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="8984" />
+      <location filename="../artisanlib/main.py" line="9050" />
       <source>autoDROP on</source>
       <translation>autoDROP bekapcsolva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="8987" />
+      <location filename="../artisanlib/main.py" line="9053" />
       <source>autoDROP off</source>
       <translation>autoDROP kikapcsolva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22478" />
-      <location filename="../artisanlib/main.py" line="9035" />
-      <location filename="../artisanlib/main.py" line="9013" />
+      <location filename="../artisanlib/main.py" line="22607" />
+      <location filename="../artisanlib/main.py" line="9101" />
+      <location filename="../artisanlib/main.py" line="9079" />
       <source>PID set to OFF</source>
       <translation>A PID OFF állásban van</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22482" />
-      <location filename="../artisanlib/main.py" line="9032" />
-      <location filename="../artisanlib/main.py" line="9022" />
+      <location filename="../artisanlib/main.py" line="22611" />
+      <location filename="../artisanlib/main.py" line="9098" />
+      <location filename="../artisanlib/main.py" line="9088" />
       <source>PID set to ON</source>
       <translation>A PID BE állásba van állítva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="9060" />
-      <location filename="../artisanlib/main.py" line="9048" />
+      <location filename="../artisanlib/main.py" line="9126" />
+      <location filename="../artisanlib/main.py" line="9114" />
       <source>PID mode manual</source>
       <translation>PID mód kézikönyv</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="9063" />
-      <location filename="../artisanlib/main.py" line="9052" />
+      <location filename="../artisanlib/main.py" line="9129" />
+      <location filename="../artisanlib/main.py" line="9118" />
       <source>PID mode Ramp/Soak</source>
       <translation>PID mód Rámp/Soak</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="9066" />
-      <location filename="../artisanlib/main.py" line="9056" />
+      <location filename="../artisanlib/main.py" line="9132" />
+      <location filename="../artisanlib/main.py" line="9122" />
       <source>PID mode background</source>
       <translation>PID mód háttér</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="9076" />
+      <location filename="../artisanlib/main.py" line="9142" />
       <source>playback off</source>
       <translation>lejátszás kikapcsolva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="9080" />
+      <location filename="../artisanlib/main.py" line="9146" />
       <source>playback by time</source>
       <translation>lejátszás idő szerint</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="9084" />
+      <location filename="../artisanlib/main.py" line="9150" />
       <source>playback by BT</source>
       <translation>lejátszás a BT által</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="9088" />
+      <location filename="../artisanlib/main.py" line="9154" />
       <source>playback by ET</source>
       <translation>lejátszása ET</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="9151" />
+      <location filename="../artisanlib/main.py" line="9217" />
       <source>Notifications on</source>
       <translation>Értesítések bekapcsolva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="9154" />
+      <location filename="../artisanlib/main.py" line="9220" />
       <source>Notifications off</source>
       <translation>Értesítések kikapcsolva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="10835" />
-      <location filename="../artisanlib/main.py" line="10832" />
-      <location filename="../artisanlib/main.py" line="10823" />
-      <location filename="../artisanlib/main.py" line="10820" />
-      <location filename="../artisanlib/main.py" line="9430" />
-      <location filename="../artisanlib/main.py" line="9427" />
+      <location filename="../artisanlib/main.py" line="10943" />
+      <location filename="../artisanlib/main.py" line="10940" />
+      <location filename="../artisanlib/main.py" line="10931" />
+      <location filename="../artisanlib/main.py" line="10928" />
+      <location filename="../artisanlib/main.py" line="9496" />
+      <location filename="../artisanlib/main.py" line="9493" />
       <source>PID Lookahead: {0}</source>
       <translation>PID előretekintés: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="9448" />
+      <location filename="../artisanlib/main.py" line="9514" />
       <source>Keep ON enabled</source>
       <translation>Tartsa bekapcsolva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="9451" />
+      <location filename="../artisanlib/main.py" line="9517" />
       <source>Keep ON disable</source>
       <translation>Tartsa BE letiltva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="10069" />
+      <location filename="../artisanlib/main.py" line="10135" />
       <source>Do you want to reset all settings?&lt;br&gt; ArtisanViewer has to be restarted!</source>
       <translation>Szeretné visszaállítani az összes beállítást?&lt;br&gt; Az ArtisanViewert újra kell indítani!</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="10071" />
+      <location filename="../artisanlib/main.py" line="10137" />
       <source>Do you want to reset all settings?&lt;br&gt; Artisan has to be restarted!</source>
       <translation>Szeretné visszaállítani az összes beállítást?&lt;br&gt; Az Artisant újra kell indítani!</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="10072" />
+      <location filename="../artisanlib/main.py" line="10138" />
       <source>Factory Reset</source>
       <translation type="unfinished">Gyári beállítások visszaállítása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="10739" />
+      <location filename="../artisanlib/main.py" line="10847" />
       <source>Auto Axis Graph Mode: Roast</source>
       <translation>Auto Axis Graph Mode: Pörkölt</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="10741" />
+      <location filename="../artisanlib/main.py" line="10849" />
       <source>Auto Axis Graph Mode: BBP+Roast</source>
       <translation>Automatikus tengelygrafikon mód: BBP+sült</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="10743" />
+      <location filename="../artisanlib/main.py" line="10851" />
       <source>Auto Axis Graph Mode: BBP</source>
       <translation>Automatikus tengelyes grafikon mód: BBP</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="10809" />
-      <location filename="../artisanlib/main.py" line="10793" />
+      <location filename="../artisanlib/main.py" line="10917" />
+      <location filename="../artisanlib/main.py" line="10901" />
       <source>PID Mode: Ramp/Soak</source>
       <translation>PID mód: rámpa/áztatás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="10811" />
-      <location filename="../artisanlib/main.py" line="10798" />
+      <location filename="../artisanlib/main.py" line="10919" />
+      <location filename="../artisanlib/main.py" line="10906" />
       <source>PID Mode: Background</source>
       <translation>PID mód: Háttér</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="10807" />
-      <location filename="../artisanlib/main.py" line="10802" />
+      <location filename="../artisanlib/main.py" line="10915" />
+      <location filename="../artisanlib/main.py" line="10910" />
       <source>PID Mode: Manual</source>
       <translation>PID mód: kézi</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="10873" />
+      <location filename="../artisanlib/main.py" line="10981" />
       <source>Exit Designer?</source>
       <translation>Kilép a Tervezőből?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="10874" />
+      <location filename="../artisanlib/main.py" line="10982" />
       <source>Designer Mode ON</source>
       <translation>Tervező mód BE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="10937" />
+      <location filename="../artisanlib/main.py" line="11045" />
       <source>LCD cursor on profile data</source>
       <translation>LCD kurzor a profiladatokon</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="10940" />
+      <location filename="../artisanlib/main.py" line="11048" />
       <source>LCD cursor on template data</source>
       <translation>LCD kurzor a sablonadatokon</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="10943" />
+      <location filename="../artisanlib/main.py" line="11051" />
       <source>LCD cursor OFF</source>
       <translation>LCD kurzor KI</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11187" />
+      <location filename="../artisanlib/main.py" line="11295" />
       <source>Keyboard moves turned ON</source>
       <translation>A billentyűzet mozgatása be van kapcsolva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11195" />
+      <location filename="../artisanlib/main.py" line="11303" />
       <source>Keyboard moves turned OFF</source>
       <translation>A billentyűzet mozgása KI van kapcsolva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11497" />
+      <location filename="../artisanlib/main.py" line="11605" />
       <source>Profile {0} saved in: {1}</source>
       <translation>A(z) {0} profil elmentve ide: {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11531" />
+      <location filename="../artisanlib/main.py" line="11639" />
       <source>Autosave path does not exist. Autosave failed.</source>
       <translation>Az automatikus mentés elérési útja nem létezik. Az automatikus mentés nem sikerült.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11534" />
+      <location filename="../artisanlib/main.py" line="11642" />
       <source>Empty path or box unchecked in Autosave</source>
       <translation>Üres útvonal vagy négyzet nincs bejelölve az Automatikus mentésben</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11649" />
+      <location filename="../artisanlib/main.py" line="11757" />
       <source>Event #{0}:  {1} has been updated</source>
       <translation>{0}. esemény: {1} frissítve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11724" />
+      <location filename="../artisanlib/main.py" line="11832" />
       <source>Select</source>
       <translation type="unfinished">Kiválasztás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11749" />
-      <location filename="../artisanlib/main.py" line="11738" />
+      <location filename="../artisanlib/main.py" line="11857" />
+      <location filename="../artisanlib/main.py" line="11846" />
       <source>Open</source>
       <translation type="unfinished">Megnyitás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11751" />
+      <location filename="../artisanlib/main.py" line="11859" />
       <source>URL</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11769" />
+      <location filename="../artisanlib/main.py" line="11877" />
       <source>Save</source>
       <translation type="unfinished">Mentés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11780" />
+      <location filename="../artisanlib/main.py" line="11888" />
       <source>Select Directory</source>
       <translation>Válassza a Címtár lehetőséget</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11821" />
+      <location filename="../artisanlib/main.py" line="11929" />
       <source>NEW ROAST canceled: incomplete profile lacking CHARGE and DROP found</source>
       <translation>NEW ROAST törölve: hiányos profilt találtunk, amelyből hiányzik a CHARGE és a DROP</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11826" />
+      <location filename="../artisanlib/main.py" line="11934" />
       <source>NEW ROAST canceled: incomplete profile lacking DROP found</source>
       <translation>NEW ROAST törölve: hiányos profilt találtunk, amelyből hiányzik a DROP</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11836" />
+      <location filename="../artisanlib/main.py" line="11944" />
       <source>{0} has been saved. New roast has started</source>
       <translation>{0} mentése megtörtént. Elkezdődött az új sütés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25056" />
-      <location filename="../artisanlib/main.py" line="12428" />
-      <location filename="../artisanlib/main.py" line="11873" />
+      <location filename="../artisanlib/main.py" line="25188" />
+      <location filename="../artisanlib/main.py" line="12536" />
+      <location filename="../artisanlib/main.py" line="11981" />
       <source>Invalid artisan format</source>
       <translation>Érvénytelen kézműves formátum</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="11957" />
+      <location filename="../artisanlib/main.py" line="12065" />
       <source>{0}  loaded </source>
       <translation>{0} betöltve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="12096" />
+      <location filename="../artisanlib/main.py" line="12204" />
       <source>No profile data.  ET/BT not recalculated</source>
       <translation>Nincsenek profiladatok. ET/BT nincs újraszámítva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="12099" />
+      <location filename="../artisanlib/main.py" line="12207" />
       <source>Problem with the profile data.  ET/BT not recalculated</source>
       <translation>Probléma a profiladatokkal. ET/BT nincs újraszámítva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="12422" />
+      <location filename="../artisanlib/main.py" line="12530" />
       <source>Background {0} loaded successfully {1}</source>
       <translation>A háttér {0} sikeresen betöltve {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="12547" />
+      <location filename="../artisanlib/main.py" line="12655" />
       <source>Artisan CSV file loaded successfully</source>
       <translation>Kézműves CSV-fájl sikeresen betöltve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="12689" />
+      <location filename="../artisanlib/main.py" line="12797" />
       <source>The Probat Shop Pilot Software expects files named &lt;Name&gt;_&lt;Index&gt;.xml like in Test_0.xml on import</source>
       <translation>A Probat Shop Pilot Software importáláskor a &lt;Név&gt;_&lt;Index&gt;.xml fájlokat várja, mint a Test_0.xml fájlban.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15237" />
+      <location filename="../artisanlib/main.py" line="15360" />
       <source>Save Profile</source>
       <translation>Profil mentése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15256" />
+      <location filename="../artisanlib/main.py" line="15379" />
       <source>Profile saved</source>
       <translation>Profil mentve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22836" />
-      <location filename="../artisanlib/main.py" line="22766" />
-      <location filename="../artisanlib/main.py" line="22698" />
-      <location filename="../artisanlib/main.py" line="22626" />
-      <location filename="../artisanlib/main.py" line="15626" />
-      <location filename="../artisanlib/main.py" line="15307" />
-      <location filename="../artisanlib/main.py" line="15291" />
-      <location filename="../artisanlib/main.py" line="15289" />
+      <location filename="../artisanlib/main.py" line="22965" />
+      <location filename="../artisanlib/main.py" line="22895" />
+      <location filename="../artisanlib/main.py" line="22827" />
+      <location filename="../artisanlib/main.py" line="22755" />
+      <location filename="../artisanlib/main.py" line="15749" />
+      <location filename="../artisanlib/main.py" line="15430" />
+      <location filename="../artisanlib/main.py" line="15414" />
+      <location filename="../artisanlib/main.py" line="15412" />
       <source>Cancelled</source>
       <translation>Törölve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15305" />
+      <location filename="../artisanlib/main.py" line="15428" />
       <source>Readings exported</source>
       <translation>Leolvasások exportálva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15316" />
+      <location filename="../artisanlib/main.py" line="15439" />
       <source>Export Excel</source>
       <translation>Excel exportálása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15321" />
+      <location filename="../artisanlib/main.py" line="15444" />
       <source>Export CSV</source>
       <translation>CSV exportálása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15326" />
+      <location filename="../artisanlib/main.py" line="15449" />
       <source>Export JSON</source>
       <translation>JSON exportálása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15331" />
+      <location filename="../artisanlib/main.py" line="15454" />
       <source>Export RoastLogger</source>
       <translation>RoastLogger exportálása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15336" />
+      <location filename="../artisanlib/main.py" line="15459" />
       <source>Export Probat Pilot</source>
       <translation>Probat Pilot exportálása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15584" />
-      <location filename="../artisanlib/main.py" line="15533" />
-      <location filename="../artisanlib/main.py" line="15493" />
-      <location filename="../artisanlib/main.py" line="15432" />
-      <location filename="../artisanlib/main.py" line="15346" />
+      <location filename="../artisanlib/main.py" line="15707" />
+      <location filename="../artisanlib/main.py" line="15656" />
+      <location filename="../artisanlib/main.py" line="15616" />
+      <location filename="../artisanlib/main.py" line="15555" />
+      <location filename="../artisanlib/main.py" line="15469" />
       <source>Converting...</source>
       <translation>Konvertálás...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15604" />
-      <location filename="../artisanlib/main.py" line="15553" />
-      <location filename="../artisanlib/main.py" line="15513" />
-      <location filename="../artisanlib/main.py" line="15462" />
-      <location filename="../artisanlib/main.py" line="15366" />
+      <location filename="../artisanlib/main.py" line="15727" />
+      <location filename="../artisanlib/main.py" line="15676" />
+      <location filename="../artisanlib/main.py" line="15636" />
+      <location filename="../artisanlib/main.py" line="15585" />
+      <location filename="../artisanlib/main.py" line="15489" />
       <source>Target file {0} exists. {1} not converted.</source>
       <translation>A(z) {0} célfájl létezik. {1} nincs konvertálva.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15624" />
+      <location filename="../artisanlib/main.py" line="15747" />
       <source>Readings imported</source>
       <translation>Olvasmányok importálva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15647" />
+      <location filename="../artisanlib/main.py" line="15770" />
       <source>Import Artisan URL</source>
       <translation>Kézműves URL importálása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15654" />
+      <location filename="../artisanlib/main.py" line="15777" />
       <source>Import CSV</source>
       <translation>CSV importálása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15659" />
+      <location filename="../artisanlib/main.py" line="15782" />
       <source>Import JSON</source>
       <translation>JSON importálása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15664" />
+      <location filename="../artisanlib/main.py" line="15787" />
       <source>Import RoastLogger</source>
       <translation>Importálja a RoastLoggert</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15793" />
+      <location filename="../artisanlib/main.py" line="15916" />
       <source>Batch Counter</source>
       <translation type="unfinished">Tételszámláló</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="15796" />
+      <location filename="../artisanlib/main.py" line="15919" />
       <source>Load Settings canceled</source>
       <translation>A beállítások betöltése megszakítva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19547" />
+      <location filename="../artisanlib/main.py" line="19675" />
       <source>No statistics found</source>
       <translation>Nem található statisztika</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19561" />
+      <location filename="../artisanlib/main.py" line="19689" />
       <source>Save Statistics</source>
       <translation>Statisztikák mentése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19566" />
+      <location filename="../artisanlib/main.py" line="19694" />
       <source>Statistics Saved</source>
       <translation>Statisztika mentve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="19718" />
+      <location filename="../artisanlib/main.py" line="19846" />
       <source>Excel Production Report exported to {0}</source>
       <translation>Excel termelési jelentés exportálva ide: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20497" />
+      <location filename="../artisanlib/main.py" line="20625" />
       <source>Ranking Report</source>
       <translation>Rangsor jelentés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20498" />
+      <location filename="../artisanlib/main.py" line="20626" />
       <source>Ranking graphs are only generated up to {0} profiles</source>
       <translation>A rangsorolási grafikonok csak {0} profilig készülnek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20710" />
+      <location filename="../artisanlib/main.py" line="20838" />
       <source>Profile missing DRY event</source>
       <translation>A profilból hiányzik a DRY esemény</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20725" />
+      <location filename="../artisanlib/main.py" line="20853" />
       <source>Profile missing phase events</source>
       <translation>A profilból hiányzó fázisesemények</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="20854" />
+      <location filename="../artisanlib/main.py" line="20982" />
       <source>CSV Ranking Report exported to {0}</source>
       <translation>CSV-rangsorolási jelentés exportálva ide: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="21072" />
+      <location filename="../artisanlib/main.py" line="21200" />
       <source>Excel Ranking Report exported to {0}</source>
       <translation>Excel rangsorolási jelentés exportálva ide: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22406" />
+      <location filename="../artisanlib/main.py" line="22535" />
       <source>Bluetooth scale cannot be connected while permission for Artsian to access Bluetooth is denied</source>
       <translation>A Bluetooth-mérleg nem csatlakoztatható, amíg az Artsian nem engedélyezi a Bluetooth-hozzáférést</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22407" />
+      <location filename="../artisanlib/main.py" line="22536" />
       <source>Bluetooth access denied</source>
       <translation>Bluetooth hozzáférés megtagadva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22444" />
+      <location filename="../artisanlib/main.py" line="22573" />
       <source>Hottop control turned off</source>
       <translation>A hottop vezérlés kikapcsolva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22461" />
+      <location filename="../artisanlib/main.py" line="22590" />
       <source>Hottop control turned on</source>
       <translation>A hottop vezérlés bekapcsolva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22464" />
+      <location filename="../artisanlib/main.py" line="22593" />
       <source>To control a Hottop you need to activate the super user mode via a right click on the timer LCD first!</source>
       <translation>A Hottop vezérléséhez először aktiválnia kell a szuperfelhasználói módot az időzítő LCD-n jobb klikkel!</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22738" />
-      <location filename="../artisanlib/main.py" line="22670" />
+      <location filename="../artisanlib/main.py" line="22867" />
+      <location filename="../artisanlib/main.py" line="22799" />
       <source>Settings not found</source>
       <translation>A beállítások nem találhatók</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22677" />
+      <location filename="../artisanlib/main.py" line="22806" />
       <source>artisan-settings</source>
       <translation>kézműves-beállítások</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22678" />
+      <location filename="../artisanlib/main.py" line="22807" />
       <source>Save Settings</source>
       <translation>Beállítások mentése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22683" />
+      <location filename="../artisanlib/main.py" line="22812" />
       <source>Settings saved</source>
       <translation>Beállítások elmentve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22745" />
+      <location filename="../artisanlib/main.py" line="22874" />
       <source>artisan-theme</source>
       <translation>kézműves-téma</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22746" />
+      <location filename="../artisanlib/main.py" line="22875" />
       <source>Save Theme</source>
       <translation>Téma mentése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22749" />
+      <location filename="../artisanlib/main.py" line="22878" />
       <source>Theme saved</source>
       <translation>Téma mentve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22777" />
+      <location filename="../artisanlib/main.py" line="22906" />
       <source>Load Theme</source>
       <translation>Töltsd be a témát</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22803" />
+      <location filename="../artisanlib/main.py" line="22932" />
       <source>Theme loaded</source>
       <translation>Téma betöltve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="22989" />
+      <location filename="../artisanlib/main.py" line="23118" />
       <source>Background profile removed</source>
       <translation>Háttérprofil eltávolítva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23130" />
+      <location filename="../artisanlib/main.py" line="23259" />
       <source>Alarm Config</source>
       <translation>Riasztás Konfig</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23131" />
+      <location filename="../artisanlib/main.py" line="23260" />
       <source>Alarms are not available for device None</source>
       <translation>A riasztások nem érhetők el az eszközön Nincs</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23148" />
+      <location filename="../artisanlib/main.py" line="23277" />
       <source>Switching the language needs a restart. Restart now?</source>
       <translation>A nyelvváltáshoz újra kell indítani. Újraindítás most?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23149" />
+      <location filename="../artisanlib/main.py" line="23278" />
       <source>Restart</source>
       <translation>Újrakezd</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23187" />
+      <location filename="../artisanlib/main.py" line="23316" />
       <source>Import K202 CSV</source>
       <translation>K202 CSV importálása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23237" />
+      <location filename="../artisanlib/main.py" line="23366" />
       <source>K202 file loaded successfully</source>
       <translation>K202 fájl sikeresen betöltve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23253" />
+      <location filename="../artisanlib/main.py" line="23382" />
       <source>Import K204 CSV</source>
       <translation>K204 CSV importálása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23317" />
+      <location filename="../artisanlib/main.py" line="23446" />
       <source>K204 file loaded successfully</source>
       <translation>K204 fájl sikeresen betöltve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23347" />
+      <location filename="../artisanlib/main.py" line="23476" />
       <source>Import Probat Recipe</source>
       <translation>Probat recept importálása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23520" />
+      <location filename="../artisanlib/main.py" line="23649" />
       <source>Probat Pilot data imported successfully</source>
       <translation>Probat Pilot adatok sikeresen importálva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23530" />
+      <location filename="../artisanlib/main.py" line="23659" />
       <source>Import Probat Pilot failed</source>
       <translation>A Probat Pilot importálása nem sikerült</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23538" />
+      <location filename="../artisanlib/main.py" line="23667" />
       <source>Import Aillio RoasTime</source>
       <translation>Importálja az Aillio RoasTime-ot</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23547" />
+      <location filename="../artisanlib/main.py" line="23676" />
       <source>Import Aillio Roast.World URL</source>
       <translation>Importálja az Aillio Roast.World URL-t</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23615" />
-      <location filename="../artisanlib/main.py" line="23581" />
+      <location filename="../artisanlib/main.py" line="23744" />
+      <location filename="../artisanlib/main.py" line="23710" />
       <source>{0} imported</source>
       <translation>{0} importálva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23584" />
+      <location filename="../artisanlib/main.py" line="23713" />
       <source>an error occurred on importing {0}</source>
       <translation>hiba történt a(z) {0} importálásakor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23631" />
+      <location filename="../artisanlib/main.py" line="23760" />
       <source>Import Cropster XLS</source>
       <translation>Importálja a Cropster XLS-t</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23637" />
+      <location filename="../artisanlib/main.py" line="23766" />
       <source>Import RoastLog URL</source>
       <translation>RoastLog URL importálása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23643" />
+      <location filename="../artisanlib/main.py" line="23772" />
       <source>Import RoastPATH URL</source>
       <translation>RoastPATH URL importálása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23649" />
+      <location filename="../artisanlib/main.py" line="23778" />
       <source>Import Giesen CSV</source>
       <translation>Importálja a Giesen CSV-t</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23655" />
+      <location filename="../artisanlib/main.py" line="23784" />
       <source>Import Petroncini CSV</source>
       <translation>Importálja a Petroncini CSV-t</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23661" />
+      <location filename="../artisanlib/main.py" line="23790" />
       <source>Import IKAWA URL</source>
       <translation>Importálja az IKAWA URL-t</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23667" />
+      <location filename="../artisanlib/main.py" line="23796" />
       <source>Import IKAWA CSV</source>
       <translation>IKAWA CSV importálása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23673" />
+      <location filename="../artisanlib/main.py" line="23802" />
       <source>Import Loring CSV</source>
       <translation>Loring CSV importálása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23679" />
+      <location filename="../artisanlib/main.py" line="23808" />
       <source>Import Rubasse CSV</source>
       <translation>Importálja a Rubasse CSV-t</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23686" />
+      <location filename="../artisanlib/main.py" line="23815" />
       <source>Import HH506RA CSV</source>
       <translation>HH506RA CSV importálása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23735" />
+      <location filename="../artisanlib/main.py" line="23864" />
       <source>HH506RA file loaded successfully</source>
       <translation>A HH506RA fájl sikeresen betöltve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23822" />
+      <location filename="../artisanlib/main.py" line="23951" />
       <source>Save Graph as</source>
       <translation>Grafikon mentése másként</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23872" />
+      <location filename="../artisanlib/main.py" line="24001" />
       <source>{0}  size({1},{2}) saved</source>
       <translation>{0} méret ({1},{2}) mentve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23883" />
+      <location filename="../artisanlib/main.py" line="24012" />
       <source>Save Graph as PDF</source>
       <translation>Grafikon mentése PDF formátumban</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23885" />
+      <location filename="../artisanlib/main.py" line="24014" />
       <source>Save Graph as SVG</source>
       <translation>Graph mentése SVG-ként</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23903" />
+      <location filename="../artisanlib/main.py" line="24032" />
       <source>{0} saved</source>
       <translation>{0} mentve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23964" />
+      <location filename="../artisanlib/main.py" line="24093" />
       <source>Wheel {0} loaded</source>
       <translation>A(z) {0} kerék betöltve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23967" />
+      <location filename="../artisanlib/main.py" line="24096" />
       <source>Invalid Wheel graph format</source>
       <translation>Érvénytelen kerékdiagram formátum</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24207" />
+      <location filename="../artisanlib/main.py" line="24339" />
       <source>Buttons copied to Palette #</source>
       <translation>Gombok a palettára másolva #</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24262" />
+      <location filename="../artisanlib/main.py" line="24394" />
       <source>Palette #%i restored</source>
       <translation>A #%i paletta visszaállítva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24264" />
+      <location filename="../artisanlib/main.py" line="24396" />
       <source>Palette #%i empty</source>
       <translation>#%i paletta üres</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24289" />
+      <location filename="../artisanlib/main.py" line="24421" />
       <source>Save Palettes</source>
       <translation>Paletták mentése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24293" />
+      <location filename="../artisanlib/main.py" line="24425" />
       <source>Palettes saved</source>
       <translation>Paletták mentve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24425" />
+      <location filename="../artisanlib/main.py" line="24557" />
       <source>Palettes loaded</source>
       <translation>A paletták betöltve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24428" />
+      <location filename="../artisanlib/main.py" line="24560" />
       <source>Invalid palettes file format</source>
       <translation>Érvénytelen paletta fájlformátum</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24466" />
+      <location filename="../artisanlib/main.py" line="24598" />
       <source>Alarms loaded</source>
       <translation>Riasztások betöltve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24535" />
+      <location filename="../artisanlib/main.py" line="24667" />
       <source>Fitting curves...</source>
       <translation>Görbék illesztése...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24788" />
+      <location filename="../artisanlib/main.py" line="24920" />
       <source>Warning: The start of the analysis interval of interest is earlier than the start of curve fitting.
 Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
       <translation>Figyelmeztetés: Az érdeklődésre számot tartó elemzési intervallum kezdete korábbi, mint a görbeillesztés kezdete.
 Javítsa ki ezt a Config&gt;Curves&gt;Analysis fülön.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24789" />
+      <location filename="../artisanlib/main.py" line="24921" />
       <source>Analysis earlier than Curve fit</source>
       <translation>A görbe illesztésénél korábbi elemzés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25022" />
+      <location filename="../artisanlib/main.py" line="25154" />
       <source>Simulator stopped</source>
       <translation>A szimulátor leállt</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25315" />
+      <location filename="../artisanlib/main.py" line="25448" />
       <source>debug logging ON</source>
       <translation type="unfinished">hibakeresési naplózás BE</translation>
     </message>
@@ -16450,659 +16503,659 @@ Javítsa ki ezt a Config&gt;Curves&gt;Analysis fülön.</translation>
       <translation>Következő adag: számláló+1</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1830" />
+      <location filename="../artisanlib/devices.py" line="1842" />
       <source>Device table copied to clipboard</source>
       <translation>Az eszköztáblázat a vágólapra másolva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="2072" />
+      <location filename="../artisanlib/devices.py" line="2084" />
       <source>Overwrite existing ET and BT values?</source>
       <translation>Felülírja a meglévő ET és BT értékeket?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="2084" />
-      <location filename="../artisanlib/devices.py" line="2073" />
+      <location filename="../artisanlib/devices.py" line="2096" />
+      <location filename="../artisanlib/devices.py" line="2085" />
       <source>Caution - About to overwrite profile data</source>
       <translation>Figyelem – A profiladatok felülírására készül</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="2083" />
+      <location filename="../artisanlib/devices.py" line="2095" />
       <source>At least one Virtual Extra Device depends on ET or BT.  Do you want to update all the Virtual Extra Devices after ET and BT are updated?</source>
       <translation>Legalább egy virtuális extra eszköz függ ET-től vagy BT-től. Frissíteni szeretné az összes virtuális extra eszközt az ET és a BT frissítése után?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="2099" />
+      <location filename="../artisanlib/devices.py" line="2111" />
       <source>Symbolic values updated.</source>
       <translation>A szimbolikus értékek frissítve.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="2101" />
+      <location filename="../artisanlib/devices.py" line="2113" />
       <source>Symbolic values were not updated.</source>
       <translation>A szimbolikus értékek nem frissültek.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="2103" />
+      <location filename="../artisanlib/devices.py" line="2115" />
       <source>Nothing here to process.</source>
       <translation>Itt nincs mit feldolgozni.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="2244" />
+      <location filename="../artisanlib/devices.py" line="2256" />
       <source>Device not set</source>
       <translation>Az eszköz nincs beállítva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="2525" />
-      <location filename="../artisanlib/devices.py" line="2510" />
-      <location filename="../artisanlib/devices.py" line="2333" />
-      <location filename="../artisanlib/devices.py" line="2328" />
+      <location filename="../artisanlib/devices.py" line="2537" />
+      <location filename="../artisanlib/devices.py" line="2522" />
+      <location filename="../artisanlib/devices.py" line="2345" />
+      <location filename="../artisanlib/devices.py" line="2340" />
       <source>Device set to {0}. Now, check Serial Port settings</source>
       <translation>Az eszköz beállítva a következőre: {0}. Most ellenőrizze a soros port beállításait</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="2967" />
-      <location filename="../artisanlib/devices.py" line="2909" />
+      <location filename="../artisanlib/devices.py" line="2979" />
+      <location filename="../artisanlib/devices.py" line="2921" />
+      <location filename="../artisanlib/devices.py" line="2876" />
       <location filename="../artisanlib/devices.py" line="2864" />
-      <location filename="../artisanlib/devices.py" line="2852" />
-      <location filename="../artisanlib/devices.py" line="2772" />
-      <location filename="../artisanlib/devices.py" line="2729" />
-      <location filename="../artisanlib/devices.py" line="2687" />
+      <location filename="../artisanlib/devices.py" line="2784" />
+      <location filename="../artisanlib/devices.py" line="2741" />
+      <location filename="../artisanlib/devices.py" line="2699" />
+      <location filename="../artisanlib/devices.py" line="2689" />
       <location filename="../artisanlib/devices.py" line="2677" />
       <location filename="../artisanlib/devices.py" line="2665" />
-      <location filename="../artisanlib/devices.py" line="2653" />
-      <location filename="../artisanlib/devices.py" line="2598" />
-      <location filename="../artisanlib/devices.py" line="2489" />
-      <location filename="../artisanlib/devices.py" line="2399" />
-      <location filename="../artisanlib/devices.py" line="2372" />
-      <location filename="../artisanlib/devices.py" line="2363" />
-      <location filename="../artisanlib/devices.py" line="2354" />
-      <location filename="../artisanlib/devices.py" line="2344" />
+      <location filename="../artisanlib/devices.py" line="2610" />
+      <location filename="../artisanlib/devices.py" line="2501" />
+      <location filename="../artisanlib/devices.py" line="2411" />
+      <location filename="../artisanlib/devices.py" line="2384" />
+      <location filename="../artisanlib/devices.py" line="2375" />
+      <location filename="../artisanlib/devices.py" line="2366" />
+      <location filename="../artisanlib/devices.py" line="2356" />
       <source>Device set to {0}. Now, choose serial port</source>
       <translation>Az eszköz beállítva a következőre: {0}. Most válassza ki a soros portot</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="2381" />
+      <location filename="../artisanlib/devices.py" line="2393" />
       <source>Device set to CENTER 305, which is equivalent to CENTER 306. Now, choose serial port</source>
       <translation>Az eszköz CENTER 305-re van állítva, ami egyenértékű a CENTER 306-tal. Most válassza ki a soros portot</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="2435" />
-      <location filename="../artisanlib/devices.py" line="2390" />
+      <location filename="../artisanlib/devices.py" line="2447" />
+      <location filename="../artisanlib/devices.py" line="2402" />
       <source>Device set to {0}, which is equivalent to CENTER 309. Now, choose serial port</source>
       <translation>Az eszköz beállítása {0}, ami megfelel a CENTER 309-nek. Most válassza ki a soros portot</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="2462" />
-      <location filename="../artisanlib/devices.py" line="2453" />
-      <location filename="../artisanlib/devices.py" line="2426" />
-      <location filename="../artisanlib/devices.py" line="2417" />
-      <location filename="../artisanlib/devices.py" line="2408" />
+      <location filename="../artisanlib/devices.py" line="2474" />
+      <location filename="../artisanlib/devices.py" line="2465" />
+      <location filename="../artisanlib/devices.py" line="2438" />
+      <location filename="../artisanlib/devices.py" line="2429" />
+      <location filename="../artisanlib/devices.py" line="2420" />
       <source>Device set to {0}, which is equivalent to CENTER 303. Now, choose serial port</source>
       <translation>Az eszköz beállítása {0}, ami megfelel a CENTER 303-nak. Most válassza ki a soros portot</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="2444" />
+      <location filename="../artisanlib/devices.py" line="2456" />
       <source>Device set to {0}, which is equivalent to CENTER 306. Now, choose serial port</source>
       <translation>Az eszköz beállítása {0}, ami megfelel a CENTER 306-nak. Most válassza ki a soros portot</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="2471" />
+      <location filename="../artisanlib/devices.py" line="2483" />
       <source>Device set to {0}, which is equivalent to Omega HH506RA. Now, choose serial port</source>
       <translation>Az eszköz a következőre van állítva: {0}, ami egyenértékű az Omega HH506RA-val. Most válassza ki a soros portot</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="2568" />
-      <location filename="../artisanlib/devices.py" line="2480" />
+      <location filename="../artisanlib/devices.py" line="2580" />
+      <location filename="../artisanlib/devices.py" line="2492" />
       <source>Device set to {0}, which is equivalent to Omega HH806AU. Now, choose serial port</source>
       <translation>Az eszköz a következőre van állítva: {0}, ami egyenértékű az Omega HH806AU-val. Most válassza ki a soros portot</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="3058" />
-      <location filename="../artisanlib/devices.py" line="3041" />
-      <location filename="../artisanlib/devices.py" line="3026" />
+      <location filename="../artisanlib/devices.py" line="3070" />
+      <location filename="../artisanlib/devices.py" line="3053" />
+      <location filename="../artisanlib/devices.py" line="3038" />
+      <location filename="../artisanlib/devices.py" line="3032" />
       <location filename="../artisanlib/devices.py" line="3020" />
+      <location filename="../artisanlib/devices.py" line="3014" />
       <location filename="../artisanlib/devices.py" line="3008" />
       <location filename="../artisanlib/devices.py" line="3002" />
       <location filename="../artisanlib/devices.py" line="2996" />
       <location filename="../artisanlib/devices.py" line="2990" />
-      <location filename="../artisanlib/devices.py" line="2984" />
-      <location filename="../artisanlib/devices.py" line="2978" />
+      <location filename="../artisanlib/devices.py" line="2968" />
+      <location filename="../artisanlib/devices.py" line="2962" />
       <location filename="../artisanlib/devices.py" line="2956" />
       <location filename="../artisanlib/devices.py" line="2950" />
       <location filename="../artisanlib/devices.py" line="2944" />
       <location filename="../artisanlib/devices.py" line="2938" />
-      <location filename="../artisanlib/devices.py" line="2932" />
-      <location filename="../artisanlib/devices.py" line="2926" />
-      <location filename="../artisanlib/devices.py" line="2891" />
-      <location filename="../artisanlib/devices.py" line="2882" />
-      <location filename="../artisanlib/devices.py" line="2878" />
-      <location filename="../artisanlib/devices.py" line="2874" />
+      <location filename="../artisanlib/devices.py" line="2903" />
+      <location filename="../artisanlib/devices.py" line="2894" />
+      <location filename="../artisanlib/devices.py" line="2890" />
+      <location filename="../artisanlib/devices.py" line="2886" />
+      <location filename="../artisanlib/devices.py" line="2855" />
+      <location filename="../artisanlib/devices.py" line="2849" />
       <location filename="../artisanlib/devices.py" line="2843" />
       <location filename="../artisanlib/devices.py" line="2837" />
       <location filename="../artisanlib/devices.py" line="2831" />
       <location filename="../artisanlib/devices.py" line="2825" />
       <location filename="../artisanlib/devices.py" line="2819" />
-      <location filename="../artisanlib/devices.py" line="2813" />
       <location filename="../artisanlib/devices.py" line="2807" />
-      <location filename="../artisanlib/devices.py" line="2795" />
-      <location filename="../artisanlib/devices.py" line="2780" />
-      <location filename="../artisanlib/devices.py" line="2755" />
-      <location filename="../artisanlib/devices.py" line="2751" />
-      <location filename="../artisanlib/devices.py" line="2738" />
-      <location filename="../artisanlib/devices.py" line="2734" />
-      <location filename="../artisanlib/devices.py" line="2709" />
-      <location filename="../artisanlib/devices.py" line="2705" />
-      <location filename="../artisanlib/devices.py" line="2701" />
-      <location filename="../artisanlib/devices.py" line="2691" />
+      <location filename="../artisanlib/devices.py" line="2792" />
+      <location filename="../artisanlib/devices.py" line="2767" />
+      <location filename="../artisanlib/devices.py" line="2763" />
+      <location filename="../artisanlib/devices.py" line="2750" />
+      <location filename="../artisanlib/devices.py" line="2746" />
+      <location filename="../artisanlib/devices.py" line="2721" />
+      <location filename="../artisanlib/devices.py" line="2717" />
+      <location filename="../artisanlib/devices.py" line="2713" />
+      <location filename="../artisanlib/devices.py" line="2703" />
+      <location filename="../artisanlib/devices.py" line="2656" />
       <location filename="../artisanlib/devices.py" line="2644" />
+      <location filename="../artisanlib/devices.py" line="2635" />
       <location filename="../artisanlib/devices.py" line="2632" />
-      <location filename="../artisanlib/devices.py" line="2623" />
-      <location filename="../artisanlib/devices.py" line="2620" />
-      <location filename="../artisanlib/devices.py" line="2617" />
-      <location filename="../artisanlib/devices.py" line="2602" />
-      <location filename="../artisanlib/devices.py" line="2586" />
-      <location filename="../artisanlib/devices.py" line="2577" />
-      <location filename="../artisanlib/devices.py" line="2493" />
+      <location filename="../artisanlib/devices.py" line="2629" />
+      <location filename="../artisanlib/devices.py" line="2614" />
+      <location filename="../artisanlib/devices.py" line="2598" />
+      <location filename="../artisanlib/devices.py" line="2589" />
+      <location filename="../artisanlib/devices.py" line="2505" />
       <source>Device set to {0}</source>
       <translation>Eszköz beállítva a következőre: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="2498" />
+      <location filename="../artisanlib/devices.py" line="2510" />
       <source>Device set to {0}{1}</source>
       <translation>Az eszköz beállítva a következőre: {0}{1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="2550" />
+      <location filename="../artisanlib/devices.py" line="2562" />
       <source>Device set to {0}. Now, choose Modbus serial port or IP address</source>
       <translation>Az eszköz beállítva a következőre: {0}. Most válassza a Modbus soros portot vagy IP-címet</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="2559" />
+      <location filename="../artisanlib/devices.py" line="2571" />
       <source>Device set to {0}, which is equivalent to CENTER 302. Now, choose serial port</source>
       <translation>Az eszköz beállítása {0}, ami egyenértékű a CENTER 302-vel. Most válassza ki a soros portot</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2242" />
+      <location filename="../artisanlib/canvas.py" line="2244" />
       <source>set y-coordinate to {}</source>
       <translation>állítsa be az y-koordinátát a következőre: {}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2701" />
+      <location filename="../artisanlib/canvas.py" line="2703" />
       <source>seconds before FCs</source>
       <translation>másodperccel az FCs előtt</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2704" />
+      <location filename="../artisanlib/canvas.py" line="2706" />
       <source>seconds after FCs</source>
       <translation>másodperccel az FC-k után</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="3144" />
+      <location filename="../artisanlib/canvas.py" line="3146" />
       <source>Alarm notice</source>
       <translation>Figyelmeztetés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="4845" />
+      <location filename="../artisanlib/canvas.py" line="4851" />
       <source>Alarm is calling: {0}</source>
       <translation>Riasztó hív: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="4847" />
+      <location filename="../artisanlib/canvas.py" line="4853" />
       <source>Calling alarm failed on {0}</source>
       <translation>Az ébresztő hívása sikertelen ekkor: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="4857" />
+      <location filename="../artisanlib/canvas.py" line="4863" />
       <source>Alarm trigger button error, description '{0}' not a number</source>
       <translation>A riasztás indítógombjának hibája, a leírás „{0}” nem szám</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="4886" />
+      <location filename="../artisanlib/canvas.py" line="4892" />
       <source>Alarm trigger slider error, description '{0}' not a valid number [0-100]</source>
       <translation>Riasztási trigger csúszka hiba, a leírás '{0}' nem érvényes szám [0-100]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="4969" />
+      <location filename="../artisanlib/canvas.py" line="4975" />
       <source>Alarm trigger SV slider error, description '{0}' not a valid number</source>
       <translation>Riasztási trigger SV csúszka hiba, a leírás „{0}” nem érvényes szám</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="5003" />
+      <location filename="../artisanlib/canvas.py" line="5009" />
       <source>Alarm {0} triggered</source>
       <translation>{0} riasztás aktiválva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="6266" />
-      <location filename="../artisanlib/canvas.py" line="6263" />
+      <location filename="../artisanlib/canvas.py" line="6272" />
+      <location filename="../artisanlib/canvas.py" line="6269" />
       <source>Save profile?</source>
       <translation>Profil mentése?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="6268" />
+      <location filename="../artisanlib/canvas.py" line="6274" />
       <source>Profile unsaved</source>
       <translation>A profil mentése visszavonva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="6407" />
+      <location filename="../artisanlib/canvas.py" line="6413" />
       <source>Scope has been reset</source>
       <translation>A hatókör visszaállításra került</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10159" />
+      <location filename="../artisanlib/canvas.py" line="10167" />
       <source>Load Image File</source>
       <translation>Képfájl betöltése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10166" />
+      <location filename="../artisanlib/canvas.py" line="10174" />
       <source>Loaded watermark image {0}</source>
       <translation>Betöltött vízjel kép {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10169" />
+      <location filename="../artisanlib/canvas.py" line="10177" />
       <source>Unable to load watermark image {0}</source>
       <translation>Nem sikerült betölteni a vízjelképet ({0})</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10581" />
+      <location filename="../artisanlib/canvas.py" line="10589" />
       <source>Convert profile data to Fahrenheit?</source>
       <translation>Átalakítja a profiladatokat Fahrenheit formátumra?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10694" />
-      <location filename="../artisanlib/canvas.py" line="10642" />
-      <location filename="../artisanlib/canvas.py" line="10632" />
-      <location filename="../artisanlib/canvas.py" line="10582" />
+      <location filename="../artisanlib/canvas.py" line="10702" />
+      <location filename="../artisanlib/canvas.py" line="10650" />
+      <location filename="../artisanlib/canvas.py" line="10640" />
+      <location filename="../artisanlib/canvas.py" line="10590" />
       <source>Convert Profile Temperature</source>
       <translation>Profil hőmérsékletének konvertálása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10629" />
+      <location filename="../artisanlib/canvas.py" line="10637" />
       <source>Profile changed to Fahrenheit</source>
       <translation>A profil Fahrenheit-re módosult</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10633" />
+      <location filename="../artisanlib/canvas.py" line="10641" />
       <source>Unable to comply. You already are in Fahrenheit</source>
       <translation>Képtelen megfelelni. Már Fahrenheitben vagy</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10696" />
-      <location filename="../artisanlib/canvas.py" line="10634" />
+      <location filename="../artisanlib/canvas.py" line="10704" />
+      <location filename="../artisanlib/canvas.py" line="10642" />
       <source>Profile not changed</source>
       <translation>A profil nem változott</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10641" />
+      <location filename="../artisanlib/canvas.py" line="10649" />
       <source>Convert profile data to Celsius?</source>
       <translation>Átalakítja a profiladatokat Celsius-fokra?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10691" />
+      <location filename="../artisanlib/canvas.py" line="10699" />
       <source>Profile changed to Celsius</source>
       <translation>A profil Celsius-ra változott</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10695" />
+      <location filename="../artisanlib/canvas.py" line="10703" />
       <source>Unable to comply. You already are in Celsius</source>
       <translation>Képtelen megfelelni. Már Celsiusban vagy</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10703" />
+      <location filename="../artisanlib/canvas.py" line="10711" />
       <source>Convert Profile Scale</source>
       <translation>Profil skála konvertálása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10704" />
+      <location filename="../artisanlib/canvas.py" line="10712" />
       <source>No profile data found</source>
       <translation>Nem található profiladat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10731" />
-      <location filename="../artisanlib/canvas.py" line="10715" />
+      <location filename="../artisanlib/canvas.py" line="10739" />
+      <location filename="../artisanlib/canvas.py" line="10723" />
       <source>Colors set to defaults</source>
       <translation>A színek alapértelmezettre vannak állítva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10719" />
+      <location filename="../artisanlib/canvas.py" line="10727" />
       <source>Colors set to Default Theme</source>
       <translation>A színek alapértelmezett témára vannak állítva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10735" />
+      <location filename="../artisanlib/canvas.py" line="10743" />
       <source>Colors set to grey</source>
       <translation>A színek szürkére állítva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/cup_profile.py" line="185" />
-      <location filename="../artisanlib/canvas.py" line="10924" />
+      <location filename="../artisanlib/cup_profile.py" line="188" />
+      <location filename="../artisanlib/canvas.py" line="10932" />
       <source>Background does not match number of labels</source>
       <translation>A háttér nem egyezik a címkék számával</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11122" />
+      <location filename="../artisanlib/canvas.py" line="11130" />
       <source>Phidget service discovery started...</source>
       <translation>A Phidget szolgáltatás felfedezése elindult...</translation>
     </message>
     <message>
+      <location filename="../artisanlib/canvas.py" line="11337" />
       <location filename="../artisanlib/canvas.py" line="11332" />
-      <location filename="../artisanlib/canvas.py" line="11327" />
-      <location filename="../artisanlib/canvas.py" line="11304" />
+      <location filename="../artisanlib/canvas.py" line="11309" />
       <source>{} connected</source>
       <translation>{} csatlakoztatva</translation>
     </message>
     <message>
+      <location filename="../artisanlib/canvas.py" line="11338" />
       <location filename="../artisanlib/canvas.py" line="11333" />
-      <location filename="../artisanlib/canvas.py" line="11328" />
-      <location filename="../artisanlib/canvas.py" line="11305" />
+      <location filename="../artisanlib/canvas.py" line="11310" />
       <source>{} disconnected</source>
       <translation>{} megszakadt</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11336" />
+      <location filename="../artisanlib/canvas.py" line="11341" />
       <source>scanning for device</source>
       <translation>eszköz keresése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11352" />
+      <location filename="../artisanlib/canvas.py" line="11357" />
       <source>Scope monitoring...</source>
       <translation>Hatókör figyelése...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11495" />
+      <location filename="../artisanlib/canvas.py" line="11476" />
       <source>Scope stopped</source>
       <translation>Scope megállt</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11598" />
+      <location filename="../artisanlib/canvas.py" line="11619" />
       <source>Humidity: {}%</source>
       <translation>Páratartalom: {}%</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11606" />
+      <location filename="../artisanlib/canvas.py" line="11627" />
       <source>Temperature: {}{}</source>
       <translation>Hőfok: {}{}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11612" />
+      <location filename="../artisanlib/canvas.py" line="11633" />
       <source>Pressure: {}hPa</source>
       <translation>Nyomás: {}hPa</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11900" />
+      <location filename="../artisanlib/canvas.py" line="11921" />
       <source>Scope recording...</source>
       <translation>Hatókör felvétel...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11989" />
+      <location filename="../artisanlib/canvas.py" line="12011" />
       <source>Scope recording stopped</source>
       <translation>A Scope felvétel leállt</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12111" />
+      <location filename="../artisanlib/canvas.py" line="12133" />
       <source>Not enough data collected yet. Try again in a few seconds</source>
       <translation>Még nincs elég adat gyűjtve. Próbálja újra néhány másodperc múlva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12169" />
+      <location filename="../artisanlib/canvas.py" line="12191" />
       <source>CHARGE: Scope is not recording</source>
       <translation>CHARGE: A Scope nem rögzít</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12195" />
+      <location filename="../artisanlib/canvas.py" line="12217" />
       <source>Roast time starts now 00:00 BT = {0}</source>
       <translation>A sütési idő most kezdődik 00:00 BT = {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12231" />
+      <location filename="../artisanlib/canvas.py" line="12253" />
       <source>[TP] recorded at {0} BT = {1}</source>
       <translation>[TP] rögzítve: {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12317" />
+      <location filename="../artisanlib/canvas.py" line="12340" />
       <source>DRY END: Scope is not recording</source>
       <translation>DRY END: A Scope nem rögzít</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12354" />
+      <location filename="../artisanlib/canvas.py" line="12377" />
       <source>[DRY END] recorded at {0} BT = {1}</source>
       <translation>[SZÁRAZ VÉGE] rögzítve: {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12434" />
+      <location filename="../artisanlib/canvas.py" line="12457" />
       <source>FC START: Scope is not recording</source>
       <translation>FC START: A Scope nem rögzít</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12473" />
+      <location filename="../artisanlib/canvas.py" line="12496" />
       <source>[FC START] recorded at {0} BT = {1}</source>
       <translation>[FC START] rögzítve: {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12544" />
+      <location filename="../artisanlib/canvas.py" line="12567" />
       <source>FC END: Scope is not recording</source>
       <translation>FC END: A Scope nem rögzít</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12586" />
+      <location filename="../artisanlib/canvas.py" line="12609" />
       <source>[FC END] recorded at {0} BT = {1}</source>
       <translation>[FC END] rögzítve: {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12655" />
+      <location filename="../artisanlib/canvas.py" line="12678" />
       <source>SC START: Scope is not recording</source>
       <translation>SC START: A Scope nem rögzít</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12704" />
+      <location filename="../artisanlib/canvas.py" line="12727" />
       <source>[SC START] recorded at {0} BT = {1}</source>
       <translation>[SC START] rögzítve: {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12773" />
+      <location filename="../artisanlib/canvas.py" line="12796" />
       <source>SC END: Scope is not recording</source>
       <translation>SC END: A Scope nem rögzít</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12821" />
+      <location filename="../artisanlib/canvas.py" line="12844" />
       <source>[SC END] recorded at {0} BT = {1}</source>
       <translation>[SC END] rögzítve: {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12936" />
+      <location filename="../artisanlib/canvas.py" line="12959" />
       <source>DROP: Scope is not recording</source>
       <translation>DROP: A Scope nem rögzít</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12990" />
+      <location filename="../artisanlib/canvas.py" line="13013" />
       <source>Roast ended at {0} BT = {1}</source>
       <translation>A sütés vége: {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13076" />
+      <location filename="../artisanlib/canvas.py" line="13099" />
       <source>COOL: Scope is not recording</source>
       <translation>COOL: A Scope nem rögzít</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13126" />
+      <location filename="../artisanlib/canvas.py" line="13149" />
       <source>[COOL END] recorded at {0} BT = {1}</source>
       <translation>[COOL END] rögzítve: {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13468" />
+      <location filename="../artisanlib/canvas.py" line="13491" />
       <source>Event # {0} recorded at BT = {1} Time = {2}</source>
       <translation>{0}. számú esemény rögzítve BT = {1} Idő = {2}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13488" />
+      <location filename="../artisanlib/canvas.py" line="13511" />
       <source>Timer is OFF</source>
       <translation>Az időzítő KI</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13521" />
+      <location filename="../artisanlib/canvas.py" line="13544" />
       <source>Computer Event # {0} recorded at BT = {1} Time = {2}</source>
       <translation>Számítógépes esemény # {0} rögzítve BT = {1} Idő = {2}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14480" />
+      <location filename="../artisanlib/canvas.py" line="14503" />
       <source>Unable to move background</source>
       <translation>A háttér nem mozgatható</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14538" />
+      <location filename="../artisanlib/canvas.py" line="14561" />
       <source>No finished profile found</source>
       <translation>Nem található kész profil</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14555" />
+      <location filename="../artisanlib/canvas.py" line="14578" />
       <source>Polynomial coefficients (Horner form):</source>
       <translation>Polinom együtthatók (Horner alak):</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14557" />
+      <location filename="../artisanlib/canvas.py" line="14580" />
       <source>Knots:</source>
       <translation>Csomók:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14559" />
+      <location filename="../artisanlib/canvas.py" line="14582" />
       <source>Residual:</source>
       <translation>Maradó:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14561" />
+      <location filename="../artisanlib/canvas.py" line="14584" />
       <source>Roots:</source>
       <translation>Gyökerek:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14564" />
+      <location filename="../artisanlib/canvas.py" line="14587" />
       <source>Profile information</source>
       <translation>Profil információ</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14988" />
+      <location filename="../artisanlib/canvas.py" line="15011" />
       <source>Designer Start</source>
       <translation>Tervező Start</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14989" />
+      <location filename="../artisanlib/canvas.py" line="15012" />
       <source>Importing a profile in to Designer will decimate all data except the main [points].
 Continue?</source>
       <translation>Ha egy profilt importál a Designerbe, az összes adatot megtizedeli, kivéve a fő [pontokat].
 Folytatni?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15031" />
+      <location filename="../artisanlib/canvas.py" line="15054" />
       <source>Save Points</source>
       <translation>Mentse pontokat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15041" />
+      <location filename="../artisanlib/canvas.py" line="15064" />
       <source>Points saved</source>
       <translation>Mentett pontok</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15051" />
+      <location filename="../artisanlib/canvas.py" line="15074" />
       <source>Load Points</source>
       <translation>Betöltési pontok</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15064" />
+      <location filename="../artisanlib/canvas.py" line="15087" />
       <source>Points loaded</source>
       <translation>Pontok betöltve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15134" />
+      <location filename="../artisanlib/canvas.py" line="15157" />
       <source>Designer Init</source>
       <translation>Tervező Init</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15135" />
+      <location filename="../artisanlib/canvas.py" line="15158" />
       <source>Unable to start designer.
 Profile missing [CHARGE] or [DROP]</source>
       <translation>Nem sikerült elindítani a tervezőt.
 Hiányzik a profilból [CHARGE] vagy [DROP]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15670" />
+      <location filename="../artisanlib/canvas.py" line="15701" />
       <source>[ CHARGE ]</source>
       <translation>[ FELTÖLTÉS ]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15673" />
+      <location filename="../artisanlib/canvas.py" line="15704" />
       <source>[ DRY END ]</source>
       <translation>[ SZÁRAZ VÉGE ]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15676" />
+      <location filename="../artisanlib/canvas.py" line="15707" />
       <source>[ FC START ]</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15679" />
+      <location filename="../artisanlib/canvas.py" line="15710" />
       <source>[ FC END ]</source>
       <translation>[ FC VÉGE ]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15682" />
+      <location filename="../artisanlib/canvas.py" line="15713" />
       <source>[ SC START ]</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15685" />
+      <location filename="../artisanlib/canvas.py" line="15716" />
       <source>[ SC END ]</source>
       <translation>[ SC VÉGE ]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15688" />
+      <location filename="../artisanlib/canvas.py" line="15719" />
       <source>[ DROP ]</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15691" />
+      <location filename="../artisanlib/canvas.py" line="15722" />
       <source>[ COOL ]</source>
       <translation>[ MENŐ ]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15990" />
+      <location filename="../artisanlib/canvas.py" line="16021" />
       <source>New profile created</source>
       <translation>Új profil létrehozva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16186" />
+      <location filename="../artisanlib/canvas.py" line="16217" />
       <source> added to cupping notes</source>
       <translation> hozzáadva a köpölyözéshez</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16197" />
+      <location filename="../artisanlib/canvas.py" line="16228" />
       <source> added to roasting notes</source>
       <translation> pörkölési jegyzetekhez adva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16458" />
+      <location filename="../artisanlib/canvas.py" line="16489" />
       <source>Mouse Cross ON: move mouse around</source>
       <translation>Egérkereszt BE: mozgassa az egeret</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16488" />
+      <location filename="../artisanlib/canvas.py" line="16519" />
       <source>Mouse cross OFF</source>
       <translation>Egérkereszt KI</translation>
     </message>
     <message>
-      <location filename="../artisanlib/colors.py" line="1010" />
-      <location filename="../artisanlib/colors.py" line="902" />
+      <location filename="../artisanlib/colors.py" line="1013" />
+      <location filename="../artisanlib/colors.py" line="905" />
       <source>Color of {0} set to {1}</source>
       <translation>{0} színe beállítva erre: {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/colors.py" line="911" />
+      <location filename="../artisanlib/colors.py" line="914" />
       <source>Config LCD colors</source>
       <translation>Konfigurálja az LCD színeit</translation>
     </message>
     <message>
-      <location filename="../artisanlib/colors.py" line="912" />
+      <location filename="../artisanlib/colors.py" line="915" />
       <source>LCD digits color and background color cannot be the same.</source>
       <translation>Az LCD számjegyeinek színe és háttérszíne nem lehet azonos.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/cup_profile.py" line="181" />
+      <location filename="../artisanlib/cup_profile.py" line="184" />
       <source>Background profile not found</source>
       <translation>Háttérprofil nem található</translation>
     </message>
@@ -17206,52 +17259,52 @@ Hiányzik a profilból [CHARGE] vagy [DROP]</translation>
   <context>
     <name>Plus</name>
     <message>
-      <location filename="../artisanlib/main.py" line="1155" />
+      <location filename="../artisanlib/main.py" line="1156" />
       <source>debug logging ON</source>
       <translation>hibakeresési naplózás BE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1156" />
+      <location filename="../artisanlib/main.py" line="1157" />
       <source>debug logging OFF</source>
       <translation>hibakeresési naplózás KI</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1169" />
+      <location filename="../artisanlib/main.py" line="1170" />
       <source>1 day left</source>
       <translation>1 nap maradt</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1171" />
+      <location filename="../artisanlib/main.py" line="1172" />
       <source>{} days left</source>
       <translation>{} nap van hátra</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1173" />
+      <location filename="../artisanlib/main.py" line="1174" />
       <source>Paid until</source>
       <translation>Addig fizetett</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1200" />
+      <location filename="../artisanlib/main.py" line="1201" />
       <source>Please visit our {0}shop{1} to extend your subscription</source>
       <translation>Kérjük, látogassa meg {0} üzletünket {1} előfizetésének meghosszabbításához</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1214" />
+      <location filename="../artisanlib/main.py" line="1215" />
       <source>Do you want to extend your subscription?</source>
       <translation>Szeretné meghosszabbítani előfizetését?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1215" />
+      <location filename="../artisanlib/main.py" line="1216" />
       <source>Your subscription ends on</source>
       <translation>Előfizetése ekkor lejár</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="1215" />
+      <location filename="../artisanlib/main.py" line="1216" />
       <source>Your subscription ended on</source>
       <translation>Előfizetése lejárt</translation>
     </message>
     <message>
-      <location filename="../plus/queue.py" line="367" />
+      <location filename="../plus/queue.py" line="365" />
       <source>Queuing roast for upload to artisan.plus</source>
       <translation>Sorban sült feltöltés az artisan.plus webhelyre</translation>
     </message>
@@ -17348,17 +17401,17 @@ Hiányzik a profilból [CHARGE] vagy [DROP]</translation>
       <translation>Jelszó visszaállítása</translation>
     </message>
     <message>
-      <location filename="../plus/login.py" line="128" />
+      <location filename="../plus/login.py" line="135" />
       <source>Password</source>
       <translation>Jelszó</translation>
     </message>
     <message>
-      <location filename="../plus/login.py" line="133" />
+      <location filename="../plus/login.py" line="140" />
       <source>Email</source>
       <translation />
     </message>
     <message>
-      <location filename="../plus/login.py" line="142" />
+      <location filename="../plus/login.py" line="149" />
       <source>Remember</source>
       <translation>Emlékezik</translation>
     </message>
@@ -17423,67 +17476,67 @@ Hiányzik a profilból [CHARGE] vagy [DROP]</translation>
   <context>
     <name>Scope Annotation</name>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12139" />
-      <location filename="../artisanlib/canvas.py" line="12071" />
-      <location filename="../artisanlib/canvas.py" line="10360" />
-      <location filename="../artisanlib/canvas.py" line="7115" />
-      <location filename="../artisanlib/canvas.py" line="7110" />
+      <location filename="../artisanlib/canvas.py" line="12161" />
+      <location filename="../artisanlib/canvas.py" line="12093" />
+      <location filename="../artisanlib/canvas.py" line="10368" />
+      <location filename="../artisanlib/canvas.py" line="7121" />
+      <location filename="../artisanlib/canvas.py" line="7116" />
       <source>CHARGE</source>
       <translation>TÖLTÉS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12221" />
-      <location filename="../artisanlib/canvas.py" line="7141" />
-      <location filename="../artisanlib/canvas.py" line="7129" />
+      <location filename="../artisanlib/canvas.py" line="12243" />
+      <location filename="../artisanlib/canvas.py" line="7147" />
+      <location filename="../artisanlib/canvas.py" line="7135" />
       <source>TP {0}</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12301" />
-      <location filename="../artisanlib/canvas.py" line="12266" />
-      <location filename="../artisanlib/canvas.py" line="7155" />
+      <location filename="../artisanlib/canvas.py" line="12324" />
+      <location filename="../artisanlib/canvas.py" line="12289" />
+      <location filename="../artisanlib/canvas.py" line="7161" />
       <source>DE {0}</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12420" />
-      <location filename="../artisanlib/canvas.py" line="12385" />
-      <location filename="../artisanlib/canvas.py" line="7170" />
+      <location filename="../artisanlib/canvas.py" line="12443" />
+      <location filename="../artisanlib/canvas.py" line="12408" />
+      <location filename="../artisanlib/canvas.py" line="7176" />
       <source>FCs {0}</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12532" />
-      <location filename="../artisanlib/canvas.py" line="12500" />
-      <location filename="../artisanlib/canvas.py" line="7184" />
+      <location filename="../artisanlib/canvas.py" line="12555" />
+      <location filename="../artisanlib/canvas.py" line="12523" />
+      <location filename="../artisanlib/canvas.py" line="7190" />
       <source>FCe {0}</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12643" />
-      <location filename="../artisanlib/canvas.py" line="12612" />
-      <location filename="../artisanlib/canvas.py" line="7201" />
+      <location filename="../artisanlib/canvas.py" line="12666" />
+      <location filename="../artisanlib/canvas.py" line="12635" />
+      <location filename="../artisanlib/canvas.py" line="7207" />
       <source>SCs {0}</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12761" />
-      <location filename="../artisanlib/canvas.py" line="12730" />
-      <location filename="../artisanlib/canvas.py" line="7215" />
+      <location filename="../artisanlib/canvas.py" line="12784" />
+      <location filename="../artisanlib/canvas.py" line="12753" />
+      <location filename="../artisanlib/canvas.py" line="7221" />
       <source>SCe {0}</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12889" />
-      <location filename="../artisanlib/canvas.py" line="12849" />
-      <location filename="../artisanlib/canvas.py" line="10358" />
-      <location filename="../artisanlib/canvas.py" line="7244" />
+      <location filename="../artisanlib/canvas.py" line="12912" />
+      <location filename="../artisanlib/canvas.py" line="12872" />
+      <location filename="../artisanlib/canvas.py" line="10366" />
+      <location filename="../artisanlib/canvas.py" line="7250" />
       <source>DROP {0}</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13063" />
-      <location filename="../artisanlib/canvas.py" line="13029" />
+      <location filename="../artisanlib/canvas.py" line="13086" />
+      <location filename="../artisanlib/canvas.py" line="13052" />
       <source>CE {0}</source>
       <translation type="unfinished" />
     </message>
@@ -17515,16 +17568,16 @@ Hiányzik a profilból [CHARGE] vagy [DROP]</translation>
   <context>
     <name>Scope Title</name>
     <message>
-      <location filename="../artisanlib/canvas.py" line="10205" />
-      <location filename="../artisanlib/canvas.py" line="7580" />
-      <location filename="../artisanlib/canvas.py" line="6455" />
-      <location filename="../artisanlib/canvas.py" line="1094" />
-      <location filename="../artisanlib/main.py" line="14105" />
-      <location filename="../artisanlib/main.py" line="11240" />
-      <location filename="../artisanlib/roast_properties.py" line="2440" />
-      <location filename="../artisanlib/roast_properties.py" line="2412" />
-      <location filename="../artisanlib/roast_properties.py" line="2068" />
-      <location filename="../artisanlib/roast_properties.py" line="2055" />
+      <location filename="../artisanlib/canvas.py" line="10213" />
+      <location filename="../artisanlib/canvas.py" line="7587" />
+      <location filename="../artisanlib/canvas.py" line="6461" />
+      <location filename="../artisanlib/canvas.py" line="1095" />
+      <location filename="../artisanlib/main.py" line="14225" />
+      <location filename="../artisanlib/main.py" line="11348" />
+      <location filename="../artisanlib/roast_properties.py" line="2447" />
+      <location filename="../artisanlib/roast_properties.py" line="2419" />
+      <location filename="../artisanlib/roast_properties.py" line="2075" />
+      <location filename="../artisanlib/roast_properties.py" line="2062" />
       <source>Roaster Scope</source>
       <translation type="unfinished" />
     </message>
@@ -17539,339 +17592,339 @@ Hiányzik a profilból [CHARGE] vagy [DROP]</translation>
   <context>
     <name>StatusBar</name>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1075" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1083" />
       <source>Decimal position successfully set to 1</source>
       <translation>A tizedes pozíciót sikeresen 1-re állította be</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1078" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1086" />
       <source>Problem setting decimal position</source>
       <translation>Probléma a tizedespont beállításával</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1132" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1140" />
       <source>Thermocouple type successfully set</source>
       <translation>A hőelem típusa sikeresen beállítva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1135" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1143" />
       <source>Problem setting thermocouple type</source>
       <translation>Probléma a hőelem típusának beállításával</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2038" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1232" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2048" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1240" />
       <source>Ready</source>
       <translation>Kész</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3835" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1592" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3845" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1600" />
       <source>setting autotune...</source>
       <translation>automatikus hangolás beállítása...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3862" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1604" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3872" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1612" />
       <source>Autotune successfully turned OFF</source>
       <translation>Az automatikus hangolás sikeresen kikapcsolva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3865" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1607" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3875" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1615" />
       <source>Autotune successfully turned ON</source>
       <translation>Az automatikus hangolás sikeresen bekapcsolva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3792" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1625" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3802" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1633" />
       <source>wait...</source>
       <translation>várjon...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1629" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1637" />
       <source>PID OFF</source>
       <translation type="unfinished">PID KI</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="1334" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1631" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1639" />
       <source>PID ON</source>
       <translation type="unfinished">PID BE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1659" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1649" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1667" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1657" />
       <source>SV successfully set to {0}</source>
       <translation>Az SV sikeresen beállítva erre: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1670" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1678" />
       <source>Empty SV box</source>
       <translation>Üres SV doboz</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1680" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1688" />
       <source>Unable to read SV</source>
       <translation>Az SV nem olvasható</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3706" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1821" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3716" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1829" />
       <source>Ramp/Soak operation cancelled</source>
       <translation>A rámpa/áztatási művelet megszakítva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3709" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1824" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3719" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1832" />
       <source>No RX data</source>
       <translation>Nincs RX adat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3727" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3710" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1847" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1825" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3737" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3720" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1855" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1833" />
       <source>RS ON</source>
       <translation>RS BE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3715" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1835" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3725" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1843" />
       <source>Need to change pattern mode...</source>
       <translation>Módosítani kell a minta módot...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3718" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1838" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3728" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1846" />
       <source>Pattern has been changed. Wait 5 secs.</source>
       <translation>A minta megváltozott. Várjon 5 másodpercet.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3720" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1840" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3730" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1848" />
       <source>Pattern could not be changed</source>
       <translation>A minta nem módosítható</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3749" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1864" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3759" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1872" />
       <source>RampSoak could not be changed</source>
       <translation>A RampSoak nem módosítható</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3752" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1871" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3762" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1879" />
       <source>RS OFF</source>
       <translation>RS KI</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3811" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1878" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3821" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1886" />
       <source>Reading Ramp/Soak {0} ...</source>
       <translation>Olvasási rámpa/áztatás {0}...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3816" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1883" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3826" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1891" />
       <source>problem reading Ramp/Soak</source>
       <translation>olvasási probléma Rámp/Soak</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3819" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1886" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3829" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1894" />
       <source>Finished reading Ramp/Soak val.</source>
       <translation>Befejezett olvasás Ramp/Soak val.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1923" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1931" />
       <source>Finished reading pid values</source>
       <translation>A pid értékek beolvasása befejeződött</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="4000" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2020" />
+      <location filename="../artisanlib/pid_dialogs.py" line="4012" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2030" />
       <source>Ramp/Soak successfully written</source>
       <translation>A rámpa/áztatás sikeresen megírva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2823" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2833" />
       <source>Time Units successfully set to MM:SS</source>
       <translation>Az időegységek sikeresen beállítva MM:SS értékre</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2826" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2836" />
       <source>Problem setting time units</source>
       <translation>Probléma az időegységek beállításával</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2991" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3001" />
       <source>SV{0} set to {1}</source>
       <translation>SV{0} beállítva erre: {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2995" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3005" />
       <source>Problem setting SV</source>
       <translation>Hiba történt az SV beállításával</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2997" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3007" />
       <source>Cancelled svN change</source>
       <translation>Az svN módosítás visszavonva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3015" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3025" />
       <source>PID already using sv{0}</source>
       <translation>A PID már sv-t használ{0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3018" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3028" />
       <source>setNsv(): bad response</source>
       <translation>setNsv(): rossz válasz</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3072" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3082" />
       <source>pid changed to {0}</source>
       <translation>pid módosítva erre: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3075" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3085" />
       <source>setNpid(): bad confirmation</source>
       <translation>setNpid(): rossz megerősítés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3079" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3089" />
       <source>Cancelled pid change</source>
       <translation>Törölt pid változás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3104" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3114" />
       <source>PID was already using pid {0}</source>
       <translation>A PID már használta a következőt: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3107" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3117" />
       <source>setNpid(): Unable to set pid {0} </source>
       <translation>setNpid(): Nem állítható be a pid {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3228" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3221" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3214" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3207" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3200" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3193" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3186" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3238" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3231" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3224" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3217" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3210" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3203" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3196" />
       <source>SV{0} successfully set to {1}</source>
       <translation>Az SV{0} sikeresen beállítva erre: {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3239" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3249" />
       <source>setsv(): Unable to set SV</source>
       <translation>setsv(): Nem lehet beállítani az SV-t</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="365" />
       <location filename="../artisanlib/pid_control.py" line="320" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3374" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3366" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3358" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3350" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3342" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3334" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3326" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3384" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3376" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3368" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3360" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3352" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3344" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3336" />
       <source>pid #{0} successfully set to ({1},{2},{3})</source>
       <translation>pid #{0} sikeresen beállítva erre: ({1},{2},{3})</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="372" />
       <location filename="../artisanlib/pid_control.py" line="327" />
-      <location filename="../artisanlib/pid_dialogs.py" line="3382" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3392" />
       <source>pid command failed. Bad data at pid{0} (8,8,8): ({1},{2},{3}) </source>
       <translation>pid parancs nem sikerült. Hibás adatok a pid{0} (8,8,8): ({1},{2},{3})</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3397" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3407" />
       <source>sending commands for p{0} i{1} d{2}</source>
       <translation>parancsok küldése a következőhöz: p{0} i{1} d{2}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3467" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3477" />
       <source>getallpid(): Unable to read pid values</source>
       <translation>getallpid(): A pid értékek nem olvashatók</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3495" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3505" />
       <source>PID is using pid = {0}</source>
       <translation>A PID a következőt használja: pid = {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3498" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3508" />
       <source>getallpid(): Unable to read current sv</source>
       <translation>getallpid(): Az aktuális sv nem olvasható</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3568" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3578" />
       <source>PID is using SV = {0}</source>
       <translation>A PID SV-t használ = {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3796" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3806" />
       <source>PID set to OFF</source>
       <translation>A PID OFF állásban van</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3798" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3808" />
       <source>PID set to ON</source>
       <translation>A PID BE állásba van állítva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3801" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3811" />
       <source>Unable</source>
       <translation>Képtelen</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3802" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3812" />
       <source>No data received</source>
       <translation>Nem érkezett adat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3844" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3854" />
       <source>Current pid = {0}. Proceed with autotune command?</source>
       <translation>Jelenlegi pid = {0}. Folytatja az autotune paranccsal?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3848" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3858" />
       <source>Autotune cancelled</source>
       <translation>Az automatikus hangolás megszakítva</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3867" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3877" />
       <source>UNABLE to set Autotune</source>
       <translation>NEM LEHET beállítani az automatikus hangolást</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3923" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3933" />
       <source>SV</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3924" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3934" />
       <source>Ramp (MM:SS)</source>
       <translation>Rámpa (MM:SS)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="3925" />
+      <location filename="../artisanlib/pid_dialogs.py" line="3935" />
       <source>Soak (MM:SS)</source>
       <translation>Áztatás (MM:SS)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="4017" />
+      <location filename="../artisanlib/pid_dialogs.py" line="4029" />
       <source>Work in Progress</source>
       <translation>Munka folyamatban</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="4053" />
+      <location filename="../artisanlib/pid_dialogs.py" line="4065" />
       <source>SV =</source>
       <translation type="unfinished" />
     </message>
@@ -17904,8 +17957,8 @@ Hiányzik a profilból [CHARGE] vagy [DROP]</translation>
   <context>
     <name>Tab</name>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2631" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1494" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2641" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1502" />
       <location filename="../artisanlib/pid_dialogs.py" line="552" />
       <source>PID</source>
       <translation type="unfinished" />
@@ -17916,213 +17969,213 @@ Hiányzik a profilból [CHARGE] vagy [DROP]</translation>
       <translation>Rámpa / áztatás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2625" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1480" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2635" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1488" />
       <location filename="../artisanlib/pid_dialogs.py" line="665" />
       <source>RS</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2628" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1483" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2638" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1491" />
       <source>SV</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="2634" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1497" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2644" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1505" />
       <source>Set RS</source>
       <translation type="unfinished">RS beállítása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1602" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2637" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1500" />
+      <location filename="../artisanlib/ports.py" line="1605" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2647" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1508" />
       <source>Extra</source>
       <translation>Külön</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="4034" />
+      <location filename="../artisanlib/pid_dialogs.py" line="4046" />
       <source>General</source>
       <translation>Általános</translation>
     </message>
     <message>
       <location filename="../artisanlib/background.py" line="428" />
-      <location filename="../artisanlib/events.py" line="1549" />
+      <location filename="../artisanlib/events.py" line="1558" />
       <source>Config</source>
       <translation type="unfinished">Konfiguráció</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1555" />
+      <location filename="../artisanlib/events.py" line="1564" />
       <source>Buttons</source>
       <translation type="unfinished">Gombok</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1560" />
+      <location filename="../artisanlib/events.py" line="1569" />
       <source>Sliders</source>
       <translation type="unfinished">Csúszkák</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1563" />
+      <location filename="../artisanlib/events.py" line="1572" />
       <source>Quantifiers</source>
       <translation>Kvantifikátorok</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1566" />
+      <location filename="../artisanlib/events.py" line="1575" />
       <source>Palettes</source>
       <translation type="unfinished">Paletták</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1572" />
+      <location filename="../artisanlib/events.py" line="1581" />
       <source>Style</source>
       <translation type="unfinished">Stílus</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1575" />
+      <location filename="../artisanlib/events.py" line="1584" />
       <source>Annotations</source>
       <translation>Megjegyzések</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1359" />
-      <location filename="../artisanlib/ports.py" line="1599" />
+      <location filename="../artisanlib/devices.py" line="1363" />
+      <location filename="../artisanlib/ports.py" line="1602" />
       <source>ET/BT</source>
       <translation>ET / BT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1605" />
+      <location filename="../artisanlib/ports.py" line="1608" />
       <source>Modbus</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1608" />
+      <location filename="../artisanlib/ports.py" line="1611" />
       <source>S7</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1611" />
+      <location filename="../artisanlib/ports.py" line="1614" />
       <source>Scale</source>
       <translation type="unfinished">Skála</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1614" />
+      <location filename="../artisanlib/ports.py" line="1617" />
       <source>Color</source>
       <translation type="unfinished">Szín</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1617" />
+      <location filename="../artisanlib/ports.py" line="1620" />
       <source>WebSocket</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1550" />
+      <location filename="../artisanlib/roast_properties.py" line="1557" />
       <location filename="../artisanlib/background.py" line="431" />
       <source>Events</source>
       <translation type="unfinished">Események</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1553" />
+      <location filename="../artisanlib/roast_properties.py" line="1560" />
       <location filename="../artisanlib/background.py" line="434" />
       <source>Data</source>
       <translation type="unfinished">Adat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1544" />
+      <location filename="../artisanlib/roast_properties.py" line="1551" />
       <source>Roast</source>
       <translation type="unfinished">Pörkölés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1547" />
+      <location filename="../artisanlib/roast_properties.py" line="1554" />
       <source>Notes</source>
       <translation type="unfinished">Jegyzetek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1555" />
+      <location filename="../artisanlib/roast_properties.py" line="1562" />
       <source>Energy</source>
       <translation>Energia</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1557" />
+      <location filename="../artisanlib/roast_properties.py" line="1564" />
       <source>Setup</source>
       <translation>Beállít</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="2719" />
+      <location filename="../artisanlib/roast_properties.py" line="2728" />
       <source>Details</source>
       <translation>Részletek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="2720" />
+      <location filename="../artisanlib/roast_properties.py" line="2729" />
       <source>Loads</source>
       <translation>Terhelések</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="2721" />
+      <location filename="../artisanlib/roast_properties.py" line="2730" />
       <source>Protocol</source>
       <translation>Jegyzőkönyv</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="564" />
-      <location filename="../artisanlib/curves.py" line="1181" />
+      <location filename="../artisanlib/curves.py" line="1195" />
       <source>Graph</source>
       <translation type="unfinished">Grafikon</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1324" />
+      <location filename="../artisanlib/curves.py" line="1338" />
       <source>RoR</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1330" />
+      <location filename="../artisanlib/curves.py" line="1344" />
       <source>Filters</source>
       <translation>Szűrők</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1336" />
+      <location filename="../artisanlib/curves.py" line="1350" />
       <source>Plotter</source>
       <translation type="unfinished">Rajzoló</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1342" />
+      <location filename="../artisanlib/curves.py" line="1356" />
       <source>Math</source>
       <translation type="unfinished">Matek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1348" />
+      <location filename="../artisanlib/curves.py" line="1362" />
       <source>Analyze</source>
       <translation>Elemezze</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1354" />
+      <location filename="../artisanlib/curves.py" line="1368" />
       <source>UI</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="223" />
+      <location filename="../artisanlib/alarms.py" line="224" />
       <source>Alarm Table</source>
       <translation>Riasztási táblázat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="231" />
+      <location filename="../artisanlib/alarms.py" line="232" />
       <source>Alarm Sets</source>
       <translation>Riasztási szettek</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1362" />
+      <location filename="../artisanlib/devices.py" line="1366" />
       <source>Extra Devices</source>
       <translation type="unfinished">Extra Eszközök</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1365" />
+      <location filename="../artisanlib/devices.py" line="1369" />
       <source>Symb ET/BT</source>
       <translation type="unfinished">Szimbólikus KÖRNY. HŐ/BAB HŐ</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1374" />
+      <location filename="../artisanlib/devices.py" line="1378" />
       <source>Ambient</source>
       <translation>Környező</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1377" />
+      <location filename="../artisanlib/devices.py" line="1381" />
       <source>Networks</source>
       <translation>Hálózatok</translation>
     </message>
@@ -18148,81 +18201,81 @@ Hiányzik a profilból [CHARGE] vagy [DROP]</translation>
   <context>
     <name>Table</name>
     <message>
-      <location filename="../artisanlib/cup_profile.py" line="148" />
-      <location filename="../artisanlib/events.py" line="2364" />
-      <location filename="../artisanlib/wheels.py" line="198" />
+      <location filename="../artisanlib/cup_profile.py" line="150" />
+      <location filename="../artisanlib/events.py" line="2377" />
+      <location filename="../artisanlib/wheels.py" line="209" />
       <source>Label</source>
       <translation>Címke</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="199" />
+      <location filename="../artisanlib/wheels.py" line="210" />
       <source>Parent</source>
       <translation>Szülő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="200" />
+      <location filename="../artisanlib/wheels.py" line="211" />
       <source>Width</source>
       <translation>Szélesség</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2371" />
-      <location filename="../artisanlib/wheels.py" line="418" />
-      <location filename="../artisanlib/wheels.py" line="201" />
+      <location filename="../artisanlib/events.py" line="2384" />
+      <location filename="../artisanlib/wheels.py" line="431" />
+      <location filename="../artisanlib/wheels.py" line="212" />
       <source>Color</source>
       <translation type="unfinished">Szín</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="202" />
+      <location filename="../artisanlib/wheels.py" line="213" />
       <source>Opaqueness</source>
       <translation>Átlátszatlanság</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="410" />
+      <location filename="../artisanlib/wheels.py" line="423" />
       <source>Delete Wheel</source>
       <translation>Kerék törlése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="411" />
+      <location filename="../artisanlib/wheels.py" line="424" />
       <source>Edit Labels</source>
       <translation>Címkék szerkesztése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="412" />
+      <location filename="../artisanlib/wheels.py" line="425" />
       <source>Update Labels</source>
       <translation>Címkék frissítése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="413" />
+      <location filename="../artisanlib/wheels.py" line="426" />
       <source>Properties</source>
       <translation>Tulajdonságok</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="414" />
+      <location filename="../artisanlib/wheels.py" line="427" />
       <source>Radius</source>
       <translation>Sugár</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="415" />
+      <location filename="../artisanlib/wheels.py" line="428" />
       <source>Starting angle</source>
       <translation>Indítási szög</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="416" />
+      <location filename="../artisanlib/wheels.py" line="429" />
       <source>Projection</source>
       <translation>Kivetítés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="417" />
+      <location filename="../artisanlib/wheels.py" line="430" />
       <source>Text Size</source>
       <translation>Szövegméret</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="419" />
+      <location filename="../artisanlib/wheels.py" line="432" />
       <source>Color Pattern</source>
       <translation>Színminta</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1946" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1954" />
       <location filename="../artisanlib/pid_dialogs.py" line="576" />
       <location filename="../artisanlib/pid_dialogs.py" line="424" />
       <source>SV</source>
@@ -18241,406 +18294,406 @@ Hiányzik a profilból [CHARGE] vagy [DROP]</translation>
       <translation>Áztatás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="978" />
-      <location filename="../artisanlib/events.py" line="2368" />
+      <location filename="../artisanlib/alarms.py" line="996" />
+      <location filename="../artisanlib/events.py" line="2381" />
       <location filename="../artisanlib/pid_dialogs.py" line="579" />
       <location filename="../artisanlib/pid_dialogs.py" line="427" />
       <source>Action</source>
       <translation>Akció</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="979" />
+      <location filename="../artisanlib/alarms.py" line="997" />
       <location filename="../artisanlib/pid_dialogs.py" line="580" />
       <location filename="../artisanlib/pid_dialogs.py" line="428" />
       <source>Beep</source>
       <translation type="unfinished">Hangjelzés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="980" />
-      <location filename="../artisanlib/roast_properties.py" line="4061" />
+      <location filename="../artisanlib/alarms.py" line="998" />
+      <location filename="../artisanlib/roast_properties.py" line="4101" />
       <location filename="../artisanlib/background.py" line="767" />
-      <location filename="../artisanlib/events.py" line="3527" />
-      <location filename="../artisanlib/events.py" line="2365" />
+      <location filename="../artisanlib/events.py" line="3565" />
+      <location filename="../artisanlib/events.py" line="2378" />
       <location filename="../artisanlib/pid_dialogs.py" line="581" />
       <location filename="../artisanlib/pid_dialogs.py" line="429" />
       <source>Description</source>
       <translation>Leírás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1947" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1955" />
       <source>Ramp HH:MM</source>
       <translation>Rámpa ÓÓ: MM</translation>
     </message>
     <message>
-      <location filename="../artisanlib/pid_dialogs.py" line="1948" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1956" />
       <source>Soak HH:MM</source>
       <translation>Áztassa HH: MM</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="4062" />
+      <location filename="../artisanlib/roast_properties.py" line="4102" />
       <location filename="../artisanlib/background.py" line="768" />
-      <location filename="../artisanlib/events.py" line="3529" />
-      <location filename="../artisanlib/events.py" line="2366" />
+      <location filename="../artisanlib/events.py" line="3567" />
+      <location filename="../artisanlib/events.py" line="2379" />
       <source>Type</source>
       <translation type="unfinished">Típus</translation>
     </message>
     <message>
-      <location filename="../artisanlib/cup_profile.py" line="149" />
-      <location filename="../artisanlib/alarms.py" line="977" />
-      <location filename="../artisanlib/roast_properties.py" line="4063" />
+      <location filename="../artisanlib/cup_profile.py" line="151" />
+      <location filename="../artisanlib/alarms.py" line="995" />
+      <location filename="../artisanlib/roast_properties.py" line="4103" />
       <location filename="../artisanlib/background.py" line="769" />
-      <location filename="../artisanlib/events.py" line="3535" />
-      <location filename="../artisanlib/events.py" line="2367" />
+      <location filename="../artisanlib/events.py" line="3573" />
+      <location filename="../artisanlib/events.py" line="2380" />
       <source>Value</source>
       <translation type="unfinished">Érték</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2369" />
+      <location filename="../artisanlib/events.py" line="2382" />
       <source>Documentation</source>
       <translation type="unfinished">Leírás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2370" />
+      <location filename="../artisanlib/events.py" line="2383" />
       <source>Visibility</source>
       <translation>Láthatóság</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="2372" />
+      <location filename="../artisanlib/events.py" line="2385" />
       <source>Text Color</source>
       <translation>Szöveg szín</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1531" />
-      <location filename="../artisanlib/ports.py" line="1710" />
+      <location filename="../artisanlib/devices.py" line="1535" />
+      <location filename="../artisanlib/ports.py" line="1713" />
       <source>Device</source>
       <translation>Eszköz</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1711" />
+      <location filename="../artisanlib/ports.py" line="1714" />
       <source>Comm Port</source>
       <translation type="unfinished">Kommunikációs port</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1712" />
+      <location filename="../artisanlib/ports.py" line="1715" />
       <source>Baud Rate</source>
       <translation>Átviteli sebesség</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1713" />
+      <location filename="../artisanlib/ports.py" line="1716" />
       <source>Byte Size</source>
       <translation>Bájtméret</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1714" />
+      <location filename="../artisanlib/ports.py" line="1717" />
       <source>Parity</source>
       <translation>Paritás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1715" />
+      <location filename="../artisanlib/ports.py" line="1718" />
       <source>Stopbits</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1716" />
+      <location filename="../artisanlib/ports.py" line="1719" />
       <source>Timeout</source>
       <translation>Időtúllépés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/transposer.py" line="182" />
-      <location filename="../artisanlib/alarms.py" line="974" />
-      <location filename="../artisanlib/curves.py" line="132" />
-      <location filename="../artisanlib/roast_properties.py" line="4058" />
-      <location filename="../artisanlib/roast_properties.py" line="3918" />
-      <location filename="../artisanlib/background.py" line="833" />
+      <location filename="../artisanlib/transposer.py" line="184" />
+      <location filename="../artisanlib/alarms.py" line="992" />
+      <location filename="../artisanlib/curves.py" line="133" />
+      <location filename="../artisanlib/roast_properties.py" line="4098" />
+      <location filename="../artisanlib/roast_properties.py" line="3951" />
+      <location filename="../artisanlib/background.py" line="836" />
       <location filename="../artisanlib/background.py" line="764" />
       <source>Time</source>
       <translation type="unfinished">Idő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="4059" />
-      <location filename="../artisanlib/roast_properties.py" line="3919" />
-      <location filename="../artisanlib/background.py" line="836" />
-      <location filename="../artisanlib/background.py" line="834" />
+      <location filename="../artisanlib/roast_properties.py" line="4099" />
+      <location filename="../artisanlib/roast_properties.py" line="3952" />
+      <location filename="../artisanlib/background.py" line="839" />
+      <location filename="../artisanlib/background.py" line="837" />
       <location filename="../artisanlib/background.py" line="765" />
       <source>ET</source>
       <translation type="unfinished">KÖRNY. HŐ</translation>
     </message>
     <message>
-      <location filename="../artisanlib/transposer.py" line="184" />
-      <location filename="../artisanlib/roast_properties.py" line="4060" />
-      <location filename="../artisanlib/roast_properties.py" line="3920" />
-      <location filename="../artisanlib/background.py" line="837" />
-      <location filename="../artisanlib/background.py" line="835" />
+      <location filename="../artisanlib/transposer.py" line="186" />
+      <location filename="../artisanlib/roast_properties.py" line="4100" />
+      <location filename="../artisanlib/roast_properties.py" line="3953" />
+      <location filename="../artisanlib/background.py" line="840" />
+      <location filename="../artisanlib/background.py" line="838" />
       <location filename="../artisanlib/background.py" line="766" />
       <source>BT</source>
       <translation type="unfinished">BAB HŐ</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="2025" />
-      <location filename="../artisanlib/roast_properties.py" line="3994" />
-      <location filename="../artisanlib/background.py" line="900" />
+      <location filename="../artisanlib/curves.py" line="2041" />
+      <location filename="../artisanlib/roast_properties.py" line="4034" />
+      <location filename="../artisanlib/background.py" line="907" />
       <source>CHARGE</source>
       <translation type="unfinished">TÖLTÉS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="2027" />
-      <location filename="../artisanlib/roast_properties.py" line="3997" />
-      <location filename="../artisanlib/background.py" line="903" />
+      <location filename="../artisanlib/curves.py" line="2043" />
+      <location filename="../artisanlib/roast_properties.py" line="4037" />
+      <location filename="../artisanlib/background.py" line="910" />
       <source>DRY END</source>
       <translation type="unfinished">SZÁRÍTÁS VÉGE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="2028" />
-      <location filename="../artisanlib/roast_properties.py" line="4000" />
-      <location filename="../artisanlib/background.py" line="906" />
+      <location filename="../artisanlib/curves.py" line="2044" />
+      <location filename="../artisanlib/roast_properties.py" line="4040" />
+      <location filename="../artisanlib/background.py" line="913" />
       <source>FC START</source>
       <translation type="unfinished">FC KEZD</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="2029" />
-      <location filename="../artisanlib/roast_properties.py" line="4003" />
-      <location filename="../artisanlib/background.py" line="909" />
+      <location filename="../artisanlib/curves.py" line="2045" />
+      <location filename="../artisanlib/roast_properties.py" line="4043" />
+      <location filename="../artisanlib/background.py" line="916" />
       <source>FC END</source>
       <translation type="unfinished">FC VÉGE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="2030" />
-      <location filename="../artisanlib/roast_properties.py" line="4006" />
-      <location filename="../artisanlib/background.py" line="912" />
+      <location filename="../artisanlib/curves.py" line="2046" />
+      <location filename="../artisanlib/roast_properties.py" line="4046" />
+      <location filename="../artisanlib/background.py" line="919" />
       <source>SC START</source>
       <translation type="unfinished">SC KEZD</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="2031" />
-      <location filename="../artisanlib/roast_properties.py" line="4009" />
-      <location filename="../artisanlib/background.py" line="915" />
+      <location filename="../artisanlib/curves.py" line="2047" />
+      <location filename="../artisanlib/roast_properties.py" line="4049" />
+      <location filename="../artisanlib/background.py" line="922" />
       <source>SC END</source>
       <translation type="unfinished">SC VÉGE</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="2032" />
-      <location filename="../artisanlib/roast_properties.py" line="4012" />
-      <location filename="../artisanlib/background.py" line="918" />
+      <location filename="../artisanlib/curves.py" line="2048" />
+      <location filename="../artisanlib/roast_properties.py" line="4052" />
+      <location filename="../artisanlib/background.py" line="925" />
       <source>DROP</source>
       <translation type="unfinished">ÜRÍTÉS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="2033" />
-      <location filename="../artisanlib/roast_properties.py" line="4015" />
-      <location filename="../artisanlib/background.py" line="921" />
+      <location filename="../artisanlib/curves.py" line="2049" />
+      <location filename="../artisanlib/roast_properties.py" line="4055" />
+      <location filename="../artisanlib/background.py" line="928" />
       <source>COOL</source>
       <translation type="unfinished">HŰTÉS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="3985" />
-      <location filename="../artisanlib/background.py" line="925" />
+      <location filename="../artisanlib/roast_properties.py" line="4020" />
+      <location filename="../artisanlib/background.py" line="932" />
       <source>#{0} {1}{2}</source>
       <translation># {0} {1} {2}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="2728" />
+      <location filename="../artisanlib/roast_properties.py" line="2739" />
       <source>Power</source>
       <translation type="unfinished">Fűtés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="2729" />
+      <location filename="../artisanlib/roast_properties.py" line="2742" />
       <source>Duration</source>
       <translation>Időtartam</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="2731" />
+      <location filename="../artisanlib/roast_properties.py" line="2748" />
       <source>CO2</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="2732" />
+      <location filename="../artisanlib/roast_properties.py" line="2751" />
       <source>Load</source>
       <translation type="unfinished">Megnyitás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="975" />
-      <location filename="../artisanlib/roast_properties.py" line="2733" />
+      <location filename="../artisanlib/alarms.py" line="993" />
+      <location filename="../artisanlib/roast_properties.py" line="2754" />
       <source>Source</source>
       <translation>Forrás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="2734" />
+      <location filename="../artisanlib/roast_properties.py" line="2757" />
       <source>Kind</source>
       <translation>Kedves</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="5271" />
+      <location filename="../artisanlib/roast_properties.py" line="5323" />
       <source>Name</source>
       <translation>Név</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="5272" />
+      <location filename="../artisanlib/roast_properties.py" line="5324" />
       <source>Weight</source>
       <translation>Súly</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="131" />
+      <location filename="../artisanlib/curves.py" line="132" />
       <source>t</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="133" />
+      <location filename="../artisanlib/curves.py" line="134" />
       <source>P1</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="134" />
+      <location filename="../artisanlib/curves.py" line="135" />
       <source>P2</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="135" />
+      <location filename="../artisanlib/curves.py" line="136" />
       <source>P3</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="136" />
+      <location filename="../artisanlib/curves.py" line="137" />
       <source>P4</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="137" />
+      <location filename="../artisanlib/curves.py" line="138" />
       <source>P5</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="138" />
+      <location filename="../artisanlib/curves.py" line="139" />
       <source>P6</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="139" />
+      <location filename="../artisanlib/curves.py" line="140" />
       <source>P7</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="140" />
+      <location filename="../artisanlib/curves.py" line="141" />
       <source>P8</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="141" />
+      <location filename="../artisanlib/curves.py" line="142" />
       <source>P9</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="969" />
+      <location filename="../artisanlib/alarms.py" line="987" />
       <source>Nr</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="970" />
+      <location filename="../artisanlib/alarms.py" line="988" />
       <source>Status</source>
       <translation>Állapot</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="971" />
+      <location filename="../artisanlib/alarms.py" line="989" />
       <source>If Alarm</source>
       <translation>Ha Riasztás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="972" />
+      <location filename="../artisanlib/alarms.py" line="990" />
       <source>But Not</source>
       <translation>De nem</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="973" />
+      <location filename="../artisanlib/alarms.py" line="991" />
       <source>From</source>
       <translation>Tól től</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="976" />
+      <location filename="../artisanlib/alarms.py" line="994" />
       <source>Condition</source>
       <translation>Feltétel</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1532" />
+      <location filename="../artisanlib/devices.py" line="1536" />
       <source>Color 1</source>
       <translation>1. szín</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1533" />
+      <location filename="../artisanlib/devices.py" line="1537" />
       <source>Color 2</source>
       <translation>2. szín</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1534" />
+      <location filename="../artisanlib/devices.py" line="1538" />
       <source>Label 1</source>
       <translation>1. címke</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1535" />
+      <location filename="../artisanlib/devices.py" line="1539" />
       <source>Label 2</source>
       <translation>2. címke</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1536" />
+      <location filename="../artisanlib/devices.py" line="1540" />
       <source>y1(x)</source>
       <translation>y1 (x)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1537" />
+      <location filename="../artisanlib/devices.py" line="1541" />
       <source>y2(x)</source>
       <translation>y2 (x)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1538" />
+      <location filename="../artisanlib/devices.py" line="1542" />
       <source>LCD 1</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1539" />
+      <location filename="../artisanlib/devices.py" line="1543" />
       <source>LCD 2</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1540" />
+      <location filename="../artisanlib/devices.py" line="1544" />
       <source>Curve 1</source>
       <translation>1. görbe</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1541" />
+      <location filename="../artisanlib/devices.py" line="1545" />
       <source>Curve 2</source>
       <translation>2. görbe</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1544" />
+      <location filename="../artisanlib/devices.py" line="1548" />
       <source>Fill 1</source>
       <translation>1</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1545" />
+      <location filename="../artisanlib/devices.py" line="1549" />
       <source>Fill 2</source>
       <translation>2. kitöltés</translation>
     </message>
     <message>
-      <location filename="../artisanlib/transposer.py" line="180" />
+      <location filename="../artisanlib/transposer.py" line="182" />
       <source>Phases</source>
       <translation>Fázisok</translation>
     </message>
     <message>
-      <location filename="../artisanlib/transposer.py" line="1142" />
-      <location filename="../artisanlib/transposer.py" line="1076" />
-      <location filename="../artisanlib/transposer.py" line="981" />
+      <location filename="../artisanlib/transposer.py" line="1161" />
+      <location filename="../artisanlib/transposer.py" line="1090" />
+      <location filename="../artisanlib/transposer.py" line="990" />
       <source>Profile</source>
       <translation>Profil</translation>
     </message>
     <message>
-      <location filename="../artisanlib/transposer.py" line="1143" />
-      <location filename="../artisanlib/transposer.py" line="1077" />
-      <location filename="../artisanlib/transposer.py" line="982" />
+      <location filename="../artisanlib/transposer.py" line="1162" />
+      <location filename="../artisanlib/transposer.py" line="1091" />
+      <location filename="../artisanlib/transposer.py" line="991" />
       <source>Target</source>
       <translation>Cél</translation>
     </message>
     <message>
-      <location filename="../artisanlib/transposer.py" line="1144" />
-      <location filename="../artisanlib/transposer.py" line="1078" />
-      <location filename="../artisanlib/transposer.py" line="983" />
+      <location filename="../artisanlib/transposer.py" line="1163" />
+      <location filename="../artisanlib/transposer.py" line="1092" />
+      <location filename="../artisanlib/transposer.py" line="992" />
       <source>Result</source>
       <translation>Eredmény</translation>
     </message>
@@ -18668,216 +18721,216 @@ Hiányzik a profilból [CHARGE] vagy [DROP]</translation>
   <context>
     <name>Textbox</name>
     <message>
+      <location filename="../artisanlib/canvas.py" line="452" />
+      <location filename="../artisanlib/canvas.py" line="442" />
+      <location filename="../artisanlib/canvas.py" line="433" />
+      <location filename="../artisanlib/canvas.py" line="426" />
+      <location filename="../artisanlib/canvas.py" line="418" />
+      <location filename="../artisanlib/canvas.py" line="415" />
+      <location filename="../artisanlib/canvas.py" line="394" />
+      <location filename="../artisanlib/canvas.py" line="382" />
+      <location filename="../artisanlib/canvas.py" line="371" />
+      <location filename="../artisanlib/canvas.py" line="336" />
+      <source>Acidity</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
       <location filename="../artisanlib/canvas.py" line="451" />
-      <location filename="../artisanlib/canvas.py" line="441" />
-      <location filename="../artisanlib/canvas.py" line="432" />
-      <location filename="../artisanlib/canvas.py" line="425" />
-      <location filename="../artisanlib/canvas.py" line="417" />
-      <location filename="../artisanlib/canvas.py" line="414" />
-      <location filename="../artisanlib/canvas.py" line="393" />
+      <location filename="../artisanlib/canvas.py" line="429" />
+      <location filename="../artisanlib/canvas.py" line="421" />
+      <location filename="../artisanlib/canvas.py" line="413" />
+      <location filename="../artisanlib/canvas.py" line="396" />
       <location filename="../artisanlib/canvas.py" line="381" />
       <location filename="../artisanlib/canvas.py" line="370" />
-      <location filename="../artisanlib/canvas.py" line="335" />
-      <source>Acidity</source>
+      <location filename="../artisanlib/canvas.py" line="337" />
+      <source>Aftertaste</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="401" />
+      <location filename="../artisanlib/canvas.py" line="387" />
+      <location filename="../artisanlib/canvas.py" line="375" />
+      <location filename="../artisanlib/canvas.py" line="338" />
+      <source>Clean Cup</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="339" />
+      <source>Head</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="440" />
+      <location filename="../artisanlib/canvas.py" line="409" />
+      <location filename="../artisanlib/canvas.py" line="340" />
+      <source>Fragrance</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="455" />
+      <location filename="../artisanlib/canvas.py" line="454" />
+      <location filename="../artisanlib/canvas.py" line="432" />
+      <location filename="../artisanlib/canvas.py" line="402" />
+      <location filename="../artisanlib/canvas.py" line="388" />
+      <location filename="../artisanlib/canvas.py" line="376" />
+      <location filename="../artisanlib/canvas.py" line="341" />
+      <source>Sweetness</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="449" />
+      <location filename="../artisanlib/canvas.py" line="425" />
+      <location filename="../artisanlib/canvas.py" line="410" />
+      <location filename="../artisanlib/canvas.py" line="392" />
+      <location filename="../artisanlib/canvas.py" line="342" />
+      <source>Aroma</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="457" />
+      <location filename="../artisanlib/canvas.py" line="456" />
+      <location filename="../artisanlib/canvas.py" line="447" />
+      <location filename="../artisanlib/canvas.py" line="430" />
+      <location filename="../artisanlib/canvas.py" line="422" />
+      <location filename="../artisanlib/canvas.py" line="386" />
+      <location filename="../artisanlib/canvas.py" line="374" />
+      <location filename="../artisanlib/canvas.py" line="343" />
+      <source>Balance</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="453" />
+      <location filename="../artisanlib/canvas.py" line="441" />
+      <location filename="../artisanlib/canvas.py" line="434" />
+      <location filename="../artisanlib/canvas.py" line="420" />
+      <location filename="../artisanlib/canvas.py" line="414" />
+      <location filename="../artisanlib/canvas.py" line="404" />
+      <location filename="../artisanlib/canvas.py" line="395" />
+      <location filename="../artisanlib/canvas.py" line="384" />
+      <location filename="../artisanlib/canvas.py" line="372" />
+      <location filename="../artisanlib/canvas.py" line="344" />
+      <source>Body</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="417" />
+      <location filename="../artisanlib/canvas.py" line="379" />
+      <location filename="../artisanlib/canvas.py" line="368" />
+      <source>Fragrance-Aroma</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="419" />
+      <location filename="../artisanlib/canvas.py" line="405" />
+      <location filename="../artisanlib/canvas.py" line="393" />
+      <location filename="../artisanlib/canvas.py" line="380" />
+      <location filename="../artisanlib/canvas.py" line="369" />
+      <source>Flavor</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="399" />
+      <location filename="../artisanlib/canvas.py" line="385" />
+      <location filename="../artisanlib/canvas.py" line="373" />
+      <source>Uniformity</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="458" />
+      <location filename="../artisanlib/canvas.py" line="389" />
+      <location filename="../artisanlib/canvas.py" line="377" />
+      <source>Overall</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="383" />
+      <source>Intensity</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="391" />
+      <source>Fragance</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="398" />
+      <source>Dry Fragrance</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="400" />
+      <source>Complexity</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="435" />
+      <location filename="../artisanlib/canvas.py" line="403" />
+      <source>Finish</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="406" />
+      <source>Brightness</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="407" />
+      <source>Wet Aroma</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="411" />
+      <source>Taste</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="412" />
+      <source>Nose</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="427" />
+      <source>Mouthfeel</source>
       <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="450" />
       <location filename="../artisanlib/canvas.py" line="428" />
-      <location filename="../artisanlib/canvas.py" line="420" />
-      <location filename="../artisanlib/canvas.py" line="412" />
-      <location filename="../artisanlib/canvas.py" line="395" />
-      <location filename="../artisanlib/canvas.py" line="380" />
-      <location filename="../artisanlib/canvas.py" line="369" />
-      <location filename="../artisanlib/canvas.py" line="336" />
-      <source>Aftertaste</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="400" />
-      <location filename="../artisanlib/canvas.py" line="386" />
-      <location filename="../artisanlib/canvas.py" line="374" />
-      <location filename="../artisanlib/canvas.py" line="337" />
-      <source>Clean Cup</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="338" />
-      <source>Head</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="439" />
-      <location filename="../artisanlib/canvas.py" line="408" />
-      <location filename="../artisanlib/canvas.py" line="339" />
-      <source>Fragrance</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="454" />
-      <location filename="../artisanlib/canvas.py" line="453" />
-      <location filename="../artisanlib/canvas.py" line="431" />
-      <location filename="../artisanlib/canvas.py" line="401" />
-      <location filename="../artisanlib/canvas.py" line="387" />
-      <location filename="../artisanlib/canvas.py" line="375" />
-      <location filename="../artisanlib/canvas.py" line="340" />
-      <source>Sweetness</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="448" />
-      <location filename="../artisanlib/canvas.py" line="424" />
-      <location filename="../artisanlib/canvas.py" line="409" />
-      <location filename="../artisanlib/canvas.py" line="391" />
-      <location filename="../artisanlib/canvas.py" line="341" />
-      <source>Aroma</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="456" />
-      <location filename="../artisanlib/canvas.py" line="455" />
-      <location filename="../artisanlib/canvas.py" line="446" />
-      <location filename="../artisanlib/canvas.py" line="429" />
-      <location filename="../artisanlib/canvas.py" line="421" />
-      <location filename="../artisanlib/canvas.py" line="385" />
-      <location filename="../artisanlib/canvas.py" line="373" />
-      <location filename="../artisanlib/canvas.py" line="342" />
-      <source>Balance</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="452" />
-      <location filename="../artisanlib/canvas.py" line="440" />
-      <location filename="../artisanlib/canvas.py" line="433" />
-      <location filename="../artisanlib/canvas.py" line="419" />
-      <location filename="../artisanlib/canvas.py" line="413" />
-      <location filename="../artisanlib/canvas.py" line="403" />
-      <location filename="../artisanlib/canvas.py" line="394" />
-      <location filename="../artisanlib/canvas.py" line="383" />
-      <location filename="../artisanlib/canvas.py" line="371" />
-      <location filename="../artisanlib/canvas.py" line="343" />
-      <source>Body</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="416" />
-      <location filename="../artisanlib/canvas.py" line="378" />
-      <location filename="../artisanlib/canvas.py" line="367" />
-      <source>Fragrance-Aroma</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="418" />
-      <location filename="../artisanlib/canvas.py" line="404" />
-      <location filename="../artisanlib/canvas.py" line="392" />
-      <location filename="../artisanlib/canvas.py" line="379" />
-      <location filename="../artisanlib/canvas.py" line="368" />
-      <source>Flavor</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="398" />
-      <location filename="../artisanlib/canvas.py" line="384" />
-      <location filename="../artisanlib/canvas.py" line="372" />
-      <source>Uniformity</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="457" />
-      <location filename="../artisanlib/canvas.py" line="388" />
-      <location filename="../artisanlib/canvas.py" line="376" />
-      <source>Overall</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="382" />
-      <source>Intensity</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="390" />
-      <source>Fragance</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="397" />
-      <source>Dry Fragrance</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="399" />
-      <source>Complexity</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="434" />
-      <location filename="../artisanlib/canvas.py" line="402" />
-      <source>Finish</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="405" />
-      <source>Brightness</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="406" />
-      <source>Wet Aroma</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="410" />
-      <source>Taste</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="411" />
-      <source>Nose</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="426" />
-      <source>Mouthfeel</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="449" />
-      <location filename="../artisanlib/canvas.py" line="427" />
       <source>Flavour</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="436" />
+      <location filename="../artisanlib/canvas.py" line="437" />
       <source>Roast Color</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="437" />
+      <location filename="../artisanlib/canvas.py" line="438" />
       <source>Crema Texture</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="438" />
+      <location filename="../artisanlib/canvas.py" line="439" />
       <source>Crema Volume</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="442" />
+      <location filename="../artisanlib/canvas.py" line="443" />
       <source>Bitterness</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="443" />
+      <location filename="../artisanlib/canvas.py" line="444" />
       <source>Defects</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="444" />
+      <location filename="../artisanlib/canvas.py" line="445" />
       <source>Aroma Intensity</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="445" />
+      <location filename="../artisanlib/canvas.py" line="446" />
       <source>Aroma Persistence</source>
       <translation type="unfinished" />
     </message>
@@ -18889,33 +18942,33 @@ Hiányzik a profilból [CHARGE] vagy [DROP]</translation>
   <context>
     <name>Toolbar</name>
     <message>
-      <location filename="../artisanlib/main.py" line="719" />
+      <location filename="../artisanlib/main.py" line="720" />
       <source>Home</source>
       <translation>itthon</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="720" />
+      <location filename="../artisanlib/main.py" line="721" />
       <source>Back</source>
       <translation>Vissza</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="721" />
+      <location filename="../artisanlib/main.py" line="722" />
       <source>Forward</source>
       <translation>Előre</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="723" />
+      <location filename="../artisanlib/main.py" line="724" />
       <source>Pan</source>
       <translation>Pán</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="724" />
+      <location filename="../artisanlib/main.py" line="725" />
       <source>Zoom</source>
       <translation>Zoomolás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="897" />
-      <location filename="../artisanlib/main.py" line="758" />
+      <location filename="../artisanlib/main.py" line="898" />
+      <location filename="../artisanlib/main.py" line="759" />
       <source>Lines</source>
       <translation>Vonalak</translation>
     </message>
@@ -18923,184 +18976,184 @@ Hiányzik a profilból [CHARGE] vagy [DROP]</translation>
   <context>
     <name>Tooltip</name>
     <message>
-      <location filename="../artisanlib/axis.py" line="83" />
+      <location filename="../artisanlib/axis.py" line="87" />
       <source>100% event values in step mode are aligned with the given y-axis value or the lowest phases limit if left empty</source>
       <translation>A lépés módban a 100%-os eseményértékek igazodnak az adott y tengely értékéhez vagy a legalacsonyabb fázishatárhoz, ha üresen marad</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="156" />
+      <location filename="../artisanlib/axis.py" line="160" />
       <source>Time axis max on start of a recording</source>
       <translation>Időtengely max a felvétel kezdetén</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="165" />
+      <location filename="../artisanlib/axis.py" line="169" />
       <source>Time axis min on start of a recording</source>
       <translation>Időtengely min a felvétel kezdetén</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="170" />
+      <location filename="../artisanlib/axis.py" line="174" />
       <source>Automatically extend the time axis by 3min on need</source>
       <translation>Szükség esetén automatikusan meghosszabbítja az időtengelyt 3 perccel</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="175" />
+      <location filename="../artisanlib/axis.py" line="179" />
       <source>Do not set time axis min and max from profile on load</source>
       <translation>Ne állítsa be az időtengely min és maximumát a profilból terheléskor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="180" />
+      <location filename="../artisanlib/axis.py" line="184" />
       <source>Automatically set time axis min and max from profile CHARGE/DROP events</source>
       <translation>Automatikusan beállítja az időtengely min és maximumát a profil CHARGE/DROP eseményeiből</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="192" />
+      <location filename="../artisanlib/axis.py" line="196" />
       <source>Coverage of auto time axis mode</source>
       <translation>Az automatikus időtengely mód lefedettsége</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="257" />
-      <location filename="../artisanlib/axis.py" line="255" />
-      <location filename="../artisanlib/axis.py" line="247" />
-      <location filename="../artisanlib/axis.py" line="245" />
-      <location filename="../artisanlib/axis.py" line="208" />
-      <location filename="../artisanlib/axis.py" line="206" />
+      <location filename="../artisanlib/axis.py" line="261" />
+      <location filename="../artisanlib/axis.py" line="259" />
+      <location filename="../artisanlib/axis.py" line="251" />
+      <location filename="../artisanlib/axis.py" line="249" />
+      <location filename="../artisanlib/axis.py" line="212" />
+      <location filename="../artisanlib/axis.py" line="210" />
       <source>Distance of major tick labels</source>
       <translation>A főbb kullancscímkék távolsága</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="236" />
+      <location filename="../artisanlib/axis.py" line="240" />
       <source>Show time grid</source>
       <translation>Időrács megjelenítése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="240" />
+      <location filename="../artisanlib/axis.py" line="244" />
       <source>Show temperature grid</source>
       <translation>Hőmérsékletrács megjelenítése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="270" />
+      <location filename="../artisanlib/axis.py" line="274" />
       <source>Automatically set delta axis max from DeltaET</source>
       <translation>Automatikusan beállítja a delta tengely max. értékét a DeltaET-ből</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="271" />
+      <location filename="../artisanlib/axis.py" line="275" />
       <source>Automatically set delta axis max from DeltaBT</source>
       <translation>Automatikusan beállítja a delta tengely max. értékét a DeltaBT-ből</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="316" />
+      <location filename="../artisanlib/axis.py" line="321" />
       <source>Reset axis settings to their defaults</source>
       <translation>Állítsa vissza a tengelybeállításokat az alapértelmezett értékekre</translation>
     </message>
     <message>
-      <location filename="../artisanlib/axis.py" line="320" />
+      <location filename="../artisanlib/axis.py" line="325" />
       <source>Take axis settings from profile on load</source>
       <translation>Vegye ki a tengelybeállításokat a profilból terheléskor</translation>
     </message>
     <message>
       <location filename="../artisanlib/cup_profile.py" line="85" />
-      <location filename="../artisanlib/wheels.py" line="66" />
+      <location filename="../artisanlib/wheels.py" line="70" />
       <source>Aspect Ratio</source>
       <translation type="unfinished">Képarány</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="73" />
+      <location filename="../artisanlib/wheels.py" line="77" />
       <source>Increase size of text in all the graph</source>
       <translation>Növelje a szöveg méretét az egész grafikonon</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="76" />
+      <location filename="../artisanlib/wheels.py" line="80" />
       <source>Decrease size of text in all the graph</source>
       <translation>Csökkentse a szöveg méretét az egész grafikonon</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="80" />
+      <location filename="../artisanlib/wheels.py" line="84" />
       <source>Decorative edge between wheels</source>
       <translation>Dekoratív él a kerekek között</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="86" />
+      <location filename="../artisanlib/wheels.py" line="90" />
       <source>Line thickness</source>
       <translation>Vonalvastagság</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="91" />
+      <location filename="../artisanlib/wheels.py" line="95" />
       <source>Line color</source>
       <translation>Vonal színe</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="94" />
+      <location filename="../artisanlib/wheels.py" line="98" />
       <source>Text color</source>
       <translation>Szöveg szín</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="98" />
+      <location filename="../artisanlib/wheels.py" line="102" />
       <source>Apply color pattern to whole graph</source>
       <translation>Színminta alkalmazása a teljes grafikonra</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="104" />
+      <location filename="../artisanlib/wheels.py" line="109" />
       <source>Add new wheel</source>
       <translation>Új kerék hozzáadása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="107" />
+      <location filename="../artisanlib/wheels.py" line="113" />
       <source>Rotate graph 1 degree counter clockwise</source>
       <translation>A grafikon elforgatása 1 fokkal az óramutató járásával ellentétes irányba</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="110" />
+      <location filename="../artisanlib/wheels.py" line="117" />
       <source>Rotate graph 1 degree clockwise</source>
       <translation>A grafikon elforgatása 1 fokkal az óramutató járásával megegyező irányba</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="117" />
+      <location filename="../artisanlib/wheels.py" line="125" />
       <source>Save graph to a text file.wg</source>
       <translation>Grafikon mentése szöveges fájlba.wg</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="791" />
-      <location filename="../artisanlib/wheels.py" line="121" />
+      <location filename="../artisanlib/curves.py" line="804" />
+      <location filename="../artisanlib/wheels.py" line="130" />
       <source>Save image using current graph size to a png format</source>
       <translation>Mentse a képet az aktuális grafikonmérettel png formátumba</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="127" />
+      <location filename="../artisanlib/wheels.py" line="137" />
       <source>open wheel graph file</source>
       <translation>nyissa meg a kerékgrafikon fájlt</translation>
     </message>
     <message>
-      <location filename="../artisanlib/wheels.py" line="131" />
+      <location filename="../artisanlib/wheels.py" line="142" />
       <source>Sets Wheel graph to view mode</source>
       <translation>A kerékdiagramot nézet módba állítja</translation>
     </message>
     <message>
-      <location filename="../artisanlib/autosave.py" line="44" />
+      <location filename="../artisanlib/autosave.py" line="49" />
       <source>Automatic generated name</source>
       <translation>Automatikusan generált név</translation>
     </message>
     <message>
-      <location filename="../artisanlib/autosave.py" line="57" />
+      <location filename="../artisanlib/autosave.py" line="62" />
       <source>ON/OFF of automatic saving when pressing keyboard letter [a]</source>
       <translation>Az automatikus mentés BE/KI a billentyűzet [a] betűjének megnyomásakor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/autosave.py" line="62" />
+      <location filename="../artisanlib/autosave.py" line="67" />
       <source>Add auto saved file names to the recent files list</source>
       <translation>Adjon hozzá automatikusan mentett fájlneveket a legutóbbi fájlok listájához</translation>
     </message>
     <message>
-      <location filename="../artisanlib/autosave.py" line="67" />
+      <location filename="../artisanlib/autosave.py" line="72" />
       <source>Save image alongside .alog profiles</source>
       <translation>Kép mentése az .alog profilok mellé</translation>
     </message>
     <message>
-      <location filename="../artisanlib/autosave.py" line="94" />
+      <location filename="../artisanlib/autosave.py" line="102" />
       <source>Sets the directory to store batch profiles when using the letter [a]</source>
       <translation>Beállítja a könyvtárat a kötegelt profilok tárolására az [a] betű használatakor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/autosave.py" line="100" />
+      <location filename="../artisanlib/autosave.py" line="108" />
       <source>Sets the directory to store the save also files</source>
       <translation>Beállítja a könyvtárat a mentési fájlok tárolására</translation>
     </message>
@@ -19113,71 +19166,72 @@ Hiányzik a profilból [CHARGE] vagy [DROP]</translation>
       <translation>Definíciós karakterlánc a különleges események megjegyzéséhez</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="567" />
+      <location filename="../artisanlib/events.py" line="568" />
       <source>Invert color of last button pressed</source>
       <translation>Az utoljára megnyomott gomb színének megfordítása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="571" />
+      <location filename="../artisanlib/events.py" line="572" />
       <source>Show custom event button specification as button tooltip</source>
       <translation>Egyéni eseménygomb-specifikáció megjelenítése gomb elemleírásaként</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="259" />
+      <location filename="../artisanlib/devices.py" line="261" />
       <location filename="../artisanlib/alarms.py" line="91" />
-      <location filename="../artisanlib/curves.py" line="78" />
-      <location filename="../artisanlib/roast_properties.py" line="2727" />
-      <location filename="../artisanlib/roast_properties.py" line="798" />
-      <location filename="../artisanlib/roast_properties.py" line="788" />
+      <location filename="../artisanlib/curves.py" line="79" />
+      <location filename="../artisanlib/roast_properties.py" line="2736" />
+      <location filename="../artisanlib/roast_properties.py" line="803" />
+      <location filename="../artisanlib/roast_properties.py" line="793" />
       <location filename="../artisanlib/background.py" line="180" />
       <location filename="../artisanlib/background.py" line="169" />
-      <location filename="../artisanlib/events.py" line="581" />
+      <location filename="../artisanlib/events.py" line="584" />
       <source>Copy table to clipboard, OPTION or ALT click for tabular text</source>
       <translation>Táblázat másolása vágólapra, OPTION vagy ALT kattintás a táblázatos szövegért</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="585" />
+      <location filename="../artisanlib/events.py" line="589" />
       <source>Add new extra Event button</source>
       <translation>Új extra esemény hozzáadása gomb</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="590" />
+      <location filename="../artisanlib/events.py" line="595" />
       <source>Delete the last extra Event button</source>
       <translation>Törölje az utolsó extra esemény gombot</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="111" />
-      <location filename="../artisanlib/ports.py" line="839" />
-      <location filename="../artisanlib/events.py" line="602" />
+      <location filename="../artisanlib/alarms.py" line="112" />
+      <location filename="../artisanlib/ports.py" line="842" />
+      <location filename="../artisanlib/events.py" line="609" />
       <source>Show help</source>
       <translation>Segítség megjelenítése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="641" />
+      <location filename="../artisanlib/events.py" line="648" />
       <source>Backup all palettes to a text file</source>
       <translation>Az összes paletta biztonsági mentése szöveges fájlba</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="642" />
+      <location filename="../artisanlib/events.py" line="649" />
       <source>Restore all palettes from a text file</source>
       <translation>Az összes paletta visszaállítása szöveges fájlból</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="668" />
+      <location filename="../artisanlib/events.py" line="675" />
       <source>Triggered quantifier fires slider action</source>
       <translation>Az aktivált kvantor csúszkaműveletet indít el</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="671" />
+      <location filename="../artisanlib/events.py" line="678" />
       <source>No processing delay if source delivers the set value (SV) instead of the process value (PV)</source>
       <translation>Nincs feldolgozási késleltetés, ha a forrás a beállított értéket (SV) adja meg a folyamatérték (PV) helyett</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1253" />
-      <location filename="../artisanlib/events.py" line="1245" />
-      <location filename="../artisanlib/events.py" line="1224" />
-      <location filename="../artisanlib/events.py" line="1216" />
-      <location filename="../artisanlib/events.py" line="1209" />
+      <location filename="../artisanlib/events.py" line="1262" />
+      <location filename="../artisanlib/events.py" line="1254" />
+      <location filename="../artisanlib/events.py" line="1233" />
+      <location filename="../artisanlib/events.py" line="1225" />
+      <location filename="../artisanlib/events.py" line="1218" />
+      <location filename="../artisanlib/events.py" line="1210" />
       <location filename="../artisanlib/events.py" line="1201" />
       <location filename="../artisanlib/events.py" line="1192" />
       <location filename="../artisanlib/events.py" line="1183" />
@@ -19185,16 +19239,15 @@ Hiányzik a profilból [CHARGE] vagy [DROP]</translation>
       <location filename="../artisanlib/events.py" line="1165" />
       <location filename="../artisanlib/events.py" line="1156" />
       <location filename="../artisanlib/events.py" line="1147" />
-      <location filename="../artisanlib/events.py" line="1138" />
-      <location filename="../artisanlib/events.py" line="724" />
-      <location filename="../artisanlib/events.py" line="719" />
-      <location filename="../artisanlib/events.py" line="714" />
-      <location filename="../artisanlib/events.py" line="709" />
+      <location filename="../artisanlib/events.py" line="731" />
+      <location filename="../artisanlib/events.py" line="726" />
+      <location filename="../artisanlib/events.py" line="721" />
+      <location filename="../artisanlib/events.py" line="716" />
       <source>Action Type</source>
       <translation>Művelet típusa</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="827" />
+      <location filename="../artisanlib/events.py" line="834" />
       <source>Applies the Bernoulli's gas law to the values computed
 by applying the given factor and offset to the slider value
 assuming that the gas pressureand not the gas flow is controlled.
@@ -19207,59 +19260,60 @@ A hő (vagy gázáramlás) csökkentése a gáznyomás 50%-ával
 4-szeresére kell csökkenteni.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="949" />
-      <location filename="../artisanlib/events.py" line="944" />
-      <location filename="../artisanlib/events.py" line="939" />
-      <location filename="../artisanlib/events.py" line="934" />
-      <location filename="../artisanlib/events.py" line="862" />
-      <location filename="../artisanlib/events.py" line="857" />
-      <location filename="../artisanlib/events.py" line="852" />
-      <location filename="../artisanlib/events.py" line="847" />
+      <location filename="../artisanlib/events.py" line="957" />
+      <location filename="../artisanlib/events.py" line="952" />
+      <location filename="../artisanlib/events.py" line="947" />
+      <location filename="../artisanlib/events.py" line="942" />
+      <location filename="../artisanlib/events.py" line="869" />
+      <location filename="../artisanlib/events.py" line="864" />
+      <location filename="../artisanlib/events.py" line="859" />
+      <location filename="../artisanlib/events.py" line="854" />
       <source>Step Size</source>
       <translation>Lépés mérete</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="867" />
+      <location filename="../artisanlib/events.py" line="874" />
       <source>Slider values interpreted as temperatures</source>
       <translation>A csúszka értékek hőmérsékletként értelmezve</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="885" />
+      <location filename="../artisanlib/events.py" line="892" />
       <source>Unit to be added to generated event descriptions</source>
       <translation>A generált eseményleírásokhoz hozzáadandó egység</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="904" />
+      <location filename="../artisanlib/events.py" line="912" />
       <source>Move slider under focus using the up/down cursor keys</source>
       <translation>Mozgassa a csúszkát fókuszba a fel/le kurzorbillentyűkkel</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="907" />
+      <location filename="../artisanlib/events.py" line="915" />
       <source>Group Slider 1 with Slider 4 and Slider 2 with Slider 3</source>
-      <translation type="unfinished" />
+      <translation>Csoportosítsa az 1. csúszkát a 4. csúszkával és a 2. csúszkát a 3. csúszkával</translation>
     </message>
     <message>
+      <location filename="../artisanlib/events.py" line="976" />
+      <location filename="../artisanlib/events.py" line="972" />
       <location filename="../artisanlib/events.py" line="968" />
       <location filename="../artisanlib/events.py" line="964" />
-      <location filename="../artisanlib/events.py" line="960" />
-      <location filename="../artisanlib/events.py" line="956" />
       <source>fire slider action</source>
       <translation>tűz csúszka akció</translation>
     </message>
     <message>
+      <location filename="../artisanlib/events.py" line="992" />
+      <location filename="../artisanlib/events.py" line="988" />
       <location filename="../artisanlib/events.py" line="984" />
       <location filename="../artisanlib/events.py" line="980" />
-      <location filename="../artisanlib/events.py" line="976" />
-      <location filename="../artisanlib/events.py" line="972" />
       <source>If source is a Set Value quantification gets never blocked</source>
       <translation>Ha a forrás beállított érték, a kvantifikáció soha nem blokkolódik</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1258" />
-      <location filename="../artisanlib/events.py" line="1250" />
-      <location filename="../artisanlib/events.py" line="1231" />
-      <location filename="../artisanlib/events.py" line="1221" />
-      <location filename="../artisanlib/events.py" line="1214" />
+      <location filename="../artisanlib/events.py" line="1267" />
+      <location filename="../artisanlib/events.py" line="1259" />
+      <location filename="../artisanlib/events.py" line="1240" />
+      <location filename="../artisanlib/events.py" line="1230" />
+      <location filename="../artisanlib/events.py" line="1223" />
+      <location filename="../artisanlib/events.py" line="1215" />
       <location filename="../artisanlib/events.py" line="1206" />
       <location filename="../artisanlib/events.py" line="1197" />
       <location filename="../artisanlib/events.py" line="1188" />
@@ -19267,51 +19321,50 @@ A hő (vagy gázáramlás) csökkentése a gáznyomás 50%-ával
       <location filename="../artisanlib/events.py" line="1170" />
       <location filename="../artisanlib/events.py" line="1161" />
       <location filename="../artisanlib/events.py" line="1152" />
-      <location filename="../artisanlib/events.py" line="1143" />
       <source>Action String</source>
       <translation>Akciókarakterlánc</translation>
     </message>
     <message>
-      <location filename="../artisanlib/events.py" line="1233" />
+      <location filename="../artisanlib/events.py" line="1242" />
       <source>Interval</source>
       <translation>Intervallum</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1192" />
-      <location filename="../artisanlib/ports.py" line="637" />
+      <location filename="../artisanlib/ports.py" line="1195" />
+      <location filename="../artisanlib/ports.py" line="639" />
       <source>OFF Action String</source>
       <translation>KI Műveleti karakterlánc</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1195" />
-      <location filename="../artisanlib/ports.py" line="640" />
+      <location filename="../artisanlib/ports.py" line="1198" />
+      <location filename="../artisanlib/ports.py" line="642" />
       <source>ON Action String</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="671" />
-      <location filename="../artisanlib/ports.py" line="667" />
+      <location filename="../artisanlib/ports.py" line="673" />
+      <location filename="../artisanlib/ports.py" line="669" />
       <source>Extra delay in Milliseconds between MODBUS Serial commands</source>
       <translation>Extra késleltetés ezredmásodpercben a MODBUS soros parancsok között</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="697" />
-      <location filename="../artisanlib/ports.py" line="693" />
+      <location filename="../artisanlib/ports.py" line="699" />
+      <location filename="../artisanlib/ports.py" line="695" />
       <source>IP timeout in seconds, not larger than half of the sampling interval</source>
       <translation>IP időtúllépés másodpercben, legfeljebb a mintavételi intervallum fele</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="723" />
+      <location filename="../artisanlib/ports.py" line="725" />
       <source>Scan MODBUS</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="740" />
+      <location filename="../artisanlib/ports.py" line="742" />
       <source>Reset socket connection on error</source>
       <translation>Reset socket kapcsolat hiba esetén</translation>
     </message>
     <message>
-      <location filename="../artisanlib/ports.py" line="1003" />
+      <location filename="../artisanlib/ports.py" line="1006" />
       <source>Scan S7</source>
       <translation type="unfinished" />
     </message>
@@ -19327,7 +19380,7 @@ A hő (vagy gázáramlás) csökkentése a gáznyomás 50%-ával
       <translation>Csak betöltött hátterekhez extra eszközökkel</translation>
     </message>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="3684" />
+      <location filename="../artisanlib/roast_properties.py" line="3715" />
       <source>The maximum nominal batch size of the machine in kg</source>
       <translation>A gép maximális névleges tételmérete kg-ban</translation>
     </message>
@@ -19337,22 +19390,22 @@ A hő (vagy gázáramlás) csökkentése a gáznyomás 50%-ával
       <translation>ON/OFF naplózza a soros kommunikációt</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="348" />
+      <location filename="../artisanlib/curves.py" line="361" />
       <source>Use an optimal smoothing algorithm (only applicable offline, after recording)</source>
       <translation>Használjon optimális simító algoritmust (csak offline, felvétel után alkalmazható)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="354" />
+      <location filename="../artisanlib/curves.py" line="367" />
       <source>Compute the rate-of-rise over the delta span interval by a linear polyfit</source>
       <translation>Számítsa ki a delta span intervallumon belüli emelkedési sebességet lineáris polifit segítségével</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="781" />
+      <location filename="../artisanlib/curves.py" line="794" />
       <source>Shows data table of plots</source>
       <translation>A telkek adattáblázatát mutatja</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="866" />
+      <location filename="../artisanlib/curves.py" line="880" />
       <source>linear: linear interpolation
 cubic: 3rd order spline interpolation
 nearest: y value of the nearest point</source>
@@ -19361,22 +19414,22 @@ köbös: 3. rendű spline interpoláció
 legközelebbi: a legközelebbi pont y értéke</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="908" />
+      <location filename="../artisanlib/curves.py" line="922" />
       <source>Choose the start point of analysis interval of interest</source>
       <translation>Válassza ki a kívánt elemzési intervallum kezdőpontját</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="940" />
+      <location filename="../artisanlib/curves.py" line="954" />
       <source>Choose the start point of curve fitting</source>
       <translation>Válassza ki a görbe illesztésének kezdőpontját</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1626" />
+      <location filename="../artisanlib/curves.py" line="1642" />
       <source>Add P1 and P2 as ET and BT</source>
       <translation>Adja hozzá a P1-et és a P2-t ET és BT-ként</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1631" />
+      <location filename="../artisanlib/curves.py" line="1647" />
       <source>Add P1 and P2 as:
 
 1 an Extra virtual device if a profile is loaded
@@ -19389,18 +19442,18 @@ legközelebbi: a legközelebbi pont y értéke</translation>
 </translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1634" />
+      <location filename="../artisanlib/curves.py" line="1650" />
       <source>No more Virtual Extra Devices available</source>
       <translation>Nincs több virtuális extra eszköz</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1639" />
-      <location filename="../artisanlib/curves.py" line="1637" />
+      <location filename="../artisanlib/curves.py" line="1655" />
+      <location filename="../artisanlib/curves.py" line="1653" />
       <source>Not available during recording</source>
       <translation>Felvétel közben nem elérhető</translation>
     </message>
     <message>
-      <location filename="../artisanlib/curves.py" line="1642" />
+      <location filename="../artisanlib/curves.py" line="1658" />
       <source>Set P1 as ET background B1
 Set P2 as BT background B2
 Note: Erases all existing background curves.</source>
@@ -19409,277 +19462,277 @@ Note: Erases all existing background curves.</source>
 Megjegyzés: Törli az összes meglévő háttérgörbét.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/alarms.py" line="116" />
+      <location filename="../artisanlib/alarms.py" line="117" />
       <source>Clear alarms table</source>
       <translation>Törölje a riasztási táblázatot</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="717" />
+      <location filename="../artisanlib/main.py" line="718" />
       <source>Connect to plus service</source>
       <translation>Csatlakozzon a plusz szolgáltatáshoz</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="718" />
+      <location filename="../artisanlib/main.py" line="719" />
       <source>Subscription</source>
       <translation>Feliratkozás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="719" />
+      <location filename="../artisanlib/main.py" line="720" />
       <source>Reset original view</source>
       <translation>Az eredeti nézet visszaállítása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="720" />
+      <location filename="../artisanlib/main.py" line="721" />
       <source>Back to  previous view</source>
       <translation>Vissza az előző nézethez</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="721" />
+      <location filename="../artisanlib/main.py" line="722" />
       <source>Forward to next view</source>
       <translation>Tovább a következő nézetre</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="723" />
+      <location filename="../artisanlib/main.py" line="724" />
       <source>Pan axes with left mouse, zoom with right</source>
       <translation>Bal egérrel pásztázza a tengelyeket, jobb egérrel zoom</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="724" />
+      <location filename="../artisanlib/main.py" line="725" />
       <source>Zoom to rectangle</source>
       <translation>Nagyítás téglalapra</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="760" />
+      <location filename="../artisanlib/main.py" line="761" />
       <source>Line styles</source>
       <translation>Vonalstílusok</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11494" />
-      <location filename="../artisanlib/main.py" line="2908" />
+      <location filename="../artisanlib/canvas.py" line="11475" />
+      <location filename="../artisanlib/main.py" line="2945" />
       <source>Start monitoring</source>
       <translation>Kezdje el a megfigyelést</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2922" />
+      <location filename="../artisanlib/main.py" line="2959" />
       <source>Start recording</source>
       <translation type="unfinished">Felvétel megkezdése</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2936" />
+      <location filename="../artisanlib/main.py" line="2973" />
       <source>First Crack Start</source>
       <translation>Első Crack Start</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2940" />
+      <location filename="../artisanlib/main.py" line="2977" />
       <source>First Crack End</source>
       <translation>Első Crack End</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2944" />
+      <location filename="../artisanlib/main.py" line="2981" />
       <source>Second Crack Start</source>
       <translation>Második repedésindítás</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2948" />
+      <location filename="../artisanlib/main.py" line="2985" />
       <source>Second Crack End</source>
       <translation>Második Crack End</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2960" />
+      <location filename="../artisanlib/main.py" line="2997" />
       <source>Reset</source>
       <translation>Gyári beállítások visszaállítása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2965" />
+      <location filename="../artisanlib/main.py" line="3002" />
       <source>Charge</source>
       <translation>Díj</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2970" />
+      <location filename="../artisanlib/main.py" line="3007" />
       <source>Drop</source>
       <translation>Csepp</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2988" />
+      <location filename="../artisanlib/main.py" line="3025" />
       <source>Event</source>
       <translation type="unfinished">Esemény</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="2997" />
+      <location filename="../artisanlib/main.py" line="3034" />
       <source>Increases the current SV value by 5</source>
       <translation>5-tel növeli az aktuális SV értéket</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3006" />
+      <location filename="../artisanlib/main.py" line="3043" />
       <source>Increases the current SV value by 10</source>
       <translation>10-zel növeli az aktuális SV értéket</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3015" />
+      <location filename="../artisanlib/main.py" line="3052" />
       <source>Increases the current SV value by 20</source>
       <translation>20-al növeli az aktuális SV értéket</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3024" />
+      <location filename="../artisanlib/main.py" line="3061" />
       <source>Decreases the current SV value by 20</source>
       <translation>20-al csökkenti az aktuális SV értéket</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3033" />
+      <location filename="../artisanlib/main.py" line="3070" />
       <source>Decreases the current SV value by 10</source>
       <translation>10-zel csökkenti az aktuális SV értéket</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3042" />
+      <location filename="../artisanlib/main.py" line="3079" />
       <source>Decreases the current SV value by 5</source>
       <translation>5-tel csökkenti az aktuális SV értéket</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3049" />
+      <location filename="../artisanlib/main.py" line="3086" />
       <source>Dry End</source>
       <translation>Száraz vég</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3054" />
+      <location filename="../artisanlib/main.py" line="3091" />
       <source>Cool End</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3104" />
+      <location filename="../artisanlib/main.py" line="3141" />
       <source>Timer</source>
       <translation>Időzítő</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3105" />
+      <location filename="../artisanlib/main.py" line="3142" />
       <source>ET Temperature</source>
       <translation>ET hőmérséklet</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3106" />
+      <location filename="../artisanlib/main.py" line="3143" />
       <source>BT Temperature</source>
       <translation>BT hőmérséklet</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3107" />
+      <location filename="../artisanlib/main.py" line="3144" />
       <source>ET/time (degrees/min)</source>
       <translation>ET/idő (fok/perc)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3108" />
+      <location filename="../artisanlib/main.py" line="3145" />
       <source>BT/time (degrees/min)</source>
       <translation>BT/idő (fok/perc)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3109" />
+      <location filename="../artisanlib/main.py" line="3146" />
       <source>Value of SV in PID</source>
       <translation>SV értéke PID-ben</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3110" />
+      <location filename="../artisanlib/main.py" line="3147" />
       <source>PID power %</source>
       <translation>PID teljesítmény %</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3219" />
+      <location filename="../artisanlib/main.py" line="3256" />
       <source>Number of events found</source>
       <translation>Talált események száma</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3235" />
+      <location filename="../artisanlib/main.py" line="3272" />
       <source>Type of event</source>
       <translation>Az esemény típusa</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3242" />
+      <location filename="../artisanlib/main.py" line="3279" />
       <source>Value of event</source>
       <translation>Az esemény értéke</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3254" />
+      <location filename="../artisanlib/main.py" line="3291" />
       <source>Updates the event</source>
       <translation>Frissíti az eseményt</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="3571" />
+      <location filename="../artisanlib/main.py" line="3608" />
       <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE</source>
       <translation>Fázis LCD: kattintson a jobb gombbal az IDŐ, SZÁZALÉK és HŐMÉRSÉKLET mód közötti váltáshoz</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="4514" />
+      <location filename="../artisanlib/main.py" line="4567" />
       <source>Syncing with artisan.plus</source>
       <translation>Szinkronizálás az artisan.plusszal</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="4551" />
-      <location filename="../artisanlib/main.py" line="4517" />
+      <location filename="../artisanlib/main.py" line="4604" />
+      <location filename="../artisanlib/main.py" line="4570" />
       <source>Disconnect artisan.plus</source>
       <translation>Az artisan.plus leválasztása</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="4520" />
+      <location filename="../artisanlib/main.py" line="4573" />
       <source>Upload to artisan.plus</source>
       <translation>Feltöltés az artisan.plus oldalra</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="4554" />
+      <location filename="../artisanlib/main.py" line="4607" />
       <source>Connect artisan.plus</source>
       <translation>Csatlakoztassa az artisan.plus-t</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6955" />
+      <location filename="../artisanlib/main.py" line="7021" />
       <source>Phase LCDs
 Currently in ALL FINISHING MODE</source>
       <translation>Fázis LCD-k
 Jelenleg MINDEN FINISHING ÜZEMMÓDBAN</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="6992" />
+      <location filename="../artisanlib/main.py" line="7058" />
       <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE
 Currently in TIME MODE</source>
       <translation>Fázis LCD: kattintson a jobb gombbal az IDŐ, SZÁZALÉK és HŐMÉRSÉKLET mód közötti váltáshoz
 Jelenleg IDŐ MÓD-ban van</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="7010" />
+      <location filename="../artisanlib/main.py" line="7076" />
       <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE
 Currently in PERCENTAGE MODE</source>
       <translation>Fázis LCD: kattintson a jobb gombbal az IDŐ, SZÁZALÉK és HŐMÉRSÉKLET mód közötti váltáshoz
 Jelenleg PERCENTAGE MODE-ban van</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="7024" />
+      <location filename="../artisanlib/main.py" line="7090" />
       <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE
 Currently in TEMP MODE</source>
       <translation>Fázis LCD: kattintson a jobb gombbal az IDŐ, SZÁZALÉK és HŐMÉRSÉKLET mód közötti váltáshoz
 Jelenleg TEMP MODE-ban van</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24172" />
+      <location filename="../artisanlib/main.py" line="24304" />
       <source>&lt;b&gt;Label&lt;/b&gt;= </source>
       <translation>&lt;b&gt;Címke&lt;/b&gt;=</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24173" />
+      <location filename="../artisanlib/main.py" line="24305" />
       <source>&lt;b&gt;Description &lt;/b&gt;= </source>
       <translation>&lt;b&gt;Leírás &lt;/b&gt;=</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24174" />
+      <location filename="../artisanlib/main.py" line="24306" />
       <source>&lt;b&gt;Type &lt;/b&gt;= </source>
       <translation>&lt;b&gt;Típus &lt;/b&gt;=</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24176" />
+      <location filename="../artisanlib/main.py" line="24308" />
       <source>&lt;b&gt;Value &lt;/b&gt;= </source>
       <translation>&lt;b&gt;Érték &lt;/b&gt;=</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24178" />
+      <location filename="../artisanlib/main.py" line="24310" />
       <source>&lt;b&gt;Documentation &lt;/b&gt;= </source>
       <translation>&lt;b&gt;Dokumentáció &lt;/b&gt;=</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24179" />
+      <location filename="../artisanlib/main.py" line="24311" />
       <source>&lt;b&gt;Button# &lt;/b&gt;= </source>
       <translation>&lt;b&gt;Button# &lt;/b&gt;=</translation>
     </message>
@@ -19699,32 +19752,32 @@ Jelenleg TEMP MODE-ban van</translation>
       <translation>Ha be van jelölve, a kötegszámláló soha nem módosul a beállítási fájl betöltésével</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="288" />
+      <location filename="../artisanlib/devices.py" line="292" />
       <source>Recaclulates all Virtual Devices and updates their values in the profile</source>
       <translation>Újraszámolja az összes virtuális eszközt, és frissíti az értékeket a profilban</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1265" />
+      <location filename="../artisanlib/devices.py" line="1269" />
       <source>Recaclulates ET and BT and updates their values in the profile</source>
       <translation>Újraszámolja az ET és BT értékeket, és frissíti az értékeket a profilban</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1593" />
+      <location filename="../artisanlib/devices.py" line="1599" />
       <source>Example: 100 + 2*x</source>
       <translation>Példa: 100 + 2*x</translation>
     </message>
     <message>
-      <location filename="../artisanlib/devices.py" line="1594" />
+      <location filename="../artisanlib/devices.py" line="1600" />
       <source>Example: 100 + x</source>
       <translation>Példa: 100 + x</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11371" />
+      <location filename="../artisanlib/canvas.py" line="11375" />
       <source>Stop monitoring</source>
       <translation>Állítsa le a megfigyelést</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11907" />
+      <location filename="../artisanlib/canvas.py" line="11928" />
       <source>Stop recording</source>
       <translation>Állítsa le a felvételt</translation>
     </message>

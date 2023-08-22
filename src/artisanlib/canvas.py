@@ -16694,7 +16694,11 @@ class SampleThread(QThread): # pyright: ignore [reportGeneralTypeIssues] # Argum
         _ = libtime.perf_counter() + delay
         # use the standard sleep until one 5ms before the timeout (Windows <10 might need a limit of 5.5ms)
         if delay > self.accurate_delay_cutoff:
-            libtime.sleep(delay - self.accurate_delay_cutoff)
+            half_delay = (delay - self.accurate_delay_cutoff) / 2.0
+            libtime.sleep(half_delay)
+            if not self.aw.qmc.flagon:
+                return # we leave this sleep earlier as sampling was terminated
+            libtime.sleep(half_delay)
         # continuous with a busy sleep
         while libtime.perf_counter() < _:
             pass # this raises CPU to 100%
@@ -16734,6 +16738,9 @@ class SampleThread(QThread): # pyright: ignore [reportGeneralTypeIssues] # Argum
                             self.sample()
                         finally:
                             self.aw.qmc.flagsampling = False # we signal that we are done with sampling
+                    else:
+                        self.quit()
+                        break  #thread ends
                 else:
                     self.aw.qmc.flagsampling = False # type: ignore # mypy: Statement is unreachable  [unreachable] # we signal that we are done with sampling
                     # port is disconnected in OFFmonitor by calling disconnectProbes() => disconnectProbesFromSerialDevice()

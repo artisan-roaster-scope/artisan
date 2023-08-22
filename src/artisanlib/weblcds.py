@@ -31,14 +31,17 @@ from platform import system as psystem
 if psystem() != 'Windows':
     from signal import SIGQUIT # type: ignore[attr-defined] # pylint: disable=no-name-in-module # not available on Windows
 
+import logging
 import multiprocessing as mp
 
 from json import dumps as jdumps
 from requests import get as rget
 
 import time as libtime
-from typing import Any, List
+from typing import Any, List, Final
 
+
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 wsocks: List[Any] = [] # list of open web sockets
 process = None
@@ -85,6 +88,7 @@ def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,sh
     etbackground = etbg
     showet = showetflag
     showbt = showbtflag
+    r = None
     if psystem() != 'Windows':
         gsignal(SIGQUIT, kill)
 
@@ -102,14 +106,30 @@ def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,sh
         showbtflag))
     process.start()
 
-    libtime.sleep(4)
+    libtime.sleep(2)
+
+    while not process.is_alive():
+        libtime.sleep(0.1)
 
     if process.is_alive():
         # check successful start
         url = f'http://127.0.0.1:{port}/status'
-        r = rget(url,timeout=2)
-
-        return bool(r.status_code == 200)
+        for _ in range(10):
+            libtime.sleep(1)
+            try:
+                r = rget(url, timeout=(6.1,10))
+            except Exception: # pylint: disable=broad-except
+                pass
+            if r is not None:
+                break
+        if r is None:
+            return False
+        res: bool = bool(r.status_code == 200)
+        if res:
+            _log.info('WebLCDs started')
+        else:
+            _log.info('WebLCDs start failed')
+        return res
     return False
 
 def stopWeb():

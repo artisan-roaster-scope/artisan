@@ -2,7 +2,7 @@
 name = 'Artisan'
 dynamic = ['version']
 description = "Artisan is a software that helps coffee roasters record, analyze, and control roast profiles."
-readme = {file = 'README.md', content-type='text/markdown'}
+readme = {file = 'README.txt', content-type='text/markdown'}
 authors = [
     {name = 'Rafael Cobo'},
     {name = 'Marko Luther'},

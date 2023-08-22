@@ -129,7 +129,6 @@ setup(
     setup_requires=['py2app'],
 )
 
-
 subprocess.check_call(r'cp README.txt dist',shell = True)
 subprocess.check_call(r'cp ../LICENSE dist/LICENSE.txt',shell = True)
 subprocess.check_call(r'mkdir dist/Wheels',shell = True)

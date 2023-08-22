@@ -502,16 +502,16 @@ if sys.platform.startswith('darwin'):
 #        if 'forkserver' in multiprocessing.get_all_start_methods(): # pylint: disable=condition-evals-to-constant,using-constant-test
 #            # signed app with forkserver option fails with a MemoryError
 #            multiprocessing.set_start_method('forkserver') # only available on Python3 on Unix, currently (Python 3.8) not supported by frozen executables generated with pyinstaller
-        if 'fork' in multiprocessing.get_all_start_methods():
-            multiprocessing.set_start_method('fork') # default on Python3.7 for macOS (and on Unix also under Python3.8), but considered unsafe,
-            # not available on Windows, on Python3.8 we have to explicitly set this
-            # https://bugs.python.org/issue33725
-            # this is the only option that works (Hottop communication & WebLCDs) in signed macOS apps
-#        if "spawn" in multiprocessing.get_all_start_methods():
-#            multiprocessing.set_start_method('spawn') # default on Python3.8 for macOS (always default on Windows)
-#            # this breaks on starting WebLCDs in macOS (and linux) builds with py2app, pyinstaller
-#            # https://bugs.python.org/issue32146
-#            # https://github.com/pyinstaller/pyinstaller/issues/4865
+#        if 'fork' in multiprocessing.get_all_start_methods():
+#            multiprocessing.set_start_method('fork') # default on Python3.7 for macOS (and on Unix also under Python3.8), but considered unsafe,
+#            # not available on Windows, on Python3.8 we have to explicitly set this
+#            # https://bugs.python.org/issue33725
+#            # this is the only option that works (Hottop communication & WebLCDs) in signed macOS apps
+        if 'spawn' in multiprocessing.get_all_start_methods():
+            multiprocessing.set_start_method('spawn') # default on Python3.8 for macOS (always default on Windows)
+            # this breaks on starting WebLCDs in macOS (and linux) builds with py2app, pyinstaller
+            # https://bugs.python.org/issue32146
+            # https://github.com/pyinstaller/pyinstaller/issues/4865
     except Exception: # pylint: disable=broad-except
         pass
 
@@ -5057,202 +5057,205 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     @pyqtSlot(bool)
     def openMachineSettings(self, _checked:bool = False):
         action = self.sender()
-        if action and hasattr(action,'data') and hasattr(action,'text'):
-            label = (action.text() if action.data()[1] == '' else f'{action.data()[1]} {action.text()}')
-            label = label.replace('&&','&') # we reduce those && again to & that were introduced to have the & rendered in the menu entry
-#            string = QApplication.translate('Message', 'Configure for<br>{0}?<br><br>Your current settings will be overwritten!<br><br>It is advisable to save your current settings beforehand via menu Help >> Save Settings.').format(label)
-            help_menu = QApplication.translate('Menu', 'Help')
-            string = QApplication.translate('Message', 'Configure for<br>{0}?<br><br>Some of your settings will be modified!<br><br>Before proceeding it is best to save your current settings and reset Artisan<br>(first menu {1} >> {2} then {4} >> {3})').format(label, help_menu, QApplication.translate('Menu', 'Save Settings...'),QApplication.translate('Menu', 'Factory Reset'),help_menu)
-            reply = QMessageBox.question(self, QApplication.translate('Message', 'Adjust Settings'),string,
-                QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
-            if reply == QMessageBox.StandardButton.Cancel:
-                return
-            if reply == QMessageBox.StandardButton.Yes and hasattr(action,'data') and hasattr(action,'text'):
-                self.qmc.etypes = self.qmc.etypesdefault
-                # keep original information to Cancel
-                org_etypes = self.qmc.etypes
-                org_device = self.qmc.device
-                org_machinesetup = self.qmc.machinesetup
-                org_modbus_host = self.modbus.host
-                org_s7_host = self.s7.host
-                org_ws_host = self.ws.host
-                org_kaleido_host = self.kaleidoHost
-                org_comport = self.ser.comport
-                org_modbus_comport = self.modbus.comport
-                org_roastersize_setup = self.qmc.roastersize_setup
-                org_last_batchsize = self.qmc.last_batchsize
-                org_roastersize = self.qmc.roastersize
-                org_roasterheating_setup = self.qmc.roasterheating_setup
-                org_roasterheating = self.qmc.roasterheating
-                # reset roaster_setup_default to ensure we do not offer a default from a previously loaded machine setup
-                self.qmc.roastersize_setup_default = 0
-                #
-                self.loadSettings(fn=action.data()[0],remember=False,machine=True,reload=False)
-                res:bool
-                res2: Optional[bool]
-                if action.data()[1] == 'Phidget':
-                    if action.text() == 'VINT Ambient Modules':
-                        elevation, res2 = QInputDialog.getInt(self,
-                            QApplication.translate('Message', 'Ambient'),
-                            QApplication.translate('Message', 'Elevation (MASL)'),value=self.qmc.elevation)
-                        if res2 is not None and res2:
-                            try:
-                                self.qmc.elevation = int(elevation)
-                            except Exception: # pylint: disable=broad-except
-                                pass
+        try:
+            if action and hasattr(action,'data') and hasattr(action,'text'):
+                label = (action.text() if action.data()[1] == '' else f'{action.data()[1]} {action.text()}')
+                label = label.replace('&&','&') # we reduce those && again to & that were introduced to have the & rendered in the menu entry
+    #            string = QApplication.translate('Message', 'Configure for<br>{0}?<br><br>Your current settings will be overwritten!<br><br>It is advisable to save your current settings beforehand via menu Help >> Save Settings.').format(label)
+                help_menu = QApplication.translate('Menu', 'Help')
+                string = QApplication.translate('Message', 'Configure for<br>{0}?<br><br>Some of your settings will be modified!<br><br>Before proceeding it is best to save your current settings and reset Artisan<br>(first menu {1} >> {2} then {4} >> {3})').format(label, help_menu, QApplication.translate('Menu', 'Save Settings...'),QApplication.translate('Menu', 'Factory Reset'),help_menu)
+                reply = QMessageBox.question(self, QApplication.translate('Message', 'Adjust Settings'),string,
+                    QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
+                if reply == QMessageBox.StandardButton.Cancel:
+                    return
+                if reply == QMessageBox.StandardButton.Yes and hasattr(action,'data') and hasattr(action,'text'):
+                    self.qmc.etypes = self.qmc.etypesdefault
+                    # keep original information to Cancel
+                    org_etypes = self.qmc.etypes
+                    org_device = self.qmc.device
+                    org_machinesetup = self.qmc.machinesetup
+                    org_modbus_host = self.modbus.host
+                    org_s7_host = self.s7.host
+                    org_ws_host = self.ws.host
+                    org_kaleido_host = self.kaleidoHost
+                    org_comport = self.ser.comport
+                    org_modbus_comport = self.modbus.comport
+                    org_roastersize_setup = self.qmc.roastersize_setup
+                    org_last_batchsize = self.qmc.last_batchsize
+                    org_roastersize = self.qmc.roastersize
+                    org_roasterheating_setup = self.qmc.roasterheating_setup
+                    org_roasterheating = self.qmc.roasterheating
+                    # reset roaster_setup_default to ensure we do not offer a default from a previously loaded machine setup
+                    self.qmc.roastersize_setup_default = 0
+                    #
+                    self.loadSettings(fn=action.data()[0],remember=False,machine=True,reload=False)
+                    res:bool
+                    res2: Optional[bool]
+                    if action.data()[1] == 'Phidget':
+                        if action.text() == 'VINT Ambient Modules':
+                            elevation, res2 = QInputDialog.getInt(self,
+                                QApplication.translate('Message', 'Ambient'),
+                                QApplication.translate('Message', 'Elevation (MASL)'),value=self.qmc.elevation)
+                            if res2 is not None and res2:
+                                try:
+                                    self.qmc.elevation = int(elevation)
+                                except Exception: # pylint: disable=broad-except
+                                    pass
+                            else:
+                                res = False
+                                self.sendmessage(QApplication.translate('Message','Action canceled'))
                         else:
-                            res = False
-                            self.sendmessage(QApplication.translate('Message','Action canceled'))
+                            res = True
+                            self.qmc.machinesetup = action.text()
+                        if res:
+                            QTimer.singleShot(700, self.qmc.startPhidgetManager)
                     else:
-                        res = True
                         self.qmc.machinesetup = action.text()
-                    if res:
-                        QTimer.singleShot(700, self.qmc.startPhidgetManager)
-                else:
-                    self.qmc.machinesetup = action.text()
-                    res = True
-                if self.qmc.device == 29 and self.modbus.type in [3,4]: # MODBUS TCP or UDP
-                    # as default we offer the current settings MODBUS host, or if this is set to its default as after a factory reset (self.modbus.default_host) we take the one from the machine setup
-                    defaultModbusHost:str = (self.modbus.host if org_modbus_host == self.modbus.default_host else org_modbus_host)
-                    host, res2 = QInputDialog.getText(self,
-                        QApplication.translate('Message', 'Machine'),
-                        QApplication.translate('Message', 'Network name or IP address'),text=defaultModbusHost)
-                    if res2 is not None and res2:
-                        res = res2
-                        self.modbus.host = host
-                elif self.qmc.device == 79: # S7
-                    # as default we offer the current settings S7 host, or if this is set to its default as after a factory reset (self.s7.default_host) we take the one from the machine setup
-                    defaultS7Host:str = (self.s7.host if org_s7_host == self.s7.default_host else org_s7_host)
-                    host, res2 = QInputDialog.getText(self,
-                        QApplication.translate('Message', 'Machine'),
-                        QApplication.translate('Message', 'Network name or IP address'),text=defaultS7Host)
-                    if res2 is not None and res2:
-                        res = res2
-                        self.s7.host = host
-                elif self.qmc.device == 111: # WebSocket
-                    # as default we offer the current settings WebSocket host, or if this is set to its default as after a factory reset (self.ws.default_host) we take the one from the machine setup
-                    defaultWSHost:str = (self.ws.host if org_ws_host == self.ws.default_host else org_ws_host)
-                    host, res2 = QInputDialog.getText(self,
-                        QApplication.translate('Message', 'Machine'),
-                        QApplication.translate('Message', 'Network name or IP address'),text=defaultWSHost)
-                    if res2 is not None and res2:
-                        res = res2
-                        self.ws.host = host
-                elif self.qmc.device == 138 and not self.kaleidoSerial: # Kaleido Network
-                    # as default we offer the current settings kaleido host, or if this is set to its default as after a factory reset (self.kaleido_default_host) we take the one from the machine setup
-                    defaultKaleidoHost:str = (self.kaleidoHost if org_kaleido_host == self.kaleido_default_host else org_kaleido_host)
-                    host, res2 = QInputDialog.getText(self,
-                        QApplication.translate('Message', 'Machine'),
-                        QApplication.translate('Message', 'Network name or IP address'),text=defaultKaleidoHost)
-                    if res2 is not None and res2:
-                        res = res2
-                        self.kaleidoHost = host
-                elif (self.qmc.device in [0,9,19,53,101,115,126] or (self.qmc.device == 29 and self.modbus.type in [0,1,2]) or
-                        (self.qmc.device == 134 and self.santokerSerial) or
-                        (self.qmc.device == 138 and self.kaleidoSerial)): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial, HB/ARC
-                    select_device_name = None
-                    # as default we offer the current settings serial/modbus port, or if this is set to its default as after a factory reset (self.ser.default_comport or self.modbus.default_comport) we take the one from the machine setup
-                    defaultComPort:str = ((self.modbus.comport if org_modbus_comport == self.modbus.default_comport else org_modbus_comport) if self.qmc.device == 29 else (self.ser.comport if org_comport == self.ser.default_comport else org_comport))
-                    if self.qmc.device == 53: # Hottop 2k+:
-                        select_device_name = 'FT230X Basic UART'
-                    commPort_dlg:ArtisanPortsDialog = ArtisanPortsDialog(self, self, selection=defaultComPort, select_device_name=select_device_name)
-                    res = bool(commPort_dlg.exec())
-                    if res:
-                        new_port = commPort_dlg.getSelection()
-                        if new_port is not None:
-                            if self.qmc.device == 29: # MODBUS serial
-                                self.modbus.comport = new_port
-                            else: # Fuji or HOTTOP
-                                self.ser.comport = new_port
-                elif self.qmc.device == 142: # IKAWA
-                    # we request Bluetooth permission
-                    permission_status:Optional[bool] = self.app.getBluetoothPermission(request=True)
-                    if permission_status is False:
-                        message:str = QApplication.translate('Message','Bluetootooth access denied')
-                        QMessageBox.warning(self, message, message)
-                if res:
-                    if self.qmc.roastersize_setup == 0:
-                        batchsize, res2 = QInputDialog.getDouble(self,
+                        res = True
+                    if self.qmc.device == 29 and self.modbus.type in [3,4]: # MODBUS TCP or UDP
+                        # as default we offer the current settings MODBUS host, or if this is set to its default as after a factory reset (self.modbus.default_host) we take the one from the machine setup
+                        defaultModbusHost:str = (self.modbus.host if org_modbus_host == self.modbus.default_host else org_modbus_host)
+                        host, res2 = QInputDialog.getText(self,
                             QApplication.translate('Message', 'Machine'),
-                            QApplication.translate('Message', 'Machine Capacity (kg)'),
-                            self.qmc.roastersize_setup_default, # defaut value as loaded from the machine setup
-                            0, # min
-                            999, # max
-                            1) # decimals
+                            QApplication.translate('Message', 'Network name or IP address'),text=defaultModbusHost)
                         if res2 is not None and res2:
                             res = res2
-                            self.qmc.roastersize_setup = self.qmc.roastersize = batchsize
+                            self.modbus.host = host
+                    elif self.qmc.device == 79: # S7
+                        # as default we offer the current settings S7 host, or if this is set to its default as after a factory reset (self.s7.default_host) we take the one from the machine setup
+                        defaultS7Host:str = (self.s7.host if org_s7_host == self.s7.default_host else org_s7_host)
+                        host, res2 = QInputDialog.getText(self,
+                            QApplication.translate('Message', 'Machine'),
+                            QApplication.translate('Message', 'Network name or IP address'),text=defaultS7Host)
+                        if res2 is not None and res2:
+                            res = res2
+                            self.s7.host = host
+                    elif self.qmc.device == 111: # WebSocket
+                        # as default we offer the current settings WebSocket host, or if this is set to its default as after a factory reset (self.ws.default_host) we take the one from the machine setup
+                        defaultWSHost:str = (self.ws.host if org_ws_host == self.ws.default_host else org_ws_host)
+                        host, res2 = QInputDialog.getText(self,
+                            QApplication.translate('Message', 'Machine'),
+                            QApplication.translate('Message', 'Network name or IP address'),text=defaultWSHost)
+                        if res2 is not None and res2:
+                            res = res2
+                            self.ws.host = host
+                    elif self.qmc.device == 138 and not self.kaleidoSerial: # Kaleido Network
+                        # as default we offer the current settings kaleido host, or if this is set to its default as after a factory reset (self.kaleido_default_host) we take the one from the machine setup
+                        defaultKaleidoHost:str = (self.kaleidoHost if org_kaleido_host == self.kaleido_default_host else org_kaleido_host)
+                        host, res2 = QInputDialog.getText(self,
+                            QApplication.translate('Message', 'Machine'),
+                            QApplication.translate('Message', 'Network name or IP address'),text=defaultKaleidoHost)
+                        if res2 is not None and res2:
+                            res = res2
+                            self.kaleidoHost = host
+                    elif (self.qmc.device in [0,9,19,53,101,115,126] or (self.qmc.device == 29 and self.modbus.type in [0,1,2]) or
+                            (self.qmc.device == 134 and self.santokerSerial) or
+                            (self.qmc.device == 138 and self.kaleidoSerial)): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial, HB/ARC
+                        select_device_name = None
+                        # as default we offer the current settings serial/modbus port, or if this is set to its default as after a factory reset (self.ser.default_comport or self.modbus.default_comport) we take the one from the machine setup
+                        defaultComPort:str = ((self.modbus.comport if org_modbus_comport == self.modbus.default_comport else org_modbus_comport) if self.qmc.device == 29 else (self.ser.comport if org_comport == self.ser.default_comport else org_comport))
+                        if self.qmc.device == 53: # Hottop 2k+:
+                            select_device_name = 'FT230X Basic UART'
+                        commPort_dlg:ArtisanPortsDialog = ArtisanPortsDialog(self, self, selection=defaultComPort, select_device_name=select_device_name)
+                        res = bool(commPort_dlg.exec())
+                        if res:
+                            new_port = commPort_dlg.getSelection()
+                            if new_port is not None:
+                                if self.qmc.device == 29: # MODBUS serial
+                                    self.modbus.comport = new_port
+                                else: # Fuji or HOTTOP
+                                    self.ser.comport = new_port
+                    elif self.qmc.device == 142: # IKAWA
+                        # we request Bluetooth permission
+                        permission_status:Optional[bool] = self.app.getBluetoothPermission(request=True)
+                        if permission_status is False:
+                            message:str = QApplication.translate('Message','Bluetootooth access denied')
+                            QMessageBox.warning(self, message, message)
+                    if res:
+                        if self.qmc.roastersize_setup == 0:
+                            batchsize, res2 = QInputDialog.getDouble(self,
+                                QApplication.translate('Message', 'Machine'),
+                                QApplication.translate('Message', 'Machine Capacity (kg)'),
+                                self.qmc.roastersize_setup_default, # defaut value as loaded from the machine setup
+                                0, # min
+                                999, # max
+                                1) # decimals
+                            if res2 is not None and res2:
+                                res = res2
+                                self.qmc.roastersize_setup = self.qmc.roastersize = batchsize
+                        else:
+                            res = self.qmc.roastersize_setup != 0 # roastersize_setup was loaded from machine setup
+                    if res:
+                        # first establish roastersize_setup batchsizes as default batchsize (potentially unit converted)
+                        if self.qmc.roastersize_setup > 0:
+                            weight_unit = self.qmc.weight[2]
+                            nominal_batch_size = self.convertWeight(self.qmc.roastersize_setup,1,self.qmc.weight_units.index(self.qmc.weight[2]))
+                            self.qmc.last_batchsize = nominal_batch_size
+                            self.qmc.weight = (nominal_batch_size,0,weight_unit)
+                        # size set, ask for heating
+                        resi:Optional[int]
+                        if self.qmc.roasterheating_setup == 0:
+                            dlg:ArtisanComboBoxDialog = ArtisanComboBoxDialog(self, self, QApplication.translate('Message',
+                                    'Machine'),QApplication.translate('Label', 'Heating'),self.qmc.heating_types,0)
+                            resi = dlg.idx if dlg.exec() else None
+                        else:
+                            resi = self.qmc.roasterheating_setup
+                        if resi is not None:
+                            res = True
+                            self.qmc.roasterheating_setup = self.qmc.roasterheating = resi
+                            # now check if the machine setup contains energy default ratings for the given batch size and energy rating
+                            if self.qmc.machinesetup_energy_ratings is not None and self.qmc.roastersize_setup > 0 and self.qmc.roasterheating_setup > 0 and \
+                                    self.qmc.roasterheating_setup in self.qmc.machinesetup_energy_ratings:
+                                heating_ratings = self.qmc.machinesetup_energy_ratings[self.qmc.roasterheating_setup]
+                                if self.qmc.roastersize_setup in heating_ratings:
+                                    ratings = heating_ratings[self.qmc.roastersize_setup]
+                                    if 'loadlabels' in ratings and len(ratings['loadlabels']) == 4:
+                                        self.qmc.loadlabels_setup = ratings['loadlabels']
+                                    if 'loadratings' in ratings and len(ratings['loadratings']) == 4:
+                                        self.qmc.loadratings_setup = ratings['loadratings']
+                                    if 'ratingunits' in ratings and len(ratings['ratingunits']) == 4:
+                                        self.qmc.ratingunits_setup = ratings['ratingunits']
+                                    if 'sourcetypes' in ratings and len(ratings['sourcetypes']) == 4:
+                                        self.qmc.sourcetypes_setup = ratings['sourcetypes']
+                                    if 'load_etypes' in ratings and len(ratings['load_etypes']) == 4:
+                                        self.qmc.load_etypes_setup = ratings['load_etypes']
+                                    if 'presssure_percents' in ratings and len(ratings['presssure_percents']) == 4:
+                                        self.qmc.presssure_percents_setup = ratings['presssure_percents']
+                                    if 'loadevent_zeropcts' in ratings and len(ratings['loadevent_zeropcts']) == 4:
+                                        self.qmc.loadevent_zeropcts_setup = ratings['loadevent_zeropcts']
+                                    if 'loadevent_hundpcts' in ratings and len(ratings['loadevent_hundpcts']) == 4:
+                                        self.qmc.loadevent_hundpcts_setup = ratings['loadevent_hundpcts']
+                                    self.qmc.restoreEnergyLoadDefaults()
+                                    self.sendmessage(QApplication.translate('Message','Energy loads configured for {0} {1}kg').format(label,self.qmc.roastersize_setup))
+                            self.sendmessage(QApplication.translate('Message','Artisan configured for {0}').format(label))
+                            _log.info('Artisan configured for %s',label)
+                        else:
+                            res = False
+                    if not res:
+                        # reset
+                        self.qmc.etypes= org_etypes
+                        self.qmc.device = org_device
+                        self.qmc.machinesetup = org_machinesetup
+                        self.modbus.host = org_modbus_host
+                        self.s7.host = org_s7_host
+                        self.ws.host = org_ws_host
+                        self.kaleidoHost = org_kaleido_host
+                        self.ser.comport = org_comport
+                        self.modbus.comport = org_modbus_comport
+                        self.qmc.roastersize_setup = org_roastersize_setup
+                        self.qmc.last_batchsize = org_last_batchsize
+                        self.qmc.roastersize = org_roastersize
+                        self.qmc.roasterheating_setup = org_roasterheating_setup
+                        self.qmc.roasterheating = org_roasterheating
+                        #
+                        self.sendmessage(QApplication.translate('Message','Action canceled'))
                     else:
-                        res = self.qmc.roastersize_setup != 0 # roastersize_setup was loaded from machine setup
-                if res:
-                    # first establish roastersize_setup batchsizes as default batchsize (potentially unit converted)
-                    if self.qmc.roastersize_setup > 0:
-                        weight_unit = self.qmc.weight[2]
-                        nominal_batch_size = self.convertWeight(self.qmc.roastersize_setup,1,self.qmc.weight_units.index(self.qmc.weight[2]))
-                        self.qmc.last_batchsize = nominal_batch_size
-                        self.qmc.weight = (nominal_batch_size,0,weight_unit)
-                    # size set, ask for heating
-                    resi:Optional[int]
-                    if self.qmc.roasterheating_setup == 0:
-                        dlg:ArtisanComboBoxDialog = ArtisanComboBoxDialog(self, self, QApplication.translate('Message',
-                                'Machine'),QApplication.translate('Label', 'Heating'),self.qmc.heating_types,0)
-                        resi = dlg.idx if dlg.exec() else None
-                    else:
-                        resi = self.qmc.roasterheating_setup
-                    if resi is not None:
-                        res = True
-                        self.qmc.roasterheating_setup = self.qmc.roasterheating = resi
-                        # now check if the machine setup contains energy default ratings for the given batch size and energy rating
-                        if self.qmc.machinesetup_energy_ratings is not None and self.qmc.roastersize_setup > 0 and self.qmc.roasterheating_setup > 0 and \
-                                self.qmc.roasterheating_setup in self.qmc.machinesetup_energy_ratings:
-                            heating_ratings = self.qmc.machinesetup_energy_ratings[self.qmc.roasterheating_setup]
-                            if self.qmc.roastersize_setup in heating_ratings:
-                                ratings = heating_ratings[self.qmc.roastersize_setup]
-                                if 'loadlabels' in ratings and len(ratings['loadlabels']) == 4:
-                                    self.qmc.loadlabels_setup = ratings['loadlabels']
-                                if 'loadratings' in ratings and len(ratings['loadratings']) == 4:
-                                    self.qmc.loadratings_setup = ratings['loadratings']
-                                if 'ratingunits' in ratings and len(ratings['ratingunits']) == 4:
-                                    self.qmc.ratingunits_setup = ratings['ratingunits']
-                                if 'sourcetypes' in ratings and len(ratings['sourcetypes']) == 4:
-                                    self.qmc.sourcetypes_setup = ratings['sourcetypes']
-                                if 'load_etypes' in ratings and len(ratings['load_etypes']) == 4:
-                                    self.qmc.load_etypes_setup = ratings['load_etypes']
-                                if 'presssure_percents' in ratings and len(ratings['presssure_percents']) == 4:
-                                    self.qmc.presssure_percents_setup = ratings['presssure_percents']
-                                if 'loadevent_zeropcts' in ratings and len(ratings['loadevent_zeropcts']) == 4:
-                                    self.qmc.loadevent_zeropcts_setup = ratings['loadevent_zeropcts']
-                                if 'loadevent_hundpcts' in ratings and len(ratings['loadevent_hundpcts']) == 4:
-                                    self.qmc.loadevent_hundpcts_setup = ratings['loadevent_hundpcts']
-                                self.qmc.restoreEnergyLoadDefaults()
-                                self.sendmessage(QApplication.translate('Message','Energy loads configured for {0} {1}kg').format(label,self.qmc.roastersize_setup))
-                        self.sendmessage(QApplication.translate('Message','Artisan configured for {0}').format(label))
-                        _log.info('Artisan configured for %s',label)
-                    else:
-                        res = False
-                if not res:
-                    # reset
-                    self.qmc.etypes= org_etypes
-                    self.qmc.device = org_device
-                    self.qmc.machinesetup = org_machinesetup
-                    self.modbus.host = org_modbus_host
-                    self.s7.host = org_s7_host
-                    self.ws.host = org_ws_host
-                    self.kaleidoHost = org_kaleido_host
-                    self.ser.comport = org_comport
-                    self.modbus.comport = org_modbus_comport
-                    self.qmc.roastersize_setup = org_roastersize_setup
-                    self.qmc.last_batchsize = org_last_batchsize
-                    self.qmc.roastersize = org_roastersize
-                    self.qmc.roasterheating_setup = org_roasterheating_setup
-                    self.qmc.roasterheating = org_roasterheating
-                    #
-                    self.sendmessage(QApplication.translate('Message','Action canceled'))
-                else:
-                    # setup not canceled, we establish the last_batchsize
-                    self.qmc.weight = (self.qmc.last_batchsize,0,self.qmc.weight[2])
-                self.establish_etypes()
-            self.qmc.redraw(False,False)
+                        # setup not canceled, we establish the last_batchsize
+                        self.qmc.weight = (self.qmc.last_batchsize,0,self.qmc.weight[2])
+                    self.establish_etypes()
+                self.qmc.redraw(False,False)
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 
     def populateThemeMenu(self):
         self.themeMenu.clear()
@@ -17589,7 +17592,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.largePhasesLCDs()
             # start server if needed
             if self.WebLCDs:
-                self.startWebLCDs(force=True)
+                QTimer.singleShot(5000, self.startWebLCDsforced)
 
 #--- BEGIN GROUP ExtraEventButtons
             #restore buttons
@@ -17810,6 +17813,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             QMessageBox.information(self,QApplication.translate('Error Message', 'Error'),QApplication.translate('Error Message', 'Exception:') + ' settingsLoad()  @line ' + str(getattr(exc_tb, 'tb_lineno', '?')))
 
         return res
+
+    @pyqtSlot()
+    def startWebLCDsforced(self):
+        self.startWebLCDs(force=True)
 
     def startWebLCDs(self,force=False):
         try:
@@ -24164,6 +24171,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 ('\\w', self.qmc.etypes[1]),
                 ('\\e', self.qmc.etypes[2]),
                 ('\\r', self.qmc.etypes[3]),
+                ('\\i', QApplication.translate('Label','STIRRER')),
+                ('\\f', QApplication.translate('Label','FILL')),
+                ('\\r', QApplication.translate('Label','RELEASE')),
                 ('\\h', QApplication.translate('Label','HEATING')),
                 ('\\l', QApplication.translate('Label','COOLING'))
                 ]:
@@ -25355,7 +25365,6 @@ def initialize_locale(my_app) -> str:
     if locale is None or len(locale) == 0:
         locale = 'en'
 
-
     #load Qt default translations from QLibrary
     try:
         try:
@@ -25373,14 +25382,16 @@ def initialize_locale(my_app) -> str:
         trans_paths.append('translations')
 
         #load Qt translations
-        qtTranslator:QTranslator = QTranslator(my_app)
+        _log.info('modules: %s',qt_translation_modules)
         for qt_trans_module in qt_translation_modules:
+            # each QTranslator can only hold one file
+            qtTranslator:QTranslator = QTranslator(my_app)
             qt_qm_file:str = f'{qt_trans_module}_{locale}'
             for trans_path in [qt_trans_path] + trans_paths: # start with the default PyQt/Qt translations location
                 if qtTranslator.load(qt_qm_file, trans_path):
                     _log.info('loading qt translations %s from %s', qt_qm_file, trans_path)
                     break
-        my_app.installTranslator(qtTranslator)
+            my_app.installTranslator(qtTranslator)
 
         #load Artisan translations
         appTranslator:QTranslator = QTranslator(my_app)
