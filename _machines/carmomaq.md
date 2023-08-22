@@ -15,12 +15,41 @@ sidebar:
 * __Connection:__ MODBUS RTU via serial connection or MODBUS TCP via the network
 * __Features:__
   - logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
-  - logging and control of burner level (0-100%), drum speed (0-100%) and air flow (0-100%)
+  - logging and control of burner level (0-100%), drum speed (0-120%) and air flow (0-120%)
 
 <figure>
 <center>
 <a href="{{ site.baseurl }}/assets/images/buttons-carmomaq.png">
 <img src="{{ site.baseurl }}/assets/images/buttons-carmomaq.png" style="width: 80%;"></a>
-    <figcaption>custom event buttons</figcaption>
+    <figcaption>custom event buttons (legacy setups)</figcaption>
 </center>
 </figure>
+
+<figure>
+<center>
+<a href="{{ site.baseurl }}/assets/images/buttons-carmomaq2.png">
+<img src="{{ site.baseurl }}/assets/images/buttons-carmomaq2.png" style="width: 80%;"></a>
+    <figcaption>custom event buttons (2.0 setups)</figcaption>
+</center>
+</figure>
+
+> **Setup Notes**  
+>    
+> For machines produced in 8/2020 and later choose one of the following machine setups  
+> 
+> - `Caloratto 2.0`
+> - `Masteratto 2.0`
+> - `Speciatto 2.0`
+> - `Stratto 2.0`
+>
+>   
+> For Caloratto and Materatto machines produced before 8/2020 choose the `Caloratto-Materatto_Legacy` machine setup.  
+> 
+For Stratto machines produced before 8/2020 choose one of the following machine setups  
+> 
+> - `Stratto_1.5_Network_Legacy` (with tablet, connected via WiFi)
+> - `Stratto_1.5_Serial_Legacy` (with touch screen, connected via USB)  
+> 
+>    
+> For even older Stratto machines featuring Novus controls choose the machine setup `Stratto_1.0_Serial_Novus`.
+{: .notice--primary}
