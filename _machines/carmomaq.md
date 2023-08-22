@@ -16,6 +16,7 @@ sidebar:
 * __Features:__
   - logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
   - logging and control of burner level (0-100%), drum speed (0-120%) and air flow (0-120%)
+  - control of further actors
 
 <figure>
 <center>

@@ -149,11 +149,9 @@ There are also legacy builds for Windows 8 (x64) and macOS 10.13.
   
 ## Cast
 
-__Rafael Cobo__ –– initator of the project
-
 __[Marko Luther](/authors/luther/)__ –– maintainer
 
-__[Dave Baxter](/authors/baxter/)__ –– design wizard & genius
+__[Dave Baxter](/authors/baxter/)__ –– design wizard, genius & CI
 
 __[Michael Herbert](/authors/herbert/)__ –– documentation & fundraising
 
@@ -161,7 +159,9 @@ __Brett Pound__ –– support
 
 __Frans Goddijn__ –– support
 
-__Rui Paulo__ –– Aillio master & CI
+<span style="color:grey">__Rui Paulo__ –– Aillio master & CI</span>
+
+<span style="color:grey">__Rafael Cobo__ –– initator of the project</span>
 
 We are always looking for people that support us here and there. Especially, people that help us to localize the UI of Artisan to more languages and to complete the existing translations are very welcome!
 
