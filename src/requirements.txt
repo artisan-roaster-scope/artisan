@@ -27,8 +27,8 @@ Pillow==9.5.0; sys_platform=='darwin'
 ######
 # packages that are required on all platforms
 #
-setuptools==68.0.0
-wheel==0.41.1
+setuptools==68.1.2
+wheel==0.41.2
 pyserial==3.5
 pymodbus==3.4.1
 python-snap7==1.3
@@ -47,11 +47,11 @@ websockets==11.0.3
 PyYAML==6.0.1
 psutil==5.9.4
 typing-extensions==4.71; python_version < '3.8' # required for supporting Final and TypeDict on Python <3.8
-protobuf==4.24.0
+protobuf==4.24.1
 numpy==1.24.3; python_version < '3.9' # last Python 3.8 release
 numpy==1.25.2; python_version >= '3.9'
 scipy==1.10.1; python_version < '3.9' # last Python 3.8 release
-scipy==1.11.1; python_version >= '3.9'
+scipy==1.11.2; python_version >= '3.9'
 wquantiles==0.6
 colorspacious==1.1.2
 openpyxl==3.1.2
