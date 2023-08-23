@@ -613,6 +613,7 @@ _log.info(
     str(__build__),
 )
 _log.info('platform: %s',str(platform.platform()))
+_log.info('exec: %s', str(sys.executable))
 
 
 if platform.system().startswith('Windows'):
@@ -25382,7 +25383,6 @@ def initialize_locale(my_app) -> str:
         trans_paths.append('translations')
 
         #load Qt translations
-        _log.info('modules: %s',qt_translation_modules)
         for qt_trans_module in qt_translation_modules:
             # each QTranslator can only hold one file
             qtTranslator:QTranslator = QTranslator(my_app)

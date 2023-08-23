@@ -11238,15 +11238,18 @@ class tgraphcanvas(FigureCanvas):
             if self.phidgetManager is not None:
                 self.phidgetManager.close()
                 self.phidgetManager = None
+                _log.info('phidgetManager stopped')
             self.removePhidgetServer()
             try:
                 from Phidget22.Devices.Log import Log as PhidgetLog # type: ignore
                 PhidgetLog.disable()
+                _log.info('phidgetLog stopped')
             except Exception: # pylint: disable=broad-except
                 pass
 
     def restartPhidgetManager(self):
         if not self.flagon:
+            _log.info('restart phidgetManager')
             self.stopPhidgetManager()
             self.startPhidgetManager()
 
