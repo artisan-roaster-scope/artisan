@@ -132,7 +132,7 @@ marklastbuttonpressed=false
 showextrabuttontooltips=false
 
 [SerialPort]
-baudrate=9600
+baudrate=57600
 bytesize=8
 comport=COM4
 parity=N

@@ -4,13 +4,13 @@ Oversampling=true
 roastertype_setup=Carmomaq Masteratto
 
 [DefaultButtons]
-buttonactions=0, 0, 0, 0, 0, 0, 0, 0
-buttonactionstrings=, , , , , , , 
+buttonactions=3, 0, 0, 0, 0, 0, 3, 0
+buttonactionstrings="write(1,50,1)", , , , , , "write(1,50,2)", 
 buttonvisibility=true, true, true, true, true, false, true, true
-extrabuttonactions=0, 3, 0
-extrabuttonactionstrings=, "write(1,50,2)", 
-xextrabuttonactions=0, 3
-xextrabuttonactionstrings=, "write(1,50,1)"
+extrabuttonactions=0, 0, 0
+extrabuttonactionstrings=, , 
+xextrabuttonactions=0, 0
+xextrabuttonactionstrings=, 
 
 [Device]
 id=29
@@ -40,6 +40,8 @@ extramathexpression2=,
 extraname1={3}, {1}
 extraname2={0}, {2}
 
+[events]
+etypes=Air, Drum, V.Press, Burner, --
 
 [ExtraEventButtons]
 buttonlistmaxlen=8
@@ -137,7 +139,7 @@ input6code=3
 input6div=0
 input6float=false
 input6mode=
-input6register=59
+input6register=49
 input6slave=1
 input7BCDsAsInt=false
 input7FloatsAsInt=false
