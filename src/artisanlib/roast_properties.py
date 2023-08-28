@@ -5046,7 +5046,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         loadLabels = ['']*4
         loadUnits = ['']*4
         loadValues = ['0']*4
-        for i in range(0,4):
+        for i in range(4):
             loadLabels[i] = self.formatLoadLabel(chr(ord('A')+i),self.aw.qmc.loadlabels[i])
             if self.aw.qmc.load_etypes[i] > 0 and loadEnergy[i] >- 1:
                 loadValues[i] = scaleFloat2String(loadEnergy[i])

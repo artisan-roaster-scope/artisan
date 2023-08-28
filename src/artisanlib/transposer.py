@@ -835,7 +835,7 @@ class profileTransformatorDlg(ArtisanDialog):
                         fits[i] = numpy.polyfit([sources[i],sources[next_idx]],[targets[i],targets[next_idx]],1)
                     # if this is the first fit, we copy it to all previous positions
                     if last_fit is None:
-                        for k in range(0,i):
+                        for k in range(i):
                             if sources[k] is not None:
                                 fits[k] = fits[i]
                     # register this fit

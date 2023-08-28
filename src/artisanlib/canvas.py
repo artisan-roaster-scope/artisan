@@ -14121,7 +14121,7 @@ class tgraphcanvas(FigureCanvas):
                 prev_loadtime = [self.timex[-1]]*4
                 #self.aw.sendmessage(QApplication.translate("Message","Profile has no DROP event"),append=False)
 
-            for i in range(0,4):
+            for i in range(4):
                 # iterate specialevents in reverse from DROP to the first event
                 for j in range(len(self.specialevents) - 1, -1, -1):
                     if self.load_etypes[i] != 0 and self.specialeventstype[j] == self.load_etypes[i]-1:
@@ -14400,7 +14400,7 @@ class tgraphcanvas(FigureCanvas):
 
             prev_loadtime = [self.timex[-1]]*4
 
-            for i in range(0,4):
+            for i in range(4):
                 # iterate specialevents in reverse from end of profile to start
                 if self.load_etypes[i] == 0:
                     heatEnergy[i] = -1

@@ -32,7 +32,7 @@ from lxml import html # type: ignore
 
 import logging
 from typing import Optional, TYPE_CHECKING
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     try:
@@ -276,10 +276,10 @@ class AillioR1:
         d = int(round(min(d,11)))
         if f > value:
             if self.parent_pipe is not None:
-                for _ in range(0, d):
+                for _ in range(d):
                     self.parent_pipe.send(self.AILLIO_CMD_FAN_DECR)
         elif self.parent_pipe is not None:
-            for _ in range(0, d):
+            for _ in range(d):
                 self.parent_pipe.send(self.AILLIO_CMD_FAN_INCR)
         self.fan = value
 
