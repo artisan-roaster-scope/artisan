@@ -45,12 +45,6 @@ sidebar:
 >
 >   
 > For Caloratto and Materatto machines produced before 8/2020 choose the `Caloratto-Materatto_Legacy` machine setup.  
-> 
-For Stratto machines produced before 8/2020 choose one of the following machine setups  
-> 
-> - `Stratto_1.5_Network_Legacy` (with tablet, connected via WiFi)
-> - `Stratto_1.5_Serial_Legacy` (with touch screen, connected via USB)  
-> 
 >    
-> For even older Stratto machines featuring Novus controls choose the machine setup `Stratto_1.0_Serial_Novus`.
+> For older Stratto machines featuring Novus controls choose the machine setup `Stratto_1.0_Serial_Novus`.
 {: .notice--primary}
