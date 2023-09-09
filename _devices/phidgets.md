@@ -20,7 +20,7 @@ All Phidgets can be connected either directly via USB or remotely via network co
 > Setting up Artisan for wireless access to Phidgets see below under [5. Remote Access](#remote-access).
 {: .notice--primary}
 
-There are Phidgets that feature a direct USB connection as well as the more recent [VINT Phidgets](https://www.phidgets.com/docs/What_is_VINT%3F){:target="_blank"}* that are connected via a [VINT USB hub](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643){:target="_blank"} to the USB port. Some are electrically isolated and thus more resistant against electrical noise.
+There are Phidgets that feature a direct USB connection as well as the more recent [VINT Phidgets](https://www.phidgets.com/docs/What_is_VINT%3F){:target="_blank"}* that are connected via a [VINT USB hub](https://phidgets.com/?tier=2&catid=64&pcid=57){:target="_blank"} to the USB port. Some are electrically isolated and thus more resistant against electrical noise.
 
 Any number of Phidgets, of one type or mixed types, can be used in combination with any of the other supported devices.
 
@@ -107,23 +107,28 @@ Artisan can attach to all Phidgets IO ports. The input ports are configured as (
   [Phidget 1018](https://phidgets.com/?tier=3&catid=105&pcid=85&prodid=1198){:target="_blank"}  
   [Phidget 1019](https://phidgets.com/?tier=3&catid=96&pcid=76&prodid=1035){:target="_blank"}  
   [Phidget SBC](https://phidgets.com/?tier=3&catid=64&pcid=57&prodid=969){:target="_blank"} : analog/digital in
-	* `Phidget IO 01` : analog input (0-5V), ports 0 and 1
-	* `Phidget IO 23` : analog input (0-5V), ports 2 and 3
-	* `Phidget IO 45` : analog input (0-5V), ports 4 and 5
-	* `Phidget IO 67` : analog input (0-5V), ports 6 and 7
+	* `Phidget IO 01` : analog input (0-5V), ports 0 & 1
+	* `Phidget IO 23` : analog input (0-5V), ports 2 & 3
+	* `Phidget IO 45` : analog input (0-5V), ports 4 & 5
+	* `Phidget IO 67` : analog input (0-5V), ports 6 & 7
 	
-	* `Phidget IO Digital 01` : digital input (0 or 1), ports 2 and 3
-	* `Phidget IO Digital 23` : digital input (0 or 1), ports 2 and 3
-	* `Phidget IO Digital 45` : digital input (0 or 1), ports 4 and 5
-	* `Phidget IO Digital 67` : digital input (0 or 1), ports 6 and 7
+	* `Phidget IO Digital 01` : digital input (0 or 1), ports 2 & 3
+	* `Phidget IO Digital 23` : digital input (0 or 1), ports 2 & 3
+	* `Phidget IO Digital 45` : digital input (0 or 1), ports 4 & 5
+	* `Phidget IO Digital 67` : digital input (0 or 1), ports 6 & 7
 
 
 * [Phidget 1011](https://phidgets.com/?tier=3&catid=105&pcid=85&prodid=4){:target="_blank"}  (2x Analog, 2x Digital)   
 	* `Phidget 1011 IO 01` : analog input (0-5V), ports 0 and 1
 	* `Phidget 1011 IO Digital 01` : digital input (0 or 1), ports 0 and 1
 
+* [Phidget  HUB0007](https://phidgets.com/?tier=3&catid=64&pcid=57&prodid=1290){:target="_blank"} (VINT HUB): 1x analog/digital in
 
-* [Phidget  HUB0000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643){:target="_blank"}   
+	* `Phidget HUB IO 0` : analog input (0-5V); attaches only port 0
+
+* [Phidget  HUB0000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643){:target="_blank"}  
+  [Phidget  HUB0001](https://phidgets.com/?tier=3&catid=64&pcid=57&prodid=1202){:target="_blank"}  
+  [Phidget  HUB0002](https://phidgets.com/?tier=3&catid=64&pcid=57&prodid=1289){:target="_blank"}   
   [Phidget HUB5000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=1143){:target="_blank"} (VINT HUB): 6x analog/digital in
 
 	* `Phidget HUB IO 0` : analog input (0-5V); attaches only port 0
@@ -165,7 +170,12 @@ Artisan can attach to all Phidgets IO ports. The input ports are configured as (
 
 Artisan can attach to all Phidgets IO ports. Phidgets output can be activated via `IO Command`, `PWM Command` or `VOUT Command` button or slider actions configured in the Events tab (menu `Config >> Events`). Note that buttons and sliders themself can be triggered autoamatically via alarm actions.
 
-* [Phidget  HUB0000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643){:target="_blank"} (VINT HUB): 6x digital PWM out
+
+* [Phidget  HUB0007](https://phidgets.com/?tier=3&catid=64&pcid=57&prodid=1290){:target="_blank"} (VINT HUB): 1x voltage out
+* [Phidget  HUB0000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643){:target="_blank"}, 
+  [Phidget  HUB0001](https://phidgets.com/?tier=3&catid=64&pcid=57&prodid=1202){:target="_blank"}, 
+  [Phidget  HUB0002](https://phidgets.com/?tier=3&catid=64&pcid=57&prodid=1289){:target="_blank"},    
+  [Phidget HUB5000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=1143){:target="_blank"} (VINT HUB): 6x voltage out
 * [Phidget OUT1000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=711){:target="_blank"} (VINT): 1x 12bit voltage out
 * [Phidget OUT1001](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=712){:target="_blank"} (VINT): 1x 12bit isolated voltage out
 * [Phidget OUT1002](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=713){:target="_blank"} (VINT): 1x 16bit isolated voltage out
@@ -242,7 +252,11 @@ with
 
 ### 4.3 HUB PWM Output 
 
-* [HUB0000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643){:target="_blank"} (6x VINT HUB)
+* [Phidget  HUB0007](https://phidgets.com/?tier=3&catid=64&pcid=57&prodid=1290){:target="_blank"} (1x VINT HUB)
+* [Phidget  HUB0000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643){:target="_blank"}, 
+  [Phidget  HUB0001](https://phidgets.com/?tier=3&catid=64&pcid=57&prodid=1202){:target="_blank"}, 
+  [Phidget  HUB0002](https://phidgets.com/?tier=3&catid=64&pcid=57&prodid=1289){:target="_blank"},    
+  [Phidget HUB5000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=1143){:target="_blank"} (6x VINT HUB)
 
 Phidget HUB PWM modules can be controlled via `PWM Command ` actions triggered by buttons or sliders configured in the Events tab (menu `Config >> Events`). The following commands are supported:
 
