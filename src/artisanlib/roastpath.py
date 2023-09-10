@@ -11,7 +11,8 @@ import json
 from lxml import html # type: ignore
 import logging
 from typing import Optional, List, TYPE_CHECKING
-from typing_extensions import Final, TypedDict  # Python <=3.7
+from typing_extensions import TypedDict  # Python <=3.7
+from typing import Final
 
 
 if TYPE_CHECKING:
@@ -63,8 +64,8 @@ def extractProfileRoastPathHTML(url,_):
 
         title = ''
         date = tree.xpath('//div[contains(@class, "roast-top")]/*/*[local-name() = "h5"]/text()')
-        if date and len(date) > 0:
-            date_str = date[0].strip().split()
+        if isinstance(date, list) and len(date) > 0:
+            date_str = str(date[0]).strip().split()
             if len(date_str) > 2:
                 dateQt = QDateTime.fromString(date_str[-2]+date_str[-1], 'yyyy-MM-ddhh:mm')
                 if dateQt.isValid():
@@ -89,8 +90,8 @@ def extractProfileRoastPathHTML(url,_):
         for m in ['Roasted By','Coffee','Batch Size','Notes','Organization']:
             s:str = f'//*[@class="ml-2" and normalize-space(text())="Details"]/following::table[1]/tbody/tr[*]/td/*[normalize-space(text())="{m}"]/following::td[1]/text()'
             value = tree.xpath(s)
-            if len(value) > 0:
-                meta = value[0].strip()
+            if isinstance(value, list) and len(value) > 0:
+                meta = str(value[0]).strip()
                 try:
                     if m == 'Roasted By':
                         res['operator'] = meta
@@ -112,8 +113,8 @@ def extractProfileRoastPathHTML(url,_):
         for m in ['Nickname','Country','Region','Farm','Varietal','Process']:
             s = f'//*[@class="ml-2" and normalize-space(text())="Greens"]/following::table[1]/tbody/tr/td[count(//table/thead/tr/th[normalize-space(text())="{m}"]/preceding-sibling::th)+1]/text()'
             value = tree.xpath(s)
-            if len(value)>0:
-                meta = value[0].strip()
+            if isinstance(value, list) and len(value)>0:
+                meta = str(value[0]).strip()
                 if meta != '':
                     if beans == '':
                         beans = meta
@@ -209,9 +210,9 @@ def extractProfileRoastPathHTML(url,_):
                                 else: # n == 3: # Notes
                                     specialeventstype.append(4)
                                 try:
-                                    v = float(n['Note'])
-                                    v = v/10. + 1
-                                    specialeventsvalue.append(v)
+                                    vv:float = float(n['Note'])
+                                    vv = vv/10. + 1
+                                    specialeventsvalue.append(vv)
                                 except Exception: # pylint: disable=broad-except
                                     specialeventsvalue.append(0)
                                 specialeventsStrings.append(n['Note'])

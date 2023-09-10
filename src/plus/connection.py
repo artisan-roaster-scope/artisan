@@ -30,8 +30,9 @@ except Exception: # pylint: disable=broad-except
 
 from artisanlib import __version__
 from typing import Any, Optional, Dict, Tuple  #for Python >= 3.9: can remove 'Dict' since type hints can now use the generic 'dict'
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
+import uuid
 import datetime
 import gzip
 import json
@@ -344,9 +345,11 @@ def getHeaders(
     return headers
 
 
-def getHeadersAndData(authorized: bool, compress: bool, jsondata: JSON) -> Tuple[Dict[str, str],bytes]:
+def getHeadersAndData(authorized: bool, compress: bool, jsondata: JSON, verb: str) -> Tuple[Dict[str, str],bytes]:
     headers = getHeaders(authorized, decompress=compress)
     headers['Content-Type'] = 'application/json'
+    if verb == 'POST':
+        headers['Idempotency-Key'] = uuid.uuid4().hex
     if compress and len(jsondata) > config.post_compression_threshold:
         postdata = gzip.compress(jsondata)
         _log.debug('-> compressed size %s', len(postdata))
@@ -367,7 +370,7 @@ def sendData(
     _log.debug('sendData(%s,_data_,%s,%s)', url, verb, authorized)
     jsondata = json.dumps(data).encode('utf8')
     _log.debug('-> size %s', len(jsondata))
-    headers, postdata = getHeadersAndData(authorized, compress, jsondata)
+    headers, postdata = getHeadersAndData(authorized, compress, jsondata, verb)
     import requests  # @Reimport
     if verb == 'POST':
         r = requests.post(
@@ -391,7 +394,7 @@ def sendData(
         # we re-authentify by renewing the session token and try again
         if authentify():
             headers, postdata = getHeadersAndData(
-                authorized, compress, jsondata
+                authorized, compress, jsondata, verb
             )  # recreate header with new token
             if verb == 'POST':
                 r = requests.post(

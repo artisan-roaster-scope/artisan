@@ -10,7 +10,7 @@ import re
 from lxml import html # type: ignore
 import logging
 from typing import List, Optional, TYPE_CHECKING
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.types import ProfileData # pylint: disable=unused-import
@@ -37,14 +37,16 @@ def extractProfileRoastLog(url,_):
 
         title = ''
         title_elements = tree.xpath('//h2[contains(@id,"page-title")]/text()')
-        if len(title_elements)>0:
-            title = title_elements[0].strip()
+        if isinstance(title_elements, list) and len(title_elements)>0:
+            title0 = title_elements[0]
+            if isinstance(title0,str):
+                title = title0.strip()
 
         tag_values = {}
         for tag in ['Roastable:', 'Starting mass:', 'Ending mass:', 'Roasted on:', 'Roasted by:', 'Roaster:', 'Roast level:', 'Roast Notes:']:
             tag_elements = tree.xpath(f'//td[contains(@class,"text-rt") and normalize-space(text())="{tag}"]/following::td[1]/text()')
-            if len(tag_elements)>0:
-                tag_values[tag] = '\n'.join([e.strip() for e in tag_elements])
+            if isinstance(tag_elements, list) and len(tag_elements)>0:
+                tag_values[tag] = '\n'.join([str(e).strip() for e in tag_elements])
         # {'Roastable:': '2003000 Diablo FTO BULK', 'Starting mass:': '140.00 lb', 'Ending mass:': '116.80 lb', 'Roasted on:': 'Thu, Jun 6th, 2019 11:11 PM', 'Roasted by:': 'Ryan@caffeladro.com', 'Roaster:': 'Diedrich CR-70'}
 
         if 'Roasted on:' in tag_values:
@@ -97,8 +99,8 @@ def extractProfileRoastLog(url,_):
         # if DROP temp > 300 => F else C
 
         source_elements = tree.xpath('//script[contains(@id,"source")]/text()')
-        if len(source_elements)>0:
-            source_element = source_elements[0].strip()
+        if isinstance(source_elements, list) and len(source_elements)>0:
+            source_element = str(source_elements[0]).strip()
 
             pattern = re.compile(r"\"rid=(\d+)\"")
             d = pattern.findall(source_element)

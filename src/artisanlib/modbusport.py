@@ -19,7 +19,7 @@ import sys
 import time
 import logging
 from typing import Optional, List, Dict, Tuple, Union, TYPE_CHECKING
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
@@ -74,15 +74,15 @@ def convert_from_bcd(bcd):
 def getBinaryPayloadBuilder(byteorderLittle:bool = True, wordorderLittle:bool = False) -> 'BinaryPayloadBuilder':
     from pymodbus.constants import Endian
     from pymodbus.payload import BinaryPayloadBuilder
-    byteorder = Endian.Little if byteorderLittle else Endian.Big
-    wordorder = Endian.Little if wordorderLittle else Endian.Big
+    byteorder = Endian.LITTLE if byteorderLittle else Endian.BIG
+    wordorder = Endian.LITTLE if wordorderLittle else Endian.BIG
     return BinaryPayloadBuilder(byteorder=byteorder, wordorder=wordorder)
 
 def getBinaryPayloadDecoderFromRegisters(registers, byteorderLittle:bool = True, wordorderLittle:bool = False) -> 'BinaryPayloadDecoder':
     from pymodbus.constants import Endian
     from pymodbus.payload import BinaryPayloadDecoder
-    byteorder = Endian.Little if byteorderLittle else Endian.Big
-    wordorder = Endian.Little if wordorderLittle else Endian.Big
+    byteorder = Endian.LITTLE if byteorderLittle else Endian.BIG
+    wordorder = Endian.LITTLE if wordorderLittle else Endian.BIG
     return BinaryPayloadDecoder.fromRegisters(registers, byteorder=byteorder, wordorder=wordorder)
 
 

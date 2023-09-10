@@ -166,7 +166,7 @@ from artisanlib.suppress_errors import suppress_stdout_stderr
 
 with suppress_stdout_stderr():
     import matplotlib as mpl
-    from matplotlib import cm
+    from matplotlib import colormaps
     import matplotlib.colors as mcolors
 
 #try:
@@ -206,9 +206,8 @@ if TYPE_CHECKING:
     from matplotlib.text import Annotation # pylint: disable=unused-import
     from openpyxl.worksheet.worksheet import Worksheet # pylint: disable=unused-import
     import numpy.typing as npt # pylint: disable=unused-import
-    from matplotlib.backend_bases import Event # pylint: disable=unused-import
     from PyQt6.QtWidgets import QTableWidget, QScrollBar # pylint: disable=unused-import
-    from PyQt6.QtGui import QStyleHints, QClipboard # pylint: disable=unused-import
+    from PyQt6.QtGui import QStyleHints, QClipboard, QKeyEvent # pylint: disable=unused-import
 
 # fix socket.inet_pton on Windows (used by pymodbus TCP/UDP)
 try:
@@ -699,12 +698,12 @@ import plus.stock
 #######################################################################################
 
 
-def my_get_icon(name:str) -> Optional[QIcon]:
-    basedir = os.path.join(mpl.rcParams['datapath'], 'images')
-    p = os.path.join(basedir, name.replace('.svg','.png'))
-    if os.path.exists(p):
-        return QIcon(p)
-    return None
+#def my_get_icon(name:str) -> Optional[QIcon]:
+#    basedir = os.path.join(mpl.rcParams['datapath'], 'images')
+#    p = os.path.join(basedir, name.replace('.svg','.png'))
+#    if os.path.exists(p):
+#        return QIcon(p)
+#    return None
 
 
 
@@ -715,7 +714,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
     def __init__(self, plotCanvas:tgraphcanvas, parent:QWidget, white_icons=False) -> None:
 
         # toolitem entries of the form (text, tooltip_text, image_file, callback)
-        self.toolitems = (
+        self.toolitems: Tuple = (
                 ('Plus', QApplication.translate('Tooltip', 'Connect to plus service'), 'plus', 'plus'),
                 ('', QApplication.translate('Tooltip', 'Subscription'), 'plus-pro', 'subscription'),
                 (QApplication.translate('Toolbar', 'Home'), QApplication.translate('Tooltip', 'Reset original view'), 'home', 'home'),
@@ -735,7 +734,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         self.axis_ranges:List[float] = [] # holds the ranges of all axis to detect if it is zoomed in
 
         # holds the last known cursor event while mouse pointer is in canvas, set by mouse_move()
-        self._last_event:Optional['Event'] = None
+        self._last_event:Optional[mplLocationevent] = None
 
         NavigationToolbar.__init__(self, plotCanvas, parent)
 
@@ -795,15 +794,15 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         self.release_zoom_org = self.release_zoom
         self.release_zoom = self.release_zoom_new # type: ignore # Cannot assign to a method  [method-assign]
 
-        # monkey patch matplotlib figureoptions that links to svg icon by default (crashes Windows Qt4 builds!)
-        if not svgsupport:
-            figureoptions.get_icon = my_get_icon
+#        # monkey patch matplotlib figureoptions that links to svg icon by default (crashes Windows Qt4 builds!)
+#        if not svgsupport:
+#            figureoptions.get_icon = my_get_icon
         # monkey patch _formlayout
         try:
-            formlayout.fedit_org #@UndefinedVariable # noqa: B018
+            formlayout.fedit_org # type: ignore #@UndefinedVariable # noqa: B018
         except Exception: # pylint: disable=broad-except
             # not yet monkey patched
-            formlayout.fedit_org = formlayout.fedit
+            formlayout.fedit_org = formlayout.fedit # type: ignore
             formlayout.fedit = self.my_fedit
 #        # monkey patch _formlayout to work around a MPL3.5.1 issue on Qt6
 #        # (see https://github.com/matplotlib/matplotlib/issues/22471)
@@ -815,8 +814,9 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 #####   temporary hack for windows till better solution found about toolbar icon problem with py2exe and svg
 #######################################################################################
 
-    def my_fedit(self, data, comment='', icon=None, parent=None, **kargs):
-        del kargs
+    def my_fedit(self, data, title:str='', comment:str='', icon=None, parent=None, apply=None):
+        del title
+        del apply
 
         axes = self.aw.qmc.ax
         if axes is not None:
@@ -825,7 +825,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
             orig_ylim = axes.get_ylim()
             linedict = {}
             for line in axes.get_lines():
-                label = line.get_label()
+                label:str = str(line.get_label())
                 if label == '_nolegend_':
                     continue
                 linedict[label] = line
@@ -893,7 +893,9 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                         # Redraw
                         figure.canvas.draw()
                         if axes is not None and not (axes.get_xlim() == orig_xlim and axes.get_ylim() == orig_ylim):
-                            figure.canvas.toolbar.push_current()
+                            tb = figure.canvas.toolbar
+                            if tb is not None:
+                                tb.push_current()
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
                 dialog = formlayout.FormDialog(data, QApplication.translate('Toolbar', 'Lines'), comment, icon, parent, my_apply)
@@ -1034,7 +1036,8 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
     def update_message(self) -> None:
         if not self.qmc.twoAxisMode():
             self.qmc.fmt_data_RoR = False
-        xs = None
+        xs: Optional[str] = None
+        ys: Optional[float] = None
         timeindex = None # caches the foreground timex index computed at x cursor position
         backgroundtimeindex = None # caches the background timex index computed at x cursor position
         # update xy cursor position widget
@@ -1046,9 +1049,12 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
             else:
                 try:
                     channel = ''
-                    xs = self._last_event.inaxes.format_xdata(self._last_event.xdata)
+                    inaxes = self._last_event.inaxes
+                    if inaxes is not None and self._last_event.xdata is not None:
+                        xs = inaxes.format_xdata(self._last_event.xdata)
                     if self.qmc.fmt_data_curve == 0 or self.qmc.designerflag:
-                        ys = self._last_event.inaxes.format_ydata(self._last_event.ydata)
+                        if inaxes is not None and self._last_event.ydata is not None:
+                            ys = float(inaxes.format_ydata(self._last_event.ydata))
                     else:
                         try:
                             if self.qmc.fmt_data_curve == 1: # BT
@@ -1079,15 +1085,16 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                                 else:
                                     ys = self.qmc.temp1B[backgroundtimeindex]
                                 channel = 'ETB'
-                            else:
-                                ys = self._last_event.inaxes.format_ydata(self._last_event.ydata)
+                            elif inaxes is not None and self._last_event.ydata is not None:
+                                ys = float(inaxes.format_ydata(self._last_event.ydata))
                             if ys is not None:
                                 if self.qmc.LCDdecimalplaces:
                                     ys = self.aw.float2float(ys)
                                 else:
                                     ys = int(round(ys))
                         except Exception: # pylint: disable=broad-except
-                            ys = self._last_event.inaxes.format_ydata(self._last_event.ydata)
+                            if inaxes is not None and self._last_event.ydata is not None:
+                                ys = float(inaxes.format_ydata(self._last_event.ydata))
                 except Exception: # pylint: disable=broad-except
                     self.set_message(self.mode)
                 else:
@@ -1104,33 +1111,35 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                     if timeindex is None:
                         timeindex = self.qmc.time2index(self._last_event.xdata, nearest=False)
                     time = self._last_event.xdata
-                    if self.qmc.timeindex[0] != -1 and self.qmc.timeindex[0] < len(self.qmc.timex):
-                        time -= self.qmc.timex[self.qmc.timeindex[0]]
-                    self.qmc.updateLCDs(
-                        time,
-                        self.qmc.temp1,
-                        self.qmc.temp2,
-                        self.qmc.delta1,
-                        self.qmc.delta2,
-                        self.qmc.extratemp1,
-                        self.qmc.extratemp2,
-                        idx=(None if timeindex < 0 else timeindex))
+                    if time is not None:
+                        if self.qmc.timeindex[0] != -1 and self.qmc.timeindex[0] < len(self.qmc.timex):
+                            time -= self.qmc.timex[self.qmc.timeindex[0]]
+                        self.qmc.updateLCDs(
+                            time,
+                            self.qmc.temp1,
+                            self.qmc.temp2,
+                            self.qmc.delta1,
+                            self.qmc.delta2,
+                            self.qmc.extratemp1,
+                            self.qmc.extratemp2,
+                            idx=(None if timeindex < 0 else timeindex))
                 elif self.qmc.running_LCDs == 2:  # show background profile readings at cursor position in LCDs
                     try:
                         if backgroundtimeindex is None:
                             backgroundtimeindex = self.qmc.backgroundtime2index(self._last_event.xdata, nearest=False)
                         time = self._last_event.xdata
-                        if self.qmc.timeindexB[0] != -1 and self.qmc.timeindexB[0] < len(self.qmc.timeB):
-                            time -= self.qmc.timeB[self.qmc.timeindexB[0]]
-                        self.qmc.updateLCDs(
-                            time,
-                            self.qmc.temp1B,
-                            self.qmc.temp2B,
-                            self.qmc.delta1B,
-                            self.qmc.delta2B,
-                            self.qmc.temp1BX,
-                            self.qmc.temp2BX,
-                            idx=(None if backgroundtimeindex < 0 else backgroundtimeindex))
+                        if time is not None:
+                            if self.qmc.timeindexB[0] != -1 and self.qmc.timeindexB[0] < len(self.qmc.timeB):
+                                time -= self.qmc.timeB[self.qmc.timeindexB[0]]
+                            self.qmc.updateLCDs(
+                                time,
+                                self.qmc.temp1B,
+                                self.qmc.temp2B,
+                                self.qmc.delta1B,
+                                self.qmc.delta2B,
+                                self.qmc.temp1BX,
+                                self.qmc.temp2BX,
+                                idx=(None if backgroundtimeindex < 0 else backgroundtimeindex))
                     except Exception as e:  # pylint: disable=broad-except
                         _log.exception(e)
 
@@ -1140,7 +1149,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
             self._update_cursor(event) # not available in MPL v3.0.3 on Python3.5 for the RPi Stretch builds
         except Exception: # pylint: disable=broad-except
             pass
-        if event.inaxes and event.inaxes.get_navigate():
+        if event.inaxes and event.inaxes.get_navigate() and isinstance(event, mplLocationevent):
             self._last_event = event
         else:
             self._last_event = None
@@ -1856,12 +1865,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.importMenu.addSeparator()
 
                 importBulletAction = QAction('Aillio RoasTime...', self)
-                importBulletAction.triggered.connect(self.importBullet)
+#                importBulletAction.triggered.connect(self.importBullet)
                 self.importMenu.addAction(importBulletAction)
                 importBulletAction.setEnabled(False)
 
                 importBulletAction = QAction('Aillio Roast.World URL...', self)
-                importBulletAction.triggered.connect(self.importBulletURL)
+#                importBulletAction.triggered.connect(self.importBulletURL)
                 self.importMenu.addAction(importBulletAction)
                 importBulletAction.setEnabled(False)
 
@@ -3889,8 +3898,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.celsiusMode()
             self.qmc.phases = self.qmc.phases_celsius_defaults
 
-        self.qmc.toolbar.hide() # we need to hide the default navigation toolbar that we don't use
-        self.qmc.toolbar.destroy()
+#        if self.qmc.toolbar is not None:
+#            self.qmc.toolbar.hide() # we need to hide the default navigation toolbar that we don't use
+#            self.qmc.toolbar.destroy()
 
         # this variable is bound to the Roast Properties dialog if it is open, set to False to block opening the dialog or None otherwise
 
@@ -5681,7 +5691,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.level1layout.insertWidget(0,self.ntb)
 
         if str(canvas_color) == 'None':
-            self.qmc.fig.canvas.setStyleSheet('background-color:transparent;')
+            self.qmc.setStyleSheet('background-color:transparent;')
             self.ntb.setStyleSheet('QToolBar {background-color:transparent;}')
 
         self.updateSliderColors()
@@ -6118,8 +6128,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.superusermode = not self.superusermode
             if self.superusermode:
                 self.sendmessage(QApplication.translate('Message','super on'))
+                _log.info('Hottop super on')
             else:
                 self.sendmessage(QApplication.translate('Message','super off'))
+                _log.info('Hottop super off')
 
     @pyqtSlot(QPoint)
     def PhaseslcdClicked(self,_): # pylint: disable=no-self-use # used as slot
@@ -6859,9 +6871,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.mpl_fontproperties = mpl.font_manager.FontProperties(fname=fontpath)
 
     # trims arabic strings to be rendered correctly with unicode fonts if arabic locale is active
-    # if s is a QString with one {0} placeholder and a is an argument, the argument is reversed, and then the whole string result is reversed
+    # if s is a string with one {0} placeholder and a is an argument, the argument is reversed, and then the whole string result is reversed
     # if it contains any arabic characters
-    def arabicReshape(self,s,a=None):
+    def arabicReshape(self, s:str, a:Optional[str]=None) -> str:
         if self.locale_str == 'ar':
             st = str(s)
             if artisanlib.arabic_reshaper.has_arabic_letters(st):
@@ -7753,7 +7765,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     with warnings.catch_warnings():
                         warnings.simplefilter('ignore')
                         self.qmc.fig.canvas.draw()
-                        self.qmc.fig.canvas.update()
+#                        self.qmc.fig.canvas.update()
                     self.qmc.adjustSize()
                     FigureCanvas.updateGeometry(self.qmc)  #@UndefinedVariable
                     QApplication.processEvents()
@@ -10550,7 +10562,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         if self.saveGraphMenu is not None:
             self.saveGraphMenu.setEnabled(True)
         self.htmlAction.setEnabled(True)
-        self.roastReportPDFAction.setEnabled(True)
+        if self.QtWebEngineSupport:
+            self.roastReportPDFAction.setEnabled(True)
         if self.reportMenu is not None:
             self.reportMenu.setEnabled(True)
         if self.productionMenu is not None:
@@ -10802,8 +10815,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             else:
                 self.qmc.l_subtitle.set_color(self.qmc.palette['title'])
             self.qmc.ax.draw_artist(self.qmc.l_subtitle)
-            self.qmc.ax.figure.canvas.blit()
-            self.qmc.ax.figure.canvas.flush_events()
+            if self.qmc.ax.figure is not None:
+                self.qmc.ax.figure.canvas.blit()
+                self.qmc.ax.figure.canvas.flush_events()
             self.qmc.ax_background = None
 
     def togglePlaybackEvents(self):
@@ -10815,8 +10829,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.updatePlaybackIndicatorSignal.emit()
 
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work
-    def keyPressEvent(self,event):
-        if not self.processingKeyEvent:
+    def keyPressEvent(self, event: Optional['QKeyEvent']) -> None:
+        if not self.processingKeyEvent and event is not None:
             try:
                 self.processingKeyEvent = True
                 k = int(event.key())
@@ -15287,12 +15301,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             # add positions of main event annotations and custom event flags
             profile['anno_positions'] = self.qmc.getAnnoPositions()
             profile['flag_positions'] = self.qmc.getFlagPositions()
-            if self.qmc.legend is not None and not isinstance(self.qmc.legend._loc, int): # pylint: disable=protected-access
+            if self.qmc.legend is not None and not isinstance(self.qmc.legend._loc, int): # type: ignore # "Legend" has no attribute "_loc" # pylint: disable=protected-access
                 # if a legend is currently drawn and has a custom position we save its position in data coordinates
                 try:
                     if self.qmc.ax is not None:
                         axis_to_data = self.qmc.ax.transAxes + self.qmc.ax.transData.inverted()
-                        profile['legendloc_pos'] = axis_to_data.transform(self.qmc.legend._loc).tolist() # pylint: disable=protected-access
+                        profile['legendloc_pos'] = axis_to_data.transform(self.qmc.legend._loc).tolist() # type: ignore # "Legend" has no attribute "_loc" # pylint: disable=protected-access
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
 
@@ -17849,8 +17863,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             return False
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-            _, _, exc_tb = sys.exc_info()
-            self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' startWebLCDs() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.qmc.adderror(QApplication.translate('Error Message','Could not start WebLCDs. Selected port might be busy.'))
             self.stopWebLCDs()
             self.WebLCDs = False
             return False
@@ -17876,14 +17889,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     @staticmethod
     def getColor(line):
         c = line.get_color()
-        if isinstance(c, (list, tuple)):
-            return mpl.colors.rgb2hex(c)
+        if isinstance(c, (str, tuple)):
+            return mpl.colors.rgb2hex(c) # type: ignore # tuple items expected to be of type float
         return c
 
     def fetchCurveStyles(self):
         try:
             if self.qmc.l_temp1 is not None:
-                self.qmc.ETlinestyle = self.qmc.l_temp1.get_linestyle()
+                ls = self.qmc.l_temp1.get_linestyle()
+                if isinstance(ls, str):
+                    self.qmc.ETlinestyle = ls
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
                 # otherwise the drawingstyle cannot be set back to default!
                 if self.qmc.ETlinestyle == self.qmc.linestyle_default:
@@ -17892,12 +17907,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.qmc.ETdrawstyle = self.qmc.drawstyle_default
                 self.qmc.ETlinewidth = max(self.qmc.linewidth_min, self.qmc.l_temp1.get_linewidth())
                 m = self.qmc.l_temp1.get_marker()
-                if not isinstance(m, (int)):
+                if isinstance(m, str):
                     self.qmc.ETmarker = m
                 self.qmc.ETmarkersize = max(self.qmc.markersize_min, self.qmc.l_temp1.get_markersize())
                 self.qmc.palette['et'] = self.getColor(self.qmc.l_temp1)
             if self.qmc.l_temp2 is not None:
-                self.qmc.BTlinestyle = self.qmc.l_temp2.get_linestyle()
+                ls = self.qmc.l_temp2.get_linestyle()
+                if isinstance(ls, str):
+                    self.qmc.BTlinestyle = ls
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
                 if self.qmc.BTlinestyle == self.qmc.linestyle_default:
                     self.qmc.BTdrawstyle = self.qmc.l_temp2.get_drawstyle()
@@ -17905,12 +17922,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.qmc.BTdrawstyle = self.qmc.drawstyle_default
                 self.qmc.BTlinewidth = max(self.qmc.linewidth_min, self.qmc.l_temp2.get_linewidth())
                 m = self.qmc.l_temp2.get_marker()
-                if not isinstance(m, (int)):
+                if isinstance(m, str):
                     self.qmc.BTmarker = m
                 self.qmc.BTmarkersize = max(self.qmc.markersize_min, self.qmc.l_temp2.get_markersize())
                 self.qmc.palette['bt'] = self.getColor(self.qmc.l_temp2)
             if self.qmc.l_delta1 is not None:
-                self.qmc.ETdeltalinestyle = self.qmc.l_delta1.get_linestyle()
+                ls = self.qmc.l_delta1.get_linestyle()
+                if isinstance(ls, str):
+                    self.qmc.ETdeltalinestyle = ls
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
                 if self.qmc.ETdeltalinestyle == self.qmc.linestyle_default:
                     self.qmc.ETdeltadrawstyle = self.qmc.l_delta1.get_drawstyle()
@@ -17918,12 +17937,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.qmc.ETdeltadrawstyle = self.qmc.drawstyle_default
                 self.qmc.ETdeltalinewidth = max(self.qmc.linewidth_min, self.qmc.l_delta1.get_linewidth())
                 m = self.qmc.l_delta1.get_marker()
-                if not isinstance(m, (int)):
+                if isinstance(m, str):
                     self.qmc.ETdeltamarker = m
                 self.qmc.ETdeltamarkersize = max(self.qmc.markersize_min, self.qmc.l_delta1.get_markersize())
                 self.qmc.palette['deltaet'] = self.getColor(self.qmc.l_delta1)
             if self.qmc.l_delta2 is not None:
-                self.qmc.BTdeltalinestyle = self.qmc.l_delta2.get_linestyle()
+                ls = self.qmc.l_delta2.get_linestyle()
+                if isinstance(ls, str):
+                    self.qmc.BTdeltalinestyle = ls
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
                 if self.qmc.BTdeltalinestyle == self.qmc.linestyle_default:
                     self.qmc.BTdeltadrawstyle = self.qmc.l_delta2.get_drawstyle()
@@ -17931,12 +17952,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.qmc.BTdeltadrawstyle = self.qmc.drawstyle_default
                 self.qmc.BTdeltalinewidth = max(self.qmc.linewidth_min, self.qmc.l_delta2.get_linewidth())
                 m = self.qmc.l_delta2.get_marker()
-                if not isinstance(m, (int)):
+                if isinstance(m, str):
                     self.qmc.BTdeltamarker = m
                 self.qmc.BTdeltamarkersize = max(self.qmc.markersize_min, self.qmc.l_delta2.get_markersize())
                 self.qmc.palette['deltabt'] = self.getColor(self.qmc.l_delta2)
             if self.qmc.l_back1 is not None:
-                self.qmc.ETbacklinestyle = self.qmc.l_back1.get_linestyle()
+                ls = self.qmc.l_back1.get_linestyle()
+                if isinstance(ls, str):
+                    self.qmc.ETbacklinestyle = ls
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
                 if self.qmc.ETbacklinestyle == self.qmc.linestyle_default:
                     self.qmc.ETbackdrawstyle = self.qmc.l_back1.get_drawstyle()
@@ -17944,12 +17967,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.qmc.ETbackdrawstyle = self.qmc.drawstyle_default
                 self.qmc.ETbacklinewidth = max(self.qmc.linewidth_min, self.qmc.l_back1.get_linewidth())
                 m = self.qmc.l_back1.get_marker()
-                if not isinstance(m, (int)):
+                if isinstance(m, str):
                     self.qmc.ETbackmarker = m
                 self.qmc.ETbackmarkersize = max(self.qmc.markersize_min, self.qmc.l_back1.get_markersize())
                 self.qmc.backgroundmetcolor = self.getColor(self.qmc.l_back1)
             if self.qmc.l_back2 is not None:
-                self.qmc.BTbacklinestyle = self.qmc.l_back2.get_linestyle()
+                ls = self.qmc.l_back2.get_linestyle()
+                if isinstance(ls, str):
+                    self.qmc.BTbacklinestyle = ls
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
                 if self.qmc.BTbacklinestyle == self.qmc.linestyle_default:
                     self.qmc.BTbackdrawstyle = self.qmc.l_back2.get_drawstyle()
@@ -17957,12 +17982,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.qmc.BTbackdrawstyle = self.qmc.drawstyle_default
                 self.qmc.BTbacklinewidth = max(self.qmc.linewidth_min, self.qmc.l_back2.get_linewidth())
                 m = self.qmc.l_back2.get_marker()
-                if not isinstance(m, (int)):
+                if isinstance(m, str):
                     self.qmc.BTbackmarker = m
                 self.qmc.BTbackmarkersize = max(self.qmc.markersize_min, self.qmc.l_back2.get_markersize())
                 self.qmc.backgroundbtcolor = self.getColor(self.qmc.l_back2)
             if self.qmc.l_back3 is not None:
-                self.qmc.XTbacklinestyle = self.qmc.l_back3.get_linestyle()
+                ls = self.qmc.l_back3.get_linestyle()
+                if isinstance(ls, str):
+                    self.qmc.XTbacklinestyle = ls
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
                 if self.qmc.XTbacklinestyle == self.qmc.linestyle_default:
                     self.qmc.XTbackdrawstyle = self.qmc.l_back3.get_drawstyle()
@@ -17970,12 +17997,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.qmc.XTbackdrawstyle = self.qmc.drawstyle_default
                 self.qmc.XTbacklinewidth = max(self.qmc.linewidth_min, self.qmc.l_back3.get_linewidth())
                 m = self.qmc.l_back3.get_marker()
-                if not isinstance(m, (int)):
+                if isinstance(m, str):
                     self.qmc.XTbackmarker = m
                 self.qmc.XTbackmarkersize = max(self.qmc.markersize_min, self.qmc.l_back3.get_markersize())
                 self.qmc.backgroundxtcolor = self.getColor(self.qmc.l_back3)
             if self.qmc.l_back4 is not None:
-                self.qmc.YTbacklinestyle = self.qmc.l_back4.get_linestyle()
+                ls = self.qmc.l_back4.get_linestyle()
+                if isinstance(ls, str):
+                    self.qmc.YTbacklinestyle = ls
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
                 if self.qmc.YTbacklinestyle == self.qmc.linestyle_default:
                     self.qmc.YTbackdrawstyle = self.qmc.l_back4.get_drawstyle()
@@ -17983,12 +18012,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.qmc.YTbackdrawstyle = self.qmc.drawstyle_default
                 self.qmc.YTbacklinewidth = max(self.qmc.linewidth_min, self.qmc.l_back4.get_linewidth())
                 m = self.qmc.l_back4.get_marker()
-                if not isinstance(m, (int)):
+                if isinstance(m, str):
                     self.qmc.YTbackmarker = m
                 self.qmc.YTbackmarkersize = max(self.qmc.markersize_min, self.qmc.l_back4.get_markersize())
                 self.qmc.backgroundytcolor = self.getColor(self.qmc.l_back4)
             if self.qmc.l_delta1B is not None:
-                self.qmc.ETBdeltalinestyle = self.qmc.l_delta1B.get_linestyle()
+                ls = self.qmc.l_delta1B.get_linestyle()
+                if isinstance(ls, str):
+                    self.qmc.ETBdeltalinestyle = ls
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
                 if self.qmc.ETBdeltalinestyle == self.qmc.linestyle_default:
                     self.qmc.ETBdeltadrawstyle = self.qmc.l_delta1B.get_drawstyle()
@@ -17996,12 +18027,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.qmc.ETBdeltadrawstyle = self.qmc.drawstyle_default
                 self.qmc.ETBdeltalinewidth = max(self.qmc.linewidth_min, self.qmc.l_delta1B.get_linewidth())
                 m = self.qmc.l_delta1B.get_marker()
-                if not isinstance(m, (int)):
+                if isinstance(m, str):
                     self.qmc.ETBdeltamarker = m
                 self.qmc.ETBdeltamarkersize = max(self.qmc.markersize_min, self.qmc.l_delta1B.get_markersize())
                 self.qmc.backgrounddeltaetcolor = self.getColor(self.qmc.l_delta1B)
             if self.qmc.l_delta2B is not None:
-                self.qmc.BTBdeltalinestyle = self.qmc.l_delta2B.get_linestyle()
+                ls = self.qmc.l_delta2B.get_linestyle()
+                if isinstance(ls, str):
+                    self.qmc.BTBdeltalinestyle = ls
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
                 if self.qmc.BTBdeltalinestyle == self.qmc.linestyle_default:
                     self.qmc.BTBdeltadrawstyle = self.qmc.l_delta2B.get_drawstyle()
@@ -18009,7 +18042,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.qmc.BTBdeltadrawstyle = self.qmc.drawstyle_default
                 self.qmc.BTBdeltalinewidth = max(self.qmc.linewidth_min, self.qmc.l_delta2B.get_linewidth())
                 m = self.qmc.l_delta2B.get_marker()
-                if not isinstance(m, (int)):
+                if isinstance(m, str):
                     self.qmc.BTBdeltamarker = m
                 self.qmc.BTBdeltamarkersize = max(self.qmc.markersize_min, self.qmc.l_delta2B.get_markersize())
                 self.qmc.backgrounddeltabtcolor = self.getColor(self.qmc.l_delta2B)
@@ -18017,69 +18050,73 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             for i in range(len(self.qmc.extradevices)):
                 if len(self.extraCurveVisibility1)> i and self.extraCurveVisibility1[i] and len(self.qmc.extratemp1lines) > x1:
                     l1 = self.qmc.extratemp1lines[x1]
-                    self.qmc.extralinestyles1[i] = l1.get_linestyle()
+                    ls = l1.get_linestyle()
+                    if isinstance(ls, str):
+                        self.qmc.extralinestyles1[i] = ls
                     if self.qmc.extralinestyles1[i] == self.qmc.linestyle_default:
                         self.qmc.extradrawstyles1[i] = l1.get_drawstyle()
                     else:
                         self.qmc.extradrawstyles1[i] = self.qmc.drawstyle_default
                     self.qmc.extralinewidths1[i] = max(self.qmc.linewidth_min, l1.get_linewidth())
                     m = l1.get_marker()
-                    if not isinstance(m, (int)):
+                    if isinstance(m, str):
                         self.qmc.extramarkers1[i] = m
                     self.qmc.extramarkersizes1[i] = max(self.qmc.markersize_min, l1.get_markersize())
                     self.qmc.extradevicecolor1[i] = self.getColor(l1)
                     self.setLabelColor(self.extraLCDlabel1[i],QColor(self.qmc.extradevicecolor1[i]))
-                    self.qmc.extraname1[i] = l1.get_label()
+                    self.qmc.extraname1[i] = str(l1.get_label())
                     x1 = x1 + 1
                 if len(self.extraCurveVisibility2)> i and self.extraCurveVisibility2[i] and len(self.qmc.extratemp2lines) > x2:
                     l2 = self.qmc.extratemp2lines[x2]
-                    self.qmc.extralinestyles2[i] = l2.get_linestyle()
+                    ls = l2.get_linestyle()
+                    if isinstance(ls, str):
+                        self.qmc.extralinestyles2[i] = ls
                     if self.qmc.extralinestyles2[i] == self.qmc.linestyle_default:
                         self.qmc.extradrawstyles2[i] = l2.get_drawstyle()
                     else:
                         self.qmc.extradrawstyles2[i] = self.qmc.drawstyle_default
                     self.qmc.extralinewidths2[i] = max(self.qmc.linewidth_min, l2.get_linewidth())
                     m = l2.get_marker()
-                    if not isinstance(m, (int)):
+                    if isinstance(m, str):
                         self.qmc.extramarkers2[i] = m
                     self.qmc.extramarkersizes2[i] = max(self.qmc.markersize_min, l2.get_markersize())
                     self.qmc.extradevicecolor2[i] = self.getColor(l2)
                     self.setLabelColor(self.extraLCDlabel2[i],QColor(self.qmc.extradevicecolor2[i]))
-                    self.qmc.extraname2[i] = l2.get_label()
+                    self.qmc.extraname2[i] = str(l2.get_label())
                     x2 = x2 + 1
             if self.qmc.eventsGraphflag in [2,3,4]:
                 if self.qmc.l_eventtype1dots is not None:
                     m = self.qmc.l_eventtype1dots.get_marker()
-                    if not isinstance(m, (int)):
+                    if isinstance(m, str):
                         self.qmc.EvalueMarker[0] = m
                     self.qmc.EvalueMarkerSize[0] = max(self.qmc.markersize_min, self.qmc.l_eventtype1dots.get_markersize())
                     self.qmc.EvalueColor[0] = self.getColor(self.qmc.l_eventtype1dots)
                     self.qmc.Evaluelinethickness[0] = max(self.qmc.linewidth_min, self.qmc.l_eventtype1dots.get_linewidth())
-                    self.qmc.etypes[0] = self.qmc.l_eventtype1dots.get_label()
+                    self.qmc.etypes[0] = str(self.qmc.l_eventtype1dots.get_label())
                 if self.qmc.l_eventtype2dots is not None:
                     m = self.qmc.l_eventtype2dots.get_marker()
-                    if not isinstance(m, (int)):
+                    if isinstance(m, str):
                         self.qmc.EvalueMarker[1] = m
                     self.qmc.EvalueMarkerSize[1] = max(self.qmc.markersize_min, self.qmc.l_eventtype2dots.get_markersize())
                     self.qmc.EvalueColor[1] = self.getColor(self.qmc.l_eventtype2dots)
                     self.qmc.Evaluelinethickness[1] = max(self.qmc.linewidth_min, self.qmc.l_eventtype2dots.get_linewidth())
-                    self.qmc.etypes[1] = self.qmc.l_eventtype2dots.get_label()
+                    self.qmc.etypes[1] = str(self.qmc.l_eventtype2dots.get_label())
                 if self.qmc.l_eventtype3dots is not None:
                     m = self.qmc.l_eventtype3dots.get_marker()
-                    if not isinstance(m, (int)):
+                    if isinstance(m, str):
                         self.qmc.EvalueMarker[2] = m
                     self.qmc.EvalueMarkerSize[2] = max(self.qmc.markersize_min, self.qmc.l_eventtype3dots.get_markersize())
                     self.qmc.EvalueColor[2] = self.getColor(self.qmc.l_eventtype3dots)
                     self.qmc.Evaluelinethickness[2] = max(self.qmc.linewidth_min, self.qmc.l_eventtype3dots.get_linewidth())
-                    self.qmc.etypes[2] = self.qmc.l_eventtype3dots.get_label()
+                    self.qmc.etypes[2] = str(self.qmc.l_eventtype3dots.get_label())
                 if self.qmc.l_eventtype4dots is not None:
                     m = self.qmc.l_eventtype4dots.get_marker()
-                    if not isinstance(m, (int)):
+                    if isinstance(m, str):
                         self.qmc.EvalueMarker[3] = m
                     self.qmc.EvalueMarkerSize[3] = max(self.qmc.markersize_min, self.qmc.l_eventtype4dots.get_markersize())
                     self.qmc.EvalueColor[3] = self.getColor(self.qmc.l_eventtype4dots)
                     self.qmc.Evaluelinethickness[3] = max(self.qmc.linewidth_min, self.qmc.l_eventtype4dots.get_linewidth())
-                    self.qmc.etypes[3] = self.qmc.l_eventtype4dots.get_label()
+                    self.qmc.etypes[3] = str(self.qmc.l_eventtype4dots.get_label())
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
@@ -19682,16 +19719,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             # 3. convert display coordinates to figure-inches
             rect_extents_bbox_inches = self.qmc.fig.dpi_scale_trans.inverted().transform(rect_extents_display)
             # 4. generate
-            rect_bbox_inches =  mpl.transforms.Bbox.from_extents(rect_extents_bbox_inches)
+            rect_bbox_inches =  mpl.transforms.Bbox.from_extents(*list(rect_extents_bbox_inches))
             # 5. fig.save
             # MPL 3.1.1 does not properly handle saving pdf on Windows when figure dpi not 72.  Maybe fixed in a future version.
             # ref: https://github.com/matplotlib/matplotlib/issues/15497#issuecomment-548072609
             ext = '*.png' if platform.system() == 'Windows' else '*.pdf'
             filename = self.ArtisanSaveFileDialog(msg=QApplication.translate('Message', 'Save Statistics'), ext=ext)
             if filename:
-                self.qmc.fig.set_tight_layout(False)
+                self.qmc.fig.set_layout_engine('none')
                 self.qmc.fig.savefig(filename,bbox_inches=rect_bbox_inches,pad_inches=0)
-                self.qmc.fig.set_tight_layout(self.qmc.tight_layout_params)
+                self.qmc.fig.set_layout_engine('tight', **self.qmc.tight_layout_params)
                 self.sendmessage(QApplication.translate('Message','Statistics Saved'))
 
         except Exception as e: # pylint: disable=broad-except
@@ -20411,7 +20448,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     stemp_list = []
                     cl_list = []
                     max_profiles = 20
-                    color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))  # @UndefinedVariable # pylint: disable=maybe-no-member
+                    color=iter(colormaps['tab20'](numpy.linspace(0,1,max_profiles)))  # @UndefinedVariable # pylint: disable=maybe-no-member
                     # collect data
 #                    c = 1
                     min_start_time = max_end_time = 0
@@ -20429,7 +20466,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         try:
                             cl = next(color) # here to keep colors_list in sync with the pct graph colors_list
                         except Exception: # pylint: disable=broad-except
-                            color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))  # @UndefinedVariable # pylint: disable=maybe-no-member
+                            color=iter(colormaps['tab20'](numpy.linspace(0,1,max_profiles)))  # @UndefinedVariable # pylint: disable=maybe-no-member
                             cl = next(color)
                         try:
                             rd = self.profileRankingData(p)
@@ -20582,8 +20619,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     if len(t1)>10 and len(tx) > 10:
                                         # we start RoR computation 10 readings after CHARGE to avoid this initial peak
                                         RoR_start = min(rd['charge_idx']+10,len(tx)-1)
-                                        _,delta = self.qmc.recomputeDeltas(tx,RoR_start,drop,None,t1,optimalSmoothing=self.qmc.optimalSmoothing)
-                                        delta_max = max(delta_max,self.calcAutoDelta([],delta,timeindex,False,True))
+#                                        delta: Optional[List[Optional[float]]]
+                                        _,deltas = self.qmc.recomputeDeltas(tx,RoR_start,drop,None,t1,optimalSmoothing=self.qmc.optimalSmoothing)
+                                        delta_max = max(delta_max,self.calcAutoDelta([],deltas,timeindex,False,True))
                                         if self.qmc.BTlinewidth > 1 and self.qmc.BTlinewidth == self.qmc.BTdeltalinewidth:
                                             dlinewidth = self.qmc.BTlinewidth-1 # we render the delta lines a bit thinner
                                             dlinestyle = self.qmc.BTdeltalinestyle
@@ -20591,9 +20629,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                             dlinewidth = self.qmc.BTdeltalinewidth
                                             dlinestyle = self.qmc.BTdeltalinestyle
                                         trans = self.qmc.delta_ax.transData
-                                        self.qmc.ax.plot(tx, delta,transform=trans,markersize=self.qmc.BTdeltamarkersize,marker=self.qmc.BTdeltamarker,
-                                            sketch_params=None,path_effects=[],
-                                            linewidth=dlinewidth,linestyle=dlinestyle,drawstyle=self.qmc.BTdeltadrawstyle,color=cl,alpha=0.7)
+                                        if deltas is not None:
+                                            self.qmc.ax.plot(tx, numpy.array(deltas), transform=trans,markersize=self.qmc.BTdeltamarkersize,marker=self.qmc.BTdeltamarker,
+                                                sketch_params=None,path_effects=[],
+                                                linewidth=dlinewidth,linestyle=dlinestyle,drawstyle=self.qmc.BTdeltadrawstyle,color=cl,alpha=0.7)
 
                                 first_profile = False
 
@@ -20712,7 +20751,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 _log.exception(e)
 
                             # generate graph
-                            self.qmc.fig.set_tight_layout(False)
+                            self.qmc.fig.set_layout_engine('none')
                             self.qmc.fig.canvas.draw()
                             # save graph
                             graph_image = str(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + '.svg')))
@@ -20720,7 +20759,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 os.remove(graph_image)
                             except OSError:
                                 pass
-                            self.qmc.fig.set_tight_layout(self.qmc.tight_layout_params)
+                            self.qmc.fig.set_layout_engine('tight', **self.qmc.tight_layout_params)
                             self.qmc.fig.savefig(graph_image,transparent=True)
 
                             #add some random number to force HTML reloading
@@ -20765,8 +20804,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
                         # no grid or tick marks
                         ax.grid(False)
-                        ax.axes.get_xaxis().set_ticks([])
-                        ax.axes.get_yaxis().set_ticks([])
+                        if ax.axes is not None:
+                            ax.axes.get_xaxis().set_ticks([])
+                            ax.axes.get_yaxis().set_ticks([])
 
                         # set graph xy limits
                         ylim = (barheight + barspacer) * (1 + len(profiles))
@@ -20795,14 +20835,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
                         # generate the bar graph
                         prop.set_size('small')
-                        color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))    # @UndefinedVariable # pylint: disable=maybe-no-member
+                        color=iter(colormaps['tab20'](numpy.linspace(0,1,max_profiles)))    # @UndefinedVariable # pylint: disable=maybe-no-member
                         label_chr_nr = 0
                         for p in profiles:
                             i -= 1
                             try:
                                 cl = mcolors.to_hex(next(color)), '#00b950', '#ffb347', '#9f7960'
                             except Exception: # pylint: disable=broad-except
-                                color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))    # @UndefinedVariable # pylint: disable=maybe-no-member
+                                color=iter(colormaps['tab20'](numpy.linspace(0,1,max_profiles)))    # @UndefinedVariable # pylint: disable=maybe-no-member
                                 cl = mcolors.to_hex(next(color)), '#00b950', '#ffb347', '#9f7960'
                             try:
                                 rd = self.profileRankingData(p)
@@ -22580,7 +22620,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             from artisanlib.hottop import isHottopLoopRunning
             if not isHottopLoopRunning():
                 from artisanlib.hottop import startHottop
-                startHottop(0.6,self.ser.comport,self.ser.baudrate,self.ser.bytesize,self.ser.parity,self.ser.stopbits,self.ser.timeout)
+                startHottop(0.6,self.ser.comport,self.ser.baudrate,self.ser.bytesize,self.ser.parity,self.ser.stopbits,self.ser.timeout,self.qmc.device_logging)
             from artisanlib.hottop import takeHottopControl
             res = takeHottopControl()
             if res:
@@ -23660,26 +23700,26 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.sendmessage(QApplication.translate('Message','Import Probat Pilot failed'))
             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' importPilot() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def importBullet(self,_=False):
-        try:
-            from artisanlib.aillio import extractProfileRoasTime
-            self.importExternal(extractProfileRoasTime,QApplication.translate('Message','Import Aillio RoasTime'),'*.json')
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
+#    @pyqtSlot()
+#    @pyqtSlot(bool)
+#    def importBullet(self,_=False):
+#        try:
+#            from artisanlib.aillio import extractProfileRoasTime
+#            self.importExternal(extractProfileRoasTime,QApplication.translate('Message','Import Aillio RoasTime'),'*.json')
+#        except Exception as e: # pylint: disable=broad-except
+#            _log.exception(e)
 
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def importBulletURL(self,_=False):
-        try:
-            from artisanlib.aillio import extractProfileRoastWorld
-            self.importExternalURL(extractProfileRoastWorld, QApplication.translate('Message','Import Aillio Roast.World URL'))
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
+#    @pyqtSlot()
+#    @pyqtSlot(bool)
+#    def importBulletURL(self,_=False):
+#        try:
+#            from artisanlib.aillio import extractProfileRoastWorld
+#            self.importExternalURL(extractProfileRoastWorld, QApplication.translate('Message','Import Aillio Roast.World URL'))
+#        except Exception as e: # pylint: disable=broad-except
+#            _log.exception(e)
 
     # url a QUrl
-    def importExternalURL(self,extractor,message='',url=None):
+    def importExternalURL(self, extractor: Callable[['QUrl', 'ApplicationWindow'], Optional['ProfileData']], message:str='',url:Optional[QUrl]=None):
         try:
             res:bool = self.qmc.reset(redraw=True,soundOn=False)
             if not res:
@@ -24631,7 +24671,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     @pyqtSlot()
     @pyqtSlot(bool)
     def clearResults(self,_=False):
-        self.qmc.fig.canvas.mpl_disconnect(self.qmc.analyzer_connect_id)
+        if self.qmc.analyzer_connect_id is not None:
+            self.qmc.fig.canvas.mpl_disconnect(self.qmc.analyzer_connect_id)
         self.segmentresultsanno = None
         self.analysisresultsanno = None
         self.autoAdjustAxis()

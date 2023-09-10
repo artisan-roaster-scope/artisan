@@ -22,7 +22,7 @@ import serial
 import time
 import logging
 from typing import Optional, Any
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -73,7 +73,7 @@ def closeport(p):
     except Exception as e: # pylint: disable=broad-except
         _log.exception(e)
 
-def gettemperatures(p,retry=True):
+def gettemperatures(p,retry:bool=True, log:bool=False):
     BT = -1
     ET = -1
     HEATER = -1
@@ -93,15 +93,21 @@ def gettemperatures(p,retry=True):
             r = p.read(36)
 #            print(len(r),"".join("\\x%02x" % ord(i) for i in r))
             if len(r) != 36:
+                if log:
+                    _log.info('received %s bytes, expected 36 bytes. Closing port.', len(r))
                 closeport(p)
                 if retry: # we retry once
                     return gettemperatures(p,retry=False)
             else:
+                if log:
+                    _log.info('received 36 bytes: %s', r.hex())
                 P0 = hex2int(r[0])
                 P1 = hex2int(r[1])
                 chksum = sum(hex2int(c) for c in r[:35]) & 0xFF
                 P35 = hex2int(r[35])
                 if P0 != 165 or P1 != 150 or chksum != P35:
+                    if log:
+                        _log.info('received data invalid. Closing port.')
                     closeport(p)
                     if retry: # we retry once
                         return gettemperatures(p,retry=False)
@@ -122,7 +128,7 @@ def gettemperatures(p,retry=True):
 
 def doWork(interval:float, comport, baudrate, bytesize, parity, stopbits, timeout,
         aBT, aET, aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR, aCHAFF_TRAY,
-        aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR, aCONTROL):
+        aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR, aCONTROL, DEVICE_LOGGING):
     global SP # pylint: disable=global-statement
     SP = serial.Serial()
     # configure serial port
@@ -132,9 +138,10 @@ def doWork(interval:float, comport, baudrate, bytesize, parity, stopbits, timeou
     SP.parity = parity
     SP.stopbits = stopbits
     SP.timeout = timeout
+    SP.write_timeout = 1 # 1 sec
     while True:
         # logging part
-        BT, ET, HEATER, FAN, MAIN_FAN, SOLENOID, DRUM_MOTOR, COOLING_MOTOR, CHAFF_TRAY = gettemperatures(SP)
+        BT, ET, HEATER, FAN, MAIN_FAN, SOLENOID, DRUM_MOTOR, COOLING_MOTOR, CHAFF_TRAY = gettemperatures(SP, log=DEVICE_LOGGING)
         if -1 != BT:
             if aBT.value == -1:
                 aBT.value = float(BT)
@@ -174,7 +181,7 @@ def doWork(interval:float, comport, baudrate, bytesize, parity, stopbits, timeou
                 aSET_DRUM_MOTOR.value = 1
                 aSET_COOLING_MOTOR.value = 1
             sendControl(SP,aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR,
-                        aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR)
+                        aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR, DEVICE_LOGGING)
 
         time.sleep(interval)
 
@@ -182,7 +189,7 @@ def doWork(interval:float, comport, baudrate, bytesize, parity, stopbits, timeou
 # Control processing
 
 def sendControl(p,aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR,
-        aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR):
+        aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR, DEVICE_LOGGING):
     try:
         openport(SP)
         if p.is_open:
@@ -193,7 +200,11 @@ def sendControl(p,aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOT
             p.reset_input_buffer()
             #p.flushOutput() # deprecated in v3
             p.reset_output_buffer()
-            p.write(cmd)
+            if DEVICE_LOGGING:
+                _log.info('sending: %s', cmd.hex())
+            res = p.write(cmd)
+            if DEVICE_LOGGING:
+                _log.info('bytes sent: %s', res)
     except Exception as e: # pylint: disable=broad-except
         _log.exception(e)
 
@@ -272,13 +283,15 @@ def setHottop(heater:Optional[int]=None,fan:Optional[int]=None,main_fan:Optional
 
 
 # interval has to be smaller than 1 (= 1sec)
-def startHottop(interval:float=1.0,comport='COM4',baudrate=115200,bytesize=8,parity='N',stopbits=1,timeout=0.5):
+def startHottop(interval:float=1.0,comport:str='COM4',baudrate:int=115200,bytesize:int=8,parity:str='N',stopbits:int=1,timeout:float=0.5,device_logging:bool=False) -> bool:
     global process, xCONTROL, xBT, xET, xHEATER, xFAN, xMAIN_FAN, xSOLENOID, xDRUM_MOTOR, xCOOLING_MOTOR, xCHAFF_TRAY, \
         xSET_HEATER, xSET_FAN, xSET_MAIN_FAN, xSET_SOLENOID, xSET_DRUM_MOTOR, xSET_COOLING_MOTOR # pylint: disable=global-statement
+    _log.debug('startHottop()')
     try:
         if process is not None:
             return False
         stopHottop() # we stop an already running process to ensure that only one is running
+
         lock = mp.Lock()
         xCONTROL = Value(c_bool, False, lock=lock)
         # variables to read from the Hottop
@@ -302,7 +315,7 @@ def startHottop(interval:float=1.0,comport='COM4',baudrate=115200,bytesize=8,par
 
         process = mp.Process(target=doWork, args=(interval,comport,baudrate,bytesize,parity,stopbits,timeout,
             xBT, xET, xHEATER, xFAN, xMAIN_FAN, xSOLENOID, xDRUM_MOTOR, xCOOLING_MOTOR, xCHAFF_TRAY, \
-            xSET_HEATER, xSET_FAN, xSET_MAIN_FAN, xSET_SOLENOID, xSET_DRUM_MOTOR, xSET_COOLING_MOTOR, xCONTROL))
+            xSET_HEATER, xSET_FAN, xSET_MAIN_FAN, xSET_SOLENOID, xSET_DRUM_MOTOR, xSET_COOLING_MOTOR, xCONTROL, device_logging))
         process.start()
         return True
     except Exception as e: # pylint: disable=broad-except
@@ -311,10 +324,12 @@ def startHottop(interval:float=1.0,comport='COM4',baudrate=115200,bytesize=8,par
 
 def stopHottop():
     global process # pylint: disable=global-statement
+    _log.debug('stopHottop()')
     if process:
         process.terminate()
         process.join()
         process = None
+        _log.debug('Hottop stopped')
 
 def isHottopLoopRunning():
     return bool(process)

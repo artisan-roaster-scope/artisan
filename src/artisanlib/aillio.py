@@ -24,11 +24,12 @@ from platform import system
 import usb.core # type: ignore
 import usb.util # type: ignore
 
-import requests
-from requests_file import FileAdapter # type: ignore # @UnresolvedImport
-import json
 import array
-from lxml import html # type: ignore
+
+#import requests
+#from requests_file import FileAdapter # type: ignore # @UnresolvedImport
+#import json
+#from lxml import html # unused
 
 import logging
 from typing import Optional, TYPE_CHECKING
@@ -40,7 +41,8 @@ if TYPE_CHECKING:
     except ImportError:
         from multiprocessing.connection import Connection # type:ignore # pylint: disable=unused-import
     from artisanlib.types import ProfileData # pylint: disable=unused-import
-
+    from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
+#    from PyQt6.QtCore import QUrl # pylint: disable=unused-import
 
 try:
     from PyQt6.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
@@ -406,7 +408,7 @@ class AillioR1:
             return self.usbhandle.read(self.AILLIO_ENDPOINT_RD, length)
         raise OSError('not found or no permission')
 
-def extractProfileBulletDict(data,aw):
+def extractProfileBulletDict(data, aw:'ApplicationWindow') -> 'ProfileData':
     try:
         res:'ProfileData' = {} # the interpreted data set
 
@@ -627,28 +629,28 @@ def extractProfileBulletDict(data,aw):
         _log.exception(e)
         return {}
 
-def extractProfileRoastWorld(url,aw):
-    s = requests.Session()
-    s.mount('file://', FileAdapter())
-    page = s.get(url.toString(), timeout=(4, 15), headers={'Accept-Encoding' : 'gzip'})
-    tree = html.fromstring(page.content)
-    data = tree.xpath('//body/script[1]/text()')
-    data = data[0].split('gon.profile=')
-    data = data[1].split(';')
-    res = extractProfileBulletDict(json.loads(data[0]),aw)
-    if 'beans' not in res:
-        try:
-            b = tree.xpath("//div[*='Bean']/*/a/text()")
-            if b:
-                res['beans'] = b[0]
-        except Exception: # pylint: disable=broad-except
-            pass
-    return res
+#def extractProfileRoastWorld(url:'QUrl', aw:'ApplicationWindow') -> Optional['ProfileData']:
+#    s = requests.Session()
+#    s.mount('file://', FileAdapter())
+#    page = s.get(url.toString(), timeout=(4, 15), headers={'Accept-Encoding' : 'gzip'})
+#    tree = html.fromstring(page.content)_
+#    data = tree.xpath('//body/script[1]/text()')
+#    data = data[0].split('gon.profile=')
+#    data = data[1].split(';')
+#    res = extractProfileBulletDict(json.loads(data[0]),aw)
+#    if 'beans' not in res:
+#        try:
+#            b = tree.xpath("//div[*='Bean']/*/a/text()")
+#            if b:
+#                res['beans'] = b[0]
+#        except Exception: # pylint: disable=broad-except
+#            pass
+#    return res
 
-def extractProfileRoasTime(file,aw):
-    with open(file, encoding='utf-8') as infile:
-        data = json.load(infile)
-    return extractProfileBulletDict(data,aw)
+#def extractProfileRoasTime(file, aw:'ApplicationWindow') -> 'ProfileData':
+#    with open(file, encoding='utf-8') as infile:
+#        data = json.load(infile)
+#    return extractProfileBulletDict(data, aw)
 
 if __name__ == '__main__':
     R1 = AillioR1(debug=True)
