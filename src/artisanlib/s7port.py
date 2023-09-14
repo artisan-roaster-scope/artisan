@@ -20,10 +20,10 @@ import sys
 import struct
 import logging
 from typing import List, Dict, Tuple, Optional, Iterator, TYPE_CHECKING
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
-    from artisanlib.s7client import S7Client # noqa: F401 # pylint: disable=unused-import
+    from snap7.client import Client as S7Client
     from snap7.types import Areas # noqa: F401 # pylint: disable=unused-import
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
 

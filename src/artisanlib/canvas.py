@@ -11889,6 +11889,7 @@ class tgraphcanvas(FigureCanvas):
     #Turns ON/OFF flag self.flagon to read and print values. Called from push buttonONOFF.
     @pyqtSlot(bool)
     def ToggleMonitor(self,_=False):
+        _log.debug('ToggleMonitor')
         #turn ON
         if not self.flagon:
 #            QApplication.processEvents()
@@ -16812,9 +16813,7 @@ class SampleThread(QThread): # pyright: ignore [reportGeneralTypeIssues] # Argum
                             self.sample()
                         finally:
                             self.aw.qmc.flagsampling = False # we signal that we are done with sampling
-                    else:
-                        self.quit()
-                        break  #thread ends
+                    # else: we don't self.quit() and break to end the thread as the simulator (paused) might still be running
                 else:
                     self.aw.qmc.flagsampling = False # type: ignore # mypy: Statement is unreachable  [unreachable] # we signal that we are done with sampling
                     # port is disconnected in OFFmonitor by calling disconnectProbes() => disconnectProbesFromSerialDevice()
