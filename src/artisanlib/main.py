@@ -58,10 +58,11 @@ import numpy
 import threading
 import multiprocessing
 import re
-import gc
+#import gc
 import io
 import functools
 import dateutil.parser
+import copy as copyd
 
 # links CTR-C signals to the system default (ignore)
 import signal
@@ -495,24 +496,24 @@ class Artisan(QtSingleApplication):
         return True
 
 # configure multiprocessing
-if sys.platform.startswith('darwin'):
-    try:
-        # start method can only be set once!
-#        if 'forkserver' in multiprocessing.get_all_start_methods(): # pylint: disable=condition-evals-to-constant,using-constant-test
-#            # signed app with forkserver option fails with a MemoryError
-#            multiprocessing.set_start_method('forkserver') # only available on Python3 on Unix, currently (Python 3.8) not supported by frozen executables generated with pyinstaller
+#if sys.platform.startswith('darwin'):
+#    try:
+#        # start method can only be set once!
+##        if 'forkserver' in multiprocessing.get_all_start_methods(): # pylint: disable=condition-evals-to-constant,using-constant-test
+##            # signed app with forkserver option fails with a MemoryError
+##            multiprocessing.set_start_method('forkserver') # only available on Python3 on Unix, currently (Python 3.8) not supported by frozen executables generated with pyinstaller
 #        if 'fork' in multiprocessing.get_all_start_methods():
 #            multiprocessing.set_start_method('fork') # default on Python3.7 for macOS (and on Unix also under Python3.8), but considered unsafe,
 #            # not available on Windows, on Python3.8 we have to explicitly set this
 #            # https://bugs.python.org/issue33725
 #            # this is the only option that works (Hottop communication & WebLCDs) in signed macOS apps
-        if 'spawn' in multiprocessing.get_all_start_methods():
-            multiprocessing.set_start_method('spawn') # default on Python3.8 for macOS (always default on Windows)
-            # this breaks on starting WebLCDs in macOS (and linux) builds with py2app, pyinstaller
-            # https://bugs.python.org/issue32146
-            # https://github.com/pyinstaller/pyinstaller/issues/4865
-    except Exception: # pylint: disable=broad-except
-        pass
+##        if 'spawn' in multiprocessing.get_all_start_methods():
+##            multiprocessing.set_start_method('spawn') # default on Python3.8 for macOS (always default on Windows)
+##            # this breaks on starting WebLCDs in macOS (and linux) builds with py2app, pyinstaller
+##            # https://bugs.python.org/issue32146
+##            # https://github.com/pyinstaller/pyinstaller/issues/4865
+#    except Exception: # pylint: disable=broad-except
+#        pass
 
 
 
@@ -773,10 +774,10 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 
                 if self.white_icons:
                     selected_canvas_color = canvas_color.lighter(250)
-                    border_color = 'white'
+                    border_color = '#ffffff'
                 else:
                     selected_canvas_color = canvas_color.darker(120)
-                    border_color = 'black'
+                    border_color = '#000000'
                 self.widgetForAction(a).setStyleSheet(' \
                         QToolButton:checked {border:1px solid transparent; margin: 1px; padding: 2px; background-color:' + selected_canvas_color.name() + ';border-radius: 3px;} \
                         QToolButton:hover {border:1px solid ' + border_color + '; margin: 2px; padding: 2px; background-color:transparent;border-radius: 3px;} \
@@ -1421,20 +1422,24 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'minieventleft', 'minieventright', 'nLCDS', 'notificationManager', 'notificationsflag', 'ntb', 'pdf_page_layout', 'pdf_rendering', 'productionPDFAction',
         'rankingPDFAction', 'roastReportMenu', 'roastReportPDFAction', 'saveAsThemeAction', 'sliderGrp12', 'sliderGrp34', 'sliderGrpBox1x', 'sliderGrpBox2x', 'sliderGrpBox3x', 'sliderGrpBox4x',
         'small_button_min_width_str', 'standard_button_min_width_px', 'tiny_button_min_width_str', 'recording_version', 'recording_revision', 'recording_build',
-        'lastIOResult', 'max_palettes', 'palette_entries', 'eventsliders' ]
+        'lastIOResult', 'max_palettes', 'palette_entries', 'eventsliders', 'defaultSettings' ]
 
 
 
     def __init__(self, parent:Optional[QWidget] = None, *, locale:str, WebEngineSupport:bool, artisanviewerFirstStart:bool) -> None:
 
-        self.locale_str = locale
-        self.app = app
+        self.defaultSettings: Dict[str, Any] = {}
+                # holds default values of all app QSettings
+                # filled on app start by calling self.saveAllSettings(QSettings(), self.defaultSettings) before self.settingsLoad()
+
+        self.locale_str:str = locale
+        self.app:Artisan = app
         self.superusermode:bool = False
 
         self.sample_loop_running:bool = True
-        self.time_stopped = 0
+        self.time_stopped:float = 0
 
-        self.QtWebEngineSupport = WebEngineSupport
+        self.QtWebEngineSupport:bool = WebEngineSupport
         self.artisanviewerFirstStart:bool = artisanviewerFirstStart
 
 #PLUS
@@ -1594,7 +1599,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.wheeldialog:Optional['WheelDlg'] = None
 
         self.simulator:Optional[Simulator] = None # holds the simulator in simulation mode
-        self.simulatorpath:Optional[str] = None # points to the last profile used by the simulator
+        self.simulatorpath:str = '' # points to the last profile used by the simulator
 
         self.comparator:Optional['roastCompareDlg'] = None # holds the profile comparator dialog
 
@@ -1670,20 +1675,20 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         #lcd1 = time, lcd2 = met, lcd3 = bt, lcd4 = roc et, lcd5 = roc bt, lcd6 = sv (extra devices lcd same as sv seetings)
         self.lcdpaletteB = {
             'timer':'#F8F8F8',
-            'et':'#cc0f50', #'black',
-            'bt':'#0A5C90', #'black',
-            'deltaet':'#EBEBEB', #'black',
-            'deltabt':'#EBEBEB', #'black',
-            'sv':'#F8F8F8', #'black'
+            'et':'#cc0f50',
+            'bt':'#0A5C90',
+            'deltaet':'#EBEBEB',
+            'deltabt':'#EBEBEB',
+            'sv':'#F8F8F8',
             'rstimer':'#F8F8F8',
             'slowcoolingtimer':'#F8F8F8',
             }
         self.lcdpaletteF = {
             'timer':'#262626',
-            'et':'white', #'white',
-            'bt':'white', #'white',
-            'deltaet':'#cc0f50', #'white',
-            'deltabt':'#0A5C90', #'white',
+            'et':'#ffffff',
+            'bt':'#ffffff',
+            'deltaet':'#cc0f50',
+            'deltabt':'#0A5C90',
             'sv':'#4C4C4C',
             'rstimer':'#187AB3',
             'slowcoolingtimer':'#CC0D50',
@@ -4293,7 +4298,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     @pyqtSlot()
     def logStartupTime(self) -> None: # pylint: disable=no-self-use # used as slot
-        _log.info('startup time: %.2f', libtime.process_time() - startup_time)
+        _log.info('MODE: startup time: %.2f', libtime.process_time() - startup_time)
 
     @pyqtSlot()
     def donate(self) -> None:
@@ -5485,9 +5490,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 c3 = c[3]
                 # if one color is the canvas color set to None (transparent), we try to avoid a false warning
                 if str(c1) == 'None' and c[0] == 'Canvas':
-                    c1 = 'black' if self.app.darkmode else 'white'
+                    c1 = '#000000' if self.app.darkmode else '#ffffff'
                 if str(c3) == 'None' and c[2] == 'Canvas':
-                    c3 = 'black' if self.app.darkmode else 'white'
+                    c3 = '#000000' if self.app.darkmode else '#ffffff'
                 val = self.colorDifference(c1,c3)
                 if val < self.qmc.colorDifferenceThreshold :
                     val = self.float2float(val,1)
@@ -5528,26 +5533,26 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     def labelBorW(self,backgroundcolor):
         base = self.convertToGreyscale(backgroundcolor)
         if self.checkColors([('base',base,'white','#ffffff')], False) > self.checkColors([('base',base,'black','#000000')],False):
-            return 'white'
-        return 'black'
+            return '#ffffff'
+        return '#000000'
 
     def setLCDsBW(self):
-        self.lcdpaletteB['timer'] = 'black'
-        self.lcdpaletteF['timer'] = 'white'
-        self.lcdpaletteB['et'] = 'black'
-        self.lcdpaletteF['et'] = 'white'
-        self.lcdpaletteB['bt'] = 'black'
-        self.lcdpaletteF['bt'] = 'white'
-        self.lcdpaletteB['deltaet'] = 'black'
-        self.lcdpaletteF['deltaet'] = 'white'
-        self.lcdpaletteB['deltabt'] = 'black'
-        self.lcdpaletteF['deltabt'] = 'white'
-        self.lcdpaletteB['sv'] = 'black'
-        self.lcdpaletteF['sv'] = 'white'
-        self.lcdpaletteB['rstimer'] = 'white'
-        self.lcdpaletteF['rstimer'] = 'black'
-        self.lcdpaletteB['slowcoolingtimer'] = 'black'
-        self.lcdpaletteF['slowcoolingtimer'] = 'white'
+        self.lcdpaletteB['timer'] = '#000000'
+        self.lcdpaletteF['timer'] = '#ffffff'
+        self.lcdpaletteB['et'] = '#000000'
+        self.lcdpaletteF['et'] = '#ffffff'
+        self.lcdpaletteB['bt'] = '#000000'
+        self.lcdpaletteF['bt'] = '#ffffff'
+        self.lcdpaletteB['deltaet'] = '#000000'
+        self.lcdpaletteF['deltaet'] = '#ffffff'
+        self.lcdpaletteB['deltabt'] = '#000000'
+        self.lcdpaletteF['deltabt'] = '#ffffff'
+        self.lcdpaletteB['sv'] = '#000000'
+        self.lcdpaletteF['sv'] = '#ffffff'
+        self.lcdpaletteB['rstimer'] = '#ffffff'
+        self.lcdpaletteF['rstimer'] = '#000000'
+        self.lcdpaletteB['slowcoolingtimer'] = '#000000'
+        self.lcdpaletteF['slowcoolingtimer'] = '#ffffff'
         self.setTimerColor('timer')
         self.lcd2.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.lcdpaletteF['et']}; background-color: {self.lcdpaletteB['et']};}}")
         self.lcd3.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.lcdpaletteF['bt']}; background-color: {self.lcdpaletteB['bt']};}}")
@@ -5634,14 +5639,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             else:
                 whitep = False
         else:
-            whitep = self.colorDifference('white',canvas_color) > self.colorDifference('black',canvas_color)
+            whitep = self.colorDifference('#ffffff',canvas_color) > self.colorDifference('#000000',canvas_color)
 
         self.qmc.fig.patch.set_facecolor(str(canvas_color))
         self.setStyleSheet('QMainWindow{background-color:' + str(canvas_color) + ';'
                                    + 'border: 0px solid black;'
                                    + '}' )
 
-        if current_background_color is None or current_background_color != str(canvas_color) or (whitep and self.qmc.palette['messages'] != 'white'): # canvas color did not change, we do not need to redo the navigation bar
+        if current_background_color is None or current_background_color != str(canvas_color) or (whitep and self.qmc.palette['messages'] != '#ffffff'): # canvas color did not change, we do not need to redo the navigation bar
             # update navigationbar
             self.level1layout.removeWidget(self.ntb) # remove current bar
 
@@ -5655,9 +5660,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.ntb = VMToolbar(self.qmc, self.main_widget, whitep)
 
         if whitep:
-            self.qmc.palette['messages'] = 'white'
+            self.qmc.palette['messages'] = '#ffffff'
         else:
-            self.qmc.palette['messages'] = 'black'
+            self.qmc.palette['messages'] = '#000000'
         self.sendmessage('', append=False)
         self.ntb.setMinimumHeight(50)
 
@@ -11856,12 +11861,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     #reads and sets the actual directory
     # if ext is given, the file selector allows only file with that extension to be selected for open
     # if ext_alt is given (not None), all files can be selected, but if a file was selected not having the ext_alt the empty string is returned (used in the background profile dialog)
-    def ArtisanOpenFileDialog(self,msg:Optional[str] = None,ext:str = '*',ext_alt=None,path=None):
+    def ArtisanOpenFileDialog(self,msg:Optional[str] = None,ext:str = '*',ext_alt=None,path=None) -> str:
         if msg is None:
             msg = QApplication.translate('Message','Open')
         if path is None:
             path = self.getDefaultPath()
-        f = str(QFileDialog.getOpenFileName(self,caption=msg,directory=path,filter=ext)[0])
+        f:str = str(QFileDialog.getOpenFileName(self,caption=msg,directory=path,filter=ext)[0])
         if ext_alt is not None and not f.endswith(ext_alt):
             return ''
         self.setDefaultPath(f)
@@ -12698,9 +12703,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.extradevices.append(25)
             n = len(self.qmc.extradevices)
             self.qmc.extradevicecolor1 = self.qmc.extradevicecolor1[:n-1]
-            self.qmc.extradevicecolor1.append('black') #init color to black
+            self.qmc.extradevicecolor1.append('#000000') #init color to black
             self.qmc.extradevicecolor2 = self.qmc.extradevicecolor2[:n-1]
-            self.qmc.extradevicecolor2.append('black')
+            self.qmc.extradevicecolor2.append('#000000')
             self.qmc.extraname1 = self.qmc.extraname1[:n-1]
             self.qmc.extraname1.append('Extra 1')
             self.qmc.extraname2 = self.qmc.extraname2[:n-1]
@@ -13660,9 +13665,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.qmc.extramathexpression2 = self.qmc.extramathexpression2[:len(self.qmc.extradevices)]
         self.qmc.extramathexpression2 = self.qmc.extramathexpression2 + ['']*max(0,len(self.qmc.extradevices)-len(self.qmc.extramathexpression2))
         self.qmc.extradevicecolor1 = self.qmc.extradevicecolor1[:len(self.qmc.extradevices)]
-        self.qmc.extradevicecolor1 = self.qmc.extradevicecolor1 + ['black']*max(0,len(self.qmc.extradevices)-len(self.qmc.extradevicecolor1))
+        self.qmc.extradevicecolor1 = self.qmc.extradevicecolor1 + ['#000000']*max(0,len(self.qmc.extradevices)-len(self.qmc.extradevicecolor1))
         self.qmc.extradevicecolor2 = self.qmc.extradevicecolor2[:len(self.qmc.extradevices)]
-        self.qmc.extradevicecolor2 = self.qmc.extradevicecolor2 + ['black']*max(0,len(self.qmc.extradevices)-len(self.qmc.extradevicecolor2))
+        self.qmc.extradevicecolor2 = self.qmc.extradevicecolor2 + ['#000000']*max(0,len(self.qmc.extradevices)-len(self.qmc.extradevicecolor2))
 
     def saveExtradeviceSettings(self):
         self.org_extradevicesettings = {
@@ -13807,43 +13812,43 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             return os.path.join(datadir,'extra_devices_backup_viewer.aset')
         return os.path.join(datadir,'extra_devices_backup.aset')
 
-    def setExtraDeviceSettings(self, settings):
-        settings.setValue('extradevices',self.qmc.extradevices)
-        settings.setValue('extraname1',self.qmc.extraname1)
-        settings.setValue('extraname2',self.qmc.extraname2)
-        settings.setValue('extramathexpression1',self.qmc.extramathexpression1)
-        settings.setValue('extramathexpression2',self.qmc.extramathexpression2)
-        settings.setValue('extradevicecolor1',self.qmc.extradevicecolor1)
-        settings.setValue('extradevicecolor2',self.qmc.extradevicecolor2)
-        settings.setValue('extraLCDvisibility1',self.extraLCDvisibility1)
-        settings.setValue('extraLCDvisibility2',self.extraLCDvisibility2)
-        settings.setValue('extraCurveVisibility1',self.extraCurveVisibility1)
-        settings.setValue('extraCurveVisibility2',self.extraCurveVisibility2)
-        settings.setValue('extraDelta1',self.extraDelta1)
-        settings.setValue('extraDelta2',self.extraDelta2)
-        settings.setValue('extraFill1',self.extraFill1)
-        settings.setValue('extraFill2',self.extraFill2)
-        settings.setValue('devicetablecolumnwidths',self.qmc.devicetablecolumnwidths)
+    def setExtraDeviceSettings(self, settings:QSettings, default_settings:Optional[Dict[str, Any]] = None, read_defaults:bool = False) -> None:
+        self.settingsSetValue(settings, default_settings, 'extradevices',self.qmc.extradevices, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extraname1',self.qmc.extraname1, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extraname2',self.qmc.extraname2, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extramathexpression1',self.qmc.extramathexpression1, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extramathexpression2',self.qmc.extramathexpression2, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extradevicecolor1',self.qmc.extradevicecolor1, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extradevicecolor2',self.qmc.extradevicecolor2, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extraLCDvisibility1',self.extraLCDvisibility1, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extraLCDvisibility2',self.extraLCDvisibility2, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extraCurveVisibility1',self.extraCurveVisibility1, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extraCurveVisibility2',self.extraCurveVisibility2, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extraDelta1',self.extraDelta1, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extraDelta2',self.extraDelta2, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extraFill1',self.extraFill1, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extraFill2',self.extraFill2, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'devicetablecolumnwidths',self.qmc.devicetablecolumnwidths, read_defaults)
 
-    def setExtraDeviceCurveStyles(self, settings):
-        settings.setValue('extralinestyles1',self.qmc.extralinestyles1)
-        settings.setValue('extralinestyles2',self.qmc.extralinestyles2)
-        settings.setValue('extradrawstyles1',self.qmc.extradrawstyles1)
-        settings.setValue('extradrawstyles2',self.qmc.extradrawstyles2)
-        settings.setValue('extralinewidths1',self.qmc.extralinewidths1)
-        settings.setValue('extralinewidths2',self.qmc.extralinewidths2)
-        settings.setValue('extramarkers1',self.qmc.extramarkers1)
-        settings.setValue('extramarkers2',self.qmc.extramarkers2)
-        settings.setValue('extramarkersizes1',self.qmc.extramarkersizes1)
-        settings.setValue('extramarkersizes2',self.qmc.extramarkersizes2)
+    def setExtraDeviceCurveStyles(self, settings:QSettings, default_settings:Optional[Dict[str, Any]] = None, read_defaults:bool = False) -> None:
+        self.settingsSetValue(settings, default_settings, 'extralinestyles1',self.qmc.extralinestyles1, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extralinestyles2',self.qmc.extralinestyles2, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extradrawstyles1',self.qmc.extradrawstyles1, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extradrawstyles2',self.qmc.extradrawstyles2, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extralinewidths1',self.qmc.extralinewidths1, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extralinewidths2',self.qmc.extralinewidths2, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extramarkers1',self.qmc.extramarkers1, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extramarkers2',self.qmc.extramarkers2, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extramarkersizes1',self.qmc.extramarkersizes1, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extramarkersizes2',self.qmc.extramarkersizes2, read_defaults)
 
-    def setExtraDeviceCommSettings(self, settings):
-        settings.setValue('extracomport',self.extracomport)
-        settings.setValue('extrabaudrate',self.extrabaudrate)
-        settings.setValue('extrabytesize',self.extrabytesize)
-        settings.setValue('extraparity',self.extraparity)
-        settings.setValue('extrastopbits',self.extrastopbits)
-        settings.setValue('extratimeout',self.extratimeout)
+    def setExtraDeviceCommSettings(self, settings:QSettings, default_settings:Optional[Dict[str, Any]] = None, read_defaults:bool = False) -> None:
+        self.settingsSetValue(settings, default_settings, 'extracomport',self.extracomport, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extrabaudrate',self.extrabaudrate, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extrabytesize',self.extrabytesize, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extraparity',self.extraparity, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extrastopbits',self.extrastopbits, read_defaults)
+        self.settingsSetValue(settings, default_settings, 'extratimeout',self.extratimeout, read_defaults)
 
     def createExtraDeviceSettingsBackup(self):
         _log.debug('createExtraDeviceSettingsBackup()')
@@ -14125,9 +14130,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
                 if updateRender:
                     if 'extradevicecolor1' in profile:
-                        self.qmc.extradevicecolor1 = [decodeLocalStrict(x, 'black') for x in profile['extradevicecolor1']]
+                        self.qmc.extradevicecolor1 = [decodeLocalStrict(x, '#000000') for x in profile['extradevicecolor1']]
                     if 'extradevicecolor2' in profile:
-                        self.qmc.extradevicecolor2 = [decodeLocalStrict(x, 'black') for x in profile['extradevicecolor2']]
+                        self.qmc.extradevicecolor2 = [decodeLocalStrict(x, '#000000') for x in profile['extradevicecolor2']]
 
                     if 'extraLCDvisibility1' in profile:
                         self.extraLCDvisibility1 = profile['extraLCDvisibility1']
@@ -15237,8 +15242,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             profile['extratemp2'] = [[self.float2float(t,8) for t in x] for x in self.qmc.extratemp2]
             profile['extramathexpression1'] = [encodeLocalStrict(x) for x in self.qmc.extramathexpression1]
             profile['extramathexpression2'] = [encodeLocalStrict(x) for x in self.qmc.extramathexpression2]
-            profile['extradevicecolor1'] = [encodeLocalStrict(x, 'black') for x in self.qmc.extradevicecolor1]
-            profile['extradevicecolor2'] = [encodeLocalStrict(x, 'black') for x in self.qmc.extradevicecolor2]
+            profile['extradevicecolor1'] = [encodeLocalStrict(x, '#000000') for x in self.qmc.extradevicecolor1]
+            profile['extradevicecolor2'] = [encodeLocalStrict(x, '#000000') for x in self.qmc.extradevicecolor2]
             profile['extraLCDvisibility1']     = self.extraLCDvisibility1
             profile['extraLCDvisibility2']     = self.extraLCDvisibility2
             profile['extraCurveVisibility1']   = self.extraCurveVisibility1
@@ -15890,7 +15895,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     # removes window geometry and splitter settings from the given settings
     @staticmethod
     def clearWindowGeometry(settings:QSettings) -> None:
-        _log.info('clearWindowGeometry')
         for s in ['Geometry', 'BlendGeometry','RoastGeometry','FlavorProperties','CalculatorGeometry','EventsGeometry', 'CompareGeometry',
                 'BackgroundGeometry','LCDGeometry','DeltaLCDGeometry','ExtraLCDGeometry','PhasesLCDGeometry','AlarmsGeometry',
                 'DeviceAssignmentGeometry','PortsGeometry','TransformatorPosition', 'CurvesPosition', 'StatisticsPosition',
@@ -15988,16 +15992,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 settings.endGroup()
 #--- END GROUP Batch
 
-            if filename is None and settings.contains('fullscreen'):
+            if filename is None:
+                # don't load fullscreen or artisan.plus account from external settings file
                 self.full_screen_mode_active = bool(toBool(settings.value('fullscreen',self.full_screen_mode_active)))
-            if filename is None and settings.contains('plus_account'):
                 self.plus_account = settings.value('plus_account',self.plus_account)
-                if settings.contains('plus_remember_credentials'):
-                    self.plus_remember_credentials = bool(toBool(settings.value('plus_remember_credentials',self.plus_remember_credentials)))
-                if settings.contains('plus_email'):
-                    self.plus_email = settings.value('plus_email',self.plus_email)
-                if settings.contains('plus_language'):
-                    self.plus_language = settings.value('plus_language',self.plus_language)
+            self.plus_remember_credentials = bool(toBool(settings.value('plus_remember_credentials',self.plus_remember_credentials)))
+            self.plus_email = settings.value('plus_email',self.plus_email)
+            self.plus_language = settings.value('plus_language',self.plus_language)
             #remember swaplcds and swapdeltalcds
             old_swaplcds = self.qmc.swaplcds
             old_swapdeltalcds = self.qmc.swapdeltalcds
@@ -16046,152 +16047,93 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     setDeviceDebugLogLevel(self.qmc.device_logging)
                 except Exception: # pylint: disable=broad-except
                     pass
-            if settings.contains('id'):
-                self.qmc.device = toInt(settings.value('id',self.qmc.device))
+            self.qmc.device = toInt(settings.value('id',self.qmc.device))
             # Phidget configurations
-            if settings.contains('phidget1048_types'):
-                self.qmc.phidget1048_types = [toInt(x) for x in toList(settings.value('phidget1048_types',self.qmc.phidget1048_types))]
-            if settings.contains('phidget1048_async'):
-                self.qmc.phidget1048_async = [bool(toBool(x)) for x in toList(settings.value('phidget1048_async',self.qmc.phidget1048_async))]
-                self.qmc.phidget1048_changeTriggers = [self.float2float(toFloat(x)) for x in toList(settings.value('phidget1048_changeTriggers',self.qmc.phidget1048_changeTriggers))]
-            if settings.contains('phidget1048_dataRate'):
-                self.qmc.phidget1048_dataRate = toInt(settings.value('phidget1048_dataRate',self.qmc.phidget1048_dataRate))
-            if settings.contains('phidget1046_gain'):
-                self.qmc.phidget1046_gain = [toInt(x) for x in toList(settings.value('phidget1046_gain',self.qmc.phidget1046_gain))]
-            if settings.contains('phidget1046_formula'):
-                self.qmc.phidget1046_formula = [toInt(x) for x in toList(settings.value('phidget1046_formula',self.qmc.phidget1046_formula))]
-            if settings.contains('phidget1046_async'):
-                self.qmc.phidget1046_async = [bool(toBool(x)) for x in toList(settings.value('phidget1046_async',self.qmc.phidget1046_async))]
-            if settings.contains('phidget1046_dataRate'):
-                self.qmc.phidget1046_dataRate = toInt(settings.value('phidget1046_dataRate',self.qmc.phidget1046_dataRate))
-            if settings.contains('phidget1045_async'):
-                self.qmc.phidget1045_async = bool(toBool(settings.value('phidget1045_async',self.qmc.phidget1045_async)))
-                self.qmc.phidget1045_changeTrigger = self.float2float(toFloat(settings.value('phidget1045_changeTrigger',self.qmc.phidget1045_changeTrigger)))
-            if settings.contains('phidget1045_emissivity'):
-                self.qmc.phidget1045_emissivity = toFloat(settings.value('phidget1045_emissivity',self.qmc.phidget1045_emissivity))
-            if settings.contains('phidget1045_dataRate'):
-                self.qmc.phidget1045_dataRate = toInt(settings.value('phidget1045_dataRate',self.qmc.phidget1045_dataRate))
-            if settings.contains('phidget1200_formula'):
-                self.qmc.phidget1200_formula = toInt(settings.value('phidget1200_formula',self.qmc.phidget1200_formula))
-                self.qmc.phidget1200_wire = toInt(settings.value('phidget1200_wire',self.qmc.phidget1200_wire))
-                self.qmc.phidget1200_async = bool(toBool(settings.value('phidget1200_async',self.qmc.phidget1200_async)))
-                self.qmc.phidget1200_changeTrigger = self.float2float(toFloat(settings.value('phidget1200_changeTrigger',self.qmc.phidget1200_changeTrigger)))
-                self.qmc.phidget1200_dataRate = toInt(settings.value('phidget1200_dataRate',self.qmc.phidget1200_dataRate))
-            if settings.contains('phidget1200_2_formula'):
-                self.qmc.phidget1200_2_formula = toInt(settings.value('phidget1200_2_formula',self.qmc.phidget1200_2_formula))
-                self.qmc.phidget1200_2_wire = toInt(settings.value('phidget1200_2_wire',self.qmc.phidget1200_2_wire))
-                self.qmc.phidget1200_2_async = bool(toBool(settings.value('phidget1200_2_async',self.qmc.phidget1200_2_async)))
-                self.qmc.phidget1200_2_changeTrigger = self.float2float(toFloat(settings.value('phidget1200_2_changeTrigger',self.qmc.phidget1200_2_changeTrigger)))
-                self.qmc.phidget1200_2_dataRate = toInt(settings.value('phidget1200_2_dataRate',self.qmc.phidget1200_2_dataRate))
-            if settings.contains('phidgetDAQ1400_powerSupply'):
-                self.qmc.phidgetDAQ1400_powerSupply = toInt(settings.value('phidgetDAQ1400_powerSupply',self.qmc.phidgetDAQ1400_powerSupply))
-                self.qmc.phidgetDAQ1400_inputMode = toInt(settings.value('phidgetDAQ1400_inputMode',self.qmc.phidgetDAQ1400_inputMode))
-            if settings.contains('phidgetRemoteFlag'):
-                self.qmc.phidgetRemoteFlag = bool(toBool(settings.value('phidgetRemoteFlag',self.qmc.phidgetRemoteFlag)))
-                self.qmc.phidgetServerID = toString(settings.value('phidgetServerID',self.qmc.phidgetServerID))
-                self.qmc.phidgetPassword = toString(settings.value('phidgetPassword',self.qmc.phidgetPassword))
-                if settings.contains('phidgetPort'):
-                    self.qmc.phidgetPort = toInt(settings.value('phidgetPort',self.qmc.phidgetPort))
-                if settings.contains('phidgetRemoteOnlyFlag'):
-                    self.qmc.phidgetRemoteOnlyFlag = bool(toBool(settings.value('phidgetRemoteOnlyFlag',self.qmc.phidgetRemoteOnlyFlag)))
-            if settings.contains('phidget1018_async'):
-                self.qmc.phidget1018_async = [bool(toBool(x)) for x in toList(settings.value('phidget1018_async',self.qmc.phidget1018_async))]
-                self.qmc.phidget1018_dataRates = [toInt(x) for x in toList(settings.value('phidget1018_dataRates',self.qmc.phidget1018_dataRates))]
-                self.qmc.phidget1018_changeTriggers = [toInt(x) for x in toList(settings.value('phidget1018_changeTriggers',self.qmc.phidget1018_changeTriggers))]
-            if settings.contains('phidget1018_ratio'):
-                self.qmc.phidget1018_ratio = [bool(toBool(x)) for x in toList(settings.value('phidget1018_ratio',self.qmc.phidget1018_ratio))]
-            if settings.contains('phidgetVCP100x_voltageRanges'):
-                self.qmc.phidgetVCP100x_voltageRanges = [toInt(x) for x in toList(settings.value('phidgetVCP100x_voltageRanges',self.qmc.phidgetVCP100x_voltageRanges))]
-            if settings.contains('PIDbuttonflag'):
-                self.qmc.PIDbuttonflag = bool(toBool(settings.value('PIDbuttonflag',self.qmc.PIDbuttonflag)))
-            if settings.contains('Controlbuttonflag'):
-                self.qmc.Controlbuttonflag = bool(toBool(settings.value('Controlbuttonflag',self.qmc.Controlbuttonflag)))
-            if settings.contains('yoctoRemoteFlag'):
-                self.qmc.yoctoRemoteFlag = bool(toBool(settings.value('yoctoRemoteFlag',self.qmc.yoctoRemoteFlag)))
-                self.qmc.yoctoServerID = toString(settings.value('yoctoServerID',self.qmc.yoctoServerID))
-            if settings.contains('YOCTO_emissivity'):
-                self.qmc.YOCTO_emissivity = toFloat(settings.value('YOCTO_emissivity',self.qmc.YOCTO_emissivity))
-            if settings.contains('YOCTO_async'):
-                self.qmc.YOCTO_async = [bool(toBool(x)) for x in toList(settings.value('YOCTO_async',self.qmc.YOCTO_async))]
-            if settings.contains('YOCTO_dataRate'):
-                self.qmc.YOCTO_dataRate = toInt(settings.value('YOCTO_dataRate',self.qmc.YOCTO_dataRate))
-            if settings.contains('ambient_temperature_device'):
-                self.qmc.ambient_temperature_device = toInt(settings.value('ambient_temperature_device',self.qmc.ambient_temperature_device))
-                self.qmc.ambient_humidity_device = toInt(settings.value('ambient_humidity_device',self.qmc.ambient_humidity_device))
-                self.qmc.ambient_pressure_device = toInt(settings.value('ambient_pressure_device',self.qmc.ambient_pressure_device))
-                self.qmc.elevation = toInt(settings.value('elevation',self.qmc.elevation))
-            if settings.contains('santokerHost'):
-                self.santokerHost = toString(settings.value('santokerHost',self.santokerHost))
-            if settings.contains('santokerPort'):
-                self.santokerPort = toInt(settings.value('santokerPort',self.santokerPort))
-            if settings.contains('santokerSerial'):
-                self.santokerSerial = bool(toBool(settings.value('santokerSerial',self.santokerSerial)))
-            if settings.contains('kaleidoHost'):
-                self.kaleidoHost = toString(settings.value('kaleidoHost',self.kaleidoHost))
-            if settings.contains('kaleidoPort'):
-                self.kaleidoPort = toInt(settings.value('kaleidoPort',self.kaleidoPort))
-            if settings.contains('kaleidoSerial'):
-                self.kaleidoSerial = toBool(settings.value('kaleidoSerial',self.kaleidoSerial))
-            if settings.contains('kaleidoPID'):
-                self.kaleidoPID = bool(toBool(settings.value('kaleidoPID',self.kaleidoPID)))
+            self.qmc.phidget1048_types = [toInt(x) for x in toList(settings.value('phidget1048_types',self.qmc.phidget1048_types))]
+            self.qmc.phidget1048_async = [bool(toBool(x)) for x in toList(settings.value('phidget1048_async',self.qmc.phidget1048_async))]
+            self.qmc.phidget1048_changeTriggers = [self.float2float(toFloat(x)) for x in toList(settings.value('phidget1048_changeTriggers',self.qmc.phidget1048_changeTriggers))]
+            self.qmc.phidget1048_dataRate = toInt(settings.value('phidget1048_dataRate',self.qmc.phidget1048_dataRate))
+            self.qmc.phidget1046_gain = [toInt(x) for x in toList(settings.value('phidget1046_gain',self.qmc.phidget1046_gain))]
+            self.qmc.phidget1046_formula = [toInt(x) for x in toList(settings.value('phidget1046_formula',self.qmc.phidget1046_formula))]
+            self.qmc.phidget1046_async = [bool(toBool(x)) for x in toList(settings.value('phidget1046_async',self.qmc.phidget1046_async))]
+            self.qmc.phidget1046_dataRate = toInt(settings.value('phidget1046_dataRate',self.qmc.phidget1046_dataRate))
+            self.qmc.phidget1045_async = bool(toBool(settings.value('phidget1045_async',self.qmc.phidget1045_async)))
+            self.qmc.phidget1045_changeTrigger = self.float2float(toFloat(settings.value('phidget1045_changeTrigger',self.qmc.phidget1045_changeTrigger)))
+            self.qmc.phidget1045_emissivity = toFloat(settings.value('phidget1045_emissivity',self.qmc.phidget1045_emissivity))
+            self.qmc.phidget1045_dataRate = toInt(settings.value('phidget1045_dataRate',self.qmc.phidget1045_dataRate))
+            self.qmc.phidget1200_formula = toInt(settings.value('phidget1200_formula',self.qmc.phidget1200_formula))
+            self.qmc.phidget1200_wire = toInt(settings.value('phidget1200_wire',self.qmc.phidget1200_wire))
+            self.qmc.phidget1200_async = bool(toBool(settings.value('phidget1200_async',self.qmc.phidget1200_async)))
+            self.qmc.phidget1200_changeTrigger = self.float2float(toFloat(settings.value('phidget1200_changeTrigger',self.qmc.phidget1200_changeTrigger)))
+            self.qmc.phidget1200_dataRate = toInt(settings.value('phidget1200_dataRate',self.qmc.phidget1200_dataRate))
+            self.qmc.phidget1200_2_formula = toInt(settings.value('phidget1200_2_formula',self.qmc.phidget1200_2_formula))
+            self.qmc.phidget1200_2_wire = toInt(settings.value('phidget1200_2_wire',self.qmc.phidget1200_2_wire))
+            self.qmc.phidget1200_2_async = bool(toBool(settings.value('phidget1200_2_async',self.qmc.phidget1200_2_async)))
+            self.qmc.phidget1200_2_changeTrigger = self.float2float(toFloat(settings.value('phidget1200_2_changeTrigger',self.qmc.phidget1200_2_changeTrigger)))
+            self.qmc.phidget1200_2_dataRate = toInt(settings.value('phidget1200_2_dataRate',self.qmc.phidget1200_2_dataRate))
+            self.qmc.phidgetDAQ1400_powerSupply = toInt(settings.value('phidgetDAQ1400_powerSupply',self.qmc.phidgetDAQ1400_powerSupply))
+            self.qmc.phidgetDAQ1400_inputMode = toInt(settings.value('phidgetDAQ1400_inputMode',self.qmc.phidgetDAQ1400_inputMode))
+            self.qmc.phidgetRemoteFlag = bool(toBool(settings.value('phidgetRemoteFlag',self.qmc.phidgetRemoteFlag)))
+            self.qmc.phidgetServerID = toString(settings.value('phidgetServerID',self.qmc.phidgetServerID))
+            self.qmc.phidgetPassword = toString(settings.value('phidgetPassword',self.qmc.phidgetPassword))
+            self.qmc.phidgetPort = toInt(settings.value('phidgetPort',self.qmc.phidgetPort))
+            self.qmc.phidgetRemoteOnlyFlag = bool(toBool(settings.value('phidgetRemoteOnlyFlag',self.qmc.phidgetRemoteOnlyFlag)))
+            self.qmc.phidget1018_async = [bool(toBool(x)) for x in toList(settings.value('phidget1018_async',self.qmc.phidget1018_async))]
+            self.qmc.phidget1018_dataRates = [toInt(x) for x in toList(settings.value('phidget1018_dataRates',self.qmc.phidget1018_dataRates))]
+            self.qmc.phidget1018_changeTriggers = [toInt(x) for x in toList(settings.value('phidget1018_changeTriggers',self.qmc.phidget1018_changeTriggers))]
+            self.qmc.phidget1018_ratio = [bool(toBool(x)) for x in toList(settings.value('phidget1018_ratio',self.qmc.phidget1018_ratio))]
+            self.qmc.phidgetVCP100x_voltageRanges = [toInt(x) for x in toList(settings.value('phidgetVCP100x_voltageRanges',self.qmc.phidgetVCP100x_voltageRanges))]
+            self.qmc.PIDbuttonflag = bool(toBool(settings.value('PIDbuttonflag',self.qmc.PIDbuttonflag)))
+            self.qmc.Controlbuttonflag = bool(toBool(settings.value('Controlbuttonflag',self.qmc.Controlbuttonflag)))
+            self.qmc.yoctoRemoteFlag = bool(toBool(settings.value('yoctoRemoteFlag',self.qmc.yoctoRemoteFlag)))
+            self.qmc.yoctoServerID = toString(settings.value('yoctoServerID',self.qmc.yoctoServerID))
+            self.qmc.YOCTO_emissivity = toFloat(settings.value('YOCTO_emissivity',self.qmc.YOCTO_emissivity))
+            self.qmc.YOCTO_async = [bool(toBool(x)) for x in toList(settings.value('YOCTO_async',self.qmc.YOCTO_async))]
+            self.qmc.YOCTO_dataRate = toInt(settings.value('YOCTO_dataRate',self.qmc.YOCTO_dataRate))
+            self.qmc.ambient_temperature_device = toInt(settings.value('ambient_temperature_device',self.qmc.ambient_temperature_device))
+            self.qmc.ambient_humidity_device = toInt(settings.value('ambient_humidity_device',self.qmc.ambient_humidity_device))
+            self.qmc.ambient_pressure_device = toInt(settings.value('ambient_pressure_device',self.qmc.ambient_pressure_device))
+            self.qmc.elevation = toInt(settings.value('elevation',self.qmc.elevation))
+            self.santokerHost = toString(settings.value('santokerHost',self.santokerHost))
+            self.santokerPort = toInt(settings.value('santokerPort',self.santokerPort))
+            self.santokerSerial = bool(toBool(settings.value('santokerSerial',self.santokerSerial)))
+            self.kaleidoHost = toString(settings.value('kaleidoHost',self.kaleidoHost))
+            self.kaleidoPort = toInt(settings.value('kaleidoPort',self.kaleidoPort))
+            self.kaleidoSerial = toBool(settings.value('kaleidoSerial',self.kaleidoSerial))
+            self.kaleidoPID = bool(toBool(settings.value('kaleidoPID',self.kaleidoPID)))
             # activate CONTROL BUTTON
             self.showControlButton()
-            if settings.contains('controlETpid'):
-                self.ser.controlETpid = [toInt(x) for x in toList(settings.value('controlETpid',self.ser.controlETpid))]
-            if settings.contains('readBTpid'):
-                self.ser.readBTpid = [toInt(x) for x in toList(settings.value('readBTpid',self.ser.readBTpid))]
-            if settings.contains('arduinoETChannel'):
-                self.ser.arduinoETChannel = s2a(toString(settings.value('arduinoETChannel',self.ser.arduinoETChannel)))
-            if settings.contains('arduinoBTChannel'):
-                self.ser.arduinoBTChannel = s2a(toString(settings.value('arduinoBTChannel',self.ser.arduinoBTChannel)))
-            if settings.contains('arduinoATChannel'):
-                self.ser.arduinoATChannel = s2a(toString(settings.value('arduinoATChannel',self.ser.arduinoATChannel)))
-            if settings.contains('ArduinoFILT'):
-                self.ser.ArduinoFILT = [toInt(x) for x in toList(settings.value('ArduinoFILT',self.ser.ArduinoFILT))]
-            if settings.contains('useModbusPort'):
-                self.ser.useModbusPort = bool(toBool(settings.value('useModbusPort',self.ser.useModbusPort)))
-            if settings.contains('showFujiLCDs'):
-                self.ser.showFujiLCDs = bool(toBool(settings.value('showFujiLCDs',self.ser.showFujiLCDs)))
+            self.ser.controlETpid = [toInt(x) for x in toList(settings.value('controlETpid',self.ser.controlETpid))]
+            self.ser.readBTpid = [toInt(x) for x in toList(settings.value('readBTpid',self.ser.readBTpid))]
+            self.ser.arduinoETChannel = s2a(toString(settings.value('arduinoETChannel',self.ser.arduinoETChannel)))
+            self.ser.arduinoBTChannel = s2a(toString(settings.value('arduinoBTChannel',self.ser.arduinoBTChannel)))
+            self.ser.arduinoATChannel = s2a(toString(settings.value('arduinoATChannel',self.ser.arduinoATChannel)))
+            self.ser.ArduinoFILT = [toInt(x) for x in toList(settings.value('ArduinoFILT',self.ser.ArduinoFILT))]
+            self.ser.useModbusPort = bool(toBool(settings.value('useModbusPort',self.ser.useModbusPort)))
+            self.ser.showFujiLCDs = bool(toBool(settings.value('showFujiLCDs',self.ser.showFujiLCDs)))
             settings.endGroup()
 #--- END GROUP Device
 
             #restore x,y formatting mode
-            if settings.contains('fmt_data_RoR'):
-                self.qmc.fmt_data_RoR = bool(toBool(settings.value('fmt_data_RoR',self.qmc.fmt_data_RoR)))
-            if settings.contains('fmt_data_ON'):
-                self.qmc.fmt_data_ON = bool(toBool(settings.value('fmt_data_ON',self.qmc.fmt_data_ON)))
-            if settings.contains('fmt_data_curve'):
-                self.qmc.fmt_data_curve = toInt(settings.value('fmt_data_curve',self.qmc.fmt_data_curve))
+            self.qmc.fmt_data_RoR = bool(toBool(settings.value('fmt_data_RoR',self.qmc.fmt_data_RoR)))
+            self.qmc.fmt_data_ON = bool(toBool(settings.value('fmt_data_ON',self.qmc.fmt_data_ON)))
+            self.qmc.fmt_data_curve = toInt(settings.value('fmt_data_curve',self.qmc.fmt_data_curve))
             #restore playback aid
-            if settings.contains('detectBackgroundEventTime'):
-                self.qmc.detectBackgroundEventTime = toInt(settings.value('detectBackgroundEventTime',self.qmc.detectBackgroundEventTime))
-            if settings.contains('backgroundReproduce'):
-                self.qmc.backgroundReproduce = bool(toBool(settings.value('backgroundReproduce',self.qmc.backgroundReproduce)))
-            if settings.contains('backgroundReproduceBeep'):
-                self.qmc.backgroundReproduceBeep = bool(toBool(settings.value('backgroundReproduceBeep',self.qmc.backgroundReproduceBeep)))
-            if settings.contains('backgroundPlaybackEvents'):
-                self.qmc.backgroundPlaybackEvents = bool(toBool(settings.value('backgroundPlaybackEvents',self.qmc.backgroundPlaybackEvents)))
-            if settings.contains('backgroundPlaybackDROP'):
-                self.qmc.backgroundPlaybackDROP = bool(toBool(settings.value('backgroundPlaybackDROP',self.qmc.backgroundPlaybackDROP)))
-            if settings.contains('replayType'):
-                self.qmc.replayType = toInt(settings.value('replayType',self.qmc.replayType))
-            if settings.contains('specialeventplaybackaid'):
-                self.qmc.specialeventplaybackaid = [toBool(x) for x in toList(settings.value('specialeventplaybackaid'))]
-            if settings.contains('specialeventplayback'):
-                self.qmc.specialeventplayback = [toBool(x) for x in toList(settings.value('specialeventplayback'))]
+            self.qmc.detectBackgroundEventTime = toInt(settings.value('detectBackgroundEventTime',self.qmc.detectBackgroundEventTime))
+            self.qmc.backgroundReproduce = bool(toBool(settings.value('backgroundReproduce',self.qmc.backgroundReproduce)))
+            self.qmc.backgroundReproduceBeep = bool(toBool(settings.value('backgroundReproduceBeep',self.qmc.backgroundReproduceBeep)))
+            self.qmc.backgroundPlaybackEvents = bool(toBool(settings.value('backgroundPlaybackEvents',self.qmc.backgroundPlaybackEvents)))
+            self.qmc.backgroundPlaybackDROP = bool(toBool(settings.value('backgroundPlaybackDROP',self.qmc.backgroundPlaybackDROP)))
+            self.qmc.replayType = toInt(settings.value('replayType',self.qmc.replayType))
+            self.qmc.specialeventplaybackaid = [toBool(x) for x in toList(settings.value('specialeventplaybackaid',self.qmc.specialeventplaybackaid))]
+            self.qmc.specialeventplayback = [toBool(x) for x in toList(settings.value('specialeventplayback',self.qmc.specialeventplayback))]
             #restore phases
-            if settings.contains('Phases'):
-                self.qmc.phases = [toInt(x) for x in toList(settings.value('Phases',self.qmc.phases))]
-            if settings.contains('phasesbuttonflag'):
-                self.qmc.phasesbuttonflag = bool(toBool(settings.value('phasesbuttonflag',self.qmc.phasesbuttonflag)))
-            if settings.contains('phasesfromBackgroundflag'):
-                self.qmc.phasesfromBackgroundflag = bool(toBool(settings.value('phasesfromBackgroundflag',self.qmc.phasesfromBackgroundflag)))
-            if settings.contains('watermarks'):
-                self.qmc.watermarksflag = bool(toBool(settings.value('watermarks',self.qmc.watermarksflag)))
-            if settings.contains('phasesLCDs'):
-                self.qmc.phasesLCDflag = bool(toBool(settings.value('phasesLCDs',self.qmc.phasesLCDflag)))
-            if settings.contains('phasesLCDmode'):
-                self.qmc.phasesLCDmode = toInt(settings.value('phasesLCDmode',self.qmc.phasesLCDmode))
+            self.qmc.phases = [toInt(x) for x in toList(settings.value('Phases',self.qmc.phases))]
+            self.qmc.phasesbuttonflag = bool(toBool(settings.value('phasesbuttonflag',self.qmc.phasesbuttonflag)))
+            self.qmc.phasesfromBackgroundflag = bool(toBool(settings.value('phasesfromBackgroundflag',self.qmc.phasesfromBackgroundflag)))
+            self.qmc.watermarksflag = bool(toBool(settings.value('watermarks',self.qmc.watermarksflag)))
+            self.qmc.phasesLCDflag = bool(toBool(settings.value('phasesLCDs',self.qmc.phasesLCDflag)))
+            self.qmc.phasesLCDmode = toInt(settings.value('phasesLCDmode',self.qmc.phasesLCDmode))
             if settings.contains('step100temp'):
                 try:
                     self.qmc.step100temp = int(settings.value('step100temp',self.qmc.step100temp))
@@ -16203,22 +16145,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.phasesLCDmode_l = [toInt(x) for x in toList(settings.value('phasesLCDmode_l',self.qmc.phasesLCDmode_l))]
             elif settings.contains('phasesLCDmode'):
                 self.qmc.phasesLCDmode_l = [toInt(self.qmc.phasesLCDmode)]*3
-            if settings.contains('phasesLCDmode_all'):
-                self.qmc.phasesLCDmode_all = [bool(toBool(x)) for x in toList(settings.value('phasesLCDmode_all',self.qmc.phasesLCDmode_all))]
-            if settings.contains('autoDry'):
-                self.qmc.autoDRYflag = bool(toBool(settings.value('autoDry',self.qmc.autoDRYflag)))
-            if settings.contains('autoFCs'):
-                self.qmc.autoFCsFlag = bool(toBool(settings.value('autoFCs',self.qmc.autoFCsFlag)))
+            self.qmc.phasesLCDmode_all = [bool(toBool(x)) for x in toList(settings.value('phasesLCDmode_all',self.qmc.phasesLCDmode_all))]
+            self.qmc.autoDRYflag = bool(toBool(settings.value('autoDry',self.qmc.autoDRYflag)))
+            self.qmc.autoFCsFlag = bool(toBool(settings.value('autoFCs',self.qmc.autoFCsFlag)))
 
 #--- BEGIN GROUP events
             #restore Events settings
             settings.beginGroup('events')
-            if settings.contains('eventsbuttonflag'):
-                self.eventsbuttonflag = toInt(settings.value('eventsbuttonflag',int(self.eventsbuttonflag)))
-            if settings.contains('minieventsflags'):
-                self.minieventsflags = [toInt(x) for x in toList(settings.value('minieventsflags',self.minieventsflags))]
-            if settings.contains('eventsGraphflag'):
-                self.qmc.eventsGraphflag = toInt(settings.value('eventsGraphflag',int(self.qmc.eventsGraphflag)))
+            self.eventsbuttonflag = toInt(settings.value('eventsbuttonflag',int(self.eventsbuttonflag)))
+            self.minieventsflags = [toInt(x) for x in toList(settings.value('minieventsflags',self.minieventsflags))]
+            self.qmc.eventsGraphflag = toInt(settings.value('eventsGraphflag',int(self.qmc.eventsGraphflag)))
             if settings.contains('etypes'):
                 self.qmc.etypes = toStringList(settings.value('etypes',self.qmc.etypes))
                 # update minieditor event type ComboBox
@@ -16232,51 +16168,34 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     QApplication.translate('ComboBox', 'Damper'),
                     QApplication.translate('ComboBox', 'Burner')
                 ]
-            if settings.contains('eventsshowflag'):
-                self.qmc.eventsshowflag = toInt(settings.value('eventsshowflag',int(self.qmc.eventsshowflag)))
-            if settings.contains('clampEvents'):
-                self.qmc.clampEvents = bool(toBool(settings.value('clampEvents',self.qmc.clampEvents)))
-            if settings.contains('renderEventsDescr'):
-                self.qmc.renderEventsDescr = bool(toBool(settings.value('renderEventsDescr',self.qmc.renderEventsDescr)))
-            if settings.contains('eventslabelschars'):
-                self.qmc.eventslabelschars = toInt(settings.value('eventslabelschars',int(self.qmc.eventslabelschars)))
-            if settings.contains('annotationsflag'):
-                self.qmc.annotationsflag = toInt(settings.value('annotationsflag',int(self.qmc.annotationsflag)))
-            if settings.contains('showeventsonbt'):
-                self.qmc.showeventsonbt = bool(toBool(settings.value('showeventsonbt',self.qmc.showeventsonbt)))
-            if settings.contains('showEtypes'):
-                self.qmc.showEtypes = [bool(toBool(x)) for x in toList(settings.value('showEtypes',self.qmc.showEtypes))]
+            self.qmc.eventsshowflag = toInt(settings.value('eventsshowflag',int(self.qmc.eventsshowflag)))
+            self.qmc.clampEvents = bool(toBool(settings.value('clampEvents',self.qmc.clampEvents)))
+            self.qmc.renderEventsDescr = bool(toBool(settings.value('renderEventsDescr',self.qmc.renderEventsDescr)))
+            self.qmc.eventslabelschars = toInt(settings.value('eventslabelschars',int(self.qmc.eventslabelschars)))
+            self.qmc.annotationsflag = toInt(settings.value('annotationsflag',int(self.qmc.annotationsflag)))
+            self.qmc.showeventsonbt = bool(toBool(settings.value('showeventsonbt',self.qmc.showeventsonbt)))
+            self.qmc.showEtypes = [bool(toBool(x)) for x in toList(settings.value('showEtypes',self.qmc.showEtypes))]
             if settings.contains('autoChargeDrop'):
                 self.qmc.autoChargeFlag = bool(toBool(settings.value('autoChargeDrop',False)))
                 self.qmc.autoDropFlag = self.qmc.autoChargeFlag
-            if settings.contains('chargeTimer'):
-                self.qmc.chargeTimerFlag = bool(toBool(settings.value('chargeTimer',self.qmc.chargeTimerFlag)))
-            if settings.contains('chargeTimerPeriod'):
-                self.qmc.chargeTimerPeriod = toInt(settings.value('chargeTimerPeriod',int(self.qmc.chargeTimerPeriod)))
-            if settings.contains('autoCharge'):
-                self.qmc.autoChargeFlag = bool(toBool(settings.value('autoCharge',self.qmc.autoChargeFlag)))
-            if settings.contains('autoDrop'):
-                self.qmc.autoDropFlag = bool(toBool(settings.value('autoDrop',self.qmc.autoDropFlag)))
-            if settings.contains('markTP'):
-                self.qmc.markTPflag = bool(toBool(settings.value('markTP',self.qmc.markTPflag)))
+            self.qmc.chargeTimerFlag = bool(toBool(settings.value('chargeTimer',self.qmc.chargeTimerFlag)))
+            self.qmc.chargeTimerPeriod = toInt(settings.value('chargeTimerPeriod',int(self.qmc.chargeTimerPeriod)))
+            self.qmc.autoChargeFlag = bool(toBool(settings.value('autoCharge',self.qmc.autoChargeFlag)))
+            self.qmc.autoDropFlag = bool(toBool(settings.value('autoDrop',self.qmc.autoDropFlag)))
+            self.qmc.markTPflag = bool(toBool(settings.value('markTP',self.qmc.markTPflag)))
             if settings.contains('EvalueColor'):
                 self.qmc.EvalueColor = list(map(str,list(toStringList(settings.value('EvalueColor',self.qmc.EvalueColor)))))
                 self.updateSliderColors()
-                self.qmc.EvalueMarker = list(map(str,list(toStringList(settings.value('EvalueMarker',self.qmc.EvalueMarker)))))
+            self.qmc.EvalueMarker = list(map(str,list(toStringList(settings.value('EvalueMarker',self.qmc.EvalueMarker)))))
             if settings.contains('EvalueTextColor'):
                 self.qmc.EvalueTextColor = list(map(str,list(toStringList(settings.value('EvalueTextColor',self.qmc.EvalueTextColor)))))
                 self.updateSliderColors()
-            if settings.contains('Evaluelinethickness'):
-                self.qmc.Evaluelinethickness = [max(self.qmc.linewidth_min, toFloat(x)) for x in toList(settings.value('Evaluelinethickness',self.qmc.Evaluelinethickness))]
-                self.qmc.Evaluealpha = [toFloat(x) for x in toList(settings.value('Evaluealpha',self.qmc.Evaluealpha))]
-            if settings.contains('EvalueMarkerSize'):
-                self.qmc.EvalueMarkerSize = [max(self.qmc.markersize_min, toFloat(x)) for x in toList(settings.value('EvalueMarkerSize',self.qmc.EvalueMarkerSize))]
-            if settings.contains('specialeventannotations'):
-                self.qmc.specialeventannotations = list(map(str,list(toStringList(settings.value('specialeventannotations',self.qmc.specialeventannotations)))))
-            if settings.contains('specialeventannovisibilities'):
-                self.qmc.specialeventannovisibilities = [toInt(x) for x in toList(settings.value('specialeventannovisibilities',self.qmc.specialeventannovisibilities))]
-            if settings.contains('overlappct'):
-                self.qmc.overlappct = toInt(settings.value('overlappct',int(self.qmc.overlappct)))
+            self.qmc.Evaluelinethickness = [max(self.qmc.linewidth_min, toFloat(x)) for x in toList(settings.value('Evaluelinethickness',self.qmc.Evaluelinethickness))]
+            self.qmc.Evaluealpha = [toFloat(x) for x in toList(settings.value('Evaluealpha',self.qmc.Evaluealpha))]
+            self.qmc.EvalueMarkerSize = [max(self.qmc.markersize_min, toFloat(x)) for x in toList(settings.value('EvalueMarkerSize',self.qmc.EvalueMarkerSize))]
+            self.qmc.specialeventannotations = list(map(str,list(toStringList(settings.value('specialeventannotations',self.qmc.specialeventannotations)))))
+            self.qmc.specialeventannovisibilities = [toInt(x) for x in toList(settings.value('specialeventannovisibilities',self.qmc.specialeventannovisibilities))]
+            self.qmc.overlappct = toInt(settings.value('overlappct',int(self.qmc.overlappct)))
             settings.endGroup()
 #--- END GROUP events
 
@@ -16294,51 +16213,30 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 srl = toList(settings.value('SegmentResultsLoc',self.qmc.segmentresultsloc))
                 if len(srl)>1:
                     self.qmc.segmentresultsloc = (toFloat(srl[0]), toFloat(srl[1]))
-            if settings.contains('analysisstartchoice'):
-                self.qmc.analysisstartchoice = toInt(settings.value('analysisstartchoice',int(self.qmc.analysisstartchoice)))
-            if settings.contains('analysisoffset'):
-                self.qmc.analysisoffset = toInt(settings.value('analysisoffset',int(self.qmc.analysisoffset)))
-            if settings.contains('curvefitstartchoice'):
-                self.qmc.curvefitstartchoice = toInt(settings.value('curvefitstartchoice',int(self.qmc.curvefitstartchoice)))
-            if settings.contains('curvefitoffset'):
-                self.qmc.curvefitoffset = toInt(settings.value('curvefitoffset',int(self.qmc.curvefitoffset)))
-            if settings.contains('segmentsamplesthreshold'):
-                self.qmc.segmentsamplesthreshold = toInt(settings.value('segmentsamplesthreshold',int(self.qmc.segmentsamplesthreshold)))
-            if settings.contains('segmentdeltathreshold'):
-                self.qmc.segmentdeltathreshold = self.float2float(toFloat(settings.value('segmentdeltathreshold',self.qmc.segmentdeltathreshold)),4)
-            if settings.contains('projectFlag'):
-                self.qmc.projectFlag = bool(toBool(settings.value('projectFlag',self.qmc.projectFlag)))
-            if settings.contains('projectDeltaFlag'):
-                self.qmc.projectDeltaFlag = bool(toBool(settings.value('projectDeltaFlag',self.qmc.projectDeltaFlag)))
-            if settings.contains('projectionmode'):
-                self.qmc.projectionmode = toInt(settings.value('projectionmode',int(self.qmc.projectionmode)))
-            if settings.contains('AUCbegin'):
-                self.qmc.AUCbegin = toInt(settings.value('AUCbegin',int(self.qmc.AUCbegin)))
-                self.qmc.AUCbase = toInt(settings.value('AUCbase',int(self.qmc.AUCbase)))
-                self.qmc.AUCbaseFlag = bool(toBool(settings.value('AUCbaseFlag',self.qmc.AUCbaseFlag)))
-                self.qmc.AUCtarget = toInt(settings.value('AUCtarget',int(self.qmc.AUCtarget)))
-                self.qmc.AUCtargetFlag = bool(toBool(settings.value('AUCtargetFlag',self.qmc.AUCtargetFlag)))
-                self.qmc.AUCguideFlag = bool(toBool(settings.value('AUCguideFlag',self.qmc.AUCguideFlag)))
-                self.qmc.AUClcdFlag = bool(toBool(settings.value('AUClcdFlag',self.qmc.AUClcdFlag)))
-                self.qmc.AUCLCDmode = toInt(settings.value('AUCLCDmode',self.qmc.AUCLCDmode))
-            if settings.contains('AUCshowFlag'):
-                self.qmc.AUCshowFlag = bool(toBool(settings.value('AUCshowFlag',self.qmc.AUCshowFlag)))
-            if settings.contains('keyboardmoveflag'):
-                self.keyboardmoveflag = toInt(settings.value('keyboardmoveflag',int(self.keyboardmoveflag)))
-            #restore ambient temperature source
-            if settings.contains('AmbientTempSource'):
-                self.qmc.ambientTempSource = toInt(settings.value('AmbientTempSource',int(self.qmc.ambientTempSource)))
-            #restore delay
-            if settings.contains('Delay'):
-                self.setSamplingRate(toInt(settings.value('Delay',int(self.qmc.delay))))
-            # restore keepON flag
-            if settings.contains('KeepON'):
-                self.qmc.flagKeepON = bool(toBool(settings.value('KeepON',self.qmc.flagKeepON)))
-            if settings.contains('flagOpenCompleted'):
-                self.qmc.flagOpenCompleted = bool(toBool(settings.value('flagOpenCompleted',self.qmc.flagOpenCompleted)))
-            # restore extra event sampling interval
-            if settings.contains('ExtraEventSamplingDelay'):
-                self.qmc.extra_event_sampling_delay = toInt(settings.value('ExtraEventSamplingDelay',int(self.qmc.extra_event_sampling_delay)))
+            self.qmc.analysisstartchoice = toInt(settings.value('analysisstartchoice',int(self.qmc.analysisstartchoice)))
+            self.qmc.analysisoffset = toInt(settings.value('analysisoffset',int(self.qmc.analysisoffset)))
+            self.qmc.curvefitstartchoice = toInt(settings.value('curvefitstartchoice',int(self.qmc.curvefitstartchoice)))
+            self.qmc.curvefitoffset = toInt(settings.value('curvefitoffset',int(self.qmc.curvefitoffset)))
+            self.qmc.segmentsamplesthreshold = toInt(settings.value('segmentsamplesthreshold',int(self.qmc.segmentsamplesthreshold)))
+            self.qmc.segmentdeltathreshold = self.float2float(toFloat(settings.value('segmentdeltathreshold',self.qmc.segmentdeltathreshold)),4)
+            self.qmc.projectFlag = bool(toBool(settings.value('projectFlag',self.qmc.projectFlag)))
+            self.qmc.projectDeltaFlag = bool(toBool(settings.value('projectDeltaFlag',self.qmc.projectDeltaFlag)))
+            self.qmc.projectionmode = toInt(settings.value('projectionmode',int(self.qmc.projectionmode)))
+            self.qmc.AUCbegin = toInt(settings.value('AUCbegin',int(self.qmc.AUCbegin)))
+            self.qmc.AUCbase = toInt(settings.value('AUCbase',int(self.qmc.AUCbase)))
+            self.qmc.AUCbaseFlag = bool(toBool(settings.value('AUCbaseFlag',self.qmc.AUCbaseFlag)))
+            self.qmc.AUCtarget = toInt(settings.value('AUCtarget',int(self.qmc.AUCtarget)))
+            self.qmc.AUCtargetFlag = bool(toBool(settings.value('AUCtargetFlag',self.qmc.AUCtargetFlag)))
+            self.qmc.AUCguideFlag = bool(toBool(settings.value('AUCguideFlag',self.qmc.AUCguideFlag)))
+            self.qmc.AUClcdFlag = bool(toBool(settings.value('AUClcdFlag',self.qmc.AUClcdFlag)))
+            self.qmc.AUCLCDmode = toInt(settings.value('AUCLCDmode',self.qmc.AUCLCDmode))
+            self.qmc.AUCshowFlag = bool(toBool(settings.value('AUCshowFlag',self.qmc.AUCshowFlag)))
+            self.keyboardmoveflag = toInt(settings.value('keyboardmoveflag',int(self.keyboardmoveflag)))
+            self.qmc.ambientTempSource = toInt(settings.value('AmbientTempSource',int(self.qmc.ambientTempSource)))
+            self.setSamplingRate(toInt(settings.value('Delay',int(self.qmc.delay))))
+            self.qmc.flagKeepON = bool(toBool(settings.value('KeepON',self.qmc.flagKeepON)))
+            self.qmc.flagOpenCompleted = bool(toBool(settings.value('flagOpenCompleted',self.qmc.flagOpenCompleted)))
+            self.qmc.extra_event_sampling_delay = toInt(settings.value('ExtraEventSamplingDelay',int(self.qmc.extra_event_sampling_delay)))
             #restore colors
             if settings.contains('Colors'):
                 for (k, v) in list(toMap(settings.value('Colors')).items()):
@@ -16355,28 +16253,22 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.setLabelColor(self.label5,QColor(self.qmc.palette['deltabt']))
                 if 'canvas' in self.qmc.palette:
                     if len(self.qmc.palette['canvas']) == 0:  #revert the canvas element to default if it is blank in the settings.
-                        self.qmc.palette['canvas'] = '#F8F8F8'
+                        self.qmc.palette['canvas'] = '#f8f8f8'
                 else:
-                    self.qmc.palette['canvas'] = '#F8F8F8'  #revert the canvas element to default if it does not exist in the settings.
+                    self.qmc.palette['canvas'] = '#f8f8f8'  #revert the canvas element to default if it does not exist in the settings.
                 if 'canvas_alt' in self.qmc.palette:
                     self.qmc.palette.pop('canvas_alt')  #remove the canvas_alt element if it somehow snuck into the settings
-            if settings.contains('ETBColor'):
-                self.qmc.backgroundmetcolor = s2a(toString(settings.value('ETBColor',self.qmc.backgroundmetcolor)))
-            if settings.contains('BTBColor'):
-                self.qmc.backgroundbtcolor = s2a(toString(settings.value('BTBColor',self.qmc.backgroundbtcolor)))
-            if settings.contains('ETBdeltaColor'):
-                self.qmc.backgrounddeltaetcolor = s2a(toString(settings.value('ETBdeltaColor',self.qmc.backgrounddeltaetcolor)))
-            if settings.contains('BTBdeltaColor'):
-                self.qmc.backgrounddeltabtcolor = s2a(toString(settings.value('BTBdeltaColor',self.qmc.backgrounddeltabtcolor)))
-            if settings.contains('BackgroundAlpha'):
-                self.qmc.backgroundalpha = min(0.5,self.float2float(toFloat(settings.value('BackgroundAlpha',self.qmc.backgroundalpha))))
+            self.qmc.backgroundmetcolor = s2a(toString(settings.value('ETBColor',self.qmc.backgroundmetcolor)))
+            self.qmc.backgroundbtcolor = s2a(toString(settings.value('BTBColor',self.qmc.backgroundbtcolor)))
+            self.qmc.backgrounddeltaetcolor = s2a(toString(settings.value('ETBdeltaColor',self.qmc.backgrounddeltaetcolor)))
+            self.qmc.backgrounddeltabtcolor = s2a(toString(settings.value('BTBdeltaColor',self.qmc.backgrounddeltabtcolor)))
+            self.qmc.backgroundalpha = min(0.5,self.float2float(toFloat(settings.value('BackgroundAlpha',self.qmc.backgroundalpha))))
             if settings.contains('LCDColors'):
                 for (k, v) in list(toMap(settings.value('LCDColors')).items()):
                     self.lcdpaletteB[str(k)] = s2a(toString(v))
             if settings.contains('LEDColors'):
                 for (k, v) in list(toMap(settings.value('LEDColors')).items()):
                     self.lcdpaletteF[str(k)] = s2a(toString(v))
-#?            self.qmc.palette["alpha"] = 'None'  #revert the canvas element to default if it does not exist in the settings.
             if settings.contains('Alphas'):
                 for (k, v) in list(toMap(settings.value('Alphas')).items()):
                     self.qmc.alpha[str(k)] = v
@@ -16388,53 +16280,40 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.lcd5.setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {self.lcdpaletteF['deltabt']}; background: {self.lcdpaletteB['deltabt']};}}")
             self.lcd6.setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {self.lcdpaletteF['sv']}; background: {self.lcdpaletteB['sv']};}}")
             self.lcd7.setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {self.lcdpaletteF['sv']}; background: {self.lcdpaletteB['sv']};}}")
-            if settings.contains('readingslcdsflags'):
-                self.readingslcdsflags = [toInt(x) for x in toList(settings.value('readingslcdsflags',self.readingslcdsflags))]
+            self.readingslcdsflags = [toInt(x) for x in toList(settings.value('readingslcdsflags',self.readingslcdsflags))]
             #restore flavors
             self.qmc.flavorlabels = toStringList(settings.value('Flavors',self.qmc.flavorlabels))
             self.qmc.flavors = [5.]*len(self.qmc.flavorlabels)
-            if settings.contains('flavorstartangle'):
-                self.qmc.flavorstartangle = toInt(settings.value('flavorstartangle',int(self.qmc.flavorstartangle)))
-            #restore roast color system
-            if settings.contains('colorsystem'):
-                self.qmc.color_system_idx = toInt(settings.value('colorsystem',int(self.qmc.color_system_idx)))
+            self.qmc.flavorstartangle = toInt(settings.value('flavorstartangle',int(self.qmc.flavorstartangle)))
+            self.qmc.color_system_idx = toInt(settings.value('colorsystem',int(self.qmc.color_system_idx)))
 
 #--- BEGIN GROUP XT
             #restore extra background curve color and index
             settings.beginGroup('XT')
-            if settings.contains('color'):
-                self.qmc.backgroundxtcolor = s2a(toString(settings.value('color',self.qmc.backgroundxtcolor)))
-            if settings.contains('color2'):
-                self.qmc.backgroundytcolor = s2a(toString(settings.value('color2',self.qmc.backgroundytcolor)))
-            if settings.contains('index'):
-                self.qmc.xtcurveidx = toInt(settings.value('index',int(self.qmc.xtcurveidx)))
-            if settings.contains('index2'):
-                self.qmc.ytcurveidx = toInt(settings.value('index2',int(self.qmc.ytcurveidx)))
+            self.qmc.backgroundxtcolor = s2a(toString(settings.value('color',self.qmc.backgroundxtcolor)))
+            self.qmc.backgroundytcolor = s2a(toString(settings.value('color2',self.qmc.backgroundytcolor)))
+            self.qmc.xtcurveidx = toInt(settings.value('index',int(self.qmc.xtcurveidx)))
+            self.qmc.ytcurveidx = toInt(settings.value('index2',int(self.qmc.ytcurveidx)))
             settings.endGroup()
 #--- END GROUP XT
 
 #--- BEGIN GROUP Units
             #restore units
             settings.beginGroup('Units')
-            if settings.contains('weight'):
-                self.qmc.weight = (self.qmc.weight[0],self.qmc.weight[1],s2a(toString(settings.value('weight',self.qmc.weight[2]))))
-                self.qmc.volume = (self.qmc.volume[0],self.qmc.volume[1],s2a(toString(settings.value('volume',self.qmc.volume[2]))))
+            self.qmc.weight = (self.qmc.weight[0],self.qmc.weight[1],s2a(toString(settings.value('weight',self.qmc.weight[2]))))
+            self.qmc.volume = (self.qmc.volume[0],self.qmc.volume[1],s2a(toString(settings.value('volume',self.qmc.volume[2]))))
 # density units are now fixed to g/l
 #                self.qmc.density[1] = s2a(toString(settings.value("densityweight",self.qmc.density[1])))
 #                self.qmc.density[3] = s2a(toString(settings.value("densityvolume",self.qmc.density[3])))
-            if settings.contains('volumeCalcUnit'):
-                self.qmc.volumeCalcUnit = self.float2float(toFloat(settings.value('volumeCalcUnit',self.qmc.volumeCalcUnit)))
+            self.qmc.volumeCalcUnit = self.float2float(toFloat(settings.value('volumeCalcUnit',self.qmc.volumeCalcUnit)))
             settings.endGroup()
 #--- END GROUP Units
 
 #--- BEGIN GROUP Tare
             settings.beginGroup('Tare')
-            if settings.contains('names'):
-                self.qmc.container_names = list(map(str,list(toStringList(settings.value('names',self.qmc.container_names)))))
-            if settings.contains('weights'):
-                self.qmc.container_weights = [toInt(x) for x in toList(settings.value('weights',self.qmc.container_weights))]
-            if settings.contains('idx'):
-                self.qmc.container_idx = toInt(settings.value('idx',int(self.qmc.container_idx)))
+            self.qmc.container_names = list(map(str,list(toStringList(settings.value('names',self.qmc.container_names)))))
+            self.qmc.container_weights = [toInt(x) for x in toList(settings.value('weights',self.qmc.container_weights))]
+            self.qmc.container_idx = toInt(settings.value('idx',int(self.qmc.container_idx)))
             settings.endGroup()
 #--- END GROUP Tare
 
@@ -16442,15 +16321,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             #restore serial port
             settings.beginGroup('SerialPort')
             self.ser.comport = s2a(toString(settings.value('comport',self.ser.comport)))
-            if settings.contains('baudrate'):
-                self.ser.baudrate = toInt(settings.value('baudrate',int(self.ser.baudrate)))
-            if settings.contains('bytesize'):
-                self.ser.bytesize = toInt(settings.value('bytesize',self.ser.bytesize))
-            if settings.contains('stopbits'):
-                self.ser.stopbits = toInt(settings.value('stopbits',self.ser.stopbits))
+            self.ser.baudrate = toInt(settings.value('baudrate',int(self.ser.baudrate)))
+            self.ser.bytesize = toInt(settings.value('bytesize',self.ser.bytesize))
+            self.ser.stopbits = toInt(settings.value('stopbits',self.ser.stopbits))
             self.ser.parity = s2a(toString(settings.value('parity',self.ser.parity)))
-            if settings.contains('timeout'):
-                self.ser.timeout = self.float2float(toFloat(settings.value('timeout',self.ser.timeout)))
+            self.ser.timeout = self.float2float(toFloat(settings.value('timeout',self.ser.timeout)))
             settings.endGroup()
 #--- END GROUP SerialPort
 
@@ -16493,40 +16368,35 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #--- BEGIN GROUP S7
             #restore s7 port
             settings.beginGroup('S7')
-            if settings.contains('area'):
-                self.s7.area = [toInt(x) for x in toList(settings.value('area',self.s7.area))]
-                self.s7.area = self.s7.area + [0]*(max(0,self.s7.channels - len(self.s7.area)))
-                self.s7.db_nr = [toInt(x) for x in toList(settings.value('db_nr',self.s7.db_nr))]
-                self.s7.db_nr = self.s7.db_nr + [1]*(max(0,self.s7.channels - len(self.s7.db_nr)))
-                self.s7.start = [toInt(x) for x in toList(settings.value('start',self.s7.start))]
-                self.s7.start = self.s7.start + [0]*(max(0,self.s7.channels - len(self.s7.start)))
-                self.s7.type = [toInt(x) for x in toList(settings.value('type',self.s7.type))]
-                self.s7.type = self.s7.type + [0]*(max(0,self.s7.channels - len(self.s7.type)))
-                self.s7.mode = [toInt(x) for x in toList(settings.value('mode',self.s7.mode))]
-                self.s7.mode = self.s7.mode + [0]*(max(0,self.s7.channels - len(self.s7.mode)))
-                self.s7.div = [toInt(x) for x in toList(settings.value('div',self.s7.div))]
-                self.s7.div = self.s7.div + [0]*(max(0,self.s7.channels - len(self.s7.div)))
-                self.s7.host = toString(settings.value('host',self.s7.host))
-                self.s7.port = toInt(settings.value('port',self.s7.port))
-                self.s7.rack = toInt(settings.value('rack',self.s7.rack))
-                self.s7.slot = toInt(settings.value('slot',self.s7.slot))
-            if settings.contains('PIDmultiplier'):
-                self.s7.PID_area = toInt(settings.value('PID_area',self.s7.PID_area))
-                self.s7.PID_db_nr = toInt(settings.value('PID_db_nr',self.s7.PID_db_nr))
-                self.s7.PID_SV_register = toInt(settings.value('PID_SV_register',self.s7.PID_SV_register))
-                self.s7.PID_p_register = toInt(settings.value('PID_p_register',self.s7.PID_p_register))
-                self.s7.PID_i_register = toInt(settings.value('PID_i_register',self.s7.PID_i_register))
-                self.s7.PID_d_register = toInt(settings.value('PID_d_register',self.s7.PID_d_register))
-                self.s7.PID_OFF_action = s2a(toString(settings.value('PID_OFF_action',self.s7.PID_OFF_action)))
-                self.s7.PID_ON_action = s2a(toString(settings.value('PID_ON_action',self.s7.PID_ON_action)))
-                self.s7.PIDmultiplier = toInt(settings.value('PIDmultiplier',self.s7.PIDmultiplier))
-                self.s7.SVmultiplier = toInt(settings.value('SVmultiplier',self.s7.SVmultiplier))
-            if settings.contains('SVtype'):
-                self.s7.SVtype = toInt(settings.value('SVtype',self.s7.SVtype))
-            if settings.contains('optimizer'):
-                self.s7.optimizer = bool(toBool(settings.value('optimizer',self.s7.optimizer)))
-            if settings.contains('fetch_max_blocks'):
-                self.s7.fetch_max_blocks = bool(toBool(settings.value('fetch_max_blocks',self.s7.fetch_max_blocks)))
+            self.s7.area = [toInt(x) for x in toList(settings.value('area',self.s7.area))]
+            self.s7.area = self.s7.area + [0]*(max(0,self.s7.channels - len(self.s7.area)))
+            self.s7.db_nr = [toInt(x) for x in toList(settings.value('db_nr',self.s7.db_nr))]
+            self.s7.db_nr = self.s7.db_nr + [1]*(max(0,self.s7.channels - len(self.s7.db_nr)))
+            self.s7.start = [toInt(x) for x in toList(settings.value('start',self.s7.start))]
+            self.s7.start = self.s7.start + [0]*(max(0,self.s7.channels - len(self.s7.start)))
+            self.s7.type = [toInt(x) for x in toList(settings.value('type',self.s7.type))]
+            self.s7.type = self.s7.type + [0]*(max(0,self.s7.channels - len(self.s7.type)))
+            self.s7.mode = [toInt(x) for x in toList(settings.value('mode',self.s7.mode))]
+            self.s7.mode = self.s7.mode + [0]*(max(0,self.s7.channels - len(self.s7.mode)))
+            self.s7.div = [toInt(x) for x in toList(settings.value('div',self.s7.div))]
+            self.s7.div = self.s7.div + [0]*(max(0,self.s7.channels - len(self.s7.div)))
+            self.s7.host = toString(settings.value('host',self.s7.host))
+            self.s7.port = toInt(settings.value('port',self.s7.port))
+            self.s7.rack = toInt(settings.value('rack',self.s7.rack))
+            self.s7.slot = toInt(settings.value('slot',self.s7.slot))
+            self.s7.PID_area = toInt(settings.value('PID_area',self.s7.PID_area))
+            self.s7.PID_db_nr = toInt(settings.value('PID_db_nr',self.s7.PID_db_nr))
+            self.s7.PID_SV_register = toInt(settings.value('PID_SV_register',self.s7.PID_SV_register))
+            self.s7.PID_p_register = toInt(settings.value('PID_p_register',self.s7.PID_p_register))
+            self.s7.PID_i_register = toInt(settings.value('PID_i_register',self.s7.PID_i_register))
+            self.s7.PID_d_register = toInt(settings.value('PID_d_register',self.s7.PID_d_register))
+            self.s7.PID_OFF_action = s2a(toString(settings.value('PID_OFF_action',self.s7.PID_OFF_action)))
+            self.s7.PID_ON_action = s2a(toString(settings.value('PID_ON_action',self.s7.PID_ON_action)))
+            self.s7.PIDmultiplier = toInt(settings.value('PIDmultiplier',self.s7.PIDmultiplier))
+            self.s7.SVmultiplier = toInt(settings.value('SVmultiplier',self.s7.SVmultiplier))
+            self.s7.SVtype = toInt(settings.value('SVtype',self.s7.SVtype))
+            self.s7.optimizer = bool(toBool(settings.value('optimizer',self.s7.optimizer)))
+            self.s7.fetch_max_blocks = bool(toBool(settings.value('fetch_max_blocks',self.s7.fetch_max_blocks)))
             settings.endGroup()
 #--- END GROUP S7
 
@@ -16534,185 +16404,121 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             #restore modbus port
             settings.beginGroup('Modbus')
             self.modbus.comport = s2a(toString(settings.value('comport',self.modbus.comport)))
-            if settings.contains('baudrate'):
-                self.modbus.baudrate = toInt(settings.value('baudrate',int(self.modbus.baudrate)))
-            if settings.contains('bytesize'):
-                self.modbus.bytesize = toInt(settings.value('bytesize',self.modbus.bytesize))
-            if settings.contains('stopbits'):
-                self.modbus.stopbits = toInt(settings.value('stopbits',self.modbus.stopbits))
-            if settings.contains('parity'):
-                self.modbus.parity = s2a(toString(settings.value('parity',self.modbus.parity)))
-            if settings.contains('timeout'):
-                self.modbus.timeout = self.float2float(toFloat(settings.value('timeout',self.modbus.timeout)))
-            if settings.contains('modbus_serial_extra_read_delay'):
-                self.modbus.modbus_serial_extra_read_delay = toFloat(settings.value('modbus_serial_extra_read_delay',self.modbus.modbus_serial_extra_read_delay))
-            if settings.contains('serial_readRetries'):
-                self.modbus.serial_readRetries = toInt(settings.value('serial_readRetries',self.modbus.serial_readRetries))
-            if settings.contains('IP_timeout'):
-                self.modbus.IP_timeout = self.float2float(toFloat(settings.value('IP_timeout',self.modbus.IP_timeout)))
-            if settings.contains('IP_retries'):
-                self.modbus.IP_retries = toInt(settings.value('IP_retries',self.modbus.IP_retries))
-            if settings.contains('input1slave'):
-                self.modbus.inputSlaves[0] = toInt(settings.value('input1slave',self.modbus.inputSlaves[0]))
-            if settings.contains('input1register'):
-                self.modbus.inputRegisters[0] = toInt(settings.value('input1register',self.modbus.inputRegisters[0]))
-            if settings.contains('input2slave'):
-                self.modbus.inputSlaves[1] = toInt(settings.value('input2slave',self.modbus.inputSlaves[1]))
-            if settings.contains('input2register'):
-                self.modbus.inputRegisters[1] = toInt(settings.value('input2register',self.modbus.inputRegisters[1]))
-            if settings.contains('input3slave'):
-                self.modbus.inputSlaves[2] = toInt(settings.value('input3slave',self.modbus.inputSlaves[2]))
-            if settings.contains('input3register'):
-                self.modbus.inputRegisters[2] = toInt(settings.value('input3register',self.modbus.inputRegisters[2]))
-            if settings.contains('input4slave'):
-                self.modbus.inputSlaves[3] = toInt(settings.value('input4slave',self.modbus.inputSlaves[3]))
-            if settings.contains('input4register'):
-                self.modbus.inputRegisters[3] = toInt(settings.value('input4register',self.modbus.inputRegisters[3]))
-            if settings.contains('input5slave'):
-                self.modbus.inputSlaves[4] = toInt(settings.value('input5slave',self.modbus.inputSlaves[4]))
-            if settings.contains('input5register'):
-                self.modbus.inputRegisters[4] = toInt(settings.value('input5register',self.modbus.inputRegisters[4]))
-            if settings.contains('input6slave'):
-                self.modbus.inputSlaves[5] = toInt(settings.value('input6slave',self.modbus.inputSlaves[5]))
-            if settings.contains('input6register'):
-                self.modbus.inputRegisters[5] = toInt(settings.value('input6register',self.modbus.inputRegisters[5]))
-            if settings.contains('input7slave'):
-                self.modbus.inputSlaves[6] = toInt(settings.value('input7slave',self.modbus.inputSlaves[6]))
-            if settings.contains('input7register'):
-                self.modbus.inputRegisters[6] = toInt(settings.value('input7register',self.modbus.inputRegisters[6]))
-            if settings.contains('input8slave'):
-                self.modbus.inputSlaves[7] = toInt(settings.value('input8slave',self.modbus.inputSlaves[7]))
-            if settings.contains('input8register'):
-                self.modbus.inputRegisters[7] = toInt(settings.value('input8register',self.modbus.inputRegisters[7]))
+            self.modbus.baudrate = toInt(settings.value('baudrate',int(self.modbus.baudrate)))
+            self.modbus.bytesize = toInt(settings.value('bytesize',self.modbus.bytesize))
+            self.modbus.stopbits = toInt(settings.value('stopbits',self.modbus.stopbits))
+            self.modbus.parity = s2a(toString(settings.value('parity',self.modbus.parity)))
+            self.modbus.timeout = self.float2float(toFloat(settings.value('timeout',self.modbus.timeout)))
+            self.modbus.modbus_serial_extra_read_delay = toFloat(settings.value('modbus_serial_extra_read_delay',self.modbus.modbus_serial_extra_read_delay))
+            self.modbus.serial_readRetries = toInt(settings.value('serial_readRetries',self.modbus.serial_readRetries))
+            self.modbus.IP_timeout = self.float2float(toFloat(settings.value('IP_timeout',self.modbus.IP_timeout)))
+            self.modbus.IP_retries = toInt(settings.value('IP_retries',self.modbus.IP_retries))
+            self.modbus.inputSlaves[0] = toInt(settings.value('input1slave',self.modbus.inputSlaves[0]))
+            self.modbus.inputRegisters[0] = toInt(settings.value('input1register',self.modbus.inputRegisters[0]))
+            self.modbus.inputSlaves[1] = toInt(settings.value('input2slave',self.modbus.inputSlaves[1]))
+            self.modbus.inputRegisters[1] = toInt(settings.value('input2register',self.modbus.inputRegisters[1]))
+            self.modbus.inputSlaves[2] = toInt(settings.value('input3slave',self.modbus.inputSlaves[2]))
+            self.modbus.inputRegisters[2] = toInt(settings.value('input3register',self.modbus.inputRegisters[2]))
+            self.modbus.inputSlaves[3] = toInt(settings.value('input4slave',self.modbus.inputSlaves[3]))
+            self.modbus.inputRegisters[3] = toInt(settings.value('input4register',self.modbus.inputRegisters[3]))
+            self.modbus.inputSlaves[4] = toInt(settings.value('input5slave',self.modbus.inputSlaves[4]))
+            self.modbus.inputRegisters[4] = toInt(settings.value('input5register',self.modbus.inputRegisters[4]))
+            self.modbus.inputSlaves[5] = toInt(settings.value('input6slave',self.modbus.inputSlaves[5]))
+            self.modbus.inputRegisters[5] = toInt(settings.value('input6register',self.modbus.inputRegisters[5]))
+            self.modbus.inputSlaves[6] = toInt(settings.value('input7slave',self.modbus.inputSlaves[6]))
+            self.modbus.inputRegisters[6] = toInt(settings.value('input7register',self.modbus.inputRegisters[6]))
+            self.modbus.inputSlaves[7] = toInt(settings.value('input8slave',self.modbus.inputSlaves[7]))
+            self.modbus.inputRegisters[7] = toInt(settings.value('input8register',self.modbus.inputRegisters[7]))
             #----
-            if settings.contains('input1float'):
-                self.modbus.inputFloats[0] = bool(toBool(settings.value('input1float',self.modbus.inputFloats[0])))
-            if settings.contains('input1bcd'):
-                self.modbus.inputBCDs[0] = bool(toBool(settings.value('input1bcd',self.modbus.inputBCDs[0])))
-            if settings.contains('input1code'):
-                self.modbus.inputCodes[0] = toInt(settings.value('input1code',self.modbus.inputCodes[0]))
-            if settings.contains('input2float'):
-                self.modbus.inputFloats[1] = bool(toBool(settings.value('input2float',self.modbus.inputFloats[1])))
-            if settings.contains('input2bcd'):
-                self.modbus.inputBCDs[1] = bool(toBool(settings.value('input2bcd',self.modbus.inputBCDs[1])))
-            if settings.contains('input2code'):
-                self.modbus.inputCodes[1] = toInt(settings.value('input2code',self.modbus.inputCodes[1]))
-            if settings.contains('input3float'):
-                self.modbus.inputFloats[2] = bool(toBool(settings.value('input3float',self.modbus.inputFloats[2])))
-            if settings.contains('input3bcd'):
-                self.modbus.inputBCDs[2] = bool(toBool(settings.value('input3bcd',self.modbus.inputBCDs[2])))
-            if settings.contains('input3code'):
-                self.modbus.inputCodes[2] = toInt(settings.value('input3code',self.modbus.inputCodes[2]))
-            if settings.contains('input4float'):
-                self.modbus.inputFloats[3] = bool(toBool(settings.value('input4float',self.modbus.inputFloats[3])))
-            if settings.contains('input4bcd'):
-                self.modbus.inputBCDs[3] = bool(toBool(settings.value('input4bcd',self.modbus.inputBCDs[3])))
-            if settings.contains('input4code'):
-                self.modbus.inputCodes[3] = toInt(settings.value('input4code',self.modbus.inputCodes[3]))
-            if settings.contains('input5float'):
-                self.modbus.inputFloats[4] = bool(toBool(settings.value('input5float',self.modbus.inputFloats[4])))
-            if settings.contains('input5bcd'):
-                self.modbus.inputBCDs[4] = bool(toBool(settings.value('input5bcd',self.modbus.inputBCDs[4])))
-            if settings.contains('input5code'):
-                self.modbus.inputCodes[4] = toInt(settings.value('input5code',self.modbus.inputCodes[4]))
-            if settings.contains('input6float'):
-                self.modbus.inputFloats[5] = bool(toBool(settings.value('input6float',self.modbus.inputFloats[5])))
-            if settings.contains('input6bcd'):
-                self.modbus.inputBCDs[5] = bool(toBool(settings.value('input6bcd',self.modbus.inputBCDs[5])))
-            if settings.contains('input6code'):
-                self.modbus.inputCodes[5] = toInt(settings.value('input6code',self.modbus.inputCodes[5]))
-            if settings.contains('input7float'):
-                self.modbus.inputFloats[6] = bool(toBool(settings.value('input7float',self.modbus.inputFloats[6])))
-            if settings.contains('input7bcd'):
-                self.modbus.inputBCDs[6] = bool(toBool(settings.value('input7bcd',self.modbus.inputBCDs[6])))
-            if settings.contains('input7code'):
-                self.modbus.inputCodes[6] = toInt(settings.value('input7code',self.modbus.inputCodes[6]))
-            if settings.contains('input8float'):
-                self.modbus.inputFloats[7] = bool(toBool(settings.value('input8float',self.modbus.inputFloats[7])))
-            if settings.contains('input8bcd'):
-                self.modbus.inputBCDs[7] = bool(toBool(settings.value('input8bcd',self.modbus.inputBCDs[7])))
-            if settings.contains('input8code'):
-                self.modbus.inputCodes[7] = toInt(settings.value('input8code',self.modbus.inputCodes[7]))
-            if settings.contains('littleEndianFloats'):
-                self.modbus.byteorderLittle = bool(toBool(settings.value('littleEndianFloats',self.modbus.byteorderLittle)))
-            if settings.contains('wordorderLittle'):
-                self.modbus.wordorderLittle = bool(toBool(settings.value('wordorderLittle',self.modbus.wordorderLittle)))
-            if settings.contains('optimizer'):
-                self.modbus.optimizer = bool(toBool(settings.value('optimizer',self.modbus.optimizer)))
-            if settings.contains('fetch_max_blocks'):
-                self.modbus.fetch_max_blocks = bool(toBool(settings.value('fetch_max_blocks',self.modbus.fetch_max_blocks)))
-            if settings.contains('input1mode'):
-                self.modbus.inputModes[0] = s2a(toString(settings.value('input1mode',self.modbus.inputModes[0])))
-                self.modbus.inputModes[1] = s2a(toString(settings.value('input2mode',self.modbus.inputModes[1])))
-                self.modbus.inputModes[2] = s2a(toString(settings.value('input3mode',self.modbus.inputModes[2])))
-                self.modbus.inputModes[3] = s2a(toString(settings.value('input4mode',self.modbus.inputModes[3])))
-                self.modbus.inputModes[4] = s2a(toString(settings.value('input5mode',self.modbus.inputModes[4])))
-                self.modbus.inputModes[5] = s2a(toString(settings.value('input6mode',self.modbus.inputModes[5])))
-                self.modbus.inputModes[6] = s2a(toString(settings.value('input7mode',self.modbus.inputModes[6])))
-                self.modbus.inputModes[7] = s2a(toString(settings.value('input8mode',self.modbus.inputModes[7])))
-            if settings.contains('input1div'):
-                self.modbus.inputDivs[0] = toInt(settings.value('input1div',self.modbus.inputDivs[0]))
-                self.modbus.inputDivs[1] = toInt(settings.value('input2div',self.modbus.inputDivs[1]))
-                self.modbus.inputDivs[2] = toInt(settings.value('input3div',self.modbus.inputDivs[2]))
-                self.modbus.inputDivs[3] = toInt(settings.value('input4div',self.modbus.inputDivs[3]))
-                self.modbus.inputDivs[4] = toInt(settings.value('input5div',self.modbus.inputDivs[4]))
-                self.modbus.inputDivs[5] = toInt(settings.value('input6div',self.modbus.inputDivs[5]))
-                self.modbus.inputDivs[6] = toInt(settings.value('input7div',self.modbus.inputDivs[6]))
-                self.modbus.inputDivs[7] = toInt(settings.value('input8div',self.modbus.inputDivs[7]))
-            if settings.contains('input1FloatsAsInt'):
-                self.modbus.inputFloatsAsInt[0] = bool(toBool(settings.value('input1FloatsAsInt',self.modbus.inputFloatsAsInt[0])))
-                self.modbus.inputFloatsAsInt[1] = bool(toBool(settings.value('input2FloatsAsInt',self.modbus.inputFloatsAsInt[1])))
-                self.modbus.inputFloatsAsInt[2] = bool(toBool(settings.value('input3FloatsAsInt',self.modbus.inputFloatsAsInt[2])))
-                self.modbus.inputFloatsAsInt[3] = bool(toBool(settings.value('input4FloatsAsInt',self.modbus.inputFloatsAsInt[3])))
-                self.modbus.inputFloatsAsInt[4] = bool(toBool(settings.value('input5FloatsAsInt',self.modbus.inputFloatsAsInt[4])))
-                self.modbus.inputFloatsAsInt[5] = bool(toBool(settings.value('input6FloatsAsInt',self.modbus.inputFloatsAsInt[5])))
-                self.modbus.inputFloatsAsInt[6] = bool(toBool(settings.value('input7FloatsAsInt',self.modbus.inputFloatsAsInt[6])))
-                self.modbus.inputFloatsAsInt[7] = bool(toBool(settings.value('input8FloatsAsInt',self.modbus.inputFloatsAsInt[7])))
-            if settings.contains('input1BCDsAsInt'):
-                self.modbus.inputBCDsAsInt[0] = bool(toBool(settings.value('input1BCDsAsInt',self.modbus.inputBCDsAsInt[0])))
-                self.modbus.inputBCDsAsInt[1] = bool(toBool(settings.value('input2BCDsAsInt',self.modbus.inputBCDsAsInt[1])))
-                self.modbus.inputBCDsAsInt[2] = bool(toBool(settings.value('input3BCDsAsInt',self.modbus.inputBCDsAsInt[2])))
-                self.modbus.inputBCDsAsInt[3] = bool(toBool(settings.value('input4BCDsAsInt',self.modbus.inputBCDsAsInt[3])))
-                self.modbus.inputBCDsAsInt[4] = bool(toBool(settings.value('input5BCDsAsInt',self.modbus.inputBCDsAsInt[4])))
-                self.modbus.inputBCDsAsInt[5] = bool(toBool(settings.value('input6BCDsAsInt',self.modbus.inputBCDsAsInt[5])))
-                self.modbus.inputBCDsAsInt[6] = bool(toBool(settings.value('input7BCDsAsInt',self.modbus.inputBCDsAsInt[6])))
-                self.modbus.inputBCDsAsInt[7] = bool(toBool(settings.value('input8BCDsAsInt',self.modbus.inputBCDsAsInt[7])))
-            if settings.contains('input1Signed'):
-                self.modbus.inputSigned[0] = bool(toBool(settings.value('input1Signed',self.modbus.inputSigned[0])))
-                self.modbus.inputSigned[1] = bool(toBool(settings.value('input2Signed',self.modbus.inputSigned[1])))
-                self.modbus.inputSigned[2] = bool(toBool(settings.value('input3Signed',self.modbus.inputSigned[2])))
-                self.modbus.inputSigned[3] = bool(toBool(settings.value('input4Signed',self.modbus.inputSigned[3])))
-                self.modbus.inputSigned[4] = bool(toBool(settings.value('input5Signed',self.modbus.inputSigned[4])))
-                self.modbus.inputSigned[5] = bool(toBool(settings.value('input6Signed',self.modbus.inputSigned[5])))
-                self.modbus.inputSigned[6] = bool(toBool(settings.value('input7Signed',self.modbus.inputSigned[6])))
-                self.modbus.inputSigned[7] = bool(toBool(settings.value('input8Signed',self.modbus.inputSigned[7])))
-            if settings.contains('PIDmultiplier'):
-                self.modbus.PIDmultiplier = toInt(settings.value('PIDmultiplier',self.modbus.PIDmultiplier))
-                self.modbus.SVmultiplier = toInt(settings.value('SVmultiplier',self.modbus.SVmultiplier))
-            if settings.contains('PID_slave_ID'):
-                self.modbus.PID_slave_ID = toInt(settings.value('PID_slave_ID',self.modbus.PID_slave_ID))
-                self.modbus.PID_SV_register = toInt(settings.value('PID_SV_register',self.modbus.PID_SV_register))
-                self.modbus.PID_p_register = toInt(settings.value('PID_p_register',self.modbus.PID_p_register))
-                self.modbus.PID_i_register = toInt(settings.value('PID_i_register',self.modbus.PID_i_register))
-                self.modbus.PID_d_register = toInt(settings.value('PID_d_register',self.modbus.PID_d_register))
-            if settings.contains('PID_OFF_action'):
-                self.modbus.PID_OFF_action = s2a(toString(settings.value('PID_OFF_action',self.modbus.PID_OFF_action)))
-            if settings.contains('PID_ON_action'):
-                self.modbus.PID_ON_action = s2a(toString(settings.value('PID_ON_action',self.modbus.PID_ON_action)))
+            self.modbus.inputFloats[0] = bool(toBool(settings.value('input1float',self.modbus.inputFloats[0])))
+            self.modbus.inputBCDs[0] = bool(toBool(settings.value('input1bcd',self.modbus.inputBCDs[0])))
+            self.modbus.inputCodes[0] = toInt(settings.value('input1code',self.modbus.inputCodes[0]))
+            self.modbus.inputFloats[1] = bool(toBool(settings.value('input2float',self.modbus.inputFloats[1])))
+            self.modbus.inputBCDs[1] = bool(toBool(settings.value('input2bcd',self.modbus.inputBCDs[1])))
+            self.modbus.inputCodes[1] = toInt(settings.value('input2code',self.modbus.inputCodes[1]))
+            self.modbus.inputFloats[2] = bool(toBool(settings.value('input3float',self.modbus.inputFloats[2])))
+            self.modbus.inputBCDs[2] = bool(toBool(settings.value('input3bcd',self.modbus.inputBCDs[2])))
+            self.modbus.inputCodes[2] = toInt(settings.value('input3code',self.modbus.inputCodes[2]))
+            self.modbus.inputFloats[3] = bool(toBool(settings.value('input4float',self.modbus.inputFloats[3])))
+            self.modbus.inputBCDs[3] = bool(toBool(settings.value('input4bcd',self.modbus.inputBCDs[3])))
+            self.modbus.inputCodes[3] = toInt(settings.value('input4code',self.modbus.inputCodes[3]))
+            self.modbus.inputFloats[4] = bool(toBool(settings.value('input5float',self.modbus.inputFloats[4])))
+            self.modbus.inputBCDs[4] = bool(toBool(settings.value('input5bcd',self.modbus.inputBCDs[4])))
+            self.modbus.inputCodes[4] = toInt(settings.value('input5code',self.modbus.inputCodes[4]))
+            self.modbus.inputFloats[5] = bool(toBool(settings.value('input6float',self.modbus.inputFloats[5])))
+            self.modbus.inputBCDs[5] = bool(toBool(settings.value('input6bcd',self.modbus.inputBCDs[5])))
+            self.modbus.inputCodes[5] = toInt(settings.value('input6code',self.modbus.inputCodes[5]))
+            self.modbus.inputFloats[6] = bool(toBool(settings.value('input7float',self.modbus.inputFloats[6])))
+            self.modbus.inputBCDs[6] = bool(toBool(settings.value('input7bcd',self.modbus.inputBCDs[6])))
+            self.modbus.inputCodes[6] = toInt(settings.value('input7code',self.modbus.inputCodes[6]))
+            self.modbus.inputFloats[7] = bool(toBool(settings.value('input8float',self.modbus.inputFloats[7])))
+            self.modbus.inputBCDs[7] = bool(toBool(settings.value('input8bcd',self.modbus.inputBCDs[7])))
+            self.modbus.inputCodes[7] = toInt(settings.value('input8code',self.modbus.inputCodes[7]))
+            self.modbus.byteorderLittle = bool(toBool(settings.value('littleEndianFloats',self.modbus.byteorderLittle)))
+            self.modbus.wordorderLittle = bool(toBool(settings.value('wordorderLittle',self.modbus.wordorderLittle)))
+            self.modbus.optimizer = bool(toBool(settings.value('optimizer',self.modbus.optimizer)))
+            self.modbus.fetch_max_blocks = bool(toBool(settings.value('fetch_max_blocks',self.modbus.fetch_max_blocks)))
+            self.modbus.inputModes[0] = s2a(toString(settings.value('input1mode',self.modbus.inputModes[0])))
+            self.modbus.inputModes[1] = s2a(toString(settings.value('input2mode',self.modbus.inputModes[1])))
+            self.modbus.inputModes[2] = s2a(toString(settings.value('input3mode',self.modbus.inputModes[2])))
+            self.modbus.inputModes[3] = s2a(toString(settings.value('input4mode',self.modbus.inputModes[3])))
+            self.modbus.inputModes[4] = s2a(toString(settings.value('input5mode',self.modbus.inputModes[4])))
+            self.modbus.inputModes[5] = s2a(toString(settings.value('input6mode',self.modbus.inputModes[5])))
+            self.modbus.inputModes[6] = s2a(toString(settings.value('input7mode',self.modbus.inputModes[6])))
+            self.modbus.inputModes[7] = s2a(toString(settings.value('input8mode',self.modbus.inputModes[7])))
+            self.modbus.inputDivs[0] = toInt(settings.value('input1div',self.modbus.inputDivs[0]))
+            self.modbus.inputDivs[1] = toInt(settings.value('input2div',self.modbus.inputDivs[1]))
+            self.modbus.inputDivs[2] = toInt(settings.value('input3div',self.modbus.inputDivs[2]))
+            self.modbus.inputDivs[3] = toInt(settings.value('input4div',self.modbus.inputDivs[3]))
+            self.modbus.inputDivs[4] = toInt(settings.value('input5div',self.modbus.inputDivs[4]))
+            self.modbus.inputDivs[5] = toInt(settings.value('input6div',self.modbus.inputDivs[5]))
+            self.modbus.inputDivs[6] = toInt(settings.value('input7div',self.modbus.inputDivs[6]))
+            self.modbus.inputDivs[7] = toInt(settings.value('input8div',self.modbus.inputDivs[7]))
+            self.modbus.inputFloatsAsInt[0] = bool(toBool(settings.value('input1FloatsAsInt',self.modbus.inputFloatsAsInt[0])))
+            self.modbus.inputFloatsAsInt[1] = bool(toBool(settings.value('input2FloatsAsInt',self.modbus.inputFloatsAsInt[1])))
+            self.modbus.inputFloatsAsInt[2] = bool(toBool(settings.value('input3FloatsAsInt',self.modbus.inputFloatsAsInt[2])))
+            self.modbus.inputFloatsAsInt[3] = bool(toBool(settings.value('input4FloatsAsInt',self.modbus.inputFloatsAsInt[3])))
+            self.modbus.inputFloatsAsInt[4] = bool(toBool(settings.value('input5FloatsAsInt',self.modbus.inputFloatsAsInt[4])))
+            self.modbus.inputFloatsAsInt[5] = bool(toBool(settings.value('input6FloatsAsInt',self.modbus.inputFloatsAsInt[5])))
+            self.modbus.inputFloatsAsInt[6] = bool(toBool(settings.value('input7FloatsAsInt',self.modbus.inputFloatsAsInt[6])))
+            self.modbus.inputFloatsAsInt[7] = bool(toBool(settings.value('input8FloatsAsInt',self.modbus.inputFloatsAsInt[7])))
+            self.modbus.inputBCDsAsInt[0] = bool(toBool(settings.value('input1BCDsAsInt',self.modbus.inputBCDsAsInt[0])))
+            self.modbus.inputBCDsAsInt[1] = bool(toBool(settings.value('input2BCDsAsInt',self.modbus.inputBCDsAsInt[1])))
+            self.modbus.inputBCDsAsInt[2] = bool(toBool(settings.value('input3BCDsAsInt',self.modbus.inputBCDsAsInt[2])))
+            self.modbus.inputBCDsAsInt[3] = bool(toBool(settings.value('input4BCDsAsInt',self.modbus.inputBCDsAsInt[3])))
+            self.modbus.inputBCDsAsInt[4] = bool(toBool(settings.value('input5BCDsAsInt',self.modbus.inputBCDsAsInt[4])))
+            self.modbus.inputBCDsAsInt[5] = bool(toBool(settings.value('input6BCDsAsInt',self.modbus.inputBCDsAsInt[5])))
+            self.modbus.inputBCDsAsInt[6] = bool(toBool(settings.value('input7BCDsAsInt',self.modbus.inputBCDsAsInt[6])))
+            self.modbus.inputBCDsAsInt[7] = bool(toBool(settings.value('input8BCDsAsInt',self.modbus.inputBCDsAsInt[7])))
+            self.modbus.inputSigned[0] = bool(toBool(settings.value('input1Signed',self.modbus.inputSigned[0])))
+            self.modbus.inputSigned[1] = bool(toBool(settings.value('input2Signed',self.modbus.inputSigned[1])))
+            self.modbus.inputSigned[2] = bool(toBool(settings.value('input3Signed',self.modbus.inputSigned[2])))
+            self.modbus.inputSigned[3] = bool(toBool(settings.value('input4Signed',self.modbus.inputSigned[3])))
+            self.modbus.inputSigned[4] = bool(toBool(settings.value('input5Signed',self.modbus.inputSigned[4])))
+            self.modbus.inputSigned[5] = bool(toBool(settings.value('input6Signed',self.modbus.inputSigned[5])))
+            self.modbus.inputSigned[6] = bool(toBool(settings.value('input7Signed',self.modbus.inputSigned[6])))
+            self.modbus.inputSigned[7] = bool(toBool(settings.value('input8Signed',self.modbus.inputSigned[7])))
+            self.modbus.PIDmultiplier = toInt(settings.value('PIDmultiplier',self.modbus.PIDmultiplier))
+            self.modbus.SVmultiplier = toInt(settings.value('SVmultiplier',self.modbus.SVmultiplier))
+            self.modbus.PID_slave_ID = toInt(settings.value('PID_slave_ID',self.modbus.PID_slave_ID))
+            self.modbus.PID_SV_register = toInt(settings.value('PID_SV_register',self.modbus.PID_SV_register))
+            self.modbus.PID_p_register = toInt(settings.value('PID_p_register',self.modbus.PID_p_register))
+            self.modbus.PID_i_register = toInt(settings.value('PID_i_register',self.modbus.PID_i_register))
+            self.modbus.PID_d_register = toInt(settings.value('PID_d_register',self.modbus.PID_d_register))
+            self.modbus.PID_OFF_action = s2a(toString(settings.value('PID_OFF_action',self.modbus.PID_OFF_action)))
+            self.modbus.PID_ON_action = s2a(toString(settings.value('PID_ON_action',self.modbus.PID_ON_action)))
             #restore MODBUS TCP/UDP settings
-            if settings.contains('host'):
-                self.modbus.type = toInt(settings.value('type',self.modbus.type))
-                self.modbus.host = toString(settings.value('host',self.modbus.host))
-                self.modbus.port = toInt(settings.value('port',self.modbus.port))
-            if settings.contains('reset_socket'):
-                self.modbus.reset_socket = bool(toBool(settings.value('reset_socket',self.modbus.reset_socket)))
+            self.modbus.type = toInt(settings.value('type',self.modbus.type))
+            self.modbus.host = toString(settings.value('host',self.modbus.host))
+            self.modbus.port = toInt(settings.value('port',self.modbus.port))
+            self.modbus.reset_socket = bool(toBool(settings.value('reset_socket',self.modbus.reset_socket)))
             settings.endGroup()
 #--- END GROUP Modbus
 
 #--- BEGIN GROUP Scale
             #restore scale port
             settings.beginGroup('Scale')
-            self.scale.device = toString(settings.value('device',self.scale.device))
+            self.scale.device = settings.value('device',self.scale.device)
             self.scale.comport = s2a(toString(settings.value('comport',self.scale.comport)))
             self.scale.baudrate = toInt(settings.value('baudrate',int(self.scale.baudrate)))
             self.scale.bytesize = toInt(settings.value('bytesize',self.scale.bytesize))
@@ -16725,7 +16531,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #--- BEGIN GROUP Color
             #restore color port
             settings.beginGroup('Color')
-            self.color.device = toString(settings.value('device',self.color.device))
+            self.color.device = settings.value('device',self.color.device)
             self.color.comport = s2a(toString(settings.value('comport',self.color.comport)))
             self.color.baudrate = toInt(settings.value('baudrate',int(self.color.baudrate)))
             self.color.bytesize = toInt(settings.value('bytesize',self.color.bytesize))
@@ -16744,7 +16550,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.qmc.alarmsetlabel = toString(settings.value('alarmsetlabel',self.qmc.alarmsetlabel))
                 else:
                     self.qmc.alarmsetlabel = ''
-
                 if settings.contains('alarmguard'):
                     self.qmc.alarmguard = [toInt(x) for x in toList(settings.value('alarmguard',self.qmc.alarmguard))]
                 else:
@@ -16786,94 +16591,74 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 else:
                     self.qmc.alarmstrings = ['']*len(self.qmc.alarmflag)
                 self.qmc.alarmstate = [-1]*len(self.qmc.alarmflag)
-                if settings.contains('loadAlarmsFromProfile'):
-                    self.qmc.loadalarmsfromprofile = bool(toBool(settings.value('loadAlarmsFromProfile',self.qmc.loadalarmsfromprofile)))
-                if settings.contains('loadAlarmsFromBackground'):
-                    self.qmc.loadalarmsfrombackground = bool(toBool(settings.value('loadAlarmsFromBackground',self.qmc.loadalarmsfrombackground)))
-                if settings.contains('alarmsfile'):
-                    self.qmc.alarmsfile = toString(settings.value('alarmsfile',self.qmc.alarmsfile))
-                if settings.contains('alarm_popup_timout'):
-                    self.qmc.alarm_popup_timout = toInt(settings.value('alarm_popup_timout',self.qmc.alarm_popup_timout))
-                if settings.contains('alarmtablecolumnwidths'):
-                    self.qmc.alarmtablecolumnwidths = [toInt(x) for x in toList(settings.value('alarmtablecolumnwidths',self.qmc.alarmtablecolumnwidths))]
-                if settings.contains('alarmsets'):
-                    self.qmc.alarmsets = toList(settings.value('alarmsets',self.qmc.alarmsets))
-                if settings.contains('alarmsetlabel'):
-                    self.qmc.alarmsetlabel = toString(settings.value('alarmsetlabel',self.qmc.alarmsetlabel))
+                self.qmc.loadalarmsfromprofile = bool(toBool(settings.value('loadAlarmsFromProfile',self.qmc.loadalarmsfromprofile)))
+                self.qmc.loadalarmsfrombackground = bool(toBool(settings.value('loadAlarmsFromBackground',self.qmc.loadalarmsfrombackground)))
+                self.qmc.alarmsfile = toString(settings.value('alarmsfile',self.qmc.alarmsfile))
+                self.qmc.alarm_popup_timout = toInt(settings.value('alarm_popup_timout',self.qmc.alarm_popup_timout))
+                self.qmc.alarmtablecolumnwidths = [toInt(x) for x in toList(settings.value('alarmtablecolumnwidths',self.qmc.alarmtablecolumnwidths))]
+                self.qmc.alarmsets = toList(settings.value('alarmsets',self.qmc.alarmsets))
+                self.qmc.alarmsetlabel = toString(settings.value('alarmsetlabel',self.qmc.alarmsetlabel))
             settings.endGroup()
 #--- END GROUP Alarms
 
 #--- BEGIN GROUP ArduinoPID
             #restore TC4/Arduino PID settings
             settings.beginGroup('ArduinoPID')
-            if settings.contains('pidOnCHARGE'):
-                self.pidcontrol.pidOnCHARGE = bool(toBool(settings.value('pidOnCHARGE',self.pidcontrol.pidOnCHARGE)))
-                if settings.contains('createEvents'):
-                    self.pidcontrol.createEvents = bool(toBool(settings.value('createEvents',self.pidcontrol.createEvents)))
-                self.pidcontrol.loadRampSoakFromProfile = bool(toBool(settings.value('loadRampSoakFromProfile',self.pidcontrol.loadRampSoakFromProfile)))
-                self.pidcontrol.svValues = [toInt(x) for x in toList(settings.value('svValues',self.pidcontrol.svValues))]
-                self.pidcontrol.svRamps = [toInt(x) for x in toList(settings.value('svRamps',self.pidcontrol.svRamps))]
-                self.pidcontrol.svSoaks = [toInt(x) for x in toList(settings.value('svSoaks',self.pidcontrol.svSoaks))]
-                self.pidcontrol.svActions = [toInt(x) for x in toList(settings.value('svActions',self.pidcontrol.svActions))]
-                self.pidcontrol.svBeeps = [bool(toBool(x)) for x in toList(settings.value('svBeeps',self.pidcontrol.svBeeps))]
-                self.pidcontrol.svDescriptions = list(toStringList(settings.value('svDescriptions',self.pidcontrol.svDescriptions)))
-                self.pidcontrol.svSlider = bool(toBool(settings.value('svSlider',self.pidcontrol.svSlider)))
-                self.pidcontrol.svButtons = bool(toBool(settings.value('svButtons',self.pidcontrol.svButtons)))
-                self.pidcontrol.svMode = toInt(settings.value('svMode',self.pidcontrol.svMode))
-                self.pidcontrol.svLookahead = toInt(settings.value('svLookahead',self.pidcontrol.svLookahead))
-                self.pidcontrol.dutySteps = toInt(settings.value('dutySteps',self.pidcontrol.dutySteps))
-                self.pidcontrol.svSliderMin = toInt(settings.value('svSliderMin',self.pidcontrol.svSliderMin))
-                self.pidcontrol.svSliderMax = toInt(settings.value('svSliderMax',self.pidcontrol.svSliderMax))
-                self.pidcontrol.svValue = toInt(settings.value('svValue',self.pidcontrol.svValue))
-                if settings.contains('loadRampSoakFromBackground'):
-                    self.pidcontrol.loadRampSoakFromBackground = bool(toBool(settings.value('loadRampSoakFromBackground',self.pidcontrol.loadRampSoakFromBackground)))
-                if settings.contains('svLabel'):
-                    self.pidcontrol.svLabel = toString(settings.value('svLabel',self.pidcontrol.svLabel))
+            self.pidcontrol.pidOnCHARGE = bool(toBool(settings.value('pidOnCHARGE',self.pidcontrol.pidOnCHARGE)))
+            self.pidcontrol.createEvents = bool(toBool(settings.value('createEvents',self.pidcontrol.createEvents)))
+            self.pidcontrol.loadRampSoakFromProfile = bool(toBool(settings.value('loadRampSoakFromProfile',self.pidcontrol.loadRampSoakFromProfile)))
+            self.pidcontrol.svValues = [toInt(x) for x in toList(settings.value('svValues',self.pidcontrol.svValues))]
+            self.pidcontrol.svRamps = [toInt(x) for x in toList(settings.value('svRamps',self.pidcontrol.svRamps))]
+            self.pidcontrol.svSoaks = [toInt(x) for x in toList(settings.value('svSoaks',self.pidcontrol.svSoaks))]
+            self.pidcontrol.svActions = [toInt(x) for x in toList(settings.value('svActions',self.pidcontrol.svActions))]
+            self.pidcontrol.svBeeps = [bool(toBool(x)) for x in toList(settings.value('svBeeps',self.pidcontrol.svBeeps))]
+            self.pidcontrol.svDescriptions = list(toStringList(settings.value('svDescriptions',self.pidcontrol.svDescriptions)))
+            self.pidcontrol.svSlider = bool(toBool(settings.value('svSlider',self.pidcontrol.svSlider)))
+            self.pidcontrol.svButtons = bool(toBool(settings.value('svButtons',self.pidcontrol.svButtons)))
+            self.pidcontrol.svMode = toInt(settings.value('svMode',self.pidcontrol.svMode))
+            self.pidcontrol.svLookahead = toInt(settings.value('svLookahead',self.pidcontrol.svLookahead))
+            self.pidcontrol.dutySteps = toInt(settings.value('dutySteps',self.pidcontrol.dutySteps))
+            self.pidcontrol.svSliderMin = toInt(settings.value('svSliderMin',self.pidcontrol.svSliderMin))
+            self.pidcontrol.svSliderMax = toInt(settings.value('svSliderMax',self.pidcontrol.svSliderMax))
+            self.pidcontrol.svValue = toInt(settings.value('svValue',self.pidcontrol.svValue))
+            self.pidcontrol.loadRampSoakFromBackground = bool(toBool(settings.value('loadRampSoakFromBackground',self.pidcontrol.loadRampSoakFromBackground)))
+            self.pidcontrol.svLabel = toString(settings.value('svLabel',self.pidcontrol.svLabel))
 
-                self.sliderSV.blockSignals(True)
-                try:
-                    if settings.contains('dutyMin'):
-                        self.pidcontrol.dutyMin = toInt(settings.value('dutyMin',self.pidcontrol.dutyMin))
-                    if settings.contains('dutyMax'):
-                        self.pidcontrol.dutyMax = toInt(settings.value('dutyMax',self.pidcontrol.dutyMax))
-                finally:
-                    self.sliderSV.blockSignals(False)
+            self.sliderSV.blockSignals(True)
+            try:
+                if settings.contains('dutyMin'):
+                    self.pidcontrol.dutyMin = toInt(settings.value('dutyMin',self.pidcontrol.dutyMin))
+                if settings.contains('dutyMax'):
+                    self.pidcontrol.dutyMax = toInt(settings.value('dutyMax',self.pidcontrol.dutyMax))
+            finally:
+                self.sliderSV.blockSignals(False)
 
-                self.pidcontrol.activateSVSlider(self.pidcontrol.svSlider)
-                self.pidcontrol.pidKp = toFloat(settings.value('pidKp',self.pidcontrol.pidKp))
-                self.pidcontrol.pidKi = toFloat(settings.value('pidKi',self.pidcontrol.pidKi))
-                self.pidcontrol.pidKd = toFloat(settings.value('pidKd',self.pidcontrol.pidKd))
-                self.pidcontrol.pidSource = toInt(settings.value('pidSource',self.pidcontrol.pidSource))
-                self.pidcontrol.pidCycle = toInt(settings.value('pidCycle',self.pidcontrol.pidCycle))
-                if settings.contains('pidPositiveTarget'):
-                    self.pidcontrol.pidPositiveTarget = toInt(settings.value('pidPositiveTarget',self.pidcontrol.pidPositiveTarget))
-                    self.pidcontrol.pidNegativeTarget = toInt(settings.value('pidNegativeTarget',self.pidcontrol.pidNegativeTarget))
-                    self.pidcontrol.invertControl = bool(toBool(settings.value('invertControl',self.pidcontrol.invertControl)))
-                if settings.contains('pOnE'):
-                    self.pidcontrol.pOnE = bool(toBool(settings.value('pOnE',self.pidcontrol.pOnE)))
+            self.pidcontrol.activateSVSlider(self.pidcontrol.svSlider)
+            self.pidcontrol.pidKp = toFloat(settings.value('pidKp',self.pidcontrol.pidKp))
+            self.pidcontrol.pidKi = toFloat(settings.value('pidKi',self.pidcontrol.pidKi))
+            self.pidcontrol.pidKd = toFloat(settings.value('pidKd',self.pidcontrol.pidKd))
+            self.pidcontrol.pidSource = toInt(settings.value('pidSource',self.pidcontrol.pidSource))
+            self.pidcontrol.pidCycle = toInt(settings.value('pidCycle',self.pidcontrol.pidCycle))
+            self.pidcontrol.pidPositiveTarget = toInt(settings.value('pidPositiveTarget',self.pidcontrol.pidPositiveTarget))
+            self.pidcontrol.pidNegativeTarget = toInt(settings.value('pidNegativeTarget',self.pidcontrol.pidNegativeTarget))
+            self.pidcontrol.invertControl = bool(toBool(settings.value('invertControl',self.pidcontrol.invertControl)))
+            self.pidcontrol.pOnE = bool(toBool(settings.value('pOnE',self.pidcontrol.pOnE)))
 
-                for n in range(self.pidcontrol.RSLen):
-                    svLabelLabel = 'RS_svLabel'+str(n)
-                    if settings.contains(svLabelLabel):
-                        self.pidcontrol.RS_svLabels[n] = toString(settings.value(svLabelLabel,self.pidcontrol.RS_svLabels[n]))
-                    svValuesLabel = 'RS_svValues'+str(n)
-                    if settings.contains(svValuesLabel):
-                        self.pidcontrol.RS_svValues[n] = [toInt(x) for x in toList(settings.value(svValuesLabel,self.pidcontrol.RS_svValues[n]))]
-                    svRampsLabel = 'RS_svRamps'+str(n)
-                    if settings.contains(svRampsLabel):
-                        self.pidcontrol.RS_svRamps[n] = [toInt(x) for x in toList(settings.value(svRampsLabel,self.pidcontrol.RS_svRamps[n]))]
-                    svSoaksLabel = 'RS_svSoaks'+str(n)
-                    if settings.contains(svSoaksLabel):
-                        self.pidcontrol.RS_svSoaks[n] = [toInt(x) for x in toList(settings.value(svSoaksLabel,self.pidcontrol.RS_svSoaks[n]))]
-                    svActionsLabel = 'RS_svActions'+str(n)
-                    if settings.contains(svActionsLabel):
-                        self.pidcontrol.RS_svActions[n] = [toInt(x) for x in toList(settings.value(svActionsLabel,self.pidcontrol.RS_svActions[n]))]
-                    svBeepsLabel = 'RS_svBeeps'+str(n)
-                    if settings.contains(svBeepsLabel):
-                        self.pidcontrol.RS_svBeeps[n] = [bool(toBool(x)) for x in toList(settings.value(svBeepsLabel,self.pidcontrol.RS_svBeeps[n]))]
-                    svDescriptionsLabel = 'RS_svDescriptions'+str(n)
-                    if settings.contains(svDescriptionsLabel):
-                        self.pidcontrol.RS_svDescriptions[n] = list(toStringList(settings.value(svDescriptionsLabel,self.pidcontrol.RS_svDescriptions[n])))
+            for n in range(self.pidcontrol.RSLen):
+                svLabelLabel = 'RS_svLabel'+str(n)
+                self.pidcontrol.RS_svLabels[n] = toString(settings.value(svLabelLabel,self.pidcontrol.RS_svLabels[n]))
+                svValuesLabel = 'RS_svValues'+str(n)
+                self.pidcontrol.RS_svValues[n] = [toInt(x) for x in toList(settings.value(svValuesLabel,self.pidcontrol.RS_svValues[n]))]
+                svRampsLabel = 'RS_svRamps'+str(n)
+                self.pidcontrol.RS_svRamps[n] = [toInt(x) for x in toList(settings.value(svRampsLabel,self.pidcontrol.RS_svRamps[n]))]
+                svSoaksLabel = 'RS_svSoaks'+str(n)
+                self.pidcontrol.RS_svSoaks[n] = [toInt(x) for x in toList(settings.value(svSoaksLabel,self.pidcontrol.RS_svSoaks[n]))]
+                svActionsLabel = 'RS_svActions'+str(n)
+                self.pidcontrol.RS_svActions[n] = [toInt(x) for x in toList(settings.value(svActionsLabel,self.pidcontrol.RS_svActions[n]))]
+                svBeepsLabel = 'RS_svBeeps'+str(n)
+                self.pidcontrol.RS_svBeeps[n] = [bool(toBool(x)) for x in toList(settings.value(svBeepsLabel,self.pidcontrol.RS_svBeeps[n]))]
+                svDescriptionsLabel = 'RS_svDescriptions'+str(n)
+                self.pidcontrol.RS_svDescriptions[n] = list(toStringList(settings.value(svDescriptionsLabel,self.pidcontrol.RS_svDescriptions[n])))
             settings.endGroup()
 #--- END GROUP ArduinoPID
 
@@ -16897,10 +16682,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.fujipid.PXG4[k][0] = toInt(settings.value(k,self.fujipid.PXG4[k][0]))
             if self.fujipid.PXG4['selectsv'][0] < 1:
                 self.fujipid.PXG4['selectsv'][0] = 1
-            if settings.contains('followBackground'):
-                self.fujipid.followBackground = bool(toBool(settings.value('followBackground',self.fujipid.followBackground)))
-            if settings.contains('lookahead'):
-                self.fujipid.lookahead = toInt(settings.value('lookahead',self.fujipid.lookahead))
+            self.fujipid.followBackground = bool(toBool(settings.value('followBackground',self.fujipid.followBackground)))
+            self.fujipid.lookahead = toInt(settings.value('lookahead',self.fujipid.lookahead))
             settings.endGroup()
 #--- END GROUP PXG4
 
@@ -16915,26 +16698,17 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 settings.endGroup()
 #--- END GROUP deltaDTA
 
-            if settings.contains('filterDropOuts'):
-                self.qmc.filterDropOuts = bool(toBool(settings.value('filterDropOuts',self.qmc.filterDropOuts)))
-            if settings.contains('dropSpikes'):
-                self.qmc.dropSpikes = bool(toBool(settings.value('dropSpikes',self.qmc.dropSpikes)))
-            if settings.contains('dropDuplicates'):
-                self.qmc.dropDuplicates = bool(toBool(settings.value('dropDuplicates',self.qmc.dropDuplicates)))
-            if settings.contains('dropDuplicatesLimit'):
-                self.qmc.dropDuplicatesLimit = toFloat(settings.value('dropDuplicatesLimit',self.qmc.dropDuplicatesLimit))
-            if settings.contains('optimalSmoothing'):
-                self.qmc.optimalSmoothing = bool(toBool(settings.value('optimalSmoothing',self.qmc.optimalSmoothing)))
-            if settings.contains('polyfitRoRcalc'):
-                self.qmc.polyfitRoRcalc = bool(toBool(settings.value('polyfitRoRcalc',self.qmc.polyfitRoRcalc)))
-            if settings.contains('swapETBT'):
-                self.qmc.swapETBT = bool(toBool(settings.value('swapETBT',self.qmc.swapETBT)))
-            if settings.contains('minmaxLimits'):
-                self.qmc.minmaxLimits = bool(toBool(settings.value('minmaxLimits',self.qmc.minmaxLimits)))
-                self.qmc.filterDropOut_tmin = toInt(settings.value('minLimit',self.qmc.filterDropOut_tmin))
-                self.qmc.filterDropOut_tmax = toInt(settings.value('maxLimit',self.qmc.filterDropOut_tmax))
-            if settings.contains('foregroundShowFullflag'):
-                self.qmc.foregroundShowFullflag = bool(toBool(settings.value('foregroundShowFullflag',self.qmc.foregroundShowFullflag)))
+            self.qmc.filterDropOuts = bool(toBool(settings.value('filterDropOuts',self.qmc.filterDropOuts)))
+            self.qmc.dropSpikes = bool(toBool(settings.value('dropSpikes',self.qmc.dropSpikes)))
+            self.qmc.dropDuplicates = bool(toBool(settings.value('dropDuplicates',self.qmc.dropDuplicates)))
+            self.qmc.dropDuplicatesLimit = toFloat(settings.value('dropDuplicatesLimit',self.qmc.dropDuplicatesLimit))
+            self.qmc.optimalSmoothing = bool(toBool(settings.value('optimalSmoothing',self.qmc.optimalSmoothing)))
+            self.qmc.polyfitRoRcalc = bool(toBool(settings.value('polyfitRoRcalc',self.qmc.polyfitRoRcalc)))
+            self.qmc.swapETBT = bool(toBool(settings.value('swapETBT',self.qmc.swapETBT)))
+            self.qmc.minmaxLimits = bool(toBool(settings.value('minmaxLimits',self.qmc.minmaxLimits)))
+            self.qmc.filterDropOut_tmin = toInt(settings.value('minLimit',self.qmc.filterDropOut_tmin))
+            self.qmc.filterDropOut_tmax = toInt(settings.value('maxLimit',self.qmc.filterDropOut_tmax))
+            self.qmc.foregroundShowFullflag = bool(toBool(settings.value('foregroundShowFullflag',self.qmc.foregroundShowFullflag)))
 
 #--- BEGIN GROUP RoC
             settings.beginGroup('RoC')
@@ -16945,55 +16719,32 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.deltaETfilter = toInt(settings.value('deltaETfilter',self.qmc.deltaETfilter))
             else:
                 self.qmc.deltaETfilter = self.qmc.deltaBTfilter
-            if settings.contains('DeltaSpan'):
-                self.qmc.deltaBTspan = toInt(settings.value('DeltaSpan',self.qmc.deltaBTspan))
-                if settings.contains('DeltaETspan'):
-                    self.qmc.deltaETspan = toInt(settings.value('DeltaETspan',self.qmc.deltaETspan))
-                else:
-                    self.qmc.deltaETspan = self.qmc.deltaBTspan
+            self.qmc.deltaBTspan = toInt(settings.value('DeltaSpan',self.qmc.deltaBTspan))
+            self.qmc.deltaETspan = toInt(settings.value('DeltaETspan',self.qmc.deltaETspan))
             self.qmc.LCDdecimalplaces = toInt(settings.value('LCDdecimalplaces',self.qmc.LCDdecimalplaces))
-            if settings.contains('statisticsmode'):
-                self.qmc.statisticsmode = toInt(settings.value('statisticsmode',self.qmc.statisticsmode))
-            if settings.contains('DeltaETlcd'):
-                self.qmc.DeltaETlcdflag = bool(toBool(settings.value('DeltaETlcd',self.qmc.DeltaETlcdflag)))
-            if settings.contains('DeltaBTlcd'):
-                self.qmc.DeltaBTlcdflag = bool(toBool(settings.value('DeltaBTlcd',self.qmc.DeltaBTlcdflag)))
-            if settings.contains('swapdeltalcds'):
-                self.qmc.swapdeltalcds = bool(toBool(settings.value('swapdeltalcds',self.qmc.swapdeltalcds)))
+            self.qmc.statisticsmode = toInt(settings.value('statisticsmode',self.qmc.statisticsmode))
+            self.qmc.DeltaETlcdflag = bool(toBool(settings.value('DeltaETlcd',self.qmc.DeltaETlcdflag)))
+            self.qmc.DeltaBTlcdflag = bool(toBool(settings.value('DeltaBTlcd',self.qmc.DeltaBTlcdflag)))
+            self.qmc.swapdeltalcds = bool(toBool(settings.value('swapdeltalcds',self.qmc.swapdeltalcds)))
             settings.endGroup()
 #--- END GROUP RoC
 
-            if settings.contains('curvefilter'):
-                self.qmc.curvefilter = toInt(settings.value('curvefilter',self.qmc.curvefilter))
-#            if settings.contains("smoothingwindowsize"):
-#                self.qmc.smoothingwindowsize = toInt(settings.value("smoothingwindowsize",self.qmc.smoothingwindowsize))
-            if settings.contains('ETcurve'):
-                self.qmc.ETcurve = bool(toBool(settings.value('ETcurve',self.qmc.ETcurve)))
-            if settings.contains('BTcurve'):
-                self.qmc.BTcurve = bool(toBool(settings.value('BTcurve',self.qmc.BTcurve)))
-            if settings.contains('ETlcd'):
-                self.qmc.ETlcd = bool(toBool(settings.value('ETlcd',self.qmc.ETlcd)))
-            if settings.contains('BTlcd'):
-                self.qmc.BTlcd = bool(toBool(settings.value('BTlcd',self.qmc.BTlcd)))
-            if settings.contains('swaplcds'):
-                self.qmc.swaplcds = bool(toBool(settings.value('swaplcds',self.qmc.swaplcds)))
+            self.qmc.curvefilter = toInt(settings.value('curvefilter',self.qmc.curvefilter))
+            self.qmc.ETcurve = bool(toBool(settings.value('ETcurve',self.qmc.ETcurve)))
+            self.qmc.BTcurve = bool(toBool(settings.value('BTcurve',self.qmc.BTcurve)))
+            self.qmc.ETlcd = bool(toBool(settings.value('ETlcd',self.qmc.ETlcd)))
+            self.qmc.BTlcd = bool(toBool(settings.value('BTlcd',self.qmc.BTlcd)))
+            self.qmc.swaplcds = bool(toBool(settings.value('swaplcds',self.qmc.swaplcds)))
 
 #--- BEGIN GROUP DefaultButtons
             settings.beginGroup('DefaultButtons')
-            if settings.contains('buttonvisibility'):
-                self.qmc.buttonvisibility = [toBool(x) for x in toList(settings.value('buttonvisibility'))]
-            if settings.contains('buttonactions'):
-                self.qmc.buttonactions = [toInt(x) for x in toList(settings.value('buttonactions'))]
-            if settings.contains('buttonactionstrings'):
-                self.qmc.buttonactionstrings = list(map(str,list(toStringList(settings.value('buttonactionstrings',self.qmc.buttonactionstrings)))))
-            if settings.contains('extrabuttonactions'):
-                self.qmc.extrabuttonactions = [toInt(x) for x in toList(settings.value('extrabuttonactions'))]
-            if settings.contains('extrabuttonactionstrings'):
-                self.qmc.extrabuttonactionstrings = list(map(str,list(toStringList(settings.value('extrabuttonactionstrings',self.qmc.extrabuttonactionstrings)))))
-            if settings.contains('xextrabuttonactions'):
-                self.qmc.xextrabuttonactions = [toInt(x) for x in toList(settings.value('xextrabuttonactions'))]
-            if settings.contains('xextrabuttonactionstrings'):
-                self.qmc.xextrabuttonactionstrings = list(map(str,list(toStringList(settings.value('xextrabuttonactionstrings',self.qmc.xextrabuttonactionstrings)))))
+            self.qmc.buttonvisibility = [toBool(x) for x in toList(settings.value('buttonvisibility', self.qmc.buttonvisibility))]
+            self.qmc.buttonactions = [toInt(x) for x in toList(settings.value('buttonactions', self.qmc.buttonactions))]
+            self.qmc.buttonactionstrings = list(map(str,list(toStringList(settings.value('buttonactionstrings',self.qmc.buttonactionstrings)))))
+            self.qmc.extrabuttonactions = [toInt(x) for x in toList(settings.value('extrabuttonactions', self.qmc.extrabuttonactions))]
+            self.qmc.extrabuttonactionstrings = list(map(str,list(toStringList(settings.value('extrabuttonactionstrings',self.qmc.extrabuttonactionstrings)))))
+            self.qmc.xextrabuttonactions = [toInt(x) for x in toList(settings.value('xextrabuttonactions', self.qmc.xextrabuttonactions))]
+            self.qmc.xextrabuttonactionstrings = list(map(str,list(toStringList(settings.value('xextrabuttonactionstrings',self.qmc.xextrabuttonactionstrings)))))
             settings.endGroup()
 #--- END GROUP DefaultButtons
 
@@ -17001,12 +16752,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
 #--- BEGIN GROUP Style
             settings.beginGroup('Style')
-            if settings.contains('patheffects'):
-                self.qmc.patheffects = toInt(settings.value('patheffects',self.qmc.patheffects))
-            if settings.contains('graphstyle'):
-                self.qmc.graphstyle = toInt(settings.value('graphstyle',self.qmc.graphstyle))
-            if settings.contains('graphfont'):
-                self.qmc.graphfont = toInt(settings.value('graphfont',self.qmc.graphfont))
+            self.qmc.patheffects = toInt(settings.value('patheffects',self.qmc.patheffects))
+            self.qmc.graphstyle = toInt(settings.value('graphstyle',self.qmc.graphstyle))
+            self.qmc.graphfont = toInt(settings.value('graphfont',self.qmc.graphfont))
             if settings.contains('ETname'):
                 self.ETname = settings.value('ETname')
                 self.label2.setText('<big><b>' + self.ETname + '</b></big>')
@@ -17056,8 +16804,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #--- BEGIN GROUP Axis
             #loads max-min temp limits of graph
             settings.beginGroup('Axis')
-            if settings.contains('loadAxisFromProfile'):
-                self.qmc.loadaxisfromprofile = bool(toBool(settings.value('loadAxisFromProfile',self.qmc.loadaxisfromprofile)))
+            self.qmc.loadaxisfromprofile = bool(toBool(settings.value('loadAxisFromProfile',self.qmc.loadaxisfromprofile)))
             try: # prevents some random exceptions in Windows!?
                 self.qmc.startofx = toFloat(settings.value('xmin',self.qmc.startofx))
                 self.qmc.endofx = toFloat(settings.value('xmax',self.qmc.endofx))
@@ -17070,31 +16817,19 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.ylimit_min = max(min(toInt(settings.value('ymin',self.qmc.ylimit_min)),self.qmc.ylimit),self.qmc.ylimit_min_max)
             self.qmc.zlimit = min(toInt(settings.value('zmax',self.qmc.zlimit)),self.qmc.zlimit_max)
             self.qmc.zlimit_min = max(min(toInt(settings.value('zmin',self.qmc.zlimit_min)),self.qmc.zlimit),self.qmc.zlimit_min_max)
-            if settings.contains('resetmaxtime'):
-                self.qmc.resetmaxtime = toInt(settings.value('resetmaxtime',self.qmc.resetmaxtime))
-            if settings.contains('lockmax'):
-                self.qmc.fixmaxtime = bool(toBool(settings.value('lockmax',self.qmc.fixmaxtime)))
-            if settings.contains('locktimex'):
-                self.qmc.locktimex = bool(toBool(settings.value('locktimex',self.qmc.locktimex)))
-            if settings.contains('autotimex'):
-                self.qmc.autotimex = bool(toBool(settings.value('autotimex',self.qmc.autotimex)))
-            if settings.contains('autotimexMode'):
-                self.qmc.autotimexMode = toInt(settings.value('autotimexMode',self.qmc.autotimexMode))
-            if settings.contains('autodeltaxET'):
-                self.qmc.autodeltaxET = bool(toBool(settings.value('autodeltaxET',self.qmc.autodeltaxET)))
-            if settings.contains('autodeltaxBT'):
-                self.qmc.autodeltaxBT = bool(toBool(settings.value('autodeltaxBT',self.qmc.autodeltaxBT)))
-            if settings.contains('locktimex_start'):
-                self.qmc.locktimex_start = toInt(settings.value('locktimex_start',self.qmc.locktimex_start))
-            if settings.contains('locktimex_end'):
-                self.qmc.locktimex_end = toInt(settings.value('locktimex_end',self.qmc.locktimex_end))
-            if settings.contains('chargemintime'):
-                self.qmc.chargemintime = toInt(settings.value('chargemintime',self.qmc.chargemintime))
+            self.qmc.resetmaxtime = toInt(settings.value('resetmaxtime',self.qmc.resetmaxtime))
+            self.qmc.fixmaxtime = bool(toBool(settings.value('lockmax',self.qmc.fixmaxtime)))
+            self.qmc.locktimex = bool(toBool(settings.value('locktimex',self.qmc.locktimex)))
+            self.qmc.autotimex = bool(toBool(settings.value('autotimex',self.qmc.autotimex)))
+            self.qmc.autotimexMode = toInt(settings.value('autotimexMode',self.qmc.autotimexMode))
+            self.qmc.autodeltaxET = bool(toBool(settings.value('autodeltaxET',self.qmc.autodeltaxET)))
+            self.qmc.autodeltaxBT = bool(toBool(settings.value('autodeltaxBT',self.qmc.autodeltaxBT)))
+            self.qmc.locktimex_start = toInt(settings.value('locktimex_start',self.qmc.locktimex_start))
+            self.qmc.locktimex_end = toInt(settings.value('locktimex_end',self.qmc.locktimex_end))
+            self.qmc.chargemintime = toInt(settings.value('chargemintime',self.qmc.chargemintime))
             self.qmc.legendloc = toInt(settings.value('legendloc',self.qmc.legendloc))
-            if settings.contains('temp_grid'):
-                self.qmc.temp_grid = bool(toBool(settings.value('temp_grid',self.qmc.temp_grid)))
-            if settings.contains('time_grid'):
-                self.qmc.time_grid = bool(toBool(settings.value('time_grid',self.qmc.time_grid)))
+            self.qmc.temp_grid = bool(toBool(settings.value('temp_grid',self.qmc.temp_grid)))
+            self.qmc.time_grid = bool(toBool(settings.value('time_grid',self.qmc.time_grid)))
             settings.endGroup()
 #--- END GROUP Axis
 
@@ -17102,74 +16837,42 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             # only set in (some) predefined machine setups:
             if filename and machine:
                 settings.beginGroup('MachineSetup')
-                if settings.contains('capacity'):
-                    self.qmc.roastersize_setup = toFloat(settings.value('capacity',self.qmc.roastersize_setup))
-                else:
-                    self.qmc.roastersize_setup = 0
-                if settings.contains('heating_type'):
-                    self.qmc.roasterheating_setup = toInt(settings.value('heating_type',self.qmc.roasterheating_setup))
-                else:
-                    self.qmc.roasterheating_setup = 0
+                self.qmc.roastersize_setup = toFloat(settings.value('capacity', self.qmc.roastersize_setup))
+                self.qmc.roasterheating_setup = toInt(settings.value('heating_type', self.qmc.roasterheating_setup))
                 settings.endGroup()
 #--- END GROUP MachineSetup
 
-            if settings.contains('organization_setup'):
-                self.qmc.organization_setup = toString(settings.value('organization_setup',self.qmc.organization_setup))
-            if settings.contains('operator_setup'):
-                self.qmc.operator_setup = toString(settings.value('operator_setup',self.qmc.operator_setup))
-            if settings.contains('roastertype_setup'):
-                self.qmc.roastertype_setup = toString(settings.value('roastertype_setup',self.qmc.roastertype_setup))
-            if settings.contains('roastersize_setup_default'):
-                self.qmc.roastersize_setup_default = toFloat(settings.value('roastersize_setup_default',self.qmc.roastersize_setup_default))
-            if settings.contains('roastersize_setup'):
-                self.qmc.roastersize_setup = toFloat(settings.value('roastersize_setup',self.qmc.roastersize_setup))
-            if settings.contains('last_batchsize'):
-                self.qmc.last_batchsize = toFloat(settings.value('last_batchsize',self.qmc.last_batchsize))
+            self.qmc.organization_setup = toString(settings.value('organization_setup',self.qmc.organization_setup))
+            self.qmc.operator_setup = toString(settings.value('operator_setup',self.qmc.operator_setup))
+            self.qmc.roastertype_setup = toString(settings.value('roastertype_setup',self.qmc.roastertype_setup))
+            self.qmc.roastersize_setup_default = toFloat(settings.value('roastersize_setup_default',self.qmc.roastersize_setup_default))
+            self.qmc.roastersize_setup = toFloat(settings.value('roastersize_setup',self.qmc.roastersize_setup))
+            self.qmc.last_batchsize = toFloat(settings.value('last_batchsize',self.qmc.last_batchsize))
             # we set the default in-weight from the given last_batchsize
             self.qmc.weight = (self.qmc.last_batchsize,self.qmc.weight[1],self.qmc.weight[2])
-            if settings.contains('roasterheating_setup'):
-                self.qmc.roasterheating_setup = toInt(settings.value('roasterheating_setup',self.qmc.roasterheating_setup))
-            if settings.contains('drumspeed_setup'):
-                self.qmc.drumspeed_setup = toString(settings.value('drumspeed_setup',self.qmc.drumspeed_setup))
+            self.qmc.roasterheating_setup = toInt(settings.value('roasterheating_setup',self.qmc.roasterheating_setup))
+            self.qmc.drumspeed_setup = toString(settings.value('drumspeed_setup',self.qmc.drumspeed_setup))
 
 #--- BEGIN GROUP EnergyUse
             settings.beginGroup('EnergyUse')
-            if settings.contains('loadlabels_setup'):
-                self.qmc.loadlabels_setup = [toString(x) for x in toList(settings.value('loadlabels_setup'))]
-            if settings.contains('loadratings_setup'):
-                self.qmc.loadratings_setup = [toFloat(x) for x in toList(settings.value('loadratings_setup'))]
-            if settings.contains('ratingunits_setup'):
-                self.qmc.ratingunits_setup = [toInt(x) for x in toList(settings.value('ratingunits_setup'))]
-            if settings.contains('sourcetypes_setup'):
-                self.qmc.sourcetypes_setup = [toInt(x) for x in toList(settings.value('sourcetypes_setup'))]
-            if settings.contains('load_etypes_setup'):
-                self.qmc.load_etypes_setup = [toInt(x) for x in toList(settings.value('load_etypes_setup'))]
-            if settings.contains('presssure_percents_setup'):
-                self.qmc.presssure_percents_setup = [bool(toBool(x)) for x in toList(settings.value('presssure_percents_setup'))]
-            if settings.contains('loadevent_zeropcts_setup'):
-                self.qmc.loadevent_zeropcts_setup = [toInt(x) for x in toList(settings.value('loadevent_zeropcts_setup'))]
-            if settings.contains('loadevent_hundpcts_setup'):
-                self.qmc.loadevent_hundpcts_setup = [toInt(x) for x in toList(settings.value('loadevent_hundpcts_setup'))]
-            if settings.contains('preheatDuration_setup'):
-                self.qmc.preheatDuration_setup = toInt(settings.value('preheatDuration_setup',self.qmc.preheatDuration_setup))
-            if settings.contains('preheatenergies_setup'):
-                self.qmc.preheatenergies_setup = [toFloat(x) for x in toList(settings.value('preheatenergies_setup'))]
-            if settings.contains('betweenbatchDuration_setup'):
-                self.qmc.betweenbatchDuration_setup = toInt(settings.value('betweenbatchDuration_setup',self.qmc.betweenbatchDuration_setup))
-            if settings.contains('betweenbatchenergies_setup'):
-                self.qmc.betweenbatchenergies_setup = [toFloat(x) for x in toList(settings.value('betweenbatchenergies_setup'))]
-            if settings.contains('coolingDuration_setup'):
-                self.qmc.coolingDuration_setup = toInt(settings.value('coolingDuration_setup',self.qmc.coolingDuration_setup))
-            if settings.contains('coolingenergies_setup'):
-                self.qmc.coolingenergies_setup = [toFloat(x) for x in toList(settings.value('coolingenergies_setup'))]
-            if settings.contains('betweenbatch_after_preheat_setup'):
-                self.qmc.betweenbatch_after_preheat_setup = bool(toBool(settings.value('betweenbatch_after_preheat_setup',self.qmc.betweenbatch_after_preheat_setup)))
-            if settings.contains('electricEnergyMix_setup'):
-                self.qmc.electricEnergyMix_setup = toInt(settings.value('electricEnergyMix_setup',self.qmc.electricEnergyMix_setup))
-            if settings.contains('energyresultunit_setup'):
-                self.qmc.energyresultunit_setup = toInt(settings.value('energyresultunit_setup',self.qmc.energyresultunit_setup))
-#            if settings.contains("energytablecolumnwidths"):
-#                self.qmc.energytablecolumnwidths = [toInt(x) for x in toList(settings.value("energytablecolumnwidths",self.qmc.energytablecolumnwidths))]
+            self.qmc.loadlabels_setup = [toString(x) for x in toList(settings.value('loadlabels_setup', self.qmc.loadlabels_setup))]
+            self.qmc.loadratings_setup = [toFloat(x) for x in toList(settings.value('loadratings_setup', self.qmc.loadratings_setup))]
+            self.qmc.ratingunits_setup = [toInt(x) for x in toList(settings.value('ratingunits_setup', self.qmc.ratingunits_setup))]
+            self.qmc.sourcetypes_setup = [toInt(x) for x in toList(settings.value('sourcetypes_setup', self.qmc.sourcetypes_setup))]
+            self.qmc.load_etypes_setup = [toInt(x) for x in toList(settings.value('load_etypes_setup', self.qmc.load_etypes_setup))]
+            self.qmc.presssure_percents_setup = [bool(toBool(x)) for x in toList(settings.value('presssure_percents_setup', self.qmc.presssure_percents_setup))]
+            self.qmc.loadevent_zeropcts_setup = [toInt(x) for x in toList(settings.value('loadevent_zeropcts_setup', self.qmc.loadevent_zeropcts_setup))]
+            self.qmc.loadevent_hundpcts_setup = [toInt(x) for x in toList(settings.value('loadevent_hundpcts_setup', self.qmc.loadevent_hundpcts_setup))]
+            self.qmc.preheatDuration_setup = toInt(settings.value('preheatDuration_setup',self.qmc.preheatDuration_setup))
+            self.qmc.preheatenergies_setup = [toFloat(x) for x in toList(settings.value('preheatenergies_setup', self.qmc.preheatenergies_setup))]
+            self.qmc.betweenbatchDuration_setup = toInt(settings.value('betweenbatchDuration_setup',self.qmc.betweenbatchDuration_setup))
+            self.qmc.betweenbatchenergies_setup = [toFloat(x) for x in toList(settings.value('betweenbatchenergies_setup', self.qmc.betweenbatchenergies_setup))]
+            self.qmc.coolingDuration_setup = toInt(settings.value('coolingDuration_setup',self.qmc.coolingDuration_setup))
+            self.qmc.coolingenergies_setup = [toFloat(x) for x in toList(settings.value('coolingenergies_setup', self.qmc.coolingenergies_setup))]
+            self.qmc.betweenbatch_after_preheat_setup = bool(toBool(settings.value('betweenbatch_after_preheat_setup',self.qmc.betweenbatch_after_preheat_setup)))
+            self.qmc.electricEnergyMix_setup = toInt(settings.value('electricEnergyMix_setup',self.qmc.electricEnergyMix_setup))
+            self.qmc.energyresultunit_setup = toInt(settings.value('energyresultunit_setup',self.qmc.energyresultunit_setup))
+#            self.qmc.energytablecolumnwidths = [toInt(x) for x in toList(settings.value("energytablecolumnwidths",self.qmc.energytablecolumnwidths))]
             settings.endGroup()
             self.qmc.restoreEnergyLoadDefaults()
             self.qmc.restoreEnergyProtocolDefaults()
@@ -17177,10 +16880,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
 #--- BEGIN GROUP EnergyDefaults
             settings.beginGroup('EnergyDefaults')
-            if settings.contains('ratings'):
-                self.qmc.machinesetup_energy_ratings = settings.value('ratings',self.qmc.machinesetup_energy_ratings)
-            else:
-                self.qmc.machinesetup_energy_ratings = None
+            self.qmc.machinesetup_energy_ratings = settings.value('ratings',self.qmc.machinesetup_energy_ratings)
             settings.endGroup()
 #--- END GROUP EnergyDefaults
 
@@ -17211,17 +16911,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
 #            if settings.contains('beansize'):
 #                self.qmc.beansize = toFloat(settings.value('beansize',self.qmc.beansize)) # retired
-            if settings.contains('beansize_min'):
-                self.qmc.beansize_min = toInt(settings.value('beansize_min',self.qmc.beansize_min))
-            if settings.contains('beansize_max'):
-                self.qmc.beansize_max = toInt(settings.value('beansize_max',self.qmc.beansize_max))
-            if filename is None and settings.contains('plus_default_store'):
-                self.qmc.plus_default_store = toString(settings.value('plus_default_store',self.qmc.plus_default_store))
+            self.qmc.beansize_min = toInt(settings.value('beansize_min',self.qmc.beansize_min))
+            self.qmc.beansize_max = toInt(settings.value('beansize_max',self.qmc.beansize_max))
+            self.qmc.plus_default_store = settings.value('plus_default_store',self.qmc.plus_default_store)
             if filename is None and settings.contains('plus_custom_blend_name'):
                 # we don't import plus custom blend data from external settings file as the custom blend is considered temporary
                 plus_custom_blend_name = toString(settings.value('plus_custom_blend_name',''))
-                plus_custom_blend_coffees = [toString(x) for x in toList(settings.value('plus_custom_blend_coffees'))]
-                plus_custom_blend_ratios = [toFloat(x) for x in toList(settings.value('plus_custom_blend_ratios'))]
+                plus_custom_blend_coffees = [toString(x) for x in toList(settings.value('plus_custom_blend_coffees', []))]
+                plus_custom_blend_ratios = [toFloat(x) for x in toList(settings.value('plus_custom_blend_ratios', []))]
                 if plus_custom_blend_name != '' and len(plus_custom_blend_coffees)>1 and len(plus_custom_blend_ratios) == len(plus_custom_blend_coffees):
                     try:
                         plus_custom_blend_components = [plus.blend.Component(c,r) for (c,r) in zip(plus_custom_blend_coffees, plus_custom_blend_ratios)]
@@ -17237,27 +16934,18 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #--- END GROUP RoastProperties
 
             self.userprofilepath = toString(settings.value('profilepath',self.userprofilepath))
-            if settings.contains('settingspath') and not filename:
-                self.settingspath = toString(settings.value('settingspath',self.settingspath))
-            if settings.contains('wheelpath'):
-                self.wheelpath = toString(settings.value('wheelpath',self.wheelpath))
-            if settings.contains('autosavepath'):
-                self.qmc.autosavepath = toString(settings.value('autosavepath',self.qmc.autosavepath))
-            if settings.contains('autosavealsopath'):
-                self.qmc.autosavealsopath = toString(settings.value('autosavealsopath',self.qmc.autosavealsopath))
-            if settings.contains('autosavealsopath'):
-                self.simulatorpath = toString(settings.value('simulatorpath',self.simulatorpath))
-            if settings.contains('externalprogram'):
-                self.ser.externalprogram = toString(settings.value('externalprogram',self.ser.externalprogram))
-            if settings.contains('externaloutprogram'):
-                self.ser.externaloutprogram = toString(settings.value('externaloutprogram',self.ser.externaloutprogram))
-            if settings.contains('externaloutprogramFlag'):
-                self.ser.externaloutprogramFlag = bool(toBool(settings.value('externaloutprogramFlag',self.ser.externaloutprogramFlag)))
+            self.settingspath = toString(settings.value('settingspath',self.settingspath))
+            self.wheelpath = toString(settings.value('wheelpath',self.wheelpath))
+            self.qmc.autosavepath = toString(settings.value('autosavepath',self.qmc.autosavepath))
+            self.qmc.autosavealsopath = toString(settings.value('autosavealsopath',self.qmc.autosavealsopath))
+            self.simulatorpath = toString(settings.value('simulatorpath',self.simulatorpath))
+            self.ser.externalprogram = toString(settings.value('externalprogram',self.ser.externalprogram))
+            self.ser.externaloutprogram = toString(settings.value('externaloutprogram',self.ser.externaloutprogram))
+            self.ser.externaloutprogramFlag = bool(toBool(settings.value('externaloutprogramFlag',self.ser.externaloutprogramFlag)))
             if not theme:
 #--- BEGIN GROUP ExtraDev
                 settings.beginGroup('ExtraDev')
-                if settings.contains('extradevices'):
-                    self.getExtraDeviceSettings(settings)
+                self.getExtraDeviceSettings(settings)
                 settings.endGroup()
 #--- END GROUP ExtraDev
                 # ensure that extra list length are of the size of the extradevices:
@@ -17277,189 +16965,165 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #--- BEGIN GROUP CurveStyles
             #restore curve styles
             settings.beginGroup('CurveStyles')
-            if settings.contains('BTlinestyle'):
-                self.qmc.BTlinestyle = s2a(toString(settings.value('BTlinestyle',self.qmc.BTlinestyle)))
-                self.qmc.BTdrawstyle = s2a(toString(settings.value('BTdrawstyle',self.qmc.BTdrawstyle)))
-                if self.qmc.BTdrawstyle == '-':
-                    self.qmc.BTdrawstyle = self.qmc.drawstyle_default
-                self.qmc.BTlinewidth = max(0.1,self.float2float(toFloat(settings.value('BTlinewidth',self.qmc.BTlinewidth))))
-                self.qmc.BTmarker = s2a(toString(settings.value('BTmarker',self.qmc.BTmarker)))
-                self.qmc.BTmarkersize = max(0.1,self.float2float(toFloat(settings.value('BTmarkersize',self.qmc.BTmarkersize))))
-                self.qmc.ETlinestyle = s2a(toString(settings.value('ETlinestyle',self.qmc.ETlinestyle)))
-                self.qmc.ETdrawstyle = s2a(toString(settings.value('ETdrawstyle',self.qmc.ETdrawstyle)))
-                if self.qmc.ETdrawstyle == '-':
-                    self.qmc.ETdrawstyle = self.qmc.drawstyle_default
-                self.qmc.ETlinewidth = max(0.1,self.float2float(toFloat(settings.value('ETlinewidth',self.qmc.ETlinewidth))))
-                self.qmc.ETmarker = s2a(toString(settings.value('ETmarker',self.qmc.ETmarker)))
-                self.qmc.ETmarkersize = max(0.1,self.float2float(toFloat(settings.value('ETmarkersize',self.qmc.ETmarkersize))))
-                self.qmc.BTdeltalinestyle = s2a(toString(settings.value('BTdeltalinestyle',self.qmc.BTdeltalinestyle)))
-                self.qmc.BTdeltadrawstyle = s2a(toString(settings.value('BTdeltadrawstyle',self.qmc.BTdeltadrawstyle)))
-                if self.qmc.BTdeltadrawstyle == '-':
-                    self.qmc.BTdeltadrawstyle = self.qmc.drawstyle_default
-                self.qmc.BTdeltalinewidth = max(0.1,self.float2float(toFloat(settings.value('BTdeltalinewidth',self.qmc.BTdeltalinewidth))))
-                self.qmc.BTdeltamarker = s2a(toString(settings.value('BTdeltamarker',self.qmc.BTdeltamarker)))
-                self.qmc.BTdeltamarkersize = max(0.1,self.float2float(toFloat(settings.value('BTdeltamarkersize',self.qmc.BTdeltamarkersize))))
-                self.qmc.ETdeltalinestyle = s2a(toString(settings.value('ETdeltalinestyle',self.qmc.ETdeltalinestyle)))
-                self.qmc.ETdeltadrawstyle = s2a(toString(settings.value('ETdeltadrawstyle',self.qmc.ETdeltadrawstyle)))
-                if self.qmc.ETdeltadrawstyle == '-':
-                    self.qmc.ETdeltadrawstyle = self.qmc.drawstyle_default
-                self.qmc.ETdeltalinewidth = max(0.1,self.float2float(toFloat(settings.value('ETdeltalinewidth',self.qmc.ETdeltalinewidth))))
-                self.qmc.ETdeltamarker = s2a(toString(settings.value('ETdeltamarker',self.qmc.ETdeltamarker)))
-                self.qmc.ETdeltamarkersize = max(0.1,self.float2float(toFloat(settings.value('ETdeltamarkersize',self.qmc.ETdeltamarkersize))))
-                self.qmc.BTbacklinestyle = s2a(toString(settings.value('BTbacklinestyle',self.qmc.BTbacklinestyle)))
-                self.qmc.BTbackdrawstyle = s2a(toString(settings.value('BTbackdrawstyle',self.qmc.BTbackdrawstyle)))
-                if self.qmc.BTbackdrawstyle == '-':
-                    self.qmc.BTbackdrawstyle = self.qmc.drawstyle_default
-                self.qmc.BTbacklinewidth = max(0.1,self.float2float(toFloat(settings.value('BTbacklinewidth',self.qmc.BTbacklinewidth))))
-                self.qmc.BTbackmarker = s2a(toString(settings.value('BTbackmarker',self.qmc.BTbackmarker)))
-                self.qmc.BTbackmarkersize = max(0.1,self.float2float(toFloat(settings.value('BTbackmarkersize',self.qmc.BTbackmarkersize))))
-                self.qmc.ETbacklinestyle = s2a(toString(settings.value('ETbacklinestyle',self.qmc.ETbacklinestyle)))
-                self.qmc.ETbackdrawstyle = s2a(toString(settings.value('ETbackdrawstyle',self.qmc.ETbackdrawstyle)))
-                if self.qmc.ETbackdrawstyle == '-':
-                    self.qmc.ETbackdrawstyle = self.qmc.drawstyle_default
-                self.qmc.ETbacklinewidth = max(0.1,self.float2float(toFloat(settings.value('ETbacklinewidth',self.qmc.ETbacklinewidth))))
-                self.qmc.ETbackmarker = s2a(toString(settings.value('ETbackmarker',self.qmc.ETbackmarker)))
-                self.qmc.ETbackmarkersize = max(0.1,self.float2float(toFloat(settings.value('ETbackmarkersize',self.qmc.ETbackmarkersize))))
-                self.qmc.XTbacklinestyle = s2a(toString(settings.value('XTbacklinestyle',self.qmc.XTbacklinestyle)))
-                self.qmc.XTbackdrawstyle = s2a(toString(settings.value('XTbackdrawstyle',self.qmc.XTbackdrawstyle)))
-                if self.qmc.XTbackdrawstyle == '-':
-                    self.qmc.XTbackdrawstyle = self.qmc.drawstyle_default
-                self.qmc.XTbacklinewidth = max(0.1,self.float2float(toFloat(settings.value('XTbacklinewidth',self.qmc.XTbacklinewidth))))
-                self.qmc.XTbackmarker = s2a(toString(settings.value('XTbackmarker',self.qmc.XTbackmarker)))
-                self.qmc.XTbackmarkersize = max(0.1,self.float2float(toFloat(settings.value('XTbackmarkersize',self.qmc.XTbackmarkersize))))
-                self.qmc.YTbacklinestyle = s2a(toString(settings.value('YTbacklinestyle',self.qmc.XTbacklinestyle)))
-                self.qmc.YTbackdrawstyle = s2a(toString(settings.value('YTbackdrawstyle',self.qmc.YTbackdrawstyle)))
-                if self.qmc.YTbackdrawstyle == '-':
-                    self.qmc.YTbackdrawstyle = self.qmc.drawstyle_default
-                self.qmc.YTbacklinewidth = max(0.1,self.float2float(toFloat(settings.value('YTbacklinewidth',self.qmc.YTbacklinewidth))))
-                self.qmc.YTbackmarker = s2a(toString(settings.value('YTbackmarker',self.qmc.YTbackmarker)))
-                self.qmc.YTbackmarkersize = max(0.1,self.float2float(toFloat(settings.value('YTbackmarkersize',self.qmc.YTbackmarkersize))))
-                self.getExtraDeviceCurveStyles(settings)
-                self.qmc.BTBdeltalinestyle = s2a(toString(settings.value('BTBdeltalinestyle',self.qmc.BTBdeltalinestyle)))
-                self.qmc.BTBdeltadrawstyle = s2a(toString(settings.value('BTBdeltadrawstyle',self.qmc.BTBdeltadrawstyle)))
-                self.qmc.BTBdeltalinewidth = max(0.1,self.float2float(toFloat(settings.value('BTBdeltalinewidth',self.qmc.BTBdeltalinewidth))))
-                self.qmc.BTBdeltamarker = s2a(toString(settings.value('BTBdeltamarker',self.qmc.BTBdeltamarker)))
-                self.qmc.BTBdeltamarkersize = max(0.1,self.float2float(toFloat(settings.value('BTBdeltamarkersize',self.qmc.BTBdeltamarkersize))))
-                self.qmc.ETBdeltalinestyle = s2a(toString(settings.value('ETBdeltalinestyle',self.qmc.ETBdeltalinestyle)))
-                self.qmc.ETBdeltadrawstyle = s2a(toString(settings.value('ETBdeltadrawstyle',self.qmc.ETBdeltadrawstyle)))
-                self.qmc.ETBdeltalinewidth = max(0.1,self.float2float(toFloat(settings.value('ETBdeltalinewidth',self.qmc.ETBdeltalinewidth))))
-                self.qmc.ETBdeltamarker = s2a(toString(settings.value('ETBdeltamarker',self.qmc.ETBdeltamarker)))
-                self.qmc.ETBdeltamarkersize = max(0.1,self.float2float(toFloat(settings.value('ETBdeltamarkersize',self.qmc.ETBdeltamarkersize))))
+            self.qmc.BTlinestyle = s2a(toString(settings.value('BTlinestyle',self.qmc.BTlinestyle)))
+            self.qmc.BTdrawstyle = s2a(toString(settings.value('BTdrawstyle',self.qmc.BTdrawstyle)))
+            if self.qmc.BTdrawstyle == '-':
+                self.qmc.BTdrawstyle = self.qmc.drawstyle_default
+            self.qmc.BTlinewidth = max(0.1,self.float2float(toFloat(settings.value('BTlinewidth',self.qmc.BTlinewidth))))
+            self.qmc.BTmarker = s2a(toString(settings.value('BTmarker',self.qmc.BTmarker)))
+            self.qmc.BTmarkersize = max(0.1,self.float2float(toFloat(settings.value('BTmarkersize',self.qmc.BTmarkersize))))
+            self.qmc.ETlinestyle = s2a(toString(settings.value('ETlinestyle',self.qmc.ETlinestyle)))
+            self.qmc.ETdrawstyle = s2a(toString(settings.value('ETdrawstyle',self.qmc.ETdrawstyle)))
+            if self.qmc.ETdrawstyle == '-':
+                self.qmc.ETdrawstyle = self.qmc.drawstyle_default
+            self.qmc.ETlinewidth = max(0.1,self.float2float(toFloat(settings.value('ETlinewidth',self.qmc.ETlinewidth))))
+            self.qmc.ETmarker = s2a(toString(settings.value('ETmarker',self.qmc.ETmarker)))
+            self.qmc.ETmarkersize = max(0.1,self.float2float(toFloat(settings.value('ETmarkersize',self.qmc.ETmarkersize))))
+            self.qmc.BTdeltalinestyle = s2a(toString(settings.value('BTdeltalinestyle',self.qmc.BTdeltalinestyle)))
+            self.qmc.BTdeltadrawstyle = s2a(toString(settings.value('BTdeltadrawstyle',self.qmc.BTdeltadrawstyle)))
+            if self.qmc.BTdeltadrawstyle == '-':
+                self.qmc.BTdeltadrawstyle = self.qmc.drawstyle_default
+            self.qmc.BTdeltalinewidth = max(0.1,self.float2float(toFloat(settings.value('BTdeltalinewidth',self.qmc.BTdeltalinewidth))))
+            self.qmc.BTdeltamarker = s2a(toString(settings.value('BTdeltamarker',self.qmc.BTdeltamarker)))
+            self.qmc.BTdeltamarkersize = max(0.1,self.float2float(toFloat(settings.value('BTdeltamarkersize',self.qmc.BTdeltamarkersize))))
+            self.qmc.ETdeltalinestyle = s2a(toString(settings.value('ETdeltalinestyle',self.qmc.ETdeltalinestyle)))
+            self.qmc.ETdeltadrawstyle = s2a(toString(settings.value('ETdeltadrawstyle',self.qmc.ETdeltadrawstyle)))
+            if self.qmc.ETdeltadrawstyle == '-':
+                self.qmc.ETdeltadrawstyle = self.qmc.drawstyle_default
+            self.qmc.ETdeltalinewidth = max(0.1,self.float2float(toFloat(settings.value('ETdeltalinewidth',self.qmc.ETdeltalinewidth))))
+            self.qmc.ETdeltamarker = s2a(toString(settings.value('ETdeltamarker',self.qmc.ETdeltamarker)))
+            self.qmc.ETdeltamarkersize = max(0.1,self.float2float(toFloat(settings.value('ETdeltamarkersize',self.qmc.ETdeltamarkersize))))
+            self.qmc.BTbacklinestyle = s2a(toString(settings.value('BTbacklinestyle',self.qmc.BTbacklinestyle)))
+            self.qmc.BTbackdrawstyle = s2a(toString(settings.value('BTbackdrawstyle',self.qmc.BTbackdrawstyle)))
+            if self.qmc.BTbackdrawstyle == '-':
+                self.qmc.BTbackdrawstyle = self.qmc.drawstyle_default
+            self.qmc.BTbacklinewidth = max(0.1,self.float2float(toFloat(settings.value('BTbacklinewidth',self.qmc.BTbacklinewidth))))
+            self.qmc.BTbackmarker = s2a(toString(settings.value('BTbackmarker',self.qmc.BTbackmarker)))
+            self.qmc.BTbackmarkersize = max(0.1,self.float2float(toFloat(settings.value('BTbackmarkersize',self.qmc.BTbackmarkersize))))
+            self.qmc.ETbacklinestyle = s2a(toString(settings.value('ETbacklinestyle',self.qmc.ETbacklinestyle)))
+            self.qmc.ETbackdrawstyle = s2a(toString(settings.value('ETbackdrawstyle',self.qmc.ETbackdrawstyle)))
+            if self.qmc.ETbackdrawstyle == '-':
+                self.qmc.ETbackdrawstyle = self.qmc.drawstyle_default
+            self.qmc.ETbacklinewidth = max(0.1,self.float2float(toFloat(settings.value('ETbacklinewidth',self.qmc.ETbacklinewidth))))
+            self.qmc.ETbackmarker = s2a(toString(settings.value('ETbackmarker',self.qmc.ETbackmarker)))
+            self.qmc.ETbackmarkersize = max(0.1,self.float2float(toFloat(settings.value('ETbackmarkersize',self.qmc.ETbackmarkersize))))
+            self.qmc.XTbacklinestyle = s2a(toString(settings.value('XTbacklinestyle',self.qmc.XTbacklinestyle)))
+            self.qmc.XTbackdrawstyle = s2a(toString(settings.value('XTbackdrawstyle',self.qmc.XTbackdrawstyle)))
+            if self.qmc.XTbackdrawstyle == '-':
+                self.qmc.XTbackdrawstyle = self.qmc.drawstyle_default
+            self.qmc.XTbacklinewidth = max(0.1,self.float2float(toFloat(settings.value('XTbacklinewidth',self.qmc.XTbacklinewidth))))
+            self.qmc.XTbackmarker = s2a(toString(settings.value('XTbackmarker',self.qmc.XTbackmarker)))
+            self.qmc.XTbackmarkersize = max(0.1,self.float2float(toFloat(settings.value('XTbackmarkersize',self.qmc.XTbackmarkersize))))
+            self.qmc.YTbacklinestyle = s2a(toString(settings.value('YTbacklinestyle',self.qmc.XTbacklinestyle)))
+            self.qmc.YTbackdrawstyle = s2a(toString(settings.value('YTbackdrawstyle',self.qmc.YTbackdrawstyle)))
+            if self.qmc.YTbackdrawstyle == '-':
+                self.qmc.YTbackdrawstyle = self.qmc.drawstyle_default
+            self.qmc.YTbacklinewidth = max(0.1,self.float2float(toFloat(settings.value('YTbacklinewidth',self.qmc.YTbacklinewidth))))
+            self.qmc.YTbackmarker = s2a(toString(settings.value('YTbackmarker',self.qmc.YTbackmarker)))
+            self.qmc.YTbackmarkersize = max(0.1,self.float2float(toFloat(settings.value('YTbackmarkersize',self.qmc.YTbackmarkersize))))
+            self.getExtraDeviceCurveStyles(settings)
+            self.qmc.BTBdeltalinestyle = s2a(toString(settings.value('BTBdeltalinestyle',self.qmc.BTBdeltalinestyle)))
+            self.qmc.BTBdeltadrawstyle = s2a(toString(settings.value('BTBdeltadrawstyle',self.qmc.BTBdeltadrawstyle)))
+            self.qmc.BTBdeltalinewidth = max(0.1,self.float2float(toFloat(settings.value('BTBdeltalinewidth',self.qmc.BTBdeltalinewidth))))
+            self.qmc.BTBdeltamarker = s2a(toString(settings.value('BTBdeltamarker',self.qmc.BTBdeltamarker)))
+            self.qmc.BTBdeltamarkersize = max(0.1,self.float2float(toFloat(settings.value('BTBdeltamarkersize',self.qmc.BTBdeltamarkersize))))
+            self.qmc.ETBdeltalinestyle = s2a(toString(settings.value('ETBdeltalinestyle',self.qmc.ETBdeltalinestyle)))
+            self.qmc.ETBdeltadrawstyle = s2a(toString(settings.value('ETBdeltadrawstyle',self.qmc.ETBdeltadrawstyle)))
+            self.qmc.ETBdeltalinewidth = max(0.1,self.float2float(toFloat(settings.value('ETBdeltalinewidth',self.qmc.ETBdeltalinewidth))))
+            self.qmc.ETBdeltamarker = s2a(toString(settings.value('ETBdeltamarker',self.qmc.ETBdeltamarker)))
+            self.qmc.ETBdeltamarkersize = max(0.1,self.float2float(toFloat(settings.value('ETBdeltamarkersize',self.qmc.ETBdeltamarkersize))))
             settings.endGroup()
 #--- END GROUP CurveStyles
 
 #--- BEGIN GROUP ExtraComm
             # Extra com ports
             settings.beginGroup('ExtraComm')
-            if settings.contains('extracomport'):
-                self.getExtraDeviceCommSettings(settings)
+            self.getExtraDeviceCommSettings(settings)
             settings.endGroup()
 #--- END GROUP ExtraComm
 
-            if settings.contains('ChannelTares'):
-                self.channel_tare_values = [toFloat(x) for x in toList(settings.value('ChannelTares',self.channel_tare_values))]
-            if settings.contains('BTfunction'):
-                self.qmc.BTfunction = s2a(toString(settings.value('BTfunction',self.qmc.BTfunction)))
-            if settings.contains('ETfunction'):
-                self.qmc.ETfunction = s2a(toString(settings.value('ETfunction',self.qmc.ETfunction)))
-            if settings.contains('DeltaBTfunction'):
-                self.qmc.DeltaBTfunction = s2a(toString(settings.value('DeltaBTfunction',self.qmc.DeltaBTfunction)))
-                self.qmc.DeltaETfunction = s2a(toString(settings.value('DeltaETfunction',self.qmc.DeltaETfunction)))
-            if settings.contains('plotcurves'):
-                self.qmc.plotcurves = list(toStringList(settings.value('plotcurves',self.qmc.plotcurves)))
-                self.qmc.plotcurvecolor = list(toStringList(settings.value('plotcurvecolor',self.qmc.plotcurvecolor)))
-                #convert to 9
-                if len(self.qmc.plotcurves) == 6:
-                    self.qmc.plotcurves += ['','','']
-                    self.qmc.plotcurvecolor += ['black','black','black']
+            self.channel_tare_values = [toFloat(x) for x in toList(settings.value('ChannelTares',self.channel_tare_values))]
+            self.qmc.BTfunction = s2a(toString(settings.value('BTfunction',self.qmc.BTfunction)))
+            self.qmc.ETfunction = s2a(toString(settings.value('ETfunction',self.qmc.ETfunction)))
+            self.qmc.DeltaBTfunction = s2a(toString(settings.value('DeltaBTfunction',self.qmc.DeltaBTfunction)))
+            self.qmc.DeltaETfunction = s2a(toString(settings.value('DeltaETfunction',self.qmc.DeltaETfunction)))
+            self.qmc.plotcurves = list(toStringList(settings.value('plotcurves',self.qmc.plotcurves)))
+            self.qmc.plotcurvecolor = list(toStringList(settings.value('plotcurvecolor',self.qmc.plotcurvecolor)))
+            #convert to 9
+            if len(self.qmc.plotcurves) == 6:
+                self.qmc.plotcurves += ['','','']
+                self.qmc.plotcurvecolor += ['#000000','#000000','#000000']
 
 #--- BEGIN GROUP RoRlimits
             settings.beginGroup('RoRlimits')
-            if settings.contains('RoRlimitFlag'):
-                self.qmc.RoRlimitFlag = bool(toBool(settings.value('RoRlimitFlag',self.qmc.RoRlimitFlag)))
-                self.qmc.RoRlimit = toInt(settings.value('RoRlimit',self.qmc.RoRlimit))
-                self.qmc.RoRlimitm = toInt(settings.value('RoRlimitm',self.qmc.RoRlimitm))
+            self.qmc.RoRlimitFlag = bool(toBool(settings.value('RoRlimitFlag',self.qmc.RoRlimitFlag)))
+            self.qmc.RoRlimit = toInt(settings.value('RoRlimit',self.qmc.RoRlimit))
+            self.qmc.RoRlimitm = toInt(settings.value('RoRlimitm',self.qmc.RoRlimitm))
             settings.endGroup()
 #--- END GROUP RoRlimits
 
 #--- BEGIN GROUP grid
             settings.beginGroup('grid')
-            if settings.contains('xgrid'):
-                self.qmc.xgrid = toInt(settings.value('xgrid',self.qmc.xgrid))
-                self.qmc.ygrid = max(0,toInt(settings.value('ygrid',self.qmc.ygrid)))
-                self.qmc.zgrid = max(0,toInt(settings.value('zgrid',self.qmc.zgrid)))
-                self.qmc.gridthickness = toInt(settings.value('gridthickness',self.qmc.gridthickness))
-#                self.qmc.xrotation = toInt(settings.value("xrotation",self.qmc.xrotation))
-                self.qmc.gridlinestyle = toInt(settings.value('gridlinestyle',self.qmc.gridlinestyle))
-                self.qmc.gridalpha = toFloat(settings.value('gridalpha',self.qmc.gridalpha))
+            self.qmc.xgrid = toInt(settings.value('xgrid',self.qmc.xgrid))
+            self.qmc.ygrid = max(0,toInt(settings.value('ygrid',self.qmc.ygrid)))
+            self.qmc.zgrid = max(0,toInt(settings.value('zgrid',self.qmc.zgrid)))
+            self.qmc.gridthickness = toInt(settings.value('gridthickness',self.qmc.gridthickness))
+            self.qmc.gridlinestyle = toInt(settings.value('gridlinestyle',self.qmc.gridlinestyle))
+            self.qmc.gridalpha = toFloat(settings.value('gridalpha',self.qmc.gridalpha))
             settings.endGroup()
 #--- END GROUP grid
 
-            if settings.contains('titleshowalways'):
-                self.qmc.title_show_always = bool(toBool(settings.value('titleshowalways',self.qmc.title_show_always)))
-            if settings.contains('roastpropertiesflag'):
-                self.qmc.roastpropertiesflag = toInt(settings.value('roastpropertiesflag',self.qmc.roastpropertiesflag))
-            if settings.contains('roastpropertiesAutoOpenFlag'):
-                self.qmc.roastpropertiesAutoOpenFlag = toInt(settings.value('roastpropertiesAutoOpenFlag',self.qmc.roastpropertiesAutoOpenFlag))
-            if settings.contains('roastpropertiesAutoOpenDropFlag'):
-                self.qmc.roastpropertiesAutoOpenDropFlag = toInt(settings.value('roastpropertiesAutoOpenDropFlag',self.qmc.roastpropertiesAutoOpenDropFlag))
-            if settings.contains('customflavorlabels'):
-                self.qmc.customflavorlabels = list(map(str,list(toStringList(settings.value('customflavorlabels',self.qmc.customflavorlabels)))))
+            self.qmc.title_show_always = bool(toBool(settings.value('titleshowalways',self.qmc.title_show_always)))
+            self.qmc.roastpropertiesflag = toInt(settings.value('roastpropertiesflag',self.qmc.roastpropertiesflag))
+            self.qmc.roastpropertiesAutoOpenFlag = toInt(settings.value('roastpropertiesAutoOpenFlag',self.qmc.roastpropertiesAutoOpenFlag))
+            self.qmc.roastpropertiesAutoOpenDropFlag = toInt(settings.value('roastpropertiesAutoOpenDropFlag',self.qmc.roastpropertiesAutoOpenDropFlag))
+            self.qmc.customflavorlabels = list(map(str,list(toStringList(settings.value('customflavorlabels',self.qmc.customflavorlabels)))))
 
 #--- BEGIN GROUP Sliders
             #restore sliders
             settings.beginGroup('Sliders')
-            if settings.contains('slidervisibilities'):
-                eventslidervisibilities = list(map(toInt, toList(settings.value('slidervisibilities',self.eventslidervisibilities))))
-                if len(eventslidervisibilities) == self.eventsliders:
-                    self.eventslidervisibilities = eventslidervisibilities
-                eventslideractions = list(map(toInt, toList(settings.value('slideractions',self.eventslideractions))))
-                if len(eventslideractions) == self.eventsliders:
-                    self.eventslideractions = eventslideractions
-                eventslidercommands = list(map(str,list(toStringList(settings.value('slidercommands',self.eventslidercommands)))))
-                if len(eventslidercommands) == self.eventsliders:
-                    self.eventslidercommands = eventslidercommands
-                eventslideroffsets = list(map(toFloat, toList(settings.value('slideroffsets',self.eventslideroffsets))))
-                if len(eventslideroffsets) == self.eventsliders:
-                    self.eventslideroffsets = eventslideroffsets
-                eventsliderfactors = list(map(toFloat, toList(settings.value('sliderfactors',self.eventsliderfactors))))
-                if len(eventsliderfactors) == self.eventsliders:
-                    self.eventsliderfactors = eventsliderfactors
-            if settings.contains('eventsliderKeyboardControl'):
-                self.eventsliderKeyboardControl = bool(toBool(settings.value('eventsliderKeyboardControl',self.eventsliderKeyboardControl)))
+            eventslidervisibilities = list(map(toInt, toList(settings.value('slidervisibilities',self.eventslidervisibilities))))
+            if len(eventslidervisibilities) == self.eventsliders:
+                self.eventslidervisibilities = eventslidervisibilities
+            eventslideractions = list(map(toInt, toList(settings.value('slideractions',self.eventslideractions))))
+            if len(eventslideractions) == self.eventsliders:
+                self.eventslideractions = eventslideractions
+            eventslidercommands = list(map(str,list(toStringList(settings.value('slidercommands',self.eventslidercommands)))))
+            if len(eventslidercommands) == self.eventsliders:
+                self.eventslidercommands = eventslidercommands
+            eventslideroffsets = list(map(toFloat, toList(settings.value('slideroffsets',self.eventslideroffsets))))
+            if len(eventslideroffsets) == self.eventsliders:
+                self.eventslideroffsets = eventslideroffsets
+            eventsliderfactors = list(map(toFloat, toList(settings.value('sliderfactors',self.eventsliderfactors))))
+            if len(eventsliderfactors) == self.eventsliders:
+                self.eventsliderfactors = eventsliderfactors
+            self.eventsliderKeyboardControl = bool(toBool(settings.value('eventsliderKeyboardControl',self.eventsliderKeyboardControl)))
             if settings.contains('eventsliderAlternativeLayout'):
                 new_eventsliderAlternativeLayout = bool(toBool(settings.value('eventsliderAlternativeLayout',self.eventsliderAlternativeLayout)))
                 self.updateSliderLayout(new_eventsliderAlternativeLayout)
-            if settings.contains('slidermin'):
-                eventslidermin = [toInt(x) for x in toList(settings.value('slidermin',self.eventslidermin))]
-                if len(eventslidermin) == self.eventsliders:
-                    self.eventslidermin = eventslidermin
-                eventslidermax = [toInt(x) for x in toList(settings.value('slidermax',self.eventslidermax))]
-                if len(eventslidermax) == self.eventsliders:
-                    self.eventslidermax = eventslidermax
-                self.updateSliderMinMax()
-            if settings.contains('eventslidersflags'):
-                eventslidersflags = [toInt(x) for x in toList(settings.value('eventslidersflags',self.eventslidersflags))]
-                if len(eventslidersflags) == 3:
-                    self.eventslidersflags = eventslidersflags
-            if settings.contains('eventsliderBernoulli'):
-                eventsliderBernoulli = [toInt(x) for x in toList(settings.value('eventsliderBernoulli',self.eventsliderBernoulli))]
-                if len(eventsliderBernoulli) == self.eventsliders:
-                    self.eventsliderBernoulli = eventsliderBernoulli
-            if settings.contains('eventslidercoarse'):
-                eventslidercoarse = [toInt(x) for x in toList(settings.value('eventslidercoarse',self.eventslidercoarse))]
-                if len(eventslidercoarse) == self.eventsliders:
-                    self.eventslidercoarse = eventslidercoarse
-            if settings.contains('eventslidertemp'):
-                eventslidertemp = [toInt(x) for x in toList(settings.value('eventslidertemp',self.eventslidertemp))]
-                if len(eventslidertemp) == self.eventsliders:
-                    self.eventslidertemp = eventslidertemp
-            if settings.contains('eventsliderunits'):
-                eventsliderunits = list(map(str,list(toStringList(settings.value('eventsliderunits',self.eventsliderunits)))))
-                if len(eventsliderunits) == self.eventsliders:
-                    self.eventsliderunits = eventsliderunits
-            if settings.contains('ModeTempSliders'):
-                self.qmc.mode_tempsliders = str(settings.value('ModeTempSliders',self.qmc.mode_tempsliders))
+            eventslidermin = [toInt(x) for x in toList(settings.value('slidermin',self.eventslidermin))]
+            if len(eventslidermin) == self.eventsliders:
+                self.eventslidermin = eventslidermin
+            eventslidermax = [toInt(x) for x in toList(settings.value('slidermax',self.eventslidermax))]
+            if len(eventslidermax) == self.eventsliders:
+                self.eventslidermax = eventslidermax
+            self.updateSliderMinMax()
+            eventslidersflags = [toInt(x) for x in toList(settings.value('eventslidersflags',self.eventslidersflags))]
+            if len(eventslidersflags) == 3:
+                self.eventslidersflags = eventslidersflags
+            eventsliderBernoulli = [toInt(x) for x in toList(settings.value('eventsliderBernoulli',self.eventsliderBernoulli))]
+            if len(eventsliderBernoulli) == self.eventsliders:
+                self.eventsliderBernoulli = eventsliderBernoulli
+            eventslidercoarse = [toInt(x) for x in toList(settings.value('eventslidercoarse',self.eventslidercoarse))]
+            if len(eventslidercoarse) == self.eventsliders:
+                self.eventslidercoarse = eventslidercoarse
+            eventslidertemp = [toInt(x) for x in toList(settings.value('eventslidertemp',self.eventslidertemp))]
+            if len(eventslidertemp) == self.eventsliders:
+                self.eventslidertemp = eventslidertemp
+            eventsliderunits = list(map(str,list(toStringList(settings.value('eventsliderunits',self.eventsliderunits)))))
+            if len(eventsliderunits) == self.eventsliders:
+                self.eventsliderunits = eventsliderunits
+            self.qmc.mode_tempsliders = str(settings.value('ModeTempSliders',self.qmc.mode_tempsliders))
             settings.endGroup()
             self.qmc.adjustTempSliders() # adjust min/max slider limits of temperature sliders to correspond to the current temp mode
             self.slidersAction.setEnabled(any(self.eventslidervisibilities) or self.pidcontrol.svSlider)
@@ -17483,33 +17147,28 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 quantifiersmax =[toInt(x) for x in toList(settings.value('quantifiermax',self.eventquantifiermax))]
                 if len(quantifiersmax) == self.eventsliders:
                     self.eventquantifiermax = quantifiersmax
-                if settings.contains('quantifiercoarse'):
-                    eventquantifiercoarse = [toInt(x) for x in toList(settings.value('quantifiercoarse',self.eventquantifiercoarse))]
-                    if len(eventquantifiercoarse) == self.eventsliders:
-                        self.eventquantifiercoarse = eventquantifiercoarse
-                    if settings.contains('clusterEventsFlag'):
-                        self.clusterEventsFlag = bool(toBool(settings.value('clusterEventsFlag',self.clusterEventsFlag)))
-                if settings.contains('eventquantifieraction'):
-                    eventquantifieraction = [toInt(x) for x in toList(settings.value('eventquantifieraction',self.eventquantifieraction))]
-                    if len(eventquantifieraction) == self.eventsliders:
-                        self.eventquantifieraction = eventquantifieraction
-                if settings.contains('eventquantifierSV'):
-                    eventquantifierSV = [toInt(x) for x in toList(settings.value('eventquantifierSV',self.eventquantifierSV))]
-                    if len(eventquantifierSV) == self.eventsliders:
-                        self.eventquantifierSV = eventquantifierSV
+                eventquantifiercoarse = [toInt(x) for x in toList(settings.value('quantifiercoarse',self.eventquantifiercoarse))]
+                if len(eventquantifiercoarse) == self.eventsliders:
+                    self.eventquantifiercoarse = eventquantifiercoarse
+                self.clusterEventsFlag = bool(toBool(settings.value('clusterEventsFlag',self.clusterEventsFlag)))
+                eventquantifieraction = [toInt(x) for x in toList(settings.value('eventquantifieraction',self.eventquantifieraction))]
+                if len(eventquantifieraction) == self.eventsliders:
+                    self.eventquantifieraction = eventquantifieraction
+                eventquantifierSV = [toInt(x) for x in toList(settings.value('eventquantifierSV',self.eventquantifierSV))]
+                if len(eventquantifierSV) == self.eventsliders:
+                    self.eventquantifierSV = eventquantifierSV
             settings.endGroup()
 #--- END GROUP Quantifiers
 
 #--- BEGIN GROUP Batch
             settings.beginGroup('Batch')
-            if settings.contains('batchcounter'):
-                if updateBatchCounter:
-                    self.qmc.batchcounter = toInt(settings.value('batchcounter',self.qmc.batchcounter))
-                self.qmc.batchprefix = toString(settings.value('batchprefix',self.qmc.batchprefix))
-                if filename is None:
-                    # we do not load those two from setting files!
-                    self.qmc.batchsequence = toInt(settings.value('batchsequence',self.qmc.batchsequence))
-                    self.qmc.lastroastepoch = toInt(settings.value('lastroastepoch',self.qmc.lastroastepoch))
+            if updateBatchCounter:
+                self.qmc.batchcounter = toInt(settings.value('batchcounter',self.qmc.batchcounter))
+            self.qmc.batchprefix = toString(settings.value('batchprefix',self.qmc.batchprefix))
+            if filename is None:
+                # we do not load those two from setting files!
+                self.qmc.batchsequence = toInt(settings.value('batchsequence',self.qmc.batchsequence))
+                self.qmc.lastroastepoch = toInt(settings.value('lastroastepoch',self.qmc.lastroastepoch))
             settings.endGroup()
 #--- END GROUP Batch
 
@@ -17519,90 +17178,61 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #--- BEGIN GROUP background
             #restore background profile settings
             settings.beginGroup('background')
-            if settings.contains('backgrounddetails'):
-                self.qmc.backgroundDetails = bool(toBool(settings.value('backgrounddetails',self.qmc.backgroundDetails)))
-                self.qmc.backgroundeventsflag = bool(toBool(settings.value('backgroundevents',self.qmc.backgroundeventsflag)))
-                self.qmc.DeltaETBflag = bool(toBool(settings.value('DeltaETB',self.qmc.DeltaETBflag)))
-                self.qmc.DeltaBTBflag = bool(toBool(settings.value('DeltaBTB',self.qmc.DeltaBTBflag)))
-                if settings.contains('alignEvent'):
-                    self.qmc.alignEvent = toInt(settings.value('alignEvent',self.qmc.alignEvent))
-                if settings.contains('movespeed'):
-                    self.qmc.backgroundmovespeed = toInt(settings.value('movespeed',self.qmc.backgroundmovespeed))
-            if settings.contains('ETBflag'):
-                self.qmc.backgroundETcurve = bool(toBool(settings.value('ETBflag',self.qmc.backgroundETcurve)))
-                self.qmc.backgroundBTcurve = bool(toBool(settings.value('BTBflag',self.qmc.backgroundBTcurve)))
-            if settings.contains('backgroundShowFullflag'):
-                self.qmc.backgroundShowFullflag = bool(toBool(settings.value('backgroundShowFullflag',self.qmc.backgroundShowFullflag)))
-            if settings.contains('backgroundKeyboardControlFlag'):
-                self.qmc.backgroundKeyboardControlFlag = bool(toBool(settings.value('backgroundKeyboardControlFlag',self.qmc.backgroundKeyboardControlFlag)))
-            if settings.contains('clearBgbeforeprofileload'):
-                self.qmc.clearBgbeforeprofileload = bool(toBool(settings.value('clearBgbeforeprofileload',self.qmc.clearBgbeforeprofileload)))
-            if settings.contains('hideBgafterprofileload'):
-                self.qmc.hideBgafterprofileload = bool(toBool(settings.value('hideBgafterprofileload',self.qmc.hideBgafterprofileload)))
+            self.qmc.backgroundDetails = bool(toBool(settings.value('backgrounddetails',self.qmc.backgroundDetails)))
+            self.qmc.backgroundeventsflag = bool(toBool(settings.value('backgroundevents',self.qmc.backgroundeventsflag)))
+            self.qmc.DeltaETBflag = bool(toBool(settings.value('DeltaETB',self.qmc.DeltaETBflag)))
+            self.qmc.DeltaBTBflag = bool(toBool(settings.value('DeltaBTB',self.qmc.DeltaBTBflag)))
+            self.qmc.alignEvent = toInt(settings.value('alignEvent',self.qmc.alignEvent))
+            self.qmc.backgroundmovespeed = toInt(settings.value('movespeed',self.qmc.backgroundmovespeed))
+            self.qmc.backgroundETcurve = bool(toBool(settings.value('ETBflag',self.qmc.backgroundETcurve)))
+            self.qmc.backgroundBTcurve = bool(toBool(settings.value('BTBflag',self.qmc.backgroundBTcurve)))
+            self.qmc.backgroundShowFullflag = bool(toBool(settings.value('backgroundShowFullflag',self.qmc.backgroundShowFullflag)))
+            self.qmc.backgroundKeyboardControlFlag = bool(toBool(settings.value('backgroundKeyboardControlFlag',self.qmc.backgroundKeyboardControlFlag)))
+            self.qmc.clearBgbeforeprofileload = bool(toBool(settings.value('clearBgbeforeprofileload',self.qmc.clearBgbeforeprofileload)))
+            self.qmc.hideBgafterprofileload = bool(toBool(settings.value('hideBgafterprofileload',self.qmc.hideBgafterprofileload)))
             settings.endGroup()
 #--- END GROUP background
 
-            if settings.contains('compareAlignEvent'):
-                self.qmc.compareAlignEvent = toInt(settings.value('compareAlignEvent',self.qmc.compareAlignEvent))
-            if settings.contains('compareEvents'):
-                self.qmc.compareEvents = toInt(settings.value('compareEvents',self.qmc.compareEvents))
-            if settings.contains('compareET'):
-                self.qmc.compareET = bool(toBool(settings.value('compareET',self.qmc.compareET)))
-            if settings.contains('compareBT'):
-                self.qmc.compareBT = bool(toBool(settings.value('compareBT',self.qmc.compareBT)))
-            if settings.contains('compareDeltaET'):
-                self.qmc.compareDeltaET = bool(toBool(settings.value('compareDeltaET',self.qmc.compareDeltaET)))
-            if settings.contains('compareDeltaBT'):
-                self.qmc.compareDeltaBT = bool(toBool(settings.value('compareDeltaBT',self.qmc.compareDeltaBT)))
-            if settings.contains('compareMainEvents'):
-                self.qmc.compareMainEvents = bool(toBool(settings.value('compareMainEvents',self.qmc.compareMainEvents)))
-            if settings.contains('compareBBP'):
-                self.qmc.compareBBP = bool(toBool(settings.value('compareBBP',self.qmc.compareBBP)))
-            if settings.contains('compareRoast'):
-                self.qmc.compareRoast = bool(toBool(settings.value('compareRoast',self.qmc.compareRoast)))
-            if settings.contains('autosaveflag'):
-                self.qmc.autosaveflag = toInt(settings.value('autosaveflag',self.qmc.autosaveflag))
-            if settings.contains('autosaveaddtorecentfilesflag'):
-                self.qmc.autosaveaddtorecentfilesflag = bool(toBool(settings.value('autosaveaddtorecentfilesflag',self.qmc.autosaveaddtorecentfilesflag)))
-            if settings.contains('autosavepdf'):
-                self.qmc.autosaveimage = bool(toBool(settings.value('autosavepdf',self.qmc.autosaveimage)))
-            if settings.contains('autosaveimageformat'):
-                self.qmc.autosaveimageformat = toString(settings.value('autosaveimageformat',self.qmc.autosaveimageformat))
-            if settings.contains('autosaveprefix'):
-                self.qmc.autosaveprefix = toString(settings.value('autosaveprefix',self.qmc.autosaveprefix))
+            self.qmc.compareAlignEvent = toInt(settings.value('compareAlignEvent',self.qmc.compareAlignEvent))
+            self.qmc.compareEvents = toInt(settings.value('compareEvents',self.qmc.compareEvents))
+            self.qmc.compareET = bool(toBool(settings.value('compareET',self.qmc.compareET)))
+            self.qmc.compareBT = bool(toBool(settings.value('compareBT',self.qmc.compareBT)))
+            self.qmc.compareDeltaET = bool(toBool(settings.value('compareDeltaET',self.qmc.compareDeltaET)))
+            self.qmc.compareDeltaBT = bool(toBool(settings.value('compareDeltaBT',self.qmc.compareDeltaBT)))
+            self.qmc.compareMainEvents = bool(toBool(settings.value('compareMainEvents',self.qmc.compareMainEvents)))
+            self.qmc.compareBBP = bool(toBool(settings.value('compareBBP',self.qmc.compareBBP)))
+            self.qmc.compareRoast = bool(toBool(settings.value('compareRoast',self.qmc.compareRoast)))
+            self.qmc.autosaveflag = toInt(settings.value('autosaveflag',self.qmc.autosaveflag))
+            self.qmc.autosaveaddtorecentfilesflag = bool(toBool(settings.value('autosaveaddtorecentfilesflag',self.qmc.autosaveaddtorecentfilesflag)))
+            self.qmc.autosaveimage = bool(toBool(settings.value('autosavepdf',self.qmc.autosaveimage)))
+            self.qmc.autosaveimageformat = toString(settings.value('autosaveimageformat',self.qmc.autosaveimageformat))
+            self.qmc.autosaveprefix = toString(settings.value('autosaveprefix',self.qmc.autosaveprefix))
 
 #--- BEGIN GROUP WebLCDs
             # WebLCDs
             settings.beginGroup('WebLCDs')
-            if settings.contains('active'):
-                self.WebLCDs = bool(toBool(settings.value('active',self.WebLCDs)))
-                self.WebLCDsPort = toInt(settings.value('port',self.WebLCDsPort))
-                self.WebLCDsAlerts = bool(toBool(settings.value('alerts',self.WebLCDsAlerts)))
+            self.WebLCDs = bool(toBool(settings.value('active',self.WebLCDs)))
+            self.WebLCDsPort = toInt(settings.value('port',self.WebLCDsPort))
+            self.WebLCDsAlerts = bool(toBool(settings.value('alerts',self.WebLCDsAlerts)))
             settings.endGroup()
 #--- END GROUP WebLCDs
 
-            if settings.contains('LargeLCDs'):
-                self.LargeLCDsFlag = toBool(settings.value('LargeLCDs',self.LargeLCDsFlag))
+            self.LargeLCDsFlag = toBool(settings.value('LargeLCDs',self.LargeLCDsFlag))
             if self.LargeLCDsFlag:
                 self.largeLCDs()
-            if settings.contains('LargeDeltaLCDs'):
-                self.LargeDeltaLCDsFlag = toBool(settings.value('LargeDeltaLCDs',self.LargeDeltaLCDsFlag))
+            self.LargeDeltaLCDsFlag = toBool(settings.value('LargeDeltaLCDs',self.LargeDeltaLCDsFlag))
             if self.LargeDeltaLCDsFlag:
                 self.largeDeltaLCDs()
-            if settings.contains('LargePIDLCDs'):
-                self.LargePIDLCDsFlag = toBool(settings.value('LargePIDLCDs',self.LargePIDLCDsFlag))
+            self.LargePIDLCDsFlag = toBool(settings.value('LargePIDLCDs',self.LargePIDLCDsFlag))
             if self.LargePIDLCDsFlag:
                 self.largePIDLCDs()
-            if settings.contains('LargeScaleLCDs'):
-                self.LargeScaleLCDsFlag = toBool(settings.value('LargeScaleLCDs',self.LargeScaleLCDsFlag))
+            self.LargeScaleLCDsFlag = toBool(settings.value('LargeScaleLCDs',self.LargeScaleLCDsFlag))
             if self.LargeScaleLCDsFlag:
                 self.largeScaleLCDs()
-            if settings.contains('LargeExtraLCDs'):
-                self.LargeExtraLCDsFlag = toBool(settings.value('LargeExtraLCDs',self.LargeExtraLCDsFlag))
+            self.LargeExtraLCDsFlag = toBool(settings.value('LargeExtraLCDs',self.LargeExtraLCDsFlag))
             if self.LargeExtraLCDsFlag:
                 self.largeExtraLCDs()
-            if settings.contains('LargePhasesLCDs'):
-                self.LargePhasesLCDsFlag = toBool(settings.value('LargePhasesLCDs',self.LargePhasesLCDsFlag))
+            self.LargePhasesLCDsFlag = toBool(settings.value('LargePhasesLCDs',self.LargePhasesLCDsFlag))
             if self.LargePhasesLCDsFlag:
                 self.largePhasesLCDs()
             # start server if needed
@@ -17612,88 +17242,77 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #--- BEGIN GROUP ExtraEventButtons
             #restore buttons
             settings.beginGroup('ExtraEventButtons')
-            if settings.contains('extraeventsactions'):
-                if settings.contains('buttonlistmaxlen'):
-                    self.buttonlistmaxlen = toInt(settings.value('buttonlistmaxlen',self.buttonlistmaxlen))
-                if settings.contains('extraeventsbuttonsflags'):
-                    self.extraeventsbuttonsflags = [toInt(x) for x in toList(settings.value('extraeventsbuttonsflags',self.extraeventsbuttonsflags))]
-                extraeventstypes = [toInt(x) for x in toList(settings.value('extraeventstypes',self.extraeventstypes))]
-                extraeventsvalues = [toFloat(x) for x in toList(settings.value('extraeventsvalues',self.extraeventsvalues))]
-                extraeventsactions = [toInt(x) for x in toList(settings.value('extraeventsactions',self.extraeventsactions))]
-                extraeventsvisibility = [toInt(x) for x in toList(settings.value('extraeventsvisibility',self.extraeventsvisibility))]
-                extraeventsactionstrings = list(toStringList(settings.value('extraeventsactionstrings',self.extraeventsactionstrings)))
-                extraeventslabels = list(toStringList(settings.value('extraeventslabels',self.extraeventslabels)))
-                extraeventsdescriptions= list(toStringList(settings.value('extraeventsdescriptions',self.extraeventsdescriptions)))
-                if settings.contains('extraeventbuttoncolor'):
-                    extraeventbuttoncolor = list(toStringList(settings.value('extraeventbuttoncolor',self.extraeventbuttoncolor)))
-                    extraeventbuttontextcolor = list(toStringList(settings.value('extraeventbuttontextcolor',self.extraeventbuttontextcolor)))
-                else:
-                    extraeventbuttoncolor = ['yellow']*len(extraeventstypes)
-                    extraeventbuttontextcolor = ['black']*len(extraeventstypes)
-                if len(extraeventstypes) == len(extraeventsvalues) == len(extraeventsactions) == len(extraeventsvisibility) ==\
-                        len(extraeventsactionstrings) == len(extraeventslabels) == len(extraeventsdescriptions) == \
-                        len(extraeventbuttoncolor) == len(extraeventbuttontextcolor):
-                    self.extraeventstypes = extraeventstypes
-                    self.extraeventsvalues = extraeventsvalues
-                    self.extraeventsactions = extraeventsactions
-                    self.extraeventsvisibility = extraeventsvisibility
-                    self.extraeventsactionstrings = extraeventsactionstrings
-                    self.extraeventslabels = extraeventslabels
-                    self.extraeventsdescriptions = extraeventsdescriptions
-                    self.extraeventbuttoncolor = extraeventbuttoncolor
-                    self.extraeventbuttontextcolor = extraeventbuttontextcolor
-                if settings.contains('buttonpalette'):
-                    self.buttonpalettemaxlen = [min(30,max(6,toInt(x))) for x in toList(settings.value('buttonpalettemaxlen',self.buttonpalettemaxlen))]
-                    bp = toList(settings.value('buttonpalette',self.buttonpalette))
-                    self.buttonpalette = []
-                    if bp is None:
-                        self.buttonpalette = [ self.makePalette() for _ in range(10) ] # initialize empty palettes
+            self.buttonlistmaxlen = toInt(settings.value('buttonlistmaxlen',self.buttonlistmaxlen))
+            self.extraeventsbuttonsflags = [toInt(x) for x in toList(settings.value('extraeventsbuttonsflags',self.extraeventsbuttonsflags))]
+            extraeventstypes = [toInt(x) for x in toList(settings.value('extraeventstypes',self.extraeventstypes))]
+            extraeventsvalues = [toFloat(x) for x in toList(settings.value('extraeventsvalues',self.extraeventsvalues))]
+            extraeventsactions = [toInt(x) for x in toList(settings.value('extraeventsactions',self.extraeventsactions))]
+            extraeventsvisibility = [toInt(x) for x in toList(settings.value('extraeventsvisibility',self.extraeventsvisibility))]
+            extraeventsactionstrings = list(toStringList(settings.value('extraeventsactionstrings',self.extraeventsactionstrings)))
+            extraeventslabels = list(toStringList(settings.value('extraeventslabels',self.extraeventslabels)))
+            extraeventsdescriptions= list(toStringList(settings.value('extraeventsdescriptions',self.extraeventsdescriptions)))
+            if settings.contains('extraeventbuttoncolor'):
+                extraeventbuttoncolor = list(toStringList(settings.value('extraeventbuttoncolor',self.extraeventbuttoncolor)))
+            else:
+                extraeventbuttoncolor = ['yellow']*len(extraeventstypes)
+            if settings.contains('extraeventbuttontextcolor'):
+                extraeventbuttontextcolor = list(toStringList(settings.value('extraeventbuttontextcolor',self.extraeventbuttontextcolor)))
+            else:
+                extraeventbuttontextcolor = ['#000000']*len(extraeventstypes)
+            if len(extraeventstypes) == len(extraeventsvalues) == len(extraeventsactions) == len(extraeventsvisibility) ==\
+                    len(extraeventsactionstrings) == len(extraeventslabels) == len(extraeventsdescriptions) == \
+                    len(extraeventbuttoncolor) == len(extraeventbuttontextcolor):
+                self.extraeventstypes = extraeventstypes
+                self.extraeventsvalues = extraeventsvalues
+                self.extraeventsactions = extraeventsactions
+                self.extraeventsvisibility = extraeventsvisibility
+                self.extraeventsactionstrings = extraeventsactionstrings
+                self.extraeventslabels = extraeventslabels
+                self.extraeventsdescriptions = extraeventsdescriptions
+                self.extraeventbuttoncolor = extraeventbuttoncolor
+                self.extraeventbuttontextcolor = extraeventbuttontextcolor
+            self.buttonpalettemaxlen = [min(30,max(6,toInt(x))) for x in toList(settings.value('buttonpalettemaxlen',self.buttonpalettemaxlen))]
+            bp = toList(settings.value('buttonpalette',self.buttonpalette))
+            self.buttonpalette = []
+            if bp is None:
+                self.buttonpalette = [ self.makePalette() for _ in range(10) ] # initialize empty palettes
+            else:
+                for p in bp[:self.max_palettes]:
+                    if p is None or len(p)>self.palette_entries:
+                        # we generate a new default palette
+                        self.buttonpalette.append(self.makePalette())
+                    elif len(p) == self.palette_entries:
+                        # we convert the list into a Palette tuple
+                        if self.paletteValid(p):
+                            tp = cast('Palette', tuple(p))
+                            self.buttonpalette.append(tp)
+                        else:
+                            self.buttonpalette.append(self.makePalette())
                     else:
-                        for p in bp[:self.max_palettes]:
-                            if p is None or len(p)>self.palette_entries:
-                                # we generate a new default palette
-                                self.buttonpalette.append(self.makePalette())
-                            elif len(p) == self.palette_entries:
-                                # we convert the list into a Palette tuple
-                                if self.paletteValid(p):
-                                    tp = cast('Palette', tuple(p))
-                                    self.buttonpalette.append(tp)
-                                else:
-                                    self.buttonpalette.append(self.makePalette())
-                            else:
-                                # to be compatible to older Artisan versions with smaller palettes we fill the list from the defaults and convert it into a Palette
-                                tp = cast('Palette', tuple(p + list(self.makePalette(empty=False))[len(p):]))
-                                self.buttonpalette.append(tp)
-                if settings.contains('buttonpalette_shortcuts'):
-                    self.buttonpalette_shortcuts = bool(toBool(settings.value('buttonpalette_shortcuts',self.buttonpalette_shortcuts)))
-                if settings.contains('eventbuttontablecolumnwidths'):
-                    self.eventbuttontablecolumnwidths = [toInt(x) for x in toList(settings.value('eventbuttontablecolumnwidths',self.eventbuttontablecolumnwidths))]
-                if settings.contains('buttonsize'):
-                    self.buttonsize = toInt(settings.value('buttonsize',self.buttonsize))
-                if settings.contains('marklastbuttonpressed'):
-                    self.mark_last_button_pressed = bool(toBool(settings.value('marklastbuttonpressed',self.mark_last_button_pressed)))
-                if settings.contains('showextrabuttontooltips'):
-                    self.show_extrabutton_tooltips = bool(toBool(settings.value('showextrabuttontooltips',self.show_extrabutton_tooltips)))
-                if settings.contains('buttonpalette_label'):
-                    self.buttonpalette_label = toString(settings.value('buttonpalette_label',self.buttonpalette_label))
+                        # to be compatible to older Artisan versions with smaller palettes we fill the list from the defaults and convert it into a Palette
+                        tp = cast('Palette', tuple(p + list(self.makePalette(empty=False))[len(p):]))
+                        self.buttonpalette.append(tp)
+            self.buttonpalette_shortcuts = bool(toBool(settings.value('buttonpalette_shortcuts',self.buttonpalette_shortcuts)))
+            self.eventbuttontablecolumnwidths = [toInt(x) for x in toList(settings.value('eventbuttontablecolumnwidths',self.eventbuttontablecolumnwidths))]
+            self.buttonsize = toInt(settings.value('buttonsize',self.buttonsize))
+            self.mark_last_button_pressed = bool(toBool(settings.value('marklastbuttonpressed',self.mark_last_button_pressed)))
+            self.show_extrabutton_tooltips = bool(toBool(settings.value('showextrabuttontooltips',self.show_extrabutton_tooltips)))
+            self.buttonpalette_label = toString(settings.value('buttonpalette_label',self.buttonpalette_label))
             settings.endGroup()
 #--- END GROUP ExtraEventButtons
 
 #--- BEGIN GROUP ExtrasMoreInfo
             # Extras more info
             settings.beginGroup('ExtrasMoreInfo')
-            if settings.contains('showmet'):
-                self.qmc.showmet = bool(toBool(settings.value('showmet',self.qmc.showmet)))
+            self.qmc.showmet = bool(toBool(settings.value('showmet',self.qmc.showmet)))
             if settings.contains('statssummary'):
                 self.qmc.statssummary = bool(toBool(settings.value('statssummary')))
                 if self.qmc.statssummary:
                     self.savestatisticsAction.setEnabled(True)
                 else:
                     self.savestatisticsAction.setEnabled(False)
-            if settings.contains('statsmaxchrperline'):
-                self.qmc.statsmaxchrperline = int(settings.value('statsmaxchrperline', self.qmc.statsmaxchrperline))
-            if settings.contains('showtimeguide'):
-                self.qmc.showtimeguide = bool(toBool(settings.value('showtimeguide',self.qmc.showtimeguide)))
+            self.qmc.statsmaxchrperline = int(settings.value('statsmaxchrperline', self.qmc.statsmaxchrperline))
+            self.qmc.showtimeguide = bool(toBool(settings.value('showtimeguide',self.qmc.showtimeguide)))
             settings.endGroup()
 #--- END GROUP ExtrasMoreInfo
 
@@ -17712,13 +17331,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             except Exception: # pylint: disable=broad-except
                 pass
 
-#            #update axis limits
-#            if not self.qmc.locktimex:
-#                self.qmc.startofx = self.qmc.chargemintime # self.qmc.locktimex_start
-#                self.qmc.endofx = self.qmc.locktimex_end
-#            if self.qmc.endofx < 1:
-#                self.qmc.endofx = 60
-
             # used on startup to reload previous loaded profiles
             if settings.contains('lastLoadedProfile'):
                 self.lastLoadedProfile = toString(settings.value('lastLoadedProfile',self.curFile))
@@ -17726,12 +17338,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.lastLoadedBackground = toString(settings.value('lastLoadedBackground',self.qmc.backgroundpath))
 
             #watermark image
-            if settings.contains('logoimgalpha'):
-                self.logoimgalpha = toFloat(settings.value('logoimgalpha'))
-            if settings.contains('logoimgflag'):
-                self.logoimgflag = bool(toBool(settings.value('logoimgflag', self.logoimgflag)))
-            if settings.contains('logofilename'):
-                self.logofilename = toString(settings.value('logofilename'))
+            self.logoimgalpha = toFloat(settings.value('logoimgalpha', self.logoimgalpha))
+            self.logoimgflag = bool(toBool(settings.value('logoimgflag', self.logoimgflag)))
+            self.logofilename = toString(settings.value('logofilename', self.logofilename))
 
             res = True
 
@@ -18057,7 +17666,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         self.qmc.extradrawstyles1[i] = l1.get_drawstyle()
                     else:
                         self.qmc.extradrawstyles1[i] = self.qmc.drawstyle_default
-                    self.qmc.extralinewidths1[i] = max(self.qmc.linewidth_min, l1.get_linewidth())
+                    self.qmc.extralinewidths1[i] = max(self.qmc.linewidth_min, float(l1.get_linewidth()))
                     m = l1.get_marker()
                     if isinstance(m, str):
                         self.qmc.extramarkers1[i] = m
@@ -18075,7 +17684,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         self.qmc.extradrawstyles2[i] = l2.get_drawstyle()
                     else:
                         self.qmc.extradrawstyles2[i] = self.qmc.drawstyle_default
-                    self.qmc.extralinewidths2[i] = max(self.qmc.linewidth_min, l2.get_linewidth())
+                    self.qmc.extralinewidths2[i] = max(self.qmc.linewidth_min, float(l2.get_linewidth()))
                     m = l2.get_marker()
                     if isinstance(m, str):
                         self.qmc.extramarkers2[i] = m
@@ -18177,549 +17786,667 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             _log.exception(e)
             return '','',''
 
+    # settingsSetValue() avoids writing settings unmodified w.r.t. their defaults and is to be used on saving settings on appQuit
+    # if read_defaults=False the name/value pair is added in case the name is not in defaults or the value for name in defaults is different
+    # else the defaultSettings dictionary is filled if given
+    @staticmethod
+    def settingsSetValue(settings:QSettings, default_settings:Optional[Dict[str, Any]], name:str, value:Any, read_defaults:bool) -> None:
+        item = f'{settings.group()}/{name}'
+        if read_defaults:
+            # we fill the default_settings dict with the current values
+            if default_settings is not None:
+                if item in default_settings:
+                    _log.error('internal error in settingsSetValue: duplicate settings name: %s', item)
+                else:
+                    # as value could be a list of lists or a deeply structured dict where just items change,
+                    # we need to add a deep copy to our cache here to be able to detect those changes
+                    default_settings[item] = copyd.deepcopy(value)
+        else:
+            # we fill the settings with the current values
+            if default_settings is None or item not in default_settings or default_settings[item] != value:
+                settings.setValue(name, value)
+            if default_settings is not None and settings.contains(name) and item in default_settings and default_settings[item] == value:
+                settings.remove(name)
 
-    def closeEventSettings(self, filename=None) -> bool: # pyright: ignore [reportGeneralTypeIssues| #  Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths
+    # returns True on success and False otherwise
+    def closeEventSettings(self, filename:Optional[str] = None) -> bool: # pyright: ignore [reportGeneralTypeIssues| #  Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths
         #save window geometry and position. See QSettings documentation.
         #This information is often stored in the system registry on Windows,
         #and in XML preferences files on Mac OS X. On Unix systems, in the absence of a standard,
         #many applications (including the KDE applications) use INI text files
 
+        if filename is not None and filename:
+            # we set the default_settings to None here to force the saving of all settings not only those different to the defaults
+            return self.saveAllSettings(QSettings(filename, QSettings.Format.IniFormat), None, filename)
+        # we hand over the defaultSettings to have only those settings saved that are diffent from their defaults
+        return self.saveAllSettings(QSettings(), self.defaultSettings)
+
+    # if settings are None, the default_settings dict is filled with current values (the default values if called directly after start)
+    # if settings are given all values are filled if default_settings are not given or different to the corresponding value in default_settings
+    # see the definition of the method settingsSetValue() above
+    # returns True on success and False otherwise
+    def saveAllSettings(self, settings:QSettings, default_settings:Optional[Dict[str, Any]], filename:Optional[str] = None, read_defaults:bool = False) -> bool:
+        start_time = libtime.process_time()
         try:
-            if filename is not None and filename:
-                settings = QSettings(filename,QSettings.Format.IniFormat)
-            else:
-                settings = QSettings()
-            #save window geometry if not in fullscreen mode
-            if filename is None or not (self.full_screen_mode_active or self.isFullScreen()):
-                settings.setValue('Geometry',self.saveGeometry())
-
             if filename is None:
-                settings.setValue('fullscreen', self.full_screen_mode_active or self.isFullScreen())
-                settings.setValue('plus_account',self.plus_account)
-                settings.setValue('plus_remember_credentials',self.plus_remember_credentials)
-                settings.setValue('plus_email',self.plus_email)
-                settings.setValue('plus_language',self.plus_language)
+                self.settingsSetValue(settings, default_settings, 'fullscreen', self.full_screen_mode_active or self.isFullScreen(), read_defaults)
+                self.settingsSetValue(settings, default_settings, 'plus_account', self.plus_account, read_defaults)
+                self.settingsSetValue(settings, default_settings, 'plus_remember_credentials', self.plus_remember_credentials, read_defaults)
+                self.settingsSetValue(settings, default_settings, 'plus_email', self.plus_email, read_defaults)
+                self.settingsSetValue(settings, default_settings, 'plus_language', self.plus_language, read_defaults)
 
-            # save screens fingerprint to decide if dialog positions should be remembered on startup
-            settings.setValue('screens',len(self.app.screens())) # number of connected screens (int)
-            mainScreen:Optional[QScreen] = self.app.primaryScreen()
-            if mainScreen is not None:
-                settings.setValue('mainScreenPixelRatio',mainScreen.devicePixelRatio()) # main screen pixel ratio (float)
-                settings.setValue('mainScreenWidth',mainScreen.size().width())          # main screen width (int)
-                settings.setValue('mainScreenHeight',mainScreen.size().height())        # main screen height (int)
+            if not read_defaults: # we don't add those to the cache forcing those settings to be saved always
+                #save window geometry if not in fullscreen mode
+                if filename is None or not (self.full_screen_mode_active or self.isFullScreen()):
+                    self.settingsSetValue(settings, default_settings, 'Geometry',self.saveGeometry(), read_defaults)
 
-            #on OS X we prevent the reopening of windows
-            # as done by defaults write com.google.code.p.Artisan NSQuitAlwaysKeepsWindows -bool false
-            # resulting in the entry <key>NSQuitAlwaysKeepsWindows</key><false/> in the app settings
-            # file com.google.code.p.Artisan.plist under ~/Library/Preferences/
-            if sys.platform.startswith('darwin'):
-                settings.setValue('NSQuitAlwaysKeepsWindows',False)
+
+                # save screens fingerprint to decide if dialog positions should be remembered on startup
+                if not read_defaults:
+                    # we always write those settings to the settings file and never cache it
+                    self.settingsSetValue(settings, default_settings, 'screens',len(self.app.screens()), read_defaults) # number of connected screens (int)
+                    mainScreen:Optional[QScreen] = self.app.primaryScreen()
+                    if mainScreen is not None:
+                        self.settingsSetValue(settings, default_settings, 'mainScreenPixelRatio',mainScreen.devicePixelRatio(), read_defaults) # main screen pixel ratio (float)
+                        self.settingsSetValue(settings, default_settings, 'mainScreenWidth',mainScreen.size().width(), read_defaults)          # main screen width (int)
+                        self.settingsSetValue(settings, default_settings, 'mainScreenHeight',mainScreen.size().height(), read_defaults)        # main screen height (int)
+
+                try:
+                    self.settingsSetValue(settings, default_settings, 'DebugLogLevel',debugLogLevelActive(), read_defaults)
+                except Exception: # pylint: disable=broad-except
+                    pass
+
             #save mode
-            settings.setValue('Mode',self.qmc.mode)
-            try:
-                settings.setValue('DebugLogLevel',debugLogLevelActive())
-            except Exception: # pylint: disable=broad-except
-                pass
-            #save system
-            settings.beginGroup('System')
-            settings.setValue('artisan_version',__version__)
-            settings.setValue('artisan_revision',__revision__)
-            settings.setValue('artisan_build',__build__)
-            os_name,os_version,os_arch = self.get_os()
-            settings.setValue('artisan_os',os_name)
-            settings.setValue('artisan_os_version',os_version)
-            settings.setValue('artisan_os_arch',os_arch)
-            settings.endGroup()
+            self.settingsSetValue(settings, default_settings, 'Mode',self.qmc.mode, read_defaults)
+
+            if filename is not None:
+                # only add those on exporting settings (those are never read by Artisan)
+#--- BEGIN GROUP System
+                if settings is not None:
+                    settings.beginGroup('System')
+                self.settingsSetValue(settings, default_settings, 'artisan_version',__version__, read_defaults)
+                self.settingsSetValue(settings, default_settings, 'artisan_revision',__revision__, read_defaults)
+                self.settingsSetValue(settings, default_settings, 'artisan_build',__build__, read_defaults)
+                os_name,os_version,os_arch = self.get_os()
+                self.settingsSetValue(settings, default_settings, 'artisan_os',os_name, read_defaults)
+                self.settingsSetValue(settings, default_settings, 'artisan_os_version',os_version, read_defaults)
+                self.settingsSetValue(settings, default_settings, 'artisan_os_arch',os_arch, read_defaults)
+                if settings is not None:
+                    settings.endGroup()
+#--- END GROUP System
+
+#--- BEGIN GROUP Device
             #save device
-            settings.beginGroup('Device')
-            settings.setValue('device_logging',self.qmc.device_logging)
-            settings.setValue('id',self.qmc.device)
-            settings.setValue('phidget1048_types',self.qmc.phidget1048_types)
-            settings.setValue('phidget1048_async',self.qmc.phidget1048_async)
-            settings.setValue('phidget1048_changeTriggers',self.qmc.phidget1048_changeTriggers)
-            settings.setValue('phidget1048_dataRate',self.qmc.phidget1048_dataRate)
-            settings.setValue('phidget1046_async',self.qmc.phidget1046_async)
-            settings.setValue('phidget1046_gain',self.qmc.phidget1046_gain)
-            settings.setValue('phidget1046_formula',self.qmc.phidget1046_formula)
-            settings.setValue('phidget1046_dataRate',self.qmc.phidget1046_dataRate)
-            settings.setValue('phidget1045_async',self.qmc.phidget1045_async)
-            settings.setValue('phidget1045_changeTrigger',self.qmc.phidget1045_changeTrigger)
-            settings.setValue('phidget1045_emissivity',self.qmc.phidget1045_emissivity)
-            settings.setValue('phidget1045_dataRate',self.qmc.phidget1045_dataRate)
-            settings.setValue('phidget1200_formula',self.qmc.phidget1200_formula)
-            settings.setValue('phidget1200_wire',self.qmc.phidget1200_wire)
-            settings.setValue('phidget1200_async',self.qmc.phidget1200_async)
-            settings.setValue('phidget1200_changeTrigger',self.qmc.phidget1200_changeTrigger)
-            settings.setValue('phidget1200_dataRate',self.qmc.phidget1200_dataRate)
-            settings.setValue('phidget1200_2_formula',self.qmc.phidget1200_2_formula)
-            settings.setValue('phidget1200_2_wire',self.qmc.phidget1200_2_wire)
-            settings.setValue('phidget1200_2_async',self.qmc.phidget1200_2_async)
-            settings.setValue('phidget1200_2_changeTrigger',self.qmc.phidget1200_2_changeTrigger)
-            settings.setValue('phidget1200_2_dataRate',self.qmc.phidget1200_2_dataRate)
-            settings.setValue('phidgetDAQ1400_powerSupply',self.qmc.phidgetDAQ1400_powerSupply)
-            settings.setValue('phidgetDAQ1400_inputMode',self.qmc.phidgetDAQ1400_inputMode)
-            settings.setValue('phidgetRemoteFlag',self.qmc.phidgetRemoteFlag)
-            settings.setValue('phidgetServerID',self.qmc.phidgetServerID)
-            settings.setValue('phidgetPassword',self.qmc.phidgetPassword)
-            settings.setValue('phidgetPort',self.qmc.phidgetPort)
-            settings.setValue('phidgetRemoteOnlyFlag',self.qmc.phidgetRemoteOnlyFlag)
-            settings.setValue('phidget1018_async',self.qmc.phidget1018_async)
-            settings.setValue('phidget1018_ratio',self.qmc.phidget1018_ratio)
-            settings.setValue('phidget1018_dataRates',self.qmc.phidget1018_dataRates)
-            settings.setValue('phidget1018_changeTriggers',self.qmc.phidget1018_changeTriggers)
-            settings.setValue('phidgetVCP100x_voltageRanges',self.qmc.phidgetVCP100x_voltageRanges)
-            settings.setValue('controlETpid',self.ser.controlETpid)
-            settings.setValue('readBTpid',self.ser.readBTpid)
-            settings.setValue('arduinoETChannel',self.ser.arduinoETChannel)
-            settings.setValue('arduinoBTChannel',self.ser.arduinoBTChannel)
-            settings.setValue('arduinoATChannel',self.ser.arduinoATChannel)
-            settings.setValue('ArduinoFILT',self.ser.ArduinoFILT)
-            settings.setValue('useModbusPort',self.ser.useModbusPort)
-            settings.setValue('showFujiLCDs',self.ser.showFujiLCDs)
-            settings.setValue('PIDbuttonflag',self.qmc.PIDbuttonflag)
-            settings.setValue('Controlbuttonflag',self.qmc.Controlbuttonflag)
-            settings.setValue('yoctoRemoteFlag',self.qmc.yoctoRemoteFlag)
-            settings.setValue('yoctoServerID',self.qmc.yoctoServerID)
-            settings.setValue('YOCTO_emissivity',self.qmc.YOCTO_emissivity)
-            settings.setValue('YOCTO_async',self.qmc.YOCTO_async)
-            settings.setValue('YOCTO_dataRate',self.qmc.YOCTO_dataRate)
-            settings.setValue('ambient_temperature_device',self.qmc.ambient_temperature_device)
-            settings.setValue('ambient_humidity_device',self.qmc.ambient_humidity_device)
-            settings.setValue('ambient_pressure_device',self.qmc.ambient_pressure_device)
-            settings.setValue('elevation',self.qmc.elevation)
-            settings.setValue('santokerHost',self.santokerHost)
-            settings.setValue('santokerPort',self.santokerPort)
-            settings.setValue('santokerSerial',self.santokerSerial)
-            settings.setValue('kaleidoHost',self.kaleidoHost)
-            settings.setValue('kaleidoPort',self.kaleidoPort)
-            settings.setValue('kaleidoSerial',self.kaleidoSerial)
-            settings.setValue('kaleidoPID',self.kaleidoPID)
-            settings.endGroup()
-            settings.setValue('fmt_data_RoR',self.qmc.fmt_data_RoR)
-            settings.setValue('fmt_data_ON',self.qmc.fmt_data_ON)
-            settings.setValue('fmt_data_curve',self.qmc.fmt_data_curve)
-            settings.setValue('detectBackgroundEventTime',self.qmc.detectBackgroundEventTime)
-            settings.setValue('backgroundReproduce',self.qmc.backgroundReproduce)
-            settings.setValue('backgroundReproduceBeep',self.qmc.backgroundReproduceBeep)
-            settings.setValue('backgroundPlaybackEvents',self.qmc.backgroundPlaybackEvents)
-            settings.setValue('backgroundPlaybackDROP',self.qmc.backgroundPlaybackDROP)
-            settings.setValue('replayType',self.qmc.replayType)
-            settings.setValue('specialeventplaybackaid',self.qmc.specialeventplaybackaid)
-            settings.setValue('specialeventplayback',self.qmc.specialeventplayback)
-            settings.setValue('Phases',self.qmc.phases)
+            if settings is not None:
+                settings.beginGroup('Device')
+            self.settingsSetValue(settings, default_settings, 'device_logging',self.qmc.device_logging, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'id',self.qmc.device, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1048_types',self.qmc.phidget1048_types, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1048_async',self.qmc.phidget1048_async, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1048_changeTriggers',self.qmc.phidget1048_changeTriggers, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1048_dataRate',self.qmc.phidget1048_dataRate, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1046_async',self.qmc.phidget1046_async, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1046_gain',self.qmc.phidget1046_gain, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1046_formula',self.qmc.phidget1046_formula, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1046_dataRate',self.qmc.phidget1046_dataRate, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1045_async',self.qmc.phidget1045_async, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1045_changeTrigger',self.qmc.phidget1045_changeTrigger, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1045_emissivity',self.qmc.phidget1045_emissivity, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1045_dataRate',self.qmc.phidget1045_dataRate, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1200_formula',self.qmc.phidget1200_formula, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1200_wire',self.qmc.phidget1200_wire, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1200_async',self.qmc.phidget1200_async, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1200_changeTrigger',self.qmc.phidget1200_changeTrigger, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1200_dataRate',self.qmc.phidget1200_dataRate, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1200_2_formula',self.qmc.phidget1200_2_formula, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1200_2_wire',self.qmc.phidget1200_2_wire, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1200_2_async',self.qmc.phidget1200_2_async, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1200_2_changeTrigger',self.qmc.phidget1200_2_changeTrigger, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1200_2_dataRate',self.qmc.phidget1200_2_dataRate, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidgetDAQ1400_powerSupply',self.qmc.phidgetDAQ1400_powerSupply, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidgetDAQ1400_inputMode',self.qmc.phidgetDAQ1400_inputMode, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidgetRemoteFlag',self.qmc.phidgetRemoteFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidgetServerID',self.qmc.phidgetServerID, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidgetPassword',self.qmc.phidgetPassword, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidgetPort',self.qmc.phidgetPort, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidgetRemoteOnlyFlag',self.qmc.phidgetRemoteOnlyFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1018_async',self.qmc.phidget1018_async, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1018_ratio',self.qmc.phidget1018_ratio, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1018_dataRates',self.qmc.phidget1018_dataRates, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidget1018_changeTriggers',self.qmc.phidget1018_changeTriggers, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phidgetVCP100x_voltageRanges',self.qmc.phidgetVCP100x_voltageRanges, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'controlETpid',self.ser.controlETpid, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'readBTpid',self.ser.readBTpid, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'arduinoETChannel',self.ser.arduinoETChannel, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'arduinoBTChannel',self.ser.arduinoBTChannel, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'arduinoATChannel',self.ser.arduinoATChannel, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ArduinoFILT',self.ser.ArduinoFILT, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'useModbusPort',self.ser.useModbusPort, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'showFujiLCDs',self.ser.showFujiLCDs, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'PIDbuttonflag',self.qmc.PIDbuttonflag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'Controlbuttonflag',self.qmc.Controlbuttonflag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'yoctoRemoteFlag',self.qmc.yoctoRemoteFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'yoctoServerID',self.qmc.yoctoServerID, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'YOCTO_emissivity',self.qmc.YOCTO_emissivity, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'YOCTO_async',self.qmc.YOCTO_async, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'YOCTO_dataRate',self.qmc.YOCTO_dataRate, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ambient_temperature_device',self.qmc.ambient_temperature_device, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ambient_humidity_device',self.qmc.ambient_humidity_device, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ambient_pressure_device',self.qmc.ambient_pressure_device, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'elevation',self.qmc.elevation, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'santokerHost',self.santokerHost, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'santokerPort',self.santokerPort, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'santokerSerial',self.santokerSerial, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'kaleidoHost',self.kaleidoHost, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'kaleidoPort',self.kaleidoPort, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'kaleidoSerial',self.kaleidoSerial, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'kaleidoPID',self.kaleidoPID, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP System
+
+            self.settingsSetValue(settings, default_settings, 'fmt_data_RoR',self.qmc.fmt_data_RoR, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'fmt_data_ON',self.qmc.fmt_data_ON, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'fmt_data_curve',self.qmc.fmt_data_curve, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'detectBackgroundEventTime',self.qmc.detectBackgroundEventTime, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'backgroundReproduce',self.qmc.backgroundReproduce, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'backgroundReproduceBeep',self.qmc.backgroundReproduceBeep, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'backgroundPlaybackEvents',self.qmc.backgroundPlaybackEvents, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'backgroundPlaybackDROP',self.qmc.backgroundPlaybackDROP, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'replayType',self.qmc.replayType, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'specialeventplaybackaid',self.qmc.specialeventplaybackaid, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'specialeventplayback',self.qmc.specialeventplayback, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'Phases',self.qmc.phases, read_defaults)
             #save phasesbuttonflag
-            settings.setValue('phasesbuttonflag',self.qmc.phasesbuttonflag)
-            settings.setValue('phasesfromBackgroundflag',self.qmc.phasesfromBackgroundflag)
+            self.settingsSetValue(settings, default_settings, 'phasesbuttonflag',self.qmc.phasesbuttonflag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phasesfromBackgroundflag',self.qmc.phasesfromBackgroundflag, read_defaults)
             #save phases watermarks flag
-            settings.setValue('watermarks',self.qmc.watermarksflag)
+            self.settingsSetValue(settings, default_settings, 'watermarks',self.qmc.watermarksflag, read_defaults)
             #save phases LCDs on recording flag
-            settings.setValue('phasesLCDs',self.qmc.phasesLCDflag)
-            settings.setValue('phasesLCDmode',self.qmc.phasesLCDmode)
-            settings.setValue('phasesLCDmode_l', self.qmc.phasesLCDmode_l)
-            settings.setValue('phasesLCDmode_all', self.qmc.phasesLCDmode_all)
-            settings.setValue('step100temp',self.qmc.step100temp)
+            self.settingsSetValue(settings, default_settings, 'phasesLCDs',self.qmc.phasesLCDflag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phasesLCDmode',self.qmc.phasesLCDmode, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phasesLCDmode_l', self.qmc.phasesLCDmode_l, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'phasesLCDmode_all', self.qmc.phasesLCDmode_all, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'step100temp',self.qmc.step100temp, read_defaults)
             #phase triggered DRY and FCs
-            settings.setValue('autoDry',self.qmc.autoDRYflag)
-            settings.setValue('autoFCs',self.qmc.autoFCsFlag)
+            self.settingsSetValue(settings, default_settings, 'autoDry',self.qmc.autoDRYflag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'autoFCs',self.qmc.autoFCsFlag, read_defaults)
             #save statistics
-            settings.setValue('Statistics',self.qmc.statisticsflags)
-            settings.setValue('AnalysisResultsLoc',list(self.qmc.analysisresultsloc))
-            settings.setValue('SegmentResultsLoc',list(self.qmc.segmentresultsloc))
-            settings.setValue('analysisstartchoice',self.qmc.analysisstartchoice)
-            settings.setValue('analysisoffset',self.qmc.analysisoffset)
-            settings.setValue('curvefitstartchoice',self.qmc.curvefitstartchoice)
-            settings.setValue('curvefitoffset',self.qmc.curvefitoffset)
-            settings.setValue('segmentsamplesthreshold',self.qmc.segmentsamplesthreshold)
-            settings.setValue('segmentdeltathreshold',self.qmc.segmentdeltathreshold)
+            self.settingsSetValue(settings, default_settings, 'Statistics',self.qmc.statisticsflags, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'AnalysisResultsLoc',list(self.qmc.analysisresultsloc), read_defaults)
+            self.settingsSetValue(settings, default_settings, 'SegmentResultsLoc',list(self.qmc.segmentresultsloc), read_defaults)
+            self.settingsSetValue(settings, default_settings, 'analysisstartchoice',self.qmc.analysisstartchoice, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'analysisoffset',self.qmc.analysisoffset, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'curvefitstartchoice',self.qmc.curvefitstartchoice, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'curvefitoffset',self.qmc.curvefitoffset, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'segmentsamplesthreshold',self.qmc.segmentsamplesthreshold, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'segmentdeltathreshold',self.qmc.segmentdeltathreshold, read_defaults)
             #projection
-            settings.setValue('projectFlag',self.qmc.projectFlag)
-            settings.setValue('projectDeltaFlag',self.qmc.projectDeltaFlag)
-            settings.setValue('projectionmode',self.qmc.projectionmode)
+            self.settingsSetValue(settings, default_settings, 'projectFlag',self.qmc.projectFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'projectDeltaFlag',self.qmc.projectDeltaFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'projectionmode',self.qmc.projectionmode, read_defaults)
             #save AUC
-            settings.setValue('AUCbegin',self.qmc.AUCbegin)
-            settings.setValue('AUCbase',self.qmc.AUCbase)
-            settings.setValue('AUCbaseFlag',self.qmc.AUCbaseFlag)
-            settings.setValue('AUCtarget',self.qmc.AUCtarget)
-            settings.setValue('AUCtargetFlag',self.qmc.AUCtargetFlag)
-            settings.setValue('AUCguideFlag',self.qmc.AUCguideFlag)
-            settings.setValue('AUClcdFlag',self.qmc.AUClcdFlag)
-            settings.setValue('AUCLCDmode',self.qmc.AUCLCDmode)
-            settings.setValue('AUCshowFlag',self.qmc.AUCshowFlag)
-            settings.setValue('keyboardmoveflag',self.keyboardmoveflag)
+            self.settingsSetValue(settings, default_settings, 'AUCbegin',self.qmc.AUCbegin, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'AUCbase',self.qmc.AUCbase, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'AUCbaseFlag',self.qmc.AUCbaseFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'AUCtarget',self.qmc.AUCtarget, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'AUCtargetFlag',self.qmc.AUCtargetFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'AUCguideFlag',self.qmc.AUCguideFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'AUClcdFlag',self.qmc.AUClcdFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'AUCLCDmode',self.qmc.AUCLCDmode, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'AUCshowFlag',self.qmc.AUCshowFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'keyboardmoveflag',self.keyboardmoveflag, read_defaults)
+
+#--- BEGIN GROUP events
             #save Events settings
-            settings.beginGroup('events')
-            settings.setValue('eventsbuttonflag',self.eventsbuttonflag)
-            settings.setValue('minieventsflags',self.minieventsflags)
-            settings.setValue('eventsGraphflag',self.qmc.eventsGraphflag)
+            if settings is not None:
+                settings.beginGroup('events')
+            self.settingsSetValue(settings, default_settings, 'eventsbuttonflag',self.eventsbuttonflag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'minieventsflags',self.minieventsflags, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'eventsGraphflag',self.qmc.eventsGraphflag, read_defaults)
             # we only store etype names if they have been modified by the user to allow automatic translations otherwise
-            if ((self.qmc.etypes[0] != QApplication.translate('ComboBox', 'Air')) or
+            if (read_defaults or (self.qmc.etypes[0] != QApplication.translate('ComboBox', 'Air')) or
                 (self.qmc.etypes[1] != QApplication.translate('ComboBox', 'Drum')) or
                 (self.qmc.etypes[2] != QApplication.translate('ComboBox', 'Damper')) or
                 (self.qmc.etypes[3] != QApplication.translate('ComboBox', 'Burner'))):
-                settings.setValue('etypes',self.qmc.etypes)
-            else:
+                self.settingsSetValue(settings, default_settings, 'etypes',self.qmc.etypes, read_defaults)
+            elif settings is not None:
                 settings.remove('etypes')
-            settings.setValue('eventsshowflag',self.qmc.eventsshowflag)
-            settings.setValue('clampEvents',self.qmc.clampEvents)
-            settings.setValue('renderEventsDescr',self.qmc.renderEventsDescr)
-            settings.setValue('eventslabelschars',self.qmc.eventslabelschars)
-            settings.setValue('annotationsflag',self.qmc.annotationsflag)
-            settings.setValue('showeventsonbt',self.qmc.showeventsonbt)
-            settings.setValue('showEtypes',self.qmc.showEtypes)
-            settings.setValue('chargeTimer',self.qmc.chargeTimerFlag)
-            settings.setValue('chargeTimerPeriod',self.qmc.chargeTimerPeriod)
-            settings.setValue('autoCharge',self.qmc.autoChargeFlag)
-            settings.setValue('autoDrop',self.qmc.autoDropFlag)
-            settings.setValue('markTP',self.qmc.markTPflag)
-            settings.setValue('EvalueColor',self.qmc.EvalueColor)
-            settings.setValue('EvalueTextColor',self.qmc.EvalueTextColor)
-            settings.setValue('EvalueMarker',self.qmc.EvalueMarker)
-            settings.setValue('Evaluelinethickness',self.qmc.Evaluelinethickness)
-            settings.setValue('EvalueMarkerSize',self.qmc.EvalueMarkerSize)
-            settings.setValue('Evaluealpha',self.qmc.Evaluealpha)
-            settings.setValue('specialeventannotations', self.qmc.specialeventannotations)
-            settings.setValue('specialeventannovisibilities', self.qmc.specialeventannovisibilities)
-            settings.setValue('overlappct', self.qmc.overlappct)
-            settings.endGroup()
-            #save ambient temperature source
-            settings.setValue('AmbientTempSource',self.qmc.ambientTempSource)
-            #save delay (sampling interval)
-            settings.setValue('Delay',self.qmc.delay)
-            # save keepON flag
-            settings.setValue('KeepON',self.qmc.flagKeepON)
-            settings.setValue('flagOpenCompleted',self.qmc.flagOpenCompleted)
-            # save extra event sampling interval
-            settings.setValue('ExtraEventSamplingDelay',self.qmc.extra_event_sampling_delay)
-            #save colors
-            settings.setValue('Colors',self.qmc.palette)
-            settings.setValue('Alphas',self.qmc.alpha)
-            settings.setValue('LCDColors',self.lcdpaletteB)
-            settings.setValue('LEDColors',self.lcdpaletteF)
-            settings.setValue('ETBColor',self.qmc.backgroundmetcolor)
-            settings.setValue('BTBColor',self.qmc.backgroundbtcolor)
-            settings.setValue('ETBdeltaColor',self.qmc.backgrounddeltaetcolor)
-            settings.setValue('BTBdeltaColor',self.qmc.backgrounddeltabtcolor)
-            settings.setValue('BackgroundAlpha',self.qmc.backgroundalpha)
-            #save readings LCDs status flags
-            settings.setValue('readingslcdsflags',self.readingslcdsflags)
-            #save flavors
-            settings.setValue('Flavors',self.qmc.flavorlabels)
-            settings.setValue('flavorstartangle',self.qmc.flavorstartangle)
-            #save roast color system
-            settings.setValue('colorsystem',self.qmc.color_system_idx)
-            #watermark image
-            settings.setValue('logofilename', self.logofilename)
-            settings.setValue('logoimgalpha', self.logoimgalpha)
-            settings.setValue('logoimgflag', self.logoimgflag)
-            settings.beginGroup('Tare')
-            settings.setValue('names',self.qmc.container_names)
-            settings.setValue('weights',self.qmc.container_weights)
-            settings.setValue('idx',self.qmc.container_idx)
-            settings.endGroup()
-            #save serial port
-            settings.beginGroup('SerialPort')
-            settings.setValue('comport',self.ser.comport)
-            settings.setValue('baudrate',self.ser.baudrate)
-            settings.setValue('bytesize',self.ser.bytesize)
-            settings.setValue('stopbits',self.ser.stopbits)
-            settings.setValue('parity',self.ser.parity)
-            settings.setValue('timeout',self.ser.timeout)
-            settings.endGroup()
-            #save WebSocket port
-            settings.beginGroup('WebSocket')
-            settings.setValue('host',self.ws.host)
-            settings.setValue('port',self.ws.port)
-            settings.setValue('path',self.ws.path)
-            settings.setValue('machineID',self.ws.machineID)
-            settings.setValue('connect_timeout',self.ws.connect_timeout)
-            settings.setValue('request_timeout',self.ws.request_timeout)
-            settings.setValue('reconnect_interval',self.ws.reconnect_interval)
-            settings.setValue('id_node',self.ws.id_node)
-            settings.setValue('machine_node',self.ws.machine_node)
-            settings.setValue('command_node',self.ws.command_node)
-            settings.setValue('data_node',self.ws.data_node)
-            settings.setValue('pushMessage_node',self.ws.pushMessage_node)
-            settings.setValue('request_data_command',self.ws.request_data_command)
-            settings.setValue('charge_message',self.ws.charge_message)
-            settings.setValue('drop_message',self.ws.drop_message)
-            settings.setValue('STARTonCHARGE',self.ws.STARTonCHARGE)
-            settings.setValue('OFFonDROP',self.ws.OFFonDROP)
-            settings.setValue('addEvent_message',self.ws.addEvent_message)
-            settings.setValue('event_node',self.ws.event_node)
-            settings.setValue('DRY_node',self.ws.DRY_node)
-            settings.setValue('FCs_node',self.ws.FCs_node)
-            settings.setValue('FCe_node',self.ws.FCe_node)
-            settings.setValue('SCs_node',self.ws.SCs_node)
-            settings.setValue('SCe_node',self.ws.SCe_node)
-            settings.setValue('channel_requests',self.ws.channel_requests)
-            settings.setValue('channel_nodes',self.ws.channel_nodes)
-            settings.setValue('channel_modes',self.ws.channel_modes)
-            settings.endGroup()
-            #save s7 port
-            settings.beginGroup('S7')
-            settings.setValue('area',self.s7.area)
-            settings.setValue('db_nr',self.s7.db_nr)
-            settings.setValue('start',self.s7.start)
-            settings.setValue('type',self.s7.type)
-            settings.setValue('mode',self.s7.mode)
-            settings.setValue('div',self.s7.div)
-            settings.setValue('host',self.s7.host)
-            settings.setValue('port',self.s7.port)
-            settings.setValue('rack',self.s7.rack)
-            settings.setValue('slot',self.s7.slot)
-            settings.setValue('PID_area',self.s7.PID_area)
-            settings.setValue('PID_db_nr',self.s7.PID_db_nr)
-            settings.setValue('PID_SV_register',self.s7.PID_SV_register)
-            settings.setValue('PID_p_register',self.s7.PID_p_register)
-            settings.setValue('PID_i_register',self.s7.PID_i_register)
-            settings.setValue('PID_d_register',self.s7.PID_d_register)
-            settings.setValue('PID_OFF_action',self.s7.PID_OFF_action)
-            settings.setValue('PID_ON_action',self.s7.PID_ON_action)
-            settings.setValue('PIDmultiplier',self.s7.PIDmultiplier)
-            settings.setValue('SVtype',self.s7.SVtype)
-            settings.setValue('SVmultiplier',self.s7.SVmultiplier)
-            settings.setValue('optimizer',self.s7.optimizer)
-            settings.setValue('fetch_max_blocks',self.s7.fetch_max_blocks)
-            settings.endGroup()
-            #save modbus port
-            settings.beginGroup('Modbus')
-            settings.setValue('comport',self.modbus.comport)
-            settings.setValue('baudrate',self.modbus.baudrate)
-            settings.setValue('bytesize',self.modbus.bytesize)
-            settings.setValue('stopbits',self.modbus.stopbits)
-            settings.setValue('parity',self.modbus.parity)
-            settings.setValue('timeout',self.modbus.timeout)
-            settings.setValue('modbus_serial_extra_read_delay',self.modbus.modbus_serial_extra_read_delay)
-            settings.setValue('serial_readRetries',self.modbus.serial_readRetries)
-            settings.setValue('IP_timeout',self.modbus.IP_timeout)
-            settings.setValue('IP_retries',self.modbus.IP_retries)
-            settings.setValue('PID_slave_ID',self.modbus.PID_slave_ID)
-            settings.setValue('PID_SV_register',self.modbus.PID_SV_register)
-            settings.setValue('PID_p_register',self.modbus.PID_p_register)
-            settings.setValue('PID_i_register',self.modbus.PID_i_register)
-            settings.setValue('PID_d_register',self.modbus.PID_d_register)
-            settings.setValue('PID_OFF_action',self.modbus.PID_OFF_action)
-            settings.setValue('PID_ON_action',self.modbus.PID_ON_action)
-            settings.setValue('input1slave',self.modbus.inputSlaves[0])
-            settings.setValue('input1register',self.modbus.inputRegisters[0])
-            settings.setValue('input1float',self.modbus.inputFloats[0])
-            settings.setValue('input1bcd',self.modbus.inputBCDs[0])
-            settings.setValue('input1code',self.modbus.inputCodes[0])
-            settings.setValue('input1div',self.modbus.inputDivs[0])
-            settings.setValue('input1mode',self.modbus.inputModes[0])
-            settings.setValue('input1FloatsAsInt',self.modbus.inputFloatsAsInt[0])
-            settings.setValue('input1BCDsAsInt',self.modbus.inputBCDsAsInt[0])
-            settings.setValue('input1Signed',self.modbus.inputSigned[0])
-            settings.setValue('input2slave',self.modbus.inputSlaves[1])
-            settings.setValue('input2register',self.modbus.inputRegisters[1])
-            settings.setValue('input2float',self.modbus.inputFloats[1])
-            settings.setValue('input2bcd',self.modbus.inputBCDs[1])
-            settings.setValue('input2code',self.modbus.inputCodes[1])
-            settings.setValue('input2div',self.modbus.inputDivs[1])
-            settings.setValue('input2mode',self.modbus.inputModes[1])
-            settings.setValue('input2FloatsAsInt',self.modbus.inputFloatsAsInt[1])
-            settings.setValue('input2BCDsAsInt',self.modbus.inputBCDsAsInt[1])
-            settings.setValue('input2Signed',self.modbus.inputSigned[1])
-            settings.setValue('input3slave',self.modbus.inputSlaves[2])
-            settings.setValue('input3register',self.modbus.inputRegisters[2])
-            settings.setValue('input3float',self.modbus.inputFloats[2])
-            settings.setValue('input3bcd',self.modbus.inputBCDs[2])
-            settings.setValue('input3code',self.modbus.inputCodes[2])
-            settings.setValue('input3div',self.modbus.inputDivs[2])
-            settings.setValue('input3mode',self.modbus.inputModes[2])
-            settings.setValue('input3FloatsAsInt',self.modbus.inputFloatsAsInt[2])
-            settings.setValue('input3BCDsAsInt',self.modbus.inputBCDsAsInt[2])
-            settings.setValue('input3Signed',self.modbus.inputSigned[2])
-            settings.setValue('input4slave',self.modbus.inputSlaves[3])
-            settings.setValue('input4register',self.modbus.inputRegisters[3])
-            settings.setValue('input4float',self.modbus.inputFloats[3])
-            settings.setValue('input4bcd',self.modbus.inputBCDs[3])
-            settings.setValue('input4code',self.modbus.inputCodes[3])
-            settings.setValue('input4div',self.modbus.inputDivs[3])
-            settings.setValue('input4mode',self.modbus.inputModes[3])
-            settings.setValue('input4FloatsAsInt',self.modbus.inputFloatsAsInt[3])
-            settings.setValue('input4BCDsAsInt',self.modbus.inputBCDsAsInt[3])
-            settings.setValue('input4Signed',self.modbus.inputSigned[3])
-            settings.setValue('input5slave',self.modbus.inputSlaves[4])
-            settings.setValue('input5register',self.modbus.inputRegisters[4])
-            settings.setValue('input5float',self.modbus.inputFloats[4])
-            settings.setValue('input5bcd',self.modbus.inputBCDs[4])
-            settings.setValue('input5code',self.modbus.inputCodes[4])
-            settings.setValue('input5div',self.modbus.inputDivs[4])
-            settings.setValue('input5mode',self.modbus.inputModes[4])
-            settings.setValue('input5FloatsAsInt',self.modbus.inputFloatsAsInt[4])
-            settings.setValue('input5BCDsAsInt',self.modbus.inputBCDsAsInt[4])
-            settings.setValue('input5Signed',self.modbus.inputSigned[4])
-            settings.setValue('input6slave',self.modbus.inputSlaves[5])
-            settings.setValue('input6register',self.modbus.inputRegisters[5])
-            settings.setValue('input6float',self.modbus.inputFloats[5])
-            settings.setValue('input6bcd',self.modbus.inputBCDs[5])
-            settings.setValue('input6code',self.modbus.inputCodes[5])
-            settings.setValue('input6div',self.modbus.inputDivs[5])
-            settings.setValue('input6mode',self.modbus.inputModes[5])
-            settings.setValue('input6FloatsAsInt',self.modbus.inputFloatsAsInt[5])
-            settings.setValue('input6BCDsAsInt',self.modbus.inputBCDsAsInt[5])
-            settings.setValue('input6Signed',self.modbus.inputSigned[5])
-            settings.setValue('input7slave',self.modbus.inputSlaves[6])
-            settings.setValue('input7register',self.modbus.inputRegisters[6])
-            settings.setValue('input7float',self.modbus.inputFloats[6])
-            settings.setValue('input7bcd',self.modbus.inputBCDs[6])
-            settings.setValue('input7code',self.modbus.inputCodes[6])
-            settings.setValue('input7div',self.modbus.inputDivs[6])
-            settings.setValue('input7mode',self.modbus.inputModes[6])
-            settings.setValue('input7FloatsAsInt',self.modbus.inputFloatsAsInt[6])
-            settings.setValue('input7BCDsAsInt',self.modbus.inputBCDsAsInt[6])
-            settings.setValue('input7Signed',self.modbus.inputSigned[6])
-            settings.setValue('input8slave',self.modbus.inputSlaves[7])
-            settings.setValue('input8register',self.modbus.inputRegisters[7])
-            settings.setValue('input8float',self.modbus.inputFloats[7])
-            settings.setValue('input8bcd',self.modbus.inputBCDs[7])
-            settings.setValue('input8code',self.modbus.inputCodes[7])
-            settings.setValue('input8div',self.modbus.inputDivs[7])
-            settings.setValue('input8mode',self.modbus.inputModes[7])
-            settings.setValue('input8FloatsAsInt',self.modbus.inputFloatsAsInt[7])
-            settings.setValue('input8BCDsAsInt',self.modbus.inputBCDsAsInt[7])
-            settings.setValue('input8Signed',self.modbus.inputSigned[7])
+            self.settingsSetValue(settings, default_settings, 'eventsshowflag',self.qmc.eventsshowflag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'clampEvents',self.qmc.clampEvents, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'renderEventsDescr',self.qmc.renderEventsDescr, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'eventslabelschars',self.qmc.eventslabelschars, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'annotationsflag',self.qmc.annotationsflag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'showeventsonbt',self.qmc.showeventsonbt, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'showEtypes',self.qmc.showEtypes, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'chargeTimer',self.qmc.chargeTimerFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'chargeTimerPeriod',self.qmc.chargeTimerPeriod, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'autoCharge',self.qmc.autoChargeFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'autoDrop',self.qmc.autoDropFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'markTP',self.qmc.markTPflag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'EvalueColor',self.qmc.EvalueColor, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'EvalueTextColor',self.qmc.EvalueTextColor, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'EvalueMarker',self.qmc.EvalueMarker, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'Evaluelinethickness',self.qmc.Evaluelinethickness, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'EvalueMarkerSize',self.qmc.EvalueMarkerSize, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'Evaluealpha',self.qmc.Evaluealpha, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'specialeventannotations', self.qmc.specialeventannotations, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'specialeventannovisibilities', self.qmc.specialeventannovisibilities, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'overlappct', self.qmc.overlappct, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP events
 
-            settings.setValue('PIDmultiplier',self.modbus.PIDmultiplier)
-            settings.setValue('SVmultiplier',self.modbus.SVmultiplier)
-            settings.setValue('littleEndianFloats',self.modbus.byteorderLittle)
-            settings.setValue('wordorderLittle',self.modbus.wordorderLittle)
-            settings.setValue('optimizer',self.modbus.optimizer)
-            settings.setValue('fetch_max_blocks',self.modbus.fetch_max_blocks)
-            settings.setValue('type',self.modbus.type)
-            settings.setValue('host',self.modbus.host)
-            settings.setValue('port',self.modbus.port)
-            settings.setValue('reset_socket',self.modbus.reset_socket)
-            settings.endGroup()
+            #save ambient temperature source
+            self.settingsSetValue(settings, default_settings, 'AmbientTempSource',self.qmc.ambientTempSource, read_defaults)
+            #save delay (sampling interval)
+            self.settingsSetValue(settings, default_settings, 'Delay',self.qmc.delay, read_defaults)
+            # save keepON flag
+            self.settingsSetValue(settings, default_settings, 'KeepON',self.qmc.flagKeepON, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'flagOpenCompleted',self.qmc.flagOpenCompleted, read_defaults)
+            # save extra event sampling interval
+            self.settingsSetValue(settings, default_settings, 'ExtraEventSamplingDelay',self.qmc.extra_event_sampling_delay, read_defaults)
+            #save colors
+            self.settingsSetValue(settings, default_settings, 'Colors',self.qmc.palette, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'Alphas',self.qmc.alpha, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'LCDColors',self.lcdpaletteB, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'LEDColors',self.lcdpaletteF, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETBColor',self.qmc.backgroundmetcolor, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTBColor',self.qmc.backgroundbtcolor, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETBdeltaColor',self.qmc.backgrounddeltaetcolor, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTBdeltaColor',self.qmc.backgrounddeltabtcolor, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BackgroundAlpha',self.qmc.backgroundalpha, read_defaults)
+            #save readings LCDs status flags
+            self.settingsSetValue(settings, default_settings, 'readingslcdsflags',self.readingslcdsflags, read_defaults)
+            #save flavors
+            self.settingsSetValue(settings, default_settings, 'Flavors',self.qmc.flavorlabels, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'flavorstartangle',self.qmc.flavorstartangle, read_defaults)
+            #save roast color system
+            self.settingsSetValue(settings, default_settings, 'colorsystem',self.qmc.color_system_idx, read_defaults)
+            #watermark image
+
+            self.settingsSetValue(settings, default_settings, 'logofilename', self.logofilename, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'logoimgalpha', self.logoimgalpha, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'logoimgflag', self.logoimgflag, read_defaults)
+
+#--- BEGIN GROUP Tare
+            if settings is not None:
+                settings.beginGroup('Tare')
+            self.settingsSetValue(settings, default_settings, 'names',self.qmc.container_names, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'weights',self.qmc.container_weights, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'idx',self.qmc.container_idx, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP Tare
+
+#--- BEGIN GROUP SerialPort
+            #save serial port
+                settings.beginGroup('SerialPort')
+            self.settingsSetValue(settings, default_settings, 'comport',self.ser.comport, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'baudrate',self.ser.baudrate, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'bytesize',self.ser.bytesize, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'stopbits',self.ser.stopbits, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'parity',self.ser.parity, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'timeout',self.ser.timeout, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP SerialPort
+
+#--- BEGIN GROUP WebSocket
+            #save WebSocket port
+                settings.beginGroup('WebSocket')
+            self.settingsSetValue(settings, default_settings, 'host',self.ws.host, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'port',self.ws.port, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'path',self.ws.path, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'machineID',self.ws.machineID, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'connect_timeout',self.ws.connect_timeout, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'request_timeout',self.ws.request_timeout, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'reconnect_interval',self.ws.reconnect_interval, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'id_node',self.ws.id_node, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'machine_node',self.ws.machine_node, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'command_node',self.ws.command_node, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'data_node',self.ws.data_node, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'pushMessage_node',self.ws.pushMessage_node, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'request_data_command',self.ws.request_data_command, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'charge_message',self.ws.charge_message, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'drop_message',self.ws.drop_message, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'STARTonCHARGE',self.ws.STARTonCHARGE, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'OFFonDROP',self.ws.OFFonDROP, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'addEvent_message',self.ws.addEvent_message, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'event_node',self.ws.event_node, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'DRY_node',self.ws.DRY_node, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'FCs_node',self.ws.FCs_node, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'FCe_node',self.ws.FCe_node, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'SCs_node',self.ws.SCs_node, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'SCe_node',self.ws.SCe_node, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'channel_requests',self.ws.channel_requests, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'channel_nodes',self.ws.channel_nodes, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'channel_modes',self.ws.channel_modes, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP WebSocket
+
+#--- BEGIN GROUP S7
+            #save s7 port
+                settings.beginGroup('S7')
+            self.settingsSetValue(settings, default_settings, 'area',self.s7.area, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'db_nr',self.s7.db_nr, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'start',self.s7.start, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'type',self.s7.type, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'mode',self.s7.mode, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'div',self.s7.div, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'host',self.s7.host, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'port',self.s7.port, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'rack',self.s7.rack, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'slot',self.s7.slot, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'PID_area',self.s7.PID_area, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'PID_db_nr',self.s7.PID_db_nr, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'PID_SV_register',self.s7.PID_SV_register, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'PID_p_register',self.s7.PID_p_register, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'PID_i_register',self.s7.PID_i_register, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'PID_d_register',self.s7.PID_d_register, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'PID_OFF_action',self.s7.PID_OFF_action, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'PID_ON_action',self.s7.PID_ON_action, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'PIDmultiplier',self.s7.PIDmultiplier, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'SVtype',self.s7.SVtype, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'SVmultiplier',self.s7.SVmultiplier, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'optimizer',self.s7.optimizer, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'fetch_max_blocks',self.s7.fetch_max_blocks, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP S7
+
+#--- BEGIN GROUP Modbus
+            #save modbus port
+                settings.beginGroup('Modbus')
+            self.settingsSetValue(settings, default_settings, 'comport',self.modbus.comport, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'baudrate',self.modbus.baudrate, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'bytesize',self.modbus.bytesize, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'stopbits',self.modbus.stopbits, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'parity',self.modbus.parity, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'timeout',self.modbus.timeout, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'modbus_serial_extra_read_delay',self.modbus.modbus_serial_extra_read_delay, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'serial_readRetries',self.modbus.serial_readRetries, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'IP_timeout',self.modbus.IP_timeout, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'IP_retries',self.modbus.IP_retries, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'PID_slave_ID',self.modbus.PID_slave_ID, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'PID_SV_register',self.modbus.PID_SV_register, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'PID_p_register',self.modbus.PID_p_register, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'PID_i_register',self.modbus.PID_i_register, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'PID_d_register',self.modbus.PID_d_register, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'PID_OFF_action',self.modbus.PID_OFF_action, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'PID_ON_action',self.modbus.PID_ON_action, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input1slave',self.modbus.inputSlaves[0], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input1register',self.modbus.inputRegisters[0], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input1float',self.modbus.inputFloats[0], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input1bcd',self.modbus.inputBCDs[0], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input1code',self.modbus.inputCodes[0], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input1div',self.modbus.inputDivs[0], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input1mode',self.modbus.inputModes[0], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input1FloatsAsInt',self.modbus.inputFloatsAsInt[0], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input1BCDsAsInt',self.modbus.inputBCDsAsInt[0], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input1Signed',self.modbus.inputSigned[0], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input2slave',self.modbus.inputSlaves[1], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input2register',self.modbus.inputRegisters[1], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input2float',self.modbus.inputFloats[1], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input2bcd',self.modbus.inputBCDs[1], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input2code',self.modbus.inputCodes[1], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input2div',self.modbus.inputDivs[1], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input2mode',self.modbus.inputModes[1], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input2FloatsAsInt',self.modbus.inputFloatsAsInt[1], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input2BCDsAsInt',self.modbus.inputBCDsAsInt[1], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input2Signed',self.modbus.inputSigned[1], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input3slave',self.modbus.inputSlaves[2], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input3register',self.modbus.inputRegisters[2], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input3float',self.modbus.inputFloats[2], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input3bcd',self.modbus.inputBCDs[2], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input3code',self.modbus.inputCodes[2], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input3div',self.modbus.inputDivs[2], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input3mode',self.modbus.inputModes[2], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input3FloatsAsInt',self.modbus.inputFloatsAsInt[2], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input3BCDsAsInt',self.modbus.inputBCDsAsInt[2], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input3Signed',self.modbus.inputSigned[2], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input4slave',self.modbus.inputSlaves[3], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input4register',self.modbus.inputRegisters[3], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input4float',self.modbus.inputFloats[3], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input4bcd',self.modbus.inputBCDs[3], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input4code',self.modbus.inputCodes[3], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input4div',self.modbus.inputDivs[3], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input4mode',self.modbus.inputModes[3], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input4FloatsAsInt',self.modbus.inputFloatsAsInt[3], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input4BCDsAsInt',self.modbus.inputBCDsAsInt[3], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input4Signed',self.modbus.inputSigned[3], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input5slave',self.modbus.inputSlaves[4], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input5register',self.modbus.inputRegisters[4], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input5float',self.modbus.inputFloats[4], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input5bcd',self.modbus.inputBCDs[4], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input5code',self.modbus.inputCodes[4], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input5div',self.modbus.inputDivs[4], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input5mode',self.modbus.inputModes[4], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input5FloatsAsInt',self.modbus.inputFloatsAsInt[4], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input5BCDsAsInt',self.modbus.inputBCDsAsInt[4], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input5Signed',self.modbus.inputSigned[4], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input6slave',self.modbus.inputSlaves[5], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input6register',self.modbus.inputRegisters[5], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input6float',self.modbus.inputFloats[5], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input6bcd',self.modbus.inputBCDs[5], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input6code',self.modbus.inputCodes[5], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input6div',self.modbus.inputDivs[5], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input6mode',self.modbus.inputModes[5], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input6FloatsAsInt',self.modbus.inputFloatsAsInt[5], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input6BCDsAsInt',self.modbus.inputBCDsAsInt[5], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input6Signed',self.modbus.inputSigned[5], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input7slave',self.modbus.inputSlaves[6], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input7register',self.modbus.inputRegisters[6], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input7float',self.modbus.inputFloats[6], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input7bcd',self.modbus.inputBCDs[6], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input7code',self.modbus.inputCodes[6], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input7div',self.modbus.inputDivs[6], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input7mode',self.modbus.inputModes[6], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input7FloatsAsInt',self.modbus.inputFloatsAsInt[6], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input7BCDsAsInt',self.modbus.inputBCDsAsInt[6], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input7Signed',self.modbus.inputSigned[6], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input8slave',self.modbus.inputSlaves[7], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input8register',self.modbus.inputRegisters[7], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input8float',self.modbus.inputFloats[7], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input8bcd',self.modbus.inputBCDs[7], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input8code',self.modbus.inputCodes[7], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input8div',self.modbus.inputDivs[7], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input8mode',self.modbus.inputModes[7], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input8FloatsAsInt',self.modbus.inputFloatsAsInt[7], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input8BCDsAsInt',self.modbus.inputBCDsAsInt[7], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'input8Signed',self.modbus.inputSigned[7], read_defaults)
+
+            self.settingsSetValue(settings, default_settings, 'PIDmultiplier',self.modbus.PIDmultiplier, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'SVmultiplier',self.modbus.SVmultiplier, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'littleEndianFloats',self.modbus.byteorderLittle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'wordorderLittle',self.modbus.wordorderLittle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'optimizer',self.modbus.optimizer, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'fetch_max_blocks',self.modbus.fetch_max_blocks, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'type',self.modbus.type, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'host',self.modbus.host, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'port',self.modbus.port, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'reset_socket',self.modbus.reset_socket, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP Modbus
+
+#--- BEGIN GROUP Scale
             #save scale port
-            settings.beginGroup('Scale')
-            settings.setValue('device',self.scale.device)
-            settings.setValue('comport',self.scale.comport)
-            settings.setValue('baudrate',self.scale.baudrate)
-            settings.setValue('bytesize',self.scale.bytesize)
-            settings.setValue('stopbits',self.scale.stopbits)
-            settings.setValue('parity',self.scale.parity)
-            settings.setValue('timeout',self.scale.timeout)
-            settings.endGroup()
+                settings.beginGroup('Scale')
+            self.settingsSetValue(settings, default_settings, 'device',self.scale.device, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'comport',self.scale.comport, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'baudrate',self.scale.baudrate, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'bytesize',self.scale.bytesize, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'stopbits',self.scale.stopbits, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'parity',self.scale.parity, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'timeout',self.scale.timeout, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP Scale
+
+#--- BEGIN GROUP Color
             #save color port
-            settings.beginGroup('Color')
-            settings.setValue('device',self.color.device)
-            settings.setValue('comport',self.color.comport)
-            settings.setValue('baudrate',self.color.baudrate)
-            settings.setValue('bytesize',self.color.bytesize)
-            settings.setValue('stopbits',self.color.stopbits)
-            settings.setValue('parity',self.color.parity)
-            settings.setValue('timeout',self.color.timeout)
-            settings.endGroup()
+                settings.beginGroup('Color')
+            self.settingsSetValue(settings, default_settings, 'device',self.color.device, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'comport',self.color.comport, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'baudrate',self.color.baudrate, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'bytesize',self.color.bytesize, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'stopbits',self.color.stopbits, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'parity',self.color.parity, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'timeout',self.color.timeout, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP Color
+
+#--- BEGIN GROUP ArduinoPID
             #save pid settings (only key and value[0])
-            settings.beginGroup('ArduinoPID')
-            settings.setValue('pidOnCHARGE',self.pidcontrol.pidOnCHARGE)
-            settings.setValue('createEvents',self.pidcontrol.createEvents)
-            settings.setValue('loadRampSoakFromProfile',self.pidcontrol.loadRampSoakFromProfile)
-            settings.setValue('loadRampSoakFromBackground',self.pidcontrol.loadRampSoakFromBackground)
-            settings.setValue('svLabel',self.pidcontrol.svLabel)
-            settings.setValue('svValues',self.pidcontrol.svValues)
-            settings.setValue('svRamps',self.pidcontrol.svRamps)
-            settings.setValue('svSoaks',self.pidcontrol.svSoaks)
-            settings.setValue('svActions',self.pidcontrol.svActions)
-            settings.setValue('svBeeps',self.pidcontrol.svBeeps)
-            settings.setValue('svDescriptions',self.pidcontrol.svDescriptions)
-            settings.setValue('svSlider',self.pidcontrol.svSlider)
-            settings.setValue('svButtons',self.pidcontrol.svButtons)
-            settings.setValue('svMode',self.pidcontrol.svMode)
-            settings.setValue('svLookahead',self.pidcontrol.svLookahead)
-            settings.setValue('dutySteps',self.pidcontrol.dutySteps)
-            settings.setValue('svSliderMin',self.pidcontrol.svSliderMin)
-            settings.setValue('svSliderMax',self.pidcontrol.svSliderMax)
-            settings.setValue('svValue',self.pidcontrol.svValue)
-            settings.setValue('dutyMin',self.pidcontrol.dutyMin)
-            settings.setValue('dutyMax',self.pidcontrol.dutyMax)
-            settings.setValue('pidKp',self.pidcontrol.pidKp)
-            settings.setValue('pidKi',self.pidcontrol.pidKi)
-            settings.setValue('pidKd',self.pidcontrol.pidKd)
-            settings.setValue('pidSource',self.pidcontrol.pidSource)
-            settings.setValue('pidCycle',self.pidcontrol.pidCycle)
-            settings.setValue('pidPositiveTarget',self.pidcontrol.pidPositiveTarget)
-            settings.setValue('pidNegativeTarget',self.pidcontrol.pidNegativeTarget)
-            settings.setValue('invertControl',self.pidcontrol.invertControl)
-            settings.setValue('pOnE',self.pidcontrol.pOnE)
+                settings.beginGroup('ArduinoPID')
+            self.settingsSetValue(settings, default_settings, 'pidOnCHARGE',self.pidcontrol.pidOnCHARGE, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'createEvents',self.pidcontrol.createEvents, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'loadRampSoakFromProfile',self.pidcontrol.loadRampSoakFromProfile, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'loadRampSoakFromBackground',self.pidcontrol.loadRampSoakFromBackground, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'svLabel',self.pidcontrol.svLabel, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'svValues',self.pidcontrol.svValues, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'svRamps',self.pidcontrol.svRamps, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'svSoaks',self.pidcontrol.svSoaks, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'svActions',self.pidcontrol.svActions, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'svBeeps',self.pidcontrol.svBeeps, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'svDescriptions',self.pidcontrol.svDescriptions, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'svSlider',self.pidcontrol.svSlider, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'svButtons',self.pidcontrol.svButtons, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'svMode',self.pidcontrol.svMode, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'svLookahead',self.pidcontrol.svLookahead, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'dutySteps',self.pidcontrol.dutySteps, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'svSliderMin',self.pidcontrol.svSliderMin, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'svSliderMax',self.pidcontrol.svSliderMax, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'svValue',self.pidcontrol.svValue, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'dutyMin',self.pidcontrol.dutyMin, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'dutyMax',self.pidcontrol.dutyMax, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'pidKp',self.pidcontrol.pidKp, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'pidKi',self.pidcontrol.pidKi, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'pidKd',self.pidcontrol.pidKd, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'pidSource',self.pidcontrol.pidSource, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'pidCycle',self.pidcontrol.pidCycle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'pidPositiveTarget',self.pidcontrol.pidPositiveTarget, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'pidNegativeTarget',self.pidcontrol.pidNegativeTarget, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'invertControl',self.pidcontrol.invertControl, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'pOnE',self.pidcontrol.pOnE, read_defaults)
             for n in range(self.pidcontrol.RSLen):
-                settings.setValue('RS_svLabel'+str(n),self.pidcontrol.RS_svLabels[n])
-                settings.setValue('RS_svValues'+str(n),self.pidcontrol.RS_svValues[n])
-                settings.setValue('RS_svRamps'+str(n),self.pidcontrol.RS_svRamps[n])
-                settings.setValue('RS_svSoaks'+str(n),self.pidcontrol.RS_svSoaks[n])
-                settings.setValue('RS_svActions'+str(n),self.pidcontrol.RS_svActions[n])
-                settings.setValue('RS_svBeeps'+str(n),self.pidcontrol.RS_svBeeps[n])
-                settings.setValue('RS_svDescriptions'+str(n),self.pidcontrol.RS_svDescriptions[n])
-            settings.endGroup()
-            settings.beginGroup('PXR')
+                self.settingsSetValue(settings, default_settings, 'RS_svLabel'+str(n),self.pidcontrol.RS_svLabels[n], read_defaults)
+                self.settingsSetValue(settings, default_settings, 'RS_svValues'+str(n),self.pidcontrol.RS_svValues[n], read_defaults)
+                self.settingsSetValue(settings, default_settings, 'RS_svRamps'+str(n),self.pidcontrol.RS_svRamps[n], read_defaults)
+                self.settingsSetValue(settings, default_settings, 'RS_svSoaks'+str(n),self.pidcontrol.RS_svSoaks[n], read_defaults)
+                self.settingsSetValue(settings, default_settings, 'RS_svActions'+str(n),self.pidcontrol.RS_svActions[n], read_defaults)
+                self.settingsSetValue(settings, default_settings, 'RS_svBeeps'+str(n),self.pidcontrol.RS_svBeeps[n], read_defaults)
+                self.settingsSetValue(settings, default_settings, 'RS_svDescriptions'+str(n),self.pidcontrol.RS_svDescriptions[n], read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP ArduinoPID
+
+
+#--- BEGIN GROUP PXR
+                settings.beginGroup('PXR')
             for k in list(self.fujipid.PXR.keys()):
-                settings.setValue(k,self.fujipid.PXR[k][0])
-            settings.endGroup()
-            settings.beginGroup('PXG4')
+                self.settingsSetValue(settings, default_settings, k,self.fujipid.PXR[k][0], read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP PXR
+
+#--- BEGIN GROUP PXG4
+                settings.beginGroup('PXG4')
             for k in list(self.fujipid.PXG4.keys()):
-                settings.setValue(k,self.fujipid.PXG4[k][0])
-            settings.setValue('followBackground',self.fujipid.followBackground)
-            settings.setValue('lookahead',self.fujipid.lookahead)
-            settings.endGroup()
-            settings.beginGroup('deltaDTA')
+                self.settingsSetValue(settings, default_settings, k,self.fujipid.PXG4[k][0], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'followBackground',self.fujipid.followBackground, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'lookahead',self.fujipid.lookahead, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP PXG4
+
+#--- BEGIN GROUP deltaDTA
+                settings.beginGroup('deltaDTA')
             for k in list(self.dtapid.dtamem.keys()):
-                settings.setValue(k,self.dtapid.dtamem[k][0])
-            settings.endGroup()
-            settings.setValue('filterDropOuts',self.qmc.filterDropOuts)
-            settings.setValue('dropSpikes',self.qmc.dropSpikes)
-            settings.setValue('dropDuplicates',self.qmc.dropDuplicates)
-            settings.setValue('dropDuplicatesLimit',self.qmc.dropDuplicatesLimit)
-#            settings.setValue("altSmoothing",self.qmc.altsmoothing)
-            settings.setValue('optimalSmoothing',self.qmc.optimalSmoothing)
-            settings.setValue('polyfitRoRcalc',self.qmc.polyfitRoRcalc)
-            settings.setValue('swapETBT',self.qmc.swapETBT)
-            settings.setValue('minmaxLimits',self.qmc.minmaxLimits)
-            settings.setValue('minLimit',self.qmc.filterDropOut_tmin)
-            settings.setValue('maxLimit',self.qmc.filterDropOut_tmax)
-            settings.setValue('foregroundShowFullflag',self.qmc.foregroundShowFullflag)
-            settings.beginGroup('RoC')
-            settings.setValue('DeltaET',self.qmc.DeltaETflag)
-            settings.setValue('DeltaBT',self.qmc.DeltaBTflag)
-            settings.setValue('DeltaETlcd',self.qmc.DeltaETlcdflag)
-            settings.setValue('DeltaBTlcd',self.qmc.DeltaBTlcdflag)
-            settings.setValue('deltaETfilter',self.qmc.deltaETfilter)
-            settings.setValue('deltafilter',self.qmc.deltaBTfilter)
-            settings.setValue('DeltaETspan',self.qmc.deltaETspan)
-            settings.setValue('DeltaSpan',self.qmc.deltaBTspan)
-            settings.setValue('LCDdecimalplaces',self.qmc.LCDdecimalplaces)
-            settings.setValue('statisticsmode',self.qmc.statisticsmode)
-            settings.setValue('swapdeltalcds',self.qmc.swapdeltalcds)
-            settings.endGroup()
-            settings.setValue('curvefilter',self.qmc.curvefilter)
-#            settings.setValue("smoothingwindowsize",self.qmc.smoothingwindowsize)
-            settings.setValue('ETcurve',self.qmc.ETcurve)
-            settings.setValue('BTcurve',self.qmc.BTcurve)
-            settings.setValue('ETlcd',self.qmc.ETlcd)
-            settings.setValue('BTlcd',self.qmc.BTlcd)
-            settings.setValue('swaplcds',self.qmc.swaplcds)
-            settings.beginGroup('DefaultButtons')
-            settings.setValue('buttonvisibility',self.qmc.buttonvisibility)
-            settings.setValue('buttonactions',self.qmc.buttonactions)
-            settings.setValue('buttonactionstrings',self.qmc.buttonactionstrings)
-            settings.setValue('extrabuttonactions',self.qmc.extrabuttonactions)
-            settings.setValue('extrabuttonactionstrings',self.qmc.extrabuttonactionstrings)
-            settings.setValue('xextrabuttonactions',self.qmc.xextrabuttonactions)
-            settings.setValue('xextrabuttonactionstrings',self.qmc.xextrabuttonactionstrings)
-            settings.endGroup()
-            settings.setValue('transMappingMode',self.qmc.transMappingMode)
-            settings.beginGroup('Style')
-            settings.setValue('patheffects',self.qmc.patheffects)
-            settings.setValue('graphstyle',self.qmc.graphstyle)
-            settings.setValue('graphfont',self.qmc.graphfont)
-            settings.setValue('ETname', self.ETname)
-            settings.setValue('BTname', self.BTname)
-            settings.endGroup()
-            settings.beginGroup('Sound')
-            settings.setValue('Beep',self.soundflag)
-            settings.endGroup()
-            settings.beginGroup('Notifications')
+                self.settingsSetValue(settings, default_settings, k,self.dtapid.dtamem[k][0], read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP deltaDTA
+
+            self.settingsSetValue(settings, default_settings, 'filterDropOuts',self.qmc.filterDropOuts, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'dropSpikes',self.qmc.dropSpikes, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'dropDuplicates',self.qmc.dropDuplicates, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'dropDuplicatesLimit',self.qmc.dropDuplicatesLimit, read_defaults)
+#            self.settingsSetValue(settings, default_settings, "altSmoothing",self.qmc.altsmoothing, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'optimalSmoothing',self.qmc.optimalSmoothing, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'polyfitRoRcalc',self.qmc.polyfitRoRcalc, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'swapETBT',self.qmc.swapETBT, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'minmaxLimits',self.qmc.minmaxLimits, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'minLimit',self.qmc.filterDropOut_tmin, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'maxLimit',self.qmc.filterDropOut_tmax, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'foregroundShowFullflag',self.qmc.foregroundShowFullflag, read_defaults)
+
+#--- BEGIN GROUP RoC
+            if settings is not None:
+                settings.beginGroup('RoC')
+            self.settingsSetValue(settings, default_settings, 'DeltaET',self.qmc.DeltaETflag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'DeltaBT',self.qmc.DeltaBTflag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'DeltaETlcd',self.qmc.DeltaETlcdflag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'DeltaBTlcd',self.qmc.DeltaBTlcdflag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'deltaETfilter',self.qmc.deltaETfilter, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'deltafilter',self.qmc.deltaBTfilter, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'DeltaETspan',self.qmc.deltaETspan, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'DeltaSpan',self.qmc.deltaBTspan, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'LCDdecimalplaces',self.qmc.LCDdecimalplaces, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'statisticsmode',self.qmc.statisticsmode, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'swapdeltalcds',self.qmc.swapdeltalcds, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP RoC
+
+            self.settingsSetValue(settings, default_settings, 'curvefilter',self.qmc.curvefilter, read_defaults)
+#            self.settingsSetValue(settings, default_settings, "smoothingwindowsize",self.qmc.smoothingwindowsize, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETcurve',self.qmc.ETcurve, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTcurve',self.qmc.BTcurve, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETlcd',self.qmc.ETlcd, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTlcd',self.qmc.BTlcd, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'swaplcds',self.qmc.swaplcds, read_defaults)
+
+#--- BEGIN GROUP DefaultButtons
+            if settings is not None:
+                settings.beginGroup('DefaultButtons')
+            self.settingsSetValue(settings, default_settings, 'buttonvisibility',self.qmc.buttonvisibility, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'buttonactions',self.qmc.buttonactions, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'buttonactionstrings',self.qmc.buttonactionstrings, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'extrabuttonactions',self.qmc.extrabuttonactions, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'extrabuttonactionstrings',self.qmc.extrabuttonactionstrings, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'xextrabuttonactions',self.qmc.xextrabuttonactions, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'xextrabuttonactionstrings',self.qmc.xextrabuttonactionstrings, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP DefaultButtons
+
+            self.settingsSetValue(settings, default_settings, 'transMappingMode',self.qmc.transMappingMode, read_defaults)
+
+#--- BEGIN GROUP Style
+            if settings is not None:
+                settings.beginGroup('Style')
+            self.settingsSetValue(settings, default_settings, 'patheffects',self.qmc.patheffects, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'graphstyle',self.qmc.graphstyle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'graphfont',self.qmc.graphfont, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETname', self.ETname, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTname', self.BTname, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP Style
+
+#--- BEGIN GROUP Sound
+                settings.beginGroup('Sound')
+            self.settingsSetValue(settings, default_settings, 'Beep',self.soundflag, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP Sound
+
+#--- BEGIN GROUP Notifications
+                settings.beginGroup('Notifications')
             if self.notificationManager:
                 try:
                     titles = []
@@ -18731,364 +18458,454 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         messages.append(noti.message)
                         types.append(noti.type.value)
                         created.append(noti.created)
-                    settings.setValue('titles', titles)
-                    settings.setValue('messages', messages)
-                    settings.setValue('types', types)
-                    settings.setValue('created', created)
+                    self.settingsSetValue(settings, default_settings, 'titles', titles, read_defaults)
+                    self.settingsSetValue(settings, default_settings, 'messages', messages, read_defaults)
+                    self.settingsSetValue(settings, default_settings, 'types', types, read_defaults)
+                    self.settingsSetValue(settings, default_settings, 'created', created, read_defaults)
                 except Exception as e:  # pylint: disable=broad-except
                     _log.exception(e)
-            settings.setValue('notificationsflag',self.notificationsflag)
-            settings.endGroup()
-            settings.beginGroup('Axis')
-            settings.setValue('loadAxisFromProfile',self.qmc.loadaxisfromprofile)
+            self.settingsSetValue(settings, default_settings, 'notificationsflag',self.notificationsflag, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP Notifications
+
+#--- BEGIN GROUP Axis
+                settings.beginGroup('Axis')
+            self.settingsSetValue(settings, default_settings, 'loadAxisFromProfile',self.qmc.loadaxisfromprofile, read_defaults)
             xmin = self.qmc.startofx
             if self.qmc.timeindex[0] != -1:
                 xmin -= self.qmc.timex[self.qmc.timeindex[0]]
-            settings.setValue('xmin',xmin)
-            settings.setValue('xmax',self.qmc.endofx)
-            settings.setValue('ymax',self.qmc.ylimit)
-            settings.setValue('ymin',self.qmc.ylimit_min)
-            settings.setValue('zmax',self.qmc.zlimit)
-            settings.setValue('zmin',self.qmc.zlimit_min)
-            settings.setValue('resetmaxtime',self.qmc.resetmaxtime)
-            settings.setValue('lockmax',self.qmc.fixmaxtime)
-            settings.setValue('locktimex',self.qmc.locktimex)
-            settings.setValue('autotimex',self.qmc.autotimex)
-            settings.setValue('autotimexMode',self.qmc.autotimexMode)
-            settings.setValue('autodeltaxET',self.qmc.autodeltaxET)
-            settings.setValue('autodeltaxBT',self.qmc.autodeltaxBT)
-            settings.setValue('locktimex_start',self.qmc.locktimex_start)
-            settings.setValue('locktimex_end',self.qmc.locktimex_end)
-            settings.setValue('legendloc',self.qmc.legendloc)
-            settings.setValue('chargemintime',self.qmc.chargemintime)
-            settings.setValue('temp_grid',self.qmc.temp_grid)
-            settings.setValue('time_grid',self.qmc.time_grid)
-            settings.endGroup()
-            settings.setValue('organization_setup',self.qmc.organization_setup)
-            settings.setValue('operator_setup',self.qmc.operator_setup)
-            settings.setValue('roastertype_setup',self.qmc.roastertype_setup)
-            settings.setValue('roastersize_setup',self.qmc.roastersize_setup)
-            settings.setValue('roasterheating_setup',self.qmc.roasterheating_setup)
-            settings.setValue('drumspeed_setup',self.qmc.drumspeed_setup)
-            settings.setValue('last_batchsize',self.qmc.last_batchsize)
+            self.settingsSetValue(settings, default_settings, 'xmin',xmin, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'xmax',self.qmc.endofx, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ymax',self.qmc.ylimit, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ymin',self.qmc.ylimit_min, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'zmax',self.qmc.zlimit, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'zmin',self.qmc.zlimit_min, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'resetmaxtime',self.qmc.resetmaxtime, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'lockmax',self.qmc.fixmaxtime, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'locktimex',self.qmc.locktimex, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'autotimex',self.qmc.autotimex, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'autotimexMode',self.qmc.autotimexMode, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'autodeltaxET',self.qmc.autodeltaxET, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'autodeltaxBT',self.qmc.autodeltaxBT, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'locktimex_start',self.qmc.locktimex_start, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'locktimex_end',self.qmc.locktimex_end, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'legendloc',self.qmc.legendloc, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'chargemintime',self.qmc.chargemintime, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'temp_grid',self.qmc.temp_grid, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'time_grid',self.qmc.time_grid, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP Axis
 
-            settings.beginGroup('EnergyUse')
-            settings.setValue('loadlabels_setup',self.qmc.loadlabels_setup)
-            settings.setValue('loadratings_setup',self.qmc.loadratings_setup)
-            settings.setValue('ratingunits_setup',self.qmc.ratingunits_setup)
-            settings.setValue('sourcetypes_setup',self.qmc.sourcetypes_setup)
-            settings.setValue('load_etypes_setup',self.qmc.load_etypes_setup)
-            settings.setValue('presssure_percents_setup',self.qmc.presssure_percents_setup)
-            settings.setValue('loadevent_zeropcts_setup',self.qmc.loadevent_zeropcts_setup)
-            settings.setValue('loadevent_hundpcts_setup',self.qmc.loadevent_hundpcts_setup)
-            settings.setValue('preheatDuration_setup',self.qmc.preheatDuration_setup)
-            settings.setValue('preheatenergies_setup',self.qmc.preheatenergies_setup)
-            settings.setValue('betweenbatchDuration_setup',self.qmc.betweenbatchDuration_setup)
-            settings.setValue('betweenbatchenergies_setup',self.qmc.betweenbatchenergies_setup)
-            settings.setValue('coolingDuration_setup',self.qmc.coolingDuration_setup)
-            settings.setValue('coolingenergies_setup',self.qmc.coolingenergies_setup)
-            settings.setValue('betweenbatch_after_preheat_setup',self.qmc.betweenbatch_after_preheat_setup)
-            settings.setValue('electricEnergyMix_setup',self.qmc.electricEnergyMix_setup)
-            settings.setValue('energyresultunit_setup',self.qmc.energyresultunit_setup)
-#            settings.setValue("energytablecolumnwidths",self.qmc.energytablecolumnwidths)
-            settings.endGroup()
+            self.settingsSetValue(settings, default_settings, 'organization_setup',self.qmc.organization_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'operator_setup',self.qmc.operator_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'roastertype_setup',self.qmc.roastertype_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'roastersize_setup',self.qmc.roastersize_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'roasterheating_setup',self.qmc.roasterheating_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'drumspeed_setup',self.qmc.drumspeed_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'last_batchsize',self.qmc.last_batchsize, read_defaults)
 
-            settings.beginGroup('RoastProperties')
-            settings.setValue('machinesetup',self.qmc.machinesetup)
-#            settings.setValue("densitySampleVolume",self.qmc.density[2]) # fixed to 1l now
-#            settings.setValue('beansize',self.qmc.beansize) # retired
-            settings.setValue('beansize_min',self.qmc.beansize_min)
-            settings.setValue('beansize_max',self.qmc.beansize_max)
+#--- BEGIN GROUP EnergyUse
+            if settings is not None:
+                settings.beginGroup('EnergyUse')
+            self.settingsSetValue(settings, default_settings, 'loadlabels_setup',self.qmc.loadlabels_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'loadratings_setup',self.qmc.loadratings_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ratingunits_setup',self.qmc.ratingunits_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'sourcetypes_setup',self.qmc.sourcetypes_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'load_etypes_setup',self.qmc.load_etypes_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'presssure_percents_setup',self.qmc.presssure_percents_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'loadevent_zeropcts_setup',self.qmc.loadevent_zeropcts_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'loadevent_hundpcts_setup',self.qmc.loadevent_hundpcts_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'preheatDuration_setup',self.qmc.preheatDuration_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'preheatenergies_setup',self.qmc.preheatenergies_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'betweenbatchDuration_setup',self.qmc.betweenbatchDuration_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'betweenbatchenergies_setup',self.qmc.betweenbatchenergies_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'coolingDuration_setup',self.qmc.coolingDuration_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'coolingenergies_setup',self.qmc.coolingenergies_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'betweenbatch_after_preheat_setup',self.qmc.betweenbatch_after_preheat_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'electricEnergyMix_setup',self.qmc.electricEnergyMix_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'energyresultunit_setup',self.qmc.energyresultunit_setup, read_defaults)
+#            self.settingsSetValue(settings, default_settings, "energytablecolumnwidths",self.qmc.energytablecolumnwidths, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP EnergyUse
+
+#--- BEGIN GROUP RoastProperties
+                settings.beginGroup('RoastProperties')
+            self.settingsSetValue(settings, default_settings, 'machinesetup',self.qmc.machinesetup, read_defaults)
+#            self.settingsSetValue(settings, default_settings, "densitySampleVolume",self.qmc.density[2], read_defaults) # fixed to 1l now
+#            self.settingsSetValue(settings, default_settings, 'beansize',self.qmc.beansize, read_defaults) # retired
+            self.settingsSetValue(settings, default_settings, 'beansize_min',self.qmc.beansize_min, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'beansize_max',self.qmc.beansize_max, read_defaults)
             if filename is None:
                 # we don't export plus default store and custom blend data to external settings file as the custom blend is considered temporary
-                settings.setValue('plus_default_store',self.qmc.plus_default_store)
+                self.settingsSetValue(settings, default_settings, 'plus_default_store',self.qmc.plus_default_store, read_defaults)
                 if self.qmc.plus_custom_blend is not None:
-                    settings.setValue('plus_custom_blend_name', self.qmc.plus_custom_blend.name)
-                    settings.setValue('plus_custom_blend_coffees', [c.coffee for c in self.qmc.plus_custom_blend.components])
-                    settings.setValue('plus_custom_blend_ratios',  [c.ratio for c in self.qmc.plus_custom_blend.components])
+                    self.settingsSetValue(settings, default_settings, 'plus_custom_blend_name', self.qmc.plus_custom_blend.name, read_defaults)
+                    self.settingsSetValue(settings, default_settings, 'plus_custom_blend_coffees', [c.coffee for c in self.qmc.plus_custom_blend.components], read_defaults)
+                    self.settingsSetValue(settings, default_settings, 'plus_custom_blend_ratios',  [c.ratio for c in self.qmc.plus_custom_blend.components], read_defaults)
             #remove pre v2.0 settings no longer used
-            try:
-                if settings.contains('organization'):
-                    settings.remove('organization')
-                if settings.contains('operator'):
-                    settings.remove('operator')
-                if settings.contains('roastertype'):
-                    settings.remove('roastertype')
-                if settings.contains('roastersize'):
-                    settings.remove('roastersize')
-                if settings.contains('drumspeed'):
-                    settings.remove('drumspeed')
-                if settings.contains('beansize'):
-                    settings.remove('beansize')
-            except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
-            settings.endGroup()
-            settings.beginGroup('XT')
-            settings.setValue('color',self.qmc.backgroundxtcolor)
-            settings.setValue('color2',self.qmc.backgroundytcolor)
-            settings.setValue('index',self.qmc.xtcurveidx)
-            settings.setValue('index2',self.qmc.ytcurveidx)
-            settings.endGroup()
-            settings.beginGroup('Units')
-            settings.setValue('weight',self.qmc.weight[2])
-            settings.setValue('volume',self.qmc.volume[2])
-            settings.setValue('densityweight',self.qmc.density[1])
-            settings.setValue('densityvolume',self.qmc.density[3])
-            settings.setValue('volumeCalcUnit',self.qmc.volumeCalcUnit)
-            settings.endGroup()
+            if settings is not None:
+                try:
+                    if settings.contains('organization'):
+                        settings.remove('organization')
+                    if settings.contains('operator'):
+                        settings.remove('operator')
+                    if settings.contains('roastertype'):
+                        settings.remove('roastertype')
+                    if settings.contains('roastersize'):
+                        settings.remove('roastersize')
+                    if settings.contains('drumspeed'):
+                        settings.remove('drumspeed')
+                    if settings.contains('beansize'):
+                        settings.remove('beansize')
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
+                settings.endGroup()
+#--- END GROUP RoastProperties
+
+#--- BEGIN GROUP XT
+                settings.beginGroup('XT')
+            self.settingsSetValue(settings, default_settings, 'color',self.qmc.backgroundxtcolor, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'color2',self.qmc.backgroundytcolor, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'index',self.qmc.xtcurveidx, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'index2',self.qmc.ytcurveidx, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP XT
+
+#--- BEGIN GROUP Units
+                settings.beginGroup('Units')
+            self.settingsSetValue(settings, default_settings, 'weight',self.qmc.weight[2], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'volume',self.qmc.volume[2], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'densityweight',self.qmc.density[1], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'densityvolume',self.qmc.density[3], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'volumeCalcUnit',self.qmc.volumeCalcUnit, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP Units
+
+#--- BEGIN GROUP Alarms
             #save alarms
-            settings.beginGroup('Alarms')
-            settings.setValue('alarmsetlabel',self.qmc.alarmsetlabel)
-            settings.setValue('alarmflag',self.qmc.alarmflag)
-            settings.setValue('alarmguard',self.qmc.alarmguard)
-            settings.setValue('alarmnegguard',self.qmc.alarmnegguard)
-            settings.setValue('alarmtime',self.qmc.alarmtime)
-            settings.setValue('alarmoffset',self.qmc.alarmoffset)
-            settings.setValue('alarmcond',self.qmc.alarmcond)
-            settings.setValue('alarmsource',self.qmc.alarmsource)
-            settings.setValue('alarmtemperature',self.qmc.alarmtemperature)
-            settings.setValue('alarmaction',self.qmc.alarmaction)
-            settings.setValue('alarmbeep',self.qmc.alarmbeep)
-            settings.setValue('alarmstrings',self.qmc.alarmstrings)
-            settings.setValue('loadAlarmsFromProfile',self.qmc.loadalarmsfromprofile)
-            settings.setValue('loadAlarmsFromBackground',self.qmc.loadalarmsfrombackground)
-            settings.setValue('alarmsfile',self.qmc.alarmsfile)
-            settings.setValue('alarm_popup_timout',self.qmc.alarm_popup_timout)
-            settings.setValue('alarmtablecolumnwidths',self.qmc.alarmtablecolumnwidths)
-            settings.setValue('alarmsets',self.qmc.alarmsets)
-            settings.setValue('alarmsetlabel',self.qmc.alarmsetlabel)
-            settings.endGroup()
-            settings.setValue('profilepath',self.userprofilepath)
-            settings.setValue('settingspath',self.settingspath)
-            settings.setValue('wheelpath',self.wheelpath)
-            settings.setValue('autosavepath',self.qmc.autosavepath)
-            settings.setValue('autosavealsopath',self.qmc.autosavealsopath)
-            settings.setValue('simulatorpath',self.simulatorpath)
-            settings.setValue('externalprogram',self.ser.externalprogram)
-            settings.setValue('externaloutprogram',self.ser.externaloutprogram)
-            settings.setValue('externaloutprogramFlag',self.ser.externaloutprogramFlag)
+                settings.beginGroup('Alarms')
+            self.settingsSetValue(settings, default_settings, 'alarmsetlabel',self.qmc.alarmsetlabel, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'alarmflag',self.qmc.alarmflag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'alarmguard',self.qmc.alarmguard, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'alarmnegguard',self.qmc.alarmnegguard, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'alarmtime',self.qmc.alarmtime, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'alarmoffset',self.qmc.alarmoffset, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'alarmcond',self.qmc.alarmcond, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'alarmsource',self.qmc.alarmsource, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'alarmtemperature',self.qmc.alarmtemperature, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'alarmaction',self.qmc.alarmaction, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'alarmbeep',self.qmc.alarmbeep, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'alarmstrings',self.qmc.alarmstrings, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'loadAlarmsFromProfile',self.qmc.loadalarmsfromprofile, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'loadAlarmsFromBackground',self.qmc.loadalarmsfrombackground, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'alarmsfile',self.qmc.alarmsfile, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'alarm_popup_timout',self.qmc.alarm_popup_timout, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'alarmtablecolumnwidths',self.qmc.alarmtablecolumnwidths, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'alarmsets',self.qmc.alarmsets, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP Alarms
+
+            self.settingsSetValue(settings, default_settings, 'profilepath',self.userprofilepath, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'settingspath',self.settingspath, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'wheelpath',self.wheelpath, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'autosavepath',self.qmc.autosavepath, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'autosavealsopath',self.qmc.autosavealsopath, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'simulatorpath',self.simulatorpath, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'externalprogram',self.ser.externalprogram, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'externaloutprogram',self.ser.externaloutprogram, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'externaloutprogramFlag',self.ser.externaloutprogramFlag, read_defaults)
+
+#--- BEGIN GROUP ExtraDev
             #save extra devices
-            settings.beginGroup('ExtraDev')
-            self.setExtraDeviceSettings(settings)
-            settings.endGroup()
+            if settings is not None:
+                settings.beginGroup('ExtraDev')
+            self.setExtraDeviceSettings(settings, default_settings, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP ExtraDev
+
+#--- BEGIN GROUP ExtraComm
             #save extra serial comm ports settings
-            settings.beginGroup('ExtraComm')
-            self.setExtraDeviceCommSettings(settings)
-            settings.endGroup()
-            settings.setValue('ChannelTares',self.channel_tare_values)
-            settings.setValue('BTfunction',self.qmc.BTfunction)
-            settings.setValue('ETfunction',self.qmc.ETfunction)
-            settings.setValue('DeltaBTfunction',self.qmc.DeltaBTfunction)
-            settings.setValue('DeltaETfunction',self.qmc.DeltaETfunction)
-            settings.setValue('resetqsettings',self.resetqsettings)
-            settings.setValue('plotcurves',self.qmc.plotcurves)
-            settings.setValue('plotcurvecolor',self.qmc.plotcurvecolor)
+                settings.beginGroup('ExtraComm')
+            self.setExtraDeviceCommSettings(settings, default_settings, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP ExtraComm
+
+            self.settingsSetValue(settings, default_settings, 'ChannelTares',self.channel_tare_values, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTfunction',self.qmc.BTfunction, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETfunction',self.qmc.ETfunction, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'DeltaBTfunction',self.qmc.DeltaBTfunction, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'DeltaETfunction',self.qmc.DeltaETfunction, read_defaults)
+            if not read_defaults:
+                settings.setValue('resetqsettings',self.resetqsettings) # no defaults cache used here to ensure that this one is always written
+            self.settingsSetValue(settings, default_settings, 'plotcurves',self.qmc.plotcurves, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'plotcurvecolor',self.qmc.plotcurvecolor, read_defaults)
+
+#--- BEGIN GROUP CurveStyles
             #curve styles
-            settings.beginGroup('CurveStyles')
-            settings.setValue('BTlinestyle',self.qmc.BTlinestyle)
-            settings.setValue('BTdrawstyle',self.qmc.BTdrawstyle)
-            settings.setValue('BTlinewidth',self.qmc.BTlinewidth)
-            settings.setValue('BTmarker',self.qmc.BTmarker)
-            settings.setValue('BTmarkersize',self.qmc.BTmarkersize)
-            settings.setValue('ETlinestyle',self.qmc.ETlinestyle)
-            settings.setValue('ETdrawstyle',self.qmc.ETdrawstyle)
-            settings.setValue('ETlinewidth',self.qmc.ETlinewidth)
-            settings.setValue('ETmarker',self.qmc.ETmarker)
-            settings.setValue('ETmarkersize',self.qmc.ETmarkersize)
-            settings.setValue('BTdeltalinestyle',self.qmc.BTdeltalinestyle)
-            settings.setValue('BTdeltadrawstyle',self.qmc.BTdeltadrawstyle)
-            settings.setValue('BTdeltalinewidth',self.qmc.BTdeltalinewidth)
-            settings.setValue('BTdeltamarker',self.qmc.BTdeltamarker)
-            settings.setValue('BTdeltamarkersize',self.qmc.BTdeltamarkersize)
-            settings.setValue('ETdeltalinestyle',self.qmc.ETdeltalinestyle)
-            settings.setValue('ETdeltadrawstyle',self.qmc.ETdeltadrawstyle)
-            settings.setValue('ETdeltalinewidth',self.qmc.ETdeltalinewidth)
-            settings.setValue('ETdeltamarker',self.qmc.ETdeltamarker)
-            settings.setValue('ETdeltamarkersize',self.qmc.ETdeltamarkersize)
-            settings.setValue('BTbacklinestyle',self.qmc.BTbacklinestyle)
-            settings.setValue('BTbackdrawstyle',self.qmc.BTbackdrawstyle)
-            settings.setValue('BTbacklinewidth',self.qmc.BTbacklinewidth)
-            settings.setValue('BTbackmarker',self.qmc.BTbackmarker)
-            settings.setValue('BTbackmarkersize',self.qmc.BTbackmarkersize)
-            settings.setValue('ETbacklinestyle',self.qmc.ETbacklinestyle)
-            settings.setValue('ETbackdrawstyle',self.qmc.ETbackdrawstyle)
-            settings.setValue('ETbacklinewidth',self.qmc.ETbacklinewidth)
-            settings.setValue('ETbackmarker',self.qmc.ETbackmarker)
-            settings.setValue('ETbackmarkersize',self.qmc.ETbackmarkersize)
-            settings.setValue('XTbacklinestyle',self.qmc.XTbacklinestyle)
-            settings.setValue('XTbackdrawstyle',self.qmc.XTbackdrawstyle)
-            settings.setValue('XTbacklinewidth',self.qmc.XTbacklinewidth)
-            settings.setValue('XTbackmarker',self.qmc.XTbackmarker)
-            settings.setValue('XTbackmarkersize',self.qmc.XTbackmarkersize)
-            settings.setValue('YTbacklinestyle',self.qmc.YTbacklinestyle)
-            settings.setValue('YTbackdrawstyle',self.qmc.YTbackdrawstyle)
-            settings.setValue('YTbacklinewidth',self.qmc.YTbacklinewidth)
-            settings.setValue('YTbackmarker',self.qmc.YTbackmarker)
-            settings.setValue('YTbackmarkersize',self.qmc.YTbackmarkersize)
-            settings.setValue('BTBdeltalinestyle',self.qmc.BTBdeltalinestyle)
-            settings.setValue('BTBdeltadrawstyle',self.qmc.BTBdeltadrawstyle)
-            settings.setValue('BTBdeltalinewidth',self.qmc.BTBdeltalinewidth)
-            settings.setValue('BTBdeltamarker',self.qmc.BTBdeltamarker)
-            settings.setValue('BTBdeltamarkersize',self.qmc.BTBdeltamarkersize)
-            settings.setValue('ETBdeltalinestyle',self.qmc.ETBdeltalinestyle)
-            settings.setValue('ETBdeltadrawstyle',self.qmc.ETBdeltadrawstyle)
-            settings.setValue('ETBdeltalinewidth',self.qmc.ETBdeltalinewidth)
-            settings.setValue('ETBdeltamarker',self.qmc.ETBdeltamarker)
-            settings.setValue('ETBdeltamarkersize',self.qmc.ETBdeltamarkersize)
-            self.setExtraDeviceCurveStyles(settings)
-            settings.endGroup()
+            if settings is not None:
+                settings.beginGroup('CurveStyles')
+            self.settingsSetValue(settings, default_settings, 'BTlinestyle',self.qmc.BTlinestyle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTdrawstyle',self.qmc.BTdrawstyle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTlinewidth',self.qmc.BTlinewidth, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTmarker',self.qmc.BTmarker, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTmarkersize',self.qmc.BTmarkersize, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETlinestyle',self.qmc.ETlinestyle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETdrawstyle',self.qmc.ETdrawstyle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETlinewidth',self.qmc.ETlinewidth, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETmarker',self.qmc.ETmarker, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETmarkersize',self.qmc.ETmarkersize, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTdeltalinestyle',self.qmc.BTdeltalinestyle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTdeltadrawstyle',self.qmc.BTdeltadrawstyle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTdeltalinewidth',self.qmc.BTdeltalinewidth, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTdeltamarker',self.qmc.BTdeltamarker, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTdeltamarkersize',self.qmc.BTdeltamarkersize, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETdeltalinestyle',self.qmc.ETdeltalinestyle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETdeltadrawstyle',self.qmc.ETdeltadrawstyle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETdeltalinewidth',self.qmc.ETdeltalinewidth, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETdeltamarker',self.qmc.ETdeltamarker, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETdeltamarkersize',self.qmc.ETdeltamarkersize, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTbacklinestyle',self.qmc.BTbacklinestyle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTbackdrawstyle',self.qmc.BTbackdrawstyle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTbacklinewidth',self.qmc.BTbacklinewidth, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTbackmarker',self.qmc.BTbackmarker, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTbackmarkersize',self.qmc.BTbackmarkersize, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETbacklinestyle',self.qmc.ETbacklinestyle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETbackdrawstyle',self.qmc.ETbackdrawstyle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETbacklinewidth',self.qmc.ETbacklinewidth, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETbackmarker',self.qmc.ETbackmarker, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETbackmarkersize',self.qmc.ETbackmarkersize, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'XTbacklinestyle',self.qmc.XTbacklinestyle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'XTbackdrawstyle',self.qmc.XTbackdrawstyle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'XTbacklinewidth',self.qmc.XTbacklinewidth, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'XTbackmarker',self.qmc.XTbackmarker, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'XTbackmarkersize',self.qmc.XTbackmarkersize, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'YTbacklinestyle',self.qmc.YTbacklinestyle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'YTbackdrawstyle',self.qmc.YTbackdrawstyle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'YTbacklinewidth',self.qmc.YTbacklinewidth, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'YTbackmarker',self.qmc.YTbackmarker, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'YTbackmarkersize',self.qmc.YTbackmarkersize, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTBdeltalinestyle',self.qmc.BTBdeltalinestyle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTBdeltadrawstyle',self.qmc.BTBdeltadrawstyle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTBdeltalinewidth',self.qmc.BTBdeltalinewidth, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTBdeltamarker',self.qmc.BTBdeltamarker, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTBdeltamarkersize',self.qmc.BTBdeltamarkersize, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETBdeltalinestyle',self.qmc.ETBdeltalinestyle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETBdeltadrawstyle',self.qmc.ETBdeltadrawstyle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETBdeltalinewidth',self.qmc.ETBdeltalinewidth, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETBdeltamarker',self.qmc.ETBdeltamarker, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETBdeltamarkersize',self.qmc.ETBdeltamarkersize, read_defaults)
+            self.setExtraDeviceCurveStyles(settings, default_settings, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP CurveStyles
+
+#--- BEGIN GROUP background
             #background settings
-            settings.beginGroup('background')
-            settings.setValue('backgrounddetails',self.qmc.backgroundDetails)
-            settings.setValue('backgroundevents',self.qmc.backgroundeventsflag)
-            settings.setValue('movespeed',self.qmc.backgroundmovespeed)
-            settings.setValue('DeltaETB',self.qmc.DeltaETBflag)
-            settings.setValue('DeltaBTB',self.qmc.DeltaBTBflag)
-            settings.setValue('alignEvent',self.qmc.alignEvent)
-            settings.setValue('ETBflag',self.qmc.backgroundETcurve)
-            settings.setValue('BTBflag',self.qmc.backgroundBTcurve)
-            settings.setValue('backgroundShowFullflag',self.qmc.backgroundShowFullflag)
-            settings.setValue('backgroundKeyboardControlFlag',self.qmc.backgroundKeyboardControlFlag)
-            settings.setValue('clearBgbeforeprofileload',self.qmc.clearBgbeforeprofileload)
-            settings.setValue('hideBgafterprofileload',self.qmc.hideBgafterprofileload)
-            settings.endGroup()
-            settings.setValue('compareAlignEvent',self.qmc.compareAlignEvent)
-            settings.setValue('compareEvents',self.qmc.compareEvents)
-            settings.setValue('compareET',self.qmc.compareET)
-            settings.setValue('compareBT',self.qmc.compareBT)
-            settings.setValue('compareDeltaET',self.qmc.compareDeltaET)
-            settings.setValue('compareDeltaBT',self.qmc.compareDeltaBT)
-            settings.setValue('compareMainEvents',self.qmc.compareMainEvents)
-            settings.setValue('compareBBP',self.qmc.compareBBP)
-            settings.setValue('compareRoast',self.qmc.compareRoast)
-            settings.setValue('autosaveflag',self.qmc.autosaveflag)
-            settings.setValue('autosaveaddtorecentfilesflag',self.qmc.autosaveaddtorecentfilesflag)
-            settings.setValue('autosavepdf',self.qmc.autosaveimage)
-            settings.setValue('autosaveimageformat',self.qmc.autosaveimageformat)
-            settings.setValue('autosaveprefix',self.qmc.autosaveprefix)
-            settings.beginGroup('WebLCDs')
-            settings.setValue('active',self.WebLCDs)
-            settings.setValue('port',self.WebLCDsPort)
-            settings.setValue('alerts',self.WebLCDsAlerts)
-            settings.endGroup()
-            settings.setValue('LargeLCDs',self.LargeLCDsFlag)
-            settings.setValue('LargeDeltaLCDs',self.LargeDeltaLCDsFlag)
-            settings.setValue('LargePIDLCDs',self.LargePIDLCDsFlag)
-            settings.setValue('LargeScaleLCDs',self.LargeScaleLCDsFlag)
-            settings.setValue('LargeExtraLCDs',self.LargeExtraLCDsFlag)
-            settings.setValue('LargePhasesLCDs',self.LargePhasesLCDsFlag)
+                settings.beginGroup('background')
+            self.settingsSetValue(settings, default_settings, 'backgrounddetails',self.qmc.backgroundDetails, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'backgroundevents',self.qmc.backgroundeventsflag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'movespeed',self.qmc.backgroundmovespeed, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'DeltaETB',self.qmc.DeltaETBflag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'DeltaBTB',self.qmc.DeltaBTBflag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'alignEvent',self.qmc.alignEvent, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETBflag',self.qmc.backgroundETcurve, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTBflag',self.qmc.backgroundBTcurve, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'backgroundShowFullflag',self.qmc.backgroundShowFullflag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'backgroundKeyboardControlFlag',self.qmc.backgroundKeyboardControlFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'clearBgbeforeprofileload',self.qmc.clearBgbeforeprofileload, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'hideBgafterprofileload',self.qmc.hideBgafterprofileload, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP background
+
+            self.settingsSetValue(settings, default_settings, 'compareAlignEvent',self.qmc.compareAlignEvent, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'compareEvents',self.qmc.compareEvents, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'compareET',self.qmc.compareET, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'compareBT',self.qmc.compareBT, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'compareDeltaET',self.qmc.compareDeltaET, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'compareDeltaBT',self.qmc.compareDeltaBT, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'compareMainEvents',self.qmc.compareMainEvents, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'compareBBP',self.qmc.compareBBP, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'compareRoast',self.qmc.compareRoast, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'autosaveflag',self.qmc.autosaveflag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'autosaveaddtorecentfilesflag',self.qmc.autosaveaddtorecentfilesflag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'autosavepdf',self.qmc.autosaveimage, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'autosaveimageformat',self.qmc.autosaveimageformat, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'autosaveprefix',self.qmc.autosaveprefix, read_defaults)
+
+#--- BEGIN GROUP WebLCDs
+            if settings is not None:
+                settings.beginGroup('WebLCDs')
+            self.settingsSetValue(settings, default_settings, 'active',self.WebLCDs, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'port',self.WebLCDsPort, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'alerts',self.WebLCDsAlerts, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP WebLCDs
+
+            self.settingsSetValue(settings, default_settings, 'LargeLCDs',self.LargeLCDsFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'LargeDeltaLCDs',self.LargeDeltaLCDsFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'LargePIDLCDs',self.LargePIDLCDsFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'LargeScaleLCDs',self.LargeScaleLCDsFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'LargeExtraLCDs',self.LargeExtraLCDsFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'LargePhasesLCDs',self.LargePhasesLCDsFlag, read_defaults)
+
+#--- BEGIN GROUP ExtraEventButtons
             #custom event buttons
-            settings.beginGroup('ExtraEventButtons')
-            settings.setValue('buttonlistmaxlen',self.buttonlistmaxlen)
-            settings.setValue('extraeventstypes',self.extraeventstypes)
-            settings.setValue('extraeventsvalues',self.extraeventsvalues)
-            settings.setValue('extraeventsactionstrings',self.extraeventsactionstrings)
-            settings.setValue('extraeventsactions',self.extraeventsactions)
-            settings.setValue('extraeventsdescriptions',self.extraeventsdescriptions)
-            settings.setValue('extraeventsvisibility',self.extraeventsvisibility)
-            settings.setValue('extraeventslabels',self.extraeventslabels)
-            settings.setValue('extraeventbuttoncolor',self.extraeventbuttoncolor)
-            settings.setValue('extraeventbuttontextcolor',self.extraeventbuttontextcolor)
-            settings.setValue('extraeventsbuttonsflags',self.extraeventsbuttonsflags)
-            settings.setValue('buttonpalette',[list(bp) for bp in self.buttonpalette]) # externally we store lists of lists, internally we hold a list of tuples of lists (Palettes)
-            settings.setValue('buttonpalettemaxlen',self.buttonpalettemaxlen)
-            settings.setValue('buttonpalette_shortcuts',self.buttonpalette_shortcuts)
-            settings.setValue('eventbuttontablecolumnwidths',self.eventbuttontablecolumnwidths)
-            settings.setValue('buttonsize',self.buttonsize)
-            settings.setValue('marklastbuttonpressed',self.mark_last_button_pressed)
-            settings.setValue('showextrabuttontooltips',self.show_extrabutton_tooltips)
-            settings.setValue('buttonpalette_label',self.buttonpalette_label)
-            settings.endGroup()
-            settings.beginGroup('RoRlimits')
-            settings.setValue('RoRlimitFlag',self.qmc.RoRlimitFlag)
-            settings.setValue('RoRlimit',self.qmc.RoRlimit)
-            settings.setValue('RoRlimitm',self.qmc.RoRlimitm)
-            settings.endGroup()
-            settings.beginGroup('grid')
-            settings.setValue('xgrid',self.qmc.xgrid)
-            settings.setValue('ygrid',self.qmc.ygrid)
-            settings.setValue('zgrid',self.qmc.zgrid)
-            settings.setValue('gridlinestyle',self.qmc.gridlinestyle)
-            settings.setValue('gridthickness',self.qmc.gridthickness)
-            settings.setValue('gridalpha',self.qmc.gridalpha)
-#            settings.setValue("xrotation",self.qmc.xrotation)
-            settings.endGroup()
-            settings.beginGroup('Sliders')
-            settings.setValue('slidervisibilities',self.eventslidervisibilities)
-            settings.setValue('eventsliderKeyboardControl',self.eventsliderKeyboardControl)
-            settings.setValue('eventsliderAlternativeLayout',self.eventsliderAlternativeLayout)
-            settings.setValue('slideractions',self.eventslideractions)
-            settings.setValue('slidercommands',self.eventslidercommands)
-            settings.setValue('slideroffsets',self.eventslideroffsets)
-            settings.setValue('sliderfactors',self.eventsliderfactors)
-            settings.setValue('slidermin',self.eventslidermin)
-            settings.setValue('slidermax',self.eventslidermax)
-            settings.setValue('eventslidersflags',self.eventslidersflags)
-            settings.setValue('eventsliderBernoulli',self.eventsliderBernoulli)
-            settings.setValue('eventslidercoarse',self.eventslidercoarse)
-            settings.setValue('eventslidertemp',self.eventslidertemp)
-            settings.setValue('eventsliderunits',self.eventsliderunits)
-            settings.setValue('ModeTempSliders',self.qmc.mode_tempsliders)
-            settings.endGroup()
-            settings.beginGroup('Quantifiers')
-            settings.setValue('quantifieractive',self.eventquantifieractive)
-            settings.setValue('quantifiersource',self.eventquantifiersource)
-            settings.setValue('eventquantifierSV',self.eventquantifierSV)
-            settings.setValue('quantifiermin',self.eventquantifiermin)
-            settings.setValue('quantifiermax',self.eventquantifiermax)
-            settings.setValue('quantifiercoarse',self.eventquantifiercoarse)
-            settings.setValue('eventquantifieraction',self.eventquantifieraction)
-            settings.setValue('clusterEventsFlag',self.clusterEventsFlag)
-            settings.endGroup()
-            settings.setValue('titleshowalways',self.qmc.title_show_always)
-            settings.setValue('roastpropertiesflag',self.qmc.roastpropertiesflag)
-            settings.setValue('roastpropertiesAutoOpenFlag',self.qmc.roastpropertiesAutoOpenFlag)
-            settings.setValue('roastpropertiesAutoOpenDropFlag',self.qmc.roastpropertiesAutoOpenDropFlag)
-            settings.setValue('customflavorlabels',self.qmc.customflavorlabels)
-            settings.beginGroup('Batch')
-            settings.setValue('batchcounter',self.qmc.batchcounter)
-            settings.setValue('batchsequence',self.qmc.batchsequence)
-            settings.setValue('batchprefix',self.qmc.batchprefix)
-            settings.setValue('lastroastepoch',self.qmc.lastroastepoch)
-            settings.setValue('neverUpdateBatchCounter',self.qmc.neverUpdateBatchCounter)
-            settings.endGroup()
-            settings.beginGroup('ExtrasMoreInfo')
-            settings.setValue('showmet',self.qmc.showmet)
-            settings.setValue('statssummary',self.qmc.statssummary)
-            settings.setValue('statsmaxchrperline', self.qmc.statsmaxchrperline)
-            settings.setValue('showtimeguide',self.qmc.showtimeguide)
-            settings.endGroup()
+            if settings is not None:
+                settings.beginGroup('ExtraEventButtons')
+            self.settingsSetValue(settings, default_settings, 'buttonlistmaxlen',self.buttonlistmaxlen, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'extraeventstypes',self.extraeventstypes, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'extraeventsvalues',self.extraeventsvalues, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'extraeventsactionstrings',self.extraeventsactionstrings, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'extraeventsactions',self.extraeventsactions, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'extraeventsdescriptions',self.extraeventsdescriptions, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'extraeventsvisibility',self.extraeventsvisibility, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'extraeventslabels',self.extraeventslabels, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'extraeventbuttoncolor',self.extraeventbuttoncolor, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'extraeventbuttontextcolor',self.extraeventbuttontextcolor, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'extraeventsbuttonsflags',self.extraeventsbuttonsflags, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'buttonpalette',[list(bp) for bp in self.buttonpalette], read_defaults) # externally we store lists of lists, internally we hold a list of tuples of lists (Palettes)
+            self.settingsSetValue(settings, default_settings, 'buttonpalettemaxlen',self.buttonpalettemaxlen, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'buttonpalette_shortcuts',self.buttonpalette_shortcuts, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'eventbuttontablecolumnwidths',self.eventbuttontablecolumnwidths, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'buttonsize',self.buttonsize, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'marklastbuttonpressed',self.mark_last_button_pressed, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'showextrabuttontooltips',self.show_extrabutton_tooltips, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'buttonpalette_label',self.buttonpalette_label, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP ExtraEventButtons
+
+#--- BEGIN GROUP RoRlimits
+                settings.beginGroup('RoRlimits')
+            self.settingsSetValue(settings, default_settings, 'RoRlimitFlag',self.qmc.RoRlimitFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'RoRlimit',self.qmc.RoRlimit, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'RoRlimitm',self.qmc.RoRlimitm, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP RoRlimits
+
+#--- BEGIN GROUP grid
+                settings.beginGroup('grid')
+            self.settingsSetValue(settings, default_settings, 'xgrid',self.qmc.xgrid, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ygrid',self.qmc.ygrid, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'zgrid',self.qmc.zgrid, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'gridlinestyle',self.qmc.gridlinestyle, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'gridthickness',self.qmc.gridthickness, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'gridalpha',self.qmc.gridalpha, read_defaults)
+#            self.settingsSetValue(settings, default_settings, "xrotation",self.qmc.xrotation, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP grid
+
+#--- BEGIN GROUP Sliders
+                settings.beginGroup('Sliders')
+            self.settingsSetValue(settings, default_settings, 'slidervisibilities',self.eventslidervisibilities, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'eventsliderKeyboardControl',self.eventsliderKeyboardControl, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'eventsliderAlternativeLayout',self.eventsliderAlternativeLayout, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'slideractions',self.eventslideractions, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'slidercommands',self.eventslidercommands, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'slideroffsets',self.eventslideroffsets, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'sliderfactors',self.eventsliderfactors, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'slidermin',self.eventslidermin, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'slidermax',self.eventslidermax, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'eventslidersflags',self.eventslidersflags, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'eventsliderBernoulli',self.eventsliderBernoulli, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'eventslidercoarse',self.eventslidercoarse, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'eventslidertemp',self.eventslidertemp, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'eventsliderunits',self.eventsliderunits, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ModeTempSliders',self.qmc.mode_tempsliders, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP Sliders
+
+#--- BEGIN GROUP Quantifiers
+                settings.beginGroup('Quantifiers')
+            self.settingsSetValue(settings, default_settings, 'quantifieractive',self.eventquantifieractive, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'quantifiersource',self.eventquantifiersource, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'eventquantifierSV',self.eventquantifierSV, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'quantifiermin',self.eventquantifiermin, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'quantifiermax',self.eventquantifiermax, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'quantifiercoarse',self.eventquantifiercoarse, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'eventquantifieraction',self.eventquantifieraction, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'clusterEventsFlag',self.clusterEventsFlag, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP Quantifiers
+
+            self.settingsSetValue(settings, default_settings, 'titleshowalways',self.qmc.title_show_always, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'roastpropertiesflag',self.qmc.roastpropertiesflag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'roastpropertiesAutoOpenFlag',self.qmc.roastpropertiesAutoOpenFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'roastpropertiesAutoOpenDropFlag',self.qmc.roastpropertiesAutoOpenDropFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'customflavorlabels',self.qmc.customflavorlabels, read_defaults)
+
+#--- BEGIN GROUP Batch
+            if settings is not None:
+                settings.beginGroup('Batch')
+            self.settingsSetValue(settings, default_settings, 'batchcounter',self.qmc.batchcounter, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'batchsequence',self.qmc.batchsequence, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'batchprefix',self.qmc.batchprefix, read_defaults)
+            if not read_defaults:
+                # store always
+                self.settingsSetValue(settings, default_settings, 'lastroastepoch',self.qmc.lastroastepoch, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'neverUpdateBatchCounter',self.qmc.neverUpdateBatchCounter, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP Batch
+
+#--- BEGIN GROUP ExtrasMoreInfo
+                settings.beginGroup('ExtrasMoreInfo')
+            self.settingsSetValue(settings, default_settings, 'showmet',self.qmc.showmet, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'statssummary',self.qmc.statssummary, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'statsmaxchrperline', self.qmc.statsmaxchrperline, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'showtimeguide',self.qmc.showtimeguide, read_defaults)
+            if settings is not None:
+                settings.endGroup()
+#--- END GROUP ExtrasMoreInfo
+
             try:
-                settings.setValue('appearance',self.appearance)
+                self.settingsSetValue(settings, default_settings, 'appearance',self.appearance, read_defaults)
             except Exception: # pylint: disable=broad-except
                 pass
-            settings.setValue('dpi',self.dpi)
+            self.settingsSetValue(settings, default_settings, 'dpi',self.dpi, read_defaults)
 
-            settings.setValue('recentRoasts',self.recentRoasts)
+            self.settingsSetValue(settings, default_settings, 'recentRoasts',self.recentRoasts, read_defaults)
 
             if self.curFile and filename is None:
-                settings.setValue('lastLoadedProfile',self.curFile)
+                self.settingsSetValue(settings, default_settings, 'lastLoadedProfile',self.curFile, read_defaults)
             else:
-                settings.setValue('lastLoadedProfile','')
+                self.settingsSetValue(settings, default_settings, 'lastLoadedProfile','', read_defaults)
             if self.qmc.backgroundpath and filename is None:
-                settings.setValue('lastLoadedBackground',self.qmc.backgroundpath)
+                self.settingsSetValue(settings, default_settings, 'lastLoadedBackground',self.qmc.backgroundpath, read_defaults)
             else:
-                settings.setValue('lastLoadedBackground','')
+                self.settingsSetValue(settings, default_settings, 'lastLoadedBackground','', read_defaults)
             # on exported settings we add the current timestamp
             if filename:
-                settings.setValue('timestamp', QDateTime.currentDateTime().toString('yyyy-MM-ddThh:mm:ss'))
+                self.settingsSetValue(settings, default_settings, 'timestamp', QDateTime.currentDateTime().toString('yyyy-MM-ddThh:mm:ss'), read_defaults)
 
-            settings.sync()
-            if settings.status() != QSettings.Status.NoError:
+            if settings is not None and not read_defaults:
+                settings.sync()
+            if settings is not None and settings.status() != QSettings.Status.NoError:
                 _log.error('Failed to save settings')
                 QMessageBox.information(self, QApplication.translate('Error Message', 'Error',None),QApplication.translate('Error Message', 'Failed to save settings'))
                 return False
+            if not read_defaults:
+                _log.info('wrote %s settings in %.2fs', len(settings.allKeys()), libtime.process_time() - start_time)
             return True
 
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
-            QMessageBox.information(self, QApplication.translate('Error Message', 'Error',None),QApplication.translate('Error Message', 'Exception:') + ' closeEvent()  @line ' + str(getattr(exc_tb, 'tb_lineno', '?')))
+            QMessageBox.information(self, QApplication.translate('Error Message', 'Error',None),QApplication.translate('Error Message', 'Exception:') + ' saveAllSettings()  @line ' + str(getattr(exc_tb, 'tb_lineno', '?')))
         return False
 
     def closeEventSettings_theme(self, filename=None):
@@ -19245,7 +19062,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         try:
             unsaved_changes = self.qmc.safesaveflag
             if self.qmc.checkSaved(): # if not canceled
-                _log.info('QUIT')
+                _log.info('MODE: QUIT')
                 flagKeepON = self.qmc.flagKeepON
                 self.qmc.flagKeepON = False # temporarily turn keepOn off
                 self.stopActivities()
@@ -19254,8 +19071,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     # in case we have unsaved changes and the user decided to discard those, we first reset to have the correct settings (like axis limits) saved
                     self.qmc.reset(redraw=False,soundOn=False,sampling=False,keepProperties=False,fireResetAction=False)
                 if QApplication.queryKeyboardModifiers() != Qt.KeyboardModifier.AltModifier:
-                    self.closeEventSettings()
-                gc.collect()
+                    self.closeEventSettings() # it takes quite some time to write the >1000 setting items
+#                gc.collect() # this takes quite some time
                 QApplication.exit()
                 return True
             self.quitAction.setEnabled(True)
@@ -20875,7 +20692,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 ax.text( n + rd['DRY_percent'] + rd['MAI_percent'] + rd['DEV_percent']/2,       i*(barheight + barspacer) + textoffset, str(round(rd['DEV_percent'],1)) + '%  ' + stringfromseconds(rd['DEV_time']), ha='center', color=fontcolor, fontproperties=prop)
                                 ax.text( n + rd['DRY_percent'] + rd['MAI_percent'] + rd['DEV_percent'] + g + 1, i*(barheight + barspacer) + textoffset, stringfromseconds(rd['DROP_time']), ha='left', color=fontcolor, fontproperties=prop)
                             elif 'DEV_percent' in rd:   # has FCs but no Dry event
-                                cl = cl[0],'white',cl[3]
+                                cl = cl[0],'#ffffff',cl[3]
                                 missingDryevent = QApplication.translate('Message', 'Profile missing DRY event')
                                 ax.broken_barh( [ (0, m),
                                                   (n, 100 - rd['DEV_percent']),
@@ -20890,7 +20707,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 ax.text( n + 100 + g + 1, i*(barheight + barspacer) + textoffset, stringfromseconds(rd['DROP_time']), ha='left', color=fontcolor, fontproperties=prop)
                             else:    # no useful events
                                 drop_time= rd.get('DROP_time', 0)
-                                cl = cl[0],'white'
+                                cl = cl[0],'#ffffff'
                                 missingPhaseevents = QApplication.translate('Message', 'Profile missing phase events')
                                 ax.broken_barh( [ (0, m),
                                                   (n, 100),
@@ -25481,8 +25298,13 @@ def main() -> None:
     else:
         QApplication.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
 
+
+    start_time = libtime.process_time() # begin of settings load
+    # fill self.defaultSettings with default app QSettings values before loading app settings from system via settingsLoad()
+    appWindow.saveAllSettings(QSettings(), appWindow.defaultSettings, read_defaults=True) # don't save any settings, but just read in the defaults
     appWindow.settingsLoad(redraw=False) # redraw is triggered later in the startup process again
     appWindow.restoreExtraDeviceSettingsBackup() # load settings backup if it exists (like on RESET)
+    _log.info('loaded %s settings in %.2fs', len(QSettings().allKeys()), libtime.process_time() - start_time)
 
     # inform the user the debug logging is on
     if debugLogLevelActive():
@@ -25578,6 +25400,7 @@ def main() -> None:
 
 
     QTimer.singleShot(700, appWindow.qmc.startPhidgetManager)
+#    QTimer.singleShot(1, appWindow.fileQuit) # uncomment to measure startup/quit turnaround times
 
     #the following line is to trap numpy warnings that occur in the Cup Profile dialog if all values are set to 0
     with numpy.errstate(invalid='ignore',divide='ignore',over='ignore',under='ignore'):

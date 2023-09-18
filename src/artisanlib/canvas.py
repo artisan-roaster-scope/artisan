@@ -22,6 +22,7 @@ from artisanlib import __build__
 from artisanlib import __release_sponsor_domain__
 from artisanlib import __release_sponsor_url__
 
+import gc
 import time as libtime
 import os
 import sys  # @UnusedImport
@@ -313,19 +314,19 @@ class tgraphcanvas(FigureCanvas):
         #default palette of colors
         self.locale_str:str = locale
         self.alpha:Dict[str,float] = {'analysismask':0.4,'statsanalysisbkgnd':1.0,'legendbg':0.4}
-        self.palette:Dict[str,str] = {'background':'#FFFFFF','grid':'#E5E5E5','ylabel':'#808080','xlabel':'#808080','title':'#0C6AA6', 'title_focus':'#cc0f50',
-                        'rect1':'#E5E5E5','rect2':'#B2B2B2','rect3':'#E5E5E5','rect4':'#BDE0EE','rect5':'#D3D3D3',
-                        'et':'#cc0f50','bt':'#0A5C90','xt':'#404040','yt':'#404040','deltaet':'#cc0f50',
-                        'deltabt':'#0A5C90','markers':'#000000','text':'#000000','watermarks':'#FFFF00','timeguide':'#0A5C90',
-                        'canvas':'#F8F8F8','legendbg':'#FFFFFF','legendborder':'#A9A9A9',
-                        'specialeventbox':'#FF5871','specialeventtext':'#FFFFFF',
-                        'bgeventmarker':'#7F7F7F','bgeventtext':'#000000',
-                        'mettext':'#FFFFFF','metbox':'#CC0F50',
-                        'aucguide':'#0C6AA6','messages':'#000000','aucarea':'#767676',
-                        'analysismask':'#BABABA','statsanalysisbkgnd':'#FFFFFF'}
+        self.palette:Dict[str,str] = {'background':'#ffffff','grid':'#e5e5e5','ylabel':'#808080','xlabel':'#808080','title':'#0c6aa6', 'title_focus':'#cc0f50',
+                        'rect1':'#e5e5e5','rect2':'#b2b2b2','rect3':'#e5e5e5','rect4':'#bde0ee','rect5':'#d3d3d3',
+                        'et':'#cc0f50','bt':'#0a5c90','xt':'#404040','yt':'#404040','deltaet':'#cc0f50',
+                        'deltabt':'#0a5c90','markers':'#000000','text':'#000000','watermarks':'#ffff00','timeguide':'#0a5c90',
+                        'canvas':'#f8f8f8','legendbg':'#ffffff','legendborder':'#a9a9a9',
+                        'specialeventbox':'#ff5871','specialeventtext':'#ffffff',
+                        'bgeventmarker':'#7f7f7f','bgeventtext':'#000000',
+                        'mettext':'#ffffff','metbox':'#cc0f50',
+                        'aucguide':'#0c6aa6','messages':'#000000','aucarea':'#767676',
+                        'analysismask':'#bababa','statsanalysisbkgnd':'#ffffff'}
         self.palette1 = self.palette.copy()
-        self.EvalueColor_default:Final[List[str]] = ['#43A7CF','#49B160','#800080','#AD0427']
-        self.EvalueTextColor_default:Final[List[str]] = ['white','#FFFFFF','white','#FFFFFF']
+        self.EvalueColor_default:Final[List[str]] = ['#43a7cf','#49b160','#800080','#ad0427']
+        self.EvalueTextColor_default:Final[List[str]] = ['#ffffff','#ffffff','#ffffff','#ffffff']
 
         # standard math functions allowed in symbolic formulas
         self.mathdictionary_base = {
@@ -1005,7 +1006,7 @@ class tgraphcanvas(FigureCanvas):
 
         #holds math expressions to plot
         self.plotcurves:List[str]=['']*9
-        self.plotcurvecolor:List[str] = ['black']*9
+        self.plotcurvecolor:List[str] = ['#000000']*9
 
         self.overlapList:List[Tuple[float,float,float,float]] = []
 
@@ -1978,6 +1979,7 @@ class tgraphcanvas(FigureCanvas):
 
 
         self.samplingSemaphore = QSemaphore(1)
+        self.updateGraphicsSemaphore = QSemaphore(1)
         self.profileDataSemaphore = QSemaphore(1)
         self.messagesemaphore = QSemaphore(1)
         self.errorsemaphore = QSemaphore(1)
@@ -4286,299 +4288,306 @@ class tgraphcanvas(FigureCanvas):
     @pyqtSlot()
     def updategraphics(self) -> None:
 #        QApplication.processEvents() # without this we see some flickers (canvas redraws) on using multiple button event actions on macOS!?
-        try:
-            if self.flagon and self.ax is not None:
-                #### lock shared resources #####
-                self.profileDataSemaphore.acquire(1)
-                try:
-                    # initialize the arrays depending on the recording state
-                    if (self.flagstart and len(self.timex) > 0) or not self.flagon: # on recording or off we use the standard data structures
-                        sample_timex = self.timex
-                        sample_temp1 = self.temp1
-                        sample_temp2 = self.temp2
-                        sample_extratimex = self.extratimex
-                        sample_extratemp1 = self.extratemp1
-                        sample_extratemp2 = self.extratemp2
-
-                        sample_delta1 = self.delta1
-                        sample_delta2 = self.delta2
-
-                    else: # only on ON we use the temporary sampling datastructures
-                        sample_timex = self.on_timex
-                        sample_temp1 = self.on_temp1
-                        sample_temp2 = self.on_temp2
-                        sample_extratimex = self.extratimex
-                        sample_extratemp1 = self.on_extratemp1
-                        sample_extratemp2 = self.on_extratemp2
-
-                        sample_delta1 = self.on_delta1
-                        sample_delta2 = self.on_delta2
-
-                    if sample_timex:
-                        # update all LCDs (small, large, Web,..)
-                        self.updateLCDs(
-                            None,
-                            sample_temp1,
-                            sample_temp2,
-                            sample_delta1,
-                            sample_delta2,
-                            sample_extratemp1,
-                            sample_extratemp2,
-                            self.currentpidsv,
-                            self.dutycycle)
-
-                finally:
-                    if self.profileDataSemaphore.available() < 1:
-                        self.profileDataSemaphore.release(1)
-
-                #write error message
-                if self.temporary_error is not None:
-                    self.aw.sendmessage(self.temporary_error)
-                    self.temporary_error = None # clear flag
-
-                #check quantified events; do this before the canvas is redraw as additional annotations might be added here, but do not recursively call updategraphics
-                # NOTE: that EventRecordAction has to be called from outside the critical section protected by the profileDataSemaphore as it is itself accessing this section!!
-                for el in self.quantifiedEvent:
+        gotlock = self.aw.qmc.updateGraphicsSemaphore.tryAcquire(1,0) # we try to catch a lock if available but we do not wait, if we fail we just skip this redraw round (prevents stacking of waiting calls)
+        if not gotlock:
+            _log.info('updategraphics(): failed to get updateGraphicsSemaphore lock')
+        else:
+            try:
+                if self.flagon and self.ax is not None:
+                    #### lock shared resources #####
+                    self.profileDataSemaphore.acquire(1)
                     try:
-                        self.aw.moveslider(el[0],el[1])
-                        if self.flagstart:
-                            evalue = self.aw.float2float((el[1] + 10.0) / 10.0)
-                            self.EventRecordAction(extraevent = 1,eventtype=el[0],eventvalue=evalue,eventdescription='Q'+self.eventsvalues(evalue),doupdategraphics=False)
-                        if self.flagon and self.aw.eventquantifieraction[el[0]]:
-                            self.aw.fireslideractionSignal.emit(el[0])
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.exception(e)
-                self.quantifiedEvent = []
+                        # initialize the arrays depending on the recording state
+                        if (self.flagstart and len(self.timex) > 0) or not self.flagon: # on recording or off we use the standard data structures
+                            sample_timex = self.timex
+                            sample_temp1 = self.temp1
+                            sample_temp2 = self.temp2
+                            sample_extratimex = self.extratimex
+                            sample_extratemp1 = self.extratemp1
+                            sample_extratemp2 = self.extratemp2
 
-                if self.flagstart:
-                    if  self.zoom_follow: # self.aw.ntb._active == 'ZOOM'
-                        if not self.fmt_data_RoR:
-                            # center current temp reading on canvas
-                            temp = None
-                            if self.temp2 and len(self.temp2)>0:
-                                temp = self.temp2[-1]
-                                if temp is not None:
-                                    tx = self.timex[-1]
-                                    # get current limits
-                                    xlim = self.ax.get_xlim()
-                                    xlim_offset = (xlim[1] - xlim[0]) / 2.
-                                    xlim_new = (tx - xlim_offset, tx + xlim_offset)
-                                    ylim = self.ax.get_ylim()
-                                    ylim_offset = (ylim[1] - ylim[0]) / 2.
-                                    ylim_new = (temp - ylim_offset, temp + ylim_offset)
-                                    if ylim != ylim_new or xlim != xlim_new:
-                                        # set new limits to center current temp on canvas
-                                        self.ax.set_xlim(xlim_new)
-                                        self.ax.set_ylim(ylim_new)
-                                        if self.twoAxisMode() and self.delta_ax is not None:
+                            sample_delta1 = self.delta1
+                            sample_delta2 = self.delta2
+
+                        else: # only on ON we use the temporary sampling datastructures
+                            sample_timex = self.on_timex
+                            sample_temp1 = self.on_temp1
+                            sample_temp2 = self.on_temp2
+                            sample_extratimex = self.extratimex
+                            sample_extratemp1 = self.on_extratemp1
+                            sample_extratemp2 = self.on_extratemp2
+
+                            sample_delta1 = self.on_delta1
+                            sample_delta2 = self.on_delta2
+
+                        if sample_timex:
+                            # update all LCDs (small, large, Web,..)
+                            self.updateLCDs(
+                                None,
+                                sample_temp1,
+                                sample_temp2,
+                                sample_delta1,
+                                sample_delta2,
+                                sample_extratemp1,
+                                sample_extratemp2,
+                                self.currentpidsv,
+                                self.dutycycle)
+
+                    finally:
+                        if self.profileDataSemaphore.available() < 1:
+                            self.profileDataSemaphore.release(1)
+
+                    #write error message
+                    if self.temporary_error is not None:
+                        self.aw.sendmessage(self.temporary_error)
+                        self.temporary_error = None # clear flag
+
+                    #check quantified events; do this before the canvas is redraw as additional annotations might be added here, but do not recursively call updategraphics
+                    # NOTE: that EventRecordAction has to be called from outside the critical section protected by the profileDataSemaphore as it is itself accessing this section!!
+                    for el in self.quantifiedEvent:
+                        try:
+                            self.aw.moveslider(el[0],el[1])
+                            if self.flagstart:
+                                evalue = self.aw.float2float((el[1] + 10.0) / 10.0)
+                                self.EventRecordAction(extraevent = 1,eventtype=el[0],eventvalue=evalue,eventdescription='Q'+self.eventsvalues(evalue),doupdategraphics=False)
+                            if self.flagon and self.aw.eventquantifieraction[el[0]]:
+                                self.aw.fireslideractionSignal.emit(el[0])
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.exception(e)
+                    self.quantifiedEvent = []
+
+                    if self.flagstart:
+                        if  self.zoom_follow: # self.aw.ntb._active == 'ZOOM'
+                            if not self.fmt_data_RoR:
+                                # center current temp reading on canvas
+                                temp = None
+                                if self.temp2 and len(self.temp2)>0:
+                                    temp = self.temp2[-1]
+                                    if temp is not None:
+                                        tx = self.timex[-1]
+                                        # get current limits
+                                        xlim = self.ax.get_xlim()
+                                        xlim_offset = (xlim[1] - xlim[0]) / 2.
+                                        xlim_new = (tx - xlim_offset, tx + xlim_offset)
+                                        ylim = self.ax.get_ylim()
+                                        ylim_offset = (ylim[1] - ylim[0]) / 2.
+                                        ylim_new = (temp - ylim_offset, temp + ylim_offset)
+                                        if ylim != ylim_new or xlim != xlim_new:
+                                            # set new limits to center current temp on canvas
+                                            self.ax.set_xlim(xlim_new)
+                                            self.ax.set_ylim(ylim_new)
+                                            if self.twoAxisMode() and self.delta_ax is not None:
+                                                # keep the RoR axis constant
+                                                zlim = self.delta_ax.get_ylim()
+                                                zlim_offset = (zlim[1] - zlim[0]) / 2.
+                                                tempd = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,temp))[1]))[1])
+                                                zlim_new = (tempd - zlim_offset, tempd + zlim_offset)
+                                                self.delta_ax.set_ylim(zlim_new)
+                                            self.ax_background = None
+                            else:
+                                # center current RoR reading on canvas
+                                ror = None
+                                two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or (self.background and (self.DeltaETBflag or self.DeltaBTBflag)))
+                                if two_ax_mode and self.delta_ax is not None:
+                                    if self.delta2 and len(self.delta2)>0:
+                                        ror = self.delta2[-1]
+                                    if ror is not None:
+                                        tx = self.timex[-1]
+                                        # get current limits
+                                        xlim = self.ax.get_xlim()
+                                        xlim_offset = (xlim[1] - xlim[0]) / 2.
+                                        xlim_new = (tx - xlim_offset, tx + xlim_offset)
+                                        ylim = self.ax.get_ylim()
+                                        ylim_offset = (ylim[1] - ylim[0]) / 2.
+                                        rord = (self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,ror))[1]))[1])
+                                        ylim_new = (rord - ylim_offset, rord + ylim_offset)
+                                        if ylim != ylim_new or xlim != xlim_new:
+                                            # set new limits to center current temp on canvas
+                                            self.ax.set_xlim(xlim_new)
+                                            self.ax.set_ylim(ylim_new)
                                             # keep the RoR axis constant
                                             zlim = self.delta_ax.get_ylim()
                                             zlim_offset = (zlim[1] - zlim[0]) / 2.
-                                            tempd = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,temp))[1]))[1])
-                                            zlim_new = (tempd - zlim_offset, tempd + zlim_offset)
+                                            zlim_new = (ror - zlim_offset, ror + zlim_offset)
                                             self.delta_ax.set_ylim(zlim_new)
-                                        self.ax_background = None
+                                            self.ax_background = None
+
+                        if self.patheffects:
+                            rcParams['path.effects'] = [PathEffects.withStroke(linewidth=self.patheffects, foreground=self.palette['background'])]
                         else:
-                            # center current RoR reading on canvas
-                            ror = None
-                            two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or (self.background and (self.DeltaETBflag or self.DeltaBTBflag)))
-                            if two_ax_mode and self.delta_ax is not None:
-                                if self.delta2 and len(self.delta2)>0:
-                                    ror = self.delta2[-1]
-                                if ror is not None:
-                                    tx = self.timex[-1]
-                                    # get current limits
-                                    xlim = self.ax.get_xlim()
-                                    xlim_offset = (xlim[1] - xlim[0]) / 2.
-                                    xlim_new = (tx - xlim_offset, tx + xlim_offset)
-                                    ylim = self.ax.get_ylim()
-                                    ylim_offset = (ylim[1] - ylim[0]) / 2.
-                                    rord = (self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,ror))[1]))[1])
-                                    ylim_new = (rord - ylim_offset, rord + ylim_offset)
-                                    if ylim != ylim_new or xlim != xlim_new:
-                                        # set new limits to center current temp on canvas
-                                        self.ax.set_xlim(xlim_new)
-                                        self.ax.set_ylim(ylim_new)
-                                        # keep the RoR axis constant
-                                        zlim = self.delta_ax.get_ylim()
-                                        zlim_offset = (zlim[1] - zlim[0]) / 2.
-                                        zlim_new = (ror - zlim_offset, ror + zlim_offset)
-                                        self.delta_ax.set_ylim(zlim_new)
-                                        self.ax_background = None
+                            rcParams['path.effects'] = []
 
-                    if self.patheffects:
-                        rcParams['path.effects'] = [PathEffects.withStroke(linewidth=self.patheffects, foreground=self.palette['background'])]
-                    else:
-                        rcParams['path.effects'] = []
+                        #auto mark CHARGE (this forces a realignment/redraw by resetting the cache ax_background)
+                        if self.autoChargeIdx and self.timeindex[0] < 0:
+                            self.markCharge() # we do not reset the autoChargeIdx to avoid another trigger
+                            self.autoChargeIdx = 0
 
-                    #auto mark CHARGE (this forces a realignment/redraw by resetting the cache ax_background)
-                    if self.autoChargeIdx and self.timeindex[0] < 0:
-                        self.markCharge() # we do not reset the autoChargeIdx to avoid another trigger
-                        self.autoChargeIdx = 0
+                        #auto mark TP/DRY/FCs/DROP
+                        # we set marks already here to have the canvas, incl. the projections, immediately redrawn
+                        if self.autoTPIdx != 0:
+                            self.markTP()
+                            self.autoTPIdx = 0
+                        if self.autoDryIdx != 0:
+                            self.markDryEnd()
+                            self.autoDryIdx = 0
+                        if self.autoFCsIdx != 0:
+                            self.mark1Cstart()
+                            self.autoFCsIdx = 0
+                        if self.autoDropIdx > 0 and self.timeindex[0] > -1 and not self.timeindex[6]:
+                            self.markDrop() # we do not reset the autoDropIdx here to avoid another trigger
+                            self.autoDropIdx = -1 # we set the autoDropIdx to a negative value to prevent further triggers after undo markDROP
 
-                    #auto mark TP/DRY/FCs/DROP
-                    # we set marks already here to have the canvas, incl. the projections, immediately redrawn
-                    if self.autoTPIdx != 0:
-                        self.markTP()
-                        self.autoTPIdx = 0
-                    if self.autoDryIdx != 0:
-                        self.markDryEnd()
-                        self.autoDryIdx = 0
-                    if self.autoFCsIdx != 0:
-                        self.mark1Cstart()
-                        self.autoFCsIdx = 0
-                    if self.autoDropIdx > 0 and self.timeindex[0] > -1 and not self.timeindex[6]:
-                        self.markDrop() # we do not reset the autoDropIdx here to avoid another trigger
-                        self.autoDropIdx = -1 # we set the autoDropIdx to a negative value to prevent further triggers after undo markDROP
+                        ##### updated canvas
+                        try:
+                            if not self.block_update:
+                            #-- start update display
+                                #### lock shared resources to ensure that no other redraw is interfering with this one here #####
+                                self.profileDataSemaphore.acquire(1)
+                                try:
+                                    if self.ax_background is not None:
+                                        self.fig.canvas.restore_region(self.ax_background) # type: ignore
+                                        # draw eventtypes
+    # this seems not to be needed and hides partially event by value "Combo-type" annotations
+    #                                    if self.eventsshowflag != 0 and self.eventsGraphflag in [2,3,4]:
+    #                                        self.ax.draw_artist(self.l_eventtype1dots)
+    #                                        self.ax.draw_artist(self.l_eventtype2dots)
+    #                                        self.ax.draw_artist(self.l_eventtype3dots)
+    #                                        self.ax.draw_artist(self.l_eventtype4dots)
+                                        # draw delta lines
 
-                    ##### updated canvas
-                    try:
-                        if not self.block_update:
-                        #-- start update display
-                            #### lock shared resources to ensure that no other redraw is interfering with this one here #####
-                            self.profileDataSemaphore.acquire(1)
-                            try:
-                                if self.ax_background is not None:
-                                    self.fig.canvas.restore_region(self.ax_background) # type: ignore
-                                    # draw eventtypes
-# this seems not to be needed and hides partially event by value "Combo-type" annotations
-#                                    if self.eventsshowflag != 0 and self.eventsGraphflag in [2,3,4]:
-#                                        self.ax.draw_artist(self.l_eventtype1dots)
-#                                        self.ax.draw_artist(self.l_eventtype2dots)
-#                                        self.ax.draw_artist(self.l_eventtype3dots)
-#                                        self.ax.draw_artist(self.l_eventtype4dots)
-                                    # draw delta lines
-
-                                    if self.swapdeltalcds:
-                                        if self.DeltaETflag and self.l_delta1 is not None:
-                                            try:
-                                                self.ax.draw_artist(self.l_delta1)
-                                            except Exception as e: # pylint: disable=broad-except
-                                                _log.exception(e)
-                                        if self.DeltaBTflag and self.l_delta2 is not None:
-                                            try:
-                                                self.ax.draw_artist(self.l_delta2)
-                                            except Exception as e: # pylint: disable=broad-except
-                                                _log.exception(e)
-                                    else:
-                                        if self.DeltaBTflag and self.l_delta2 is not None:
-                                            try:
-                                                self.ax.draw_artist(self.l_delta2)
-                                            except Exception as e: # pylint: disable=broad-except
-                                                _log.exception(e)
-                                        if self.DeltaETflag and self.l_delta1 is not None:
-                                            try:
-                                                self.ax.draw_artist(self.l_delta1)
-                                            except Exception as e: # pylint: disable=broad-except
-                                                _log.exception(e)
-
-                                    # draw extra curves
-                                    xtra_dev_lines1 = 0
-                                    xtra_dev_lines2 = 0
-
-                                    try:
-                                        for i in range(min(len(self.aw.extraCurveVisibility1),len(self.aw.extraCurveVisibility1),len(sample_extratimex),len(sample_extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(sample_extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
-                                            if self.aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > xtra_dev_lines1:
+                                        if self.swapdeltalcds:
+                                            if self.DeltaETflag and self.l_delta1 is not None:
                                                 try:
-                                                    self.ax.draw_artist(self.extratemp1lines[xtra_dev_lines1])
+                                                    self.ax.draw_artist(self.l_delta1)
                                                 except Exception as e: # pylint: disable=broad-except
                                                     _log.exception(e)
-                                                xtra_dev_lines1 = xtra_dev_lines1 + 1
-                                            if self.aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > xtra_dev_lines2:
+                                            if self.DeltaBTflag and self.l_delta2 is not None:
                                                 try:
-                                                    self.ax.draw_artist(self.extratemp2lines[xtra_dev_lines2])
+                                                    self.ax.draw_artist(self.l_delta2)
                                                 except Exception as e: # pylint: disable=broad-except
                                                     _log.exception(e)
-                                                xtra_dev_lines2 = xtra_dev_lines2 + 1
-                                    except Exception: # pylint: disable=broad-except
-                                        pass
-                                    if self.swaplcds:
-                                        # draw ET
-                                        if self.ETcurve and self.l_temp1 is not None:
-                                            try:
-                                                self.ax.draw_artist(self.l_temp1)
-                                            except Exception as e: # pylint: disable=broad-except
-                                                _log.exception(e)
-                                        # draw BT
-                                        if self.BTcurve and self.l_temp2 is not None:
-                                            try:
-                                                self.ax.draw_artist(self.l_temp2)
-                                            except Exception as e: # pylint: disable=broad-except
-                                                _log.exception(e)
+                                        else:
+                                            if self.DeltaBTflag and self.l_delta2 is not None:
+                                                try:
+                                                    self.ax.draw_artist(self.l_delta2)
+                                                except Exception as e: # pylint: disable=broad-except
+                                                    _log.exception(e)
+                                            if self.DeltaETflag and self.l_delta1 is not None:
+                                                try:
+                                                    self.ax.draw_artist(self.l_delta1)
+                                                except Exception as e: # pylint: disable=broad-except
+                                                    _log.exception(e)
+
+                                        # draw extra curves
+                                        xtra_dev_lines1 = 0
+                                        xtra_dev_lines2 = 0
+
+                                        try:
+                                            for i in range(min(len(self.aw.extraCurveVisibility1),len(self.aw.extraCurveVisibility1),len(sample_extratimex),len(sample_extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(sample_extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
+                                                if self.aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > xtra_dev_lines1:
+                                                    try:
+                                                        self.ax.draw_artist(self.extratemp1lines[xtra_dev_lines1])
+                                                    except Exception as e: # pylint: disable=broad-except
+                                                        _log.exception(e)
+                                                    xtra_dev_lines1 = xtra_dev_lines1 + 1
+                                                if self.aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > xtra_dev_lines2:
+                                                    try:
+                                                        self.ax.draw_artist(self.extratemp2lines[xtra_dev_lines2])
+                                                    except Exception as e: # pylint: disable=broad-except
+                                                        _log.exception(e)
+                                                    xtra_dev_lines2 = xtra_dev_lines2 + 1
+                                        except Exception: # pylint: disable=broad-except
+                                            pass
+                                        if self.swaplcds:
+                                            # draw ET
+                                            if self.ETcurve and self.l_temp1 is not None:
+                                                try:
+                                                    self.ax.draw_artist(self.l_temp1)
+                                                except Exception as e: # pylint: disable=broad-except
+                                                    _log.exception(e)
+                                            # draw BT
+                                            if self.BTcurve and self.l_temp2 is not None:
+                                                try:
+                                                    self.ax.draw_artist(self.l_temp2)
+                                                except Exception as e: # pylint: disable=broad-except
+                                                    _log.exception(e)
+                                        else:
+                                            # draw BT
+                                            if self.BTcurve and self.l_temp2 is not None:
+                                                try:
+                                                    self.ax.draw_artist(self.l_temp2)
+                                                except Exception as e: # pylint: disable=broad-except
+                                                    _log.exception(e)
+                                            # draw ET
+                                            if self.ETcurve and self.l_temp1 is not None:
+                                                try:
+                                                    self.ax.draw_artist(self.l_temp1)
+                                                except Exception as e: # pylint: disable=broad-except
+                                                    _log.exception(e)
+
+                                        try:
+                                            if self.BTcurve:
+                                                for a in self.l_annotations:
+                                                    self.ax.draw_artist(a)
+                                        except Exception as e : # pylint: disable=broad-except
+                                            _log.exception(e)
+
+                                        try:
+                                            self.update_additional_artists()
+                                        except Exception as e: # pylint: disable=broad-except
+                                            _log.exception(e)
+                                        axfig = self.ax.get_figure()
+                                        if axfig is not None:
+                                            self.fig.canvas.blit(axfig.bbox)
+
                                     else:
-                                        # draw BT
-                                        if self.BTcurve and self.l_temp2 is not None:
-                                            try:
-                                                self.ax.draw_artist(self.l_temp2)
-                                            except Exception as e: # pylint: disable=broad-except
-                                                _log.exception(e)
-                                        # draw ET
-                                        if self.ETcurve and self.l_temp1 is not None:
-                                            try:
-                                                self.ax.draw_artist(self.l_temp1)
-                                            except Exception as e: # pylint: disable=broad-except
-                                                _log.exception(e)
-
-                                    try:
-                                        if self.BTcurve:
-                                            for a in self.l_annotations:
-                                                self.ax.draw_artist(a)
-                                    except Exception as e : # pylint: disable=broad-except
-                                        _log.exception(e)
-
-                                    try:
+                                        # we do not have a background to bitblit, so do a full redraw
+                                        self.updateBackground() # does the canvas draw, but also fills the ax_background cache
                                         self.update_additional_artists()
-                                    except Exception as e: # pylint: disable=broad-except
-                                        _log.exception(e)
-                                    axfig = self.ax.get_figure()
-                                    if axfig is not None:
-                                        self.fig.canvas.blit(axfig.bbox)
+                                finally:
+                                    if self.profileDataSemaphore.available() < 1:
+                                        self.profileDataSemaphore.release(1)
+                            #-- end update display
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.exception(e)
+                            _, _, exc_tb = sys.exc_info()
+                            self.adderror((QApplication.translate('Error Message','Exception:') + ' updategraphics() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
-                                else:
-                                    # we do not have a background to bitblit, so do a full redraw
-                                    self.updateBackground() # does the canvas draw, but also fills the ax_background cache
-                                    self.update_additional_artists()
-                            finally:
-                                if self.profileDataSemaphore.available() < 1:
-                                    self.profileDataSemaphore.release(1)
-                        #-- end update display
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.exception(e)
-                        _, _, exc_tb = sys.exc_info()
-                        self.adderror((QApplication.translate('Error Message','Exception:') + ' updategraphics() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+                        try:
+                            if self.backgroundprofile is not None and (self.timeindex[0] > -1 or self.timeindexB[0] < 0):
+                                if self.backgroundReproduce or self.backgroundPlaybackEvents:
+                                    self.playbackevent()
+                                if self.backgroundPlaybackDROP:
+                                    self.playbackdrop()
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.exception(e)
+                            _, _, exc_tb = sys.exc_info()
+                            self.adderror((QApplication.translate('Error Message','Exception:') + ' updategraphics() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
-                    try:
-                        if self.backgroundprofile is not None and (self.timeindex[0] > -1 or self.timeindexB[0] < 0):
-                            if self.backgroundReproduce or self.backgroundPlaybackEvents:
-                                self.playbackevent()
-                            if self.backgroundPlaybackDROP:
-                                self.playbackdrop()
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.exception(e)
-                        _, _, exc_tb = sys.exc_info()
-                        self.adderror((QApplication.translate('Error Message','Exception:') + ' updategraphics() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+                        #####
+                        if self.patheffects:
+                            rcParams['path.effects'] = []
 
-                    #####
-                    if self.patheffects:
-                        rcParams['path.effects'] = []
+                        #update phase lcds
+                        self.aw.updatePhasesLCDs()
 
-                    #update phase lcds
-                    self.aw.updatePhasesLCDs()
+                        #update AUC lcd
+                        if self.AUClcdFlag:
+                            self.aw.updateAUCLCD()
 
-                    #update AUC lcd
-                    if self.AUClcdFlag:
-                        self.aw.updateAUCLCD()
+                    #check triggered alarms
+                    if self.temporaryalarmflag > -3:
+                        i = self.temporaryalarmflag  # reset self.temporaryalarmflag before calling alarm
+                        self.temporaryalarmflag = -3 # self.setalarm(i) can take longer to run than the sampling interval
+                        self.setalarm(i)
 
-                #check triggered alarms
-                if self.temporaryalarmflag > -3:
-                    i = self.temporaryalarmflag  # reset self.temporaryalarmflag before calling alarm
-                    self.temporaryalarmflag = -3 # self.setalarm(i) can take longer to run than the sampling interval
-                    self.setalarm(i)
-
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
-            _, _, exc_tb = sys.exc_info()
-            self.adderror((QApplication.translate('Error Message','Exception:') + ' updategraphics() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+                _, _, exc_tb = sys.exc_info()
+                self.adderror((QApplication.translate('Error Message','Exception:') + ' updategraphics() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+            finally:
+                if self.aw.qmc.updateGraphicsSemaphore.available() < 1:
+                    self.aw.qmc.updateGraphicsSemaphore.release(1)
 
     def setLCDtimestr(self, timestr):
         self.aw.lcd1.display(timestr)
@@ -6721,12 +6730,18 @@ class tgraphcanvas(FigureCanvas):
             self.aw.autoAdjustAxis(background=not keepProperties) # if reset() triggered by ON, we ignore background on adjusting the axis and adjust according to RESET min/max
             self.redraw(True,sampling=sampling,smooth=self.optimalSmoothing) # we need to re-smooth with standard smoothing if ON and optimal-smoothing is ticked
 
+        try:
+            gc.collect()
+            _log.debug('gc_stats: %s', gc.get_stats())
+        except Exception: # pylint: disable=broad-except
+            pass
         # write memory stats to the log
         try:
             vm = psutil.virtual_memory()
             _log.info('memory used %s, %s (%s%%) available', bytes2human(psutil.Process().memory_full_info().uss),bytes2human(vm[1]),int(round(100-vm[2])))
         except Exception: # pylint: disable=broad-except
             pass
+
 
         #QApplication.processEvents() # this one seems to be needed for a proper redraw in fullscreen mode on OS X if a profile was loaded and NEW is pressed
         #   this processEvents() seems not to be needed any longer!?
@@ -10205,9 +10220,9 @@ class tgraphcanvas(FigureCanvas):
         return numpy.array(imgsize).reshape((height, width, int(32/8)))
 
     #watermark image
-    def logoloadfile(self,filename=None):
+    def logoloadfile(self,filename:Optional[str] = None) -> None:
         try:
-            if not filename:
+            if filename is None or not filename:
                 filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Image File'),ext='*.png *.jpg')
             if len(filename) == 0:
                 return
@@ -11449,7 +11464,7 @@ class tgraphcanvas(FigureCanvas):
 
             if not bool(self.aw.simulator):
                 QTimer.singleShot(300,self.StartAsyncSamplingAction)
-            _log.info('ON MONITOR (sampling @%ss)', self.aw.float2float(self.delay/1000))
+            _log.info('MODE: ON MONITOR (sampling @%ss)', self.aw.float2float(self.delay/1000))
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
@@ -11458,7 +11473,7 @@ class tgraphcanvas(FigureCanvas):
     # OffMonitorCloseDown is called after the sampling loop stopped
     @pyqtSlot()
     def OffMonitorCloseDown(self):
-        _log.debug('OffMonitorCloseDown')
+        _log.debug('MODE: OffMonitorCloseDown')
         try:
             self.threadserver.terminatingSignal.disconnect(self.OffMonitorCloseDown)
             if len(self.timex) < 3:
@@ -11545,15 +11560,15 @@ class tgraphcanvas(FigureCanvas):
             self.aw.enableEditMenus()
 
             self.aw.autoAdjustAxis()
-            self.redraw(recomputeAllDeltas=True,smooth=True)
+            self.redraw(recomputeAllDeltas=True,smooth=True) # this is slow and takes about 1sec for an empty canvas with a background profile loaded!
             # HACK:
             # with visible (draggable) legend a click (or several) on the canvas makes the extra lines disappear
             # this happens after real recordings or simlator runs and also if signals onclick/onpick/ondraw are disconnected
             # solutions are to run an updateBackground() or another redraw() about in 100s using a QTimer
             # also a call  to self.fig.canvas.flush_events() or QApplication.processEvents() here resolves it. A libtime.sleep(1) does not solve the issue
-#            QTimer.singleShot(100,self.updateBackground) # solves the issue
-            self.fig.canvas.flush_events() # solves the issue
-#            QApplication.processEvents()  # solves the issue (but is more general as the MPL flush_events
+            QTimer.singleShot(100,self.updateBackground) # solves the issue and is faster than the other 2 options
+#            self.fig.canvas.flush_events() # solves the issue (takes ~1sec)
+#            QApplication.processEvents()  # solves the issue (but is more general as the MPL flush_events (takes ~1sec)
 
             # we autosave after full redraw after OFF to have the optional generated PDF containing all information
             if len(self.timex) > 2 and self.autosaveflag != 0 and self.autosavepath:
@@ -11593,7 +11608,7 @@ class tgraphcanvas(FigureCanvas):
             self.adderror((QApplication.translate('Error Message', 'Exception:') + ' OffMonitorCloseDown() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def OffMonitor(self):
-        _log.info('OFF MONITOR')
+        _log.info('MODE: OFF MONITOR')
         try:
             # first activate "Stopping Mode" to ensure that sample() is not resetting the timer now (independent of the flagstart state)
 
@@ -12017,14 +12032,14 @@ class tgraphcanvas(FigureCanvas):
                     self.aw.setTimerColor('slowcoolingtimer')
                 QTimer.singleShot(self.chargeTimerPeriod*1000, self.fireChargeTimer)
 
-            _log.info('START RECORDING')
+            _log.info('MODE: START RECORDING')
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             self.adderror((QApplication.translate('Error Message', 'Exception:') + ' OnRecorder() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def OffRecorder(self, autosave=True, enableButton=True):
-        _log.info('STOP RECORDING')
+        _log.info('MODE: STOP RECORDING')
         try:
             # mark DROP if not yet set, at least 7min roast time and CHARGE is set and either autoDROP is active or DROP button is hidden
             if self.timeindex[6] == 0 and self.timeindex[0] != -1 and (self.autoDropFlag or not self.buttonvisibility[6]):
@@ -14780,7 +14795,7 @@ class tgraphcanvas(FigureCanvas):
                     xb = numpy.array(self.timex)
                     xxb = xb + charge
                     xxa = xa + charge
-                    self.ax.plot(xxb, func(xb, *popt),  color='black', linestyle = '-.', linewidth=3)
+                    self.ax.plot(xxb, func(xb, *popt),  color='#000000', linestyle = '-.', linewidth=3)
                     self.ax.plot(xxa, yn, 'ro')
                     with warnings.catch_warnings():
                         warnings.simplefilter('ignore')
@@ -14821,7 +14836,7 @@ class tgraphcanvas(FigureCanvas):
                 xa = numpy.array(self.timex)
                 newX = func(xa).tolist()
 
-                self.ax.plot(self.timex, newX, color='black', linestyle = '-.', linewidth=3)
+                self.ax.plot(self.timex, newX, color='#000000', linestyle = '-.', linewidth=3)
                 self.ax.plot(Xpoints, Ypoints, 'ro')
 
                 with warnings.catch_warnings():
@@ -14844,7 +14859,7 @@ class tgraphcanvas(FigureCanvas):
                 Xpoints,Ypoints = self.findpoints() #from 0 origin
                 func = inter.interp1d(Xpoints, Ypoints, kind=mode)
                 newY = func(self.timex)
-                self.ax.plot(self.timex, newY, color='black', linestyle = '-.', linewidth=3)
+                self.ax.plot(self.timex, newY, color='#000000', linestyle = '-.', linewidth=3)
                 self.ax.plot(Xpoints, Ypoints, 'ro')
 
                 with warnings.catch_warnings():
@@ -15671,11 +15686,11 @@ class tgraphcanvas(FigureCanvas):
                 finishroc = f'/min' f' 0 {self.mode}/min'
 
             margin = '&nbsp;&nbsp;&nbsp;'
-            text_color_rect1 = 'white' if self.aw.QColorBrightness(QColor(self.palette['rect1'])) < 128 else 'black'
+            text_color_rect1 = '#ffffff' if self.aw.QColorBrightness(QColor(self.palette['rect1'])) < 128 else '#000000'
             string1 = f" <font color = \"{text_color_rect1}\" style=\"BACKGROUND-COLOR: {self.palette['rect1']}\">{margin}{stringfromseconds(dryphasetime)}{margin}{dryphaseP}%{margin}{dryroc}{margin}</font>"
-            text_color_rect2 = 'white' if self.aw.QColorBrightness(QColor(self.palette['rect2'])) < 128 else 'black'
+            text_color_rect2 = '#ffffff' if self.aw.QColorBrightness(QColor(self.palette['rect2'])) < 128 else '#000000'
             string2 = f" <font color = \"{text_color_rect2}\" style=\"BACKGROUND-COLOR: {self.palette['rect2']}\">{margin} {stringfromseconds(midphasetime)} {margin} {midphaseP}% {margin} {midroc} {margin}</font>"
-            text_color_rect3 = 'white' if self.aw.QColorBrightness(QColor(self.palette['rect3'])) < 128 else 'black'
+            text_color_rect3 = '#ffffff' if self.aw.QColorBrightness(QColor(self.palette['rect3'])) < 128 else '#000000'
             string3 = f" <font color = \"{text_color_rect3}\" style=\"BACKGROUND-COLOR: {self.palette['rect3']}\">{margin} {stringfromseconds(finishphasetime)} {margin} {finishphaseP}% {margin} {finishroc} {margin}</font>"
             self.aw.sendmessage(f'{string1}{string2}{string3}',append=False)
 
