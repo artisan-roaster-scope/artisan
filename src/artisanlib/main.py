@@ -4181,12 +4181,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     def addLanguage(self, locale:str, menu_entry:str) -> None:
         languageAction = QAction(menu_entry, self)
-        if locale in ['ru']:
-            languageAction.setEnabled(False)
-        else:
-            languageAction.setCheckable(True)
-            languageAction.triggered.connect(self.change_local_action)
-            self.language_menu_actions[locale] = languageAction
+        languageAction.setCheckable(True)
+        languageAction.triggered.connect(self.change_local_action)
+        self.language_menu_actions[locale] = languageAction
         if self.languageMenu is not None:
             self.languageMenu.addAction(languageAction)
         if self.locale_str == locale:
