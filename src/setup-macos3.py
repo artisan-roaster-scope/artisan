@@ -385,3 +385,16 @@ os.chdir('..')
 subprocess.check_call(r'rm -f artisan-mac-' + VERSION + r'.dmg',shell = True)
 subprocess.check_call(r'hdiutil create artisan-mac-' + VERSION + r'.dmg -volname "artisan" -fs HFS+ -srcfolder "dist"',shell = True)
 # otool -L dist/Artisan.app/Contents/MacOS/Artisan
+
+# brew install create-dmg
+#subprocess.check_call(r'create-dmg \
+#  --volname "Artisan" \
+#  --volicon "Hello World.icns" \
+#  --window-pos 200 120 \
+#  --window-size 600 300 \
+#  --icon-size 100 \
+#  --icon "Hello World.app" 175 120 \
+#  --hide-extension "Hello World.app" \
+#  --app-drop-link 425 120 \
+#  "dist/Hello World.dmg" \
+#  "dist/dmg/"
