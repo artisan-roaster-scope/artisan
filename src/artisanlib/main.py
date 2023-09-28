@@ -301,7 +301,7 @@ class Artisan(QtSingleApplication):
             if aw is not None and not sip.isdeleted(aw): # sip not supported on older PyQt versions (eg. RPi)
                 if oldFocusWidget is None and newFocusWidget is not None and aw is not None and aw.centralWidget() == newFocusWidget and self.sentToBackground is not None:
                     #focus gained
-                    _log.debug('focus gained')
+#                    _log.debug('focus gained')
                     try:
                         if aw.plus_account is not None and aw.qmc.roastUUID is not None and aw.curFile is not None and \
                                 libtime.time() - self.sentToBackground > self.plus_sync_cache_expiration:
@@ -605,16 +605,19 @@ except Exception: # pylint: disable=broad-except
     pass
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
-_log.info(
-    '%s v%s (%s, %s)',
-    ('ArtisanViewer' if app.artisanviewerMode else 'Artisan'),
-    str(__version__),
-    str(__revision__),
-    str(__build__),
-)
-_log.info('platform: %s',str(platform.platform()))
-_log.info('exec: %s', str(sys.executable))
 
+if multiprocessing.current_process().name == 'MainProcess':
+    _log.info(
+        '%s v%s (%s, %s)',
+        ('ArtisanViewer' if app.artisanviewerMode else 'Artisan'),
+        str(__version__),
+        str(__revision__),
+        str(__build__),
+    )
+    _log.info('platform: %s',str(platform.platform()))
+    _log.info('exec: %s', str(sys.executable))
+else:
+    _log.info('child process loaded')
 
 if platform.system().startswith('Windows'):
     # on Windows we use the Fusion style per default which supports the dark mode
@@ -7936,8 +7939,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 _log.exception(e)
                         else:
                             buttonnumber = int(cs)-1
-                            if self.extraeventsactions[buttonnumber] != 3:   #avoid calling other buttons with multiple actions to avoid possible infinite loops
-                                self.recordextraevent(buttonnumber,parallel=False,updateButtons=False)
+                            #if self.extraeventsactions[buttonnumber] != 3:   #avoid calling other buttons with multiple actions to avoid possible infinite loops
+                            self.recordextraevent(buttonnumber,parallel=False,updateButtons=False)
                 elif action == 4: # MODBUS Command
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(';')) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
@@ -8571,7 +8574,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 elif action == 9: # HOTTOP Main Fan
                     from artisanlib.hottop import setHottop # @Reimport
                     setHottop(main_fan=int(cmd))
-                elif action == 10: # HOTTOP Command (one of "heater", "fan", "motor", "solenoid", "stirrer")
+                elif action == 10: # HOTTOP Command (one of "heater", "fan", "motor", "solenoid", "stirrer"); "drum" accepted as alias for "motor"
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(';')) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
@@ -8589,6 +8592,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     cmds = eval(cs[len('fan'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,int):
                                         setHottop(main_fan = int(min(max(cmds,0),10) * 10))
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            elif cs.startswith('drum'): # drum as an alias for motor
+                                try:
+                                    cmds = eval(cs[len('drum'):]) # pylint: disable=eval-used
+                                    if cmds:
+                                        setHottop(drum_motor=True)
+                                    else:
+                                        setHottop(drum_motor=False)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             elif cs.startswith('motor'):
@@ -13947,11 +13959,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     # this should only be called from reset()
     def restoreExtraDeviceSettingsBackup(self):
-        _log.debug('restoreExtraDeviceSettingsBackup()')
         if self.simulator is None:
             try:
                 filename = self.getExtraDeviceSettingsPath()
                 if filename is not None and os.path.isfile(filename):
+                    _log.debug('restoreExtraDeviceSettingsBackup()')
                     settings = QSettings(filename, QSettings.Format.IniFormat)
                     settings.beginGroup('ExtraDev')
                     self.getExtraDeviceSettings(settings)
@@ -19043,15 +19055,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.closeserialports()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-        try:
-            self.qmc.closePhidgetOUTPUTs()
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
-        try:
-            self.qmc.closePhidgetAMBIENTs()
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
-        self.qmc.stopPhidgetManager()
+        if self.qmc.phidgetManager is not None:
+            try:
+                self.qmc.closePhidgetOUTPUTs()
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+            try:
+                self.qmc.closePhidgetAMBIENTs()
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+            self.qmc.stopPhidgetManager()
 
     # returns True if confirmed, False if canceled by the user
     def closeApp(self):
