@@ -5358,5 +5358,6 @@ class EnergyMeasuringDialog(ArtisanDialog):
         self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Apply)
         # hack to assign the Apply button the AcceptRole without losing default system translations
         applyButton = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Apply)
-        self.ui.buttonBox.removeButton(applyButton)
-        self.ui.buttonBox.addButton(applyButton.text(), QDialogButtonBox.ButtonRole.AcceptRole)
+        if applyButton is not None:
+            self.ui.buttonBox.removeButton(applyButton)
+            self.ui.buttonBox.addButton(applyButton.text(), QDialogButtonBox.ButtonRole.AcceptRole)
