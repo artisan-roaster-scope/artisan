@@ -112,6 +112,7 @@ OPTIONS = {
     'matplotlib_backends': '-', # '-' for imported or explicit "Qt5Agg, PDF, PS, SVG"
     'includes': ['serial', 'charset_normalizer.md__mypyc'],
     'excludes' :  ['tkinter','curses',
+                'PyInstaller', # if pyinstaller is installed, whyever, py2app tries to include pyinstaller and fails on some missing pyside modules
                 'PyQt5', # standard builds are now running on PyQt6. If PyQt5 is not excluded here it will be included in Resources/lib/python310.zip
                 # 'sqlite3',
                 ],

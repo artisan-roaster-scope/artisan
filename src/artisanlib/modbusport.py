@@ -205,16 +205,16 @@ class modbusport:
         return self.master is not None and bool(self.master.socket)
 
     def disconnect(self) -> None:
-        _log.debug('disconnect()')
         try:
             if self.master is not None:
+                _log.debug('disconnect()')
                 self.master.close()
+                self.clearReadingsCache()
                 self.aw.sendmessage(QApplication.translate('Message', 'MODBUS disconnected'))
                 del self.master
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         self.master = None
-        self.clearReadingsCache()
 
     def clearCommError(self) -> None:
         if self.commError>0:

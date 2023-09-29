@@ -17,10 +17,6 @@
 
 from bottle import default_app, request, abort, route, template, static_file, get, TEMPLATE_PATH # type: ignore
 from gevent import Timeout, kill # type: ignore
-
-# what is the exact difference between the next too?
-#from gevent import signal as gsignal # works only up to gevent v1.4.0
-#from gevent.signal import signal as gsignal # works on gevent v1.4.0 and newer
 from gevent import signal_handler as gsignal # type: ignore # works on gevent v1.4.0 and newer
 
 from gevent.pywsgi import WSGIServer # type: ignore

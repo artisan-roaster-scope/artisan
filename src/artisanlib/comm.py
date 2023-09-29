@@ -2250,15 +2250,15 @@ class serialport:
 
     def HOTTOPtemperatures(self) -> Tuple[float, float]:
         try:
-            from artisanlib.hottop import getHottop
-            BT, ET, heater, main_fan = getHottop()
-            self.aw.qmc.hottop_HEATER = heater
-            self.aw.qmc.hottop_MAIN_FAN = main_fan
-            self.aw.qmc.hottop_ET = ET
-            self.aw.qmc.hottop_BT = BT
-            if self.aw.qmc.mode == 'F':
-                self.aw.qmc.hottop_ET = fromCtoF(self.aw.qmc.hottop_ET)
-                self.aw.qmc.hottop_BT = fromCtoF(self.aw.qmc.hottop_BT)
+            if self.aw.hottop is not None:
+                BT, ET, heater, main_fan = self.aw.hottop.getState()
+                self.aw.qmc.hottop_HEATER = heater
+                self.aw.qmc.hottop_MAIN_FAN = main_fan
+                self.aw.qmc.hottop_ET = ET
+                self.aw.qmc.hottop_BT = BT
+                if self.aw.qmc.mode == 'F':
+                    self.aw.qmc.hottop_ET = fromCtoF(self.aw.qmc.hottop_ET)
+                    self.aw.qmc.hottop_BT = fromCtoF(self.aw.qmc.hottop_BT)
             return self.aw.qmc.hottop_BT,self.aw.qmc.hottop_ET
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)

@@ -3382,33 +3382,31 @@ class editGraphDlg(ArtisanResizeablDialog):
             tbl = prettytable.PrettyTable()
             fields = []
             for c in range(ncols):
-                fields.append(self.energy_ui.datatable.horizontalHeaderItem(c).text())
+                horizontalHeaderItem = self.energy_ui.datatable.horizontalHeaderItem(c)
+                if horizontalHeaderItem is not None:
+                    fields.append(horizontalHeaderItem.text())
             tbl.field_names = fields
             for i in range(nrows):
                 rows = []
-                rows.append(self.energy_ui.datatable.item(i,0).text())
-                rows.append(self.energy_ui.datatable.item(i,1).text())
-                rows.append(self.energy_ui.datatable.item(i,2).text())
-                rows.append(self.energy_ui.datatable.item(i,3).text())
-                rows.append(self.energy_ui.datatable.item(i,4).text())
-                rows.append(self.energy_ui.datatable.item(i,5).text())
-                rows.append(self.energy_ui.datatable.item(i,6).text())
+                for j in range(7):
+                    item = self.energy_ui.datatable.item(i,j)
+                    if item is not None:
+                        rows.append(item.text())
                 tbl.add_row(rows)
             clipboard = tbl.get_string()
         else:
             for c in range(ncols):
-                clipboard += self.energy_ui.datatable.horizontalHeaderItem(c).text()
-                if c != (ncols-1):
-                    clipboard += '\t'
+                horizontalHeaderItem = self.energy_ui.datatable.horizontalHeaderItem(c)
+                if horizontalHeaderItem is not None:
+                    clipboard += horizontalHeaderItem.text()
+                    if c != (ncols-1):
+                        clipboard += '\t'
             clipboard += '\n'
             for r in range(nrows):
-                clipboard += self.energy_ui.datatable.item(r,0).text() + '\t'
-                clipboard += self.energy_ui.datatable.item(r,1).text() + '\t'
-                clipboard += self.energy_ui.datatable.item(r,2).text() + '\t'
-                clipboard += self.energy_ui.datatable.item(r,3).text() + '\t'
-                clipboard += self.energy_ui.datatable.item(r,4).text() + '\t'
-                clipboard += self.energy_ui.datatable.item(r,5).text() + '\t'
-                clipboard += self.energy_ui.datatable.item(r,6).text() + '\n'
+                for j in range(7):
+                    item = self.energy_ui.datatable.item(r,j)
+                    if item is not None:
+                        clipboard += item.text() + '\t'
         # copy to the system clipboard
         sys_clip = QApplication.clipboard()
         if sys_clip is not None:

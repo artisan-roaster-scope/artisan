@@ -114,7 +114,7 @@ from artisanlib.phidgets import PhidgetManager
 from Phidget22.VoltageRange import VoltageRange # type: ignore
 
 try:
-    # spanning a second multiprocessing instance (Hottop server) on macOS falils to import the YAPI interface
+    # spanning a second multiprocessing instance on macOS falils to import the YAPI interface
     from yoctopuce.yocto_api import YAPI # type: ignore
 except Exception: # pylint: disable=broad-except
     pass
@@ -11351,8 +11351,19 @@ class tgraphcanvas(FigureCanvas):
             if not bool(self.aw.simulator):
                 if self.device == 53:
                     # connect HOTTOP
-                    from artisanlib.hottop import startHottop
-                    startHottop(0.6,self.aw.ser.comport,self.aw.ser.baudrate,self.aw.ser.bytesize,self.aw.ser.parity,self.aw.ser.stopbits,self.aw.ser.timeout,self.device_logging)
+                    from artisanlib.hottop import Hottop
+                    self.aw.hottop = Hottop()
+                    self.aw.hottop.setLogging(self.device_logging)
+                    hottop_serial:SerialSettings = {
+                                'port': self.aw.ser.comport,
+                                'baudrate': self.aw.ser.baudrate,
+                                'bytesize': self.aw.ser.bytesize,
+                                'stopbits': self.aw.ser.stopbits,
+                                'parity': self.aw.ser.parity,
+                                'timeout': self.aw.ser.timeout}
+                    self.aw.hottop.start(hottop_serial,
+                        connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Hottop'),True,None),
+                        disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Hottop'),True,None))
                 elif self.device == 134:
                     # connect Santoker
                     from artisanlib.santoker import SantokerNetwork
@@ -11395,13 +11406,20 @@ class tgraphcanvas(FigureCanvas):
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Kaleido'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Kaleido'),True,None))
                 elif self.device == 142:
-                    from artisanlib.ikawa import IKAWA_BLE
-                    self.aw.ikawa = IKAWA_BLE(
-                        connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('IKAWA'),True,None),
-                        disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('IKAWA'),True,None))
-                    if self.aw.ikawa is not None:
-                        self.aw.ikawa.start()
-                        self.aw.sendmessageSignal.emit(QApplication.translate('Message', 'scanning for device'),True,None)
+                    try:
+                        from artisanlib.ikawa import IKAWA_BLE
+                        self.aw.ikawa = IKAWA_BLE(
+                            connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('IKAWA'),True,None),
+                            disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('IKAWA'),True,None))
+                        if self.aw.ikawa is not None:
+                            self.aw.ikawa.start()
+                            self.aw.sendmessageSignal.emit(QApplication.translate('Message', 'scanning for device'),True,None)
+                    except Exception as ex:  # pylint: disable=broad-except
+                        _log.error(ex)
+                        _, _, exc_tb = sys.exc_info()
+                        self.adderror((QApplication.translate('Error Message', 'Exception:') + ' Bluetooth BLE support not available {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+
+
 
             self.aw.initializedMonitoringExtraDeviceStructures()
 
@@ -11487,11 +11505,11 @@ class tgraphcanvas(FigureCanvas):
             self.aw.pidcontrol.pidOff(send_command=self.device != 138)
 
             try:
-                if not bool(self.aw.simulator) and self.device == 53:
+                if not bool(self.aw.simulator) and self.device == 53 and self.aw.hottop is not None:
                     self.aw.HottopControlOff()
                     # disconnect HOTTOP
-                    from artisanlib.hottop import stopHottop
-                    stopHottop()
+                    self.aw.hottop.stop()
+                    self.aw.hottop = None
 
                 # disconnect Santoker
                 if not bool(self.aw.simulator) and self.device == 134 and self.aw.santoker is not None:

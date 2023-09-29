@@ -215,7 +215,7 @@ enable='''c-extension-no-member,'''
 
 [tool.mypy]
 files = ["artisanlib/*.py", "plus/*.py"]
-exclude = ['build', 'dist', 'uic']
+exclude = ['build', 'dist']
 ##python_version = "3.7"
 check_untyped_defs = true
 

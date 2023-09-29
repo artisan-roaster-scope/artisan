@@ -486,7 +486,8 @@ class KaleidoPort:
             await asyncio.sleep(self._reconnect_delay)
 
     @staticmethod
-    def start_background_loop(loop: asyncio.AbstractEventLoop) -> None:
+    def start_background_loop(loop: asyncio.AbstractEventLoop,
+                disconnected_handler:Optional[Callable[[], None]] = None) -> None:
         asyncio.set_event_loop(loop)
         try:
             # run_forever() returns after calling loop.stop()
@@ -497,6 +498,11 @@ class KaleidoPort:
             for t in [t for t in asyncio.all_tasks(loop) if not (t.done() or t.cancelled())]:
                 with suppress(asyncio.CancelledError):
                     loop.run_until_complete(t)
+            if disconnected_handler is not None:
+                try:
+                    disconnected_handler()
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         finally:
@@ -595,7 +601,7 @@ class KaleidoPort:
         try:
             _log.debug('start sampling')
             self._loop = asyncio.new_event_loop()
-            self._thread = Thread(target=self.start_background_loop, args=(self._loop,), daemon=True)
+            self._thread = Thread(target=self.start_background_loop, args=(self._loop,disconnected_handler), daemon=True)
             self._thread.start()
             # run sample task in async loop
             if serial is None:

@@ -1,6 +1,5 @@
 [General]
-Delay=2000
-Oversampling=true
+Delay=1000
 roastertype_setup=Hottop 2K+
 dropDuplicates=true
 
@@ -45,7 +44,7 @@ extramarkersizes2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x6)
 
 [DefaultButtons]
 buttonactions=0, 0, 0, 0, 0, 0, 8, 0
-buttonactionstrings=, , , , , , "heater(0);fan(10);drum(1);heater(0);solenoid(1);stirrer(1)", 
+buttonactionstrings=, , , , , , "heater(0);fan(10);motor(1);solenoid(1);stirrer(1)", 
 buttonvisibility=true, true, true, true, true, false, true, true
 extrabuttonactions=0, 0, 0
 extrabuttonactionstrings=, , 
@@ -101,6 +100,7 @@ showextrabuttontooltips=false
 
 [Quantifiers]
 clusterEventsFlag=true
+eventquantifierSV=0, 0, 0, 0
 quantifieractive=1, 0, 0, 1
 quantifiercoarse=1, 0, 0, 0
 quantifiermax=100, 100, 100, 100
@@ -117,7 +117,7 @@ bytesize=8
 comport=/dev/cu.usbserial-DA01POGR
 parity=N
 stopbits=1
-timeout=1
+timeout=0.3
 
 [Sliders]
 ModeTempSliders=C

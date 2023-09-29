@@ -294,7 +294,6 @@ class PortComboBox(MyQComboBox):  # pyright: ignore [reportGeneralTypeIssues] # 
         self.edited:Optional[str] = None
         if self.selection is not None:
             self.setCurrentText(self.selection)
-        self.editTextChanged.connect(self.textEdited)
         self.currentIndexChanged.connect(self.setSelection)
 
         # we prefer the device name if available over the selection port
@@ -304,6 +303,7 @@ class PortComboBox(MyQComboBox):  # pyright: ignore [reportGeneralTypeIssues] # 
                 self.setCurrentIndex(pos)
         except Exception: # pylint: disable=broad-except
             pass
+        self.editTextChanged.connect(self.textEdited) # this has to be done after the setCurrentIndex above to avoid setting the self.edited to the currents ports name
 
     @pyqtSlot(str)
     def textEdited(self, txt:str) -> None:
@@ -316,8 +316,8 @@ class PortComboBox(MyQComboBox):  # pyright: ignore [reportGeneralTypeIssues] # 
     def setSelection(self, i:int) -> None:
         if i >= 0:
             try:
-                self.selection = self.ports[i][0]
                 self.edited = None # reset the user text editing
+                self.selection = self.ports[i][0]
             except Exception: # pylint: disable=broad-except
                 pass
 

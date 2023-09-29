@@ -334,7 +334,6 @@ class s7port:
         return False
 
     def disconnect(self) -> None:
-        _log.debug('disconnect()')
 # don't stop the PLC as we want to keep it running beyond the Artisan disconnect!!
 #        try:
 #            self.plc.plc_stop()
@@ -342,7 +341,9 @@ class s7port:
 #            pass
         try:
             if self.plc is not None:
+                _log.debug('disconnect()')
                 self.plc.disconnect()
+                self.clearReadingsCache()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         try:
@@ -352,7 +353,6 @@ class s7port:
             _log.exception(e)
         self.plc = None
         self.is_connected = False
-        self.clearReadingsCache()
 
 
     def connect(self) -> None:

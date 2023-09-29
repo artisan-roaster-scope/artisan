@@ -201,6 +201,7 @@ if TYPE_CHECKING:
     from artisanlib.roast_properties import editGraphDlg # pylint: disable=unused-import
     from artisanlib.comparator import roastCompareDlg # pylint: disable=unused-import
     from artisanlib.wheels import WheelDlg # pylint: disable=unused-import
+    from artisanlib.hottop import Hottop # pylint: disable=unused-import
     from artisanlib.santoker import SantokerNetwork # pylint: disable=unused-import
     from artisanlib.kaleido import KaleidoPort # pylint: disable=unused-import
     from artisanlib.ikawa import IKAWA_BLE # pylint: disable=unused-import
@@ -1380,7 +1381,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'userprofilepath', 'printer', 'main_widget', 'defaultdpi', 'dpi', 'qmc', 'HottopControlActive', 'AsyncSamplingTimer', 'wheeldialog',
         'simulator', 'simulatorpath', 'comparator', 'stack', 'eventsbuttonflag', 'minieventsflags', 'seriallogflag',
         'seriallog', 'ser', 'modbus', 'extraMODBUStemps', 'extraMODBUStx', 's7', 'ws', 'scale', 'color', 'extraser', 'extracomport', 'extrabaudrate',
-        'extrabytesize', 'extraparity', 'extrastopbits', 'extratimeout', 'santokerHost', 'santokerPort', 'santokerSerial', 'santoker', 'fujipid', 'dtapid', 'pidcontrol', 'soundflag', 'recentRoasts', 'maxRecentRoasts',
+        'extrabytesize', 'extraparity', 'extrastopbits', 'extratimeout', 'hottop', 'santokerHost', 'santokerPort', 'santokerSerial', 'santoker', 'fujipid', 'dtapid', 'pidcontrol', 'soundflag', 'recentRoasts', 'maxRecentRoasts',
         'kaleidoHost', 'kaleidoPort', 'kaleidoSerial', 'kaleidoPID', 'kaleido',
         'lcdpaletteB', 'lcdpaletteF', 'extraeventsbuttonsflags', 'extraeventslabels', 'extraeventbuttoncolor', 'extraeventsactionstrings',
         'extraeventbuttonround', 'block_quantification_sampling_ticks', 'sampling_seconds_to_block_quantifiction', 'sampling_ticks_to_block_quantifiction', 'extraeventsactionslastvalue',
@@ -1645,6 +1646,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.extraparity:List[str] = []
         self.extrastopbits:List[int] = []
         self.extratimeout:List[float] = []
+
+        # Hottop
+        self.hottop:Optional['Hottop'] = None # holds the Hottop instance created on connect; reset to None on disconnect
 
         # Santoker Network
         self.santokerHost:str = '10.10.100.254'
@@ -8569,65 +8573,64 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         _, _, exc_tb = sys.exc_info()
                         self.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' callProgram(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
                 elif action == 8: # HOTTOP Heater
-                    from artisanlib.hottop import setHottop
-                    setHottop(heater=int(cmd))
+                    if self.hottop is not None:
+                        self.hottop.setHottop(heater=int(cmd))
                 elif action == 9: # HOTTOP Main Fan
-                    from artisanlib.hottop import setHottop # @Reimport
-                    setHottop(main_fan=int(cmd))
+                    if self.hottop is not None:
+                        self.hottop.setHottop(main_fan=int(cmd))
                 elif action == 10: # HOTTOP Command (one of "heater", "fan", "motor", "solenoid", "stirrer"); "drum" accepted as alias for "motor"
-                    if cmd_str:
+                    if cmd_str and self.hottop is not None:
                         cmds = filter(None, cmd_str.split(';')) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
                             cs = c.strip()
-                            from artisanlib.hottop import setHottop # @Reimport
                             if cs.startswith('heater'):
                                 try:
                                     cmds = eval(cs[len('heater'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,int):
-                                        setHottop(heater = min(max(cmds,0),100))
+                                        self.hottop.setHottop(heater = min(max(cmds,0),100))
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             elif cs.startswith('fan'):
                                 try:
                                     cmds = eval(cs[len('fan'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,int):
-                                        setHottop(main_fan = int(min(max(cmds,0),10) * 10))
+                                        self.hottop.setHottop(main_fan = int(min(max(cmds,0),10) * 10))
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             elif cs.startswith('drum'): # drum as an alias for motor
                                 try:
                                     cmds = eval(cs[len('drum'):]) # pylint: disable=eval-used
                                     if cmds:
-                                        setHottop(drum_motor=True)
+                                        self.hottop.setHottop(drum_motor=True)
                                     else:
-                                        setHottop(drum_motor=False)
+                                        self.hottop.setHottop(drum_motor=False)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             elif cs.startswith('motor'):
                                 try:
                                     cmds = eval(cs[len('motor'):]) # pylint: disable=eval-used
                                     if cmds:
-                                        setHottop(drum_motor=True)
+                                        self.hottop.setHottop(drum_motor=True)
                                     else:
-                                        setHottop(drum_motor=False)
+                                        self.hottop.setHottop(drum_motor=False)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             elif cs.startswith('solenoid'):
                                 try:
                                     cmds = eval(cs[len('solenoid'):]) # pylint: disable=eval-used
                                     if cmds:
-                                        setHottop(solenoid=True)
+                                        self.hottop.setHottop(solenoid=True)
                                     else:
-                                        setHottop(solenoid=False)
+                                        self.hottop.setHottop(solenoid=False)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             elif cs.startswith('stirrer'):
                                 try:
                                     cmds = eval(cs[len('stirrer'):]) # pylint: disable=eval-used
                                     if cmds:
-                                        setHottop(cooling_motor=True)
+                                        self.hottop.setHottop(cooling_motor=True)
                                     else:
-                                        setHottop(cooling_motor=False)
+                                        self.hottop.setHottop(cooling_motor=False)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             elif cs.startswith('sleep') and cs.endswith(')'): # in seconds
@@ -19002,10 +19005,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.fullscreenAction.setChecked(False)
             self.showNormal()
         if self.simulator is None:
-            if self.qmc.device == 53:
+            if self.qmc.device == 53 and self.hottop is not None:
                 # disconnect HOTTOP
-                from artisanlib.hottop import stopHottop
-                stopHottop()
+                self.hottop.stop()
+                self.hottop = None
             elif self.qmc.device == 134 and self.santoker is not None:
                 # disconnect Santoker
                 self.santoker.stop()
@@ -22213,10 +22216,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         dialog = comportDlg(self,self)
         if dialog.exec():
             # we stop the HOTTOP loop to trigger a new connect with the potential changed serial port settings
-            if self.qmc.device == 53:
+            if self.qmc.device == 53 and self.hottop:
                 # disconnect HOTTOP
-                from artisanlib.hottop import stopHottop
-                stopHottop()
+                self.hottop.stop()
             # set serial port
             self.ser.comport = str(dialog.comportEdit.getSelection())
             self.ser.baudrate = int(str(dialog.baudrateComboBox.currentText()))              #int changes QString to int
@@ -22434,29 +22436,24 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.HottopControlOn()
 
     def HottopControlOff(self):
-        from artisanlib.hottop import releaseHottopControl
-        res = releaseHottopControl()
-        if res:
-            if self.HottopControlActive:
-                self.sendmessage(QApplication.translate('Message','Hottop control turned off'))
-            self.HottopControlActive = False
-            self.buttonCONTROL.setStyleSheet(self.pushbuttonstyles['PID'])
+        if self.hottop is not None:
+            res = self.hottop.releaseHottopControl()
+            if res:
+                if self.HottopControlActive:
+                    self.sendmessage(QApplication.translate('Message','Hottop control turned off'))
+                self.HottopControlActive = False
+                self.buttonCONTROL.setStyleSheet(self.pushbuttonstyles['PID'])
 
     def HottopControlOn(self):
         if self.superusermode: # Hottop control mode can for now activated only in super user mode
-            from artisanlib.hottop import isHottopLoopRunning
-            if not isHottopLoopRunning():
-                from artisanlib.hottop import startHottop
-                startHottop(0.6,self.ser.comport,self.ser.baudrate,self.ser.bytesize,self.ser.parity,self.ser.stopbits,self.ser.timeout,self.qmc.device_logging)
-            from artisanlib.hottop import takeHottopControl
-            res = takeHottopControl()
-            if res:
-                from artisanlib.hottop import setHottop
-                setHottop(drum_motor=True)
-                self.buttonCONTROL.setStyleSheet(self.pushbuttonstyles['PIDactive'])
-                if not self.HottopControlActive:
-                    self.sendmessage(QApplication.translate('Message','Hottop control turned on'))
-                self.HottopControlActive = True
+            if self.hottop is not None:
+                res = self.hottop.takeHottopControl()
+                if res:
+                    self.hottop.setHottop(drum_motor=True)
+                    self.buttonCONTROL.setStyleSheet(self.pushbuttonstyles['PIDactive'])
+                    if not self.HottopControlActive:
+                        self.sendmessage(QApplication.translate('Message','Hottop control turned on'))
+                    self.HottopControlActive = True
         else:
             QMessageBox.warning(self, QApplication.translate('Message', 'Warning'), QApplication.translate('Message',
                 'To control a Hottop you need to activate the super user mode via a right click on the timer LCD first!'))
