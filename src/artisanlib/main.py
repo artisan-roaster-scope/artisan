@@ -202,7 +202,7 @@ if TYPE_CHECKING:
     from artisanlib.comparator import roastCompareDlg # pylint: disable=unused-import
     from artisanlib.wheels import WheelDlg # pylint: disable=unused-import
     from artisanlib.hottop import Hottop # pylint: disable=unused-import
-    from artisanlib.santoker import SantokerNetwork # pylint: disable=unused-import
+    from artisanlib.santoker import Santoker # pylint: disable=unused-import
     from artisanlib.kaleido import KaleidoPort # pylint: disable=unused-import
     from artisanlib.ikawa import IKAWA_BLE # pylint: disable=unused-import
     from matplotlib.text import Annotation # pylint: disable=unused-import
@@ -1654,7 +1654,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.santokerHost:str = '10.10.100.254'
         self.santokerPort:int = 20001
         self.santokerSerial:bool = False # if True connection is via the main serial port
-        self.santoker:Optional['SantokerNetwork'] = None # holds the Santoker instance created on connect; reset to None on disconnect
+        self.santoker:Optional['Santoker'] = None # holds the Santoker instance created on connect; reset to None on disconnect
 
         # Kaleido Network
         self.kaleido_default_host:Final[str] = '127.0.0.1'

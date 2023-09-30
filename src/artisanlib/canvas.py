@@ -11352,8 +11352,6 @@ class tgraphcanvas(FigureCanvas):
                 if self.device == 53:
                     # connect HOTTOP
                     from artisanlib.hottop import Hottop
-                    self.aw.hottop = Hottop()
-                    self.aw.hottop.setLogging(self.device_logging)
                     hottop_serial:SerialSettings = {
                                 'port': self.aw.ser.comport,
                                 'baudrate': self.aw.ser.baudrate,
@@ -11361,14 +11359,15 @@ class tgraphcanvas(FigureCanvas):
                                 'stopbits': self.aw.ser.stopbits,
                                 'parity': self.aw.ser.parity,
                                 'timeout': self.aw.ser.timeout}
-                    self.aw.hottop.start(hottop_serial,
+                    self.aw.hottop = Hottop(
+                        serial=hottop_serial,
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Hottop'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Hottop'),True,None))
+                    self.aw.hottop.setLogging(self.device_logging)
+                    self.aw.hottop.start()
                 elif self.device == 134:
                     # connect Santoker
-                    from artisanlib.santoker import SantokerNetwork
-                    self.aw.santoker = SantokerNetwork()
-                    self.aw.santoker.setLogging(self.device_logging)
+                    from artisanlib.santoker import Santoker
                     santoker_serial:Optional[SerialSettings] = None
                     if self.aw.santokerSerial:
                         santoker_serial = {
@@ -11378,7 +11377,7 @@ class tgraphcanvas(FigureCanvas):
                                 'stopbits': self.aw.ser.stopbits,
                                 'parity': self.aw.ser.parity,
                                 'timeout': self.aw.ser.timeout}
-                    self.aw.santoker.start(self.aw.santokerHost, self.aw.santokerPort,
+                    self.aw.santoker = Santoker(self.aw.santokerHost, self.aw.santokerPort,
                         santoker_serial,
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Santoker'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Santoker'),True,None),
@@ -11387,6 +11386,8 @@ class tgraphcanvas(FigureCanvas):
                         fcs_handler=lambda : (self.markFCsSignal.emit(False) if (self.timeindex[1] == 0) else None),
                         scs_handler=lambda : (self.markSCsSignal.emit(False) if (self.timeindex[4] == 0) else None),
                         drop_handler=lambda : (self.markDropSignal.emit(False) if (self.timeindex[6] == 0) else None))
+                    self.aw.santoker.setLogging(self.device_logging)
+                    self.aw.santoker.start()
                 elif self.device == 138:
                     # connect Kaleido
                     from artisanlib.kaleido import KaleidoPort
@@ -11616,6 +11617,8 @@ class tgraphcanvas(FigureCanvas):
             self.aw.buttonONOFF.setGraphicsEffect(self.aw.makeShadow())
             self.aw.buttonSTARTSTOP.setEnabled(True)
             self.aw.buttonSTARTSTOP.setGraphicsEffect(self.aw.makeShadow())
+            self.aw.buttonCONTROL.setEnabled(True)
+            self.aw.buttonCONTROL.setGraphicsEffect(self.aw.makeShadow())
 
             if self.flagKeepON and len(self.timex) > 10:
                 QTimer.singleShot(300, self.onMonitorSignal.emit)
@@ -11639,6 +11642,11 @@ class tgraphcanvas(FigureCanvas):
             if ge is not None:
                 ge.setEnabled(False)
             self.aw.buttonSTARTSTOP.setEnabled(False)
+
+            self.aw.buttonCONTROL.setEnabled(False)
+            ge = self.aw.buttonCONTROL.graphicsEffect()
+            if ge is not None:
+                ge.setEnabled(False)
 
             # stop Recorder if still running
             if self.flagstart:

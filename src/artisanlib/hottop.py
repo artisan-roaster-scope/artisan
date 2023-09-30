@@ -18,10 +18,6 @@
 import time
 import logging
 import asyncio
-from contextlib import suppress
-from threading import Thread
-from pymodbus.transport.transport_serial import create_serial_connection # patched pyserial-asyncio
-
 
 from typing import Optional, Tuple, Callable, TYPE_CHECKING
 from typing import Final  # Python <=3.7
@@ -29,12 +25,13 @@ from typing import Final  # Python <=3.7
 if TYPE_CHECKING:
     from artisanlib.types import SerialSettings # pylint: disable=unused-import
 
+from artisanlib.async_comm import AsyncComm
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
-class Hottop:
+class Hottop(AsyncComm):
     HEADER:Final[bytes] = b'\xa5\x96' # 165, 150
 
     SEND_INTERVAL:Final[float] = 0.5 # in seconds (should be larger than >100ms and <1s; if machine does not receive anything within 1s it ejects the beans)
@@ -43,17 +40,15 @@ class Hottop:
     BTcutoff:Final[int] = 220        # 220C = 428F (was 212C/413F before)
     BTleaveControl:Final[int] = 180  # 180C = 350F; the BT below which the control can be released; above the control cannot be released to avoid sudden stop at high temperatures
 
-    __slots__ = [ '_loop', '_thread', '_write_queue', '_bt', '_et', '_heater', '_main_fan', '_fan', '_solenoid', '_drum_motor', '_cooling_motor',
-                     '_control_active', '_set_heater', '_set_fan', '_set_main_fan', '_set_solenoid', '_set_drum_motor', '_set_cooling_motor',
-                     '_last_write', '_verify_crc', '_logging' ]
+    __slots__ = [ '_bt', '_et', '_heater', '_main_fan', '_fan', '_solenoid', '_drum_motor', '_cooling_motor', '_control_active',
+                    '_set_heater', '_set_fan', '_set_main_fan', '_set_solenoid', '_set_drum_motor', '_set_cooling_motor', '_last_write' ]
 
 
-    def __init__(self) -> None:
+    def __init__(self, host:str = '127.0.0.1', port:int = 8080, serial:Optional['SerialSettings'] = None,
+                connected_handler:Optional[Callable[[], None]] = None,
+                disconnected_handler:Optional[Callable[[], None]] = None) -> None:
 
-        # internals
-        self._loop:        Optional[asyncio.AbstractEventLoop] = None # the asyncio loop
-        self._thread:      Optional[Thread]                    = None # the thread running the asyncio loop
-        self._write_queue: Optional['asyncio.Queue[bytes]']    = None # the write queue
+        super().__init__(host, port, serial, connected_handler, disconnected_handler)
 
         # current readings
         self._bt:float = -1         # bean temperature in °C
@@ -76,49 +71,8 @@ class Hottop:
         self._set_cooling_motor:int = -1
         self._last_write = time.time()
 
-        # configuration
-        self._verify_crc:bool = True
-        self._logging = False # if True device communication is logged
 
-
-    # external configuration API
-    def setVerifyCRC(self, b:bool) -> None:
-        self._verify_crc = b
-    def setLogging(self, b:bool) -> None:
-        self._logging = b
-
-
-    # asyncio loop
-
-    @staticmethod
-    async def open_serial_connection(*, loop=None, limit=None, **kwargs):
-        """A wrapper for create_serial_connection() returning a (reader,
-        writer) pair.
-
-        The reader returned is a StreamReader instance; the writer is a
-        StreamWriter instance.
-
-        The arguments are all the usual arguments to Serial(). Additional
-        optional keyword arguments are loop (to set the event loop instance
-        to use) and limit (to set the buffer limit passed to the
-        StreamReader.
-
-        This function is a coroutine.
-        """
-        if loop is None:
-            loop = asyncio.get_event_loop()
-        if limit is None:
-            limit = 2 ** 16  # 64 KiB
-        reader = asyncio.StreamReader(limit=limit, loop=loop)
-        protocol = asyncio.StreamReaderProtocol(reader, loop=loop)
-        transport, _ = await create_serial_connection(
-            loop=loop, protocol_factory=lambda: protocol, **kwargs
-        )
-        writer = asyncio.StreamWriter(transport, protocol, reader, loop)
-        return reader, writer
-
-
-    # message decoder
+    # message encoder/decoder
 
     def valid_message(self, message:bytearray) -> bool:
         return (len(message) == 36 and
@@ -164,120 +118,15 @@ class Hottop:
         elif self._logging:
             _log.info('invalid message received: %s', message)
 
-
-    async def handle_reads(self, reader: asyncio.StreamReader) -> None:
-        try:
-            with suppress(asyncio.CancelledError):
-                while not reader.at_eof():
-                    await self.read_msg(reader)
-        except Exception as e: # pylint: disable=broad-except
-            _log.error(e)
-
-    async def write(self, writer: asyncio.StreamWriter, message: bytes) -> None:
-        try:
-            if self._logging:
-                _log.info('write(%s)',message)
-            writer.write(message)
-            await writer.drain()
-            self._last_write = time.time()
-        except Exception as e: # pylint: disable=broad-except
-            _log.error(e)
-
-    async def handle_writes(self, writer: asyncio.StreamWriter, queue: 'asyncio.Queue[bytes]') -> None:
-        try:
-            with suppress(asyncio.CancelledError):
-# assignments in while are only only available from Python 3.8
-#                while (message := await queue.get()) != b'':
-#                    await self.write(writer, message)
-                message = await queue.get()
-                while message != b'':
-                    await self.write(writer, message)
-                    message = await queue.get()
-        except Exception as e: # pylint: disable=broad-except
-            _log.error(e)
-        finally:
-            with suppress(asyncio.CancelledError, ConnectionResetError):
-                await writer.drain()
-
-    # if serial settings are given, host/port are ignore and communication handled by the given serial port
-    async def connect(self, serial:'SerialSettings',
-                connected_handler:Optional[Callable[[], None]] = None,
-                disconnected_handler:Optional[Callable[[], None]] = None) -> None:
-        writer = None
-        while True:
-            try:
-                _log.debug('connecting to serial port: %s ...',serial['port'])
-                connect = self.open_serial_connection(
-                    url=serial['port'],
-                    baudrate=serial['baudrate'],
-                    bytesize=serial['bytesize'],
-                    stopbits=serial['stopbits'],
-                    parity=serial['parity'],
-                    timeout=serial['timeout'])
-                # Wait for 2 seconds, then raise TimeoutError
-                reader, writer = await asyncio.wait_for(connect, timeout=2)
-                _log.debug('connected')
-                if connected_handler is not None:
-                    try:
-                        connected_handler()
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.exception(e)
-                self._write_queue = asyncio.Queue()
-                read_handler = asyncio.create_task(self.handle_reads(reader))
-                write_handler = asyncio.create_task(self.handle_writes(writer, self._write_queue))
-                done, pending = await asyncio.wait([read_handler, write_handler], return_when=asyncio.FIRST_COMPLETED)
-
-                for task in pending:
-                    task.cancel()
-                for task in done:
-                    exception = task.exception()
-                    if isinstance(exception, Exception):
-                        raise exception
-
-            except asyncio.TimeoutError:
-                _log.debug('connection timeout')
-            except Exception as e: # pylint: disable=broad-except
-                _log.error(e)
-            finally:
-                if writer is not None:
-                    try:
-                        writer.close()
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.error(e)
-
-            self.resetReadings()
-            if disconnected_handler is not None:
-                try:
-                    disconnected_handler()
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
-
-            await asyncio.sleep(1)
-
-    @staticmethod
-    def start_background_loop(loop: asyncio.AbstractEventLoop, disconnected_handler:Optional[Callable[[], None]] = None) -> None:
-        asyncio.set_event_loop(loop)
-        try:
-            # run_forever() returns after calling loop.stop()
-            loop.run_forever()
-            # clean up tasks
-            for task in asyncio.all_tasks(loop):
-                task.cancel()
-            for t in [t for t in asyncio.all_tasks(loop) if not (t.done() or t.cancelled())]:
-                with suppress(asyncio.CancelledError):
-                    loop.run_until_complete(t)
-            if disconnected_handler is not None:
-                try:
-                    disconnected_handler()
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
-        except Exception as e:  # pylint: disable=broad-except
-            _log.exception(e)
-        finally:
-            loop.close()
-
-
-    # send message interface
+    def reset_readings(self) -> None:
+        self._bt = -1
+        self._et = -1
+        self._heater = 0
+        self._main_fan = 0
+        self._fan = 0
+        self._solenoid = 0
+        self._drum_motor = 0
+        self._cooling_motor = 0
 
     # prefers set_value, and returns get_value if set_value is -1. If both are -1, returns 0
     @staticmethod
@@ -313,35 +162,6 @@ class Hottop:
             if self._write_queue is not None:
                 asyncio.run_coroutine_threadsafe(self._write_queue.put(msg), self._loop)
 
-    # start/stop sample thread
-
-    def start(self, serial:'SerialSettings',
-                connected_handler:Optional[Callable[[], None]] = None,
-                disconnected_handler:Optional[Callable[[], None]] = None) -> None:
-        try:
-            _log.debug('start sampling')
-            self._loop = asyncio.new_event_loop()
-            self._thread = Thread(target=self.start_background_loop, args=(self._loop,disconnected_handler), daemon=True)
-            self._thread.start()
-            # run sample task in async loop
-            asyncio.run_coroutine_threadsafe(self.connect(serial,
-                connected_handler, disconnected_handler), self._loop)
-        except Exception as e:  # pylint: disable=broad-except
-            _log.exception(e)
-
-    def stop(self) -> None:
-        _log.debug('stop sampling')
-        # self._loop.stop() needs to be called as follows as the event loop class is not thread safe
-        if self._loop is not None:
-            self._loop.call_soon_threadsafe(self._loop.stop)
-            self._loop = None
-        # wait for the thread to finish
-        if self._thread is not None:
-            self._thread.join()
-            self._thread = None
-        self._write_queue = None
-        self.resetReadings()
-
 
     # External Interface
 
@@ -359,16 +179,6 @@ class Hottop:
 
     def getState(self) -> Tuple[float, float, int, int]:
         return self._bt, self._et, self._heater, self._main_fan
-
-    def resetReadings(self) -> None:
-        self._bt = -1
-        self._et = -1
-        self._heater = 0
-        self._main_fan = 0
-        self._fan = 0
-        self._solenoid = 0
-        self._drum_motor = 0
-        self._cooling_motor = 0
 
     # heater : int(0-100)
     # fan, main_fan : int(0-100) (will be converted to the internal int(0-10))
@@ -392,7 +202,6 @@ class Hottop:
                 self._set_cooling_motor = (1 if cooling_motor else 0)
 
 def main():
-    hottop = Hottop()
     hottop_serial:'SerialSettings' = {
         'port': '/dev/slave',
         'baudrate': 9600, # 115200
@@ -400,7 +209,8 @@ def main():
         'stopbits': 1,
         'parity': 'N',
         'timeout': 0.3}
-    hottop.start(hottop_serial)
+    hottop = Hottop(serial=hottop_serial)
+    hottop.start()
     for _ in range(4):
         hottop.setHottop(heater=35) # set power to 35%
         time.sleep(1)
