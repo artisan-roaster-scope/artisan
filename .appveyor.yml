@@ -20,7 +20,7 @@ environment:
   # Set the Appveyor Python version for windows, macos and linux here. Does not affect windows_legacy.
   PYTHON_V: 3.11
   # Upgrade to specific version (for platforms supporting upgrade). Upgrade skipped if env var is missing or blank.
-#  PYUPGRADE_V: 3.11.5
+  PYUPGRADE_V: 3.11.5
 
   matrix:
   - job_name: windows_legacy

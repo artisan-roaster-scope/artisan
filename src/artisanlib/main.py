@@ -17393,7 +17393,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 # the dpi is set on creating the FigureCanvas
                 try:
                     if self.dpi != toInt(settings.value('dpi',self.dpi)):
-                        self.setdpi(toInt(settings.value('dpi',self.dpi)),moveWindow=True)
+                        self.setdpi(max(40,toInt(settings.value('dpi',self.dpi))),moveWindow=True)
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
             #restore geometry
@@ -18894,7 +18894,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.settingsSetValue(settings, default_settings, 'appearance',self.appearance, read_defaults)
             except Exception: # pylint: disable=broad-except
                 pass
-            self.settingsSetValue(settings, default_settings, 'dpi',self.dpi, read_defaults)
+
+            if not read_defaults:
+                settings.setValue('dpi',self.dpi) # no defaults cache used here to ensure that this one is always writ
 
             self.settingsSetValue(settings, default_settings, 'recentRoasts',self.recentRoasts, read_defaults)
 
