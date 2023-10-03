@@ -15,215 +15,192 @@
 # AUTHOR
 # Marko Luther, 2023
 
-from bottle import default_app, request, abort, route, template, static_file, get, TEMPLATE_PATH # type: ignore
-from gevent import Timeout, kill # type: ignore
-from gevent import signal_handler as gsignal # type: ignore # works on gevent v1.4.0 and newer
-
-from gevent.pywsgi import WSGIServer # type: ignore
-#from geventwebsocket import WebSocketError
-from geventwebsocket.handler import WebSocketHandler # type: ignore
-from platform import system as psystem
-
-if psystem() != 'Windows':
-    from signal import SIGQUIT # type: ignore[attr-defined] # pylint: disable=no-name-in-module # not available on Windows
-
+import time
+import asyncio
 import logging
-import multiprocessing as mp
+import weakref
+import jinja2
+import aiohttp_jinja2
+from contextlib import suppress
+from aiohttp import web, WSCloseCode, WSMsgType
+from threading import Thread
+from typing import Final, Optional, Dict, TYPE_CHECKING
 
-from json import dumps as jdumps
-from requests import get as rget
-
-import time as libtime
-from typing import Any, List, Final
-
+if TYPE_CHECKING:
+    from aiohttp.web import Request #, Response  # pylint: disable=unused-import
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
-wsocks: List[Any] = [] # list of open web sockets
-process = None
-port = None
-nonesymbol = '--'
-timecolor='#FFF'
-timebackground='#000'
-btcolor='#00007F'
-btbackground='#CCCCCC'
-etcolor='#FF0000'
-etbackground='#CCCCCC'
-showet = True
-showbt = True
-static_path = ''
+class WebLCDs:
 
-# pickle hack:
-def work(p,rp,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,showbtflag):
-    global port, static_path, nonesymbol, timecolor, timebackground, btcolor, btbackground, etcolor, etbackground, showbt, showet # pylint: disable=global-statement
-    port = p
-    static_path = rp
-    nonesymbol = nonesym
-    timecolor = timec
-    timebackground = timebg
-    btcolor = btc
-    btbackground = btbg
-    etcolor = etc
-    etbackground = etbg
-    showet = showetflag
-    showbt = showbtflag
-    TEMPLATE_PATH.insert(0,rp)
-    s = WSGIServer(('0.0.0.0', p), default_app(), handler_class=WebSocketHandler)
-    s.serve_forever()
+    __slots__ = [ '_loop', '_thread', '_app', '_port', '_last_send', '_min_send_interval', '_resource_path', '_nonesymbol', '_timecolor',
+                    '_timebackground', '_btcolor', '_btbackground', '_etcolor', '_etbackground',
+                    '_showetflag', '_showbtflag' ]
 
-def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,showbtflag):
-    global port, process, static_path, nonesymbol, timecolor, timebackground, btcolor, btbackground, etcolor, etbackground, showet, showbt # pylint: disable=global-statement
-    port = p
-    static_path = resourcePath
-    nonesymbol = nonesym
-    timecolor = timec
-    timebackground = timebg
-    btcolor = btc
-    btbackground = btbg
-    etcolor = etc
-    etbackground = etbg
-    showet = showetflag
-    showbt = showbtflag
-    r = None
-    if psystem() != 'Windows':
-        gsignal(SIGQUIT, kill)
+    def __init__(self, port:int, resource_path:str, nonesymbol:str, timecolor:str, timebackground:str, btcolor:str,
+            btbackground:str, etcolor:str, etbackground:str, showetflag:bool, showbtflag:bool):
 
-    process = mp.Process(name='WebLCDs',target=work,args=(
-        port,
-        resourcePath,
-        nonesym,
-        timec,
-        timebg,
-        btc,
-        btbg,
-        etc,
-        etbg,
-        showetflag,
-        showbtflag))
-    process.start()
+        self._loop:        Optional[asyncio.AbstractEventLoop] = None # the asyncio loop
+        self._thread:      Optional[Thread]                    = None # the thread running the asyncio loop
+        self._app = web.Application(debug=True)
+        self._app['websockets'] = weakref.WeakSet()
+        self._app.on_shutdown.append(self.on_shutdown)
 
-    libtime.sleep(2)
+        self._last_send:float = time.time() # timestamp of the last message send to the clients
+        self._min_send_interval:float = 0.03
 
-    while not process.is_alive():
-        libtime.sleep(0.1)
+        aiohttp_jinja2.setup(self._app,
+            loader=jinja2.FileSystemLoader(resource_path))
 
-    if process.is_alive():
-        # check successful start
-        url = f'http://127.0.0.1:{port}/status'
-        for _ in range(10):
-            libtime.sleep(1)
+        self._app.add_routes([
+#            web.get('/status', self.status), # not used any longer
+            web.get('/artisan', self.index),
+#            web.post('/send', self.send),    # only needed to update readings via http (see canvas.py:updateWebLCDs)
+            web.get('/websocket', self.websocket_handler),
+            web.static('/', resource_path, append_version=True)
+        ])
+
+        self._port: int = port
+        self._resource_path:str = resource_path
+        self._nonesymbol:str = nonesymbol
+        self._timecolor:str = timecolor
+        self._timebackground:str = timebackground
+        self._btcolor:str = btcolor
+        self._btbackground:str = btbackground
+        self._etcolor:str = etcolor
+        self._etbackground:str = etbackground
+        self._showetflag:bool = showetflag
+        self._showbtflag:bool = showbtflag
+
+#    @staticmethod
+#    def status(_request: 'Request'):
+#        return web.Response(text='1')
+
+    @aiohttp_jinja2.template('artisan.tpl')
+    async def index(self, _request: 'Request') -> Dict[str,str]:
+        showspace_str = 'inline' if not (self._showbtflag and self._showetflag) else 'none'
+        showbt_str = 'inline' if self._showbtflag else 'none'
+        showet_str = 'inline' if self._showetflag else 'none'
+        return {
+            'port': str(self._port),
+            'nonesymbol': self._nonesymbol,
+            'timecolor': self._timecolor,
+            'timebackground': self._timebackground,
+            'btcolor': self._btcolor,
+            'btbackground': self._btbackground,
+            'etcolor': self._etcolor,
+            'etbackground': self._etbackground,
+            'showbt': showbt_str,
+            'showet': showet_str,
+            'showspace': showspace_str
+        }
+
+#    # route to push new data to the client
+#    async def send(self, request: 'Request') -> 'Response':
+#        json = await request.text()
+#        wsocks = self._app['websockets']
+#        for ws in wsocks:
+#            try:
+#                await ws.send_str(json)
+#            except Exception as e: # pylint: disable=broad-except
+#                _log.exception(e)
+#                try:
+#                    request.app['websockets'].discard(ws)
+#                except Exception as e: # pylint: disable=broad-except
+#                    _log.exception(e)
+#        return web.Response()
+
+
+
+    async def send_msg_to_all(self, message:str) -> None:
+        wsocks = self._app['websockets']
+        for ws in wsocks:
             try:
-                r = rget(url, timeout=(6.1,10))
-            except Exception: # pylint: disable=broad-except
-                pass
-            if r is not None:
-                break
-        if r is None:
+                await ws.send_str(message)
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+                try:
+                    self._app['websockets'].discard(ws)
+                except Exception as ex: # pylint: disable=broad-except
+                    _log.exception(ex)
+
+    def send_msg(self, message:str, timeout:Optional[float] = 0.2) -> None:
+        now: float = time.time()
+        if self._loop is not None and (now - self._min_send_interval) > self._last_send:
+            self._last_send = now
+            future = asyncio.run_coroutine_threadsafe(self.send_msg_to_all(message), self._loop)
+            try:
+                future.result(timeout)
+            except TimeoutError:
+                # the coroutine took too long, cancelling the task...
+                future.cancel()
+            except Exception as ex: # pylint: disable=broad-except
+                _log.error(ex)
+
+    # route that establishes the websocket between the Artisan app and the clients
+    @staticmethod
+    async def websocket_handler(request: 'Request'):
+        ws = web.WebSocketResponse()
+        await ws.prepare(request)
+        request.app['websockets'].add(ws)
+        try:
+            async for msg in ws:
+#                _log.info('ws msg: %s', msg)
+                if msg.type == WSMsgType.ERROR:
+                    log.error('ws connection closed with exception %s', ws.exception())
+        finally:
+            request.app['websockets'].discard(ws)
+        return ws
+
+    @staticmethod
+    async def on_shutdown(app):
+        for ws in set(app['websockets']):
+            await ws.close(code=WSCloseCode.GOING_AWAY,
+                           message='Server shutdown')
+
+    async def startup(self):
+        runner = web.AppRunner(self._app)
+        await runner.setup()
+        site = web.TCPSite(runner, '0.0.0.0', self._port)
+        await site.start()
+
+    @staticmethod
+    def start_background_loop(loop: asyncio.AbstractEventLoop) -> None:
+        asyncio.set_event_loop(loop)
+        try:
+            # run_forever() returns after calling loop.stop()
+            loop.run_forever()
+            # clean up tasks
+            for task in asyncio.all_tasks(loop):
+                task.cancel()
+            for t in [t for t in asyncio.all_tasks(loop) if not (t.done() or t.cancelled())]:
+                with suppress(asyncio.CancelledError):
+                    loop.run_until_complete(t)
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
+        finally:
+            loop.close()
+
+    def startWeb(self) -> bool:
+        _log.info('start WebLCDs on port %s', self._port)
+        try:
+            self._loop = asyncio.new_event_loop()
+            self._thread = Thread(target=self.start_background_loop, args=(self._loop,), daemon=True)
+            self._thread.start()
+            # run web task in async loop
+            asyncio.run_coroutine_threadsafe(self.startup(), self._loop)
+            return True
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
             return False
-        res: bool = bool(r.status_code == 200)
-        if res:
-            _log.info('WebLCDs started')
-        else:
-            _log.info('WebLCDs start failed')
-        return res
-    return False
 
-def stopWeb():
-    global wsocks, process # pylint: disable=global-statement
-    for ws in wsocks:
-        ws.close()
-    wsocks = []
-    if process:
-        process.terminate()
-        process.join()
-        process = None
-
-class TooLong(Exception):
-    pass
-time_to_wait = 1 # seconds
-
-def send_all(msg):
-    socks = wsocks[:]
-    for ws in socks:
-        try:
-            with Timeout(time_to_wait, TooLong):
-                if ws.closed:
-                    try:
-                        wsocks.remove(ws)
-                    except Exception: # pylint: disable=broad-except
-                        pass
-                else:
-                    ws.send(msg)
-        except Exception: # pylint: disable=broad-except
-            try:
-                wsocks.remove(ws)
-            except Exception: # pylint: disable=broad-except
-                pass
-
-# route to push new data to the client
-@route('/send', method='POST')
-def send():
-    send_all(jdumps(request.json))
-
-# route that establishes the websocket between the Artisan app and the clients
-@route('/websocket')
-def handle_websocket():
-    wsock = request.environ.get('wsgi.websocket')  # @UndefinedVariable
-    if not wsock:
-        abort(400, 'Expected WebSocket request.')
-    wsocks.append(wsock)
-    while True:
-        try:
-            if wsock.closed:
-                try:
-                    wsocks.remove(wsock)
-                except Exception: # pylint: disable=broad-except
-                    pass
-                break
-            message = wsock.receive()
-            if message is None:
-                try:
-                    wsocks.remove(wsock)
-                except Exception: # pylint: disable=broad-except
-                    pass
-                break
-        except Exception: # pylint: disable=broad-except
-            try:
-                wsocks.remove(wsock)
-            except Exception: # pylint: disable=broad-except
-                pass
-            break
-
-@route('/status')
-def status():
-    return '1'
-
-# route to serve the static page
-@route('/artisan')
-def index():
-    showspace_str = 'inline' if not (showbt and showet) else 'none'
-    showbt_str = 'inline' if showbt else 'none'
-    showet_str = 'inline' if showet else 'none'
-    return template('artisan.tpl',
-        port=str(port),
-        nonesymbol=nonesymbol,
-        timecolor=timecolor,
-        timebackground=timebackground,
-        btcolor=btcolor,
-        btbackground=btbackground,
-        etcolor=etcolor,
-        etbackground=etbackground,
-        showbt=showbt_str,
-        showet=showet_str,
-        showspace=showspace_str)
-
-
-# Static Routes
-
-@get(r'/<filename:re:.*\.js>')
-def javascripts(filename):
-    return static_file(filename, root=static_path)
-
-@get(r'/<filename:re:.*\.(eot|ttf|woff|svg)>')
-def fonts(filename):
-    return static_file(filename, root=static_path)
+    def stopWeb(self) -> None:
+        _log.info('stop WebLCDs')
+        # _loop.stop() needs to be called as follows as the event loop class is not thread safe
+        if self._loop is not None:
+            self._loop.call_soon_threadsafe(self._loop.stop)
+            self._loop = None
+        # wait for the thread to finish
+        if self._thread is not None:
+            self._thread.join()
+            self._thread = None

@@ -114,8 +114,8 @@
    <body>
       <div id="artisan" style="width:100%;">
          <div>&nbsp;<span class="tspace">&nbsp;</span><span id="time">00:00</span><span class="tspace">&nbsp;</span>&nbsp;</div>
-         <div><span id="showspacel">&nbsp;</span><span id="showet"><span class="spacel">&nbsp;</span><span class="spacer">&thinsp;</span><span id="et">{{!nonesymbol}}</span><span class="spacel">&nbsp;</span><span class="spacer">&thinsp;</span></span><span id="showbt"><span class="space">&thinsp;</span><span id="bt">{{!nonesymbol}}</span></span><span id="showspacer">&nbsp;</span></div>
-         <div id="hbt"><span id="showhbt"><span class="spacel">&nbsp;</span><span class="spacer">&thinsp;</span><span id="bt2">{{!nonesymbol}}</span><span class="spacel">&nbsp;</span><span class="spacer">&thinsp;</span></span></div>
+         <div><span id="showspacel">&nbsp;</span><span id="showet"><span class="spacel">&nbsp;</span><span class="spacer">&thinsp;</span><span id="et">{{nonesymbol|safe}}</span><span class="spacel">&nbsp;</span><span class="spacer">&thinsp;</span></span><span id="showbt"><span class="space">&thinsp;</span><span id="bt">{{nonesymbol|safe}}</span></span><span id="showspacer">&nbsp;</span></div>
+         <div id="hbt"><span id="showhbt"><span class="spacel">&nbsp;</span><span class="spacer">&thinsp;</span><span id="bt2">{{nonesymbol|safe}}</span><span class="spacel">&nbsp;</span><span class="spacer">&thinsp;</span></span></div>
       </div>
       <script src="jquery-1.11.1.min.js"></script>
       <script src="bigtext.js"></script>

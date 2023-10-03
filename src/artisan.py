@@ -78,7 +78,7 @@ else: # Linux
         pass
 
 from artisanlib import main, command_utility
-from multiprocessing import freeze_support
+#from multiprocessing import freeze_support # no longer needed after Hottop/WebLCDs have been reimplemented
 
 # from pyinstaller 5.8:
 class NullWriter:
@@ -111,16 +111,17 @@ if system() == 'Windows' and hasattr(sys, 'frozen'): # tools/freeze
     except Exception: # pylint: disable=broad-except
         pass
 
-    from multiprocessing import set_executable
-    executable = os.path.join(os.path.dirname(sys.executable), 'artisan.exe')
-    set_executable(executable)
-    del executable
+# no longer needed as multiprocessing is not used by Hottop/WebLCDs any longer
+#    from multiprocessing import set_executable
+#    executable = os.path.join(os.path.dirname(sys.executable), 'artisan.exe')
+#    set_executable(executable)
+#    del executable
 
 if __name__ == '__main__':
 
     # Manage commands that does not need to start the whole application
     if command_utility.handleCommands():
-        freeze_support()
+#        freeze_support() # no longer needed after Hottop/WebLCDs have been reimplemented
         main.main()
 
 

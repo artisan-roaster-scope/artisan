@@ -202,6 +202,7 @@ if TYPE_CHECKING:
     from artisanlib.comparator import roastCompareDlg # pylint: disable=unused-import
     from artisanlib.wheels import WheelDlg # pylint: disable=unused-import
     from artisanlib.hottop import Hottop # pylint: disable=unused-import
+    from artisanlib.weblcds import WebLCDs # pylint: disable=unused-import
     from artisanlib.santoker import Santoker # pylint: disable=unused-import
     from artisanlib.kaleido import KaleidoPort # pylint: disable=unused-import
     from artisanlib.ikawa import IKAWA_BLE # pylint: disable=unused-import
@@ -1375,7 +1376,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'eventaction_running_threads', 'curFile', 'MaxRecentFiles', 'recentFileActs', 'recentSettingActs',
         'recentThemeActs', 'applicationDirectory', 'helpdialog', 'redrawTimer', 'lastLoadedProfile', 'lastLoadedBackground', 'LargeScaleLCDsFlag', 'largeScaleLCDs_dialog',
         'analysisresultsanno', 'segmentresultsanno', 'largeLCDs_dialog', 'LargeLCDsFlag', 'largeDeltaLCDs_dialog', 'LargeDeltaLCDsFlag', 'largePIDLCDs_dialog',
-        'LargePIDLCDsFlag', 'largeExtraLCDs_dialog', 'LargeExtraLCDsFlag', 'largePhasesLCDs_dialog', 'LargePhasesLCDsFlag', 'WebLCDs', 'WebLCDsPort',
+        'LargePIDLCDsFlag', 'largeExtraLCDs_dialog', 'LargeExtraLCDsFlag', 'largePhasesLCDs_dialog', 'LargePhasesLCDsFlag', 'WebLCDs', 'WebLCDsPort', 'weblcds_server',
         'WebLCDsAlerts', 'EventsDlg_activeTab', 'graphColorDlg_activeTab', 'PID_DlgControl_activeTab', 'CurveDlg_activeTab', 'editGraphDlg_activeTab',
         'backgroundDlg_activeTab', 'DeviceAssignmentDlg_activeTab', 'AlarmDlg_activeTab', 'resetqsettings', 'settingspath', 'wheelpath', 'profilepath',
         'userprofilepath', 'printer', 'main_widget', 'defaultdpi', 'dpi', 'qmc', 'HottopControlActive', 'AsyncSamplingTimer', 'wheeldialog',
@@ -1647,6 +1648,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.extrastopbits:List[int] = []
         self.extratimeout:List[float] = []
 
+        # WebLCDs
+        self.weblcds_server:Optional['WebLCDs'] = None # holds the WebLCD instance
+
         # Hottop
         self.hottop:Optional['Hottop'] = None # holds the Hottop instance created on connect; reset to None on disconnect
 
@@ -1680,7 +1684,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.maxRecentRoasts = 25 # the maximum number of recent roasts held
 
         #lcd1 = time, lcd2 = met, lcd3 = bt, lcd4 = roc et, lcd5 = roc bt, lcd6 = sv (extra devices lcd same as sv seetings)
-        self.lcdpaletteB = {
+        self.lcdpaletteB:Dict[str,str] = {
             'timer':'#F8F8F8',
             'et':'#cc0f50',
             'bt':'#0A5C90',
@@ -1690,7 +1694,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             'rstimer':'#F8F8F8',
             'slowcoolingtimer':'#F8F8F8',
             }
-        self.lcdpaletteF = {
+        self.lcdpaletteF:Dict[str,str] = {
             'timer':'#262626',
             'et':'#ffffff',
             'bt':'#ffffff',
@@ -17457,8 +17461,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     def startWebLCDs(self,force=False):
         try:
             if not self.app.artisanviewerMode and not self.WebLCDs or force:
-                from artisanlib.weblcds import startWeb
-                res = startWeb(
+                from artisanlib.weblcds import WebLCDs
+                self.weblcds_server = WebLCDs(
                     self.WebLCDsPort,
                     str(getResourcePath()),
                     ('&nbsp;&nbsp;-.-' if self.qmc.LCDdecimalplaces else '&nbsp;--'),
@@ -17470,6 +17474,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.lcdpaletteB['et'],
                     self.qmc.ETlcd,
                     self.qmc.BTlcd)
+                res = self.weblcds_server.startWeb()
                 if res:
                     self.WebLCDs = True
                     return True
@@ -17491,8 +17496,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     def stopWebLCDs(self):
         try:
-            from artisanlib.weblcds import stopWeb
-            stopWeb()
+            if self.weblcds_server is not None:
+                self.weblcds_server.stopWeb()
+            self.weblcds_server = None
             self.WebLCDs = False
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)

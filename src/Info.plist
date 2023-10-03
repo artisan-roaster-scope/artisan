@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>English</string>
+	<string>en</string>
 	<key>CFBundleDisplayName</key>
 	<string>Artisan</string>
 	<key>CFBundleDocumentTypes</key>
@@ -121,8 +121,6 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>2.8.5</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -135,7 +133,7 @@
 	<key>CFBundleVersion</key>
 	<string>Artisan 2.8.5</string>
 	<key>LSApplicationCategoryType</key>
-	<string>public.app-category.developer-tools</string>
+	<string>public.app-category.productivity</string>
 	<key>LSArchitecturePriority</key>
 	<array>
 		<string>x86_64</string>
@@ -150,26 +148,14 @@
 	<string>Artisan wants to access bluetooth</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>Artisan wants to access bluetooth</string>
-	<key>NSDesktopFolderUsageDescription</key>
-	<string>Artisan wants to access the Desktop folder</string>
-	<key>NSDocumentsFolderUsageDescription</key>
-	<string>Artisan wants to access the Documents folder</string>
-	<key>NSDownloadsFolderUsageDescription</key>
-	<string>Artisan wants to access the Downloads folder</string>
-	<key>NSFileProviderDomainUsageDescription</key>
-	<string>Artisan wants to access files from a provider</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string>GNU General Public License (GPL)</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
-	<key>NSNetworkVolumesUsageDescription</key>
-	<string>Artisan wants to access network volumes</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>NSRemovableVolumesUsageDescription</key>
-	<string>Artisan wants to access removable volumes</string>
 	<key>NSSupportsAutomaticGraphicsSwitching</key>
 	<true/>
 </dict>

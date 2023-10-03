@@ -3118,8 +3118,6 @@ class tgraphcanvas(FigureCanvas):
 
     def updateWebLCDs(self, bt:Optional[str] = None, et:Optional[str] = None, time:Optional[str] = None, alertTitle:Optional[str] = None, alertText:Optional[str] = None, alertTimeout:Optional[int] = None) -> None:
         try:
-            url = f'http://127.0.0.1:{self.aw.WebLCDsPort}/send'
-            headers = {'content-type': 'application/json'}
             payload:Dict[str,Dict[str,Union[str,int]]] = {'data': {}}
             if not (bt is None and et is None) and self.flagon and not self.flagstart:
                 # in monitoring only mode, timer might be set by PID RS
@@ -3137,9 +3135,15 @@ class tgraphcanvas(FigureCanvas):
                     payload['alert']['title'] = alertTitle
                 if alertTimeout:
                     payload['alert']['timeout'] = alertTimeout
-            import requests
-            from json import dumps as json_dumps
-            requests.post(url, data=json_dumps(payload), headers=headers, timeout=0.3)
+# send update via http:
+#            import requests
+#            url = f'http://127.0.0.1:{self.aw.WebLCDsPort}/send'
+#            headers = {'content-type': 'application/json'}
+#            requests.post(url, data=json_dumps(payload), headers=headers, timeout=0.3)
+# send update directly:
+            if self.aw.weblcds_server is not None:
+                from json import dumps as json_dumps
+                self.aw.weblcds_server.send_msg(json_dumps(payload))
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
@@ -4151,7 +4155,9 @@ class tgraphcanvas(FigureCanvas):
                         timestr = stringfromseconds(time)
                     except Exception: # pylint: disable=broad-except
                         pass
-                self.setLCDtimestr(timestr)
+                self.aw.lcd1.display(timestr)
+                if self.aw.largeLCDs_dialog:
+                    self.updateLargeLCDsTimeSignal.emit(timestr)
 
             ## ET LCD:
             etstr = resLCD

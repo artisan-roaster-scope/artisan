@@ -95,6 +95,16 @@ cp includes/alarmclock.eot dist
 cp includes/alarmclock.svg dist
 cp includes/alarmclock.ttf dist
 cp includes/alarmclock.woff dist
+cp android-chrome-192x192.png dist
+cp android-chrome-512x512.png dist
+cp apple-touch-icon.png dist
+cp browserconfig.xml dist
+cp favicon-16x16.png dist
+cp favicon-32x32.png dist
+cp favicon.ico dist
+cp mstile-150x150.png dist
+cp safari-pinned-tab.svg dist
+cp site.webmanifest dist
 cp includes/artisan.tpl dist
 cp includes/bigtext.js dist
 cp includes/sorttable.js dist

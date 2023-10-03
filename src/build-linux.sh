@@ -113,6 +113,16 @@ cp includes/report-template.htm dist
 cp includes/roast-template.htm dist
 cp includes/ranking-template.htm dist
 cp includes/jquery-1.11.1.min.js dist
+cp includes/android-chrome-192x192.png
+cp includes/android-chrome-512x512.png
+cp includes/apple-touch-icon.png
+cp includes/browserconfig.xml
+cp includes/favicon-16x16.png
+cp includes/favicon-32x32.png
+cp includes/favicon.ico
+cp includes/mstile-150x150.png
+cp includes/safari-pinned-tab.svg
+cp includes/site.webmanifest
 cp includes/logging.yaml dist
 cp -R icons dist
 cp -R Wheels dist

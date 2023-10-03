@@ -38,45 +38,52 @@ QTDIR = os.environ['QT_PATH']
 APP = ['artisan.py']
 
 DATA_FILES = [
-#    ("../Resources", [r"qt.conf"]), # uncomment in QT Framework variant
-    ('../Resources', [r'artisanProfile.icns']),
-    ('../Resources', [r'artisanAlarms.icns']),
-    ('../Resources', [r'artisanPalettes.icns']),
-    ('../Resources', [r'artisanSettings.icns']),
-    ('../Resources', [r'artisanTheme.icns']),
-    ('../Resources', [r'artisanWheel.icns']),
-    ('../Resources', [r'includes/alarmclock.eot']),
-    ('../Resources', [r'includes/alarmclock.svg']),
-    ('../Resources', [r'includes/alarmclock.ttf']),
-    ('../Resources', [r'includes/alarmclock.woff']),
-    ('../Resources', [r'includes/artisan.tpl']),
-    ('../Resources', [r'includes/bigtext.js']),
-    ('../Resources', [r'includes/sorttable.js']),
-    ('../Resources', [r'includes/report-template.htm']),
-    ('../Resources', [r'includes/roast-template.htm']),
-    ('../Resources', [r'includes/ranking-template.htm']),
-    ('../Resources', [r'includes/Humor-Sans.ttf']),
-    ('../Resources', [r'includes/WenQuanYiZenHei-01.ttf']),
-    ('../Resources', [r'includes/WenQuanYiZenHeiMonoMedium.ttf']),
-    ('../Resources', [r'includes/SourceHanSansCN-Regular.otf']),
-    ('../Resources', [r'includes/SourceHanSansHK-Regular.otf']),
-    ('../Resources', [r'includes/SourceHanSansJP-Regular.otf']),
-    ('../Resources', [r'includes/SourceHanSansKR-Regular.otf']),
-    ('../Resources', [r'includes/SourceHanSansTW-Regular.otf']),
-    ('../Resources', [r'includes/dijkstra.ttf']),
-    ('../Resources', [r'includes/jquery-1.11.1.min.js']),
-    ('../Resources', [r'includes/Machines']),
-    ('../Resources', [r'includes/Themes']),
-    ('../Resources', [r'includes/Icons']),
-    ('../Resources', [r'includes/logging.yaml']),
-  ]
+    ('../Resources', [
+        r'artisanProfile.icns',
+        r'artisanAlarms.icns',
+        r'artisanPalettes.icns',
+        r'artisanSettings.icns',
+        r'artisanTheme.icns',
+        r'artisanWheel.icns',
+        r'includes/alarmclock.eot',
+        r'includes/alarmclock.svg',
+        r'includes/alarmclock.ttf',
+        r'includes/alarmclock.woff',
+        r'includes/artisan.tpl',
+        r'includes/bigtext.js',
+        r'includes/jquery-1.11.1.min.js',
+        r'includes/android-chrome-192x192.png',
+        r'includes/android-chrome-512x512.png',
+        r'includes/apple-touch-icon.png',
+        r'includes/browserconfig.xml',
+        r'includes/favicon-16x16.png',
+        r'includes/favicon-32x32.png',
+        r'includes/favicon.ico',
+        r'includes/mstile-150x150.png',
+        r'includes/safari-pinned-tab.svg',
+        r'includes/site.webmanifest',
+        r'includes/sorttable.js',
+        r'includes/report-template.htm',
+        r'includes/roast-template.htm',
+        r'includes/ranking-template.htm',
+        r'includes/Humor-Sans.ttf',
+        r'includes/WenQuanYiZenHei-01.ttf',
+        r'includes/WenQuanYiZenHeiMonoMedium.ttf',
+        r'includes/SourceHanSansCN-Regular.otf',
+        r'includes/SourceHanSansHK-Regular.otf',
+        r'includes/SourceHanSansJP-Regular.otf',
+        r'includes/SourceHanSansKR-Regular.otf',
+        r'includes/SourceHanSansTW-Regular.otf',
+        r'includes/dijkstra.ttf',
+        r'includes/Machines',
+        r'includes/Themes',
+        r'includes/Icons',
+        r'includes/logging.yaml',
+  ])]
 
 # add Artisan translations to DATA_FILES
-for _subdir, _dirs, files in os.walk('translations'):
-    for file in files:
-        filename, ext = file.split('.')
-        if ext == 'qm':
-            DATA_FILES.append(('../translations', [f'translations/{file}']))
+DATA_FILES.append(('../translations',
+    [f'translations/{file}' for root,dirs,files in os.walk('translations') for file in files if (file.split('.')[1]) == 'qm']))
 
 with open('Info.plist', 'r+b') as fp:
     plist = plistlib.load(fp)
@@ -98,8 +105,7 @@ with open('Info.plist', 'r+b') as fp:
     plistlib.dump(plist, fp)
 
 OPTIONS = {
-    'strip': False,
-#    'xref': True,
+    'no_strip': False,
     'argv_emulation': False, # this would confuses GUI processing
     'semi_standalone': False,
     'site_packages': True,
