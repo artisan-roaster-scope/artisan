@@ -109,7 +109,7 @@ OPTIONS = {
     'argv_emulation': False, # this would confuses GUI processing
     'semi_standalone': False,
     'site_packages': True,
-    'packages': ['yoctopuce','gevent','openpyxl','numpy','scipy','certifi',
+    'packages': ['yoctopuce','openpyxl','numpy','scipy','certifi',
         'matplotlib','PIL', 'lxml', 'snap7', 'google.protobuf', 'google._upb'],
     'optimize':  2,
     'compressed': True,
