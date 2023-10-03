@@ -147,7 +147,7 @@ class WebLCDs:
             async for msg in ws:
 #                _log.info('ws msg: %s', msg)
                 if msg.type == WSMsgType.ERROR:
-                    log.error('ws connection closed with exception %s', ws.exception())
+                    _log.error('ws connection closed with exception %s', ws.exception())
         finally:
             request.app['websockets'].discard(ws)
         return ws
