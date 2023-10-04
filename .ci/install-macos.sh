@@ -27,7 +27,8 @@ if [ -n "${PYUPGRADE_V:-}" ]; then
     source ${VIRTUAL_ENV}/bin/activate
     deactivate
     # brew update Python
-    brew update && brew upgrade python && brew cleanup
+    export HOMEBREW_NO_INSTALL_CLEANUP=TRUE
+    brew update && brew upgrade python
     # relink Python
     brew unlink python@${PYTHON_V} && brew link --force --overwrite python@${PYTHON_V}
     hash -r
