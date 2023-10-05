@@ -8,7 +8,7 @@ types-requests==2.31.0.7
 types-setuptools==68.2.0.0
 types-urllib3==1.26.25.14
 mypy==1.5.1
-pyright==1.1.327
+pyright==1.1.329
 ruff>=0.0.285
 pylint==3.0.0
 pre-commit>=3.3.3
