@@ -17837,6 +17837,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
         if filename is not None and filename:
             # we set the default_settings to None here to force the saving of all settings not only those different to the defaults
+            _log.info('export settings to %s',filename)
             return self.saveAllSettings(QSettings(filename, QSettings.Format.IniFormat), None, filename)
         # we hand over the defaultSettings to have only those settings saved that are diffent from their defaults
         return self.saveAllSettings(QSettings(), self.defaultSettings)

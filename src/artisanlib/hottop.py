@@ -34,7 +34,7 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 class Hottop(AsyncComm):
     HEADER:Final[bytes] = b'\xa5\x96' # 165, 150
 
-    SEND_INTERVAL:Final[float] = 0.5 # in seconds (should be larger than >100ms and <1s; if machine does not receive anything within 1s it ejects the beans)
+    SEND_INTERVAL:Final[float] = 0.3 # in seconds (should be larger than >100ms and <1s; if machine does not receive anything within 1s it ejects the beans)
 
     # safety cut-off BT temperature
     BTcutoff:Final[int] = 220        # 220C = 428F (was 212C/413F before)
