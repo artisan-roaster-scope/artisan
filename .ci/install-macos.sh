@@ -27,15 +27,12 @@ if [ -n "${PYUPGRADE_V:-}" ]; then
     source ${VIRTUAL_ENV}/bin/activate
     deactivate
     # brew update Python
-#    export HOMEBREW_NO_INSTALL_CLEANUP=TRUE # no cleanup here, not to delete libs needed by curl!
     brew update && brew upgrade python # no "brew cleanup" here, not to delete libs needed by curl!
     # relink Python
     brew unlink python@${PYTHON_V} && brew link --force --overwrite python@${PYTHON_V}
     hash -r
     brew install jq
     # add path
-    export PATHT="$(brew --prefix)/Cellar/python@${PYTHON_V}/${PYUPGRADE_V}/bin:${PATH}"
-    echo $PATHT
     export PATH="$(brew --cellar python@${PYTHON_V})/$(brew info --json python@${PYTHON_V} | jq -r '.[0].installed[0].version')/bin:${PATH}"
     echo $PATH
     which python3

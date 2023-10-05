@@ -222,12 +222,14 @@ check_untyped_defs = true
 plugins = ["numpy.typing.mypy_plugin"]
 
 [[tool.mypy.overrides]]
-module = "matplotlib.*"
+module = ["matplotlib.*", "aiohttp.*", "aiohttp.web.*", "aiohttp_jinja2.*"]
 ignore_missing_imports = true
+
 
 [[tool.mypy.overrides]]
 module = "uic.*"
 follow_imports = 'skip'
+
 
 ## ruff conf
 
@@ -240,7 +242,7 @@ follow_imports = 'skip'
 ## next: flake8-use-pathlib (PTH), flake8-print (T20)
 select = ["E", "F", "UP", "B", "A", "YTT", "COM", "C4", "DTZ", "PIE", "RSE", "RET", "SIM", "ARG", "PLE", "PLR", "PLW", "INT"]
 
-format = "pylint" # one of: text, json, junit, grouped, github, gitlab, pylint, azure
+output-format = "pylint" # one of: text, json, junit, grouped, github, gitlab, pylint, azure
 
 # Same as Black.
 line-length = 80

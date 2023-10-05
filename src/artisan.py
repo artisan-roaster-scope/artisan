@@ -78,7 +78,7 @@ else: # Linux
         pass
 
 from artisanlib import main, command_utility
-#from multiprocessing import freeze_support # no longer needed after Hottop/WebLCDs have been reimplemented
+#from multiprocessing import freeze_support
 
 # from pyinstaller 5.8:
 class NullWriter:
@@ -121,7 +121,7 @@ if __name__ == '__main__':
 
     # Manage commands that does not need to start the whole application
     if command_utility.handleCommands():
-#        freeze_support() # no longer needed after Hottop/WebLCDs have been reimplemented
+#        freeze_support() # needed for multiprocessing; was used by Hottop/WebLCDs module, as well as for py-cpuinfo!
         main.main()
 
 

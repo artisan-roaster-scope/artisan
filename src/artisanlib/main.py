@@ -17762,34 +17762,36 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     @staticmethod
     @functools.lru_cache(maxsize=None) #we cache the result to avoid re-compuation #for Python >=3.9 can use @functools.cache
     def get_os():
-        def get_macOS_version():
-            # platform.mac_ver() returns 10.16-style version info on BigSur
-            # and is likely to do so until Python is compiled with the macOS 11 SDK
-            # which may not happen for a while. And Apple's odd tricks mean that even
-            # reading /System/Library/CoreServices/SystemVersion.plist is unreliable.
-            import subprocess
-            try:
-                os_version_tuple = subprocess.check_output(
-                    ('/usr/bin/sw_vers', '-productVersion'),
-                    env={'SYSTEM_VERSION_COMPAT': '0'}
-                ).decode('UTF-8').rstrip().split('.')
-            except subprocess.CalledProcessError:
-                os_version_tuple = platform.mac_ver()[0].split('.')
-            os_version_tuple = os_version_tuple[0:2]
-            return '.'.join(os_version_tuple)
-        def get_macOS_arch():
-            # platform.machine() returns x86_64 on M1 macs running Artisan under Rossetta2
-            try:
-                import cpuinfo # type: ignore
-                manufacturer = cpuinfo.get_cpu_info().get('brand_raw')
-                return 'm1' if 'm1' in manufacturer.lower() else 'x86_64'
-            except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
-                return platform.machine()
+        # subprocess above below is problematic in signed builds on macOS 14 especially on AppleSilicon
+#        def get_macOS_version():
+#            # platform.mac_ver() returns 10.16-style version info on BigSur
+#            # and is likely to do so until Python is compiled with the macOS 11 SDK
+#            # which may not happen for a while. And Apple's odd tricks mean that even
+#            # reading /System/Library/CoreServices/SystemVersion.plist is unreliable.
+#            import subprocess
+#            try:
+#                os_version_tuple = subprocess.check_output(
+#                    ('/usr/bin/sw_vers', '-productVersion'),
+#                    env={'SYSTEM_VERSION_COMPAT': '0'}
+#                ).decode('UTF-8').rstrip().split('.')
+#            except subprocess.CalledProcessError:
+#                os_version_tuple = platform.mac_ver()[0].split('.')
+#            os_version_tuple = platform.mac_ver()[0].split('.')
+#            os_version_tuple = os_version_tuple[0:2]
+#            return '.'.join(os_version_tuple)
+# cpuinfo.get_cpu_info().get('brand_raw') hangs on macOS 14 if app is signed (not cpuinfo needs multiprocessing.freeze_support() !)
+#        def get_macOS_arch():
+#            # platform.machine() returns x86_64 on M1 macs running Artisan under Rossetta2
+#            try:
+#                import cpuinfo # type: ignore
+#                manufacturer = cpuinfo.get_cpu_info().get('brand_raw')
+#                return 'm1' if 'm1' in manufacturer.lower() else 'x86_64'
+#            except Exception as e: # pylint: disable=broad-except
+#                return platform.machine()
         try:
             if platform.system().startswith('Darwin'):
-#                return "macOS", platform.mac_ver()[0], platform.machine() # reports wrong version on macOS 12 on older Python versions
-                return 'macOS', get_macOS_version(), get_macOS_arch()
+#                return 'macOS', get_macOS_version(), get_macOS_arch()
+                return 'macOS', platform.mac_ver()[0], platform.machine() # reports wrong version on macOS 12 on older Python versions
             if platform.system().startswith('Windows'):
                 return 'Windows', platform.release(), platform.machine()
             # we assume Linux
@@ -17827,7 +17829,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 settings.remove(name)
 
     # returns True on success and False otherwise
-    def closeEventSettings(self, filename:Optional[str] = None) -> bool: # pyright: ignore [reportGeneralTypeIssues| #  Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths
+    def closeEventSettings(self, filename:Optional[str] = None) -> bool:
         #save window geometry and position. See QSettings documentation.
         #This information is often stored in the system registry on Windows,
         #and in XML preferences files on Mac OS X. On Unix systems, in the absence of a standard,
@@ -17877,26 +17879,24 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             #save mode
             self.settingsSetValue(settings, default_settings, 'Mode',self.qmc.mode, read_defaults)
 
-            if filename is not None:
+            if filename is not None and not read_defaults:
                 # only add those on exporting settings (those are never read by Artisan)
 #--- BEGIN GROUP System
-                if settings is not None:
-                    settings.beginGroup('System')
-                self.settingsSetValue(settings, default_settings, 'artisan_version',__version__, read_defaults)
-                self.settingsSetValue(settings, default_settings, 'artisan_revision',__revision__, read_defaults)
-                self.settingsSetValue(settings, default_settings, 'artisan_build',__build__, read_defaults)
+                settings.beginGroup('System')
+                settings.setValue('artisan_version',__version__)
+                settings.setValue('artisan_revision',__revision__)
+                settings.setValue('artisan_build',__build__)
                 os_name,os_version,os_arch = self.get_os()
-                self.settingsSetValue(settings, default_settings, 'artisan_os',os_name, read_defaults)
-                self.settingsSetValue(settings, default_settings, 'artisan_os_version',os_version, read_defaults)
-                self.settingsSetValue(settings, default_settings, 'artisan_os_arch',os_arch, read_defaults)
-                if settings is not None:
-                    settings.endGroup()
+                settings.setValue('artisan_os',os_name)
+                settings.setValue('artisan_os_version',os_version)
+                settings.setValue('artisan_os_arch',os_arch)
+                settings.endGroup()
 #--- END GROUP System
+
 
 #--- BEGIN GROUP Device
             #save device
-            if settings is not None:
-                settings.beginGroup('Device')
+            settings.beginGroup('Device')
             self.settingsSetValue(settings, default_settings, 'device_logging',self.qmc.device_logging, read_defaults)
             self.settingsSetValue(settings, default_settings, 'id',self.qmc.device, read_defaults)
             self.settingsSetValue(settings, default_settings, 'phidget1048_types',self.qmc.phidget1048_types, read_defaults)
@@ -17959,8 +17959,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'kaleidoPort',self.kaleidoPort, read_defaults)
             self.settingsSetValue(settings, default_settings, 'kaleidoSerial',self.kaleidoSerial, read_defaults)
             self.settingsSetValue(settings, default_settings, 'kaleidoPID',self.kaleidoPID, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP System
 
             self.settingsSetValue(settings, default_settings, 'fmt_data_RoR',self.qmc.fmt_data_RoR, read_defaults)
@@ -18017,8 +18016,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
 #--- BEGIN GROUP events
             #save Events settings
-            if settings is not None:
-                settings.beginGroup('events')
+            settings.beginGroup('events')
             self.settingsSetValue(settings, default_settings, 'eventsbuttonflag',self.eventsbuttonflag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'minieventsflags',self.minieventsflags, read_defaults)
             self.settingsSetValue(settings, default_settings, 'eventsGraphflag',self.qmc.eventsGraphflag, read_defaults)
@@ -18028,7 +18026,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 (self.qmc.etypes[2] != QApplication.translate('ComboBox', 'Damper')) or
                 (self.qmc.etypes[3] != QApplication.translate('ComboBox', 'Burner'))):
                 self.settingsSetValue(settings, default_settings, 'etypes',self.qmc.etypes, read_defaults)
-            elif settings is not None:
+            else:
                 settings.remove('etypes')
             self.settingsSetValue(settings, default_settings, 'eventsshowflag',self.qmc.eventsshowflag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'clampEvents',self.qmc.clampEvents, read_defaults)
@@ -18051,8 +18049,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'specialeventannotations', self.qmc.specialeventannotations, read_defaults)
             self.settingsSetValue(settings, default_settings, 'specialeventannovisibilities', self.qmc.specialeventannovisibilities, read_defaults)
             self.settingsSetValue(settings, default_settings, 'overlappct', self.qmc.overlappct, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP events
 
             #save ambient temperature source
@@ -18088,31 +18085,28 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'logoimgflag', self.logoimgflag, read_defaults)
 
 #--- BEGIN GROUP Tare
-            if settings is not None:
-                settings.beginGroup('Tare')
+            settings.beginGroup('Tare')
             self.settingsSetValue(settings, default_settings, 'names',self.qmc.container_names, read_defaults)
             self.settingsSetValue(settings, default_settings, 'weights',self.qmc.container_weights, read_defaults)
             self.settingsSetValue(settings, default_settings, 'idx',self.qmc.container_idx, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP Tare
 
 #--- BEGIN GROUP SerialPort
             #save serial port
-                settings.beginGroup('SerialPort')
+            settings.beginGroup('SerialPort')
             self.settingsSetValue(settings, default_settings, 'comport',self.ser.comport, read_defaults)
             self.settingsSetValue(settings, default_settings, 'baudrate',self.ser.baudrate, read_defaults)
             self.settingsSetValue(settings, default_settings, 'bytesize',self.ser.bytesize, read_defaults)
             self.settingsSetValue(settings, default_settings, 'stopbits',self.ser.stopbits, read_defaults)
             self.settingsSetValue(settings, default_settings, 'parity',self.ser.parity, read_defaults)
             self.settingsSetValue(settings, default_settings, 'timeout',self.ser.timeout, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP SerialPort
 
 #--- BEGIN GROUP WebSocket
             #save WebSocket port
-                settings.beginGroup('WebSocket')
+            settings.beginGroup('WebSocket')
             self.settingsSetValue(settings, default_settings, 'host',self.ws.host, read_defaults)
             self.settingsSetValue(settings, default_settings, 'port',self.ws.port, read_defaults)
             self.settingsSetValue(settings, default_settings, 'path',self.ws.path, read_defaults)
@@ -18140,13 +18134,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'channel_requests',self.ws.channel_requests, read_defaults)
             self.settingsSetValue(settings, default_settings, 'channel_nodes',self.ws.channel_nodes, read_defaults)
             self.settingsSetValue(settings, default_settings, 'channel_modes',self.ws.channel_modes, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP WebSocket
 
 #--- BEGIN GROUP S7
             #save s7 port
-                settings.beginGroup('S7')
+            settings.beginGroup('S7')
             self.settingsSetValue(settings, default_settings, 'area',self.s7.area, read_defaults)
             self.settingsSetValue(settings, default_settings, 'db_nr',self.s7.db_nr, read_defaults)
             self.settingsSetValue(settings, default_settings, 'start',self.s7.start, read_defaults)
@@ -18170,13 +18163,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'SVmultiplier',self.s7.SVmultiplier, read_defaults)
             self.settingsSetValue(settings, default_settings, 'optimizer',self.s7.optimizer, read_defaults)
             self.settingsSetValue(settings, default_settings, 'fetch_max_blocks',self.s7.fetch_max_blocks, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP S7
 
 #--- BEGIN GROUP Modbus
             #save modbus port
-                settings.beginGroup('Modbus')
+            settings.beginGroup('Modbus')
             self.settingsSetValue(settings, default_settings, 'comport',self.modbus.comport, read_defaults)
             self.settingsSetValue(settings, default_settings, 'baudrate',self.modbus.baudrate, read_defaults)
             self.settingsSetValue(settings, default_settings, 'bytesize',self.modbus.bytesize, read_defaults)
@@ -18285,13 +18277,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'host',self.modbus.host, read_defaults)
             self.settingsSetValue(settings, default_settings, 'port',self.modbus.port, read_defaults)
             self.settingsSetValue(settings, default_settings, 'reset_socket',self.modbus.reset_socket, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP Modbus
 
 #--- BEGIN GROUP Scale
             #save scale port
-                settings.beginGroup('Scale')
+            settings.beginGroup('Scale')
             self.settingsSetValue(settings, default_settings, 'device',self.scale.device, read_defaults)
             self.settingsSetValue(settings, default_settings, 'comport',self.scale.comport, read_defaults)
             self.settingsSetValue(settings, default_settings, 'baudrate',self.scale.baudrate, read_defaults)
@@ -18299,13 +18290,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'stopbits',self.scale.stopbits, read_defaults)
             self.settingsSetValue(settings, default_settings, 'parity',self.scale.parity, read_defaults)
             self.settingsSetValue(settings, default_settings, 'timeout',self.scale.timeout, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP Scale
 
 #--- BEGIN GROUP Color
             #save color port
-                settings.beginGroup('Color')
+            settings.beginGroup('Color')
             self.settingsSetValue(settings, default_settings, 'device',self.color.device, read_defaults)
             self.settingsSetValue(settings, default_settings, 'comport',self.color.comport, read_defaults)
             self.settingsSetValue(settings, default_settings, 'baudrate',self.color.baudrate, read_defaults)
@@ -18313,13 +18303,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'stopbits',self.color.stopbits, read_defaults)
             self.settingsSetValue(settings, default_settings, 'parity',self.color.parity, read_defaults)
             self.settingsSetValue(settings, default_settings, 'timeout',self.color.timeout, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP Color
 
 #--- BEGIN GROUP ArduinoPID
             #save pid settings (only key and value[0])
-                settings.beginGroup('ArduinoPID')
+            settings.beginGroup('ArduinoPID')
             self.settingsSetValue(settings, default_settings, 'pidOnCHARGE',self.pidcontrol.pidOnCHARGE, read_defaults)
             self.settingsSetValue(settings, default_settings, 'createEvents',self.pidcontrol.createEvents, read_defaults)
             self.settingsSetValue(settings, default_settings, 'loadRampSoakFromProfile',self.pidcontrol.loadRampSoakFromProfile, read_defaults)
@@ -18358,42 +18347,37 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.settingsSetValue(settings, default_settings, 'RS_svActions'+str(n),self.pidcontrol.RS_svActions[n], read_defaults)
                 self.settingsSetValue(settings, default_settings, 'RS_svBeeps'+str(n),self.pidcontrol.RS_svBeeps[n], read_defaults)
                 self.settingsSetValue(settings, default_settings, 'RS_svDescriptions'+str(n),self.pidcontrol.RS_svDescriptions[n], read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP ArduinoPID
 
 
 #--- BEGIN GROUP PXR
-                settings.beginGroup('PXR')
+            settings.beginGroup('PXR')
             for k in list(self.fujipid.PXR.keys()):
                 self.settingsSetValue(settings, default_settings, k,self.fujipid.PXR[k][0], read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP PXR
 
 #--- BEGIN GROUP PXG4
-                settings.beginGroup('PXG4')
+            settings.beginGroup('PXG4')
             for k in list(self.fujipid.PXG4.keys()):
                 self.settingsSetValue(settings, default_settings, k,self.fujipid.PXG4[k][0], read_defaults)
             self.settingsSetValue(settings, default_settings, 'followBackground',self.fujipid.followBackground, read_defaults)
             self.settingsSetValue(settings, default_settings, 'lookahead',self.fujipid.lookahead, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP PXG4
 
 #--- BEGIN GROUP deltaDTA
-                settings.beginGroup('deltaDTA')
+            settings.beginGroup('deltaDTA')
             for k in list(self.dtapid.dtamem.keys()):
                 self.settingsSetValue(settings, default_settings, k,self.dtapid.dtamem[k][0], read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP deltaDTA
 
             self.settingsSetValue(settings, default_settings, 'filterDropOuts',self.qmc.filterDropOuts, read_defaults)
             self.settingsSetValue(settings, default_settings, 'dropSpikes',self.qmc.dropSpikes, read_defaults)
             self.settingsSetValue(settings, default_settings, 'dropDuplicates',self.qmc.dropDuplicates, read_defaults)
             self.settingsSetValue(settings, default_settings, 'dropDuplicatesLimit',self.qmc.dropDuplicatesLimit, read_defaults)
-#            self.settingsSetValue(settings, default_settings, "altSmoothing",self.qmc.altsmoothing, read_defaults)
             self.settingsSetValue(settings, default_settings, 'optimalSmoothing',self.qmc.optimalSmoothing, read_defaults)
             self.settingsSetValue(settings, default_settings, 'polyfitRoRcalc',self.qmc.polyfitRoRcalc, read_defaults)
             self.settingsSetValue(settings, default_settings, 'swapETBT',self.qmc.swapETBT, read_defaults)
@@ -18403,8 +18387,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'foregroundShowFullflag',self.qmc.foregroundShowFullflag, read_defaults)
 
 #--- BEGIN GROUP RoC
-            if settings is not None:
-                settings.beginGroup('RoC')
+            settings.beginGroup('RoC')
             self.settingsSetValue(settings, default_settings, 'DeltaET',self.qmc.DeltaETflag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'DeltaBT',self.qmc.DeltaBTflag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'DeltaETlcd',self.qmc.DeltaETlcdflag, read_defaults)
@@ -18416,12 +18399,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'LCDdecimalplaces',self.qmc.LCDdecimalplaces, read_defaults)
             self.settingsSetValue(settings, default_settings, 'statisticsmode',self.qmc.statisticsmode, read_defaults)
             self.settingsSetValue(settings, default_settings, 'swapdeltalcds',self.qmc.swapdeltalcds, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP RoC
 
             self.settingsSetValue(settings, default_settings, 'curvefilter',self.qmc.curvefilter, read_defaults)
-#            self.settingsSetValue(settings, default_settings, "smoothingwindowsize",self.qmc.smoothingwindowsize, read_defaults)
             self.settingsSetValue(settings, default_settings, 'ETcurve',self.qmc.ETcurve, read_defaults)
             self.settingsSetValue(settings, default_settings, 'BTcurve',self.qmc.BTcurve, read_defaults)
             self.settingsSetValue(settings, default_settings, 'ETlcd',self.qmc.ETlcd, read_defaults)
@@ -18429,8 +18410,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'swaplcds',self.qmc.swaplcds, read_defaults)
 
 #--- BEGIN GROUP DefaultButtons
-            if settings is not None:
-                settings.beginGroup('DefaultButtons')
+            settings.beginGroup('DefaultButtons')
             self.settingsSetValue(settings, default_settings, 'buttonvisibility',self.qmc.buttonvisibility, read_defaults)
             self.settingsSetValue(settings, default_settings, 'buttonactions',self.qmc.buttonactions, read_defaults)
             self.settingsSetValue(settings, default_settings, 'buttonactionstrings',self.qmc.buttonactionstrings, read_defaults)
@@ -18438,33 +18418,29 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'extrabuttonactionstrings',self.qmc.extrabuttonactionstrings, read_defaults)
             self.settingsSetValue(settings, default_settings, 'xextrabuttonactions',self.qmc.xextrabuttonactions, read_defaults)
             self.settingsSetValue(settings, default_settings, 'xextrabuttonactionstrings',self.qmc.xextrabuttonactionstrings, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP DefaultButtons
 
             self.settingsSetValue(settings, default_settings, 'transMappingMode',self.qmc.transMappingMode, read_defaults)
 
 #--- BEGIN GROUP Style
-            if settings is not None:
-                settings.beginGroup('Style')
+            settings.beginGroup('Style')
             self.settingsSetValue(settings, default_settings, 'patheffects',self.qmc.patheffects, read_defaults)
             self.settingsSetValue(settings, default_settings, 'graphstyle',self.qmc.graphstyle, read_defaults)
             self.settingsSetValue(settings, default_settings, 'graphfont',self.qmc.graphfont, read_defaults)
             self.settingsSetValue(settings, default_settings, 'ETname', self.ETname, read_defaults)
             self.settingsSetValue(settings, default_settings, 'BTname', self.BTname, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP Style
 
 #--- BEGIN GROUP Sound
-                settings.beginGroup('Sound')
+            settings.beginGroup('Sound')
             self.settingsSetValue(settings, default_settings, 'Beep',self.soundflag, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP Sound
 
 #--- BEGIN GROUP Notifications
-                settings.beginGroup('Notifications')
+            settings.beginGroup('Notifications')
             if self.notificationManager:
                 try:
                     titles = []
@@ -18483,12 +18459,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 except Exception as e:  # pylint: disable=broad-except
                     _log.exception(e)
             self.settingsSetValue(settings, default_settings, 'notificationsflag',self.notificationsflag, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP Notifications
 
 #--- BEGIN GROUP Axis
-                settings.beginGroup('Axis')
+            settings.beginGroup('Axis')
             self.settingsSetValue(settings, default_settings, 'loadAxisFromProfile',self.qmc.loadaxisfromprofile, read_defaults)
             xmin = self.qmc.startofx
             if self.qmc.timeindex[0] != -1:
@@ -18512,8 +18487,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'chargemintime',self.qmc.chargemintime, read_defaults)
             self.settingsSetValue(settings, default_settings, 'temp_grid',self.qmc.temp_grid, read_defaults)
             self.settingsSetValue(settings, default_settings, 'time_grid',self.qmc.time_grid, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP Axis
 
             self.settingsSetValue(settings, default_settings, 'organization_setup',self.qmc.organization_setup, read_defaults)
@@ -18525,8 +18499,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'last_batchsize',self.qmc.last_batchsize, read_defaults)
 
 #--- BEGIN GROUP EnergyUse
-            if settings is not None:
-                settings.beginGroup('EnergyUse')
+            settings.beginGroup('EnergyUse')
             self.settingsSetValue(settings, default_settings, 'loadlabels_setup',self.qmc.loadlabels_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'loadratings_setup',self.qmc.loadratings_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'ratingunits_setup',self.qmc.ratingunits_setup, read_defaults)
@@ -18544,16 +18517,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'betweenbatch_after_preheat_setup',self.qmc.betweenbatch_after_preheat_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'electricEnergyMix_setup',self.qmc.electricEnergyMix_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'energyresultunit_setup',self.qmc.energyresultunit_setup, read_defaults)
-#            self.settingsSetValue(settings, default_settings, "energytablecolumnwidths",self.qmc.energytablecolumnwidths, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP EnergyUse
 
 #--- BEGIN GROUP RoastProperties
-                settings.beginGroup('RoastProperties')
+            settings.beginGroup('RoastProperties')
+
             self.settingsSetValue(settings, default_settings, 'machinesetup',self.qmc.machinesetup, read_defaults)
-#            self.settingsSetValue(settings, default_settings, "densitySampleVolume",self.qmc.density[2], read_defaults) # fixed to 1l now
-#            self.settingsSetValue(settings, default_settings, 'beansize',self.qmc.beansize, read_defaults) # retired
             self.settingsSetValue(settings, default_settings, 'beansize_min',self.qmc.beansize_min, read_defaults)
             self.settingsSetValue(settings, default_settings, 'beansize_max',self.qmc.beansize_max, read_defaults)
             if filename is None:
@@ -18564,49 +18534,46 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.settingsSetValue(settings, default_settings, 'plus_custom_blend_coffees', [c.coffee for c in self.qmc.plus_custom_blend.components], read_defaults)
                     self.settingsSetValue(settings, default_settings, 'plus_custom_blend_ratios',  [c.ratio for c in self.qmc.plus_custom_blend.components], read_defaults)
             #remove pre v2.0 settings no longer used
-            if settings is not None:
-                try:
-                    if settings.contains('organization'):
-                        settings.remove('organization')
-                    if settings.contains('operator'):
-                        settings.remove('operator')
-                    if settings.contains('roastertype'):
-                        settings.remove('roastertype')
-                    if settings.contains('roastersize'):
-                        settings.remove('roastersize')
-                    if settings.contains('drumspeed'):
-                        settings.remove('drumspeed')
-                    if settings.contains('beansize'):
-                        settings.remove('beansize')
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
-                settings.endGroup()
+            try:
+                if settings.contains('organization'):
+                    settings.remove('organization')
+                if settings.contains('operator'):
+                    settings.remove('operator')
+                if settings.contains('roastertype'):
+                    settings.remove('roastertype')
+                if settings.contains('roastersize'):
+                    settings.remove('roastersize')
+                if settings.contains('drumspeed'):
+                    settings.remove('drumspeed')
+                if settings.contains('beansize'):
+                    settings.remove('beansize')
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+            settings.endGroup()
 #--- END GROUP RoastProperties
 
 #--- BEGIN GROUP XT
-                settings.beginGroup('XT')
+            settings.beginGroup('XT')
             self.settingsSetValue(settings, default_settings, 'color',self.qmc.backgroundxtcolor, read_defaults)
             self.settingsSetValue(settings, default_settings, 'color2',self.qmc.backgroundytcolor, read_defaults)
             self.settingsSetValue(settings, default_settings, 'index',self.qmc.xtcurveidx, read_defaults)
             self.settingsSetValue(settings, default_settings, 'index2',self.qmc.ytcurveidx, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP XT
 
 #--- BEGIN GROUP Units
-                settings.beginGroup('Units')
+            settings.beginGroup('Units')
             self.settingsSetValue(settings, default_settings, 'weight',self.qmc.weight[2], read_defaults)
             self.settingsSetValue(settings, default_settings, 'volume',self.qmc.volume[2], read_defaults)
             self.settingsSetValue(settings, default_settings, 'densityweight',self.qmc.density[1], read_defaults)
             self.settingsSetValue(settings, default_settings, 'densityvolume',self.qmc.density[3], read_defaults)
             self.settingsSetValue(settings, default_settings, 'volumeCalcUnit',self.qmc.volumeCalcUnit, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP Units
 
 #--- BEGIN GROUP Alarms
             #save alarms
-                settings.beginGroup('Alarms')
+            settings.beginGroup('Alarms')
             self.settingsSetValue(settings, default_settings, 'alarmsetlabel',self.qmc.alarmsetlabel, read_defaults)
             self.settingsSetValue(settings, default_settings, 'alarmflag',self.qmc.alarmflag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'alarmguard',self.qmc.alarmguard, read_defaults)
@@ -18625,8 +18592,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'alarm_popup_timout',self.qmc.alarm_popup_timout, read_defaults)
             self.settingsSetValue(settings, default_settings, 'alarmtablecolumnwidths',self.qmc.alarmtablecolumnwidths, read_defaults)
             self.settingsSetValue(settings, default_settings, 'alarmsets',self.qmc.alarmsets, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP Alarms
 
             self.settingsSetValue(settings, default_settings, 'profilepath',self.userprofilepath, read_defaults)
@@ -18641,19 +18607,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
 #--- BEGIN GROUP ExtraDev
             #save extra devices
-            if settings is not None:
-                settings.beginGroup('ExtraDev')
+            settings.beginGroup('ExtraDev')
             self.setExtraDeviceSettings(settings, default_settings, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP ExtraDev
 
 #--- BEGIN GROUP ExtraComm
             #save extra serial comm ports settings
-                settings.beginGroup('ExtraComm')
+            settings.beginGroup('ExtraComm')
             self.setExtraDeviceCommSettings(settings, default_settings, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP ExtraComm
 
             self.settingsSetValue(settings, default_settings, 'ChannelTares',self.channel_tare_values, read_defaults)
@@ -18668,8 +18631,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
 #--- BEGIN GROUP CurveStyles
             #curve styles
-            if settings is not None:
-                settings.beginGroup('CurveStyles')
+            settings.beginGroup('CurveStyles')
             self.settingsSetValue(settings, default_settings, 'BTlinestyle',self.qmc.BTlinestyle, read_defaults)
             self.settingsSetValue(settings, default_settings, 'BTdrawstyle',self.qmc.BTdrawstyle, read_defaults)
             self.settingsSetValue(settings, default_settings, 'BTlinewidth',self.qmc.BTlinewidth, read_defaults)
@@ -18721,13 +18683,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'ETBdeltamarker',self.qmc.ETBdeltamarker, read_defaults)
             self.settingsSetValue(settings, default_settings, 'ETBdeltamarkersize',self.qmc.ETBdeltamarkersize, read_defaults)
             self.setExtraDeviceCurveStyles(settings, default_settings, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP CurveStyles
 
 #--- BEGIN GROUP background
             #background settings
-                settings.beginGroup('background')
+            settings.beginGroup('background')
             self.settingsSetValue(settings, default_settings, 'backgrounddetails',self.qmc.backgroundDetails, read_defaults)
             self.settingsSetValue(settings, default_settings, 'backgroundevents',self.qmc.backgroundeventsflag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'movespeed',self.qmc.backgroundmovespeed, read_defaults)
@@ -18740,8 +18701,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'backgroundKeyboardControlFlag',self.qmc.backgroundKeyboardControlFlag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'clearBgbeforeprofileload',self.qmc.clearBgbeforeprofileload, read_defaults)
             self.settingsSetValue(settings, default_settings, 'hideBgafterprofileload',self.qmc.hideBgafterprofileload, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP background
 
             self.settingsSetValue(settings, default_settings, 'compareAlignEvent',self.qmc.compareAlignEvent, read_defaults)
@@ -18760,13 +18720,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'autosaveprefix',self.qmc.autosaveprefix, read_defaults)
 
 #--- BEGIN GROUP WebLCDs
-            if settings is not None:
-                settings.beginGroup('WebLCDs')
+            settings.beginGroup('WebLCDs')
             self.settingsSetValue(settings, default_settings, 'active',self.WebLCDs, read_defaults)
             self.settingsSetValue(settings, default_settings, 'port',self.WebLCDsPort, read_defaults)
             self.settingsSetValue(settings, default_settings, 'alerts',self.WebLCDsAlerts, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP WebLCDs
 
             self.settingsSetValue(settings, default_settings, 'LargeLCDs',self.LargeLCDsFlag, read_defaults)
@@ -18778,8 +18736,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
 #--- BEGIN GROUP ExtraEventButtons
             #custom event buttons
-            if settings is not None:
-                settings.beginGroup('ExtraEventButtons')
+            settings.beginGroup('ExtraEventButtons')
             self.settingsSetValue(settings, default_settings, 'buttonlistmaxlen',self.buttonlistmaxlen, read_defaults)
             self.settingsSetValue(settings, default_settings, 'extraeventstypes',self.extraeventstypes, read_defaults)
             self.settingsSetValue(settings, default_settings, 'extraeventsvalues',self.extraeventsvalues, read_defaults)
@@ -18799,34 +18756,30 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'marklastbuttonpressed',self.mark_last_button_pressed, read_defaults)
             self.settingsSetValue(settings, default_settings, 'showextrabuttontooltips',self.show_extrabutton_tooltips, read_defaults)
             self.settingsSetValue(settings, default_settings, 'buttonpalette_label',self.buttonpalette_label, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP ExtraEventButtons
 
 #--- BEGIN GROUP RoRlimits
-                settings.beginGroup('RoRlimits')
+            settings.beginGroup('RoRlimits')
             self.settingsSetValue(settings, default_settings, 'RoRlimitFlag',self.qmc.RoRlimitFlag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'RoRlimit',self.qmc.RoRlimit, read_defaults)
             self.settingsSetValue(settings, default_settings, 'RoRlimitm',self.qmc.RoRlimitm, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP RoRlimits
 
 #--- BEGIN GROUP grid
-                settings.beginGroup('grid')
+            settings.beginGroup('grid')
             self.settingsSetValue(settings, default_settings, 'xgrid',self.qmc.xgrid, read_defaults)
             self.settingsSetValue(settings, default_settings, 'ygrid',self.qmc.ygrid, read_defaults)
             self.settingsSetValue(settings, default_settings, 'zgrid',self.qmc.zgrid, read_defaults)
             self.settingsSetValue(settings, default_settings, 'gridlinestyle',self.qmc.gridlinestyle, read_defaults)
             self.settingsSetValue(settings, default_settings, 'gridthickness',self.qmc.gridthickness, read_defaults)
             self.settingsSetValue(settings, default_settings, 'gridalpha',self.qmc.gridalpha, read_defaults)
-#            self.settingsSetValue(settings, default_settings, "xrotation",self.qmc.xrotation, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP grid
 
 #--- BEGIN GROUP Sliders
-                settings.beginGroup('Sliders')
+            settings.beginGroup('Sliders')
             self.settingsSetValue(settings, default_settings, 'slidervisibilities',self.eventslidervisibilities, read_defaults)
             self.settingsSetValue(settings, default_settings, 'eventsliderKeyboardControl',self.eventsliderKeyboardControl, read_defaults)
             self.settingsSetValue(settings, default_settings, 'eventsliderAlternativeLayout',self.eventsliderAlternativeLayout, read_defaults)
@@ -18842,12 +18795,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'eventslidertemp',self.eventslidertemp, read_defaults)
             self.settingsSetValue(settings, default_settings, 'eventsliderunits',self.eventsliderunits, read_defaults)
             self.settingsSetValue(settings, default_settings, 'ModeTempSliders',self.qmc.mode_tempsliders, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP Sliders
 
 #--- BEGIN GROUP Quantifiers
-                settings.beginGroup('Quantifiers')
+            settings.beginGroup('Quantifiers')
             self.settingsSetValue(settings, default_settings, 'quantifieractive',self.eventquantifieractive, read_defaults)
             self.settingsSetValue(settings, default_settings, 'quantifiersource',self.eventquantifiersource, read_defaults)
             self.settingsSetValue(settings, default_settings, 'eventquantifierSV',self.eventquantifierSV, read_defaults)
@@ -18856,8 +18808,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'quantifiercoarse',self.eventquantifiercoarse, read_defaults)
             self.settingsSetValue(settings, default_settings, 'eventquantifieraction',self.eventquantifieraction, read_defaults)
             self.settingsSetValue(settings, default_settings, 'clusterEventsFlag',self.clusterEventsFlag, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP Quantifiers
 
             self.settingsSetValue(settings, default_settings, 'titleshowalways',self.qmc.title_show_always, read_defaults)
@@ -18867,8 +18818,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'customflavorlabels',self.qmc.customflavorlabels, read_defaults)
 
 #--- BEGIN GROUP Batch
-            if settings is not None:
-                settings.beginGroup('Batch')
+            settings.beginGroup('Batch')
             self.settingsSetValue(settings, default_settings, 'batchcounter',self.qmc.batchcounter, read_defaults)
             self.settingsSetValue(settings, default_settings, 'batchsequence',self.qmc.batchsequence, read_defaults)
             self.settingsSetValue(settings, default_settings, 'batchprefix',self.qmc.batchprefix, read_defaults)
@@ -18876,18 +18826,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 # store always
                 self.settingsSetValue(settings, default_settings, 'lastroastepoch',self.qmc.lastroastepoch, read_defaults)
             self.settingsSetValue(settings, default_settings, 'neverUpdateBatchCounter',self.qmc.neverUpdateBatchCounter, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP Batch
 
 #--- BEGIN GROUP ExtrasMoreInfo
-                settings.beginGroup('ExtrasMoreInfo')
+            settings.beginGroup('ExtrasMoreInfo')
             self.settingsSetValue(settings, default_settings, 'showmet',self.qmc.showmet, read_defaults)
             self.settingsSetValue(settings, default_settings, 'statssummary',self.qmc.statssummary, read_defaults)
             self.settingsSetValue(settings, default_settings, 'statsmaxchrperline', self.qmc.statsmaxchrperline, read_defaults)
             self.settingsSetValue(settings, default_settings, 'showtimeguide',self.qmc.showtimeguide, read_defaults)
-            if settings is not None:
-                settings.endGroup()
+            settings.endGroup()
 #--- END GROUP ExtrasMoreInfo
 
             try:
@@ -18912,9 +18860,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if filename:
                 self.settingsSetValue(settings, default_settings, 'timestamp', QDateTime.currentDateTime().toString('yyyy-MM-ddThh:mm:ss'), read_defaults)
 
-            if settings is not None and not read_defaults:
+            if not read_defaults:
                 settings.sync()
-            if settings is not None and settings.status() != QSettings.Status.NoError:
+
+            if settings.status() != QSettings.Status.NoError:
                 _log.error('Failed to save settings')
                 QMessageBox.information(self, QApplication.translate('Error Message', 'Error',None),QApplication.translate('Error Message', 'Failed to save settings'))
                 return False
@@ -22680,7 +22629,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         filename = self.ArtisanSaveFileDialog(msg=QApplication.translate('Message', 'Save Settings'), path=fname, ext='*.aset')
         if filename:
             self.settingspath = filename
-
             if self.closeEventSettings(filename):
                 self.sendmessage(QApplication.translate('Message','Settings saved'))
                 # update recentSettings menu
