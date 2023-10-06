@@ -28,8 +28,7 @@ if [ -n "${PYUPGRADE_V:-}" ]; then
     deactivate
     # brew update Python
     brew update
-    brew uninstall --force openssl
-    brew install openssl
+    brew upgrade openssl
     brew upgrade python # no "brew cleanup" here, not to delete libs needed by curl!
     # relink Python
     brew unlink python@${PYTHON_V} && brew link --force --overwrite python@${PYTHON_V}
@@ -53,6 +52,7 @@ hash -r
 uname -srv
 which python3
 python3 --version
+openssl version -a
 
 # to work around a wget open ssl issue: dyld: Library not loaded: /usr/local/opt/openssl/lib/libssl.1.0.0.dylib
 # however for now we settled to use curl instead to download the upload script
