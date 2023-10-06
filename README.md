@@ -28,7 +28,7 @@ Artisan is a software that helps coffee roasters record, analyze, and control ro
 Donations
 ---------
 
-This software is open-source and absolutely free, also for commercial use.
+This software is open-source and absolutely free to use, also in commercial settings.
 
 If you think Artisan is useful to you, contribute financially to its further development. Send any amount via my [PayPal.Me page](https://www.paypal.me/MarkoLuther). Thanks!
 
