@@ -37,9 +37,6 @@ if [ -n "${PYUPGRADE_V:-}" ]; then
     echo $PATH
     which python3
     python3 --version
-    # we upgrade libidn2 and curl to prevent issues caused by the previous python update
-    # on running curl for later upload (libunistring.2.dylib not found)
-    brew upgrade libidn2 # 2.3.4 -> 2.3.4_1
 
     # create new venv
     python3 -m venv /Users/appveyor/venv${PYUPGRADE_V}
