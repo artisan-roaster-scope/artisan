@@ -27,7 +27,10 @@ if [ -n "${PYUPGRADE_V:-}" ]; then
     source ${VIRTUAL_ENV}/bin/activate
     deactivate
     # brew update Python
-    brew update && brew upgrade openssl && brew upgrade python # no "brew cleanup" here, not to delete libs needed by curl!
+    brew update
+    brew uninstall --force openssl
+    brew install openssl
+    brew upgrade python # no "brew cleanup" here, not to delete libs needed by curl!
     # relink Python
     brew unlink python@${PYTHON_V} && brew link --force --overwrite python@${PYTHON_V}
     hash -r
