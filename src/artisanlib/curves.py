@@ -1504,16 +1504,16 @@ class CurvesDlg(ArtisanDialog):
         self.aw.BTname = str(self.renameBTLine.text()).strip()
         if self.aw.BTname == '':
             self.aw.BTname = QApplication.translate('Label', 'BT')
-        self.aw.label3.setText('<big><b>' + self.aw.BTname + '</b></big>')
-        self.aw.label5.setText(deltaLabelBigPrefix + self.aw.BTname + '</b></big>')
+        self.aw.label3.setText(f'<big><b>{self.aw.BTname}</b></big>'.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3]))
+        self.aw.label5.setText(f'{deltaLabelBigPrefix}{self.aw.BTname}</b></big>'.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3]))
 
     @pyqtSlot()
     def renameET(self):
         self.aw.ETname = str(self.renameETLine.text()).strip()
         if self.aw.ETname == '':
             self.aw.ETname = QApplication.translate('Label', 'ET')
-        self.aw.label2.setText('<big><b>' + self.aw.ETname + '</b></big>')
-        self.aw.label4.setText(deltaLabelBigPrefix + self.aw.ETname + '</b></big>')
+        self.aw.label2.setText(f'<big><b>{self.aw.ETname}</b></big>'.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3]))
+        self.aw.label4.setText(f'{deltaLabelBigPrefix}{self.aw.ETname}</b></big>'.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3]))
 
     @pyqtSlot(int)
     def toggleWebLCDsAlerts(self,_):
@@ -1526,7 +1526,7 @@ class CurvesDlg(ArtisanDialog):
     def setWebLCDsURL(self):
         url_str = self.getWebLCDsURL()
         # set URL label
-        self.WebLCDsURL.setText('<a href="' + url_str + '">' + url_str + '</a>')
+        self.WebLCDsURL.setText(f'<a href="{url_str}">{url_str}</a>')
         # set QR label
         try:
             from artisanlib.qrcode import QRlabel
@@ -1541,7 +1541,7 @@ class CurvesDlg(ArtisanDialog):
         s.connect(('8.8.8.8', 80))
         localIP = s.getsockname()[0]
         s.close()
-        return 'http://' + str(localIP) + ':' + str(self.aw.WebLCDsPort) + '/artisan'
+        return f'http://{str(localIP)}:{str(self.aw.WebLCDsPort)}/artisan'
 
     @pyqtSlot(bool)
     def toggleWebLCDs(self,b):

@@ -3175,31 +3175,31 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         #MET
         self.label2 = QLabel()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
-        self.label2.setText('<big><b>' + QApplication.translate('Label', 'ET') + '</b></big>')
+        self.label2.setText(f"<big><b>{QApplication.translate('Label', 'ET')}</b></big>")
         self.setLabelColor(self.label2,QColor(self.qmc.palette['et']))
         #BT
         self.label3 = QLabel()
         self.label3.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
-        self.label3.setText('<big><b>' + QApplication.translate('Label', 'BT') + '</b></big>')
+        self.label3.setText(f"<big><b>{QApplication.translate('Label', 'BT')}</b></big>")
         self.setLabelColor(self.label3,QColor(self.qmc.palette['bt']))
         #DELTA MET
         self.label4 = QLabel()
         self.label4.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
-        self.label4.setText(deltaLabelBigPrefix + QApplication.translate('Label', 'ET') + '</b></big>')
+        self.label4.setText(f"{deltaLabelBigPrefix}{QApplication.translate('Label', 'ET')}</b></big>")
         self.setLabelColor(self.label4,QColor(self.qmc.palette['deltaet']))
         # DELTA BT
         self.label5 = QLabel()
         self.label5.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
-        self.label5.setText(deltaLabelBigPrefix + QApplication.translate('Label', 'BT') + '</b></big>')
+        self.label5.setText(f"{deltaLabelBigPrefix}{QApplication.translate('Label', 'BT')}</b></big>")
         self.setLabelColor(self.label5,QColor(self.qmc.palette['deltabt']))
         # pid sv
         self.label6 = QLabel()
         self.label6.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
-        self.label6.setText('<big><b>' + QApplication.translate('Label', 'PID SV') + '</b></big>')
+        self.label6.setText(f"<big><b>{QApplication.translate('Label', 'PID SV')}</b></big>")
         # pid power % duty cycle
         self.label7 = QLabel()
         self.label7.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
-        self.label7.setText('<big><b>' + QApplication.translate('Label', 'PID %') + '</b></big>')
+        self.label7.setText(f"<big><b>{QApplication.translate('Label', 'PID %')}</b></big>")
 
         #extra LCDs
         self.nLCDS: Final[int] = 10 # maximum number of LCDs and extra devices
@@ -4989,6 +4989,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         return [self.recentRoastLabel(rr) for rr in self.recentRoasts]
 
     def establish_etypes(self):
+        # update ET/BT LCD label substitutions
+        self.label2.setText(f'<big><b>{self.ETname}</b></big>'.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
+        self.label3.setText(f'<big><b>{self.BTname}</b></big>'.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
+        # update ET/BT Delta LCD lable substitutions
+        self.label4.setText(f'{deltaLabelBigPrefix}{self.ETname}</b></big>'.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
+        self.label5.setText(f'{deltaLabelBigPrefix}{self.BTname}</b></big>'.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
         # update extra LCD label substitutions
         for i in range(len(self.qmc.extradevices)):
             if i < len(self.qmc.extraname1):
@@ -16173,17 +16179,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.eventsGraphflag = toInt(settings.value('eventsGraphflag',int(self.qmc.eventsGraphflag)))
             if settings.contains('etypes'):
                 self.qmc.etypes = toStringList(settings.value('etypes',self.qmc.etypes))
+                # etype specified as empty strings are replaced by their defaults to enable translations in partially customized etypes
+                for i, name in enumerate(self.qmc.etypes):
+                    if name == '':
+                        self.qmc.etypes[i] = self.qmc.etypesdefault[i]
                 # update minieditor event type ComboBox
                 self.etypeComboBox.clear()
                 self.etypeComboBox.addItems(self.qmc.etypes)
             else:
                 # etypes have not been saved in the setting to presever the translations, we have to reset those to their default
-                self.qmc.etypes = [
-                    QApplication.translate('ComboBox', 'Air'),
-                    QApplication.translate('ComboBox', 'Drum'),
-                    QApplication.translate('ComboBox', 'Damper'),
-                    QApplication.translate('ComboBox', 'Burner')
-                ]
+                self.qmc.etypes = self.qmc.etypesdefault
             self.qmc.eventsshowflag = toInt(settings.value('eventsshowflag',int(self.qmc.eventsshowflag)))
             self.qmc.clampEvents = bool(toBool(settings.value('clampEvents',self.qmc.clampEvents)))
             self.qmc.renderEventsDescr = bool(toBool(settings.value('renderEventsDescr',self.qmc.renderEventsDescr)))
@@ -16773,14 +16778,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.graphfont = toInt(settings.value('graphfont',self.qmc.graphfont))
             if settings.contains('ETname'):
                 self.ETname = settings.value('ETname')
-                self.label2.setText('<big><b>' + self.ETname + '</b></big>')
-                self.label4.setText(deltaLabelBigPrefix + self.ETname + '</b></big>')
+                self.label2.setText(f'<big><b>{self.ETname}</b></big>'.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
+                self.label4.setText(f'{deltaLabelBigPrefix}{self.ETname}</b></big>'.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
             else:
                 self.ETname = QApplication.translate('Label', 'ET')
             if settings.contains('BTname'):
                 self.BTname = settings.value('BTname')
-                self.label3.setText('<big><b>' + self.BTname + '</b></big>')
-                self.label5.setText(deltaLabelBigPrefix + self.BTname + '</b></big>')
+                self.label3.setText(f'<big><b>{self.BTname}</b></big>'.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
+                self.label5.setText(f'{deltaLabelBigPrefix}{self.BTname}</b></big>'.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
             else:
                 self.BTname = QApplication.translate('Label', 'BT')
             settings.endGroup()
@@ -18026,7 +18031,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 (self.qmc.etypes[1] != QApplication.translate('ComboBox', 'Drum')) or
                 (self.qmc.etypes[2] != QApplication.translate('ComboBox', 'Damper')) or
                 (self.qmc.etypes[3] != QApplication.translate('ComboBox', 'Burner'))):
-                self.settingsSetValue(settings, default_settings, 'etypes',self.qmc.etypes, read_defaults)
+                etypes = self.qmc.etypes
+                if not read_defaults:
+                    for i, _ in enumerate(self.qmc.etypes):
+                        if self.qmc.etypes[i] == self.qmc.etypesdefault[i]:
+                            etypes[i] = '' # we save empty strings for default event type names to ensure correct translation on re-loading those settings
+                self.settingsSetValue(settings, default_settings, 'etypes',etypes, read_defaults)
             else:
                 settings.remove('etypes')
             self.settingsSetValue(settings, default_settings, 'eventsshowflag',self.qmc.eventsshowflag, read_defaults)

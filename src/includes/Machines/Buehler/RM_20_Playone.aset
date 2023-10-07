@@ -1,7 +1,7 @@
 [General]
 Delay=1000
 Oversampling=false
-roastertype_setup=B\xfchler RM 20 Legacy
+roastertype_setup=B\xfchler RM Playone
 
 [MachineSetup]
 capacity=20
@@ -45,14 +45,14 @@ PID_p_register=0
 PIDmultiplier=0
 SVmultiplier=0
 area=6, 6, 6, 6, 6, 6, 0, 0, 0, 0
-db_nr=1604, 1604, 1604, 1604, 1604, 1604, 1, 1, 1, 1
+db_nr=1606, 1606, 1606, 1606, 1606, 1606, 1, 1, 1, 1
 div=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 host=192.168.1.10
 mode=1, 1, 1, 0, 0, 0, 0, 0, 0, 0
 port=102
 rack=0
 slot=1
-start=16, 12, 32, 20, 8, 24, 0, 0, 0, 0
+start=240, 244, 252, 248,228, 232, 0, 0, 0, 0
 type=1, 1, 1, 1, 2, 2, 0, 0, 0, 0
 optimizer=true
 fetch_max_blocks=true

@@ -3304,7 +3304,7 @@ class tgraphcanvas(FigureCanvas):
                                             linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
                 else:
                     self.l_timeline.set_xdata(tx)
-                    self.ax.draw_artist(self.l_timeline)
+                self.ax.draw_artist(self.l_timeline)
             if self.projectFlag:
                 if self.l_BTprojection is not None and self.BTcurve:
                     self.ax.draw_artist(self.l_BTprojection)
@@ -6672,6 +6672,8 @@ class tgraphcanvas(FigureCanvas):
             self.deleteAnnoPositions(foreground=True, background=False)
             self.l_event_flags_dict = {} # initiate the event id to temp/time annotation dict for flags
             self.l_background_annotations = [] # initiate the background event annotations
+
+            self.l_timeline = None # clear timeline Artist to get the linecount correct after changning a machine setup
 
             if not sampling:
                 self.aw.hideDefaultButtons()
