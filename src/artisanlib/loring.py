@@ -7,7 +7,7 @@ import time as libtime
 import csv
 import logging
 from typing import List, Optional, TYPE_CHECKING
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.types import ProfileData # pylint: disable=unused-import
@@ -59,7 +59,7 @@ def extractProfileLoringCSV(file,aw):
         extra2:List[float] = [] # inlet
         extra3:List[float] = [] # stack
         extra4:List[float] = [] # ror
-        timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
+        timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
 
         power_event:bool = False
 
@@ -68,7 +68,7 @@ def extractProfileLoringCSV(file,aw):
         sampling_interval:float = 6
         roasting:int = 0
 
-        mode = 'C' # by default we assume temperature data in degree Celcius
+        mode = 'C' # by default we assume temperature data in degree Celsius
 
         i = 0
         for row in data:
@@ -80,7 +80,7 @@ def extractProfileLoringCSV(file,aw):
             try:
                 if 'Time' in item and 'RoastTimeSeconds' in item and 'RoastingOnOff' in item and item['RoastingOnOff'] != '':
 
-                    #time = int(item['RoastTimeSeconds']) # seems to be unprecise and does not correspond exactly to the 6s interval given by 'Time'
+                    #time = int(item['RoastTimeSeconds']) # seems to be imprecise and does not correspond exactly to the 6s interval given by 'Time'
 
                     datetime:QDateTime = QDateTime.fromString(item['Time'], 'M/d/yyyy h:mm:ss AP')
 

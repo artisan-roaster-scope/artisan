@@ -30,7 +30,7 @@ import time as libtime
 import numpy
 import logging
 from typing import Union, List, Dict, Optional, TYPE_CHECKING
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
@@ -1185,7 +1185,7 @@ class PIDcontrol:
         self.sv_decay_weights:Optional[List[float]] = None
         self.previous_svs:List[float] = []
         # time @ PID ON
-        self.time_pidON:float = 0 # in monitoring mode, ramp-soak times are interperted w.r.t. the time after the PID was turned on and not the time after CHARGE as during recording
+        self.time_pidON:float = 0 # in monitoring mode, ramp-soak times are interpreted w.r.t. the time after the PID was turned on and not the time after CHARGE as during recording
         self.current_ramp_segment:int = 0 # the RS segment currently active. Note that this is 1 based, 0 indicates that no segment has started yet
         self.current_soak_segment:int = 0 # the RS segment currently active. Note that this is 1 based, 0 indicates that no segment has started yet
         self.ramp_soak_engaged:int = 1 # set to 0, disengaged, after the RS pattern was processed fully
@@ -1527,7 +1527,7 @@ class PIDcontrol:
                 elif int(self.aw.ser.arduinoBTChannel) == self.pidSource: # we observe the BT
                     followCurveNr = 1
                 else:
-                    # we do not know which extra background device curve holds the selcted PID source temperatures
+                    # we do not know which extra background device curve holds the selected PID source temperatures
                     return None
             else:
                 followCurveNr = self.pidSource

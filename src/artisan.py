@@ -32,7 +32,7 @@ try:
 except Exception: # pylint: disable=broad-except
     pass
 
-# on Qt5, the platform plugin cocoa/windows is not found in the plugin directory (dispite the qt.conf file) if we do not
+# on Qt5, the platform plugin cocoa/windows is not found in the plugin directory (despite the qt.conf file) if we do not
 # extend the libraryPath accordingly
 if system().startswith('Windows'):
     try:

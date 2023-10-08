@@ -323,7 +323,7 @@ class Artisan(QtSingleApplication):
     # takes a QUrl and interprets it as follows
     # artisan://roast/<UUID>         : loads profile from path associated with the given roast <UUID>
     # artisan://template/<UUID>      : loads background profile from path associated with the given roast <UUID>
-    # artisan://profile?url=<url>    : loads proflie from given URL
+    # artisan://profile?url=<url>    : loads profile from given URL
     # file://<path>                  : loads file from path
     #                                  if query is "background" Artisan is not raised to the foreground
     #                                  if query is "template" and the file has an .alog extension, the profile is loaded as background profile
@@ -1683,7 +1683,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.recentRoasts:List[RecentRoast] = []
         self.maxRecentRoasts = 25 # the maximum number of recent roasts held
 
-        #lcd1 = time, lcd2 = met, lcd3 = bt, lcd4 = roc et, lcd5 = roc bt, lcd6 = sv (extra devices lcd same as sv seetings)
+        #lcd1 = time, lcd2 = met, lcd3 = bt, lcd4 = roc et, lcd5 = roc bt, lcd6 = sv (extra devices lcd same as sv settings)
         self.lcdpaletteB:Dict[str,str] = {
             'timer':'#F8F8F8',
             'et':'#cc0f50',
@@ -1768,7 +1768,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.eventquantifierSV:List[int] = [0]*self.eventsliders # 1 (SV mode): quantification is never blocked; 0 (PV mode): quantification is blocked for a period as signal might still in move
         self.eventquantifiermin:List[int] = [0]*self.eventsliders
         self.eventquantifiermax:List[int] = [100]*self.eventsliders
-        self.eventquantifiercoarse:List[int] = [0]*self.eventsliders # 1: quantifiy in 10 steps, 2: quantify in steps of 5, otherwise quantify in steps of 1
+        self.eventquantifiercoarse:List[int] = [0]*self.eventsliders # 1: quantify in 10 steps, 2: quantify in steps of 5, otherwise quantify in steps of 1
         self.eventquantifieraction:List[int] = [0]*self.eventsliders
         self.clusterEventsFlag:bool = False
         self.eventquantifierlinspaces = [self.computeLinespace(0),self.computeLinespace(1),self.computeLinespace(2),self.computeLinespace(3)]
@@ -1815,7 +1815,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.recentThemeActs.append(action)
 
 
-        #temp variable for text searches in Help menu artisan seetings
+        #temp variable for text searches in Help menu artisan settings
         self.searchtextartisansettings = ''
 
         #######################    MENUS SECTION ##################################################
@@ -4147,7 +4147,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.ETcurve = not self.qmc.ETcurve
         else:
             self.qmc.BTcurve = not self.qmc.BTcurve
-        # we reset the chached main event annotation positions as those annotations are now rendered on the other curve
+        # we reset the cached main event annotation positions as those annotations are now rendered on the other curve
         self.qmc.l_annotations_dict = {}
         # and redraw
         self.qmc.redraw(recomputeAllDeltas=False)
@@ -4328,7 +4328,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     0 <= starts < everystarts):
 #                message = QApplication.translate('Message', 'Artisan is free to use!<br><br>To keep it free and current please support us<br><br><a href="{0}">{0}</a><br><br>and book<br><br><a href="{1}">{1}</a><br><br>to suppress this dialog')
 #                message = message.format('https://artisan-scope.org/donate/', 'https://artisan.plus')
-                message = QApplication.translate('Message', 'Artisan is free to use!\n\nTo keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!')
+                message = QApplication.translate('Message', 'Artisan is free to use!\n\nTo keep it free and current please support us with your donation and subscribe to artisan.plus to suppress this dialog!')
                 donate_message_box = QMessageBox(self)
                 donate_message_box.setText(message)
                 donate_message_box.setIcon(QMessageBox.Icon.Information)
@@ -4666,7 +4666,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         elif fct == 'OUTsetPWMhub':
             QTimer.singleShot(int(round(millis)),lambda : self.ser.phidgetOUTsetPWMhub(channel,0,serial))
         elif fct == 'BinaryOUTset':
-            QTimer.singleShot(int(round(millis)),lambda : (None if self.ser.phidgetBinaryOUTset(channel, False, serial) else None)) # return None to fullfil the type signature of QTimer.singleShot()
+            QTimer.singleShot(int(round(millis)),lambda : (None if self.ser.phidgetBinaryOUTset(channel, False, serial) else None)) # return None to fulfill the type signature of QTimer.singleShot()
 
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  #####################################
@@ -4992,7 +4992,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         # update ET/BT LCD label substitutions
         self.label2.setText(f'<big><b>{self.ETname}</b></big>'.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
         self.label3.setText(f'<big><b>{self.BTname}</b></big>'.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
-        # update ET/BT Delta LCD lable substitutions
+        # update ET/BT Delta LCD label substitutions
         self.label4.setText(f'{deltaLabelBigPrefix}{self.ETname}</b></big>'.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
         self.label5.setText(f'{deltaLabelBigPrefix}{self.BTname}</b></big>'.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
         # update extra LCD label substitutions
@@ -5206,7 +5206,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             batchsize, res2 = QInputDialog.getDouble(self,
                                 QApplication.translate('Message', 'Machine'),
                                 QApplication.translate('Message', 'Machine Capacity (kg)'),
-                                self.qmc.roastersize_setup_default, # defaut value as loaded from the machine setup
+                                self.qmc.roastersize_setup_default, # default value as loaded from the machine setup
                                 0, # min
                                 999, # max
                                 1) # decimals
@@ -6660,7 +6660,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 np_bt = np_bt[start:end]
                 np_timex = numpy.array(self.qmc.timex[start:end])
 
-                # diference in time between DROPs in profile and background
+                # difference in time between DROPs in profile and background
                 dropTimeDelta = self.qmc.timex[self.qmc.timeindex[6]] - self.qmc.timeB[self.qmc.timeindexB[6]]
 
                 # these are not the smoothed background temps, which is how the old CM was done
@@ -7910,7 +7910,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
 
-                lastbuttonpressed = self.lastbuttonpressed # we rember that here as it might be reset to -1 by some button commands to avoid changing its state
+                lastbuttonpressed = self.lastbuttonpressed # we remember that here as it might be reset to -1 by some button commands to avoid changing its state
                 if action == 1: # Serial Command
                     cmd_str_bin = b''
                     #example a2b_uu("Hello") sends Hello in binary format instead of ASCII
@@ -8297,7 +8297,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     #
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(';')) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
-                        lastbuttonpressed = self.lastbuttonpressed # we rember that here as it might be reset to -1 by some button commands to avoid changing its state
+                        lastbuttonpressed = self.lastbuttonpressed # we remember that here as it might be reset to -1 by some button commands to avoid changing its state
                         for cs in cmds:
                             c = cs.strip().replace('_',('0' if self.lastIOResult is None else f'{self.lastIOResult:g}')) # the last read value can be accessed via the "_" symbol
                             # $ is substituted by the state of the current button (1:pressed, 0:normal)
@@ -9048,7 +9048,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 elif action == 20: # Artisan Command
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(';')) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
-                        lastbuttonpressed = self.lastbuttonpressed # we rember that here as it might be reset to -1 by some button commands to avoid changing its state
+                        lastbuttonpressed = self.lastbuttonpressed # we remember that here as it might be reset to -1 by some button commands to avoid changing its state
                         for c in cmds:
                             cs = c.strip().replace('_',('0' if self.lastArtisanResult is None else f'{self.lastArtisanResult:g}')) # the last read value can be accessed via the "_" symbol
                             # $ is substituted by the state of the current button (1:pressed, 0:normal)
@@ -11006,7 +11006,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     else:
                         self.releaseminieditor()
                         self.moveKbutton('enter')
-                elif k == 16777216:                 #ESCAPE (exists full screen mode / clears message line / resets event short cut / exixts designer/wheel graph / releases minieditor)
+                elif k == 16777216:                 #ESCAPE (exists full screen mode / clears message line / resets event short cut / exits designer/wheel graph / releases minieditor)
                     self.quickEventShortCut = None
                     self.clearMessageLine()
                     macfullscreen = False
@@ -11951,14 +11951,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         #       create filename using the autosavepath and date+time
         #   else:
         #       start autosave Dialog to set the name path
-        #       return (nothing saved. Cancell New)
+        #       return (nothing saved. Cancel New)
         #   reset  (delete everything)
         #   start new roast (START)
         #ELSE (if recording is stopped - OFF):
         #   if no profile present (no data present or profile loaded):
         #       start new roast (START)
         #   else:
-        #       reset (reset offers three options: Save,Continue,Cancell)
+        #       reset (reset offers three options: Save,Continue,Cancel)
         #       START
         #########################################
 
@@ -13677,7 +13677,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' deserialize() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return obj
 
-    def ensureCorrectExtraDeviceListLenght(self):
+    def ensureCorrectExtraDeviceListLength(self):
         self.qmc.extraname1 = self.qmc.extraname1[:len(self.qmc.extradevices)]
         self.qmc.extraname1 = self.qmc.extraname1 + ['Extra 1']*max(0,len(self.qmc.extradevices)-len(self.qmc.extraname1))
         self.qmc.extraname2 = self.qmc.extraname2[:len(self.qmc.extradevices)]
@@ -13987,7 +13987,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     settings.endGroup()
 
                     # ensure that extra list length are of the size of the extradevices:
-                    self.ensureCorrectExtraDeviceListLenght()
+                    self.ensureCorrectExtraDeviceListLength()
                     self.updateExtradeviceSettings()
 
                     settings.beginGroup('ExtraComm')
@@ -14015,7 +14015,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     @staticmethod
     def makeListLength(l:List, n:int, default_element:Any) -> List:
-        """Returns list l extended by the given default elements to make it exactly of lenght n"""
+        """Returns list l extended by the given default elements to make it exactly of length n"""
         return l[:n] + [default_element]*max(0,n-len(l))
 
     def consolidateSpecialEvents(self) -> None:
@@ -14230,7 +14230,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         self.qmc.extradrawstyles2 = [self.qmc.drawstyle_default]*len(self.qmc.extratemp2)
 
                 # ensure that extra list length are of the size of the extradevices:
-                self.ensureCorrectExtraDeviceListLenght()
+                self.ensureCorrectExtraDeviceListLength()
 
             self.updateExtraLCDvisibility()
 
@@ -16970,7 +16970,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 settings.endGroup()
 #--- END GROUP ExtraDev
                 # ensure that extra list length are of the size of the extradevices:
-                self.ensureCorrectExtraDeviceListLenght()
+                self.ensureCorrectExtraDeviceListLength()
                 self.updateExtradeviceSettings()
 
             try:
@@ -17844,7 +17844,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             # we set the default_settings to None here to force the saving of all settings not only those different to the defaults
             _log.info('export settings to %s',filename)
             return self.saveAllSettings(QSettings(filename, QSettings.Format.IniFormat), None, filename)
-        # we hand over the defaultSettings to have only those settings saved that are diffent from their defaults
+        # we hand over the defaultSettings to have only those settings saved that are different from their defaults
         return self.saveAllSettings(QSettings(), self.defaultSettings)
 
     # if settings are None, the default_settings dict is filled with current values (the default values if called directly after start)
@@ -20412,7 +20412,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
                                 if self.qmc.DeltaBTflag and self.qmc.delta_ax is not None:
                                     tx = numpy.array(timex)
-                                    cf = self.qmc.curvefilter #*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
+                                    cf = self.qmc.curvefilter #*2 # we smooth twice as heavy for PID/RoR calculation as for normal curve smoothing
                                     t1 = self.qmc.smooth_list(timex,fill_gaps(temp),window_len=cf,decay_smoothing=not self.qmc.optimalSmoothing)
                                     if len(t1)>10 and len(tx) > 10:
                                         # we start RoR computation 10 readings after CHARGE to avoid this initial peak
@@ -20957,7 +20957,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                             ws[cr].number_format = '0.0%' # type: ignore
                                         elif typ == 'time':
                                             h,m = divmod(conv_fld,60)
-                                            dt = datetime.time(int(h),int(m),0) # note that rounding h and m might lead to failure of .time() as round(59.99) = 60 which is >59 thus not accepeted by .time()
+                                            dt = datetime.time(int(h),int(m),0) # note that rounding h and m might lead to failure of .time() as round(59.99) = 60 which is >59 thus not accepted by .time()
                                             ws[cr] = dt # type: ignore # Incompatible types in assignment (expression has type "time", target has type "str")
                                             ws[cr].number_format = 'H:MM' # type: ignore
                                         elif typ == 'date':
@@ -21477,7 +21477,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             return '\n<center><pre>' + ', '.join(res) + '</pre></center>'
         return ''
 
-    # returns the overal cupping score and as second value a flag if True indicating that all individual ratings were set to their default value
+    # returns the overall cupping score and as second value a flag if True indicating that all individual ratings were set to their default value
     def cuppingSum(self, flavors):
         score = 0.
         all_default = True

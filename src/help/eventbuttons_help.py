@@ -60,7 +60,7 @@ def content():
     tbl_Labels.add_row(['\\r',QApplication.translate('HelpDlg','Event type 4')])
     tbl_Labels.add_row(['\\0',QApplication.translate('HelpDlg','OFF (translated)')])
     tbl_Labels.add_row(['\\1',QApplication.translate('HelpDlg','ON (translated)')])
-    tbl_Labels.add_row(['\\2',QApplication.translate('HelpDlg','OFF (translated, resepecting button state)')])
+    tbl_Labels.add_row(['\\2',QApplication.translate('HelpDlg','OFF (translated, respecting button state)')])
     tbl_Labels.add_row(['\\3',QApplication.translate('HelpDlg','ON (translated, respecting button state)')])
     tbl_Labels.add_row(['\\p',QApplication.translate('HelpDlg','STOP (translated)')])
     tbl_Labels.add_row(['\\s',QApplication.translate('HelpDlg','START (translated)')])
@@ -91,7 +91,7 @@ def content():
     tbl_Commands.field_names = [QApplication.translate('HelpDlg','Action'),QApplication.translate('HelpDlg','Command'),QApplication.translate('HelpDlg','Description')]
     tbl_Commands.add_row([QApplication.translate('HelpDlg','Serial Command'),QApplication.translate('HelpDlg','ASCII serial command or binary a2b_uu(serial command)'),'&#160;'])
     tbl_Commands.add_row([QApplication.translate('HelpDlg','Call Program'),QApplication.translate('HelpDlg','A program/script path (absolute or relative)'),QApplication.translate('HelpDlg','start an external program')])
-    tbl_Commands.add_row([QApplication.translate('HelpDlg','Multiple Event'),QApplication.translate('HelpDlg','button numbers separated by a comma: 1,2,..'),QApplication.translate('HelpDlg','triggers other buttons')])
+    tbl_Commands.add_row([QApplication.translate('HelpDlg','Multiple Event'),QApplication.translate('HelpDlg','button numbers or sleep(<float>) separated by a comma: 1,2,sleep(2.5), 3..'),QApplication.translate('HelpDlg','triggers other buttons')])
     tbl_Commands.add_row([QApplication.translate('HelpDlg','Modbus Command'),'_',QApplication.translate('HelpDlg','variable holding the last value read via MODBUS')])
     tbl_Commands.add_row(['&#160;','$',QApplication.translate('HelpDlg','variable holding the last state of the button pressed (1 or 0)')])
     tbl_Commands.add_row(['&#160;','sleep(<float>)',QApplication.translate('HelpDlg','sleep: add a delay of <float> seconds')])

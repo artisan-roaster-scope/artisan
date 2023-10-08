@@ -264,7 +264,7 @@ class serialport:
         #serial port for ET/BT
         import serial  # @UnusedImport
         self.SP:serial.Serial = serial.Serial()
-        #used only in devices that also control the roaster like PIDs or Arduino (possible to receive asynchrous comands from GUI commands and thread sample()).
+        #used only in devices that also control the roaster like PIDs or Arduino (possible to receive asynchrous commands from GUI commands and thread sample()).
         self.COMsemaphore:QSemaphore = QSemaphore(1)
         ##### SPECIAL METER FLAGS ########
         #stores the Phidget 1048 TemperatureSensor object (None if not initialized)
@@ -6689,7 +6689,7 @@ class scaleport(extraserialport):
                         line2 = self.SP.readline()
                         d = re.findall(r'[0-9\.\-]+',str(line2))
                         if len(d) == 1:
-                            den = toFloat(d[0]) *12.8718597   # convert from LBS/BU to g/
+                            den = toFloat(d[0]) *12.8718597   # convert from LBS/BTU to g/
                             return -1,toFloat(den),-1
                         return -1,-1,-1
 

@@ -58,7 +58,7 @@ def extractProfileIkawaURL(url:QUrl, aw:'ApplicationWindow') -> 'ProfileData':
     extra4:List[float] = []
     extra5:List[float] = []
     extra6:List[float] = []
-    timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
+    timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
 
     fan_points:List = list(ikawa_profile.fan_points)
     for idx, p in enumerate(ikawa_profile.temp_points):
@@ -198,7 +198,7 @@ def extractProfileIkawaCSV(file, aw:'ApplicationWindow') -> 'ProfileData':
         extra4:List[float] = []
         extra5:List[float] = []
         extra6:List[float] = []
-        timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
+        timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
         i:int = 0
         v:Optional[float]
         for row in data:
@@ -410,7 +410,7 @@ try: # BLE not available on some platforms
             self.frame_char_escaped:Final[int]  = self.frame_char - self.escape_offset # 94 = b'\x5e'
             self.escape_char_escaped:Final[int] = self.escape_char - self.escape_offset # 93 = b'\x5d'
 
-            # either empty, or contains a partial payload incl. the begining frame_char or contains the full payload incl. the begining and ending frame_char
+            # either empty, or contains a partial payload incl. the beginning frame_char or contains the full payload incl. the beginning and ending frame_char
             self.rcv_buffer:Optional[bytes] = None
 
         @staticmethod

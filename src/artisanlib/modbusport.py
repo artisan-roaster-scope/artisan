@@ -179,7 +179,7 @@ class modbusport:
         #    4: UDP
         self.lastReadResult:Optional[int] = None # this is set by eventaction following some custom button/slider Modbus actions with "read" command
 
-        self.commError:int = 0 # number of errors that occured after the last connect; cleared by receiving proper data
+        self.commError:int = 0 # number of errors that occurred after the last connect; cleared by receiving proper data
 
     # this guarantees a minimum of 30 milliseconds between readings and 80ms between writes (according to the Modbus spec) on serial connections
     # this sleep delays between requests seems to be beneficial on slow RTU serial connections like those of the FZ-94
@@ -222,7 +222,7 @@ class modbusport:
         self.commError = 0
 
     def disconnectOnError(self) -> None:
-        # we only disconnect on error if mechanism is active, we are no longer connected or there is a IO commError, [ and we are on serial MODBUS (IP MODBUS reconnects automtically) NOTE: this seems to succeed in any case!?]
+        # we only disconnect on error if mechanism is active, we are no longer connected or there is a IO commError, [ and we are on serial MODBUS (IP MODBUS reconnects automatically) NOTE: this seems to succeed in any case!?]
         if self.disconnect_on_error and (self.commError>self.acceptable_errors or not self.isConnected()): # and self.type < 3:
             _log.info('MODBUS disconnectOnError: %s', self.commError)
             self.disconnect()
@@ -248,7 +248,7 @@ class modbusport:
                     from pymodbus.transaction import ModbusAsciiFramer
                     self.master = ModbusSerialClient(
                         framer=ModbusAsciiFramer,
-                        #method='ascii', # depricated in pymodbus 3.x
+                        #method='ascii', # deprecated in pymodbus 3.x
                         port=self.comport,
                         baudrate=self.baudrate,
                         bytesize=self.bytesize,
@@ -268,7 +268,7 @@ class modbusport:
                     from pymodbus.transaction import ModbusBinaryFramer
                     self.master = ModbusSerialClient(
                         framer=ModbusBinaryFramer,
-                        #method='binary', # depricated in pymodbus 3.x
+                        #method='binary', # deprecated in pymodbus 3.x
                         port=self.comport,
                         baudrate=self.baudrate,
                         bytesize=self.bytesize,
@@ -332,7 +332,7 @@ class modbusport:
                     from pymodbus.transaction import ModbusRtuFramer
                     self.master = ModbusSerialClient(
                         framer=ModbusRtuFramer,
-                        #method='rtu', # depricated in pymodbus 3.x
+                        #method='rtu', # deprecated in pymodbus 3.x
                         port=self.comport,
                         baudrate=self.baudrate,
                         bytesize=self.bytesize,

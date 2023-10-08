@@ -1205,7 +1205,7 @@ class tgraphcanvas(FigureCanvas):
         #Example: Use as self.timex[self.timeindex[1]] to get the time of DryEnd
         #Example: Use self.temp2[self.timeindex[4]] to get the BT temperature of SCs
 
-        self.timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
+        self.timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
 
         #applies a Y(x) function to ET or BT
         self.ETfunction:str = ''
@@ -1551,7 +1551,7 @@ class tgraphcanvas(FigureCanvas):
         self.overlappct:int = 100
 
         #curve styles
-        self.linewidth_min: Final[float] = 0.1 # minimum linewidth. NOTE: MPL raises an (unhandled) excpetion if linewidth is 0 with dotted styles in plot()
+        self.linewidth_min: Final[float] = 0.1 # minimum linewidth. NOTE: MPL raises an (unhandled) exception if linewidth is 0 with dotted styles in plot()
         self.markersize_min: Final[float] = 0.1
 
         self.linestyle_default: Final[str] = '-'
@@ -1679,7 +1679,7 @@ class tgraphcanvas(FigureCanvas):
 
         self.loadaxisfromprofile:bool = False # if set, axis are loaded from profile
 
-        # set initial limits for X and Y axes. But they change after reading the previous seetings at self.aw.settingsload()
+        # set initial limits for X and Y axes. But they change after reading the previous settings at self.aw.settingsload()
         self.startofx_default: Final[float] = -30
         self.endofx_default: Final[float] = 600 # 10min*60
 
@@ -3679,7 +3679,7 @@ class tgraphcanvas(FigureCanvas):
 
 
                     #we populate the temporary smoothed ET/BT data arrays (with readings cleansed from -1 dropouts)
-                    cf = self.curvefilter #*2 - 1 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
+                    cf = self.curvefilter #*2 - 1 # we smooth twice as heavy for PID/RoR calculation as for normal curve smoothing
                     if self.temp_decay_weights is None or len(self.temp_decay_weights) != cf: # recompute only on changes
                         self.temp_decay_weights = list(numpy.arange(1,cf+1))
                     # we don't smooth st'x if last, or butlast temperature value were a drop-out not to confuse the RoR calculation
@@ -5073,7 +5073,7 @@ class tgraphcanvas(FigureCanvas):
                 now = self.timeclock.elapsedMilli()
                 for i, bge in enumerate(self.backgroundEvents):
                     if (i not in self.replayedBackgroundEvents and # never replay one event twice
-                        (self.timeindexB[6]==0 or bge < self.timeindexB[6])): # don't replay events that happend after DROP in the backgroundprofile
+                        (self.timeindexB[6]==0 or bge < self.timeindexB[6])): # don't replay events that happened after DROP in the backgroundprofile
                         timed = self.timeB[bge] - now
                         delta:float = 1 # by default don't trigger this one
                         if self.replayType == 0: # replay by time
@@ -6602,7 +6602,7 @@ class tgraphcanvas(FigureCanvas):
             self.scorching_flag = False
             self.divots_flag = False
 
-            # renable autoCHARGE/autoDRY/autoFCs/autoDROP; all of those get set to False on UNDO of the event for the current roast
+            # re-enable autoCHARGE/autoDRY/autoFCs/autoDROP; all of those get set to False on UNDO of the event for the current roast
             self.autoCHARGEenabled = True
             self.autoDRYenabled = True
             self.autoFCsenabled = True
@@ -7117,7 +7117,7 @@ class tgraphcanvas(FigureCanvas):
                 temp_anno.set_picker(self.aw.draggable_text_box_picker)
         except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
             pass
-        #anotate time
+        #annotate time
         if draggable and draggable_anno_key is not None and draggable_anno_key in self.l_annotations_pos_dict:
             # we first look into the position dictionary loaded from file
             xytext = self.l_annotations_pos_dict[draggable_anno_key][1]
@@ -7334,7 +7334,7 @@ class tgraphcanvas(FigureCanvas):
                     # we simply set it to twice as wide and trust that the clipping will cut of the part not within the axis system
                     endidx = 2*max(self.timex[-1],self.endofx,self.ax.get_xlim()[0],self.ax.get_xlim()[1])
                     if timex[tidx] < endidx and self.watermarksflag:
-                        cool_mark = self.ax.axvspan(timex[tidx],endidx, facecolor=self.palette['rect4'], ec='none', alpha=0.3, clip_on=True, lw=None)#,lod=False)
+                        cool_mark = self.ax.axvspan(timex[tidx],endidx, facecolor=self.palette['rect4'], ec='none', alpha=0.3, clip_on=True, lw=None)
                         try:
                             cool_mark.set_in_layout(False) # remove title from tight_layout calculation
                         except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
@@ -7803,7 +7803,7 @@ class tgraphcanvas(FigureCanvas):
             #populate delta ET (self.delta1) and delta BT (self.delta2)
             # calculated here to be available for parsepecialeventannotations(). the curve are plotted later.
             if (recomputeAllDeltas or (self.DeltaETflag and self.delta1 == []) or (self.DeltaBTflag and self.delta2 == [])) and not self.flagstart: # during recording we don't recompute the deltas
-                cf = self.curvefilter #*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
+                cf = self.curvefilter #*2 # we smooth twice as heavy for PID/RoR calculation as for normal curve smoothing
                 decay_smoothing_p = not self.optimalSmoothing or sampling or self.flagon
                 t1 = self.smooth_list(self.timex,temp1_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
                 t2 = self.smooth_list(self.timex,temp2_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
@@ -7832,7 +7832,7 @@ class tgraphcanvas(FigureCanvas):
                     timeB_lin = None
 
                 # we populate temporary smoothed ET/BT data arrays
-                cf = self.curvefilter #*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
+                cf = self.curvefilter #*2 # we smooth twice as heavy for PID/RoR calculation as for normal curve smoothing
                 st1 = self.smooth_list(self.timeB,fill_gaps(self.temp1B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
                 st2 = self.smooth_list(self.timeB,fill_gaps(self.temp2B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
                 # we start RoR computation 10 readings after CHARGE to avoid this initial peak
@@ -10954,7 +10954,7 @@ class tgraphcanvas(FigureCanvas):
                 self.ax1.bar(.1, .1, width=2.*pi, bottom=.6,color='#0c6aa6',linewidth=0.,alpha = .1)
                 self.ax1.bar(.1, .1, width=2.*pi, bottom=.8,color='#0c6aa6',linewidth=0.,alpha = .1)
 
-                #delete degrees ticks to anotate flavor characteristics
+                #delete degrees ticks to annotate flavor characteristics
                 for tick in self.ax1.xaxis.get_major_ticks():
                     #tick.label1On = False
                     tick.label1.set_visible(False)
@@ -10971,7 +10971,7 @@ class tgraphcanvas(FigureCanvas):
                 self.ax1.set_yticklabels(labels,color=self.palette['xlabel'],fontproperties=fontprop_small)
                 self.updateFlavorChartData()
 
-                #anotate labels
+                #annotate labels
                 self.flavorchart_labels = []
                 for i in range(len(self.flavorlabels)):
                     if self.flavorchart_angles[i] > 2.*pi or self.flavorchart_angles[i] < 0.:
@@ -11483,7 +11483,7 @@ class tgraphcanvas(FigureCanvas):
                 QApplication.processEvents()
             self.threadserver.createSampleThread()
             if self.device != 138:
-                # if not Kaleido Serial or Network we run the ON action after starting the sample thread which might start the connectin in the first place
+                # if not Kaleido Serial or Network we run the ON action after starting the sample thread which might start the connection in the first place
                 try:
                     self.aw.eventactionx(self.extrabuttonactions[0],self.extrabuttonactionstrings[0])
                 except Exception as e: # pylint: disable=broad-except
@@ -11615,7 +11615,7 @@ class tgraphcanvas(FigureCanvas):
                     _log.exception(e)
 
             try:
-                # Artisan Commands are executed after the OFFMonitor action is fully executued as they might trigger other buttons
+                # Artisan Commands are executed after the OFFMonitor action is fully executed as they might trigger other buttons
                 if self.extrabuttonactions[1] == 18:
                     self.aw.eventactionx(self.extrabuttonactions[1],self.extrabuttonactionstrings[1])
             except Exception as e: # pylint: disable=broad-except
@@ -11662,7 +11662,7 @@ class tgraphcanvas(FigureCanvas):
 
             try:
                 # trigger event action before disconnecting from devices
-                if self.extrabuttonactions[1] != 18: # Artisan Commands are executed after the OFFMonitor action is fully executued as they might trigger another buttons
+                if self.extrabuttonactions[1] != 18: # Artisan Commands are executed after the OFFMonitor action is fully executed as they might trigger another buttons
                     self.aw.eventactionx(self.extrabuttonactions[1],self.extrabuttonactionstrings[1])
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
@@ -12345,7 +12345,7 @@ class tgraphcanvas(FigureCanvas):
                 if is_proper_temp(temp):
                     st = stringfromseconds(self.timex[self.TPalarmtimeindex]-self.timex[self.timeindex[0]],False)
                     st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','TP {0}').format(st))
-                    #anotate temperature
+                    #annotate temperature
                     d = self.ylimit - self.ylimit_min
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,temp,temp,d)
                     time_temp_annos = self.annotate(temp,st1,self.timex[self.TPalarmtimeindex],temp,self.ystep_up,self.ystep_down,0,1.,draggable_anno_key=-1)
@@ -12425,7 +12425,7 @@ class tgraphcanvas(FigureCanvas):
                                 #calculate time elapsed since charge time
                                 st = stringfromseconds(self.timex[self.timeindex[1]]-start,False)
                                 st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','DE {0}').format(st))
-                                #anotate temperature
+                                #annotate temperature
                                 d = self.ylimit - self.ylimit_min
                                 if self.timeindex[0] != -1 and is_proper_temp(temp_CHARGE):
                                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,temp_CHARGE,temp,d)
@@ -13187,7 +13187,7 @@ class tgraphcanvas(FigureCanvas):
                                 # only if BT is shown we place the annotation:
                                 #calculate time elapsed since charge time
                                 st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','CE {0}').format(stringfromseconds(self.timex[self.timeindex[7]] - start)))
-                                #anotate temperature
+                                #annotate temperature
                                 d = self.ylimit - self.ylimit_min
                                 if self.timeindex[6] and is_proper_temp(temp_DROP):
                                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,temp_DROP,temp,d)
@@ -14852,7 +14852,7 @@ class tgraphcanvas(FigureCanvas):
             else:
                 fit = QApplication.translate('Label','ln()')
             msg = QApplication.translate('Message','Cannot fit this curve to ' + fit)
-            QApplication.processEvents() #this is here to be sure the adderror gets wrtten to the log before the sendmessage
+            QApplication.processEvents() #this is here to be sure the adderror gets written to the log before the sendmessage
             self.aw.sendmessage(msg)
 
         return res

@@ -339,7 +339,7 @@ class RoastProfile:
         self.stemp1 = list(self.aw.qmc.smooth_list(self.timex,self.temp1,window_len=self.aw.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin))
         self.stemp2 = list(self.aw.qmc.smooth_list(self.timex,self.temp2,window_len=self.aw.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin))
         # recompute deltas
-        cf = self.aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
+        cf = self.aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calculation as for normal curve smoothing
         t1 = self.aw.qmc.smooth_list(self.timex,self.temp1,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
         t2 = self.aw.qmc.smooth_list(self.timex,self.temp2,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
         if self.timeindex[0]>-1:

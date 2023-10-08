@@ -29,7 +29,7 @@ except Exception: # pylint: disable=broad-except
     from PyQt5.QtCore import QSemaphore, QTimer, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from typing import List, Dict, Any
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 import logging
 
@@ -88,7 +88,7 @@ def retrieveNotifications() -> None:
                     # we remove notifications that are tagged not_for_artisan:True
                     results = [r for r in res['result'] if not ('not_for_artisan' in r and r['not_for_artisan'])]
                     sorted_results = sorted(results, key=lambda nd: (util.ISO86012epoch(nd['added_on']) if 'added_on' in nd else 0))
-                    # we present the notfications in reverse order, oldest first
+                    # we present the notifications in reverse order, oldest first
                     for i, n in enumerate(sorted_results):
                         processNotification(n, i)
 

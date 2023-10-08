@@ -261,7 +261,7 @@
         return;
       }
 
-      // must re-use font-size, even though it was removed above.
+      // must reuse font-size, even though it was removed above.
       $line.css('font-size', fontSizes[lineNumber] + 'px');
 
       for(var m=1, n=3; m<n; m+=interval) {

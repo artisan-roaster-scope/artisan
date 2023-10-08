@@ -32,7 +32,7 @@ Runs on 64bit x64 Windows 10, macOS 11 Big Sur (legacy builds support Windows 8 
 - Batch counter.
 - Profile designer, cupping editor, spider- and wheel graph.
 - Roast Analyzer, Comparator, Simulator and Transformator tools
-- User defined buttons and sliders with programable actions.
+- User defined buttons and sliders with programmable actions.
 - Many import and export formats.
 
 ## INSTALLATION

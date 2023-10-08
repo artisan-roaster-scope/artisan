@@ -98,7 +98,7 @@ class tphasescanvas(FigureCanvas):
 
     # data is expected to be a None or a list of tuples of the form
     #   (label, total_time, (phase1_time, phase2_time, phase3_time), active, color)
-    # each time value in the tripple is in seconds and can be 0 if corresponding phase is missing
+    # each time value in the triple is in seconds and can be 0 if corresponding phase is missing
     # active is of type bool indicating the state of the corresponding profile
     # aligned is of type bool indicating that the profile is aligned to the current selected alignment target
     # color is a regular color string like '#00b950'

@@ -3283,7 +3283,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.qmc.ETfunction = str(self.ETfunctionedit.text())
             self.aw.qmc.BTfunction = str(self.BTfunctionedit.text())
             if self.aw.qmc.BTcurve != self.BTcurve.isChecked():
-                # we reset the chached main event annotation positions as those annotations are now rendered on the other curve
+                # we reset the cached main event annotation positions as those annotations are now rendered on the other curve
                 self.aw.qmc.l_annotations_dict = {}
             self.aw.qmc.ETcurve = self.ETcurve.isChecked()
             self.aw.qmc.BTcurve = self.BTcurve.isChecked()

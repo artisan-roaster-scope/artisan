@@ -34,7 +34,8 @@ from artisanlib.util import decodeLocal, encodeLocal, getDirectory, is_int_list,
 from plus import config, connection, controller, util
 from typing import List, Union, Optional, Tuple, Dict, TextIO
 from typing_extensions import NotRequired # Python <=3.10
-from typing_extensions import Final, TypedDict  # Python <=3.7
+from typing_extensions import TypedDict  # Python <=3.7
+from typing import Final
 
 import copy
 import json
@@ -75,7 +76,7 @@ class Coffee(TypedDict, total=False):
     label: str
     origin: str
     varietals: List[str]
-    grade: str # not transfered from server!
+    grade: str # not transferred from server!
     stock: List[StockItem]
     default_unit: CoffeeUnit
     moisture: float

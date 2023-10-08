@@ -89,7 +89,7 @@ class KaleidoPort:
     # getETBT triggers a 'Read Device Data' request to the machine also fetching data other than BT/ET
     def getBTET(self) -> Tuple[float,float, int]:
         if self.get_state('sid') is not None and self.get_state('TU') is not None:
-            # only if initalization is complete (sid and TU received) we request data
+            # only if initialization is complete (sid and TU received) we request data
             self.send_request('RD', self._default_data_stream, 'BT')
         bt = self.get_state('BT')
         et = self.get_state('ET')
@@ -270,13 +270,13 @@ class KaleidoPort:
             await asyncio.sleep(self._ping_retry_delay)
         # send TU (temperature unit)
         try:
-            # ping was successfull, now we send the temperature mode via the queue
+            # ping was successful, now we send the temperature mode via the queue
             await self.ws_write_process(websocket, self.create_msg('TU', mode))
         except asyncio.TimeoutError:
             _log.debug('TU response timeout')
         # send SC (start guard)
         try:
-            # ping was successfull, now we send the start guard via the queue
+            # ping was successful, now we send the start guard via the queue
             await self.ws_write_process(websocket, self.create_msg('SC', 'AR'))
         except asyncio.TimeoutError:
             _log.debug('SC AR timeout')
@@ -413,13 +413,13 @@ class KaleidoPort:
             # otherwise repeat in one second
             await asyncio.sleep(self._ping_retry_delay)
         try:
-            # ping was successfull, now we send the temperature mode via the queue
+            # ping was successful, now we send the temperature mode via the queue
             await self.serial_write_process(reader, writer, self.create_msg('TU', mode))
         except asyncio.TimeoutError:
             _log.debug('TU response timeout')
         # send SC (start guard)
         try:
-            # ping was successfull, now we send the temperature mode via the queue
+            # ping was successful, now we send the temperature mode via the queue
             await self.serial_write_process(reader, writer, self.create_msg('SC', 'AR'))
         except asyncio.TimeoutError:
             _log.debug('SC AR timeout')

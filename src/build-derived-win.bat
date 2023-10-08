@@ -1,5 +1,5 @@
 :: ABOUT
-:: Windows batch file to generate translation, ui and help files derived 
+:: Windows batch file to generate translation, ui and help files derived
 :: on sources in the Artisan repository.
 ::
 :: LICENSE
@@ -17,14 +17,14 @@
 
 :: on entry to this script the current path must be the src folder
 ::
-:: script comandline option LEGACY used to flag a legacy build
+:: script commandline option LEGACY used to flag a legacy build
 ::
 
 @echo off
-:: test for existance of required environment variables
+:: test for existence of required environment variables
 setlocal enabledelayedexpansion
 if not defined QT_PATH (
-    echo QT_PATH not set, be sure Qt 6.x is installed.  
+    echo QT_PATH not set, be sure Qt 6.x is installed.
     echo Set QT_PATH appropriately, something like C:\Qt\6.4\msvc2019_64.  Exiting...
     exit /b 1
 )
@@ -43,7 +43,7 @@ if not defined ARTISAN_LEGACY (
     set ARTISAN_SPEC=win
 )
 if not defined ARTISAN_SPEC (
-    echo ARTISAN_SPEC not set.  
+    echo ARTISAN_SPEC not set.
     echo Set it manually to win or win-legacy.  Exiting...
     exit /b 1
 )
@@ -69,7 +69,7 @@ for /r %%a IN (ui\*.ui) DO (
     if ERRORLEVEL 1 (echo ** Failed in pyuic & exit /b 1)
 )
 echo ** Success
- 
+
 :: Process translation files
 echo ************* pylupdate **************
 if /i "%ARTISAN_LEGACY%" == "True" (
@@ -82,7 +82,7 @@ if /i "%ARTISAN_LEGACY%" == "True" (
     if ERRORLEVEL 1 (echo ** Failed in pylupdate6pro.py & exit /b 1) else (echo ** Success)
 )
 echo ************* lrelease **************
-cd translations   
+cd translations
 for /r %%a IN (*.ts) DO (
     qt%PYQT%-tools lrelease %%~a
     if ERRORLEVEL 1 (echo ** Failed in qt%PYQT%-tools lrelease step 2 & exit /b 1)

@@ -224,7 +224,7 @@ for lang in ['ar', 'da', 'de','el','en','es','fa','fi','fr','gd', 'he','hu','id'
 
 
 # copy brew installed libusb (note the slight name change of the dylib!)
-    # cannot be run brew as root thus the folllowing does not work
+    # cannot be run brew as root thus the following does not work
     # subprocess.check_call(r'cp $(brew list libusb | grep libusb-1.0.0.dylib) Artisan.app/Contents/Frameworks/libusb-1.0.dylib',shell = True)
 
 # you need to do a

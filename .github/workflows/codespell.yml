@@ -1,0 +1,58 @@
+name: Codespell
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      ### Flags for codespell ###
+      codespell_flags:
+        description: 'codespell options (default: <none>)'
+        required: false
+        default: ''
+      tool_name:
+        description: 'Tool name to use for reviewdog reporter'
+        default: 'codespell'
+      ignore_note:
+        description: |
+          Ignore note entry.
+          codespell report some error with optional note entry.
+          This option is workaround.
+        default: 'false'
+
+
+jobs:
+  codespell:
+    runs-on: ubuntu-latest
+    name: runner / codespell
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip' # caching pip dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r src/requirements-dev.txt
+          pip install -r src/requirements.txt
+      - uses: codespell-project/actions-codespell@v2
+        with:
+          github_token: ${{ secrets.github_token }}
+          # Change reviewdog reporter if you need [github-pr-check,github-check,github-pr-review].
+          reporter: github-check # github-pr-review # reporter: github-pr-check
+          # Change reporter level if you need.
+          # GitHub Status Check won't become failure with warning.
+          level: info # info, warning, error
+          # Change the current directory to run mypy command.
+          # codespell command reads setup.cfg or other settings file in this path.
+          workdir: src
+
+          reviewdog_flags: -filter-mode=file -fail-on-error
+          filter_mode: nofilter
+          fail_on_error: true

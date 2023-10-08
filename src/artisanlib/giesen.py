@@ -6,7 +6,7 @@ from pathlib import Path
 import csv
 import logging
 from typing import List, TYPE_CHECKING
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.types import ProfileData # pylint: disable=unused-import
@@ -62,7 +62,7 @@ def extractProfileGiesenCSV(file,aw):
         extra2:List[float] = [] # power
         extra3:List[float] = [] # speed
         extra4:List[float] = [] # pressure
-        timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
+        timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
         i:int = 0
         for row in data:
             i = i + 1

@@ -6,7 +6,7 @@ import os
 import csv
 import logging
 from typing import List, Optional, TYPE_CHECKING
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
@@ -56,7 +56,7 @@ def extractProfileRubasseCSV(file:str, aw:'ApplicationWindow') -> 'ProfileData':
         extra4:List[float] = []
         extra5:List[float] = []
         extra6:List[float] = []
-        timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
+        timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
 
 
 

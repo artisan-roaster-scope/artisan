@@ -6,7 +6,7 @@ ETBColor=#cc0f50
 LCDColors=@Variant(\0\0\0\b\0\0\0\x2\0\0\0\x4\0\x65\0t\0\0\0\n\0\0\0\xe\0#\0\x63\0\x63\0\x30\0\x66\0\x35\0\x30\0\0\0\x4\0\x62\0t\0\0\0\n\0\0\0\xe\0#\0\x30\0\x41\0\x35\0\x43\0\x39\0\x30)
 LEDColors=@Variant(\0\0\0\b\0\0\0\x2\0\0\0\x4\0\x65\0t\0\0\0\n\0\0\0\n\0w\0h\0i\0t\0\x65\0\0\0\x4\0\x62\0t\0\0\0\n\0\0\0\n\0w\0h\0i\0t\0\x65)
 Oversampling=false
-roastertype_setup=San Fransiscan
+roastertype_setup=San Franciscan
 
 [Device]
 id=29

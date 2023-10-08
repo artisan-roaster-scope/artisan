@@ -9,7 +9,7 @@ import re
 import time as libtime
 import logging
 from typing import List, Optional, TYPE_CHECKING
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.types import ProfileData # pylint: disable=unused-import
@@ -90,7 +90,7 @@ def extractProfilePetronciniCSV(file,aw):
         temp2:List[float] = [] # bean temperature
         extra1:List[float] = [] # inlet temperature
         extra2:List[float] = [] # burner percentage
-        timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
+        timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
         i = 0
         for row in data:
             if row == []:

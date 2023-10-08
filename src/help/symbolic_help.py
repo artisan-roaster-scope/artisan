@@ -134,7 +134,7 @@ def content():
     tbl_RoastProperties.field_names = [QApplication.translate('HelpDlg','Symbol'),QApplication.translate('HelpDlg','Description')]
     tbl_RoastProperties.add_row(['WEIGHTin',QApplication.translate('HelpDlg','batch size (g)')])
     tbl_RoastProperties.add_row(['MOISTUREin',QApplication.translate('HelpDlg','green moisture (%)')])
-    tbl_RoastProperties.add_row(['TEMPunit',QApplication.translate('HelpDlg','temperature unit (Celcius: 0, Fahrenheit: 1)')])
+    tbl_RoastProperties.add_row(['TEMPunit',QApplication.translate('HelpDlg','temperature unit (Celsius: 0, Fahrenheit: 1)')])
     strlist.append(tbl_RoastProperties.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
     strlist.append('<br/><br/><b>')
     strlist.append(QApplication.translate('HelpDlg','EXPRESSIONS'))

@@ -5149,7 +5149,7 @@ class StockComboBox(MyQComboBox):
 
     def mousePressEvent(self, event):
         if self.unitsComboBox is not None and QApplication.keyboardModifiers() == Qt.KeyboardModifier.AltModifier or self.inverted:
-            # with ALT (Win) / OPTION (macOS) pressed we rewrite the popup menu indicating weights in imperial units if metric units were selected and vise versa
+            # with ALT (Win) / OPTION (macOS) pressed we rewrite the popup menu indicating weights in imperial units if metric units were selected and vice versa
             default_unit:int = self.unitsComboBox.currentIndex()
             unit:int = 0 # g
             if self.inverted:
