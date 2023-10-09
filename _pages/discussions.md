@@ -25,7 +25,7 @@ Visit the Discussions page at any time with a web browser to see new and old dis
 
 ### Push method
 
-Receive notifications when new posts are made to the Discussions page.  You must have a GitHub account to recieve notifications.  You can control when notifications are sent, for instance you can recieve them each time there is a new post to the Discussions page or limit them to only updates on your posts or when you are mentioned.  Replying to the notification email will create a reply post in that Discussion. 
+Receive notifications when new posts are made to the Discussions page.  You must have a GitHub account to receive notifications.  You can control when notifications are sent, for instance you can receive them each time there is a new post to the Discussions page or limit them to only updates on your posts or when you are mentioned.  Replying to the notification email will create a reply post in that Discussion. 
 
 ## Subscribe to Notifications
 
@@ -39,7 +39,7 @@ Select which notifications you wish to receive.
 
 ### Turn Off Notifications
 
-To turn off notifications from the Artisan repository click the "Unwatch" button and click "Participating and @mentions" in the menu.  With this selection you will still recieve a notification when a new post is made to a discussion where you are a participant, or when someone mentions your usename.  
+To turn off notifications from the Artisan repository click the "Unwatch" button and click "Participating and @mentions" in the menu.  With this selection you will still receive a notification when a new post is made to a discussion where you are a participant, or when someone mentions your usename.  
 
 ![sub_disc_3](/assets/images/sub_disc_3.png)
 

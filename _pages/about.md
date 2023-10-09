@@ -121,7 +121,7 @@ Artisan is an open-source software that helps coffee roasters record, analyze, a
 
 Artisan supports the following 64bit operating systems:
 
-* macOS BigSure (vesion 11)
+* macOS BigSure (version 11)
 * Windows 10 (x64)
 * Ubuntu 22.04+ (GCC11), Red Hat 8.4+ (GCC10)
 
@@ -130,7 +130,7 @@ There are also legacy builds for Windows 8 (x64) and macOS 10.13.
 ## Notable Features
 
 - we believe in [Open-Source](https://www.youtube.com/watch?v=SpeDK1TPbew){:target="_blank"}, check out [our code](https://github.com/artisan-roaster-scope/artisan){:target="_blank"} and contribute
-- seemless integration into the [artisan.plus](https://artisan.plus){:target="_blank"} inventory management service
+- seamless integration into the [artisan.plus](https://artisan.plus){:target="_blank"} inventory management service
 - extensive [machine](/machines/) and [device](/devices/) support including control
 - unlimited number of curves
 - rate-of-rise (RoR), [area-under-the-curve (AUC)](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html){:target="_blank"}, [development-time-ratio (DTR)](https://artisan-roasterscope.blogspot.com/2020/05/displaying-development-time-ratio-in.html){:target="_blank"} calculations
@@ -141,7 +141,7 @@ There are also legacy builds for Windows 8 (x64) and macOS 10.13.
 - automated reproduction of roasts via [alarm programs](http://artisan-roasterscope.blogspot.de/2013/03/alarms.html){:target="_blank"}, [replay of events](https://artisan-roasterscope.blogspot.de/2017/10/profile-templates.html){:target="_blank"} or [PID control](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html){:target="_blank"}
 - [batch counter](https://artisan-roasterscope.blogspot.de/2015/07/batch-counter.html){:target="_blank"}
 - [profile designer](https://artisan-roasterscope.blogspot.com/2019/05/using-artisan-designer.html){:target="_blank"}, cupping editor, spider- and wheel graph
-- [user defined buttons and sliders](http://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html){:target="_blank"} with programable actions
+- [user defined buttons and sliders](http://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html){:target="_blank"} with programmable actions
 - many import and export formats like Aillio Roastime, Cropster XLS, Giesen CSV, IKAWA CSV, Probat Pilot, RoastLogger, RoastLog, RoastPath,..
 
 [Request a Feature](https://github.com/artisan-roaster-scope/artisan/issues){: .btn .btn--success .btn--large}{:target="_blank"}
@@ -161,7 +161,7 @@ __Frans Goddijn__ –– support
 
 <span style="color:grey">__Rui Paulo__ –– Aillio master & CI</span>
 
-<span style="color:grey">__Rafael Cobo__ –– initator of the project</span>
+<span style="color:grey">__Rafael Cobo__ –– initiator</span>
 
 We are always looking for people that support us here and there. Especially, people that help us to localize the UI of Artisan to more languages and to complete the existing translations are very welcome!
 

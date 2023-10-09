@@ -18,5 +18,5 @@ sidebar:
 * __Connection:__ MODBUS RTU via USB; requires the installation of a [serial driver](/modbus_serial/)
 * __Features:__ logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
 
-**Watch out!** The new models are equipped with Fuji PXF PIDs instead of the Fuji PXR PIDs that were build-in before. For those new models choose `Phoenix Roaster PXF` from the machine menu.
+**Watch out!** The new models are equipped with Fuji PXF PIDs instead of the Fuji PXR PIDs that were built-in before. For those new models choose `Phoenix Roaster PXF` from the machine menu.
 {: .notice--primary}

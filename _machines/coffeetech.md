@@ -37,7 +37,7 @@ For machines talking MODBUS TCP via network connection: the computer running Art
 ### Notes
 
 - some Ghibli series machines do not feature an environmental temperature sensor and report the drum temperature on the Artisan ET channel.
-- the FZ-94 setup defines 2 configurations that can be switched by pressing the COMMAND/Apple key (macOS) / CONTROL key (Windows) modifer plus a number key.
+- the FZ-94 setup defines 2 configurations that can be switched by pressing the COMMAND/Apple key (macOS) / CONTROL key (Windows) modifier plus a number key.
   * CMD/CTR-1 (default): logs drum- and fan speed changes as custom events
   * CMD/CTR-2: defines drum- and fan speed sliders that allow to take control via a [re-configuration of the frequency drives](https://artisan-roasterscope.blogspot.de/2016/08/fz-94-4-taking-control.html){:target="_blank"}
 - The drum heat limit can also be controlled via an SV slider by ticking `Control` in the device setup (menu `Config` >> `Device`)

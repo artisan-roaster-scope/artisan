@@ -39,7 +39,7 @@ String: ~batchprefix ~batchcounter ~title ~beans_line  ~date_long
 
 Output Example: CBB 690 Hama O Rama Espresso Guji Zone Ethiopia - Ahuachapan El Salvador - Nyeri Kenya 4/27/2020
 
-Production roaster interested in roaster’s name (in this case intials), machine name, drumspeed, weight, coffee name, and date.  Not shown but available are volume, density and moisture:  
+Production roaster interested in roaster’s name (in this case initials), machine name, drumspeed, weight, coffee name, and date.  Not shown but available are volume, density and moisture:  
 
 ~operator ~machine ~drumspeed  ~weight ~weightunits ~title ~date_long
 

@@ -93,6 +93,6 @@ For some people, unless you have a USB isolator, you need to unplug your compute
 
 Before or after your first roast, look at the [Setup ](https://artisan-scope.org/docs/setup/) page to see how to adjust your bean temp readings and your sampling rates.
 
-You can save your graphs under `File` >> `Save Graph` to various size formats or PDF.  You can aslo convert your data to other formats and export it under the `File` >> `Convert` and `File` >> `Export` commands.  You can import another roaster's file under `File` >> `Import`.  
+You can save your graphs under `File` >> `Save Graph` to various size formats or PDF.  You can also convert your data to other formats and export it under the `File` >> `Convert` and `File` >> `Export` commands.  You can import another roaster's file under `File` >> `Import`.  
 
 To review your own files you can use `File` >> `Open` and search for a file or use the list under `File` >> `Open Recent`.  When starting a roast you can choose `File` >> `New` and pick one of the previous Roast Profiles you may have saved.  

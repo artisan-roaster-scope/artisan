@@ -21,7 +21,7 @@ If you press +, your current roast profile gets saved (up to 25 entries). Here i
 
 You can note moisture as well if you know it, and ambient data.  If you want to manually enter ambient data, leave the source dropdown blank.  If you have a VintHub Phidget, you can use Phidgets to record the ambient temperature, humdity and and pressure.  See `File` >> `Config` >> `Device`, `Ambient Tab`. These will show up in the Summary box.
 
-On the second tab Notes, you can add roasting and cupping notes.  The first two lines will show up in the Summary box.  Events and Data are entered by Artisan throughout the roast.  You can now use the Copy Table button on these tabs from a roast to export the data to excel using the text import wizzard.
+On the second tab Notes, you can add roasting and cupping notes.  The first two lines will show up in the Summary box.  Events and Data are entered by Artisan throughout the roast.  You can now use the Copy Table button on these tabs from a roast to export the data to Excel using the text import wizard.
 
 To reset the Properties you have to select the box “Delete roast properties on RESET” and then reset. You can also have the Properties box open on charge to remind you, mostly to at least, to name your coffee.
 
@@ -41,7 +41,7 @@ https://artisan-roasterscope.blogspot.de/2014/11/batch-volume-and-bean-density.h
 You need a beaker that is smaller than your batch size for this calculator.  You will put in your unit of measurement at the top (say a 400ml beaker), and then you put in your pre and post roast weights to fill that measure of beans on the left. The calculator will return the density both pre and post roast using the actual pre and post grams.   Once you know the density of the bean you are using there is shortcut. Assume you know the bean’s density you can enter the known density in the Density field within the roast properties, select the correct density weight (e.g. grams) and volume units (e.g. one liter – put 1 in the box).  Put the cursor in the Volume field after putting in the weight and press the Enter key. Artisan will take the specified density and batch weight of the greens and compute the volume for you.
 
 *Energy Consumption*
-For tracking engery consumption, those parameters are entered on the Engery tab.  The analysis and entries are explained in the blog post [Tracking Energy Consumption & CO2 Production in Coffee Roasting](https://artisan-roasterscope.blogspot.com/2021/07/tracking-energy-consumption-co2.html).
+For tracking energy consumption, those parameters are entered on the Energy tab.  The analysis and entries are explained in the blog post [Tracking Energy Consumption & CO2 Production in Coffee Roasting](https://artisan-roasterscope.blogspot.com/2021/07/tracking-energy-consumption-co2.html).
 
 ![roasting menus](/assets/images/gsg/roast menu.png)
 

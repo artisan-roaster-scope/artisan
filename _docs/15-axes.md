@@ -12,7 +12,7 @@ author_profile: true
 
 Menu: `Config` >> `Axes`
 
-![cofig axes](/assets/images/gsg/axes dialog.png)
+![config axes](/assets/images/gsg/axes dialog.png)
 
  These settings control the dimensions of your graphs and are important to understand.  There are now two primary Axes check marks, Auto and Lock. If Auto is checked, Artisan computes from CHARGE and DROP sensible axis limits to have the full profile shown on your screen.  If Lock is checked, the min/max limits will come from the profile that has been loaded.  If Lock is also not checked, what you might call Normal mode, a user can set the limit to his likes and those limits are preserved over anything in a profile that is saved or loaded.
 

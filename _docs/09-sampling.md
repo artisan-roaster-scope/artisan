@@ -10,7 +10,7 @@ author_profile: true
 
 ### Sampling and Oversampling
 
-Menu: `Confg` >> `Sampling Interval`
+Menu: `Config` >> `Sampling Interval`
 
 ![probes meter app](/assets/images/gsg/probes meter app.png)
 

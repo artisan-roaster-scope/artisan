@@ -102,7 +102,7 @@ delay processing by `s` seconds (float)
 * `read(<json>)`: 
 if the `<json>` text respects the JSON format it is send to the connected WebSocket server and the response is bound to the variable `_`
 * `button(<expr>) :
-sets the last button state to either "pressed" if <expr> evalutes to 1 or True and "normal", otherwise
+sets the last button state to either "pressed" if <expr> evaluates to 1 or True and "normal", otherwise
 
 Example Custom Event Button Action:
 
@@ -111,7 +111,7 @@ read({{"command": "getRoasterState"}});button(_["data"]["state"] == "ready")
 ```{% endraw %}
 Send `getRoasterState` request on button press and sets the button in "pressed" state if response indicate "ready".
 
-The placeholder `{}` is substituted by the event value in custom event button and slider actions.  However, if the `WebSocket Command` is used as custom button or slider action (not as main button actions like for CHARGE, RESET, ...) where this substition takes place all regular brackets have to be escaped by duplicating them like in the following example
+The placeholder `{}` is substituted by the event value in custom event button and slider actions.  However, if the `WebSocket Command` is used as custom button or slider action (not as main button actions like for CHARGE, RESET, ...) where this substitution takes place all regular brackets have to be escaped by duplicating them like in the following example
 
 {% raw %}```
 send(
@@ -121,7 +121,7 @@ send(
 )
 ```{% endraw %}
 
-The placeholders `{BT}`, `{ET}`, `{time}` substituted in WebSocket Command actions by the current bean temperature (BT), environmental temperature (ET) or the time in seconds (float). Again, if such a placeholder is used in a WebSocket Command, all JSON elements have to be wrapped in an extra set of brackets as well as this placeholder substition like in the following example.
+The placeholders `{BT}`, `{ET}`, `{time}` substituted in WebSocket Command actions by the current bean temperature (BT), environmental temperature (ET) or the time in seconds (float). Again, if such a placeholder is used in a WebSocket Command, all JSON elements have to be wrapped in an extra set of brackets as well as this placeholder substitution like in the following example.
 
 ```
 {% raw %}
@@ -204,7 +204,7 @@ BT Request:
 {% endraw %}
 ```
 
-BT Repsonse:
+BT Response:
 
 ```
 {% raw %}
@@ -223,7 +223,7 @@ ET Request:
 ```
 
 
-ET Repsonse: 
+ET Response: 
 
 ```
 {% raw %}

@@ -53,7 +53,7 @@ write coils via function 15
 * `mwrite(slaveId,register,andMask,orMask)`:  
 mask write register via function 22
 * `mwrite(slaveId,register,andMask,orMask,value)`:  
-fake mask write register which evaluates thes masks on the `value` and writes the result using function 6. Together with a previous read to set the temporary variable `_` this can be used to simulate a mask write register (function 22) if the PLC does not support it directly.
+fake mask write register which evaluates these masks on the `value` and writes the result using function 6. Together with a previous read to set the temporary variable `_` this can be used to simulate a mask write register (function 22) if the PLC does not support it directly.
 * `writem(slaveId,register,value)` and  
 `writem(slaveId,register,[<int>,..,<int>])`:  
 write multiple holding registers via function 16
