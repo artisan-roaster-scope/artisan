@@ -4578,7 +4578,7 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="17497" />
       <source>Could not start WebLCDs. Selected port might be busy.</source>
-      <translation type="unfinished" />
+      <translation>לא ניתן היה להפעיל WebLCDs. ייתכן שהיציאה שנבחרה תפוסה.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="18879" />
@@ -4625,7 +4625,7 @@ END</source>
     <message>
       <location filename="../artisanlib/canvas.py" line="15554" />
       <source>Exception: redrawdesigner() Roast events may be out of order. Resetting Designer.</source>
-      <translation type="unfinished" />
+      <translation>חריג: redrawdesigner() אירועי צלי עלולים להיות לא בסדר. איפוס מעצב.</translation>
     </message>
     <message>
       <source>Exception: redrawdesigner() Roast events may be out of order. Restting Designer.</source>
@@ -6864,7 +6864,7 @@ Artisan יתחיל את התוכנית בכל תקופה לדוגמה. פלט ה
     <message>
       <location filename="../help/programs_help.py" line="18" />
       <source>If only one temperature is provided it will be interpreted as BT.  If more than one temperature is provided the values are order dependent with ET first and BT second.</source>
-      <translation type="unfinished" />
+      <translation>אם רק טמפרטורה אחת מסופקת היא תתפרש כ-BT. אם מסופקת יותר מטמפרטורה אחת, הערכים תלויים בסדר עם ET ראשון ו-BT שני.</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="18" />
@@ -7131,7 +7131,7 @@ When Keyboard Shortcuts are OFF adds a custom event</source>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="49" />
       <source>Quick Special Event Entry.  The keys q,w,e, and r correspond to special events 1,2,3 and 4.  A two digit numeric value must follow the shortcut letter, e.g. &amp;#39;q75&amp;#39;, when the corresponding event slider max value is 100 or less (default setting).   When the slider max value is greater than 100, three digits must be entered and for values less than 100 a leading zero is required, e.g. &amp;#39;q075&amp;#39;.  </source>
-      <translation type="unfinished" />
+      <translation>כניסה מהירה לאירוע מיוחד. המקשים q,w,e ו-r תואמים לאירועים מיוחדים 1,2,3 ו-4. ערך מספרי דו ספרתי חייב לעקוב אחר אות הקיצור, למשל. &amp;#39;q75&amp;#39;, כאשר הערך המקסימלי של מחוון האירועים המתאים הוא 100 או פחות (הגדרת ברירת מחדל). כאשר ערך המחוון המקסימלי גדול מ-100, יש להזין שלוש ספרות ולערכים הנמוכים מ-100 נדרש אפס מוביל, למשל. &amp;#39;q075&amp;#39;.</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="50" />
@@ -7474,7 +7474,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="79" />
       <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
-      <translation type="unfinished" />
+      <translation>מהירות הסימולטור עשויה להשתנות בזמן מושהה (החזק את ההילוך (1x), OPTION/ALT (2x) או COMMAND/CTRL (4x) בהפעלה מחדש).</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="80" />
@@ -7937,7 +7937,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
     <message>
       <location filename="../help/eventsliders_help.py" line="22" />
       <source>Scale factor, Slider value is multiplied by this value.</source>
-      <translation type="unfinished" />
+      <translation>גורם קנה מידה, ערך המחוון מוכפל בערך זה.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="23" />
@@ -7995,7 +7995,8 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: "{}" can be used as a placeholder, it will be substituted by (value*factor + offset). In all slider command actions, but for IO, VOUT, S7 and RC Commands, the bound value is converted from a float to an int.
 </source>
-      <translation type="unfinished" />
+      <translation>הערה: "{}" יכול לשמש כמציין מיקום, הוא יוחלף ב-(ערך*גורם + היסט). בכל פעולות הפקודות של המחוון, למעט פקודות IO, VOUT, S7 ו-RC, הערך המחובר מומר מ-float ל-int.
+</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="88" />
@@ -8315,7 +8316,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
     <message>
       <location filename="../help/eventsliders_help.py" line="74" />
       <source>for PHIDGET OUTPUT modules: sets voltage voltage range (r=5 for r5V and r=10 for 10V)</source>
-      <translation type="unfinished" />
+      <translation>עבור מודולי PHIDGET OUTPUT: מגדיר את טווח המתח (r=5 עבור r5V ו-r=10 עבור 10V)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="157" />
@@ -9142,7 +9143,7 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
       <location filename="../help/eventbuttons_help.py" line="63" />
       <source>OFF (translated, respecting button state)</source>
-      <translation type="unfinished" />
+      <translation>כבוי (מתורגם, מכבד את מצב הלחצן)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="64" />
@@ -9254,7 +9255,7 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
       <source>button numbers or sleep(&lt;float&gt;) separated by a comma: 1,2,sleep(2.5), 3..</source>
-      <translation type="unfinished" />
+      <translation>מספרי לחצן או שינה(&lt;float&gt;) מופרדים בפסיק: 1,2,sleep(2.5), 3..</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
@@ -10922,7 +10923,7 @@ The prediction value is the calculated time in seconds to reach the DRY or FCs t
     <message>
       <location filename="../help/symbolic_help.py" line="137" />
       <source>temperature unit (Celsius: 0, Fahrenheit: 1)</source>
-      <translation type="unfinished" />
+      <translation>יחידת טמפרטורה (צלזיוס: 0, פרנהייט: 1)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="140" />
@@ -15555,8 +15556,8 @@ Repeat Operation at the end: {0}</source>
       <location filename="../artisanlib/main.py" line="4331" />
       <source>Artisan is free to use!
 
-To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
-      <translation>ניתן להשתמש ב-Artisan בחינם!
+To keep it free and current please support us with your donation and subscribe to artisan.plus to suppress this dialog!</source>
+      <translation>Artisan חופשי לשימוש!
 
 כדי לשמור את זה בחינם ועדכני אנא תמכו בנו בתרומתכם והירשם ל-artisan.plus כדי לדכא את הדו-שיח הזה!</translation>
     </message>
@@ -17076,6 +17077,14 @@ Profile missing [CHARGE] or [DROP]</source>
       <translation>פרופיל רקע לא נמצא</translation>
     </message>
     <message>
+      <source>Artisan is free to use!
+
+To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
+      <translation type="vanished">ניתן להשתמש ב-Artisan בחינם!
+
+כדי לשמור את זה בחינם ועדכני אנא תמכו בנו בתרומתכם והירשם ל-artisan.plus כדי לדכא את הדו-שיח הזה!</translation>
+    </message>
+    <message>
       <source>Import Aillio RoasTime</source>
       <translation type="vanished">ייבוא Aillio RoasTime</translation>
     </message>
@@ -17249,32 +17258,32 @@ Profile missing [CHARGE] or [DROP]</source>
       <translation>artisan.plus מנותק</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="320" />
+      <location filename="../plus/stock.py" line="321" />
       <source>bag</source>
       <translation>תיק</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="321" />
+      <location filename="../plus/stock.py" line="322" />
       <source>box</source>
       <translation>קופסא</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="322" />
+      <location filename="../plus/stock.py" line="323" />
       <source>barrel</source>
       <translation>חָבִית</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="325" />
+      <location filename="../plus/stock.py" line="326" />
       <source>bags</source>
       <translation>תיקים</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="326" />
+      <location filename="../plus/stock.py" line="327" />
       <source>boxes</source>
       <translation>תיבות</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="327" />
+      <location filename="../plus/stock.py" line="328" />
       <source>barrels</source>
       <translation>חביות</translation>
     </message>

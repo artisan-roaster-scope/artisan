@@ -4491,7 +4491,7 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="17497" />
       <source>Could not start WebLCDs. Selected port might be busy.</source>
-      <translation type="unfinished" />
+      <translation>ไม่สามารถเริ่ม WebLCD ได้ พอร์ตที่เลือกอาจไม่ว่าง</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="18879" />
@@ -4538,7 +4538,7 @@ END</source>
     <message>
       <location filename="../artisanlib/canvas.py" line="15554" />
       <source>Exception: redrawdesigner() Roast events may be out of order. Resetting Designer.</source>
-      <translation type="unfinished" />
+      <translation>ข้อยกเว้น: กิจกรรม redrawdesigner() Roast อาจไม่เป็นระเบียบ กำลังรีเซ็ตนักออกแบบ</translation>
     </message>
     <message>
       <source>Exception: redrawdesigner() Roast events may be out of order. Restting Designer.</source>
@@ -6714,7 +6714,7 @@ Artisan จะเริ่มโปรแกรมในแต่ละช่ว
     <message>
       <location filename="../help/programs_help.py" line="18" />
       <source>If only one temperature is provided it will be interpreted as BT.  If more than one temperature is provided the values are order dependent with ET first and BT second.</source>
-      <translation type="unfinished" />
+      <translation>หากระบุอุณหภูมิเพียงอุณหภูมิเดียว ระบบจะตีความว่าเป็น BT หากมีการระบุอุณหภูมิมากกว่าหนึ่งค่า ค่าต่างๆ จะขึ้นอยู่กับลำดับ ET ก่อนและ BT วินาที</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="18" />
@@ -6981,7 +6981,7 @@ When Keyboard Shortcuts are OFF adds a custom event</source>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="49" />
       <source>Quick Special Event Entry.  The keys q,w,e, and r correspond to special events 1,2,3 and 4.  A two digit numeric value must follow the shortcut letter, e.g. &amp;#39;q75&amp;#39;, when the corresponding event slider max value is 100 or less (default setting).   When the slider max value is greater than 100, three digits must be entered and for values less than 100 a leading zero is required, e.g. &amp;#39;q075&amp;#39;.  </source>
-      <translation type="unfinished" />
+      <translation>รายการกิจกรรมพิเศษด่วน ปุ่ม q,w,e และ r สอดคล้องกับเหตุการณ์พิเศษ 1,2,3 และ 4 ค่าตัวเลขสองหลักต้องอยู่หลังอักษรทางลัด เช่น &amp;#39;q75&amp;#39; เมื่อค่าสูงสุดของแถบเลื่อนเหตุการณ์ที่เกี่ยวข้องคือ 100 หรือน้อยกว่า (การตั้งค่าเริ่มต้น) เมื่อค่าสูงสุดของตัวเลื่อนมากกว่า 100 จะต้องป้อนตัวเลขสามหลัก และสำหรับค่าที่น้อยกว่า 100 จะต้องระบุเลขศูนย์นำหน้า เช่น &amp;#39;q075&amp;#39;.</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="50" />
@@ -7324,7 +7324,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="79" />
       <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
-      <translation type="unfinished" />
+      <translation>ความเร็วของตัวจำลองอาจมีการเปลี่ยนแปลงในขณะที่หยุดชั่วคราว (กด Shift ค้างไว้ (1x), OPTION/ALT (2x) หรือ COMMAND/CTRL (4x) เมื่อรีสตาร์ท)</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="80" />
@@ -7789,7 +7789,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
     <message>
       <location filename="../help/eventsliders_help.py" line="22" />
       <source>Scale factor, Slider value is multiplied by this value.</source>
-      <translation type="unfinished" />
+      <translation>ตัวประกอบสเกล ค่าสไลเดอร์จะคูณด้วยค่านี้</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="23" />
@@ -7847,7 +7847,8 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: "{}" can be used as a placeholder, it will be substituted by (value*factor + offset). In all slider command actions, but for IO, VOUT, S7 and RC Commands, the bound value is converted from a float to an int.
 </source>
-      <translation type="unfinished" />
+      <translation>หมายเหตุ: "{}" สามารถใช้เป็นตัวยึดตำแหน่งได้ โดยจะแทนที่ด้วย (value*factor + offset) ในการดำเนินการคำสั่งตัวเลื่อนทั้งหมด แต่สำหรับคำสั่ง IO, VOUT, S7 และ RC ค่าที่ถูกผูกไว้จะถูกแปลงจาก float เป็น int
+</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="88" />
@@ -8167,7 +8168,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
     <message>
       <location filename="../help/eventsliders_help.py" line="74" />
       <source>for PHIDGET OUTPUT modules: sets voltage voltage range (r=5 for r5V and r=10 for 10V)</source>
-      <translation type="unfinished" />
+      <translation>สำหรับโมดูล PHIDGET OUTPUT: กำหนดช่วงแรงดันไฟฟ้า (r=5 สำหรับ r5V และ r=10 สำหรับ 10V)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="157" />
@@ -8994,7 +8995,7 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
       <location filename="../help/eventbuttons_help.py" line="63" />
       <source>OFF (translated, respecting button state)</source>
-      <translation type="unfinished" />
+      <translation>ปิด (แปลตามสถานะปุ่ม)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="64" />
@@ -9106,7 +9107,7 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
       <source>button numbers or sleep(&lt;float&gt;) separated by a comma: 1,2,sleep(2.5), 3..</source>
-      <translation type="unfinished" />
+      <translation>หมายเลขปุ่มหรือ sleep(&lt;float&gt;) คั่นด้วยเครื่องหมายจุลภาค: 1,2,sleep(2.5), 3..</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
@@ -9142,7 +9143,7 @@ Always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating</source>
     <message>
       <location filename="../help/eventbuttons_help.py" line="144" />
       <source>p-i-d</source>
-      <translation type="unfinished" />
+      <translation>พี-ไอ-ดี</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="144" />
@@ -10774,7 +10775,7 @@ The prediction value is the calculated time in seconds to reach the DRY or FCs t
     <message>
       <location filename="../help/symbolic_help.py" line="137" />
       <source>temperature unit (Celsius: 0, Fahrenheit: 1)</source>
-      <translation type="unfinished" />
+      <translation>หน่วยอุณหภูมิ (เซลเซียส: 0, ฟาเรนไฮต์: 1)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="140" />
@@ -15943,10 +15944,10 @@ Repeat Operation at the end: {0}</source>
       <location filename="../artisanlib/main.py" line="4331" />
       <source>Artisan is free to use!
 
-To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
+To keep it free and current please support us with your donation and subscribe to artisan.plus to suppress this dialog!</source>
       <translation>Artisan ใช้งานได้ฟรี!
 
-เพื่อให้ฟรีและเป็นปัจจุบัน โปรดสนับสนุนเราด้วยการบริจาคของคุณและสมัครรับข้อมูล artisan.plus เพื่อระงับกล่องโต้ตอบนี้!</translation>
+เพื่อให้มันฟรีและเป็นปัจจุบัน โปรดสนับสนุนเราด้วยการบริจาคของคุณและสมัครสมาชิก artisan.plus เพื่อระงับการสนทนานี้!</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="5096" />
@@ -17465,6 +17466,14 @@ Profile missing [CHARGE] or [DROP]</source>
       <translation>ไม่พบโปรไฟล์พื้นหลัง</translation>
     </message>
     <message>
+      <source>Artisan is free to use!
+
+To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
+      <translation type="vanished">Artisan ใช้งานได้ฟรี!
+
+เพื่อให้ฟรีและเป็นปัจจุบัน โปรดสนับสนุนเราด้วยการบริจาคของคุณและสมัครรับข้อมูล artisan.plus เพื่อระงับกล่องโต้ตอบนี้!</translation>
+    </message>
+    <message>
       <source>Import Aillio RoasTime</source>
       <translation type="vanished">นำเข้า Aillio RoasTime</translation>
     </message>
@@ -17674,32 +17683,32 @@ Profile missing [CHARGE] or [DROP]</source>
       <translation>artisan.plus ถูกตัดการเชื่อมต่อ</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="320" />
+      <location filename="../plus/stock.py" line="321" />
       <source>bag</source>
       <translation>ถุง</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="321" />
+      <location filename="../plus/stock.py" line="322" />
       <source>box</source>
       <translation>กล่อง</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="322" />
+      <location filename="../plus/stock.py" line="323" />
       <source>barrel</source>
       <translation>บาร์เรล</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="325" />
+      <location filename="../plus/stock.py" line="326" />
       <source>bags</source>
       <translation>กระเป๋า</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="326" />
+      <location filename="../plus/stock.py" line="327" />
       <source>boxes</source>
       <translation>กล่อง</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="327" />
+      <location filename="../plus/stock.py" line="328" />
       <source>barrels</source>
       <translation>บาร์เรล</translation>
     </message>

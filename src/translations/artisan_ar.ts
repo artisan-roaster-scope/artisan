@@ -4670,7 +4670,7 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="17497" />
       <source>Could not start WebLCDs. Selected port might be busy.</source>
-      <translation type="unfinished" />
+      <translation>تعذر بدء تشغيل شاشات WebLCD. قد يكون المنفذ المحدد مشغولاً.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="18879" />
@@ -4717,7 +4717,7 @@ END</source>
     <message>
       <location filename="../artisanlib/canvas.py" line="15554" />
       <source>Exception: redrawdesigner() Roast events may be out of order. Resetting Designer.</source>
-      <translation type="unfinished" />
+      <translation>الاستثناء: قد تكون أحداث التحميص redrawdesigner() معطلة. إعادة تعيين المصمم.</translation>
     </message>
     <message>
       <source>Exception: redrawdesigner() Roast events may be out of order. Restting Designer.</source>
@@ -7004,7 +7004,7 @@ Artisan will start the program each sample period.  The program output must be t
     <message>
       <location filename="../help/programs_help.py" line="18" />
       <source>If only one temperature is provided it will be interpreted as BT.  If more than one temperature is provided the values are order dependent with ET first and BT second.</source>
-      <translation type="unfinished" />
+      <translation>إذا تم توفير درجة حرارة واحدة فقط، فسيتم تفسيرها على أنها BT. إذا تم توفير أكثر من درجة حرارة واحدة، فستعتمد القيم على الترتيب مع ET أولاً وBT ثانيًا.</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="18" />
@@ -7271,7 +7271,7 @@ When Keyboard Shortcuts are OFF adds a custom event</source>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="49" />
       <source>Quick Special Event Entry.  The keys q,w,e, and r correspond to special events 1,2,3 and 4.  A two digit numeric value must follow the shortcut letter, e.g. &amp;#39;q75&amp;#39;, when the corresponding event slider max value is 100 or less (default setting).   When the slider max value is greater than 100, three digits must be entered and for values less than 100 a leading zero is required, e.g. &amp;#39;q075&amp;#39;.  </source>
-      <translation type="unfinished" />
+      <translation>دخول حدث خاص سريع. تتوافق المفاتيح q وw وe وr مع الأحداث الخاصة 1 و2 و3 و4. ويجب أن تتبع القيمة الرقمية المكونة من رقمين الحرف المختصر، على سبيل المثال. &amp;#39;q75&amp;#39;، عندما تكون القيمة القصوى لشريط تمرير الحدث المقابل 100 أو أقل (الإعداد الافتراضي). عندما تكون القيمة القصوى لشريط التمرير أكبر من 100، يجب إدخال ثلاثة أرقام وبالنسبة للقيم الأقل من 100، يلزم وجود صفر بادئ، على سبيل المثال. &amp;#39;q075&amp;#39;.</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="50" />
@@ -7614,7 +7614,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="79" />
       <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
-      <translation type="unfinished" />
+      <translation>قد تتغير سرعة جهاز المحاكاة أثناء الإيقاف المؤقت (اضغط مع الاستمرار على Shift (1x) أو OPTION/ALT (2x) أو COMMAND/CTRL (4x) عند إعادة التشغيل).</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="80" />
@@ -7673,7 +7673,8 @@ CTRL + L [فوز]</translation>
       <location filename="../help/keyboardshortcuts_help.py" line="83" />
       <source>OPTION click Stock [Mac]
 ALT click Stock [Win]</source>
-      <translation type="unfinished" />
+      <translation>خيار انقر فوق المخزون [Mac]
+ALT انقر فوق الأسهم [فوز]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="83" />
@@ -8078,7 +8079,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
     <message>
       <location filename="../help/eventsliders_help.py" line="22" />
       <source>Scale factor, Slider value is multiplied by this value.</source>
-      <translation type="unfinished" />
+      <translation>عامل القياس، يتم ضرب قيمة شريط التمرير بهذه القيمة.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="23" />
@@ -8136,7 +8137,8 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: "{}" can be used as a placeholder, it will be substituted by (value*factor + offset). In all slider command actions, but for IO, VOUT, S7 and RC Commands, the bound value is converted from a float to an int.
 </source>
-      <translation type="unfinished" />
+      <translation>ملاحظة: يمكن استخدام "{}" كعنصر نائب، وسيتم استبداله بـ (القيمة*العامل + الإزاحة). في جميع إجراءات أوامر شريط التمرير، ولكن بالنسبة لأوامر IO وVOUT وS7 وRC، يتم تحويل القيمة المرتبطة من عدد عشري إلى عدد صحيح.
+</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="88" />
@@ -8456,7 +8458,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
     <message>
       <location filename="../help/eventsliders_help.py" line="74" />
       <source>for PHIDGET OUTPUT modules: sets voltage voltage range (r=5 for r5V and r=10 for 10V)</source>
-      <translation type="unfinished" />
+      <translation>لوحدات إخراج PHIDGET: يحدد نطاق جهد الجهد (r=5 لـ r5V وr=10 لـ 10V)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="157" />
@@ -9283,7 +9285,7 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
       <location filename="../help/eventbuttons_help.py" line="63" />
       <source>OFF (translated, respecting button state)</source>
-      <translation type="unfinished" />
+      <translation>OFF (مترجم، مع احترام حالة الزر)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="64" />
@@ -9395,7 +9397,7 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
       <source>button numbers or sleep(&lt;float&gt;) separated by a comma: 1,2,sleep(2.5), 3..</source>
-      <translation type="unfinished" />
+      <translation>أرقام الأزرار أو وضع السكون(&lt;float&gt;) مفصولة بفاصلة: 1,2,sleep(2.5), 3..</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
@@ -11063,7 +11065,7 @@ The prediction value is the calculated time in seconds to reach the DRY or FCs t
     <message>
       <location filename="../help/symbolic_help.py" line="137" />
       <source>temperature unit (Celsius: 0, Fahrenheit: 1)</source>
-      <translation type="unfinished" />
+      <translation>وحدة درجة الحرارة (مئوية: 0، فهرنهايت: 1)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="140" />
@@ -16446,10 +16448,10 @@ Repeat Operation at the end: {0}</source>
       <location filename="../artisanlib/main.py" line="4331" />
       <source>Artisan is free to use!
 
-To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
+To keep it free and current please support us with your donation and subscribe to artisan.plus to suppress this dialog!</source>
       <translation>الحرفي مجاني للاستخدام!
 
-لإبقائها مجانية وحديثة ، يرجى دعمنا بتبرعك والاشتراك في artisan.plus لقمع هذا الحوار!</translation>
+لإبقائه مجانيًا وحديثًا، يرجى دعمنا بتبرعك والاشتراك في artisan.plus لإيقاف هذا الحوار!</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="5096" />
@@ -17968,6 +17970,14 @@ Profile missing [CHARGE] or [DROP]</source>
       <translation>لم يتم العثور على ملف تعريف الخلفية</translation>
     </message>
     <message>
+      <source>Artisan is free to use!
+
+To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
+      <translation type="vanished">الحرفي مجاني للاستخدام!
+
+لإبقائها مجانية وحديثة ، يرجى دعمنا بتبرعك والاشتراك في artisan.plus لقمع هذا الحوار!</translation>
+    </message>
+    <message>
       <source>Import Aillio RoasTime</source>
       <translation type="vanished">استيراد Aillio RoasTime</translation>
     </message>
@@ -18177,32 +18187,32 @@ Profile missing [CHARGE] or [DROP]</source>
       <translation>الحرفيين</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="320" />
+      <location filename="../plus/stock.py" line="321" />
       <source>bag</source>
       <translation>كيس</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="321" />
+      <location filename="../plus/stock.py" line="322" />
       <source>box</source>
       <translation>صندوق</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="322" />
+      <location filename="../plus/stock.py" line="323" />
       <source>barrel</source>
       <translation>برميل</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="325" />
+      <location filename="../plus/stock.py" line="326" />
       <source>bags</source>
       <translation>أكياس</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="326" />
+      <location filename="../plus/stock.py" line="327" />
       <source>boxes</source>
       <translation>مربعات</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="327" />
+      <location filename="../plus/stock.py" line="328" />
       <source>barrels</source>
       <translation>براميل</translation>
     </message>

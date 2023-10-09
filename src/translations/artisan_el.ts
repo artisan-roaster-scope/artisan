@@ -4635,7 +4635,7 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="17497" />
       <source>Could not start WebLCDs. Selected port might be busy.</source>
-      <translation type="unfinished" />
+      <translation>Δεν ήταν δυνατή η εκκίνηση των WebLCD. Η επιλεγμένη θύρα μπορεί να είναι απασχολημένη.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="18879" />
@@ -4672,17 +4672,17 @@ END</source>
       <location filename="../artisanlib/canvas.py" line="11302" />
       <location filename="../artisanlib/canvas.py" line="11295" />
       <source>Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!</source>
-      <translation type="unfinished" />
+      <translation>Εξαίρεση: Δεν ήταν δυνατή η εκκίνηση του PhidgetManager. Βεβαιωθείτε ότι το πρόγραμμα οδήγησης Phidget έχει εγκατασταθεί σωστά!</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="14847" />
       <source>Error in lnRegression:</source>
-      <translation type="unfinished" />
+      <translation>Σφάλμα στο lnRegression:</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="15554" />
       <source>Exception: redrawdesigner() Roast events may be out of order. Resetting Designer.</source>
-      <translation type="unfinished" />
+      <translation>Εξαίρεση: redrawdesigner() Τα γεγονότα Roast ενδέχεται να είναι εκτός λειτουργίας. Επαναφορά σχεδιαστή.</translation>
     </message>
     <message>
       <source>HH806AUtemperature(): {0} bytes received but 14 needed</source>
@@ -6937,7 +6937,7 @@ Artisan will start the program each sample period.  The program output must be t
     <message>
       <location filename="../help/programs_help.py" line="18" />
       <source>If only one temperature is provided it will be interpreted as BT.  If more than one temperature is provided the values are order dependent with ET first and BT second.</source>
-      <translation type="unfinished" />
+      <translation>Εάν παρέχεται μόνο μία θερμοκρασία, θα ερμηνευθεί ως BT. Εάν παρέχονται περισσότερες από μία θερμοκρασίες, οι τιμές εξαρτώνται από τη σειρά με το ET πρώτα και το BT δεύτερο.</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="18" />
@@ -7204,7 +7204,7 @@ When Keyboard Shortcuts are OFF adds a custom event</source>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="49" />
       <source>Quick Special Event Entry.  The keys q,w,e, and r correspond to special events 1,2,3 and 4.  A two digit numeric value must follow the shortcut letter, e.g. &amp;#39;q75&amp;#39;, when the corresponding event slider max value is 100 or less (default setting).   When the slider max value is greater than 100, three digits must be entered and for values less than 100 a leading zero is required, e.g. &amp;#39;q075&amp;#39;.  </source>
-      <translation type="unfinished" />
+      <translation>Γρήγορη είσοδος σε ειδική εκδήλωση. Τα πλήκτρα q,w,e και r αντιστοιχούν στα ειδικά συμβάντα 1,2,3 και 4. Μια διψήφια αριθμητική τιμή πρέπει να ακολουθεί το γράμμα συντόμευσης, π.χ. &amp;#39;q75&amp;#39;, όταν η αντίστοιχη μέγιστη τιμή του ρυθμιστικού συμβάντος είναι 100 ή μικρότερη (προεπιλεγμένη ρύθμιση). Όταν η μέγιστη τιμή του ρυθμιστικού είναι μεγαλύτερη από 100, πρέπει να εισαχθούν τρία ψηφία και για τιμές μικρότερες από 100 απαιτείται ένα μηδενικό στην αρχή, π.χ. &amp;#39;q075&amp;#39;.</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="50" />
@@ -7547,7 +7547,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="79" />
       <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
-      <translation type="unfinished" />
+      <translation>Η ταχύτητα του προσομοιωτή μπορεί να αλλάξει κατά την παύση (αναμονή μετατόπισης (1x), OPTION/ALT (2x) ή COMMAND/CTRL (4x) κατά την επανεκκίνηση).</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="80" />
@@ -8011,7 +8011,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
     <message>
       <location filename="../help/eventsliders_help.py" line="22" />
       <source>Scale factor, Slider value is multiplied by this value.</source>
-      <translation type="unfinished" />
+      <translation>Συντελεστής κλίμακας, η τιμή του ρυθμιστικού πολλαπλασιάζεται με αυτήν την τιμή.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="23" />
@@ -8069,7 +8069,8 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: "{}" can be used as a placeholder, it will be substituted by (value*factor + offset). In all slider command actions, but for IO, VOUT, S7 and RC Commands, the bound value is converted from a float to an int.
 </source>
-      <translation type="unfinished" />
+      <translation>Σημείωση: Το "{}" μπορεί να χρησιμοποιηθεί ως σύμβολο κράτησης θέσης, θα αντικατασταθεί από (value*factor + offset). Σε όλες τις ενέργειες εντολών ρυθμιστικού, αλλά για τις εντολές IO, VOUT, S7 και RC, η δεσμευμένη τιμή μετατρέπεται από float σε int.
+</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="88" />
@@ -8389,7 +8390,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
     <message>
       <location filename="../help/eventsliders_help.py" line="74" />
       <source>for PHIDGET OUTPUT modules: sets voltage voltage range (r=5 for r5V and r=10 for 10V)</source>
-      <translation type="unfinished" />
+      <translation>για μονάδες PHIDGET OUTPUT: ορίζει το εύρος τάσης (r=5 για r5V και r=10 για 10V)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="157" />
@@ -9216,7 +9217,7 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
       <location filename="../help/eventbuttons_help.py" line="63" />
       <source>OFF (translated, respecting button state)</source>
-      <translation type="unfinished" />
+      <translation>ΑΠΕΝΕΡΓΟΠΟΙΗΣΗ (μεταφρασμένο, σεβόμενη την κατάσταση του κουμπιού)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="64" />
@@ -9328,7 +9329,7 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
       <source>button numbers or sleep(&lt;float&gt;) separated by a comma: 1,2,sleep(2.5), 3..</source>
-      <translation type="unfinished" />
+      <translation>αριθμοί κουμπιών ή sleep(&lt;float&gt;) που χωρίζονται με κόμμα: 1,2,sleep(2.5), 3..</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
@@ -10996,7 +10997,7 @@ The prediction value is the calculated time in seconds to reach the DRY or FCs t
     <message>
       <location filename="../help/symbolic_help.py" line="137" />
       <source>temperature unit (Celsius: 0, Fahrenheit: 1)</source>
-      <translation type="unfinished" />
+      <translation>μονάδα θερμοκρασίας (Κελσίου: 0, Φαρενάιτ: 1)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="140" />
@@ -16511,7 +16512,7 @@ Repeat Operation at the end: {0}</source>
       <location filename="../artisanlib/main.py" line="4331" />
       <source>Artisan is free to use!
 
-To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
+To keep it free and current please support us with your donation and subscribe to artisan.plus to suppress this dialog!</source>
       <translation>Η χρήση του Artisan είναι δωρεάν!
 
 Για να το διατηρήσετε δωρεάν και επίκαιρο, υποστηρίξτε μας με τη δωρεά σας και εγγραφείτε στο artisan.plus για να καταργήσετε αυτό το παράθυρο διαλόγου!</translation>
@@ -18034,6 +18035,14 @@ Profile missing [CHARGE] or [DROP]</source>
       <translation>Προφιλ Φοντου δεν ευρεθει</translation>
     </message>
     <message>
+      <source>Artisan is free to use!
+
+To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
+      <translation type="vanished">Η χρήση του Artisan είναι δωρεάν!
+
+Για να το διατηρήσετε δωρεάν και επίκαιρο, υποστηρίξτε μας με τη δωρεά σας και εγγραφείτε στο artisan.plus για να καταργήσετε αυτό το παράθυρο διαλόγου!</translation>
+    </message>
+    <message>
       <source>Import Aillio RoasTime</source>
       <translation type="vanished">Εισαγωγή Aillio RoasTime</translation>
     </message>
@@ -18733,32 +18742,32 @@ Proceed?</source>
       <translation>Το artisan.plus αποσυνδέθηκε</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="320" />
+      <location filename="../plus/stock.py" line="321" />
       <source>bag</source>
       <translation>τσάντα</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="321" />
+      <location filename="../plus/stock.py" line="322" />
       <source>box</source>
       <translation>κουτί</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="322" />
+      <location filename="../plus/stock.py" line="323" />
       <source>barrel</source>
       <translation>βαρέλι</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="325" />
+      <location filename="../plus/stock.py" line="326" />
       <source>bags</source>
       <translation>τσάντες</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="326" />
+      <location filename="../plus/stock.py" line="327" />
       <source>boxes</source>
       <translation>κουτιά</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="327" />
+      <location filename="../plus/stock.py" line="328" />
       <source>barrels</source>
       <translation>βαρέλια</translation>
     </message>

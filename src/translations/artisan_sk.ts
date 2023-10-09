@@ -4338,7 +4338,7 @@ KONIEC</translation>
     <message>
       <location filename="../artisanlib/main.py" line="17497" />
       <source>Could not start WebLCDs. Selected port might be busy.</source>
-      <translation type="unfinished" />
+      <translation>Nepodarilo sa spustiť WebLCD. Vybraný port môže byť zaneprázdnený.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="18879" />
@@ -4385,7 +4385,7 @@ KONIEC</translation>
     <message>
       <location filename="../artisanlib/canvas.py" line="15554" />
       <source>Exception: redrawdesigner() Roast events may be out of order. Resetting Designer.</source>
-      <translation type="unfinished" />
+      <translation>Výnimka: udalosti redrawdesigner() Roast môžu byť mimo prevádzky. Resetovanie návrhára.</translation>
     </message>
     <message>
       <source>Exception: redrawdesigner() Roast events may be out of order. Restting Designer.</source>
@@ -6489,7 +6489,7 @@ Artisan spustí program každé vzorové obdobie. Výstup programu musí byť st
     <message>
       <location filename="../help/programs_help.py" line="18" />
       <source>If only one temperature is provided it will be interpreted as BT.  If more than one temperature is provided the values are order dependent with ET first and BT second.</source>
-      <translation type="unfinished" />
+      <translation>Ak je zadaná iba jedna teplota, bude sa interpretovať ako BT. Ak je poskytnutých viac ako jedna teplota, hodnoty závisia od poradia s ET ako prvým a BT ako druhým.</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="18" />
@@ -6756,7 +6756,7 @@ Keď sú klávesové skratky VYPNUTÉ, pridá sa vlastná udalosť</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="49" />
       <source>Quick Special Event Entry.  The keys q,w,e, and r correspond to special events 1,2,3 and 4.  A two digit numeric value must follow the shortcut letter, e.g. &amp;#39;q75&amp;#39;, when the corresponding event slider max value is 100 or less (default setting).   When the slider max value is greater than 100, three digits must be entered and for values less than 100 a leading zero is required, e.g. &amp;#39;q075&amp;#39;.  </source>
-      <translation type="unfinished" />
+      <translation>Rýchly vstup na špeciálnu udalosť. Klávesy q,w,e a r zodpovedajú špeciálnym udalostiam 1,2,3 a 4. Za písmenom skratky musí nasledovať dvojciferná číselná hodnota, napr. &amp;#39;q75&amp;#39;, keď je maximálna hodnota zodpovedajúceho posúvača udalosti 100 alebo menej (predvolené nastavenie). Keď je maximálna hodnota posúvača väčšia ako 100, musia sa zadať tri číslice a pre hodnoty menšie ako 100 sa vyžaduje úvodná nula, napr. &amp;#39;q075&amp;#39;.</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="50" />
@@ -7098,7 +7098,7 @@ Klávesové skratky musia byť zakázané (ENTER)</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="79" />
       <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
-      <translation type="unfinished" />
+      <translation>Rýchlosť simulátora je možné zmeniť počas pozastavenia (podržať posun (1x), OPTION/ALT (2x) alebo COMMAND/CTRL (4x) pri reštarte).</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="80" />
@@ -7561,7 +7561,7 @@ Vložte profil zaznamenaný na menšom stroji a otvorte Transposer. Vyberte line
     <message>
       <location filename="../help/eventsliders_help.py" line="22" />
       <source>Scale factor, Slider value is multiplied by this value.</source>
-      <translation type="unfinished" />
+      <translation>Faktor mierky, hodnota posúvača sa vynásobí touto hodnotou.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="23" />
@@ -7619,7 +7619,8 @@ Vložte profil zaznamenaný na menšom stroji a otvorte Transposer. Vyberte line
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: "{}" can be used as a placeholder, it will be substituted by (value*factor + offset). In all slider command actions, but for IO, VOUT, S7 and RC Commands, the bound value is converted from a float to an int.
 </source>
-      <translation type="unfinished" />
+      <translation>Poznámka: "{}" môže byť použitý ako zástupný symbol, bude nahradený (hodnota*faktor + offset). Vo všetkých akciách príkazov posuvníka, ale pre príkazy IO, VOUT, S7 a RC sa viazaná hodnota skonvertuje z float na int.
+</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="88" />
@@ -7939,7 +7940,7 @@ Vložte profil zaznamenaný na menšom stroji a otvorte Transposer. Vyberte line
     <message>
       <location filename="../help/eventsliders_help.py" line="74" />
       <source>for PHIDGET OUTPUT modules: sets voltage voltage range (r=5 for r5V and r=10 for 10V)</source>
-      <translation type="unfinished" />
+      <translation>pre moduly PHIDGET OUTPUT: nastavuje rozsah napätia (r=5 pre r5V a r=10 pre 10V)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="157" />
@@ -8766,7 +8767,7 @@ Funkcia 4 (čítanie vstupných registrov): registre 0 až 65535 zodpovedajúce 
     <message>
       <location filename="../help/eventbuttons_help.py" line="63" />
       <source>OFF (translated, respecting button state)</source>
-      <translation type="unfinished" />
+      <translation>VYPNUTÉ (preložené, rešpektuje stav tlačidla)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="64" />
@@ -8878,7 +8879,7 @@ Funkcia 4 (čítanie vstupných registrov): registre 0 až 65535 zodpovedajúce 
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
       <source>button numbers or sleep(&lt;float&gt;) separated by a comma: 1,2,sleep(2.5), 3..</source>
-      <translation type="unfinished" />
+      <translation>čísla tlačidiel alebo sleep(&lt;float&gt;) oddelené čiarkou: 1,2,sleep(2.5), 3..</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
@@ -10546,7 +10547,7 @@ Predikovaná hodnota je vypočítaný čas v sekundách na dosiahnutie teploty D
     <message>
       <location filename="../help/symbolic_help.py" line="137" />
       <source>temperature unit (Celsius: 0, Fahrenheit: 1)</source>
-      <translation type="unfinished" />
+      <translation>jednotka teploty (Celsius: 0, Fahrenheit: 1)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="140" />
@@ -14986,10 +14987,10 @@ Opakujte operáciu na konci: {0}</translation>
       <location filename="../artisanlib/main.py" line="4331" />
       <source>Artisan is free to use!
 
-To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
+To keep it free and current please support us with your donation and subscribe to artisan.plus to suppress this dialog!</source>
       <translation>Artisan je zadarmo na použitie!
 
-Ak chcete, aby bola bezplatná a aktuálna, podporte nás svojím darom a prihláste sa na odber artisan.plus, aby ste potlačili tento dialóg!</translation>
+Ak chcete, aby bol bezplatný a aktuálny, podporte nás svojím darom a prihláste sa na odber artisan.plus, aby ste tento dialóg potlačili!</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="5096" />
@@ -16508,6 +16509,14 @@ V profile chýba [CHARGE] alebo [DROP]</translation>
       <translation>Profil na pozadí sa nenašiel</translation>
     </message>
     <message>
+      <source>Artisan is free to use!
+
+To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
+      <translation type="vanished">Artisan je zadarmo na použitie!
+
+Ak chcete, aby bola bezplatná a aktuálna, podporte nás svojím darom a prihláste sa na odber artisan.plus, aby ste potlačili tento dialóg!</translation>
+    </message>
+    <message>
       <source>Import Aillio RoasTime</source>
       <translation type="vanished">Importovať Aillio RoasTime</translation>
     </message>
@@ -16649,32 +16658,32 @@ V profile chýba [CHARGE] alebo [DROP]</translation>
       <translation>remeselník.plus odpojený</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="320" />
+      <location filename="../plus/stock.py" line="321" />
       <source>bag</source>
       <translation>taška</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="321" />
+      <location filename="../plus/stock.py" line="322" />
       <source>box</source>
       <translation />
     </message>
     <message>
-      <location filename="../plus/stock.py" line="322" />
+      <location filename="../plus/stock.py" line="323" />
       <source>barrel</source>
       <translation>sud</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="325" />
+      <location filename="../plus/stock.py" line="326" />
       <source>bags</source>
       <translation>tašky</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="326" />
+      <location filename="../plus/stock.py" line="327" />
       <source>boxes</source>
       <translation>škatule</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="327" />
+      <location filename="../plus/stock.py" line="328" />
       <source>barrels</source>
       <translation>sudy</translation>
     </message>

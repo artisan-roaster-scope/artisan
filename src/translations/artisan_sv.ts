@@ -4334,7 +4334,7 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="17497" />
       <source>Could not start WebLCDs. Selected port might be busy.</source>
-      <translation type="unfinished" />
+      <translation>Kunde inte starta WebLCD:er. Den valda porten kan vara upptagen.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="18879" />
@@ -4381,7 +4381,7 @@ END</source>
     <message>
       <location filename="../artisanlib/canvas.py" line="15554" />
       <source>Exception: redrawdesigner() Roast events may be out of order. Resetting Designer.</source>
-      <translation type="unfinished" />
+      <translation>Undantag: redrawdesigner() Roast-händelser kan vara ur funktion. Återställ designer.</translation>
     </message>
     <message>
       <source>Exception: redrawdesigner() Roast events may be out of order. Restting Designer.</source>
@@ -6485,7 +6485,7 @@ Artisan kommer att starta programmet varje provperiod. Programutgången måste v
     <message>
       <location filename="../help/programs_help.py" line="18" />
       <source>If only one temperature is provided it will be interpreted as BT.  If more than one temperature is provided the values are order dependent with ET first and BT second.</source>
-      <translation type="unfinished" />
+      <translation>Om endast en temperatur anges kommer den att tolkas som BT. Om mer än en temperatur tillhandahålls är värdena ordningsberoende med ET först och BT andra.</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="18" />
@@ -6752,7 +6752,7 @@ När kortkommandon är AV läggs en anpassad händelse till</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="49" />
       <source>Quick Special Event Entry.  The keys q,w,e, and r correspond to special events 1,2,3 and 4.  A two digit numeric value must follow the shortcut letter, e.g. &amp;#39;q75&amp;#39;, when the corresponding event slider max value is 100 or less (default setting).   When the slider max value is greater than 100, three digits must be entered and for values less than 100 a leading zero is required, e.g. &amp;#39;q075&amp;#39;.  </source>
-      <translation type="unfinished" />
+      <translation>Snabbt inträde till specialevenemang. Knapparna q,w,e och r motsvarar specialhändelser 1,2,3 och 4. Ett tvåsiffrigt numeriskt värde måste följa genvägsbokstaven, t.ex. &amp;#39;q75&amp;#39;, när motsvarande maxvärde för händelsereglaget är 100 eller mindre (standardinställning). När skjutreglagets maxvärde är större än 100 måste tre siffror anges och för värden mindre än 100 krävs en inledande nolla, t.ex. &amp;#39;q075&amp;#39;.</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="50" />
@@ -7095,7 +7095,7 @@ Kortkommandon måste vara inaktiverade (ENTER)</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="79" />
       <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
-      <translation type="unfinished" />
+      <translation>Simulatorhastigheten kan ändras när den är pausad (håll skift (1x), OPTION/ALT (2x) eller COMMAND/CTRL (4x) vid omstart).</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="80" />
@@ -7560,7 +7560,7 @@ Ladda profilen inspelad på den mindre maskinen och öppna Transposern. Välj de
     <message>
       <location filename="../help/eventsliders_help.py" line="22" />
       <source>Scale factor, Slider value is multiplied by this value.</source>
-      <translation type="unfinished" />
+      <translation>Skalfaktor, skjutreglagets värde multipliceras med detta värde.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="23" />
@@ -7618,7 +7618,8 @@ Ladda profilen inspelad på den mindre maskinen och öppna Transposern. Välj de
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: "{}" can be used as a placeholder, it will be substituted by (value*factor + offset). In all slider command actions, but for IO, VOUT, S7 and RC Commands, the bound value is converted from a float to an int.
 </source>
-      <translation type="unfinished" />
+      <translation>Notera: "{}" kan användas som platshållare, den kommer att ersättas med (värde*faktor + offset). I alla skjutreglagekommandon, utom för IO-, VOUT-, S7- och RC-kommandon, konverteras det bundna värdet från en float till en int.
+</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="88" />
@@ -7938,7 +7939,7 @@ Ladda profilen inspelad på den mindre maskinen och öppna Transposern. Välj de
     <message>
       <location filename="../help/eventsliders_help.py" line="74" />
       <source>for PHIDGET OUTPUT modules: sets voltage voltage range (r=5 for r5V and r=10 for 10V)</source>
-      <translation type="unfinished" />
+      <translation>för PHIDGET OUTPUT-moduler: ställer in spänningsspänningsområdet (r=5 för r5V och r=10 för 10V)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="157" />
@@ -8765,7 +8766,7 @@ Funktion 4 (läs indataregister): register 0 till 65535 motsvarande nummer 30000
     <message>
       <location filename="../help/eventbuttons_help.py" line="63" />
       <source>OFF (translated, respecting button state)</source>
-      <translation type="unfinished" />
+      <translation>AV (översatt, med respekt för knappstatus)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="64" />
@@ -8877,7 +8878,7 @@ Funktion 4 (läs indataregister): register 0 till 65535 motsvarande nummer 30000
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
       <source>button numbers or sleep(&lt;float&gt;) separated by a comma: 1,2,sleep(2.5), 3..</source>
-      <translation type="unfinished" />
+      <translation>knappnummer eller sleep(&lt;float&gt;) åtskilda av ett kommatecken: 1,2,sleep(2.5), 3..</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
@@ -10545,7 +10546,7 @@ Förutsägelsevärdet är den beräknade tiden i sekunder för att nå DRY eller
     <message>
       <location filename="../help/symbolic_help.py" line="137" />
       <source>temperature unit (Celsius: 0, Fahrenheit: 1)</source>
-      <translation type="unfinished" />
+      <translation>temperaturenhet (Celsius: 0, Fahrenheit: 1)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="140" />
@@ -15021,10 +15022,10 @@ Upprepa operationen i slutet: {0}</translation>
       <location filename="../artisanlib/main.py" line="4331" />
       <source>Artisan is free to use!
 
-To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
+To keep it free and current please support us with your donation and subscribe to artisan.plus to suppress this dialog!</source>
       <translation>Artisan är gratis att använda!
 
-För att hålla det gratis och aktuellt, stöd oss med din donation och prenumerera på artisan.plus för att undertrycka den här dialogrutan!</translation>
+För att hålla det gratis och aktuellt, stöd oss ​​med din donation och prenumerera på artisan.plus för att undertrycka den här dialogrutan!</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="5096" />
@@ -16543,6 +16544,14 @@ Profil saknar [CHARGE] eller [DROP]</translation>
       <translation>Bakgrundsprofilen hittades inte</translation>
     </message>
     <message>
+      <source>Artisan is free to use!
+
+To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
+      <translation type="vanished">Artisan är gratis att använda!
+
+För att hålla det gratis och aktuellt, stöd oss med din donation och prenumerera på artisan.plus för att undertrycka den här dialogrutan!</translation>
+    </message>
+    <message>
       <source>Import Aillio RoasTime</source>
       <translation type="vanished">Importera Aillio RoasTime</translation>
     </message>
@@ -16707,32 +16716,32 @@ Profil saknar [CHARGE] eller [DROP]</translation>
       <translation>artisan.plus frånkopplad</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="320" />
+      <location filename="../plus/stock.py" line="321" />
       <source>bag</source>
       <translation>väska</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="321" />
+      <location filename="../plus/stock.py" line="322" />
       <source>box</source>
       <translation>låda</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="322" />
+      <location filename="../plus/stock.py" line="323" />
       <source>barrel</source>
       <translation>tunna</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="325" />
+      <location filename="../plus/stock.py" line="326" />
       <source>bags</source>
       <translation>påsar</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="326" />
+      <location filename="../plus/stock.py" line="327" />
       <source>boxes</source>
       <translation>lådor</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="327" />
+      <location filename="../plus/stock.py" line="328" />
       <source>barrels</source>
       <translation>fat</translation>
     </message>

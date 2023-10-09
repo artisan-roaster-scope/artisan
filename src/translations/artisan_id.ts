@@ -4614,7 +4614,7 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="17497" />
       <source>Could not start WebLCDs. Selected port might be busy.</source>
-      <translation type="unfinished" />
+      <translation>Tidak dapat memulai WebLCD. Port yang dipilih mungkin sibuk.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="18879" />
@@ -4661,7 +4661,7 @@ END</source>
     <message>
       <location filename="../artisanlib/canvas.py" line="15554" />
       <source>Exception: redrawdesigner() Roast events may be out of order. Resetting Designer.</source>
-      <translation type="unfinished" />
+      <translation>Pengecualian: redrawdesigner() Acara pemanggangan mungkin rusak. Menyetel Ulang Desainer.</translation>
     </message>
     <message>
       <source>Exception: redrawdesigner() Roast events may be out of order. Restting Designer.</source>
@@ -6731,7 +6731,7 @@ Alarm dipindai secara berurutan dari atas tabel ke bawah.</translation>
     <message>
       <location filename="../help/alarms_help.py" line="79" />
       <source>RampSoak ON</source>
-      <translation type="unfinished" />
+      <translation>RampRendam ON</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="79" />
@@ -6792,7 +6792,7 @@ Artisan akan memulai program setiap periode sampel. Keluaran program harus ke st
     <message>
       <location filename="../help/programs_help.py" line="18" />
       <source>If only one temperature is provided it will be interpreted as BT.  If more than one temperature is provided the values are order dependent with ET first and BT second.</source>
-      <translation type="unfinished" />
+      <translation>Jika hanya satu suhu yang diberikan maka akan diartikan sebagai BT. Jika lebih dari satu suhu disediakan, nilainya bergantung pada urutan dengan ET pertama dan BT kedua.</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="18" />
@@ -6876,7 +6876,7 @@ Artisan akan memulai program setiap periode sampel. Keluaran program harus ke st
     <message>
       <location filename="../help/programs_help.py" line="22" />
       <source>ET, BT, ETB, BTB = sys.argv[1:]</source>
-      <translation type="unfinished" />
+      <translation>DAN, BT, ETB, BTB = sys.argv[1:]</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="22" />
@@ -7034,7 +7034,7 @@ Saat Pintasan Keyboard MATI menambahkan acara khusus</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="44" />
       <source>Inc/dec PID lookahead</source>
-      <translation type="unfinished" />
+      <translation>Inc/Des Pandangan ke depan PID</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="45" />
@@ -7059,7 +7059,7 @@ Saat Pintasan Keyboard MATI menambahkan acara khusus</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="49" />
       <source>Quick Special Event Entry.  The keys q,w,e, and r correspond to special events 1,2,3 and 4.  A two digit numeric value must follow the shortcut letter, e.g. &amp;#39;q75&amp;#39;, when the corresponding event slider max value is 100 or less (default setting).   When the slider max value is greater than 100, three digits must be entered and for values less than 100 a leading zero is required, e.g. &amp;#39;q075&amp;#39;.  </source>
-      <translation type="unfinished" />
+      <translation>Entri Acara Spesial Cepat. Tombol q,w,e, dan r berhubungan dengan kejadian khusus 1,2,3 dan 4. Nilai numerik dua digit harus mengikuti huruf pintasan, mis. &amp;#39;q75&amp;#39;, ketika nilai maksimal penggeser peristiwa yang terkait adalah 100 atau kurang (pengaturan default). Jika nilai maksimal penggeser lebih besar dari 100, tiga digit harus dimasukkan dan untuk nilai kurang dari 100 diperlukan angka nol di depannya, mis. 'q075'.</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="50" />
@@ -7402,7 +7402,7 @@ Pintasan Keyboard harus dinonaktifkan (ENTER)</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="79" />
       <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
-      <translation type="unfinished" />
+      <translation>Kecepatan simulator mungkin berubah saat dijeda (tahan shift (1x), OPTION/ALT (2x) atau COMMAND/CTRL (4x) saat restart).</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="80" />
@@ -7867,7 +7867,7 @@ Muat profil yang direkam pada mesin yang lebih kecil dan buka Transposer. Pilih 
     <message>
       <location filename="../help/eventsliders_help.py" line="22" />
       <source>Scale factor, Slider value is multiplied by this value.</source>
-      <translation type="unfinished" />
+      <translation>Faktor skala, Nilai penggeser dikalikan dengan nilai ini.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="23" />
@@ -7925,7 +7925,8 @@ Muat profil yang direkam pada mesin yang lebih kecil dan buka Transposer. Pilih 
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: "{}" can be used as a placeholder, it will be substituted by (value*factor + offset). In all slider command actions, but for IO, VOUT, S7 and RC Commands, the bound value is converted from a float to an int.
 </source>
-      <translation type="unfinished" />
+      <translation>Catatan: "{}" dapat digunakan sebagai placeholder, akan diganti dengan (nilai*faktor + offset). Di semua tindakan perintah penggeser, kecuali untuk Perintah IO, VOUT, S7 dan RC, nilai terikat diubah dari float menjadi int.
+</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="88" />
@@ -8245,7 +8246,7 @@ Muat profil yang direkam pada mesin yang lebih kecil dan buka Transposer. Pilih 
     <message>
       <location filename="../help/eventsliders_help.py" line="74" />
       <source>for PHIDGET OUTPUT modules: sets voltage voltage range (r=5 for r5V and r=10 for 10V)</source>
-      <translation type="unfinished" />
+      <translation>untuk modul PHIDGET OUTPUT: mengatur rentang tegangan (r=5 untuk r5V dan r=10 untuk 10V)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="157" />
@@ -9072,7 +9073,7 @@ Fungsi 4 (Baca Register Input): register 0 hingga 65535 sesuai dengan angka 3000
     <message>
       <location filename="../help/eventbuttons_help.py" line="63" />
       <source>OFF (translated, respecting button state)</source>
-      <translation type="unfinished" />
+      <translation>OFF (diterjemahkan, sesuai dengan status tombol)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="64" />
@@ -9184,7 +9185,7 @@ Fungsi 4 (Baca Register Input): register 0 hingga 65535 sesuai dengan angka 3000
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
       <source>button numbers or sleep(&lt;float&gt;) separated by a comma: 1,2,sleep(2.5), 3..</source>
-      <translation type="unfinished" />
+      <translation>nomor tombol atau sleep(&lt;float&gt;) dipisahkan dengan koma: 1,2,sleep(2.5), 3..</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
@@ -9494,7 +9495,7 @@ Untuk tonggak sensorik (lihat catatan di atas) nilai 50 sesuai dengan aroma "Hay
     <message>
       <location filename="../help/eventannotations_help.py" line="51" />
       <source>Gas ~E @~Y2~degmode</source>
-      <translation type="unfinished" />
+      <translation>Gas ~E @~Y2~mode derajat</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="51" />
@@ -9504,22 +9505,22 @@ Untuk tonggak sensorik (lihat catatan di atas) nilai 50 sesuai dengan aroma "Hay
     <message>
       <location filename="../help/eventannotations_help.py" line="52" />
       <source>Gas ~E% @~Y2~mode</source>
-      <translation type="unfinished" />
+      <translation>Mode gas ~E% @~Y2~</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="52" />
       <source>Gas 50% @340F</source>
-      <translation type="unfinished" />
+      <translation>Bahan bakar 50% @340F</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="53" />
       <source>Gas ~E/10kPh @~Y2~mode</source>
-      <translation type="unfinished" />
+      <translation>Mode gas ~E/10kPh @~Y2~</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="53" />
       <source>Gas 5.0kPh @340F</source>
-      <translation type="unfinished" />
+      <translation>Bahan bakar 5,0kPh @340F</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="54" />
@@ -10852,7 +10853,7 @@ Nilai prediksi adalah waktu yang dihitung dalam detik untuk mencapai suhu KERING
     <message>
       <location filename="../help/symbolic_help.py" line="137" />
       <source>temperature unit (Celsius: 0, Fahrenheit: 1)</source>
-      <translation type="unfinished" />
+      <translation>satuan suhu (Celcius: 0, Fahrenheit: 1)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="140" />
@@ -15429,10 +15430,10 @@ Ulangi Operasi di akhir: {0}</translation>
       <location filename="../artisanlib/main.py" line="4331" />
       <source>Artisan is free to use!
 
-To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
-      <translation>Artisan gratis untuk digunakan!
+To keep it free and current please support us with your donation and subscribe to artisan.plus to suppress this dialog!</source>
+      <translation>Pengrajin bebas untuk digunakan!
 
-Agar tetap gratis dan terkini, dukung kami dengan donasi Anda dan berlangganan artisan.plus untuk menekan dialog ini!</translation>
+Agar tetap gratis dan terkini, dukung kami dengan donasi Anda dan berlangganan artisan.plus untuk menyembunyikan dialog ini!</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="5096" />
@@ -16021,7 +16022,7 @@ Agar tetap gratis dan terkini, dukung kami dengan donasi Anda dan berlangganan a
     <message>
       <location filename="../artisanlib/main.py" line="22639" />
       <source>artisan-settings</source>
-      <translation type="unfinished" />
+      <translation>pengaturan tukang</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22640" />
@@ -16036,7 +16037,7 @@ Agar tetap gratis dan terkini, dukung kami dengan donasi Anda dan berlangganan a
     <message>
       <location filename="../artisanlib/main.py" line="22706" />
       <source>artisan-theme</source>
-      <translation type="unfinished" />
+      <translation>tema artisan</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22707" />
@@ -16951,6 +16952,14 @@ Profil tidak ada [CHARGE] atau [DROP]</translation>
       <translation>Profil latar belakang tidak ditemukan</translation>
     </message>
     <message>
+      <source>Artisan is free to use!
+
+To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
+      <translation type="vanished">Artisan gratis untuk digunakan!
+
+Agar tetap gratis dan terkini, dukung kami dengan donasi Anda dan berlangganan artisan.plus untuk menekan dialog ini!</translation>
+    </message>
+    <message>
       <source>Import Aillio RoasTime</source>
       <translation type="vanished">Impor Aillio RoasTime</translation>
     </message>
@@ -17116,32 +17125,32 @@ Profil tidak ada [CHARGE] atau [DROP]</translation>
       <translation>artisan.plus terputus</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="320" />
+      <location filename="../plus/stock.py" line="321" />
       <source>bag</source>
       <translation>tas</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="321" />
+      <location filename="../plus/stock.py" line="322" />
       <source>box</source>
       <translation>kotak</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="322" />
+      <location filename="../plus/stock.py" line="323" />
       <source>barrel</source>
       <translation>barel</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="325" />
+      <location filename="../plus/stock.py" line="326" />
       <source>bags</source>
       <translation>tas</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="326" />
+      <location filename="../plus/stock.py" line="327" />
       <source>boxes</source>
       <translation>kotak</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="327" />
+      <location filename="../plus/stock.py" line="328" />
       <source>barrels</source>
       <translation>barel</translation>
     </message>

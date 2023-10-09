@@ -4667,7 +4667,7 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="17497" />
       <source>Could not start WebLCDs. Selected port might be busy.</source>
-      <translation type="unfinished" />
+      <translation>Não foi possível iniciar os WebLCDs. A porta selecionada pode estar ocupada.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="18879" />
@@ -4714,7 +4714,7 @@ END</source>
     <message>
       <location filename="../artisanlib/canvas.py" line="15554" />
       <source>Exception: redrawdesigner() Roast events may be out of order. Resetting Designer.</source>
-      <translation type="unfinished" />
+      <translation>Exceção: eventos redrawdesigner() Roast podem estar fora de ordem. Redefinindo o Designer.</translation>
     </message>
     <message>
       <source>Exception: redrawdesigner() Roast events may be out of order. Restting Designer.</source>
@@ -6916,7 +6916,7 @@ Os alarmes são verificados na ordem do topo da tabela para o fundo.</translatio
     <message>
       <location filename="../help/alarms_help.py" line="79" />
       <source>RampSoak ON</source>
-      <translation type="unfinished" />
+      <translation>RampaSoak ON</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="79" />
@@ -6926,7 +6926,7 @@ Os alarmes são verificados na ordem do topo da tabela para o fundo.</translatio
     <message>
       <location filename="../help/alarms_help.py" line="80" />
       <source>RampSoak OFF</source>
-      <translation type="unfinished" />
+      <translation>RampaSoak OFF</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="80" />
@@ -6977,7 +6977,7 @@ O Artisan iniciará o programa a cada período de amostragem. A saída do progra
     <message>
       <location filename="../help/programs_help.py" line="18" />
       <source>If only one temperature is provided it will be interpreted as BT.  If more than one temperature is provided the values are order dependent with ET first and BT second.</source>
-      <translation type="unfinished" />
+      <translation>Se apenas uma temperatura for fornecida, ela será interpretada como BT. Se for fornecida mais de uma temperatura, os valores dependem da ordem, com ET primeiro e BT depois.</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="18" />
@@ -7024,7 +7024,7 @@ O Artisan iniciará o programa a cada período de amostragem. A saída do progra
     <message>
       <location filename="../help/programs_help.py" line="22" />
       <source>print("237.1,100.4")</source>
-      <translation type="unfinished" />
+      <translation>imprimir("237.1.100.4")</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="22" />
@@ -7071,7 +7071,7 @@ O Artisan iniciará o programa a cada período de amostragem. A saída do progra
     <message>
       <location filename="../help/programs_help.py" line="22" />
       <source>    file.write(f&amp;#39;ET: {ET}, BT: {ET}, ETB: {ETB}, BTB: {BTB};&amp;#39;)</source>
-      <translation type="unfinished" />
+      <translation>    arquivo.write(f&amp;#39;ET: {ET}, BT: {ET}, ETB: {ETB}, BTB: {BTB};&amp;#39;)</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="14" />
@@ -7219,7 +7219,7 @@ Quando os atalhos de teclado estão desativados, adiciona um evento personalizad
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="44" />
       <source>Inc/dec PID lookahead</source>
-      <translation type="unfinished" />
+      <translation>Aumento/dec PID antecipado</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="45" />
@@ -7244,7 +7244,7 @@ Quando os atalhos de teclado estão desativados, adiciona um evento personalizad
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="49" />
       <source>Quick Special Event Entry.  The keys q,w,e, and r correspond to special events 1,2,3 and 4.  A two digit numeric value must follow the shortcut letter, e.g. &amp;#39;q75&amp;#39;, when the corresponding event slider max value is 100 or less (default setting).   When the slider max value is greater than 100, three digits must be entered and for values less than 100 a leading zero is required, e.g. &amp;#39;q075&amp;#39;.  </source>
-      <translation type="unfinished" />
+      <translation>Entrada rápida em eventos especiais. As teclas q,w,e e r correspondem aos eventos especiais 1,2,3 e 4. Um valor numérico de dois dígitos deve seguir a letra de atalho, por exemplo. &amp;#39;q75&amp;#39;, quando o valor máximo do controle deslizante de evento correspondente for 100 ou menos (configuração padrão). Quando o valor máximo do controle deslizante é maior que 100, três dígitos devem ser inseridos e para valores menores que 100 é necessário um zero à esquerda, por exemplo. &amp;#39;q075&amp;#39;.</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="50" />
@@ -7587,7 +7587,7 @@ Atalhos de teclado devem estar desabilitados (ENTER)</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="79" />
       <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
-      <translation type="unfinished" />
+      <translation>A velocidade do simulador pode ser alterada durante a pausa (segure shift (1x), OPTION/ALT (2x) ou COMMAND/CTRL (4x) na reinicialização).</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="80" />
@@ -7959,7 +7959,7 @@ Durante a gravação apenas</translation>
     <message>
       <location filename="../help/transposer_help.py" line="14" />
       <source>TRANSPOSER</source>
-      <translation type="unfinished" />
+      <translation>TRANSPOSTOR</translation>
     </message>
     <message>
       <location filename="../help/transposer_help.py" line="18" />
@@ -8052,7 +8052,7 @@ Carregue o perfil gravado na máquina menor e abra o Transposer. Selecione o map
     <message>
       <location filename="../help/eventsliders_help.py" line="22" />
       <source>Scale factor, Slider value is multiplied by this value.</source>
-      <translation type="unfinished" />
+      <translation>Fator de escala, o valor do controle deslizante é multiplicado por este valor.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="23" />
@@ -8110,7 +8110,8 @@ Carregue o perfil gravado na máquina menor e abra o Transposer. Selecione o map
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: "{}" can be used as a placeholder, it will be substituted by (value*factor + offset). In all slider command actions, but for IO, VOUT, S7 and RC Commands, the bound value is converted from a float to an int.
 </source>
-      <translation type="unfinished" />
+      <translation>Nota: "{}" pode ser usado como espaço reservado, será substituído por (valor*fator + deslocamento). Em todas as ações de comando do controle deslizante, exceto para comandos IO, VOUT, S7 e RC, o valor vinculado é convertido de float para int.
+</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="88" />
@@ -8430,7 +8431,7 @@ Carregue o perfil gravado na máquina menor e abra o Transposer. Selecione o map
     <message>
       <location filename="../help/eventsliders_help.py" line="74" />
       <source>for PHIDGET OUTPUT modules: sets voltage voltage range (r=5 for r5V and r=10 for 10V)</source>
-      <translation type="unfinished" />
+      <translation>para módulos PHIDGET OUTPUT: define a faixa de tensão (r=5 para r5V e r=10 para 10V)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="157" />
@@ -9257,7 +9258,7 @@ Função 4 (Read Input Registers): registros 0 a 65535 correspondentes aos núme
     <message>
       <location filename="../help/eventbuttons_help.py" line="63" />
       <source>OFF (translated, respecting button state)</source>
-      <translation type="unfinished" />
+      <translation>OFF (traduzido, respeitando o estado do botão)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="64" />
@@ -9369,7 +9370,7 @@ Função 4 (Read Input Registers): registros 0 a 65535 correspondentes aos núme
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
       <source>button numbers or sleep(&lt;float&gt;) separated by a comma: 1,2,sleep(2.5), 3..</source>
-      <translation type="unfinished" />
+      <translation>números de botão ou sleep(&lt;float&gt;) separados por vírgula: 1,2,sleep(2.5), 3..</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
@@ -9674,7 +9675,7 @@ Para um marco sensorial (ver notas acima) o valor 50 corresponde ao aroma "Hay".
     <message>
       <location filename="../help/eventannotations_help.py" line="50" />
       <source>Displays</source>
-      <translation type="unfinished" />
+      <translation>Exibições</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="51" />
@@ -11037,7 +11038,7 @@ O valor de previsão é o tempo calculado em segundos para atingir a temperatura
     <message>
       <location filename="../help/symbolic_help.py" line="137" />
       <source>temperature unit (Celsius: 0, Fahrenheit: 1)</source>
-      <translation type="unfinished" />
+      <translation>unidade de temperatura (Celsius: 0, Fahrenheit: 1)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="140" />
@@ -15725,10 +15726,10 @@ Repita a operação no final: {0}</translation>
       <location filename="../artisanlib/main.py" line="4331" />
       <source>Artisan is free to use!
 
-To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
-      <translation>O uso do Artisan é gratuito!
+To keep it free and current please support us with your donation and subscribe to artisan.plus to suppress this dialog!</source>
+      <translation>Artisan é de uso gratuito!
 
-Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o craft.plus para suprimir este diálogo!</translation>
+Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o artist.plus para suprimir esse diálogo!</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="5096" />
@@ -15935,7 +15936,7 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o craf
       <location filename="../artisanlib/main.py" line="9536" />
       <location filename="../artisanlib/main.py" line="9533" />
       <source>PID Lookahead: {0}</source>
-      <translation type="unfinished" />
+      <translation>Antecipação de PID: {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="9554" />
@@ -17246,6 +17247,14 @@ Profile missing [CHARGE] or [DROP]</source>
       <translation>Perfil de fundo não encontrado</translation>
     </message>
     <message>
+      <source>Artisan is free to use!
+
+To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
+      <translation type="vanished">O uso do Artisan é gratuito!
+
+Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o craft.plus para suprimir este diálogo!</translation>
+    </message>
+    <message>
       <source>Import Aillio RoasTime</source>
       <translation type="vanished">Importar Aillio RoasTime</translation>
     </message>
@@ -17721,32 +17730,32 @@ Continuar?</translation>
       <translation>artisan.plus desconectado</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="320" />
+      <location filename="../plus/stock.py" line="321" />
       <source>bag</source>
       <translation>saca</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="321" />
+      <location filename="../plus/stock.py" line="322" />
       <source>box</source>
       <translation>caixa</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="322" />
+      <location filename="../plus/stock.py" line="323" />
       <source>barrel</source>
       <translation>barril</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="325" />
+      <location filename="../plus/stock.py" line="326" />
       <source>bags</source>
       <translation>sacas</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="326" />
+      <location filename="../plus/stock.py" line="327" />
       <source>boxes</source>
       <translation>caixas</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="327" />
+      <location filename="../plus/stock.py" line="328" />
       <source>barrels</source>
       <translation>barrils</translation>
     </message>

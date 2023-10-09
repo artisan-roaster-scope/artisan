@@ -4338,7 +4338,7 @@ LOPPU</translation>
     <message>
       <location filename="../artisanlib/main.py" line="17497" />
       <source>Could not start WebLCDs. Selected port might be busy.</source>
-      <translation type="unfinished" />
+      <translation>WebLCD-levyjä ei voitu käynnistää. Valittu portti saattaa olla varattu.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="18879" />
@@ -4385,7 +4385,7 @@ LOPPU</translation>
     <message>
       <location filename="../artisanlib/canvas.py" line="15554" />
       <source>Exception: redrawdesigner() Roast events may be out of order. Resetting Designer.</source>
-      <translation type="unfinished" />
+      <translation>Poikkeus: redrawdesigner() Roast-tapahtumat voivat olla epäkunnossa. Suunnittelijan nollaus.</translation>
     </message>
     <message>
       <source>Exception: redrawdesigner() Roast events may be out of order. Restting Designer.</source>
@@ -6489,7 +6489,7 @@ Artisan aloittaa ohjelman jokaisella näytejaksolla. Ohjelman tulosteen tulee ol
     <message>
       <location filename="../help/programs_help.py" line="18" />
       <source>If only one temperature is provided it will be interpreted as BT.  If more than one temperature is provided the values are order dependent with ET first and BT second.</source>
-      <translation type="unfinished" />
+      <translation>Jos tarjotaan vain yksi lämpötila, se tulkitaan BT:ksi. Jos annetaan useampi kuin yksi lämpötila, arvot ovat järjestyksen mukaan ET ensin ja BT toiseksi.</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="18" />
@@ -6756,7 +6756,7 @@ Kun pikanäppäimet ovat POIS PÄÄLTÄ, lisää mukautetun tapahtuman</translat
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="49" />
       <source>Quick Special Event Entry.  The keys q,w,e, and r correspond to special events 1,2,3 and 4.  A two digit numeric value must follow the shortcut letter, e.g. &amp;#39;q75&amp;#39;, when the corresponding event slider max value is 100 or less (default setting).   When the slider max value is greater than 100, three digits must be entered and for values less than 100 a leading zero is required, e.g. &amp;#39;q075&amp;#39;.  </source>
-      <translation type="unfinished" />
+      <translation>Nopea sisäänpääsy erikoistapahtumaan. Näppäimet q,w,e ja r vastaavat erikoistapahtumia 1,2,3 ja 4. Pikanäppäimen jälkeen tulee olla kaksinumeroinen numeroarvo, esim. &amp;#39;q75&amp;#39;, kun vastaava tapahtumaliukusäätimen maksimiarvo on 100 tai vähemmän (oletusasetus). Kun liukusäätimen maksimiarvo on suurempi kuin 100, on syötettävä kolme numeroa ja alle 100 arvoille vaaditaan etunolla, esim. &amp;#39;q075&amp;#39;.</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="50" />
@@ -7099,7 +7099,7 @@ Pikanäppäimet on poistettava käytöstä (ENTER)</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="79" />
       <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
-      <translation type="unfinished" />
+      <translation>Simulaattorin nopeutta voidaan muuttaa tauon aikana (pidä vaihto (1x), OPTION/ALT (2x) tai COMMAND/CTRL (4x) uudelleenkäynnistettäessä).</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="80" />
@@ -7564,7 +7564,7 @@ Lataa pienempään koneeseen tallennettu profiili ja avaa Transposer. Valitse li
     <message>
       <location filename="../help/eventsliders_help.py" line="22" />
       <source>Scale factor, Slider value is multiplied by this value.</source>
-      <translation type="unfinished" />
+      <translation>Skaalauskerroin, liukusäätimen arvo kerrotaan tällä arvolla.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="23" />
@@ -7622,7 +7622,8 @@ Lataa pienempään koneeseen tallennettu profiili ja avaa Transposer. Valitse li
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: "{}" can be used as a placeholder, it will be substituted by (value*factor + offset). In all slider command actions, but for IO, VOUT, S7 and RC Commands, the bound value is converted from a float to an int.
 </source>
-      <translation type="unfinished" />
+      <translation>Huomautus: "{}" voidaan käyttää paikkamerkkinä, se korvataan (arvo*tekijä + offset). Kaikissa liukusäätimen komentotoiminnoissa, paitsi IO-, VOUT-, S7- ja RC-komentoissa, sidottu arvo muunnetaan floatista int-arvoksi.
+</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="88" />
@@ -7942,7 +7943,7 @@ Lataa pienempään koneeseen tallennettu profiili ja avaa Transposer. Valitse li
     <message>
       <location filename="../help/eventsliders_help.py" line="74" />
       <source>for PHIDGET OUTPUT modules: sets voltage voltage range (r=5 for r5V and r=10 for 10V)</source>
-      <translation type="unfinished" />
+      <translation>PHIDGET OUTPUT -moduuleille: asettaa jännitealueen (r=5 r5V:lle ja r=10 10V:lle)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="157" />
@@ -8769,7 +8770,7 @@ Funktio 4 (Lue syöttörekisterit): rekisterit 0-65535, jotka vastaavat numeroit
     <message>
       <location filename="../help/eventbuttons_help.py" line="63" />
       <source>OFF (translated, respecting button state)</source>
-      <translation type="unfinished" />
+      <translation>OFF (käännetty, painikkeen tilan mukaan)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="64" />
@@ -8881,7 +8882,7 @@ Funktio 4 (Lue syöttörekisterit): rekisterit 0-65535, jotka vastaavat numeroit
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
       <source>button numbers or sleep(&lt;float&gt;) separated by a comma: 1,2,sleep(2.5), 3..</source>
-      <translation type="unfinished" />
+      <translation>painikkeiden numerot tai uni (&lt;kelluke&gt;) pilkulla erotettuna: 1,2,sleep(2.5), 3..</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
@@ -10549,7 +10550,7 @@ Ennustearvo on sekunteina laskettu aika DRY- tai FCs-lämpötilan saavuttamiseen
     <message>
       <location filename="../help/symbolic_help.py" line="137" />
       <source>temperature unit (Celsius: 0, Fahrenheit: 1)</source>
-      <translation type="unfinished" />
+      <translation>lämpötilayksikkö (Celsius: 0, Fahrenheit: 1)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="140" />
@@ -15205,7 +15206,7 @@ Toista toiminto lopussa: {0}</translation>
       <location filename="../artisanlib/main.py" line="4331" />
       <source>Artisan is free to use!
 
-To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
+To keep it free and current please support us with your donation and subscribe to artisan.plus to suppress this dialog!</source>
       <translation>Artisan on ilmainen käyttää!
 
 Pitääksesi sen ilmaisena ja ajan tasalla, tue meitä lahjoituksellasi ja tilaa artisan.plus estääksesi tämän valintaikkunan!</translation>
@@ -16727,6 +16728,14 @@ Profiilista puuttuu [CHARGE] tai [DROP]</translation>
       <translation>Taustaprofiilia ei löydy</translation>
     </message>
     <message>
+      <source>Artisan is free to use!
+
+To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
+      <translation type="vanished">Artisan on ilmainen käyttää!
+
+Pitääksesi sen ilmaisena ja ajan tasalla, tue meitä lahjoituksellasi ja tilaa artisan.plus estääksesi tämän valintaikkunan!</translation>
+    </message>
+    <message>
       <source>Import Aillio RoasTime</source>
       <translation type="vanished">Tuo Aillio RoasTime</translation>
     </message>
@@ -16864,32 +16873,32 @@ Profiilista puuttuu [CHARGE] tai [DROP]</translation>
       <translation>artisan.plus katkaistu</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="320" />
+      <location filename="../plus/stock.py" line="321" />
       <source>bag</source>
       <translation>laukku</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="321" />
+      <location filename="../plus/stock.py" line="322" />
       <source>box</source>
       <translation>laatikko</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="322" />
+      <location filename="../plus/stock.py" line="323" />
       <source>barrel</source>
       <translation>tynnyri</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="325" />
+      <location filename="../plus/stock.py" line="326" />
       <source>bags</source>
       <translation>laukut</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="326" />
+      <location filename="../plus/stock.py" line="327" />
       <source>boxes</source>
       <translation>laatikot</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="327" />
+      <location filename="../plus/stock.py" line="328" />
       <source>barrels</source>
       <translation>tynnyriä</translation>
     </message>

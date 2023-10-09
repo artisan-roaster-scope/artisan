@@ -4601,7 +4601,7 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="17497" />
       <source>Could not start WebLCDs. Selected port might be busy.</source>
-      <translation type="unfinished" />
+      <translation>WebLCD를 시작할 수 없습니다. 선택한 포트가 사용 중일 수 있습니다.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="18879" />
@@ -4648,7 +4648,7 @@ END</source>
     <message>
       <location filename="../artisanlib/canvas.py" line="15554" />
       <source>Exception: redrawdesigner() Roast events may be out of order. Resetting Designer.</source>
-      <translation type="unfinished" />
+      <translation>예외: redrawdesigner() 로스트 이벤트의 순서가 잘못될 수 있습니다. 디자이너를 재설정 중입니다.</translation>
     </message>
     <message>
       <source>Exception: redrawdesigner() Roast events may be out of order. Restting Designer.</source>
@@ -6866,7 +6866,7 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     <message>
       <location filename="../help/alarms_help.py" line="79" />
       <source>RampSoak ON</source>
-      <translation type="unfinished" />
+      <translation>램프소크 ON</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="79" />
@@ -6927,7 +6927,7 @@ Artisan은 각 샘플 기간마다 프로그램을 시작합니다. 프로그램
     <message>
       <location filename="../help/programs_help.py" line="18" />
       <source>If only one temperature is provided it will be interpreted as BT.  If more than one temperature is provided the values are order dependent with ET first and BT second.</source>
-      <translation type="unfinished" />
+      <translation>온도가 하나만 제공되면 BT로 해석됩니다. 둘 이상의 온도가 제공되는 경우 값은 ET가 먼저, BT가 두 번째로 순서에 따라 달라집니다.</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="18" />
@@ -7194,7 +7194,7 @@ When Keyboard Shortcuts are OFF adds a custom event</source>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="49" />
       <source>Quick Special Event Entry.  The keys q,w,e, and r correspond to special events 1,2,3 and 4.  A two digit numeric value must follow the shortcut letter, e.g. &amp;#39;q75&amp;#39;, when the corresponding event slider max value is 100 or less (default setting).   When the slider max value is greater than 100, three digits must be entered and for values less than 100 a leading zero is required, e.g. &amp;#39;q075&amp;#39;.  </source>
-      <translation type="unfinished" />
+      <translation>빠른 특별 이벤트 입장. q,w,e,r 키는 특수 이벤트 1,2,3,4에 해당합니다. 두 자리 숫자 값은 단축키 문자 뒤에 와야 합니다. 'q75', 해당 이벤트 슬라이더 최대값이 100 이하(기본 설정)인 경우. 슬라이더 최대 값이 100보다 큰 경우 세 자리 숫자를 입력해야 하며 100보다 작은 값의 경우 앞에 0을 붙여야 합니다. 'q075'.</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="50" />
@@ -7537,7 +7537,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="79" />
       <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
-      <translation type="unfinished" />
+      <translation>일시 중지된 동안 시뮬레이터 속도가 변경될 수 있습니다(다시 시작 시 Shift(1x), OPTION/ALT(2x) 또는 COMMAND/CTRL(4x) 누르기).</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="80" />
@@ -8002,7 +8002,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
     <message>
       <location filename="../help/eventsliders_help.py" line="22" />
       <source>Scale factor, Slider value is multiplied by this value.</source>
-      <translation type="unfinished" />
+      <translation>스케일 팩터, 슬라이더 값에 이 값을 곱합니다.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="23" />
@@ -8060,7 +8060,8 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: "{}" can be used as a placeholder, it will be substituted by (value*factor + offset). In all slider command actions, but for IO, VOUT, S7 and RC Commands, the bound value is converted from a float to an int.
 </source>
-      <translation type="unfinished" />
+      <translation>참고: "{}"는 자리 표시자로 사용될 수 있으며 (값*계수 + 오프셋)으로 대체됩니다. IO, VOUT, S7 및 RC 명령을 제외한 모든 슬라이더 명령 작업에서 경계 값은 부동 소수점에서 정수형으로 변환됩니다.
+</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="88" />
@@ -8380,7 +8381,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
     <message>
       <location filename="../help/eventsliders_help.py" line="74" />
       <source>for PHIDGET OUTPUT modules: sets voltage voltage range (r=5 for r5V and r=10 for 10V)</source>
-      <translation type="unfinished" />
+      <translation>PHIDGET OUTPUT 모듈의 경우: 전압 전압 범위 설정(r5V의 경우 r=5, 10V의 경우 r=10)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="157" />
@@ -9207,7 +9208,7 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
       <location filename="../help/eventbuttons_help.py" line="63" />
       <source>OFF (translated, respecting button state)</source>
-      <translation type="unfinished" />
+      <translation>OFF(번역됨, 버튼 상태 존중)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="64" />
@@ -9319,7 +9320,7 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
       <source>button numbers or sleep(&lt;float&gt;) separated by a comma: 1,2,sleep(2.5), 3..</source>
-      <translation type="unfinished" />
+      <translation>버튼 번호 또는 쉼표로 구분된 sleep(&lt;float&gt;): 1,2,sleep(2.5), 3..</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
@@ -10987,7 +10988,7 @@ The prediction value is the calculated time in seconds to reach the DRY or FCs t
     <message>
       <location filename="../help/symbolic_help.py" line="137" />
       <source>temperature unit (Celsius: 0, Fahrenheit: 1)</source>
-      <translation type="unfinished" />
+      <translation>온도 단위(섭씨: 0, 화씨: 1)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="140" />
@@ -15487,7 +15488,7 @@ Repeat Operation at the end: {0}</source>
     <message>
       <location filename="../artisanlib/pid_control.py" line="1392" />
       <source>PID OFF</source>
-      <translation type="unfinished" />
+      <translation>PID 꺼짐</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="1418" />
@@ -15712,10 +15713,10 @@ Repeat Operation at the end: {0}</source>
       <location filename="../artisanlib/main.py" line="4331" />
       <source>Artisan is free to use!
 
-To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
-      <translation>장인은 무료로 사용할 수 있습니다!
+To keep it free and current please support us with your donation and subscribe to artisan.plus to suppress this dialog!</source>
+      <translation>Artisan은 무료로 사용할 수 있습니다!
 
-무료로 최신 상태로 유지하려면 기부로 지원하고 artisan.plus를 구독하여 이 대화를 억제하세요!</translation>
+무료로 최신 상태로 유지하려면 기부로 지원하고 artisan.plus를 구독하여 이 대화 상자를 표시하지 마세요!</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="5096" />
@@ -17234,6 +17235,14 @@ Profile missing [CHARGE] or [DROP]</source>
       <translation>백그라운드 프로필을 찾을 수 없음</translation>
     </message>
     <message>
+      <source>Artisan is free to use!
+
+To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
+      <translation type="vanished">장인은 무료로 사용할 수 있습니다!
+
+무료로 최신 상태로 유지하려면 기부로 지원하고 artisan.plus를 구독하여 이 대화를 억제하세요!</translation>
+    </message>
+    <message>
       <source>Import Aillio RoasTime</source>
       <translation type="vanished">Aillio RoasTime 가져오기</translation>
     </message>
@@ -17391,32 +17400,32 @@ Profile missing [CHARGE] or [DROP]</source>
       <translation>artisan.plus 연결 해제</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="320" />
+      <location filename="../plus/stock.py" line="321" />
       <source>bag</source>
       <translation>가방</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="321" />
+      <location filename="../plus/stock.py" line="322" />
       <source>box</source>
       <translation>상자</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="322" />
+      <location filename="../plus/stock.py" line="323" />
       <source>barrel</source>
       <translation>통</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="325" />
+      <location filename="../plus/stock.py" line="326" />
       <source>bags</source>
       <translation>바지</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="326" />
+      <location filename="../plus/stock.py" line="327" />
       <source>boxes</source>
       <translation>상자</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="327" />
+      <location filename="../plus/stock.py" line="328" />
       <source>barrels</source>
       <translation>배럴</translation>
     </message>

@@ -4342,7 +4342,7 @@ BEIGT</translation>
     <message>
       <location filename="../artisanlib/main.py" line="17497" />
       <source>Could not start WebLCDs. Selected port might be busy.</source>
-      <translation type="unfinished" />
+      <translation>Nevarēja palaist WebLCD. Iespējams, izvēlētais ports ir aizņemts.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="18879" />
@@ -4389,7 +4389,7 @@ BEIGT</translation>
     <message>
       <location filename="../artisanlib/canvas.py" line="15554" />
       <source>Exception: redrawdesigner() Roast events may be out of order. Resetting Designer.</source>
-      <translation type="unfinished" />
+      <translation>Izņēmums: redrawdesigner() Roast notikumi var nebūt kārtībā. Dizainera atiestatīšana.</translation>
     </message>
     <message>
       <source>Exception: redrawdesigner() Roast events may be out of order. Restting Designer.</source>
@@ -6493,7 +6493,7 @@ Amatnieks sāks programmu katrā parauga periodā. Programmas izvadei ir jābūt
     <message>
       <location filename="../help/programs_help.py" line="18" />
       <source>If only one temperature is provided it will be interpreted as BT.  If more than one temperature is provided the values are order dependent with ET first and BT second.</source>
-      <translation type="unfinished" />
+      <translation>Ja tiek nodrošināta tikai viena temperatūra, tā tiks interpretēta kā BT. Ja tiek nodrošināta vairāk nekā viena temperatūra, vērtības ir atkarīgas no secības ar ET pirmo un BT otro.</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="18" />
@@ -6760,7 +6760,7 @@ Kad īsinājumtaustiņi ir IZSLĒGTI, tiek pievienots pielāgots notikums</trans
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="49" />
       <source>Quick Special Event Entry.  The keys q,w,e, and r correspond to special events 1,2,3 and 4.  A two digit numeric value must follow the shortcut letter, e.g. &amp;#39;q75&amp;#39;, when the corresponding event slider max value is 100 or less (default setting).   When the slider max value is greater than 100, three digits must be entered and for values less than 100 a leading zero is required, e.g. &amp;#39;q075&amp;#39;.  </source>
-      <translation type="unfinished" />
+      <translation>Ātra pieteikšanās īpašajam pasākumam. Taustiņi q,w,e un r atbilst īpašiem notikumiem 1,2,3 un 4. Aiz īsinājumtaustiņa burta ir jāraksta divciparu skaitliskā vērtība, piem. &amp;#39;q75&amp;#39;, ja atbilstošā notikuma slīdņa maksimālā vērtība ir 100 vai mazāka (noklusējuma iestatījums). Ja slīdņa maksimālā vērtība ir lielāka par 100, jāievada trīs cipari, un vērtībām, kas ir mazākas par 100, ir nepieciešama sākuma nulle, piemēram, &amp;#39;q075&amp;#39;.</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="50" />
@@ -7103,7 +7103,7 @@ Tastatūras īsinājumtaustiņi ir jāatspējo (ENTER)</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="79" />
       <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
-      <translation type="unfinished" />
+      <translation>Simulatora ātrumu var mainīt, kamēr tas ir apturēts (restartējot turiet pārslēgšanu (1x), OPTION/ALT (2x) vai COMMAND/CTRL (4x).</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="80" />
@@ -7567,7 +7567,7 @@ Ielādējiet mazākajā iekārtā ierakstīto profilu un atveriet Transposer. At
     <message>
       <location filename="../help/eventsliders_help.py" line="22" />
       <source>Scale factor, Slider value is multiplied by this value.</source>
-      <translation type="unfinished" />
+      <translation>Mēroga faktors, slīdņa vērtība tiek reizināta ar šo vērtību.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="23" />
@@ -7625,7 +7625,8 @@ Ielādējiet mazākajā iekārtā ierakstīto profilu un atveriet Transposer. At
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: "{}" can be used as a placeholder, it will be substituted by (value*factor + offset). In all slider command actions, but for IO, VOUT, S7 and RC Commands, the bound value is converted from a float to an int.
 </source>
-      <translation type="unfinished" />
+      <translation>Piezīme: "{}" var izmantot kā vietturi, tas tiks aizstāts ar (vērtība*faktors + nobīde). Visās slīdņa komandu darbībās, izņemot IO, VOUT, S7 un RC komandām, saistītā vērtība tiek pārveidota no pludiņa par int.
+</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="88" />
@@ -7945,7 +7946,7 @@ Ielādējiet mazākajā iekārtā ierakstīto profilu un atveriet Transposer. At
     <message>
       <location filename="../help/eventsliders_help.py" line="74" />
       <source>for PHIDGET OUTPUT modules: sets voltage voltage range (r=5 for r5V and r=10 for 10V)</source>
-      <translation type="unfinished" />
+      <translation>PHIDGET OUTPUT moduļiem: iestata sprieguma diapazonu (r=5 r5V un r=10 10V)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="157" />
@@ -8772,7 +8773,7 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
       <location filename="../help/eventbuttons_help.py" line="63" />
       <source>OFF (translated, respecting button state)</source>
-      <translation type="unfinished" />
+      <translation>IZSLĒGTS (tulkots, ievērojot pogas stāvokli)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="64" />
@@ -8884,7 +8885,7 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
       <source>button numbers or sleep(&lt;float&gt;) separated by a comma: 1,2,sleep(2.5), 3..</source>
-      <translation type="unfinished" />
+      <translation>pogu cipari vai miega režīms (&lt;float&gt;), atdalot ar komatu: 1,2,miegs(2.5), 3..</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
@@ -10552,7 +10553,7 @@ Prognozētā vērtība ir aprēķinātais laiks sekundēs, lai sasniegtu DRY vai
     <message>
       <location filename="../help/symbolic_help.py" line="137" />
       <source>temperature unit (Celsius: 0, Fahrenheit: 1)</source>
-      <translation type="unfinished" />
+      <translation>temperatūras mērvienība (Celsija: 0, Fārenheita: 1)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="140" />
@@ -14992,7 +14993,7 @@ Atkārtojiet darbību beigās: {0}</translation>
       <location filename="../artisanlib/main.py" line="4331" />
       <source>Artisan is free to use!
 
-To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
+To keep it free and current please support us with your donation and subscribe to artisan.plus to suppress this dialog!</source>
       <translation>Artisan var izmantot bez maksas!
 
 Lai tas būtu bezmaksas un aktuāls, lūdzu, atbalstiet mūs ar savu ziedojumu un abonējiet vietni artisan.plus, lai izslēgtu šo dialoglodziņu!</translation>
@@ -16514,6 +16515,14 @@ Profilā trūkst [CHARGE] vai [DROP]</translation>
       <translation>Fona profils nav atrasts</translation>
     </message>
     <message>
+      <source>Artisan is free to use!
+
+To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
+      <translation type="vanished">Artisan var izmantot bez maksas!
+
+Lai tas būtu bezmaksas un aktuāls, lūdzu, atbalstiet mūs ar savu ziedojumu un abonējiet vietni artisan.plus, lai izslēgtu šo dialoglodziņu!</translation>
+    </message>
+    <message>
       <source>Import Aillio RoasTime</source>
       <translation type="vanished">Importējiet Aillio RoasTime</translation>
     </message>
@@ -16651,32 +16660,32 @@ Profilā trūkst [CHARGE] vai [DROP]</translation>
       <translation>artisan.plus atvienots</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="320" />
+      <location filename="../plus/stock.py" line="321" />
       <source>bag</source>
       <translation>soma</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="321" />
+      <location filename="../plus/stock.py" line="322" />
       <source>box</source>
       <translation>lodziņā</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="322" />
+      <location filename="../plus/stock.py" line="323" />
       <source>barrel</source>
       <translation>muca</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="325" />
+      <location filename="../plus/stock.py" line="326" />
       <source>bags</source>
       <translation>somas</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="326" />
+      <location filename="../plus/stock.py" line="327" />
       <source>boxes</source>
       <translation>kastes</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="327" />
+      <location filename="../plus/stock.py" line="328" />
       <source>barrels</source>
       <translation>mucas</translation>
     </message>

@@ -4509,7 +4509,7 @@ EIND</translation>
     <message>
       <location filename="../artisanlib/main.py" line="17497" />
       <source>Could not start WebLCDs. Selected port might be busy.</source>
-      <translation type="unfinished" />
+      <translation>Kan WebLCD's niet starten. De geselecteerde poort is mogelijk bezet.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="18879" />
@@ -4556,7 +4556,7 @@ EIND</translation>
     <message>
       <location filename="../artisanlib/canvas.py" line="15554" />
       <source>Exception: redrawdesigner() Roast events may be out of order. Resetting Designer.</source>
-      <translation type="unfinished" />
+      <translation>Uitzondering: redrawdesigner() Roast-evenementen zijn mogelijk niet in gebruik. Ontwerper opnieuw instellen.</translation>
     </message>
     <message>
       <source>Exception: redrawdesigner() Roast events may be out of order. Restting Designer.</source>
@@ -6735,7 +6735,7 @@ Artisan start het programma elke proefperiode. De uitvoer van het programma moet
     <message>
       <location filename="../help/programs_help.py" line="18" />
       <source>If only one temperature is provided it will be interpreted as BT.  If more than one temperature is provided the values are order dependent with ET first and BT second.</source>
-      <translation type="unfinished" />
+      <translation>Als er slechts één temperatuur wordt opgegeven, wordt deze geïnterpreteerd als BT. Als er meer dan één temperatuur wordt opgegeven, zijn de waarden afhankelijk van de volgorde, waarbij eerst ET en tweede BT wordt gegeven.</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="18" />
@@ -7002,7 +7002,7 @@ Wanneer sneltoetsen zijn uitgeschakeld, wordt een aangepaste gebeurtenis toegevo
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="49" />
       <source>Quick Special Event Entry.  The keys q,w,e, and r correspond to special events 1,2,3 and 4.  A two digit numeric value must follow the shortcut letter, e.g. &amp;#39;q75&amp;#39;, when the corresponding event slider max value is 100 or less (default setting).   When the slider max value is greater than 100, three digits must be entered and for values less than 100 a leading zero is required, e.g. &amp;#39;q075&amp;#39;.  </source>
-      <translation type="unfinished" />
+      <translation>Snelle toegang tot speciale evenementen. De toetsen q,w,e en r komen overeen met speciale gebeurtenissen 1,2,3 en 4. Een numerieke waarde van twee cijfers moet volgen op de snelkoppeling, bijvoorbeeld: &amp;#39;q75&amp;#39;, wanneer de maximale waarde van de corresponderende gebeurtenisschuifregelaar 100 of minder is (standaardinstelling). Wanneer de maximale waarde van de schuifregelaar groter is dan 100, moeten drie cijfers worden ingevoerd en voor waarden kleiner dan 100 is een voorloopnul vereist, b.v. &amp;#39;q075&amp;#39;.</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="50" />
@@ -7345,7 +7345,7 @@ Sneltoetsen moeten zijn uitgeschakeld (ENTER)</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="79" />
       <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
-      <translation type="unfinished" />
+      <translation>De snelheid van de simulator kan worden gewijzigd terwijl deze is gepauzeerd (houd shift (1x), OPTION/ALT (2x) of COMMAND/CTRL (4x) ingedrukt bij opnieuw opstarten).</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="80" />
@@ -7810,7 +7810,7 @@ Laad het profiel opgenomen op de kleinere machine en open de Transposer. Selecte
     <message>
       <location filename="../help/eventsliders_help.py" line="22" />
       <source>Scale factor, Slider value is multiplied by this value.</source>
-      <translation type="unfinished" />
+      <translation>Schaalfactor, schuifregelaarwaarde wordt vermenigvuldigd met deze waarde.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="23" />
@@ -7868,7 +7868,8 @@ Laad het profiel opgenomen op de kleinere machine en open de Transposer. Selecte
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: "{}" can be used as a placeholder, it will be substituted by (value*factor + offset). In all slider command actions, but for IO, VOUT, S7 and RC Commands, the bound value is converted from a float to an int.
 </source>
-      <translation type="unfinished" />
+      <translation>Opmerking: "{}" kan als tijdelijke aanduiding worden gebruikt, deze wordt vervangen door (waarde*factor + offset). Bij alle schuifopdrachtacties, maar voor IO-, VOUT-, S7- en RC-opdrachten, wordt de grenswaarde geconverteerd van een float naar een int.
+</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="88" />
@@ -8188,7 +8189,7 @@ Laad het profiel opgenomen op de kleinere machine en open de Transposer. Selecte
     <message>
       <location filename="../help/eventsliders_help.py" line="74" />
       <source>for PHIDGET OUTPUT modules: sets voltage voltage range (r=5 for r5V and r=10 for 10V)</source>
-      <translation type="unfinished" />
+      <translation>voor PHIDGET OUTPUT-modules: stelt het spanningsbereik in (r=5 voor r5V en r=10 voor 10V)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="157" />
@@ -8953,7 +8954,7 @@ Functie 4 (invoerregisters lezen): registers 0 tot 65535 overeenkomend met numme
     <message>
       <location filename="../help/eventbuttons_help.py" line="47" />
       <source>LABELS</source>
-      <translation type="unfinished" />
+      <translation>ETIKETTEN</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="51" />
@@ -9015,7 +9016,7 @@ Functie 4 (invoerregisters lezen): registers 0 tot 65535 overeenkomend met numme
     <message>
       <location filename="../help/eventbuttons_help.py" line="63" />
       <source>OFF (translated, respecting button state)</source>
-      <translation type="unfinished" />
+      <translation>UIT (vertaald, met inachtneming van de knopstatus)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="64" />
@@ -9127,7 +9128,7 @@ Functie 4 (invoerregisters lezen): registers 0 tot 65535 overeenkomend met numme
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
       <source>button numbers or sleep(&lt;float&gt;) separated by a comma: 1,2,sleep(2.5), 3..</source>
-      <translation type="unfinished" />
+      <translation>knopnummers of sleep(&lt;float&gt;) gescheiden door een komma: 1,2,sleep(2.5), 3..</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
@@ -9437,7 +9438,7 @@ Voor een zintuiglijke mijlpaal (zie opmerkingen hierboven) komt de waarde 50 ove
     <message>
       <location filename="../help/eventannotations_help.py" line="51" />
       <source>Gas ~E @~Y2~degmode</source>
-      <translation type="unfinished" />
+      <translation>Gas ~E @~Y2~gradenmodus</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="51" />
@@ -9462,7 +9463,7 @@ Voor een zintuiglijke mijlpaal (zie opmerkingen hierboven) komt de waarde 50 ove
     <message>
       <location filename="../help/eventannotations_help.py" line="53" />
       <source>Gas 5.0kPh @340F</source>
-      <translation type="unfinished" />
+      <translation>Gas 5,0 kph @340F</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="54" />
@@ -10795,7 +10796,7 @@ De voorspellingswaarde is de berekende tijd in seconden om de DROOG- of FC-tempe
     <message>
       <location filename="../help/symbolic_help.py" line="137" />
       <source>temperature unit (Celsius: 0, Fahrenheit: 1)</source>
-      <translation type="unfinished" />
+      <translation>temperatuureenheid (Celsius: 0, Fahrenheit: 1)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="140" />
@@ -14351,7 +14352,7 @@ Alle LCD-schermen</translation>
     <message>
       <location filename="../artisanlib/axis.py" line="879" />
       <source>xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})</source>
-      <translation type="unfinished" />
+      <translation>xlimiet = ({2},{3}) ylimiet = ({0},{1}) zlimiet = ({4},{5})</translation>
     </message>
     <message>
       <location filename="../artisanlib/wheels.py" line="648" />
@@ -15339,10 +15340,10 @@ Herhaal bewerking aan het einde: {0}</translation>
       <location filename="../artisanlib/main.py" line="4331" />
       <source>Artisan is free to use!
 
-To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
+To keep it free and current please support us with your donation and subscribe to artisan.plus to suppress this dialog!</source>
       <translation>Artisan is gratis te gebruiken!
 
-Om het gratis en actueel te houden, steun ons alstublieft met uw donatie en abonneer u op artisan.plus om deze dialoog te onderdrukken!</translation>
+Om het gratis en actueel te houden, steun ons met uw donatie en abonneer u op artisan.plus om deze dialoog te onderdrukken!</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="5096" />
@@ -16797,7 +16798,7 @@ Profiel ontbreekt [CHARGE] of [DROP]</translation>
     <message>
       <location filename="../artisanlib/canvas.py" line="15824" />
       <source>[ SC START ]</source>
-      <translation type="unfinished" />
+      <translation>[SC-START]</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="15827" />
@@ -16859,6 +16860,14 @@ Profiel ontbreekt [CHARGE] of [DROP]</translation>
       <location filename="../artisanlib/cup_profile.py" line="184" />
       <source>Background profile not found</source>
       <translation>Achtergrondprofiel niet gevonden</translation>
+    </message>
+    <message>
+      <source>Artisan is free to use!
+
+To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
+      <translation type="vanished">Artisan is gratis te gebruiken!
+
+Om het gratis en actueel te houden, steun ons alstublieft met uw donatie en abonneer u op artisan.plus om deze dialoog te onderdrukken!</translation>
     </message>
     <message>
       <source>Import Aillio RoasTime</source>
@@ -17062,32 +17071,32 @@ Profiel ontbreekt [CHARGE] of [DROP]</translation>
       <translation>artisan.plus verbroken</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="320" />
+      <location filename="../plus/stock.py" line="321" />
       <source>bag</source>
       <translation>zak</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="321" />
+      <location filename="../plus/stock.py" line="322" />
       <source>box</source>
       <translation>doos</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="322" />
+      <location filename="../plus/stock.py" line="323" />
       <source>barrel</source>
       <translation>vat</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="325" />
+      <location filename="../plus/stock.py" line="326" />
       <source>bags</source>
       <translation>Tassen</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="326" />
+      <location filename="../plus/stock.py" line="327" />
       <source>boxes</source>
       <translation>dozen</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="327" />
+      <location filename="../plus/stock.py" line="328" />
       <source>barrels</source>
       <translation>vaten</translation>
     </message>

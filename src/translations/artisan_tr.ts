@@ -4650,7 +4650,7 @@ END</source>
     <message>
       <location filename="../artisanlib/main.py" line="17497" />
       <source>Could not start WebLCDs. Selected port might be busy.</source>
-      <translation type="unfinished" />
+      <translation>WebLCD'ler başlatılamadı. Seçilen bağlantı noktası meşgul olabilir.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="18879" />
@@ -4697,7 +4697,7 @@ END</source>
     <message>
       <location filename="../artisanlib/canvas.py" line="15554" />
       <source>Exception: redrawdesigner() Roast events may be out of order. Resetting Designer.</source>
-      <translation type="unfinished" />
+      <translation>İstisna: redrawdesigner() Roast olayları sıra dışı olabilir. Tasarımcıyı Sıfırlama.</translation>
     </message>
     <message>
       <source>Exception: redrawdesigner() Roast events may be out of order. Restting Designer.</source>
@@ -6952,7 +6952,7 @@ Artisan programı her numune periyodunda başlatacaktır. Program çıktısı st
     <message>
       <location filename="../help/programs_help.py" line="18" />
       <source>If only one temperature is provided it will be interpreted as BT.  If more than one temperature is provided the values are order dependent with ET first and BT second.</source>
-      <translation type="unfinished" />
+      <translation>Yalnızca bir sıcaklık sağlanırsa BT olarak yorumlanacaktır. Birden fazla sıcaklık sağlanırsa değerler birinci ET ve BT ikinci olmak üzere sıraya bağlıdır.</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="18" />
@@ -7219,7 +7219,7 @@ Klavye Kısayolları KAPALI olduğunda özel bir etkinlik ekler</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="49" />
       <source>Quick Special Event Entry.  The keys q,w,e, and r correspond to special events 1,2,3 and 4.  A two digit numeric value must follow the shortcut letter, e.g. &amp;#39;q75&amp;#39;, when the corresponding event slider max value is 100 or less (default setting).   When the slider max value is greater than 100, three digits must be entered and for values less than 100 a leading zero is required, e.g. &amp;#39;q075&amp;#39;.  </source>
-      <translation type="unfinished" />
+      <translation>Hızlı Özel Etkinlik Girişi. q,w,e ve r tuşları 1,2,3 ve 4 özel olaylarına karşılık gelir. Kısayol harfinin ardından iki haneli bir sayısal değer gelmelidir, ör. &amp;#39;q75&amp;#39;, ilgili etkinlik kaydırıcısının maksimum değeri 100 veya daha az olduğunda (varsayılan ayar). Kaydırıcının maksimum değeri 100'den büyük olduğunda üç rakam girilmelidir ve 100'den küçük değerler için baştaki sıfır gereklidir, ör. 'q075'.</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="50" />
@@ -7562,7 +7562,7 @@ Klavye Kısayolları devre dışı bırakılmalıdır (ENTER)</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="79" />
       <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
-      <translation type="unfinished" />
+      <translation>Simülatörün hızı duraklatıldığında değişebilir (vardiyayı basılı tutun (1x), OPTION/ALT (2x) veya COMMAND/CTRL (4x) yeniden başlatıldığında).</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="80" />
@@ -8027,7 +8027,7 @@ Daha küçük makinede kaydedilen profili yükleyin ve Aktarıcıyı açın. Do�
     <message>
       <location filename="../help/eventsliders_help.py" line="22" />
       <source>Scale factor, Slider value is multiplied by this value.</source>
-      <translation type="unfinished" />
+      <translation>Ölçek faktörü, Slider değeri bu değerle çarpılır.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="23" />
@@ -8085,7 +8085,8 @@ Daha küçük makinede kaydedilen profili yükleyin ve Aktarıcıyı açın. Do�
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: "{}" can be used as a placeholder, it will be substituted by (value*factor + offset). In all slider command actions, but for IO, VOUT, S7 and RC Commands, the bound value is converted from a float to an int.
 </source>
-      <translation type="unfinished" />
+      <translation>Not: "{}" yer tutucu olarak kullanılabilir, bunun yerine (değer*faktör + uzaklık) kullanılır. Tüm kaydırıcı komut eylemlerinde, ancak IO, VOUT, S7 ve RC Komutları için, sınır değeri float'tan int'ye dönüştürülür.
+</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="88" />
@@ -8405,7 +8406,7 @@ Daha küçük makinede kaydedilen profili yükleyin ve Aktarıcıyı açın. Do�
     <message>
       <location filename="../help/eventsliders_help.py" line="74" />
       <source>for PHIDGET OUTPUT modules: sets voltage voltage range (r=5 for r5V and r=10 for 10V)</source>
-      <translation type="unfinished" />
+      <translation>PHIDGET OUTPUT modülleri için: voltaj voltaj aralığını ayarlar (r5V için r=5 ve 10V için r=10)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="157" />
@@ -9232,7 +9233,7 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
       <location filename="../help/eventbuttons_help.py" line="63" />
       <source>OFF (translated, respecting button state)</source>
-      <translation type="unfinished" />
+      <translation>KAPALI (çevrilmiş, düğme durumuna göre)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="64" />
@@ -9344,7 +9345,7 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
       <source>button numbers or sleep(&lt;float&gt;) separated by a comma: 1,2,sleep(2.5), 3..</source>
-      <translation type="unfinished" />
+      <translation>virgülle ayrılmış düğme numaraları veya uyku(&lt;float&gt;): 1,2,sleep(2.5), 3..</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
@@ -11012,7 +11013,7 @@ Tahmin değeri, DRY veya FCs sıcaklığına ulaşmak için saniye cinsinden hes
     <message>
       <location filename="../help/symbolic_help.py" line="137" />
       <source>temperature unit (Celsius: 0, Fahrenheit: 1)</source>
-      <translation type="unfinished" />
+      <translation>sıcaklık birimi (Santigrat: 0, Fahrenhayt: 1)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="140" />
@@ -16245,10 +16246,10 @@ Komando sondan tekrarlamak: {0}</translation>
       <location filename="../artisanlib/main.py" line="4331" />
       <source>Artisan is free to use!
 
-To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
-      <translation>Artisan'ı kullanmak ücretsizdir!
+To keep it free and current please support us with your donation and subscribe to artisan.plus to suppress this dialog!</source>
+      <translation>Artisan'ın kullanımı ücretsizdir!
 
-Ücretsiz ve güncel kalması için lütfen bağışınızla bizi destekleyin ve bu diyaloğu bastırmak için artisan.plus'a abone olun!</translation>
+Ücretsiz ve güncel kalması için lütfen bağışlarınızla bizi destekleyin ve bu diyaloğu bastırmak için artisan.plus'a abone olun!</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="5096" />
@@ -17766,6 +17767,14 @@ Profile missing [CHARGE] or [DROP]</source>
       <translation>Arka plan profili bulunmadı</translation>
     </message>
     <message>
+      <source>Artisan is free to use!
+
+To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
+      <translation type="vanished">Artisan'ı kullanmak ücretsizdir!
+
+Ücretsiz ve güncel kalması için lütfen bağışınızla bizi destekleyin ve bu diyaloğu bastırmak için artisan.plus'a abone olun!</translation>
+    </message>
+    <message>
       <source>Import Aillio RoasTime</source>
       <translation type="vanished">Aillio RoasTime'ı içe aktarın</translation>
     </message>
@@ -18383,32 +18392,32 @@ Devam?</translation>
       <translation>artisan.plus bağlantısı kesildi</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="320" />
+      <location filename="../plus/stock.py" line="321" />
       <source>bag</source>
       <translation>sırt çantası</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="321" />
+      <location filename="../plus/stock.py" line="322" />
       <source>box</source>
       <translation>Kutu</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="322" />
+      <location filename="../plus/stock.py" line="323" />
       <source>barrel</source>
       <translation>varil</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="325" />
+      <location filename="../plus/stock.py" line="326" />
       <source>bags</source>
       <translation>çanta</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="326" />
+      <location filename="../plus/stock.py" line="327" />
       <source>boxes</source>
       <translation>kutuları</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="327" />
+      <location filename="../plus/stock.py" line="328" />
       <source>barrels</source>
       <translation>variller</translation>
     </message>

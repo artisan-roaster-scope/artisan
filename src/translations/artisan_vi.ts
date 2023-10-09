@@ -4387,7 +4387,7 @@ kết thúc</translation>
     <message>
       <location filename="../artisanlib/main.py" line="17497" />
       <source>Could not start WebLCDs. Selected port might be busy.</source>
-      <translation type="unfinished" />
+      <translation>Không thể khởi động WebLCD. Cổng được chọn có thể đang bận.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="18879" />
@@ -4434,7 +4434,7 @@ kết thúc</translation>
     <message>
       <location filename="../artisanlib/canvas.py" line="15554" />
       <source>Exception: redrawdesigner() Roast events may be out of order. Resetting Designer.</source>
-      <translation type="unfinished" />
+      <translation>Ngoại lệ: redrawdesigner() Sự kiện Roast có thể không đúng thứ tự. Đặt lại Trình thiết kế.</translation>
     </message>
     <message>
       <source>Exception: redrawdesigner() Roast events may be out of order. Restting Designer.</source>
@@ -6558,7 +6558,7 @@ Nghệ nhân sẽ bắt đầu chương trình mỗi tiết mẫu. Đầu ra c�
     <message>
       <location filename="../help/programs_help.py" line="18" />
       <source>If only one temperature is provided it will be interpreted as BT.  If more than one temperature is provided the values are order dependent with ET first and BT second.</source>
-      <translation type="unfinished" />
+      <translation>Nếu chỉ cung cấp một nhiệt độ thì nó sẽ được hiểu là BT. Nếu có nhiều hơn một nhiệt độ được cung cấp, các giá trị sẽ phụ thuộc vào thứ tự với ET đầu tiên và BT thứ hai.</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="18" />
@@ -6825,7 +6825,7 @@ Khi Phím tắt TẮT sẽ thêm một sự kiện tùy chỉnh</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="49" />
       <source>Quick Special Event Entry.  The keys q,w,e, and r correspond to special events 1,2,3 and 4.  A two digit numeric value must follow the shortcut letter, e.g. &amp;#39;q75&amp;#39;, when the corresponding event slider max value is 100 or less (default setting).   When the slider max value is greater than 100, three digits must be entered and for values less than 100 a leading zero is required, e.g. &amp;#39;q075&amp;#39;.  </source>
-      <translation type="unfinished" />
+      <translation>Nhập sự kiện đặc biệt nhanh chóng. Các phím q,w,e và r tương ứng với các sự kiện đặc biệt 1,2,3 và 4. Giá trị số có hai chữ số phải theo sau chữ cái viết tắt, ví dụ: &amp;#39;q75&amp;#39;, khi giá trị tối đa của thanh trượt sự kiện tương ứng là 100 trở xuống (cài đặt mặc định). Khi giá trị tối đa của thanh trượt lớn hơn 100, phải nhập ba chữ số và đối với các giá trị nhỏ hơn 100 thì bắt buộc phải có số 0 đứng đầu, ví dụ: &amp;#39;q075&amp;#39;.</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="50" />
@@ -7168,7 +7168,7 @@ Phím tắt phải được tắt (ENTER)</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="79" />
       <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
-      <translation type="unfinished" />
+      <translation>Tốc độ mô phỏng có thể thay đổi khi tạm dừng (giữ shift (1x), OPTION/ALT (2x) hoặc COMMAND/CTRL (4x) khi khởi động lại).</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="80" />
@@ -7631,7 +7631,7 @@ Nạp hồ sơ đã ghi trên máy nhỏ hơn và mở Transposer. Chọn ánh x
     <message>
       <location filename="../help/eventsliders_help.py" line="22" />
       <source>Scale factor, Slider value is multiplied by this value.</source>
-      <translation type="unfinished" />
+      <translation>Hệ số tỷ lệ, giá trị Thanh trượt được nhân với giá trị này.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="23" />
@@ -7689,7 +7689,8 @@ Nạp hồ sơ đã ghi trên máy nhỏ hơn và mở Transposer. Chọn ánh x
       <location filename="../help/eventsliders_help.py" line="34" />
       <source>Note: "{}" can be used as a placeholder, it will be substituted by (value*factor + offset). In all slider command actions, but for IO, VOUT, S7 and RC Commands, the bound value is converted from a float to an int.
 </source>
-      <translation type="unfinished" />
+      <translation>Lưu ý: "{}" có thể được sử dụng làm phần giữ chỗ, nó sẽ được thay thế bằng (value*factor + offset). Trong tất cả các hành động lệnh thanh trượt, ngoại trừ các lệnh IO, VOUT, S7 và RC, giá trị giới hạn được chuyển đổi từ float thành int.
+</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="88" />
@@ -8009,7 +8010,7 @@ Nạp hồ sơ đã ghi trên máy nhỏ hơn và mở Transposer. Chọn ánh x
     <message>
       <location filename="../help/eventsliders_help.py" line="74" />
       <source>for PHIDGET OUTPUT modules: sets voltage voltage range (r=5 for r5V and r=10 for 10V)</source>
-      <translation type="unfinished" />
+      <translation>đối với mô-đun PHIDGET OUTPUT: đặt dải điện áp điện áp (r=5 cho r5V và r=10 cho 10V)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="157" />
@@ -8836,7 +8837,7 @@ Chức năng 4 (Đọc thanh ghi đầu vào): thanh ghi 0 đến 65535 tương 
     <message>
       <location filename="../help/eventbuttons_help.py" line="63" />
       <source>OFF (translated, respecting button state)</source>
-      <translation type="unfinished" />
+      <translation>TẮT (được dịch, tôn trọng trạng thái nút)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="64" />
@@ -8948,7 +8949,7 @@ Chức năng 4 (Đọc thanh ghi đầu vào): thanh ghi 0 đến 65535 tương 
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
       <source>button numbers or sleep(&lt;float&gt;) separated by a comma: 1,2,sleep(2.5), 3..</source>
-      <translation type="unfinished" />
+      <translation>số nút hoặc chế độ ngủ (&lt;float&gt;) được phân tách bằng dấu phẩy: 1,2,sleep(2.5), 3..</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="94" />
@@ -10616,7 +10617,7 @@ Giá trị dự đoán là thời gian được tính bằng giây để đạt 
     <message>
       <location filename="../help/symbolic_help.py" line="137" />
       <source>temperature unit (Celsius: 0, Fahrenheit: 1)</source>
-      <translation type="unfinished" />
+      <translation>đơn vị nhiệt độ (độ C: 0, độ F: 1)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="140" />
@@ -15649,10 +15650,10 @@ Lặp lại Thao tác ở cuối: {0}</translation>
       <location filename="../artisanlib/main.py" line="4331" />
       <source>Artisan is free to use!
 
-To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
+To keep it free and current please support us with your donation and subscribe to artisan.plus to suppress this dialog!</source>
       <translation>Nghệ nhân được sử dụng miễn phí!
 
-Để giữ cho nó miễn phí và cập nhật, vui lòng ủng hộ chúng tôi bằng khoản đóng góp của bạn và đăng ký artisan.plus để tắt hộp thoại này!</translation>
+Để giữ cho nó miễn phí và cập nhật, vui lòng ủng hộ chúng tôi bằng khoản đóng góp của bạn và đăng ký artist.plus để chặn hộp thoại này!</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="5096" />
@@ -17171,6 +17172,14 @@ Hồ sơ thiếu [CHARGE] hoặc [DROP]</translation>
       <translation>Không tìm thấy hồ sơ nền</translation>
     </message>
     <message>
+      <source>Artisan is free to use!
+
+To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
+      <translation type="vanished">Nghệ nhân được sử dụng miễn phí!
+
+Để giữ cho nó miễn phí và cập nhật, vui lòng ủng hộ chúng tôi bằng khoản đóng góp của bạn và đăng ký artisan.plus để tắt hộp thoại này!</translation>
+    </message>
+    <message>
       <source>Import Aillio RoasTime</source>
       <translation type="vanished">Nhập Aillio RoasTime</translation>
     </message>
@@ -17356,32 +17365,32 @@ Hồ sơ thiếu [CHARGE] hoặc [DROP]</translation>
       <translation>artisan.plus bị ngắt kết nối</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="320" />
+      <location filename="../plus/stock.py" line="321" />
       <source>bag</source>
       <translation>cái túi</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="321" />
+      <location filename="../plus/stock.py" line="322" />
       <source>box</source>
       <translation>hộp</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="322" />
+      <location filename="../plus/stock.py" line="323" />
       <source>barrel</source>
       <translation>thùng</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="325" />
+      <location filename="../plus/stock.py" line="326" />
       <source>bags</source>
       <translation>túi</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="326" />
+      <location filename="../plus/stock.py" line="327" />
       <source>boxes</source>
       <translation>hộp</translation>
     </message>
     <message>
-      <location filename="../plus/stock.py" line="327" />
+      <location filename="../plus/stock.py" line="328" />
       <source>barrels</source>
       <translation>thùng</translation>
     </message>
