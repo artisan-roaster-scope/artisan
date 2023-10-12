@@ -84,6 +84,8 @@ machines:
         url: /machines/ikawa/
       - title: "IMF"
         url: /machines/imf/
+      - title: "Joper"
+        url: /machines/joper/
       - title: "Kaleido"
         url: /machines/kaleido/
       - title: "IP-CC"

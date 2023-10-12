@@ -43,6 +43,14 @@ gallery:
     image_path: /assets/images/sivetz-logo.png
     alt: "Sivetz"
     title: "Sivetz"
+  - url: http://www.buhlergroup.com/
+    image_path: /assets/images/buhler-logo.png
+    alt: "Buhler"
+    title: "Buhler"
+  - url: https://joper-roasters.com/
+    image_path: /assets/images/joper-logo.png
+    alt: "Joper"
+    title: "Joper"
     
 ---
 
