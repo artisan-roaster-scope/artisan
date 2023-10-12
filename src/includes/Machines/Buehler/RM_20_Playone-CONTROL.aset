@@ -1,0 +1,105 @@
+[General]
+Delay=1000
+Oversampling=false
+roastertype_setup=B\xfchler RM Playone
+
+[MachineSetup]
+capacity=20
+
+[Device]
+id=79
+
+[Style]
+ETname=IT
+
+[ExtraComm]
+extrabaudrate=19200, 19200, 19200
+extrabytesize=8, 8, 8
+extracomport=COM1, COM1, COM1
+extraparity=E, E, E
+extrastopbits=1, 1, 1
+extratimeout=0.3, 0.3, 0.3
+
+[ExtraDev]
+extraCurveVisibility1=false, false, false, true, true, true, true, true, true, true
+extraCurveVisibility2=true, false, false, true, true, true, true, true, true, true
+extraLCDvisibility1=true, true, false, false, false, false, false, false, false, false
+extraLCDvisibility2=true, true, false, false, false, false, false, false, false, false
+extradevicecolor1=#d27d1c, #49b260, #ad0426
+extradevicecolor2=#333333, #45a6cf, #810081
+extradevices=80, 81, 82
+extramathexpression1=, , 
+extramathexpression2=, , 
+extraname1=AT, {1}, IT-SP
+extraname2=Pa, {0}, BT-SP
+
+[ExtraEventButtons]
+buttonlistmaxlen=11
+buttonpalettemaxlen=14, 14, 14, 14, 14, 14, 14, 14, 14, 14
+buttonsize=1
+extraeventbuttoncolor=#800080, #804c80, #808080, #45a6cf, #81b7cf, #808080, #49b260, #80b28b, #808080, #ad0426, #ad5264, #808080
+extraeventbuttontextcolor=white, white, white, white, white, white, white, white, white, white, white, white
+extraeventsactions=15, 15, 0, 15, 15, 0, 15, 15, 0, 15, 15, 0
+extraeventsactionstrings="setDBfloat(1606,214,{})", "setDBfloat(1606,214,{})", , "setDBfloat(1606,232,{})", "setDBfloat(1606,232,{})", , "setDBfloat(1606,228,{})", "setDBfloat(1606,228,{})", , "setDBfloat(1606,206,{})", "setDBfloat(1606,206,{})", 
+extraeventsbuttonsflags=0, 1, 1
+extraeventsdescriptions=, , , , , , , , , , , 
+extraeventslabels=+10%\n\\t, -10%\n\\t, , +10%\n\\t, -10%\n\\t, , +10%\n\\t, -10%\n\\t, , +10%\n\\t, -10%\n\\t, 
+extraeventstypes=7, 7, 4, 5, 5, 4, 6, 6, 4, 8, 8, 4
+extraeventsvalues=2, -2, 0, 2, -2, 0, 2, -2, 0, 2, -2, 0
+extraeventsvisibility=1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0
+marklastbuttonpressed=true
+showextrabuttontooltips=false
+
+[S7]
+PID_OFF_action=
+PID_ON_action=
+PID_SV_register=0
+PID_area=0
+PID_d_register=0
+PID_db_nr=0
+PID_i_register=0
+PID_p_register=0
+PIDmultiplier=0
+SVmultiplier=0
+area=6, 6, 6, 6, 6, 6, 6, 6, 0, 0
+db_nr=1606, 1606, 1606, 1606, 1606, 1606, 1606, 1606, 1, 1
+div=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+host=192.168.1.10
+mode=1, 1, 1, 0, 0, 0, 1, 1, 0, 0
+port=102
+rack=0
+slot=1
+start=244, 240, 252, 248,228, 232, 206, 214, 0, 0
+type=1, 1, 1, 1, 2, 2, 1, 1, 0, 0
+optimizer=true
+fetch_max_blocks=true
+
+[events]
+etypes=, ,BT-SP,IT-SP, 
+
+[Sliders]
+eventsliderunits=%, %, , 
+eventsliderAlternativeLayout=false
+eventsliderBernoulli=0, 0, 0, 0
+eventsliderKeyboardControl=true
+eventslidercoarse=0, 0, 0, 0
+eventslidersflags=0, 1, 1
+eventslidertemp=0, 0, 1, 1
+slideractions=12, 12, 12, 12
+slidercommands="setDBfloat(1606,232,{})", "setDBfloat(1606,228,{})", "setDBfloat(1606,214,{})", "setDBfloat(1606,206,{})"
+sliderfactors=1, 1, 1, 1
+slidermax=100, 100, 250, 400
+slidermin=0, 0, 180, 0
+slideroffsets=0, 0, 0, 0
+slidervisibilities=1, 1, 1, 1
+
+
+[Quantifiers]
+clusterEventsFlag=false
+eventquantifierSV=0, 0, 0, 0
+eventquantifieraction=0, 0, 0, 0
+quantifieractive=1, 1, 1, 1
+quantifiercoarse=0, 0, 0, 0
+quantifiermax=100, 100, 250, 400
+quantifiermin=0, 0, 180, 0
+quantifiersource=5, 4, 7, 6

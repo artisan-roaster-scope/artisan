@@ -82,18 +82,21 @@ from artisanlib import main, command_utility
 
 # from pyinstaller 5.8:
 class NullWriter:
-  softspace = 0
-  encoding:str = 'UTF-8'
+    softspace = 0
+    encoding:str = 'UTF-8'
 
-  def write(*args):
-      pass
+    @staticmethod
+    def write(*args):
+        pass
 
-  def flush(*args):
-      pass
+    @staticmethod
+    def flush(*args):
+        pass
 
-  # Some packages are checking if stdout/stderr is available (e.g., youtube-dl). For details, see #1883.
-  def isatty(self):
-      return False
+    # Some packages are checking if stdout/stderr is available (e.g., youtube-dl). For details, see #1883.
+    @staticmethod
+    def isatty():
+        return False
 
 if system() == 'Windows' and hasattr(sys, 'frozen'): # tools/freeze
     # to (re-)set sys.stdout/sys.stderr on Windows builds under PyInstaller >= 5.8.0 (set to None under --noconsole using pythonw)

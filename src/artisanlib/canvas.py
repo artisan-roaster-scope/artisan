@@ -845,7 +845,8 @@ class tgraphcanvas(FigureCanvas):
                        'Phidget DAQ1000 01',        #146
                        '+Phidget DAQ1000 23',       #147
                        '+Phidget DAQ1000 45',       #148
-                       '+Phidget DAQ1000 67'        #149
+                       '+Phidget DAQ1000 67',       #149
+                       '+MODBUS 910',               #150
                        ]
 
         # ADD DEVICE:

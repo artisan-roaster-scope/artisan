@@ -1,7 +1,7 @@
 [General]
 Delay=1000
 Oversampling=false
-roastertype_setup=B\xfchler RM 20 Legacy
+roastertype_setup=B\xfchler RM 20 Simatic
 
 [MachineSetup]
 capacity=20

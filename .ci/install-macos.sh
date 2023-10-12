@@ -38,7 +38,7 @@ if [ -n "${PYUPGRADE_V:-}" ]; then
     echo $PATH
     which python3
     python3 --version
-    brew reinstall openssl
+    brew reinstall openssl # needed to get the ssl certificates properly installed for artisan.plus communication
 
     # create new venv
     python3 -m venv /Users/appveyor/venv${PYUPGRADE_V}

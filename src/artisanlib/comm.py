@@ -510,7 +510,8 @@ class serialport:
                                    self.PHIDGET_DAQ1000_01,   #146
                                    self.PHIDGET_DAQ1000_23,   #147
                                    self.PHIDGET_DAQ1000_45,   #148
-                                   self.PHIDGET_DAQ1000_67    #149
+                                   self.PHIDGET_DAQ1000_67,   #149
+                                   self.MODBUS_910,           #150
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -1210,6 +1211,9 @@ class serialport:
 
     def MODBUS_78(self) -> Tuple[float,float,float]:
         return self.aw.qmc.extraMODBUStx,self.aw.qmc.extraMODBUStemps[7],self.aw.qmc.extraMODBUStemps[6]
+
+    def MODBUS_910(self) -> Tuple[float,float,float]:
+        return self.aw.qmc.extraMODBUStx,self.aw.qmc.extraMODBUStemps[9],self.aw.qmc.extraMODBUStemps[8]
 
     def HH802U(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()

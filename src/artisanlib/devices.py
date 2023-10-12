@@ -3076,6 +3076,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ##########################
                 ####  DEVICE 149 is +Phidget DAQ1000 67 but +DEVICE cannot be set as main device
+                ##########################
+                ####  DEVICE 150 is +MODBUS_910 but +DEVICE cannot be set as main device
+                ##########################
 
 
                 # ADD DEVICE:
@@ -3245,7 +3248,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 146
                 1, # 147
                 1, # 148
-                1  # 149
+                1, # 149
+                7  # 150
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):

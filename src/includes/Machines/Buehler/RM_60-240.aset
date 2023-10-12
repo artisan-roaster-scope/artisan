@@ -1,7 +1,7 @@
 [General]
 Delay=1000
 Oversampling=false
-roastertype_setup=B\xfchler RM 60-240 OC
+roastertype_setup=B\xfchler RM 60-240
 
 [Device]
 id=79
@@ -22,12 +22,12 @@ extraCurveVisibility1=false, false, false, true, true, true, true, true, true, t
 extraCurveVisibility2=true, false, false, true, true, true, true, true, true, true
 extraLCDvisibility1=true, true, true, false, false, false, false, false, false, false
 extraLCDvisibility2=true, true, true, false, false, false, false, false, false, false
-extradevicecolor1=#d27d1c, #49b260, #333333
-extradevicecolor2=#333333, #45a6cf, #810081
+extradevicecolor1=#d27d1c, #49b260, #810081
+extradevicecolor2=#333333, #45a6cf, #333333
 extradevices=80, 81, 82
 extramathexpression1=, , 
 extramathexpression2=, , 
-extraname1=XT, {1}, TT
+extraname1=XT, {1}, IT-SP
 extraname2=Pa, {0}, RC
 
 [S7]

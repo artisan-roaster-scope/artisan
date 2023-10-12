@@ -129,7 +129,7 @@ class modbusport:
         self.PID_ON_action:str = ''
         self.PID_OFF_action:str = ''
 
-        self.channels:Final[int] = 8
+        self.channels:Final[int] = 10
         self.inputSlaves:List[int] = [0]*self.channels
         self.inputRegisters:List[int] = [0]*self.channels
         # decoding (default: 16bit uInt)

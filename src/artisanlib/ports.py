@@ -33,14 +33,14 @@ try:
     from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QTextEdit, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QHeaderView, QMessageBox)  # @UnusedImport @Reimport  @UnresolvedImport
+                                 QHeaderView, QMessageBox, QScrollArea, QFrame)  # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import (Qt, pyqtSlot, QSettings) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QIntValidator # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QTextEdit, QDoubleSpinBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                                 QHeaderView, QMessageBox) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                                 QHeaderView, QMessageBox, QScrollArea) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -897,6 +897,7 @@ class comportDlg(ArtisanResizeablDialog):
 
         modbus_serial_group = QGroupBox(QApplication.translate('GroupBox','Serial'))
         modbus_serial_group.setLayout(modbus_gridV)
+        modbus_serial_group.setSizePolicy(QSizePolicy.Policy.Fixed,QSizePolicy.Policy.Preferred)
 
         modbus_input_grid = QGridLayout()
 
@@ -935,13 +936,19 @@ class comportDlg(ArtisanResizeablDialog):
                     modbus_input_grid.addWidget(inputDecode,6,i+1,Qt.AlignmentFlag.AlignCenter)
 
         modbus_input_grid.setContentsMargins(0,0,0,0)
-        modbus_input_grid.setSpacing(2)
+        modbus_input_grid.setSpacing(5)
+
+        modbus_input_scroll = QScrollArea()
+        modbus_input_scroll.setWidgetResizable(False)
+        modbus_input_scroll_content = QFrame()
+        modbus_input_scroll_content.setSizePolicy(QSizePolicy.Policy.MinimumExpanding,QSizePolicy.Policy.Ignored)
+        modbus_input_scroll_content.setLayout(modbus_input_grid)
+        modbus_input_scroll.setWidget(modbus_input_scroll_content)
+
 
         modbus_gridVLayout = QHBoxLayout()
         modbus_gridVLayout.addWidget(modbus_serial_group)
-        modbus_gridVLayout.addStretch()
-        modbus_gridVLayout.addLayout(modbus_input_grid)
-        modbus_gridVLayout.addStretch()
+        modbus_gridVLayout.addWidget(modbus_input_scroll)
         modbus_setup = QHBoxLayout()
         modbus_setup.addWidget(scanButton)
         modbus_setup.addStretch()
