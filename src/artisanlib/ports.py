@@ -40,7 +40,7 @@ except ImportError:
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QTextEdit, QDoubleSpinBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                                 QHeaderView, QMessageBox, QScrollArea) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                                 QHeaderView, QMessageBox, QScrollArea, QFrame) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
