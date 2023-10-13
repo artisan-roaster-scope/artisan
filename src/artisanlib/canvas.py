@@ -6295,7 +6295,7 @@ class tgraphcanvas(FigureCanvas):
         if abs(s-30) < 1:
             return f'-{m:d.5}'
         if s > 1:
-            return  '-{m:.0f}:{s:02.0f}'
+            return  f'-{m:.0f}:{s:02.0f}'
         if m == 0:
             return '0'
         return f'-{m:.0f}'
