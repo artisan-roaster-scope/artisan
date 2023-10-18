@@ -32,7 +32,7 @@ import array
 #from lxml import html # unused
 
 import logging
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, Dict, TYPE_CHECKING
 from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
@@ -42,7 +42,6 @@ if TYPE_CHECKING:
         from multiprocessing.connection import Connection # type:ignore # pylint: disable=unused-import
     from artisanlib.types import ProfileData # pylint: disable=unused-import
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
-#    from PyQt6.QtCore import QUrl # pylint: disable=unused-import
 
 try:
     from PyQt6.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
@@ -80,7 +79,7 @@ class AillioR1:
     AILLIO_STATE_COOLING = 0x08
     AILLIO_STATE_SHUTDOWN = 0x09
 
-    def __init__(self, debug=False) -> None:
+    def __init__(self, debug:bool = False) -> None:
         self.simulated = False
         self.AILLIO_DEBUG = debug
         self.__dbg('init')
@@ -408,7 +407,7 @@ class AillioR1:
             return self.usbhandle.read(self.AILLIO_ENDPOINT_RD, length)
         raise OSError('not found or no permission')
 
-def extractProfileBulletDict(data, aw:'ApplicationWindow') -> 'ProfileData':
+def extractProfileBulletDict(data:Dict, aw:'ApplicationWindow') -> 'ProfileData':
     try:
         res:'ProfileData' = {} # the interpreted data set
 
@@ -456,7 +455,7 @@ def extractProfileBulletDict(data, aw:'ApplicationWindow') -> 'ProfileData':
         try:
             if 'weightGreen' in data or 'weightRoasted' in data:
                 wunit = aw.qmc.weight_units.index(aw.qmc.weight[2])
-                if wunit in [1,3]: # turn Kg into g, and lb into oz
+                if wunit in {1,3}: # turn Kg into g, and lb into oz
                     wunit = wunit -1
                 wgreen:float = 0
                 if 'weightGreen' in data:

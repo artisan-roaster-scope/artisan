@@ -15,6 +15,13 @@
 # AUTHOR
 # Marko Luther, 2023
 
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QWidget # noqa: F401 # pylint: disable=unused-import
+
 from artisanlib import __version__
 
 from artisanlib.dialogs import ArtisanDialog
@@ -32,7 +39,7 @@ except ImportError:
 ##########################################################################
 
 class serialLogDlg(ArtisanDialog):
-    def __init__(self, parent, aw) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Serial Log'))
@@ -76,7 +83,7 @@ class serialLogDlg(ArtisanDialog):
 ##########################################################################
 
 class errorDlg(ArtisanDialog):
-    def __init__(self, parent, aw) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Error Log'))
@@ -109,7 +116,7 @@ class errorDlg(ArtisanDialog):
 ##########################################################################
 
 class messageDlg(ArtisanDialog):
-    def __init__(self, parent, aw) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Message History'))

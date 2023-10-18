@@ -56,6 +56,21 @@ extend-exclude = '''
 
 [tool.pylint.MASTER]
 load-plugins = [
+#    'pylint.extensions.bad_builtin', # suggest comprehension over filter/join/map
+    'pylint.extensions.check_elif',
+#    'pylint.extensions.code_style', # suggests the := operator; NOT YET
+    'pylint.extensions.comparison_placement',
+#    'pylint.extensions.confusing_elif', # nested if => functions; NOT YET
+    'pylint.extensions.docparams',
+    'pylint.extensions.docstyle',
+    'pylint.extensions.eq_without_hash',
+    'pylint.extensions.for_any_all',
+    'pylint.extensions.overlapping_exceptions',
+    'pylint.extensions.private_import',
+    'pylint.extensions.set_membership',
+    'pylint.extensions.typing',
+#    'pylint.extensions.redefined_variable_type', # NOT YET
+#    'pylint.extensions.mccabe', # complexity rating for functions; NOT YET
     'pylint.extensions.no_self_use'
 ]
 ignore-paths = [ "^uic/.*$",
@@ -63,6 +78,16 @@ ignore-paths = [ "^uic/.*$",
                  "^dist/.*$",
                  "^proto/.*$",
                  "^test/.*$" ]
+
+# Use multiple processes to speed up Pylint. Specifying 0 will auto-detect the
+# number of processors available to use.
+jobs = "0"
+
+# Minimum supported python version
+py-version = "3.8"
+
+# Pickle collected data for later comparisons.
+persistent = "no"
 
 # A comma-separated list of package or module names from where C extensions may
 # be loaded. Extensions are loading into the active Python interpreter and may
@@ -216,8 +241,36 @@ enable='''c-extension-no-member,'''
 [tool.mypy]
 files = ["artisanlib/*.py", "plus/*.py"]
 exclude = ['build', 'dist', 'uic']
-##python_version = "3.7"
+python_version = "3.9"
+# "3.8" throws "matplotlib/backends/backend_agg.py:393: error: Parenthesized context managers are only supported in Python 3.9 and greater"
+
+# Ensure full coverage
 check_untyped_defs = true
+disallow_incomplete_defs = true
+#disallow_untyped_calls = true # Not yet
+#disallow_untyped_defs = true # Not yet
+disallow_untyped_decorators = true
+#disallow_any_unimported = true # Not yet
+
+# Restrict dynamic typing
+#disallow_any_generics = true # Not yet
+disallow_subclassing_any = true
+warn_return_any = true
+
+# Some more checks
+local_partial_types = true
+strict_equality = true
+
+# Know exactly what we're doing
+warn_redundant_casts = true
+warn_unused_configs = true
+#warn_unused_ignores = true
+warn_unreachable = true
+#show_error_codes = true
+
+# Explicit is better than implicit
+no_implicit_optional = true
+
 
 plugins = ["numpy.typing.mypy_plugin"]
 

@@ -116,7 +116,7 @@ class Notification:
 
 
 # data a datetime.datetime object representing the timestamp of the acknowledgement by the user
-def sendPlusNotificationSeen(hr_id:str, date):
+def sendPlusNotificationSeen(hr_id:str, date:datetime) -> None:
     _log.debug('sendPlusNotificationSeen(%s,%s)', hr_id, date.isoformat())
     try:
         plus.connection.sendData(
@@ -254,12 +254,12 @@ class NotificationManager(QObject): # pyright: ignore [reportGeneralTypeIssues]
     def getNotificationItems(self):
         return self.notifications_queue
 
-    def addNotificationItem(self, notification: Notification):
+    def addNotificationItem(self, notification: Notification) -> None:
         _log.debug('addNotificationItem()')
         self.notifications_queue.append(notification)
         self.updateNotificationMenu()
 
-    def removeNotificationItem(self, notification: Notification):
+    def removeNotificationItem(self, notification: Notification) -> None:
         self.notifications_queue.remove(notification)
         self.updateNotificationMenu()
 
@@ -314,14 +314,14 @@ class NotificationManager(QObject): # pyright: ignore [reportGeneralTypeIssues]
             _log.exception(e)
 
     @pyqtSlot(bool)
-    def notificationItemSelected(self, _checked:bool = False):
+    def notificationItemSelected(self, _checked:bool = False) -> None:
         action = self.sender()
         if action is not None and hasattr(action, 'data'):
             n = action.data()
             self.setNotification(n, addToQueue=False)
 
     # actually presents the given notification to the user
-    def showNotification(self, notification: Notification):
+    def showNotification(self, notification: Notification) -> None:
         _log.debug('showNotification(%s)',notification)
         try:
             icon = QSystemTrayIcon.MessageIcon.Information # NoIcon, Information, Warning, Critical
@@ -338,7 +338,7 @@ class NotificationManager(QObject): # pyright: ignore [reportGeneralTypeIssues]
             _log.exception(e)
 
     # set the given notification as the active one and shows it to the user
-    def setNotification(self, notification: Notification, addToQueue:bool = True):
+    def setNotification(self, notification: Notification, addToQueue:bool = True) -> None:
         _log.info('setNotification(%s %s %s, %s', notification.type.name, notification.formatedTitle(), notification.message, addToQueue)
         try:
             self.active_notification = notification
@@ -351,12 +351,19 @@ class NotificationManager(QObject): # pyright: ignore [reportGeneralTypeIssues]
             _log.exception(e)
 
     # clears the active notification if equal to the given one
-    def clearNotification(self, notification: Notification):
+    def clearNotification(self, notification: Notification) -> None:
         if self.active_notification == notification:
             self.active_notification = None
 
     # external API to send a notification to the user via the notification manager
-    def sendNotificationMessage(self, title: str, message: str, notification_type: NotificationType, created:Optional[float] = None, hr_id: Optional[str] = None, link: Optional[str]=None, pos:int = 0):
+    def sendNotificationMessage(self,
+            title: str,
+            message: str,
+            notification_type: NotificationType,
+            created:Optional[float] = None,
+            hr_id: Optional[str] = None,
+            link: Optional[str] = None,
+            pos:int = 0) -> None:
         _log.debug('sendNotificationMessage(%s,%s,%s,%s)', title, message, notification_type, hr_id)
         try:
             if self.notifications_available and self.notifications_enabled:

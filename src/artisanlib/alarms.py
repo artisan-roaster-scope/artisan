@@ -18,7 +18,7 @@
 import os
 import sys
 import logging
-from typing import TYPE_CHECKING
+from typing import Dict, Union, List, TYPE_CHECKING
 from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
@@ -674,7 +674,7 @@ class AlarmDlg(ArtisanResizeablDialog):
     def exportalarmsJSON(self,filename):
         try:
             self.savealarms()
-            alarms = {}
+            alarms:Dict[str,Union[List[int],List[float],List[str]]] = {}
             alarms['alarmflags'] = self.aw.qmc.alarmflag
             alarms['alarmguards'] = self.aw.qmc.alarmguard
             alarms['alarmnegguards'] = self.aw.qmc.alarmnegguard
@@ -716,15 +716,6 @@ class AlarmDlg(ArtisanResizeablDialog):
 
     def closeEvent(self, _):
         self.closealarms()
-
-    @pyqtSlot(bool)
-    def restorealarmsets(self,_):
-        self.aw.restorealarmsets()
-        self.setAlarmSetLabels()
-
-    @pyqtSlot(bool)
-    def backupalarmsets(self,_):
-        self.aw.backupalarmsets()
 
     def savealarms(self):
         try:
@@ -773,7 +764,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                 offset = self.alarmtable.cellWidget(i,5)
                 assert isinstance(offset, QTimeEdit)
                 tx = self.aw.QTime2time(offset.time())
-                self.aw.qmc.alarmoffset[i] = max(0,tx)
+                self.aw.qmc.alarmoffset[i] = max(0,int(round(tx)))
                 atype = self.alarmtable.cellWidget(i,6)
                 assert isinstance(atype, MyQComboBox)
                 self.aw.qmc.alarmsource[i] = int(str(atype.currentIndex())) - 3
@@ -962,7 +953,9 @@ class AlarmDlg(ArtisanResizeablDialog):
         if beepL is not None:
             item1 = beepL.itemAt(1)
             if item1 is not None:
-                self.alarmtable.setItem(i, 10, MyTableWidgetItemQCheckBox(item1.widget()))
+                item1widget = item1.widget()
+                if isinstance(item1widget,QCheckBox):
+                    self.alarmtable.setItem(i, 10, MyTableWidgetItemQCheckBox(item1widget))
         self.alarmtable.setCellWidget(i,11,descriptionedit)
         self.alarmtable.setItem(i, 11, MyTableWidgetItemQLineEdit(descriptionedit))
 

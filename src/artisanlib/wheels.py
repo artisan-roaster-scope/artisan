@@ -15,8 +15,12 @@
 # AUTHOR
 # Marko Luther, 2023
 
-from typing import Optional
 from matplotlib import rcParams
+from typing import Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QWidget # pylint: disable=unused-import
 
 from artisanlib.dialogs import ArtisanDialog
 
@@ -36,7 +40,7 @@ except ImportError:
 
 
 class WheelDlg(ArtisanDialog):
-    def __init__(self, parent, aw) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, False) # overwrite the ArtisanDialog class default here!!
 

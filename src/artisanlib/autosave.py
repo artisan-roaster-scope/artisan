@@ -31,10 +31,12 @@ except ImportError:
 
 
 if TYPE_CHECKING:
+    from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QWidget # pylint: disable=unused-import
     from PyQt6.QtGui import QStandardItem # pylint: disable=unused-import
 
 class autosaveDlg(ArtisanDialog):
-    def __init__(self, parent, aw) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Autosave'))
@@ -60,7 +62,7 @@ class autosaveDlg(ArtisanDialog):
         autochecklabel = QLabel(QApplication.translate('CheckBox','Autosave [a]'))
         self.autocheckbox = QCheckBox()
         self.autocheckbox.setToolTip(QApplication.translate('Tooltip', 'ON/OFF of automatic saving when pressing keyboard letter [a]'))
-        self.autocheckbox.setChecked(self.aw.qmc.autosaveflag)
+        self.autocheckbox.setChecked(bool(self.aw.qmc.autosaveflag))
 
         addtorecentfileslabel = QLabel(QApplication.translate('CheckBox','Add to recent file list'))
         self.addtorecentfiles = QCheckBox()

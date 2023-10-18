@@ -15,6 +15,8 @@
 # AUTHOR
 # Marko Luther, 2023
 
+from typing import TYPE_CHECKING
+
 from artisanlib.util import fromCtoF, fromFtoC, stringfromseconds, stringtoseconds, comma2dot
 from artisanlib.dialogs import ArtisanDialog
 
@@ -29,8 +31,13 @@ except ImportError:
     from PyQt5.QtWidgets import (QApplication, QLabel, QGridLayout, QGroupBox, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QComboBox, QHBoxLayout, QVBoxLayout) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
+
+if TYPE_CHECKING:
+    from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QWidget # pylint: disable=unused-import
+
 class calculatorDlg(ArtisanDialog):
-    def __init__(self, parent, aw) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Roast Calculator'))

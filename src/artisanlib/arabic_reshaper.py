@@ -201,7 +201,7 @@ def get_lam_alef(candidate_alef, candidate_lam, is_end_of_word):
     return ''
 
 class DecomposedWord: # pylint: disable=too-few-public-methods
-    def __init__(self, word) -> None:
+    def __init__(self, word:str) -> None:
         self.stripped_harakat = []
         self.harakat_positions = []
         self.stripped_regular_letters = []

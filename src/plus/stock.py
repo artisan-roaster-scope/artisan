@@ -132,8 +132,8 @@ stock_epsilon = 0.01
 
 ####### Stock Update Thread
 
-worker = None
-worker_thread = None
+worker:Optional['Worker'] = None
+worker_thread:Optional[QThread] = None
 
 class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     startSignal = pyqtSignal()

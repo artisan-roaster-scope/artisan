@@ -18,6 +18,7 @@
 import platform
 from typing import Optional, TYPE_CHECKING
 
+
 from artisanlib.util import deltaLabelUTF8, stringfromseconds, stringtoseconds
 from artisanlib.dialogs import ArtisanDialog
 
@@ -35,10 +36,11 @@ except ImportError:
         QSpinBox) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 if TYPE_CHECKING:
-    from PyQt6.QtWidgets import QPushButton # pylint: disable=unused-import
+    from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QPushButton, QWidget # pylint: disable=unused-import
 
 class WindowsDlg(ArtisanDialog):
-    def __init__(self, parent, aw) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
 
         # remember previous original settings
@@ -575,7 +577,7 @@ class WindowsDlg(ArtisanDialog):
                 self.autodeltaxETFlag.blockSignals(False)
                 self.autodeltaxBTFlag.blockSignals(False)
                 self.aw.qmc.zlimit = new_value
-                if bool(self.aw.comparator):
+                if self.aw.comparator is not None:
                     self.aw.comparator.redraw()
                 else:
                     self.aw.qmc.redraw(recomputeAllDeltas=False)
@@ -603,7 +605,7 @@ class WindowsDlg(ArtisanDialog):
         self.aw.qmc.autodeltaxET = self.autodeltaxETFlag.isChecked()
         self.aw.qmc.autodeltaxBT = self.autodeltaxBTFlag.isChecked()
         if not self.aw.qmc.flagon and (self.autodeltaxETFlag or self.autodeltaxBTFlag):
-            if bool(self.aw.comparator):
+            if self.aw.comparator is not None:
                 self.aw.comparator.redraw()
                 self.zlimitEdit.setText(str(self.aw.qmc.zlimit))
             else:
@@ -616,7 +618,7 @@ class WindowsDlg(ArtisanDialog):
             self.locktimexFlag.setChecked(False)
             self.enableAutoControls()
             self.enableXAxisControls()
-            if bool(self.aw.comparator):
+            if self.aw.comparator is not None:
                 self.aw.comparator.redraw()
             elif not self.aw.qmc.flagon:
                 self.autoAxis()
@@ -750,7 +752,7 @@ class WindowsDlg(ArtisanDialog):
     @pyqtSlot(int)
     def changelegendloc(self,_):
         self.aw.qmc.legendloc = self.legendComboBox.currentIndex()
-        if bool(self.aw.comparator):
+        if self.aw.comparator is not None:
             self.aw.comparator.legend = None
             self.aw.comparator.redraw()
         else:
@@ -760,7 +762,7 @@ class WindowsDlg(ArtisanDialog):
     @pyqtSlot(int)
     def changeAutoTimexMode(self,_):
         self.aw.qmc.autotimexMode = self.autotimexModeCombobox.currentIndex()
-        if bool(self.aw.comparator):
+        if self.aw.comparator is not None:
             self.aw.comparator.modeComboBox.setCurrentIndex(self.aw.qmc.autotimexMode)
         elif not self.aw.qmc.flagon:
             self.autoAxis()
@@ -962,7 +964,7 @@ class WindowsDlg(ArtisanDialog):
             self.zlimitEdit.setText(str(self.aw.qmc.zlimit_C_default))
             self.zlimitEdit_min.setText(str(self.aw.qmc.zlimit_min_C_default))
             self.zgridSpinBox.setValue(int(self.aw.qmc.zgrid_C_default))
-        if bool(self.aw.comparator):
+        if self.aw.comparator is not None:
             self.aw.comparator.redraw()
         else:
             self.aw.qmc.redraw(recomputeAllDeltas=False)

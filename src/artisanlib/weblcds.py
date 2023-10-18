@@ -139,7 +139,7 @@ class WebLCDs:
 
     # route that establishes the websocket between the Artisan app and the clients
     @staticmethod
-    async def websocket_handler(request: 'Request'):
+    async def websocket_handler(request: 'Request') -> web.WebSocketResponse:
         ws = web.WebSocketResponse()
         await ws.prepare(request)
         request.app['websockets'].add(ws)

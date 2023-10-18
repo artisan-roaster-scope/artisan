@@ -148,7 +148,7 @@ def extractProfileIkawaURL(url:QUrl, aw:'ApplicationWindow') -> 'ProfileData':
 
 
 # returns a dict containing all profile information contained in the given IKAWA CSV file
-def extractProfileIkawaCSV(file, aw:'ApplicationWindow') -> 'ProfileData':
+def extractProfileIkawaCSV(file:str, aw:'ApplicationWindow') -> 'ProfileData':
     res:ProfileData = {} # the interpreted data set
 
     res['samplinginterval'] = 1.0

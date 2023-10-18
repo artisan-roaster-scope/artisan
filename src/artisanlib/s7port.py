@@ -69,7 +69,7 @@ def get_bool(bytearray_: bytearray, byte_index: int, bool_index: int) -> bool:
     return current_value == index_value
 
 
-def set_bool(bytearray_: bytearray, byte_index: int, bool_index: int, value: bool):
+def set_bool(bytearray_: bytearray, byte_index: int, bool_index: int, value: bool) -> None:
     """Set boolean value on location in bytearray.
 
     Args:
@@ -102,7 +102,7 @@ def set_bool(bytearray_: bytearray, byte_index: int, bool_index: int, value: boo
         # make sure index_v is NOT in current byte
         bytearray_[byte_index] -= index_value
 
-def set_int(bytearray_: bytearray, byte_index: int, _int: int):
+def set_int(bytearray_: bytearray, byte_index: int, v_int: int) -> bytes:
     """Set value in bytearray to int
 
     Notes:
@@ -111,7 +111,7 @@ def set_int(bytearray_: bytearray, byte_index: int, _int: int):
     Args:
         bytearray_: buffer to write on.
         byte_index: byte index to start writing from.
-        _int: int value to write.
+        v_int: int value to write.
 
     Returns:
         Buffer with the written value.
@@ -122,8 +122,7 @@ def set_int(bytearray_: bytearray, byte_index: int, _int: int):
             bytearray(b'\\x00\\xff')
     """
     # make sure were dealing with an int
-    _int = int(_int)
-    _bytes = struct.unpack('2B', struct.pack('>h', _int))
+    _bytes = struct.unpack('2B', struct.pack('>h', v_int))
     bytearray_[byte_index:byte_index + 2] = _bytes
     return bytearray_
 
@@ -149,7 +148,7 @@ def get_int(bytearray_: bytearray, byte_index: int) -> int:
     data[1] = data[1] & 0xff
     data[0] = data[0] & 0xff
     packed = struct.pack('2B', *data)
-    return struct.unpack('>h', packed)[0]
+    return int(struct.unpack('>h', packed)[0])
 
 def get_real(bytearray_: bytearray, byte_index: int) -> float:
     """Get real value.
@@ -171,9 +170,9 @@ def get_real(bytearray_: bytearray, byte_index: int) -> float:
             123.32099914550781
     """
     x = bytearray_[byte_index:byte_index + 4]
-    return struct.unpack('>f', struct.pack('4B', *x))[0]
+    return int(struct.unpack('>f', struct.pack('4B', *x))[0])
 
-def set_real(bytearray_: bytearray, byte_index: int, real) -> bytearray:
+def set_real(bytearray_: bytearray, byte_index: int, real:float) -> bytearray:
     """Set Real value
 
     Notes:
@@ -193,9 +192,8 @@ def set_real(bytearray_: bytearray, byte_index: int, real) -> bytearray:
         >>> snap7.util.set_real(data, 0, 123.321)
             bytearray(b'B\\xf6\\xa4Z')
     """
-    real = float(real)
-    real = struct.pack('>f', real)
-    _bytes = struct.unpack('4B', real)
+    real_bytes:bytes = struct.pack('>f', real)
+    _bytes = struct.unpack('4B', real_bytes)
     for i, b in enumerate(_bytes):
         bytearray_[byte_index + i] = b
     return bytearray_
@@ -367,12 +365,13 @@ class s7port:
         if not self.isConnected():
             _log.debug('connect(): connecting')
             try:
-                if self.plc is None:
-                    from artisanlib.s7client import S7Client # ylint: disable=reimported
-                    self.plc = S7Client()
-                    self.initArrays() # initialize S7 arrays
-                else:
-                    self.plc.disconnect()
+#                if self.plc is None:
+#                    from artisanlib.s7client import S7Client # pylint: disable=reimported
+#                    self.plc = S7Client()
+#                    self.initArrays() # initialize S7 arrays
+#                else:
+#                    self.plc.disconnect()
+                self.plc.disconnect()
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
             time.sleep(0.2)
@@ -429,7 +428,7 @@ class s7port:
                 db_nr = self.db_nr[c]
                 register = self.start[c]
                 registers = [register] # BOOL
-                if self.type[c] in [1,2]: # FLOAT (or FLOAT2INT)
+                if self.type[c] in {1,2}: # FLOAT (or FLOAT2INT)
                     registers.append(register+1)
                     registers.append(register+2)
                     registers.append(register+3)
@@ -588,7 +587,7 @@ class s7port:
             if self.aw.seriallogflag:
                 self.aw.addserial(f'S7 writeInt({area},{dbnumber},{start},{value})')
 
-    def maskWriteInt(self, area:int, dbnumber:int, start:int, and_mask:int, or_mask,value:int) -> None:
+    def maskWriteInt(self, area:int, dbnumber:int, start:int, and_mask:int, or_mask:int, value:int) -> None:
         _log.debug('maskWriteInt(%d,%d,%d,%s,%s,%d)',area,dbnumber,start,and_mask,or_mask,value)
         try:
             #### lock shared resources #####

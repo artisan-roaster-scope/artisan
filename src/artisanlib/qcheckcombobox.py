@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 #
 
-"""
-Check Combo Box
+"""Check Combo Box
 ---------------
 A QComboBox subclass designed for multiple item selection.
 The combo box popup allows the user to check/uncheck multiple items at
@@ -14,6 +13,7 @@ once.
 # updatet to PyQt6, by Marko Luther 2021
 
 import sys
+from typing import Dict, Optional
 
 try:
     from PyQt6.QtCore import Qt, QEvent, QTimer, pyqtSignal # @UnusedImport @Reimport  @UnresolvedImport
@@ -23,7 +23,7 @@ try:
     from PyQt6.QtWidgets import (
         QComboBox, QAbstractItemDelegate, QStyledItemDelegate, # @UnusedImport @Reimport  @UnresolvedImport
         QApplication, QStyle, QStyleOptionComboBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QStyleOptionMenuItem, QStyleOptionViewItem, QStylePainter # @UnusedImport @Reimport  @UnresolvedImport
+        QStyleOptionMenuItem, QStyleOptionViewItem, QStylePainter, QWidget # @UnusedImport @Reimport  @UnresolvedImport
     )
 except ImportError:
     from PyQt5.QtCore import Qt, QEvent, QTimer, pyqtSignal # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
@@ -33,21 +33,19 @@ except ImportError:
     from PyQt5.QtWidgets import ( # type: ignore
         QComboBox, QAbstractItemDelegate, QStyledItemDelegate, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QApplication, QStyle, QStyleOptionComboBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QStyleOptionMenuItem, QStyleOptionViewItem, QStylePainter # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QStyleOptionMenuItem, QStyleOptionViewItem, QStylePainter, QWidget # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     )
 
 
 class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
-    """
-    A QComboBox allowing multiple item selection.
+    """A QComboBox allowing multiple item selection.
     """
 
     flagChanged=pyqtSignal(int,bool)
 
 
     class ComboItemDelegate(QStyledItemDelegate): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
-        """
-        Helper styled delegate (mostly based on existing private Qt's
+        """Helper styled delegate (mostly based on existing private Qt's
         delegate used by the QComboBox). Used to style the popup like a
         list view (e.g windows style).
         """
@@ -76,8 +74,7 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
                 super().paint(painter, option, index)
 
     class ComboMenuDelegate(QAbstractItemDelegate): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
-        """
-        Helper styled delegate (mostly based on existing private Qt's
+        """Helper styled delegate (mostly based on existing private Qt's
         delegate used by the QComboBox). Used to style the popup like a
         menu. (e.g osx aqua style).
         """
@@ -185,8 +182,8 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
             menuoption.state = state
             return menuoption
 
-    def __init__(self, parent=None, placeholderText='', separator=', ',
-                 **kwargs) -> None:
+    def __init__(self, parent:Optional[QWidget] = None, placeholderText:str = '', separator:str = ', ',
+                 **kwargs:Dict) -> None:
         super().__init__(parent, **kwargs)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 
@@ -312,8 +309,7 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
         painter.drawControl(QStyle.ControlElement.CE_ComboBoxLabel, option)
 
     def itemCheckState(self, index):
-        """
-        Return the check state for item at `index`
+        """Return the check state for item at `index`
         Parameters
         ----------
         index : int
@@ -327,8 +323,7 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
         return Qt.CheckState.Unchecked
 
     def setItemCheckState(self, index, state):
-        """
-        Set the check state for item at `index` to `state`.
+        """Set the check state for item at `index` to `state`.
         Parameters
         ----------
         index : int
@@ -337,8 +332,7 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
         self.setItemData(index, state, Qt.ItemDataRole.CheckStateRole)
 
     def checkedIndices(self):
-        """
-        Return a list of indices of all checked items.
+        """Return a list of indices of all checked items.
         Returns
         -------
         indices : List[int]
@@ -347,8 +341,7 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
                 if self.itemCheckState(i) == Qt.CheckState.Checked]
 
     def setPlaceholderText(self, text):
-        """
-        Set the placeholder text.
+        """Set the placeholder text.
         This text is displayed on the checkbox when there are no checked
         items.
         Parameters
@@ -360,8 +353,7 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
             self.update()
 
     def placeholderText(self):
-        """
-        Return the placeholder text.
+        """Return the placeholder text.
         Returns
         -------
         text : str

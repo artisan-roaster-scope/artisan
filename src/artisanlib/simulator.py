@@ -20,8 +20,8 @@ from artisanlib.util import fromFtoC, fromCtoF, RoRfromFtoC, RoRfromCtoF
 
 import numpy
 import logging
-from typing import Tuple
-from typing_extensions import Final  # Python <=3.7
+from typing import Tuple, Dict, Any, Optional
+from typing import Final  # Python <=3.7
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -31,7 +31,7 @@ class Simulator:
         'extraDelta1', 'extraDelta2', 'extraNoneTempHint1', 'extraNoneTempHint2' ]
 
     # mode is the current temperature of Artisan, either "C" or "F"
-    def __init__(self, mode, profile = None) -> None:
+    def __init__(self, mode:str, profile:Optional[Dict[str, Any]] = None) -> None:
 
         self.profile = profile
         if profile is not None:

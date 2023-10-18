@@ -336,7 +336,7 @@ class BleInterface(QtCore.QObject): # pyright: ignore [reportGeneralTypeIssues] 
             self.deviceDisconnected.emit()
 
     @QtCore.pyqtSlot('QBluetoothDeviceDiscoveryAgent::Error')
-    def scanError(self, error)  -> None: # pylint: disable=no-self-use
+    def scanError(self, error:QtBluetooth.QBluetoothDeviceDiscoveryAgent.Error) -> None: # pylint: disable=no-self-use
         _log.debug('scanError: %s', error)
 
     @QtCore.pyqtSlot()
@@ -350,8 +350,6 @@ class BleInterface(QtCore.QObject): # pyright: ignore [reportGeneralTypeIssues] 
     @staticmethod
     def deviceHasService(device:QtBluetooth.QBluetoothDeviceInfo, service_uuid:QtBluetooth.QBluetoothUuid) -> bool:
         try:
-            if device is None:
-                return False
             services = device.serviceUuids()
             has_service:bool = services is not None and len(services)>0 and service_uuid in services
             if has_service:

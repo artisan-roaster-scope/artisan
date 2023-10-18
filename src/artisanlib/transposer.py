@@ -22,6 +22,8 @@ import numpy
 from typing import List, Tuple, Callable, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QWidget # noqa: F401 # pylint: disable=unused-import
     import numpy.typing as npt  # pylint: disable=unused-import
 
 from artisanlib.dialogs import ArtisanDialog
@@ -54,7 +56,7 @@ class MyQRegularExpressionValidator(QRegularExpressionValidator): # pyright: ign
         return value
 
 class profileTransformatorDlg(ArtisanDialog):
-    def __init__(self, parent, aw) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Profile Transposer'))
@@ -528,8 +530,9 @@ class profileTransformatorDlg(ArtisanDialog):
             result_temps,fit = self.calcTempResults()
             for i in range(5):
                 temp_result_widget:Optional[QTableWidgetItem] = self.temp_result_widgets[i]
-                if temp_result_widget is not None and result_temps[i] is not None:
-                    temp_result_widget.setText(str(self.aw.float2float(result_temps[i])) + self.aw.qmc.mode)
+                result_temp = result_temps[i]
+                if temp_result_widget is not None and result_temp is not None:
+                    temp_result_widget.setText(str(self.aw.float2float(result_temp)) + self.aw.qmc.mode)
             s = ''
             if fit is not None:
                 s = fit
@@ -809,7 +812,7 @@ class profileTransformatorDlg(ArtisanDialog):
     # the lists of sources and targets are expected to be of the same length
     # the length of the result list is the same as that of the sources and targets
     @staticmethod
-    def calcDiscretefits(sources,targets) -> List[Optional['npt.NDArray[numpy.float64]']]:
+    def calcDiscretefits(sources:List[Optional[float]], targets:List[Optional[float]]) -> List[Optional['npt.NDArray[numpy.float64]']]:
         if len(sources) != len(targets):
             return [None]*len(sources)
         fits:List[Optional['npt.NDArray[numpy.float64]']] = [None]*len(sources)
@@ -826,13 +829,22 @@ class profileTransformatorDlg(ArtisanDialog):
                             next_idx = j
                             break
                     if next_idx is None:
+                        sources_i = sources[i]
+                        targets_i = targets[i]
                         if last_fit is not None:
                             fits[i] = last_fit # copy previous fit
-                        else:
+                        elif sources_i is not None and targets_i is not None:
                             # set a simple offset only as there is no previous nor next fit
-                            fits[i] = numpy.array([1,targets[i]-sources[i]])
+                            fits[i] = numpy.array([1,targets_i - sources_i])
+                        else:
+                            fits[i] = numpy.array([1,0])
                     else:
-                        fits[i] = numpy.polyfit([sources[i],sources[next_idx]],[targets[i],targets[next_idx]],1)
+                        sources_next = sources[next_idx]
+                        targets_next = targets[next_idx]
+                        if sources_i is None or targets_i is None or sources_next is None or targets_next is None:
+                            fits[i] = numpy.array([1,0])
+                        else:
+                            fits[i] = numpy.polyfit([sources_i, sources_next], [targets_i, targets_next] ,1)
                     # if this is the first fit, we copy it to all previous positions
                     if last_fit is None:
                         for k in range(i):
@@ -1030,9 +1042,10 @@ class profileTransformatorDlg(ArtisanDialog):
 
         for i in range(3):
             profilePhasesTime = profilePhasesTimes[i]
-            if len(profilePhasesTimes) > i and profilePhasesTime is not None:
+            profilePhasesPercentage = profilePhasesPercentages[i]
+            if len(profilePhasesTimes) > i and profilePhasesTime is not None and profilePhasesPercentage is not None:
                 profile_phases_time_str = \
-                    f'{stringfromseconds(int(round(profilePhasesTime)),leadingzero=False)}    {self.aw.float2float(profilePhasesPercentages[i])}%'
+                    f'{stringfromseconds(int(round(profilePhasesTime)),leadingzero=False)}    {self.aw.float2float(profilePhasesPercentage)}%'
                 profile_phases_widget = QTableWidgetItem(profile_phases_time_str)
                 profile_phases_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 self.phasestable.setItem(0,i,profile_phases_widget)
@@ -1186,8 +1199,9 @@ class profileTransformatorDlg(ArtisanDialog):
         self.temp_result_widgets = []
 
         for i in range(5):
-            if len(self.profileTemps) > i and self.profileTemps[i] is not None:
-                profile_temp_str = str(self.aw.float2float(self.profileTemps[i])) + self.aw.qmc.mode
+            profileTemp = self.profileTemps[i]
+            if len(self.profileTemps) > i and profileTemp is not None:
+                profile_temp_str = str(self.aw.float2float(profileTemp)) + self.aw.qmc.mode
                 profile_widget = QTableWidgetItem(profile_temp_str)
                 profile_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 self.temptable.setItem(0,i,profile_widget)

@@ -38,7 +38,7 @@ import platform
 import threading
 import logging
 from typing import Optional, TYPE_CHECKING
-from typing_extensions import Final # Python <=3.7
+from typing import Final # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -77,7 +77,7 @@ def is_synced() -> bool:
     return False
 
 
-def start(app_window:'ApplicationWindow'):
+def start(app_window:'ApplicationWindow') -> None:
     config.app_window = app_window
     QTimer.singleShot(2, connect)
 

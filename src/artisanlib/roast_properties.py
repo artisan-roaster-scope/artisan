@@ -19,7 +19,7 @@ import sys
 import math
 import platform
 import logging
-from typing import Optional, List, Tuple, Dict, cast, TYPE_CHECKING
+from typing import Optional, List, Tuple, Dict, cast, Any, TYPE_CHECKING
 from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
@@ -27,6 +27,7 @@ if TYPE_CHECKING:
     from artisanlib.ble import BleInterface # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtWidgets import QLayout, QAbstractItemView, QCompleter # pylint: disable=unused-import
     from PyQt6.QtGui import QClipboard # pylint: disable=unused-import
+    from PyQt6.QtCore import QObject # pylint: disable=unused-import
 
 
 # import artisan.plus modules
@@ -75,9 +76,9 @@ except ImportError:
 ########################################################################################
 
 class volumeCalculatorDlg(ArtisanDialog):
-    def __init__(self, parent, aw, weightIn, weightOut,
-            weightunit,volumeunit,
-            inlineedit,outlineedit,tare) -> None: # weight in and out expected in g (int)
+    def __init__(self, parent:'editGraphDlg', aw:'ApplicationWindow', weightIn:Optional[float], weightOut:Optional[float],
+            weightunit:int,volumeunit:int,
+            inlineedit:QLineEdit,outlineedit:QLineEdit,tare:float) -> None: # weight in and out expected in g (int)
 
         self.parent_dialog = parent
         # weightunit 0:g, 1:Kg  volumeunit 0:ml, 1:l
@@ -90,16 +91,16 @@ class volumeCalculatorDlg(ArtisanDialog):
         else:
             self.scale_connected = False
 
-        self.weightIn = weightIn
-        self.weightOut = weightOut
+        self.weightIn:Optional[float] = weightIn
+        self.weightOut:Optional[float] = weightOut
 
         # the units
         self.weightunit = weightunit
         self.volumeunit = volumeunit
 
         # the results
-        self.inVolume:Optional[str] = None
-        self.outVolume:Optional[str] = None
+        self.inVolume:Optional[float] = None
+        self.outVolume:Optional[float] = None
 
         # the QLineedits of the RoastProperties dialog to be updated
         self.inlineedit = inlineedit
@@ -406,11 +407,14 @@ class volumeCalculatorDlg(ArtisanDialog):
     def resetInVolume(self):
         try:
             line = self.coffeeinweightEdit.text()
-            if line is None or str(line).strip() == '':
+            if self.weightIn is None or line is None or str(line).strip() == '':
                 self.coffeeinvolume.setText('')
                 self.inVolume = None
             else:
-                self.inVolume = self.aw.convertVolume(self.aw.convertWeight(self.weightIn,self.weightunit,0) * float(comma2dot(self.unitvolumeEdit.text())) / float(comma2dot(self.coffeeinweightEdit.text())),5,self.volumeunit)
+                self.inVolume = self.aw.convertVolume(
+                    self.aw.convertWeight(self.weightIn,self.weightunit,0) * float(comma2dot(self.unitvolumeEdit.text())) / float(comma2dot(self.coffeeinweightEdit.text())),
+                    5,
+                    self.volumeunit)
                 self.coffeeinvolume.setText(f'{self.aw.float2floatWeightVolume(self.inVolume):g}')
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -421,7 +425,7 @@ class volumeCalculatorDlg(ArtisanDialog):
     def resetOutVolume(self):
         try:
             line = self.coffeeoutweightEdit.text()
-            if line is None or str(line).strip() == '':
+            if self.weightOut is None or line is None or str(line).strip() == '':
                 self.coffeeoutvolume.setText('')
                 self.outVolume = None
             else:
@@ -435,15 +439,9 @@ class volumeCalculatorDlg(ArtisanDialog):
     @pyqtSlot()
     def updateVolumes(self):
         if self.inVolume:
-            if self.volumeunit == 0:
-                self.inlineedit.setText(f'{self.aw.float2floatWeightVolume(self.inVolume):g}')
-            else:
-                self.inlineedit.setText(f'{self.aw.float2floatWeightVolume(self.inVolume):g}')
-        if self.outVolume and self.outVolume != '':
-            if self.volumeunit == 0:
-                self.outlineedit.setText(f'{self.aw.float2floatWeightVolume(self.outVolume):g}')
-            else:
-                self.outlineedit.setText(f'{self.aw.float2floatWeightVolume(self.outVolume):g}')
+            self.inlineedit.setText(f'{self.aw.float2floatWeightVolume(self.inVolume):g}')
+        if self.outVolume:
+            self.outlineedit.setText(f'{self.aw.float2floatWeightVolume(self.outVolume):g}')
         self.parent_dialog.volume_percent()
         self.closeEvent(None)
 
@@ -501,11 +499,11 @@ class RoastsComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # A
             except Exception: # pylint: disable=broad-except
                 pass
 
-    def eventFilter(self, _obj, event) -> bool:
+    def eventFilter(self, _obj:Optional['QObject'] = None, event:Optional[QEvent] = None) -> bool:
 # the next prevents correct setSelection on Windows
 #        if event.type() == QEvent.Type.FocusIn:
 #            self.setSelection(self.currentIndex())
-        if event.type() == QEvent.Type.MouseButtonPress:
+        if event is not None and event.type() == QEvent.Type.MouseButtonPress:
             self.updateMenu()
 #            return True # stops processing # popup not drawn if this line is added
 #        return super().eventFilter(obj, event) # this seems to slow down things on Windows and not necessary anyhow
@@ -538,7 +536,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     def __init__(self, parent:QWidget, aw:'ApplicationWindow', activeTab:int = 0) -> None:
         super().__init__(parent, aw)
 
-        self.activeTab = activeTab
+        self.activeTab:int = activeTab
 
         self.setModal(True)
 #        self.setWindowModality(Qt.WindowModality.WindowModal)
@@ -547,18 +545,18 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         # register per tab if all its widgets and data has been initialized
         # initialization of some tabs is delayed for efficiency reasons until they are opened for the first time
-        self.tabInitialized = [False]*6 # 0: Roast, 1: Notes, 2: Events, 3: Data, 4: Energy, 5: Setup
+        self.tabInitialized:List[bool] = [False]*6 # 0: Roast, 1: Notes, 2: Events, 3: Data, 4: Energy, 5: Setup
 
         # we remember user modifications to revert to them on deselecting a plus element
-        self.modified_beans = self.aw.qmc.beans
-        self.modified_density_in_text = str(self.aw.float2float(self.aw.qmc.density[0]))
-        self.modified_volume_in_text = str(self.aw.float2float(self.aw.qmc.volume[0]))
-        self.modified_beansize_min_text = str(self.aw.qmc.beansize_min)
-        self.modified_beansize_max_text = str(self.aw.qmc.beansize_max)
-        self.modified_moisture_greens_text = str(self.aw.qmc.moisture_greens)
+        self.modified_beans:str = self.aw.qmc.beans
+        self.modified_density_in_text:str = str(self.aw.float2float(self.aw.qmc.density[0]))
+        self.modified_volume_in_text:str = str(self.aw.float2float(self.aw.qmc.volume[0]))
+        self.modified_beansize_min_text:str = str(self.aw.qmc.beansize_min)
+        self.modified_beansize_max_text:str = str(self.aw.qmc.beansize_max)
+        self.modified_moisture_greens_text:str = str(self.aw.qmc.moisture_greens)
 
         # remember parameters set by plus_coffee/plus_blend on entering the dialog to enable a Cancel action
-        self.org_beans = self.aw.qmc.beans
+        self.org_beans:str = self.aw.qmc.beans
         self.org_density = self.aw.qmc.density
         self.org_density_roasted = self.aw.qmc.density_roasted
         self.org_beansize_min = self.aw.qmc.beansize_min
@@ -1396,7 +1394,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     self.ble.scanDevices()
                 except Exception as e:  # pylint: disable=broad-except
                     _log.exception(e)
-            elif self.aw.scale.device in ['KERN NDE','Shore 930']:
+            elif self.aw.scale.device in {'KERN NDE','Shore 930'}:
                 self.connectScaleSignal.connect(self.connectScaleLoop)
                 QTimer.singleShot(2,lambda : self.connectScaleSignal.emit()) # pylint: disable= unnecessary-lambda
 
@@ -1714,7 +1712,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.scale.closeport()
             self.scale_weight = None
             self.scale_battery = None
-        elif self.aw.scale.SP is None or not self.aw.scale.SP.isOpen():
+        elif self.aw.scale.SP is None or not self.aw.scale.SP.is_open:
             self.connectScaleSignal.emit()
         else:
             w,_,_ = self.aw.scale.readWeight()
@@ -1754,12 +1752,12 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.updateLargeScaleLCDs(None, '')
 
     # takes total accumulated weight and renders it as text; returns the empty string if the total weight is not given
-    def updateScaleWeightAccumulated(self,weight:Optional[float]=None):
-        unit = ''
-        v_formatted = ''
+    def updateScaleWeightAccumulated(self,weight:Optional[float]=None) -> Tuple[str,str]:
+        unit:str = ''
+        v_formatted:str = ''
         if self.scale_set is not None and weight is not None:
             v = weight + self.scale_set
-            if self.aw.qmc.weight_units.index(self.aw.qmc.weight[2]) in [0,1]:
+            if self.aw.qmc.weight_units.index(self.aw.qmc.weight[2]) in {0, 1}:
                 if v > 1000:
                     v_formatted = f'{v/1000:.2f}'
                     unit = 'kg'
@@ -2174,10 +2172,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             _log.exception(e)
 
     def defaultCoffeeData(self):
-        if self.modified_beans is None:
-            self.beansedit.clear()
-        else:
-            self.beansedit.setPlainText(self.modified_beans)
+        self.beansedit.setPlainText(self.modified_beans)
         self.bean_density_in_edit.setText(self.modified_density_in_text)
         self.volumeinedit.setText(self.modified_volume_in_text)
         self.bean_size_min_edit.setText(self.modified_beansize_min_text)
@@ -2492,7 +2487,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     beanSize_min,
                     beanSize_max,
                     moistureGreen,
-                    colorSystem,
+                    self.aw.qmc.color_systems[colorSystem],
                     self.aw.curFile, # could be empty
                     self.aw.qmc.roastUUID, # could be empty
                     self.aw.qmc.roastbatchnr, #self.batchcounterSpinBox # self.aw.superusermode and self.aw.qmc.batchcounter > -1
@@ -2938,13 +2933,13 @@ class editGraphDlg(ArtisanResizeablDialog):
             item2.setText(self.aw.qmc.energyunits[self.aw.qmc.energyresultunit_setup])
 
         for i in range(ndata):
-            if self.btu_list[i]['Kind'] in [0, 2]:  #Preheat Measured, BBP Measured
+            if self.btu_list[i]['Kind'] in {0, 2}:  #Preheat Measured, BBP Measured
                 load_widget = MyTableWidgetItemNumber('',self.btu_list[i]['load_pct'])
             else:
                 load_widget = MyTableWidgetItemNumber(f"{self.btu_list[i]['load_pct']:.1f}%",self.btu_list[i]['load_pct'])
             load_widget.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
 
-            if self.btu_list[i]['Kind'] in [0, 2]:  #Preheat Measured, BBP Measured
+            if self.btu_list[i]['Kind'] in {0, 2}:  #Preheat Measured, BBP Measured
                 duration_mmss_widget = MyTableWidgetItemNumber('',0)
             else:
                 duration_mmss_widget = MyTableWidgetItemNumber(stringfromseconds(self.btu_list[i]['duration']),self.btu_list[i]['duration'])
@@ -3686,7 +3681,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     def setupModified(self) -> bool:
         if self.setup_ui is None:
             return False
-        return (
+        return bool(
             self.setup_ui.lineEditOrganization.text() != self.aw.qmc.organization_setup or
             self.setup_ui.lineEditOperator.text() != self.aw.qmc.operator_setup  or
             self.setup_ui.lineEditMachine.text() != self.aw.qmc.roastertype_setup or
@@ -3836,8 +3831,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         QTimer.singleShot(1, self.volumeCalculator)
 
     def volumeCalculator(self):
-        weightin = None
-        weightout = None
+        weightin:Optional[float] = None
+        weightout:Optional[float] = None
         try:
             weightin = float(comma2dot(self.weightinedit.text()))
         except Exception: # pylint: disable=broad-except
@@ -3849,7 +3844,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         k = 1.
         weightin = weightin * k if weightin is not None else None
         weightout = weightout * k if weightout is not None else None
-        tare = 0
+        tare:float = 0
         try:
             tare_idx = self.tareComboBox.currentIndex() - 3
             if tare_idx > -1:
@@ -3972,7 +3967,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         vheader: Optional[QHeaderView] = self.datatable.verticalHeader()
         if vheader is not None:
             vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
-        offset = 0
+        offset:float = 0
         if self.aw.qmc.timeindex[0] > -1:
             offset = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
 
@@ -4060,6 +4055,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.datatable.setItem(i,3,deltaET)
             self.datatable.setItem(i,4,deltaBT)
             j = 5
+            value:float
             for k in range(len(self.aw.qmc.extratimex)):
                 if len(self.aw.qmc.extratemp1) > k:
                     value = -1
@@ -4752,6 +4748,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.aw.qmc.adderror(QApplication.translate('Error Message', 'Unable to move CHARGE to a value that does not exist'))
             self.chargeeditcopy = str(self.chargeedit.text())
         # check CHARGE (with index self.aw.qmc.timeindex[0])
+        start: float
         if self.aw.qmc.timeindex[0] == -1:
             start = 0                   #relative start time
         else:
@@ -5135,7 +5132,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         return dialog.exec()
 
 class StockComboBox(MyQComboBox):
-    def __init__(self, unitsComboBox:QComboBox, *args, **kwargs) -> None:
+    def __init__(self, unitsComboBox:QComboBox, *args:Any, **kwargs:Any) -> None:
         super().__init__(*args, **kwargs)
         self.inverted:bool = False # is True if the weight units were inverted before
         self.unitsComboBox:QComboBox = unitsComboBox
@@ -5166,20 +5163,20 @@ class StockComboBox(MyQComboBox):
         super().mousePressEvent(event)
 
 class CoffeesComboBox(StockComboBox):
-    def __init__(self, parent:editGraphDlg, *args, **kwargs) -> None:
+    def __init__(self, parent:editGraphDlg, *args:Any, **kwargs:Any) -> None:
         super().__init__(parent.unitsComboBox, *args, **kwargs)
         self.parentDialog = parent
 
-    def getItems(self, unit:int):
+    def getItems(self, unit:int) -> List[str]:
         plus_coffees = plus.stock.getCoffees(unit, self.parentDialog.plus_default_store)
         return [''] + plus.stock.getCoffeesLabels(plus_coffees)
 
 class BlendsComboBox(StockComboBox):
-    def __init__(self, parent:editGraphDlg, *args, **kwargs) -> None:
+    def __init__(self, parent:editGraphDlg, *args:Any, **kwargs:Any) -> None:
         super().__init__(parent.unitsComboBox, *args, **kwargs)
         self.parentDialog:editGraphDlg = parent
 
-    def getItems(self, unit:int):
+    def getItems(self, unit:int) -> List[str]:
         custom_blend:Optional[plus.stock.Blend] = None
         if self.parentDialog.aw.qmc.plus_custom_blend is not None and self.parentDialog.aw.qmc.plus_custom_blend.name.strip() != '':
             coffees = plus.stock.getCoffeeLabels()
@@ -5350,7 +5347,7 @@ class tareDlg(ArtisanDialog):
 #####################  ENERGY Measuring Dialog  ########################################
 
 class EnergyMeasuringDialog(ArtisanDialog):
-    def __init__(self, parent, aw:'ApplicationWindow') -> None:
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         self.ui = MeasureDialog.Ui_setMeasureDialog()
         self.ui.setupUi(self)

@@ -22,18 +22,19 @@ from matplotlib import ticker, transforms
 import matplotlib.patheffects as PathEffects
 from matplotlib import rcParams
 import logging
-from typing import Sequence, List, Tuple, Dict, Any, Optional, TYPE_CHECKING
+from typing import Sequence, List, Union, Tuple, Optional, Literal, Callable, cast, TYPE_CHECKING
 from typing_extensions import TypedDict  # Python <=3.7
 from typing import Final
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+    from artisanlib.types import ProfileData # pylint: disable=unused-import
     from matplotlib.lines import Line2D # pylint: disable=unused-import
     import matplotlib as mpl # pylint: disable=unused-import
     from PyQt6.QtWidgets import QLayoutItem, QLayout, QScrollBar # pylint: disable=unused-import
     from PyQt6.QtGui import QStandardItem, QKeyEvent # pylint: disable=unused-import
 
-from artisanlib.util import deltaLabelUTF8, decodeLocal, stringfromseconds, fromFtoC, fromCtoF, fill_gaps
+from artisanlib.util import deltaLabelUTF8, decodeLocal, stringfromseconds, fromFtoCstrict, fromCtoFstrict, fill_gaps
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
@@ -82,7 +83,7 @@ class RoastProfile:
         'l_events3', 'l_events4', 'ambientTemp', 'metadata', 'specialevents', 'specialeventstype', 'specialeventsvalue', 'TP']
 
     # NOTE: filepath/filename can also be a URL string
-    def __init__(self, aw:'ApplicationWindow', profile:Dict[str, Any], filepath:str, color: Tuple[float, float, float, float]) -> None:
+    def __init__(self, aw:'ApplicationWindow', profile:'ProfileData', filepath:str, color: Tuple[float, float, float, float]) -> None:
         self.aw = aw
         # state:
         self.visible:bool = True
@@ -165,35 +166,6 @@ class RoastProfile:
             for i,ti in enumerate(profile['timeindex']):
                 if i < len(self.timeindex):
                     self.timeindex[i] = ti
-        elif len(profile) > 0 and ('startend' in profile or 'dryend' in profile or 'cracks' in profile):
-            try:
-                ###########      OLD PROFILE FORMAT
-                if 'startend' in profile:
-                    startend = [float(fl) for fl in profile['startend']]
-                else:
-                    startend = [0.,0.,0.,0.]
-                dryend = profile.get('dryend', [0.0, 0.0])
-                if 'cracks' in profile:
-                    varC = [float(fl) for fl in profile['cracks']]
-                else:
-                    varC = [0.,0.,0.,0.,0.,0.,0.,0.]
-                times = []
-                times.append(startend[0])
-                times.append(dryend[0])
-                times.append(varC[0])
-                times.append(varC[2])
-                times.append(varC[4])
-                times.append(varC[6])
-                times.append(startend[2])
-                #convert to new profile
-                for i, _ in enumerate(times):
-                    if times[i]:
-                        self.timeindex[i] = self.aw.qmc.timearray2index(self.timex,times[i])
-                    else:
-                        self.timeindex[i] = 0
-            except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
-            ###########      END OLD PROFILE FORMAT
 
         # temperature conversion
         m = str(profile['mode']) if 'mode' in profile else self.aw.qmc.mode
@@ -204,13 +176,13 @@ class RoastProfile:
         else:
             self.ambientTemp = 68
         if self.aw.qmc.mode == 'C' and m == 'F':
-            self.temp1 = [fromFtoC(t) for t in self.temp1]
-            self.temp2 = [fromFtoC(t) for t in self.temp2]
-            self.ambientTemp = fromFtoC(self.ambientTemp)
+            self.temp1 = [fromFtoCstrict(t) for t in self.temp1]
+            self.temp2 = [fromFtoCstrict(t) for t in self.temp2]
+            self.ambientTemp = fromFtoCstrict(self.ambientTemp)
         elif self.aw.qmc.mode == 'F' and m == 'C':
-            self.temp1 = [fromCtoF(t) for t in self.temp1]
-            self.temp2 = [fromCtoF(t) for t in self.temp2]
-            self.ambientTemp = fromCtoF(self.ambientTemp)
+            self.temp1 = [fromCtoFstrict(t) for t in self.temp1]
+            self.temp2 = [fromCtoFstrict(t) for t in self.temp2]
+            self.ambientTemp = fromCtoFstrict(self.ambientTemp)
         if 'title' in profile:
             title:Optional[str] = decodeLocal(profile['title'])
             if title is not None:
@@ -288,7 +260,7 @@ class RoastProfile:
             if beans_str is not None:
                 self.metadata['beans'] = beans_str
         if 'weight' in profile and profile['weight'][0] != 0.0:
-            w = profile['weight'][0]
+            w:float = float(profile['weight'][0])
             weight_unit:Optional[str] = decodeLocal(profile['weight'][2])
             if weight_unit is not None:
                 if weight_unit != 'g':
@@ -798,7 +770,7 @@ class roastCompareDlg(ArtisanDialog):
         'button_2_org_state_hidden', 'button_10_org_state_hidden', 'pick_handler_id', 'modeComboBox', 'buttonCONTROL_org_state_hidden', 'buttonONOFF_org_state_hidden',
         'buttonRESET_org_state_hidden', 'buttonSTARTSTOP_org_state_hidden', 'profileTable' ]
 
-    def __init__(self, parent:QWidget, aw:'ApplicationWindow', foreground = None, background = None) -> None:
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow', foreground:Optional[str] = None, background:Optional[str] = None) -> None:
         super().__init__(parent, aw)
 
         if platform.system() == 'Darwin':
@@ -806,8 +778,8 @@ class roastCompareDlg(ArtisanDialog):
 
         self.setAcceptDrops(True)
 
-        self.foreground = foreground
-        self.background = background
+        self.foreground:Optional[str] = foreground
+        self.background:Optional[str] = background
         self.setWindowTitle(QApplication.translate('Form Caption','Comparator'))
         self.maxentries = 10 # maximum number of profiles to be compared
         self.basecolors: List[Tuple[float, float, float, float]] = list(colormaps['tab10'](numpy.linspace(0,1,10)))  # @UndefinedVariable # pylint: disable=maybe-no-member
@@ -1058,7 +1030,7 @@ class roastCompareDlg(ArtisanDialog):
         self.aw.qmc.ax.set_facecolor(self.aw.qmc.palette['background'])
         self.aw.qmc.delta_ax.clear()
         self.aw.qmc.ax.set_ylim(self.aw.qmc.ylimit_min, self.aw.qmc.ylimit)
-        grid_axis = None
+        grid_axis:Optional[Literal['both', 'x', 'y']] = None
         if self.aw.qmc.temp_grid and self.aw.qmc.time_grid:
             grid_axis = 'both'
         elif self.aw.qmc.temp_grid:
@@ -1066,7 +1038,14 @@ class roastCompareDlg(ArtisanDialog):
         elif self.aw.qmc.time_grid:
             grid_axis = 'x'
         if grid_axis is not None:
-            self.aw.qmc.ax.grid(True,axis=grid_axis,color=self.aw.qmc.palette['grid'],linestyle=self.aw.qmc.gridstyles[self.aw.qmc.gridlinestyle],linewidth = self.aw.qmc.gridthickness,alpha = self.aw.qmc.gridalpha,sketch_params=0,path_effects=[])
+            self.aw.qmc.ax.grid(True,
+                axis = grid_axis,
+                color = self.aw.qmc.palette['grid'],
+                linestyle = self.aw.qmc.gridstyles[self.aw.qmc.gridlinestyle],
+                linewidth = self.aw.qmc.gridthickness,
+                alpha = self.aw.qmc.gridalpha,
+                sketch_params = 0,
+                path_effects = [])
 
         self.aw.qmc.ax.spines.top.set_visible(self.aw.qmc.xgrid != 0 and self.aw.qmc.ygrid != 0 and self.aw.qmc.zgrid != 0)
         self.aw.qmc.ax.spines.bottom.set_visible(self.aw.qmc.xgrid != 0)
@@ -1177,15 +1156,17 @@ class roastCompareDlg(ArtisanDialog):
 
     # draw time alignment vertical line
     def drawAlignmentLine(self):
-        self.l_align = self.aw.qmc.ax.axvline(0,
-            color=self.aw.qmc.palette['grid'],
-            linestyle=self.aw.qmc.gridstyles[self.aw.qmc.gridlinestyle],
-            zorder=0,
-            linewidth = self.aw.qmc.gridthickness*2,sketch_params=0,
-            path_effects=[])
+        if self.aw.qmc.ax is not None:
+            self.l_align = self.aw.qmc.ax.axvline(0,
+                color=self.aw.qmc.palette['grid'],
+                linestyle=self.aw.qmc.gridstyles[self.aw.qmc.gridlinestyle],
+                zorder=0,
+                linewidth = self.aw.qmc.gridthickness*2,sketch_params=0,
+                path_effects=[])
 
     def drawLegend(self):
         if self.aw.qmc.legendloc:
+            loc:Union[int, Tuple[float,float]]
             if self.legend is None:
                 if self.legendloc_pos is None:
                     loc = self.aw.qmc.legendloc
@@ -1209,9 +1190,10 @@ class roastCompareDlg(ArtisanDialog):
             if len(handles) > 0:
                 prop = self.aw.mpl_fontproperties.copy()
                 prop.set_size('x-small')
-                self.legend = self.aw.qmc.ax.legend(handles,labels,loc=loc,
-                    #ncol=ncol,
-                    fancybox=True,prop=prop,shadow=False,frameon=True)
+                if self.aw.qmc.ax is not None:
+                    self.legend = self.aw.qmc.ax.legend(handles,labels,loc=loc,
+                        #ncol=ncol,
+                        fancybox=True,prop=prop,shadow=False,frameon=True)
 
                 if self.legend is not None:
                     try:
@@ -1552,7 +1534,8 @@ class roastCompareDlg(ArtisanDialog):
                         dmax = max(dmax,rp.max_DeltaBT)
             if dmax > 0:
                 dmax = int(dmax) + 1
-                self.aw.qmc.delta_ax.set_ylim(top=dmax) # we only autoadjust the upper limit
+                if self.aw.qmc.delta_ax is not None:
+                    self.aw.qmc.delta_ax.set_ylim(top=dmax) # we only autoadjust the upper limit
                 self.aw.qmc.zlimit = int(round(dmax))
 
     def recompute(self):
@@ -1609,11 +1592,7 @@ class roastCompareDlg(ArtisanDialog):
                 if p.active:
                     c = QColor.fromRgbF(*p.color)
                 else:
-                    r,g,b,a = p.gray
-                    if r is not None and g is not None and b is not None and a is not None:
-                        c = QColor.fromRgbF(*p.gray)
-                    else:
-                        c = QColor.fromRgbF(*p.color).lighter()
+                    c = QColor.fromRgbF(*p.gray)
                 w.setBackground(c)
         self.aw.qpc.update_phases(self.getPhasesData())
 
@@ -1703,7 +1682,7 @@ class roastCompareDlg(ArtisanDialog):
 
     ### ADD/DELETE table items
 
-    def addProfile(self, filename:str, obj:Dict[str, Any]) -> None:
+    def addProfile(self, filename:str, obj:'ProfileData') -> None:
         selected = [self.aw.findWidgetsRow(self.profileTable,si,2) for si in self.profileTable.selectedItems()]
         active = not bool(selected)
         # assign next color
@@ -1721,12 +1700,12 @@ class roastCompareDlg(ArtisanDialog):
         self.profileTable.setRowCount(len(self.profiles))
         self.setProfileTableRow(len(self.profiles)-1)
 
-    def addProfileFromURL(self, extractor, url) -> None:
+    def addProfileFromURL(self, extractor:Callable[[QUrl, 'ApplicationWindow'], Optional['ProfileData']], url:QUrl) -> None:
         _log.info('addProfileFromURL(%s)', url)
         try:
-            obj = extractor(url,self.aw)
+            obj:Optional['ProfileData'] = extractor(url, self.aw)
             if obj:
-                self.addProfile(url,obj)
+                self.addProfile(str(url), obj)
                 self.updateAlignMenu()
                 self.realign()
                 self.updateZorders()
@@ -1747,12 +1726,12 @@ class roastCompareDlg(ArtisanDialog):
                 firstChar = stream.read(1)
                 if firstChar == '{':
                     f.close()
-                    obj = self.aw.deserialize(filename)
+                    obj = cast('ProfileData', self.aw.deserialize(filename))
                     self.addProfile(filename,obj)
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
 
-    def addProfiles(self,filenames):
+    def addProfiles(self, filenames):
         if filenames:
             for filename in filenames:
                 self.addProfileFromFile(filename)

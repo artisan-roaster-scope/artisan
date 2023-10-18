@@ -34,14 +34,15 @@ except ImportError:
         QGroupBox, QLineEdit, QMessageBox, QLayout) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 if TYPE_CHECKING:
-    from PyQt6.QtWidgets import QPushButton # pylint: disable=unused-import
+    from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QWidget, QPushButton # pylint: disable=unused-import
 
 #########################################################################
 #############  DESIGNER CONFIG DIALOG ###################################
 #########################################################################
 
 class designerconfigDlg(ArtisanDialog):
-    def __init__(self, parent, aw) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         self.setWindowTitle(QApplication.translate('Form Caption','Designer Config'))
         self.setModal(True)
@@ -591,11 +592,11 @@ class designerconfigDlg(ArtisanDialog):
         self.aw.sendmessage(QApplication.translate('Message','Designer has been reset'))
 
     def loadconfigflags(self):
-        self.dryend.setChecked(self.aw.qmc.timeindex[1])
-        self.fcs.setChecked(self.aw.qmc.timeindex[2])
-        self.fce.setChecked(self.aw.qmc.timeindex[3])
-        self.scs.setChecked(self.aw.qmc.timeindex[4])
-        self.sce.setChecked(self.aw.qmc.timeindex[5])
+        self.dryend.setChecked(bool(self.aw.qmc.timeindex[1]))
+        self.fcs.setChecked(bool(self.aw.qmc.timeindex[2]))
+        self.fce.setChecked(bool(self.aw.qmc.timeindex[3]))
+        self.scs.setChecked(bool(self.aw.qmc.timeindex[4]))
+        self.sce.setChecked(bool(self.aw.qmc.timeindex[5]))
 
     #adds deletes landmarks
     @pyqtSlot(bool)
@@ -704,7 +705,7 @@ class designerconfigDlg(ArtisanDialog):
 
 
 class pointDlg(ArtisanDialog):
-    def __init__(self,parent, aw, values = None) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow', values:Optional[List[float]] = None) -> None:
         super().__init__(parent, aw)
         if values is None:
             values = [0,0]

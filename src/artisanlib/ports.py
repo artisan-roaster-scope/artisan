@@ -19,8 +19,13 @@ import sys
 import time
 import platform
 import logging
-from typing import List, Optional
+from typing import List, Optional, TYPE_CHECKING
 from typing import Final  # Python <=3.7
+
+if TYPE_CHECKING:
+    from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+    from artisanlib.dialogs import HelpDlg # noqa: F401 # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QWidget # pylint: disable=unused-import
 
 from artisanlib.util import toFloat, uchr, comma2dot
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog, PortComboBox
@@ -46,84 +51,84 @@ except ImportError:
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 class scanModbusDlg(ArtisanDialog):
-    def __init__(self, parent, aw) -> None:
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         self.setModal(True)
         # current setup selected in the MODBUS tab
-        self.port = ''
-        self.baudrate = 19200
-        self.bytesize = 8
-        self.stopbits = 1
-        self.parity = 'N'
-        self.timeout = 1
-        self.mtype = 1
-        self.mhost = '127.0.0.1'
-        self.mport = 502
+        self.port:str = ''
+        self.baudrate:int = 19200
+        self.bytesize:int = 8
+        self.stopbits:int = 1
+        self.parity:str = 'N'
+        self.timeout:float = 0.5
+        self.mtype:int = 1
+        self.mhost:str = '127.0.0.1'
+        self.mport:int = 502
         # save current MODBUS serial, type, host, port settings
-        self.port_aw = self.aw.modbus.comport
-        self.baudrate_aw = self.aw.modbus.baudrate
-        self.bytesize_aw = self.aw.modbus.bytesize
-        self.parity_aw = self.aw.modbus.parity
-        self.stopbits_aw = self.aw.modbus.stopbits
-        self.timeout_aw = self.aw.modbus.timeout
-        self.mtype_aw = self.aw.modbus.type
-        self.mhost_aw = self.aw.modbus.host
-        self.mport_aw = self.aw.modbus.port
-        self.stop = False # if True stop the processing
+        self.port_aw:str = self.aw.modbus.comport
+        self.baudrate_aw:int = self.aw.modbus.baudrate
+        self.bytesize_aw:int = self.aw.modbus.bytesize
+        self.parity_aw:str = self.aw.modbus.parity
+        self.stopbits_aw:int = self.aw.modbus.stopbits
+        self.timeout_aw:float = self.aw.modbus.timeout
+        self.mtype_aw:int = self.aw.modbus.type
+        self.mhost_aw:str = self.aw.modbus.host
+        self.mport_aw:int = self.aw.modbus.port
+        self.stop:bool = False # if True stop the processing
         self.setWindowTitle(QApplication.translate('Form Caption','Scan Modbus'))
-        self.slave = 1
-        self.slaveLabel = QLabel(QApplication.translate('Label', 'Slave'))
-        self.slaveEdit = QLineEdit(str(self.slave))
+        self.slave:int = 1
+        self.slaveLabel:QLabel = QLabel(QApplication.translate('Label', 'Slave'))
+        self.slaveEdit:QLineEdit = QLineEdit(str(self.slave))
         self.slaveEdit.setValidator(QIntValidator(1,247,self.slaveEdit))
         self.slaveEdit.setFixedWidth(65)
         self.slaveEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.min_register = 0
-        self.registerLabel = QLabel(QApplication.translate('Label', 'Register'))
-        self.toLabel = QLabel(uchr(8212))
-        self.minRegisterEdit = QLineEdit(str(self.min_register))
+        self.min_register:int = 0
+        self.registerLabel:QLabel = QLabel(QApplication.translate('Label', 'Register'))
+        self.toLabel:QLabel = QLabel(uchr(8212))
+        self.minRegisterEdit:QLineEdit = QLineEdit(str(self.min_register))
         self.minRegisterEdit.setValidator(QIntValidator(0,65536,self.minRegisterEdit))
         self.minRegisterEdit.setFixedWidth(65)
         self.minRegisterEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.max_register = 65536
-        self.maxRegisterEdit = QLineEdit(str(self.max_register))
+        self.max_register:int = 65536
+        self.maxRegisterEdit:QLineEdit = QLineEdit(str(self.max_register))
         self.maxRegisterEdit.setValidator(QIntValidator(0,65536,self.maxRegisterEdit))
         self.maxRegisterEdit.setFixedWidth(65)
         self.maxRegisterEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.code3 = True
-        self.code4 = False
-        self.checkbox3 = QCheckBox(QApplication.translate('CheckBox','Fct. 3'))
+        self.code3:bool = True
+        self.code4:bool = False
+        self.checkbox3:QCheckBox = QCheckBox(QApplication.translate('CheckBox','Fct. 3'))
         self.checkbox3.setChecked(self.code3)
         self.checkbox3.stateChanged.connect(self.checkbox3Changed)
-        self.checkbox4 = QCheckBox(QApplication.translate('CheckBox','Fct. 4'))
+        self.checkbox4:QCheckBox = QCheckBox(QApplication.translate('CheckBox','Fct. 4'))
         self.checkbox4.setChecked(self.code4)
         self.checkbox4.stateChanged.connect(self.checkbox4Changed)
-        self.modbusEdit = QTextEdit()
+        self.modbusEdit:QTextEdit = QTextEdit()
         self.modbusEdit.setReadOnly(True)
-        startButton = QPushButton(QApplication.translate('Button','Start'))
+        startButton:QPushButton = QPushButton(QApplication.translate('Button','Start'))
         startButton.setMaximumWidth(150)
         startButton.clicked.connect(self.start_pressed)
-        labellayout = QHBoxLayout()
+        labellayout:QHBoxLayout = QHBoxLayout()
         labellayout.addWidget(self.slaveLabel)
         labellayout.addStretch()
         labellayout.addWidget(self.registerLabel)
         labellayout.addStretch()
-        srlayout = QHBoxLayout()
+        srlayout:QHBoxLayout = QHBoxLayout()
         srlayout.addWidget(self.slaveEdit)
         srlayout.addStretch()
         srlayout.addWidget(self.minRegisterEdit)
         srlayout.addWidget(self.toLabel)
         srlayout.addWidget(self.maxRegisterEdit)
-        cblayout= QHBoxLayout()
+        cblayout:QHBoxLayout = QHBoxLayout()
         cblayout.addStretch()
         cblayout.addWidget(self.checkbox3)
         cblayout.addStretch()
         cblayout.addWidget(self.checkbox4)
         cblayout.addStretch()
-        hlayout = QHBoxLayout()
+        hlayout:QHBoxLayout = QHBoxLayout()
         hlayout.addStretch()
         hlayout.addWidget(startButton)
         hlayout.addStretch()
-        layout = QVBoxLayout()
+        layout:QVBoxLayout = QVBoxLayout()
         layout.addLayout(labellayout)
         layout.addLayout(srlayout)
         layout.addLayout(cblayout)
@@ -212,7 +217,7 @@ class scanModbusDlg(ArtisanDialog):
 
 
 class scanS7Dlg(ArtisanDialog):
-    def __init__(self, parent, aw) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         self.setModal(True)
         # current setup selected in the S7 tab
@@ -365,12 +370,12 @@ class scanS7Dlg(ArtisanDialog):
 
 
 class comportDlg(ArtisanResizeablDialog):
-    def __init__(self, parent, aw) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, False) # overwrite the ArtisanDialog class default here!!
         self.setWindowTitle(QApplication.translate('Form Caption','Ports Configuration'))
         self.setModal(True)
-        self.helpdialog = None
+        self.helpdialog:Optional['HelpDlg'] = None
         ##########################    TAB 1 WIDGETS
         comportlabel =QLabel(QApplication.translate('Label', 'Comm Port'))
         self.comportEdit = PortComboBox(selection = self.aw.ser.comport)
@@ -747,7 +752,8 @@ class comportDlg(ArtisanResizeablDialog):
         self.supported_scales = list(self.aw.scale.devicefunctionlist.keys())
         self.scale_deviceEdit.addItems(self.supported_scales)
         try:
-            self.scale_deviceEdit.setCurrentIndex(self.supported_scales.index(self.aw.scale.device))
+            if self.aw.scale.device is not None:
+                self.scale_deviceEdit.setCurrentIndex(self.supported_scales.index(self.aw.scale.device))
         except Exception: # pylint: disable=broad-except
             self.scale_deviceEdit.setCurrentIndex(0)
         self.scale_deviceEdit.setEditable(False)
@@ -794,7 +800,8 @@ class comportDlg(ArtisanResizeablDialog):
         supported_color_meters = list(self.aw.color.devicefunctionlist.keys())
         self.color_deviceEdit.addItems(supported_color_meters)
         try:
-            self.color_deviceEdit.setCurrentIndex(supported_color_meters.index(self.aw.color.device))
+            if self.aw.color.device is not None:
+                self.color_deviceEdit.setCurrentIndex(supported_color_meters.index(self.aw.color.device))
         except Exception: # pylint: disable=broad-except
             self.color_deviceEdit.setCurrentIndex(0)
         self.color_deviceEdit.setEditable(False)

@@ -16,7 +16,10 @@
 # Marko Luther, 2023
 
 from artisanlib.util import stringtoseconds, createGradient
-from typing import Optional
+from typing import Optional, Dict, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from PyQt6.QtWidgets import QWidget, QLineEdit, QTimeEdit, QCheckBox, QComboBox # pylint: disable=unused-import
 
 try:
     from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
@@ -33,8 +36,8 @@ except ImportError:
 
 
 class MyQComboBox(QComboBox): # pylint: disable=too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues]# Argument to class must be a base class
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+    def __init__(self, parent:Optional['QWidget'] = None, **kwargs:Dict) -> None:
+        super().__init__(parent, **kwargs)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
 
@@ -44,8 +47,8 @@ class MyQComboBox(QComboBox): # pylint: disable=too-few-public-methods  # pyrigh
         return None
 
 class MyQDoubleSpinBox(QDoubleSpinBox):  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+    def __init__(self, parent:Optional['QWidget'] = None, **kwargs:Dict) -> None:
+        super().__init__(parent, **kwargs)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setLocale(QLocale('C'))
 
@@ -66,7 +69,7 @@ class MyQDoubleSpinBox(QDoubleSpinBox):  # pyright: ignore [reportGeneralTypeIss
 
 class MyTableWidgetItemQLineEdit(QTableWidgetItem): # pylint: disable= too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     __slots__ = ['sortKey'] # save some memory by using slots
-    def __init__(self, sortKey) -> None:
+    def __init__(self, sortKey:'QLineEdit') -> None:
         #call custom constructor with UserType item type
         super().__init__('', 1001) #QTableWidgetItem.ItemType.UserType)
         self.sortKey = sortKey
@@ -87,7 +90,7 @@ class MyTableWidgetItemQLineEdit(QTableWidgetItem): # pylint: disable= too-few-p
 
 class MyTableWidgetItemQTime(QTableWidgetItem): # pylint: disable= too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     __slots__ = ['sortKey'] # save some memory by using slots
-    def __init__(self, sortKey) -> None:
+    def __init__(self, sortKey:'QTimeEdit') -> None:
         #call custom constructor with UserType item type
         super().__init__('', 1002) #QTableWidgetItem.ItemType.UserType)
         self.sortKey = sortKey
@@ -100,7 +103,7 @@ class MyTableWidgetItemQTime(QTableWidgetItem): # pylint: disable= too-few-publi
 
 class MyTableWidgetItemNumber(QTableWidgetItem): # pylint: disable= too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     __slots__ = ['sortKey'] # save some memory by using slots
-    def __init__(self, text, sortKey) -> None:
+    def __init__(self, text:str, sortKey:int) -> None:
         super().__init__(text, 1003) #QTableWidgetItem.ItemType.UserType)
         self.sortKey = sortKey
 
@@ -110,7 +113,7 @@ class MyTableWidgetItemNumber(QTableWidgetItem): # pylint: disable= too-few-publ
 
 class MyTableWidgetItemQCheckBox(QTableWidgetItem): # pylint: disable= too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base clas
     __slots__ = ['sortKey'] # save some memory by using slots
-    def __init__(self, sortKey) -> None:
+    def __init__(self, sortKey:'QCheckBox') -> None:
         #call custom constructor with UserType item type
         super().__init__('', 1004) #QTableWidgetItem.ItemType.UserType)
         self.sortKey = sortKey
@@ -121,7 +124,7 @@ class MyTableWidgetItemQCheckBox(QTableWidgetItem): # pylint: disable= too-few-p
 
 class MyTableWidgetItemQComboBox(QTableWidgetItem): # pylint: disable= too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     __slots__ = ['sortKey'] # save some memory by using slots
-    def __init__(self, sortKey) -> None:
+    def __init__(self, sortKey:'QComboBox') -> None:
         #call custom constructor with UserType item type
         super().__init__('', 1005) # QTableWidgetItem.ItemType.UserType)
         self.sortKey = sortKey
@@ -132,8 +135,8 @@ class MyTableWidgetItemQComboBox(QTableWidgetItem): # pylint: disable= too-few-p
 
 # QLabel that automatically resizes its text font
 class MyQLabel(QLabel):  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
-    def __init__(self, *args, **kargs) -> None:
-        super().__init__(*args, **kargs)
+    def __init__(self, text: Optional[str] = None, parent: Optional['QWidget'] = None, flags: Qt.WindowType = Qt.WindowType.Widget) -> None:
+        super().__init__(text, parent, flags)
         self.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Ignored,QSizePolicy.Policy.Ignored))
         self.setMinSize(14)
 
@@ -233,8 +236,8 @@ class ClickableTextEdit(QTextEdit): # pylint: disable=too-few-public-methods # p
     editingFinished = pyqtSignal()
     receivedFocus = pyqtSignal()
 
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+    def __init__(self, parent:Optional['QWidget'] = None, **kwargs:Dict) -> None:
+        super().__init__(parent, **kwargs)
         self._changed = False
         self.setTabChangesFocus(True)
         self.textChanged.connect(self._handle_text_changed)
@@ -278,15 +281,15 @@ def pushButtonColorStyle(
         state: str='',
         color:Optional[str]=None,
         background:Optional[str]=None,
-        font_size:Optional[int]=None):
+        font_size:Optional[int]=None) -> str:
     color = ('' if color is None else f'color:{color};')
     background = ('' if background is None else f'background-color:{background};')
     font_size_str = ('' if font_size is None else f'font-size:{font_size}pt;')
     return f'{class_name}{selector}{state}{{{color}{background}{font_size_str}}}'
 
 class EventPushButton(QPushButton): # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
-    def __init__(self, background_color, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+    def __init__(self, text:str, parent:Optional['QWidget'] = None, background_color:str = '#777777') -> None:
+        super().__init__(text, parent)
         self.default_background_color = background_color
         self.default_style = pushButtonColorStyle('*',
             selector='[Selected=false]',
@@ -304,13 +307,13 @@ class EventPushButton(QPushButton): # pylint: disable=too-few-public-methods # p
 
 
 class MajorEventPushButton(EventPushButton): # pylint: disable=too-few-public-methods
-    def __init__(self, *args, background_color = '#147bb3', **kwargs) -> None:
-        super().__init__(background_color, *args, **kwargs)
+    def __init__(self, text:str, parent:Optional['QWidget'] = None, background_color:str = '#147bb3') -> None:
+        super().__init__(text, parent, background_color)
 
 
 class AnimatedMajorEventPushButton(MajorEventPushButton):
-    def __init__(self, *args, background_color = '#147bb3', **kwargs) -> None:
-        super().__init__(*args, background_color=background_color, **kwargs)
+    def __init__(self, text:str, parent:Optional['QWidget'] = None, background_color:str = '#147bb3') -> None:
+        super().__init__(text, parent, background_color)
 
         # we make the dark animation color slightly darker than the background:
         anim_dark_color = QColor(background_color).lighter(80)
@@ -391,9 +394,9 @@ class AnimatedMajorEventPushButton(MajorEventPushButton):
     zcolor = pyqtProperty(QColor, getBackColor, setBackColor)
 
 class MinorEventPushButton(EventPushButton): # pylint: disable=too-few-public-methods
-    def __init__(self, *args, background_color = '#66b8d7', **kwargs) -> None:
-        super().__init__(background_color, *args, **kwargs)
+    def __init__(self, text:str, parent:Optional['QWidget'] = None, background_color:str = '#66b8d7') -> None:
+        super().__init__(text, parent, background_color)
 
 class AuxEventPushButton(EventPushButton): # pylint: disable=too-few-public-methods
-    def __init__(self, *args, background_color = '#bdbdbd', **kwargs) -> None:
-        super().__init__(background_color, *args, **kwargs)
+    def __init__(self, text:str, parent:Optional['QWidget'] = None, background_color:str = '#bdbdbd') -> None:
+        super().__init__(text, parent, background_color)

@@ -25,14 +25,18 @@ except ImportError:
     from PyQt5.QtCore import (Qt, QSettings) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QFrame, QWidget, QLCDNumber, QHBoxLayout, QVBoxLayout) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
-from typing import List, Optional
+from typing import List, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QWidget # pylint: disable=unused-import
 
 class LargeLCDs(ArtisanDialog):
 
     __slots__ = ['lcds1', 'lcds2', 'lcds1styles', 'lcds2styles', 'lcds1labelsUpper', 'lcds2labelsUpper', 'lcds1labelsLower', 'lcds2labelsLower',
         'lcds1frames', 'lcds2frames', 'visibleFrames', 'tight', 'layoutNr', 'swaplcds']
 
-    def __init__(self, parent, aw) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         # it is assumed that both lists of lcds (lcd1 & lcd2) have the same length
         # the same is assumed for the other lists below:
@@ -325,7 +329,7 @@ class LargeMainLCDs(LargeLCDs):
 
     __slots__ = ['lcd0']
 
-    def __init__(self, parent = None, aw = None) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         self.lcd0:Optional[QLCDNumber] = None # Timer
         # we add the ET lcd to the lcd1 list and the BT lcds to the lcd2 list (same for styles, labels and frames
         super().__init__(parent, aw)
@@ -477,7 +481,7 @@ class LargeMainLCDs(LargeLCDs):
 
 class LargeDeltaLCDs(LargeLCDs):
 
-    def __init__(self, parent = None, aw = None) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         settings = QSettings()
         if settings.contains('DeltaLCDGeometry'):
@@ -524,7 +528,7 @@ class LargeDeltaLCDs(LargeLCDs):
         self.aw.deltalcdsAction.setChecked(False)
 
 class LargePIDLCDs(LargeLCDs):
-    def __init__(self, parent = None, aw = None) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         settings = QSettings()
         if settings.contains('PIDLCDGeometry'):
@@ -570,7 +574,7 @@ class LargePIDLCDs(LargeLCDs):
         self.aw.pidlcdsAction.setChecked(False)
 
 class LargeExtraLCDs(LargeLCDs):
-    def __init__(self, parent = None, aw = None) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         settings = QSettings()
         if settings.contains('ExtraLCDGeometry'):
@@ -654,7 +658,7 @@ class LargePhasesLCDs(LargeLCDs):
 
     __slots__ = ['labels', 'values1', 'values2']
 
-    def __init__(self, parent = None, aw = None) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         self.labels = [' ', ' ', ' ', self.formatLabel('AUC')] # formatted labels
         self.values1 = [' ']*2
         self.values2 = [' ']*2
@@ -754,7 +758,7 @@ class LargePhasesLCDs(LargeLCDs):
         self.aw.phaseslcdsAction.setChecked(False)
 
 class LargeScaleLCDs(LargeLCDs):
-    def __init__(self, parent = None, aw = None) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         settings = QSettings()
         if settings.contains('ScaleLCDGeometry'):

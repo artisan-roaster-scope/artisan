@@ -60,7 +60,7 @@ from artisanlib.util import comma2dot
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
 from uic import BlendDialog # type: ignore[attr-defined] # pylint: disable=no-name-in-module
-from typing import Optional, List, Dict, Tuple, Any, TYPE_CHECKING
+from typing import Optional, List, Collection, Dict, Tuple, Any, TYPE_CHECKING
 from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
@@ -126,7 +126,7 @@ class CustomBlend:
     #  - the component ratios of all ingredients sum up to 1,
     #  - there are no duplicates in the list of component coffees, and,
     #  - all component coffees are contained in the list of available_coffees (list of hr_ids as strings), if given
-    def isValid(self, available_coffees: Optional[List[str]] = None) -> bool:
+    def isValid(self, available_coffees: Optional[Collection[str]] = None) -> bool:
         component_coffees = [c.coffee for c in self._components]
         return (
             len(component_coffees)>1 and

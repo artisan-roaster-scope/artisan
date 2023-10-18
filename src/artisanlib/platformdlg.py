@@ -17,6 +17,8 @@
 
 import platform
 
+from typing import TYPE_CHECKING
+
 from artisanlib import __version__
 from artisanlib import __revision__
 
@@ -27,8 +29,13 @@ try:
 except ImportError:
     from PyQt5.QtWidgets import QApplication, QVBoxLayout, QTextEdit # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
+
+if TYPE_CHECKING:
+    from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QWidget # pylint: disable=unused-import
+
 class platformDlg(ArtisanDialog):
-    def __init__(self, parent, aw) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Artisan Platform'))

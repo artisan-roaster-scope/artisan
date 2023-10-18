@@ -17,7 +17,7 @@
 
 import logging
 from typing import List, Optional, Union, Tuple, Callable
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 
 from artisanlib.ble import UUID, BLE_CHAR_TYPE
@@ -121,7 +121,7 @@ class AcaiaBLE:
         self.protocolParseDataLen = 0
         self.protocolParseDataIndex = 0
 
-    def acaiaProtocolParser(self, write:Callable[[Optional[bytes]],None], dataIn) -> None:
+    def acaiaProtocolParser(self, write:Callable[[Optional[bytes]],None], dataIn:bytes) -> None:
         for c_in in dataIn:
             if self.protocolParseStep==self.E_PRS_CHECKHEADER1:
                 if c_in == self.HEADER1:

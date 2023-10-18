@@ -476,7 +476,7 @@ class RecentRoast(TypedDict, total=False):
     plus_coffee_label:Optional[str]
     plus_blend_label:Optional[str]
     plus_blend_spec:Optional['Blend']
-    plus_blend_spec_labels: List[str]
+    plus_blend_spec_labels: Optional[List[str]]
 
 class SerialSettings(TypedDict):
     port: str

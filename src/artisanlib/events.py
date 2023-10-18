@@ -2121,84 +2121,84 @@ class EventsDlg(ArtisanResizeablDialog):
     def localSetbuttonsfrom(self,pindex):
         copy = cast('Palette', self.aw.buttonpalette[pindex][:])
         if len(copy):
-            self.extraeventstypes = cast(List[int], copy[0][:]) # pylint: disable=attribute-defined-outside-init
-            self.extraeventsvalues = cast(List[float], copy[1][:]) # pylint: disable=attribute-defined-outside-init
-            self.extraeventsactions = cast(List[int], copy[2][:]) # pylint: disable=attribute-defined-outside-init
-            self.extraeventsvisibility = cast(List[int], copy[3][:]) # pylint: disable=attribute-defined-outside-init
-            self.extraeventsactionstrings = cast(List[str], copy[4][:]) # pylint: disable=attribute-defined-outside-init
-            self.extraeventslabels = cast(List[str], copy[5][:]) # pylint: disable=attribute-defined-outside-init
-            self.extraeventsdescriptions = cast(List[str], copy[6][:]) # pylint: disable=attribute-defined-outside-init
-            self.extraeventbuttoncolor = cast(List[str], copy[7][:]) # pylint: disable=attribute-defined-outside-init
-            self.extraeventbuttontextcolor = cast(List[str], copy[8][:]) # pylint: disable=attribute-defined-outside-init
+            self.extraeventstypes = copy[0][:] # pylint: disable=attribute-defined-outside-init
+            self.extraeventsvalues = copy[1][:] # pylint: disable=attribute-defined-outside-init
+            self.extraeventsactions = copy[2][:] # pylint: disable=attribute-defined-outside-init
+            self.extraeventsvisibility = copy[3][:] # pylint: disable=attribute-defined-outside-init
+            self.extraeventsactionstrings = copy[4][:] # pylint: disable=attribute-defined-outside-init
+            self.extraeventslabels = copy[5][:] # pylint: disable=attribute-defined-outside-init
+            self.extraeventsdescriptions = copy[6][:] # pylint: disable=attribute-defined-outside-init
+            self.extraeventbuttoncolor = copy[7][:] # pylint: disable=attribute-defined-outside-init
+            self.extraeventbuttontextcolor = copy[8][:] # pylint: disable=attribute-defined-outside-init
             # added slider settings
             if len(copy)>9 and len(copy[9]) == 4:
-                self.aw.eventslidervisibilities = cast(List[int], copy[9][:])
+                self.aw.eventslidervisibilities = copy[9][:]
             else:
                 self.aw.eventslidervisibilities = [0,0,0,0]
             if len(copy)>10 and len(copy[10]) == 4:
-                self.aw.eventslideractions = cast(List[int], copy[10][:])
+                self.aw.eventslideractions = copy[10][:]
             else:
                 self.aw.eventslideractions = [0,0,0,0]
             if len(copy)>11 and len(copy[11]) == 4:
-                self.aw.eventslidercommands = cast(List[str], copy[11][:])
+                self.aw.eventslidercommands = copy[11][:]
             else:
                 self.aw.eventslidercommands = ['','','','']
             if len(copy)>12 and len(copy[12]) == 4:
-                self.aw.eventslideroffsets = cast(List[float], copy[12][:])
+                self.aw.eventslideroffsets = copy[12][:]
             else:
                 self.aw.eventslideroffsets = [0., 0., 0., 0.]
             if len(copy)>13 and len(copy[13]) == 4:
-                self.aw.eventsliderfactors = cast(List[float], copy[13][:])
+                self.aw.eventsliderfactors = copy[13][:]
             else:
                 self.aw.eventsliderfactors = [1.0,1.0,1.0,1.0]
             # quantifiers
             if len(copy)>14 and len(copy[14]) == 4:
-                self.aw.eventquantifieractive = cast(List[int], copy[14][:])
+                self.aw.eventquantifieractive = copy[14][:]
             else:
                 self.aw.eventquantifieractive = [0,0,0,0]
             if len(copy)>15 and len(copy[15]) == 4:
-                self.aw.eventquantifiersource = cast(List[int], copy[15][:])
+                self.aw.eventquantifiersource = copy[15][:]
             else:
                 self.aw.eventquantifiersource = [0,0,0,0]
             if len(copy)>16 and len(copy[16]) == 4:
-                self.aw.eventquantifiermin = cast(List[int], copy[16][:])
+                self.aw.eventquantifiermin = copy[16][:]
             else:
                 self.aw.eventquantifiermin = [0,0,0,0]
             if len(copy)>17 and len(copy[17]) == 4:
-                self.aw.eventquantifiermax = cast(List[int], copy[17][:])
+                self.aw.eventquantifiermax = copy[17][:]
             else:
                 self.aw.eventquantifiermax = [100,100,100,100]
             if len(copy)>18 and len(copy[18]) == 4:
-                self.aw.eventquantifiercoarse = cast(List[int], copy[18][:])
+                self.aw.eventquantifiercoarse = copy[18][:]
             else:
                 self.aw.eventquantifiercoarse = [0,0,0,0]
             # slider min/max
             if len(copy)>19 and len(copy[19]) == 4:
-                self.aw.eventslidermin = cast(List[int], copy[19][:])
+                self.aw.eventslidermin = copy[19][:]
             else:
                 self.aw.eventslidermin = [0,0,0,0]
             if len(copy)>20 and len(copy[20]) == 4:
-                self.aw.eventslidermax = cast(List[int], copy[20][:])
+                self.aw.eventslidermax = copy[20][:]
             else:
                 self.aw.eventslidermax = [100,100,100,100]
             # slider coarse
             if len(copy)>21 and len(copy[21]) == 4:
-                self.aw.eventslidercoarse = cast(List[int], copy[21][:])
+                self.aw.eventslidercoarse = copy[21][:]
             else:
                 self.aw.eventslidercoarse = [0,0,0,0]
             # slide temp
             if len(copy)>22 and len(copy[22]) == 4:
-                self.aw.eventslidertemp = cast(List[int], copy[22][:])
+                self.aw.eventslidertemp = copy[22][:]
             else:
                 self.aw.eventslidertemp = [0,0,0,0]
             # slider units
             if len(copy)>23 and len(copy[23]) == 4:
-                self.aw.eventsliderunits = cast(List[str], copy[23][:])
+                self.aw.eventsliderunits = copy[23][:]
             else:
                 self.aw.eventsliderunits = ['','','','']
             # slider bernoulli
             if len(copy)>24 and len(copy[24]) == 4:
-                self.aw.eventsliderBernoulli = cast(List[int], copy[24][:])
+                self.aw.eventsliderBernoulli = copy[24][:]
             else:
                 self.aw.eventsliderBernoulli = [0,0,0,0]
             # palette label
@@ -2207,11 +2207,11 @@ class EventsDlg(ArtisanResizeablDialog):
             else:
                 self.aw.buttonpalette_label = self.aw.buttonpalette_default_label
             if len(copy)>26 and len(copy[26]) == 4:
-                self.aw.eventquantifieraction = cast(List[int], copy[26][:])
+                self.aw.eventquantifieraction = copy[26][:]
             else:
                 self.aw.eventquantifieraction = [0,0,0,0]
             if len(copy)>27 and len(copy[27]) == 4:
-                self.aw.eventquantifierSV = cast(List[int], copy[27][:])
+                self.aw.eventquantifierSV = copy[27][:]
             else:
                 self.aw.eventquantifierSV = [0,0,0,0]
 
@@ -3465,7 +3465,7 @@ class EventsDlg(ArtisanResizeablDialog):
         dialog.ui.lineEdit_Factor.setText(factor)
         dialog.ui.lineEdit_Offset.setText(offset)
 
-    def openSliderCalculator(self,sliderMin:int, sliderMax:int, factorWidget, offsetWidget):
+    def openSliderCalculator(self,sliderMin:int, sliderMax:int, factorWidget:MyQDoubleSpinBox, offsetWidget:MyQDoubleSpinBox) -> None:
         dialog = SliderCalculator(self, self.aw, factorWidget, offsetWidget)
         # set data
         dialog.ui.lineEdit_SliderValue_min.setText(str(sliderMin))
@@ -3492,18 +3492,7 @@ class EventsDlg(ArtisanResizeablDialog):
             layout.setSpacing(7)
         dialog.setFixedHeight(dialog.sizeHint().height())
         dialog.setFixedWidth(dialog.sizeHint().width())
-#        res = dialog.exec()
-#        #deleteLater() will not work here as the dialog is still bound via the parent
-#        #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
-#        # the following will immediately release the memory despite this parent link
-#        QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
-#        try: # sip not supported on older PyQt versions (RPi!)
-#            sip.delete(dialog)
-#            #print(sip.isdeleted(dialog))
-#        except Exception: # pylint: disable=broad-except
-#            pass
-#        return res
-        return dialog.exec()
+        dialog.exec()
 
 #########################################################################
 #############  SLIDER Calculator Dialog  ################################
@@ -3544,7 +3533,7 @@ class SliderCalculator(ArtisanDialog):
 #########################################################################
 
 class customEventDlg(ArtisanDialog):
-    def __init__(self, parent, aw, time_idx=0,description='',event_type=4,value=0) -> None:
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow', time_idx:int = 0,description:str = '',event_type:int = 4, value:float = 0) -> None:
         super().__init__(parent, aw)
         if time_idx != 0:
             event_time = self.aw.qmc.timex[time_idx]
@@ -3556,7 +3545,7 @@ class customEventDlg(ArtisanDialog):
         self.setWindowTitle(QApplication.translate('Form Caption','Event') + event_time_str)
         self.description = description
         self.type = event_type
-        self.value = self.aw.qmc.eventsvalues(value)
+        self.value:float = value
 
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.accept)
@@ -3571,7 +3560,7 @@ class customEventDlg(ArtisanDialog):
         self.typeCombo.addItems(etypes)
         self.typeCombo.setCurrentIndex(self.type)
         valueLabel = QLabel(QApplication.translate('Table', 'Value'))
-        self.valueEdit = QLineEdit(str(self.value))
+        self.valueEdit = QLineEdit(self.aw.qmc.eventsvalues(self.value))
 
         grid = QGridLayout()
         grid.addWidget(descriptionLabel,0,0)

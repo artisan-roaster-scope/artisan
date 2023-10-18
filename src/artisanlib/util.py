@@ -26,9 +26,13 @@ import numpy
 import functools
 from pathlib import Path
 from matplotlib import colors
-from typing import Optional, Tuple, List, Union, Any
+from typing import Optional, Tuple, List, Sequence, Union, Any, TYPE_CHECKING
 from typing import Final  # Python <=3.7
 from typing_extensions import TypeGuard  # Python <=3.10
+
+if TYPE_CHECKING:
+    import numpy.typing as npt # pylint: disable=unused-import
+
 
 ##
 
@@ -71,7 +75,7 @@ def appFrozen() -> bool:
         _log.exception(e)
     return ib
 
-def decs2string(x) -> bytes:
+def decs2string(x:List[int]) -> bytes:
     if len(x) > 0:
         return bytes(x)
     return b''
@@ -93,7 +97,7 @@ def encodeLocalStrict(x:Optional[Any], default:str = '') -> str:
     if x is None:
         return default
     return codecs.unicode_escape_encode(str(x))[0].decode('utf8')
-def hex2int(h1,h2=None) -> int:
+def hex2int(h1:int, h2:Optional[int] = None) -> int:
     if h2 is not None:
         return int(h1*256 + h2)
     return int(h1)
@@ -115,7 +119,7 @@ def abbrevString(s:str, ll:int) -> str:
     return s
 
 # used to convert time from int seconds to string (like in the LCD clock timer). input int, output string xx:xx
-def stringfromseconds(seconds_raw:float, leadingzero=True) -> str:
+def stringfromseconds(seconds_raw:float, leadingzero:bool = True) -> str:
     # seconds = int(round(seconds_raw)) # note that round(1.5)=round(2.5)=2
     seconds = int(math.floor(seconds_raw + 0.5))
     if seconds >= 0:
@@ -144,13 +148,23 @@ def stringtoseconds(string:str) -> int:
     seconds -= int(timeparts[1])
     return seconds    #return negative number
 
-def fromFtoC(Ffloat) -> float:
-    if Ffloat in [-1,None] or numpy.isnan(Ffloat):
+def fromFtoCstrict(Ffloat:float) -> float:
+    if Ffloat == -1:
         return Ffloat
     return (Ffloat-32.0)*(5.0/9.0)
 
-def fromCtoF(Cfloat) -> float:
-    """
+def fromFtoC(Ffloat:Optional[float]) -> Optional[float]:
+    if Ffloat is None or Ffloat == -1 or (Ffloat is not None and numpy.isnan(Ffloat)):
+        return Ffloat
+    return fromFtoCstrict(Ffloat)
+
+def fromCtoFstrict(Cfloat:float) -> float:
+    if Cfloat == -1:
+        return Cfloat
+    return (Cfloat*9.0/5.0)+32.0
+
+def fromCtoF(Cfloat:Optional[float]) -> Optional[float]:
+    """Converts Celsius to Fahrenheit
     >>> fromCtoF(-1)
     -1
     >>> fromCtoF(None)
@@ -158,19 +172,29 @@ def fromCtoF(Cfloat) -> float:
     >>> fromCtoF(32)
     89.6
     """
-    if Cfloat in [-1,None] or numpy.isnan(Cfloat):
+    if Cfloat is None or Cfloat == -1 or (Cfloat is not None and numpy.isnan(Cfloat)):
         return Cfloat
-    return (Cfloat*9.0/5.0)+32.0
+    return fromCtoFstrict(Cfloat)
 
-def RoRfromCtoF(CRoR) -> float:
-    if CRoR in [-1,None] or numpy.isnan(CRoR):
+def RoRfromCtoFstrict(CRoR:float) -> float:
+    if CRoR == -1:
         return CRoR
     return CRoR*9.0/5.0
 
-def RoRfromFtoC(FRoR) -> float:
-    if FRoR in [-1,None] or numpy.isnan(FRoR):
+def RoRfromCtoF(CRoR:Optional[float]) -> Optional[float]:
+    if CRoR is None or CRoR == -1 or (CRoR is not None and numpy.isnan(CRoR)):
+        return CRoR
+    return RoRfromCtoFstrict(CRoR)
+
+def RoRfromFtoCstrict(FRoR:float) -> float:
+    if FRoR == -1:
         return FRoR
     return FRoR*(5.0/9.0)
+
+def RoRfromFtoC(FRoR:Optional[float]) -> Optional[float]:
+    if FRoR is None or FRoR == -1 or (FRoR is not None and numpy.isnan(FRoR)):
+        return FRoR
+    return RoRfromFtoCstrict(FRoR)
 
 def convertRoR(r,source_unit,target_unit):
     if source_unit == target_unit:
@@ -182,9 +206,16 @@ def convertRoR(r,source_unit,target_unit):
 def convertTemp(t:float, source_unit:str, target_unit:str) -> float:
     if source_unit in ('', target_unit) or target_unit == '':
         return t
+    res : Optional[float]
     if source_unit == 'C':
-        return fromCtoF(t)
-    return fromFtoC(t)
+        res = fromCtoF(t)
+        if res is None:
+            return t
+        return res
+    res = fromFtoC(t)
+    if res is None:
+        return t
+    return res
 
 def path2url(path):
     import urllib.parse as urlparse  # @Reimport
@@ -202,37 +233,41 @@ def toInt(x:Optional[Union[int,str,float]]) -> int:
         return int(round(float(x)))
     except Exception: # pylint: disable=broad-except
         return 0
-def toString(x) -> str:
+
+def toString(x:Any) -> str:
     return str(x)
-def toList(x) -> List:
+
+def toList(x:Any) -> List:
     if x is None:
         return []
     return list(x)
-def toFloat(x) -> float:
+
+def toFloat(x:Any) -> float:
     if x is None:
         return 0.
     try:
         return float(x)
     except Exception: # pylint: disable=broad-except
         return 0.
-def toBool(x) -> bool:
+
+def toBool(x:Any) -> bool:
     if isinstance(x,str):
         x_lower = x.lower()
-        if x_lower in ('yes', 'true', 't', '1'):
+        if x_lower in {'yes', 'true', 't', '1'}:
             return True
-        if x_lower in ('no', 'false', 'f', '0'):
+        if x_lower in {'no', 'false', 'f', '0'}:
             return False
         try:
             return bool(eval(x)) # pylint: disable=eval-used
         except Exception: # pylint: disable=broad-except
             return False
     return bool(x)
-def toStringList(x) -> List[str]:
+
+def toStringList(x:List) -> List[str]:
     if x:
         return [str(s) for s in x]
     return []
-def toMap(x):
-    return x
+
 def removeAll(ll, s):
     for _ in range(ll.count(s)):  # @UndefinedVariable
         ll.remove(s)
@@ -243,15 +278,15 @@ def removeAll(ll, s):
 # [-1,-1,2] => [2, 2, 2] # a prefix of -1 of max length 'interpolate_max' will be replaced by the first value in l that is not -1
 # INVARIANT: the resulting list has always the same length as l
 # only gaps of length interpolate_max (should be set to the global aw.qmc.interpolatemax), if not None, are interpolated
-def fill_gaps(ll, interpolate_max:int=3):
-    res = []
-    last_val = -1
-    skip = -1
+def fill_gaps(ll:Union[Sequence[Union[float, int]], 'npt.NDArray[numpy.floating]'], interpolate_max:int=3) -> List[float]:
+    res:List[float] = []
+    last_val:float = -1
+    skip:int = -1
     for i,e in enumerate(ll):
         if i >= skip:
             if i == 0 and e == -1 and last_val == -1: # only for the prefix
                 # a prefix of -1 will be replaced by the first value in ll that is not -1
-                s = -1
+                s:float = -1
                 for ee in ll[:5]:
                     if ee != -1:
                         s = ee
@@ -324,7 +359,7 @@ def _getAppDataDirectory(app):
 @functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
 def getAppPath():
     platf = platform.system()
-    if platf in ['Darwin','Linux']:
+    if platf in {'Darwin','Linux'}:
         if appFrozen():
             return QCoreApplication.applicationDirPath() + '/../../../'
         return os.path.dirname(os.path.realpath(__file__)) + '/../'
@@ -442,7 +477,7 @@ def isOpen(ip: str, port: int) -> bool:
 # Logging
 
 @functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
-def getLoggers():
+def getLoggers() -> List[logging.Logger]:
     return [logging.getLogger(name) for name in logging.root.manager.loggerDict if '.' not in name]  # @UndefinedVariable pylint: disable=no-member
 
 def debugLogLevelActive() -> bool:
@@ -471,13 +506,13 @@ def setDebugLogLevel(state: bool) -> None:
         setFileLogLevels(logging.INFO, ['artisanlib', 'plus'])
         _log.info('debug logging OFF')
 
-def setFileLogLevel(logger, level) -> None:
+def setFileLogLevel(logger: logging.Logger, level:int) -> None:
     logger.setLevel(level)
     for handler in logger.handlers:
         if handler.get_name() == 'file':
             handler.setLevel(level)
 
-def setFileLogLevels(level, logger_names) -> None:
+def setFileLogLevels(level:int, logger_names:List[str]) -> None:
     loggers = getLoggers()
     for logger in loggers:
         if logger.name in logger_names:

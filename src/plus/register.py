@@ -35,7 +35,7 @@ import os
 import logging
 
 from typing import Optional, TextIO
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -204,7 +204,7 @@ def scanDir(path: Optional[str] = None) -> None:
             d = config.app_window.deserialize(
                 str(currentFile)
             )  # @UndefinedVariable
-            if d is not None and isinstance(d, str) and config.uuid_tag in d:
+            if d is not None and config.uuid_tag in d:
                 addPath(d[config.uuid_tag], str(currentFile))  # @UndefinedVariable
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)

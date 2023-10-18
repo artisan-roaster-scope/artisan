@@ -22,11 +22,12 @@ import threading
 import json
 import random
 
-from typing import List, Dict, Optional, Any, TYPE_CHECKING
-from typing_extensions import Final  # Python <=3.7
+from typing import List, Dict, Optional, Union, TYPE_CHECKING
+from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     import websocket # type: ignore # pylint: disable=unused-import
+    from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
 
 try:
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
@@ -41,7 +42,7 @@ class wsport:
                     'DRY_node', 'FCs_node', 'FCe_node', 'SCs_node', 'SCe_node', 'STARTonCHARGE', 'OFFonDROP', 'open_event', 'pending_events', 'active',
                     'ws', 'wst' ]
 
-    def __init__(self,aw) -> None:
+    def __init__(self, aw:'ApplicationWindow') -> None:
         self.aw = aw
 
         # connects to "ws://<host>:<port>/<path>"
@@ -97,7 +98,7 @@ class wsport:
         self.OFFonDROP:bool = False
 
         self.open_event:Optional[threading.Event] = None # an event set on connecting
-        self.pending_events:Dict[int, Any] = {} # message ids associated with pending threading.Event object or result
+        self.pending_events:Dict[int, Union[threading.Event, Dict]] = {} # message ids associated with pending threading.Event object or result
 
         self.active:bool = False
         self.ws:Optional['websocket.WebSocketApp'] = None  # the WebService client object
@@ -298,7 +299,7 @@ class wsport:
                 self.pending_events[message_id] = v
 
     # returns the response received for request with id or None
-    def getRequestResponse(self, message_id):
+    def getRequestResponse(self, message_id:int) -> Optional[Dict]:
         if message_id in self.pending_events:
             v = self.pending_events[message_id]
             del self.pending_events[message_id]
@@ -309,7 +310,7 @@ class wsport:
     # takes a request as dict to be send as JSON
     # and returns a dict generated from the JSON response
     # or None on exception or if block=False
-    def send(self, request:Dict, block=True) -> Optional[Dict]:
+    def send(self, request:Dict, block:bool = True) -> Optional[Dict]:
         try:
             connected = self.connect()
             if connected and self.ws is not None:

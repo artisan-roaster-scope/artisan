@@ -31,11 +31,12 @@ except ImportError:
         QSpinBox) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 if TYPE_CHECKING:
-    from PyQt6.QtWidgets import QPushButton # pylint: disable=unused-import
+    from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QPushButton, QWidget # pylint: disable=unused-import
 
 
 class StatisticsDlg(ArtisanDialog):
-    def __init__(self, parent, aw) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         self.setWindowTitle(QApplication.translate('Form Caption','Statistics'))
         self.setModal(True)

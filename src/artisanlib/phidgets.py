@@ -21,7 +21,7 @@ from Phidget22.DeviceClass import DeviceClass # type: ignore
 
 import logging
 from typing import Dict, Tuple, Optional, TYPE_CHECKING
-from typing_extensions import Final  # Python <=3.7
+from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from Phidget22.Phidget import Phidget # type: ignore # pylint: disable=unused-import
@@ -60,7 +60,7 @@ class PhidgetManager:
         self.attachedPhidgetChannels.clear()
         _log.debug('PhidgetManager closed')
 
-    def attachHandler(self,_,attachedChannel:'Phidget') -> None:
+    def attachHandler(self,_:Manager , attachedChannel:'Phidget') -> None:
         try:
             if attachedChannel.getParent().getDeviceClass() != DeviceClass.PHIDCLASS_HUB:
                 # we do not add the hub itself
@@ -68,7 +68,7 @@ class PhidgetManager:
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
-    def detachHandler(self,_,attachedChannel:'Phidget') -> None:
+    def detachHandler(self, _:Manager, attachedChannel:'Phidget') -> None:
         try:
             self.deleteChannel(attachedChannel)
         except Exception as e: # pylint: disable=broad-except

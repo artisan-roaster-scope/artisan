@@ -51,7 +51,7 @@ class tphasescanvas(FigureCanvas):
 
     __slots__ = [ 'aw', 'dpi_offset', 'barheight', 'm', 'g', 'data', 'fig', 'ax' , 'tight_layout_params' ]
 
-    def __init__(self, dpi, aw:'ApplicationWindow') -> None:
+    def __init__(self, dpi:int, aw:'ApplicationWindow') -> None:
         self.aw = aw
         self.dpi_offset = -30 # set the dpi to 30% less than the user selected dpi
         # values that define the bars and spacing

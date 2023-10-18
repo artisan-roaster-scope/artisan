@@ -127,7 +127,7 @@ class KaleidoPort:
 
     @staticmethod
     def intVar(var:str) -> bool:
-        return var in ('sid', 'HP', 'FC', 'RC', 'AH', 'HS', 'EV', 'CS')
+        return var in {'sid', 'HP', 'FC', 'RC', 'AH', 'HS', 'EV', 'CS'}
 
     @staticmethod
     def floatVar(var:str) -> bool:
@@ -135,7 +135,7 @@ class KaleidoPort:
 
     @staticmethod
     def strVar(var:str) -> bool:
-        return var in ['TU', 'SC', 'CL', 'SN']
+        return var in {'TU', 'SC', 'CL', 'SN'}
 
 # -- Kaleido PID control
 
@@ -163,7 +163,7 @@ class KaleidoPort:
     def get_state(self, var:str) -> Optional[Union[str,int,float]]:
         if var in self._state:
             return self._state[var] # type: ignore # TypedDict key must be a string literal
-        if var in ['sid', 'TU', 'SC', 'CL', 'SN']:
+        if var in {'sid', 'TU', 'SC', 'CL', 'SN'}:
             return None
         if self.intVar(var):
             return -1
@@ -211,13 +211,13 @@ class KaleidoPort:
             except Exception as e:  # pylint: disable=broad-except
                 _log.exception(e)
 
-    async def add_request(self, var) -> asyncio.Event:
+    async def add_request(self, var:str) -> asyncio.Event:
         if var in self._pending_requests:
             return self._pending_requests[var]
         self._pending_requests[var] = asyncio.Event()
         return self._pending_requests[var]
 
-    async def clear_request(self, var) -> None:
+    async def clear_request(self, var:str) -> None:
         if var in self._pending_requests:
             # clear and remove lock
             self._pending_requests.pop(var).set()
@@ -573,8 +573,6 @@ class KaleidoPort:
             msg = self.create_msg(target, value)
             if self._write_queue is not None:
                 task = self.write_await(msg, variable, await_var)
-                if task is None:
-                    return None
                 future = asyncio.run_coroutine_threadsafe(task, self._loop)
                 try:
                     return future.result(send_timeout)

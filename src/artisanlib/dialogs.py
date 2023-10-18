@@ -43,7 +43,7 @@ class ArtisanDialog(QDialog): # pyright: ignore [reportGeneralTypeIssues] # Argu
 
     __slots__ = ['aw', 'dialogbuttons']
 
-    def __init__(self, parent, aw) -> None:
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow') -> None:
         super().__init__(parent)
         self.aw = aw # the Artisan application window
 
@@ -97,7 +97,7 @@ class ArtisanDialog(QDialog): # pyright: ignore [reportGeneralTypeIssues] # Argu
         self.reject()
 
     @staticmethod
-    def setButtonTranslations(btn: Optional['QPushButton'], txt:str, trans:str):
+    def setButtonTranslations(btn: Optional['QPushButton'], txt:str, trans:str) -> None:
         if btn is not None:
             current_trans = btn.text()
             if txt == current_trans:
@@ -121,7 +121,7 @@ class ArtisanDialog(QDialog): # pyright: ignore [reportGeneralTypeIssues] # Argu
             super().keyPressEvent(event)
 
 class ArtisanResizeablDialog(ArtisanDialog):
-    def __init__(self, parent, aw) -> None:
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         if str(platform.system()) == 'Windows':
             windowFlags = self.windowFlags()
@@ -133,7 +133,7 @@ class ArtisanMessageBox(QMessageBox): # pyright: ignore [reportGeneralTypeIssues
 
     __slots__ = ['timeout', 'currentTime']
 
-    def __init__(self, parent:Optional[QWidget] = None, title=None, text=None, timeout=0, modal=True) -> None:
+    def __init__(self, parent:Optional[QWidget] = None, title:Optional[str] = None, text:Optional[str] = None, timeout:int = 0, modal:bool = True) -> None:
         super().__init__(parent)
         self.setWindowTitle(title)
         self.setText(text)
@@ -156,7 +156,7 @@ class ArtisanMessageBox(QMessageBox): # pyright: ignore [reportGeneralTypeIssues
             self.done(0)
 
 class HelpDlg(ArtisanDialog):
-    def __init__(self, parent:QWidget, aw:'ApplicationWindow', title = '', content = '') -> None:
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow', title:str = '', content:str = '') -> None:
         super().__init__(parent, aw)
         self.setWindowTitle(title)
         self.setModal(False)
@@ -198,7 +198,7 @@ class ArtisanInputDialog(ArtisanDialog):
 
     __slots__ = ['url', 'inputLine']
 
-    def __init__(self, parent:QWidget, aw:'ApplicationWindow', title='',label='') -> None:
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow', title:str = '', label:str = '') -> None:
         super().__init__(parent, aw)
 
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, False)
@@ -208,10 +208,9 @@ class ArtisanInputDialog(ArtisanDialog):
         self.setWindowTitle(title)
         self.setModal(True)
         self.setAcceptDrops(True)
-        label = QLabel(label)
         self.inputLine = QLineEdit(self.url)
         layout = QVBoxLayout()
-        layout.addWidget(label)
+        layout.addWidget(QLabel(label))
         layout.addWidget(self.inputLine)
         layout.addWidget(self.dialogbuttons)
         self.setLayout(layout)

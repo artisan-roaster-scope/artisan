@@ -1,18 +1,17 @@
 #
-
-'''
+"""qtsingleapplication.py
 Source: https://github.com/IARI/alsa_jack_gui
 Author: https://github.com/IARI
 Original Source: http://stackoverflow.com/questions/12712360/qtsingleapplication-for-pyside-or-pyqt
 Original Author: user763305
 Notes: Modified for PyQt5; further modified to remove blocking sockets remaining from died server
 Updated to support QT6
-'''
+"""
 
 import sys
 import multiprocessing as mp
 
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
@@ -33,7 +32,7 @@ class QtSingleApplication(QApplication): # pyright: ignore [reportGeneralTypeIss
     __slots__ = [ '_id', '_viewer_id', '_activationWindow', '_activateOnMessage', '_inSocket', '_outSocket', '_isRunning', '_server',
         '_isRunningViewer', '_outSocketViewer', '_inStream', '_outStream', '_outStreamViewer' ]
 
-    def __init__(self, _id:str, _viewer_id:str, *argv) -> None:
+    def __init__(self, _id:str, _viewer_id:str, *argv: Any) -> None:
 
         if sys.platform.startswith('darwin') and mp.current_process().name == 'WebLCDs':
             import AppKit # type: ignore # pylint: disable=import-error
@@ -120,7 +119,7 @@ class QtSingleApplication(QApplication): # pyright: ignore [reportGeneralTypeIss
     def activationWindow(self) -> Optional['ApplicationWindow']:
         return self._activationWindow
 
-    def setActivationWindow(self, activationWindow:'ApplicationWindow', activateOnMessage=True) -> None:
+    def setActivationWindow(self, activationWindow:'ApplicationWindow', activateOnMessage:bool = True) -> None:
         self._activationWindow = activationWindow
         self._activateOnMessage = activateOnMessage
 

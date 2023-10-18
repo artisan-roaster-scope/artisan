@@ -30,10 +30,11 @@ except ImportError:
                                  QDialogButtonBox, QLayout) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 if TYPE_CHECKING:
-    from PyQt6.QtWidgets import QPushButton # pylint: disable=unused-import
+    from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QWidget, QPushButton # pylint: disable=unused-import
 
 class SamplingDlg(ArtisanDialog):
-    def __init__(self, parent, aw) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         self.setWindowTitle(QApplication.translate('Message','Sampling'))
         self.setModal(True)
