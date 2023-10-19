@@ -11,7 +11,7 @@ from artisanlib.canvas import tgraphcanvas
     (1, 1.1),
     (43, 5.3),
     (82, 9.2)])
-def test_eventsExternal2InternalValue(test_input:int, expected:float):
+def test_eventsExternal2InternalValue(test_input:int, expected:float) -> None:
     assert tgraphcanvas.eventsExternal2InternalValue(test_input) == expected
 
 @pytest.mark.parametrize('test_input,expected', [
@@ -28,19 +28,19 @@ def test_eventsExternal2InternalValue(test_input:int, expected:float):
     (5.3, 43),
     (9.2, 82)
     ])
-def test_eventsInternal2ExternalValue(test_input:float, expected:int):
+def test_eventsInternal2ExternalValue(test_input:float, expected:int) -> None:
     assert tgraphcanvas.eventsInternal2ExternalValue(test_input) == expected
 
 
 @given(value=st.one_of(st.integers(-100,100)))
 @settings(max_examples=10)
-def test_eventsExternal2Internal2ExternalValue(value:int):
+def test_eventsExternal2Internal2ExternalValue(value:int) -> None:
     assert tgraphcanvas.eventsInternal2ExternalValue(tgraphcanvas.eventsExternal2InternalValue(value)) == value
 
 
 @given(value=st.one_of(st.floats(-11,11)))
 @settings(max_examples=10)
-def test_eventsInternal2External2InternalValue(value:float):
+def test_eventsInternal2External2InternalValue(value:float) -> None:
     if -1 <= value <= 1:
         assert tgraphcanvas.eventsExternal2InternalValue(tgraphcanvas.eventsInternal2ExternalValue(value)) == 0
     else:

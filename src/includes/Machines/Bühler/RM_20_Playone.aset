@@ -1,0 +1,94 @@
+[General]
+Delay=1000
+Oversampling=false
+roastertype_setup=B\xfchler RM 20 Playone
+swaplcds=true
+ETlcd=false
+ETBColor=#0a5c90
+ETBdeltaColor=#0a5c90
+Colors=@Variant(\0\0\0\b\0\0\0#\0\0\0\x18\0\x61\0n\0\x61\0l\0y\0s\0i\0s\0m\0\x61\0s\0k\0\0\0\n\0\0\0\xe\0#\0\x62\0\x61\0\x62\0\x61\0\x62\0\x61\0\0\0\xe\0\x61\0u\0\x63\0\x61\0r\0\x65\0\x61\0\0\0\n\0\0\0\xe\0#\0\x37\0\x36\0\x37\0\x36\0\x37\0\x36\0\0\0\x10\0\x61\0u\0\x63\0g\0u\0i\0\x64\0\x65\0\0\0\n\0\0\0\xe\0#\0\x30\0\x63\0\x36\0\x61\0\x61\0\x36\0\0\0\x14\0\x62\0\x61\0\x63\0k\0g\0r\0o\0u\0n\0\x64\0\0\0\n\0\0\0\xe\0#\0\x66\0\x66\0\x66\0\x66\0\x66\0\x66\0\0\0\x1a\0\x62\0g\0\x65\0v\0\x65\0n\0t\0m\0\x61\0r\0k\0\x65\0r\0\0\0\n\0\0\0\xe\0#\0\x37\0\x66\0\x37\0\x66\0\x37\0\x66\0\0\0\x16\0\x62\0g\0\x65\0v\0\x65\0n\0t\0t\0\x65\0x\0t\0\0\0\n\0\0\0\xe\0#\0\x30\0\x30\0\x30\0\x30\0\x30\0\x30\0\0\0\x4\0\x62\0t\0\0\0\n\0\0\0\xe\0#\0\x30\0\x61\0\x35\0\x63\0\x39\0\x30\0\0\0\f\0\x63\0\x61\0n\0v\0\x61\0s\0\0\0\n\0\0\0\xe\0#\0\x66\0\x38\0\x66\0\x38\0\x66\0\x38\0\0\0\xe\0\x64\0\x65\0l\0t\0\x61\0\x62\0t\0\0\0\n\0\0\0\xe\0#\0\x30\0\x61\0\x35\0\x63\0\x39\0\x30\0\0\0\xe\0\x64\0\x65\0l\0t\0\x61\0\x65\0t\0\0\0\n\0\0\0\xe\0#\0\x63\0\x63\0\x30\0\x66\0\x35\0\x30\0\0\0\x4\0\x65\0t\0\0\0\n\0\0\0\xe\0#\0\x30\0\x65\0\x35\0\x63\0\x39\0\x30\0\0\0\b\0g\0r\0i\0\x64\0\0\0\n\0\0\0\xe\0#\0\x65\0\x35\0\x65\0\x35\0\x65\0\x35\0\0\0\x10\0l\0\x65\0g\0\x65\0n\0\x64\0\x62\0g\0\0\0\n\0\0\0\xe\0#\0\x66\0\x66\0\x66\0\x66\0\x66\0\x66\0\0\0\x18\0l\0\x65\0g\0\x65\0n\0\x64\0\x62\0o\0r\0\x64\0\x65\0r\0\0\0\n\0\0\0\xe\0#\0\x61\0\x39\0\x61\0\x39\0\x61\0\x39\0\0\0\xe\0m\0\x61\0r\0k\0\x65\0r\0s\0\0\0\n\0\0\0\xe\0#\0\x30\0\x30\0\x30\0\x30\0\x30\0\x30\0\0\0\x10\0m\0\x65\0s\0s\0\x61\0g\0\x65\0s\0\0\0\n\0\0\0\xe\0#\0\x30\0\x30\0\x30\0\x30\0\x30\0\x30\0\0\0\f\0m\0\x65\0t\0\x62\0o\0x\0\0\0\n\0\0\0\xe\0#\0\x63\0\x63\0\x30\0\x66\0\x35\0\x30\0\0\0\xe\0m\0\x65\0t\0t\0\x65\0x\0t\0\0\0\n\0\0\0\xe\0#\0\x66\0\x66\0\x66\0\x66\0\x66\0\x66\0\0\0\n\0r\0\x65\0\x63\0t\0\x31\0\0\0\n\0\0\0\xe\0#\0\x65\0\x35\0\x65\0\x35\0\x65\0\x35\0\0\0\n\0r\0\x65\0\x63\0t\0\x32\0\0\0\n\0\0\0\xe\0#\0\x62\0\x32\0\x62\0\x32\0\x62\0\x32\0\0\0\n\0r\0\x65\0\x63\0t\0\x33\0\0\0\n\0\0\0\xe\0#\0\x65\0\x35\0\x65\0\x35\0\x65\0\x35\0\0\0\n\0r\0\x65\0\x63\0t\0\x34\0\0\0\n\0\0\0\xe\0#\0\x62\0\x64\0\x65\0\x30\0\x65\0\x65\0\0\0\n\0r\0\x65\0\x63\0t\0\x35\0\0\0\n\0\0\0\xe\0#\0\x64\0\x33\0\x64\0\x33\0\x64\0\x33\0\0\0\x1e\0s\0p\0\x65\0\x63\0i\0\x61\0l\0\x65\0v\0\x65\0n\0t\0\x62\0o\0x\0\0\0\n\0\0\0\xe\0#\0\x66\0\x66\0\x35\0\x38\0\x37\0\x31\0\0\0 \0s\0p\0\x65\0\x63\0i\0\x61\0l\0\x65\0v\0\x65\0n\0t\0t\0\x65\0x\0t\0\0\0\n\0\0\0\xe\0#\0\x66\0\x66\0\x66\0\x66\0\x66\0\x66\0\0\0$\0s\0t\0\x61\0t\0s\0\x61\0n\0\x61\0l\0y\0s\0i\0s\0\x62\0k\0g\0n\0\x64\0\0\0\n\0\0\0\xe\0#\0\x66\0\x66\0\x66\0\x66\0\x66\0\x66\0\0\0\b\0t\0\x65\0x\0t\0\0\0\n\0\0\0\xe\0#\0\x30\0\x30\0\x30\0\x30\0\x30\0\x30\0\0\0\x12\0t\0i\0m\0\x65\0g\0u\0i\0\x64\0\x65\0\0\0\n\0\0\0\xe\0#\0\x30\0\x61\0\x35\0\x63\0\x39\0\x30\0\0\0\n\0t\0i\0t\0l\0\x65\0\0\0\n\0\0\0\xe\0#\0\x30\0\x63\0\x36\0\x61\0\x61\0\x36\0\0\0\x16\0t\0i\0t\0l\0\x65\0_\0\x66\0o\0\x63\0u\0s\0\0\0\n\0\0\0\xe\0#\0\x63\0\x63\0\x30\0\x66\0\x35\0\x30\0\0\0\x14\0w\0\x61\0t\0\x65\0r\0m\0\x61\0r\0k\0s\0\0\0\n\0\0\0\xe\0#\0\x66\0\x66\0\x66\0\x66\0\x30\0\x30\0\0\0\f\0x\0l\0\x61\0\x62\0\x65\0l\0\0\0\n\0\0\0\xe\0#\0\x38\0\x30\0\x38\0\x30\0\x38\0\x30\0\0\0\x4\0x\0t\0\0\0\n\0\0\0\xe\0#\0\x34\0\x30\0\x34\0\x30\0\x34\0\x30\0\0\0\f\0y\0l\0\x61\0\x62\0\x65\0l\0\0\0\n\0\0\0\xe\0#\0\x38\0\x30\0\x38\0\x30\0\x38\0\x30\0\0\0\x4\0y\0t\0\0\0\n\0\0\0\xe\0#\0\x34\0\x30\0\x34\0\x30\0\x34\0\x30)
+LCDColors=@Variant(\0\0\0\b\0\0\0\b\0\0\0\x4\0\x62\0t\0\0\0\n\0\0\0\xe\0#\0\x30\0\x41\0\x35\0\x43\0\x39\0\x30\0\0\0\xe\0\x64\0\x65\0l\0t\0\x61\0\x62\0t\0\0\0\n\0\0\0\xe\0#\0\x45\0\x42\0\x45\0\x42\0\x45\0\x42\0\0\0\xe\0\x64\0\x65\0l\0t\0\x61\0\x65\0t\0\0\0\n\0\0\0\xe\0#\0\x45\0\x42\0\x45\0\x42\0\x45\0\x42\0\0\0\x4\0\x65\0t\0\0\0\n\0\0\0\xe\0#\0\x65\0\x62\0\x65\0\x62\0\x65\0\x62\0\0\0\xe\0r\0s\0t\0i\0m\0\x65\0r\0\0\0\n\0\0\0\xe\0#\0\x46\0\x38\0\x46\0\x38\0\x46\0\x38\0\0\0 \0s\0l\0o\0w\0\x63\0o\0o\0l\0i\0n\0g\0t\0i\0m\0\x65\0r\0\0\0\n\0\0\0\xe\0#\0\x46\0\x38\0\x46\0\x38\0\x46\0\x38\0\0\0\x4\0s\0v\0\0\0\n\0\0\0\xe\0#\0\x46\0\x38\0\x46\0\x38\0\x46\0\x38\0\0\0\n\0t\0i\0m\0\x65\0r\0\0\0\n\0\0\0\xe\0#\0\x46\0\x38\0\x46\0\x38\0\x46\0\x38)
+LEDColors=@Variant(\0\0\0\b\0\0\0\b\0\0\0\x4\0\x62\0t\0\0\0\n\0\0\0\xe\0#\0\x66\0\x66\0\x66\0\x66\0\x66\0\x66\0\0\0\xe\0\x64\0\x65\0l\0t\0\x61\0\x62\0t\0\0\0\n\0\0\0\xe\0#\0\x30\0\x41\0\x35\0\x43\0\x39\0\x30\0\0\0\xe\0\x64\0\x65\0l\0t\0\x61\0\x65\0t\0\0\0\n\0\0\0\xe\0#\0\x63\0\x63\0\x30\0\x66\0\x35\0\x30\0\0\0\x4\0\x65\0t\0\0\0\n\0\0\0\xe\0#\0\x30\0\x65\0\x35\0\x63\0\x39\0\x30\0\0\0\xe\0r\0s\0t\0i\0m\0\x65\0r\0\0\0\n\0\0\0\xe\0#\0\x31\0\x38\0\x37\0\x41\0\x42\0\x33\0\0\0 \0s\0l\0o\0w\0\x63\0o\0o\0l\0i\0n\0g\0t\0i\0m\0\x65\0r\0\0\0\n\0\0\0\xe\0#\0\x43\0\x43\0\x30\0\x44\0\x35\0\x30\0\0\0\x4\0s\0v\0\0\0\n\0\0\0\xe\0#\0\x34\0\x43\0\x34\0\x43\0\x34\0\x43\0\0\0\n\0t\0i\0m\0\x65\0r\0\0\0\n\0\0\0\xe\0#\0\x32\0\x36\0\x32\0\x36\0\x32\0\x36)
+
+[MachineSetup]
+capacity=20
+
+[Device]
+id=79
+
+[CurveStyles]
+ETlinestyle=--
+ETlinewidth=1
+extralinestyles1=-, -, -, -
+extralinestyles2=--, -, -, -
+
+[background]
+ETBflag=false
+
+[Style]
+ETname=BT SP
+
+[ExtraComm]
+extrabaudrate=19200, 19200, 19200, 19200
+extrabytesize=8, 8, 8, 8
+extracomport=COM1, COM1, COM1, COM1
+extraparity=E, E, E, E
+extrastopbits=1, 1, 1, 1
+extratimeout=1, 1, 1, 1
+
+[ExtraDev]
+extraCurveVisibility1=true, false, false, false, true, true, true, true, true, true
+extraCurveVisibility2=true, false, false, false, true, true, true, true, true, true
+extraLCDvisibility1=true, true, true, false, false, false, false, false, false, false
+extraLCDvisibility2=true, false, true, false, false, false, false, false, false, false
+extradevicecolor1=#cc0f50, #333333, #49b260, #333333
+extradevicecolor2=#cc0f50, #333333, #45a6cf, #333333
+extradevices=80, 81, 82, 110
+extramathexpression1=, , , 
+extramathexpression2=, , , 
+extraname1=IT, mbar, {1}, AT
+extraname2=IT SP, state, {0}
+
+[S7]
+area=6, 6, 6, 6, 6, 6, 6, 6, 6, 0, 0, 0
+db_nr=1606, 1606, 1606, 1606, 1606, 1601, 1606, 1606, 1606, 1, 1, 1
+div=0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+host=192.168.1.10
+mode=1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0
+port=102
+rack=0
+slot=1
+start=244, 214, 240, 206, 248, 44, 228, 232, 252, 0, 0, 0
+type=1, 1, 1, 1, 1, 2, 2, 2, 1, 0, 0, 0
+optimizer=true
+fetch_max_blocks=true
+
+[Alarms]
+alarmaction=16, 13
+alarmbeep=0, 0
+alarmcond=2, 3
+alarmflag=1, 1
+alarmguard=-1, -1
+alarmnegguard=-1, -1
+alarmoffset=0, 0
+alarmsetlabel=
+alarmsource=5, 5
+alarmstrings=, 
+alarmtemperature=4, 4
+alarmtime=-1, 0
+
+[events]
+eventsGraphflag=4
+
+[Sliders]
+eventsliderunits=%, %, , 
+
+[Quantifiers]
+clusterEventsFlag=false
+eventquantifierSV=0, 0, 0, 0
+eventquantifieraction=0, 0, 0, 0
+quantifieractive=1, 1, 0, 0
+quantifiercoarse=0, 0, 0, 0
+quantifiermax=100, 100, 100, 100
+quantifiermin=0, 0, 0, 0
+quantifiersource=7, 6, 0, 0

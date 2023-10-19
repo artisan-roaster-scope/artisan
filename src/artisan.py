@@ -108,9 +108,9 @@ if system() == 'Windows' and hasattr(sys, 'frozen'): # tools/freeze
     #   https://stackoverflow.com/questions/19425736/how-to-redirect-stdout-and-stderr-to-logger-in-python
     try:
         if sys.stdout is None:
-            sys.stdout = NullWriter()
+            sys.stdout = NullWriter() # type: ignore[unreachable]
         if sys.stderr is None:
-            sys.stderr = NullWriter()
+            sys.stderr = NullWriter() # type: ignore[unreachable]
     except Exception: # pylint: disable=broad-except
         pass
 

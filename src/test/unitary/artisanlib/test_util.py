@@ -1,6 +1,7 @@
 import pytest
 import hypothesis.strategies as st
 from hypothesis import given, example, settings
+from typing import Optional
 
 from artisanlib.util import fromCtoF, fromFtoC
 
@@ -11,7 +12,7 @@ from artisanlib.util import fromCtoF, fromFtoC
 @settings(max_examples=10)
 @example(-1)
 @example(None)
-def test_fromCtoF(temp):
+def test_fromCtoF(temp:Optional[float]) -> None:
     if temp == -1:
         assert fromCtoF(temp) == -1
     elif temp is None:
@@ -25,7 +26,7 @@ def test_fromCtoF(temp):
 @settings(max_examples=10)
 @example(-1)
 @example(None)
-def test_fromFtoC(temp):
+def test_fromFtoC(temp:Optional[float]) -> None:
     if temp == -1:
         assert fromFtoC(temp) == -1
     elif temp is None:

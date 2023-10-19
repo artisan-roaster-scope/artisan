@@ -24,7 +24,6 @@ from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
-#    from pymodbus.client import ModbusSerialClient, ModbusTcpClient, ModbusUdpClient, AsyncModbusSerialClient, AsyncModbusTcpClient, AsyncModbusUdpClient # pylint: disable=unused-import
     from pymodbus.client import ModbusBaseClient # pylint: disable=unused-import
     from pymodbus.payload import BinaryPayloadBuilder # pylint: disable=unused-import
     from pymodbus.payload import BinaryPayloadDecoder # pylint: disable=unused-import

@@ -17,19 +17,16 @@
 
 import time
 import sys
-import struct
 import logging
 from typing import List, Dict, Tuple, Optional, Iterator, TYPE_CHECKING
 from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from snap7.client import Client as S7Client
-    from snap7.types import Areas # noqa: F401 # pylint: disable=unused-import
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
 
-# imports avoided to speed up startup for non-S7 users
-#from snap7.types import Areas
-#from snap7.util import get_bool, set_bool, get_int, set_int, get_real, set_real
+from snap7.types import Areas
+from snap7.util import get_bool, set_bool, get_int, set_int, get_real, set_real
 
 import artisanlib.util
 
@@ -44,160 +41,6 @@ except ImportError:
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
-################
-# conversion methods copied from s7:util.py to avoid the import for non S7 users
-
-def get_bool(bytearray_: bytearray, byte_index: int, bool_index: int) -> bool:
-    """Get the boolean value from location in bytearray
-
-    Args:
-        bytearray_: buffer data.
-        byte_index: byte index to read from.
-        bool_index: bit index to read from.
-
-    Returns:
-        True if the bit is 1, else 0.
-
-    Examples:
-        >>> buffer = bytearray([0b00000001])  # Only one byte length
-        >>> get_bool(buffer, 0, 0)  # The bit 0 starts at the right.
-            True
-    """
-    index_value = 1 << bool_index
-    byte_value = bytearray_[byte_index]
-    current_value = byte_value & index_value
-    return current_value == index_value
-
-
-def set_bool(bytearray_: bytearray, byte_index: int, bool_index: int, value: bool) -> None:
-    """Set boolean value on location in bytearray.
-
-    Args:
-        bytearray_: buffer to write to.
-        byte_index: byte index to write to.
-        bool_index: bit index to write to.
-        value: value to write.
-
-    Examples:
-        >>> buffer = bytearray([0b00000000])
-        >>> set_bool(buffer, 0, 0, True)
-        >>> buffer
-            bytearray(b"\\x01")
-    """
-
-    if value not in {0, 1, True, False}: # pylint: disable=duplicate-value
-        raise TypeError(f'Value value:{value} is not a boolean expression.')
-
-    current_value = get_bool(bytearray_, byte_index, bool_index)
-    index_value = 1 << bool_index
-
-    # check if bool already has correct value
-    if current_value == value:
-        return
-
-    if value:
-        # make sure index_v is IN current byte
-        bytearray_[byte_index] += index_value
-    else:
-        # make sure index_v is NOT in current byte
-        bytearray_[byte_index] -= index_value
-
-def set_int(bytearray_: bytearray, byte_index: int, v_int: int) -> bytes:
-    """Set value in bytearray to int
-
-    Notes:
-        An datatype `int` in the PLC consists of two `bytes`.
-
-    Args:
-        bytearray_: buffer to write on.
-        byte_index: byte index to start writing from.
-        v_int: int value to write.
-
-    Returns:
-        Buffer with the written value.
-
-    Examples:
-        >>> data = bytearray(2)
-        >>> snap7.util.set_int(data, 0, 255)
-            bytearray(b'\\x00\\xff')
-    """
-    # make sure were dealing with an int
-    _bytes = struct.unpack('2B', struct.pack('>h', v_int))
-    bytearray_[byte_index:byte_index + 2] = _bytes
-    return bytearray_
-
-def get_int(bytearray_: bytearray, byte_index: int) -> int:
-    """Get int value from bytearray.
-
-    Notes:
-        Datatype `int` in the PLC is represented in two bytes
-
-    Args:
-        bytearray_: buffer to read from.
-        byte_index: byte index to start reading from.
-
-    Returns:
-        Value read.
-
-    Examples:
-        >>> data = bytearray([0, 255])
-        >>> snap7.util.get_int(data, 0)
-            255
-    """
-    data = bytearray_[byte_index:byte_index + 2]
-    data[1] = data[1] & 0xff
-    data[0] = data[0] & 0xff
-    packed = struct.pack('2B', *data)
-    return int(struct.unpack('>h', packed)[0])
-
-def get_real(bytearray_: bytearray, byte_index: int) -> float:
-    """Get real value.
-
-    Notes:
-        Datatype `real` is represented in 4 bytes in the PLC.
-        The packed representation uses the `IEEE 754 binary32`.
-
-    Args:
-        bytearray_: buffer to read from.
-        byte_index: byte index to reading from.
-
-    Returns:
-        Real value.
-
-    Examples:
-        >>> data = bytearray(b'B\\xf6\\xa4Z')
-        >>> snap7.util.get_real(data, 0)
-            123.32099914550781
-    """
-    x = bytearray_[byte_index:byte_index + 4]
-    return int(struct.unpack('>f', struct.pack('4B', *x))[0])
-
-def set_real(bytearray_: bytearray, byte_index: int, real:float) -> bytearray:
-    """Set Real value
-
-    Notes:
-        Datatype `real` is represented in 4 bytes in the PLC.
-        The packed representation uses the `IEEE 754 binary32`.
-
-    Args:
-        bytearray_: buffer to write to.
-        byte_index: byte index to start writing from.
-        real: value to be written.
-
-    Returns:
-        Buffer with the value written.
-
-    Examples:
-        >>> data = bytearray(4)
-        >>> snap7.util.set_real(data, 0, 123.321)
-            bytearray(b'B\\xf6\\xa4Z')
-    """
-    real_bytes:bytes = struct.pack('>f', real)
-    _bytes = struct.unpack('4B', real_bytes)
-    for i, b in enumerate(_bytes):
-        bytearray_[byte_index + i] = b
-    return bytearray_
-
 class s7port:
 
     __slots__ = [ 'aw', 'readRetries', 'channels', 'default_host', 'host', 'port', 'rack', 'slot', 'lastReadResult', 'area', 'db_nr', 'start', 'type', 'mode',
@@ -209,7 +52,7 @@ class s7port:
         self.aw = aw
 
         self.readRetries:int = 1
-        self.channels:int = 10 # maximal number of S7 channels
+        self.channels:int = 12 # maximal number of S7 channels
         self.default_host:Final[str] = '127.0.0.1'
         self.host:str = self.default_host # the TCP host
         self.port:int = 102 # the TCP port
@@ -259,7 +102,7 @@ class s7port:
         self.COMsemaphore:QSemaphore = QSemaphore(1)
 
         # we do not use the snap7 enums here to avoid the import for non S7 users
-        self.areas:Optional[List['Areas']] = None # lazy initialized in initArray() on connect
+        self.areas:Optional[List[Areas]] = None # lazy initialized in initArray() on connect
         self.last_request_timestamp:float = time.time()
         self.min_time_between_requests:float = 0.04
 
@@ -272,7 +115,6 @@ class s7port:
 
     def initArrays(self) -> None:
         if self.areas is None:
-            from snap7.types import Areas
             self.areas = [
                 Areas.PE, # 129, 0x81
                 Areas.PA, # 130, 0x82

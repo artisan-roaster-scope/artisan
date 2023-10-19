@@ -1568,6 +1568,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     try:
                         # 0: device type
                         typeComboBox =  MyQComboBox()
+#                        typeComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContentsOnFirstShow) # default
                         typeComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
 #                        typeComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
                         typeComboBox.addItems(devices[:])
@@ -1676,12 +1677,20 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 if header is not None:
                     header.setStretchLastSection(True)
                 self.devicetable.resizeColumnsToContents()
-                # remember the columnwidth
-                for i, _ in enumerate(self.aw.qmc.devicetablecolumnwidths):
-                    try:
-                        self.devicetable.setColumnWidth(i, self.aw.qmc.devicetablecolumnwidths[i])
-                    except Exception: # pylint: disable=broad-except
-                        pass
+                if not self.aw.qmc.devicetablecolumnwidths:
+                    self.devicetable.setColumnWidth(0, 100)
+                    self.devicetable.setColumnWidth(3, 100)
+                    self.devicetable.setColumnWidth(4, 100)
+                    self.devicetable.setColumnWidth(5, 40)
+                    self.devicetable.setColumnWidth(6, 40)
+                    self.devicetable.setColumnWidth(14, 30)
+                else:
+                    # remember the columnwidth
+                    for i, _ in enumerate(self.aw.qmc.devicetablecolumnwidths):
+                        try:
+                            self.devicetable.setColumnWidth(i, self.aw.qmc.devicetablecolumnwidths[i])
+                        except Exception: # pylint: disable=broad-except
+                            pass
         except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' createDeviceTable(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -3079,6 +3088,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 150 is +MODBUS_910 but +DEVICE cannot be set as main device
                 ##########################
+                ####  DEVICE 151 is +S7_1112 but +DEVICE cannot be set as main device
+                ##########################
 
 
                 # ADD DEVICE:
@@ -3098,7 +3109,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             #map device index to a setting mode (choose the one that matches the device)
     # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
     # - add an entry to devsettings below (and potentially to ssettings above)
-            devssettings: Final = [
+            devssettings: Final[List[int]] = [
                 0, # 0
                 1, # 1
                 2, # 2
@@ -3249,7 +3260,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 147
                 1, # 148
                 1, # 149
-                7  # 150
+                7, # 150
+                1  # 110
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):

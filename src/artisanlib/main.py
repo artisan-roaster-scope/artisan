@@ -175,7 +175,7 @@ with suppress_stdout_stderr():
 #except Exception: # pylint: disable=broad-except
 #    mpl_version = [7,7,7] # a trunk version
 
-from matplotlib.backend_bases import _Mode as MPL_Mode  # @UnresolvedImport # pylint: disable=import-private-name
+from matplotlib.backend_bases import _Mode as MPL_Mode  # @UnresolvedImport
 
 # on OS X / PyQt5 one needs to
 #   export DYLD_FRAMEWORK_PATH=~/Qt5.5.0/5.5/clang_64/lib/
@@ -934,7 +934,6 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         #self.qmc.ax_background = None
 
     def release_zoom_new(self, event:'MplEvent') -> None:
-        _log.info('PRINT release_zoom_new')
         self.release_zoom_org(event)
         if self.qmc.ai is not None:
             self.qmc.ai.set_visible(False)

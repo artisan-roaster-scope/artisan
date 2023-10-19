@@ -848,6 +848,7 @@ class tgraphcanvas(FigureCanvas):
                        '+Phidget DAQ1000 45',       #148
                        '+Phidget DAQ1000 67',       #149
                        '+MODBUS 910',               #150
+                       '+S7 1112'                   #151
                        ]
 
         # ADD DEVICE:
@@ -1631,7 +1632,7 @@ class tgraphcanvas(FigureCanvas):
         self.alarmoffset: List[int] = []    # for timed alarms, the seconds after alarmtime the alarm is triggered
         self.alarmtime2menuidx: Final[List[int]] = [2,4,5,6,7,8,9,10,3,0,11,1] # maps self.alarmtime index to menu idx (to move TP in menu from index 9 to 3)
         self.menuidx2alarmtime: Final[List[int]] = [9,-1,0,8,1,2,3,4,5,6,7,10] # inverse of above (note that those two are only inverse in one direction!)
-        self.alarmcond: List[int] = []      # 0 = falls below; 1 = rises above
+        self.alarmcond: List[int] = []      # 0 = falls below; 1 = rises above; 2 = equal; 3 not equal
         # alarmstate is set to 'not triggered' on reset(). This is needed so that the user does not have to turn the alarms ON next roast after alarm being used once.
         self.alarmstate:List[int] = []   # <idx>=triggered, -1=not triggered.
         self.alarmsource: List[int] = []    # -3=None, -2=DeltaET, -1=DeltaBT, 0=ET , 1=BT, 2=extratemp1[0], 3=extratemp2[0], 4=extratemp2[1],....
@@ -3305,9 +3306,11 @@ class tgraphcanvas(FigureCanvas):
                     self.l_timeline.set_xdata(tx)
                 self.ax.draw_artist(self.l_timeline)
             if self.projectFlag:
-                if self.l_BTprojection is not None and self.BTcurve:
+                if self.l_BTprojection is not None and self.BTcurve and (self.DeltaBTflag or self.DeltaBTlcdflag):
+                    # show only if either the DeltaBT curve or LCD is shown
                     self.ax.draw_artist(self.l_BTprojection)
-                if self.l_ETprojection is not None and self.ETcurve:
+                if self.l_ETprojection is not None and self.ETcurve and (self.DeltaETflag or self.DeltaETlcdflag):
+                    # show only if either the DeltaBT curve or LCD is shown
                     self.ax.draw_artist(self.l_ETprojection)
                 if self.projectDeltaFlag:
                     if self.l_DeltaBTprojection is not None and self.DeltaBTflag:
@@ -4093,6 +4096,8 @@ class tgraphcanvas(FigureCanvas):
                                 if alarm_temp is not None and alarm_temp != -1 and (
                                         (self.alarmcond[i] == 1 and alarm_temp > alarm_limit) or
                                         (self.alarmcond[i] == 0 and alarm_temp < alarm_limit) or
+                                        (self.alarmcond[i] == 2 and alarm_temp == alarm_limit) or
+                                        (self.alarmcond[i] == 3 and alarm_temp != alarm_limit) or
                                         (alarm_idx is not None and alarm_temp == alarm_limit)): # for relative IF_ALARMS we include the equality
                                     self.temporaryalarmflag = i
                     except Exception as e: # pylint: disable=broad-except

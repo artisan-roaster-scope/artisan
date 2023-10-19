@@ -806,7 +806,7 @@ class roastCompareDlg(ArtisanDialog):
             QApplication.translate('ComboBox','BBP+Roast'),
             QApplication.translate('ComboBox','BBP'),
             ]
-        self.modeComboBox = MyQComboBox()
+        self.modeComboBox:MyQComboBox = MyQComboBox()
         self.modeComboBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.modeComboBox.addItems(modes)
         if self.aw.qmc.compareRoast and self.aw.qmc.compareBBP:

@@ -515,6 +515,7 @@ class serialport:
                                    self.PHIDGET_DAQ1000_45,   #148
                                    self.PHIDGET_DAQ1000_67,   #149
                                    self.MODBUS_910,           #150
+                                   self.S7_1112               #151
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -1141,6 +1142,11 @@ class serialport:
     def S7_910(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.S7read(4)
+        return tx,t2,t1
+
+    def S7_1112(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        t2,t1 = self.S7read(5)
         return tx,t2,t1
 
     def R1_DTBT(self) -> Tuple[float,float,float]:
@@ -2411,6 +2417,7 @@ class serialport:
     # mode=2 to read ch5+6
     # mode=3 to read ch7+8
     # mode=4 to read ch9+10
+    # mode=5 to read ch11+12
     def S7read(self, mode:int, force:bool = False) -> Tuple[float, float]:
         # fill the S7 optimizer (if active and not forced to fetch fresh data) with data for all read requests specified in the device S7 tab using block reads
         if not force and mode == 0:

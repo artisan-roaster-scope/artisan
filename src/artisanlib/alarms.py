@@ -868,8 +868,9 @@ class AlarmDlg(ArtisanResizeablDialog):
         #7: condition
         condComboBox = MyQComboBox()
         condComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
-        condComboBox.addItems([QApplication.translate('ComboBox','below'),
-                               QApplication.translate('ComboBox','above')])
+#        condComboBox.addItems([QApplication.translate('ComboBox','below'),
+#                               QApplication.translate('ComboBox','above')])
+        condComboBox.addItems(['<','>','=', '\u2260'])
         condComboBox.setCurrentIndex(self.aw.qmc.alarmcond[i])
         #8: temperature
         tempedit = QLineEdit(str(self.aw.float2float(self.aw.qmc.alarmtemperature[i])))
@@ -1008,15 +1009,24 @@ class AlarmDlg(ArtisanResizeablDialog):
             if header is not None:
                 header.setStretchLastSection(True)
             self.alarmtable.resizeColumnsToContents()
-            # remember the columnwidth
-            for i, _ in enumerate(self.aw.qmc.alarmtablecolumnwidths):
-                try:
-                    w = self.aw.qmc.alarmtablecolumnwidths[i]
-                    if i == 6:
-                        w = max(80,w)
-                    self.alarmtable.setColumnWidth(i,w)
-                except Exception: # pylint: disable=broad-except
-                    pass
+            if not self.aw.qmc.alarmtablecolumnwidths:
+                self.alarmtable.setColumnWidth(2, 50)
+                self.alarmtable.setColumnWidth(3, 50)
+                self.alarmtable.setColumnWidth(4, 95)
+                self.alarmtable.setColumnWidth(5, 65)
+                self.alarmtable.setColumnWidth(6, 100)
+                self.alarmtable.setColumnWidth(8, 51)
+                self.alarmtable.setColumnWidth(9, 103)
+            else:
+                # remember the columnwidth
+                for i, _ in enumerate(self.aw.qmc.alarmtablecolumnwidths):
+                    try:
+                        w = self.aw.qmc.alarmtablecolumnwidths[i]
+                        if i == 6:
+                            w = max(100,w)
+                        self.alarmtable.setColumnWidth(i,w)
+                    except Exception: # pylint: disable=broad-except
+                        pass
             self.markNotEnabledAlarmRows()
             self.alarmtable.setSortingEnabled(True)
             self.alarmtable.sortItems(0)
