@@ -24,11 +24,11 @@ from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+    from artisanlib.types import RecentRoast, BTU
     from artisanlib.ble import BleInterface # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtWidgets import QLayout, QAbstractItemView, QCompleter # pylint: disable=unused-import
     from PyQt6.QtGui import QClipboard # pylint: disable=unused-import
     from PyQt6.QtCore import QObject # pylint: disable=unused-import
-
 
 # import artisan.plus modules
 import plus.config  # @UnusedImport
@@ -1018,7 +1018,10 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.bean_size_max_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.colorSystemComboBox = QComboBox()
         self.colorSystemComboBox.addItems(self.aw.qmc.color_systems)
-        self.colorSystemComboBox.setCurrentIndex(self.aw.qmc.color_system_idx)
+        if isinstance(self.aw.qmc.color_system_idx, int):
+            self.colorSystemComboBox.setCurrentIndex(self.aw.qmc.color_system_idx)
+        else: # in older versions this could have been a string
+            self.aw.qmc.color_system_idx = 0 # type: ignore[unreachable]
         #Greens Temp
         greens_temp_label = QLabel('<b>' + QApplication.translate('Label', 'Beans') + '</b>')
         greens_temp_unit_label = QLabel(self.aw.qmc.mode)
@@ -2242,7 +2245,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         return plus.stock.getBlendBlendDict(blend,v)
 
     @pyqtSlot(int)
-    def blendSelectionChanged(self,n):
+    def blendSelectionChanged(self, n:int) -> None:
         # check for previously selected blend label
         prev_coffee_label = self.plus_coffee_selected_label
         prev_blend_label = self.plus_blend_selected_label
@@ -2290,10 +2293,10 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.updatePlusSelectedLine()
 
     # recentRoast activated from within RoastProperties dialog
-    def recentRoastActivated(self,n):
+    def recentRoastActivated(self, n:int) -> None:
         # note, the first item is the edited text!
         if 0 < n <= len(self.aw.recentRoasts):
-            rr = self.aw.recentRoasts[n-1]
+            rr:'RecentRoast' = self.aw.recentRoasts[n-1]
             if 'title' in rr and rr['title'] is not None:
                 self.titleedit.textEdited(rr['title'])
                 self.titleedit.setEditText(rr['title'])
@@ -2337,7 +2340,14 @@ class editGraphDlg(ArtisanResizeablDialog):
             else:
                 self.ground_color_edit.setText('0')
             if 'colorSystem' in rr and rr['colorSystem'] is not None:
-                self.colorSystemComboBox.setCurrentIndex(rr['colorSystem'])
+                if rr['colorSystem'] in self.aw.qmc.color_systems:
+                    self.aw.qmc.color_system_idx = self.aw.qmc.color_systems.index(rr['colorSystem'])
+                    self.colorSystemComboBox.setCurrentIndex(self.aw.qmc.color_system_idx)
+                elif isinstance(rr['colorSystem'], int) and rr['colorSystem'] < len(self.aw.qmc.color_systems):  # type: ignore
+                    # to stay compatible with older versions were rr['colorSystem'] was an index instead of the name of a system
+                    self.aw.qmc.color_system_idx = rr['colorSystem'] # type: ignore[unreachable]
+                    self.colorSystemComboBox.setCurrentIndex(self.aw.qmc.color_system_idx) # type: ignore[unreachable]
+
             # items added in v1.4 might not be in the data set of previous stored recent roasts
             if 'beanSize_min' in rr and rr['beanSize_min'] is not None:
                 self.bean_size_min_edit.setText(str(int(rr['beanSize_min'])))
@@ -2424,7 +2434,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.delRecentButton.setEnabled(False)
 
     @pyqtSlot(bool)
-    def delRecentRoast(self,_):
+    def delRecentRoast(self, _:bool) -> None:
         try:
             title = ' '.join(self.titleedit.currentText().split())
             weightIn = float(comma2dot(self.weightinedit.text()))
@@ -2434,7 +2444,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             _log.exception(e)
 
     @pyqtSlot(bool)
-    def addRecentRoast(self,_):
+    def addRecentRoast(self, __:bool) -> None:
         try:
             title = ' '.join(self.titleedit.currentText().split())
             weightIn = float(comma2dot(str(self.weightinedit.text())))
@@ -2538,7 +2548,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     # triggered via the cancel button
     @pyqtSlot()
-    def cancel_dialog(self):
+    def cancel_dialog(self) -> None:
         self.disconnecting = True
         if self.ble is not None:
             try:
@@ -2588,11 +2598,11 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     # calcs volume (in ml) from density (in g/l) and weight (in g)
     @staticmethod
-    def calc_volume(density, weight):
+    def calc_volume(density:float, weight:float) -> float:
         return (1./density) * weight * 1000
 
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work
-    def keyPressEvent(self,event):
+    def keyPressEvent(self, event):
         key = int(event.key())
         #print(key)
         modifiers = event.modifiers()
@@ -2615,7 +2625,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.resetScaleSet()
 
     @pyqtSlot(int)
-    def tareChanged(self,i):
+    def tareChanged(self, i:int) -> None:
         if i == 0 and self.tarePopupEnabled:
             tareDLG = tareDlg(self,self.aw,self)
             tareDLG.show()
@@ -2625,7 +2635,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.update_scale_weight()
 
     @pyqtSlot(int)
-    def changeWeightUnit(self,i):
+    def changeWeightUnit(self, i:int) -> None:
         o = self.aw.qmc.weight_units.index(self.aw.qmc.weight[2]) # previous unit index
         self.aw.qmc.weight = (self.aw.qmc.weight[0],self.aw.qmc.weight[1],self.unitsComboBox.currentText())
         for le in [self.weightinedit,self.weightoutedit]:
@@ -2652,7 +2662,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
 
     @pyqtSlot(int)
-    def changeVolumeUnit(self,i):
+    def changeVolumeUnit(self, i:int) -> None:
         o = self.aw.qmc.volume_units.index(self.aw.qmc.volume[2]) # previous unit index
         self.aw.qmc.volume = (self.aw.qmc.volume[0],self.aw.qmc.volume[1],self.volumeUnitsComboBox.currentText())
         for le in [self.volumeinedit,self.volumeoutedit]:
@@ -2664,7 +2674,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 #        self.calculated_density() # if just the unit changes, the density will not change as it is fixed now
 
     @pyqtSlot(int)
-    def tabSwitched(self,i):
+    def tabSwitched(self, i:int) -> None:
         if i == 0: # Roast (always initialized in __init__())
             self.saveEventTable()
         elif i == 1: # Notes (always initialized in __init__())
@@ -2685,14 +2695,14 @@ class editGraphDlg(ArtisanResizeablDialog):
     ###### ENERGY TAB #####
 
 
-    def initEnergyTab(self):
+    def initEnergyTab(self) -> None:
         # pylint: disable=attribute-defined-outside-init
         if not self.tabInitialized[4]:
             # fill Energy tab
             self.energy_ui = EnergyWidget.Ui_EnergyWidget()
             self.energy_ui.setupUi(self.C5Widget)
 
-            self.btu_list = []
+            self.btu_list:List['BTU'] = []
 
             # remember parameters to enable a Cancel action
             self.org_loadlabels = self.aw.qmc.loadlabels.copy()
@@ -2921,7 +2931,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         # we always set the batch position on tab switch as it might have been changed in the first tab of the Roast Properties dialog
         self.energy_ui.roastbatchposLabel.setText(f"{QApplication.translate('Label','Batch')} #{self.aw.qmc.roastbatchpos}")
 
-    def createEnergyDataTable(self):
+    def createEnergyDataTable(self) -> None:
         self.updateEnergyConfig()
         ndata = len(self.btu_list)
         self.energy_ui.datatable.setSortingEnabled(False) # deactivate sorting while populating not to mess up things

@@ -14179,7 +14179,7 @@ class tgraphcanvas(FigureCanvas):
                         emin = toInt(self.loadevent_zeropcts[i])
                         emax = toInt(self.loadevent_hundpcts[i])
                         scaled = (val - emin) / (emax - emin)  #emax > emin enforced by energy.py
-                        load_pct = min(1,max(0,scaled)) * 100
+                        load_pct = min(1,max(0, scaled)) * 100
                         if self.presssure_percents[i] and self.sourcetypes[i] in {0, 1}:   # gas loads only
                             # convert pressure to heat
                             factor = math.sqrt(load_pct / 100)

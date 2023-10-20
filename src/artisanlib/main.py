@@ -4811,7 +4811,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         return d
 
     # recentRoast activated via NEW
-    def setRecentRoast(self,rr):
+    def setRecentRoast(self, rr:'RecentRoast') -> None:
         if 'title' in rr and rr['title'] is not None:
             self.qmc.title = rr['title']
             if not self.qmc.flagstart or self.qmc.title_show_always:
@@ -4855,7 +4855,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         else:
             self.qmc.ground_color = 0
         if 'colorSystem' in rr and rr['colorSystem'] is not None:
-            self.qmc.color_system_idx = rr['colorSystem']
+            if rr['colorSystem'] in self.qmc.color_systems:
+                self.qmc.color_system_idx = self.qmc.color_systems.index(rr['colorSystem'])
+            elif isinstance(rr['colorSystem'], int) and rr['colorSystem'] < len(self.qmc.color_systems): # type: ignore
+                # to stay compatible with older versions were rr['colorSystem'] was an index instead of the name of a system
+                self.qmc.color_system_idx = rr['colorSystem'] # type: ignore[unreachable]
+
         # Note: the background profile will not be changed if recent roast is activated from Roast Properties
 #PLUS
         if self.plus_account is not None and 'plus_account' in rr and self.plus_account == rr['plus_account']:

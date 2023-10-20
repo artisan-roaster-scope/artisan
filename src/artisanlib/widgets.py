@@ -103,7 +103,7 @@ class MyTableWidgetItemQTime(QTableWidgetItem): # pylint: disable= too-few-publi
 
 class MyTableWidgetItemNumber(QTableWidgetItem): # pylint: disable= too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     __slots__ = ['sortKey'] # save some memory by using slots
-    def __init__(self, text:str, sortKey:int) -> None:
+    def __init__(self, text:str, sortKey:float) -> None:
         super().__init__(text, 1003) #QTableWidgetItem.ItemType.UserType)
         self.sortKey = sortKey
 
