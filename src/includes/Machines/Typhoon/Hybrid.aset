@@ -1,7 +1,7 @@
 [General]
 Delay=2000
 Oversampling=false
-roastertype_setup=Typhoon
+roastertype_setup=Typhoon Hybrid
 
 [Device]
 id=29
@@ -51,7 +51,7 @@ input1code=3
 input1div=1
 input1float=false
 input1mode=C
-input1register=53
+input1register=819
 input1slave=1
 input2FloatsAsInt=false
 input2bcd=false
@@ -59,7 +59,7 @@ input2code=3
 input2div=1
 input2float=false
 input2mode=C
-input2register=54
+input2register=820
 input2slave=1
 input3FloatsAsInt=false
 input3bcd=false
@@ -67,7 +67,7 @@ input3code=3
 input3div=0
 input3float=false
 input3mode=C
-input3register=45
+input3register=818
 input3slave=1
 input4FloatsAsInt=false
 input4bcd=false

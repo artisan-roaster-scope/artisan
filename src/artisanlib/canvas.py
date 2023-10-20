@@ -3307,10 +3307,10 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.draw_artist(self.l_timeline)
             if self.projectFlag:
                 if self.l_BTprojection is not None and self.BTcurve and (self.DeltaBTflag or self.DeltaBTlcdflag):
-                    # show only if either the DeltaBT curve or LCD is shown
+                    # show only if either the DeltaBT curve or LCD is shown (allows to suppress projects for cases where ET channel is used for other signals)
                     self.ax.draw_artist(self.l_BTprojection)
                 if self.l_ETprojection is not None and self.ETcurve and (self.DeltaETflag or self.DeltaETlcdflag):
-                    # show only if either the DeltaBT curve or LCD is shown
+                    # show only if either the DeltaBT curve or LCD is shown (allows to suppress projects for cases where ET channel is used for other signals)
                     self.ax.draw_artist(self.l_ETprojection)
                 if self.projectDeltaFlag:
                     if self.l_DeltaBTprojection is not None and self.DeltaBTflag:
