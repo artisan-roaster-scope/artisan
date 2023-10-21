@@ -7794,6 +7794,29 @@ class tgraphcanvas(FigureCanvas):
                     any(self.aw.extraDelta1[:len(self.extratimex)]) or
                     any(self.aw.extraDelta2[:len(self.extratimex)])))
 
+    def redraw_keep_view(self, *args:bool, **kwargs:bool) -> None:
+        xlimit_min: Optional[float] = None
+        xlimit: Optional[float] = None
+        ylimit_min: Optional[float] = None
+        ylimit: Optional[float] = None
+        zlimit_min: Optional[float] = None
+        zlimit: Optional[float] = None
+        # save current view axes min max
+        if self.ax is not None:
+            xlimit_min, xlimit = self.ax.get_xlim()
+            ylimit_min, ylimit = self.ax.get_ylim()
+        if self.delta_ax is not None:
+            zlimit_min, zlimit = self.delta_ax.get_ylim()
+        # redraw
+        self.redraw(*args, **kwargs)
+        if self.ax is not None and xlimit_min is not None and xlimit is not None and ylimit_min is not None and ylimit is not None:
+            # restore the view
+            self.ax.set_xlim(xlimit_min, xlimit)
+            self.ax.set_ylim(ylimit_min, ylimit)
+        if self.delta_ax is not None and xlimit_min is not None and xlimit is not None and zlimit_min is not None and zlimit is not None:
+            self.delta_ax.set_xlim(xlimit_min, xlimit)
+            self.delta_ax.set_ylim(zlimit_min, zlimit)
+
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed (incl. those of the background curves)
     def redraw(self, recomputeAllDeltas=True, smooth=True, sampling=False, takelock=True, forceRenewAxis=False): # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths

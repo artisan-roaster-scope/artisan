@@ -213,12 +213,12 @@ class modbusport:
     def isConnected(self) -> bool:
         return self._loop is not None and not self._loop.is_closed() and self.master is not None and bool(self.master.connected)
 
-    async def cancel_tasks(self) -> None:
-        tasks: List[asyncio.Task] = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
-        for task in tasks:
-            task.cancel()
-        await asyncio.gather(*tasks)
-
+#    async def cancel_tasks(self) -> None:
+#        tasks: List[asyncio.Task] = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
+#        for task in tasks:
+#            task.cancel()
+#        await asyncio.gather(*tasks)
+#
 #    def stop_asyncio_loop(self) -> None:
 #        if self._loop is not None:
 #            if not self._loop.is_closed():
