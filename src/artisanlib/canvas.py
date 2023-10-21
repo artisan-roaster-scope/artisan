@@ -7785,9 +7785,11 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             self.adderror((QApplication.translate('Error Message','Exception:') + ' smmothETBTBkgnd() anno {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
-    def twoAxisMode(self):
+    def twoAxisMode(self) -> bool:
         return (self.DeltaETflag or self.DeltaBTflag or
-                    (self.background and self.backgroundprofile is not None and (self.DeltaETBflag or self.DeltaBTBflag)))
+                    (self.background and self.backgroundprofile is not None and (self.DeltaETBflag or self.DeltaBTBflag) or
+                    any(self.aw.extraDelta1[:len(self.extratimex)]) or
+                    any(self.aw.extraDelta2[:len(self.extratimex)])))
 
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed (incl. those of the background curves)
@@ -7915,9 +7917,7 @@ class tgraphcanvas(FigureCanvas):
                     except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
                         pass
 
-                    two_ax_mode = (self.twoAxisMode() or
-                        any(self.aw.extraDelta1[:len(self.extratimex)]) or
-                        any(self.aw.extraDelta2[:len(self.extratimex)]))
+                    two_ax_mode = self.twoAxisMode()
 
                     titleB = ''
                     if not ((self.flagstart and not self.title_show_always) or self.title is None or self.title.strip() == ''):
@@ -7951,8 +7951,9 @@ class tgraphcanvas(FigureCanvas):
                     self.ax.fmt_ydata = self.fmt_data
                     self.ax.fmt_xdata = self.fmt_timedata
 
-                    if two_ax_mode and self.delta_ax is not None:
+                    if self.delta_ax is not None:
                         self.ax.set_zorder(self.delta_ax.get_zorder()+1) # put ax in front of delta_ax (which remains empty!)
+                    if two_ax_mode and self.delta_ax is not None:
                         #create a second set of axes in the same position as self.ax
                         self.delta_ax.tick_params(\
                             axis='y',           # changes apply to the y-axis
@@ -16668,7 +16669,7 @@ class SampleThread(QThread): # pyright: ignore [reportGeneralTypeIssues] # Argum
         #read time, ET (t1) and BT (t2) TEMPERATURE
         try:
             if self.aw.simulator is None:
-                tx,t1,t2 = self.aw.ser.devicefunctionlist[self.aw.qmc.device]() # Note that not all device functions feature the force parameter!!
+                tx,t1,t2 = self.aw.ser.devicefunctionlist[self.aw.qmc.device]()
                 if self.aw.qmc.swapETBT:
                     return tx,float(t2),float(t1)
                 return tx,float(t1),float(t2)
