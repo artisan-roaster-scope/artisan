@@ -585,9 +585,9 @@ class serialport:
     #finds time, ET and BT when using Fuji PID. Updates sv (set value) LCD. Finds power duty cycle
     def fujitemperature(self) -> Tuple[float,float,float]:
         #update ET SV LCD 6
-        self.aw.qmc.currentpidsv = self.aw.fujipid.readcurrentsv()
         #get time of temperature reading in seconds from start; .elapsed() returns milliseconds
         tx = self.aw.qmc.timeclock.elapsedMilli()
+        self.aw.qmc.currentpidsv = self.aw.fujipid.readcurrentsv()
         # get the temperature for ET. self.aw.fujipid.gettemperature(unitID)
         t1 = self.aw.fujipid.gettemperature(self.controlETpid[0],self.controlETpid[1])/10.  #Need to divide by 10 because using 1 decimal point in Fuji (ie. received 843 = 84.3)
         #if Fuji for BT is not None (0= PXG, 1 = PXR, 2 = None 3 = DTA)
@@ -619,6 +619,7 @@ class serialport:
 
     #especial function that collects extra duty cycle % and SV
     def piddutycycle(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         if self.aw.qmc.device == 0: # FUJI
             #return saved readings from device 0
             return self.aw.qmc.dutycycleTX, self.aw.qmc.dutycycle, self.aw.qmc.currentpidsv
@@ -640,10 +641,11 @@ class serialport:
             if duty is None:
                 duty = -1
             duty = min(100,max(-100,duty))
-        return self.aw.qmc.timeclock.elapsedMilli(),duty,sv
+        return tx,duty,sv
 
     def DTAtemperature(self) -> Tuple[float,float,float]:
         _log.debug('DTAtemperature')
+        tx = self.aw.qmc.timeclock.elapsedMilli()
         ###########################################################
         ### create command
         command = self.aw.dtapid.message2send(self.controlETpid[1],3,self.aw.dtapid.dtamem['sv'][1],1)
@@ -659,7 +661,6 @@ class serialport:
         command = self.aw.dtapid.message2send(self.controlETpid[1],3,self.aw.dtapid.dtamem['pv'][1],1)
         #read
         t1 = self.sendDTAcommand(command)
-        tx = self.aw.qmc.timeclock.elapsedMilli()
         #if Fuji for BT is not None (0= PXG, 1 = PXR, 2 = None 3 = DTA)
         if self.readBTpid[0] < 2:
             t2 = self.aw.fujipid.gettemperature(self.readBTpid[0],self.readBTpid[1])/10.
@@ -744,6 +745,7 @@ class serialport:
         import subprocess
         output = None
         try:
+            tx = self.aw.qmc.timeclock.elapsedMilli()
 #            output = os.popen(self.aw.ser.externalprogram,"r").readline()
             # we try to set the users standard environment, replacing the one pointing to the restrictive python build in Artisan
             my_env = self.aw.calc_env()
@@ -762,7 +764,6 @@ class serialport:
                 p = subprocess.Popen([os.path.expanduser(c) for c in shlex.split(self.aw.ser.externalprogram)],env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo) # pylint: disable=consider-using-with
             output = p.communicate()[0].decode('UTF-8')
 
-            tx = self.aw.qmc.timeclock.elapsedMilli()
             if ',' in output:
                 parts = output.split(',')
                 if len(parts) > 2:
@@ -1121,33 +1122,29 @@ class serialport:
     # if force the optimizer is deactivated to ensure fetching fresh readings
     def S7(self,force:bool=False) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
+        self.aw.extraS7tx = tx
         t2,t1 = self.S7read(0,force)
-        return tx,t2,t1
+        return self.aw.extraS7tx,t2,t1
 
     def S7_34(self) -> Tuple[float,float,float]:
-        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.S7read(1)
-        return tx,t2,t1
+        return self.aw.extraS7tx,t2,t1
 
     def S7_56(self) -> Tuple[float,float,float]:
-        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.S7read(2)
-        return tx,t2,t1
+        return self.aw.extraS7tx,t2,t1
 
     def S7_78(self) -> Tuple[float,float,float]:
-        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.S7read(3)
-        return tx,t2,t1
+        return self.aw.extraS7tx,t2,t1
 
     def S7_910(self) -> Tuple[float,float,float]:
-        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.S7read(4)
-        return tx,t2,t1
+        return self.aw.extraS7tx,t2,t1
 
     def S7_1112(self) -> Tuple[float,float,float]:
-        tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.S7read(5)
-        return tx,t2,t1
+        return self.aw.extraS7tx,t2,t1
 
     def R1_DTBT(self) -> Tuple[float,float,float]:
         if self.R1 is None:
@@ -1209,20 +1206,21 @@ class serialport:
     # if force the optimizer is deactivated to ensure fetching fresh readings
     def MODBUS(self,force:bool=False) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
+        self.aw.extraMODBUStx = tx
         t2,t1 = self.MODBUSread(force)
         return tx,t2,t1
 
     def MODBUS_34(self) -> Tuple[float,float,float]:
-        return self.aw.qmc.extraMODBUStx,self.aw.qmc.extraMODBUStemps[3],self.aw.qmc.extraMODBUStemps[2]
+        return self.aw.extraMODBUStx,self.aw.extraMODBUStemps[3],self.aw.extraMODBUStemps[2]
 
     def MODBUS_56(self) -> Tuple[float,float,float]:
-        return self.aw.qmc.extraMODBUStx,self.aw.qmc.extraMODBUStemps[5],self.aw.qmc.extraMODBUStemps[4]
+        return self.aw.extraMODBUStx,self.aw.extraMODBUStemps[5],self.aw.extraMODBUStemps[4]
 
     def MODBUS_78(self) -> Tuple[float,float,float]:
-        return self.aw.qmc.extraMODBUStx,self.aw.qmc.extraMODBUStemps[7],self.aw.qmc.extraMODBUStemps[6]
+        return self.aw.extraMODBUStx,self.aw.extraMODBUStemps[7],self.aw.extraMODBUStemps[6]
 
     def MODBUS_910(self) -> Tuple[float,float,float]:
-        return self.aw.qmc.extraMODBUStx,self.aw.qmc.extraMODBUStemps[9],self.aw.qmc.extraMODBUStemps[8]
+        return self.aw.extraMODBUStx,self.aw.extraMODBUStemps[9],self.aw.extraMODBUStemps[8]
 
     def HH802U(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
@@ -2510,9 +2508,7 @@ class serialport:
                         res[i] = ri
                 rf = self.processChannelData(res[i],self.aw.modbus.inputDivs[i],self.aw.modbus.inputModes[i])
                 res[i] = rf
-
-        self.aw.qmc.extraMODBUStemps = res[:]
-        self.aw.qmc.extraMODBUStx = self.aw.qmc.timeclock.elapsedMilli()
+        self.aw.extraMODBUStemps = res[:]
         return res[1], res[0]
 
     def NONEtmp(self) -> Tuple[float, float]:

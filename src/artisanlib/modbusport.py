@@ -225,7 +225,7 @@ class modbusport:
 #                if self._loop.is_running():
 #                    future = asyncio.run_coroutine_threadsafe(self.cancel_tasks(), self._loop)
 #                    try:
-#                        return future.result(0.2) # wait 0.2sec for cancelation of all tasks
+#                        return future.result(0.2) # wait 0.2sec for cancellation of all tasks
 #                    except TimeoutError:
 #                        # the coroutine took too long, cancelling the task...
 #                        future.cancel()
