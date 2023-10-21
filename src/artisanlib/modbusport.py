@@ -19,7 +19,7 @@ import sys
 import time
 import logging
 import asyncio
-from typing import Optional, List, Dict, Tuple, Set, Union, Any, TYPE_CHECKING
+from typing import Optional, List, Dict, Tuple, Union, Any, TYPE_CHECKING
 from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
@@ -213,22 +213,27 @@ class modbusport:
     def isConnected(self) -> bool:
         return self._loop is not None and not self._loop.is_closed() and self.master is not None and bool(self.master.connected)
 
-    def stop_asyncio_loop(self) -> None:
-        if self._loop is not None:
-            if not self._loop.is_closed():
-                if self._loop.is_running():
-                    self._loop.call_soon_threadsafe(self._loop.stop)
-                    done:Set[asyncio.Task]
-                    pending:Set[asyncio.Task]
-                    done, pending = self._loop.run_until_complete(asyncio.wait(asyncio.all_tasks()))
-                    for task in pending:
-                        task.cancel()
-                    for task in done:
-                        exception = task.exception()
-                        if isinstance(exception, Exception):
-                            raise exception
-                self._loop.close()
-            self._loop = None
+    async def cancel_tasks(self) -> None:
+        tasks: List[asyncio.Task] = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
+        for task in tasks:
+            task.cancel()
+        await asyncio.gather(*tasks)
+
+#    def stop_asyncio_loop(self) -> None:
+#        if self._loop is not None:
+#            if not self._loop.is_closed():
+#                if self._loop.is_running():
+#                    future = asyncio.run_coroutine_threadsafe(self.cancel_tasks(), self._loop)
+#                    try:
+#                        return future.result(0.2) # wait 0.2sec for cancelation of all tasks
+#                    except TimeoutError:
+#                        # the coroutine took too long, cancelling the task...
+#                        future.cancel()
+#                    except Exception as ex: # pylint: disable=broad-except
+#                        _log.error(ex)
+#                    self._loop.call_soon_threadsafe(self._loop.stop) # this just halts the loop
+#                self._loop.close()
+#            self._loop = None
 
     def disconnect(self) -> None:
         try:
@@ -238,7 +243,7 @@ class modbusport:
                 self.clearReadingsCache()
                 self.aw.sendmessage(QApplication.translate('Message', 'MODBUS disconnected'))
                 del self.master
-                self.stop_asyncio_loop()
+#                self.stop_asyncio_loop() # we just keep the loop running
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         self.master = None
