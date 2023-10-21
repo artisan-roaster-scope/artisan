@@ -607,10 +607,10 @@ class serialport:
             t2 = -1
         #get current duty cycle and update LCD 7
         try:
+            self.aw.qmc.dutycycleTX = self.aw.qmc.timeclock.elapsedMilli()
             dc = self.aw.fujipid.readdutycycle()
             if dc != -1: # on wrong reading we just keep the previous one
                 self.aw.qmc.dutycycle = max(0,min(100,dc))
-            self.aw.qmc.dutycycleTX = self.aw.qmc.timeclock.elapsedMilli()
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()

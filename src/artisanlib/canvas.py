@@ -6650,6 +6650,9 @@ class tgraphcanvas(FigureCanvas):
             self.dutycycleTX = 0.
             self.currentpidsv = 0.
 
+            self.aw.extraMODBUStx = 0.
+            self.aw.extraS7tx = 0.
+
             # we remove the filename to force writing a new file
             # and avoid accidental overwriting of existing data
             #current file name
