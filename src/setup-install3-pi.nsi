@@ -379,6 +379,8 @@ Section Uninstall
   RMDir /r "$INSTDIR\yaml"
   RMDir /r "$INSTDIR\yoctopuce"
   RMDir /r "$INSTDIR\zope"
+  
+  RMDir /r "$INSTDIR\_internal"
 
   !insertmacro Rmdir_Wildcard "$INSTDIR\PyQt*" ${__LINE__}
   !insertmacro Rmdir_Wildcard "$INSTDIR\qt*_plugins" ${__LINE__}

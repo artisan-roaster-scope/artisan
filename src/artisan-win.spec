@@ -225,9 +225,9 @@ if not ARTISAN_LEGACY=='True':
 #remove_dir(TARGET + 'mpl-data\sample_data',False)
 
 # YOCTO HACK BEGIN: manually copy over the dlls
-make_dir(TARGET + 'yoctopuce\cdll')
-copy_file(YOCTO_BIN + r'\yapi.dll', TARGET + 'yoctopuce\cdll')
-copy_file(YOCTO_BIN + r'\yapi64.dll', TARGET + 'yoctopuce\cdll')
+make_dir(TARGET + '_internal\yoctopuce\cdll')
+copy_file(YOCTO_BIN + r'\yapi.dll', TARGET + '_internal\yoctopuce\cdll')
+copy_file(YOCTO_BIN + r'\yapi64.dll', TARGET + '_internal\yoctopuce\cdll')
 # YOCTO HACK END
 
 # copy Snap7 lib
