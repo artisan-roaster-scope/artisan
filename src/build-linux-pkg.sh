@@ -42,7 +42,7 @@ mv debian/usr/share/dist debian/usr/share/artisan
 find debian -name .svn -exec rm -rf {} \; > /dev/null 2>&1
 fakeroot chown -R root:root debian
 fakeroot chmod -R go-w debian
-fakeroot chmod 0644 debian/usr/share/artisan/*.so*
+fakeroot chmod 0644 debian/usr/share/artisan/*.so* || true
 fakeroot chmod +x debian/usr/bin/artisan
 rm -f ${NAME}*.rpm
 
