@@ -146,9 +146,8 @@ mkdir dist/_internal/yoctopuce
 mkdir dist/_internal/yoctopuce/cdll
 cp ${PYTHONSITEPKGS}/yoctopuce/cdll/*64.so dist/_internal/yoctopuce/cdll
 
-# NOTE: seems that pyinstaller 6.x is adding a copy of the snap7 lib from the python package to the build automatically
 #cp /usr/lib/libsnap7.so dist
-#cp ${PYTHONSITEPKGS}/snap7/lib/libsnap7.so dist
+cp ${PYTHONSITEPKGS}/snap7/lib/libsnap7.so dist/_internal
 
 
 # remove automatically collected PyQt6 libs that are not used to save space
