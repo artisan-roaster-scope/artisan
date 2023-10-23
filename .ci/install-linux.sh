@@ -32,7 +32,8 @@ pip install --upgrade pip
 pip install -r src/requirements.txt | sed '/^Ignoring/d'
 
 # copy the snap7 binary installed by pip
-sudo cp -f ${PYTHONSITEPKGS}/snap7/lib/libsnap7.so /usr/lib
+# NOTE: seems that pyinstaller 6.x is adding a copy of the snap7 lib from the python package to the build automatically
+#sudo cp -f ${PYTHONSITEPKGS}/snap7/lib/libsnap7.so /usr/lib
 
 .ci/install-libusb.sh
 

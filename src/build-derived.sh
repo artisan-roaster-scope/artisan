@@ -35,7 +35,7 @@ if [ $# != 0 ]; then
             ;;
         *)
             echo "Error: invalid argument \"$arg\""
-            echo "Argument is invalid: $1. Must be 'macos' or 'linux'"
+            echo "Argument is invalid: $1. Must be 'macOS' or 'linux'"
             exit 1
             ;;
     esac

@@ -1280,7 +1280,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                     pass
                 self.aw.fetchCurveStyles()
                 # the redraw is mostly necessary to force a redraw of the legend to reflect the changed colors/styles/labels
-                self.qmc.redraw(recomputeAllDeltas=False)
+                self.qmc.redraw_keep_view(recomputeAllDeltas=False)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _type, _exc, exc_tb = sys.exc_info()

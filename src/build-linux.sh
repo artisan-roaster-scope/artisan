@@ -25,13 +25,15 @@ export PATH=$PATH:$HOME/.local/bin
 if [ ! -z $APPVEYOR ]; then
     # Appveyor environment
     echo "NOTICE: Appveyor build"
-elif [ -d /usr/lib/python3/dist-packages/PyQt5 ]; then
-    # ARM builds
-    export PYTHON_PATH=`python3 -m site --user-site`
-    export PYTHONSITEPKGS=`python3 -m site --user-site`
-    export QT_PATH=/usr/share/qt5
-    export QT_SRC_PATH=/usr/share/Qt/6.4/gcc_64
+elif [ -d /usr/lib/python3/dist-packages/PyQt6 ]; then
+    # ARM RPi bookworm builds (assumes requirements.txt installed in a user local venv
+    export PYTHON_PATH=`python3 -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])'`
+    export PYTHONSITEPKGS=`python3 -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])'`
+    export QT_PATH=/usr/share/qt6
+    export QT_SRC_PATH=/usr/lib/qt6
+#    export PYUIC=`python3 -m PyQt6.uic.pyuic`
     export PYLUPDATE=./pylupdate6pro.py
+#    export PYLUPDATE=/usr/bin/pylupdate6
 else
     # Other builds
     export PYTHON_PATH=`python3 -m site --user-site`
@@ -83,8 +85,7 @@ cp translations/*.qm dist/translations
 
 # copy data (mpl-data is now copied to matplotlib/mpl-data by pyinstaller)
 #cp -R $PYTHON_PATH/matplotlib/mpl-data dist
-#rm -rf dist/mpl-data/sample_data
-rm -rf dist/matplotlib/sample_data
+rm -rf dist/_internal/matplotlib/sample_data
 
 # copy file icon and other includes
 cp artisan-alog.xml dist
@@ -143,43 +144,68 @@ cp -R includes/Icons/* dist/Icons
 
 mkdir dist/yoctopuce
 mkdir dist/yoctopuce/cdll
-# dave cp $PYTHON_PATH/yoctopuce/cdll/*64.so dist/yoctopuce/cdll
-cp $PYTHONSITEPKGS/yoctopuce/cdll/*64.so dist/yoctopuce/cdll
+cp ${PYTHONSITEPKGS}/yoctopuce/cdll/*64.so dist/yoctopuce/cdll
 
-cp /usr/lib/libsnap7.so dist
+# NOTE: seems that pyinstaller 6.x is adding a copy of the snap7 lib from the python package to the build automatically
+#cp /usr/lib/libsnap7.so dist
+#cp ${PYTHONSITEPKGS}/snap7/lib/libsnap7.so dist
 
-cp README.txt dist
-cp ../LICENSE dist/LICENSE.txt
 
 # remove automatically collected PyQt6 libs that are not used to save space
-rm -f dist/libQt6Multimedia*.*
-rm -f dist/libQt6Quick3D*.*
-rm -f dist/libQt6QuickC*.*
-rm -f dist/libQt6QuickD*.*
-rm -f dist/libQt6QuickD*.*
-rm -f dist/libQt6QuickL*.*
-rm -f dist/libQt6QuickP*.*
-rm -f dist/libQt6QuickT*.*
-rm -f dist/libQt6QuickS*.*
-rm -f dist/libQt6RemoteObjects*.*
-rm -f dist/libQt6Sensors*.*
-rm -f dist/libQt6SerialPort*.*
-rm -f dist/libQt6ShaderTools*.*
-rm -f dist/libQt6Sql*.*
-rm -f dist/libQt6Test*.*
-rm -rf dist/PyQt6/Qt6/translations
-rm -rf dist/PyQt6/Qt6/qml/QtQuick3D
+# THIS GOT REPLACED BY THE FOR LOOP BELOW
+#rm -f dist/_internal/libQt6Multimedia*.*
+#rm -f dist/_internal/libQt6Quick3D*.*
+#rm -f dist/_internal/libQt6QuickC*.*
+#rm -f dist/_internal/libQt6QuickD*.*
+#rm -f dist/_internal/libQt6QuickD*.*
+#rm -f dist/_internal/libQt6QuickL*.*
+#rm -f dist/_internal/libQt6QuickP*.*
+#rm -f dist/_internal/libQt6QuickT*.*
+#rm -f dist/_internal/libQt6QuickS*.*
+#rm -f dist/_internal/libQt6RemoteObjects*.*
+#rm -f dist/_internal/libQt6Sensors*.*
+#rm -f dist/_internal/libQt6SerialPort*.*
+#rm -f dist/_internal/libQt6ShaderTools*.*
+#rm -f dist/_internal/libQt6Sql*.*
+#rm -f dist/_internal/libQt6Test*.*
+
+# with pyinstaller 6.0 it seems not to needed any longer to remove unused Qt libs:
+#keep_qt_modules="libQt6Core libQt6Gui libQt6Widgets libQt6Svg libQt6PrintSupport
+# libQt6Network libQt6DBus libQt6Bluetooth libQt6Concurrent libQt6WebEngineWidgets
+# libQt6WebEngineCore libQt6WebEngine libQt6Quick libQt6QuickWidgets libQt6Qml
+# libQt6QmlModels libQt6WebChannel libQt6Positioning libQt6OpenGL libQt6WaylandClient"
+#
+#for qtlib in dist/_internal/libQt6*.so.*; do
+#    match=0
+#    for item in ${keep_qt_modules}; do
+#        if [ ${qtlib} = dist/_internal/${item}.so.* ]; then
+#            match=1
+#            break
+#        fi
+#    done
+#    if [ $match = 0 ]; then
+##        rm -f ${qtlib}
+#        echo ${qtlib}
+#    fi
+#done
+
+# remove libQt5 libs
+rm -rf dist/_internal/libQt5*
+rm -rf dist/_internal/PyQt5
+
+rm -rf dist/_internal/PyQt6/Qt6/translations
+rm -rf dist/_internal/PyQt6/Qt6/qml/QtQuick3D
 
 # remove automatically collected libs that might break things on some installations (eg. Ubuntu 16.04)
 # so it is better to rely on the system installed once
 # see https://github.com/gridsync/gridsync/issues/47 and https://github.com/gridsync/gridsync/issues/43
 #   and https://askubuntu.com/questions/575505/glibcxx-3-4-20-not-found-how-to-fix-this-error
-rm -f dist/libdrm.so.2 # https://github.com/gridsync/gridsync/issues/47
-rm -f dist/libX11.so.6 # https://github.com/gridsync/gridsync/issues/43
-rm -f dist/libstdc++.so.6 # https://github.com/gridsync/gridsync/issues/189
+rm -f dist/_internal/libdrm.so.2 # https://github.com/gridsync/gridsync/issues/47
+rm -f dist/_internal/libX11.so.6 # https://github.com/gridsync/gridsync/issues/43
+rm -f dist/_internal/libstdc++.so.6 # https://github.com/gridsync/gridsync/issues/189
 # the following libs might not need to be removed
-rm -f dist/libgio-2.0.so.0
-rm -f dist/libz.so.1 # removing this lib seems to break the build on some RPi Buster version
-rm -f dist/libglib-2.0.so.0 # removed for v1.6 and later
+rm -f dist/_internal/libgio-2.0.so.0
+rm -f dist/_internal/libz.so.1 # removing this lib seems to break the build on some RPi Buster version
+rm -f dist/_internal/libglib-2.0.so.0 # removed for v1.6 and later
 
 rm -f libusb-1.0.so.0
