@@ -142,9 +142,9 @@ mkdir dist/Icons
 find includes/Icons -name '.*.aset' -exec rm -r {} \;
 cp -R includes/Icons/* dist/Icons
 
-mkdir dist/yoctopuce
-mkdir dist/yoctopuce/cdll
-cp ${PYTHONSITEPKGS}/yoctopuce/cdll/*64.so dist/yoctopuce/cdll
+mkdir dist/_internal/yoctopuce
+mkdir dist/_internal/yoctopuce/cdll
+cp ${PYTHONSITEPKGS}/yoctopuce/cdll/*64.so dist/_internal/yoctopuce/cdll
 
 # NOTE: seems that pyinstaller 6.x is adding a copy of the snap7 lib from the python package to the build automatically
 #cp /usr/lib/libsnap7.so dist

@@ -25,7 +25,7 @@ chmod +rx debian/usr/bin/artisan
 chmod -R +r dist
 chmod +x dist/icons
 
-# buid .deb package (into /usr/share)
+# build .deb package (into /usr/share)
 
 tar -cf dist-rpi.tar dist
 rm -rf dist

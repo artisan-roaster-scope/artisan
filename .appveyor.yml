@@ -228,8 +228,8 @@ for:
 #  test_script:
 #    - python -m unittest discover -s src
 
-  artifacts:
-    - path: 'generated-macos.zip'
+#  artifacts:
+#    - path: 'generated-macos.zip'
 #    - path: 'src/artisan-*.dmg'
 
   deploy_script:
