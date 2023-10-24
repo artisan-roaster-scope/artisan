@@ -142,14 +142,6 @@ mkdir dist/Icons
 find includes/Icons -name '.*.aset' -exec rm -r {} \;
 cp -R includes/Icons/* dist/Icons
 
-mkdir dist/_internal/yoctopuce
-mkdir dist/_internal/yoctopuce/cdll
-cp ${PYTHONSITEPKGS}/yoctopuce/cdll/*64.so dist/_internal/yoctopuce/cdll
-
-#cp /usr/lib/libsnap7.so dist
-cp ${PYTHONSITEPKGS}/snap7/lib/libsnap7.so dist/_internal
-
-
 # remove automatically collected PyQt6 libs that are not used to save space
 # with pyinstaller 6.0 it seems not to needed any longer to remove unused Qt libs:
 #keep_qt_modules="libQt6Core libQt6Gui libQt6Widgets libQt6Svg libQt6PrintSupport

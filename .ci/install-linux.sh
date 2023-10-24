@@ -31,9 +31,6 @@ gem install fpm -v 1.12.0 # Linux build fails using 1.13.0
 pip install --upgrade pip
 pip install -r src/requirements.txt | sed '/^Ignoring/d'
 
-# copy the snap7 binary installed by pip
-sudo cp -f ${PYTHONSITEPKGS}/snap7/lib/libsnap7.so /usr/lib
-
 .ci/install-libusb.sh
 
 # show set of libraries are installed
