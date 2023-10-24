@@ -15035,6 +15035,7 @@ class tgraphcanvas(FigureCanvas):
         try:
             #### lock shared resources #####
             self.errorsemaphore.acquire(1)
+            _log.error(error)
             timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = milliseconds
             #keep a max of 500 errors
             if len(self.errorlog) > 499:
