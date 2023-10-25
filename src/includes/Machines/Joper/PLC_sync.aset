@@ -4,6 +4,7 @@ roastertype_setup=Joper PLC
 
 [Device]
 id=29
+Controlbuttonflag=true
 
 [ExtraComm]
 extrabaudrate=38400, 38400, 38400, 38400
@@ -92,7 +93,7 @@ input5float=false
 input5div=1
 input5mode=
 input5register=986
-input5slave=0
+input5slave=1
 input6BCDsAsInt=false
 input6FloatsAsInt=false
 input6Signed=false
@@ -102,7 +103,7 @@ input6float=false
 input6div=1
 input6mode=
 input6register=987
-input6slave=0
+input6slave=1
 input7BCDsAsInt=false
 input7FloatsAsInt=false
 input7Signed=false
@@ -158,7 +159,7 @@ reset_socket=false
 clusterEventsFlag=false
 eventquantifierSV=0, 0, 0, 0
 eventquantifieraction=0, 0, 0, 0
-quantifieractive=0, 0, 0, 1
+quantifieractive=1, 1, 0, 1
 quantifiercoarse=0, 0, 0, 0
 quantifiermax=100, 100, 100, 100
 quantifiermin=0, 0, 0, 0
@@ -179,3 +180,11 @@ slidermax=100, 100, 100, 100
 slidermin=0, 0, 0, 0
 slideroffsets=0, 0, 0, 0
 slidervisibilities=1, 1, 0, 1
+
+
+[ArduinoPID]
+pidKd=20
+pidKi=0.01
+pidKp=15
+pidPositiveTarget=4
+svSlider=true

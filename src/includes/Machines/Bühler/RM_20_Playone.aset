@@ -68,7 +68,7 @@ alarmaction=16, 13
 alarmbeep=0, 0
 alarmcond=2, 3
 alarmflag=1, 1
-alarmguard=-1, -1
+alarmguard=-1, 0
 alarmnegguard=-1, -1
 alarmoffset=0, 0
 alarmsetlabel=
@@ -79,6 +79,8 @@ alarmtime=-1, 0
 
 [events]
 eventsGraphflag=4
+autoCharge=false
+autoDrop=false
 
 [Sliders]
 eventsliderunits=%, %, , 
