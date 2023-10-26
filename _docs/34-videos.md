@@ -7,6 +7,10 @@ toc: false
 author: Michael Herbert
 author_profile: true
 gallery:
+  - url: https://www.youtube.com/watch?v=4VFM4jvDLi8
+    image_path: /assets/images/gsg/video-captain-beginners-guide.jpg
+    alt: "The Captain's Coffee - Artisan Beginner's Guide!"
+    title: "2023-4 The Captain's Coffee - Artisan Beginner's Guide!"
   - url: https://www.youtube.com/watch?v=8ivsccu9e_Y
     image_path: /assets/images/gsg/video-RoyalCoffee-GettingMostFromArtisansTools.jpg
     alt: "Royal Coffee - Getting the Most from Artisan's Tools"
