@@ -15,7 +15,7 @@
 # AUTHOR
 # Marko Luther, 2023
 
-from typing import TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 
 from artisanlib.util import fromCtoF, fromFtoC, stringfromseconds, stringtoseconds, comma2dot
 from artisanlib.dialogs import ArtisanDialog
@@ -35,6 +35,7 @@ except ImportError:
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtWidgets import QWidget # pylint: disable=unused-import
+    from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
 class calculatorDlg(ArtisanDialog):
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
@@ -326,7 +327,8 @@ class calculatorDlg(ArtisanDialog):
         cyield = coffee * tds / grounds
         self.yieldEdit.setText(f'{cyield:.1f}')
 
-    def closeEvent(self, _):
+    @pyqtSlot('QCloseEvent')
+    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
         settings = QSettings()
         #save window geometry
         settings.setValue('CalculatorGeometry',self.saveGeometry())

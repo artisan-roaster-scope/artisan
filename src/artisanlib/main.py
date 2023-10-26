@@ -210,7 +210,7 @@ if TYPE_CHECKING:
     from openpyxl.worksheet.worksheet import Worksheet # pylint: disable=unused-import
     import numpy.typing as npt # pylint: disable=unused-import
     from PyQt6.QtWidgets import QTableWidgetItem, QTableWidget, QScrollBar # pylint: disable=unused-import
-    from PyQt6.QtGui import QStyleHints, QClipboard, QKeyEvent, QMouseEvent, QDropEvent, QDragEnterEvent # pylint: disable=unused-import
+    from PyQt6.QtGui import QStyleHints, QClipboard, QKeyEvent, QMouseEvent, QDropEvent, QDragEnterEvent, QCloseEvent # pylint: disable=unused-import
     from PyQt6.QtCore import QObject # noqa: F401 # pylint: disable=unused-import
     from matplotlib.backend_bases import Event as MplEvent
 
@@ -14090,7 +14090,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     # we remove the extra device elements that do not fit
                         if reply == QMessageBox.StandardButton.No:
                             #if (len(self.qmc.extradevices) < len(profile["extradevices"])):
-                            l =len(self.qmc.extradevices)
+                            l = len(self.qmc.extradevices)
                             profile['extratimex'] = profile['extratimex'][:l]
                             profile['extratemp1'] = profile['extratemp1'][:l]
                             profile['extratemp2'] = profile['extratemp2'][:l]
@@ -14490,6 +14490,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.cuppingnotes = ''
             if 'timex' in profile:
                 self.qmc.timex = profile['timex']
+
+            # ensure that extra timex and temp lists are as long as the main timex
+            for i, _ in enumerate(self.qmc.extratimex):
+                if not isinstance(self.qmc.extratimex[i], list) or len(self.qmc.extratimex[i]) != len(self.qmc.timex):
+                    self.qmc.extratimex[i] = self.qmc.timex
+                if not isinstance(self.qmc.extratemp1[i], list) or len(self.qmc.extratemp1[i]) != len(self.qmc.timex):
+                    self.qmc.extratemp1[i] = [-1]*len(self.qmc.timex)
+                if not isinstance(self.qmc.extratemp2[i], list) or len(self.qmc.extratemp2[i]) != len(self.qmc.timex):
+                    self.qmc.extratemp2[i] = [-1]*len(self.qmc.timex)
 
             # alarms
             if self.qmc.loadalarmsfromprofile and filename is not None:
@@ -17693,12 +17702,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' fetchCurveStyles() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     #Saves the settings when closing application. See the oppposite settingsLoad()
-    def closeEvent(self,event):
+    @pyqtSlot('QCloseEvent')
+    def closeEvent(self, event:Optional['QCloseEvent'] = None) -> None:
         res = self.closeApp()
-        if res:
-            event.accept()
-        else:
-            event.ignore()
+        if event is not None:
+            if res:
+                event.accept()
+            else:
+                event.ignore()
 
     # returns OS name, version and architecture as strings
     # ex: "macOS", "11.6",

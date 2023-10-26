@@ -32,6 +32,7 @@ except ImportError:
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtWidgets import QWidget, QPushButton # pylint: disable=unused-import
+    from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
 class SamplingDlg(ArtisanDialog):
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
@@ -94,7 +95,8 @@ class SamplingDlg(ArtisanDialog):
         layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
 
     #window close box
-    def closeEvent(self,_):
+    @pyqtSlot('QCloseEvent')
+    def closeEvent(self,_:Optional['QCloseEvent'] = None) -> None:
         self.close()
 
     #cancel button

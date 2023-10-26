@@ -24,6 +24,7 @@ from typing import Final  # Python <=3.7
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtWidgets import QWidget # pylint: disable=unused-import
+    from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
 from artisanlib.util import stringfromseconds, stringtoseconds, comma2dot
 from artisanlib.dialogs import ArtisanDialog
@@ -1021,7 +1022,8 @@ class PID_DlgControl(ArtisanDialog):
         #
         self.closeEvent(None)
 
-    def closeEvent(self,_):
+    @pyqtSlot('QCloseEvent')
+    def closeEvent(self,_:Optional['QCloseEvent'] = None) -> None:
         #save window position (only; not size!)
         settings = QSettings()
         settings.setValue('PIDPosition',self.frameGeometry().topLeft())

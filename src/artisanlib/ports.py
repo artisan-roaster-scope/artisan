@@ -26,6 +26,7 @@ if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from artisanlib.dialogs import HelpDlg # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtWidgets import QWidget # pylint: disable=unused-import
+    from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
 from artisanlib.util import toFloat, uchr, comma2dot
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog, PortComboBox
@@ -211,7 +212,8 @@ class scanModbusDlg(ArtisanDialog):
         else:
             self.code4 = False
 
-    def closeEvent(self,_):
+    @pyqtSlot('QCloseEvent')
+    def closeEvent(self,_:Optional['QCloseEvent'] = None) -> None:
         self.stop = True
         self.accept()
 
@@ -364,7 +366,8 @@ class scanS7Dlg(ArtisanDialog):
             self.typeFloat = False
             self.checkbox3.setChecked(not self.typeFloat)
 
-    def closeEvent(self,_):
+    @pyqtSlot('QCloseEvent')
+    def closeEvent(self,_:Optional['QCloseEvent'] = None) -> None:
         self.stop = True
         self.accept()
 
@@ -1859,7 +1862,8 @@ class comportDlg(ArtisanResizeablDialog):
     def tabSwitched(self,_):
         self.closeHelp()
 
-    def closeEvent(self,_):
+    @pyqtSlot('QCloseEvent')
+    def closeEvent(self,_:Optional['QCloseEvent'] = None) -> None:
         self.closeHelp()
         settings = QSettings()
         #save window geometry

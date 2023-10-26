@@ -328,7 +328,7 @@ def fill_gaps(ll:Union[Sequence[Union[float, int]], 'npt.NDArray[numpy.floating]
 # setting of the app
 # eg. ~/Library/Application Support/artisan-scope/Artisan (macOS)
 #     C:\Users\<USER>\AppData\Local\artisan-scope\Artisan (Windows)
-#     ~/.local/shared/artisan-scope/Artisan (Linux)
+#     ~/.local/share/artisan-scope/Artisan (Linux)
 
 # getDataDirectory() returns the Artisan data directory
 # if app is not yet initialized None is returned

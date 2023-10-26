@@ -24,6 +24,7 @@ from typing import List, Tuple, Callable, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtWidgets import QWidget # noqa: F401 # pylint: disable=unused-import
+    from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
     import numpy.typing as npt  # pylint: disable=unused-import
 
 from artisanlib.dialogs import ArtisanDialog
@@ -613,7 +614,8 @@ class profileTransformatorDlg(ArtisanDialog):
     def closeHelp(self):
         self.aw.closeHelpDialog(self.helpdialog)
 
-    def closeEvent(self, _):
+    @pyqtSlot('QCloseEvent')
+    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
         self.restoreState()
 
 

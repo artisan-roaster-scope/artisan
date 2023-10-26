@@ -16,11 +16,12 @@
 # Marko Luther, 2023
 
 
-from typing import TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtWidgets import QWidget # noqa: F401 # pylint: disable=unused-import
+    from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
 from artisanlib import __version__
 
@@ -74,7 +75,8 @@ class serialLogDlg(ArtisanDialog):
         else:
             self.aw.seriallogflag = False
 
-    def closeEvent(self,_):
+    @pyqtSlot('QCloseEvent')
+    def closeEvent(self,_:Optional['QCloseEvent'] = None) -> None:
         self.close()
         self.aw.serial_dlg = None
 
@@ -106,7 +108,8 @@ class errorDlg(ArtisanDialog):
         self.elabel.setText(labelstr)
         self.errorEdit.setHtml('version = ' +__version__ +'<br><br>' + htmlerr)
 
-    def closeEvent(self,_):
+    @pyqtSlot('QCloseEvent')
+    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
         self.close()
         self.aw.error_dlg = None
 
@@ -133,6 +136,7 @@ class messageDlg(ArtisanDialog):
         htmlmessage = ''.join([f'<b>{lenl-i}</b> {m}<br><br>' for i,m in enumerate(reversed(self.aw.messagehist))])
         self.messageEdit.setHtml(htmlmessage)
 
-    def closeEvent(self,_):
+    @pyqtSlot('QCloseEvent')
+    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
         self.close()
         self.aw.message_dlg = None

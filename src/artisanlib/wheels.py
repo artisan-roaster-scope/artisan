@@ -21,6 +21,7 @@ from typing import Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from PyQt6.QtWidgets import QWidget # pylint: disable=unused-import
+    from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
 from artisanlib.dialogs import ArtisanDialog
 
@@ -667,7 +668,8 @@ class WheelDlg(ArtisanDialog):
             self.createdatatable()
             self.aw.qmc.drawWheel()
 
-    def closeEvent(self, _):
+    @pyqtSlot('QCloseEvent')
+    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
         self.viewmode(False)
 
     @pyqtSlot(bool)

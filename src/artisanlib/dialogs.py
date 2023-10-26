@@ -36,6 +36,7 @@ from typing import Final  # Python <=3.7
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from PyQt6.QtWidgets import QPushButton # pylint: disable=unused-import
+    from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -106,7 +107,8 @@ class ArtisanDialog(QDialog): # pyright: ignore [reportGeneralTypeIssues] # Argu
             if txt != current_trans:
                 btn.setText(current_trans)
 
-    def closeEvent(self,_):
+    @pyqtSlot('QCloseEvent')
+    def closeEvent(self,_:Optional['QCloseEvent'] = None) -> None:
         self.dialogbuttons.rejected.emit()
 
     def keyPressEvent(self,event):
@@ -188,7 +190,8 @@ class HelpDlg(ArtisanDialog):
         if okButton is not None:
             okButton.setFocus()
 
-    def closeEvent(self, _):
+    @pyqtSlot('QCloseEvent')
+    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
         settings = QSettings()
         #save window geometry
         settings.setValue('HelpGeometry',self.saveGeometry())

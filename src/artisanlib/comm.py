@@ -45,7 +45,7 @@ if TYPE_CHECKING:
     from yoctopuce.yocto_current import YCurrent # type: ignore # pylint: disable=unused-import
     from yoctopuce.yocto_temperature import YTemperature # type: ignore # pylint: disable=unused-import
     from yoctopuce.yocto_api import YMeasure # type: ignore # pylint: disable=unused-import
-    from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
+#    from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
 
 
@@ -2038,11 +2038,12 @@ class serialport:
         except Exception: # pylint: disable=broad-except
             pass
 
-    def closeEvent(self,_:'QCloseEvent') -> None:
-        try:
-            self.closeport()
-        except Exception: # pylint: disable=broad-except
-            pass
+#    @pyqtSlot('QCloseEvent')
+#    def closeEvent(self,_:'QCloseEvent') -> None:
+#        try:
+#            self.closeport()
+#        except Exception: # pylint: disable=broad-except
+#            pass
 
     @staticmethod
     def binary(n, digits=8):

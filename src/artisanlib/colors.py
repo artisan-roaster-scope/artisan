@@ -19,10 +19,11 @@ import platform
 
 from artisanlib.util import deltaLabelUTF8
 from artisanlib.dialogs import ArtisanDialog
-from typing import TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+    from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
 try:
     from PyQt6.QtCore import Qt, QTimer, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
@@ -615,7 +616,7 @@ class graphColorDlg(ArtisanDialog):
         self.TabWidget.setCurrentIndex(self.activeTab)
 
     @pyqtSlot('QCloseEvent')
-    def closeEvent(self,_):
+    def closeEvent(self,_:Optional['QCloseEvent'] = None) -> None:
         self.aw.graphColorDlg_activeTab = self.TabWidget.currentIndex()
 
     @pyqtSlot(bool)

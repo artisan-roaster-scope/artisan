@@ -18,11 +18,12 @@
 import os
 import sys
 import logging
-from typing import Dict, Union, List, TYPE_CHECKING
+from typing import Dict, Union, List, Optional, TYPE_CHECKING
 from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+    from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
 from artisanlib.util import deltaLabelUTF8, comma2dot
 from artisanlib.dialogs import ArtisanResizeablDialog
@@ -714,7 +715,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.aw.AlarmDlg_activeTab = self.TabWidget.currentIndex()
         self.accept()
 
-    def closeEvent(self, _):
+    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
         self.closealarms()
 
     def savealarms(self):

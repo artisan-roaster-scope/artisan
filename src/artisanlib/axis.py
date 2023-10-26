@@ -38,6 +38,7 @@ except ImportError:
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from PyQt6.QtWidgets import QPushButton, QWidget # pylint: disable=unused-import
+    from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
 class WindowsDlg(ArtisanDialog):
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
@@ -916,7 +917,7 @@ class WindowsDlg(ArtisanDialog):
         self.close()
 
     @pyqtSlot('QCloseEvent')
-    def closeEvent(self,_):
+    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
         #save window position (only; not size!)
         settings = QSettings()
         settings.setValue('AxisPosition',self.frameGeometry().topLeft())

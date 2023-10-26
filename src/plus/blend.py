@@ -60,12 +60,13 @@ from artisanlib.util import comma2dot
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
 from uic import BlendDialog # type: ignore[attr-defined] # pylint: disable=no-name-in-module
-from typing import Optional, List, Collection, Dict, Tuple, Any, TYPE_CHECKING
+from typing import Optional, List, Collection, Dict, Tuple, TYPE_CHECKING
 from typing import Final  # Python <=3.7
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtWidgets import QWidget # noqa: F401 # pylint: disable=unused-import
+    from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -292,7 +293,8 @@ class CustomBlendDialog(ArtisanDialog):
         #save window geometry
         settings.setValue('BlendGeometry',self.saveGeometry())
 
-    def closeEvent(self,_:Optional[Any]) -> None:
+    @pyqtSlot('QCloseEvent')
+    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
         self.saveSettings()
 
     @pyqtSlot()

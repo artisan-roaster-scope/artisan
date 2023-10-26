@@ -19,10 +19,10 @@ from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQLabel
 
 try:
-    from PyQt6.QtCore import (Qt, QSettings) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import (Qt, QSettings, pyqtSlot) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QFrame, QWidget, QLCDNumber, QHBoxLayout, QVBoxLayout) # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
-    from PyQt5.QtCore import (Qt, QSettings) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import (Qt, QSettings, pyqtSlot) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QFrame, QWidget, QLCDNumber, QHBoxLayout, QVBoxLayout) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from typing import List, Optional, TYPE_CHECKING
@@ -30,6 +30,7 @@ from typing import List, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtWidgets import QWidget # pylint: disable=unused-import
+    from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
 class LargeLCDs(ArtisanDialog):
 
@@ -470,7 +471,8 @@ class LargeMainLCDs(LargeLCDs):
         else:
             self.reLayout(2)
 
-    def closeEvent(self, _):
+    @pyqtSlot('QCloseEvent')
+    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
         settings = QSettings()
         #save window geometry
         settings.setValue('LCDGeometry',self.saveGeometry())
@@ -519,7 +521,8 @@ class LargeDeltaLCDs(LargeLCDs):
         self.swaplcds = self.aw.qmc.swapdeltalcds
         super().reLayout(n)
 
-    def closeEvent(self, _):
+    @pyqtSlot('QCloseEvent')
+    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
         settings = QSettings()
         #save window geometry
         settings.setValue('DeltaLCDGeometry',self.saveGeometry())
@@ -565,7 +568,8 @@ class LargePIDLCDs(LargeLCDs):
         else:
             self.updateVisibilities([False],[False])
 
-    def closeEvent(self, _):
+    @pyqtSlot('QCloseEvent')
+    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
         settings = QSettings()
         #save window geometry
         settings.setValue('PIDLCDGeometry',self.saveGeometry())
@@ -646,7 +650,8 @@ class LargeExtraLCDs(LargeLCDs):
             except Exception: # pylint: disable=broad-except
                 pass
 
-    def closeEvent(self, _):
+    @pyqtSlot('QCloseEvent')
+    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
         settings = QSettings()
         #save window geometry
         settings.setValue('ExtraLCDGeometry',self.saveGeometry())
@@ -749,7 +754,8 @@ class LargePhasesLCDs(LargeLCDs):
     def updateAUCstyle(self,style):
         self.lcds2[1].setStyleSheet(style)
 
-    def closeEvent(self, _):
+    @pyqtSlot('QCloseEvent')
+    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
         settings = QSettings()
         #save window geometry
         settings.setValue('PhasesLCDGeometry',self.saveGeometry())
@@ -825,7 +831,8 @@ class LargeScaleLCDs(LargeLCDs):
                 if lcd.value() == 0:
                     lcd.display('')
 
-    def closeEvent(self, _):
+    @pyqtSlot('QCloseEvent')
+    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
         settings = QSettings()
         #save window geometry
         settings.setValue('ScaleLCDGeometry',self.saveGeometry())
