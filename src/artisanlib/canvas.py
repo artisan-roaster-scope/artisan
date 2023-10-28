@@ -1088,6 +1088,8 @@ class tgraphcanvas(FigureCanvas):
         self.compareDeltaET:bool = False
         self.compareDeltaBT:bool = True
         self.compareMainEvents:bool = True
+        self.compareExtraCurves1:List[bool] = [False]*self.aw.nLCDS
+        self.compareExtraCurves2:List[bool] = [False]*self.aw.nLCDS
         # Comparator: Roast (compareBBP=False & compareRoast=True); BBP+Roast (compareBBP=True & compareRoast=True); BBP (compareBBP=True & compareRoast=False)
         #   the state compareBBP=False and compareRoast=False should never occur
         self.compareBBP:bool = False # if True incl. BBP
@@ -2850,7 +2852,7 @@ class tgraphcanvas(FigureCanvas):
         if self.legend is not None:
             QTimer.singleShot(1,self.updateBackground)
 
-    def onrelease(self,event):     # NOTE: onrelease() is connected/disconnected in togglecrosslines()
+    def onrelease(self, event):     # NOTE: onrelease() is connected/disconnected in togglecrosslines()
         try:
             if self.ax is None:
                 return
@@ -4298,7 +4300,7 @@ class tgraphcanvas(FigureCanvas):
     @pyqtSlot()
     def updategraphics(self) -> None:
 #        QApplication.processEvents() # without this we see some flickers (canvas redraws) on using multiple button event actions on macOS!?
-        gotlock = self.aw.qmc.updateGraphicsSemaphore.tryAcquire(1,0) # we try to catch a lock if available but we do not wait, if we fail we just skip this redraw round (prevents stacking of waiting calls)
+        gotlock = self.aw.qmc.updateGraphicsSemaphore.tryAcquire(1,150) # we try to catch a lock if available but we do not wait, if we fail we just skip this redraw round (prevents stacking of waiting calls); we maximally wait 150ms which should be enough on modern machines
         if not gotlock:
             _log.info('updategraphics(): failed to get updateGraphicsSemaphore lock')
         else:
@@ -8022,9 +8024,8 @@ class tgraphcanvas(FigureCanvas):
                         # translate y-coordinate from delta into temp range to ensure the cursor position display (x,y) coordinate in the temp axis
                         self.delta_ax.fmt_ydata = self.fmt_data
                         self.delta_ax.fmt_xdata = self.fmt_timedata
-                    #put a right tick on the graph
                     else:
-                        self.ax.tick_params(\
+                        self.delta_ax.tick_params(\
                             axis='y',
                             which='both',
                             right=False,

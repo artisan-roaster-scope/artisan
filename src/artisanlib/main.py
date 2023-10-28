@@ -1406,7 +1406,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'buttonONOFF', 'buttonSTARTSTOP', 'buttonFCs', 'buttonFCe', 'buttonSCs', 'buttonSCe', 'buttonRESET', 'buttonCHARGE', 'buttonDROP',
         'buttonCONTROL', 'buttonEVENT', 'buttonSVp5', 'buttonSVp10', 'buttonSVp20', 'buttonSVm20', 'buttonSVm10', 'buttonSVm5', 'buttonDRY',
         'buttonCOOL', 'lcd1', 'lcd2', 'lcd3', 'lcd4', 'lcd5',
-        'lcd6', 'lcd7', 'label2', 'label3', 'label4', 'label5', 'label6', 'label7', 'nLCDs', 'extraLCD1', 'extraLCD2', 'extraLCDlabel1', 'extraLCDlabel2',
+        'lcd6', 'lcd7', 'label2', 'label3', 'label4', 'label5', 'label6', 'label7', 'extraLCD1', 'extraLCD2', 'extraLCDlabel1', 'extraLCDlabel2',
         'extraLCDframe1', 'extraLCDframe2', 'extraLCDvisibility1', 'extraLCDvisibility2', 'extraCurveVisibility1', 'extraCurveVisibility2',
         'extraDelta1', 'extraDelta2', 'extraFill1', 'extraFill2', 'channel_tare_values', 'messagehist', 'eventlabel', 'eNumberSpinBox',
         'lineEvent', 'etypeComboBox', 'valueEdit', 'etimeline', 'buttonminiEvent', 'buttonlist', 'buttonStates', 'lastbuttonpressed', 'buttonlistmaxlen',
@@ -1583,6 +1583,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             except Exception: # pylint: disable=broad-except
                 pass
 
+        self.nLCDS: Final[int] = 10 # maximum number of LCDs and extra devices (2x10 => 20 in total!)
 
         self.qmc:tgraphcanvas = tgraphcanvas(self.main_widget, self.dpi, locale, self)
         self.qmc.setMinimumHeight(150)
@@ -3201,7 +3202,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.label7.setText(f"<big><b>{QApplication.translate('Label', 'PID %')}</b></big>")
 
         #extra LCDs
-        self.nLCDS: Final[int] = 10 # maximum number of LCDs and extra devices
         self.extraLCD1:List[MyQLCDNumber] = []
         self.extraLCD2:List[MyQLCDNumber] = []
         self.extraLCDlabel1:List[QLabel] = []
@@ -12525,6 +12525,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.qmc.backgroundFlavors = self.qmc.backgroundFlavors[:(l-1)]
                 if 'etypes' in profile:
                     self.qmc.Betypes = [decodeLocalStrict(x) for x in profile['etypes']]
+                    # etype specified as empty strings are replaced by their defaults to enable translations in partially customized etypes
+                    for i, name in enumerate(self.qmc.Betypes):
+                        if name == '':
+                            self.qmc.Betypes[i] = self.qmc.etypesdefault[i]
                 if 'timeindex' in profile:
                     self.qmc.timeindexB = [max(0,v) if i>0 else max(-1,v) for i,v in enumerate(profile['timeindex'])]          #if new profile found with variable timeindex
                     if self.qmc.phasesfromBackgroundflag:
@@ -14036,6 +14040,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     def setProfile(self, filename:Optional[str], profile:'ProfileData', quiet:bool = False, reset:bool = True) -> bool: # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths
         try:
             updateRender = False
+            # if missing, current etypes are used. Empty entries are replaced by their defaults translated using the current locale
+            profile_etypes = ([decodeLocalStrict(x) for x in profile['etypes']] if 'etypes' in profile else self.qmc.etypes)
+            # etype specified as empty strings are replaced by their defaults to enable translations in partially customized etypes
+            for i, name in enumerate(profile_etypes):
+                if name == '':
+                    profile_etypes[i] = self.qmc.etypesdefault[i]
             #extra devices load and check
             if profile and 'extratimex' in profile:
                 if 'extradevices' in profile:
@@ -14053,7 +14063,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     try:
                         profiledev = ''.join([str(profile['extradevices']), str(profile['extraname1']), str(profile['extraname2']),
                                             str(profile['extramathexpression1']), str(profile['extramathexpression2']),
-                                            str(profile['etypes'][:4])
+                                            str(profile_etypes[:4])
                                             ])
                     except Exception: # pylint: disable=broad-except
                         profiledev = ''
@@ -14467,7 +14477,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.consolidateSpecialEvents() # we ensure that all 4 lists holding the special events are of equal length
 
             if 'etypes' in profile:
-                self.qmc.etypes = [decodeLocalStrict(x) for x in profile['etypes']]
+                self.qmc.etypes = profile_etypes
 
             if updateRender:
                 # etypes might have been changed thus we need to update the slider labels
@@ -15251,7 +15261,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             profile['specialeventstype'] = self.qmc.specialeventstype
             profile['specialeventsvalue'] = self.qmc.specialeventsvalue
             profile['specialeventsStrings'] = [encodeLocalStrict(ses) for ses in self.qmc.specialeventsStrings]
-            profile['etypes'] = [encodeLocalStrict(et) for et in self.qmc.etypes]
+            etypes = self.qmc.etypes[:]
+            for i, _ in enumerate(self.qmc.etypes):
+                if self.qmc.etypes[i] == self.qmc.etypesdefault[i]:
+                    etypes[i] = '' # we save empty strings for default event type names to ensure correct translation on re-loading those settings
+            profile['etypes'] = [encodeLocalStrict(et) for et in etypes]
             profile['roastingnotes'] = encodeLocalStrict(self.qmc.roastingnotes)
             profile['cuppingnotes'] = encodeLocalStrict(self.qmc.cuppingnotes)
             profile['timex'] = [self.float2float(x,10) for x in self.qmc.timex]
@@ -17168,6 +17182,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.compareDeltaET = bool(toBool(settings.value('compareDeltaET',self.qmc.compareDeltaET)))
             self.qmc.compareDeltaBT = bool(toBool(settings.value('compareDeltaBT',self.qmc.compareDeltaBT)))
             self.qmc.compareMainEvents = bool(toBool(settings.value('compareMainEvents',self.qmc.compareMainEvents)))
+            self.qmc.compareExtraCurves1 = [toBool(x) for x in toList(settings.value('compareExtraCurves1',self.qmc.compareExtraCurves1))]
+            self.qmc.compareExtraCurves2 = [toBool(x) for x in toList(settings.value('compareExtraCurves2',self.qmc.compareExtraCurves2))]
             self.qmc.compareBBP = bool(toBool(settings.value('compareBBP',self.qmc.compareBBP)))
             self.qmc.compareRoast = bool(toBool(settings.value('compareRoast',self.qmc.compareRoast)))
             self.qmc.autosaveflag = toInt(settings.value('autosaveflag',self.qmc.autosaveflag))
@@ -18601,6 +18617,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'compareDeltaET',self.qmc.compareDeltaET, read_defaults)
             self.settingsSetValue(settings, default_settings, 'compareDeltaBT',self.qmc.compareDeltaBT, read_defaults)
             self.settingsSetValue(settings, default_settings, 'compareMainEvents',self.qmc.compareMainEvents, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'compareExtraCurves1',self.qmc.compareExtraCurves1, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'compareExtraCurves2',self.qmc.compareExtraCurves2, read_defaults)
             self.settingsSetValue(settings, default_settings, 'compareBBP',self.qmc.compareBBP, read_defaults)
             self.settingsSetValue(settings, default_settings, 'compareRoast',self.qmc.compareRoast, read_defaults)
             self.settingsSetValue(settings, default_settings, 'autosaveflag',self.qmc.autosaveflag, read_defaults)
@@ -24806,7 +24824,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def roastCompare(self,_=False):
+    def roastCompare(self,_:bool = False) -> None:
         if self.comparator is not None:
             self.comparator.close()
         else:
@@ -24814,10 +24832,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             background = (self.qmc.backgroundpath if self.qmc.background else None)
             if self.qmc.reset():
                 filenames = []
-                if background is not None and background.strip() != '':
-                    filenames.append(background)
                 if foreground is not None and foreground.strip() != '':
                     filenames.append(foreground)
+                if background is not None and background.strip() != '':
+                    filenames.append(background)
                 if len(filenames) == 0:
                     filenames = self.reportFiles()
                 if filenames and len(filenames) > 0:
