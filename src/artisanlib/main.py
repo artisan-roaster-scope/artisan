@@ -552,7 +552,7 @@ try:
 
     settingsRelocated:bool = False
     # copy settings from legacy to new if newsettings do not exist, legacysettings do exist, and were not previously copied
-    if not newsettings.contains('Mode') and legacysettings.contains('Mode') and legacysettings.value('_settingsCopied') != 1:
+    if not newsettings.contains('Mode') and legacysettings.contains('Mode') and legacysettings.contains('_settingsCopied') and legacysettings.value('_settingsCopied') != 1:
         settingsRelocated = True
         # copy Artisan settings
         for key in legacysettings.allKeys():
@@ -9477,11 +9477,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             elif cs.startswith('loadBackground(') and cs.endswith(')'):
                                 try:
                                     try:
-                                        fp = str(eval(cs[len('loadBackground('):-1])) # pylint: disable=eval-used
+                                        # note we use here c instead of cs as we do not want _ or $ symbols to be substituted here
+                                        fp = str(eval(c[len('loadBackground('):-1])) # pylint: disable=eval-used
                                     except Exception: # pylint: disable=broad-except
                                         fp = str(cs[len('loadBackground('):-1])
                                     self.loadBackgroundSignal.emit(fp)
-                                    self.sendmessage(f'Artisan Command: {cs}')
+                                    self.sendmessage(f'Artisan Command: {c}')
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             # clearBackground
@@ -12380,7 +12381,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.loadbackground(filename)
                 self.qmc.background = not self.qmc.hideBgafterprofileload
                 self.autoAdjustAxis()
-                self.qmc.timealign(redraw=True, recompute=True)
+                self.qmc.timealign(redraw=False)
+                self.qmc.redraw()
+
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
                 self.deleteBackground() # delete a loaded background if any
@@ -12525,10 +12528,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.qmc.backgroundFlavors = self.qmc.backgroundFlavors[:(l-1)]
                 if 'etypes' in profile:
                     self.qmc.Betypes = [decodeLocalStrict(x) for x in profile['etypes']]
-                    # etype specified as empty strings are replaced by their defaults to enable translations in partially customized etypes
-                    for i, name in enumerate(self.qmc.Betypes):
-                        if name == '':
-                            self.qmc.Betypes[i] = self.qmc.etypesdefault[i]
+                    if 'default_etypes' in profile:
+                        default_etypes = profile['default_etypes']
+                        for i, _ in enumerate(self.qmc.Betypes):
+                            if default_etypes[i]:
+                                self.qmc.Betypes[i] = self.qmc.etypesdefault[i]
                 if 'timeindex' in profile:
                     self.qmc.timeindexB = [max(0,v) if i>0 else max(-1,v) for i,v in enumerate(profile['timeindex'])]          #if new profile found with variable timeindex
                     if self.qmc.phasesfromBackgroundflag:
@@ -14042,10 +14046,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             updateRender = False
             # if missing, current etypes are used. Empty entries are replaced by their defaults translated using the current locale
             profile_etypes = ([decodeLocalStrict(x) for x in profile['etypes']] if 'etypes' in profile else self.qmc.etypes)
-            # etype specified as empty strings are replaced by their defaults to enable translations in partially customized etypes
-            for i, name in enumerate(profile_etypes):
-                if name == '':
-                    profile_etypes[i] = self.qmc.etypesdefault[i]
+            if 'default_etypes' in profile:
+                default_etypes = profile['default_etypes']
+                for i, _ in enumerate(profile_etypes):
+                    if default_etypes[i]:
+                        profile_etypes[i] = self.qmc.etypesdefault[i]
             #extra devices load and check
             if profile and 'extratimex' in profile:
                 if 'extradevices' in profile:
@@ -15261,11 +15266,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             profile['specialeventstype'] = self.qmc.specialeventstype
             profile['specialeventsvalue'] = self.qmc.specialeventsvalue
             profile['specialeventsStrings'] = [encodeLocalStrict(ses) for ses in self.qmc.specialeventsStrings]
-            etypes = self.qmc.etypes[:]
-            for i, _ in enumerate(self.qmc.etypes):
-                if self.qmc.etypes[i] == self.qmc.etypesdefault[i]:
-                    etypes[i] = '' # we save empty strings for default event type names to ensure correct translation on re-loading those settings
-            profile['etypes'] = [encodeLocalStrict(et) for et in etypes]
+            profile['default_etypes'] = [item == self.qmc.etypesdefault[i] for i, item in enumerate(self.qmc.etypes)]
+            profile['etypes'] = [encodeLocalStrict(et) for et in self.qmc.etypes[:]]
             profile['roastingnotes'] = encodeLocalStrict(self.qmc.roastingnotes)
             profile['cuppingnotes'] = encodeLocalStrict(self.qmc.cuppingnotes)
             profile['timex'] = [self.float2float(x,10) for x in self.qmc.timex]
@@ -16271,7 +16273,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.curvefitoffset = toInt(settings.value('curvefitoffset',int(self.qmc.curvefitoffset)))
             self.qmc.segmentsamplesthreshold = toInt(settings.value('segmentsamplesthreshold',int(self.qmc.segmentsamplesthreshold)))
             self.qmc.segmentdeltathreshold = self.float2float(toFloat(settings.value('segmentdeltathreshold',self.qmc.segmentdeltathreshold)),4)
-            self.qmc.projectFlag = bool(toBool(settings.value('projectFlag',self.qmc.projectFlag)))
+            if settings.contains('projectFlag'): # deprecated flag controlling both projections
+                self.qmc.ETprojectFlag = self.qmc.BTprojectFlag = bool(toBool(settings.value('projectFlag')))
+            self.qmc.ETprojectFlag = bool(toBool(settings.value('ETprojectFlag',self.qmc.ETprojectFlag)))
+            self.qmc.BTprojectFlag = bool(toBool(settings.value('BTprojectFlag',self.qmc.BTprojectFlag)))
             self.qmc.projectDeltaFlag = bool(toBool(settings.value('projectDeltaFlag',self.qmc.projectDeltaFlag)))
             self.qmc.projectionmode = toInt(settings.value('projectionmode',int(self.qmc.projectionmode)))
             self.qmc.AUCbegin = toInt(settings.value('AUCbegin',int(self.qmc.AUCbegin)))
@@ -17848,7 +17853,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     pass
 
             #save mode
-            self.settingsSetValue(settings, default_settings, 'Mode',self.qmc.mode, read_defaults)
+            settings.setValue('Mode',self.qmc.mode) # 'Mode' is always stored as it is used to discriminate the ViewerSettings (see _settingsCopied)
 
             if filename is not None and not read_defaults:
                 # only add those on exporting settings (those are never read by Artisan)
@@ -17970,7 +17975,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'segmentsamplesthreshold',self.qmc.segmentsamplesthreshold, read_defaults)
             self.settingsSetValue(settings, default_settings, 'segmentdeltathreshold',self.qmc.segmentdeltathreshold, read_defaults)
             #projection
-            self.settingsSetValue(settings, default_settings, 'projectFlag',self.qmc.projectFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ETprojectFlag',self.qmc.ETprojectFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'BTprojectFlag',self.qmc.BTprojectFlag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'projectDeltaFlag',self.qmc.projectDeltaFlag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'projectionmode',self.qmc.projectionmode, read_defaults)
             #save AUC
@@ -25133,8 +25139,6 @@ def initialize_locale(my_app:Artisan) -> str:
 
 def main() -> None:
 
-    locale_str = initialize_locale(app)
-    _log.info('locale: %s',locale_str)
 
     # suppress all Qt messages
     qInstallMessageHandler(qt_message_handler)
@@ -25150,6 +25154,9 @@ def main() -> None:
         if not viewersettings.contains('Mode'):
             artisanviewerFirstStart = True
         del viewersettings
+
+    locale_str = initialize_locale(app)
+    _log.info('locale: %s',locale_str)
 
     appWindow = ApplicationWindow(locale=locale_str, WebEngineSupport=QtWebEngineSupport, artisanviewerFirstStart=artisanviewerFirstStart)
 

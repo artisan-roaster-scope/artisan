@@ -164,9 +164,11 @@ class RoastProfile:
         self.etypes:List[str] = self.aw.qmc.etypes[:-1]
         if 'etypes' in profile:
             self.etypes = profile['etypes'][:4]
-            for i, name in enumerate(self.etypes):
-                if name == '':
-                    self.etypes[i] = self.aw.qmc.etypesdefault[i]
+            if 'default_etypes' in profile:
+                default_etypes = profile['default_etypes']
+                for i, _ in enumerate(self.etypes):
+                    if default_etypes[i]:
+                        self.etypes[i] = self.aw.qmc.etypesdefault[i]
         #
         # fill profile data:
         if 'timex' in profile:

@@ -238,7 +238,7 @@ class tgraphcanvas(FigureCanvas):
         'organization_setup', 'operator_setup', 'roastertype_setup', 'roastersize_setup', 'roastersize_setup_default', 'roasterheating_setup', 'drumspeed_setup', 'last_batchsize', 'machinesetup_energy_ratings',
         'machinesetup', 'roastingnotes', 'cuppingnotes', 'roastdate', 'roastepoch', 'roastepoch_timeout', 'lastroastepoch', 'batchcounter', 'batchsequence', 'batchprefix', 'neverUpdateBatchCounter',
         'roastbatchnr', 'roastbatchprefix', 'roastbatchpos', 'roasttzoffset', 'roastUUID', 'plus_default_store', 'plus_store', 'plus_store_label', 'plus_coffee',
-        'plus_coffee_label', 'plus_blend_spec', 'plus_blend_spec_labels', 'plus_blend_label', 'plus_custom_blend', 'plus_sync_record_hash', 'plus_file_last_modified', 'beans', 'projectFlag', 'curveVisibilityCache', 'ETcurve', 'BTcurve',
+        'plus_coffee_label', 'plus_blend_spec', 'plus_blend_spec_labels', 'plus_blend_label', 'plus_custom_blend', 'plus_sync_record_hash', 'plus_file_last_modified', 'beans', 'ETprojectFlag', 'BTprojectFlag', 'curveVisibilityCache', 'ETcurve', 'BTcurve',
         'ETlcd', 'BTlcd', 'swaplcds', 'LCDdecimalplaces', 'foregroundShowFullflag', 'DeltaETflag', 'DeltaBTflag', 'DeltaETlcdflag', 'DeltaBTlcdflag',
         'swapdeltalcds', 'PIDbuttonflag', 'Controlbuttonflag', 'deltaETfilter', 'deltaBTfilter', 'curvefilter', 'deltaETspan', 'deltaBTspan',
         'deltaETsamples', 'deltaBTsamples', 'profile_sampling_interval', 'background_profile_sampling_interval', 'profile_meter', 'optimalSmoothing', 'polyfitRoRcalc',
@@ -1379,7 +1379,8 @@ class tgraphcanvas(FigureCanvas):
         self.curveVisibilityCache:Optional[Tuple[bool,bool,bool,bool,List[bool],List[bool]]] = None # caches the users curve visibility settings to be reset after recording
 
         #flags to show projections, draw Delta ET, and draw Delta BT
-        self.projectFlag:bool = True
+        self.ETprojectFlag:bool = True
+        self.BTprojectFlag:bool = True
         self.projectDeltaFlag:bool = False
         self.ETcurve:bool = True
         self.BTcurve:bool = True
@@ -3307,18 +3308,18 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     self.l_timeline.set_xdata(tx)
                 self.ax.draw_artist(self.l_timeline)
-            if self.projectFlag:
-                if self.l_BTprojection is not None and self.BTcurve and (self.DeltaBTflag or self.DeltaBTlcdflag):
-                    # show only if either the DeltaBT curve or LCD is shown (allows to suppress projects for cases where ET channel is used for other signals)
-                    self.ax.draw_artist(self.l_BTprojection)
-                if self.l_ETprojection is not None and self.ETcurve and (self.DeltaETflag or self.DeltaETlcdflag):
+            if self.ETprojectFlag:
+                if self.l_ETprojection is not None and self.ETcurve:
                     # show only if either the DeltaBT curve or LCD is shown (allows to suppress projects for cases where ET channel is used for other signals)
                     self.ax.draw_artist(self.l_ETprojection)
-                if self.projectDeltaFlag:
-                    if self.l_DeltaBTprojection is not None and self.DeltaBTflag:
-                        self.ax.draw_artist(self.l_DeltaBTprojection)
-                    if self.l_DeltaETprojection is not None and self.DeltaETflag:
-                        self.ax.draw_artist(self.l_DeltaETprojection)
+                if self.projectDeltaFlag and self.l_DeltaETprojection is not None and self.DeltaETflag:
+                    self.ax.draw_artist(self.l_DeltaETprojection)
+            if self.BTprojectFlag:
+                if self.l_BTprojection is not None and self.BTcurve:
+                    # show only if either the DeltaBT curve or LCD is shown (allows to suppress projects for cases where ET channel is used for other signals)
+                    self.ax.draw_artist(self.l_BTprojection)
+                if self.projectDeltaFlag and self.l_DeltaBTprojection is not None and self.DeltaBTflag:
+                    self.ax.draw_artist(self.l_DeltaBTprojection)
 
             if self.AUCguideFlag and self.AUCguideTime and self.AUCguideTime > 0 and self.l_AUCguide is not None:
                 self.ax.draw_artist(self.l_AUCguide)
@@ -3889,7 +3890,7 @@ class tgraphcanvas(FigureCanvas):
                             if now > (self.endofx - 45):            # if difference is smaller than 45 seconds
                                 self.endofx = int(now + 180.)       # increase x limit by 3 minutes
                                 self.xaxistosm()
-                        if self.projectFlag:
+                        if self.ETprojectFlag or self.BTprojectFlag:
                             self.updateProjection()
 
                         # autodetect CHARGE event
@@ -9779,32 +9780,30 @@ class tgraphcanvas(FigureCanvas):
                 #######################################
 
                 # add projection and AUC guide lines last as those are removed by updategraphics for optimized redrawing and not cached
-                if self.projectFlag:
-                    if self.BTcurve:
-                        self.l_BTprojection, = self.ax.plot([], [],color = self.palette['bt'],
-                                                    dashes=dashes_setup,
-                                                    label=self.aw.arabicReshape(QApplication.translate('Label', 'BTprojection')),
-                                                    linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
-                    if self.ETcurve:
-                        self.l_ETprojection, = self.ax.plot([], [],color = self.palette['et'],
-                                                    dashes=dashes_setup,
-                                                    label=self.aw.arabicReshape(QApplication.translate('Label', 'ETprojection')),
-                                                    linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
-
-                    if self.projectDeltaFlag and (self.DeltaBTflag or self.DeltaETflag) and self.delta_ax is not None:
+                if self.ETprojectFlag and self.ETcurve:
+                    self.l_ETprojection, = self.ax.plot([], [],color = self.palette['et'],
+                                                dashes=dashes_setup,
+                                                label=self.aw.arabicReshape(QApplication.translate('Label', 'ETprojection')),
+                                                linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
+                    if self.projectDeltaFlag and self.DeltaETflag and self.delta_ax is not None:
                         trans = self.delta_ax.transData
-                        if self.DeltaBTflag:
-                            self.l_DeltaBTprojection, = self.ax.plot([], [],color = self.palette['deltabt'],
-                                                        dashes=dashes_setup,
-                                                        transform=trans,
-                                                        label=self.aw.arabicReshape(QApplication.translate('Label', 'DeltaBTprojection')),
-                                                        linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
-                        if self.DeltaETflag:
-                            self.l_DeltaETprojection, = self.ax.plot([], [],color = self.palette['deltaet'],
-                                                        dashes=dashes_setup,
-                                                        transform=trans,
-                                                        label=self.aw.arabicReshape(QApplication.translate('Label', 'DeltaETprojection')),
-                                                        linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
+                        self.l_DeltaETprojection, = self.ax.plot([], [],color = self.palette['deltaet'],
+                                                    dashes=dashes_setup,
+                                                    transform=trans,
+                                                    label=self.aw.arabicReshape(QApplication.translate('Label', 'DeltaETprojection')),
+                                                    linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
+                if self.BTprojectFlag and self.BTcurve:
+                    self.l_BTprojection, = self.ax.plot([], [],color = self.palette['bt'],
+                                                dashes=dashes_setup,
+                                                label=self.aw.arabicReshape(QApplication.translate('Label', 'BTprojection')),
+                                                linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
+                    if self.projectDeltaFlag and self.DeltaBTflag and self.delta_ax is not None:
+                        trans = self.delta_ax.transData
+                        self.l_DeltaBTprojection, = self.ax.plot([], [],color = self.palette['deltabt'],
+                                                    dashes=dashes_setup,
+                                                    transform=trans,
+                                                    label=self.aw.arabicReshape(QApplication.translate('Label', 'DeltaBTprojection')),
+                                                    linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
 
                 if self.AUCguideFlag:
                     self.l_AUCguide = self.ax.axvline(0,visible=False,color = self.palette['aucguide'],

@@ -188,6 +188,7 @@ class ProfileData(TypedDict, total=False):
     specialeventstype: List[int]
     specialeventsvalue: List[float]
     specialeventsStrings: List[str]
+    default_etypes: List[bool]
     etypes: List[str]
     cuppingnotes: str
     roastingnotes: str

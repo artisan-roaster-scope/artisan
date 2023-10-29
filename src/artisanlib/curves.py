@@ -308,7 +308,8 @@ class CurvesDlg(ArtisanDialog):
         self.org_DeltaBT = self.aw.qmc.DeltaBTflag
         self.org_DeltaETlcd = self.aw.qmc.DeltaETlcdflag
         self.org_DeltaBTlcd = self.aw.qmc.DeltaBTlcdflag
-        self.org_Projection = self.aw.qmc.projectFlag
+        self.org_ETProjection = self.aw.qmc.ETprojectFlag
+        self.org_BTProjection = self.aw.qmc.BTprojectFlag
         self.org_ProjectionDelta = self.aw.qmc.projectDeltaFlag
         self.org_patheffects = self.aw.qmc.patheffects
         self.org_graphstyle = self.aw.qmc.graphstyle
@@ -435,6 +436,8 @@ class CurvesDlg(ArtisanDialog):
         self.maxLimit.setValue(int(self.aw.qmc.filterDropOut_tmax))
         #show projection
         self.projectCheck = QCheckBox(QApplication.translate('CheckBox', 'Projection'))
+        self.ETprojectCheck = QCheckBox(f"{QApplication.translate('Label', 'ET', None)} {QApplication.translate('CheckBox', 'Projection')}")
+        self.BTprojectCheck = QCheckBox(f"{QApplication.translate('Label', 'BT', None)} {QApplication.translate('CheckBox', 'Projection')}")
         self.projectDeltaCheck = QCheckBox(deltaLabelUTF8 + QApplication.translate('CheckBox', 'Projection'))
         self.projectionmodeComboBox = QComboBox()
         self.projectionmodeComboBox.addItems([QApplication.translate('ComboBox','linear'),
@@ -443,12 +446,15 @@ class CurvesDlg(ArtisanDialog):
                                               ])
         self.projectionmodeComboBox.setCurrentIndex(self.aw.qmc.projectionmode)
         self.projectionmodeComboBox.currentIndexChanged.connect(self.changeProjectionMode)
-        self.projectCheck.setChecked(self.aw.qmc.projectFlag)
+        self.ETprojectCheck.setChecked(self.aw.qmc.ETprojectFlag)
+        self.BTprojectCheck.setChecked(self.aw.qmc.BTprojectFlag)
         self.projectDeltaCheck.setChecked(self.aw.qmc.projectDeltaFlag)
-        self.projectDeltaCheck.setEnabled(self.aw.qmc.projectFlag)
+        self.projectDeltaCheck.setEnabled(self.aw.qmc.ETprojectFlag or self.aw.qmc.BTprojectFlag)
+        self.projectionmodeComboBox.setEnabled(self.aw.qmc.ETprojectFlag or self.aw.qmc.BTprojectFlag)
         self.DeltaET.stateChanged.connect(self.changeDeltaET)         #toggle
         self.DeltaBT.stateChanged.connect(self.changeDeltaBT)         #toggle
-        self.projectCheck.stateChanged.connect(self.changeProjection) #toggle
+        self.ETprojectCheck.stateChanged.connect(self.changeETProjection) #toggle
+        self.BTprojectCheck.stateChanged.connect(self.changeBTProjection) #toggle
         self.projectDeltaCheck.stateChanged.connect(self.changeDeltaProjection) #toggle
 
         deltaSpanLabel = QLabel(QApplication.translate('Label', 'Delta Span'))
@@ -479,7 +485,8 @@ class CurvesDlg(ArtisanDialog):
         rorBoxLayout.addWidget(self.DeltaBT)
         rorBoxLayout.addWidget(DeltaBTlabel)
         rorBoxLayout.addStretch()
-        rorBoxLayout.addWidget(self.projectCheck)
+        rorBoxLayout.addWidget(self.ETprojectCheck)
+        rorBoxLayout.addWidget(self.BTprojectCheck)
         rorBoxLayout.addWidget(self.projectionmodeComboBox)
         rorBoxLayout.addSpacing(10)
         rorBoxLayout.addWidget(self.projectDeltaCheck)
@@ -2392,12 +2399,22 @@ class CurvesDlg(ArtisanDialog):
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' changeFilter(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(int)
-    def changeProjection(self, _:int = 0) -> None:
-        self.aw.qmc.projectFlag = not self.aw.qmc.projectFlag
-        if not self.aw.qmc.projectFlag:
+    def changeETProjection(self, _:int = 0) -> None:
+        self.aw.qmc.ETprojectFlag = not self.aw.qmc.ETprojectFlag
+        if not self.aw.qmc.ETprojectFlag:
             #erase old projections
             self.aw.qmc.resetlines()
-        self.projectDeltaCheck.setEnabled(self.aw.qmc.projectFlag)
+        self.projectDeltaCheck.setEnabled(self.aw.qmc.ETprojectFlag or self.aw.qmc.BTprojectFlag)
+        self.projectionmodeComboBox.setEnabled(self.aw.qmc.ETprojectFlag or self.aw.qmc.BTprojectFlag)
+
+    @pyqtSlot(int)
+    def changeBTProjection(self, _:int = 0) -> None:
+        self.aw.qmc.BTprojectFlag = not self.aw.qmc.BTprojectFlag
+        if not self.aw.qmc.BTprojectFlag:
+            #erase old projections
+            self.aw.qmc.resetlines()
+        self.projectDeltaCheck.setEnabled(self.aw.qmc.ETprojectFlag or self.aw.qmc.BTprojectFlag)
+        self.projectionmodeComboBox.setEnabled(self.aw.qmc.ETprojectFlag or self.aw.qmc.BTprojectFlag)
 
     @pyqtSlot(int)
     def changeDeltaProjection(self, _:int = 0) -> None:
@@ -2446,7 +2463,8 @@ class CurvesDlg(ArtisanDialog):
         self.aw.qmc.DeltaBTflag = self.org_DeltaBT
         self.aw.qmc.DeltaETlcdflag = self.org_DeltaETlcd
         self.aw.qmc.DeltaBTlcdflag = self.org_DeltaBTlcd
-        self.aw.qmc.projectFlag = self.org_Projection
+        self.aw.qmc.ETprojectFlag = self.org_ETProjection
+        self.aw.qmc.BTprojectFlag = self.org_BTProjection
         self.aw.qmc.projectDeltaFlag = self.org_ProjectionDelta
         self.aw.qmc.patheffects = self.org_patheffects
         self.aw.qmc.graphstyle = self.org_graphstyle
