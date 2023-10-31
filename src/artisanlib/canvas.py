@@ -1331,6 +1331,7 @@ class tgraphcanvas(FigureCanvas):
         self.roastersize_setup_default:float = 0 # in kg # the default to present on setup as loaded from the machine setup
         self.roastersize_setup:float = 0 # in kg
         self.roasterheating_setup:int = 0
+        self.roasterheating_setup_default:int = 0 # the default to present on setup as loaded from the machine setup
         self.drumspeed_setup:str = ''
         #
         self.last_batchsize:float = 0 # in unit of self.weight[2]; remember the last batchsize used to be applied as default for the next batch

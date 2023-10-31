@@ -38,12 +38,12 @@ class WebLCDs:
                     '_showetflag', '_showbtflag' ]
 
     def __init__(self, port:int, resource_path:str, nonesymbol:str, timecolor:str, timebackground:str, btcolor:str,
-            btbackground:str, etcolor:str, etbackground:str, showetflag:bool, showbtflag:bool):
+            btbackground:str, etcolor:str, etbackground:str, showetflag:bool, showbtflag:bool) -> None:
 
         self._loop:        Optional[asyncio.AbstractEventLoop] = None # the asyncio loop
         self._thread:      Optional[Thread]                    = None # the thread running the asyncio loop
         self._app = web.Application(debug=True)
-        self._app['websockets'] = weakref.WeakSet()
+        self._app['websockets']:weakref.WeakSet[web.WebSocketResponse] = weakref.WeakSet()
         self._app.on_shutdown.append(self.on_shutdown)
 
         self._last_send:float = time.time() # timestamp of the last message send to the clients
@@ -53,9 +53,7 @@ class WebLCDs:
             loader=jinja2.FileSystemLoader(resource_path))
 
         self._app.add_routes([
-#            web.get('/status', self.status), # not used any longer
             web.get('/artisan', self.index),
-#            web.post('/send', self.send),    # only needed to update readings via http (see canvas.py:updateWebLCDs)
             web.get('/websocket', self.websocket_handler),
             web.static('/', resource_path, append_version=True)
         ])
@@ -71,10 +69,6 @@ class WebLCDs:
         self._etbackground:str = etbackground
         self._showetflag:bool = showetflag
         self._showbtflag:bool = showbtflag
-
-#    @staticmethod
-#    def status(_request: 'Request'):
-#        return web.Response(text='1')
 
     @aiohttp_jinja2.template('artisan.tpl')
     async def index(self, _request: 'Request') -> Dict[str,str]:
@@ -95,34 +89,18 @@ class WebLCDs:
             'showspace': showspace_str
         }
 
-#    # route to push new data to the client
-#    async def send(self, request: 'Request') -> 'Response':
-#        json = await request.text()
-#        wsocks = self._app['websockets']
-#        for ws in wsocks:
-#            try:
-#                await ws.send_str(json)
-#            except Exception as e: # pylint: disable=broad-except
-#                _log.exception(e)
-#                try:
-#                    request.app['websockets'].discard(ws)
-#                except Exception as e: # pylint: disable=broad-except
-#                    _log.exception(e)
-#        return web.Response()
-
-
-
     async def send_msg_to_all(self, message:str) -> None:
-        wsocks = self._app['websockets']
-        for ws in wsocks:
-            try:
-                await ws.send_str(message)
-            except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
+        if 'websockets' in self._app and self._app['websockets'] is not None:
+            ws_set = set(self._app['websockets'])
+            for ws in ws_set:
                 try:
-                    self._app['websockets'].discard(ws)
-                except Exception as ex: # pylint: disable=broad-except
-                    _log.exception(ex)
+                    await ws.send_str(message)
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
+                    try:
+                        self._app['websockets'].discard(ws)
+                    except Exception as ex: # pylint: disable=broad-except
+                        _log.exception(ex)
 
     def send_msg(self, message:str, timeout:Optional[float] = 0.2) -> None:
         now: float = time.time()
@@ -140,7 +118,7 @@ class WebLCDs:
     # route that establishes the websocket between the Artisan app and the clients
     @staticmethod
     async def websocket_handler(request: 'Request') -> web.WebSocketResponse:
-        ws = web.WebSocketResponse()
+        ws:web.WebSocketResponse = web.WebSocketResponse()
         await ws.prepare(request)
         request.app['websockets'].add(ws)
         try:

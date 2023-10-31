@@ -635,38 +635,6 @@ if platform.system().startswith('Windows'):
 #    except Exception as e: # pylint: disable=broad-except
 #        pass
 
-
-
-
-#def __dependencies_for_freezing():
-#    # pylint: disable=import-error,no-name-in-module,unused-import
-#    from scipy.sparse.csgraph import _validation # @UnresolvedImport @UnusedImport
-#    from scipy.special import _ufuncs_cxx # @UnresolvedImport @UnusedImport
-#    from scipy import integrate # @UnresolvedImport @UnusedImport
-#    from scipy import interpolate # @UnresolvedImport @UnusedImport
-##    from scipy.optimize import curve_fit # @UnresolvedImport @UnusedImport
-#    # to make bbfreeze on Linux and py2exe on Win/Py3 happy with scipy > 0.17.0
-#    import scipy.linalg.cython_blas # @UnresolvedImport @UnusedImport
-#    import scipy.linalg.cython_lapack # @UnresolvedImport @UnusedImport
-#    import scipy.special.cython_special # @UnresolvedImport @UnusedImport
-#
-#    import appdirs # @UnresolvedImport @UnusedImport
-#    import packaging # @UnresolvedImport @UnusedImport
-#    import packaging.version # @UnresolvedImport @UnusedImport
-#    import packaging.specifiers # @UnresolvedImport @UnusedImport
-#    import packaging.markers # @UnresolvedImport @UnusedImport
-#    import packaging.requirements # @UnresolvedImport @UnusedImport
-#
-#    import PyQt5.QtSvg  # @UnusedImport
-#    import PyQt5.QtXml  # @UnusedImport
-#    import PyQt5.QtDBus # needed for QT5 builds  # @UnusedImport
-#    import PyQt5.QtPrintSupport # needed for by platform plugin libqcocoa  # @UnusedImport
-#
-#    # for gevent bundling
-#    from gevent import signal as gevent_signal, core, resolver_thread, resolver_ares, socket, threadpool, thread, threading as gevent_threading, select, subprocess as gevent_subprocess, pywsgi, server, hub # @UnusedImport @Reimport
-#
-#del __dependencies_for_freezing
-
 from artisanlib.s7port import s7port
 from artisanlib.wsport import wsport
 from artisanlib.modbusport import modbusport
@@ -5128,6 +5096,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     org_roasterheating = self.qmc.roasterheating
                     # reset roaster_setup_default to ensure we do not offer a default from a previously loaded machine setup
                     self.qmc.roastersize_setup_default = 0
+                    self.qmc.roasterheating_setup_default = 0
+                    # also reset roastersize_setup to have the machine setup work as after a reset on each call
+                    self.qmc.roastersize_setup = 0
+                    self.qmc.roasterheating_setup = 0
                     #
                     self.loadSettings(fn=action.data()[0],remember=False,machine=True,reload=False)
                     res:bool
@@ -5237,7 +5209,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         resi:Optional[int]
                         if self.qmc.roasterheating_setup == 0:
                             dlg:ArtisanComboBoxDialog = ArtisanComboBoxDialog(self, self, QApplication.translate('Message',
-                                    'Machine'),QApplication.translate('Label', 'Heating'),self.qmc.heating_types,0)
+                                    'Machine'),QApplication.translate('Label', 'Heating'),self.qmc.heating_types,self.qmc.roasterheating_setup_default)
                             resi = dlg.idx if dlg.exec() else None
                         else:
                             resi = self.qmc.roasterheating_setup
@@ -16838,6 +16810,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             # we set the default in-weight from the given last_batchsize
             self.qmc.weight = (self.qmc.last_batchsize,self.qmc.weight[1],self.qmc.weight[2])
             self.qmc.roasterheating_setup = toInt(settings.value('roasterheating_setup',self.qmc.roasterheating_setup))
+            self.qmc.roasterheating_setup_default = toInt(settings.value('roasterheating_setup_default',self.qmc.roasterheating_setup_default))
             self.qmc.drumspeed_setup = toString(settings.value('drumspeed_setup',self.qmc.drumspeed_setup))
 
 #--- BEGIN GROUP EnergyUse
@@ -21003,8 +20976,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if ok:
                 if self.html_loader is not None and self.pdf_page_layout is not None:
                     page = self.html_loader.page()
-                    page.pdfPrintingFinished.connect(printing_finished) # type: ignore # "Callable[[str, bool], None]" has no attribute "connect"
-                    page.printToPdf(pdf_file, self.pdf_page_layout)
+                    if page is not None:
+                        page.pdfPrintingFinished.connect(printing_finished) # type: ignore # "Callable[[str, bool], None]" has no attribute "connect"
+                        page.printToPdf(pdf_file, self.pdf_page_layout)
                 else:
                     self.pdf_rendering = False
             else:
@@ -25007,7 +24981,7 @@ sys.excepthook = excepthook
 # the following avoids the "No document could be created" dialog and the Console message
 # "The Artisan Profile type doesn't map to any NSDocumentClass." on startup (since pyobjc-core 3.1.1)
 if sys.platform.startswith('darwin'):
-    from Cocoa import NSDocument # type: ignore # @UnresolvedImport # pylint: disable=import-error
+    from Cocoa import NSDocument # type: ignore # @UnresolvedImport # pylint: disable=import-error,no-name-in-module
     class Document(NSDocument): # type: ignore # pylint: disable= too-few-public-methods
 #        def windowNibName(self):
 #            return None #"Document"
@@ -25068,7 +25042,7 @@ def initialize_locale(my_app:Artisan) -> str:
 
     if len(locale) == 0:
         if platform.system() == 'Darwin':
-            from Cocoa import NSUserDefaults # type: ignore  # @UnresolvedImport # pylint: disable=import-error
+            from Cocoa import NSUserDefaults # type: ignore  # @UnresolvedImport # pylint: disable=import-error,no-name-in-module
             defs = NSUserDefaults.standardUserDefaults()
             langs = defs.objectForKey_('AppleLanguages')
             if langs.objectAtIndex_(0)[:7] == 'zh_Hans':

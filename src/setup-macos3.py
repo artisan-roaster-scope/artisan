@@ -95,9 +95,9 @@ with open('Info.plist', 'r+b') as fp:
     try:
         plist['LSMinimumSystemVersion'] = os.environ['MACOSX_DEPLOYMENT_TARGET']
     except Exception: # pylint: disable=broad-except
-        plist['LSMinimumSystemVersion'] = '11.0'
+        plist['LSMinimumSystemVersion'] = '12.0'
     plist['LSMultipleInstancesProhibited'] = 'false'
-    plist['LSArchitecturePriority'] = ['x86_64']
+    plist['LSArchitecturePriority'] = ['arm64', 'x86_64']
     plist['NSHumanReadableCopyright'] = LICENSE
     plist['NSHighResolutionCapable'] = True
     fp.seek(0, os.SEEK_SET)
@@ -114,7 +114,7 @@ OPTIONS = {
     'optimize':  2,
     'compressed': True,
     'iconfile': 'artisan.icns',
-    'arch': 'x86_64', # 'universal2', 'x86_64',
+    'arch': 'universal2', # 'universal2', 'x86_64',
     'matplotlib_backends': '-', # '-' for imported or explicit "Qt5Agg, PDF, PS, SVG"
     'includes': ['serial', 'charset_normalizer.md__mypyc'],
     'excludes' :  ['tkinter','curses',
@@ -162,7 +162,7 @@ os.chdir('./dist')
 #subprocess.check_call(r'cp -R ' + PYTHONPATH + r'site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Resources/lib/python' + PYTHON_V + '/lib-dynload/#matplotlib/.dylibs',shell = True)
 #subprocess.check_call(r'cp ' + PYTHONPATH + r'site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Frameworks',shell = True)
 
-# add localization stubs to make OS X translate the systems menu item and native dialogs
+# add localization stubs to make macOS translate the systems menu item and native dialogs
 for lang in ['ar', 'da', 'de','el','en','es','fa','fi','fr','gd', 'he','hu','id','it','ja','ko','lv', 'nl','no','pl','pt_BR','pt','sk', 'sv','th','tr','uk','vi','zh_CN','zh_TW']:
     loc_dir = r'Artisan.app/Contents/Resources/' + lang + r'.lproj'
     subprocess.check_call(r'mkdir ' + loc_dir,shell = True)

@@ -1173,6 +1173,7 @@ class roastCompareDlg(ArtisanDialog):
     def updateRightAxis(self) -> None:
         if self.aw.qmc.ax is not None:
             self.aw.qmc.ax.spines.right.set_visible(bool(self.aw.qmc.zgrid != 0 and self.delta_axis_visible))
+            self.aw.qmc.ax.spines.top.set_visible(bool(self.aw.qmc.xgrid != 0 and self.aw.qmc.ygrid != 0 and self.aw.qmc.zgrid != 0 and self.delta_axis_visible))
         delta_axis_label = (self.aw.qmc.mode + self.aw.arabicReshape(QApplication.translate('Label', '/min')) if self.aw.qmc.zgrid>0 and self.delta_axis_visible else '')
         if self.aw.qmc.delta_ax is not None:
             prop = self.aw.mpl_fontproperties.copy()
@@ -1228,7 +1229,7 @@ class roastCompareDlg(ArtisanDialog):
                 sketch_params = 0,
                 path_effects = [])
 
-        self.aw.qmc.ax.spines.top.set_visible(self.aw.qmc.xgrid != 0 and self.aw.qmc.ygrid != 0 and self.aw.qmc.zgrid != 0)
+        self.aw.qmc.ax.spines.top.set_visible(bool(self.aw.qmc.xgrid != 0 and self.aw.qmc.ygrid != 0 and self.aw.qmc.zgrid != 0 and self.delta_axis_visible))
         self.aw.qmc.ax.spines.bottom.set_visible(self.aw.qmc.xgrid != 0)
         self.aw.qmc.ax.spines.left.set_visible(self.aw.qmc.ygrid != 0)
         self.aw.qmc.ax.spines.right.set_visible(bool(self.aw.qmc.zgrid != 0 and self.delta_axis_visible))
