@@ -43,7 +43,7 @@ class WebLCDs:
         self._loop:        Optional[asyncio.AbstractEventLoop] = None # the asyncio loop
         self._thread:      Optional[Thread]                    = None # the thread running the asyncio loop
         self._app = web.Application(debug=True)
-        self._app['websockets']:weakref.WeakSet[web.WebSocketResponse] = weakref.WeakSet()
+        self._app['websockets'] = weakref.WeakSet()
         self._app.on_shutdown.append(self.on_shutdown)
 
         self._last_send:float = time.time() # timestamp of the last message send to the clients
