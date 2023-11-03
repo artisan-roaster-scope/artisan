@@ -3405,9 +3405,9 @@ class tgraphcanvas(FigureCanvas):
         tx_org = []
         temp_trail = []
         for x, tp in zip(tx_in[-l:],temp_in[-l:]): # we only iterate over l-elements
-          if tp not in [None, -1]:
-            tx_org.append(x)
-            temp_trail.append(tp)
+            if tp not in [None, -1]:
+                tx_org.append(x)
+                temp_trail.append(tp)
         if len(temp_trail) == 0:
             # no valid values
             return -1
