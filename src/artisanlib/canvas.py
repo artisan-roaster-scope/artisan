@@ -281,7 +281,8 @@ class tgraphcanvas(FigureCanvas):
         'filterDropOut_replaceRoR_period', 'filterDropOut_spikeRoR_period', 'filterDropOut_tmin_C_default', 'filterDropOut_tmax_C_default',
         'filterDropOut_tmin_F_default', 'filterDropOut_tmax_F_default', 'filterDropOut_spikeRoR_dRoR_limit_C_default', 'filterDropOut_spikeRoR_dRoR_limit_F_default',
         'filterDropOuts', 'filterDropOut_tmin', 'filterDropOut_tmax', 'filterDropOut_spikeRoR_dRoR_limit', 'minmaxLimits',
-        'dropSpikes', 'dropDuplicates', 'dropDuplicatesLimit', 'liveMedianRoRfilter', 'liveMedianETfilter', 'liveMedianBTfilter', 'interpolatemax', 'swapETBT', 'wheelflag', 'wheelnames', 'segmentlengths', 'segmentsalpha',
+        'dropSpikes', 'dropDuplicates', 'dropDuplicatesLimit', 'median_filter_factor', 'liveMedianETRoRfilter', 'liveMedianBTRoRfilter',
+        'liveMedianETfilter', 'liveMedianBTfilter', 'interpolatemax', 'swapETBT', 'wheelflag', 'wheelnames', 'segmentlengths', 'segmentsalpha',
         'wheellabelparent', 'wheelcolor', 'wradii', 'startangle', 'projection', 'wheeltextsize', 'wheelcolorpattern', 'wheeledge',
         'wheellinewidth', 'wheellinecolor', 'wheeltextcolor', 'wheelconnections', 'wheelx', 'wheelz', 'wheellocationx', 'wheellocationz',
         'wheelaspect', 'samplingSemaphore', 'updateGraphicsSemaphore', 'profileDataSemaphore', 'messagesemaphore', 'errorsemaphore', 'serialsemaphore', 'seriallogsemaphore',
@@ -1936,9 +1937,12 @@ class tgraphcanvas(FigureCanvas):
         self.dropDuplicates:bool = False
         self.dropDuplicatesLimit:float = 0.3
 
-        self.liveMedianETfilter:LiveMedian = LiveMedian(3)
-        self.liveMedianBTfilter:LiveMedian = LiveMedian(3)
-        self.liveMedianRoRfilter:LiveMedian = LiveMedian(5) # the offline filter uses a window length of 5, introducing some delay, compared to the medfilt() in offline mode which does not introduce any delay
+        # self.median_filter_factor: factor used for MedianFilter on both, temperature and RoR curves
+        self.median_filter_factor:Final[int] = 5 # k=3 is conservative seems not to catch all spikes in all cases; k=5 and k=7 seems to be ok; 13 might be the maximum; k must be odd!
+        self.liveMedianETfilter:LiveMedian = LiveMedian(self.median_filter_factor)
+        self.liveMedianBTfilter:LiveMedian = LiveMedian(self.median_filter_factor)
+        self.liveMedianETRoRfilter:LiveMedian = LiveMedian(self.median_filter_factor)
+        self.liveMedianBTRoRfilter:LiveMedian = LiveMedian(self.median_filter_factor)
 
         self.interpolatemax:Final[int] = 3 # maximal number of dropped readings (-1) that will be interpolated
 
@@ -3392,32 +3396,32 @@ class tgraphcanvas(FigureCanvas):
     # to linear time based on tx and the current sampling interval
     # -1 and None values are skipped/ignored
     def decay_average(self, tx_in,temp_in,decay_weights):
-        if len(tx_in) != len(temp_in):
+        if len(decay_weights)<2 or len(tx_in) != len(temp_in):
             if len(temp_in)>0:
                 return temp_in[-1]
             return -1
-        # remove items where temp[i]=None to fulfil precond. of numpy.interp
-        tx = []
-        temp = []
-        for i, tempin in enumerate(temp_in):
-            if tempin not in [None, -1] and not numpy.isnan(tempin):
-                tx.append(tx_in[i])
-                temp.append(tempin)
-        if len(temp) == 0:
+        l = min(len(decay_weights),len(temp_in))
+        # take trail of length l and remove items where temp[i]=None to fulfil precond. of numpy.interp
+        tx_org = []
+        temp_trail = []
+        for x, tp in zip(tx_in[-l:],temp_in[-l:]): # we only iterate over l-elements
+          if tp not in [None, -1]:
+            tx_org.append(x)
+            temp_trail.append(tp)
+        if len(temp_trail) == 0:
+            # no valid values
             return -1
-        #
-        l = min(len(decay_weights),len(temp))
+        l = len(temp_trail) # might be shorter than before
+        # len(tx)=len(temp) here and it is guaranteed that len(tx_org)=len(temp_trail) = l
         d = self.delay / 1000.
-        tx_org = tx[-l:] # as len(tx)=len(temp) here, it is guaranteed that len(tx_org)=l
         # we create a linearly spaced time array starting from the newest timestamp in sampling interval distance
         tx_lin = numpy.flip(numpy.arange(tx_org[-1],tx_org[-1]-l*d,-d), axis=0) # by construction, len(tx_lin)=len(tx_org)=l
-        temp_trail = temp[-l:] # by construction, len(temp_trail)=len(tx_lin)=len(tx_org)=l
         temp_trail_re = numpy.interp(tx_lin, tx_org, temp_trail) # resample data into that linear spaced time
         try:
             return numpy.average(temp_trail_re[-len(decay_weights):],axis=0,weights=decay_weights[-l:])  # len(decay_weights)>len(temp_trail_re)=l is possible
         except Exception: # pylint: disable=broad-except
             # in case something goes very wrong we at least return the standard average over temp, this should always work as len(tx)=len(temp)
-            return numpy.average(tx,temp)
+            return numpy.average(tx_org,temp_trail)
 
     # returns true after BT passed the TP
     def checkTPalarmtime(self):
@@ -3707,8 +3711,8 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         st2 = -1
 
-                    # we apply a minimal live median spike filter minimizing the delay by choosing a window smaller than in the offline medfilt
-                    if self.filterDropOuts and self.delay <= 2000:
+                    # we apply a minimal live median spike filter
+                    if self.filterDropOuts:
                         if st1 is not None and st1 != -1:
                             st1 = self.liveMedianETfilter(st1)
                         if st1 is not None and st2 != -1:
@@ -3828,9 +3832,9 @@ class tgraphcanvas(FigureCanvas):
                         # we apply a minimal live median spike filter minimizing the delay by choosing a window smaller than in the offline medfilt
                         if self.filterDropOuts and self.delay <= 2000:
                             if self.rateofchange1 is not None and self.rateofchange1 != -1:
-                                self.rateofchange1 = self.liveMedianRoRfilter(self.rateofchange1)
+                                self.rateofchange1 = self.liveMedianETRoRfilter(self.rateofchange1)
                             if self.rateofchange2 is not None and self.rateofchange2 != -1:
-                                self.rateofchange2 = self.liveMedianRoRfilter(self.rateofchange2)
+                                self.rateofchange2 = self.liveMedianBTRoRfilter(self.rateofchange2)
 
                         sample_unfiltereddelta1.append(self.rateofchange1)
                         sample_unfiltereddelta2.append(self.rateofchange2)
@@ -4302,7 +4306,7 @@ class tgraphcanvas(FigureCanvas):
     @pyqtSlot()
     def updategraphics(self) -> None:
 #        QApplication.processEvents() # without this we see some flickers (canvas redraws) on using multiple button event actions on macOS!?
-        gotlock = self.aw.qmc.updateGraphicsSemaphore.tryAcquire(1,150) # we try to catch a lock if available but we do not wait, if we fail we just skip this redraw round (prevents stacking of waiting calls); we maximally wait 150ms which should be enough on modern machines
+        gotlock = self.aw.qmc.updateGraphicsSemaphore.tryAcquire(1,200) # we try to catch a lock if available but we do not wait, if we fail we just skip this redraw round (prevents stacking of waiting calls); we maximally wait 200ms which should be enough on modern machines
         if not gotlock:
             _log.info('updategraphics(): failed to get updateGraphicsSemaphore lock')
         else:
@@ -6309,7 +6313,9 @@ class tgraphcanvas(FigureCanvas):
     # returns True if nothing to save, discard or save was selected and False if canceled by the user
     def checkSaved(self,allow_discard:bool = True) -> bool:
         #prevents deleting accidentally a finished roast
-        if self.safesaveflag and len(self.timex) > 3:
+        flag = self.safesaveflag
+        self.safesaveflag = False
+        if flag and len(self.timex) > 3:
             if allow_discard:
                 string = QApplication.translate('Message','Save profile?')
                 buttons = QMessageBox.StandardButton.Discard|QMessageBox.StandardButton.Save|QMessageBox.StandardButton.Cancel
@@ -6317,6 +6323,7 @@ class tgraphcanvas(FigureCanvas):
                 string = QApplication.translate('Message','Save profile?')
                 buttons = QMessageBox.StandardButton.Save|QMessageBox.StandardButton.Cancel
             reply = QMessageBox.warning(self.aw, QApplication.translate('Message','Profile unsaved'), string, buttons)
+            self.safesaveflag = flag
             if reply == QMessageBox.StandardButton.Save:
                 return bool(self.aw.fileSave(self.aw.curFile))  #if accepted, calls fileClean() and thus turns safesaveflag = False
             if reply == QMessageBox.StandardButton.Discard:
@@ -6833,10 +6840,12 @@ class tgraphcanvas(FigureCanvas):
 
     # re-sample, filter and smooth slice
     # takes numpy arrays a (time) and b (temp) of the same length and returns a numpy array representing the processed b values
+    # delta: True if b is a RoR signal
     # precondition: (self.filterDropOuts or window_len>2)
-    def smooth_slice(self, a, b,
-        window_len=7, window='hanning',decay_weights=None,decay_smoothing=False,
-        re_sample=True,back_sample=True,a_lin=None):
+    def smooth_slice(self, a:'npt.NDArray[numpy.floating]', b:'npt.NDArray[numpy.floating]',
+        window_len:int = 7, window:str = 'hanning', decay_weights:Optional[List[int]] = None, decay_smoothing:bool = False,
+        re_sample:bool = True, back_sample:bool = True, a_lin:Optional['npt.NDArray[numpy.floating]'] = None,
+        delta:bool=False) -> 'npt.NDArray[numpy.floating]':
 
         # 1. re-sample
         if re_sample:
@@ -6847,42 +6856,46 @@ class tgraphcanvas(FigureCanvas):
             b = numpy.interp(a_mod, a, b) # resample data to linear spaced time
         else:
             a_mod = a
-        res = b # just in case the precondition (self.filterDropOuts or window_len>2) does not hold
+        res:List[float] = b.tolist() # just in case the precondition (self.filterDropOuts or window_len>2) does not hold
         # 2. filter spikes
         if self.filterDropOuts:
             try:
-                b = self.medfilt(b,5)  # k=3 seems not to catch all spikes in all cases; k=5 and k=7 seems to be ok; 13 might be the maximum; k must be odd!
+                if delta and self.flagon:
+                    online_medfilt = LiveMedian(self.median_filter_factor)
+                    b = numpy.array(list(map(online_medfilt, b)))
+                else:
+                    b = self.medfilt(b, self.median_filter_factor)
 # scipyernative which performs equal, but produces larger artefacts at the borders and for intermediate NaN values for k>3
 #                from scipy.signal import medfilt as scipy_medfilt
 #                b = scipy_medfilt(b,3)
-                res = b
+                res = b.tolist()
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
-                res = b
+                res = b.tolist()
         # 3. smooth data
         if window_len>2:
             if decay_smoothing:
                 # decay smoothing
+                decay_weights_internal:'npt.NDArray[numpy.integer]'
                 if decay_weights is None:
-                    decay_weights = numpy.arange(1,window_len+1)
+                    decay_weights_internal = numpy.arange(1,window_len+1)
                 else:
                     window_len = len(decay_weights)
-                # invariant: window_len = len(decay_weights)
-                if decay_weights.sum() == 0:
-                    res = b
+                    decay_weights_internal = numpy.array(decay_weights)
+                # invariant: window_len = len(decay_weights_internal)
+                if decay_weights_internal.sum() == 0:
+                    res = b.tolist()
                 else:
                     res = []
                     # ignore -1 readings in averaging and ensure a good ramp
                     for i, v in enumerate(b):
                         seq = b[max(0,i-window_len + 1):i+1]
-#                        # we need to suppress -1 drop out values from this
-#                        seq = list(filter(lambda item: item != -1,seq)) # -1 drop out values in b have already been replaced by numpy.nan above
-
-                        w = decay_weights[max(0,window_len-len(seq)):]  # preCond: len(decay_weights)=window_len and len(seq) <= window_len; postCond: len(w)=len(seq)
+                        w = decay_weights_internal[max(0,window_len-len(seq)):]  # preCond: len(decay_weights_internal)=window_len and len(seq) <= window_len; postCond: len(w)=len(seq)
                         if len(w) == 0:
-                            res.append(v) # we don't average if there is are no weights (e.g. if the original seq did only contain -1 values and got empty)
+                            # we don't average if there is are no weights (e.g. if the original seq did only contain -1 values and got empty)
+                            res.append(v)
                         else:
-                            res.append(numpy.average(seq,weights=w)) # works only if len(seq) = len(w)
+                            res.append(numpy.average(seq,axis=0,weights=w)) # works only if len(seq) = len(w)
                     # postCond: len(res) = len(b)
             else:
                 # optimal smoothing (the default)
@@ -6890,11 +6903,11 @@ class tgraphcanvas(FigureCanvas):
                 if win_len != 1: # at the lowest level we turn smoothing completely off
                     res = self.smooth(a_mod,b,win_len,window)
                 else:
-                    res = b
+                    res = b.tolist()
         # 4. sample back
         if re_sample and back_sample:
-            res = numpy.interp(a, a_mod, res) # re-sampled back to original timestamps
-        return res
+            res = numpy.interp(a, a_mod, res).tolist() # re-sampled back to original timestamps
+        return numpy.array(res)
 
     # takes lists a (time array) and b (temperature array) containing invalid segments of -1/None values and returns a list with all segments of valid values smoothed
     # a: list of timestamps
@@ -6902,11 +6915,12 @@ class tgraphcanvas(FigureCanvas):
     # re_sample: if true re-sample readings to a linear spaced time before smoothing
     # back_sample: if true results are back-sampled to original timestamps given in "a" after smoothing
     # a_lin: pre-computed linear spaced timestamps of equal length than a
+    # delta: True if b is a RoR signal
     # NOTE: result can contain NaN items on places where the input array contains the error element -1
     # result is a numpy array or the b as numpy array with drop out readings -1 replaced by NaN
     def smooth_list(self, aa:Union['npt.NDArray[numpy.floating]', Sequence[float]], b:List[float], window_len:int = 7, window:str = 'hanning',
             decay_weights:Optional[List[int]] = None, decay_smoothing:bool = False, fromIndex:int = -1, toIndex:int = 0,
-            re_sample:bool = True, back_sample:bool = True, a_lin:Optional['npt.NDArray[numpy.floating]'] = None) -> 'npt.NDArray[numpy.floating]':
+            re_sample:bool = True, back_sample:bool = True, a_lin:Optional['npt.NDArray[numpy.floating]'] = None, delta:bool=False) -> 'npt.NDArray[numpy.floating]':
         if len(aa) > 1 and len(aa) == len(b) and (self.filterDropOuts or window_len>2):
             #pylint: disable=E1103
             # 1. truncate
@@ -6932,7 +6946,7 @@ class tgraphcanvas(FigureCanvas):
                     b_smoothed.append(numpy.full(s.stop - s.start, numpy.nan, dtype=numpy.double))
                 else:
                     # a slice with proper data
-                    b_smoothed.append(self.smooth_slice(a[s], mb[s], window_len, window, decay_weights, decay_smoothing, re_sample, back_sample, a_lin))
+                    b_smoothed.append(self.smooth_slice(a[s], mb[s], window_len, window, decay_weights, decay_smoothing, re_sample, back_sample, a_lin, delta))
             b_smoothed.append(numpy.full(len(a)-toIndex, numpy.nan, dtype=numpy.double)) # append the final segment to the list of resulting segments
             return numpy.concatenate(b_smoothed)
         bb = numpy.array(b, dtype=numpy.floating)
@@ -7380,7 +7394,7 @@ class tgraphcanvas(FigureCanvas):
                 user_filter = deltaFilter
             else:
                 user_filter = int(round(deltaFilter/2.))
-            delta1 = self.smooth_list(timex,z1,window_len=user_filter,decay_smoothing=(not optimalSmoothing),a_lin=timex_lin)
+            delta1 = self.smooth_list(timex,z1,window_len=user_filter,decay_smoothing=(not optimalSmoothing),a_lin=timex_lin,delta=True)
 
             # cut out the part after DROP and before CHARGE and remove values beyond the RoRlimit
             return [
@@ -7728,20 +7742,20 @@ class tgraphcanvas(FigureCanvas):
                 if self.flagon: # we don't smooth, but remove the dropouts
                     self.stemp1 = temp1_nogaps
                 else:
-                    self.stemp1 = list(self.smooth_list(self.timex,temp1_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin))
+                    self.stemp1 = list(self.smooth_list(self.timex,temp1_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin,delta=False))
             if smooth or len(self.stemp2) != len(self.timex):
                 if self.flagon:  # we don't smooth, but remove the dropouts
                     self.stemp2 = temp2_nogaps
                 else:
-                    self.stemp2 = list(self.smooth_list(self.timex,temp2_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin))
+                    self.stemp2 = list(self.smooth_list(self.timex,temp2_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin,delta=False))
 
             #populate delta ET (self.delta1) and delta BT (self.delta2)
             # calculated here to be available for parsepecialeventannotations(). the curve are plotted later.
             if (recomputeAllDeltas or (self.DeltaETflag and self.delta1 == []) or (self.DeltaBTflag and self.delta2 == [])) and not self.flagstart: # during recording we don't recompute the deltas
-                cf = self.curvefilter #*2 # we smooth twice as heavy for PID/RoR calculation as for normal curve smoothing
+                cf = self.curvefilter
                 decay_smoothing_p = not self.optimalSmoothing or sampling or self.flagon
-                t1 = self.smooth_list(self.timex,temp1_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
-                t2 = self.smooth_list(self.timex,temp2_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
+                t1 = self.smooth_list(self.timex,temp1_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin,delta=False)
+                t2 = self.smooth_list(self.timex,temp2_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin,delta=False)
                 # we start RoR computation 10 readings after CHARGE to avoid this initial peak
                 if self.timeindex[0]>-1:
                     RoR_start = min(self.timeindex[0]+10, len(self.timex)-1)
@@ -7767,9 +7781,11 @@ class tgraphcanvas(FigureCanvas):
                     timeB_lin = None
 
                 # we populate temporary smoothed ET/BT data arrays
+# CHANGE ML:
                 cf = self.curvefilter #*2 # we smooth twice as heavy for PID/RoR calculation as for normal curve smoothing
-                st1 = self.smooth_list(self.timeB,fill_gaps(self.temp1B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
-                st2 = self.smooth_list(self.timeB,fill_gaps(self.temp2B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
+#                cf = (1 if self.flagon else self.curvefilter) # no curve smoothing during recording
+                st1 = self.smooth_list(self.timeB,fill_gaps(self.temp1B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin,delta=False)
+                st2 = self.smooth_list(self.timeB,fill_gaps(self.temp2B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin,delta=False)
                 # we start RoR computation 10 readings after CHARGE to avoid this initial peak
                 if self.timeindexB[0]>-1:
                     RoRstart = min(self.timeindexB[0]+10, len(self.timeB)-1)
@@ -8200,8 +8216,9 @@ class tgraphcanvas(FigureCanvas):
                                 tb_lin = numpy.linspace(tb[0],tb[-1],len(tb))
                             else:
                                 tb_lin = None
-                            self.stemp1B = self.smooth_list(tb,fill_gaps(t1),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin)
-                            self.stemp2B = self.smooth_list(tb,fill_gaps(t2),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin)
+                            # no smoothing (curvefilter = 1) if sampling!
+                            self.stemp1B = self.smooth_list(tb,fill_gaps(t1),window_len=(1 if self.flagon else self.curvefilter),decay_smoothing=decay_smoothing_p,a_lin=tb_lin,delta=False)
+                            self.stemp2B = self.smooth_list(tb,fill_gaps(t2),window_len=(1 if self.flagon else self.curvefilter),decay_smoothing=decay_smoothing_p,a_lin=tb_lin,delta=False)
 
                         self.l_background_annotations = []
                         #check to see if there is both a profile loaded and a background loaded
@@ -8233,7 +8250,7 @@ class tgraphcanvas(FigureCanvas):
                                     else:
                                         trans = self.ax.transData
                                     if smooth:
-                                        self.stemp1BX[n3] = self.smooth_list(tx,fill_gaps(self.temp1BX[n3]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
+                                        self.stemp1BX[n3] = self.smooth_list(tx,fill_gaps(self.temp1BX[n3]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin,delta=False)
                                     stemp3B = self.stemp1BX[n3]
                                 else:
                                     if self.temp2Bdelta[n3] and self.delta_ax is not None:
@@ -8241,7 +8258,7 @@ class tgraphcanvas(FigureCanvas):
                                     else:
                                         trans = self.ax.transData
                                     if smooth:
-                                        self.stemp2BX[n3] = self.smooth_list(tx,fill_gaps(self.temp2BX[n3]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
+                                        self.stemp2BX[n3] = self.smooth_list(tx,fill_gaps(self.temp2BX[n3]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin,delta=False)
                                     stemp3B = self.stemp2BX[n3]
                                 if not self.backgroundShowFullflag:
                                     if not self.autotimex or self.autotimexMode == 0:
@@ -8281,7 +8298,7 @@ class tgraphcanvas(FigureCanvas):
                                     else:
                                         trans = self.ax.transData
                                     if smooth:
-                                        self.stemp1BX[n4] = self.smooth_list(tx,fill_gaps(self.temp1BX[n4]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
+                                        self.stemp1BX[n4] = self.smooth_list(tx,fill_gaps(self.temp1BX[n4]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin,delta=False)
                                     stemp4B = self.stemp1BX[n4]
                                 else:
                                     if self.temp2Bdelta[n4] and self.delta_ax is not None:
@@ -8289,7 +8306,7 @@ class tgraphcanvas(FigureCanvas):
                                     else:
                                         trans = self.ax.transData
                                     if smooth:
-                                        self.stemp2BX[n4] = self.smooth_list(tx,fill_gaps(self.temp2BX[n4]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
+                                        self.stemp2BX[n4] = self.smooth_list(tx,fill_gaps(self.temp2BX[n4]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin,delta=False)
                                     stemp4B = self.stemp2BX[n4]
                                 if not self.backgroundShowFullflag:
                                     if not self.autotimex or self.autotimexMode == 0:
@@ -9506,7 +9523,7 @@ class tgraphcanvas(FigureCanvas):
                         try:
                             if self.aw.extraCurveVisibility1[i]:
                                 if not self.flagon and (smooth or len(self.extrastemp1[i]) != len(self.extratimex[i])):
-                                    self.extrastemp1[i] = self.smooth_list(self.extratimex[i],fill_gaps(self.extratemp1[i]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timexi_lin).tolist()
+                                    self.extrastemp1[i] = self.smooth_list(self.extratimex[i],fill_gaps(self.extratemp1[i]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timexi_lin,delta=False).tolist()
                                 else: # we don't smooth, but remove the dropouts
                                     self.extrastemp1[i] = fill_gaps(self.extratemp1[i])
                                 if self.aw.extraDelta1[i] and self.delta_ax is not None:
@@ -9539,7 +9556,7 @@ class tgraphcanvas(FigureCanvas):
                         try:
                             if self.aw.extraCurveVisibility2[i]:
                                 if not self.flagon and (smooth or len(self.extrastemp2[i]) != len(self.extratimex[i])):
-                                    self.extrastemp2[i] = self.smooth_list(self.extratimex[i],fill_gaps(self.extratemp2[i]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timexi_lin).tolist()
+                                    self.extrastemp2[i] = self.smooth_list(self.extratimex[i],fill_gaps(self.extratemp2[i]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timexi_lin,delta=False).tolist()
                                 else:
                                     self.extrastemp2[i] = fill_gaps(self.extratemp2[i])
                                 if self.aw.extraDelta2[i] and self.delta_ax is not None:
@@ -11292,6 +11309,12 @@ class tgraphcanvas(FigureCanvas):
     @pyqtSlot()
     def OnMonitor(self):
         try:
+            self.generateNoneTempHints()
+            self.block_update = True # block the updating of the bitblit canvas (unblocked at the end of this function to avoid multiple redraws)
+            res = self.reset(False,False,sampling=True,keepProperties=True)
+            if not res: # reset canceled
+                return
+
             if self.aw.simulator is None:
                 self.startPhidgetManager()
                 # collect ambient data if any
@@ -11307,13 +11330,6 @@ class tgraphcanvas(FigureCanvas):
 
             # warm up software PID (write current p-i-d settings,..)
             self.aw.pidcontrol.confSoftwarePID()
-
-            self.generateNoneTempHints()
-            self.block_update = True # block the updating of the bitblit canvas (unblocked at the end of this function to avoid multiple redraws)
-            res = self.reset(False,False,sampling=True,keepProperties=True)
-            if not res: # reset canceled
-                self.OffMonitor()
-                return
 
             if not bool(self.aw.simulator):
                 if self.device == 53:
@@ -11387,8 +11403,6 @@ class tgraphcanvas(FigureCanvas):
                         _, _, exc_tb = sys.exc_info()
                         self.adderror((QApplication.translate('Error Message', 'Exception:') + ' Bluetooth BLE support not available {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
-
-
             self.aw.initializedMonitoringExtraDeviceStructures()
 
             #reset alarms
@@ -11399,7 +11413,7 @@ class tgraphcanvas(FigureCanvas):
             self.TPalarmtimeindex = None
 
             self.flagon = True
-            self.redraw(True,sampling=True,smooth=self.optimalSmoothing) # we need to re-smooth with standard smoothing if ON and optimal-smoothing is ticked
+            self.redraw(True,sampling=True,smooth=True) # we need to re-smooth background with no curve-smoothing and standard instead of optimal-smoothing on ON
 
             if self.designerflag:
                 return
@@ -11414,7 +11428,6 @@ class tgraphcanvas(FigureCanvas):
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
 
-#            QApplication.processEvents()
             if self.aw.simulator:
                 self.aw.buttonONOFF.setStyleSheet(self.aw.pushbuttonstyles_simulator['ON'])
             else:
@@ -11455,6 +11468,8 @@ class tgraphcanvas(FigureCanvas):
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             self.adderror((QApplication.translate('Error Message', 'Exception:') + ' OnMonitor() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+        finally:
+            self.block_update = False # unblock the updating of the bitblit canvas
 
     # OffMonitorCloseDown is called after the sampling loop stopped
     @pyqtSlot()
@@ -11597,42 +11612,43 @@ class tgraphcanvas(FigureCanvas):
 
     def OffMonitor(self):
         _log.info('MODE: OFF MONITOR')
-        try:
-            # first activate "Stopping Mode" to ensure that sample() is not resetting the timer now (independent of the flagstart state)
-
-            self.aw.buttonONOFF.setEnabled(False)
-            ge:Optional[QGraphicsEffect] = self.aw.buttonONOFF.graphicsEffect()
-            if ge is not None:
-                ge.setEnabled(False)
-            self.aw.buttonSTARTSTOP.setEnabled(False)
-            ge = self.aw.buttonSTARTSTOP.graphicsEffect()
-            if ge is not None:
-                ge.setEnabled(False)
-            self.aw.buttonSTARTSTOP.setEnabled(False)
-
-            self.aw.buttonCONTROL.setEnabled(False)
-            ge = self.aw.buttonCONTROL.graphicsEffect()
-            if ge is not None:
-                ge.setEnabled(False)
-
-            # stop Recorder if still running
-            if self.flagstart:
-                self.OffRecorder(autosave=False, enableButton=False) # we autosave after the monitor is turned off to get all the data in the generated PDF!
-
+        if self.flagon:
             try:
-                # trigger event action before disconnecting from devices
-                if self.extrabuttonactions[1] != 18: # Artisan Commands are executed after the OFFMonitor action is fully executed as they might trigger another buttons
-                    self.aw.eventactionx(self.extrabuttonactions[1],self.extrabuttonactionstrings[1])
-            except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
+                # first activate "Stopping Mode" to ensure that sample() is not resetting the timer now (independent of the flagstart state)
 
-            self.threadserver.terminatingSignal.connect(self.OffMonitorCloseDown)
-            self.flagon = False
+                self.aw.buttonONOFF.setEnabled(False)
+                ge:Optional[QGraphicsEffect] = self.aw.buttonONOFF.graphicsEffect()
+                if ge is not None:
+                    ge.setEnabled(False)
+                self.aw.buttonSTARTSTOP.setEnabled(False)
+                ge = self.aw.buttonSTARTSTOP.graphicsEffect()
+                if ge is not None:
+                    ge.setEnabled(False)
+                self.aw.buttonSTARTSTOP.setEnabled(False)
 
-        except Exception as ex: # pylint: disable=broad-except
-            _log.exception(ex)
-            _, _, exc_tb = sys.exc_info()
-            self.adderror((QApplication.translate('Error Message', 'Exception:') + ' OffMonitor() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+                self.aw.buttonCONTROL.setEnabled(False)
+                ge = self.aw.buttonCONTROL.graphicsEffect()
+                if ge is not None:
+                    ge.setEnabled(False)
+
+                # stop Recorder if still running
+                if self.flagstart:
+                    self.OffRecorder(autosave=False, enableButton=False) # we autosave after the monitor is turned off to get all the data in the generated PDF!
+
+                try:
+                    # trigger event action before disconnecting from devices
+                    if self.extrabuttonactions[1] != 18: # Artisan Commands are executed after the OFFMonitor action is fully executed as they might trigger another buttons
+                        self.aw.eventactionx(self.extrabuttonactions[1],self.extrabuttonactionstrings[1])
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
+
+                self.threadserver.terminatingSignal.connect(self.OffMonitorCloseDown)
+                self.flagon = False
+
+            except Exception as ex: # pylint: disable=broad-except
+                _log.exception(ex)
+                _, _, exc_tb = sys.exc_info()
+                self.adderror((QApplication.translate('Error Message', 'Exception:') + ' OffMonitor() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def getAmbientData(self):
         _log.debug('getAmbientData()')

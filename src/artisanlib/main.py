@@ -17826,7 +17826,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     pass
 
             #save mode
-            settings.setValue('Mode',self.qmc.mode) # 'Mode' is always stored as it is used to discriminate the ViewerSettings (see _settingsCopied)
+            if not read_defaults:
+                settings.setValue('Mode',self.qmc.mode) # 'Mode' is always stored as it is used to discriminate the ViewerSettings (see _settingsCopied)
 
             if filename is not None and not read_defaults:
                 # only add those on exporting settings (those are never read by Artisan)
@@ -18923,10 +18924,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 flagKeepON = self.qmc.flagKeepON
                 self.qmc.flagKeepON = False # temporarily turn keepOn off
                 self.stopActivities()
-                self.qmc.flagKeepON = flagKeepON
                 if unsaved_changes:
                     # in case we have unsaved changes and the user decided to discard those, we first reset to have the correct settings (like axis limits) saved
                     self.qmc.reset(redraw=False,soundOn=False,sampling=False,keepProperties=False,fireResetAction=False)
+                self.qmc.flagKeepON = flagKeepON
                 if QApplication.queryKeyboardModifiers() != Qt.KeyboardModifier.AltModifier:
                     self.closeEventSettings() # it takes quite some time to write the >1000 setting items
 #                gc.collect() # this takes quite some time
