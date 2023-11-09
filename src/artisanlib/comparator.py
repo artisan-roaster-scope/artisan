@@ -1819,7 +1819,7 @@ class roastCompareDlg(ArtisanDialog):
             item5.setCheckable(True)
         self.cb.setItemCheckState(5,(Qt.CheckState.Checked if self.aw.qmc.compareMainEvents else Qt.CheckState.Unchecked))
         # add extra device flags
-        if top is not None:
+        if top is not None and len(top.extraname1) > 0:
             self.cb.insertSeparator(6)
             offset:int = 7
             for i, (name1, name2) in enumerate(zip(top.extraname1, top.extraname2)):

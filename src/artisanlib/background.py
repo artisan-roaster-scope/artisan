@@ -683,7 +683,8 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.aw.qmc.movebackground(m,step)
         self.createEventTable()
         self.createDataTable()
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
+        self.aw.qmc.redraw(recomputeAllDeltas=False, re_smooth_foreground=False,
+            re_smooth_background=False)
 
     def readChecks(self):
         self.aw.qmc.background = bool(self.backgroundCheck.isChecked())
@@ -708,13 +709,13 @@ class backgroundDlg(ArtisanResizeablDialog):
     def changeXTcurveidx(self,i):
         self.aw.qmc.xtcurveidx = i
         self.createDataTable()
-        self.aw.qmc.redraw(recomputeAllDeltas=False,smooth=True)
+        self.aw.qmc.redraw(recomputeAllDeltas=False)
 
     @pyqtSlot(int)
     def changeYTcurveidx(self,i):
         self.aw.qmc.ytcurveidx = i
         self.createDataTable()
-        self.aw.qmc.redraw(recomputeAllDeltas=False,smooth=True)
+        self.aw.qmc.redraw(recomputeAllDeltas=False)
 
     @pyqtSlot(bool)
     def load(self,_):

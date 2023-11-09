@@ -1565,7 +1565,7 @@ class serialport:
             try:
                 event_flag:int = sid & 15 # last 4 bits of the sid
                 if event_flag == 1 and self.aw.qmc.timeindex[0] == -1:
-                    self.aw.qmc.markChargeNoactionSignal.emit(True) # CHARGE
+                    self.aw.qmc.markChargeSignal.emit(True) # CHARGE
                 elif event_flag == 2 and self.aw.qmc.TPalarmtimeindex is None:
                     self.aw.qmc.markTPSignal.emit() # TP
                 elif event_flag == 3 and self.aw.qmc.timeindex[1] == 0:

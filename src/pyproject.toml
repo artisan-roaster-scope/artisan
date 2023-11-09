@@ -293,7 +293,7 @@ follow_imports = 'skip'
 # flake8-simplify (SIM), flake8-gettext (INT), flake8-unused-arguments (ARG),
 # Error (PLE), Refactor (PLR), Warning (PLW)
 ## next: flake8-use-pathlib (PTH), flake8-print (T20)
-select = ["E", "F", "UP", "B", "A", "YTT", "COM", "C4", "DTZ", "PIE", "RSE", "RET", "SIM", "ARG", "PLE", "PLR", "PLW", "INT"]
+select = ["E", "F", "UP", "B", "A", "YTT", "COM", "C4", "DTZ", "PIE", "RSE", "RET", "SIM", "ARG", "PLE", "PLR", "PLW", "INT", "RUF013"]
 
 output-format = "pylint" # one of: text, json, junit, grouped, github, gitlab, pylint, azure
 

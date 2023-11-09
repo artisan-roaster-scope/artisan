@@ -2030,7 +2030,7 @@ class EventsDlg(ArtisanResizeablDialog):
 #        self.E2sizeSpinBox.setDisabled(False)
 #        self.E3sizeSpinBox.setDisabled(False)
 #        self.E4sizeSpinBox.setDisabled(False)
-        self.aw.qmc.redraw(recomputeAllDeltas=False,smooth=False)
+        self.aw.qmc.redraw(recomputeAllDeltas=False)
 
     @pyqtSlot(float)
     def setElinealpha0(self,_):

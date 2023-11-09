@@ -2346,7 +2346,7 @@ class CurvesDlg(ArtisanDialog):
     @pyqtSlot(int)
     def changeOptimalSmoothingFlag(self,_:int = 0) -> None:
         self.aw.qmc.optimalSmoothing = not self.aw.qmc.optimalSmoothing
-        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True, smooth=True)
+        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True,re_smooth_foreground=True,re_smooth_background=True)
 
     @pyqtSlot(int)
     def changePolyFitFlagFlag(self, _:int = 0) -> None:
@@ -2356,17 +2356,17 @@ class CurvesDlg(ArtisanDialog):
         self.OptimalSmoothingFlag.setChecked(self.aw.qmc.optimalSmoothing)
         self.OptimalSmoothingFlag.setEnabled(self.aw.qmc.polyfitRoRcalc)
         self.OptimalSmoothingFlag.blockSignals(False)
-        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True,smooth=True)
+        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True,re_smooth_foreground=True)
 
     @pyqtSlot(int)
     def changeDropFilter(self, _:int = 0) -> None:
         self.aw.qmc.filterDropOuts = not self.aw.qmc.filterDropOuts
-        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True,smooth=True)
+        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True,re_smooth_foreground=True, re_smooth_background=True)
 
     @pyqtSlot(int)
     def changeShowFullFilter(self, _:int = 0) -> None:
         self.aw.qmc.foregroundShowFullflag = not self.aw.qmc.foregroundShowFullflag
-        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True,smooth=True)
+        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True,re_smooth_foreground=True)
 
     @pyqtSlot(int)
     def changeSpikeFilter(self,_:int = 0) -> None:
@@ -2391,7 +2391,7 @@ class CurvesDlg(ArtisanDialog):
             if v != self.aw.qmc.curvefilter:
                 self.Filter.setDisabled(True)
                 self.aw.qmc.curvefilter = v
-                self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True,smooth=True)
+                self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True,re_smooth_foreground=True, re_smooth_background=True)
                 self.Filter.setDisabled(False)
                 self.Filter.setFocus()
         except Exception as e: # pylint: disable=broad-except
@@ -2493,7 +2493,7 @@ class CurvesDlg(ArtisanDialog):
         self.aw.qmc.resetlinecountcaches()
         self.aw.qmc.resetlines()
         self.aw.qmc.updateDeltaSamples()
-        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True)
+        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True, re_smooth_background=True)
         self.aw.clearMessageLine() #clears plotter possible exceptions if Cancel
 
         self.reject()
@@ -2555,6 +2555,6 @@ class CurvesDlg(ArtisanDialog):
         self.aw.cacheCurveVisibilities()  #dave
         self.aw.qmc.resetlinecountcaches()
         self.aw.qmc.resetlines()
-        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True)
+        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True, re_smooth_background=True)
 #        self.aw.closeEventSettings()
         self.accept()

@@ -131,7 +131,7 @@ class wsport:
                         else:
                             # markCharge with a delay waiting for the recorder to be started up
                             delay = self.aw.qmc.delay * 2 # we delay the markCharge action by 2 sampling periods
-                        self.aw.qmc.markChargeSignal.emit(delay)
+                        self.aw.qmc.markChargeDelaySignal.emit(delay)
                         if self.aw.seriallogflag:
                             self.aw.addserial(f'wsport markCHARGE() with delay={delay} signal sent')
                 elif self.drop_message != '' and pushMessage == self.drop_message:
