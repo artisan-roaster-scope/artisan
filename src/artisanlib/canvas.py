@@ -7776,7 +7776,7 @@ class tgraphcanvas(FigureCanvas):
     # if recomputeAllDeltas, the delta arrays and if smooth the smoothed line arrays are recomputed (incl. those of the background curves)
     # re_smooth_foreground: the foreground curves (incl. extras) will be re-smoothed if called while not recording. During recording foreground will never be smoothed here.
     # re_smooth_background: the background curves (incl. extras) will be re-smoothed if True (default False), also during recording
-    def redraw(self, recomputeAllDeltas=True, re_smooth_foreground=True, takelock=True, forceRenewAxis=False, re_smooth_background=False): # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths
+    def redraw(self, recomputeAllDeltas:bool = True, re_smooth_foreground:bool = True, takelock:bool = True, forceRenewAxis:bool = False, re_smooth_background:bool = False) -> None: # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths
         if self.designerflag:
             self.redrawdesigner(force=True)
         elif self.aw.comparator is not None:
@@ -9772,7 +9772,7 @@ class tgraphcanvas(FigureCanvas):
                                             label=self.aw.arabicReshape(QApplication.translate('Label', 'TIMEguide')),
                                             linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
                 if self.AUCguideFlag:
-                    self.l_AUCguide = self.ax.axvline(self.AUCguideTime,visible=(self.qmc.AUCguideTime > 0 and self.qmc.AUCguideTime < self.qmc.endofx),color = self.palette['aucguide'],
+                    self.l_AUCguide = self.ax.axvline(self.AUCguideTime,visible=(self.AUCguideTime > 0 and self.AUCguideTime < self.endofx),color = self.palette['aucguide'],
                                                 label=self.aw.arabicReshape(QApplication.translate('Label', 'AUCguide')),
                                                 linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
 
