@@ -9490,9 +9490,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     # might be a label
                                     try:
                                         label = str(eval(cs[len('alarmset('):-1])) # pylint: disable=eval-used
-                                        p = self.qmc.findAlarmSet(label)
-                                        if p is not None:
-                                            self.qmc.alarmsetSignal.emit(p)
+                                        pp:Optional[int] = self.qmc.findAlarmSet(label)
+                                        if pp is not None:
+                                            self.qmc.alarmsetSignal.emit(pp)
                                             self.sendmessage(f'Artisan Command: {cs}')
                                     except Exception as e: # pylint: disable=broad-except
                                         _log.exception(e)

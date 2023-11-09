@@ -53,6 +53,7 @@ if TYPE_CHECKING:
     from matplotlib.text import Annotation # pylint: disable=unused-import
     from matplotlib.image import AxesImage # pylint: disable=unused-import
     from matplotlib.legend import Legend # pylint: disable=unused-import
+    from matplotlib.backend_bases import PickEvent # pylint: disable=unused-import
     import numpy.typing as npt # pylint: disable=unused-import
     from PyQt6.QtGui import QResizeEvent # pylint: disable=unused-import
 
@@ -1042,7 +1043,7 @@ class tgraphcanvas(FigureCanvas):
             self.fig.canvas.setStyleSheet('background-color:transparent;') # default is white
 
         self.onclick_cid = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
-        self.oncpick_cid = self.fig.canvas.mpl_connect('pick_event', self.onpick)
+        self.oncpick_cid = self.fig.canvas.mpl_connect('pick_event', self.onpick) # type: ignore[arg-type] # incompatible type "Callable[[PickEvent], None]"; expected "Callable[[Event], Any]
         self.ondraw_cid = self.fig.canvas.mpl_connect('draw_event', self._draw_event)
 
         self.fig.canvas.mpl_connect('button_release_event', self.onrelease_after_pick)
@@ -1274,7 +1275,7 @@ class tgraphcanvas(FigureCanvas):
         self.delta1B:List[Optional[float]] = []
         self.delta2B:List[Optional[float]] = []
         self.timeindexB:List[int] = [-1,0,0,0,0,0,0,0]
-        self.TP_time_B_loaded:Optional[float] = None # the time in seconds the background TP happened. TP_time_B_loaded does not change and should be used for display
+        self.TP_time_B_loaded:Optional[float] = None # the time in seconds the background TP happens. TP_time_B_loaded does not change and should be used for display
         self.backgroundEvents:List[int] = [] #indexes of background events
         self.backgroundEtypes:List[int] = []
         self.backgroundEvalues:List[float] = []
@@ -1660,7 +1661,7 @@ class tgraphcanvas(FigureCanvas):
 
         # alarm sets
         self.alarmsets_count: Final[int] = 10 # number of alarm sets
-        self.alarmsets:List = []
+        self.alarmsets:List[List] = []
         for _ in range(self.alarmsets_count):
             self.alarmsets.append([
                 '',
@@ -2243,7 +2244,7 @@ class tgraphcanvas(FigureCanvas):
     #################################    FUNCTIONS    ###################################
     #####################################################################################
 
-    # toggles the y cursor coordinate see self.qmc.fmt_data_curve
+    # toggles the y cursor coordinate see self.fmt_data_curve
     def nextFmtDataCurve(self) -> None:
         self.fmt_data_curve = (self.fmt_data_curve+1) % 5
         if self.backgroundprofile is None and self.fmt_data_curve in {3, 4}:
@@ -2717,7 +2718,7 @@ class tgraphcanvas(FigureCanvas):
         self.eventmessagetimer.setSingleShot(True)
         self.eventmessagetimer.start(time)
 
-    def onpick(self,event):
+    def onpick(self, event:'PickEvent') -> None:
         try:
             # display MET information by clicking on the MET marker
             if (isinstance(event.artist, mpl.text.Annotation) and self.showmet and event.artist in [self.met_annotate] and
@@ -2805,12 +2806,12 @@ class tgraphcanvas(FigureCanvas):
 
             # show event information by clicking on event lines in step, step+ and combo modes
             elif isinstance(event.artist, mpl.lines.Line2D):
-                if isinstance(event.ind, int):
-                    ind = event.ind
+                if isinstance(event.ind, int): # type: ignore[attr-defined] # "PickEvent" has no attribute "ind"
+                    ind = event.ind # type: ignore[attr-defined] # "PickEvent" has no attribute "ind"
                 else:
-                    if not any(event.ind):
+                    if not any(event.ind): # type: ignore[attr-defined] # "PickEvent" has no attribute "ind"
                         return
-                    ind = event.ind[0]
+                    ind = event.ind[0] # type: ignore[attr-defined] # "PickEvent" has no attribute "ind"
                 digits = (1 if self.LCDdecimalplaces else 0)
                 if event.artist in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots]:
                     timex = self.backgroundtime2index(numpy.array(event.artist.get_xdata())[ind])
@@ -2901,7 +2902,7 @@ class tgraphcanvas(FigureCanvas):
             self.adderror((QApplication.translate('Error Message','Exception:') + ' onclick() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
 
-    def disconnect_draggableannotations_motion_notifiers(self):
+    def disconnect_draggableannotations_motion_notifiers(self) -> None:
         cids = []
         try:
             if 'motion_notify_event' in self.fig.canvas.callbacks.callbacks:
@@ -3018,21 +3019,21 @@ class tgraphcanvas(FigureCanvas):
             self.adderror((QApplication.translate('Error Message','Exception:') + ' onclick() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot('QAction*')
-    def event_popup_action(self, action):
-        if action.key[0] >= 0:
+    def event_popup_action(self, action:QAction) -> None:
+        if action.key[0] >= 0:  # type: ignore[attr-defined] # "QAction" has no attribute "key"
             # we check if this is the first DROP mark on this roast
-            firstDROP = (action.key[0] == 6 and self.timeindex[6] == 0)
-            timeindex_before = self.timeindex[action.key[0]]
-            self.timeindex[action.key[0]] = action.key[1]
+            firstDROP = (action.key[0] == 6 and self.timeindex[6] == 0)  # type: ignore[attr-defined] # "QAction" has no attribute "key"
+            timeindex_before = self.timeindex[action.key[0]]  # type: ignore[attr-defined] # "QAction" has no attribute "key"
+            self.timeindex[action.key[0]] = action.key[1]  # type: ignore[attr-defined] # "QAction" has no attribute "key"
             # clear custom label positions cache entry
-            if action.key[0] in self.l_annotations_dict:
-                del self.l_annotations_dict[action.key[0]]
+            if action.key[0] in self.l_annotations_dict:  # type: ignore[attr-defined] # "QAction" has no attribute "key"
+                del self.l_annotations_dict[action.key[0]]  # type: ignore[attr-defined]# "QAction" has no attribute "key"
             try:
                 # clear the event mark position cache
-                self.l_annotations_dict.pop(action.key[0])
+                self.l_annotations_dict.pop(action.key[0])  # type: ignore[attr-defined] # "QAction" has no attribute "key"
             except Exception: # pylint: disable=broad-except
                 pass
-            if action.key[0] == 0: # CHARGE
+            if action.key[0] == 0: # type: ignore[attr-defined] # "QAction" has no attribute "key" # CHARGE
                 try:
                     # clear the TP mark position cache (TP depends on CHARGE!)
                     self.l_annotations_dict.pop(-1)
@@ -3059,7 +3060,7 @@ class tgraphcanvas(FigureCanvas):
                         self.startofx += self.timex[self.timeindex[0]]
                     self.aw.autoAdjustAxis(deltas=False)
                 self.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
-            elif action.key[0] == 6: # DROP
+            elif action.key[0] == 6: # type: ignore[attr-defined] # "QAction" has no attribute "key" # DROP
                 try:
                     # clear the TP mark position cache (TP depends on DROP!)
                     self.l_annotations_dict.pop(-1)
@@ -3096,25 +3097,25 @@ class tgraphcanvas(FigureCanvas):
 
 
             # update phases
-            elif action.key[0] == 1 and self.phasesbuttonflag: # DRY
+            elif action.key[0] == 1 and self.phasesbuttonflag:  # type: ignore[attr-defined] # "QAction" has no attribute "key" # DRY
                 self.phases[1] = int(round(self.temp2[self.timeindex[1]]))
-            elif action.key[0] == 2 and self.phasesbuttonflag: # FCs
+            elif action.key[0] == 2 and self.phasesbuttonflag:  # type: ignore[attr-defined] # "QAction" has no attribute "key" # FCs
                 self.phases[2] = int(round(self.temp2[self.timeindex[2]]))
 
             self.fileDirtySignal.emit()
-            self.redraw(recomputeAllDeltas=(action.key[0] in {0, 6})) # on moving CHARGE or DROP, we have to recompute the Deltas
+            self.redraw(recomputeAllDeltas=(action.key[0] in {0, 6}))  # type: ignore[attr-defined] # "QAction" has no attribute "key" # on moving CHARGE or DROP, we have to recompute the Deltas
         else:
             # add a special event at the current timepoint
             from artisanlib.events import customEventDlg
-            dlg = customEventDlg(self.aw, self.aw, action.key[1])
+            dlg = customEventDlg(self.aw, self.aw, action.key[1]) # type: ignore[attr-defined] # "QAction" has no attribute "key"
             if dlg.exec():
-                self.specialevents.append(action.key[1]) # absolute time index
+                self.specialevents.append(action.key[1])  # type: ignore[attr-defined] # "QAction" has no attribute "key" # absolute time index
                 self.specialeventstype.append(dlg.type) # default: "--"
                 self.specialeventsStrings.append(dlg.description)
                 self.specialeventsvalue.append(dlg.value)
                 self.aw.orderEvents()
                 self.fileDirtySignal.emit()
-                self.redraw(recomputeAllDeltas=(action.key[0] in {0, 6})) # on moving CHARGE or DROP, we have to recompute the Deltas
+                self.redraw(recomputeAllDeltas=(action.key[0] in {0, 6}))  # type: ignore[attr-defined] # "QAction" has no attribute "key" # on moving CHARGE or DROP, we have to recompute the Deltas
             try:
                 dlg.dialogbuttons.accepted.disconnect()
                 dlg.dialogbuttons.rejected.disconnect()
@@ -3160,19 +3161,17 @@ class tgraphcanvas(FigureCanvas):
 
     # note that partial values might be given here (time might update, but not the values)
     @pyqtSlot(str,str,str)
-    def updateLargeLCDs(self, bt, et, time): # pylint: disable=no-self-use # used as slot
+    def updateLargeLCDs(self, bt:str, et:str, time:str) -> None: # pylint: disable=no-self-use # used as slot
         try:
             if self.aw.largeLCDs_dialog is not None:
-                if self.flagon and not self.flagstart:
-                    # in monitoring only mode, timer might be set by PID RS
-                    time = None
-                self.aw.largeLCDs_dialog.updateValues([et],[bt],time=time)
+                # in monitoring only mode, timer might be set by PID RS
+                self.aw.largeLCDs_dialog.updateValues([et],[bt],time=(None if self.flagon and not self.flagstart else time))
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
     @pyqtSlot(str,str)
     # pylint: disable=no-self-use # used as slot
-    def setTimerLargeLCDcolor(self, fc, bc):
+    def setTimerLargeLCDcolor(self, fc:str, bc:str) -> None:
         try:
             if self.aw.largeLCDs_dialog is not None:
                 self.aw.largeLCDs_dialog.setTimerLCDcolor(fc,bc)
@@ -3323,14 +3322,14 @@ class tgraphcanvas(FigureCanvas):
                     self.ax.draw_artist(self.l_BTprojection)
                 if self.projectDeltaFlag and self.l_DeltaBTprojection is not None and self.DeltaBTflag:
                     self.ax.draw_artist(self.l_DeltaBTprojection)
-            if self.l_AUCguide is not None and self.AUCguideFlag and self.AUCguideTime > 0 and self.qmc.AUCguideTime < self.qmc.endofx:
+            if self.l_AUCguide is not None and self.AUCguideFlag and self.AUCguideTime > 0 and self.AUCguideTime < self.endofx:
                 self.ax.draw_artist(self.l_AUCguide)
 
     # input filter
     # if temp (the actual reading) is outside of the interval [tmin,tmax] or
     # a spike is detected, the previous value is repeated or if that happened already before, -1 is returned
     # note that here we assume that the actual measured temperature time/temp was not already added to the list of previous measurements timex/tempx
-    def inputFilter(self, timex, tempx, time, temp, BT=False):
+    def inputFilter(self, timex:List[float], tempx:List[float], time:float, temp:float, BT:bool = False) -> float:
         try:
             wrong_reading = 0
             #########################
@@ -3421,7 +3420,7 @@ class tgraphcanvas(FigureCanvas):
             return numpy.average(tx_org,temp_trail)
 
     # returns true after BT passed the TP
-    def checkTPalarmtime(self):
+    def checkTPalarmtime(self) -> bool:
         seconds_since_CHARGE = int(self.timex[-1]-self.timex[self.timeindex[0]])
         # if v[-1] is the current temperature then check if
         #   we are 20sec after CHARGE
@@ -4140,7 +4139,7 @@ class tgraphcanvas(FigureCanvas):
                     # check for TP event if already CHARGEed and not yet recognized
                     if local_flagstart and self.TPalarmtimeindex is None and self.timeindex[0] > -1 and self.timeindex[0]+5 < len(sample_temp2) and self.checkTPalarmtime():
                         self.TPalarmtimeindex = self.aw.findTP()
-                        self.aw.qmc.markTPSignal.emit()
+                        self.markTPSignal.emit()
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
                 _, _, exc_tb = sys.exc_info()
@@ -4326,7 +4325,7 @@ class tgraphcanvas(FigureCanvas):
     @pyqtSlot()
     def updategraphics(self) -> None:
 #        QApplication.processEvents() # without this we see some flickers (canvas redraws) on using multiple button event actions on macOS!?
-        gotlock = self.aw.qmc.updateGraphicsSemaphore.tryAcquire(1,300) # we try to catch a lock if available but we do not wait, if we fail we just skip this redraw round (prevents stacking of waiting calls); we maximally wait 300ms which should be enough on modern machines
+        gotlock = self.updateGraphicsSemaphore.tryAcquire(1,300) # we try to catch a lock if available but we do not wait, if we fail we just skip this redraw round (prevents stacking of waiting calls); we maximally wait 300ms which should be enough on modern machines
         if not gotlock:
             _log.info('updategraphics(): failed to get updateGraphicsSemaphore lock')
         else:
@@ -4561,10 +4560,10 @@ class tgraphcanvas(FigureCanvas):
                 _, _, exc_tb = sys.exc_info()
                 self.adderror((QApplication.translate('Error Message','Exception:') + ' updategraphics() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             finally:
-                if self.aw.qmc.updateGraphicsSemaphore.available() < 1:
-                    self.aw.qmc.updateGraphicsSemaphore.release(1)
+                if self.updateGraphicsSemaphore.available() < 1:
+                    self.updateGraphicsSemaphore.release(1)
 
-    def setLCDtimestr(self, timestr):
+    def setLCDtimestr(self, timestr:str) -> None:
         self.aw.lcd1.display(timestr)
         # update connected WebLCDs
         if self.aw.WebLCDs:
@@ -4572,12 +4571,12 @@ class tgraphcanvas(FigureCanvas):
         if self.aw.largeLCDs_dialog:
             self.updateLargeLCDsTimeSignal.emit(timestr)
 
-    def setLCDtime(self,ts):
+    def setLCDtime(self, ts:float) -> None:
         timestr = stringfromseconds(ts)
         self.setLCDtimestr(timestr)
 
     @pyqtSlot()
-    def updateLCDtime(self):
+    def updateLCDtime(self) -> None:
         if self.flagstart and self.flagon:
             tx = self.timeclock.elapsedMilli()
             if self.aw.simulator is not None:
@@ -4616,7 +4615,7 @@ class tgraphcanvas(FigureCanvas):
                 QTimer.singleShot(int(round(nextreading)),self.updateLCDtime)
 
     # redraws at least the canvas if redraw=True and force=True
-    def timealign(self,redraw=True,recompute=False,force=False):
+    def timealign(self,redraw:bool = True, recompute:bool = False, force:bool = False) -> None:
         try:
             ptime = None
             btime = None
@@ -4724,14 +4723,14 @@ class tgraphcanvas(FigureCanvas):
                 linecount += 1
         return linecount
 
-    def resetlinecountcaches(self):
+    def resetlinecountcaches(self) -> None:
         self.linecount = None
         self.deltalinecount = None
 
     # NOTE: delta lines are also drawn on the main ax
     # ATTENTION: all lines that should be populated need to established in self.ax.lines thus for example delta lines should be established (with empty point lists)
     #   even if they are not drawn before CHARGE to ensure that the linecount corresponds to the fixes lines in self.ax.lines!!
-    def resetlines(self):
+    def resetlines(self) -> None:
         if self.ax is not None and not bool(self.aw.comparator):
             #note: delta curves are now in self.delta_ax and have been removed from the count of resetlines()
             if self.linecount is None:
@@ -4747,7 +4746,7 @@ class tgraphcanvas(FigureCanvas):
                     break
 
     @pyqtSlot(int)
-    def getAlarmSet(self,n):
+    def getAlarmSet(self, n:int) -> Optional[List]:
         try:
             self.alarmSemaphore.acquire(1)
             if 0<= n < len(self.alarmsets):
@@ -4757,7 +4756,7 @@ class tgraphcanvas(FigureCanvas):
             if self.alarmSemaphore.available() < 1:
                 self.alarmSemaphore.release(1)
 
-    def setAlarmSet(self,n,alarmset):
+    def setAlarmSet(self, n:int, alarmset:List) -> None:
         try:
             self.alarmSemaphore.acquire(1)
             self.alarmsets[n] = alarmset
@@ -4766,7 +4765,7 @@ class tgraphcanvas(FigureCanvas):
                 self.alarmSemaphore.release(1)
 
     @pyqtSlot(int)
-    def selectAlarmSet(self,n):
+    def selectAlarmSet(self, n:int) -> None:
         alarmset = self.getAlarmSet(n)
         if alarmset is not None:
             try:
@@ -4791,13 +4790,13 @@ class tgraphcanvas(FigureCanvas):
                     self.alarmSemaphore.release(1)
 
     @pyqtSlot(str,int)
-    def moveBackgroundAndRedraw(self,direction,step):
-        self.movebackground(direction,step)
+    def moveBackgroundAndRedraw(self, direction:str, step:int) -> None:
+        self.movebackground(direction, step)
         self.redraw(recomputeAllDeltas=False, #(direction in {'left', 'right'}),
             re_smooth_foreground=False,
             re_smooth_background=False)
 
-    def findAlarmSet(self,label):
+    def findAlarmSet(self, label:str) -> Optional[int]:
         try:
             self.alarmSemaphore.acquire(1)
             for i, alrmset in enumerate(self.alarmsets):
@@ -4809,7 +4808,8 @@ class tgraphcanvas(FigureCanvas):
                 self.alarmSemaphore.release(1)
 
     @staticmethod
-    def makeAlarmSet(label, flag, guard, negguard, time, offset, source, cond, temperature, action, beep, alarmstrings):
+    def makeAlarmSet(label:str, flag:List[int], guard:List[int], negguard:List[int], time:List[int], offset:List[int],
+            source:List[int], cond:List[int], temperature:List[float], action:List[int], beep:List[int], alarmstrings:List[str]) -> List:
         return [label,flag,guard,negguard,time,offset,source,cond,temperature,action,beep,alarmstrings]
 
     # number is alarmnumber+1 (the 1-based alarm number the user sees), for alarms triggered from outside the alarmtable (like PID RS alarms) number is 0
@@ -5014,7 +5014,7 @@ class tgraphcanvas(FigureCanvas):
             self.adderror((QApplication.translate('Error Message','Exception:') + ' playbackdrop() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     # called only after CHARGE
-    def playbackevent(self):
+    def playbackevent(self) -> None:
         try:
             reproducing = None # index of the event that is currently replaying (suppress other replays in this round)
             #needed when using device NONE
@@ -5128,7 +5128,7 @@ class tgraphcanvas(FigureCanvas):
             self.adderror((QApplication.translate('Error Message','Exception:') + ' playbackevent() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     #make a projection of change of rate of BT and ET on the graph
-    def updateProjection(self):
+    def updateProjection(self) -> None:
         try:
             # projections are only drawn after CHARGE and before DROP
             if self.ax is not None and self.timeindex[0] != -1 and self.timeindex[6] == 0 and len(self.timex)>0:
@@ -5308,7 +5308,7 @@ class tgraphcanvas(FigureCanvas):
     # takes array with readings, the current index, the sign of the shift as character and the shift value
     # returns val, evalsign
     @staticmethod
-    def shiftValueEvalsign(readings,index,sign,shiftval):
+    def shiftValueEvalsign(readings:Sequence[Optional[float]],index:int, sign:str, shiftval:int) -> Tuple[float, str]:
         if sign == '-': #  ie. original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
             evalsign = '0'      # "-" becomes digit "0" for python eval compatibility
             shiftedindex = index - shiftval
@@ -5320,7 +5320,8 @@ class tgraphcanvas(FigureCanvas):
                 shiftedindex = len(readings)- 1
             if shiftedindex < 0:
                 return -1, evalsign
-            return readings[shiftedindex], evalsign
+            r = readings[shiftedindex]
+            return (-1 if r is None else r), evalsign
         return -1, evalsign
 
     # Computes the shifted value and and sign of the background data (readings), based on the index interpreted w.r.t. foreground time
@@ -5329,7 +5330,7 @@ class tgraphcanvas(FigureCanvas):
     # the index is computed w.r.t. the foreground and then mapped to the corresponding index in the given background readings w.r.t. its time array timeb
     # result is clipped w.r.t. foreground data thus data beyond foreground cannot be accessed in the background
     # returns val, evalsign
-    def shiftValueEvalsignBackground(self, timex,timeb,readings,index,sign,shiftval):
+    def shiftValueEvalsignBackground(self, timex:List[float], timeb:List[float], readings:Sequence[Optional[float]], index:int, sign:str, shiftval:int) -> Tuple[float, str]:
         if sign == '-': #  ie. original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
             evalsign = '0'      # "-" becomes digit "0" for python eval compatibility
             shiftedindex = index - shiftval
@@ -5350,7 +5351,8 @@ class tgraphcanvas(FigureCanvas):
             if timeb[0] <= tx <= timeb[-1]:
                 idx = self.timearray2index(timeb, tx)
                 if -1 < idx < len(readings):
-                    return readings[idx], evalsign
+                    r = readings[idx]
+                    return (-1 if r is None else r), evalsign
         return -1, evalsign
 
     # mathexpression = formula; t = a number to evaluate(usually time);
@@ -5909,7 +5911,7 @@ class tgraphcanvas(FigureCanvas):
                                             idx = index
                                         if readings is None or readings_time is None:
                                             val = 0
-                                            evalsign = 0
+                                            evalsign = '0'
                                         else:
                                             val, evalsign = self.shiftValueEvalsignBackground(sample_timex, readings_time, readings, idx, sign, Yshiftval)
                                     evaltimeexpression = ''.join(('B',mathexpression[i+1],evalsign*2,mathexpression[i+4],seconddigitstr,evalsign))
@@ -6105,7 +6107,7 @@ class tgraphcanvas(FigureCanvas):
 
 
     #format X axis labels
-    def xaxistosm(self,redraw=True,min_time=None,max_time=None):
+    def xaxistosm(self,redraw:bool = True, min_time:Optional[float] = None, max_time:Optional[float] = None) -> None:
         if self.ax is None:
             return
         try:
@@ -6191,7 +6193,7 @@ class tgraphcanvas(FigureCanvas):
 #        return '%s%d:%02d'%(sign,m,s)
         return f'{sign}{m:.0f}:{s:02.0f}'
 
-    def fmt_data(self,x):
+    def fmt_data(self, x:float) -> str:
         res = x
         if self.fmt_data_ON and self.delta_ax is not None and self.ax is not None and self.fmt_data_RoR and self.twoAxisMode():
             try:
@@ -6201,8 +6203,8 @@ class tgraphcanvas(FigureCanvas):
             except Exception: # pylint: disable=broad-except
                 pass
         if self.LCDdecimalplaces:
-            return self.aw.float2float(res)
-        return int(round(res))
+            return str(self.aw.float2float(res))
+        return str(int(round(res)))
 
     #used by xaxistosm(). Provides also negative time
     def formtime(self, x:float, _pos:Optional[int]) -> str:
@@ -6267,7 +6269,7 @@ class tgraphcanvas(FigureCanvas):
         # nothing to be saved
         return True
 
-    def clearLCDs(self):
+    def clearLCDs(self) -> None:
         zz = '-.-' if self.LCDdecimalplaces else '--'
         self.aw.lcd2.display(zz)
         self.aw.lcd3.display(zz)
@@ -6291,7 +6293,7 @@ class tgraphcanvas(FigureCanvas):
         if self.aw.largePhasesLCDs_dialog is not None:
             self.aw.largePhasesLCDs_dialog.updateDecimals()
 
-    def clearMeasurements(self,andLCDs=True):
+    def clearMeasurements(self, andLCDs:bool=True) -> None:
         try:
             #### lock shared resources #####
             self.profileDataSemaphore.acquire(1)
@@ -6337,7 +6339,7 @@ class tgraphcanvas(FigureCanvas):
                 self.profileDataSemaphore.release(1)
 
     @pyqtSlot(bool)
-    def resetButtonAction(self,_=False):
+    def resetButtonAction(self,_:bool=False) -> None:
         self.disconnectProbes() # release serial/S7/MODBUS connections
         modifiers = QApplication.keyboardModifiers()
         if modifiers == Qt.KeyboardModifier.AltModifier:  #alt click
@@ -7903,7 +7905,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.flagstart or self.xgrid == 0:
                         self.set_xlabel('')
                     else:
-                        self.set_xlabel(f'{self.aw.qmc.roastertype_setup} {self.aw.qmc.roastersize_setup}kg')
+                        self.set_xlabel(f'{self.roastertype_setup} {self.roastersize_setup}kg')
 
                     try:
                         y_label.set_in_layout(False) # remove y-axis labels from tight_layout calculation
@@ -11330,7 +11332,7 @@ class tgraphcanvas(FigureCanvas):
                                 'stopbits': self.aw.ser.stopbits,
                                 'parity': self.aw.ser.parity,
                                 'timeout': self.aw.ser.timeout}
-                    self.aw.kaleido.start(self.aw.qmc.mode, self.aw.kaleidoHost, self.aw.kaleidoPort,
+                    self.aw.kaleido.start(self.mode, self.aw.kaleidoHost, self.aw.kaleidoPort,
                         serial=kaleido_serial,
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Kaleido'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Kaleido'),True,None))
@@ -12251,7 +12253,7 @@ class tgraphcanvas(FigureCanvas):
     @pyqtSlot()
     def markTPTrigger(self):
         if self.markTPflag:
-            if self.aw.qmc.TPalarmtimeindex is None:
+            if self.TPalarmtimeindex is None:
                 self.TPalarmtimeindex = len(self.timex) - 1
             self.markTP()
 
@@ -12374,7 +12376,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.aw.buttonDRY.isFlat():
                     if removed:
                         if self.alignEvent not in {1, 7}:
-                            self.updateBackground() # no updateBackground needed in case the timealign above happend as this triggeres a redraw() which triggers an updateBackground anyhow
+                            self.updateBackground() # no updateBackground needed in case the timealign above happens as this triggers a redraw() which itself triggers an updateBackground anyhow
                         self.aw.buttonDRY.setFlat(False)
                         if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
                             self.aw.buttonCHARGE.setFlat(False)
@@ -12487,7 +12489,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.aw.buttonFCs.isFlat():
                     if removed:
                         if self.alignEvent not in {2, 7}:
-                            self.updateBackground() # no updateBackground needed in case the timealign above happend as this triggeres a redraw() which triggers an updateBackground anyhow
+                            self.updateBackground() # no updateBackground needed in case the timealign above happens as this triggers a redraw() which triggers an updateBackground anyhow
                         self.aw.buttonFCs.setFlat(False)
                         if self.timeindex[1] == 0: # reactivate the DRY button if not yet set
                             self.aw.buttonDRY.setFlat(False)
@@ -12594,7 +12596,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.aw.buttonFCe.isFlat():
                     if removed:
                         if self.alignEvent not in {3, 7}:
-                            self.updateBackground() # no updateBackground needed in case the timealign above happend as this triggeres a redraw() which triggers an updateBackground anyhow
+                            self.updateBackground() # no updateBackground needed in case the timealign above happens as this triggers a redraw() which triggers an updateBackground anyhow
                         self.aw.buttonFCe.setFlat(False)
                         if self.timeindex[2] == 0: # reactivate the FCs button if not yet set
                             self.aw.buttonFCs.setFlat(False)
@@ -12702,7 +12704,7 @@ class tgraphcanvas(FigureCanvas):
                     self.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
                 if self.aw.buttonSCs.isFlat():
                     if removed:
-                        if self.alignEvent not in {4, 7}: # no updateBackground needed in case the timealign above happend as this triggeres a redraw() which triggers an updateBackground anyhow
+                        if self.alignEvent not in {4, 7}: # no updateBackground needed in case the timealign above happens as this triggers a redraw() which triggers an updateBackground anyhow
                             self.updateBackground()
                         self.aw.buttonSCs.setFlat(False)
                         if self.timeindex[3] == 0: # reactivate the FCe button if not yet set
@@ -12819,7 +12821,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.aw.buttonSCe.isFlat():
                     if removed:
                         if self.alignEvent not in {5, 7}:
-                            self.updateBackground() # no updateBackground needed in case the timealign above happend as this triggeres a redraw() which triggers an updateBackground anyhow
+                            self.updateBackground() # no updateBackground needed in case the timealign above happens as this triggers a redraw() which triggers an updateBackground anyhow
                         self.aw.buttonSCe.setFlat(False)
                         if self.timeindex[4] == 0: # reactivate the SCs button if not yet set
                             self.aw.buttonSCs.setFlat(False)
@@ -13850,7 +13852,7 @@ class tgraphcanvas(FigureCanvas):
             elif self.flagstart or self.xgrid == 0:
                 self.set_xlabel('')
             else:
-                self.set_xlabel(f'{self.aw.qmc.roastertype_setup} {self.aw.qmc.roastersize_setup}kg')
+                self.set_xlabel(f'{self.roastertype_setup} {self.roastersize_setup}kg')
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
@@ -14929,7 +14931,7 @@ class tgraphcanvas(FigureCanvas):
         return self.timetemparray2temp(self.timeB,self.delta1B,seconds + offset)
 
     # fast variant based on binary search on lists using bisect (using numpy.searchsorted is slower)
-    # side-condition: values in self.qmc.timex in linear order
+    # side-condition: values in self.timex in linear order
     # time: time in seconds
     # nearest: if nearest is True the closest index is returned (slower), otherwise the previous (faster)
     # returns
