@@ -62,12 +62,14 @@ The dual temperature meters are perfect for the standard use of Artisan to log t
   - 9V Battery only
   - Software optional
   - Minimal stable sampling rate in Artisan: 4sec
+  - USB Driver: [CP210x from Silicon Labs](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
 * [CENTER 303](http://www.centertek.com/product_d.php?lang=en&tb=1&id=73&cid=67) / VOLTCRAFT 302KJ / VOLTCRAFT KJ202
   - Dual K/J-Type
   - RS232 Interface (9600-8N1)
   - 9V Battery only
   - Software optional
   - Minimal stable sampling rate in Artisan: 4sec
+  - USB Driver: [CP210x from Silicon Labs](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
 * [CENTER 306](http://www.centertek.com/product_d.php?lang=en&tb=1&id=85&cid=67) / VOLTCRAFT K202
   - Dual K-Type
   - RS232 Interface (9600-8N1), cable included
@@ -75,6 +77,7 @@ The dual temperature meters are perfect for the standard use of Artisan to log t
   - Internal memory
   - Software included
   - Minimal stable sampling rate in Artisan: 4sec
+  - USB Driver: [CP210x from Silicon Labs](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
 * [Omega HH506RA](http://www.omega.com/pptst/HH506A_HH506RA.html) / [EXTECH 421509](http://www.extech.com/products/421509)
   - Dual K/J/T/E/R/S/N-Type
   - RS232 Interface (2400-7E1)
@@ -82,11 +85,13 @@ The dual temperature meters are perfect for the standard use of Artisan to log t
   - 9V Battery only
   - Optional optical-isolated serial2USB converter
   - Minimal stable sampling rate in Artisan: 5sec
+  - USB Driver: FTDI build into Linux/macOS/Windows
 * [Amprobe TMD-56](https://www.amprobe.com/product/tmd-56/) / [Omega HH806AU](https://www.omega.com/en-us/sensors-and-sensing-equipment/temperature/thermometers/p/HH806) / [Mastech MS6514](http://www.mastech-group.com/products.php?PNo=89) / [PerfectPrime TC2100GN TC2100, 2-Channel](https://www.amazon.com/dp/B0776SD6JC/ref=cm_sw_r_cp_api_i_DkbwFb7YX283X)
   - Dual K/J/T/E/R/S/N-Type
   - Built in USB to serial converter (19200-8E1)
   - Internal memory
   - 4 x 1.5V AAA Batteries or external power
+  - USB Driver: [CP210x from Silicon Labs](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
 * [Omega HH802U](http://www.omega.com/pptst/HH802_803.html)
   - Dual K/J-Type
   - Built in USB to serial converter (19200-8E1)
@@ -95,6 +100,7 @@ The dual temperature meters are perfect for the standard use of Artisan to log t
   - Dual K/J-Type
   - Built in USB to serial converter (9600-8N1)
   - 3 x 1.5V AAA Batteries
+  - USB Driver: [CP210x from Silicon Labs](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
 
  
 ### Four Channel
@@ -107,6 +113,7 @@ Those 4 channel meters in the list below are all basically identical. Just that 
   - Software optional
   - 9V Battery or external power
   - Minimal stable sampling rate in Artisan: 4sec
+  - USB Driver: [CP210x from Silicon Labs](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
 * [CENTER 309](http://www.centertek.com/product_d.php?lang=en&tb=1&id=79&cid=67) / VOLTCRAFT K204 / [Omega HH309](https://www.omega.com/en-us/test-inspection/handheld-meters/temperature-and-humidity-and-dew-point-meters/hh309a-tc-logger/p/HH309A) / [General Tools DT309DL](http://www.tequipment.net/GeneralDT309DL.html)
   - Four K-Type
   - RS232 Interface (9600-8N1)
@@ -114,10 +121,12 @@ Those 4 channel meters in the list below are all basically identical. Just that 
   - Software included
   - 9V Battery or external power
   - Minimal stable sampling rate in Artisan: 4sec
+  - USB Driver: [CP210x from Silicon Labs](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
 * [VOLTCRAFT PL-125-T4](https://www.conrad.de/de/temperatur-messgeraet-voltcraft-pl-125-t4-200-bis-1372-c-fuehler-typ-k-j-kalibriert-nach-werksstandard-ohne-zertifi-1013036.html)
   - Four K/J-Type
   - Built in USB to serial converter (9600-8N1)
   - 3 x 1.5V AAA Batteries
+  - USB Driver: [CP210x from Silicon Labs](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
  
 ## Multi Meters
 
