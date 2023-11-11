@@ -690,7 +690,9 @@ class CurvesDlg(ArtisanDialog):
                                       'Source Han Sans HK',
                                       'Source Han Sans KR',
                                       'Source Han Sans JP',
-                                      'Dijkstra'])
+                                      'Dijkstra',
+                                      'xkcd Script',
+                                      'Comic Neue'])
         self.GraphFont.setCurrentIndex(self.aw.qmc.graphfont)
         self.GraphFont.currentIndexChanged.connect(self.changeGraphFont)
         graphLayout = QHBoxLayout()

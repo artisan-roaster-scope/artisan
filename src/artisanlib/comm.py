@@ -6066,6 +6066,7 @@ class serialport:
                         #OK. NOW SET FILTER
                         self.SP.reset_input_buffer()
                         self.SP.reset_output_buffer()
+#                        filt =  ','.join(map(str,self.aw.ser.ArduinoFILT))
                         filt =  ','.join([str(f) for f in self.aw.ser.ArduinoFILT])
                         command = 'FILT;' + filt + '\n'   #Set filters
                         self.SP.write(str2cmd(command))

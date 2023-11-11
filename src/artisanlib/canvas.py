@@ -316,7 +316,8 @@ class tgraphcanvas(FigureCanvas):
         #default palette of colors
         self.locale_str:str = locale
         self.alpha:Dict[str,float] = {'analysismask':0.4,'statsanalysisbkgnd':1.0,'legendbg':0.4}
-        self.palette:Dict[str,str] = {'background':'#ffffff','grid':'#e5e5e5','ylabel':'#808080','xlabel':'#808080','title':'#0c6aa6', 'title_focus':'#cc0f50',
+        self.palette:Dict[str,str] = {'background':'#ffffff','grid':'#e5e5e5','ylabel':'#808080','xlabel':'#808080','title':'#0c6aa6',
+                        'title_focus':'#cc0f50', 'title_hidden':'#808080',
                         'rect1':'#e5e5e5','rect2':'#b2b2b2','rect3':'#e5e5e5','rect4':'#bde0ee','rect5':'#d3d3d3',
                         'et':'#cc0f50','bt':'#0a5c90','xt':'#404040','yt':'#404040','deltaet':'#cc0f50',
                         'deltabt':'#0a5c90','markers':'#000000','text':'#000000','watermarks':'#ffff00','timeguide':'#0a5c90',
@@ -7492,7 +7493,7 @@ class tgraphcanvas(FigureCanvas):
                 horizontalalignment='right',verticalalignment='top',
                 fontsize='x-small',
                 x=suptitleX,y=1,
-                color=(self.palette['title_focus'] if (self.backgroundprofile is not None and self.backgroundPlaybackEvents) else self.palette['title']))
+                color=(self.palette['title_hidden'] if not self.background else (self.palette['title_focus'] if (self.backgroundprofile is not None and self.backgroundPlaybackEvents) else self.palette['title'])))
         try:
             self.l_subtitle.set_in_layout(False)  # remove title from tight_layout calculation
         except Exception: # pylint: disable=broad-except  # set_in_layout not available in mpl<3.x
@@ -7519,7 +7520,7 @@ class tgraphcanvas(FigureCanvas):
         elif bnr == 0 and title != '' and title != self.title != QApplication.translate('Scope Title', 'Roaster Scope') and bprefix != '':
             title = f'{bprefix} {title}'
 
-        if self.graphfont in {1, 9}: # if selected font is Humor or Dijkstra we translate the unicode title into pure ascii
+        if self.graphfont in {1,9}: # if selected font is Humor or Dijkstra we translate the unicode title into pure ascii
             title = self.__to_ascii(title)
 
         self.title_text = self.aw.arabicReshape(title.strip())

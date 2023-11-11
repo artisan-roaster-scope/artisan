@@ -287,7 +287,7 @@ class ProfileData(TypedDict, total=False):
     plus_sync_record_hash: str
 
 
-class ExtraDeviceSettings(TypedDict): #, total=False):
+class ExtraDeviceSettings(TypedDict):
     extradevices           : List[int]
     extradevicecolor1      : List[str]
     extradevicecolor2      : List[str]

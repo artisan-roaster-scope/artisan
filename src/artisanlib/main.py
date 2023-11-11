@@ -6865,10 +6865,30 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             rcParams['font.family'] = ['Dijkstra']
             rcParams['axes.unicode_minus'] = False
             self.set_mpl_fontproperties(getResourcePath() + 'dijkstra.ttf')
+        elif self.qmc.graphfont == 10:
+            # font xkcd Script selected
+            # https://github.com/ipython/xkcd-font/
+            rcParams['axes.unicode_minus'] = False
+            rcParams['font.size'] = 14.0
+            if platform.system() == 'Linux':
+                rcParams['font.family'] = ['xkcd Script']
+            else:
+                rcParams['font.family'] = ['xkcd Script', 'Comic Sans MS']
+            self.set_mpl_fontproperties(getResourcePath() + 'xkcd-script.ttf')
+        elif self.qmc.graphfont == 11:
+            # font Comic Neue selected
+            # http://comicneue.com/
+            rcParams['axes.unicode_minus'] = False
+            rcParams['font.size'] = 12.0
+            if platform.system() == 'Linux':
+                rcParams['font.family'] = ['Comic Neue']
+            else:
+                rcParams['font.family'] = ['Comic Neue', 'Comic Sans MS']
+            self.set_mpl_fontproperties(getResourcePath() + 'ComicNeue-Regular.ttf')
         elif self.qmc.graphfont == 1 or platform.system() == 'Linux': # no Comic on Linux!
             # font Humor selected
             rcParams['axes.unicode_minus'] = False
-            rcParams['font.size'] = 16.0
+            rcParams['font.size'] = 15.0
             if platform.system() == 'Linux':
                 rcParams['font.family'] = ['Humor Sans']
             else:
@@ -10833,8 +10853,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         if self.qmc.l_subtitle is not None and self.qmc.ax is not None:
             if self.qmc.backgroundprofile is not None and self.qmc.backgroundPlaybackEvents:
                 self.qmc.l_subtitle.set_color(self.qmc.palette['title_focus'])
-            else:
+            elif self.qmc.background:
                 self.qmc.l_subtitle.set_color(self.qmc.palette['title'])
+            else:
+                self.qmc.l_subtitle.set_color(self.qmc.palette['title_hidden'])
             self.qmc.ax.draw_artist(self.qmc.l_subtitle)
             if self.qmc.ax.figure is not None:
                 self.qmc.ax.figure.canvas.blit()

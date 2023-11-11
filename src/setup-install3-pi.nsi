@@ -379,7 +379,7 @@ Section Uninstall
   RMDir /r "$INSTDIR\yaml"
   RMDir /r "$INSTDIR\yoctopuce"
   RMDir /r "$INSTDIR\zope"
-  
+
   RMDir /r "$INSTDIR\_internal"
 
   !insertmacro Rmdir_Wildcard "$INSTDIR\PyQt*" ${__LINE__}
@@ -415,6 +415,8 @@ Section Uninstall
   Delete "$INSTDIR\artisanSettings.ico"
   Delete "$INSTDIR\Humor-Sans.ttf"
   Delete "$INSTDIR\dijkstra.ttf"
+  Delete "$INSTDIR\xkcd-script.ttf"
+  Delete "$INSTDIR\ComicNeue-Regular.ttf"
   Delete "$INSTDIR\WenQuanYiZenHei-01.ttf"
   Delete "$INSTDIR\WenQuanYiZenHeiMonoMedium.ttf"
   Delete "$INSTDIR\SourceHanSansCN-Regular.otf"
