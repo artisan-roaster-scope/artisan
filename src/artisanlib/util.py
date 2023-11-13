@@ -321,6 +321,19 @@ def fill_gaps(ll:Union[Sequence[Union[float, int]], 'npt.NDArray[numpy.floating]
                 last_val = e
     return res
 
+def replace_duplicates(data):
+    lv = -1
+    data_core = []
+    for v in data:
+        if v == lv:
+            data_core.append(-1)
+        else:
+            data_core.append(v)
+            lv = v
+    # reconstruct first and last reading
+    if len(data)>0:
+        data_core[-1] = data[-1]
+    return fill_gaps(data_core, interpolate_max=100)
 
 # we store data in the user- and app-specific local default data directory
 # for the platform

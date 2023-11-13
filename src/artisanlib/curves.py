@@ -406,6 +406,12 @@ class CurvesDlg(ArtisanDialog):
         self.ShowFull.stateChanged.connect(self.changeShowFullFilter)
         self.ShowFull.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
+        #interpolate drops
+        self.InterpolateDrops = QCheckBox(QApplication.translate('CheckBox', 'Interpolate Drops'))
+        self.InterpolateDrops.setChecked(self.aw.qmc.interpolateDropsflag)
+        self.InterpolateDrops.stateChanged.connect(self.changeInterpolageDrops)
+        self.InterpolateDrops.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
         #dropspikes
         self.DropSpikes = QCheckBox(QApplication.translate('CheckBox', 'Drop Spikes'))
         self.DropSpikes.setChecked(self.aw.qmc.dropSpikes)
@@ -602,6 +608,7 @@ class CurvesDlg(ArtisanDialog):
         # Render xGroup
         renderVBox = QVBoxLayout()
         renderVBox.addWidget(self.ShowFull)
+        renderVBox.addWidget(self.InterpolateDrops)
         renderGroupLayout = QGroupBox(QApplication.translate('GroupBox','Display Filter'))
         renderGroupLayout.setLayout(renderVBox)
 
@@ -2371,6 +2378,11 @@ class CurvesDlg(ArtisanDialog):
         self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True,re_smooth_foreground=True)
 
     @pyqtSlot(int)
+    def changeInterpolageDrops(self, _:int = 0) -> None:
+        self.aw.qmc.interpolateDropsflag = not self.aw.qmc.interpolateDropsflag
+        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True,re_smooth_foreground=True)
+
+    @pyqtSlot(int)
     def changeSpikeFilter(self,_:int = 0) -> None:
         self.aw.qmc.dropSpikes = not self.aw.qmc.dropSpikes
 
@@ -2545,6 +2557,7 @@ class CurvesDlg(ArtisanDialog):
         self.aw.qmc.filterDropOut_tmin = int(self.minLimit.value())
         self.aw.qmc.filterDropOut_tmax = int(self.maxLimit.value())
         self.aw.qmc.foregroundShowFullflag = self.ShowFull.isChecked()
+        self.aw.qmc.interpolateDropsflag = self.InterpolateDrops.isChecked()
         self.aw.qmc.plotcurves[0] = str(self.equedit1.text())
         self.aw.qmc.plotcurves[1] = str(self.equedit2.text())
         self.aw.qmc.plotcurves[2] = str(self.equedit3.text())

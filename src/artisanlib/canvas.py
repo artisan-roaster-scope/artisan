@@ -240,7 +240,7 @@ class tgraphcanvas(FigureCanvas):
         'machinesetup', 'roastingnotes', 'cuppingnotes', 'roastdate', 'roastepoch', 'roastepoch_timeout', 'lastroastepoch', 'batchcounter', 'batchsequence', 'batchprefix', 'neverUpdateBatchCounter',
         'roastbatchnr', 'roastbatchprefix', 'roastbatchpos', 'roasttzoffset', 'roastUUID', 'plus_default_store', 'plus_store', 'plus_store_label', 'plus_coffee',
         'plus_coffee_label', 'plus_blend_spec', 'plus_blend_spec_labels', 'plus_blend_label', 'plus_custom_blend', 'plus_sync_record_hash', 'plus_file_last_modified', 'beans', 'ETprojectFlag', 'BTprojectFlag', 'curveVisibilityCache', 'ETcurve', 'BTcurve',
-        'ETlcd', 'BTlcd', 'swaplcds', 'LCDdecimalplaces', 'foregroundShowFullflag', 'DeltaETflag', 'DeltaBTflag', 'DeltaETlcdflag', 'DeltaBTlcdflag',
+        'ETlcd', 'BTlcd', 'swaplcds', 'LCDdecimalplaces', 'foregroundShowFullflag', 'interpolateDropsflag', 'DeltaETflag', 'DeltaBTflag', 'DeltaETlcdflag', 'DeltaBTlcdflag',
         'swapdeltalcds', 'PIDbuttonflag', 'Controlbuttonflag', 'deltaETfilter', 'deltaBTfilter', 'curvefilter', 'deltaETspan', 'deltaBTspan',
         'deltaETsamples', 'deltaBTsamples', 'profile_sampling_interval', 'background_profile_sampling_interval', 'profile_meter', 'optimalSmoothing', 'polyfitRoRcalc',
         'patheffects', 'graphstyle', 'graphfont', 'buttonvisibility', 'buttonactions', 'buttonactionstrings', 'extrabuttonactions', 'extrabuttonactionstrings',
@@ -1401,6 +1401,7 @@ class tgraphcanvas(FigureCanvas):
         self.swaplcds:bool = False # if set draw ET curver on top of BT curve and show ET LCD above BT LCD by default
         self.LCDdecimalplaces = 1
         self.foregroundShowFullflag:bool = True
+        self.interpolateDropsflag:bool = True
         self.DeltaETflag:bool = False
         self.DeltaBTflag:bool = True
         self.DeltaETlcdflag:bool = False
@@ -7669,7 +7670,9 @@ class tgraphcanvas(FigureCanvas):
             timex_lin = None
 
             if smooth or len(self.stemp1) != len(self.timex):
-                temp1_nogaps = fill_gaps(self.resizeList(self.temp1,len(self.timex)))
+                temp1_nogaps = self.resizeList(self.temp1,len(self.timex))
+                if self.interpolateDropsflag:
+                    temp1_nogaps = fill_gaps(temp1_nogaps)
                 if self.flagon: # we don't smooth, but remove the dropouts
                     self.stemp1 = temp1_nogaps
                 else:
@@ -7677,7 +7680,9 @@ class tgraphcanvas(FigureCanvas):
                         timex_lin = numpy.linspace(self.timex[0],self.timex[-1],len(self.timex))
                     self.stemp1 = list(self.smooth_list(self.timex,temp1_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin,delta=False))
             if smooth or len(self.stemp2) != len(self.timex):
-                temp2_nogaps = fill_gaps(self.resizeList(self.temp2,len(self.timex)))
+                temp2_nogaps = self.resizeList(self.temp2,len(self.timex))
+                if self.interpolateDropsflag:
+                    temp2_nogaps = fill_gaps(temp2_nogaps)
                 if self.flagon:  # we don't smooth, but remove the dropouts
                     self.stemp2 = temp2_nogaps
                 else:
@@ -7714,13 +7719,23 @@ class tgraphcanvas(FigureCanvas):
                 if self.flagon or len(self.stemp1B) != len(self.timex):
                     if timeB_lin is None and self.timeB is not None and self.timeB:
                         timeB_lin = numpy.linspace(self.timeB[0],self.timeB[-1],len(self.timeB))
-                    st1 = self.smooth_list(self.timeB,fill_gaps(self.temp1B),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin,delta=False)
+                    st1 = self.smooth_list(self.timeB,
+                        (fill_gaps(self.temp1B) if self.interpolateDropsflag else self.temp1B),
+                        window_len=self.curvefilter,
+                        decay_smoothing=decay_smoothing_p,
+                        a_lin=timeB_lin,
+                        delta=False)
                 else:
                     st1 = self.stemp1B
                 if self.flagon or len(self.stemp2B) != len(self.timex):
                     if timeB_lin is None and self.timeB is not None and self.timeB:
                         timeB_lin = numpy.linspace(self.timeB[0],self.timeB[-1],len(self.timeB))
-                    st2 = self.smooth_list(self.timeB,fill_gaps(self.temp2B),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin,delta=False)
+                    st2 = self.smooth_list(self.timeB,
+                        (fill_gaps(self.temp2B) if self.interpolateDropsflag else self.temp2B),
+                        window_len=self.curvefilter,
+                        decay_smoothing=decay_smoothing_p,
+                        a_lin=timeB_lin,
+                        delta=False)
                 else:
                     st2 = self.stemp2B
 
@@ -7779,6 +7794,9 @@ class tgraphcanvas(FigureCanvas):
     # if recomputeAllDeltas, the delta arrays and if smooth the smoothed line arrays are recomputed (incl. those of the background curves)
     # re_smooth_foreground: the foreground curves (incl. extras) will be re-smoothed if called while not recording. During recording foreground will never be smoothed here.
     # re_smooth_background: the background curves (incl. extras) will be re-smoothed if True (default False), also during recording
+    # NOTE: points for error values represented by None or masked arrays (where values are -1) are not drawn and lines are broken there
+    #   see https://matplotlib.org/stable/gallery/lines_bars_and_markers/masked_demo.html
+    #   to keep points and lines drawn without those breaks data should be interpolated via util:fill_gaps (controlled by the "Interpolate Drops" filter)
     def redraw(self, recomputeAllDeltas:bool = True, re_smooth_foreground:bool = True, takelock:bool = True, forceRenewAxis:bool = False, re_smooth_background:bool = False) -> None: # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths
         if self.designerflag:
             self.redrawdesigner(force=True)
@@ -9476,8 +9494,13 @@ class tgraphcanvas(FigureCanvas):
                         try:
                             if self.aw.extraCurveVisibility1[i]:
                                 if not self.flagon and (re_smooth_foreground or len(self.extrastemp1[i]) != len(self.extratimex[i])):
-                                    self.extrastemp1[i] = self.smooth_list(self.extratimex[i],fill_gaps(self.extratemp1[i]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timexi_lin,delta=False).tolist()
-                                else: # we don't smooth, but remove the dropouts
+                                    self.extrastemp1[i] = self.smooth_list(self.extratimex[i],
+                                        (fill_gaps(self.extratemp1[i]) if self.interpolateDropsflag else self.extratemp1[i]),
+                                        window_len=self.curvefilter,
+                                        decay_smoothing=decay_smoothing_p,
+                                        a_lin=timexi_lin,
+                                        delta=False).tolist()
+                                elif self.interpolateDropsflag: # we don't smooth, but remove the dropouts
                                     self.extrastemp1[i] = fill_gaps(self.extratemp1[i])
                                 if self.aw.extraDelta1[i] and self.delta_ax is not None:
                                     trans = self.delta_ax.transData
@@ -9509,8 +9532,13 @@ class tgraphcanvas(FigureCanvas):
                         try:
                             if self.aw.extraCurveVisibility2[i]:
                                 if not self.flagon and (re_smooth_foreground or len(self.extrastemp2[i]) != len(self.extratimex[i])):
-                                    self.extrastemp2[i] = self.smooth_list(self.extratimex[i],fill_gaps(self.extratemp2[i]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timexi_lin,delta=False).tolist()
-                                else:
+                                    self.extrastemp2[i] = self.smooth_list(self.extratimex[i],
+                                        (fill_gaps(self.extratemp2[i]) if self.interpolateDropsflag else self.extratemp2[i]),
+                                        window_len=self.curvefilter,
+                                        decay_smoothing=decay_smoothing_p,
+                                        a_lin=timexi_lin,
+                                        delta=False).tolist()
+                                elif self.interpolateDropsflag:
                                     self.extrastemp2[i] = fill_gaps(self.extratemp2[i])
                                 if self.aw.extraDelta2[i] and self.delta_ax is not None:
                                     trans = self.delta_ax.transData

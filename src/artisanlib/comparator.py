@@ -174,9 +174,9 @@ class RoastProfile:
         if 'timex' in profile:
             self.timex = profile['timex']
         if 'temp1' in profile:
-            self.temp1 = fill_gaps(profile['temp1'])
+            self.temp1 = (fill_gaps(profile['temp1']) if self.aw.qmc.interpolateDropsflag else profile['temp1'])
         if 'temp2' in profile:
-            self.temp2 = fill_gaps(profile['temp2'])
+            self.temp2 = (fill_gaps(profile['temp2']) if self.aw.qmc.interpolateDropsflag else profile['temp2'])
         if 'timeindex' in profile:
             for i,ti in enumerate(profile['timeindex']):
                 if i < len(self.timeindex):
@@ -204,11 +204,11 @@ class RoastProfile:
                         else:
                             self.extratimex.append(self.timex)
                         if len(xtemp1[i]) == len(self.timex):
-                            self.extratemp1.append(fill_gaps(xtemp1[i]))
+                            self.extratemp1.append(fill_gaps(xtemp1[i]) if self.aw.qmc.interpolateDropsflag else xtemp1[i])
                         else:
                             self.extratemp1.append([-1.]*len(self.timex))
                         if len(xtemp2[i]) == len(self.timex):
-                            self.extratemp2.append(fill_gaps(xtemp2[i]))
+                            self.extratemp2.append(fill_gaps(xtemp2[i]) if self.aw.qmc.interpolateDropsflag else xtemp2[i])
                         else:
                             self.extratemp2.append([-1.]*len(self.timex))
                     self.extraname1 = [n.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3]) for n in xname1] # we apply event name substitutions
