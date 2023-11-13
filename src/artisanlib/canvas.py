@@ -218,7 +218,7 @@ class tgraphcanvas(FigureCanvas):
         'extralinewidths1', 'extralinewidths2', 'extramarkers1', 'extramarkers2', 'extramarkersizes1', 'extramarkersizes2', 'devicetablecolumnwidths', 'extraNoneTempHint1',
         'extraNoneTempHint2', 'plotcurves', 'plotcurvecolor', 'overlapList', 'tight_layout_params', 'fig', 'ax', 'delta_ax', 'legendloc', 'legendloc_pos', 'onclick_cid',
         'oncpick_cid', 'ondraw_cid', 'rateofchange1', 'rateofchange2', 'flagon', 'flagstart', 'flagKeepON', 'flagOpenCompleted', 'flagsampling', 'flagsamplingthreadrunning',
-        'manuallogETflag', 'zoom_follow', 'alignEvent', 'compareAlignEvent', 'compareEvents', 'compareET', 'compareBT', 'compareDeltaET', 'compareDeltaBT', 'compareMainEvents', 'compareBBP', 'compareRoast',
+        'manuallogETflag', 'zoom_follow', 'alignEvent', 'compareAlignEvent', 'compareEvents', 'compareET', 'compareBT', 'compareDeltaET', 'compareDeltaBT', 'compareMainEvents', 'compareBBP', 'compareRoast', 'compareExtraCurves1', 'compareExtraCurves2',
         'replayType', 'replayedBackgroundEvents', 'beepedBackgroundEvents', 'roastpropertiesflag', 'roastpropertiesAutoOpenFlag', 'roastpropertiesAutoOpenDropFlag',
         'title', 'title_show_always', 'ambientTemp', 'ambientTempSource', 'ambient_temperature_device', 'ambient_pressure', 'ambient_pressure_device', 'ambient_humidity',
         'ambient_humidity_device', 'elevation', 'temperaturedevicefunctionlist', 'humiditydevicefunctionlist', 'pressuredevicefunctionlist', 'moisture_greens', 'moisture_roasted',
@@ -226,7 +226,7 @@ class tgraphcanvas(FigureCanvas):
         'darkCut_flag', 'drops_flag', 'oily_flag', 'uneven_flag', 'tipping_flag', 'scorching_flag', 'divots_flag', 'timex',
         'temp1', 'temp2', 'delta1', 'delta2', 'stemp1', 'stemp2', 'tstemp1', 'tstemp2', 'ctimex1', 'ctimex2', 'ctemp1', 'ctemp2', 'unfiltereddelta1', 'unfiltereddelta2',  'unfiltereddelta1_pure', 'unfiltereddelta2_pure',
         'on_timex', 'on_temp1', 'on_temp2', 'on_ctimex1', 'on_ctimex2', 'on_ctemp1', 'on_ctemp2','on_tstemp1', 'on_tstemp2', 'on_unfiltereddelta1',
-        'on_unfiltereddelta2', 'on_delta1', 'on_delta2', 'on_extratemp1', 'on_extratemp2', 'on_extratimex', 'on_extractimex1', 'on_extractemp1', 'on_extractimex2', 'on_extractemp2',
+        'on_unfiltereddelta2', 'on_delta1', 'on_delta2', 'on_extratemp1', 'on_extratemp2', 'on_extratimex', 'on_extractimex1', 'on_extractemp1', 'on_extractimex2', 'on_extractemp2', 'BTprojection_tx', 'BTprojection_temp', 'ETprojection_tx', 'ETprojection_temp', 'DeltaBTprojection_tx', 'DeltaBTprojection_temp', 'DeltaETprojection_tx', 'DeltaETprojection_temp',
         'timeindex', 'ETfunction', 'BTfunction', 'DeltaETfunction', 'DeltaBTfunction', 'safesaveflag', 'pid', 'background', 'backgroundprofile', 'backgroundprofile_moved_x', 'backgroundprofile_moved_y', 'backgroundDetails',
         'backgroundeventsflag', 'backgroundpath', 'backgroundUUID', 'backgroundUUID', 'backgroundShowFullflag', 'backgroundKeyboardControlFlag', 'titleB', 'roastbatchnrB', 'roastbatchprefixB',
         'roastbatchposB', 'temp1B', 'temp2B', 'temp1BX', 'temp2BX', 'timeB', 'abs_timeB', 'temp1Bdelta', 'temp2Bdelta',
@@ -237,7 +237,7 @@ class tgraphcanvas(FigureCanvas):
         'E1backgroundtimex', 'E2backgroundtimex', 'E3backgroundtimex', 'E4backgroundtimex', 'E1backgroundvalues', 'E2backgroundvalues', 'E3backgroundvalues',
         'E4backgroundvalues', 'l_backgroundeventtype1dots', 'l_backgroundeventtype2dots', 'l_backgroundeventtype3dots', 'l_backgroundeventtype4dots',
         'DeltaETBflag', 'DeltaBTBflag', 'clearBgbeforeprofileload', 'hideBgafterprofileload', 'heating_types', 'operator', 'organization', 'roastertype', 'roastersize', 'roasterheating', 'drumspeed',
-        'organization_setup', 'operator_setup', 'roastertype_setup', 'roastersize_setup', 'roastersize_setup_default', 'roasterheating_setup', 'drumspeed_setup', 'last_batchsize', 'machinesetup_energy_ratings',
+        'organization_setup', 'operator_setup', 'roastertype_setup', 'roastersize_setup', 'roastersize_setup_default', 'roasterheating_setup', 'roasterheating_setup_default', 'drumspeed_setup', 'last_batchsize', 'machinesetup_energy_ratings',
         'machinesetup', 'roastingnotes', 'cuppingnotes', 'roastdate', 'roastepoch', 'roastepoch_timeout', 'lastroastepoch', 'batchcounter', 'batchsequence', 'batchprefix', 'neverUpdateBatchCounter',
         'roastbatchnr', 'roastbatchprefix', 'roastbatchpos', 'roasttzoffset', 'roastUUID', 'plus_default_store', 'plus_store', 'plus_store_label', 'plus_coffee',
         'plus_coffee_label', 'plus_blend_spec', 'plus_blend_spec_labels', 'plus_blend_label', 'plus_custom_blend', 'plus_sync_record_hash', 'plus_file_last_modified', 'beans', 'ETprojectFlag', 'BTprojectFlag', 'curveVisibilityCache', 'ETcurve', 'BTcurve',
@@ -281,7 +281,7 @@ class tgraphcanvas(FigureCanvas):
         'l_stat1', 'l_stat2', 'l_stat3', 'l_div1', 'l_div2', 'l_div3', 'l_div4',
         'filterDropOut_replaceRoR_period', 'filterDropOut_spikeRoR_period', 'filterDropOut_tmin_C_default', 'filterDropOut_tmax_C_default',
         'filterDropOut_tmin_F_default', 'filterDropOut_tmax_F_default', 'filterDropOut_spikeRoR_dRoR_limit_C_default', 'filterDropOut_spikeRoR_dRoR_limit_F_default',
-        'filterDropOuts', 'filterDropOut_tmin', 'filterDropOut_tmax', 'filterDropOut_spikeRoR_dRoR_limit', 'minmaxLimits',
+        'filterDropOuts', 'filterDropOut_tmin', 'filterDropOut_tmax', 'filterDropOut_spikeRoR_dRoR_limit', 'minmaxLimits', 'median_filter_factor_RoR',
         'dropSpikes', 'dropDuplicates', 'dropDuplicatesLimit', 'median_filter_factor', 'liveMedianETRoRfilter', 'liveMedianBTRoRfilter',
         'liveMedianETfilter', 'liveMedianBTfilter', 'interpolatemax', 'swapETBT', 'wheelflag', 'wheelnames', 'segmentlengths', 'segmentsalpha',
         'wheellabelparent', 'wheelcolor', 'wradii', 'startangle', 'projection', 'wheeltextsize', 'wheelcolorpattern', 'wheeledge',
@@ -3102,15 +3102,6 @@ class tgraphcanvas(FigureCanvas):
                         pass
                 if not self.flagstart:
                     self.aw.autoAdjustAxis(deltas=False)
-#                elif firstDROP: # not needed as DROP cannot be occur in popup
-#                    self.aw.buttonDROP.setFlat(True)
-#                    self.aw.buttonCHARGE.setFlat(True)
-#                    self.aw.buttonCHARGE.stopAnimation()
-#                    self.aw.buttonDRY.setFlat(True)
-#                    self.aw.buttonFCs.setFlat(True)
-#                    self.aw.buttonFCe.setFlat(True)
-#                    self.aw.buttonSCs.setFlat(True)
-#                    self.aw.buttonSCe.setFlat(True)
 
 
             # update phases
@@ -3126,10 +3117,10 @@ class tgraphcanvas(FigureCanvas):
             from artisanlib.events import customEventDlg
             dlg = customEventDlg(self.aw, self.aw, action.key[1]) # type: ignore[attr-defined] # "QAction" has no attribute "key"
             if dlg.exec():
-                self.specialevents.append(action.key[1])  # type: ignore[attr-defined] # "QAction" has no attribute "key" # absolute time index
-                self.specialeventstype.append(dlg.type) # default: "--"
-                self.specialeventsStrings.append(dlg.description)
-                self.specialeventsvalue.append(dlg.value)
+                self.addEvent(action.key[1], # type: ignore[attr-defined] # "QAction" has no attribute "key" # absolute time index
+                    dlg.type, # default: "--"
+                    dlg.description,
+                    dlg.value)
                 self.aw.orderEvents()
                 self.fileDirtySignal.emit()
                 self.redraw(recomputeAllDeltas=(action.key[0] in {0, 6}))  # type: ignore[attr-defined] # "QAction" has no attribute "key" # on moving CHARGE or DROP, we have to recompute the Deltas
@@ -6336,7 +6327,7 @@ class tgraphcanvas(FigureCanvas):
                 self.extractimex1[i],self.extractimex2[i],self.extractemp1[i],self.extractemp2[i] = [],[],[],[]
             self.replayedBackgroundEvents=[]
             self.beepedBackgroundEvents=[]
-            self.deleteEvents() # clear special events
+            self.clearEvents() # clear special events
             self.aw.lcd1.display('00:00')
             if self.aw.WebLCDs:
                 self.updateWebLCDs(time='00:00')
@@ -13369,10 +13360,7 @@ class tgraphcanvas(FigureCanvas):
                         fontprop_small = self.aw.mpl_fontproperties.copy()
                         fontsize = 'xx-small'
                         fontprop_small.set_size(fontsize)
-                        self.specialevents.append(i)
-                        self.specialeventstype.append(4)
-                        self.specialeventsStrings.append(str(Nevents+1))
-                        self.specialeventsvalue.append(0)
+                        self.addEvent(i,4,str(Nevents+1),0)
                         #if event was initiated by an Extra Event Button then change the type,value, and string
                         if extraevent is not None and eventtype is not None and eventvalue is not None:
                             self.specialeventstype[-1] = eventtype
@@ -13585,10 +13573,7 @@ class tgraphcanvas(FigureCanvas):
                 #index number
                 i = len(self.timex)-1
                 if i > 0:
-                    self.specialevents.append(i)                                     # store absolute time index
-                    self.specialeventstype.append(0)                                 # set type (to the first index 0)
-                    self.specialeventsStrings.append(command)                        # store the command in the string section of events (not a binary string)
-                    self.specialeventsvalue.append(0)                                # empty
+                    self.addEvent(i,0,command,0)
                     temp_str = str(self.temp2[i])
                     if self.timeindex[0] != -1:
                         start = self.timex[self.timeindex[0]]
@@ -16055,11 +16040,12 @@ class tgraphcanvas(FigureCanvas):
 
             #check and restore carried over events
             if self.eventtimecopy:
-                for etc in self.eventtimecopy:
-                    self.specialevents.append(self.time2index(etc + self.timex[self.timeindex[0]]))
-                self.specialeventsStrings = self.specialeventsStringscopy[:]
-                self.specialeventsvalue = self.specialeventsvaluecopy[:]
-                self.specialeventstype = self.specialeventstypecopy[:]
+                self.clearEvents() # first clear previous special event lists
+                for i, etc in enumerate(self.eventtimecopy):
+                    self.addEvent(self.time2index(etc + self.timex[self.timeindex[0]]),
+                        self.specialeventstypecopy[i],
+                        self.specialeventsStringscopy[i],
+                        self.specialeventsvaluecopy[i])
 
             #check for extra devices
             num = len(self.timex)
@@ -16139,7 +16125,7 @@ class tgraphcanvas(FigureCanvas):
 
     #saves next BT rate of change till next landmark as an event (example idea for arduino TC4)
     def designer_create_BT_rateofchange(self):
-        self.deleteEvents()
+        self.clearEvents()
         lastindexused = 0
         for i in range(1,len(self.timeindex)):
             if self.timeindex[i]:
@@ -16147,15 +16133,12 @@ class tgraphcanvas(FigureCanvas):
                 difftime = (self.timex[self.timeindex[i]] - self.timex[self.timeindex[lastindexused]])/60.
                 if difftime:
                     string = QApplication.translate('Label', 'BT {0} {1}/min for {2}').format(f'{difftemp/difftime:.1f}',self.mode,stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[lastindexused]])) # pylint: disable=consider-using-f-string
-                    self.specialevents.append(self.timeindex[lastindexused])
-                    self.specialeventstype.append(0)
-                    self.specialeventsStrings.append(string)
-                    self.specialeventsvalue.append(0)
+                    self.addEvent(self.timeindex[lastindexused],0,string,0)
                     lastindexused = i
 
     #saves next BT rate of change till next landmark as an event (example idea for arduino TC4)
     def designer_create_ET_rateofchange(self):
-        self.deleteEvents()
+        self.clearEvents()
         lastindexused = 0
         for i in range(1,len(self.timeindex)):
             if self.timeindex[i]:
@@ -16163,17 +16146,43 @@ class tgraphcanvas(FigureCanvas):
                 difftime = (self.timex[self.timeindex[i]] - self.timex[self.timeindex[lastindexused]])/60.
                 if difftime:
                     string = QApplication.translate('Label', 'ET {0} {1}/min for {2}').format(f'{difftemp/difftime:.1f}',self.mode,stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[lastindexused]])) # pylint: disable=consider-using-f-string
-                    self.specialevents.append(self.timeindex[lastindexused])
-                    self.specialeventstype.append(0)
-                    self.specialeventsStrings.append(string)
-                    self.specialeventsvalue.append(0)
+                    self.addEvent(self.timeindex[lastindexused],0,string,0)
                     lastindexused = i
 
-    def deleteEvents(self):
+## Special Event API
+
+    def clearEvents(self):
         self.specialevents = []
         self.specialeventstype = []
         self.specialeventsStrings = []
         self.specialeventsvalue = []
+
+    def addEvent(self, event_time_idx:int, event_type:int, event_description:str, event_value:float) -> None:
+        self.specialevents.append(event_time_idx)
+        self.specialeventstype.append(event_type)
+        self.specialeventsStrings.append(event_description)
+        self.specialeventsvalue.append(event_value)
+
+    def setEvent(self, idx:int, event_time_idx:int, event_type:int, event_description:str, event_value:float) -> None:
+        if -1 < idx < len(self.specialevents):
+            self.specialevents[idx] = event_time_idx
+            self.specialeventstype[idx] = event_type
+            self.specialeventsStrings[idx] = event_description
+            self.specialeventsvalue[idx] = event_value
+
+    def popEvent(self, idx:int = -1) -> None:
+        if len(self.specialevents) > (abs(idx)-1 if idx < 0 else idx):
+            self.specialevents.pop(idx)
+            self.specialeventstype.pop(idx)
+            self.specialeventsStrings.pop(idx)
+            self.specialeventsvalue.pop(idx)
+
+    # delete the events at the given positions
+    def deleteEvents(self, positions:List[int]) -> None:
+        for idx in sorted(positions, reverse=True):
+            self.popEvent(idx)
+
+##
 
     #this is used to create a string in pid language to reproduce the profile from Designer
     #NOTE: pid runs ET (temp1)
@@ -16203,10 +16212,7 @@ class tgraphcanvas(FigureCanvas):
         self.clean_old_pid_commands()
 
         #do only one event but with all segments
-        self.specialevents.append(0)
-        self.specialeventstype.append(0)
-        self.specialeventsStrings.append(command)
-        self.specialeventsvalue.append(0)
+        self.addEvent(0,0,command,0)
 
     #this is used to create a string in ET temp language to reproduce the profile from Designer
     def designer_create_sv_command(self):
@@ -16214,22 +16220,20 @@ class tgraphcanvas(FigureCanvas):
         for i in range(len(self.timeindex)-1):
             command = 'SETSV::{self.temp1[self.timeindex[i+1]]:.1f}'
             if i > 0 and self.timeindex[i]:
-                self.specialevents.append(self.timeindex[i])
-                self.specialeventstype.append(0)
-                self.specialeventsStrings.append(command)
-                self.specialeventsvalue.append(0)
+                self.addEvent(
+                    self.timeindex[i],
+                    0,
+                    command,
+                    0)
 
     #verifies there are no previous machine commands on events
     def clean_old_pid_commands(self):
         #check for possible preloaded machine commands
         target = 0
         if self.specialevents:
-            for i in range(len(self.specialevents)):
+            for i in reversed(range(len(self.specialevents))):
                 if '::' in self.specialeventsStrings[i]:
-                    self.specialevents.pop(i)
-                    self.specialeventstype.pop(i)
-                    self.specialeventsStrings.pop(i)
-                    self.specialeventsvalue.pop(i)
+                    self.popEvent(i)
                     target = 1
                     break     #break or the index i can become larger than the new shorted length of specialevents
         if target:

@@ -4185,19 +4185,22 @@ class editGraphDlg(ArtisanResizeablDialog):
                     try:
                         timez = self.eventtable.cellWidget(i,0)
                         assert isinstance(timez, QLineEdit)
+                        time_idx: int
                         if self.aw.qmc.timeindex[0] > -1:
-                            self.aw.qmc.specialevents[i] = self.aw.qmc.time2index(self.aw.qmc.timex[self.aw.qmc.timeindex[0]]+ stringtoseconds(str(timez.text())))
+                            time_idx = self.aw.qmc.time2index(self.aw.qmc.timex[self.aw.qmc.timeindex[0]]+ stringtoseconds(str(timez.text())))
                         else:
-                            self.aw.qmc.specialevents[i] = self.aw.qmc.time2index(stringtoseconds(str(timez.text())))
+                            time_idx = self.aw.qmc.time2index(stringtoseconds(str(timez.text())))
                         description = self.eventtable.cellWidget(i,3)
                         assert isinstance(description, QLineEdit)
-                        self.aw.qmc.specialeventsStrings[i] = description.text()
                         etype = self.eventtable.cellWidget(i,4)
                         assert isinstance(etype, MyQComboBox)
-                        self.aw.qmc.specialeventstype[i] = etype.currentIndex()
                         evalue = self.eventtable.cellWidget(i,5)
                         assert isinstance(evalue, QLineEdit)
-                        self.aw.qmc.specialeventsvalue[i] = self.aw.qmc.str2eventsvalue(str(evalue.text()))
+                        self.aw.qmc.setEvent(i,
+                            time_idx,
+                            etype.currentIndex(),
+                            description.text(),
+                            self.aw.qmc.str2eventsvalue(evalue.text()))
                     except Exception: # pylint: disable=broad-except
                         pass
             except Exception as e: # pylint: disable=broad-except
@@ -4319,10 +4322,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.profileDataSemaphore.acquire(1)
             nevents = len(self.aw.qmc.specialevents)
             if nevents:
-                self.aw.qmc.specialevents = []
-                self.aw.qmc.specialeventstype = []
-                self.aw.qmc.specialeventsStrings = []
-                self.aw.qmc.specialeventsvalue = []
+                self.aw.qmc.clearEvents()
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
         finally:
@@ -4373,10 +4373,11 @@ class editGraphDlg(ArtisanResizeablDialog):
     def addEventTable(self,_=False):
         if len(self.aw.qmc.timex):
             self.saveEventTable()
-            self.aw.qmc.specialevents.append(len(self.aw.qmc.timex)-1)   #qmc.specialevents holds indexes in qmx.timex. Initialize event index
-            self.aw.qmc.specialeventstype.append(0)
-            self.aw.qmc.specialeventsStrings.append(str(len(self.aw.qmc.specialevents)))
-            self.aw.qmc.specialeventsvalue.append(0)
+            self.aw.qmc.addEvent(
+                    len(self.aw.qmc.timex)-1,   #qmc.specialevents holds indexes in qmx.timex. Initialize event index
+                    0,
+                    str(len(self.aw.qmc.specialevents)),
+                    0)
             self.createEventTable(force=True)
             self.aw.qmc.redraw(recomputeAllDeltas=False)
             message = QApplication.translate('Message','Event #{0} added').format(str(len(self.aw.qmc.specialevents)))
@@ -4384,22 +4385,6 @@ class editGraphDlg(ArtisanResizeablDialog):
         else:
             message = QApplication.translate('Message','No profile found')
             self.aw.sendmessage(message)
-
-    def deleteEventRows(self,rows):
-        specialevents = []
-        specialeventstype = []
-        specialeventsStrings = []
-        specialeventsvalue = []
-        for r, se in enumerate(self.aw.qmc.specialevents):
-            if r not in rows:
-                specialevents.append(se)
-                specialeventstype.append(self.aw.qmc.specialeventstype[r])
-                specialeventsStrings.append(self.aw.qmc.specialeventsStrings[r])
-                specialeventsvalue.append(self.aw.qmc.specialeventsvalue[r])
-        self.aw.qmc.specialevents = specialevents
-        self.aw.qmc.specialeventstype = specialeventstype
-        self.aw.qmc.specialeventsStrings = specialeventsStrings
-        self.aw.qmc.specialeventsvalue = specialeventsvalue
 
     @pyqtSlot(bool)
     def deleteEventTable(self,_=False):
@@ -4411,15 +4396,11 @@ class editGraphDlg(ArtisanResizeablDialog):
                 rows = []
                 for s in selected:
                     top = s.topRow()
-                    for x in range(s.rowCount()):
-                        rows.append(top + x)
-                self.deleteEventRows(rows)
+                    rows.extend(list(range(top,top+s.rowCount())))
+                self.aw.qmc.deleteEvents(rows)
                 message = QApplication.translate('Message',' Events #{0} deleted').format(str([r+1 for r in rows]))
             else:
-                self.aw.qmc.specialevents.pop()
-                self.aw.qmc.specialeventstype.pop()
-                self.aw.qmc.specialeventsStrings.pop()
-                self.aw.qmc.specialeventsvalue.pop()
+                self.aw.qmc.popEvent()
                 message = QApplication.translate('Message',' Event #{0} deleted').format(str(len(self.aw.qmc.specialevents)+1))
             self.aw.qmc.fileDirty()
             self.createEventTable(force=True)

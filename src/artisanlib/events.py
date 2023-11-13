@@ -1745,10 +1745,11 @@ class EventsDlg(ArtisanResizeablDialog):
                                 ld = d
                                 lt = t
                                 # add to event table
-                                self.aw.qmc.specialevents.append(self.aw.qmc.time2index(timex[ii]))
-                                self.aw.qmc.specialeventstype.append(i)
-                                self.aw.qmc.specialeventsStrings.append('Q'+ self.aw.qmc.eventsvalues(float(d+1)))
-                                self.aw.qmc.specialeventsvalue.append(float(d+1))
+                                self.aw.qmc.addEvent(
+                                    self.aw.qmc.time2index(timex[ii]),
+                                    i,
+                                    'Q'+ self.aw.qmc.eventsvalues(float(d+1)),
+                                    float(d+1))
                                 self.aw.qmc.fileDirty()
                     redraw = True
         if self.aw.clusterEventsFlag:

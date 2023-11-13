@@ -5968,10 +5968,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             packed_events.sort(key=lambda tup: tup[0])
             # unpack
             for i in range(nevents):
-                self.qmc.specialevents[i] = packed_events[i][0]
-                self.qmc.specialeventstype[i] = packed_events[i][1]
-                self.qmc.specialeventsStrings[i] = packed_events[i][2]
-                self.qmc.specialeventsvalue[i] = packed_events[i][3]
+                self.qmc.setEvent(i,
+                    packed_events[i][0],
+                    packed_events[i][1],
+                    packed_events[i][2],
+                    packed_events[i][3])
             # we have to clear the event flag positions as those are now out of order
             self.qmc.l_event_flags_dict = {}
             self.qmc.l_event_flags_pos_dict = {}
@@ -6028,20 +6029,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         if self.qmc.specialeventstype[i] == tp:
                             last_event_idx = i
                     # remove marked events
-                    specialevents = []
-                    specialeventstype = []
-                    specialeventsStrings = []
-                    specialeventsvalue = []
-                    for i, se in enumerate(self.qmc.specialevents):
-                        if i not in indexes_to_be_removed:
-                            specialevents.append(se)
-                            specialeventstype.append(self.qmc.specialeventstype[i])
-                            specialeventsStrings.append(self.qmc.specialeventsStrings[i])
-                            specialeventsvalue.append(self.qmc.specialeventsvalue[i])
-                    self.qmc.specialevents = specialevents
-                    self.qmc.specialeventstype = specialeventstype
-                    self.qmc.specialeventsStrings = specialeventsStrings
-                    self.qmc.specialeventsvalue = specialeventsvalue
+                    self.qmc.deleteEvents(indexes_to_be_removed)
         finally:
             if self.qmc.profileDataSemaphore.available() < 1:
                 self.qmc.profileDataSemaphore.release(1)
@@ -11772,15 +11760,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     def miniEventRecord(self,_):
         lenevents = self.eNumberSpinBox.value()
         if lenevents:
-            self.qmc.specialeventstype[lenevents-1] = self.etypeComboBox.currentIndex()
-            self.qmc.specialeventsvalue[lenevents-1] = self.qmc.str2eventsvalue(str(self.valueEdit.text()))
-            self.qmc.specialeventsStrings[lenevents-1] = self.lineEvent.text()
             if self.qmc.timeindex[0] > -1:
                 newtime = self.qmc.time2index(self.qmc.timex[self.qmc.timeindex[0]]+ stringtoseconds(str(self.etimeline.text())))
             else:
                 newtime = self.qmc.time2index(stringtoseconds(str(self.etimeline.text())))
-            self.qmc.specialevents[lenevents-1] = newtime
-
+            self.qmc.setEvent(lenevents-1,
+                newtime,
+                self.etypeComboBox.currentIndex(),
+                self.lineEvent.text(),
+                self.qmc.str2eventsvalue(self.valueEdit.text()))
             self.lineEvent.clearFocus()
             self.eNumberSpinBox.clearFocus()
             self.etimeline.clearFocus()
@@ -14775,7 +14763,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 ndec_arr = numpy.array([ndec(x) for x in bt])
                 avgDecimal = numpy.average(ndec_arr)
                 maxDecimal = numpy.amax(ndec_arr)
-                
+
                 # Calculate the resolution from the BT values
                 # Sort the numbers in ascending order  #dave
                 # Calculate the differences between successive numbers  #dave
@@ -14785,7 +14773,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     resolution = numpy.min(numpy.diff(numpy.sort(bt))[numpy.nonzero(numpy.diff(numpy.sort(bt)))])
                 except Exception: # pylint: disable=broad-except  #dave
                     resolution = float('nan')  #dave
-                    
+
                 str_modeChanged = ''
                 if profileMode in {'C', 'F'} and self.qmc.mode != profileMode:
                     str_modeChanged = '*Result not reliable, the temperature mode was changed'
@@ -21637,7 +21625,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             d = d * f_dtwice
 
         # improved variant requesting for a certain minimum delta between the reading of interest and the next two post event legs:
-        return bool(d3 < d and d4 < d and ((abs(dpost) > min(maxdpre, offset + (f * abs(dpre)))) 
+        return bool(d3 < d and d4 < d and ((abs(dpost) > min(maxdpre, offset + (f * abs(dpre))))
                                            or (dpost < 0 and dpre < 0 and (-dpre - dpost) > dpre_dpost_diff)))
 
     # returns True if a BT break at i-2 is detected
@@ -21647,15 +21635,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     # . average delta after i-2 is negative and twice as high (absolute) as the one before
     # d is minimum temperature delta of the two legs after the event to prevent too early recognition based on noise
     def BTbreak(self,i,event):
-        if event in ['DROP','drop']:
+        if event in ('DROP','drop'):
             offset = self.qmc.btbreak_params['offset_drop']
             d = self.qmc.btbreak_params['d_drop']
         else: #CHARGE
             offset = self.qmc.btbreak_params['offset_charge']
             d = self.qmc.btbreak_params['d_charge']
-            
+
         #dave -- must revisit the i>5 term!!!
-        if len(self.qmc.timex)>5 and i>4 and i < len(self.qmc.timex):  #'i>4' prevents reading temp2[-1] or worse when using BTbreak post recording
+        if len(self.qmc.timex)>5 and 4 < i < len(self.qmc.timex):  #'i>4' prevents reading temp2[-1] or worse when using BTbreak post recording
             if self.checkTop(d,offset,self.qmc.temp2[i-5],self.qmc.temp2[i-4],self.qmc.temp2[i-3],self.qmc.temp2[i-2],self.qmc.temp2[i-1],self.qmc.temp2[i]):
                 return self.qmc.btbreak_params['tight']
             if len(self.qmc.timex)>10 and i>10 and self.checkTop(d,offset,self.qmc.temp2[i-10],self.qmc.temp2[i-8],self.qmc.temp2[i-6],self.qmc.temp2[i-4],self.qmc.temp2[i-2],self.qmc.temp2[i],twice=True):
@@ -23380,16 +23368,17 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             time_str = time_entry.text
                             if time_str is not None:
                                 time = float(stringtoseconds(time_str))
-                                self.qmc.specialevents.append(self.qmc.time2index(time))
-                                self.qmc.specialeventstype.append(3)
                                 burner_entry = elem.find('burnercapacity')
                                 if burner_entry is None:
                                     burner_entry = elem.find('nburnercapacity')
                                 if burner_entry is not None:
                                     burner = burner_entry.text
                                     if burner is not None:
-                                        self.qmc.specialeventsvalue.append(self.qmc.str2eventsvalue(burner))
-                                        self.qmc.specialeventsStrings.append('')
+                                        self.qmc.addEvent(
+                                            self.qmc.time2index(time),
+                                            3,
+                                            '',
+                                            self.qmc.str2eventsvalue(burner))
 
                 self.autoAdjustAxis()
 
