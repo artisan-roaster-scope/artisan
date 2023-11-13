@@ -10183,6 +10183,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             #raise flag. Next time app will open, the settings (bad settings) will not be loaded.
             self.resetqsettings = 1
             self.clearExtraDeviceSettingsBackup()
+            _log.info('Factory reset')
             self.close()
         elif reply == QMessageBox.StandardButton.Cancel:
             return
@@ -21635,7 +21636,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     # . average delta after i-2 is negative and twice as high (absolute) as the one before
     # d is minimum temperature delta of the two legs after the event to prevent too early recognition based on noise
     def BTbreak(self,i,event):
-        if event in ('DROP','drop'):
+        if event in {'DROP','drop'}:
             offset = self.qmc.btbreak_params['offset_drop']
             d = self.qmc.btbreak_params['d_drop']
         else: #CHARGE

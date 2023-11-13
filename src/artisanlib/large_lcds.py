@@ -15,22 +15,26 @@
 # AUTHOR
 # Marko Luther, 2023
 
+import logging
 from artisanlib.dialogs import ArtisanDialog
-from artisanlib.widgets import MyQLabel
+from artisanlib.widgets import MyQLabel, MyQLCDNumber, ClickableLCDFrame
 
 try:
-    from PyQt6.QtCore import (Qt, QSettings, pyqtSlot) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import (Qt, QSettings, pyqtSlot, QPoint) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QFrame, QWidget, QLCDNumber, QHBoxLayout, QVBoxLayout) # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
-    from PyQt5.QtCore import (Qt, QSettings, pyqtSlot) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import (Qt, QSettings, pyqtSlot, QPoint) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QFrame, QWidget, QLCDNumber, QHBoxLayout, QVBoxLayout) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
-from typing import List, Optional, TYPE_CHECKING
+from typing import Final, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtWidgets import QWidget # pylint: disable=unused-import
     from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
+
+
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 class LargeLCDs(ArtisanDialog):
 
@@ -49,9 +53,9 @@ class LargeLCDs(ArtisanDialog):
         self.lcds1labelsLower:List[MyQLabel] = []
         self.lcds2labelsUpper:List[MyQLabel] = []
         self.lcds2labelsLower:List[MyQLabel] = []
-        self.lcds1frames:List[QFrame] = []
-        self.lcds2frames:List[QFrame] = []
-        self.visibleFrames:List[QFrame] = [] # visibility flags in display order for all lcd frames
+        self.lcds1frames:List[ClickableLCDFrame] = []
+        self.lcds2frames:List[ClickableLCDFrame] = []
+        self.visibleFrames:List[ClickableLCDFrame] = [] # visibility flags in display order for all lcd frames
         self.tight:bool = False
         self.layoutNr:int = -1 # -1: unknown, 0: landscape, 1: portrait
         self.swaplcds:bool = False
@@ -172,8 +176,8 @@ class LargeLCDs(ArtisanDialog):
         else:
             self.reLayout(1)
 
-    def makeLCD(self, s:str) -> QLCDNumber:
-        lcd = QLCDNumber()
+    def makeLCD(self, s:str) -> MyQLCDNumber:
+        lcd = MyQLCDNumber()
         lcd.setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
         lcd.setFrameStyle(QFrame.Shadow.Plain)
         lcd.setSmallDecimalPoint(False)
@@ -195,7 +199,7 @@ class LargeLCDs(ArtisanDialog):
         lcdlayout.addWidget(lcdLower,1)
         lcdlayout.setSpacing(0)
         lcdlayout.setContentsMargins(0, 0, 0, 0)
-        frame = QFrame()
+        frame = ClickableLCDFrame()
         frame.setContentsMargins(0, 0, 0, 0)
         frame.setLayout(lcdlayout)
         return frame
@@ -364,6 +368,7 @@ class LargeMainLCDs(LargeLCDs):
         self.lcd0 = self.makeLCD('timer') # time
         self.lcd0.setDigitCount(5)
         self.lcd0.display('00:00')
+        self.lcd0.clicked.connect(self.aw.superusermodeLeftClicked)
         # ET
         ETlcd = self.makeLCD('et') # Environmental Temperature ET
         ETlabelUpper = self.makeLabel(f'<b>{self.aw.ETname.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3])}</b> ')
@@ -374,6 +379,9 @@ class LargeMainLCDs(LargeLCDs):
         self.lcds1labelsUpper = [ETlabelUpper]
         self.lcds1labelsLower = [ETlabelLower]
         self.lcds1frames = [self.makeLCDframe(ETlabelUpper,ETlcd,ETlabelLower)]
+        self.lcds1frames[0].left_clicked.connect(self.aw.toggleETCurve)
+        self.lcds1frames[0].setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.lcds1frames[0].customContextMenuRequested.connect(self.aw.setTareET)
         # BT
         BTlcd = self.makeLCD('bt') # Bean Temperature BT
         BTlabelUpper = self.makeLabel(f'<b>{self.aw.BTname.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3])}</b> ')
@@ -384,6 +392,9 @@ class LargeMainLCDs(LargeLCDs):
         self.lcds2labelsUpper = [BTlabelUpper]
         self.lcds2labelsLower = [BTlabelLower]
         self.lcds2frames = [self.makeLCDframe(BTlabelUpper,BTlcd,BTlabelLower)]
+        self.lcds2frames[0].left_clicked.connect(self.aw.toggleBTCurve)
+        self.lcds2frames[0].setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.lcds2frames[0].customContextMenuRequested.connect(self.aw.setTareBT)
         ##
         self.updateVisiblitiesETBT()
         self.updateStyles()
@@ -501,6 +512,7 @@ class LargeDeltaLCDs(LargeLCDs):
         self.lcds1labelsUpper = [label1Upper]
         self.lcds1labelsLower = [label1Lower]
         self.lcds1frames = [self.makeLCDframe(label1Upper,self.lcds1[0],label1Lower)]
+        self.lcds1frames[0].left_clicked.connect(self.aw.toggleDeltaETCurve)
         #
         self.lcds2styles = ['deltabt']
         self.lcds2 = [self.makeLCD(self.lcds2styles[0])] # DeltaBT
@@ -509,6 +521,7 @@ class LargeDeltaLCDs(LargeLCDs):
         self.lcds2labelsUpper = [label2Upper]
         self.lcds2labelsLower = [label2Lower]
         self.lcds2frames = [self.makeLCDframe(label2Upper,self.lcds2[0],label2Lower)]
+        self.lcds2frames[0].left_clicked.connect(self.aw.toggleDeltaBTCurve)
         ##
         self.updateVisiblitiesDeltaETBT()
         self.updateStyles()
@@ -588,6 +601,44 @@ class LargeExtraLCDs(LargeLCDs):
         self.chooseLayout(self.width(),self.height())
         self.setWindowTitle(QApplication.translate('Menu', 'Extra LCDs'))
 
+    @pyqtSlot(QPoint)
+    def setTare_slot(self,_:QPoint) -> None:
+        sender = self.sender()
+        try:
+            assert isinstance(sender, ClickableLCDFrame)
+            idx = self.lcds1frames.index(sender)
+            self.aw.setTare(2+idx*2)
+        except Exception: # pylint: disable=broad-except
+            pass
+        try:
+            assert isinstance(sender, ClickableLCDFrame)
+            idx = self.lcds2frames.index(sender)
+            self.aw.setTare(2+idx*2 + 1)
+        except Exception: # pylint: disable=broad-except
+            pass
+
+    @pyqtSlot()
+    def toggleExtraCurve1(self) -> None:
+        try:
+            sender = self.sender()
+            assert isinstance(sender, ClickableLCDFrame)
+            i = self.lcds1frames.index(sender)
+            self.aw.extraCurveVisibility1[i] = not self.aw.extraCurveVisibility1[i]
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=False)
+
+    @pyqtSlot()
+    def toggleExtraCurve2(self) -> None:
+        try:
+            sender = self.sender()
+            assert isinstance(sender, ClickableLCDFrame)
+            i = self.lcds2frames.index(sender)
+            self.aw.extraCurveVisibility2[i] = not self.aw.extraCurveVisibility2[i]
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=False)
+
     def makeLCDs(self):
         self.lcds1 = []
         self.lcds2 = []
@@ -615,6 +666,9 @@ class LargeExtraLCDs(LargeLCDs):
             label1Lower = self.makeLabel(' ')
             self.lcds1labelsLower.append(label1Lower)
             self.lcds1frames.append(self.makeLCDframe(label1Upper,lcd1,label1Lower))
+            self.lcds1frames[-1].left_clicked.connect(self.toggleExtraCurve1)
+            self.lcds1frames[-1].setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+            self.lcds1frames[-1].customContextMenuRequested.connect(self.setTare_slot)
             #
             lcd2 = self.makeLCD(lcdstyle)
             self.lcds2.append(lcd2)
@@ -629,6 +683,9 @@ class LargeExtraLCDs(LargeLCDs):
             label2Lower = self.makeLabel(' ')
             self.lcds2labelsLower.append(label2Lower)
             self.lcds2frames.append(self.makeLCDframe(label2Upper,lcd2,label2Lower))
+            self.lcds2frames[-1].left_clicked.connect(self.toggleExtraCurve2)
+            self.lcds2frames[-1].setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+            self.lcds2frames[-1].customContextMenuRequested.connect(self.setTare_slot)
         ##
         self.updateVisiblitiesExtra()
         self.updateStyles()
