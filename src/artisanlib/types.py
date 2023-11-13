@@ -486,3 +486,15 @@ class SerialSettings(TypedDict):
     stopbits: int
     parity: str
     timeout: float
+
+class BTBreakParams(TypedDict, total=False):
+    offset_charge: float
+    offset_drop: float
+    d_drop: float
+    d_charge: float
+    tight: int
+    loose: int
+    f: float
+    maxdpre: float
+    f_dtwice: float
+    dpre_dpost_diff: float

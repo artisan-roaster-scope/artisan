@@ -66,6 +66,7 @@ from artisanlib.time import ArtisanTime
 from artisanlib.filters import LiveMedian
 from artisanlib.dialogs import ArtisanMessageBox
 from artisanlib.types import SerialSettings
+from artisanlib.types import BTBreakParams
 
 # import artisan.plus module
 from plus.util import roastLink
@@ -306,7 +307,7 @@ class tgraphcanvas(FigureCanvas):
         'segmentpickflag', 'segmentdeltathreshold', 'segmentsamplesthreshold', 'stats_summary_rect', 'title_text', 'title_artist', 'title_width',
         'background_title_width', 'xlabel_text', 'xlabel_artist', 'xlabel_width', 'lazyredraw_on_resize_timer', 'mathdictionary_base',
         'ambient_pressure_sampled', 'ambient_humidity_sampled', 'ambientTemp_sampled', 'backgroundmovespeed', 'chargeTimerPeriod', 'flavors_default_value',
-        'fmt_data_ON', 'l_subtitle', 'projectDeltaFlag', 'weight_units']
+        'fmt_data_ON', 'l_subtitle', 'projectDeltaFlag', 'weight_units', 'btbreak_params']
 
 
     def __init__(self, parent:QWidget, dpi:int, locale:str, aw:'ApplicationWindow') -> None:
@@ -475,6 +476,20 @@ class tgraphcanvas(FigureCanvas):
         self.afterTP:bool = False
         self.decay_weights:Optional[List[int]] = None
         self.temp_decay_weights:Optional[List[int]] = None
+
+        # used by BTbreak
+        self.btbreak_params:BTBreakParams = {
+            'd_drop': -0.34,
+            'd_charge': -0.67,
+            'tight': 3,
+            'loose': 5,
+            'f': 2.5,
+            'maxdpre': 6.4,
+            'f_dtwice': 1.5,
+            'dpre_dpost_diff': 0.78,
+            'offset_charge': 0.5,
+            'offset_drop': 0.2
+        }
 
         self.flavorlabels = list(self.artisanflavordefaultlabels)
         #Initial flavor parameters.
@@ -3902,8 +3917,7 @@ class tgraphcanvas(FigureCanvas):
                         # only if BT > 77C/170F
                         if self.autoChargeIdx == 0 and self.autoChargeFlag and self.autoCHARGEenabled and self.timeindex[0] < 0 and length_of_qmc_timex >= 5 and \
                             ((self.mode == 'C' and sample_temp2[-1] > 77) or (self.mode == 'F' and sample_temp2[-1] > 170)):
-                            o = 0.5 if self.mode == 'C' else 0.5 * 1.8
-                            b = self.aw.BTbreak(length_of_qmc_timex - 1,o) # call BTbreak with last index
+                            b = self.aw.BTbreak(length_of_qmc_timex - 1,event='CHARGE') # call BTbreak with last index
                             if b > 0:
                                 # we found a BT break at the current index minus b
                                 self.autoChargeIdx = length_of_qmc_timex - b
@@ -3932,8 +3946,7 @@ class tgraphcanvas(FigureCanvas):
                         if self.autoDropIdx == 0 and self.autoDropFlag and self.autoDROPenabled and self.timeindex[0] > -1 and not self.timeindex[6] and \
                             length_of_qmc_timex >= 5 and ((self.mode == 'C' and sample_temp2[-1] > 160) or (self.mode == 'F' and sample_temp2[-1] > 320)) and\
                             ((sample_timex[-1] - sample_timex[self.timeindex[0]]) > 420):
-                            o = 0.2 if self.mode == 'C' else 0.2 * 1.8
-                            b = self.aw.BTbreak(length_of_qmc_timex - 1,o)
+                            b = self.aw.BTbreak(length_of_qmc_timex - 1,event='DROP') # call BTbreak with last index
                             if b > 0:
                                 # we found a BT break at the current index minus b
                                 self.autoDropIdx = length_of_qmc_timex - b

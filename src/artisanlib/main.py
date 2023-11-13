@@ -14775,6 +14775,17 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 ndec_arr = numpy.array([ndec(x) for x in bt])
                 avgDecimal = numpy.average(ndec_arr)
                 maxDecimal = numpy.amax(ndec_arr)
+                
+                # Calculate the resolution from the BT values
+                # Sort the numbers in ascending order  #dave
+                # Calculate the differences between successive numbers  #dave
+                # Find the smallest non-zero difference  #dave
+                # Exception if there are no non-zero differences
+                try:
+                    resolution = numpy.min(numpy.diff(numpy.sort(bt))[numpy.nonzero(numpy.diff(numpy.sort(bt)))])
+                except Exception: # pylint: disable=broad-except  #dave
+                    resolution = float('nan')  #dave
+                    
                 str_modeChanged = ''
                 if profileMode in {'C', 'F'} and self.qmc.mode != profileMode:
                     str_modeChanged = '*Result not reliable, the temperature mode was changed'
@@ -14828,6 +14839,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     f'Profile quality metrics'
                     f'\n  Title: {self.qmc.title}'
                     f'\n  Meter: {meter}'
+                    f'\n  Resolution: {resolution:.2E} {str_modeChanged}'
                     f'\n  Average decimals: {avgDecimal:.2f} {str_modeChanged}'
                     f'\n  Max decimals: {maxDecimal:.2f} {str_modeChanged}'
                     f'\n  Total Samples: {totalSamples}'
@@ -21600,8 +21612,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 index = i
         return index
 
-    def checkTop(self, offset, p0, p1, p2, p3, p4, p5, twice=False):
-#        _log.info('PRINT checkTop(%s,%s,%s,%s,%s,%s,%s,%s)',offset,p0,p1,p2,p3,p4,p5,twice)
+    def checkTop(self, d, offset, p0, p1, p2, p3, p4, p5, twice=False):
         d1 = p0 - p1
         d2 = p1 - p2
         #--
@@ -21609,54 +21620,47 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         d4 = p5 - p4
         dpre = (d1 + d2) / 2.0
         dpost = (d3 + d4) / 2.0
-        if self.qmc.mode == 'C':
-            f = 2.5
-            d = -0.67 #-0.55 # minimum temperature delta of the two legs after the event to prevent too early recognition based on noise
-            maxdpre = 6.4 # limit the difference between pre and post to catch the case where temp before the event rises strong
-        else:
-            f = 2.8 * 1.8
-            d = -1.2 #-0,99 # minimum temperature delta of the two legs after the event to prevent too early recognition based on noise
-            maxdpre = 11.52
+
+        f = self.qmc.btbreak_params['f']
+        maxdpre = self.qmc.btbreak_params['maxdpre']
+        f_dtwice = self.qmc.btbreak_params['f_dtwice']
+        dpre_dpost_diff = self.qmc.btbreak_params['dpre_dpost_diff']
+
+        #scale parameters for temperature units
+        if self.qmc.mode == 'F':
+            f *= 1.8
+            d *= 1.8
+            maxdpre *= 1.8
+            dpre_dpost_diff *= 1.8
+
         if twice:
-            d = d*1.5
-#        _log.info('PRINT checkTop => %s, %s, %s, %s => %s | %s | %s', d3, d4, abs(dpost), (offset + (f * abs(dpre))), dpre, dpost, -dpre - dpost)
-#        return bool(d3 < .0 and d4 < .0 and (abs(dpost) > (offset + (f * abs(dpre))))) # v2.8
+            d = d * f_dtwice
+
         # improved variant requesting for a certain minimum delta between the reading of interest and the next two post event legs:
-        return bool(d3 < d and d4 < d and ((abs(dpost) > min(maxdpre, offset + (f * abs(dpre)))) or (dpost < 0 and dpre < 0 and (-dpre - dpost) > 1.4)))
+        return bool(d3 < d and d4 < d and ((abs(dpost) > min(maxdpre, offset + (f * abs(dpre)))) 
+                                           or (dpost < 0 and dpre < 0 and (-dpre - dpost) > dpre_dpost_diff)))
 
     # returns True if a BT break at i-2 is detected
     # i the index of the last reading to be considered to proof that i-2 (or i-4) is the index of the BT break
     # idea:
     # . average delta before i-2 is not negative
     # . average delta after i-2 is negative and twice as high (absolute) as the one before
-    def BTbreak(self,i,offset):
-#        _log.info('PRINT BTbreak(%s,%s) => %s',i,offset,self.qmc.temp2[i])
-        if len(self.qmc.timex)>5 and i < len(self.qmc.timex):
-            if self.checkTop(offset,self.qmc.temp2[i-5],self.qmc.temp2[i-4],self.qmc.temp2[i-3],self.qmc.temp2[i-2],self.qmc.temp2[i-1],self.qmc.temp2[i]):
-#                _log.info('PRINT BTbreak tight success')
-                return 3
-            if len(self.qmc.timex)>10 and self.checkTop(offset,self.qmc.temp2[i-10],self.qmc.temp2[i-8],self.qmc.temp2[i-6],self.qmc.temp2[i-4],self.qmc.temp2[i-2],self.qmc.temp2[i],twice=True):
-                return 5
-#                _log.info('PRINT BTbreak loose success')
+    # d is minimum temperature delta of the two legs after the event to prevent too early recognition based on noise
+    def BTbreak(self,i,event):
+        if event in ['DROP','drop']:
+            offset = self.qmc.btbreak_params['offset_drop']
+            d = self.qmc.btbreak_params['d_drop']
+        else: #CHARGE
+            offset = self.qmc.btbreak_params['offset_charge']
+            d = self.qmc.btbreak_params['d_charge']
+            
+        #dave -- must revisit the i>5 term!!!
+        if len(self.qmc.timex)>5 and i>4 and i < len(self.qmc.timex):  #'i>4' prevents reading temp2[-1] or worse when using BTbreak post recording
+            if self.checkTop(d,offset,self.qmc.temp2[i-5],self.qmc.temp2[i-4],self.qmc.temp2[i-3],self.qmc.temp2[i-2],self.qmc.temp2[i-1],self.qmc.temp2[i]):
+                return self.qmc.btbreak_params['tight']
+            if len(self.qmc.timex)>10 and i>10 and self.checkTop(d,offset,self.qmc.temp2[i-10],self.qmc.temp2[i-8],self.qmc.temp2[i-6],self.qmc.temp2[i-4],self.qmc.temp2[i-2],self.qmc.temp2[i],twice=True):
+                return self.qmc.btbreak_params['loose']
         return 0
-
-    # this can be used to find the CHARGE index as well as the DROP index by using
-    # 0 or the DRY index as start index, respectively
-    def findBTbreak(self,start_index=0,end_index=0,offset=0.5):
-        result = 0
-        # determine average deltaBT wrt. the two previous measurements
-        # the deltaBT values wrt. the next two measurements must by twice as high and negative
-        # then our current measurement is the one of CHARGE/DROP
-        for i in range(start_index,len(self.qmc.timex)):
-            if end_index and i > end_index:
-                break
-            if i>3:
-                o = offset if self.qmc.mode == 'C' else offset * 1.8
-                b = self.BTbreak(i,o)
-                if b > 0:
-                    result = i + 1 - b
-                    break
-        return result
 
     # updates AUC guide (expected time to hit target AUC; self.qmc.AUCguideTime) based on current AUC, target, base, and RoR
     def updateAUCguide(self):

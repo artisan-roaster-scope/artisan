@@ -623,22 +623,6 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.chargeedit.setMaximumWidth(50)
         self.chargeedit.setMinimumWidth(50)
         chargelabel.setBuddy(self.chargeedit)
-        self.charge_idx = 0
-        self.drop_idx = 0
-        #charge_str = ""
-        drop_str = ''
-        if len(self.aw.qmc.timex):
-            TP_index = self.aw.findTP()
-            if self.aw.qmc.timeindex[1]:
-                #manual dryend available
-                dryEndIndex = self.aw.qmc.timeindex[1]
-            else:
-                #find when dry phase ends
-                dryEndIndex = self.aw.findDryEnd(TP_index)
-            self.charge_idx = self.aw.findBTbreak(0,dryEndIndex,offset=0.5)
-            self.drop_idx = self.aw.findBTbreak(dryEndIndex,offset=0.2)
-            if self.drop_idx not in (0, self.aw.qmc.timeindex[6]):
-                drop_str = stringfromseconds(self.aw.qmc.timex[self.drop_idx]-self.aw.qmc.timex[self.aw.qmc.timeindex[0]])
         drylabel = QLabel('<b>' + QApplication.translate('Label', 'DRY END') + '</b>')
         drylabel.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         drylabel.setStyleSheet("background-color:'orange';")
@@ -729,7 +713,6 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.dropedit.setMaximumWidth(50)
         self.dropedit.setMinimumWidth(50)
         droplabel.setBuddy(self.dropedit)
-        self.dropestimate = QLabel(drop_str)
         coollabel = QLabel('<b>' + QApplication.translate('Label', 'COOL') + '</b>')
         coollabel.setStyleSheet("background-color:'#6666ff';")
         coollabel.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
