@@ -6,7 +6,7 @@ v2.10.0 (November XX, 2023)
 
 * ADDITIONS
   - adds support for macOS 14 Sonoma and native support for Apple Silicon ([Issue #1221](../../../issues/1221))
-  - adds back Raspbian OS build (64bit bookworm)
+  - adds back Raspberry Pi OS build (64bit Bookworm)
   - adds support for [Bühler Roastmaster](https://www.buhlergroup.com/global/de/products/roastmaster_coffeeroaster.html) RM20 Playone as well as RM60, RM120 and RM240
   - adds support for [Joper](https://joper-roasters.com/) PLC-based machines
   - adds support for [Cogen](https://cogen-company.com/) machines
@@ -29,19 +29,19 @@ v2.10.0 (November XX, 2023)
   - adds CI testing infrastructure
 
 * CHANGES
-  - if background is explicitly hidden, this state is preserved on loading a new profile with background
-  - updates default serial speed for Kaleido Legacy from 9600 to 57600 baud
-  - adds Idempotency-Key header to [artisan.plus](https://artisan.plus/) POST requests
-  - allow to call buttons with Multiple-Event actions from Multiple-Event actions, potentially generating infinite call loops
-  - enable the import of IKAWA profiles from URLs on platforms without Bluetooth BLE support
+  - minimum macOS version support pushed to Monterey (macOS 12)
+  - all enabled alarms with fulfilled preconditions will be fired within a sampling interval instead of just one as in all versions before
   - updates background smoothing during recording to align 1:1 with the foreground ([Issue #1279](../../../issues/1279))
   - Smooth Spikes now always disabled during recording
+  - if background is explicitly hidden, this state is preserved on loading a new profile with background
+  - updates default serial speed for Kaleido Legacy from 9600 to 57600 baud
+  - allow to call buttons with Multiple-Event actions from Multiple-Event actions, caution! allows for generating infinite call loops
+  - enable the import of IKAWA profiles from URLs on platforms without Bluetooth BLE support
   - roasting and cupping notes are always deleted on RESET even if `delete Roast Properties on RESET` is not ticked
-  - all enabled alarms with fulfilled preconditions will be fired within a sampling interval instead of just one as in all versions before
   - use default spawn instead fork multiprocessing also on macOS and replaced troublesome multiprocessing for Hottop and WebLCDs communication by asyncio
   - internal improvements leading to faster app start and exit as well as faster start of WebLCDs and more stable communication with Hottop roasters
   - upgrades dependencies (PyQt 6.6, matplotlib 3.8, pymodbus 3.5)
-  - minimal macOS version support pushed to Monterey (macOS 12)
+  - adds Idempotency-Key header to [artisan.plus](https://artisan.plus/) POST requests
 
 * FIXES
   - improve autoDROP accuracy for most setups ([Issue #1232](../../../issues/1232))

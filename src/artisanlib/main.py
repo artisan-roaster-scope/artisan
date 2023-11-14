@@ -10910,12 +10910,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.toggleBackroundShowfullFlag()
                 elif k == 72:                       #H  (load / delete background profile)
                     if self.comparator is None:
-                        # allow SHIFT-H for all platforms (ALT-H additionally for non-Windows platforms)
+                        # delete background when there are platform specific modifiers
                         if ((alt_modifier or shift_modifier) and platform.system() != 'Windows') or (control_shift_modifier or control_alt_modifier and platform.system() == 'Windows'): #control_alt_modifier here for backward compatibility only, see note above
                             self.deleteBackground()
                             if not self.qmc.flagon:
                                 self.autoAdjustAxis()
                             self.qmc.redraw()
+                        # load background when there are no modifiers
                         else:
                             filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background'),ext_alt='.alog')
                             if len(filename) != 0:
@@ -14766,14 +14767,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 maxDecimal = numpy.amax(ndec_arr)
 
                 # Calculate the resolution from the BT values
-                # Sort the numbers in ascending order  #dave
-                # Calculate the differences between successive numbers  #dave
-                # Find the smallest non-zero difference  #dave
+                # Sort the numbers in ascending order
+                # Calculate the differences between successive numbers
+                # Find the smallest non-zero difference
                 # Exception if there are no non-zero differences
                 try:
                     resolution = numpy.min(numpy.diff(numpy.sort(bt))[numpy.nonzero(numpy.diff(numpy.sort(bt)))])
-                except Exception: # pylint: disable=broad-except  #dave
-                    resolution = float('nan')  #dave
+                except Exception: # pylint: disable=broad-except
+                    resolution = float('nan')
 
                 str_modeChanged = ''
                 if profileMode in {'C', 'F'} and self.qmc.mode != profileMode:
@@ -21643,7 +21644,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             offset = self.qmc.btbreak_params['offset_charge']
             d = self.qmc.btbreak_params['d_charge']
 
-        #dave -- must revisit the i>5 term!!!
         if len(self.qmc.timex)>5 and 4 < i < len(self.qmc.timex):  #'i>4' prevents reading temp2[-1] or worse when using BTbreak post recording
             if self.checkTop(d,offset,self.qmc.temp2[i-5],self.qmc.temp2[i-4],self.qmc.temp2[i-3],self.qmc.temp2[i-2],self.qmc.temp2[i-1],self.qmc.temp2[i]):
                 return self.qmc.btbreak_params['tight']
