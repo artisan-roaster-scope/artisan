@@ -1,5 +1,67 @@
 Detailed Release History
 ========================
+----
+v2.10.0 (November XX, 2023)
+------------------
+
+* ADDITIONS
+  - adds support for macOS 14 Sonoma and native support for Apple Silicon ([Issue #1221](../../../issues/1221))
+  - adds back Raspbian OS build (64bit bookworm)
+  - adds support for [Bühler Roastmaster](https://www.buhlergroup.com/global/de/products/roastmaster_coffeeroaster.html) RM20 Playone as well as RM60, RM120 and RM240
+  - adds support for [Joper](https://joper-roasters.com/) PLC-based machines
+  - adds support for [Cogen](https://cogen-company.com/) machines
+  - adds support for [Typhoon](https://typhoon.coffee/) Hybrid roasters
+  - adds support for additional [Carmomaq](https://carmomaq.com.br/) machine ([PR #1233](../../../pull/1233))
+  - adds support for the [Phidget DAQ1000](https://phidgets.com/?prodid=622) 8x Voltage Input module ([Issue #1225](../../../issues/1225))
+  - adds extra device curves to Comparator
+  - adds new font graph font options [Comic Neue](http://comicneue.com/) (a redesigned Comic Sans) and [xkcd Script](https://github.com/ipython/xkcd-font/) (a more complete version of Humor)
+  - adds alternative slider layout (controlled by the menu `Config >> Events`, Slider tab `Alternative Layout` flag)
+  - adds optional alternative weight units in [artisan.plus](https://artisan.plus/) stock menus activated by holding the ALT (Windows) or OPTION (macOS) key
+  - adds flags to control ET and BT projection lines separately
+  - adds support clicks on large LCDs to set tare and to show/hide curves
+  - adds equal and not equal temperature conditions to alarm rules
+  - adds additional translatable button labels (`\i`: STIRRER, `\f`: FILL, `\r`: RELEASE)
+  - adds support for event name substitution in ET, BT channel names
+  - adds two more MODBUS channels (now 10 in total)
+  - adds two more S7 channels (now 12 in total)
+  - adds Hottop device logging ([Issue #1257](../../../issues/1257))
+  - adds flag `Interpolate Drops` in `Config >> Curves`, tab `Filter` to disable data interpolation
+  - adds CI testing infrastructure
+
+* CHANGES
+  - if background is explicitly hidden, this state is preserved on loading a new profile with background
+  - updates default serial speed for Kaleido Legacy from 9600 to 57600 baud
+  - adds Idempotency-Key header to [artisan.plus](https://artisan.plus/) POST requests
+  - allow to call buttons with Multiple-Event actions from Multiple-Event actions, potentially generating infinite call loops
+  - enable the import of IKAWA profiles from URLs on platforms without Bluetooth BLE support
+  - updates background smoothing during recording to align 1:1 with the foreground ([Issue #1279](../../../issues/1279))
+  - Smooth Spikes now always disabled during recording
+  - roasting and cupping notes are always deleted on RESET even if `delete Roast Properties on RESET` is not ticked
+  - all enabled alarms with fulfilled preconditions will be fired within a sampling interval instead of just one as in all versions before
+  - use default spawn instead fork multiprocessing also on macOS and replaced troublesome multiprocessing for Hottop and WebLCDs communication by asyncio
+  - internal improvements leading to faster app start and exit as well as faster start of WebLCDs and more stable communication with Hottop roasters
+  - upgrades dependencies (PyQt 6.6, matplotlib 3.8, pymodbus 3.5)
+  - minimal macOS version support pushed to Monterey (macOS 12)
+
+* FIXES
+  - improve autoDROP accuracy for most setups ([Issue #1232](../../../issues/1232))
+  - corrects evaluation of `b{event}`
+  - ensures that extra LCD, button and slider names are correctly updated if event names are changed on profile load and reset
+  - ensure that after a factory reset the roast position counter starts at 1
+  - fixes potential failure to detach Phidget RC channels
+  - fixes event name rendering problem by adding missing background event name decoding ([Issue #1216](../../../issues/1216))
+  - fixes typos in some CTE and Hottop machine setups
+  - fixes item color handling in Comparator
+  - fixes Japanese translation errors ([Issue #1256](../../../issues/1256))
+  - fixes Brazilian portuguese translation errors ([PR #1294](../../../pull/1294))
+  - fixes German translation error ([Issue #1270](../../../issues/1270))
+  - prevents stacking graph updates which can lead to high memory consumption during recording on slow machines
+  - fixes regression which broke WebLCDs on Windows and Linux in Artisan v2.8.4 ([Issue #1229](../../../issues/1229))
+  - fixes regression which broke S7 communnication on Linux builds in v2.8.4
+  - fixes regression which broke even action Artisan Command `loadBackground` in v2.8.4 by substituting the underline symbol ([Issue #1288](../../../issues/1288))
+  - fixes language selection for ArtisanViewer
+  - fixex wrong message on toggling the `Beep` flag of the UI tab ([Issue #1283](../../../issues/1283))
+
 
 ----
 v2.8.4 (June 21, 2023)
@@ -26,7 +88,7 @@ v2.8.4 (June 21, 2023)
   - adds translated and state aware custom event button label tags
   - adds button action symbolic variable $ bound to button state
   - adds additional Artisan Command, IO Command, MODBUS Command, S7 Command, WebSocket Command button actions to set button states
-  - adds Artisan Command pidSVC(<n>) allowing to specify the SV in C which get's correctly converted to F in Fahrenheit mode
+  - adds Artisan Command pidSVC(<n>) allowing to specify the SV in C which gets correctly converted to F in Fahrenheit mode
 
 * CHANGES
   - places event annotations on ET if BT is hidden
@@ -63,7 +125,7 @@ v2.8.4 (June 21, 2023)
   - fixes Santoker Series machine setup quantifiers to use SV mode
   - fixes missed picks in designer
   - fixes desktop screenshot for Qt6
-  - fixes the +/- keyboard shortcuts for zooming to work accross all keyboard layouts
+  - fixes the +/- keyboard shortcuts for zooming to work across all keyboard layouts
   - fixes Probatone control token release under "Keep ON"
   - fixes regression which allowed to define custom blends with total ratio larger than 100%
   - fixes an issue sending multiple S7 commands via buttons as used in the Probat UG setups which could lead to a crash
@@ -91,7 +153,7 @@ v2.8.2 (December 21, 2022)
   - adds extra device channels as PID sources to the Artisan internal software PID ([Discussion #998](../../../discussions/998))
   - adds flags to activated/deactivate background shifting via cursor keys and slider control via up/down keys ([Discussion #1026](../../../discussions/1026))
   - adds factory reset by pressing ALT/OPTION modifier on startup and skips saving app settings if ALT/OPTION is held on application exit
-  - save generating Artisan version/revision/build numbers to .alog profiles
+  - save generating Artisan version/revision/build numbers to '.alog' Artisan profiles
 * CHANGES
   - better designer
   - corrects and improves autoCHARGE/autoDROP
@@ -253,7 +315,7 @@ v2.6.0 (March 11, 2022)
   - Phidget driver no longer bundled with Linux and RPi builds ([Issue #812](../../../issues/812))
   - keep ambient phidgets attached until app termination to increase system stability
   - default sampling interval set to 2sec (from 3sec)
-  - updated libarary infrastructure (Python, Qt, PyQt, matplotlib, ...)
+  - updated library infrastructure (Python, Qt, PyQt, matplotlib, ...)
   - enables drag-and-drop of background annotations
   - PhasesLCDs show time to FCs if DRY is not set after DRY target passed
 * DELETIONS
@@ -288,7 +350,7 @@ v2.6.0 (March 11, 2022)
   - button event actions now respecting the event types Bernoulli settings as slider actions do
   - fixes temperature conversion for HB/Arc roasters
   - fixes "too many open file handles" errors on S7 communication under Windows ([Issue #816](../../../issues/816))
-  - fixes ArtisanViewer file open action when Artisan is recording and a file link on Wndows ([Discussion #828](../../../issues/828))
+  - fixes ArtisanViewer file open action when Artisan is recording and a file link on Windows ([Discussion #828](../../../issues/828))
 
 ----
 v2.4.6 (July 30, 2021)
@@ -396,7 +458,7 @@ v2.4.4 (December 14, 2020)
   - interprets Software PID Ramp/Soak patterns w.r.t. time since PID ON in monitoring only mode
   - uses custom bootloader on Windows to reduce false malware warnings ([Issue #519](../../../issues/519))
   - show only CHARGE to DROP period of background profile
-  - adds FCs ROR to computed section of alog files
+  - adds FCs ROR to computed section of `.alog` Artisan Profiles
   - shows `uu` instead of -1 for error values in LCDs
   - automatic mode for the upper delta axis limits sets also a reasonable step size for the axis ticks
   - dialogs with tabs remember the last selected tab
@@ -783,7 +845,7 @@ v1.6.1 (March 10, 2019)
 
 * NEW FEATURES
   - adds focus indicator to event sliders
-  - extends the import alarms action to load alarms also from .alog profiles besides
+  - extends the import alarms action to load alarms also from `.alog` Artisan profiles besides
  dedicated Artisan alarm files (.alrm)
   - hide/show curves via click to corresponding entry in the legend
   - adds IO Command state feedback by mfurlotti ([PR #284](../../../pull/284))
@@ -894,7 +956,7 @@ v1.4.0 (October 3, 2018)
   - adds time guide option (most useful when following a background profile)
   - adds export and convert to Excel
   - adds PhasesLCD mode-by-phase selection
-  - adds PhasesLCD mode that shows all of time/temp/percentage in finish phase accros the 3 Phases LCDs ([Issue #235](../../../issues/235))
+  - adds PhasesLCD mode that shows all of time/temp/percentage in finish phase across the 3 Phases LCDs ([Issue #235](../../../issues/235))
   - adds flag to allow phases to be adjusted based on DRY and FCs of the background profile
   - adds [PID P-on-Measurement/Input mode](http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/) for internal Software PID and [TC4 aArtisanQ v6.6 PID](https://github.com/greencardigan/TC4-shield/tree/master/applications/Artisan/aArtisan_PID/tags/REL_aArtisanQ_PID_6_6) (complementing the standard P-on-Error mode)
   - adds KeepON flag
@@ -911,7 +973,7 @@ v1.4.0 (October 3, 2018)
   - adds "Insert" button to trigger the extra event table insert action instead of abusing the "Add" button
   - use zero-based port numbering in Phidgets tab
   - renumbers config event types 1-4 to be consistent with plotter notation
-  - adds roastUUID to alog profiles
+  - adds roastUUID to `.alog` Artisan profiles
   - ensures that only a single instance runs per machine
   - adds a pop-up reminder message when you forget to right-click on the timer LCD in Hottop 2K+ mode ([Issue #220](../../../issues/220))
   - allow alarms to move sliders beyond the default range of 0-100 ([Issue #213](../../../issues/213))
@@ -919,7 +981,7 @@ v1.4.0 (October 3, 2018)
   - updates in-app link to documentation
   - simplifies to one set of roast phases
   - more accurate timestamping
-  - increases number of time/temp decimals in alog profiles
+  - increases number of time/temp decimals in `.alog` Artisan profiles
   - LCDs extended to show readings beyond 4 digits without decimals ([Issue #238](../../../issues/238))
   - roast phase visualisation graph of the ranking report now also shown if more than maximally rendered profiles have been selected and this maximum was increased from 10 to 20
   - adds warning if more than 10 profiles are selected that graph will not be rendered ([Issue #226](../../../issues/226))
@@ -991,7 +1053,7 @@ v1.3.1 (May 20, 2018)
 * FIXES
   - ensures that the matplotlib font cache is used on Linux ([Issue #178](../../../issues/178))
   - fixes an error that could occur on deleting an event button definition ([Issue #179](../../../issues/179))
-  - ensures proper persistance of the "Descr." checkbox state of the events dialog over restarts ([Issue #180](../../../issues/180))
+  - ensures proper persistence of the "Descr." checkbox state of the events dialog over restarts ([Issue #180](../../../issues/180))
   - fixes a communication issue with Aillio Bullet R1 roasters running a newer firmware ([Issue #188](../../../issues/184))
   - fixes a build error in v1.3 that caused Artisan to crash on opening a file selector ([Issue #182](../../../issues/182),[Issue #187](../../../issues/187),[#188](../../../issues/188))
   - ensures that decimals in curve width are properly handled ([Issue #186](../../../issues/186))
@@ -1056,7 +1118,7 @@ v1.3.0 (April 15, 2018)
   - Mac OS X app now code signed for easier installation
 * FIXES
   - fixes a bug that made the background RoR curves disappear on START
-  - fixes a crasher on clicking the SV slider
+  - fixes a crash on clicking the SV slider
   - fixes designer reset issue
   - fixes p-i-d button action that never triggered
   - fixes coarse quantifiers
@@ -1066,7 +1128,7 @@ v1.3.0 (April 15, 2018)
   - fixed Issue #154 where replay-by-temp events would trigger out of order
   - fixes Phidgets 1046 device support broken in v1.2
   - restrict temperature conversion to temperature curves
-  - fixes crasher on some Linux platforms w.r.t. selection of items in tables like events, alarms,..
+  - fixes crash on some Linux platforms w.r.t. selection of items in tables like events, alarms,..
 
 
 ----
@@ -1105,7 +1167,7 @@ v1.2.0 (December 21, 2017)
    - adds keyboard shortcut to quickly load alarm file
    - adds support for the VOLTCRAFT PL-125-T2 and VOLTCRAFT PL-125-T4 (by Andreas Bader)
    - adds Exhaust Temperature to the Aillio Bullet import
-   - adds optional automatic saving of PDFs alongside alog profiles
+   - adds optional automatic saving of PDFs alongside `alog` Artisan profiles
    - adds Hottop to the machine menu
   - adds "remote only" flag to the Phidget tab to force remote access also for locally connected Phidgets if local Phidget server is running. That way the local Phidget server can be use on the machine running Artisan to access the Phidgets from Artisan and any other software (incl. the Phidget Control Panel) in parallel.
   - adds support for MODBUS function 1 (Read Coil) and 2 (Read Discrete Input)
@@ -1200,7 +1262,7 @@ v1.0.0 (February 24, 2017)
 * NEW FEATURES
    * adds [internal PID](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html) and support to control external MODBUS PIDs
    * adds two more MODBUS input channels (now 6 in total)
-   * adds alarms triggerd at a specified time after another alarm specified as "If Alarm" was triggered, if "from" rules is set to "If Alarm"
+   * adds alarms triggered at a specified time after another alarm specified as "If Alarm" was triggered, if "from" rules is set to "If Alarm"
    * adds improved Windows installer (option to uninstall previous versions during installation and silent option)
    * adds support for loading Artisan profiles from zip files for reporting (as kindly contributed by David Baxter)
    * adds experimental support for the [Apollo DT301](http://www.ueitest.com/products/temperature-humidity/dt301) (by Rob Gardner)
@@ -1216,7 +1278,7 @@ v1.0.0 (February 24, 2017)
    * adds MODBUS scanner
    * adds Custom Events clustering
    * adds flag to automatically open roast properties on CHARGE
-   * adds Yoctopuce VirtualHub support for acessing remote Yoctopuce devices over the network
+   * adds Yoctopuce VirtualHub support for accessing remote Yoctopuce devices over the network
    * adds automatic unit conversion for Yoctopuce devices
    * adds profile C<->F batch conversion
    * adds a field for green bean temperature
@@ -1233,8 +1295,8 @@ v1.0.0 (February 24, 2017)
    * dramatically improves speed of MODBUS over serial communication (by patching the underlying pymodbus lib)
    * makes message, error and serial logs autoupdating
    * removes "insert" in alarm table, which is not compatible to the new flexible alarmtable sorting
-   * restrict file extension to ".alog" on loading a profile
-   * current slider and button definitions are now automatically saved to palette #0 on closing the events dialog such that those definitions cannot get lost accidentially by pressing a number key to quickly entering an event value during recording
+   * restrict file extension to `.alog` on loading a profile
+   * current slider and button definitions are now automatically saved to palette #0 on closing the events dialog such that those definitions cannot get lost accidentally by pressing a number key to quickly entering an event value during recording
    * reconstruct users environment on calling external programs on MacOS X, not to limit them to the Artisan contained limited Python environment
    * remembers playback aid settings
    * improved RoR smoothing during recordings
@@ -1332,7 +1394,7 @@ v0.9.8 (October 21, 2015)
   * plotter "Virtual Device" action renamed into "BT/ET", now adds plot data to BT/ET if no profile is loaded, otherwise it creates an additional Virtual Device
   * the symbolic variables ETB and BTB to access data from the background curves have been generalized and renamed into B1 and B2
   * default state of the statistic line on the bottom of the main window changed (right-click still toggles) and setting made persistent
-  * time align of background profiles now possible per all major events possible (always aligns to CHARGE first, and if set to ALL, it aligns to all events in sequence of their occurence)
+  * time align of background profiles now possible per all major events possible (always aligns to CHARGE first, and if set to ALL, it aligns to all events in sequence of their occurrence)
   * increases the time and temperature resolution
 * FIXES
   * fixed port name support in serial port popup on OS X
@@ -1421,9 +1483,9 @@ v0.9.3 (January 15, 2015)
   * slider and button actions with command arguments fixed
   * Mastech MS6514 communication improvements (thanks to eightbit11)
   * Omega HH806AU retry on failure during communication
-  * fixes Yocto shared libary loading on Windows and improves the reconnect on reset
+  * fixes Yocto shared library loading on Windows and improves the reconnect on reset
   * missing quantifiers application on START
-  * TC4 "Start PID on CHARGE" now works on consequtive roasts
+  * TC4 "Start PID on CHARGE" now works on consecutive roasts
   * TC4 enable ArduinoTC4_56 and ArduinoTC4_78 extra device use without adding ArduinoTC4_34
   * MODBUS communication improvements
 
@@ -1439,7 +1501,7 @@ v0.9.2 (January 16, 2015)
   * adds [HukyForum.com](http://www.hukyforum.com/index.php) image export
 * FIXES
   * fixes color dialog for extra devices on OS X
-  * fixes a potential crasher caused by x-axis realignment during sampling
+  * fixes a potential crash caused by x-axis realignment during sampling
   * fixes communication issues with Phidgets especially in remote mode via an SBC
   * fixes WebLCD startup issues on slow Windows machines
   * fixes MODBUS over UDP/TCP IPv6 issues on Windows
@@ -1461,7 +1523,7 @@ v0.9.1 (Januay 3, 2015)
 * FIXES
   * fixes Arduino/TC4 temperature units
   * fixes button value restoring on palette load
-  * fixes Volume Calculater unit conversion
+  * fixes Volume Calculator unit conversion
 
 
 ----
@@ -1482,7 +1544,7 @@ v0.9.0 (November 17, 2014)
   * logs active non-zero slider values at CHARGE
   * adds coarse quantifiers 0-10, 10 steps instead of 100 as for standard quantifiers
   * Phidget 1048 sets ambient temperature (in roast dialog) automatically on DROP
-  * adds quick custom event keybord shortcuts (keys q-w-e-r followed by 3 digits)
+  * adds quick custom event keyboard shortcuts (keys q-w-e-r followed by 3 digits)
   * file from which alarms were loaded is now displayed in the alarms dialog
   * extends phases lcds by Rao's style ratios and BT deltas
   * adds MET calculation (maximum ET between TP and DROP)
@@ -1753,7 +1815,7 @@ v0.6.0 (June 14, 2013)
   * adds right-click popup on BT curve to change event time
 * File Handling
   * changed default directory on Mac from ~/Library to ~/Documents
-  * changed file extension of profiles from .txt to .alog
+  * changed file extension of profiles from `.txt` to `.alog`
   * adds load-by-double-click (Mac OS X only)
   * adds JSON import/export
   * adds RoastLogger import/export
