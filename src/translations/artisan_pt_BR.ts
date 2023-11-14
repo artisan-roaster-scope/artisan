@@ -543,7 +543,7 @@
       <location filename="../artisanlib/comm.py" line="202" />
       <location filename="../artisanlib/pid_dialogs.py" line="2419" />
       <source>Cancel</source>
-      <translation>Cancela</translation>
+      <translation>Cancelar</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2487" />
@@ -1368,7 +1368,7 @@ RESFRIADO</translation>
     <message>
       <location filename="../artisanlib/events.py" line="572" />
       <source>Tooltips</source>
-      <translation>dicas</translation>
+      <translation>Dicas</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="640" />
@@ -2066,7 +2066,7 @@ RESFRIADO</translation>
       <location filename="../artisanlib/events.py" line="112" />
       <location filename="../artisanlib/pid_dialogs.py" line="434" />
       <source>Call Program</source>
-      <translation>Executa Programa</translation>
+      <translation>Executar Programa</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="900" />
@@ -2754,7 +2754,7 @@ RESFRIADO</translation>
     <message>
       <location filename="../artisanlib/canvas.py" line="15573" />
       <source>Reset Designer</source>
-      <translation>Zerar desenhista</translation>
+      <translation>Zerar Desenhista</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="15577" />
@@ -2782,7 +2782,7 @@ RESFRIADO</translation>
     </message>
     <message>
       <source>Exit Designer</source>
-      <translation type="vanished">Sair do construtor</translation>
+      <translation type="vanished">Sair do Desenhista</translation>
     </message>
     <message>
       <source>Cancel selection</source>
@@ -3107,7 +3107,7 @@ RESFRIADO</translation>
     <message>
       <location filename="../plus/countries.py" line="92" />
       <source>Czechia</source>
-      <translation />
+      <translation>Chéquia</translation>
     </message>
     <message>
       <location filename="../plus/countries.py" line="93" />
@@ -3117,7 +3117,7 @@ RESFRIADO</translation>
     <message>
       <location filename="../plus/countries.py" line="94" />
       <source>Djibouti</source>
-      <translation />
+      <translation>Djibuti</translation>
     </message>
     <message>
       <location filename="../plus/countries.py" line="95" />
@@ -3162,7 +3162,7 @@ RESFRIADO</translation>
     <message>
       <location filename="../plus/countries.py" line="103" />
       <source>Eswatini</source>
-      <translation />
+      <translation>Reino de Essuatíni</translation>
     </message>
     <message>
       <location filename="../plus/countries.py" line="104" />
@@ -3177,7 +3177,7 @@ RESFRIADO</translation>
     <message>
       <location filename="../plus/countries.py" line="106" />
       <source>Faroe Islands</source>
-      <translation>ilhas Faroe</translation>
+      <translation>Ilhas Faroe</translation>
     </message>
     <message>
       <location filename="../plus/countries.py" line="107" />
@@ -4002,7 +4002,7 @@ RESFRIADO</translation>
     <message>
       <location filename="../plus/countries.py" line="275" />
       <source>Turkey</source>
-      <translation>Peru</translation>
+      <translation>Turquia</translation>
     </message>
     <message>
       <location filename="../plus/countries.py" line="276" />
@@ -4741,12 +4741,12 @@ RESFRIADO</translation>
     <message>
       <location filename="../artisanlib/main.py" line="24479" />
       <source>Analyze: no background profile data available</source>
-      <translation>Análise: não há dados do perfil modelo disponíveis</translation>
+      <translation>Analisar: não há dados do perfil modelo disponíveis</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="24482" />
       <source>Analyze: background profile requires CHARGE and DROP events</source>
-      <translation>Análise: o perfil modelo precisa ter eventos de CARREGAR e DESCARGA</translation>
+      <translation>Analisar: o perfil modelo precisa ter eventos de CARREGAR e DESCARGA</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="11258" />
@@ -4762,11 +4762,11 @@ RESFRIADO</translation>
     <message>
       <location filename="../artisanlib/canvas.py" line="15488" />
       <source>Exception: redrawdesigner() Roast events may be out of order. Resetting Designer.</source>
-      <translation>Exceção: eventos redrawdesigner() Roast podem estar fora de ordem. Redefinindo o Designer.</translation>
+      <translation>Exceção: eventos redrawdesigner() Torra podem estar fora de ordem. Redefinindo o Desenhista.</translation>
     </message>
     <message>
       <source>Exception: redrawdesigner() Roast events may be out of order. Restting Designer.</source>
-      <translation type="vanished">Exceção: redrawdesigner () Os eventos de roast podem estar fora de serviço. Descansando Designer.</translation>
+      <translation type="vanished">Exceção: redrawdesigner () Os eventos de torra podem estar fora de serviço. Descansando Desenhista.</translation>
     </message>
     <message>
       <source>HH806AUtemperature(): {0} bytes received but 14 needed</source>
@@ -4790,7 +4790,7 @@ RESFRIADO</translation>
     </message>
     <message>
       <source>Analyze: no profile data available</source>
-      <translation type="vanished">Análise: não há dados do perfil disponíveis</translation>
+      <translation type="vanished">Analisar: não há dados do perfil disponíveis</translation>
     </message>
     <message>
       <source>There was an error</source>
@@ -5803,7 +5803,7 @@ RESFRIADO</translation>
     <message>
       <location filename="../artisanlib/main.py" line="19788" />
       <source>Screen Max</source>
-      <translation>Peneira Min</translation>
+      <translation>Peneira Max</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="19789" />
@@ -5903,7 +5903,7 @@ RESFRIADO</translation>
     <message>
       <location filename="../artisanlib/main.py" line="19813" />
       <source>COOL Time</source>
-      <translation>Tempo RRESFRIADO</translation>
+      <translation>Tempo RESFRIADO</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="19814" />
@@ -6068,12 +6068,12 @@ RESFRIADO</translation>
     <message>
       <location filename="../artisanlib/main.py" line="19849" />
       <source>Ambient Pressure</source>
-      <translation>Ambient Pressure</translation>
+      <translation>Pressão Ambiente</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="19850" />
       <source>Ambient Temperature</source>
-      <translation>Temperature Ambientais</translation>
+      <translation>Temperatura Ambiente</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="21322" />
@@ -6225,7 +6225,7 @@ RESFRIADO</translation>
     <message>
       <location filename="../artisanlib/main.py" line="19881" />
       <source>Efficiency Batch</source>
-      <translation>Eficiência Lot</translation>
+      <translation>Eficiência Lote</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="19882" />
@@ -6609,7 +6609,7 @@ Os alarmes são verificados em ordem, do topo à base da tabela.</translation>
     <message>
       <location filename="../help/alarms_help.py" line="27" />
       <source>If not 00:00, alarm is triggered mm:ss after the event "From" happens.</source>
-      <translation>Se não for 00:00, o alarme é disparado mm: ss após o evento 'De' acontecer.</translation>
+      <translation>Se não for 00:00, o alarme é disparado mm:ss após o evento 'De' acontecer.</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="30" />
@@ -7065,12 +7065,12 @@ Os alarmes são verificados em ordem, do topo à base da tabela.</translation>
     <message>
       <location filename="../help/alarms_help.py" line="81" />
       <source>&lt;color&gt;</source>
-      <translation />
+      <translation>&lt;cor&gt;</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="81" />
       <source>sets the canvas to &lt;color&gt;, can be in hex format, e.g. "#ffaa55" or a color name, e.g. "blue"</source>
-      <translation>define a tela para &lt;color&gt;, pode estar em formato hexadecimal, por exemplo, '# ffaa55' ou um nome de cor, por exemplo 'azul'</translation>
+      <translation>define a tela para &lt;cor&gt;, pode estar em formato hexadecimal, por exemplo, '# ffaa55' ou um nome de cor, por exemplo 'azul'</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="82" />
@@ -7120,14 +7120,14 @@ O Artisan iniciará o programa a cada período de amostragem. A saída do progra
       <source>Example of output needed from program for double temperature (ET,BT)
 "200.4,100.4" (note: temperatures are separated by a comma "ET,BT")</source>
       <translation>Exemplo de saída necessária do programa para temperatura dupla (ET, BT)
-'200,4,100,4' (nota: as temperaturas são separadas por uma vírgula 'ET, BT')</translation>
+'200,4;100,4' (nota: as temperaturas são separadas por um ponto e vírgula 'ET, BT')</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="18" />
       <source>Example of output needed from program for double temperature (ET,BT) and extra devices (Program and Program 34)
 "200.4,100.4,312.4,345.6,299.0,275.5"</source>
       <translation>Exemplo de saída necessária do programa para temperatura dupla (ET, BT) e dispositivos extras (Programa e Programa 34)
-'200,4,100,4,312,4,345,6,299,0,275,5'</translation>
+'200,4;100,4;312,4;345,6;299,0;275,5'</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="22" />
@@ -7148,14 +7148,14 @@ O Artisan iniciará o programa a cada período de amostragem. A saída do progra
     <message>
       <location filename="../help/programs_help.py" line="22" />
       <source>print("237.1,100.4")</source>
-      <translation />
+      <translation>print("237,1;100,4")</source></translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="22" />
       <source>Note: In many cases the path to the Python or other language executatable should be provided along with the external program path.  On Windows it is  advised to enclose the paths with quotation marks if there are any spaces, and use forward slashes &amp;#39;/&amp;#39; in the path.
 "C:/Python38-64/python.exe" "c:/scripts/test.py"</source>
-      <translation>Nota: Em muitos casos, o caminho para o Python ou outro executável de linguagem deve ser fornecido junto com o caminho do programa externo. No Windows, é aconselhável colocar os caminhos entre aspas, se houver espaços, e usar barras &amp; # 39; / &amp; # 39; no caminho.
-'C: /Python38-64/python.exe' 'c: /scripts/test.py'</translation>
+      <translation>Nota: Em muitos casos, o caminho para o Python ou outro executável de linguagem deve ser fornecido junto com o caminho do programa externo. No Windows, é aconselhável colocar os caminhos entre aspas, se houver espaços, e usar barras &amp;#39;/&amp;#39; no caminho.
+'C:/Python38-64/python.exe' 'c:/scripts/test.py'</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="22" />
@@ -7447,7 +7447,7 @@ Quando os atalhos de teclado estão DESATIVADOS adiciona um evento personalizado
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="60" />
       <source>Graph &amp; Designer</source>
-      <translation>Gráfico e designer</translation>
+      <translation>Gráfico e Desenhista</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="60" />
@@ -9290,7 +9290,7 @@ Função 4 (Ler registros de entrada): registros 0 a 65535 correspondentes aos n
     <message>
       <location filename="../help/eventbuttons_help.py" line="39" />
       <source>Tooltips</source>
-      <translation>dicas</translation>
+      <translation>Dicas</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="39" />
@@ -15489,7 +15489,7 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/main.py" line="2364" />
       <source>Designer</source>
-      <translation>Construtor</translation>
+      <translation>Desenhista</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2370" />
@@ -16323,7 +16323,7 @@ Repita a operação no final: {0}</translation>
       <location filename="../artisanlib/designer.py" line="338" />
       <location filename="../artisanlib/designer.py" line="331" />
       <source>Designer Config</source>
-      <translation>Configuração do desenhista</translation>
+      <translation>Configuração do Desenhista</translation>
     </message>
     <message>
       <location filename="../artisanlib/designer.py" line="337" />
@@ -16947,12 +16947,12 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
     <message>
       <location filename="../artisanlib/main.py" line="11028" />
       <source>Exit Designer?</source>
-      <translation>Sair do Construtor?</translation>
+      <translation>Sair do Desenhista?</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="11029" />
       <source>Designer Mode ON</source>
-      <translation>Modo construtor LIGADO</translation>
+      <translation>Modo Desenhista LIGADO</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="11084" />
@@ -18074,7 +18074,7 @@ Corrija isso na guia Config&gt; Curves&gt; Analyze.</translation>
       <location filename="../artisanlib/canvas.py" line="15049" />
       <source>Importing a profile in to Designer will decimate all data except the main [points].
 Continue?</source>
-      <translation>Importar um perfil para o Designer dizimará todos os dados, exceto os [pontos] principais.
+      <translation>Importar um perfil para o Desenhista dizimará todos os dados, exceto os [pontos] principais.
 Prosseguir?</translation>
     </message>
     <message>
@@ -18366,7 +18366,7 @@ Substituir suas definições de dispositivo extras usando os valores do perfil?
       <source>Importing a profile in to Designer will decimate
 all data except the main [points].
 Continue?</source>
-      <translation type="vanished">Importar um perfil para o Construtor colocará casas
+      <translation type="vanished">Importar um perfil para o Desenhista colocará casas
 decimais em todos os dados exceto os [pontos] principais.
 Continuar?</translation>
     </message>
@@ -19037,7 +19037,7 @@ Continuar?</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="vanished">Cancela</translation>
+      <translation type="vanished">Cancelar</translation>
     </message>
   </context>
   <context>
@@ -19048,7 +19048,7 @@ Continuar?</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="vanished">Cancela</translation>
+      <translation type="vanished">Cancelar</translation>
     </message>
   </context>
   <context>
