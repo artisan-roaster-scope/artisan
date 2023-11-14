@@ -142,7 +142,7 @@
     </message>
     <message>
       <source>Weight Roasted</source>
-      <translation type="vanished">Peso assado</translation>
+      <translation type="vanished">Peso Torrado</translation>
     </message>
     <message>
       <source>Bean Temp</source>
@@ -1952,7 +1952,7 @@ RESFRIADO</translation>
       <location filename="../artisanlib/comparator.py" line="978" />
       <location filename="../artisanlib/axis.py" line="202" />
       <source>BBP+Roast</source>
-      <translation>BBP+Assado</translation>
+      <translation>BBP+Torra</translation>
     </message>
     <message>
       <location filename="../artisanlib/comparator.py" line="979" />
@@ -7408,7 +7408,7 @@ Quando os atalhos de teclado estão DESATIVADOS adiciona um evento personalizado
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="59" />
       <source>Double click on Roast Title</source>
-      <translation>Clique duas vezes no título do assado</translation>
+      <translation>Clique duas vezes no título da torra</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="74" />
@@ -7432,7 +7432,7 @@ Quando os atalhos de teclado estão DESATIVADOS adiciona um evento personalizado
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="59" />
       <source>Open the roast in artisan.plus</source>
-      <translation>Abra o assado em artisan.plus</translation>
+      <translation>Abra a torra no artisan.plus</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="59" />
@@ -7759,7 +7759,7 @@ CTRL+L [Vencer]</translation>
       <location filename="../help/keyboardshortcuts_help.py" line="83" />
       <location filename="../help/keyboardshortcuts_help.py" line="82" />
       <source>Roast Properties Roast tab</source>
-      <translation>Propriedades do assado Aba de assado</translation>
+      <translation>Propriedades da torra Aba de torra</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="82" />
@@ -7838,7 +7838,7 @@ CTRL+O [Vencer]</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="87" />
       <source>Adds scale weight to Roasted Weight field (same action as &amp;#39;out&amp;#39; button)</source>
-      <translation>Adiciona o peso da balança ao campo Peso assado (mesma ação do botão &amp;#39;fora&amp;#39;)</translation>
+      <translation>Adiciona o peso da balança ao campo Peso torrado (mesma ação do botão &amp;#39;fora&amp;#39;)</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -7862,7 +7862,7 @@ CTRL+P [Vencer]</translation>
       <location filename="../help/keyboardshortcuts_help.py" line="89" />
       <source>Roast Properties Roast Tab
 Volume Calculator Unit, Green Unit  Weight or Roasted Unit Weight field</source>
-      <translation>Propriedades de Assado Guia de Assado
+      <translation>Propriedades de Torra Guia de Torra
 Campo Unidade Calculadora de Volume, Peso Unitário Verde ou Peso Unitário Torrado</translation>
     </message>
     <message>
@@ -7874,7 +7874,7 @@ Campo Unidade Calculadora de Volume, Peso Unitário Verde ou Peso Unitário Torr
       <location filename="../help/keyboardshortcuts_help.py" line="90" />
       <source>Roast Properties Roast tab
 Green Weight  or Roasted Weight field</source>
-      <translation>Propriedades do assado Aba de assado
+      <translation>Propriedades da torra Aba de torra
 Campo Peso Verde ou Peso Torrado</translation>
     </message>
     <message>
@@ -7997,7 +7997,7 @@ Durante a gravação apenas</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="106" />
       <source>Open Roast Properties dialog</source>
-      <translation>Abrir caixa de diálogo Propriedades de assado</translation>
+      <translation>Abrir caixa de diálogo Propriedades de torra</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="107" />
@@ -8092,7 +8092,7 @@ Durante a gravação apenas</translation>
 Three different mapping methods are available to compute from the current profile and the given targets a resulting profile. The linear and quadratic mappings are continuous functions while the discrete option is defined stepwise between the given source/target pairs and extended at the borders
 
 Pressing the "Apply" button applies the current computed mapping to the loaded profile for inspection. "Reset" returns to the original profile shape. Leaving the Transposer with "OK" applies the current mapping to the profile. Leaving the Transposer with "Cancel" returns to the unchanged initially loaded profile.</source>
-      <translation>O Transposer permite mapear o perfil atual w.r.t. o eixo do tempo e da temperatura, definindo o tempo e a temperatura dos alvos em eventos importantes como o ponto amarelo (DRY END) ou a primeira fissura (FC START) ou para transformações de tempo também pela duração das fases alvo. As transformações de temperatura são aplicadas apenas à curva de temperatura do feijão (BT), enquanto as transformações de tempo são aplicadas a todo o perfil.
+      <translation>O Transposer permite mapear o perfil atual w.r.t. o eixo do tempo e da temperatura, definindo o tempo e a temperatura dos alvos em eventos importantes como o ponto amarelo (DRY END) ou a primeira fissura (FC START) ou para transformações de tempo também pela duração das fases alvo. As transformações de temperatura são aplicadas apenas à curva de temperatura do grão (BT), enquanto as transformações de tempo são aplicadas a todo o perfil.
 
 Três métodos de mapeamento diferentes estão disponíveis para calcular a partir do perfil atual e os destinos fornecidos um perfil resultante. Os mapeamentos lineares e quadráticos são funções contínuas, enquanto a opção discreta é definida passo a passo entre os pares fonte / destino fornecidos e estendida nas bordas
 
@@ -8101,7 +8101,7 @@ Pressionar o botão 'Aplicar' aplica o mapeamento computado atual ao perfil carr
     <message>
       <location filename="../help/transposer_help.py" line="21" />
       <source>EXAMPLE 1: ADJUST TOTAL ROAST TIME</source>
-      <translation>EXEMPLO 1: AJUSTE O TEMPO TOTAL DE ASSADO</translation>
+      <translation>EXEMPLO 1: AJUSTE O TEMPO TOTAL DE TORRA</translation>
     </message>
     <message>
       <location filename="../help/transposer_help.py" line="25" />
@@ -9969,9 +9969,9 @@ Observe que, se o valor do evento não corresponder a nenhum valor na definiçã
 Note that pre-heating and roaster cooling energy values are applied to the first roast of a roasting session.  Between batch energies are applied to every roast except the first.  Tick the "Between batches after Pre-Heating box to apply the between batch value to the first roast.
 
 Follow the steps below to set the energy inputs for the roast machine and afterburner.</source>
-      <translation>A guia Energia exibe o consumo de energia de um assado. As emissões de CO2 também são calculadas para monitorar o impacto da operação de torrefação. As configurações devem ser feitas para cada carga de energia. As cargas são os queimadores principais, motores e sopradores, e um pós-combustor, se for usado. A energia usada para pré-aquecimento, entre lotes e protocolos de resfriamento do torrador está incluída nos cálculos, e as configurações também estão disponíveis para eles.
+      <translation>A guia Energia exibe o consumo de energia de uma torra. As emissões de CO2 também são calculadas para monitorar o impacto da operação de torrefação. As configurações devem ser feitas para cada carga de energia. As cargas são os queimadores principais, motores e sopradores, e um pós-combustor, se for usado. A energia usada para pré-aquecimento, entre lotes e protocolos de resfriamento do torrador está incluída nos cálculos, e as configurações também estão disponíveis para eles.
 
-Observe que os valores de energia de pré-aquecimento e resfriamento do torrador são aplicados à primeira torra de uma sessão de torra. As energias entre os lotes são aplicadas a todas as torras, exceto a primeira. Marque a caixa "Entre lotes após o pré-aquecimento para aplicar o valor entre lotes ao primeiro assado.
+Observe que os valores de energia de pré-aquecimento e resfriamento do torrador são aplicados à primeira torra de uma sessão de torra. As energias entre os lotes são aplicadas a todas as torras, exceto a primeira. Marque a caixa "Entre lotes após o pré-aquecimento para aplicar o valor entre lotes a primeira torra.
 
 Siga as etapas abaixo para definir as entradas de energia para a máquina de torra e pós-combustão.</translation>
     </message>
@@ -10013,7 +10013,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
     <message>
       <location filename="../help/energy_help.py" line="40" />
       <source>Begin by making entries on the Loads sub-tab  to define the sources of energy used by this roast. It might be a good idea to save those settings as defaults to be used to calculate the energy consumption of future roasts</source>
-      <translation>Comece fazendo entradas na subguia Cargas para definir as fontes de energia usadas por esta torra. Pode ser uma boa ideia salvar essas configurações como padrões para serem usadas para calcular o consumo de energia de futuros assados</translation>
+      <translation>Comece fazendo entradas na subguia Cargas para definir as fontes de energia usadas por esta torra. Pode ser uma boa ideia salvar essas configurações como padrões para serem usadas para calcular o consumo de energia de futuras torras</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="40" />
@@ -10156,7 +10156,7 @@ Quando em branco, considera-se que a carga está em uma configuração constante
     <message>
       <location filename="../help/energy_help.py" line="61" />
       <source>To use the Artisan energy measurement feature you will need to record one or more profiles that include the protocol of interest.  For example, to measure the Pre-Heating energy, START recording when the roaster is turned on.  Let Artisan record the entire pre-heating procedure.  At the end of the pre-heating you can either STOP recording the profile or go forward with the roast.  The CHARGE event will mark the end of pre-heating when Artisan measures the pre-heat energy.  Similarly a Between Batches protocol can be recorded with START followed by a normal roast.  A Cooling protocol would be captured by not turning the Artisan recording OFF until the roaster is fully cooled.</source>
-      <translation>Para usar o recurso de medição de energia Artisan, você precisará registrar um ou mais perfis que incluem o protocolo de interesse. Por exemplo, para medir a energia de pré-aquecimento, INICIE a gravação quando o torrador for ligado. Deixe o Artisan registrar todo o procedimento de pré-aquecimento. No final do pré-aquecimento, você pode PARAR de gravar o perfil ou prosseguir com o assado. O evento CHARGE marcará o fim do pré-aquecimento quando o Artisan mede a energia do pré-aquecimento. Da mesma forma, um protocolo entre lotes pode ser gravado com INICIAR seguido por uma torrefação normal. Um protocolo de resfriamento seria capturado ao não desligar a gravação do Artisan até que o torrador estivesse totalmente resfriado.</translation>
+      <translation>Para usar o recurso de medição de energia Artisan, você precisará registrar um ou mais perfis que incluem o protocolo de interesse. Por exemplo, para medir a energia de pré-aquecimento, INICIE a gravação quando o torrador for ligado. Deixe o Artisan registrar todo o procedimento de pré-aquecimento. No final do pré-aquecimento, você pode PARAR de gravar o perfil ou prosseguir com a torra. O evento CHARGE marcará o fim do pré-aquecimento quando o Artisan mede a energia do pré-aquecimento. Da mesma forma, um protocolo entre lotes pode ser gravado com INICIAR seguido por uma torrefação normal. Um protocolo de resfriamento seria capturado ao não desligar a gravação do Artisan até que o torrador estivesse totalmente resfriado.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="61" />
@@ -10243,7 +10243,7 @@ A energia de pré-aquecimento é aplicada apenas ao primeiro lote de uma sessão
     <message>
       <location filename="../help/energy_help.py" line="71" />
       <source>This box should be ticked when a Between Batches protocol run is done after the Pre-heating and before the roast.</source>
-      <translation>Esta caixa deve ser marcada quando uma execução do protocolo Entre Lotes é feita após o Pré-aquecimento e antes do assado.</translation>
+      <translation>Esta caixa deve ser marcada quando uma execução do protocolo Entre Lotes é feita após o Pré-aquecimento e antes da torra.</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="14" />
@@ -10348,7 +10348,7 @@ A &amp; # 39; Durante a gravação: &amp; # 39; o exemplo também será mostrado
     <message>
       <location filename="../help/autosave_help.py" line="34" />
       <source>The current batch position, or "Roast of the Day"</source>
-      <translation>A posição do lote atual, ou 'Assado do Dia'</translation>
+      <translation>A posição do lote atual, ou 'Torra do Dia'</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="35" />
@@ -10367,12 +10367,12 @@ A &amp; # 39; Durante a gravação: &amp; # 39; o exemplo também será mostrado
       <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Beans field.
 From Roast&gt;Properties&gt;Beans</source>
       <translation>Substitua “nn” por 10, 15, 20, 25 ou 30 para mostrar os primeiros caracteres “nn” do campo Beans.
-De Assado&gt;Propriedades&gt;Feijão</translation>
+De Torra&gt;Propriedades&gt;Grãos</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="38" />
       <source>The entire first line From Roast&gt;Properties&gt;Beans</source>
-      <translation>Toda a primeira linha de Roast&gt; Propriedades&gt; Feijão</translation>
+      <translation>Toda a primeira linha de Roast&gt; Propriedades&gt; Grão</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="39" />
@@ -10387,7 +10387,7 @@ De Assado&gt;Propriedades&gt;Feijão</translation>
     <message>
       <location filename="../help/autosave_help.py" line="41" />
       <source>Roast time in format hhmm</source>
-      <translation>Hora do assado no formato hhmm</translation>
+      <translation>Hora da torra no formato hhmm</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="42" />
@@ -10402,32 +10402,32 @@ De Assado&gt;Propriedades&gt;Feijão</translation>
     <message>
       <location filename="../help/autosave_help.py" line="44" />
       <source>Roast year in format yyyy</source>
-      <translation>Ano assado no formato aaaa</translation>
+      <translation>Ano da torra no formato aaaa</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="45" />
       <source>Roast year in format yy</source>
-      <translation>Ano assado no formato aa</translation>
+      <translation>Ano da torra no formato aa</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="46" />
       <source>Roast month in format MMM (localized)</source>
-      <translation>Mês assado no formato MMM (localizado)</translation>
+      <translation>Mês da torra no formato MMM (localizado)</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="47" />
       <source>Roast month in format MM</source>
-      <translation>Mês assado no formato MM</translation>
+      <translation>Mês da torra no formato MM</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="48" />
       <source>Roast day in format ddd (localized)</source>
-      <translation>Dia do assado no formato ddd (localizado)</translation>
+      <translation>Dia da torra no formato ddd (localizado)</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="49" />
       <source>Roast day in format dd</source>
-      <translation>Dia de assado no formato dd</translation>
+      <translation>Dia da torra no formato dd</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="50" />
@@ -10437,7 +10437,7 @@ De Assado&gt;Propriedades&gt;Feijão</translation>
     <message>
       <location filename="../help/autosave_help.py" line="51" />
       <source>Roast minute in format mm</source>
-      <translation>Minuto assado no formato mm</translation>
+      <translation>Minuto da torra no formato mm</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="52" />
@@ -10684,7 +10684,7 @@ De Assado&gt;Propriedades&gt;Feijão</translation>
       <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Roasting Notes field.
 From Roast&gt;Properties&gt;Roasting Notes</source>
       <translation>Substitua “nn” por 10, 15, 20, 25 ou 30 para mostrar os primeiros caracteres “nn” do campo Roasting Notes.
-De Assado&gt;Propriedades&gt;Notas de Assado</translation>
+De Torra&gt;Propriedades&gt;Notas da Torra</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="101" />
@@ -10696,7 +10696,7 @@ De Assado&gt;Propriedades&gt;Notas de Assado</translation>
       <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Cupping Notes field.
 From Roast&gt;Properties&gt;Cupping Notes</source>
       <translation>Substitua “nn” por 10, 15, 20, 25 ou 30 para mostrar os primeiros caracteres “nn” do campo Cupping Notes.
-De Assado&gt; Propriedades&gt; Notas de degustação</translation>
+De Torra&gt; Propriedades&gt; Notas de degustação</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="103" />
@@ -10746,7 +10746,7 @@ De Assado&gt; Propriedades&gt; Notas de degustação</translation>
     <message>
       <location filename="../help/autosave_help.py" line="112" />
       <source>From the Profile Energy Use - CO2 produced per kg of green beans in g</source>
-      <translation>Do Perfil Uso de Energia - CO2 produzido por kg de feijão verde em g</translation>
+      <translation>Do Perfil Uso de Energia - CO2 produzido por kg de grão verde em g</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="123" />
@@ -10959,7 +10959,7 @@ De Assado&gt; Propriedades&gt; Notas de degustação</translation>
       <source>
 For example, while "Y2" returns the current bean temperature (BT), "Y2[-1]" returns the previous BT temperature and "Y2[-2]" the one before that. Formulas used in the Plotter are applied in sequence to all values, thus there "Y2" points to the current BT temperature processed, "Y2[-1]" the previous BT temperature processed and "Y2[+1]" the next BT temperature to be processed. A positive shift is only available in the Plotter, obviously not during recording.</source>
       <translation>
-Por exemplo, enquanto 'Y2' retorna a temperatura atual do feijão (BT), 'Y2 [-1]' retorna a temperatura BT anterior e 'Y2 [-2]' a anterior. As fórmulas usadas no Plotter são aplicadas em sequência a todos os valores, portanto, 'Y2' aponta para a temperatura BT atual processada, 'Y2 [-1]' a temperatura BT anterior processada e 'Y2 [+1]' a próxima temperatura BT ser processado. Uma mudança positiva está disponível apenas no Plotter, obviamente não durante a gravação.</translation>
+Por exemplo, enquanto 'Y2' retorna a temperatura atual do grão (BT), 'Y2 [-1]' retorna a temperatura BT anterior e 'Y2 [-2]' a anterior. As fórmulas usadas no Plotter são aplicadas em sequência a todos os valores, portanto, 'Y2' aponta para a temperatura BT atual processada, 'Y2 [-1]' a temperatura BT anterior processada e 'Y2 [+1]' a próxima temperatura BT ser processado. Uma mudança positiva está disponível apenas no Plotter, obviamente não durante a gravação.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="59" />
@@ -11009,7 +11009,7 @@ Por exemplo, enquanto 'Y2' retorna a temperatura atual do feijão (BT), 'Y2 [-1]
     <message>
       <location filename="../help/symbolic_help.py" line="72" />
       <source>Previously recorded data assigned to the symbolic variables t, b, Y&lt;n&gt;, B&lt;n&gt; and R&lt;n&gt; can also directly accessed by index. "Y2{0}" evaluates to the first recorded bean temperature (BT) and "Y2{CHARGE}" to the bean temperature at CHARGE. Additionally, the symbolic variable b can be used to access the recording time at a certain index of the background profile. Thus "b{CHARGE}" returns the recording time at CHARGE of the background profile.</source>
-      <translation>Os dados previamente registrados atribuídos às variáveis simbólicas t, b, Y &lt;n&gt;, B &lt;n&gt; e R &lt;n&gt; também podem ser acessados diretamente pelo índice. 'Y2 {0}' avalia para a primeira temperatura do feijão registrada (BT) e 'Y2 {CHARGE}' para a temperatura do feijão em CHARGE. Além disso, a variável simbólica b pode ser usada para acessar o tempo de gravação em um determinado índice do perfil de fundo. Portanto, 'b {CHARGE}' retorna o tempo de gravação em CHARGE do perfil de fundo.</translation>
+      <translation>Os dados previamente registrados atribuídos às variáveis simbólicas t, b, Y &lt;n&gt;, B &lt;n&gt; e R &lt;n&gt; também podem ser acessados diretamente pelo índice. 'Y2 {0}' avalia para a primeira temperatura do grão registrada (BT) e 'Y2 {CHARGE}' para a temperatura do grão em CHARGE. Além disso, a variável simbólica b pode ser usada para acessar o tempo de gravação em um determinado índice do perfil de fundo. Portanto, 'b {CHARGE}' retorna o tempo de gravação em CHARGE do perfil de fundo.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="75" />
@@ -11147,7 +11147,7 @@ O valor de predição é o tempo calculado em segundos para atingir a temperatur
     <message>
       <location filename="../help/symbolic_help.py" line="131" />
       <source>ROAST PROPERTIES</source>
-      <translation>PROPRIEDADES DO ASSADO</translation>
+      <translation>PROPRIEDADES DA TORRA</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="135" />
@@ -12140,9 +12140,9 @@ Gás 50% @ 12% DTR</translation>
 Note that pre-heating and roaster cooling energy values are applied to the first roast of a roasting session.  Between batch energies are applied to every roast except the first.  Tick the "Between batches after Pre-Heating box to apply the between batch value to the first roast.
 
 Follow the steps below to set the energy inputs for the roast machine and afterburner.</source>
-      <translation type="vanished">A guia Energia exibe o consumo de energia de um assado. As emissões de CO2 também são calculadas para monitorar o impacto da operação de torrefação. As configurações devem ser feitas para cada carga de energia. Cargas são os queimadores, motores e ventiladores principais e um pós-combustor, se for usado. A energia usada para pré-aquecimento, entre bateladas e protocolos de resfriamento de torrefação estão incluídas nos cálculos e as configurações também estão disponíveis para eles.
+      <translation type="vanished">A guia Energia exibe o consumo de energia de uma torra. As emissões de CO2 também são calculadas para monitorar o impacto da operação de torrefação. As configurações devem ser feitas para cada carga de energia. Cargas são os queimadores, motores e ventiladores principais e um pós-combustor, se for usado. A energia usada para pré-aquecimento, entre bateladas e protocolos de resfriamento de torrefação estão incluídas nos cálculos e as configurações também estão disponíveis para eles.
 
-Observe que os valores de energia de pré-aquecimento e resfriamento da torrefação são aplicados à primeira torrefação de uma sessão de torrefação. Entre os lotes, as energias são aplicadas a todos os assados, exceto ao primeiro. Marque a caixa 'Entre lotes após o pré-aquecimento para aplicar o valor entre lotes à primeira torrefação.
+Observe que os valores de energia de pré-aquecimento e resfriamento da torrefação são aplicados à primeira torrefação de uma sessão de torrefação. Entre os lotes, as energias são aplicadas a todas as torras, exceto ao primeiro. Marque a caixa 'Entre lotes após o pré-aquecimento para aplicar o valor entre lotes à primeira torrefação.
 
 Siga as etapas abaixo para definir as entradas de energia para a máquina de torrefação e pós-combustão.</translation>
     </message>
@@ -15279,7 +15279,7 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/main.py" line="2021" />
       <source>Roast Report PDF...</source>
-      <translation>PDF de relatório de assado ...</translation>
+      <translation>PDF de relatório de torra ...</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2029" />
@@ -16914,7 +16914,7 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
     <message>
       <location filename="../artisanlib/main.py" line="10905" />
       <source>Auto Axis Graph Mode: Roast</source>
-      <translation>Modo de gráfico de eixo automático: Assado</translation>
+      <translation>Modo de gráfico de eixo automático: Torra</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10907" />
@@ -18280,7 +18280,7 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o craf
     </message>
     <message>
       <source>Roast summary copied to clipboard</source>
-      <translation type="vanished">Resumo do assado copiado para a área de transferência</translation>
+      <translation type="vanished">Resumo da torra copiado para a área de transferência</translation>
     </message>
     <message>
       <source>Profile missing Dry event</source>
