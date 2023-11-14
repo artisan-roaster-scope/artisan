@@ -21,6 +21,12 @@ If you press +, your current roast profile gets saved (up to 25 entries). Here i
 
 You can note moisture as well if you know it, and ambient data.  If you want to manually enter ambient data, leave the source dropdown blank.  If you have a VintHub Phidget, you can use Phidgets to record the ambient temperature, humdity and and pressure.  See `File` >> `Config` >> `Device`, `Ambient Tab`. These will show up in the Summary box.
 
+On pressing Reset the following values are cleared:
+title/beans
+artisan.plus store/coffee/blend
+green weight/volume/density/moisture/screen/temp
+ambient temp/humidity/pressure.
+
 On the second tab Notes, you can add roasting and cupping notes.  The first two lines will show up in the Summary box.  Events and Data are entered by Artisan throughout the roast.  You can now use the Copy Table button on these tabs from a roast to export the data to Excel using the text import wizard.
 
 To reset the Properties you have to select the box “Delete roast properties on RESET” and then reset. You can also have the Properties box open on charge to remind you, mostly to at least, to name your coffee.
