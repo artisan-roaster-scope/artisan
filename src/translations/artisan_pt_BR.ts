@@ -11404,13 +11404,13 @@ CTRL+SHIFT+H [Win]</translation>
       <source>⌘ +,- [Mac]
 CRTL +,- [Win]</source>
       <translation type="vanished">⌘ +,- [Mac]
-CRTL +,- [Vitória]</translation>
+CRTL +,- [Win]</translation>
     </message>
     <message>
       <source>⌘ 0-9 [Mac]
 CRTL 0-9 [Win]</source>
       <translation type="vanished">⌘ 0-9 [Mac]
-CRTL 0-9 [Vitória]</translation>
+CRTL 0-9 [Win]</translation>
     </message>
     <message>
       <source>Q,W,E,R + &lt;value&gt;</source>
@@ -11518,7 +11518,7 @@ CTRL+SHIFT+F [Win]</translation>
     </message>
     <message>
       <source>~title Roasted on ~date</source>
-      <translation type="vanished">~ título Torrado em ~ data</translation>
+      <translation type="vanished">~título Torrado em ~data</translation>
     </message>
     <message>
       <source>Burundi Roasted on 20-04-25.alog</source>
@@ -11526,11 +11526,11 @@ CTRL+SHIFT+F [Win]</translation>
     </message>
     <message>
       <source>~batchcounter ~title ~date_long</source>
-      <translation type="vanished">~ batchcounter ~ title ~ date_long</translation>
+      <translation type="vanished">~batchcounter ~title ~date_long</translation>
     </message>
     <message>
       <source>~beans ~machine ~drumspeedRPM ~weight~weightunits ~poisturePCT ~operator ~date ~batch(~batchposition)</source>
-      <translation type="vanished">~ beans ~ machine ~ drumspeedRPM ~ weight ~ weightunits ~ poisturePCT ~ operator ~ date ~ batch (~ batchposition)</translation>
+      <translation type="vanished">~beans ~machine ~drumspeedRPM ~weight~weightunits ~poisturePCT ~operator ~date ~batch (~ batchposition)</translation>
     </message>
     <message>
       <source>Burundi Kiganda Murambi Lot44 SF-25 64RPM 10.3Kg 10.2PCT Roberto 20-04-25 Prod-1380(6).alog</source>
@@ -11560,7 +11560,7 @@ When OFF:
 Prod-1380 Burundi Kiganda Murambi 2020-04-25_1136.alog
 While Recording. 
 Recording 1380  Burundi KigandaMurambi 2020-04-25_113809.alog</source>
-      <translation type="vanished">Cria um nome de arquivo exclusivo para vários salvamentos durante a amostragem usando ~ currtime.
+      <translation type="vanished">Cria um nome de arquivo exclusivo para vários salvamentos durante a amostragem usando ~currtime.
 Quando DESLIGADO:
 Prod-1380 Burundi Kiganda Murambi 2020-04-25_1136.alog
 Durante a gravação.
@@ -11568,15 +11568,15 @@ Gravação 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     </message>
     <message>
       <source>sleep(&lt;float&gt;)</source>
-      <translation type="vanished">dormir (&lt;float&gt;)</translation>
+      <translation type="vanished">sleep(&lt;float&gt;)</translation>
     </message>
     <message>
       <source>button(&lt;bool&gt;)</source>
-      <translation type="vanished">botão (&lt;bool&gt;)</translation>
+      <translation type="vanished">button(&lt;bool&gt;)</translation>
     </message>
     <message>
-      <source>read(slaveID,register)</source>
-      <translation type="vanished">ler (slaveID, registrar)</translation>
+      <source>button(slaveID,register)</source>
+      <translation type="vanished">button(slaveID, registrar)</translation>
     </message>
     <message>
       <source>readSigned(slaveId,register)</source>
@@ -11604,31 +11604,31 @@ Gravação 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     </message>
     <message>
       <source>write(slaveId,register,value) or write([slaveId,register,value],..,[slaveId,register,value])</source>
-      <translation type="vanished">escrever (slaveId, registro, valor) ou escrever ([slaveId, registro, valor], .., [slaveId, registro, valor])</translation>
+      <translation type="vanished">write(slaveId, registro, valor) ou write([slaveId, registro, valor], .., [slaveId, registro, valor])</translation>
     </message>
     <message>
       <source>wcoil(slaveId,register,&lt;bool&gt;)</source>
-      <translation type="vanished">wcoil (slaveId, registrar, &lt;bool&gt;)</translation>
+      <translation type="vanished">wcoil(slaveId, registrar, &lt;bool&gt;)</translation>
     </message>
     <message>
       <source>wcoils(slaveId,register,[&lt;bool&gt;,..,&lt;bool&gt;])</source>
-      <translation type="vanished">wcoils (slaveId, registro, [&lt;bool&gt;, .., &lt;bool&gt;])</translation>
+      <translation type="vanished">wcoils(slaveId, registro, [&lt;bool&gt;, .., &lt;bool&gt;])</translation>
     </message>
     <message>
       <source>mwrite(slaveId,register,andMask,orMask) or mwrite(s,r,am,om,v)</source>
-      <translation type="vanished">mwrite (slaveId, register, andMask, orMask) ou mwrite (s, r, am, om, v)</translation>
+      <translation type="vanished">mwrite(slaveId, register, andMask, orMask) ou mwrite(s, r, am, om, v)</translation>
     </message>
     <message>
       <source>writem(slaveId,register,value) or writem(slaveId,register,[&lt;int&gt;,..,&lt;int&gt;])</source>
-      <translation type="vanished">Writeem (slaveId, registro, valor) ou Write (slaveId, registro, [&lt;int&gt;, .., &lt;int&gt;])</translation>
+      <translation type="vanished">writem(slaveId, registro, valor) ou writem(slaveId, registro, [&lt;int&gt;, .., &lt;int&gt;])</translation>
     </message>
     <message>
       <source>writeBCD(s,r,v) or writeBCD([s,r,v],..,[s,r,v])</source>
-      <translation type="vanished">writeBCD (s, r, v) ou writeBCD ([s, r, v], .., [s, r, v])</translation>
+      <translation type="vanished">writeBCD(s, r, v) ou writeBCD([s, r, v], .., [s, r, v])</translation>
     </message>
     <message>
       <source>writeWord(slaveId,register,value) or writeWord([slaveId,register,value],..,[slaveId,register,value])</source>
-      <translation type="vanished">writeWord (slaveId, registro, valor) ou writeWord ([slaveId, registro, valor], .., [slaveId, registro, valor])</translation>
+      <translation type="vanished">writeWord(slaveId, registro, valor) ou writeWord([slaveId, registro, valor], .., [slaveId, registro, valor])</translation>
     </message>
     <message>
       <source>writeLong(slaveId,register,value) or writeLong([slaveId,register,value],..,[slaveId,register,value])</source>
@@ -11636,63 +11636,63 @@ Gravação 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     </message>
     <message>
       <source>writeSingle(slaveId,register,value) or writeSingle([slaveId,register,value],..,[slaveId,register,value])</source>
-      <translation type="vanished">writeSingle (slaveId, registro, valor) ou writeSingle ([slaveId, registro, valor], .., [slaveId, registro, valor])</translation>
+      <translation type="vanished">writeSingle(slaveId, registro, valor) ou writeSingle([slaveId, registro, valor], .., [slaveId, registro, valor])</translation>
     </message>
     <message>
       <source>motor(n),solenoid(n),stirrer(n),heater(h),fan(f) </source>
-      <translation type="vanished">motor (n), solenóide (n), agitador (n), aquecedor (h), ventilador (f)</translation>
+      <translation type="vanished">motor(n),solenoid (n),stirrer(n),heater(h),fan(f)</translation>
     </message>
     <message>
       <source>write(&lt;unitId&gt;,&lt;register&gt;,&lt;value&gt;)</source>
-      <translation type="vanished">escrever (&lt;unitId&gt;, &lt;register&gt;, &lt;value&gt;)</translation>
+      <translation type="vanished">write(&lt;unitId&gt;, &lt;register&gt;, &lt;value&gt;)</translation>
     </message>
     <message>
       <source>out(&lt;channel&gt;,&lt;value&gt;[,&lt;sn&gt;])</source>
-      <translation type="vanished">out (&lt;canal&gt;, &lt;valor&gt; [, &lt;sn&gt;])</translation>
+      <translation type="vanished">out(&lt;canal&gt;, &lt;valor&gt; [, &lt;sn&gt;])</translation>
     </message>
     <message>
       <source>toggle(&lt;channel&gt;[,&lt;sn&gt;])</source>
-      <translation type="vanished">alternar (&lt;canal&gt; [, &lt;sn&gt;])</translation>
+      <translation type="vanished">toggle(&lt;canal&gt; [, &lt;sn&gt;])</translation>
     </message>
     <message>
       <source>pulse(&lt;channel&gt;,&lt;millis&gt;[,&lt;sn&gt;])</source>
-      <translation type="vanished">pulso (&lt;canal&gt;, &lt;millis&gt; [, &lt;sn&gt;])</translation>
+      <translation type="vanished">pulse(&lt;canal&gt;, &lt;millis&gt; [, &lt;sn&gt;])</translation>
     </message>
     <message>
       <source>outhub(&lt;channel&gt;,&lt;value&gt;[,&lt;sn&gt;])</source>
-      <translation type="vanished">outhub (&lt;canal&gt;, &lt;valor&gt; [, &lt;sn&gt;])</translation>
+      <translation type="vanished">outhub(&lt;canal&gt;, &lt;valor&gt; [, &lt;sn&gt;])</translation>
     </message>
     <message>
       <source>togglehub(&lt;channel&gt;[,&lt;sn&gt;])</source>
-      <translation type="vanished">togglehub (&lt;canal&gt; [, &lt;sn&gt;])</translation>
+      <translation type="vanished">togglehub(&lt;canal&gt; [, &lt;sn&gt;])</translation>
     </message>
     <message>
       <source>pulsehub(&lt;channel&gt;,&lt;millis&gt;[,&lt;sn&gt;])</source>
-      <translation type="vanished">pulsehub (&lt;canal&gt;, &lt;millis&gt; [, &lt;sn&gt;])</translation>
+      <translation type="vanished">pulsehub(&lt;canal&gt;, &lt;millis&gt; [, &lt;sn&gt;])</translation>
     </message>
     <message>
       <source>enabled(c,b[,sn])</source>
-      <translation type="vanished">habilitado (c, b [, sn])</translation>
+      <translation type="vanished">enabled(c, b [, sn])</translation>
     </message>
     <message>
       <source>freq(c,f[,sn])</source>
-      <translation type="vanished">freq (c, f [, sn])</translation>
+      <translation type="vanished">freq(c, f [, sn])</translation>
     </message>
     <message>
       <source>duty(c,d[,sn])</source>
-      <translation type="vanished">dever (c, d [, sn])</translation>
+      <translation type="vanished">duty(c, d [, sn])</translation>
     </message>
     <message>
       <source>move(c,d,t[,sn])</source>
-      <translation type="vanished">mover (c, d, t [, sn])</translation>
+      <translation type="vanished">move(c, d, t [, sn])</translation>
     </message>
     <message>
       <source>range(c,r[,sn])</source>
-      <translation type="vanished">intervalo (c, r [, sn])</translation>
+      <translation type="vanished">range(c, r [, sn])</translation>
     </message>
     <message>
       <source>out(n,v[,sn])</source>
-      <translation type="vanished">out (n, v [, sn])</translation>
+      <translation type="vanished">out(n, v [, sn])</translation>
     </message>
     <message>
       <source>vout(c,v[,sn])</source>
@@ -11700,47 +11700,47 @@ Gravação 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     </message>
     <message>
       <source>cout(c[,sn])</source>
-      <translation type="vanished">cout (c [, sn])</translation>
+      <translation type="vanished">cout(c [, sn])</translation>
     </message>
     <message>
       <source>set(c,b[,sn])</source>
-      <translation type="vanished">conjunto (c, b [, sn])</translation>
+      <translation type="vanished">set(c, b [, sn])</translation>
     </message>
     <message>
       <source>toggle(c[,sn])</source>
-      <translation type="vanished">alternar (c [, sn])</translation>
+      <translation type="vanished">toggle(c [, sn])</translation>
     </message>
     <message>
       <source>pulse(c,t[,sn])</source>
-      <translation type="vanished">pulso (c, t [, sn])</translation>
+      <translation type="vanished">pulse(c, t [, sn])</translation>
     </message>
     <message>
       <source>out(c,v[,sn])</source>
-      <translation type="vanished">out (c, v [, sn])</translation>
+      <translation type="vanished">out(c, v [, sn])</translation>
     </message>
     <message>
       <source>accel(c,v[,sn])</source>
-      <translation type="vanished">acel (c, v [, sn])</translation>
+      <translation type="vanished">accel(c, v [, sn])</translation>
     </message>
     <message>
       <source>vel(c,v[,sn])</source>
-      <translation type="vanished">vel (c, v [, sn])</translation>
+      <translation type="vanished">vel(c, v [, sn])</translation>
     </message>
     <message>
       <source>limit(c,v[,sn])</source>
-      <translation type="vanished">limite(c,v[,sn])</translation>
+      <translation type="vanished">limit(c,v[,sn])</translation>
     </message>
     <message>
       <source>on(c[,sn])</source>
-      <translation type="vanished">em (c [, sn])</translation>
+      <translation type="vanished">on(c [, sn])</translation>
     </message>
     <message>
       <source>off(c[,sn])</source>
-      <translation type="vanished">desligado (c [, sn])</translation>
+      <translation type="vanished">off(c [, sn])</translation>
     </message>
     <message>
       <source>flip(c[,sn])</source>
-      <translation type="vanished">flip (c [, sn])</translation>
+      <translation type="vanished">flip(c [, sn])</translation>
     </message>
     <message>
       <source>pip(c,delay,duration[,sn])</source>
