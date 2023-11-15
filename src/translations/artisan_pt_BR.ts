@@ -14145,7 +14145,7 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/main.py" line="6536" />
       <source>ABC/secs</source>
-      <translation>ABC / s</translation>
+      <translation>ABC/s</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6547" />
@@ -14180,7 +14180,7 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/main.py" line="6567" />
       <source>Smooth Curves/Spikes</source>
-      <translation>Curvas / pontas suaves</translation>
+      <translation>Curvas/pontas suaves</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6568" />
@@ -14195,7 +14195,7 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/main.py" line="6569" />
       <source>Fit RoRoR (C/min/min)</source>
-      <translation>RoRoR de ajuste (C / min / min)</translation>
+      <translation>RoRoR de ajuste (C/min/min)</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6569" />
@@ -14355,7 +14355,7 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/main.py" line="24550" />
       <source>Max+/Max- RoR</source>
-      <translation>Max + / Max- RoR</translation>
+      <translation>Max+/Max- RoR</translation>
     </message>
     <message>
       <location filename="../artisanlib/batches.py" line="55" />
@@ -14703,7 +14703,7 @@ Fases LCDs</translation>
     </message>
     <message>
       <source>min</source>
-      <translation type="vanished">min</translation>
+      <translation type="vanished">mín</translation>
     </message>
     <message>
       <source>Event #&lt;b&gt;0 &lt;/b&gt;</source>
@@ -14815,7 +14815,7 @@ Fases LCDs</translation>
     </message>
     <message>
       <source>Initial Max</source>
-      <translation type="vanished">Max inicial</translation>
+      <translation type="vanished">Máx inicial</translation>
     </message>
     <message>
       <source>Bars</source>
@@ -14979,7 +14979,7 @@ Fases LCDs</translation>
     </message>
     <message>
       <source>18/64u2033</source>
-      <translation type="vanished">18 / 64u2033</translation>
+      <translation type="vanished">18/64u2033</translation>
     </message>
     <message>
       <source>Burner</source>
@@ -15658,7 +15658,7 @@ Fases LCDs</translation>
     </message>
     <message>
       <source>Quit</source>
-      <translation type="vanished">Encerrar</translation>
+      <translation type="vanished">Sair</translation>
     </message>
     <message>
       <source>About...</source>
@@ -15891,12 +15891,12 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1807" />
       <source>End output status at the end of ramp/soak: {0}</source>
-      <translation>Status de saída final no final da rampa / saturação: {0}</translation>
+      <translation>Status de saída final no final da rampa/saturação: {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1808" />
       <source>Output status while ramp/soak operation set to OFF: {0}</source>
-      <translation>Status de saída durante a operação de rampa / patamar definida como DESLIGADA: {0}</translation>
+      <translation>Status de saída durante a operação de rampa/patamar definida como DESLIGADA: {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1809" />
@@ -16263,7 +16263,7 @@ Repita a operação no final: {0}</translation>
       <location filename="../artisanlib/roast_properties.py" line="4353" />
       <location filename="../artisanlib/roast_properties.py" line="4349" />
       <source>Alarms from events #{0} created</source>
-      <translation>Alarmes de eventos nº {0} criados</translation>
+      <translation>Alarmes de eventos #{0} criados</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="4410" />
@@ -16284,7 +16284,7 @@ Repita a operação no final: {0}</translation>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="4401" />
       <source> Events #{0} deleted</source>
-      <translation> Eventos nº {0} excluídos</translation>
+      <translation> Eventos #{0} excluídos</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="4404" />
@@ -16409,7 +16409,7 @@ Repita a operação no final: {0}</translation>
     <message>
       <location filename="../artisanlib/pid_control.py" line="763" />
       <source>PXG/PXF sv#{0} set to {1}</source>
-      <translation>PXG / PXF sv # {0} definido como {1}</translation>
+      <translation>PXG/PXF sv#{0} definido como {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="792" />
