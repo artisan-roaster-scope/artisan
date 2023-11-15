@@ -11968,7 +11968,7 @@ O Artisan iniciará o programa a cada período de amostragem. A saída do progra
     </message>
     <message>
       <source>print ("237.1,100.4")</source>
-      <translation type="vanished">imprimir ('237.1,100,4')</translation>
+      <translation type="vanished">print("237.1,100.4")</translation>
     </message>
     <message>
       <source>Scaling factor from time to RoR axis. The range of the temperature scale divided by the range of the delta scale. </source>
@@ -11990,7 +11990,7 @@ Exceção ao acima para DRY apenas: se AutoDRY for verificado, a temperatura DRY
     </message>
     <message>
       <source>Number of seconds since CHARGE</source>
-      <translation type="vanished">Número de segundos desde CHARGE</translation>
+      <translation type="vanished">Número de segundos desde CARGA</translation>
     </message>
     <message>
       <source>Number of seconds after FCs 
@@ -11998,7 +11998,7 @@ Best used inside double quotes (see notes below)
 Displays &amp;#39;*&amp;#39; prior to FCs</source>
       <translation type="vanished">Número de segundos após os FCs
 Melhor usado entre aspas duplas (ver notas abaixo)
-Exibe &amp;#39; * &amp;#39; antes dos FCs</translation>
+Exibe &amp;#39;*&amp;#39; antes dos FCs</translation>
     </message>
     <message>
       <source>Number of seconds before FCs 
@@ -12006,13 +12006,13 @@ Best used inside single quotes or back ticks (see notes below)
 Displays &amp;#39;*&amp;#39; after FCs</source>
       <translation type="vanished">Número de segundos antes dos FCs
 Melhor usado dentro de aspas simples ou back ticks (veja as notas abaixo)
-Exibe &amp;#39; * &amp;#39; depois de FCs</translation>
+Exibe &amp;#39;*&amp;#39; depois de FCs</translation>
     </message>
     <message>
       <source>Development time ratio. Note: DTR=0 before FCs 
 100*(t{Event}-t{FCs})/(t{FCs}-t{CHARGE})</source>
       <translation type="vanished">Proporção do tempo de desenvolvimento. Nota: DTR = 0 antes dos FCs
-100 * (t {Event} -t {FCs}) / (t {FCs} -t {CHARGE})</translation>
+100*(t{Event}-t{FCs})/(t{FCs}-t{CHARGE})</translation>
     </message>
     <message>
       <source>Toggle LCD cursor (off/profile/template)</source>
@@ -12077,10 +12077,10 @@ Gas 50% @340 u00b0F
 After FCs:
 Gas 50% @12% DTR</source>
       <translation type="vanished">Antes dos FCs:
-Gás 50% @ 340 u00b0F
+Gás 50% @340 u00b0F
 
 Depois de FCs:
-Gás 50% @ 12% DTR</translation>
+Gás 50% @12% DTR</translation>
     </message>
     <message>
       <source>More than 90 seconds before FCs:
@@ -12092,13 +12092,13 @@ Gas 50% @340 u00b0F, 50 sec before FCs
 After FCs:
 Gas 50% @12% DTR</source>
       <translation type="vanished">Mais de 90 segundos antes dos FCs:
-Gás 50% @ 340 u00b0F
+Gás 50% @340 u00b0F
 
 Menos de 90 segundos antes dos FCs:
-Gás 50% @ 340 u00b0F, 50 segundos antes dos FCs
+Gás 50% @340 u00b0F, 50 segundos antes dos FCs
 
 Depois de FCs:
-Gás 50% @ 12% DTR</translation>
+Gás 50% @12% DTR</translation>
     </message>
     <message>
       <source>Hay @340 u00b0F</source>
@@ -12114,7 +12114,7 @@ Gás 50% @ 12% DTR</translation>
     </message>
     <message>
       <source>The action Command.  Depends on the action type, &amp;#39;{}&amp;#39; is replaced by the event value and the offset in case of a u00B1 event type.</source>
-      <translation type="vanished">O Comando de ação. Depende do tipo de ação, &amp;#39; {} &amp;#39; é substituído pelo valor do evento e o deslocamento no caso de um tipo de evento u00B1.</translation>
+      <translation type="vanished">O Comando de ação. Depende do tipo de ação, &amp;#39;{}&amp;#39; é substituído pelo valor do evento e o deslocamento no caso de um tipo de evento u00B1.</translation>
     </message>
     <message>
       <source>Note: "{}" can be used as a placeholder, it will be substituted by the current button value plus the offset for u00B1 event types.  If a placeholder occurs several times in a description/command, all those occurrences are replaced by the value.
@@ -12124,15 +12124,15 @@ Gás 50% @ 12% DTR</translation>
     </message>
     <message>
       <source>u0027Recording ~batchcounter&amp;#39; "~batch" ~title ~datetime_long</source>
-      <translation type="vanished">u0027Recording ~ batchcounter &amp;#39; '~ batch' ~ title ~ datetime_long</translation>
+      <translation type="vanished">u0027Gravando ~batchcounter&amp;#39; '~batch' ~title ~datetime_long</translation>
     </message>
     <message>
       <source>Gas 5.0kPh @340F and 32.8u00b0F/min</source>
-      <translation type="vanished">Gás 5,0kPh @ 340F e 32,8u00b0F / min</translation>
+      <translation type="vanished">Gás 5,0kPh @340F e 32,8u00b0F / min</translation>
     </message>
     <message>
       <source>u0027Recording ~batchcounter&amp;#39; "~batch" ~title ~date_long_&amp;#39;~currtime&amp;#39;"~time"</source>
-      <translation type="vanished">u0027Recording ~ batchcounter &amp;#39; '~ batch' ~ title ~ date_long _ &amp;#39; ~ currtime &amp;#39; '~ time'</translation>
+      <translation type="vanished">u0027Gravando ~batchcounter &amp;#39; '~ batch' ~title ~date_long_&amp;#39;~currtime &amp;#39; '~time'</translation>
     </message>
     <message>
       <source>The Energy tab displays a roast&amp;#39;s energy consumption.   CO2 emissions are also calculated to monitor the impact of the roasting operation.  Settings must be made for each energy load.  Loads are the main burners, motors and blowers, and an afterburner if one is used.  The energy used for preheating, between batch, and roaster cooling protocols are included in the calculations, and settings are available for them as well.
@@ -12643,7 +12643,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1295" />
       <source>&lt;u&gt;Max life&lt;/u&gt; 10,000 writes</source>
-      <translation>&lt;u&gt;Vida útil&lt;/u&gt; 10,000 gravações</translation>
+      <translation>&lt;u&gt;Vida útil&lt;/u&gt; 10.000 gravações</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1296" />
@@ -12984,7 +12984,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
       <location filename="../artisanlib/ports.py" line="1038" />
       <location filename="../artisanlib/ports.py" line="246" />
       <source>DB#</source>
-      <translation>DB #</translation>
+      <translation>DB#</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6532" />
@@ -13008,7 +13008,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
       <location filename="../artisanlib/ports.py" line="432" />
       <location filename="../artisanlib/ports.py" line="387" />
       <source>Baud Rate</source>
-      <translation>Taxa de Trasmissão</translation>
+      <translation>Taxa de Transmissão</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="823" />
@@ -13032,7 +13032,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
       <location filename="../artisanlib/ports.py" line="454" />
       <location filename="../artisanlib/ports.py" line="406" />
       <source>Stopbits</source>
-      <translation>Bit de Parada</translation>
+      <translation>Bits de Parada</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="842" />
@@ -13087,7 +13087,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
       <location filename="../artisanlib/ports.py" line="999" />
       <location filename="../artisanlib/ports.py" line="557" />
       <source>Host</source>
-      <translation>Rede</translation>
+      <translation>Servidor</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1155" />
@@ -13194,7 +13194,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
     <message>
       <location filename="../artisanlib/ports.py" line="1456" />
       <source>Data Request</source>
-      <translation>Pedido de data</translation>
+      <translation>Requisição de dados</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="1565" />
