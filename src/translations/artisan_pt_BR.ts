@@ -19546,7 +19546,7 @@ Continuar?</translation>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3967" />
       <source>Soak (MM:SS)</source>
-      <translation>Mergulhe (MM: SS)</translation>
+      <translation>Patamar (MM: SS)</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="4061" />
@@ -19581,7 +19581,7 @@ Continuar?</translation>
     <message>
       <location filename="../artisanlib/pid_control.py" line="464" />
       <source>setpid(): There was a problem setting {0}</source>
-      <translation>setpid (): Ocorreu um problema ao definir {0}</translation>
+      <translation>setpid(): Ocorreu um problema ao definir {0}</translation>
     </message>
   </context>
   <context>
@@ -19921,7 +19921,7 @@ Continuar?</translation>
       <location filename="../artisanlib/pid_dialogs.py" line="580" />
       <location filename="../artisanlib/pid_dialogs.py" line="428" />
       <source>Soak</source>
-      <translation>Absorver</translation>
+      <translation>Patamar</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="1003" />
@@ -20695,12 +20695,12 @@ Aromática</translation>
     <message>
       <location filename="../artisanlib/main.py" line="700" />
       <source>Pan</source>
-      <translation>Frigideira</translation>
+      <translation>Mover</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="701" />
       <source>Zoom</source>
-      <translation>Ampliação</translation>
+      <translation>Ampliar</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="877" />
@@ -21020,7 +21020,7 @@ tem que ser reduzido em 4 vezes.</translation>
     <message>
       <location filename="../artisanlib/events.py" line="913" />
       <source>Move slider under focus using the up/down cursor keys</source>
-      <translation>Mova o controle deslizante sob o foco usando as teclas de cursor para cima/para baixo</translation>
+      <translation>Mover o controle deslizante sob o foco usando as teclas de cursor para cima/para baixo</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="916" />
