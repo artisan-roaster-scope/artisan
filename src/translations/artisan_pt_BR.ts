@@ -4766,7 +4766,7 @@ RESFRIADO</translation>
     </message>
     <message>
       <source>Exception: redrawdesigner() Roast events may be out of order. Restting Designer.</source>
-      <translation type="vanished">Exceção: redrawdesigner () Os eventos de roast podem estar fora de serviço. Descansando Designer.</translation>
+      <translation type="vanished">Exceção: redrawdesigner () Os eventos de torra podem estar fora de serviço. Descansando Designer.</translation>
     </message>
     <message>
       <source>HH806AUtemperature(): {0} bytes received but 14 needed</source>
@@ -7154,7 +7154,7 @@ O Artisan iniciará o programa a cada período de amostragem. A saída do progra
       <location filename="../help/programs_help.py" line="22" />
       <source>Note: In many cases the path to the Python or other language executatable should be provided along with the external program path.  On Windows it is  advised to enclose the paths with quotation marks if there are any spaces, and use forward slashes &amp;#39;/&amp;#39; in the path.
 "C:/Python38-64/python.exe" "c:/scripts/test.py"</source>
-      <translation>Nota: Em muitos casos, o caminho para o Python ou outro executável de linguagem deve ser fornecido junto com o caminho do programa externo. No Windows, é aconselhável colocar os caminhos entre aspas, se houver espaços, e usar barras &amp; # 39; / &amp; # 39; no caminho.
+      <translation>Nota: Em muitos casos, o caminho para o Python ou outro executável de linguagem deve ser fornecido junto com o caminho do programa externo. No Windows, é aconselhável colocar os caminhos entre aspas, se houver espaços, e usar barras &amp;#39; / &amp;#39; no caminho.
 'C: /Python38-64/python.exe' 'c: /scripts/test.py'</translation>
     </message>
     <message>
@@ -7373,7 +7373,7 @@ Quando os atalhos de teclado estão DESATIVADOS adiciona um evento personalizado
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="50" />
       <source>Quick PID SV Entry.  Value is a three digit number.  For values less than 100 must be entered with a leading zero, e.g. &amp;#39;v075&amp;#39;.</source>
-      <translation>Entrada rápida de PID SV. O valor é um número de três dígitos. Para valores menores que 100 deve ser inserido com um zero à esquerda, por exemplo, &amp; # 39; v075 &amp; # 39 ;.</translation>
+      <translation>Entrada rápida de PID SV. O valor é um número de três dígitos. Para valores menores que 100 deve ser inserido com um zero à esquerda, por exemplo, &amp;#39; v075 &amp; # 39 ;.</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="51" />
@@ -7748,7 +7748,7 @@ Ferramentas CTRL&gt;&gt;Simulador [Win]</translation>
       <source>⌘+L [Mac]
 CTRL+L [Win]</source>
       <translation>⌘+L [Mac]
-CTRL+L [Vencer]</translation>
+CTRL+L [Win]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -7812,7 +7812,7 @@ Arquivo ALT&gt;&gt; Novo&gt;&gt; &lt;recent-roast&gt; [Win]</translation>
       <source>⌘+I [Mac]
 CTRL+I [Win]</source>
       <translation>⌘+I [Mac]
-CTRL+I [Vencer]</translation>
+CTRL+I [Win]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="86" />
@@ -7833,7 +7833,7 @@ CTRL+I [Vencer]</translation>
       <source>⌘+O [Mac]
 CTRL+O [Win]</source>
       <translation>⌘+O [Mac]
-CTRL+O [Vencer]</translation>
+CTRL+O [Win]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="87" />
@@ -7845,7 +7845,7 @@ CTRL+O [Vencer]</translation>
       <source>⌘+P [Mac]
 CTRL+P [Win]</source>
       <translation>⌘+P [Mac]
-CTRL+P [Vencer]</translation>
+CTRL+P [Win]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -7887,7 +7887,7 @@ Campo Peso Verde ou Peso Torrado</translation>
       <source>⌘+C [Mac]
 CTRL+C [Win]</source>
       <translation>⌘+C [Mac]
-CTRL+C [Vencer]</translation>
+CTRL+C [Win]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="91" />
@@ -8156,7 +8156,7 @@ Carregue o perfil gravado na máquina menor e abra o Transposer. Selecione o map
     <message>
       <location filename="../help/eventsliders_help.py" line="20" />
       <source>Command to perform, depends on the Action type. (&amp;#39;{}&amp;#39; is replaced by the slider value*Factor + Offset)</source>
-      <translation>O comando a ser executado depende do tipo de ação. (&amp; # 39; {} &amp; # 39; é substituído pelo valor do controle deslizante * Fator + Offset)</translation>
+      <translation>O comando a ser executado depende do tipo de ação. (&amp;#39; {} &amp;#39; é substituído pelo valor do controle deslizante * Fator + Offset)</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="21" />
@@ -9726,7 +9726,7 @@ Exibe &amp;#39;*&amp;#39; após FCs ou quando nenhum evento FCs existe</translat
     <message>
       <location filename="../help/eventannotations_help.py" line="32" />
       <source>Temperature mode (&amp;#39;C&amp;#39; or &amp;#39;F&amp;#39;)</source>
-      <translation>Modo de temperatura (&amp; # 39; C &amp; # 39; ou &amp; # 39; F &amp; # 39;)</translation>
+      <translation>Modo de temperatura (&amp;#39; C &amp;#39; ou &amp;#39; F &amp;#39;)</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="33" />
@@ -9738,21 +9738,21 @@ Exibe &amp;#39;*&amp;#39; após FCs ou quando nenhum evento FCs existe</translat
       <source>ET RoR value
 Displays &amp;#39;--&amp;#39; when the RoR value is not available.</source>
       <translation>Valor ET RoR
-Exibe &amp; # 39; - &amp; # 39; quando o valor RoR não está disponível.</translation>
+Exibe &amp;#39; - &amp;#39; quando o valor RoR não está disponível.</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="35" />
       <source>BT RoR value
 Shows &amp;#39;--&amp;#39; when the RoR value Is not available.</source>
       <translation>Valor BT RoR
-Mostra &amp; # 39; - &amp; # 39; quando o valor RoR não está disponível.</translation>
+Mostra &amp;#39; - &amp;#39; quando o valor RoR não está disponível.</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="36" />
       <source>RoR units
 Shorthand for &amp;#39;~deg~mode/min&amp;#39;</source>
       <translation>Unidades RoR
-Abreviação de &amp; # 39; ~ deg ~ mode / min &amp; # 39;</translation>
+Abreviação de &amp;#39; ~ deg ~ mode / min &amp;#39;</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="37" />
@@ -9844,7 +9844,7 @@ Para um marco sensorial (veja as notas acima), o valor 50 corresponde ao aroma '
     <message>
       <location filename="../help/eventannotations_help.py" line="55" />
       <source>Gas ~E% &amp;#39;@~Y2 ~degmode&amp;#39;"@~DTR% DTR"</source>
-      <translation>Gás ~ E% &amp; # 39; @ ~ Y2 ~ degmode &amp; # 39; '@ ~ DTR% DTR'</translation>
+      <translation>Gás ~ E% &amp;#39; @ ~ Y2 ~ degmode &amp;#39; '@ ~ DTR% DTR'</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="55" />
@@ -9862,7 +9862,7 @@ Gás 50% @ 12% DTR</translation>
     <message>
       <location filename="../help/eventannotations_help.py" line="56" />
       <source>Gas ~E% &amp;#39;@~Y2 ~degmode`, ~preFCs sec before FCs`&amp;#39;"@~DTR% DTR"</source>
-      <translation>Gas ~ E% &amp; # 39; @ ~ Y2 ~ degmode`, ~ preFCs seg antes de FCs` &amp; # 39; '@ ~ DTR% DTR'</translation>
+      <translation>Gas ~ E% &amp;#39; @ ~ Y2 ~ degmode`, ~ preFCs seg antes de FCs` &amp;#39; '@ ~ DTR% DTR'</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="56" />
@@ -9901,7 +9901,7 @@ Gás 50% @ 12% DTR</translation>
     <message>
       <location filename="../help/eventannotations_help.py" line="64" />
       <source>Event annotations apply only for &amp;#39;Step&amp;#39; and &amp;#39;Step+&amp;#39; Events settings</source>
-      <translation>As anotações de eventos se aplicam apenas à &amp; # 39; Etapa &amp; # 39; e &amp; # 39; Step + &amp; # 39; Configurações de eventos</translation>
+      <translation>As anotações de eventos se aplicam apenas à &amp;#39; Etapa &amp;#39; e &amp;#39; Step + &amp;#39; Configurações de eventos</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="65" />
@@ -9911,7 +9911,7 @@ Gás 50% @ 12% DTR</translation>
     <message>
       <location filename="../help/eventannotations_help.py" line="66" />
       <source>Anything between single quotes &amp;#39; will show only before FCs. Example: &amp;#39;~E1 @~degmode&amp;#39;</source>
-      <translation>Qualquer coisa entre aspas simples &amp; # 39; será exibido apenas antes dos FCs. Exemplo: &amp; # 39; ~ E1 @ ~ degmode &amp; # 39;</translation>
+      <translation>Qualquer coisa entre aspas simples &amp;#39; será exibido apenas antes dos FCs. Exemplo: &amp;#39; ~ E1 @ ~ degmode &amp;#39;</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="67" />
@@ -9926,16 +9926,16 @@ Gás 50% @ 12% DTR</translation>
     <message>
       <location filename="../help/eventannotations_help.py" line="69" />
       <source>Background event annotations can be seen during a roast when &amp;#39;Annotations&amp;#39; is checked in the Profile Background window.</source>
-      <translation>As anotações de eventos em segundo plano podem ser vistas durante uma torrefação quando &amp; # 39; Anotações &amp; # 39; é verificado na janela Perfil de fundo.</translation>
+      <translation>As anotações de eventos em segundo plano podem ser vistas durante uma torrefação quando &amp;#39; Anotações &amp;#39; é verificado na janela Perfil de fundo.</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="70" />
       <source>Simple scaling of the event value is possible. Use a single math operator (&amp;#39;*&amp;#39;, &amp;#39;/&amp;#39;, &amp;#39;+&amp;#39; or &amp;#39;-&amp;#39;) immediately following the field name "E". For example: 
 &amp;#39;~E/10&amp;#39; will divide the E value by 10. 
 &amp;#39;~E+5&amp;#39; adds 5 to the the value of E.</source>
-      <translation>O escalonamento simples do valor do evento é possível. Use um único operador matemático (&amp; # 39; * &amp; # 39 ;, &amp; # 39; / &amp; # 39 ;, &amp; # 39; + &amp; # 39; ou &amp; # 39; - &amp; # 39;) imediatamente após o campo nome 'E'. Por exemplo:
-&amp; # 39; ~ E / 10 &amp; # 39; dividirá o valor E por 10.
-&amp; # 39; ~ E + 5 &amp; # 39; adiciona 5 ao valor de E.</translation>
+      <translation>O escalonamento simples do valor do evento é possível. Use um único operador matemático (&amp;#39; * &amp; # 39 ;, &amp;#39; / &amp; # 39 ;, &amp;#39; + &amp;#39; ou &amp;#39; - &amp;#39;) imediatamente após o campo nome 'E'. Por exemplo:
+&amp;#39; ~ E / 10 &amp;#39; dividirá o valor E por 10.
+&amp;#39; ~ E + 5 &amp;#39; adiciona 5 ao valor de E.</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="71" />
@@ -9945,9 +9945,9 @@ This form of annotation must be enclosed in curly brackets &amp;#39;{}&amp;#39;.
 {~E|20Fresh Cut Grass|50Hay|80Baking Bread|100A Point} 
 
 Note that if the event value  does not match any value in the Annotation definition a blank string will be returned.  In the example above an event value of 30 will return a blank string.  The easiest way to ensure these values match is to use Custom Buttons to for the Event.</source>
-      <translation>Outro estilo de anotação permite substituir o valor numérico de um evento por uma sequência de texto, conhecida como valor nominal. Um exemplo em que isso pode ser útil é quando um evento é usado para registrar marcos sensoriais. O valor 20 pode ser usado para &amp; # 39; Grama recém-cortada &amp; # 39; aroma, 50 para &amp; # 39; Hay &amp; # 39 ;, 80 para &amp; # 39; Pão para assar &amp; # 39; e 100 para representar o &amp; # 39; Ponto A &amp; # 39 ;.
+      <translation>Outro estilo de anotação permite substituir o valor numérico de um evento por uma sequência de texto, conhecida como valor nominal. Um exemplo em que isso pode ser útil é quando um evento é usado para registrar marcos sensoriais. O valor 20 pode ser usado para &amp;#39; Grama recém-cortada &amp;#39; aroma, 50 para &amp;#39; Hay &amp; # 39 ;, 80 para &amp;#39; Pão para assar &amp;#39; e 100 para representar o &amp;#39; Ponto A &amp; # 39 ;.
 
-Esta forma de anotação deve ser colocada entre colchetes &amp; # 39; {} &amp; # 39 ;. As entradas são valores numéricos imediatamente seguidos por seu texto de representação nominal. As entradas são separadas pela barra vertical &amp; # 39; | &amp; # 39 ;. A seguinte string de anotação implementa este exemplo.
+Esta forma de anotação deve ser colocada entre colchetes &amp;#39; {} &amp; # 39 ;. As entradas são valores numéricos imediatamente seguidos por seu texto de representação nominal. As entradas são separadas pela barra vertical &amp;#39; | &amp; # 39 ;. A seguinte string de anotação implementa este exemplo.
 {~ E | 20Fresh Cut Grass | 50Hay | 80 Assar Pão | 100A Point}
 
 Observe que, se o valor do evento não corresponder a nenhum valor na definição da Anotação, uma string em branco será retornada. No exemplo acima, um valor de evento de 30 retornará uma string em branco. A maneira mais fácil de garantir que esses valores correspondam é usar botões personalizados para o evento.</translation>
@@ -9955,7 +9955,7 @@ Observe que, se o valor do evento não corresponder a nenhum valor na definiçã
     <message>
       <location filename="../help/eventannotations_help.py" line="72" />
       <source>When annotations overlap to the point they can not be read, try reducing the value of the &amp;#39;Allowed Annotation Overlap&amp;#39; found on the Annotations configuration page.  The default value for this setting is 100%.</source>
-      <translation>Quando as anotações se sobrepõem a um ponto em que não podem ser lidas, tente reduzir o valor de &amp; # 39; Sobreposição de anotação permitida &amp; # 39; encontrado na página de configuração de Anotações. O valor padrão para esta configuração é 100%.</translation>
+      <translation>Quando as anotações se sobrepõem a um ponto em que não podem ser lidas, tente reduzir o valor de &amp;#39; Sobreposição de anotação permitida &amp;#39; encontrado na página de configuração de Anotações. O valor padrão para esta configuração é 100%.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="14" />
@@ -10038,7 +10038,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
     <message>
       <location filename="../help/energy_help.py" line="44" />
       <source>Enter your personal description for this burner.  Examples are &amp;#39;Main&amp;#39; and &amp;#39;Afterburner&amp;#39;.</source>
-      <translation>Digite sua descrição pessoal para este gravador. Os exemplos são &amp; # 39; Principal &amp; # 39; e &amp; # 39; Afterburner &amp; # 39 ;.</translation>
+      <translation>Digite sua descrição pessoal para este gravador. Os exemplos são &amp;#39; Principal &amp;#39; e &amp;#39; Afterburner &amp; # 39 ;.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="45" />
@@ -10063,7 +10063,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
     <message>
       <location filename="../help/energy_help.py" line="47" />
       <source>Select the type of fuel used by this load  &amp;#39;Elec&amp;#39; is assumed to be electricity generated from dirty coal.  There is a setting below to adjust for renewable clean energy sources.</source>
-      <translation>Selecione o tipo de combustível usado por esta carga &amp; # 39; Elec &amp; # 39; é considerada eletricidade gerada a partir de carvão sujo. Há uma configuração abaixo para ajustar para fontes renováveis de energia limpa.</translation>
+      <translation>Selecione o tipo de combustível usado por esta carga &amp;#39;Elec&amp;#39; é considerada eletricidade gerada a partir de carvão sujo. Há uma configuração abaixo para ajustar para fontes renováveis de energia limpa.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="48" />
@@ -10072,7 +10072,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
 When blank the load is assumed to be at a constant setting, which is the percent &amp;#39;Value 100%&amp;#39; multiplied by the rating.  A 10 kW load at &amp;#39;100% Value&amp;#39;= 60 would thus be 10 kW * 60% = 6 kW. Continuous loads are typically motors and blowers and the afterburner.</source>
       <translation>Os eventos especiais são freqüentemente usados para registrar as configurações de carga, como uma configuração do gravador, no perfil de torrefação. Selecione o evento que corresponde à configuração de carga aqui.
 
-Quando em branco, considera-se que a carga está em uma configuração constante, que é a porcentagem &amp; # 39; Valor 100% &amp; # 39; multiplicado pela classificação. Uma carga de 10 kW em &amp; # 39; 100% Value &amp; # 39; = 60 seria, portanto, 10 kW * 60% = 6 kW. Cargas contínuas são normalmente motores e sopradores e o pós-combustor.</translation>
+Quando em branco, considera-se que a carga está em uma configuração constante, que é a porcentagem &amp;#39;Valor 100%&amp;#39; multiplicado pela classificação. Uma carga de 10 kW em &amp;#39;Valor 100%&amp;#39; = 60 seria, portanto, 10 kW * 60% = 6 kW. Cargas contínuas são normalmente motores e sopradores e o pós-combustor.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="49" />
@@ -10102,7 +10102,7 @@ Quando em branco, considera-se que a carga está em uma configuração constante
     <message>
       <location filename="../help/energy_help.py" line="51" />
       <source>When an Event is selected this value can be set to match the 100% load setting to the event setting.  This is useful when the 100% load setting is recorded as a different number in the Event.  For instance, maybe the burner event is recorded as 10x the kPa reading on the gas manometer.  An event value of 35 is recoded to signify 3.5 kPa, which is 50% pressure.  If the 100% burner setting corresponds to 7 kPa then the &amp;#39;Value 100%&amp;#39; should be set to 70, which is 7 * 10  = 70.  Thus 3.5 kPa will be seen by he energy calculator as 50%.  For pressure readings be sure to tick the Pressure box.  Heat energy readings are normally 0%-100% and do not require any adjustment to this  setting.</source>
-      <translation>Quando um evento é selecionado, este valor pode ser definido para corresponder à configuração de carga de 100% para a configuração do evento. Isso é útil quando a configuração de carga de 100% é registrada como um número diferente no evento. Por exemplo, talvez o evento do queimador seja registrado como 10x a leitura de kPa no manômetro de gás. Um valor de evento de 35 é recodificado para significar 3,5 kPa, que é 50% da pressão. Se a configuração 100% do queimador corresponder a 7 kPa, o valor &amp; # 39; Valor 100% &amp; # 39; deve ser definido como 70, que é 7 * 10 = 70. Portanto, 3,5 kPa será visto pela calculadora de energia como 50%. Para leituras de pressão, certifique-se de marcar a caixa Pressão. As leituras de energia térmica são normalmente 0% -100% e não requerem nenhum ajuste para esta configuração.</translation>
+      <translation>Quando um evento é selecionado, este valor pode ser definido para corresponder à configuração de carga de 100% para a configuração do evento. Isso é útil quando a configuração de carga de 100% é registrada como um número diferente no evento. Por exemplo, talvez o evento do queimador seja registrado como 10x a leitura de kPa no manômetro de gás. Um valor de evento de 35 é recodificado para significar 3,5 kPa, que é 50% da pressão. Se a configuração 100% do queimador corresponder a 7 kPa, o valor &amp;#39; Valor 100% &amp;#39; deve ser definido como 70, que é 7 * 10 = 70. Portanto, 3,5 kPa será visto pela calculadora de energia como 50%. Para leituras de pressão, certifique-se de marcar a caixa Pressão. As leituras de energia térmica são normalmente 0% -100% e não requerem nenhum ajuste para esta configuração.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="52" />
@@ -10189,7 +10189,7 @@ A energia de pré-aquecimento é aplicada apenas ao primeiro lote de uma sessão
 Between Batches energy is applied to each batch of the roasting session, except the first batch.  Tick the &amp;#39;Between Batches after Pre-Heating&amp;#39; box to apply Between Batches energies to the first batch of the session too.</source>
       <translation>Esta linha define os valores do protocolo entre lotes para a sessão de torrefação. Valores percentuais ou medidos podem ser inseridos para cada queimador. Quando uma porcentagem é usada, o campo Duração deve ser definido.
 
-Entre lotes, a energia é aplicada a cada lote da sessão de torra, exceto ao primeiro lote. Marque o botão &amp; # 39; Entre lotes após pré-aquecimento &amp; # 39; caixa para aplicar energias Entre Lotes ao primeiro lote da sessão também.</translation>
+Entre lotes, a energia é aplicada a cada lote da sessão de torra, exceto ao primeiro lote. Marque o botão &amp;#39; Entre lotes após pré-aquecimento &amp;#39; caixa para aplicar energias Entre Lotes ao primeiro lote da sessão também.</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="67" />
@@ -10218,7 +10218,7 @@ A energia de pré-aquecimento é aplicada apenas ao primeiro lote de uma sessão
     <message>
       <location filename="../help/energy_help.py" line="69" />
       <source>Measured Energy or Output %</source>
-      <translation>Energia medida ou% de saída</translation>
+      <translation>Energia medida ou % de saída</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="69" />
@@ -10264,7 +10264,7 @@ A energia de pré-aquecimento é aplicada apenas ao primeiro lote de uma sessão
       <location filename="../help/autosave_help.py" line="18" />
       <source>Turn Autosave ON or OFF.  When sampling, the keyboard &amp;#39;a&amp;#39; will save the profile at that moment.
 NOTE: Files with the same file name will be silently overwritten.  Use ~currdatetime in the file name prefix to get unique file names.</source>
-      <translation>Ligue ou desligue o salvamento automático. Durante a amostragem, o teclado &amp; # 39; a &amp; # 39; irá salvar o perfil naquele momento.
+      <translation>Ligue ou desligue o salvamento automático. Durante a amostragem, o teclado &amp;#39; a &amp;#39; irá salvar o perfil naquele momento.
 NOTA: Arquivos com o mesmo nome serão substituídos silenciosamente. Use ~ currdatetime no prefixo do nome do arquivo para obter nomes de arquivo exclusivos.</translation>
     </message>
     <message>
@@ -10297,7 +10297,7 @@ NOTA: Arquivos com o mesmo nome serão substituídos silenciosamente. Use ~ curr
       <source>Shows an example of the file name based on the File Name Prefix field.
 A &amp;#39;While Recording:&amp;#39; example will also be shown if the file name will be different when the scope is sampling.</source>
       <translation>Mostra um exemplo do nome do arquivo com base no campo Prefixo do nome do arquivo.
-A &amp; # 39; Durante a gravação: &amp; # 39; o exemplo também será mostrado se o nome do arquivo for diferente quando o osciloscópio for amostragem.</translation>
+A &amp;#39; Durante a gravação: &amp;#39; o exemplo também será mostrado se o nome do arquivo for diferente quando o osciloscópio for amostragem.</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="24" />
@@ -10333,7 +10333,7 @@ A &amp; # 39; Durante a gravação: &amp; # 39; o exemplo também será mostrado
     <message>
       <location filename="../help/autosave_help.py" line="31" />
       <source>The batch prefix set in Config&gt;Batch&gt;Prefix</source>
-      <translation>O prefixo do lote definido em Config&gt; Lote&gt; Prefixo</translation>
+      <translation>O prefixo do lote definido em Config&gt;Lote&gt;Prefixo</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="32" />
@@ -10343,7 +10343,7 @@ A &amp; # 39; Durante a gravação: &amp; # 39; o exemplo também será mostrado
     <message>
       <location filename="../help/autosave_help.py" line="33" />
       <source>Same as "~batchprefix~batchnum"</source>
-      <translation>O mesmo que '~ batchprefix ~ batchnum'</translation>
+      <translation>O mesmo que '~batchprefix~batchnum'</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="34" />
@@ -10355,24 +10355,24 @@ A &amp; # 39; Durante a gravação: &amp; # 39; o exemplo também será mostrado
       <source>Same as Batch field in Roast Properties
 "~batchprefix~batchnum (~batchposition)"</source>
       <translation>Igual ao campo Batch em Roast Properties
-'~ batchprefix ~ batchnum (~ batchposition)'</translation>
+'~batchprefix~batchnum (~batchposition)'</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="36" />
       <source>From Roast&gt;Properties&gt;Title</source>
-      <translation>De Roast&gt; Propriedades&gt; Título</translation>
+      <translation>De Torra&gt;Propriedades&gt;Título</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="37" />
       <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Beans field.
 From Roast&gt;Properties&gt;Beans</source>
-      <translation>Substitua “nn” por 10, 15, 20, 25 ou 30 para mostrar os primeiros caracteres “nn” do campo Beans.
+      <translation>Substitua “nn” por 10, 15, 20, 25 ou 30 para mostrar os primeiros caracteres “nn” do campo Grãos.
 De Torra&gt;Propriedades&gt;Grãos</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="38" />
       <source>The entire first line From Roast&gt;Properties&gt;Beans</source>
-      <translation>Toda a primeira linha de Roast&gt; Propriedades&gt; Grão</translation>
+      <translation>Toda a primeira linha de Torra&gt; Propriedades&gt; Grão</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="39" />
@@ -10392,12 +10392,12 @@ De Torra&gt;Propriedades&gt;Grãos</translation>
     <message>
       <location filename="../help/autosave_help.py" line="42" />
       <source>Roast date and time in format yy-MM-dd_hhmm</source>
-      <translation>Data e hora da torrefação no formato aa-MM-dd_hhmm</translation>
+      <translation>Data e hora da torra no formato aa-MM-dd_hhmm</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="43" />
       <source>Roast date and time in format yyyy-MM-dd_hhmm</source>
-      <translation>Data e hora da torrefação no formato aaaa-MM-dd_hhmm</translation>
+      <translation>Data e hora da torra no formato aaaa-MM-dd_hhmm</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="44" />
@@ -10432,7 +10432,7 @@ De Torra&gt;Propriedades&gt;Grãos</translation>
     <message>
       <location filename="../help/autosave_help.py" line="50" />
       <source>Roast hour in format hh</source>
-      <translation>Hora de assar no formato hh</translation>
+      <translation>Hora da torra no formato hh</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="51" />
@@ -10442,37 +10442,37 @@ De Torra&gt;Propriedades&gt;Grãos</translation>
     <message>
       <location filename="../help/autosave_help.py" line="52" />
       <source>Current date and time with seconds in format yy-MM-dd_hhmmss.  Not the same as roast time. </source>
-      <translation>Data e hora atuais com segundos no formato aa-MM-dd_hhmmss. Não é o mesmo que hora de assar.</translation>
+      <translation>Data e hora atuais com segundos no formato aa-MM-dd_hhmmss. Não é o mesmo que hora de torrar.</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="53" />
       <source>From Roast&gt;Properties&gt;Operator</source>
-      <translation>Em Roast&gt; Propriedades&gt; Operador</translation>
+      <translation>Em Torra&gt;Propriedades&gt;Operador</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="54" />
       <source>From Roast&gt;Properties&gt;Organization</source>
-      <translation>De Roast&gt; Propriedades&gt; Organização</translation>
+      <translation>Em Torra&gt;Propriedades&gt;Organização</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="55" />
       <source>From Roast&gt;Properties&gt;Machine</source>
-      <translation>De Roast&gt; Propriedades&gt; Máquina</translation>
+      <translation>Em Torrat&gt;Propriedades&gt;Máquina</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="56" />
       <source>From Roast&gt;Properties&gt;Weight Green</source>
-      <translation>Em Roast&gt; Propriedades&gt; Peso Verde</translation>
+      <translation>Em Torra&gt;Propriedades&gt;Peso Verde</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="57" />
       <source>From Roast&gt;Properties&gt;Weight Roasted</source>
-      <translation>Em Torrado&gt; Propriedades&gt; Torrado Peso</translation>
+      <translation>Em Torra&gt;Propriedades&gt;Torra Peso</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="58" />
       <source>From Roast&gt;Properties&gt;Weight</source>
-      <translation>De Roast&gt; Propriedades&gt; Peso</translation>
+      <translation>Em Torra&gt;Propriedades&gt;Peso</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="59" />
@@ -10482,17 +10482,17 @@ De Torra&gt;Propriedades&gt;Grãos</translation>
     <message>
       <location filename="../help/autosave_help.py" line="60" />
       <source>From Roast&gt;Properties&gt;Volume Green</source>
-      <translation>Em Roast&gt; Propriedades&gt; Volume Verde</translation>
+      <translation>Em Torra&gt;Propriedades&gt;Volume Verde</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="61" />
       <source>From Roast&gt;Properties&gt;Volume Roasted</source>
-      <translation>Em Torrado&gt; Propriedades&gt; Volume Torrado</translation>
+      <translation>Em Torra&gt;Propriedades&gt;Volume Torrado</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="62" />
       <source>From Roast&gt;Properties&gt;Volume</source>
-      <translation>De Roast&gt; Propriedades&gt; Volume</translation>
+      <translation>Em Torra&gt;Propriedades&gt;Volume</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="63" />
@@ -10502,17 +10502,17 @@ De Torra&gt;Propriedades&gt;Grãos</translation>
     <message>
       <location filename="../help/autosave_help.py" line="64" />
       <source>From Roast&gt;Properties&gt;Density Green</source>
-      <translation>De Roast&gt; Propriedades&gt; Densidade Verde</translation>
+      <translation>Em Torra&gt;Propriedades&gt;Densidade Verde</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="65" />
       <source>From Roast&gt;Properties&gt;Density Roasted</source>
-      <translation>De torrado&gt; Propriedades&gt; Densidade torrado</translation>
+      <translation>Em Torra&gt;Propriedades&gt;Densidade torrado</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="66" />
       <source>From Roast&gt;Properties&gt;Density</source>
-      <translation>De Roast&gt; Propriedades&gt; Densidade</translation>
+      <translation>Em Torra&gt;Propriedades&gt;Densidade</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="67" />
@@ -10522,12 +10522,12 @@ De Torra&gt;Propriedades&gt;Grãos</translation>
     <message>
       <location filename="../help/autosave_help.py" line="68" />
       <source>From Roast&gt;Properties&gt;Moisture Green</source>
-      <translation>De Roast&gt; Propriedades&gt; Moisture Green</translation>
+      <translation>Em Torra&gt;Propriedades&gt;Umidade Verde</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="69" />
       <source>From Roast&gt;Properties&gt;Moisture Roasted</source>
-      <translation>De Roast&gt; Propriedades&gt; Moisture Roasted</translation>
+      <translation>Em Torra&gt;Propriedades&gt;Umidade Torrado</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="70" />
@@ -10537,52 +10537,52 @@ De Torra&gt;Propriedades&gt;Grãos</translation>
     <message>
       <location filename="../help/autosave_help.py" line="71" />
       <source>From Roast&gt;Properties&gt;Drum Speed</source>
-      <translation>Em Roast&gt; Propriedades&gt; Velocidade do Tambor</translation>
+      <translation>Em Torra&gt;Propriedades&gt;Velocidade do Tambor</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="72" />
       <source>From Roast&gt;Properties&gt;Color Whole</source>
-      <translation>De Roast&gt; Propriedades&gt; Cor Inteira</translation>
+      <translation>Em Torra&gt;Propriedades&gt;Cor Inteira</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="73" />
       <source>From Roast&gt;Properties&gt;Color Ground</source>
-      <translation>De Roast&gt; Propriedades&gt; Color Ground</translation>
+      <translation>Em Torra&gt;Propriedades&gt;Cor Moído</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="74" />
       <source>From Roast&gt;Properties&gt;Color System</source>
-      <translation>De Roast&gt; Propriedades&gt; Sistema de Cor</translation>
+      <translation>Em Torra&gt;Propriedades&gt;Sistema de Cor</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="75" />
       <source>From Roast&gt;Properties&gt;Screen Min</source>
-      <translation>Em Roast&gt; Propriedades&gt; Tela Mín.</translation>
+      <translation>Em Torra&gt;Propriedades&gt;Peneira Mín.</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="76" />
       <source>From Roast&gt;Properties&gt;Screen Max</source>
-      <translation>Em Roast&gt; Propriedades&gt; Tela máxima</translation>
+      <translation>Em Torra&gt;Propriedades&gt;Peneira máxima</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="77" />
       <source>From Roast&gt;Properties&gt;(Green) Beans Temperature</source>
-      <translation>De Roast&gt; Properties&gt; (Green) Beans Temperature</translation>
+      <translation>Em Torra&gt;Properties&gt; (Green) Beans Temperature</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="78" />
       <source>From Roast&gt;Properties&gt;Ambient Temperature</source>
-      <translation>Em Roast&gt; Propriedades&gt; Temperatura ambiente</translation>
+      <translation>Em Torra&gt;Propriedades&gt;Temperatura ambiente</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="79" />
       <source>From Roast&gt;Properties&gt;Ambient Humidity</source>
-      <translation>Em Torrefação&gt; Propriedades&gt; Umidade ambiente</translation>
+      <translation>Em Torra&gt;Propriedades&gt;Umidade ambiente</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="80" />
       <source>From Roast&gt;Properties&gt;Ambient Pressure</source>
-      <translation>Em Roast&gt; Propriedades&gt; Pressão ambiente</translation>
+      <translation>Em Torra&gt;Propriedades&gt;Pressão ambiente</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="81" />
@@ -10689,19 +10689,19 @@ De Torra&gt;Propriedades&gt;Notas da Torra</translation>
     <message>
       <location filename="../help/autosave_help.py" line="101" />
       <source>The entire first line From Roast&gt;Properties&gt;Roasting Notes</source>
-      <translation>Toda a primeira linha De Roast&gt; Propriedades&gt; Roasting Notes</translation>
+      <translation>Toda a primeira linha Em Torra&gt;Propriedades&gt;Notas da Torra</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="102" />
       <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Cupping Notes field.
 From Roast&gt;Properties&gt;Cupping Notes</source>
       <translation>Substitua “nn” por 10, 15, 20, 25 ou 30 para mostrar os primeiros caracteres “nn” do campo Cupping Notes.
-De Torra&gt; Propriedades&gt; Notas de degustação</translation>
+De Torra&gt;Propriedades&gt;Notas de degustação</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="103" />
       <source>The entire first line From Roast&gt;Properties&gt;Cupping Notes</source>
-      <translation>A primeira linha inteira em Roast&gt; Propriedades&gt; Notas de degustação</translation>
+      <translation>A primeira linha inteira em Torra&gt;Propriedades&gt;Notas de degustação</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="104" />
@@ -10792,7 +10792,7 @@ De Torra&gt; Propriedades&gt; Notas de degustação</translation>
     <message>
       <location filename="../help/symbolic_help.py" line="18" />
       <source>Absolute time (seconds) from begin of recording (not only the time after CHARGE!)</source>
-      <translation>Tempo absoluto (segundos) desde o início da gravação (não apenas o tempo após CHARGE!)</translation>
+      <translation>Tempo absoluto (segundos) desde o início da gravação (não apenas o tempo após CARGA!)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="48" />
@@ -10867,17 +10867,17 @@ De Torra&gt; Propriedades&gt; Notas de degustação</translation>
     <message>
       <location filename="../help/symbolic_help.py" line="30" />
       <source>ExtraBackground #1-A</source>
-      <translation>ExtraBackground # 1-A</translation>
+      <translation>ExtraBackground #1-A</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="31" />
       <source>ExtraBackground #1-B</source>
-      <translation>ExtraBackground # 1-B</translation>
+      <translation>ExtraBackground #1-B</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="32" />
       <source>ExtraBackground #2-A</source>
-      <translation>ExtraBackground # 2-A</translation>
+      <translation>ExtraBackground #2-A</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="34" />
@@ -10892,17 +10892,17 @@ De Torra&gt; Propriedades&gt; Notas de degustação</translation>
     <message>
       <location filename="../help/symbolic_help.py" line="36" />
       <source>Extra Device #1 channel 1 tare value</source>
-      <translation>Valor de tara do canal 1 do dispositivo extra nº 1</translation>
+      <translation>Valor de tara do canal 1 do dispositivo extra #1</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="37" />
       <source>Extra Device #1 channel 2 tare value</source>
-      <translation>Valor de tara do canal 2 do dispositivo extra nº 1</translation>
+      <translation>Valor de tara do canal 2 do dispositivo extra #1</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="38" />
       <source>Extra Device #2 channel 1 tare value</source>
-      <translation>Valor de tara do canal 1 do dispositivo extra nº 2</translation>
+      <translation>Valor de tara do canal 1 do dispositivo extra #2</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="40" />
@@ -10952,14 +10952,14 @@ De Torra&gt; Propriedades&gt; Notas de degustação</translation>
     <message>
       <location filename="../help/symbolic_help.py" line="55" />
       <source>The symbolic variables t, b, Y&lt;n&gt;, B&lt;n&gt; and R&lt;n&gt; evaluate to the current value of a sequence of values that define a roast profile. To access earlier or later values one can apply a shift value.</source>
-      <translation>As variáveis simbólicas t, b, Y &lt;n&gt;, B &lt;n&gt; e R &lt;n&gt; avaliam o valor atual de uma sequência de valores que definem um perfil de torrefação. Para acessar valores anteriores ou posteriores, pode-se aplicar um valor de deslocamento.</translation>
+      <translation>As variáveis simbólicas t, b, Y &lt;n&gt;, B&lt;n&gt; e R&lt;n&gt; avaliam o valor atual de uma sequência de valores que definem um perfil de torrefação. Para acessar valores anteriores ou posteriores, pode-se aplicar um valor de deslocamento.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="55" />
       <source>
 For example, while "Y2" returns the current bean temperature (BT), "Y2[-1]" returns the previous BT temperature and "Y2[-2]" the one before that. Formulas used in the Plotter are applied in sequence to all values, thus there "Y2" points to the current BT temperature processed, "Y2[-1]" the previous BT temperature processed and "Y2[+1]" the next BT temperature to be processed. A positive shift is only available in the Plotter, obviously not during recording.</source>
       <translation>
-Por exemplo, enquanto 'Y2' retorna a temperatura atual do grão (BT), 'Y2 [-1]' retorna a temperatura BT anterior e 'Y2 [-2]' a anterior. As fórmulas usadas no Plotter são aplicadas em sequência a todos os valores, portanto, 'Y2' aponta para a temperatura BT atual processada, 'Y2 [-1]' a temperatura BT anterior processada e 'Y2 [+1]' a próxima temperatura BT ser processado. Uma mudança positiva está disponível apenas no Plotter, obviamente não durante a gravação.</translation>
+Por exemplo, enquanto 'Y2' retorna a temperatura atual do grão (BT), 'Y2[-1]' retorna a temperatura BT anterior e 'Y2[-2]' a anterior. As fórmulas usadas no Plotter são aplicadas em sequência a todos os valores, portanto, 'Y2' aponta para a temperatura BT atual processada, 'Y2 [-1]' a temperatura BT anterior processada e 'Y2 [+1]' a próxima temperatura BT ser processado. Uma mudança positiva está disponível apenas no Plotter, obviamente não durante a gravação.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="59" />
@@ -10984,12 +10984,12 @@ Por exemplo, enquanto 'Y2' retorna a temperatura atual do grão (BT), 'Y2 [-1]' 
     <message>
       <location filename="../help/symbolic_help.py" line="63" />
       <source>ExtraBackground #1-B delayed 6 indexes</source>
-      <translation>ExtraBackground # 1-B atrasou 6 índices</translation>
+      <translation>ExtraBackground #1-B atrasou 6 índices</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="64" />
       <source>ExtraBackground #2-A advanced 2 indexes (plotter only)</source>
-      <translation>ExtraBackground # 2-A avançado 2 índices (plotter apenas)</translation>
+      <translation>ExtraBackground #2-A avançado 2 índices (plotter apenas)</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="65" />
@@ -11004,12 +11004,12 @@ Por exemplo, enquanto 'Y2' retorna a temperatura atual do grão (BT), 'Y2 [-1]' 
     <message>
       <location filename="../help/symbolic_help.py" line="72" />
       <source>t, b, Y&lt;n&gt;, B&lt;n&gt; and R&lt;n&gt;</source>
-      <translation>t, b, Y &lt;n&gt;, B &lt;n&gt; e R &lt;n&gt;</translation>
+      <translation>t, b, Y&lt;n&gt;, B&lt;n&gt; e R&lt;n&gt;</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="72" />
       <source>Previously recorded data assigned to the symbolic variables t, b, Y&lt;n&gt;, B&lt;n&gt; and R&lt;n&gt; can also directly accessed by index. "Y2{0}" evaluates to the first recorded bean temperature (BT) and "Y2{CHARGE}" to the bean temperature at CHARGE. Additionally, the symbolic variable b can be used to access the recording time at a certain index of the background profile. Thus "b{CHARGE}" returns the recording time at CHARGE of the background profile.</source>
-      <translation>Os dados previamente registrados atribuídos às variáveis simbólicas t, b, Y &lt;n&gt;, B &lt;n&gt; e R &lt;n&gt; também podem ser acessados diretamente pelo índice. 'Y2 {0}' avalia para a primeira temperatura do grão registrada (BT) e 'Y2 {CHARGE}' para a temperatura do grão em CHARGE. Além disso, a variável simbólica b pode ser usada para acessar o tempo de gravação em um determinado índice do perfil de fundo. Portanto, 'b {CHARGE}' retorna o tempo de gravação em CHARGE do perfil de fundo.</translation>
+      <translation>Os dados previamente registrados atribuídos às variáveis simbólicas t, b, Y&lt;n&gt;, B&lt;n&gt; e R&lt;n&gt; também podem ser acessados diretamente pelo índice. 'Y2 {0}' avalia para a primeira temperatura do grão registrada (BT) e 'Y2 {CHARGE}' para a temperatura do grão em CHARGE. Além disso, a variável simbólica b pode ser usada para acessar o tempo de gravação em um determinado índice do perfil de fundo. Portanto, 'b{CARGA}' retorna o tempo de gravação em CARGA do perfil de fundo.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="75" />
@@ -11096,7 +11096,7 @@ Por exemplo, enquanto 'Y2' retorna a temperatura atual do grão (BT), 'Y2 [-1]' 
       <source>
 If there is no background profile the DRY or FCs bean temperature used for the prediction is taken from the Config&gt;Phases setup.</source>
       <translation>
-Se não houver nenhum perfil de fundo, a temperatura do bean DRY ou FCs usada para a previsão é obtida na configuração Config&gt; Fases.</translation>
+Se não houver nenhum perfil de fundo, a temperatura do bean DRY ou FCs usada para a previsão é obtida na configuração Config&gt;Fases.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="115" />
@@ -11242,7 +11242,7 @@ O valor de predição é o tempo calculado em segundos para atingir a temperatur
     <message>
       <location filename="../help/symbolic_help.py" line="161" />
       <source>Return x**y (x to the power of y).</source>
-      <translation>Devolve x**y (x elevado a y).</translation>
+      <translation>Retorna x**y (x elevado a y).</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="162" />
@@ -11252,7 +11252,7 @@ O valor de predição é o tempo calculado em segundos para atingir a temperatur
     <message>
       <location filename="../help/symbolic_help.py" line="163" />
       <source>Return the sine of x (measured in radians).</source>
-      <translation>Devolve o seno de x (medido em radianos).</translation>
+      <translation>Retorna o seno de x (medido em radianos).</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="164" />
@@ -11262,7 +11262,7 @@ O valor de predição é o tempo calculado em segundos para atingir a temperatur
     <message>
       <location filename="../help/symbolic_help.py" line="165" />
       <source>Return the tangent of x (measured in radians).</source>
-      <translation>Devolve a tangente de x (medido em radianos).</translation>
+      <translation>Retorna a tangente de x (medido em radianos).</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="168" />
@@ -11289,7 +11289,7 @@ O uso de fórmulas matemáticas no plotter também permite usar as variáveis si
     <message>
       <location filename="../help/symbolic_help.py" line="184" />
       <source>The variables P1,..,P9 represent the results from plot #1,..,#9. You can perform calculations in a later plot on variables of an earlier plot. That way, the plot variables P1,..,P9 allow the cascading or intermediate results. For example, plot #3 can refer to the results of plot 1 using the variable P1.</source>
-      <translation>As variáveis P1, .., P9 representam os resultados do gráfico # 1, .., # 9. Você pode realizar cálculos em um gráfico posterior nas variáveis de um gráfico anterior. Dessa forma, as variáveis do gráfico P1, .., P9 permitem o cascateamento ou resultados intermediários. Por exemplo, o gráfico nº 3 pode se referir aos resultados do gráfico 1 usando a variável P1.</translation>
+      <translation>As variáveis P1, .., P9 representam os resultados do gráfico #1, .., #9. Você pode realizar cálculos em um gráfico posterior nas variáveis de um gráfico anterior. Dessa forma, as variáveis do gráfico P1, .., P9 permitem o cascateamento ou resultados intermediários. Por exemplo, o gráfico #3 pode se referir aos resultados do gráfico 1 usando a variável P1.</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="185" />
@@ -11340,7 +11340,7 @@ O uso de fórmulas matemáticas no plotter também permite usar as variáveis si
     </message>
     <message>
       <source>ENTER</source>
-      <translation type="vanished">DIGITAR</translation>
+      <translation type="vanished">ENTER</translation>
     </message>
     <message>
       <source>SPACE</source>
@@ -11352,7 +11352,7 @@ O uso de fórmulas matemáticas no plotter também permite usar as variáveis si
     </message>
     <message>
       <source>LEFT,RIGHT,UP,DOWN</source>
-      <translation type="vanished">ESQUERDA DIREITA CIMA BAIXO</translation>
+      <translation type="vanished">ESQUERDA,DIREITA,CIMA,BAIXO</translation>
     </message>
     <message>
       <source>Move background or key focus</source>
@@ -11360,7 +11360,7 @@ O uso de fórmulas matemáticas no plotter também permite usar as variáveis si
     </message>
     <message>
       <source>Quick Special Event Entry.  The keys q,w,e, and r correspond to special events 1,2,3 and 4.  A two digit numeric value must follow the shortcut letter, e.g. &amp;#39;q75&amp;#39;, when the correspoding event slider max value is 100 or less (default setting).   When the slider max value is greater than 100, three digits must be entered and for values less that 100 a leading zero is required, e.g. &amp;#39;q075&amp;#39;.  </source>
-      <translation type="vanished">Entrada rápida em eventos especiais. As teclas q, w, e e r correspondem a eventos especiais 1,2,3 e 4. Um valor numérico de dois dígitos deve seguir a letra de atalho, por exemplo, &amp; # 39; q75 &amp; # 39 ;, quando o valor máximo do controle deslizante do evento correspondente é 100 ou menos (configuração padrão). Quando o valor máximo do controle deslizante é maior que 100, três dígitos devem ser inseridos e para valores menores que 100 um zero à esquerda é necessário, por exemplo, &amp; # 39; q075 &amp; # 39 ;.</translation>
+      <translation type="vanished">Entrada rápida em eventos especiais. As teclas q, w, e e r correspondem a eventos especiais 1,2,3 e 4. Um valor numérico de dois dígitos deve seguir a letra de atalho, por exemplo, &amp;#39;q75&amp;#39;, quando o valor máximo do controle deslizante do evento correspondente é 100 ou menos (configuração padrão). Quando o valor máximo do controle deslizante é maior que 100, três dígitos devem ser inseridos e para valores menores que 100 um zero à esquerda é necessário, por exemplo, &amp;#39;q075&amp;#39;.</translation>
     </message>
     <message>
       <source>Click on Background Profile Title</source>
@@ -11380,25 +11380,25 @@ O uso de fórmulas matemáticas no plotter também permite usar as variáveis si
       <source>⌘-N [Mac]
 CRTL+N [Win]</source>
       <translation type="vanished">⌘-N [Mac]
-CRTL+N [Vencer]</translation>
+CRTL+N [Win]</translation>
     </message>
     <message>
       <source>T [Mac]
 CTRL+SHIFT+T [Win]</source>
       <translation type="vanished">T [Mac]
-CTRL+SHIFT+T [Vencer]</translation>
+CTRL+SHIFT+T [Win]</translation>
     </message>
     <message>
       <source>H
 CTRL+H [Win]</source>
       <translation type="vanished">H
-CTRL+H [Vencer]</translation>
+CTRL+H [Win]</translation>
     </message>
     <message>
       <source>OPTION+H [Mac]
 CTRL+SHIFT+H [Win]</source>
       <translation type="vanished">OPÇÃO+H [Mac]
-CTRL+SHIFT+H [Vencer]</translation>
+CTRL+SHIFT+H [Win]</translation>
     </message>
     <message>
       <source>⌘ +,- [Mac]
@@ -11430,91 +11430,91 @@ CTRL+SHIFT+B + &lt;valor&gt; [Win]</translation>
       <source>F
 CTRL+SHIFT+F [Win]</source>
       <translation type="vanished">F
-CTRL+SHIFT+F [Vencer]</translation>
+CTRL+SHIFT+F [Win]</translation>
     </message>
     <message>
       <source>⌘+S [Mac]
 CTRL+S [Win]</source>
       <translation type="vanished">⌘+S [Mac]
-CTRL+S [Vencer]</translation>
+CTRL+S [Win]</translation>
     </message>
     <message>
       <source>⌘+X [Mac]
 CTRL+X [Win]</source>
       <translation type="vanished">⌘+X [Mac]
-CTRL+X [Vencer]</translation>
+CTRL+X [Win]</translation>
     </message>
     <message>
       <source>⌘+V [Mac]
 CTRL+V [Win]</source>
       <translation type="vanished">⌘+V [Mac]
-CTRL+V [Vencer]</translation>
+CTRL+V [Win]</translation>
     </message>
     <message>
       <source>⌘+T [Mac]
 CTRL+T [Win]</source>
       <translation type="vanished">⌘+T [Mac]
-CTRL+T [Vencer]</translation>
+CTRL+T [Win]</translation>
     </message>
     <message>
       <source>⌘+B [Mac]
 CTRL+B [Win]</source>
       <translation type="vanished">⌘+B [Mac]
-CTRL+B [Vencer]</translation>
+CTRL+B [Win]</translation>
     </message>
     <message>
       <source>⌘+F4 [Mac]
 CTRL+F4 [Win]</source>
       <translation type="vanished">⌘+F4 [Mac]
-CTRL+F4 [Vencer]</translation>
+CTRL+F4 [Win]</translation>
     </message>
     <message>
       <source>⌘+D [Mac]
 CTRL+D [Win]</source>
       <translation type="vanished">⌘+D [Mac]
-CTRL+D [Vencer]</translation>
+CTRL+D [Win]</translation>
     </message>
     <message>
       <source>⌘+U [Mac]
 CTRL+U [Win]</source>
       <translation type="vanished">⌘+U [Mac]
-CTRL+U [Vencer]</translation>
+CTRL+U [Win]</translation>
     </message>
     <message>
       <source>⌘+E [Mac]
 CTRL+E [Win]</source>
       <translation type="vanished">⌘+E [Mac]
-CTRL+E [Vencer]</translation>
+CTRL+E [Win]</translation>
     </message>
     <message>
       <source>⌘+A [Mac]
 CTRL+A [Win]</source>
       <translation type="vanished">⌘+A [Mac]
-CTRL+A [Vencer]</translation>
+CTRL+A [Win]</translation>
     </message>
     <message>
       <source>⌘+SHIFT+A [Mac]
 CTRL+SHIFT+A [Win]</source>
       <translation type="vanished">⌘+SHIFT+A [Mac]
-CTRL+SHIFT+A [Vencer]</translation>
+CTRL+SHIFT+A [Win]</translation>
     </message>
     <message>
       <source>⌘+K [Mac]
 CTRL+K [Win]</source>
       <translation type="vanished">⌘+K [Mac]
-CTRL+K [Vencer]</translation>
+CTRL+K [Win]</translation>
     </message>
     <message>
       <source>⌘+OPTION+A [Mac]
 CTRL+ALT+K [Win]</source>
       <translation type="vanished">⌘+OPÇÃO+A [Mac]
-CTRL+ALT+K [Vencer]</translation>
+CTRL+ALT+K [Win]</translation>
     </message>
     <message>
       <source>⌘+F [Mac]
 CTRL+SHIFT+F [Win]</source>
       <translation type="vanished">⌘+F [Mac]
-CTRL+SHIFT+F [Vencer]</translation>
+CTRL+SHIFT+F [Win]</translation>
     </message>
     <message>
       <source>~title Roasted on ~date</source>
@@ -11990,7 +11990,7 @@ Exceção ao acima para DRY apenas: se AutoDRY for verificado, a temperatura DRY
     </message>
     <message>
       <source>Number of seconds since CHARGE</source>
-      <translation type="vanished">Número de segundos desde CHARGE</translation>
+      <translation type="vanished">Número de segundos desde CARGA</translation>
     </message>
     <message>
       <source>Number of seconds after FCs 
@@ -11998,7 +11998,7 @@ Best used inside double quotes (see notes below)
 Displays &amp;#39;*&amp;#39; prior to FCs</source>
       <translation type="vanished">Número de segundos após os FCs
 Melhor usado entre aspas duplas (ver notas abaixo)
-Exibe &amp; # 39; * &amp; # 39; antes dos FCs</translation>
+Exibe &amp;#39; * &amp;#39; antes dos FCs</translation>
     </message>
     <message>
       <source>Number of seconds before FCs 
@@ -12006,7 +12006,7 @@ Best used inside single quotes or back ticks (see notes below)
 Displays &amp;#39;*&amp;#39; after FCs</source>
       <translation type="vanished">Número de segundos antes dos FCs
 Melhor usado dentro de aspas simples ou back ticks (veja as notas abaixo)
-Exibe &amp; # 39; * &amp; # 39; depois de FCs</translation>
+Exibe &amp;#39; * &amp;#39; depois de FCs</translation>
     </message>
     <message>
       <source>Development time ratio. Note: DTR=0 before FCs 
@@ -12114,7 +12114,7 @@ Gás 50% @ 12% DTR</translation>
     </message>
     <message>
       <source>The action Command.  Depends on the action type, &amp;#39;{}&amp;#39; is replaced by the event value and the offset in case of a u00B1 event type.</source>
-      <translation type="vanished">O Comando de ação. Depende do tipo de ação, &amp; # 39; {} &amp; # 39; é substituído pelo valor do evento e o deslocamento no caso de um tipo de evento u00B1.</translation>
+      <translation type="vanished">O Comando de ação. Depende do tipo de ação, &amp;#39; {} &amp;#39; é substituído pelo valor do evento e o deslocamento no caso de um tipo de evento u00B1.</translation>
     </message>
     <message>
       <source>Note: "{}" can be used as a placeholder, it will be substituted by the current button value plus the offset for u00B1 event types.  If a placeholder occurs several times in a description/command, all those occurrences are replaced by the value.
@@ -12124,7 +12124,7 @@ Gás 50% @ 12% DTR</translation>
     </message>
     <message>
       <source>u0027Recording ~batchcounter&amp;#39; "~batch" ~title ~datetime_long</source>
-      <translation type="vanished">u0027Recording ~ batchcounter &amp; # 39; '~ batch' ~ title ~ datetime_long</translation>
+      <translation type="vanished">u0027Recording ~ batchcounter &amp;#39; '~ batch' ~ title ~ datetime_long</translation>
     </message>
     <message>
       <source>Gas 5.0kPh @340F and 32.8u00b0F/min</source>
@@ -12132,7 +12132,7 @@ Gás 50% @ 12% DTR</translation>
     </message>
     <message>
       <source>u0027Recording ~batchcounter&amp;#39; "~batch" ~title ~date_long_&amp;#39;~currtime&amp;#39;"~time"</source>
-      <translation type="vanished">u0027Recording ~ batchcounter &amp; # 39; '~ batch' ~ title ~ date_long _ &amp; # 39; ~ currtime &amp; # 39; '~ time'</translation>
+      <translation type="vanished">u0027Recording ~ batchcounter &amp;#39; '~ batch' ~ title ~ date_long _ &amp;#39; ~ currtime &amp;#39; '~ time'</translation>
     </message>
     <message>
       <source>The Energy tab displays a roast&amp;#39;s energy consumption.   CO2 emissions are also calculated to monitor the impact of the roasting operation.  Settings must be made for each energy load.  Loads are the main burners, motors and blowers, and an afterburner if one is used.  The energy used for preheating, between batch, and roaster cooling protocols are included in the calculations, and settings are available for them as well.
@@ -12152,7 +12152,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
     </message>
     <message>
       <source>This tab shows a detailed table of the energy consumption and CO2 production data for the roast.  The values in this table are based on current Profile and the settings made on the Loads and Protocols tabs.  Columns may be sorted by clicking on the column title.  To return to original sort click on the &amp;#39;Kind&amp;#39; column title.</source>
-      <translation type="vanished">Esta guia mostra uma tabela detalhada dos dados de consumo de energia e produção de CO2 para a torrefação. Os valores nesta tabela são baseados no Perfil atual e nas configurações feitas nas guias Cargas e Protocolos. As colunas podem ser classificadas clicando no título da coluna. Para retornar à classificação original, clique no link &amp; # 39; Tipo &amp; # 39; título da coluna.</translation>
+      <translation type="vanished">Esta guia mostra uma tabela detalhada dos dados de consumo de energia e produção de CO2 para a torrefação. Os valores nesta tabela são baseados no Perfil atual e nas configurações feitas nas guias Cargas e Protocolos. As colunas podem ser classificadas clicando no título da coluna. Para retornar à classificação original, clique no link &amp;#39; Tipo &amp;#39; título da coluna.</translation>
     </message>
     <message>
       <source>2. Loads Tab</source>
@@ -12184,7 +12184,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
     </message>
     <message>
       <source>The second type of entry is a "measured" energy value.  This can be any value greater than 1.0.  Artisan can inspect the open profile to determine energy values for each Load that is associated with an Event on the Loads tab.  Click the [...] button for each Protocol to auto fill the Measured Energy fields.   The Artisan measurements for Pre-Heating and Between Batches are made from the start of the profile until CHARGE.  If there is no CHARGE event the measurement is from the start to the end of profile.  The values measured for Pre-Heating and Between Batches are the same.  Be sure you do not use the same profile to enter both values.  The Cooling energy is measured from DROP to the end of the profile.  If there is no DROP event the measurement begins at CHARGE.  If there is no CHARGE event the measurement is from the start to the end of the profile.</source>
-      <translation type="vanished">O segundo tipo de entrada é um valor de energia 'medido'. Pode ser qualquer valor maior que 1,0. O Artisan pode inspecionar o perfil aberto para determinar os valores de energia para cada Carga associada a um Evento na guia Cargas. Clique no botão [...] de cada protocolo para preencher automaticamente os campos de energia medida. As medições Artisan para Pré-aquecimento e Entre Lotes são feitas desde o início do perfil até a CARGA. Se não houver evento CHARGE, a medição é do início ao fim do perfil. Os valores medidos para pré-aquecimento e entre lotes são os mesmos. Certifique-se de não usar o mesmo perfil para inserir os dois valores. A energia de resfriamento é medida desde a DROP até o final do perfil. Se não houver evento DROP, a medição começa em CHARGE. Se não houver evento CHARGE, a medição é do início ao fim do perfil.</translation>
+      <translation type="vanished">O segundo tipo de entrada é um valor de energia 'medido'. Pode ser qualquer valor maior que 1,0. O Artisan pode inspecionar o perfil aberto para determinar os valores de energia para cada Carga associada a um Evento na guia Cargas. Clique no botão [...] de cada protocolo para preencher automaticamente os campos de energia medida. As medições Artisan para Pré-aquecimento e Entre Lotes são feitas desde o início do perfil até a CARGA. Se não houver evento CARGA, a medição é do início ao fim do perfil. Os valores medidos para pré-aquecimento e entre lotes são os mesmos. Certifique-se de não usar o mesmo perfil para inserir os dois valores. A energia de resfriamento é medida desde a DROP até o final do perfil. Se não houver evento DROP, a medição começa na CARGA. Se não houver evento de CARGA, a medição é do início ao fim do perfil.</translation>
     </message>
     <message>
       <source>This box should be ticked when a Between Batches protocol run is done after the Preheating and before the roast.</source>
@@ -18838,7 +18838,7 @@ Continuar?</translation>
     </message>
     <message>
       <source>Missing CHARGE or DROP event</source>
-      <translation type="vanished">Falta o evento CHARGE ou DROP</translation>
+      <translation type="vanished">Falta o evento CARGA ou DROP</translation>
     </message>
   </context>
   <context>
