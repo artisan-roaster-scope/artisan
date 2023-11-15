@@ -4,44 +4,45 @@ Detailed Release History
 v2.10.0 (November XX, 2023)
 ------------------
 
-* ADDITIONS
-  - adds support for macOS 14 Sonoma and native support for Apple Silicon ([Issue #1221](../../../issues/1221))
-  - adds back Raspbian OS build (64bit bookworm)
-  - adds support for [Bühler Roastmaster](https://www.buhlergroup.com/global/de/products/roastmaster_coffeeroaster.html) RM20 Playone as well as RM60, RM120 and RM240
-  - adds support for [Joper](https://joper-roasters.com/) PLC-based machines
-  - adds support for [Cogen](https://cogen-company.com/) machines
-  - adds support for [Typhoon](https://typhoon.coffee/) Hybrid roasters
-  - adds support for additional [Carmomaq](https://carmomaq.com.br/) machine ([PR #1233](../../../pull/1233))
-  - adds support for the [Phidget DAQ1000](https://phidgets.com/?prodid=622) 8x Voltage Input module ([Issue #1225](../../../issues/1225))
+* NEW FEATURES
+  - adds equal and not equal temperature conditions to alarm rules
   - adds extra device curves to Comparator
   - adds new font graph font options [Comic Neue](http://comicneue.com/) (a redesigned Comic Sans) and [xkcd Script](https://github.com/ipython/xkcd-font/) (a more complete version of Humor)
   - adds alternative slider layout (controlled by the menu `Config >> Events`, Slider tab `Alternative Layout` flag)
   - adds optional alternative weight units in [artisan.plus](https://artisan.plus/) stock menus activated by holding the ALT (Windows) or OPTION (macOS) key
   - adds flags to control ET and BT projection lines separately
   - adds support clicks on large LCDs to set tare and to show/hide curves
-  - adds equal and not equal temperature conditions to alarm rules
   - adds additional translatable button labels (`\i`: STIRRER, `\f`: FILL, `\r`: RELEASE)
   - adds support for event name substitution in ET, BT channel names
+  - adds flag `Interpolate Drops` in `Config >> Curves`, tab `Filter` to disable data interpolation
+
+* NEW HARDWARE SUPPORT
+  - adds support for macOS 14 Sonoma and native support for Apple Silicon ([Issue #1221](../../../issues/1221))
+  - adds back Raspberry Pi OS build (64bit Bookworm)
+  - adds support for [Bühler Roastmaster](https://www.buhlergroup.com/global/de/products/roastmaster_coffeeroaster.html) RM20 Playone as well as RM60, RM120 and RM240
+  - adds support for [Joper](https://joper-roasters.com/) PLC-based machines
+  - adds support for [Cogen](https://cogen-company.com/) machines
+  - adds support for [Typhoon](https://typhoon.coffee/) Hybrid roasters
+  - adds support for additional [Carmomaq](https://carmomaq.com.br/) machine ([PR #1233](../../../pull/1233))
+  - adds support for the [Phidget DAQ1000](https://phidgets.com/?prodid=622) 8x Voltage Input module ([Issue #1225](../../../issues/1225))
   - adds two more MODBUS channels (now 10 in total)
   - adds two more S7 channels (now 12 in total)
   - adds Hottop device logging ([Issue #1257](../../../issues/1257))
-  - adds flag `Interpolate Drops` in `Config >> Curves`, tab `Filter` to disable data interpolation
-  - adds CI testing infrastructure
 
 * CHANGES
-  - if background is explicitly hidden, this state is preserved on loading a new profile with background
-  - updates default serial speed for Kaleido Legacy from 9600 to 57600 baud
-  - adds Idempotency-Key header to [artisan.plus](https://artisan.plus/) POST requests
-  - allow to call buttons with Multiple-Event actions from Multiple-Event actions, potentially generating infinite call loops
-  - enable the import of IKAWA profiles from URLs on platforms without Bluetooth BLE support
+  - minimum macOS version support pushed to Monterey (macOS 12)
+  - all enabled alarms with fulfilled preconditions will be fired within a sampling interval instead of just one as in all versions before
   - updates background smoothing during recording to align 1:1 with the foreground ([Issue #1279](../../../issues/1279))
   - Smooth Spikes now always disabled during recording
+  - if background is explicitly hidden, this state is preserved on loading a new profile with background
+  - updates default serial speed for Kaleido Legacy from 9600 to 57600 baud
+  - allow to call buttons with Multiple-Event actions from Multiple-Event actions, caution! allows for generating infinite call loops
+  - enable the import of IKAWA profiles from URLs on platforms without Bluetooth BLE support
   - roasting and cupping notes are always deleted on RESET even if `delete Roast Properties on RESET` is not ticked
-  - all enabled alarms with fulfilled preconditions will be fired within a sampling interval instead of just one as in all versions before
   - use default spawn instead fork multiprocessing also on macOS and replaced troublesome multiprocessing for Hottop and WebLCDs communication by asyncio
   - internal improvements leading to faster app start and exit as well as faster start of WebLCDs and more stable communication with Hottop roasters
   - upgrades dependencies (PyQt 6.6, matplotlib 3.8, pymodbus 3.5)
-  - minimal macOS version support pushed to Monterey (macOS 12)
+  - adds Idempotency-Key header to [artisan.plus](https://artisan.plus/) POST requests
 
 * FIXES
   - improve autoDROP accuracy for most setups ([Issue #1232](../../../issues/1232))
