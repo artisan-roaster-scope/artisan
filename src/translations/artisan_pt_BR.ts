@@ -17447,7 +17447,7 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
     <message>
       <location filename="../artisanlib/main.py" line="23749" />
       <source>Save Graph as SVG</source>
-      <translation>Salvar gráficocomo SVG</translation>
+      <translation>Salvar Gráfico como SVG</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="23767" />
@@ -17514,7 +17514,7 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
       <source>Warning: The start of the analysis interval of interest is earlier than the start of curve fitting.
 Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
       <translation>Aviso: o início do intervalo de análise de interesse é anterior ao início do ajuste da curva.
-Corrija isso na guia Config&gt; Curves&gt; Analyze.</translation>
+Corrija isso na guia Configurar&gt;Curvas&gt;Analisar.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="24657" />
@@ -17534,7 +17534,7 @@ Corrija isso na guia Config&gt; Curves&gt; Analyze.</translation>
     <message>
       <location filename="../artisanlib/batches.py" line="59" />
       <source>Next batch: counter+1</source>
-      <translation>Próximo lote: contador + 1</translation>
+      <translation>Próximo lote: contador+1</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1851" />
