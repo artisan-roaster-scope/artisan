@@ -11404,13 +11404,13 @@ CTRL+SHIFT+H [Win]</translation>
       <source>⌘ +,- [Mac]
 CRTL +,- [Win]</source>
       <translation type="vanished">⌘ +,- [Mac]
-CRTL +,- [Vitória]</translation>
+CRTL +,- [Win]</translation>
     </message>
     <message>
       <source>⌘ 0-9 [Mac]
 CRTL 0-9 [Win]</source>
       <translation type="vanished">⌘ 0-9 [Mac]
-CRTL 0-9 [Vitória]</translation>
+CRTL 0-9 [Win]</translation>
     </message>
     <message>
       <source>Q,W,E,R + &lt;value&gt;</source>
@@ -11518,7 +11518,7 @@ CTRL+SHIFT+F [Win]</translation>
     </message>
     <message>
       <source>~title Roasted on ~date</source>
-      <translation type="vanished">~ título Torrado em ~ data</translation>
+      <translation type="vanished">~título Torrado em ~data</translation>
     </message>
     <message>
       <source>Burundi Roasted on 20-04-25.alog</source>
@@ -11526,11 +11526,11 @@ CTRL+SHIFT+F [Win]</translation>
     </message>
     <message>
       <source>~batchcounter ~title ~date_long</source>
-      <translation type="vanished">~ batchcounter ~ title ~ date_long</translation>
+      <translation type="vanished">~batchcounter ~title ~date_long</translation>
     </message>
     <message>
       <source>~beans ~machine ~drumspeedRPM ~weight~weightunits ~poisturePCT ~operator ~date ~batch(~batchposition)</source>
-      <translation type="vanished">~ beans ~ machine ~ drumspeedRPM ~ weight ~ weightunits ~ poisturePCT ~ operator ~ date ~ batch (~ batchposition)</translation>
+      <translation type="vanished">~beans ~machine ~drumspeedRPM ~weight~weightunits ~poisturePCT ~operator ~date ~batch (~ batchposition)</translation>
     </message>
     <message>
       <source>Burundi Kiganda Murambi Lot44 SF-25 64RPM 10.3Kg 10.2PCT Roberto 20-04-25 Prod-1380(6).alog</source>
@@ -11560,7 +11560,7 @@ When OFF:
 Prod-1380 Burundi Kiganda Murambi 2020-04-25_1136.alog
 While Recording. 
 Recording 1380  Burundi KigandaMurambi 2020-04-25_113809.alog</source>
-      <translation type="vanished">Cria um nome de arquivo exclusivo para vários salvamentos durante a amostragem usando ~ currtime.
+      <translation type="vanished">Cria um nome de arquivo exclusivo para vários salvamentos durante a amostragem usando ~currtime.
 Quando DESLIGADO:
 Prod-1380 Burundi Kiganda Murambi 2020-04-25_1136.alog
 Durante a gravação.
@@ -11568,15 +11568,15 @@ Gravação 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     </message>
     <message>
       <source>sleep(&lt;float&gt;)</source>
-      <translation type="vanished">dormir (&lt;float&gt;)</translation>
+      <translation type="vanished">sleep(&lt;float&gt;)</translation>
     </message>
     <message>
       <source>button(&lt;bool&gt;)</source>
-      <translation type="vanished">botão (&lt;bool&gt;)</translation>
+      <translation type="vanished">button(&lt;bool&gt;)</translation>
     </message>
     <message>
-      <source>read(slaveID,register)</source>
-      <translation type="vanished">ler (slaveID, registrar)</translation>
+      <source>button(slaveID,register)</source>
+      <translation type="vanished">button(slaveID, registrar)</translation>
     </message>
     <message>
       <source>readSigned(slaveId,register)</source>
@@ -11604,31 +11604,31 @@ Gravação 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     </message>
     <message>
       <source>write(slaveId,register,value) or write([slaveId,register,value],..,[slaveId,register,value])</source>
-      <translation type="vanished">escrever (slaveId, registro, valor) ou escrever ([slaveId, registro, valor], .., [slaveId, registro, valor])</translation>
+      <translation type="vanished">write(slaveId, registro, valor) ou write([slaveId, registro, valor], .., [slaveId, registro, valor])</translation>
     </message>
     <message>
       <source>wcoil(slaveId,register,&lt;bool&gt;)</source>
-      <translation type="vanished">wcoil (slaveId, registrar, &lt;bool&gt;)</translation>
+      <translation type="vanished">wcoil(slaveId, registrar, &lt;bool&gt;)</translation>
     </message>
     <message>
       <source>wcoils(slaveId,register,[&lt;bool&gt;,..,&lt;bool&gt;])</source>
-      <translation type="vanished">wcoils (slaveId, registro, [&lt;bool&gt;, .., &lt;bool&gt;])</translation>
+      <translation type="vanished">wcoils(slaveId, registro, [&lt;bool&gt;, .., &lt;bool&gt;])</translation>
     </message>
     <message>
       <source>mwrite(slaveId,register,andMask,orMask) or mwrite(s,r,am,om,v)</source>
-      <translation type="vanished">mwrite (slaveId, register, andMask, orMask) ou mwrite (s, r, am, om, v)</translation>
+      <translation type="vanished">mwrite(slaveId, register, andMask, orMask) ou mwrite(s, r, am, om, v)</translation>
     </message>
     <message>
       <source>writem(slaveId,register,value) or writem(slaveId,register,[&lt;int&gt;,..,&lt;int&gt;])</source>
-      <translation type="vanished">Writeem (slaveId, registro, valor) ou Write (slaveId, registro, [&lt;int&gt;, .., &lt;int&gt;])</translation>
+      <translation type="vanished">writem(slaveId, registro, valor) ou writem(slaveId, registro, [&lt;int&gt;, .., &lt;int&gt;])</translation>
     </message>
     <message>
       <source>writeBCD(s,r,v) or writeBCD([s,r,v],..,[s,r,v])</source>
-      <translation type="vanished">writeBCD (s, r, v) ou writeBCD ([s, r, v], .., [s, r, v])</translation>
+      <translation type="vanished">writeBCD(s, r, v) ou writeBCD([s, r, v], .., [s, r, v])</translation>
     </message>
     <message>
       <source>writeWord(slaveId,register,value) or writeWord([slaveId,register,value],..,[slaveId,register,value])</source>
-      <translation type="vanished">writeWord (slaveId, registro, valor) ou writeWord ([slaveId, registro, valor], .., [slaveId, registro, valor])</translation>
+      <translation type="vanished">writeWord(slaveId, registro, valor) ou writeWord([slaveId, registro, valor], .., [slaveId, registro, valor])</translation>
     </message>
     <message>
       <source>writeLong(slaveId,register,value) or writeLong([slaveId,register,value],..,[slaveId,register,value])</source>
@@ -11636,63 +11636,63 @@ Gravação 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     </message>
     <message>
       <source>writeSingle(slaveId,register,value) or writeSingle([slaveId,register,value],..,[slaveId,register,value])</source>
-      <translation type="vanished">writeSingle (slaveId, registro, valor) ou writeSingle ([slaveId, registro, valor], .., [slaveId, registro, valor])</translation>
+      <translation type="vanished">writeSingle(slaveId, registro, valor) ou writeSingle([slaveId, registro, valor], .., [slaveId, registro, valor])</translation>
     </message>
     <message>
       <source>motor(n),solenoid(n),stirrer(n),heater(h),fan(f) </source>
-      <translation type="vanished">motor (n), solenóide (n), agitador (n), aquecedor (h), ventilador (f)</translation>
+      <translation type="vanished">motor(n),solenoid (n),stirrer(n),heater(h),fan(f)</translation>
     </message>
     <message>
       <source>write(&lt;unitId&gt;,&lt;register&gt;,&lt;value&gt;)</source>
-      <translation type="vanished">escrever (&lt;unitId&gt;, &lt;register&gt;, &lt;value&gt;)</translation>
+      <translation type="vanished">write(&lt;unitId&gt;, &lt;register&gt;, &lt;value&gt;)</translation>
     </message>
     <message>
       <source>out(&lt;channel&gt;,&lt;value&gt;[,&lt;sn&gt;])</source>
-      <translation type="vanished">out (&lt;canal&gt;, &lt;valor&gt; [, &lt;sn&gt;])</translation>
+      <translation type="vanished">out(&lt;canal&gt;, &lt;valor&gt; [, &lt;sn&gt;])</translation>
     </message>
     <message>
       <source>toggle(&lt;channel&gt;[,&lt;sn&gt;])</source>
-      <translation type="vanished">alternar (&lt;canal&gt; [, &lt;sn&gt;])</translation>
+      <translation type="vanished">toggle(&lt;canal&gt; [, &lt;sn&gt;])</translation>
     </message>
     <message>
       <source>pulse(&lt;channel&gt;,&lt;millis&gt;[,&lt;sn&gt;])</source>
-      <translation type="vanished">pulso (&lt;canal&gt;, &lt;millis&gt; [, &lt;sn&gt;])</translation>
+      <translation type="vanished">pulse(&lt;canal&gt;, &lt;millis&gt; [, &lt;sn&gt;])</translation>
     </message>
     <message>
       <source>outhub(&lt;channel&gt;,&lt;value&gt;[,&lt;sn&gt;])</source>
-      <translation type="vanished">outhub (&lt;canal&gt;, &lt;valor&gt; [, &lt;sn&gt;])</translation>
+      <translation type="vanished">outhub(&lt;canal&gt;, &lt;valor&gt; [, &lt;sn&gt;])</translation>
     </message>
     <message>
       <source>togglehub(&lt;channel&gt;[,&lt;sn&gt;])</source>
-      <translation type="vanished">togglehub (&lt;canal&gt; [, &lt;sn&gt;])</translation>
+      <translation type="vanished">togglehub(&lt;canal&gt; [, &lt;sn&gt;])</translation>
     </message>
     <message>
       <source>pulsehub(&lt;channel&gt;,&lt;millis&gt;[,&lt;sn&gt;])</source>
-      <translation type="vanished">pulsehub (&lt;canal&gt;, &lt;millis&gt; [, &lt;sn&gt;])</translation>
+      <translation type="vanished">pulsehub(&lt;canal&gt;, &lt;millis&gt; [, &lt;sn&gt;])</translation>
     </message>
     <message>
       <source>enabled(c,b[,sn])</source>
-      <translation type="vanished">habilitado (c, b [, sn])</translation>
+      <translation type="vanished">enabled(c, b [, sn])</translation>
     </message>
     <message>
       <source>freq(c,f[,sn])</source>
-      <translation type="vanished">freq (c, f [, sn])</translation>
+      <translation type="vanished">freq(c, f [, sn])</translation>
     </message>
     <message>
       <source>duty(c,d[,sn])</source>
-      <translation type="vanished">dever (c, d [, sn])</translation>
+      <translation type="vanished">duty(c, d [, sn])</translation>
     </message>
     <message>
       <source>move(c,d,t[,sn])</source>
-      <translation type="vanished">mover (c, d, t [, sn])</translation>
+      <translation type="vanished">move(c, d, t [, sn])</translation>
     </message>
     <message>
       <source>range(c,r[,sn])</source>
-      <translation type="vanished">intervalo (c, r [, sn])</translation>
+      <translation type="vanished">range(c, r [, sn])</translation>
     </message>
     <message>
       <source>out(n,v[,sn])</source>
-      <translation type="vanished">out (n, v [, sn])</translation>
+      <translation type="vanished">out(n, v [, sn])</translation>
     </message>
     <message>
       <source>vout(c,v[,sn])</source>
@@ -11700,59 +11700,59 @@ Gravação 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     </message>
     <message>
       <source>cout(c[,sn])</source>
-      <translation type="vanished">cout (c [, sn])</translation>
+      <translation type="vanished">cout(c [, sn])</translation>
     </message>
     <message>
       <source>set(c,b[,sn])</source>
-      <translation type="vanished">conjunto (c, b [, sn])</translation>
+      <translation type="vanished">set(c, b [, sn])</translation>
     </message>
     <message>
       <source>toggle(c[,sn])</source>
-      <translation type="vanished">alternar (c [, sn])</translation>
+      <translation type="vanished">toggle(c [, sn])</translation>
     </message>
     <message>
       <source>pulse(c,t[,sn])</source>
-      <translation type="vanished">pulso (c, t [, sn])</translation>
+      <translation type="vanished">pulse(c, t [, sn])</translation>
     </message>
     <message>
       <source>out(c,v[,sn])</source>
-      <translation type="vanished">out (c, v [, sn])</translation>
+      <translation type="vanished">out(c, v [, sn])</translation>
     </message>
     <message>
       <source>accel(c,v[,sn])</source>
-      <translation type="vanished">acel (c, v [, sn])</translation>
+      <translation type="vanished">accel(c, v [, sn])</translation>
     </message>
     <message>
       <source>vel(c,v[,sn])</source>
-      <translation type="vanished">vel (c, v [, sn])</translation>
+      <translation type="vanished">vel(c, v [, sn])</translation>
     </message>
     <message>
       <source>limit(c,v[,sn])</source>
-      <translation type="vanished">limite(c,v[,sn])</translation>
+      <translation type="vanished">limit(c,v[,sn])</translation>
     </message>
     <message>
       <source>on(c[,sn])</source>
-      <translation type="vanished">em (c [, sn])</translation>
+      <translation type="vanished">on(c [, sn])</translation>
     </message>
     <message>
       <source>off(c[,sn])</source>
-      <translation type="vanished">desligado (c [, sn])</translation>
+      <translation type="vanished">off(c [, sn])</translation>
     </message>
     <message>
       <source>flip(c[,sn])</source>
-      <translation type="vanished">flip (c [, sn])</translation>
+      <translation type="vanished">flip(c [, sn])</translation>
     </message>
     <message>
       <source>pip(c,delay,duration[,sn])</source>
-      <translation type="vanished">pip (c, atraso, duração [, sn])</translation>
+      <translation type="vanished">pip(c, atraso, duração [, sn])</translation>
     </message>
     <message>
       <source>slider(c,v)</source>
-      <translation type="vanished">controle deslizante (c, v)</translation>
+      <translation type="vanished">slider(c, v)</translation>
     </message>
     <message>
       <source>button(i,c,b[,sn])</source>
-      <translation type="vanished">botão (i, c, b [, sn])</translation>
+      <translation type="vanished">button(i, c, b [, sn])</translation>
     </message>
     <message>
       <source>santoker(&lt;target&gt;,&lt;value&gt;)</source>
@@ -11760,43 +11760,43 @@ Gravação 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     </message>
     <message>
       <source>getDBbool(&lt;dbnumber&gt;,&lt;start&gt;,&lt;index&gt;)</source>
-      <translation type="vanished">getDBbool (&lt;dbnumber&gt;, &lt;start&gt;, &lt;index&gt;)</translation>
+      <translation type="vanished">getDBbool(&lt;dbnumber&gt;, &lt;start&gt;, &lt;index&gt;)</translation>
     </message>
     <message>
       <source>getDBint(&lt;dbnumber&gt;,&lt;start&gt;)</source>
-      <translation type="vanished">getDBint (&lt;dbnumber&gt;, &lt;start&gt;)</translation>
+      <translation type="vanished">getDBint(&lt;dbnumber&gt;, &lt;start&gt;)</translation>
     </message>
     <message>
       <source>getDBfloat(&lt;dbnumber&gt;,&lt;start&gt;)</source>
-      <translation type="vanished">getDBfloat (&lt;dbnumber&gt;, &lt;start&gt;)</translation>
+      <translation type="vanished">getDBfloat(&lt;dbnumber&gt;, &lt;start&gt;)</translation>
     </message>
     <message>
       <source>setDBbool(&lt;dbnumber&gt;,&lt;start&gt;,&lt;index&gt;,&lt;value&gt;)</source>
-      <translation type="vanished">setDBbool (&lt;dbnumber&gt;, &lt;start&gt;, &lt;index&gt;, &lt;value&gt;)</translation>
+      <translation type="vanished">setDBbool(&lt;dbnumber&gt;, &lt;start&gt;, &lt;index&gt;, &lt;value&gt;)</translation>
     </message>
     <message>
       <source>setDBint(&lt;dbnumber&gt;,&lt;start&gt;,&lt;value&gt;)</source>
-      <translation type="vanished">setDBint (&lt;dbnumber&gt;, &lt;start&gt;, &lt;value&gt;)</translation>
+      <translation type="vanished">setDBint(&lt;dbnumber&gt;, &lt;start&gt;, &lt;value&gt;)</translation>
     </message>
     <message>
       <source>setDBfloat(&lt;dbnumber&gt;,&lt;start&gt;,&lt;value&gt;)</source>
-      <translation type="vanished">setDBfloat (&lt;dbnumber&gt;, &lt;start&gt;, &lt;value&gt;)</translation>
+      <translation type="vanished">setDBfloat(&lt;dbnumber&gt;, &lt;start&gt;, &lt;value&gt;)</translation>
     </message>
     <message>
       <source>alarms(&lt;bool&gt;)</source>
-      <translation type="vanished">alarmes (&lt;bool&gt;)</translation>
+      <translation type="vanished">alarms(&lt;bool&gt;)</translation>
     </message>
     <message>
       <source>autoCHARGE(&lt;bool&gt;)</source>
-      <translation type="vanished">autoCHARGE (&lt;bool&gt;)</translation>
+      <translation type="vanished">autoCHARGE(&lt;bool&gt;)</translation>
     </message>
     <message>
       <source>autoDROP(&lt;bool&gt;)</source>
-      <translation type="vanished">autoDROP (&lt;bool&gt;)</translation>
+      <translation type="vanished">autoDROP(&lt;bool&gt;)</translation>
     </message>
     <message>
       <source>tare(&lt;int&gt;)</source>
-      <translation type="vanished">tara (&lt;int&gt;)</translation>
+      <translation type="vanished">tare(&lt;int&gt;)</translation>
     </message>
     <message>
       <source>PIDon</source>
@@ -11812,43 +11812,43 @@ Gravação 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     </message>
     <message>
       <source>pidmode(&lt;int&gt;)</source>
-      <translation type="vanished">pidmode (&lt;int&gt;)</translation>
+      <translation type="vanished">pidmode(&lt;int&gt;)</translation>
     </message>
     <message>
       <source>p-i-d(&lt;p&gt;,&lt;i&gt;,&lt;d&gt;)</source>
-      <translation type="vanished">p-i-d (&lt;p&gt;, &lt;i&gt;, &lt;d&gt;)</translation>
+      <translation type="vanished">p-i-d(&lt;p&gt;, &lt;i&gt;, &lt;d&gt;)</translation>
     </message>
     <message>
       <source>adjustSV(&lt;int&gt;)</source>
-      <translation type="vanished">ajustarSV (&lt;int&gt;)</translation>
+      <translation type="vanished">adjustSV(&lt;int&gt;)</translation>
     </message>
     <message>
       <source>pidSV(&lt;int&gt;)</source>
-      <translation type="vanished">pidSV (&lt;int&gt;)</translation>
+      <translation type="vanished">pidSV(&lt;int&gt;)</translation>
     </message>
     <message>
       <source>pidRS(&lt;rs&gt;)</source>
-      <translation type="vanished">pidRS (&lt;rs&gt;)</translation>
+      <translation type="vanished">pidRS(&lt;rs&gt;)</translation>
     </message>
     <message>
       <source>pidSource(&lt;int&gt;)</source>
-      <translation type="vanished">pidSource (&lt;int&gt;)</translation>
+      <translation type="vanished">pidSource(&lt;int&gt;)</translation>
     </message>
     <message>
       <source>pidLookahead(&lt;int&gt;)</source>
-      <translation type="vanished">pidLookahead (&lt;int&gt;)</translation>
+      <translation type="vanished">pidLookahead(&lt;int&gt;)</translation>
     </message>
     <message>
       <source>popup(&lt;msg&gt;[,&lt;int&gt;])</source>
-      <translation type="vanished">pop-up (&lt;msg&gt; [, &lt;int&gt;])</translation>
+      <translation type="vanished">popup(&lt;msg&gt; [, &lt;int&gt;])</translation>
     </message>
     <message>
       <source>message(&lt;msg&gt;)</source>
-      <translation type="vanished">mensagem (&lt;msg&gt;)</translation>
+      <translation type="vanished">message(&lt;msg&gt;)</translation>
     </message>
     <message>
       <source>notifications(&lt;bool&gt;)</source>
-      <translation type="vanished">notificações(&lt;bool&gt;)</translation>
+      <translation type="vanished">notifications(&lt;bool&gt;)</translation>
     </message>
     <message>
       <source>notify(&lt;title&gt;,[&lt;msg&gt;])</source>
@@ -11856,43 +11856,43 @@ Gravação 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     </message>
     <message>
       <source>setCanvasColor(&lt;color&gt;)</source>
-      <translation type="vanished">setCanvasColor (&lt;color&gt;)</translation>
+      <translation type="vanished">setCanvasColor(&lt;color&gt;)</translation>
     </message>
     <message>
       <source>button(&lt;name&gt;)</source>
-      <translation type="vanished">botão (&lt;nome&gt;)</translation>
+      <translation type="vanished">button(&lt;nome&gt;)</translation>
     </message>
     <message>
       <source>palette(&lt;p&gt;)</source>
-      <translation type="vanished">paleta (&lt;p&gt;)</translation>
+      <translation type="vanished">palette(&lt;p&gt;)</translation>
     </message>
     <message>
       <source>playbackmode(&lt;int&gt;)</source>
-      <translation type="vanished">playbackmode (&lt;int&gt;)</translation>
+      <translation type="vanished">playbackmode(&lt;int&gt;)</translation>
     </message>
     <message>
       <source>openProperties</source>
-      <translation type="vanished">abrirPropriedades</translation>
+      <translation type="vanished">openProperties</translation>
     </message>
     <message>
       <source>loadBackground(&lt;filepath&gt;)</source>
-      <translation type="vanished">loadBackground (&lt;filepath&gt;)</translation>
+      <translation type="vanished">loadBackground(&lt;filepath&gt;)</translation>
     </message>
     <message>
       <source>alarmset(&lt;as&gt;)</source>
-      <translation type="vanished">conjunto de alarmes (&lt;as&gt;)</translation>
+      <translation type="vanished">alarmset(&lt;as&gt;)</translation>
     </message>
     <message>
       <source>moveBackground(&lt;direction&gt;,&lt;int&gt;)</source>
-      <translation type="vanished">moveBackground (&lt;direction&gt;, &lt;int&gt;)</translation>
+      <translation type="vanished">moveBackground(&lt;direction&gt;, &lt;int&gt;)</translation>
     </message>
     <message>
       <source>keyboard(&lt;bool&gt;)</source>
-      <translation type="vanished">teclado(&lt;bool&gt;)</translation>
+      <translation type="vanished">keyboard(&lt;bool&gt;)</translation>
     </message>
     <message>
       <source>keepON(&lt;bool&gt;)</source>
-      <translation type="vanished">mantenhaON(&lt;bool&gt;)</translation>
+      <translation type="vanished">keepON(&lt;bool&gt;)</translation>
     </message>
     <message>
       <source>showCurve(&lt;name&gt;,&lt;bool&gt;)</source>
@@ -11900,15 +11900,15 @@ Gravação 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     </message>
     <message>
       <source>pulse(ch,min,max[,sn])</source>
-      <translation type="vanished">pulso (ch, min, max [, sn])</translation>
+      <translation type="vanished">pulse(ch, min, max [, sn])</translation>
     </message>
     <message>
       <source>pos(ch,min,max[,sn])</source>
-      <translation type="vanished">pos (ch, min, max [, sn])</translation>
+      <translation type="vanished">pos(ch, min, max [, sn])</translation>
     </message>
     <message>
       <source>engaged(ch,b[,sn])</source>
-      <translation type="vanished">engajado (ch, b [, sn])</translation>
+      <translation type="vanished">engaged(ch, b [, sn])</translation>
     </message>
     <message>
       <source>ramp(ch,b[,sn])</source>
@@ -11916,43 +11916,43 @@ Gravação 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     </message>
     <message>
       <source>volt(ch,v[,sn])</source>
-      <translation type="vanished">volt (ch, v [, sn])</translation>
+      <translation type="vanished">volt(ch, v [, sn])</translation>
     </message>
     <message>
       <source>accel(ch,a[,sn])</source>
-      <translation type="vanished">acel (ch, a [, sn])</translation>
+      <translation type="vanished">accel(ch, a [, sn])</translation>
     </message>
     <message>
       <source>veloc(ch,v[,sn])</source>
-      <translation type="vanished">velocidade (ch, v [, sn])</translation>
+      <translation type="vanished">veloc(ch, v [, sn])</translation>
     </message>
     <message>
       <source>set(ch,pos[,sn])</source>
-      <translation type="vanished">definir (ch, pos [, sn])</translation>
+      <translation type="vanished">set(ch, pos [, sn])</translation>
     </message>
     <message>
       <source>move(c,p[,t][,sn])</source>
-      <translation type="vanished">mover (c, p [, t] [, sn])</translation>
+      <translation type="vanished">move(c, p [, t] [, sn])</translation>
     </message>
     <message>
       <source>neutral(c,n[,sn])</source>
-      <translation type="vanished">neutro (c, n [, sn])</translation>
+      <translation type="vanished">neutral(c, n [, sn])</translation>
     </message>
     <message>
       <source>send(&lt;json&gt;)</source>
-      <translation type="vanished">enviar (&lt;json&gt;)</translation>
+      <translation type="vanished">send(&lt;json&gt;)</translation>
     </message>
     <message>
       <source>read(&lt;json&gt;)</source>
-      <translation type="vanished">ler (&lt;json&gt;)</translation>
+      <translation type="vanished">read(&lt;json&gt;)</translation>
     </message>
     <message>
       <source>out(&lt;n&gt;,&lt;v&gt;[,&lt;sn&gt;])</source>
-      <translation type="vanished">out (&lt;n&gt;, &lt;v&gt; [, &lt;sn&gt;])</translation>
+      <translation type="vanished">out(&lt;n&gt;, &lt;v&gt; [, &lt;sn&gt;])</translation>
     </message>
     <message>
       <source>msetDBint(&lt;dbnumber&gt;,&lt;start&gt;,&lt;andMask&gt;,&lt;orMask&gt;,&lt;value&gt;)</source>
-      <translation type="vanished">msetDBint (&lt;dbnumber&gt;, &lt;start&gt;, &lt;andMask&gt;, &lt;orMask&gt;, &lt;value&gt;)</translation>
+      <translation type="vanished">msetDBint(&lt;dbnumber&gt;, &lt;start&gt;, &lt;andMask&gt;, &lt;orMask&gt;, &lt;value&gt;)</translation>
     </message>
     <message>
       <source>Link external programs that print temperature when called.  This allows to connect meters that use any program language.
@@ -11968,7 +11968,7 @@ O Artisan iniciará o programa a cada período de amostragem. A saída do progra
     </message>
     <message>
       <source>print ("237.1,100.4")</source>
-      <translation type="vanished">imprimir ('237.1,100,4')</translation>
+      <translation type="vanished">print("237.1,100.4")</translation>
     </message>
     <message>
       <source>Scaling factor from time to RoR axis. The range of the temperature scale divided by the range of the delta scale. </source>
@@ -11998,7 +11998,7 @@ Best used inside double quotes (see notes below)
 Displays &amp;#39;*&amp;#39; prior to FCs</source>
       <translation type="vanished">Número de segundos após os FCs
 Melhor usado entre aspas duplas (ver notas abaixo)
-Exibe &amp;#39; * &amp;#39; antes dos FCs</translation>
+Exibe &amp;#39;*&amp;#39; antes dos FCs</translation>
     </message>
     <message>
       <source>Number of seconds before FCs 
@@ -12006,13 +12006,13 @@ Best used inside single quotes or back ticks (see notes below)
 Displays &amp;#39;*&amp;#39; after FCs</source>
       <translation type="vanished">Número de segundos antes dos FCs
 Melhor usado dentro de aspas simples ou back ticks (veja as notas abaixo)
-Exibe &amp;#39; * &amp;#39; depois de FCs</translation>
+Exibe &amp;#39;*&amp;#39; depois de FCs</translation>
     </message>
     <message>
       <source>Development time ratio. Note: DTR=0 before FCs 
 100*(t{Event}-t{FCs})/(t{FCs}-t{CHARGE})</source>
       <translation type="vanished">Proporção do tempo de desenvolvimento. Nota: DTR = 0 antes dos FCs
-100 * (t {Event} -t {FCs}) / (t {FCs} -t {CHARGE})</translation>
+100*(t{Event}-t{FCs})/(t{FCs}-t{CHARGE})</translation>
     </message>
     <message>
       <source>Toggle LCD cursor (off/profile/template)</source>
@@ -12077,10 +12077,10 @@ Gas 50% @340 u00b0F
 After FCs:
 Gas 50% @12% DTR</source>
       <translation type="vanished">Antes dos FCs:
-Gás 50% @ 340 u00b0F
+Gás 50% @340 u00b0F
 
 Depois de FCs:
-Gás 50% @ 12% DTR</translation>
+Gás 50% @12% DTR</translation>
     </message>
     <message>
       <source>More than 90 seconds before FCs:
@@ -12092,13 +12092,13 @@ Gas 50% @340 u00b0F, 50 sec before FCs
 After FCs:
 Gas 50% @12% DTR</source>
       <translation type="vanished">Mais de 90 segundos antes dos FCs:
-Gás 50% @ 340 u00b0F
+Gás 50% @340 u00b0F
 
 Menos de 90 segundos antes dos FCs:
-Gás 50% @ 340 u00b0F, 50 segundos antes dos FCs
+Gás 50% @340 u00b0F, 50 segundos antes dos FCs
 
 Depois de FCs:
-Gás 50% @ 12% DTR</translation>
+Gás 50% @12% DTR</translation>
     </message>
     <message>
       <source>Hay @340 u00b0F</source>
@@ -12114,7 +12114,7 @@ Gás 50% @ 12% DTR</translation>
     </message>
     <message>
       <source>The action Command.  Depends on the action type, &amp;#39;{}&amp;#39; is replaced by the event value and the offset in case of a u00B1 event type.</source>
-      <translation type="vanished">O Comando de ação. Depende do tipo de ação, &amp;#39; {} &amp;#39; é substituído pelo valor do evento e o deslocamento no caso de um tipo de evento u00B1.</translation>
+      <translation type="vanished">O Comando de ação. Depende do tipo de ação, &amp;#39;{}&amp;#39; é substituído pelo valor do evento e o deslocamento no caso de um tipo de evento u00B1.</translation>
     </message>
     <message>
       <source>Note: "{}" can be used as a placeholder, it will be substituted by the current button value plus the offset for u00B1 event types.  If a placeholder occurs several times in a description/command, all those occurrences are replaced by the value.
@@ -12124,15 +12124,15 @@ Gás 50% @ 12% DTR</translation>
     </message>
     <message>
       <source>u0027Recording ~batchcounter&amp;#39; "~batch" ~title ~datetime_long</source>
-      <translation type="vanished">u0027Recording ~ batchcounter &amp;#39; '~ batch' ~ title ~ datetime_long</translation>
+      <translation type="vanished">u0027Gravando ~batchcounter&amp;#39; '~batch' ~title ~datetime_long</translation>
     </message>
     <message>
       <source>Gas 5.0kPh @340F and 32.8u00b0F/min</source>
-      <translation type="vanished">Gás 5,0kPh @ 340F e 32,8u00b0F / min</translation>
+      <translation type="vanished">Gás 5,0kPh @340F e 32,8u00b0F / min</translation>
     </message>
     <message>
       <source>u0027Recording ~batchcounter&amp;#39; "~batch" ~title ~date_long_&amp;#39;~currtime&amp;#39;"~time"</source>
-      <translation type="vanished">u0027Recording ~ batchcounter &amp;#39; '~ batch' ~ title ~ date_long _ &amp;#39; ~ currtime &amp;#39; '~ time'</translation>
+      <translation type="vanished">u0027Gravando ~batchcounter &amp;#39; '~ batch' ~title ~date_long_&amp;#39;~currtime &amp;#39; '~time'</translation>
     </message>
     <message>
       <source>The Energy tab displays a roast&amp;#39;s energy consumption.   CO2 emissions are also calculated to monitor the impact of the roasting operation.  Settings must be made for each energy load.  Loads are the main burners, motors and blowers, and an afterburner if one is used.  The energy used for preheating, between batch, and roaster cooling protocols are included in the calculations, and settings are available for them as well.
@@ -12659,7 +12659,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1295" />
       <source>&lt;u&gt;Max life&lt;/u&gt; 10,000 writes</source>
-      <translation>&lt;u&gt;Vida útil&lt;/u&gt; 10,000 gravações</translation>
+      <translation>&lt;u&gt;Vida útil&lt;/u&gt; 10.000 gravações</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1296" />
@@ -13000,7 +13000,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
       <location filename="../artisanlib/ports.py" line="1038" />
       <location filename="../artisanlib/ports.py" line="246" />
       <source>DB#</source>
-      <translation>DB #</translation>
+      <translation>DB#</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6532" />
@@ -13024,7 +13024,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
       <location filename="../artisanlib/ports.py" line="432" />
       <location filename="../artisanlib/ports.py" line="387" />
       <source>Baud Rate</source>
-      <translation>Taxa de Trasmissão</translation>
+      <translation>Taxa de Transmissão</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="823" />
@@ -13048,7 +13048,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
       <location filename="../artisanlib/ports.py" line="454" />
       <location filename="../artisanlib/ports.py" line="406" />
       <source>Stopbits</source>
-      <translation>Bit de Parada</translation>
+      <translation>Bits de Parada</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="842" />
@@ -13103,7 +13103,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
       <location filename="../artisanlib/ports.py" line="999" />
       <location filename="../artisanlib/ports.py" line="557" />
       <source>Host</source>
-      <translation>Rede</translation>
+      <translation>Servidor</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1155" />
@@ -13210,7 +13210,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
     <message>
       <location filename="../artisanlib/ports.py" line="1456" />
       <source>Data Request</source>
-      <translation>Pedido de data</translation>
+      <translation>Requisição de dados</translation>
     </message>
     <message>
       <location filename="../artisanlib/ports.py" line="1565" />
@@ -13479,7 +13479,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
     <message>
       <location filename="../artisanlib/roast_properties.py" line="2781" />
       <source>(mm:ss)</source>
-      <translation>(mm: ss)</translation>
+      <translation>(mm:ss)</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6533" />
@@ -13490,7 +13490,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
     <message>
       <location filename="../artisanlib/roast_properties.py" line="2787" />
       <source>Measured Energy or Output %</source>
-      <translation>Energia medida ou% de saída</translation>
+      <translation>Energia medida ou % de saída</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="3253" />
@@ -14145,7 +14145,7 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/main.py" line="6536" />
       <source>ABC/secs</source>
-      <translation>ABC / s</translation>
+      <translation>ABC/s</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6547" />
@@ -14180,7 +14180,7 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/main.py" line="6567" />
       <source>Smooth Curves/Spikes</source>
-      <translation>Curvas / pontas suaves</translation>
+      <translation>Curvas/pontas suaves</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6568" />
@@ -14195,7 +14195,7 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/main.py" line="6569" />
       <source>Fit RoRoR (C/min/min)</source>
-      <translation>RoRoR de ajuste (C / min / min)</translation>
+      <translation>RoRoR de ajuste (C/min/min)</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6569" />
@@ -14355,7 +14355,7 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/main.py" line="24550" />
       <source>Max+/Max- RoR</source>
-      <translation>Max + / Max- RoR</translation>
+      <translation>Max+/Max- RoR</translation>
     </message>
     <message>
       <location filename="../artisanlib/batches.py" line="55" />
@@ -14703,7 +14703,7 @@ Fases LCDs</translation>
     </message>
     <message>
       <source>min</source>
-      <translation type="vanished">min</translation>
+      <translation type="vanished">mín</translation>
     </message>
     <message>
       <source>Event #&lt;b&gt;0 &lt;/b&gt;</source>
@@ -14815,7 +14815,7 @@ Fases LCDs</translation>
     </message>
     <message>
       <source>Initial Max</source>
-      <translation type="vanished">Max inicial</translation>
+      <translation type="vanished">Máx inicial</translation>
     </message>
     <message>
       <source>Bars</source>
@@ -14979,7 +14979,7 @@ Fases LCDs</translation>
     </message>
     <message>
       <source>18/64u2033</source>
-      <translation type="vanished">18 / 64u2033</translation>
+      <translation type="vanished">18/64u2033</translation>
     </message>
     <message>
       <source>Burner</source>
@@ -15658,7 +15658,7 @@ Fases LCDs</translation>
     </message>
     <message>
       <source>Quit</source>
-      <translation type="vanished">Encerrar</translation>
+      <translation type="vanished">Sair</translation>
     </message>
     <message>
       <source>About...</source>
@@ -15891,12 +15891,12 @@ Fases LCDs</translation>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1807" />
       <source>End output status at the end of ramp/soak: {0}</source>
-      <translation>Status de saída final no final da rampa / saturação: {0}</translation>
+      <translation>Status de saída final no final da rampa/saturação: {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1808" />
       <source>Output status while ramp/soak operation set to OFF: {0}</source>
-      <translation>Status de saída durante a operação de rampa / patamar definida como DESLIGADA: {0}</translation>
+      <translation>Status de saída durante a operação de rampa/patamar definida como DESLIGADA: {0}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="1809" />
@@ -16263,7 +16263,7 @@ Repita a operação no final: {0}</translation>
       <location filename="../artisanlib/roast_properties.py" line="4353" />
       <location filename="../artisanlib/roast_properties.py" line="4349" />
       <source>Alarms from events #{0} created</source>
-      <translation>Alarmes de eventos nº {0} criados</translation>
+      <translation>Alarmes de eventos #{0} criados</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="4410" />
@@ -16284,7 +16284,7 @@ Repita a operação no final: {0}</translation>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="4401" />
       <source> Events #{0} deleted</source>
-      <translation> Eventos nº {0} excluídos</translation>
+      <translation> Eventos #{0} excluídos</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="4404" />
@@ -16409,7 +16409,7 @@ Repita a operação no final: {0}</translation>
     <message>
       <location filename="../artisanlib/pid_control.py" line="763" />
       <source>PXG/PXF sv#{0} set to {1}</source>
-      <translation>PXG / PXF sv # {0} definido como {1}</translation>
+      <translation>PXG/PXF sv#{0} definido como {1}</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="792" />
@@ -16598,7 +16598,7 @@ Repita a operação no final: {0}</translation>
     <message>
       <location filename="../artisanlib/main.py" line="3897" />
       <source>If you never run older versions of Artisan you can skip this message, the change does not affect you.</source>
-      <translation>Se você nunca executa versões anteriores do Artisan, pode pular esta mensagem, pois a mudança não o afetará.</translation>
+      <translation>Se você nunca executou versões anteriores do Artisan, pode pular esta mensagem, pois a mudança não o afetará.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3898" />
@@ -16618,7 +16618,7 @@ Repita a operação no final: {0}</translation>
     <message>
       <location filename="../artisanlib/main.py" line="3901" />
       <source>To share settings between this version and Artisan versions before v2.0 use 'Help&gt;Save Settings' and 'Help&gt;Load Settings'.</source>
-      <translation>Para compartilhar as configurações entre esta versão e as versões do Artisan anteriores à v2.0, use 'Ajuda&gt; Salvar configurações' e 'Ajuda&gt; Carregar configurações'.</translation>
+      <translation>Para compartilhar as configurações entre esta versão e as versões do Artisan anteriores à v2.0, use 'Ajuda&gt;Salvar configurações' e 'Ajuda&gt;Carregar configurações'.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3902" />
@@ -16653,7 +16653,7 @@ Repita a operação no final: {0}</translation>
     <message>
       <location filename="../artisanlib/main.py" line="3911" />
       <source>Caution, the only way to share settings between Artisan and ArtisanViewer is to explicitly save and load them using 'Help&gt;Save Settings' and 'Help&gt;Load Settings'.</source>
-      <translation>Cuidado, a única maneira de compartilhar as configurações entre o Artisan e o ArtisanViewer é salvá-las e carregá-las explicitamente usando 'Ajuda&gt; Salvar configurações' e 'Ajuda&gt; Carregar configurações'.</translation>
+      <translation>Cuidado, a única maneira de compartilhar as configurações entre o Artisan e o ArtisanViewer é salvá-las e carregá-las explicitamente usando 'Ajuda&gt;Salvar configurações' e 'Ajuda&gt;Carregar configurações'.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3912" />
@@ -16767,7 +16767,7 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
       <location filename="../artisanlib/main.py" line="24881" />
       <location filename="../artisanlib/main.py" line="6125" />
       <source>Simulator started @{}x</source>
-      <translation>Simulador iniciado @ {} x</translation>
+      <translation>Simulador iniciado @{}x</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6136" />
@@ -16797,12 +16797,12 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
     <message>
       <location filename="../artisanlib/main.py" line="9079" />
       <source>autoCHARGE on</source>
-      <translation>autoCARREGAR ligado</translation>
+      <translation>autoCHARGE ligado</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="9082" />
       <source>autoCHARGE off</source>
-      <translation>autoCARREGAR desligado</translation>
+      <translation>autoCHARGE desligado</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="9091" />
@@ -16899,12 +16899,12 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
     <message>
       <location filename="../artisanlib/main.py" line="10177" />
       <source>Do you want to reset all settings?&lt;br&gt; ArtisanViewer has to be restarted!</source>
-      <translation>Você deseja redefinir todas as configurações? &lt;br&gt; ArtisanViewer deve ser reiniciado!</translation>
+      <translation>Você deseja redefinir todas as configurações?&lt;br&gt; ArtisanViewer deve ser reiniciado!</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10179" />
       <source>Do you want to reset all settings?&lt;br&gt; Artisan has to be restarted!</source>
-      <translation>Quer redefinir todas as configurações? &lt;br&gt; O Artisan precisa ser reiniciado!</translation>
+      <translation>Quer redefinir todas as configurações?&lt;br&gt; O Artisan precisa ser reiniciado!</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10180" />
@@ -16919,7 +16919,7 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
     <message>
       <location filename="../artisanlib/main.py" line="10896" />
       <source>Auto Axis Graph Mode: BBP+Roast</source>
-      <translation>Modo de gráfico de eixo automático: BBP+Roast</translation>
+      <translation>Modo de gráfico de eixo automático: BBP+Torra</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10898" />
@@ -16930,7 +16930,7 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
       <location filename="../artisanlib/main.py" line="10965" />
       <location filename="../artisanlib/main.py" line="10949" />
       <source>PID Mode: Ramp/Soak</source>
-      <translation>Modo PID: Rampa / Patamar</translation>
+      <translation>Modo PID: Rampa/Patamar</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10967" />
@@ -17028,12 +17028,12 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
     <message>
       <location filename="../artisanlib/main.py" line="11969" />
       <source>NEW ROAST canceled: incomplete profile lacking CHARGE and DROP found</source>
-      <translation>NEW ROAST cancelado: perfil incompleto sem CARREGAR e DESCARREGAR encontrado</translation>
+      <translation>NOVA TORRA cancelada: perfil incompleto sem CARREGAR e DESCARREGAR encontrado</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="11974" />
       <source>NEW ROAST canceled: incomplete profile lacking DROP found</source>
-      <translation>NOVO ROAST cancelado: perfil incompleto sem DROP encontrado</translation>
+      <translation>NOVA TORRA cancelada: perfil incompleto sem DROP encontrado</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="11984" />
@@ -17055,12 +17055,12 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
     <message>
       <location filename="../artisanlib/main.py" line="12243" />
       <source>No profile data.  ET/BT not recalculated</source>
-      <translation>Sem dados de perfil. ET / BT não recalculado</translation>
+      <translation>Sem dados de perfil. ET/BT não recalculado</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="12246" />
       <source>Problem with the profile data.  ET/BT not recalculated</source>
-      <translation>Problema com os dados do perfil. ET / BT não recalculado</translation>
+      <translation>Problema com os dados do perfil. ET/BT não recalculado</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="12584" />
@@ -17075,7 +17075,7 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
     <message>
       <location filename="../artisanlib/main.py" line="12851" />
       <source>The Probat Shop Pilot Software expects files named &lt;Name&gt;_&lt;Index&gt;.xml like in Test_0.xml on import</source>
-      <translation>O software Probat Shop Pilot espera arquivos chamados &lt;Nome&gt; _ &lt;Index&gt; .xml como em Test_0.xml na importação</translation>
+      <translation>O software Probat Shop Pilot espera arquivos chamados &lt;Nome&gt;_&lt;Index&gt;.xml como em Test_0.xml na importação</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="15441" />
@@ -17127,7 +17127,7 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
     <message>
       <location filename="../artisanlib/main.py" line="15540" />
       <source>Export Probat Pilot</source>
-      <translation>Piloto de teste de exportação</translation>
+      <translation>Exportar Probat Pilot</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="15788" />
@@ -17351,7 +17351,7 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
     <message>
       <location filename="../artisanlib/main.py" line="23212" />
       <source>Import Probat Recipe</source>
-      <translation>Receita Probat de importação</translation>
+      <translation>Importar Probat Recipe</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="23386" />
@@ -17447,7 +17447,7 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
     <message>
       <location filename="../artisanlib/main.py" line="23749" />
       <source>Save Graph as SVG</source>
-      <translation>Salvar gráficocomo SVG</translation>
+      <translation>Salvar Gráfico como SVG</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="23767" />
@@ -17514,7 +17514,7 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
       <source>Warning: The start of the analysis interval of interest is earlier than the start of curve fitting.
 Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
       <translation>Aviso: o início do intervalo de análise de interesse é anterior ao início do ajuste da curva.
-Corrija isso na guia Config&gt; Curves&gt; Analyze.</translation>
+Corrija isso na guia Configurar&gt;Curvas&gt;Analisar.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="24657" />
@@ -17534,7 +17534,7 @@ Corrija isso na guia Config&gt; Curves&gt; Analyze.</translation>
     <message>
       <location filename="../artisanlib/batches.py" line="59" />
       <source>Next batch: counter+1</source>
-      <translation>Próximo lote: contador + 1</translation>
+      <translation>Próximo lote: contador+1</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1851" />
@@ -18106,7 +18106,8 @@ Prosseguir?</translation>
       <location filename="../artisanlib/canvas.py" line="15195" />
       <source>Unable to start designer.
 Profile missing [CHARGE] or [DROP]</source>
-      <translation>Impossível iniciar desenhista. Perfil não tem [CARREGAR] ou [DESCARREGAR]</translation>
+      <translation>Impossível iniciar desenhista. 
+Perfil não tem [CARREGAR] ou [DESCARREGAR]</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="15746" />
@@ -18200,7 +18201,7 @@ Profile missing [CHARGE] or [DROP]</source>
 To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
       <translation type="vanished">O uso do Artisan é gratuito!
 
-Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o craft.plus para suprimir este diálogo!</translation>
+Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o artisan.plus para suprimir este diálogo!</translation>
     </message>
     <message>
       <source>Import Aillio RoasTime</source>
@@ -18256,11 +18257,11 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o craf
     </message>
     <message>
       <source>Ramp/Soak was found ON! Turn it off before changing the pattern</source>
-      <translation type="vanished">A Rampa / Patamar foi encontrada LIGADA! Desligue antes de mudar o padrão</translation>
+      <translation type="vanished">A Rampa/Patamar foi encontrada LIGADA! Desligue antes de mudar o padrão</translation>
     </message>
     <message>
       <source>Ramp/Soak was found in Hold! Turn it off before changing the pattern</source>
-      <translation type="vanished">Ramp / Soak foi encontrado em Hold! Desligue antes de mudar o padrão</translation>
+      <translation type="vanished">Ramp/Soak foi encontrado em Hold! Desligue antes de mudar o padrão</translation>
     </message>
     <message>
       <source>Phidget Bridge 4-input attached</source>
@@ -18462,7 +18463,7 @@ Continuar?</translation>
     </message>
     <message>
       <source>Language successfully changed. Restart the application.</source>
-      <translation type="vanished">Idioma foi alterado. Reiniciae a aplicação.</translation>
+      <translation type="vanished">Idioma foi alterado. Reinicie a aplicação.</translation>
     </message>
     <message>
       <source>Save Graph as PNG</source>
@@ -18474,23 +18475,23 @@ Continuar?</translation>
     </message>
     <message>
       <source>Return the absolute value of x.</source>
-      <translation type="vanished">Devolve o valor absoluto de x</translation>
+      <translation type="vanished">Retorna o valor absoluto de x</translation>
     </message>
     <message>
       <source>Return the arc cosine (measured in radians) of x.</source>
-      <translation type="vanished">Devolve o arco-coseno (medido em radianos) de x.</translation>
+      <translation type="vanished">Retorna o arco-coseno (medido em radianos) de x.</translation>
     </message>
     <message>
       <source>Return the arc sine (measured in radians) of x.</source>
-      <translation type="vanished">Devolve o arco-seno (medido em radianos) de x.</translation>
+      <translation type="vanished">Retorna o arco-seno (medido em radianos) de x.</translation>
     </message>
     <message>
       <source>Return the arc tangent (measured in radians) of x.</source>
-      <translation type="vanished">Devolve o arco-tangente (medido em radianos) de x.</translation>
+      <translation type="vanished">Retorna o arco-tangente (medido em radianos) de x.</translation>
     </message>
     <message>
       <source>Return the cosine of x (measured in radians).</source>
-      <translation type="vanished">Devolve o coseno (medido em radianos).</translation>
+      <translation type="vanished">Retorna o coseno (medido em radianos).</translation>
     </message>
     <message>
       <source>Convert angle x from radians to degrees.</source>
@@ -18498,19 +18499,19 @@ Continuar?</translation>
     </message>
     <message>
       <source>Return e raised to the power of x.</source>
-      <translation type="vanished">Devolve e elevado a potência de x.</translation>
+      <translation type="vanished">Retorna e elevado a potência de x.</translation>
     </message>
     <message>
       <source>Return the logarithm of x to the given base. </source>
-      <translation type="vanished">Devolve o logaritmo de x na base dada. </translation>
+      <translation type="vanished">Retorna o logaritmo de x na base dada. </translation>
     </message>
     <message>
       <source>Return the base 10 logarithm of x.</source>
-      <translation type="vanished">Devolve o logaritmo de x na base 10.</translation>
+      <translation type="vanished">Retorna o logaritmo de x na base 10.</translation>
     </message>
     <message>
       <source>Return x**y (x to the power of y).</source>
-      <translation type="vanished">Devolve x**y (x elevado a y).</translation>
+      <translation type="vanished">Retorna x**y (x elevado a y).</translation>
     </message>
     <message>
       <source>Convert angle x from degrees to radians.</source>
@@ -18518,15 +18519,15 @@ Continuar?</translation>
     </message>
     <message>
       <source>Return the sine of x (measured in radians).</source>
-      <translation type="vanished">Devolve o seno de x (medido em radianos).</translation>
+      <translation type="vanished">Retorna o seno de x (medido em radianos).</translation>
     </message>
     <message>
       <source>Return the square root of x.</source>
-      <translation type="vanished">Devolve a raiz quadrada de x.</translation>
+      <translation type="vanished">Retorna a raiz quadrada de x.</translation>
     </message>
     <message>
       <source>Return the tangent of x (measured in radians).</source>
-      <translation type="vanished">Devolve a tangente de x (medido em radianos).</translation>
+      <translation type="vanished">Retorna a tangente de x (medido em radianos).</translation>
     </message>
     <message>
       <source>previous ET value</source>
@@ -18690,7 +18691,7 @@ Continuar?</translation>
     </message>
     <message>
       <source>Return the minimum of x and y.</source>
-      <translation type="vanished">Retorna omínimo de x e y.</translation>
+      <translation type="vanished">Retorna o mínimo de x e y.</translation>
     </message>
     <message>
       <source>Return the maximum of x and y.</source>
@@ -19037,7 +19038,7 @@ Continuar?</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="vanished">Cancela</translation>
+      <translation type="vanished">Cancelar</translation>
     </message>
   </context>
   <context>
@@ -19048,7 +19049,7 @@ Continuar?</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="vanished">Cancela</translation>
+      <translation type="vanished">Cancelar</translation>
     </message>
   </context>
   <context>
@@ -19409,7 +19410,7 @@ Continuar?</translation>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3040" />
       <source>setNsv(): bad response</source>
-      <translation>setNsv (): resposta ruim</translation>
+      <translation>setNsv(): resposta ruim</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3094" />
@@ -19419,7 +19420,7 @@ Continuar?</translation>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3097" />
       <source>setNpid(): bad confirmation</source>
-      <translation>setNpid (): má confirmação</translation>
+      <translation>setNpid(): má confirmação</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3101" />
@@ -19434,7 +19435,7 @@ Continuar?</translation>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3129" />
       <source>setNpid(): Unable to set pid {0} </source>
-      <translation>setNpid (): Não é possível definir pid {0} </translation>
+      <translation>setNpid(): Não é possível definir pid {0} </translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3250" />
@@ -19450,7 +19451,7 @@ Continuar?</translation>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3261" />
       <source>setsv(): Unable to set SV</source>
-      <translation>setsv (): Incapaz de definir SV</translation>
+      <translation>setsv(): Incapaz de definir SV</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="365" />
@@ -19480,7 +19481,7 @@ Continuar?</translation>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3501" />
       <source>getallpid(): Unable to read pid values</source>
-      <translation>getallpid (): Incapaz de ler os valores pid</translation>
+      <translation>getallpid(): Incapaz de ler os valores pid</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3529" />
@@ -19490,7 +19491,7 @@ Continuar?</translation>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3532" />
       <source>getallpid(): Unable to read current sv</source>
-      <translation>getallpid (): Incapaz de ler sv atual</translation>
+      <translation>getallpid(): Incapaz de ler sv atual</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3608" />
@@ -19545,7 +19546,7 @@ Continuar?</translation>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3967" />
       <source>Soak (MM:SS)</source>
-      <translation>Mergulhe (MM: SS)</translation>
+      <translation>Patamar (MM: SS)</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="4061" />
@@ -19580,7 +19581,7 @@ Continuar?</translation>
     <message>
       <location filename="../artisanlib/pid_control.py" line="464" />
       <source>setpid(): There was a problem setting {0}</source>
-      <translation>setpid (): Ocorreu um problema ao definir {0}</translation>
+      <translation>setpid(): Ocorreu um problema ao definir {0}</translation>
     </message>
   </context>
   <context>
@@ -19920,7 +19921,7 @@ Continuar?</translation>
       <location filename="../artisanlib/pid_dialogs.py" line="580" />
       <location filename="../artisanlib/pid_dialogs.py" line="428" />
       <source>Soak</source>
-      <translation>Absorver</translation>
+      <translation>Patamar</translation>
     </message>
     <message>
       <location filename="../artisanlib/alarms.py" line="1003" />
@@ -20694,12 +20695,12 @@ Aromática</translation>
     <message>
       <location filename="../artisanlib/main.py" line="700" />
       <source>Pan</source>
-      <translation>Frigideira</translation>
+      <translation>Mover</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="701" />
       <source>Zoom</source>
-      <translation>Ampliação</translation>
+      <translation>Ampliar</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="877" />
@@ -21019,7 +21020,7 @@ tem que ser reduzido em 4 vezes.</translation>
     <message>
       <location filename="../artisanlib/events.py" line="913" />
       <source>Move slider under focus using the up/down cursor keys</source>
-      <translation>Mova o controle deslizante sob o foco usando as teclas de cursor para cima/para baixo</translation>
+      <translation>Mover o controle deslizante sob o foco usando as teclas de cursor para cima/para baixo</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="916" />
