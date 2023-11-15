@@ -19038,7 +19038,7 @@ Continuar?</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="vanished">Cancela</translation>
+      <translation type="vanished">Cancelar</translation>
     </message>
   </context>
   <context>
@@ -19049,7 +19049,7 @@ Continuar?</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="vanished">Cancela</translation>
+      <translation type="vanished">Cancelar</translation>
     </message>
   </context>
   <context>
@@ -19410,7 +19410,7 @@ Continuar?</translation>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3040" />
       <source>setNsv(): bad response</source>
-      <translation>setNsv (): resposta ruim</translation>
+      <translation>setNsv(): resposta ruim</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3094" />
@@ -19420,7 +19420,7 @@ Continuar?</translation>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3097" />
       <source>setNpid(): bad confirmation</source>
-      <translation>setNpid (): má confirmação</translation>
+      <translation>setNpid(): má confirmação</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3101" />
@@ -19435,7 +19435,7 @@ Continuar?</translation>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3129" />
       <source>setNpid(): Unable to set pid {0} </source>
-      <translation>setNpid (): Não é possível definir pid {0} </translation>
+      <translation>setNpid(): Não é possível definir pid {0} </translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3250" />
@@ -19451,7 +19451,7 @@ Continuar?</translation>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3261" />
       <source>setsv(): Unable to set SV</source>
-      <translation>setsv (): Incapaz de definir SV</translation>
+      <translation>setsv(): Incapaz de definir SV</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_control.py" line="365" />
@@ -19481,7 +19481,7 @@ Continuar?</translation>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3501" />
       <source>getallpid(): Unable to read pid values</source>
-      <translation>getallpid (): Incapaz de ler os valores pid</translation>
+      <translation>getallpid(): Incapaz de ler os valores pid</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3529" />
@@ -19491,7 +19491,7 @@ Continuar?</translation>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3532" />
       <source>getallpid(): Unable to read current sv</source>
-      <translation>getallpid (): Incapaz de ler sv atual</translation>
+      <translation>getallpid(): Incapaz de ler sv atual</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="3608" />
