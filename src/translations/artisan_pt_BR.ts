@@ -13479,7 +13479,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
     <message>
       <location filename="../artisanlib/roast_properties.py" line="2781" />
       <source>(mm:ss)</source>
-      <translation>(mm: ss)</translation>
+      <translation>(mm:ss)</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6533" />
@@ -13490,7 +13490,7 @@ Siga as etapas abaixo para definir as entradas de energia para a máquina de tor
     <message>
       <location filename="../artisanlib/roast_properties.py" line="2787" />
       <source>Measured Energy or Output %</source>
-      <translation>Energia medida ou% de saída</translation>
+      <translation>Energia medida ou % de saída</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="3253" />
