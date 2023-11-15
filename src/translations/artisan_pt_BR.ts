@@ -18106,7 +18106,8 @@ Prosseguir?</translation>
       <location filename="../artisanlib/canvas.py" line="15195" />
       <source>Unable to start designer.
 Profile missing [CHARGE] or [DROP]</source>
-      <translation>Impossível iniciar desenhista. Perfil não tem [CARREGAR] ou [DESCARREGAR]</translation>
+      <translation>Impossível iniciar desenhista. 
+Perfil não tem [CARREGAR] ou [DESCARREGAR]</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="15746" />
@@ -18200,7 +18201,7 @@ Profile missing [CHARGE] or [DROP]</source>
 To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
       <translation type="vanished">O uso do Artisan é gratuito!
 
-Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o craft.plus para suprimir este diálogo!</translation>
+Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o artisan.plus para suprimir este diálogo!</translation>
     </message>
     <message>
       <source>Import Aillio RoasTime</source>
@@ -18256,11 +18257,11 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o craf
     </message>
     <message>
       <source>Ramp/Soak was found ON! Turn it off before changing the pattern</source>
-      <translation type="vanished">A Rampa / Patamar foi encontrada LIGADA! Desligue antes de mudar o padrão</translation>
+      <translation type="vanished">A Rampa/Patamar foi encontrada LIGADA! Desligue antes de mudar o padrão</translation>
     </message>
     <message>
       <source>Ramp/Soak was found in Hold! Turn it off before changing the pattern</source>
-      <translation type="vanished">Ramp / Soak foi encontrado em Hold! Desligue antes de mudar o padrão</translation>
+      <translation type="vanished">Ramp/Soak foi encontrado em Hold! Desligue antes de mudar o padrão</translation>
     </message>
     <message>
       <source>Phidget Bridge 4-input attached</source>
@@ -18462,7 +18463,7 @@ Continuar?</translation>
     </message>
     <message>
       <source>Language successfully changed. Restart the application.</source>
-      <translation type="vanished">Idioma foi alterado. Reiniciae a aplicação.</translation>
+      <translation type="vanished">Idioma foi alterado. Reinicie a aplicação.</translation>
     </message>
     <message>
       <source>Save Graph as PNG</source>
@@ -18474,23 +18475,23 @@ Continuar?</translation>
     </message>
     <message>
       <source>Return the absolute value of x.</source>
-      <translation type="vanished">Devolve o valor absoluto de x</translation>
+      <translation type="vanished">Retorna o valor absoluto de x</translation>
     </message>
     <message>
       <source>Return the arc cosine (measured in radians) of x.</source>
-      <translation type="vanished">Devolve o arco-coseno (medido em radianos) de x.</translation>
+      <translation type="vanished">Retorna o arco-coseno (medido em radianos) de x.</translation>
     </message>
     <message>
       <source>Return the arc sine (measured in radians) of x.</source>
-      <translation type="vanished">Devolve o arco-seno (medido em radianos) de x.</translation>
+      <translation type="vanished">Retorna o arco-seno (medido em radianos) de x.</translation>
     </message>
     <message>
       <source>Return the arc tangent (measured in radians) of x.</source>
-      <translation type="vanished">Devolve o arco-tangente (medido em radianos) de x.</translation>
+      <translation type="vanished">Retorna o arco-tangente (medido em radianos) de x.</translation>
     </message>
     <message>
       <source>Return the cosine of x (measured in radians).</source>
-      <translation type="vanished">Devolve o coseno (medido em radianos).</translation>
+      <translation type="vanished">Retorna o coseno (medido em radianos).</translation>
     </message>
     <message>
       <source>Convert angle x from radians to degrees.</source>
@@ -18498,19 +18499,19 @@ Continuar?</translation>
     </message>
     <message>
       <source>Return e raised to the power of x.</source>
-      <translation type="vanished">Devolve e elevado a potência de x.</translation>
+      <translation type="vanished">Retorna e elevado a potência de x.</translation>
     </message>
     <message>
       <source>Return the logarithm of x to the given base. </source>
-      <translation type="vanished">Devolve o logaritmo de x na base dada. </translation>
+      <translation type="vanished">Retorna o logaritmo de x na base dada. </translation>
     </message>
     <message>
       <source>Return the base 10 logarithm of x.</source>
-      <translation type="vanished">Devolve o logaritmo de x na base 10.</translation>
+      <translation type="vanished">Retorna o logaritmo de x na base 10.</translation>
     </message>
     <message>
       <source>Return x**y (x to the power of y).</source>
-      <translation type="vanished">Devolve x**y (x elevado a y).</translation>
+      <translation type="vanished">Retorna x**y (x elevado a y).</translation>
     </message>
     <message>
       <source>Convert angle x from degrees to radians.</source>
@@ -18518,15 +18519,15 @@ Continuar?</translation>
     </message>
     <message>
       <source>Return the sine of x (measured in radians).</source>
-      <translation type="vanished">Devolve o seno de x (medido em radianos).</translation>
+      <translation type="vanished">Retorna o seno de x (medido em radianos).</translation>
     </message>
     <message>
       <source>Return the square root of x.</source>
-      <translation type="vanished">Devolve a raiz quadrada de x.</translation>
+      <translation type="vanished">Retorna a raiz quadrada de x.</translation>
     </message>
     <message>
       <source>Return the tangent of x (measured in radians).</source>
-      <translation type="vanished">Devolve a tangente de x (medido em radianos).</translation>
+      <translation type="vanished">Retorna a tangente de x (medido em radianos).</translation>
     </message>
     <message>
       <source>previous ET value</source>
@@ -18690,7 +18691,7 @@ Continuar?</translation>
     </message>
     <message>
       <source>Return the minimum of x and y.</source>
-      <translation type="vanished">Retorna omínimo de x e y.</translation>
+      <translation type="vanished">Retorna o mínimo de x e y.</translation>
     </message>
     <message>
       <source>Return the maximum of x and y.</source>
