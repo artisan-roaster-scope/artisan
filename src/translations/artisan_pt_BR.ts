@@ -11744,15 +11744,15 @@ Gravação 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     </message>
     <message>
       <source>pip(c,delay,duration[,sn])</source>
-      <translation type="vanished">pip (c, atraso, duração [, sn])</translation>
+      <translation type="vanished">pip(c, atraso, duração [, sn])</translation>
     </message>
     <message>
       <source>slider(c,v)</source>
-      <translation type="vanished">controle deslizante (c, v)</translation>
+      <translation type="vanished">slider(c, v)</translation>
     </message>
     <message>
       <source>button(i,c,b[,sn])</source>
-      <translation type="vanished">botão (i, c, b [, sn])</translation>
+      <translation type="vanished">button(i, c, b [, sn])</translation>
     </message>
     <message>
       <source>santoker(&lt;target&gt;,&lt;value&gt;)</source>
@@ -11760,43 +11760,43 @@ Gravação 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     </message>
     <message>
       <source>getDBbool(&lt;dbnumber&gt;,&lt;start&gt;,&lt;index&gt;)</source>
-      <translation type="vanished">getDBbool (&lt;dbnumber&gt;, &lt;start&gt;, &lt;index&gt;)</translation>
+      <translation type="vanished">getDBbool(&lt;dbnumber&gt;, &lt;start&gt;, &lt;index&gt;)</translation>
     </message>
     <message>
       <source>getDBint(&lt;dbnumber&gt;,&lt;start&gt;)</source>
-      <translation type="vanished">getDBint (&lt;dbnumber&gt;, &lt;start&gt;)</translation>
+      <translation type="vanished">getDBint(&lt;dbnumber&gt;, &lt;start&gt;)</translation>
     </message>
     <message>
       <source>getDBfloat(&lt;dbnumber&gt;,&lt;start&gt;)</source>
-      <translation type="vanished">getDBfloat (&lt;dbnumber&gt;, &lt;start&gt;)</translation>
+      <translation type="vanished">getDBfloat(&lt;dbnumber&gt;, &lt;start&gt;)</translation>
     </message>
     <message>
       <source>setDBbool(&lt;dbnumber&gt;,&lt;start&gt;,&lt;index&gt;,&lt;value&gt;)</source>
-      <translation type="vanished">setDBbool (&lt;dbnumber&gt;, &lt;start&gt;, &lt;index&gt;, &lt;value&gt;)</translation>
+      <translation type="vanished">setDBbool(&lt;dbnumber&gt;, &lt;start&gt;, &lt;index&gt;, &lt;value&gt;)</translation>
     </message>
     <message>
       <source>setDBint(&lt;dbnumber&gt;,&lt;start&gt;,&lt;value&gt;)</source>
-      <translation type="vanished">setDBint (&lt;dbnumber&gt;, &lt;start&gt;, &lt;value&gt;)</translation>
+      <translation type="vanished">setDBint(&lt;dbnumber&gt;, &lt;start&gt;, &lt;value&gt;)</translation>
     </message>
     <message>
       <source>setDBfloat(&lt;dbnumber&gt;,&lt;start&gt;,&lt;value&gt;)</source>
-      <translation type="vanished">setDBfloat (&lt;dbnumber&gt;, &lt;start&gt;, &lt;value&gt;)</translation>
+      <translation type="vanished">setDBfloat(&lt;dbnumber&gt;, &lt;start&gt;, &lt;value&gt;)</translation>
     </message>
     <message>
       <source>alarms(&lt;bool&gt;)</source>
-      <translation type="vanished">alarmes (&lt;bool&gt;)</translation>
+      <translation type="vanished">alarms(&lt;bool&gt;)</translation>
     </message>
     <message>
       <source>autoCHARGE(&lt;bool&gt;)</source>
-      <translation type="vanished">autoCHARGE (&lt;bool&gt;)</translation>
+      <translation type="vanished">autoCHARGE(&lt;bool&gt;)</translation>
     </message>
     <message>
       <source>autoDROP(&lt;bool&gt;)</source>
-      <translation type="vanished">autoDROP (&lt;bool&gt;)</translation>
+      <translation type="vanished">autoDROP(&lt;bool&gt;)</translation>
     </message>
     <message>
       <source>tare(&lt;int&gt;)</source>
-      <translation type="vanished">tara (&lt;int&gt;)</translation>
+      <translation type="vanished">tare(&lt;int&gt;)</translation>
     </message>
     <message>
       <source>PIDon</source>
@@ -11812,43 +11812,43 @@ Gravação 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     </message>
     <message>
       <source>pidmode(&lt;int&gt;)</source>
-      <translation type="vanished">pidmode (&lt;int&gt;)</translation>
+      <translation type="vanished">pidmode(&lt;int&gt;)</translation>
     </message>
     <message>
       <source>p-i-d(&lt;p&gt;,&lt;i&gt;,&lt;d&gt;)</source>
-      <translation type="vanished">p-i-d (&lt;p&gt;, &lt;i&gt;, &lt;d&gt;)</translation>
+      <translation type="vanished">p-i-d(&lt;p&gt;, &lt;i&gt;, &lt;d&gt;)</translation>
     </message>
     <message>
       <source>adjustSV(&lt;int&gt;)</source>
-      <translation type="vanished">ajustarSV (&lt;int&gt;)</translation>
+      <translation type="vanished">adjustSV(&lt;int&gt;)</translation>
     </message>
     <message>
       <source>pidSV(&lt;int&gt;)</source>
-      <translation type="vanished">pidSV (&lt;int&gt;)</translation>
+      <translation type="vanished">pidSV(&lt;int&gt;)</translation>
     </message>
     <message>
       <source>pidRS(&lt;rs&gt;)</source>
-      <translation type="vanished">pidRS (&lt;rs&gt;)</translation>
+      <translation type="vanished">pidRS(&lt;rs&gt;)</translation>
     </message>
     <message>
       <source>pidSource(&lt;int&gt;)</source>
-      <translation type="vanished">pidSource (&lt;int&gt;)</translation>
+      <translation type="vanished">pidSource(&lt;int&gt;)</translation>
     </message>
     <message>
       <source>pidLookahead(&lt;int&gt;)</source>
-      <translation type="vanished">pidLookahead (&lt;int&gt;)</translation>
+      <translation type="vanished">pidLookahead(&lt;int&gt;)</translation>
     </message>
     <message>
       <source>popup(&lt;msg&gt;[,&lt;int&gt;])</source>
-      <translation type="vanished">pop-up (&lt;msg&gt; [, &lt;int&gt;])</translation>
+      <translation type="vanished">popup(&lt;msg&gt; [, &lt;int&gt;])</translation>
     </message>
     <message>
       <source>message(&lt;msg&gt;)</source>
-      <translation type="vanished">mensagem (&lt;msg&gt;)</translation>
+      <translation type="vanished">message(&lt;msg&gt;)</translation>
     </message>
     <message>
       <source>notifications(&lt;bool&gt;)</source>
-      <translation type="vanished">notificações(&lt;bool&gt;)</translation>
+      <translation type="vanished">notifications(&lt;bool&gt;)</translation>
     </message>
     <message>
       <source>notify(&lt;title&gt;,[&lt;msg&gt;])</source>
@@ -11856,43 +11856,43 @@ Gravação 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     </message>
     <message>
       <source>setCanvasColor(&lt;color&gt;)</source>
-      <translation type="vanished">setCanvasColor (&lt;color&gt;)</translation>
+      <translation type="vanished">setCanvasColor(&lt;color&gt;)</translation>
     </message>
     <message>
       <source>button(&lt;name&gt;)</source>
-      <translation type="vanished">botão (&lt;nome&gt;)</translation>
+      <translation type="vanished">button(&lt;nome&gt;)</translation>
     </message>
     <message>
       <source>palette(&lt;p&gt;)</source>
-      <translation type="vanished">paleta (&lt;p&gt;)</translation>
+      <translation type="vanished">palette(&lt;p&gt;)</translation>
     </message>
     <message>
       <source>playbackmode(&lt;int&gt;)</source>
-      <translation type="vanished">playbackmode (&lt;int&gt;)</translation>
+      <translation type="vanished">playbackmode(&lt;int&gt;)</translation>
     </message>
     <message>
       <source>openProperties</source>
-      <translation type="vanished">abrirPropriedades</translation>
+      <translation type="vanished">openProperties</translation>
     </message>
     <message>
       <source>loadBackground(&lt;filepath&gt;)</source>
-      <translation type="vanished">loadBackground (&lt;filepath&gt;)</translation>
+      <translation type="vanished">loadBackground(&lt;filepath&gt;)</translation>
     </message>
     <message>
       <source>alarmset(&lt;as&gt;)</source>
-      <translation type="vanished">conjunto de alarmes (&lt;as&gt;)</translation>
+      <translation type="vanished">alarmset(&lt;as&gt;)</translation>
     </message>
     <message>
       <source>moveBackground(&lt;direction&gt;,&lt;int&gt;)</source>
-      <translation type="vanished">moveBackground (&lt;direction&gt;, &lt;int&gt;)</translation>
+      <translation type="vanished">moveBackground(&lt;direction&gt;, &lt;int&gt;)</translation>
     </message>
     <message>
       <source>keyboard(&lt;bool&gt;)</source>
-      <translation type="vanished">teclado(&lt;bool&gt;)</translation>
+      <translation type="vanished">keyboard(&lt;bool&gt;)</translation>
     </message>
     <message>
       <source>keepON(&lt;bool&gt;)</source>
-      <translation type="vanished">mantenhaON(&lt;bool&gt;)</translation>
+      <translation type="vanished">keepON(&lt;bool&gt;)</translation>
     </message>
     <message>
       <source>showCurve(&lt;name&gt;,&lt;bool&gt;)</source>
@@ -11900,15 +11900,15 @@ Gravação 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     </message>
     <message>
       <source>pulse(ch,min,max[,sn])</source>
-      <translation type="vanished">pulso (ch, min, max [, sn])</translation>
+      <translation type="vanished">pulse(ch, min, max [, sn])</translation>
     </message>
     <message>
       <source>pos(ch,min,max[,sn])</source>
-      <translation type="vanished">pos (ch, min, max [, sn])</translation>
+      <translation type="vanished">pos(ch, min, max [, sn])</translation>
     </message>
     <message>
       <source>engaged(ch,b[,sn])</source>
-      <translation type="vanished">engajado (ch, b [, sn])</translation>
+      <translation type="vanished">engaged(ch, b [, sn])</translation>
     </message>
     <message>
       <source>ramp(ch,b[,sn])</source>
@@ -11916,43 +11916,43 @@ Gravação 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     </message>
     <message>
       <source>volt(ch,v[,sn])</source>
-      <translation type="vanished">volt (ch, v [, sn])</translation>
+      <translation type="vanished">volt(ch, v [, sn])</translation>
     </message>
     <message>
       <source>accel(ch,a[,sn])</source>
-      <translation type="vanished">acel (ch, a [, sn])</translation>
+      <translation type="vanished">accel(ch, a [, sn])</translation>
     </message>
     <message>
       <source>veloc(ch,v[,sn])</source>
-      <translation type="vanished">velocidade (ch, v [, sn])</translation>
+      <translation type="vanished">veloc(ch, v [, sn])</translation>
     </message>
     <message>
       <source>set(ch,pos[,sn])</source>
-      <translation type="vanished">definir (ch, pos [, sn])</translation>
+      <translation type="vanished">set(ch, pos [, sn])</translation>
     </message>
     <message>
       <source>move(c,p[,t][,sn])</source>
-      <translation type="vanished">mover (c, p [, t] [, sn])</translation>
+      <translation type="vanished">move(c, p [, t] [, sn])</translation>
     </message>
     <message>
       <source>neutral(c,n[,sn])</source>
-      <translation type="vanished">neutro (c, n [, sn])</translation>
+      <translation type="vanished">neutral(c, n [, sn])</translation>
     </message>
     <message>
       <source>send(&lt;json&gt;)</source>
-      <translation type="vanished">enviar (&lt;json&gt;)</translation>
+      <translation type="vanished">send(&lt;json&gt;)</translation>
     </message>
     <message>
       <source>read(&lt;json&gt;)</source>
-      <translation type="vanished">ler (&lt;json&gt;)</translation>
+      <translation type="vanished">read(&lt;json&gt;)</translation>
     </message>
     <message>
       <source>out(&lt;n&gt;,&lt;v&gt;[,&lt;sn&gt;])</source>
-      <translation type="vanished">out (&lt;n&gt;, &lt;v&gt; [, &lt;sn&gt;])</translation>
+      <translation type="vanished">out(&lt;n&gt;, &lt;v&gt; [, &lt;sn&gt;])</translation>
     </message>
     <message>
       <source>msetDBint(&lt;dbnumber&gt;,&lt;start&gt;,&lt;andMask&gt;,&lt;orMask&gt;,&lt;value&gt;)</source>
-      <translation type="vanished">msetDBint (&lt;dbnumber&gt;, &lt;start&gt;, &lt;andMask&gt;, &lt;orMask&gt;, &lt;value&gt;)</translation>
+      <translation type="vanished">msetDBint(&lt;dbnumber&gt;, &lt;start&gt;, &lt;andMask&gt;, &lt;orMask&gt;, &lt;value&gt;)</translation>
     </message>
     <message>
       <source>Link external programs that print temperature when called.  This allows to connect meters that use any program language.
