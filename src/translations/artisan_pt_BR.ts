@@ -16598,7 +16598,7 @@ Repita a operação no final: {0}</translation>
     <message>
       <location filename="../artisanlib/main.py" line="3897" />
       <source>If you never run older versions of Artisan you can skip this message, the change does not affect you.</source>
-      <translation>Se você nunca executa versões anteriores do Artisan, pode pular esta mensagem, pois a mudança não o afetará.</translation>
+      <translation>Se você nunca executou versões anteriores do Artisan, pode pular esta mensagem, pois a mudança não o afetará.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3898" />
@@ -16618,7 +16618,7 @@ Repita a operação no final: {0}</translation>
     <message>
       <location filename="../artisanlib/main.py" line="3901" />
       <source>To share settings between this version and Artisan versions before v2.0 use 'Help&gt;Save Settings' and 'Help&gt;Load Settings'.</source>
-      <translation>Para compartilhar as configurações entre esta versão e as versões do Artisan anteriores à v2.0, use 'Ajuda&gt; Salvar configurações' e 'Ajuda&gt; Carregar configurações'.</translation>
+      <translation>Para compartilhar as configurações entre esta versão e as versões do Artisan anteriores à v2.0, use 'Ajuda&gt;Salvar configurações' e 'Ajuda&gt;Carregar configurações'.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3902" />
@@ -16653,7 +16653,7 @@ Repita a operação no final: {0}</translation>
     <message>
       <location filename="../artisanlib/main.py" line="3911" />
       <source>Caution, the only way to share settings between Artisan and ArtisanViewer is to explicitly save and load them using 'Help&gt;Save Settings' and 'Help&gt;Load Settings'.</source>
-      <translation>Cuidado, a única maneira de compartilhar as configurações entre o Artisan e o ArtisanViewer é salvá-las e carregá-las explicitamente usando 'Ajuda&gt; Salvar configurações' e 'Ajuda&gt; Carregar configurações'.</translation>
+      <translation>Cuidado, a única maneira de compartilhar as configurações entre o Artisan e o ArtisanViewer é salvá-las e carregá-las explicitamente usando 'Ajuda&gt;Salvar configurações' e 'Ajuda&gt;Carregar configurações'.</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3912" />
@@ -16767,7 +16767,7 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
       <location filename="../artisanlib/main.py" line="24881" />
       <location filename="../artisanlib/main.py" line="6125" />
       <source>Simulator started @{}x</source>
-      <translation>Simulador iniciado @ {} x</translation>
+      <translation>Simulador iniciado @{}x</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="6136" />
@@ -16797,12 +16797,12 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
     <message>
       <location filename="../artisanlib/main.py" line="9079" />
       <source>autoCHARGE on</source>
-      <translation>autoCARREGAR ligado</translation>
+      <translation>autoCHARGE ligado</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="9082" />
       <source>autoCHARGE off</source>
-      <translation>autoCARREGAR desligado</translation>
+      <translation>autoCHARGE desligado</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="9091" />
@@ -16899,12 +16899,12 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
     <message>
       <location filename="../artisanlib/main.py" line="10177" />
       <source>Do you want to reset all settings?&lt;br&gt; ArtisanViewer has to be restarted!</source>
-      <translation>Você deseja redefinir todas as configurações? &lt;br&gt; ArtisanViewer deve ser reiniciado!</translation>
+      <translation>Você deseja redefinir todas as configurações?&lt;br&gt; ArtisanViewer deve ser reiniciado!</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10179" />
       <source>Do you want to reset all settings?&lt;br&gt; Artisan has to be restarted!</source>
-      <translation>Quer redefinir todas as configurações? &lt;br&gt; O Artisan precisa ser reiniciado!</translation>
+      <translation>Quer redefinir todas as configurações?&lt;br&gt; O Artisan precisa ser reiniciado!</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10180" />
@@ -16919,7 +16919,7 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
     <message>
       <location filename="../artisanlib/main.py" line="10896" />
       <source>Auto Axis Graph Mode: BBP+Roast</source>
-      <translation>Modo de gráfico de eixo automático: BBP+Roast</translation>
+      <translation>Modo de gráfico de eixo automático: BBP+Torra</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10898" />
@@ -16930,7 +16930,7 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
       <location filename="../artisanlib/main.py" line="10964" />
       <location filename="../artisanlib/main.py" line="10948" />
       <source>PID Mode: Ramp/Soak</source>
-      <translation>Modo PID: Rampa / Patamar</translation>
+      <translation>Modo PID: Rampa/Patamar</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="10966" />
@@ -17028,12 +17028,12 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
     <message>
       <location filename="../artisanlib/main.py" line="11968" />
       <source>NEW ROAST canceled: incomplete profile lacking CHARGE and DROP found</source>
-      <translation>NEW ROAST cancelado: perfil incompleto sem CARREGAR e DESCARREGAR encontrado</translation>
+      <translation>NOVA TORRA cancelada: perfil incompleto sem CARREGAR e DESCARREGAR encontrado</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="11973" />
       <source>NEW ROAST canceled: incomplete profile lacking DROP found</source>
-      <translation>NOVO ROAST cancelado: perfil incompleto sem DROP encontrado</translation>
+      <translation>NOVA TORRA cancelada: perfil incompleto sem DROP encontrado</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="11983" />
@@ -17055,12 +17055,12 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
     <message>
       <location filename="../artisanlib/main.py" line="12242" />
       <source>No profile data.  ET/BT not recalculated</source>
-      <translation>Sem dados de perfil. ET / BT não recalculado</translation>
+      <translation>Sem dados de perfil. ET/BT não recalculado</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="12245" />
       <source>Problem with the profile data.  ET/BT not recalculated</source>
-      <translation>Problema com os dados do perfil. ET / BT não recalculado</translation>
+      <translation>Problema com os dados do perfil. ET/BT não recalculado</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="12583" />
@@ -17075,7 +17075,7 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
     <message>
       <location filename="../artisanlib/main.py" line="12850" />
       <source>The Probat Shop Pilot Software expects files named &lt;Name&gt;_&lt;Index&gt;.xml like in Test_0.xml on import</source>
-      <translation>O software Probat Shop Pilot espera arquivos chamados &lt;Nome&gt; _ &lt;Index&gt; .xml como em Test_0.xml na importação</translation>
+      <translation>O software Probat Shop Pilot espera arquivos chamados &lt;Nome&gt;_&lt;Index&gt;.xml como em Test_0.xml na importação</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="15440" />
@@ -17127,7 +17127,7 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
     <message>
       <location filename="../artisanlib/main.py" line="15539" />
       <source>Export Probat Pilot</source>
-      <translation>Piloto de teste de exportação</translation>
+      <translation>Exportar Probat Pilot</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="15787" />
@@ -17351,7 +17351,7 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
     <message>
       <location filename="../artisanlib/main.py" line="23212" />
       <source>Import Probat Recipe</source>
-      <translation>Receita Probat de importação</translation>
+      <translation>Importar Probat Recipe</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="23386" />
