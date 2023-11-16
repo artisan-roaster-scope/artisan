@@ -11857,7 +11857,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.loadFile(filename)
 
     def getDefaultPath(self) -> str:
-        #compare profilepath with userprofilepath (modulo the last two segments which are month/year respectively)
+        if not os.path.exists(self.userprofilepath):
+            self.userprofilepath = self.profilepath
         return self.userprofilepath
 
     def setDefaultPath(self,f):
@@ -11872,9 +11873,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             msg = QApplication.translate('Message','Select')
         if path is None:
             path = self.getDefaultPath()
-        res = QFileDialog.getOpenFileNames(self,msg,path,ext)[0]
-        for f in res:
-            self.setDefaultPath(str(f))
+        res:List[str] = QFileDialog.getOpenFileNames(self,msg,path,ext)[0]
+        if len(res) > 0:
+            self.setDefaultPath(str(res[0]))
         return res
 
     #the central OpenFileDialog function that should always be called. Besides triggering the file dialog it
@@ -16021,7 +16022,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.clearWindowGeometry(settings)
                     #
                     self.setFonts()
-                    self.qmc.redraw()
                     try:
                         self.updateNewMenuRecentRoasts()
                     except Exception: # pylint: disable=broad-except
@@ -22441,11 +22441,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 try:
                     self.stopActivities()
                     saveCurfile = self.curFile
-                    res = self.settingsLoad(filename,machine=machine,theme=theme)
+                    res = self.settingsLoad(filename,machine=machine,theme=theme,redraw=not reset)
                     if res and reset:
                         flag_temp = self.qmc.roastpropertiesflag
                         self.qmc.roastpropertiesflag = 1 # ensure that all roast properties are reset!
-                        self.qmc.reset(soundOn=False,fireResetAction=False)
+                        self.qmc.reset(soundOn=False,fireResetAction=False,redraw=not (reload and saveCurfile is not None))
                         self.qmc.roastpropertiesflag = flag_temp
                         if reload and saveCurfile is not None:
                             self.loadFile(saveCurfile)

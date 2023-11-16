@@ -54,7 +54,7 @@ v2.10.0 (November XX, 2023)
   - fixes typos in some CTE and Hottop machine setups
   - fixes item color handling in Comparator
   - fixes Japanese translation errors ([Issue #1256](../../../issues/1256))
-  - fixes Brazilian portuguese translation errors ([PR #1294](../../../pull/1294))
+  - fixes many Brazilian portuguese translation errors ([PR #1294](../../../pull/1294) & [PR #1297](../../../pull/1297)). Many thanks to your hugh contribution Max Oliver!
   - fixes German translation error ([Issue #1270](../../../issues/1270))
   - prevents stacking graph updates which can lead to high memory consumption during recording on slow machines
   - fixes regression which broke WebLCDs on Windows and Linux in Artisan v2.8.4 ([Issue #1229](../../../issues/1229))
