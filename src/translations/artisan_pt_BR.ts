@@ -7221,7 +7221,7 @@ O Artisan iniciará o programa a cada período de amostragem. A saída do progra
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="20" />
       <source>Turns Artisan OFF</source>
-      <translation>DESLIGA o artesão</translation>
+      <translation>DESLIGA o Artisan</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="21" />
@@ -7512,7 +7512,7 @@ Quando os atalhos de teclado estão DESATIVADOS adiciona um evento personalizado
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="65" />
       <source>Sync the roast with artisan.plus</source>
-      <translation>Sincronize a torra com artesão.plus</translation>
+      <translation>Sincronize a torra com artisan.plus</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="66" />
@@ -7564,7 +7564,7 @@ CTRL+ALT clique no ícone de adição [Win]</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="69" />
       <source>In  OFF state this changes the Artisan Settings, in ON/START states the change is temporary until OFF state</source>
-      <translation>No estado OFF isso altera as configurações do artesão, nos estados ON/START a mudança é temporária até o estado OFF</translation>
+      <translation>No estado OFF isso altera as configurações do Artisan, nos estados ON/START a mudança é temporária até o estado OFF</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="70" />
@@ -17281,7 +17281,7 @@ Para mantê-lo gratuito e atualizado, apoie-nos com sua doação e assine o arti
     <message>
       <location filename="../artisanlib/main.py" line="22611" />
       <source>artisan-theme</source>
-      <translation>artesão-tema</translation>
+      <translation>artisan-tema</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22612" />
