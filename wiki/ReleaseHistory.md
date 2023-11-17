@@ -14,6 +14,7 @@ v2.10.0 (November XX, 2023)
   - adds support clicks on large LCDs to set tare and to show/hide curves
   - adds additional translatable button labels (`\i`: STIRRER, `\f`: FILL, `\r`: RELEASE)
   - adds support for event name substitution in ET, BT channel names
+  - adds `Artisan Command` `visible(i,b)` to change visibility of button `i` to `b` which has to be an expression which evaluates to a boolean, like 0, 1, false, true, ... ([Issue #1301](../../../issues/1301))
   - adds flag `Interpolate Drops` in `Config >> Curves`, tab `Filter` to disable data interpolation
 
 * NEW HARDWARE SUPPORT

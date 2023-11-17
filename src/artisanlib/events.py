@@ -2663,9 +2663,9 @@ class EventsDlg(ArtisanResizeablDialog):
             self.aw.extraeventbuttontextcolor[visualIndex] = self.extraeventbuttontextcolor[i]
 
         #Apply Event Button Changes
+        self.aw.update_extraeventbuttons_visibility()
         self.aw.realignbuttons()
         self.aw.settooltip() # has to be done after realignbuttons() to have set the aw.buttonlist correctly!
-        self.aw.update_extraeventbuttons_visibility()
 
     @pyqtSlot()
     def setlabeleventbutton(self):

@@ -1336,6 +1336,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     updateSerialLogSignal = pyqtSignal()
     updateErrorLogSignal = pyqtSignal()
     establishQuantifiedEventSignal = pyqtSignal(int,float)
+    updateExtraEventButtonsVisibilitySignal = pyqtSignal()
+    realignButtonsSignal = pyqtSignal()
 
     __slots__ = [ 'locale_str', 'app', 'superusermode', 'sample_loop_running', 'time_stopped', 'plus_account', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription',
         'plus_paidUntil', 'plus_rlimit', 'plus_used', 'plus_readonly', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
@@ -3955,6 +3957,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.updateSerialLogSignal.connect(self.updateSerialLog)
         self.updateErrorLogSignal.connect(self.updateErrorLog)
         self.establishQuantifiedEventSignal.connect(self.establishQuantifiedEventSlot)
+        self.updateExtraEventButtonsVisibilitySignal.connect(self.update_extraeventbuttons_visibility)
+        self.realignButtonsSignal.connect(self.realignbuttons)
 
         self.notificationManager:Optional[NotificationManager] = None
         if not self.app.artisanviewerMode:
@@ -9281,6 +9285,29 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     self.sendmessage(f'Artisan Command: {cs}')
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
+
+                            ##  visible(<i>,<b>) : sets the visibility of <button> visible
+                            #        (visibility=ON) if value b is yes, true, t, or 1, otherwise to hidden (visibility=OFF)
+                            elif cs.startswith('visible'):
+                                try:
+                                    cs_aac = eval(cs[len('visible'):])  # pylint: disable=eval-used
+                                except Exception: # pylint: disable=broad-except
+                                    arg = cs[len('visible('):-1]
+                                    if ',' in arg and '(' not in arg:
+                                        # no function definition in arg, and exactly on comma, we split into the two args (could be just "button(1,false)" which does not eval above)
+                                        cs_aac = [a.strip() for a in arg.split(',')]
+                                    else:
+                                        cs_aac = [c[len('button('):-1].strip()]
+                                if isinstance(cs_aac, (list, tuple)):
+                                    cs_len = len(cs_aac)
+                                    if cs_len == 2:
+                                        ci = max(0, toInt(cs_aac[0]) - 1)
+                                        vb = toBool(cs_aac[1])
+                                        if len(self.extraeventsvisibility) > ci:
+                                            self.extraeventsvisibility[ci] = (1 if vb else 0)
+                                            self.updateExtraEventButtonsVisibilitySignal.emit()
+                                            self.realignButtonsSignal.emit()
+
                             # button(<e>) with <e> one of { ON, START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF }
                             elif cs.startswith('button(') and cs.endswith(')'):
                                 try:
@@ -23917,6 +23944,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
 
     #orders extra event buttons based on max number of buttons
+    @pyqtSlot()
     def realignbuttons(self):
         #clear buttons
         self.clearBoxLayout(self.e1buttonbarLayout)
@@ -24050,6 +24078,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             else:
                 bl.setToolTip('')
 
+    @pyqtSlot()
     def update_extraeventbuttons_visibility(self):
         for i, bl in enumerate(self.buttonlist):
             try:
