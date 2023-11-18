@@ -3315,8 +3315,9 @@ class tgraphcanvas(FigureCanvas):
     # draw additional "dynamic" artists during recording
     def update_additional_artists(self) -> None:
         if self.ax is not None and self.flagstart:
-            if self.l_timeline is not None and ((self.device == 18 and self.aw.simulator is None) or self.showtimeguide): # not NONE device
+            if self.l_timeline is not None and self.flagstart and ((self.device == 18 and self.aw.simulator is None) or self.showtimeguide): # not NONE device
                 self.l_timeline.set_xdata(self.timeclock.elapsedMilli() if self.aw.sample_loop_running else self.aw.time_stopped)
+                self.l_timeline.set_visible(self.flagstart)
                 self.ax.draw_artist(self.l_timeline)
             if self.ETprojectFlag:
                 if self.l_ETprojection is not None and self.ETcurve:
@@ -9806,6 +9807,7 @@ class tgraphcanvas(FigureCanvas):
                 if (self.device == 18 and self.aw.simulator is None) or self.showtimeguide: # not NONE device
                     self.l_timeline = self.ax.axvline(self.timeclock.elapsedMilli(),color = self.palette['timeguide'],
                                             label=self.aw.arabicReshape(QApplication.translate('Label', 'TIMEguide')),
+                                            visible=self.flagstart,
                                             linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
                 if self.AUCguideFlag:
                     self.l_AUCguide = self.ax.axvline(self.AUCguideTime,visible=(self.AUCguideTime > 0 and self.AUCguideTime < self.endofx),color = self.palette['aucguide'],
