@@ -21,8 +21,7 @@ import asyncio
 from contextlib import suppress
 from threading import Thread
 from pymodbus.transport.transport_serial import create_serial_connection # patched pyserial-asyncio
-from typing import Optional, Callable, TYPE_CHECKING
-from typing import Final  # Python <=3.7
+from typing import Final, Optional, Callable, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.types import SerialSettings # pylint: disable=unused-import

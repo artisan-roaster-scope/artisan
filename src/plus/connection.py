@@ -29,8 +29,7 @@ except Exception: # pylint: disable=broad-except
     from PyQt5.QtCore import QSemaphore  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib import __version__
-from typing import Any, Optional, Dict, Tuple  #for Python >= 3.9: can remove 'Dict' since type hints can now use the generic 'dict'
-from typing import Final  # Python <=3.7
+from typing import Final, Any, Optional, Dict, Tuple  #for Python >= 3.9: can remove 'Dict' since type hints can now use the generic 'dict'
 
 import uuid
 import datetime

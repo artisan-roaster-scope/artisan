@@ -20,8 +20,7 @@
 import time
 import numpy
 import logging
-from typing import List, Optional, Callable
-from typing import Final  # Python <=3.7
+from typing import Final, List, Optional, Callable
 
 try:
     from PyQt6.QtCore import QSemaphore # @Reimport @UnresolvedImport @UnusedImport

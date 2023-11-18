@@ -36,12 +36,10 @@ from plus import config, util, roast, connection, sync, controller
 import threading
 import time
 import logging
-from typing import Any, List, Dict, Optional, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' and 'Dict' since type hints can use the generic 'list' and 'dict'
+from typing import Final, Any, List, Dict, Optional, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' and 'Dict' since type hints can use the generic 'list' and 'dict'
 
 if TYPE_CHECKING:
     import persistqueue # type:ignore # pylint: disable=unused-import
-
-from typing import Final  # Python <=3.7
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)

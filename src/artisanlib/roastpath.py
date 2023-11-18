@@ -10,9 +10,7 @@ import re
 import json
 from lxml import html # type: ignore
 import logging
-from typing import Optional, List, TYPE_CHECKING
-from typing_extensions import TypedDict  # Python <=3.7
-from typing import Final
+from typing import Final, TypedDict, Optional, List, TYPE_CHECKING
 
 
 if TYPE_CHECKING:

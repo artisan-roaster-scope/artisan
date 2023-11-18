@@ -36,8 +36,7 @@ import plus.util
 import plus.connection
 import plus.config
 
-from typing import Optional
-from typing import Final  # Python <=3.7
+from typing import Final, Optional
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 

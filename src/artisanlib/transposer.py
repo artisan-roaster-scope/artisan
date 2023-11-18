@@ -381,7 +381,9 @@ class profileTransformatorDlg(ArtisanDialog):
                     s = stringfromseconds(back_fcs - back_dry)
                 elif i == 2:
                     s = stringfromseconds(back_drop - back_fcs)
-                self.phases_target_widgets_time[i].setText(s)
+                qline_edit = (self.phases_target_widgets_time[i] if len(self.phases_target_widgets_time)>i else None)
+                if qline_edit is not None:
+                    qline_edit.setText(s)
             self.updateTimeResults()
 
     @pyqtSlot(int)
@@ -830,6 +832,8 @@ class profileTransformatorDlg(ArtisanDialog):
                         if sources[j] is not None and targets[j] is not None:
                             next_idx = j
                             break
+                    sources_i:Optional[float] = None
+                    targets_i:Optional[float] = None
                     if next_idx is None:
                         sources_i = sources[i]
                         targets_i = targets[i]
@@ -899,7 +903,9 @@ class profileTransformatorDlg(ArtisanDialog):
         # apply either the discrete or the polyfit mappings
         if self.aw.qmc.transMappingMode == 0:
             # discrete mapping
-            fits = self.calcDiscretefits([0] + self.profileTimes,[0] + self.targetTimes)
+            base:List[Optional[float]] = [0]
+            base.extend(self.targetTimes)
+            fits = self.calcDiscretefits([0] + self.profileTimes, base)
             self.aw.qmc.timex = self.applyDiscreteTimeMapping(self.org_timex,fits)
             # apply to the extra timex
             self.aw.qmc.extratimex = []

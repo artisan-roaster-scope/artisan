@@ -37,29 +37,24 @@ from bisect import bisect_right
 import psutil
 from psutil._common import bytes2human
 
-from typing import Optional, List, Dict, Callable, Tuple, Union, Any, Sequence, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
-from typing import Final  # Python <=3.7
+from typing import Final, Optional, List, Dict, Callable, Tuple, Union, Any, Sequence, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
 
 if TYPE_CHECKING:
     from artisanlib.types import ProfileData, EnergyMetrics, BTU # pylint: disable=unused-import
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from plus.stock import Blend # pylint: disable=unused-import
     from plus.blend import CustomBlend # pylint: disable=unused-import
-    from matplotlib.lines import Line2D # pylint: disable=unused-import
-    from matplotlib.text import Text # pylint: disable=unused-import
     from matplotlib.collections import PolyCollection # pylint: disable=unused-import
     from matplotlib.axes import Axes # pylint: disable=unused-import
     from matplotlib.axes._base import _AxesBase # pylint: disable=unused-import
-    from matplotlib.text import Annotation # pylint: disable=unused-import
     from matplotlib.image import AxesImage # pylint: disable=unused-import
     from matplotlib.legend import Legend # pylint: disable=unused-import
     from matplotlib.backend_bases import PickEvent # pylint: disable=unused-import
     import numpy.typing as npt # pylint: disable=unused-import
     from PyQt6.QtGui import QResizeEvent # pylint: disable=unused-import
 
-from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.util import (uchr, fill_gaps, deltaLabelPrefix, deltaLabelUTF8, deltaLabelMathPrefix, stringfromseconds,
-        fromFtoC, fromFtoCstrict, fromCtoF, fromCtoFstrict, RoRfromFtoC, RoRfromCtoF, toInt, toString, toFloat, application_name, getResourcePath, getDirectory,
+        fromFtoC, fromFtoCstrict, fromCtoF, fromCtoFstrict, RoRfromFtoC, RoRfromFtoCstrict, RoRfromCtoF, toInt, toString, toFloat, application_name, getResourcePath, getDirectory,
         abbrevString, scaleFloat2String, is_proper_temp)
 from artisanlib import pid
 from artisanlib.time import ArtisanTime
@@ -102,16 +97,17 @@ except Exception: # type: ignore # pylint: disable=broad-except
     except Exception: # type: ignore # pylint: disable=broad-except
         import sip # type: ignore # @Reimport @UnresolvedImport @UnusedImport
 
-with suppress_stdout_stderr():
-    import matplotlib as mpl
 
 from matplotlib.figure import Figure
 from matplotlib import rcParams, patches, transforms, ticker
 import matplotlib.patheffects as PathEffects
 from matplotlib.patches import Polygon, Rectangle
 from matplotlib.transforms import Bbox, Transform
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas  # @Reimport
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas  # @Reimport
 from matplotlib.projections.polar import PolarAxes
+from matplotlib.text import Annotation, Text
+from matplotlib.lines import Line2D
+from matplotlib.offsetbox import DraggableAnnotation
 
 from artisanlib.phidgets import PhidgetManager
 from Phidget22.VoltageRange import VoltageRange # type: ignore
@@ -2338,7 +2334,7 @@ class tgraphcanvas(FigureCanvas):
     def ax_combo_text_annotations_clear(self) -> None:
         if self.ax is not None:
             for child in self.ax.get_children():
-                if isinstance(child, mpl.text.Annotation):
+                if isinstance(child, Annotation):
                     try:
                         child.remove()
                     except Exception: # pylint: disable=broad-except
@@ -2470,7 +2466,7 @@ class tgraphcanvas(FigureCanvas):
             if self.ax is not None:
                 axfig = self.ax.get_figure()
                 if axfig is not None and hasattr(self.fig.canvas,'copy_from_bbox'):
-                    self.ax_background = self.fig.canvas.copy_from_bbox(axfig.bbox)
+                    self.ax_background = self.fig.canvas.copy_from_bbox(axfig.bbox) # pyright: ignore[reportGeneralTypeIssues]
                     # we redraw the additional artists like the projection lines, the timeline and the AUC guide line
                     self.update_additional_artists()
                     self.fig.canvas.blit(axfig.bbox)
@@ -2738,7 +2734,7 @@ class tgraphcanvas(FigureCanvas):
     def onpick(self, event:'PickEvent') -> None:
         try:
             # display MET information by clicking on the MET marker
-            if (isinstance(event.artist, mpl.text.Annotation) and self.showmet and event.artist in [self.met_annotate] and
+            if (isinstance(event.artist, Annotation) and self.showmet and event.artist in [self.met_annotate] and
                     self.met_timex_temp1_delta is not None and self.met_timex_temp1_delta[2] is not None):
                 if  self.met_timex_temp1_delta[2] >= 0:
                     met_time_str = str(self.met_timex_temp1_delta[2])
@@ -2750,25 +2746,25 @@ class tgraphcanvas(FigureCanvas):
                 self.aw.sendmessage(f'MET {self.aw.float2float(self.met_timex_temp1_delta[1],1)}{self.mode} @ {stringfromseconds(self.met_timex_temp1_delta[0])}, {met_time_str} {met_time_msg}')
 
             # the analysis results were clicked
-            elif self.aw.analysisresultsanno is not None and isinstance(event.artist, mpl.text.Annotation) and event.artist in [self.aw.analysisresultsanno]:
+            elif self.aw.analysisresultsanno is not None and isinstance(event.artist, Annotation) and event.artist in [self.aw.analysisresultsanno]:
                 self.analysispickflag = True
 
             # the segment results were clicked
-            elif self.aw.segmentresultsanno is not None and isinstance(event.artist, mpl.text.Annotation) and event.artist in [self.aw.segmentresultsanno]:
+            elif self.aw.segmentresultsanno is not None and isinstance(event.artist, Annotation) and event.artist in [self.aw.segmentresultsanno]:
                 self.segmentpickflag = True
 
             # toggle visibility of graph lines by clicking on the legend
-            elif self.legend is not None and event.artist != self.legend and isinstance(event.artist, (mpl.lines.Line2D, mpl.text.Text)) \
+            elif self.legend is not None and event.artist != self.legend and isinstance(event.artist, (Line2D, Text)) \
                 and event.artist not in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots] \
                 and event.artist not in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
                 idx = None
                 # deltaLabelMathPrefix (legend label)
                 # deltaLabelUTF8 (artist)
-                if isinstance(event.artist, mpl.text.Text):
+                if isinstance(event.artist, Text):
                     artist = None
                     label = None
                     try:
-                        label = event.artist.get_text()
+                        label = event.artist.get_text() # pyright: ignore[reportGeneralTypeIssues]
                         idx = self.labels.index(label)
                     except Exception: # pylint: disable=broad-except
                         pass
@@ -2822,7 +2818,7 @@ class tgraphcanvas(FigureCanvas):
 
 
             # show event information by clicking on event lines in step, step+ and combo modes
-            elif isinstance(event.artist, mpl.lines.Line2D):
+            elif isinstance(event.artist, Line2D):
                 if isinstance(event.ind, int): # type: ignore[attr-defined] # "PickEvent" has no attribute "ind"
                     ind = event.ind # type: ignore[attr-defined] # "PickEvent" has no attribute "ind"
                 else:
@@ -2905,7 +2901,7 @@ class tgraphcanvas(FigureCanvas):
                 bboxpatch = self.aw.analysisresultsanno.get_bbox_patch()
                 if bboxpatch is not None:
                     corners = self.ax.transAxes.inverted().transform(bboxpatch.get_extents())
-                self.analysisresultsloc = (corners[0][0], corners[0][1] + (corners[1][1] - corners[0][1])/2)
+                    self.analysisresultsloc = (corners[0][0], corners[0][1] + (corners[1][1] - corners[0][1])/2)
             # save the location of segment results after dragging
             if self.segmentpickflag and self.aw.segmentresultsanno is not None:
                 self.segmentpickflag = False
@@ -2928,7 +2924,7 @@ class tgraphcanvas(FigureCanvas):
                     func = func_ref()
                     if func.__self__ is not None: # a bound method
                         c = func.__self__.__class__
-                        if c == mpl.offsetbox.DraggableAnnotation:
+                        if c == DraggableAnnotation:
                             cids.append(cid)
             # disconnecting all established motion_notify_event_handlers of DraggableAnnotations
             for cid in cids:
@@ -5944,9 +5940,9 @@ class tgraphcanvas(FigureCanvas):
                                                 b = [0,0,1,1,2,2,3]
                                                 edindex = b[nint-3]
                                                 if self.xtcurveidx%2:
-                                                    val = self.temp1BX[n3][absolute_index]
+                                                    val = float(self.temp1BX[n3][absolute_index])
                                                 else:
-                                                    val = self.temp2BX[n3][absolute_index]
+                                                    val = float(self.temp2BX[n3][absolute_index])
                                     except Exception: # pylint: disable=broad-except
                                         pass
                                     #add expression and values found
@@ -6877,7 +6873,7 @@ class tgraphcanvas(FigureCanvas):
             # split in masked and
             unmasked_slices = [(x,False) for x in numpy.ma.clump_unmasked(mb)] # the valid readings
             masked_slices = [(x,True) for x in numpy.ma.clump_masked(mb)] # the dropped values
-            sorted_slices = sorted(unmasked_slices + masked_slices, key=lambda tup: tup[0].start)
+            sorted_slices = sorted(unmasked_slices + masked_slices, key=lambda tup: tup[0].start) # pyright: ignore[reportGeneralTypeIssues]
             b_smoothed = [] # b_smoothed collects the smoothed segments in order
             b_smoothed.append(numpy.full(fromIndex, numpy.nan, dtype=numpy.double)) # append initial segment to the list of resulting segments
             # we just smooth the unmsked slices and add the unmasked slices with NaN values
@@ -7453,7 +7449,7 @@ class tgraphcanvas(FigureCanvas):
                 b = ix[-1]
                 verts = [ xy for xy in [(a, rtbt)] + list(zip(ix, iy)) + [(b, rtbt)] if xy[1] > 0 ]
                 if verts:
-                    poly = Polygon(verts, facecolor=self.palette['aucarea'], edgecolor='0.5', alpha=0.3)
+                    poly = Polygon(numpy.array(verts), facecolor=self.palette['aucarea'], edgecolor='0.5', alpha=0.3)
                     self.ax.add_patch(poly)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -7556,9 +7552,12 @@ class tgraphcanvas(FigureCanvas):
     # resize the given list to the length ln by cutting away elements or padding with trailing -1 items
     # used to resize temperature data to the length of the corresponding timex times
     @staticmethod
-    def resizeList(lst, ln):
+    def resizeList(lst:Optional[List[Any]], ln:int) -> Optional[List[Any]]:
         if lst is None:
             return None
+        return (lst + [-1]*(ln-len(lst)))[:ln]
+    @staticmethod
+    def resizeListStrict(lst:List[Any], ln:int) -> List[Any]:
         return (lst + [-1]*(ln-len(lst)))[:ln]
 
     def drawET(self,temp):
@@ -7675,7 +7674,7 @@ class tgraphcanvas(FigureCanvas):
             timex_lin = None
 
             if smooth or len(self.stemp1) != len(self.timex):
-                temp1_nogaps = self.resizeList(self.temp1,len(self.timex))
+                temp1_nogaps = self.resizeListStrict(self.temp1,len(self.timex))
                 if self.interpolateDropsflag:
                     temp1_nogaps = fill_gaps(temp1_nogaps)
                 if self.flagon: # we don't smooth, but remove the dropouts
@@ -7685,7 +7684,7 @@ class tgraphcanvas(FigureCanvas):
                         timex_lin = numpy.linspace(self.timex[0],self.timex[-1],len(self.timex))
                     self.stemp1 = list(self.smooth_list(self.timex,temp1_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin,delta=False))
             if smooth or len(self.stemp2) != len(self.timex):
-                temp2_nogaps = self.resizeList(self.temp2,len(self.timex))
+                temp2_nogaps = self.resizeListStrict(self.temp2,len(self.timex))
                 if self.interpolateDropsflag:
                     temp2_nogaps = fill_gaps(temp2_nogaps)
                 if self.flagon:  # we don't smooth, but remove the dropouts
@@ -9887,6 +9886,7 @@ class tgraphcanvas(FigureCanvas):
         f = self.ax.get_figure()
         if f is None:
             return 0,0,0,0
+        r = None
         try:
             r = f.canvas.get_renderer() # type: ignore # this can fail for PDF generation with 'FigureCanvasPdf' object has no attribute 'get_renderer'
         except Exception: # pylint: disable=broad-except
@@ -10191,7 +10191,7 @@ class tgraphcanvas(FigureCanvas):
         try:
             if filename is None or not filename:
                 filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Image File'),ext='*.png *.jpg')
-            if len(filename) == 0:
+            if filename is None or len(filename) == 0:
                 return
             newImage = QImage()
             if newImage.load(filename):
@@ -10467,7 +10467,7 @@ class tgraphcanvas(FigureCanvas):
             if self.ax:
                 eventtext_end = self.timex[-1] - x_pos #default for when Events Annotations is unchecked
                 for child in self.ax.get_children():
-                    if isinstance(child, mpl.text.Annotation):
+                    if isinstance(child, Annotation):
                         eventtext = re.search(fr'.*\((.*?),.*({event_label}[ 0-9:]*)',str(child))
                         if eventtext:
                             eventtextstart = int(float(eventtext.group(1))) - x_pos
@@ -15435,11 +15435,11 @@ class tgraphcanvas(FigureCanvas):
                 # initialize bitblit background
                 axfig = self.ax.get_figure()
                 if axfig is not None and hasattr(self.fig.canvas,'copy_from_bbox'):
-                    self.ax_background_designer = self.fig.canvas.copy_from_bbox(axfig.bbox)
+                    self.ax_background_designer = self.fig.canvas.copy_from_bbox(axfig.bbox)  # pyright: ignore[reportGeneralTypeIssues]
 
             # restore background
             if hasattr(self.fig.canvas,'restore_region'):
-                self.fig.canvas.restore_region(self.ax_background_designer)
+                self.fig.canvas.restore_region(self.ax_background_designer) # pyright: ignore[reportGeneralTypeIssues]
 
 
             #create statistics bar
@@ -16617,7 +16617,7 @@ class tgraphcanvas(FigureCanvas):
                                     - self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,self.baseY))[1]))[1])
                         #RoRoR is always in C/min/min
                         if self.mode == 'F':
-                            deltaRoR = RoRfromFtoC(deltaRoR)
+                            deltaRoR = RoRfromFtoCstrict(deltaRoR)
                         RoRoR = str(self.aw.float2float(60 * (deltaRoR)/(event.xdata - self.baseX),1))
                         message = f'delta Time= {deltaX},    delta Temp= {deltaY} {self.mode},    RoR= {RoR} {self.mode}/min,    RoRoR= {RoRoR} C/min/min'
                         self.aw.sendmessage(message)

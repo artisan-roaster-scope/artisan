@@ -18,8 +18,7 @@
 
 from enum import Enum
 import logging
-from typing import Optional, Tuple, List, Callable
-from typing import Final  # Python <=3.7
+from typing import Final, Optional, Tuple, List, Callable
 
 try:
     from PyQt6 import QtCore # @UnusedImport @Reimport  @UnresolvedImport

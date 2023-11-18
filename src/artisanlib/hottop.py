@@ -19,8 +19,7 @@ import time
 import logging
 import asyncio
 
-from typing import Optional, Tuple, Callable, TYPE_CHECKING
-from typing import Final  # Python <=3.7
+from typing import Final, Optional, Tuple, Callable, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.types import SerialSettings # pylint: disable=unused-import

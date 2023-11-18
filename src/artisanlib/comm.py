@@ -25,8 +25,7 @@ import shlex
 import threading
 import platform
 import logging
-from typing import Optional, List, Tuple, Dict, Callable, Union, TYPE_CHECKING
-from typing import Final  # Python <=3.7
+from typing import Final, Optional, List, Tuple, Dict, Callable, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
@@ -49,7 +48,7 @@ if TYPE_CHECKING:
 
 
 
-from artisanlib.util import cmd2str, RoRfromCtoFstrict, fromCtoF, fromCtoFstrict, fromFtoCstrict, hex2int, str2cmd, toFloat
+from artisanlib.util import cmd2str, RoRfromCtoFstrict, fromCtoFstrict, fromFtoCstrict, hex2int, str2cmd, toFloat
 
 try:
     from PyQt6.QtCore import Qt, QDateTime, QSemaphore, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
@@ -3561,7 +3560,7 @@ class serialport:
                     try:
                         at = self.PhidgetTemperatureSensor[0].getTemperature()
                         if self.aw.qmc.mode == 'F':
-                            at = fromCtoF(at)
+                            at = fromCtoFstrict(at)
                         return at,-1
                     except PhidgetException:
                         pass  # the value might be still unknown. This can happen right after attach.
@@ -5227,8 +5226,8 @@ class serialport:
                             res = float(self.PhidgetIO[idx].getVoltageRatio())
                         else:
                             res = float(self.PhidgetIO[idx].getVoltage()) * self.aw.qmc.phidget1018valueFactor
-                        self.PhidgetIOlastvalues[i] = res
-                        return res
+                        self.PhidgetIOlastvalues[i] = res # pyright: ignore[reportGeneralTypeIssues]
+                        return res # pyright: ignore[reportGeneralTypeIssues]
                     return self.PhidgetIOlastvalues[i] # return the previous result
                 self.PhidgetIOlastvalues[i] = res
                 return res
@@ -5919,8 +5918,8 @@ class serialport:
                             #### lock shared resources #####
                             self.YOCTOsemaphores[0].acquire(1)
                             if len(self.YOCTOvalues[0]) > 0:
-#                                probe1 = numpy.average(self.YOCTOvalues[0])
-                                probe1 = float(numpy.median(self.YOCTOvalues[0]))
+#                                probe1 = float(numpy.average(self.YOCTOvalues[0]))
+                                probe1 = float(numpy.median(self.YOCTOvalues[0])) # pyright: ignore[reportGeneralTypeIssues]
                                 self.YOCTOvalues[0] = self.YOCTOvalues[0][-round(self.aw.qmc.delay/self.aw.qmc.YOCTO_dataRate):]
                         except Exception as e: # pylint: disable=broad-except
                             _log.exception(e)

@@ -22,8 +22,7 @@ import threading
 import json
 import random
 
-from typing import List, Dict, Optional, Union, TYPE_CHECKING
-from typing import Final  # Python <=3.7
+from typing import Final, List, Dict, Optional, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
     import websocket # type: ignore # pylint: disable=unused-import

@@ -28,8 +28,8 @@ except Exception: # pylint: disable=broad-except
     #pylint: disable = E, W, R, C
     from PyQt5.QtCore import QSemaphore, QTimer, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
-from typing import List, Dict, Any
-from typing import Final  # Python <=3.7
+from typing import Final, List, Dict, Any
+
 
 import logging
 

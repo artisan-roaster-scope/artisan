@@ -18,8 +18,7 @@
 import sys
 import time
 import logging
-from typing import Optional, List, Dict, Tuple, Union, Any, TYPE_CHECKING
-from typing import Final  # Python <=3.7
+from typing import Final, Optional, List, Dict, Tuple, Union, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import

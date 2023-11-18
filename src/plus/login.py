@@ -56,8 +56,7 @@ except Exception: # pylint: disable=broad-except
 import logging
 from artisanlib.dialogs import ArtisanDialog
 from plus import config
-from typing import Optional, Tuple, TYPE_CHECKING
-from typing import Final  # Python <=3.7
+from typing import Final, Optional, Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import

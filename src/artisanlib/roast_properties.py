@@ -19,8 +19,7 @@ import sys
 import math
 import platform
 import logging
-from typing import Optional, List, Tuple, Dict, cast, Any, TYPE_CHECKING
-from typing import Final  # Python <=3.7
+from typing import Final, Optional, List, Tuple, Dict, cast, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -2369,7 +2368,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 else:
                     self.plus_coffee_selected_label = None
                 if 'plus_blend_spec' in rr:
-                    self.plus_blend_selected_label = rr['plus_blend_label']
+                    self.plus_blend_selected_label = (rr['plus_blend_label'] if 'plus_blend_label' in rr else None)
                     self.plus_blend_selected_spec = rr['plus_blend_spec']
                     if 'plus_blend_spec_labels' in rr:
                         self.plus_blend_selected_spec_labels = rr['plus_blend_spec_labels']
@@ -2711,6 +2710,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             # hack to access the Qt automatic translation of the Help button
             db_help = QDialogButtonBox(QDialogButtonBox.StandardButton.Help)
             help_button: Optional[QPushButton] = db_help.button(QDialogButtonBox.StandardButton.Help)
+            help_text_translated:str = 'Help'
             if help_button is not None:
                 help_text_translated = help_button.text()
             self.energy_ui.helpButton.setText(help_text_translated)
@@ -2753,6 +2753,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             # hack to access the Qt automatic translation of the RestoreDefaults button
             db = QDialogButtonBox(QDialogButtonBox.StandardButton.RestoreDefaults)
             defaults_button: Optional[QPushButton] = db.button(QDialogButtonBox.StandardButton.RestoreDefaults)
+            defaults_button_text_translated:str = 'Restore Defaults'
             if defaults_button is not None:
                 defaults_button_text_translated = defaults_button.text()
             self.energy_ui.loadsDefaultsButtons.setText(defaults_button_text_translated)
@@ -4000,9 +4001,9 @@ class editGraphDlg(ArtisanResizeablDialog):
             except Exception: # pylint: disable=broad-except
                 pass
             deltaBT = QTableWidgetItem(deltaBT_str)
-
             deltaET.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
             deltaBT.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+            text:str = ''
             if i in self.aw.qmc.specialevents:
                 index = self.aw.qmc.specialevents.index(i)
                 text = QApplication.translate('Table', '#{0} {1}{2}').format(str(index+1),self.aw.qmc.etypesf(self.aw.qmc.specialeventstype[index])[0],self.aw.qmc.eventsvalues(self.aw.qmc.specialeventsvalue[index]))
@@ -4041,8 +4042,6 @@ class editGraphDlg(ArtisanResizeablDialog):
                 elif i == self.aw.qmc.timeindex[7] and i != 0:
                     tableitem.setBackground(QColor('orange'))
                     text = QApplication.translate('Table', 'COOL')
-                else:
-                    text = ''
             Rtime.setText(text + ' ' + Rtime.text())
 
             self.datatable.setItem(i,1,ET)

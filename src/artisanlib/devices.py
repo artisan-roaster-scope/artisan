@@ -20,8 +20,7 @@ import time as libtime
 import re
 import platform
 import logging
-from typing import Optional, List, Tuple, TYPE_CHECKING
-from typing import Final  # Python <=3.7
+from typing import Final, Optional, List, Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -147,10 +146,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         help_button = db_help.button(QDialogButtonBox.StandardButton.Help)
         if help_button is not None:
             help_text_translated = help_button.text()
-            helpprogrambutton =  QPushButton(help_text_translated)
-            self.setButtonTranslations(helpprogrambutton,'Help',QApplication.translate('Button','Help'))
-            helpprogrambutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            helpprogrambutton.clicked.connect(self.showhelpprogram)
+        else:
+            help_text_translated = QApplication.translate('Button','Help')
+        helpprogrambutton =  QPushButton(help_text_translated)
+        self.setButtonTranslations(helpprogrambutton,'Help',QApplication.translate('Button','Help'))
+        helpprogrambutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        helpprogrambutton.clicked.connect(self.showhelpprogram)
         selectoutprogrambutton =  QPushButton(QApplication.translate('Button','Select'))
         selectoutprogrambutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         selectoutprogrambutton.clicked.connect(self.loadoutprogramname)
@@ -271,11 +272,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         db_reset_button = db_reset.button(QDialogButtonBox.StandardButton.Reset)
         if db_reset_button is not None:
             reset_text_translated = db_reset_button.text()
-            resetButton =  QPushButton(reset_text_translated)
-            self.setButtonTranslations(resetButton,'Reset',QApplication.translate('Button','Reset'))
-            resetButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            resetButton.setMinimumWidth(100)
-            resetButton.clicked.connect(self.resetextradevices)
+        else:
+            reset_text_translated = QApplication.translate('Button','Reset')
+        resetButton = QPushButton(reset_text_translated)
+        self.setButtonTranslations(resetButton,'Reset',QApplication.translate('Button','Reset'))
+        resetButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        resetButton.setMinimumWidth(100)
+        resetButton.clicked.connect(self.resetextradevices)
         extradevHelpButton = QPushButton(help_text_translated)
         self.setButtonTranslations(extradevHelpButton,'Help',QApplication.translate('Button','Help'))
         extradevHelpButton.setMinimumWidth(100)

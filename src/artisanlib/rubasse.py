@@ -5,8 +5,7 @@
 import os
 import csv
 import logging
-from typing import List, Optional, TYPE_CHECKING
-from typing import Final  # Python <=3.7
+from typing import Final, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import

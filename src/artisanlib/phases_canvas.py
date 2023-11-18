@@ -20,8 +20,7 @@ import warnings
 import numpy
 import logging
 
-from typing import Dict, Tuple, Optional, TYPE_CHECKING
-from typing import Final  # Python <=3.7
+from typing import Final, Dict, Tuple, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
@@ -43,7 +42,8 @@ with suppress_stdout_stderr():
     import matplotlib as mpl
 
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas  # @Reimport
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas  # @Reimport
+from matplotlib.font_manager import FontProperties
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -127,7 +127,7 @@ class tphasescanvas(FigureCanvas):
             if self.aw:
                 prop = self.aw.mpl_fontproperties
             else:
-                prop = mpl.font_manager.FontProperties().copy()
+                prop = FontProperties().copy()
             prop.set_family(mpl.rcParams['font.family'])
             prop.set_size('medium')
 

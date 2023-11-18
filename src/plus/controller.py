@@ -37,8 +37,7 @@ import os
 import platform
 import threading
 import logging
-from typing import Optional, TYPE_CHECKING
-from typing import Final # Python <=3.7
+from typing import Final, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import

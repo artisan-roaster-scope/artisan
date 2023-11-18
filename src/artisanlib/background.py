@@ -16,10 +16,11 @@
 # Marko Luther, 2023
 
 import platform
+import logging
 
 from artisanlib.util import deltaLabelUTF8, deltaLabelPrefix, stringfromseconds
 from artisanlib.dialogs import ArtisanResizeablDialog
-from typing import Optional, TYPE_CHECKING
+from typing import Final, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -39,8 +40,6 @@ except ImportError:
                                  QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QWidget, QGroupBox) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
-import logging
-from typing import Final  # Python <=3.7
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 

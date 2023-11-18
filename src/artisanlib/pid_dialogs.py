@@ -18,8 +18,7 @@
 import sys
 import time as libtime
 import logging
-from typing import Optional, Dict, List, Union, TYPE_CHECKING
-from typing import Final  # Python <=3.7
+from typing import Final, Optional, Dict, List, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import

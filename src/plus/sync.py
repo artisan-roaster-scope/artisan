@@ -36,8 +36,7 @@ from plus import config, util, connection, controller, roast, stock
 import os
 import time
 import logging
-from typing import Optional, Dict, Any, List, TextIO
-from typing_extensions import Final  # Python <=3.7
+from typing import Final, Optional, Dict, Any, List, TextIO
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)

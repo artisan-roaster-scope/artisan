@@ -6,8 +6,7 @@ from pathlib import Path
 import time as libtime
 import csv
 import logging
-from typing import List, Optional, TYPE_CHECKING
-from typing import Final  # Python <=3.7
+from typing import Final, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.types import ProfileData # pylint: disable=unused-import

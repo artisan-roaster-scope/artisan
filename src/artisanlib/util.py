@@ -26,8 +26,7 @@ import numpy
 import functools
 from pathlib import Path
 from matplotlib import colors
-from typing import Optional, Tuple, List, Sequence, Union, Any, TYPE_CHECKING
-from typing import Final  # Python <=3.7
+from typing import Final, Optional, Tuple, List, Sequence, Union, Any, TYPE_CHECKING
 from typing_extensions import TypeGuard  # Python <=3.10
 
 if TYPE_CHECKING:
@@ -196,12 +195,19 @@ def RoRfromFtoC(FRoR:Optional[float]) -> Optional[float]:
         return FRoR
     return RoRfromFtoCstrict(FRoR)
 
-def convertRoR(r,source_unit,target_unit):
+def convertRoR(r:Optional[float], source_unit:str, target_unit:str) -> Optional[float]:
     if source_unit == target_unit:
         return r
     if source_unit == 'C':
         return RoRfromCtoF(r)
     return RoRfromFtoC(r)
+
+def convertRoRstrict(r:float, source_unit:str, target_unit:str) -> float:
+    if source_unit == target_unit:
+        return r
+    if source_unit == 'C':
+        return RoRfromCtoFstrict(r)
+    return RoRfromFtoCstrict(r)
 
 def convertTemp(t:float, source_unit:str, target_unit:str) -> float:
     if source_unit in ('', target_unit) or target_unit == '':

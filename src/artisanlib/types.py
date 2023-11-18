@@ -23,8 +23,8 @@ try:
 except ImportError:
     from PyQt5.QtCore import QDateTime  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
-from typing import Optional,  Tuple, List, Union, TYPE_CHECKING
-from typing_extensions import TypedDict  # Python <=3.7
+from typing import TypedDict, Optional,  Tuple, List, Union, TYPE_CHECKING
+from typing_extensions import Required # Python <3.11
 
 if TYPE_CHECKING:
     from plus.stock import BlendList, Blend
@@ -346,7 +346,7 @@ Palette = Tuple[
     List[int]     # 27 quantifier SV flags; len=self.eventsliders
     ]
 
-class BTU(TypedDict, total=False):
+class BTU(TypedDict):
     load_pct    : float
     duration    : float
     BTUs        : float
@@ -449,11 +449,11 @@ class CurveSimilarity(TypedDict):
     segmentresultstr: str
 
 class RecentRoast(TypedDict, total=False):
-    title: str
+    title: Required[str]
     beans: str
-    weightIn: float
+    weightIn: Required[float]
     weightOut: float
-    weightUnit: str
+    weightUnit: Required[str]
     volumeIn: float
     volumeOut: float
     volumeUnit: str

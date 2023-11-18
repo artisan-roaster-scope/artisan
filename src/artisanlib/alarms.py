@@ -18,8 +18,7 @@
 import os
 import sys
 import logging
-from typing import Dict, Union, List, Optional, TYPE_CHECKING
-from typing import Final  # Python <=3.7
+from typing import Final, Dict, Union, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -49,7 +48,7 @@ except ImportError:
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
-class AlignDelegate(QStyledItemDelegate):
+class AlignDelegate(QStyledItemDelegate): # type:ignore[reportGeneralTypeIssues]
     def initStyleOption(self, option, index):
         super().initStyleOption(option, index)
         option.displayAlignment = Qt.AlignmentFlag.AlignCenter
@@ -793,9 +792,9 @@ class AlarmDlg(ArtisanResizeablDialog):
                     item1 = beepLayout.itemAt(1)
                     if item1 is not None:
                         beep = item1.widget()
-                assert isinstance(beep, QCheckBox)
-                if beep and beep is not None:
-                    self.aw.qmc.alarmbeep[i] = int(beep.isChecked())
+                        assert isinstance(beep, QCheckBox)
+                        if beep and beep is not None:
+                            self.aw.qmc.alarmbeep[i] = int(beep.isChecked())
                 description = self.alarmtable.cellWidget(i,11)
                 assert isinstance(description, QLineEdit)
                 self.aw.qmc.alarmstrings[i] = description.text()

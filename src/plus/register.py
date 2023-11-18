@@ -34,8 +34,7 @@ from plus import config
 import os
 import logging
 
-from typing import Optional, TextIO
-from typing import Final  # Python <=3.7
+from typing import Final, Optional, TextIO
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)

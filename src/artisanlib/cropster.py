@@ -5,8 +5,7 @@
 import time as libtime
 import xlrd # type: ignore
 import logging
-from typing import Union, List, Optional, TYPE_CHECKING
-from typing_extensions import Final  # Python <=3.7
+from typing import Final, Union, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.types import ProfileData # pylint: disable=unused-import

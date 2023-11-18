@@ -36,8 +36,7 @@ import dateutil.parser
 import logging
 import os
 import numpy
-from typing import Optional, Union, Any, Dict, List, Tuple, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
-from typing import Final  # Python <=3.7
+from typing import Final, Optional, Union, Any, Dict, List, Tuple, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
 
 if TYPE_CHECKING:
     from artisanlib.types import ProfileData, ComputedProfileInformation # pylint: disable=unused-import

@@ -16,8 +16,7 @@
 # Marko Luther, 2023
 
 import logging
-from typing import List, Optional, Union, Tuple, Callable
-from typing import Final  # Python <=3.7
+from typing import Final, List, Optional, Union, Tuple, Callable
 
 
 from artisanlib.ble import UUID, BLE_CHAR_TYPE

@@ -70,8 +70,7 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 import logging.config
 from yaml import safe_load as yaml_load
-from typing import Optional, List, Dict, Tuple, Union, cast, Any, Callable, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
-from typing import Final  # Python <=3.7
+from typing import Final, Optional, List, Dict, Tuple, Union, cast, Any, Callable, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
 
 from functools import reduce as freduce
 
@@ -187,9 +186,11 @@ svgsupport = next((x for x in QImageReader.supportedImageFormats() if x == b'svg
 
 from matplotlib.figure import Figure
 from matplotlib import rcParams, ticker
+from matplotlib.font_manager import FontProperties, fontManager
+from matplotlib.transforms import Bbox
 
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas  # @Reimport
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar # @Reimport
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas  # @Reimport
+from matplotlib.backends.backend_qt import NavigationToolbar2QT as NavigationToolbar # @Reimport
 from matplotlib.backend_bases import LocationEvent as mplLocationevent
 
 from matplotlib.backends.qt_editor import figureoptions
@@ -226,7 +227,7 @@ import artisanlib.arabic_reshaper
 from artisanlib.util import (appFrozen, uchr, decodeLocal, decodeLocalStrict, encodeLocal, encodeLocalStrict, s2a, fill_gaps,
         deltaLabelPrefix, deltaLabelUTF8, deltaLabelBigPrefix, stringfromseconds, stringtoseconds,
         fromFtoC, fromFtoCstrict, fromCtoF, fromCtoFstrict, RoRfromFtoCstrict, RoRfromCtoFstrict,
-        convertRoR, convertTemp, path2url, toInt, toString, toList, toFloat,
+        convertRoR, convertRoRstrict, convertTemp, path2url, toInt, toString, toList, toFloat,
         toBool, toStringList, removeAll, application_name, application_viewer_name, application_organization_name,
         application_organization_domain, getDataDirectory, getAppPath, getResourcePath, debugLogLevelToggle,
         debugLogLevelActive, setDebugLogLevel, createGradient, natsort, setDeviceDebugLogLevel,
@@ -245,6 +246,7 @@ except ImportError:
 if sys.platform.startswith('darwin'):
     # control app napping on OS X >= 10.9
     import appnope # type: ignore # @UnresolvedImport # type: ignore # pylint: disable=import-error
+    appnope.nope()
     if QVersionNumber.fromString(qVersion())[0] < QVersionNumber(6,5,0):
         # import darkdetect module to detect if macOS dark mode is active or not if Qt < 6.5.0, otherwise we related to QTs ColorScheme() mechanism
         import darkdetect # type: ignore # type: ignore # @UnresolvedImport # pylint: disable=import-error
@@ -1433,7 +1435,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.appearance = 'fusion'
 
         # matplotlib font properties:
-        self.mpl_fontproperties = mpl.font_manager.FontProperties()
+        self.mpl_fontproperties = FontProperties()
         self.full_screen_mode_active:bool = False
 
         self.processingKeyEvent:bool = False
@@ -4020,7 +4022,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         verticalScroller: Optional['QScrollBar'] = self.scroller.verticalScrollBar()
         if verticalScroller is not None:
             val = verticalScroller.value()
-            if hasattr(event, 'button') and event.button == 'down':
+            if hasattr(event, 'button') and event.button == 'down': # pyright: ignore[reportGeneralTypeIssues]
                 verticalScroller.setValue(val+10)
             else:
                 verticalScroller.setValue(val-10)
@@ -4619,7 +4621,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     subscription_icon += '.svg'
                 else:
                     subscription_icon += '.png'
-            if len(ntb.actions()) > 0:
+            if ntb is not None and len(ntb.actions()) > 0:
                 a = ntb.actions()[0] # the plus action is the first one
                 a.setIcon(ntb._icon(plus_icon)) # pylint: disable=protected-access
                 a.setToolTip(tooltip)
@@ -5109,8 +5111,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.qmc.roasterheating_setup = 0
                     #
                     self.loadSettings(fn=action.data()[0],remember=False,machine=True,reload=False)
-                    res:bool
-                    res2: Optional[bool]
+                    res:bool = False
+                    res2: Optional[bool] = None
                     if action.data()[1] == 'Phidget':
                         if action.text() == 'VINT Ambient Modules':
                             elevation, res2 = QInputDialog.getInt(self,
@@ -6370,11 +6372,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
                 # R squared - Coefficient of determination from 0 to 1 (1 is a good result, 0 is not good)
                 # residual sum of squares
-                ss_res_bt = numpy.sum((np_bt - np_btb) ** 2)
-                ss_res_dbt = numpy.sum((np_dbt - np_dbtb) ** 2)
+                ss_res_bt = float(numpy.sum((np_bt - np_btb) ** 2))
+                ss_res_dbt = float(numpy.sum((np_dbt - np_dbtb) ** 2))
                 # total sum of squares
-                ss_tot_bt = numpy.sum((np_bt - numpy.mean(np_bt)) ** 2)
-                ss_tot_dbt = numpy.sum((np_dbt - numpy.mean(np_dbt)) ** 2)
+                ss_tot_bt = float(numpy.sum((np_bt - numpy.mean(np_bt)) ** 2))
+                ss_tot_dbt = float(numpy.sum((np_dbt - numpy.mean(np_dbt)) ** 2))
                 # r-squared
                 r2_BT = 1 - (ss_res_bt / ss_tot_bt)
                 r2_deltaBT = 1 - (ss_res_dbt / ss_tot_dbt)
@@ -6784,7 +6786,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 rcParams['font.size'] = 12.0
                 if platform.system() == 'Darwin':
                     mpl.rcParams['font.family'] = 'Arial Unicode MS'
-                    self.mpl_fontproperties = mpl.font_manager.FontProperties()
+                    self.mpl_fontproperties = FontProperties()
                 elif platform.system() == 'Linux':
                     if self.locale_str == 'ar':
                         mpl.rcParams['font.family'] = ['DejaVu Sans','DejaVu Sans Mono','Times New Roman']
@@ -6796,10 +6798,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         mpl.rcParams['font.family'] = ['NanumGothic','DejaVu Sans Mono']
                     elif self.locale_str == 'zh_TW':
                         mpl.rcParams['font.family'] = ['NanumGothic','DejaVu Sans Mono']
-                    self.mpl_fontproperties = mpl.font_manager.FontProperties()
+                    self.mpl_fontproperties = FontProperties()
                 else: # Windows:
                     mpl.rcParams['font.family'] = ['Microsoft Sans Serif', 'Arial'] # works for Greek and Arabic
-                    self.mpl_fontproperties = mpl.font_manager.FontProperties()
+                    self.mpl_fontproperties = FontProperties()
                     # for asian languages on Windows we have to set the parameters directly to *.ttc fonts (mpl supports only *.ttf)
                     if self.locale_str == 'ja':
                         self.set_mpl_fontproperties('C:\\Windows\\Fonts\\MSGOTHIC.ttc')
@@ -6811,7 +6813,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         self.set_mpl_fontproperties('C:\\Windows\\Fonts\\batang.ttc')
 #                    elif self.locale_str == "ar":
 #                        mpl.rcParams['font.family'] = "TraditionalArabic"
-#                        self.mpl_fontproperties = mpl.font_manager.FontProperties()
+#                        self.mpl_fontproperties = FontProperties()
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
         elif self.qmc.graphfont == 3: # WenQuanYi Zen Hei
@@ -6891,14 +6893,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             rcParams['axes.unicode_minus'] = True
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Comic Sans MS','Humor Sans']
-            self.mpl_fontproperties = mpl.font_manager.FontProperties()
+            self.mpl_fontproperties = FontProperties()
         if redraw:
             self.qmc.redraw(recomputeAllDeltas=False, forceRenewAxis=True, re_smooth_background=True)
 
     def set_mpl_fontproperties(self,fontpath):
         if os.path.exists(fontpath):
-            mpl.font_manager.fontManager.addfont(fontpath)
-            self.mpl_fontproperties = mpl.font_manager.FontProperties(fname=fontpath)
+            fontManager.addfont(fontpath)
+            self.mpl_fontproperties = FontProperties(fname=fontpath)
 
     # trims arabic strings to be rendered correctly with unicode fonts if arabic locale is active
     # if s is a string with one {0} placeholder and a is an argument, the argument is reversed, and then the whole string result is reversed
@@ -10223,7 +10225,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if active_window is not None:
                 fw = active_window.focusWidget()
                 if fw is not None and hasattr(fw, 'cut') and callable(getattr(fw, 'cut')): # noqa: B009
-                    fw.cut()
+                    fw.cut() # pyright: ignore[reportGeneralTypeIssues]
         except Exception: # pylint: disable=broad-except
             pass # not every QWidget has a cut method
 
@@ -10235,7 +10237,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if active_window is not None:
                 fw = active_window.focusWidget()
                 if fw is not None and hasattr(fw, 'copy') and callable(getattr(fw, 'copy')): # noqa: B009
-                    fw.copy()
+                    fw.copy() # pyright: ignore[reportGeneralTypeIssues]
         except Exception: # pylint: disable=broad-except
             pass # not every QWidget has a copy method
 
@@ -10247,7 +10249,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if active_window is not None:
                 fw = active_window.focusWidget()
                 if fw is not None and hasattr(fw, 'paste') and callable(getattr(fw, 'paste')): # noqa: B009
-                    fw.paste()
+                    fw.paste() # pyright: ignore[reportGeneralTypeIssues]
         except Exception: # pylint: disable=broad-except
             pass # not every QWidget has a paste method
 
@@ -12411,7 +12413,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     # Loads background profile
     # NOTE: this does NOT set the self.qmc.background flag to make the loaded background visible.
-    def loadbackground(self,filename):
+    def loadbackground(self, filename:str) -> None:
         f = QFile(filename)
         try:
             if not f.open(QIODevice.OpenModeFlag.ReadOnly):
@@ -12475,8 +12477,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
                 # we fill_gaps for all background curves on load, not to have to re-compute those on most redraws
                 if self.qmc.interpolateDropsflag:
-                    t1 = fill_gaps(t1)
-                    t2 = fill_gaps(t2)
+                    t1 = fill_gaps(t1) # pyright: ignore[reportGeneralTypeIssues]
+                    t2 = fill_gaps(t2) # pyright: ignore[reportGeneralTypeIssues]
                     for e,_ in enumerate(t1x):
                         t1x[e] = fill_gaps(t1x[e])
                         t2x[e] = fill_gaps(t2x[e])
@@ -12564,10 +12566,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.qmc.timeindexB = [max(0,v) if i>0 else max(-1,v) for i,v in enumerate(profile['timeindex'])]          #if new profile found with variable timeindex
                     if self.qmc.phasesfromBackgroundflag:
                         # adjust phases by DryEnd and FCs events from background profile
-                        if self.qmc.timeindexB[1]:
-                            self.qmc.phases[1] = int(round(self.qmc.temp2B[self.qmc.timeindexB[1]]))
-                        if self.qmc.timeindexB[2]:
-                            self.qmc.phases[2] = int(round(self.qmc.temp2B[self.qmc.timeindexB[2]]))
+                        if self.qmc.timeindexB[1] and len(self.qmc.timeindexB) > 1 and len(self.qmc.temp2B) > self.qmc.timeindexB[1]:
+                            self.qmc.phases[1] = int(round(self.qmc.temp2B[self.qmc.timeindexB[1]])) # pyright: ignore[reportGeneralTypeIssues]
+                        if self.qmc.timeindexB[2] and len(self.qmc.timeindexB) > 2 and len(self.qmc.temp2B) > self.qmc.timeindexB[2]:
+                            self.qmc.phases[2] = int(round(self.qmc.temp2B[self.qmc.timeindexB[2]])) # pyright: ignore[reportGeneralTypeIssues]
                 elif 'startend' in profile:
                     startendB = profile['startend']
                     varCB = profile['cracks']
@@ -14815,7 +14817,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
                 # Count skipped samples (missing timex)
                 tx_diff = numpy.diff(tx)
-                avg_sample = numpy.average(tx_diff)
+                avg_sample = float(numpy.average(tx_diff))
                 longest_sample = numpy.max(tx_diff)
                 shortest_sample = numpy.min(tx_diff)
                 skipped_sample_time = 1.5*avg_sample
@@ -17859,7 +17861,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     # if settings are given all values are filled if default_settings are not given or different to the corresponding value in default_settings
     # see the definition of the method settingsSetValue() above
     # returns True on success and False otherwise
-    def saveAllSettings(self, settings:QSettings, default_settings:Optional[Dict[str, Any]], filename:Optional[str] = None, read_defaults:bool = False) -> bool:
+    def saveAllSettings(self, settings:QSettings, default_settings:Optional[Dict[str, Any]], filename:Optional[str] = None, read_defaults:bool = False) -> bool: # type:ignore[reportGeneralTypeIssues]
         start_time = libtime.process_time()
         try:
             if filename is None:
@@ -19461,7 +19463,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             # 3. convert display coordinates to figure-inches
             rect_extents_bbox_inches = self.qmc.fig.dpi_scale_trans.inverted().transform(rect_extents_display)
             # 4. generate
-            rect_bbox_inches =  mpl.transforms.Bbox.from_extents(*list(rect_extents_bbox_inches))
+            rect_bbox_inches = Bbox.from_extents(*list(rect_extents_bbox_inches))
             # 5. fig.save
             # MPL 3.1.1 does not properly handle saving pdf on Windows when figure dpi not 72.  Maybe fixed in a future version.
             # ref: https://github.com/matplotlib/matplotlib/issues/15497#issuecomment-548072609
@@ -19972,7 +19974,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         if units == 'temp':
                             conv_fld = convertTemp(res_fldf,dsd['mode'],temperature_unit)
                         elif units == 'ror':
-                            conv_fld = convertRoR(res_fldf,dsd['mode'],temperature_unit)
+                            conv_fld = convertRoRstrict(res_fldf,dsd['mode'],temperature_unit)
                         elif units == 'volume':
                             conv_fld = self.convertVolume(res_fldf,0,self.qmc.volume_units.index(volume_unit))
                         elif units == 'weight':
@@ -20857,7 +20859,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                         if units == 'temp':
                                             conv_fld = convertTemp(res_fld,dsd['mode'],temperature_unit)
                                         elif units == 'ror':
-                                            conv_fld = convertRoR(res_fld,dsd['mode'],temperature_unit)
+                                            conv_fld = convertRoRstrict(res_fld,dsd['mode'],temperature_unit)
                                         elif units == 'volume':
                                             conv_fld = self.convertVolume(res_fld,0,self.qmc.volume_units.index(volume_unit))
                                         elif units == 'weight':
@@ -21718,16 +21720,17 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             # is the positive root of the following equation
                             #   RoR/2*t^2 + (BT - base)*t + (AUCcurrent - AUCtarget) = 0
                             ror = convertRoR(self.qmc.delta2[-1],self.qmc.mode,'C') # BT RoR
-                            roots = [r for r in numpy.roots([ror/2.0,bt - tbase,self.qmc.AUCvalue-target]) if r > 0]
-                            if len(roots) > 0:
-                                ts = self.qmc.timeclock.elapsed()/1000.
-                                self.qmc.AUCguideTime = ts + roots[0]*60 # takes the first positive root and calculates the time in seconds until the target AUC is reached
-                            if self.qmc.l_AUCguide is not None:
-                                if self.qmc.AUCguideTime > 0 and self.qmc.AUCguideTime < self.qmc.endofx:
-                                    self.qmc.l_AUCguide.set_xdata(self.qmc.AUCguideTime)
-                                    self.qmc.l_AUCguide.set_visible(True)
-                                else:
-                                    self.qmc.l_AUCguide.set_visible(False)
+                            if ror is not None:
+                                roots = [r for r in numpy.roots([ror/2.0,bt - tbase,self.qmc.AUCvalue-target]) if r > 0]
+                                if len(roots) > 0:
+                                    ts = self.qmc.timeclock.elapsed()/1000.
+                                    self.qmc.AUCguideTime = ts + roots[0]*60 # takes the first positive root and calculates the time in seconds until the target AUC is reached
+                                if self.qmc.l_AUCguide is not None:
+                                    if self.qmc.AUCguideTime > 0 and self.qmc.AUCguideTime < self.qmc.endofx:
+                                        self.qmc.l_AUCguide.set_xdata(self.qmc.AUCguideTime)
+                                        self.qmc.l_AUCguide.set_visible(True)
+                                    else:
+                                        self.qmc.l_AUCguide.set_visible(False)
 
     def AUCstartidx(self, timeindex, TPindex):
         if self.qmc.AUCbegin == 0 and timeindex[0] > -1: # start after CHARGE
@@ -25161,7 +25164,7 @@ def initialize_locale(my_app:Artisan) -> str:
         appTranslator:QTranslator = QTranslator(my_app)
         artisan_qm_file:str = f'artisan_{locale}'
         for trans_path in trans_paths:
-            if qtTranslator.load(artisan_qm_file, trans_path):
+            if appTranslator.load(artisan_qm_file, trans_path):
                 _log.info('loading Artisan translations %s from %s', artisan_qm_file, trans_path)
                 break
         my_app.installTranslator(appTranslator)
@@ -25198,6 +25201,7 @@ def main() -> None:
 
     # only here deactivating the app napping seems to have an effect
     if sys.platform.startswith('darwin'):
+        import appnope # type: ignore # @UnresolvedImport # type: ignore # pylint: disable=import-error
         appnope.nope()
 
     if locale_str in {'ar', 'he', 'fa'}:

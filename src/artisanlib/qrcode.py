@@ -1,10 +1,7 @@
 #
 
 import qrcode # type: ignore
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from qrcode.main import QRCode # type: ignore # pylint: disable=unused-import
+from qrcode.main import QRCode # type: ignore
 
 try:
     from PyQt6.QtGui import QImage, QPixmap,QPainter # @UnusedImport @Reimport  @UnresolvedImport
@@ -41,11 +38,11 @@ class QRImage(qrcode.image.base.BaseImage): # type: ignore # pyright: "base" is 
     def process(self):
         pass
 
-    def drawrect_context(self, row: int, col: int, qr: 'QRCode') -> None:
+    def drawrect_context(self, row: int, col: int, qr: QRCode) -> None:
         pass
 
 def QRlabel(url_str):
-    qr = qrcode.QRCode(
+    qr = QRCode(
         version=None, # 1,
         error_correction=qrcode.constants.ERROR_CORRECT_L, # type:ignore # pyright: "constants" is not a known member of module "qrcode"
         box_size=4,

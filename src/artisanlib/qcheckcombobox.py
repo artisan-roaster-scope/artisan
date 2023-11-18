@@ -16,7 +16,7 @@ import sys
 from typing import Dict, Optional
 
 try:
-    from PyQt6.QtCore import Qt, QEvent, QTimer, pyqtSignal # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import Qt, QEvent, QTimer, pyqtSignal, QSize # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import ( QStandardItemModel,  # @UnusedImport @Reimport  @UnresolvedImport
         QPalette, QFontMetrics, QBrush, QColor, QPixmap, QIcon # @UnusedImport @Reimport  @UnresolvedImport
     )
@@ -26,7 +26,7 @@ try:
         QStyleOptionMenuItem, QStyleOptionViewItem, QStylePainter, QWidget # @UnusedImport @Reimport  @UnresolvedImport
     )
 except ImportError:
-    from PyQt5.QtCore import Qt, QEvent, QTimer, pyqtSignal # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import Qt, QEvent, QTimer, pyqtSignal, QSize # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import ( QStandardItemModel, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QPalette, QFontMetrics, QBrush, QColor, QPixmap, QIcon # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     )
@@ -86,23 +86,23 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
 
         def paint(self, painter, option, index):
             menuopt = self._getMenuStyleOption(option, index)
+            style:Optional[QStyle] = QApplication.style()
             if option.widget is not None:
                 style = option.widget.style()
-            else:
-                style = QApplication.style()
-            style.drawControl(QStyle.ControlElement.CE_MenuItem, menuopt, painter,
-                              option.widget)
+            if style is not None:
+                style.drawControl(QStyle.ControlElement.CE_MenuItem, menuopt, painter,
+                                  option.widget)
 
         def sizeHint(self, option, index):
             menuopt = self._getMenuStyleOption(option, index)
+            style:Optional[QStyle] = QApplication.style()
             if option.widget is not None:
                 style = option.widget.style()
-            else:
-                style = QApplication.style()
-            return style.sizeFromContents(
-                QStyle.ContentsType.CT_MenuItem, menuopt, menuopt.rect.size(),
-                option.widget
-            )
+            if style is not None:
+                return style.sizeFromContents(
+                    QStyle.ContentsType.CT_MenuItem, menuopt, menuopt.rect.size(),
+                    option.widget)
+            return QSize()
 
         def _getMenuStyleOption(self, option, index):
             menuoption = QStyleOptionMenuItem()

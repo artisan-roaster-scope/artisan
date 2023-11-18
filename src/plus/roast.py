@@ -25,8 +25,7 @@ from plus import config, util, stock
 import hashlib
 import logging
 
-from typing import Any, Optional, Dict, List, Tuple, TYPE_CHECKING  #for Python >= 3.9: can remove 'List', 'Dict' and 'Tuple' since type hints can use the generic 'list', 'dict' and 'tuple'
-from typing_extensions import Final  # Python <=3.7
+from typing import Final, Any, Optional, Dict, List, Tuple, TYPE_CHECKING  #for Python >= 3.9: can remove 'List', 'Dict' and 'Tuple' since type hints can use the generic 'list', 'dict' and 'tuple'
 
 
 if TYPE_CHECKING:

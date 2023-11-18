@@ -18,8 +18,7 @@
 import sys
 import platform
 import logging
-from typing import List, Optional, cast, TYPE_CHECKING
-from typing import Final  # Python <=3.7
+from typing import Final, List, Optional, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.types import Palette

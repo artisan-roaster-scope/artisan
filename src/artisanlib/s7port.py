@@ -18,8 +18,7 @@
 import time
 import sys
 import logging
-from typing import List, Dict, Tuple, Optional, Iterator, TYPE_CHECKING
-from typing import Final  # Python <=3.7
+from typing import Final, List, Dict, Tuple, Optional, Iterator, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from snap7.client import Client as S7Client

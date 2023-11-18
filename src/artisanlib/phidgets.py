@@ -20,8 +20,7 @@ from Phidget22.DeviceID import DeviceID # type: ignore
 from Phidget22.DeviceClass import DeviceClass # type: ignore
 
 import logging
-from typing import Dict, Tuple, Optional, TYPE_CHECKING
-from typing import Final  # Python <=3.7
+from typing import Final, Dict, Tuple, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from Phidget22.Phidget import Phidget # type: ignore # pylint: disable=unused-import

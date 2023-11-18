@@ -23,8 +23,7 @@ import sys
 import platform
 import numpy
 import logging
-from typing import List, Optional, Union, TYPE_CHECKING
-from typing import Final  # Python <=3.7
+from typing import Final, List, Optional, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import

@@ -9,8 +9,7 @@ import base64
 import csv
 import re
 import logging
-from typing import Optional, List, Tuple, Callable, ClassVar, Generator, TYPE_CHECKING
-from typing import Final  # Python <=3.7
+from typing import Final, Optional, List, Tuple, Callable, ClassVar, Generator, TYPE_CHECKING
 
 
 if TYPE_CHECKING:
@@ -26,7 +25,8 @@ from artisanlib.util import encodeLocal
 try:
     from artisanlib.ble import BleInterface, BLE_CHAR_TYPE # noqa: F811
 except ImportError:
-    pass # BLE not available on older Windows/PyQt5 platforms
+    # BLE not available on older Windows/PyQt5 platforms
+    pass
 from proto import IkawaCmd_pb2 # type: ignore
 
 
@@ -358,8 +358,8 @@ try: # BLE not available on some platforms
 
         DEVICE_NAME_IKAWA:   ClassVar[str] = 'IKAWA'
         IKAWA_SERVICE_UUID:  ClassVar[str] = 'C92A6046-6C8D-4116-9D1D-D20A8F6A245F'
-        IKAWA_SEND_CHAR_UUID: ClassVar[Tuple[str,BLE_CHAR_TYPE]] = ('851A4582-19C1-4E6C-AB37-E7A03766BA16', BLE_CHAR_TYPE.BLE_CHAR_WRITE)
-        IKAWA_RECEIVE_CHAR_UUID: ClassVar[Tuple[str,BLE_CHAR_TYPE]] = ('948C5059-7F00-46D9-AC55-BF090AE066E3', BLE_CHAR_TYPE.BLE_CHAR_NOTIFY)
+        IKAWA_SEND_CHAR_UUID: ClassVar[Tuple[str,BLE_CHAR_TYPE]] = ('851A4582-19C1-4E6C-AB37-E7A03766BA16', BLE_CHAR_TYPE.BLE_CHAR_WRITE) # pyright: ignore[reportUnboundVariable]
+        IKAWA_RECEIVE_CHAR_UUID: ClassVar[Tuple[str,BLE_CHAR_TYPE]] = ('948C5059-7F00-46D9-AC55-BF090AE066E3', BLE_CHAR_TYPE.BLE_CHAR_NOTIFY) # pyright: ignore[reportUnboundVariable]
 
 
         def __init__(self,
