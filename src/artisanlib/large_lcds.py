@@ -41,8 +41,8 @@ class LargeLCDs(ArtisanDialog):
     __slots__ = ['lcds1', 'lcds2', 'lcds1styles', 'lcds2styles', 'lcds1labelsUpper', 'lcds2labelsUpper', 'lcds1labelsLower', 'lcds2labelsLower',
         'lcds1frames', 'lcds2frames', 'visibleFrames', 'tight', 'layoutNr', 'swaplcds']
 
-    def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
-        super().__init__(parent, aw)
+    def __init__(self, _parent:'QWidget', aw:'ApplicationWindow') -> None:
+        super().__init__(None, aw) # set the parent to None to make LargeLCD windows on RPi Bookworm non-modal (not blocking the main window)
         # it is assumed that both lists of lcds (lcd1 & lcd2) have the same length
         # the same is assumed for the other lists below:
         self.lcds1:List[QLCDNumber] = []
@@ -59,6 +59,7 @@ class LargeLCDs(ArtisanDialog):
         self.tight:bool = False
         self.layoutNr:int = -1 # -1: unknown, 0: landscape, 1: portrait
         self.swaplcds:bool = False
+#        self.setWindowModality(Qt.WindowModality.NonModal) # this seems not to be effective on RPi bookworm thus we set the parent to None
         windowFlags = self.windowFlags()
         windowFlags |= Qt.WindowType.Tool
         self.setWindowFlags(windowFlags)

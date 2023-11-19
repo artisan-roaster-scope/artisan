@@ -44,7 +44,7 @@ class ArtisanDialog(QDialog): # pyright: ignore [reportGeneralTypeIssues] # Argu
 
     __slots__ = ['aw', 'dialogbuttons']
 
-    def __init__(self, parent:QWidget, aw:'ApplicationWindow') -> None:
+    def __init__(self, parent:Optional[QWidget], aw:'ApplicationWindow') -> None:
         super().__init__(parent)
         self.aw = aw # the Artisan application window
 
