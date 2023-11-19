@@ -25201,7 +25201,7 @@ def main() -> None:
 
     # only here deactivating the app napping seems to have an effect
     if sys.platform.startswith('darwin'):
-        import appnope # type: ignore # @UnresolvedImport # type: ignore # pylint: disable=import-error
+        import appnope # type: ignore # @UnresolvedImport # type: ignore # pylint: disable=import-error,redefined-outer-name
         appnope.nope()
 
     if locale_str in {'ar', 'he', 'fa'}:
