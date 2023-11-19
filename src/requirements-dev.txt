@@ -9,7 +9,7 @@ types-setuptools==68.2.0.1
 types-urllib3==1.26.25.14
 lxml-stubs==0.4.0
 mypy==1.7.0
-pyright==1.1.335
+pyright==1.1.336
 ruff>=0.1.0
 pylint==3.0.2
 pre-commit>=3.3.3
@@ -22,7 +22,7 @@ pytest-qt==4.2.0
 #pytest-bdd==6.1.1
 #pytest-benchmark==4.0.0
 #pytest-mock==3.11.1
-hypothesis==6.88.4
+hypothesis==6.89.0
 coverage==7.3.2
 coverage-badge==1.1.0
 codespell==2.2.6
