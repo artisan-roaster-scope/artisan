@@ -1,38 +1,50 @@
 # Installing Artisan to run from source
 
-## macOS/Linux
+## macOS/Linux/Windows
 
 ### Installation
 
-1. Install Python 3.11 from [python.org](https://www.python.org/)
+1. Install git from [scm-git.com](https://git-scm.com/downloads)
 
-2. Create and activate a virtual environment
+2. Install Python 3.11 from [python.org](https://www.python.org/)
+
+   >*Note for Windows: When Python is installed by direct download it is normally started with the command `python`.  When installed from Microsoft Store it is normally started using `python3` as shown below. Also note, the Windows command prompt is '>' where the macOS/Linux prompt is '#' as shown below.*
+
+
+3. Create and activate a virtual environment
 
     ```
     # python3 -m venv artisan_venv
     # source artisan_venv/bin/activate
     ```
 
-3. Clone the Artisan repository
+4. Clone the Artisan repository
 
     ```
     # git clone https://github.com/artisan-roaster-scope/artisan.git
     ```
 
-4. Install required packages
+5. Install required packages
 
     ```
     # cd artisan/src
     # pip install -r requirements.txt
     ```
 
-5. Build derived artefacts
+6. Build derived artifacts
 
+    macOS/Linux
     ```
     # ./build-derived.sh
     ```
+    Windows
 
-6. Start Artisan
+    ```
+    > build-derived-win.bat
+    ```
+
+
+7. Start Artisan
 
    ```
    # python3 artisan.py
@@ -50,6 +62,11 @@
 
    ```
    # tail -f ~/.local/shared/artisan-scope/Artisan/artisan.log
+   ```
+ - Windows
+
+   ```
+   > notepad %localappdata%\artisan-scope\Artisan\artisan.log
    ```
 
 
@@ -93,8 +110,3 @@ Coverage (types, tests)
 ```
 
 
-
-## Windows
-
-
-tobedone

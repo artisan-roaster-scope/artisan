@@ -20,7 +20,7 @@ environment:
   # Set the Appveyor Python version for windows, macos and linux here. Does not affect windows_legacy.
   PYTHON_V: 3.11
   # Upgrade to specific version (for platforms supporting upgrade). Upgrade skipped if env var is missing or blank.
-  PYUPGRADE_V: 3.11.5 # causes ssl problems failing to connect to plus
+  PYUPGRADE_V: 3.11.5
 
   matrix:
   - job_name: windows_legacy
@@ -106,8 +106,8 @@ for:
 #  test_script:
 #    - cmd: python -m unittest discover
 
-  artifacts:
-    - path: 'generated-win-legacy.zip'
+#  artifacts:
+#    - path: 'generated-win-legacy.zip'
 #    - path: 'src\artisan-*.zip'
 
   deploy_script:
@@ -132,7 +132,6 @@ for:
     ARTISAN_LEGACY: "False"
     VC_REDIST: "https://aka.ms/vs/17/release/vc_redist.x64.exe"  #redistributable for VS 2015-2022
     VCVARSALL: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Auxiliary/Build/vcvarsall.bat"
-#    QT_TRANSL: "C:\\Python311-x64\\Lib\\site-packages\\PyQt6\\Qt6\\translations"
 
   install:
     - cmd: echo Windows Install
@@ -176,8 +175,8 @@ for:
 #  test_script:
 #    - cmd: python -m unittest discover
 
-  artifacts:
-    - path: 'generated-win.zip'
+#  artifacts:
+#    - path: 'generated-win.zip'
 #    - path: 'src\artisan-*.zip'
 
   deploy_script:
@@ -288,8 +287,8 @@ for:
 #  test_script:
 #    - QT_QPA_PLATFORM=offscreen python -m unittest discover -s src
 
-  artifacts:
-    - path: 'generated-linux.zip'
+#  artifacts:
+#    - path: 'generated-linux.zip'
 #    - path: 'src/artisan-*.deb'
 #    - path: 'src/artisan-*.rpm'
 #    - path: 'src/artisan-*.AppImage'
