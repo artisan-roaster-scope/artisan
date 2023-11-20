@@ -114,7 +114,7 @@ OPTIONS = {
     'optimize':  2,
     'compressed': True,
     'iconfile': 'artisan.icns',
-    'arch': 'universal2', # 'universal2', 'x86_64',
+    'arch': 'x86_64', # 'universal2', 'x86_64',
     'matplotlib_backends': '-', # '-' for imported or explicit "Qt5Agg, PDF, PS, SVG"
     'includes': ['serial', 'charset_normalizer.md__mypyc'],
     'excludes' :  ['tkinter','curses',
