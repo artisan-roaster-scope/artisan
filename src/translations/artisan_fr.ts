@@ -9479,12 +9479,12 @@ Fonction 4 (Read Input Registers) : registres 0 à 65535 correspondant aux numé
     <message>
       <location filename="../help/eventbuttons_help.py" line="80" />
       <source>HEATING</source>
-      <translation type="unfinished">CHAUFFAGE</translation>
+      <translation>CHAUFFAGE</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="81" />
       <source>COOLING</source>
-      <translation type="unfinished">REFROIDISSEMENT</translation>
+      <translation>REFROIDISSEMENT</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="88" />
@@ -13020,7 +13020,7 @@ Artisan démarrera le programme à chaque période d'échantillonnage. La sortie
     </message>
     <message>
       <location filename="../plus/blend.py" line="166" />
-      <location filename="../artisanlib/large_lcds.py" line="838" />
+      <location filename="../artisanlib/large_lcds.py" line="839" />
       <location filename="../artisanlib/roast_properties.py" line="869" />
       <location filename="../artisanlib/roast_properties.py" line="229" />
       <location filename="../artisanlib/roast_properties.py" line="156" />
@@ -13260,7 +13260,7 @@ Artisan démarrera le programme à chaque période d'échantillonnage. La sortie
       <location filename="../artisanlib/roast_properties.py" line="3256" />
       <location filename="../artisanlib/roast_properties.py" line="3227" />
       <source>BBP</source>
-      <translation type="unfinished" />
+      <translation />
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="13848" />
@@ -13662,18 +13662,18 @@ Tous les LCDs</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3171" />
-      <location filename="../artisanlib/large_lcds.py" line="560" />
+      <location filename="../artisanlib/large_lcds.py" line="561" />
       <source>PID SV</source>
       <translation>PID SV</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3175" />
-      <location filename="../artisanlib/large_lcds.py" line="568" />
+      <location filename="../artisanlib/large_lcds.py" line="569" />
       <source>PID %</source>
       <translation>PID %</translation>
     </message>
     <message>
-      <location filename="../artisanlib/large_lcds.py" line="843" />
+      <location filename="../artisanlib/large_lcds.py" line="844" />
       <source>Total</source>
       <translation>Le total</translation>
     </message>
@@ -14877,37 +14877,37 @@ Tous les LCDs</translation>
     <name>Menu</name>
     <message>
       <location filename="../artisanlib/main.py" line="2454" />
-      <location filename="../artisanlib/large_lcds.py" line="347" />
+      <location filename="../artisanlib/large_lcds.py" line="348" />
       <source>Main LCDs</source>
       <translation>LCDs Principal</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2461" />
-      <location filename="../artisanlib/large_lcds.py" line="504" />
+      <location filename="../artisanlib/large_lcds.py" line="505" />
       <source>Delta LCDs</source>
       <translation>LCDs Delta</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2467" />
-      <location filename="../artisanlib/large_lcds.py" line="554" />
+      <location filename="../artisanlib/large_lcds.py" line="555" />
       <source>PID LCDs</source>
       <translation>LCDs PID</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2473" />
-      <location filename="../artisanlib/large_lcds.py" line="602" />
+      <location filename="../artisanlib/large_lcds.py" line="603" />
       <source>Extra LCDs</source>
       <translation>LCDs Supplémentaires</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2479" />
-      <location filename="../artisanlib/large_lcds.py" line="734" />
+      <location filename="../artisanlib/large_lcds.py" line="735" />
       <source>Phases LCDs</source>
       <translation>LCDs Phases</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2485" />
-      <location filename="../artisanlib/large_lcds.py" line="831" />
+      <location filename="../artisanlib/large_lcds.py" line="832" />
       <source>Scale LCDs</source>
       <translation>Échelle LCDs</translation>
     </message>
@@ -17031,8 +17031,8 @@ Pour le garder gratuit et à jour, veuillez nous soutenir avec votre don et vous
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22308" />
-      <source>Bluetooth scale cannot be connected while permission for Artsian to access Bluetooth is denied</source>
-      <translation>La balance Bluetooth ne peut pas être connectée alors que l'autorisation pour Artsian d'accéder au Bluetooth est refusée</translation>
+      <source>Bluetooth scale cannot be connected while permission for Artisan to access Bluetooth is denied</source>
+      <translation>La balance Bluetooth ne peut pas être connectée alors que l'autorisation pour Artisan d'accéder au Bluetooth est refusée</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22309" />
@@ -17944,7 +17944,7 @@ Profile manquant [CHARGE] ou [VIDAGE]</translation>
     <message>
       <location filename="../artisanlib/canvas.py" line="15770" />
       <source>[ COOL ]</source>
-      <translation type="unfinished" />
+      <translation>[ REFROIDISSEMNT ]</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="16074" />
@@ -17991,6 +17991,10 @@ Profile manquant [CHARGE] ou [VIDAGE]</translation>
       <location filename="../artisanlib/cup_profile.py" line="191" />
       <source>Background profile not found</source>
       <translation>Profile arrière plan non trouvé</translation>
+    </message>
+    <message>
+      <source>Bluetooth scale cannot be connected while permission for Artsian to access Bluetooth is denied</source>
+      <translation type="vanished">La balance Bluetooth ne peut pas être connectée alors que l'autorisation pour Artsian d'accéder au Bluetooth est refusée</translation>
     </message>
     <message>
       <source>Artisan is free to use!

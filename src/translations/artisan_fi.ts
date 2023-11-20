@@ -12055,7 +12055,7 @@ Tallennuksen aikana.
     </message>
     <message>
       <location filename="../plus/blend.py" line="166" />
-      <location filename="../artisanlib/large_lcds.py" line="838" />
+      <location filename="../artisanlib/large_lcds.py" line="839" />
       <location filename="../artisanlib/roast_properties.py" line="869" />
       <location filename="../artisanlib/roast_properties.py" line="229" />
       <location filename="../artisanlib/roast_properties.py" line="156" />
@@ -12698,18 +12698,18 @@ LCD-näytöt Kaikki</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3171" />
-      <location filename="../artisanlib/large_lcds.py" line="560" />
+      <location filename="../artisanlib/large_lcds.py" line="561" />
       <source>PID SV</source>
       <translation />
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3175" />
-      <location filename="../artisanlib/large_lcds.py" line="568" />
+      <location filename="../artisanlib/large_lcds.py" line="569" />
       <source>PID %</source>
       <translation>PID%</translation>
     </message>
     <message>
-      <location filename="../artisanlib/large_lcds.py" line="843" />
+      <location filename="../artisanlib/large_lcds.py" line="844" />
       <source>Total</source>
       <translation>Kaikki yhteensä</translation>
     </message>
@@ -13668,37 +13668,37 @@ LCD-näytöt Kaikki</translation>
     <name>Menu</name>
     <message>
       <location filename="../artisanlib/main.py" line="2454" />
-      <location filename="../artisanlib/large_lcds.py" line="347" />
+      <location filename="../artisanlib/large_lcds.py" line="348" />
       <source>Main LCDs</source>
       <translation>Tärkeimmät LCD-näytöt</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2461" />
-      <location filename="../artisanlib/large_lcds.py" line="504" />
+      <location filename="../artisanlib/large_lcds.py" line="505" />
       <source>Delta LCDs</source>
       <translation>Delta LCD -näytöt</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2467" />
-      <location filename="../artisanlib/large_lcds.py" line="554" />
+      <location filename="../artisanlib/large_lcds.py" line="555" />
       <source>PID LCDs</source>
       <translation>PID-LCD-näytöt</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2473" />
-      <location filename="../artisanlib/large_lcds.py" line="602" />
+      <location filename="../artisanlib/large_lcds.py" line="603" />
       <source>Extra LCDs</source>
       <translation>Ylimääräiset LCD-näytöt</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2479" />
-      <location filename="../artisanlib/large_lcds.py" line="734" />
+      <location filename="../artisanlib/large_lcds.py" line="735" />
       <source>Phases LCDs</source>
       <translation>Vaihe LCD-näytöt</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2485" />
-      <location filename="../artisanlib/large_lcds.py" line="831" />
+      <location filename="../artisanlib/large_lcds.py" line="832" />
       <source>Scale LCDs</source>
       <translation type="unfinished" />
     </message>
@@ -15774,8 +15774,8 @@ Pitääksesi sen ilmaisena ja ajan tasalla, tue meitä lahjoituksellasi ja tilaa
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22308" />
-      <source>Bluetooth scale cannot be connected while permission for Artsian to access Bluetooth is denied</source>
-      <translation>Bluetooth-vaakaa ei voi yhdistää, kun Artsianin Bluetooth-käyttöoikeus on evätty</translation>
+      <source>Bluetooth scale cannot be connected while permission for Artisan to access Bluetooth is denied</source>
+      <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22309" />
@@ -16734,6 +16734,10 @@ Profiilista puuttuu [CHARGE] tai [DROP]</translation>
       <location filename="../artisanlib/cup_profile.py" line="191" />
       <source>Background profile not found</source>
       <translation>Taustaprofiilia ei löydy</translation>
+    </message>
+    <message>
+      <source>Bluetooth scale cannot be connected while permission for Artsian to access Bluetooth is denied</source>
+      <translation type="vanished">Bluetooth-vaakaa ei voi yhdistää, kun Artsianin Bluetooth-käyttöoikeus on evätty</translation>
     </message>
     <message>
       <source>Artisan is free to use!

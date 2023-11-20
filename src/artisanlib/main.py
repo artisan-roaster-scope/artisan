@@ -22305,7 +22305,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.scale.device = str(dialog.scale_deviceEdit.currentText())                #unicode() changes QString to a python string
             if self.scale.device in self.scale.bluetooth_devices and not self.app.getBluetoothPermission():
                 self.scale.device = None
-                message:str = QApplication.translate('Message','Bluetooth scale cannot be connected while permission for Artsian to access Bluetooth is denied')
+                message:str = QApplication.translate('Message','Bluetooth scale cannot be connected while permission for Artisan to access Bluetooth is denied')
                 QMessageBox.information(self, QApplication.translate('Message','Bluetooth access denied'), message)
             self.scale.comport = str(dialog.scale_comportEdit.getSelection())
             self.scale.baudrate = int(str(dialog.scale_baudrateComboBox.currentText()))              #int changes QString to int

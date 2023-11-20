@@ -12686,7 +12686,7 @@ Nagranie 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     </message>
     <message>
       <location filename="../plus/blend.py" line="166" />
-      <location filename="../artisanlib/large_lcds.py" line="838" />
+      <location filename="../artisanlib/large_lcds.py" line="839" />
       <location filename="../artisanlib/roast_properties.py" line="869" />
       <location filename="../artisanlib/roast_properties.py" line="229" />
       <location filename="../artisanlib/roast_properties.py" line="156" />
@@ -13329,18 +13329,18 @@ Wyświetlacze LCD All</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3171" />
-      <location filename="../artisanlib/large_lcds.py" line="560" />
+      <location filename="../artisanlib/large_lcds.py" line="561" />
       <source>PID SV</source>
       <translation />
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3175" />
-      <location filename="../artisanlib/large_lcds.py" line="568" />
+      <location filename="../artisanlib/large_lcds.py" line="569" />
       <source>PID %</source>
       <translation>PID%</translation>
     </message>
     <message>
-      <location filename="../artisanlib/large_lcds.py" line="843" />
+      <location filename="../artisanlib/large_lcds.py" line="844" />
       <source>Total</source>
       <translation>Całkowity</translation>
     </message>
@@ -14407,37 +14407,37 @@ Wyświetlacze LCD All</translation>
     <name>Menu</name>
     <message>
       <location filename="../artisanlib/main.py" line="2454" />
-      <location filename="../artisanlib/large_lcds.py" line="347" />
+      <location filename="../artisanlib/large_lcds.py" line="348" />
       <source>Main LCDs</source>
       <translation>Główne wyświetlacze LCD</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2461" />
-      <location filename="../artisanlib/large_lcds.py" line="504" />
+      <location filename="../artisanlib/large_lcds.py" line="505" />
       <source>Delta LCDs</source>
       <translation>Ekrany LCD typu Delta</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2467" />
-      <location filename="../artisanlib/large_lcds.py" line="554" />
+      <location filename="../artisanlib/large_lcds.py" line="555" />
       <source>PID LCDs</source>
       <translation>Wyświetlacze LCD PID</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2473" />
-      <location filename="../artisanlib/large_lcds.py" line="602" />
+      <location filename="../artisanlib/large_lcds.py" line="603" />
       <source>Extra LCDs</source>
       <translation>Dodatkowe wyświetlacze LCD</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2479" />
-      <location filename="../artisanlib/large_lcds.py" line="734" />
+      <location filename="../artisanlib/large_lcds.py" line="735" />
       <source>Phases LCDs</source>
       <translation>Wyświetlacz faz</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2485" />
-      <location filename="../artisanlib/large_lcds.py" line="831" />
+      <location filename="../artisanlib/large_lcds.py" line="832" />
       <source>Scale LCDs</source>
       <translation />
     </message>
@@ -16537,8 +16537,8 @@ Aby było bezpłatne i aktualne, wesprzyj nas swoją darowizną i zasubskrybuj r
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22308" />
-      <source>Bluetooth scale cannot be connected while permission for Artsian to access Bluetooth is denied</source>
-      <translation>Nie można podłączyć wagi Bluetooth, jeśli Artsian nie ma dostępu do Bluetooth</translation>
+      <source>Bluetooth scale cannot be connected while permission for Artisan to access Bluetooth is denied</source>
+      <translation>Nie można podłączyć wagi Bluetooth, jeśli Artisan nie ma dostępu do Bluetooth</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22309" />
@@ -17497,6 +17497,10 @@ Brak profilu [CHARGE] lub [DROP]</translation>
       <location filename="../artisanlib/cup_profile.py" line="191" />
       <source>Background profile not found</source>
       <translation>Nie znaleziono profilu-tła</translation>
+    </message>
+    <message>
+      <source>Bluetooth scale cannot be connected while permission for Artsian to access Bluetooth is denied</source>
+      <translation type="vanished">Nie można podłączyć wagi Bluetooth, jeśli Artsian nie ma dostępu do Bluetooth</translation>
     </message>
     <message>
       <source>Artisan is free to use!

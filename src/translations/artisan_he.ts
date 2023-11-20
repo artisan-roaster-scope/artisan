@@ -12260,7 +12260,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     </message>
     <message>
       <location filename="../plus/blend.py" line="166" />
-      <location filename="../artisanlib/large_lcds.py" line="838" />
+      <location filename="../artisanlib/large_lcds.py" line="839" />
       <location filename="../artisanlib/roast_properties.py" line="869" />
       <location filename="../artisanlib/roast_properties.py" line="229" />
       <location filename="../artisanlib/roast_properties.py" line="156" />
@@ -12903,18 +12903,18 @@ LCDs All</source>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3171" />
-      <location filename="../artisanlib/large_lcds.py" line="560" />
+      <location filename="../artisanlib/large_lcds.py" line="561" />
       <source>PID SV</source>
       <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3175" />
-      <location filename="../artisanlib/large_lcds.py" line="568" />
+      <location filename="../artisanlib/large_lcds.py" line="569" />
       <source>PID %</source>
       <translation>אחוז PID</translation>
     </message>
     <message>
-      <location filename="../artisanlib/large_lcds.py" line="843" />
+      <location filename="../artisanlib/large_lcds.py" line="844" />
       <source>Total</source>
       <translation>סה"כ</translation>
     </message>
@@ -13994,37 +13994,37 @@ LCDs All</source>
     <name>Menu</name>
     <message>
       <location filename="../artisanlib/main.py" line="2454" />
-      <location filename="../artisanlib/large_lcds.py" line="347" />
+      <location filename="../artisanlib/large_lcds.py" line="348" />
       <source>Main LCDs</source>
       <translation>מסכי LCD ראשיים</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2461" />
-      <location filename="../artisanlib/large_lcds.py" line="504" />
+      <location filename="../artisanlib/large_lcds.py" line="505" />
       <source>Delta LCDs</source>
       <translation>מסכי LCD של דלתא</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2467" />
-      <location filename="../artisanlib/large_lcds.py" line="554" />
+      <location filename="../artisanlib/large_lcds.py" line="555" />
       <source>PID LCDs</source>
       <translation>מסכי PID</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2473" />
-      <location filename="../artisanlib/large_lcds.py" line="602" />
+      <location filename="../artisanlib/large_lcds.py" line="603" />
       <source>Extra LCDs</source>
       <translation>מסכי LCD נוספים</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2479" />
-      <location filename="../artisanlib/large_lcds.py" line="734" />
+      <location filename="../artisanlib/large_lcds.py" line="735" />
       <source>Phases LCDs</source>
       <translation type="unfinished">צג שלביות</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2485" />
-      <location filename="../artisanlib/large_lcds.py" line="831" />
+      <location filename="../artisanlib/large_lcds.py" line="832" />
       <source>Scale LCDs</source>
       <translation type="unfinished" />
     </message>
@@ -16124,8 +16124,8 @@ To keep it free and current please support us with your donation and subscribe t
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22308" />
-      <source>Bluetooth scale cannot be connected while permission for Artsian to access Bluetooth is denied</source>
-      <translation>לא ניתן לחבר את סולם ה-Bluetooth בזמן שהרשאת Artsian לגשת ל-Bluetooth נדחתה</translation>
+      <source>Bluetooth scale cannot be connected while permission for Artisan to access Bluetooth is denied</source>
+      <translation>לא ניתן לחבר את סולם ה-Bluetooth בזמן שהרשאת Artisan לגשת ל-Bluetooth נדחתה</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22309" />
@@ -17083,6 +17083,10 @@ Profile missing [CHARGE] or [DROP]</source>
       <location filename="../artisanlib/cup_profile.py" line="191" />
       <source>Background profile not found</source>
       <translation>פרופיל רקע לא נמצא</translation>
+    </message>
+    <message>
+      <source>Bluetooth scale cannot be connected while permission for Artsian to access Bluetooth is denied</source>
+      <translation type="vanished">לא ניתן לחבר את סולם ה-Bluetooth בזמן שהרשאת Artsian לגשת ל-Bluetooth נדחתה</translation>
     </message>
     <message>
       <source>Artisan is free to use!

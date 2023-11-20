@@ -11840,7 +11840,7 @@ Používanie matematických vzorcov v plotri tiež umožňuje používať symbol
     </message>
     <message>
       <location filename="../plus/blend.py" line="166" />
-      <location filename="../artisanlib/large_lcds.py" line="838" />
+      <location filename="../artisanlib/large_lcds.py" line="839" />
       <location filename="../artisanlib/roast_properties.py" line="869" />
       <location filename="../artisanlib/roast_properties.py" line="229" />
       <location filename="../artisanlib/roast_properties.py" line="156" />
@@ -12483,18 +12483,18 @@ LCD všetky</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3171" />
-      <location filename="../artisanlib/large_lcds.py" line="560" />
+      <location filename="../artisanlib/large_lcds.py" line="561" />
       <source>PID SV</source>
       <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3175" />
-      <location filename="../artisanlib/large_lcds.py" line="568" />
+      <location filename="../artisanlib/large_lcds.py" line="569" />
       <source>PID %</source>
       <translation>PID%</translation>
     </message>
     <message>
-      <location filename="../artisanlib/large_lcds.py" line="843" />
+      <location filename="../artisanlib/large_lcds.py" line="844" />
       <source>Total</source>
       <translation>Celkom</translation>
     </message>
@@ -13449,37 +13449,37 @@ LCD všetky</translation>
     <name>Menu</name>
     <message>
       <location filename="../artisanlib/main.py" line="2454" />
-      <location filename="../artisanlib/large_lcds.py" line="347" />
+      <location filename="../artisanlib/large_lcds.py" line="348" />
       <source>Main LCDs</source>
       <translation>Hlavné LCD</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2461" />
-      <location filename="../artisanlib/large_lcds.py" line="504" />
+      <location filename="../artisanlib/large_lcds.py" line="505" />
       <source>Delta LCDs</source>
       <translation>LCD displeje Delta</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2467" />
-      <location filename="../artisanlib/large_lcds.py" line="554" />
+      <location filename="../artisanlib/large_lcds.py" line="555" />
       <source>PID LCDs</source>
       <translation>PID LCD</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2473" />
-      <location filename="../artisanlib/large_lcds.py" line="602" />
+      <location filename="../artisanlib/large_lcds.py" line="603" />
       <source>Extra LCDs</source>
       <translation>Extra LCD</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2479" />
-      <location filename="../artisanlib/large_lcds.py" line="734" />
+      <location filename="../artisanlib/large_lcds.py" line="735" />
       <source>Phases LCDs</source>
       <translation>Fázy LCD</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2485" />
-      <location filename="../artisanlib/large_lcds.py" line="831" />
+      <location filename="../artisanlib/large_lcds.py" line="832" />
       <source>Scale LCDs</source>
       <translation type="unfinished" />
     </message>
@@ -15555,8 +15555,8 @@ Ak chcete, aby bol bezplatný a aktuálny, podporte nás svojím darom a prihlá
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22308" />
-      <source>Bluetooth scale cannot be connected while permission for Artsian to access Bluetooth is denied</source>
-      <translation>Váhu Bluetooth nie je možné pripojiť, kým je zamietnuté povolenie pre Artsian na prístup k Bluetooth</translation>
+      <source>Bluetooth scale cannot be connected while permission for Artisan to access Bluetooth is denied</source>
+      <translation>Váhu Bluetooth nie je možné pripojiť, kým je zamietnuté povolenie pre Artisan na prístup k Bluetooth</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22309" />
@@ -16515,6 +16515,10 @@ V profile chýba [CHARGE] alebo [DROP]</translation>
       <location filename="../artisanlib/cup_profile.py" line="191" />
       <source>Background profile not found</source>
       <translation>Profil na pozadí sa nenašiel</translation>
+    </message>
+    <message>
+      <source>Bluetooth scale cannot be connected while permission for Artsian to access Bluetooth is denied</source>
+      <translation type="vanished">Váhu Bluetooth nie je možné pripojiť, kým je zamietnuté povolenie pre Artsian na prístup k Bluetooth</translation>
     </message>
     <message>
       <source>Artisan is free to use!

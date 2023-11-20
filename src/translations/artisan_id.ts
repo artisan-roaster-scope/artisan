@@ -12182,7 +12182,7 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
     </message>
     <message>
       <location filename="../plus/blend.py" line="166" />
-      <location filename="../artisanlib/large_lcds.py" line="838" />
+      <location filename="../artisanlib/large_lcds.py" line="839" />
       <location filename="../artisanlib/roast_properties.py" line="869" />
       <location filename="../artisanlib/roast_properties.py" line="229" />
       <location filename="../artisanlib/roast_properties.py" line="156" />
@@ -12825,18 +12825,18 @@ Semua LCD</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3171" />
-      <location filename="../artisanlib/large_lcds.py" line="560" />
+      <location filename="../artisanlib/large_lcds.py" line="561" />
       <source>PID SV</source>
       <translation />
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="3175" />
-      <location filename="../artisanlib/large_lcds.py" line="568" />
+      <location filename="../artisanlib/large_lcds.py" line="569" />
       <source>PID %</source>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/large_lcds.py" line="843" />
+      <location filename="../artisanlib/large_lcds.py" line="844" />
       <source>Total</source>
       <translation type="unfinished" />
     </message>
@@ -13848,37 +13848,37 @@ Semua LCD</translation>
     <name>Menu</name>
     <message>
       <location filename="../artisanlib/main.py" line="2454" />
-      <location filename="../artisanlib/large_lcds.py" line="347" />
+      <location filename="../artisanlib/large_lcds.py" line="348" />
       <source>Main LCDs</source>
       <translation>LCD utama</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2461" />
-      <location filename="../artisanlib/large_lcds.py" line="504" />
+      <location filename="../artisanlib/large_lcds.py" line="505" />
       <source>Delta LCDs</source>
       <translation>LCD Delta</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2467" />
-      <location filename="../artisanlib/large_lcds.py" line="554" />
+      <location filename="../artisanlib/large_lcds.py" line="555" />
       <source>PID LCDs</source>
       <translation>LCD PID</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2473" />
-      <location filename="../artisanlib/large_lcds.py" line="602" />
+      <location filename="../artisanlib/large_lcds.py" line="603" />
       <source>Extra LCDs</source>
       <translation>LCD ekstra</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2479" />
-      <location filename="../artisanlib/large_lcds.py" line="734" />
+      <location filename="../artisanlib/large_lcds.py" line="735" />
       <source>Phases LCDs</source>
       <translation type="unfinished">Fase LCD</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2485" />
-      <location filename="../artisanlib/large_lcds.py" line="831" />
+      <location filename="../artisanlib/large_lcds.py" line="832" />
       <source>Scale LCDs</source>
       <translation type="unfinished" />
     </message>
@@ -15998,8 +15998,8 @@ Agar tetap gratis dan terkini, dukung kami dengan donasi Anda dan berlangganan a
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22308" />
-      <source>Bluetooth scale cannot be connected while permission for Artsian to access Bluetooth is denied</source>
-      <translation>Timbangan Bluetooth tidak dapat dihubungkan sementara izin Artisian untuk mengakses Bluetooth ditolak</translation>
+      <source>Bluetooth scale cannot be connected while permission for Artisan to access Bluetooth is denied</source>
+      <translation>Timbangan Bluetooth tidak dapat dihubungkan sementara izin Artisan untuk mengakses Bluetooth ditolak</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="22309" />
@@ -16293,7 +16293,7 @@ Perbaiki ini pada tab Config&gt;Curves&gt;Analyze.</translation>
     <message>
       <location filename="../artisanlib/main.py" line="25222" />
       <source>debug logging ON</source>
-      <translation type="unfinished">debug masuk ON</translation>
+      <translation>debug masuk ON</translation>
     </message>
     <message>
       <location filename="../artisanlib/batches.py" line="59" />
@@ -16960,6 +16960,10 @@ Profil tidak ada [CHARGE] atau [DROP]</translation>
       <translation>Profil latar belakang tidak ditemukan</translation>
     </message>
     <message>
+      <source>Bluetooth scale cannot be connected while permission for Artsian to access Bluetooth is denied</source>
+      <translation type="vanished">Timbangan Bluetooth tidak dapat dihubungkan sementara izin Artisian untuk mengakses Bluetooth ditolak</translation>
+    </message>
+    <message>
       <source>Artisan is free to use!
 
 To keep it free and current please support us with your donation and subscribe to artisan.plus to supress this dialog!</source>
@@ -17215,22 +17219,22 @@ Agar tetap gratis dan terkini, dukung kami dengan donasi Anda dan berlangganan a
     <message>
       <location filename="../artisanlib/devices.py" line="108" />
       <source>Meter</source>
-      <translation type="unfinished">Alat ukur</translation>
+      <translation>Alat ukur</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="109" />
       <source>PID</source>
-      <translation type="unfinished">Alat PID</translation>
+      <translation>Alat PID</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="110" />
       <source>TC4</source>
-      <translation type="unfinished">Kontroler TC4</translation>
+      <translation>Kontroler TC4</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="111" />
       <source>Prog</source>
-      <translation type="unfinished">Program</translation>
+      <translation>Program</translation>
     </message>
   </context>
   <context>
