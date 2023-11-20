@@ -35,10 +35,10 @@ gallery:
     image_path: /assets/images/acaia-logo.jpeg
     alt: "acaia"
     title: "acaia"
-  - url: https://cmsale.com/
-    image_path: /assets/images/cms-logo.jpg
-    alt: "Coffee Maschines Sale"
-    title: "Coffee Maschines Sale"
+  - url: https://www.paoloscimone.com/
+    image_path: /assets/images/paoloscimone-logo.jpg
+    alt: "Paolo Scimone Coffee Consulting"
+    title: "Paolo Scimone Coffee Consulting"
   - url: https://www.sivetz.com/
     image_path: /assets/images/sivetz-logo.png
     alt: "Sivetz"
@@ -55,6 +55,10 @@ gallery:
 ---
 
 <!--
+  - url: https://cmsale.com/
+    image_path: /assets/images/cms-logo.jpg
+    alt: "Coffee Maschines Sale"
+    title: "Coffee Maschines Sale"
   - url: http://www.roastmaxroasters.com.au
     image_path: /assets/images/roastmax_logo.jpg
     alt: "Roastmax"
