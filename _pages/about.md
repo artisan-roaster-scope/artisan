@@ -145,10 +145,8 @@ There are also legacy builds for Windows 8 (x64) and macOS 10.13.
 - seamless integration into the [artisan.plus](https://artisan.plus){:target="_blank"} inventory management service
 - extensive [machine](/machines/) and [device](/devices/) support including control
 - unlimited number of curves
-- rate-of-rise (RoR), [area-under-the-curve (AUC)](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html){:target="_blank"}, [development-time-ratio (DTR)](https://artisan-roasterscope.blogspot.com/2020/05/displaying-development-time-ratio-in.html){:target="_blank"} calculations
-- projection lines and head-up-display (HUD)
-- roast profile evaluation and statistics
-- [Profile Analyzer](https://artisan-roasterscope.blogspot.com/2019/11/analyzer.html){:target="_blank"}, [Roast Comparator](https://artisan-roasterscope.blogspot.com/2020/05/roast-comparator.html){:target="_blank"}, [Profile Transposer](https://artisan-roasterscope.blogspot.com/2020/05/profile-transposer.html){:target="_blank"} and [Roast Simulator](https://artisan-roasterscope.blogspot.com/2020/05/roast-simulator.html){:target="_blank"}
+- rate-of-rise (RoR), [area-under-the-curve (AUC)](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html){:target="_blank"}, [development-time-ratio (DTR)](https://artisan-roasterscope.blogspot.com/2020/05/displaying-development-time-ratio-in.html){:target="_blank"} calculations and projection lines
+- statistics, roast profile evaluation, [Profile Analyzer](https://artisan-roasterscope.blogspot.com/2019/11/analyzer.html){:target="_blank"}, [Roast Comparator](https://artisan-roasterscope.blogspot.com/2020/05/roast-comparator.html){:target="_blank"}, [Profile Transposer](https://artisan-roasterscope.blogspot.com/2020/05/profile-transposer.html){:target="_blank"} and [Roast Simulator](https://artisan-roasterscope.blogspot.com/2020/05/roast-simulator.html){:target="_blank"}
 - [roast-, production- and ranking reports](https://artisan-roasterscope.blogspot.de/2016/03/artisan-v099.html){:target="_blank"}
 - automated reproduction of roasts via [alarm programs](http://artisan-roasterscope.blogspot.de/2013/03/alarms.html){:target="_blank"}, [replay of events](https://artisan-roasterscope.blogspot.de/2017/10/profile-templates.html){:target="_blank"} or [PID control](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html){:target="_blank"}
 - [batch counter](https://artisan-roasterscope.blogspot.de/2015/07/batch-counter.html){:target="_blank"}
@@ -195,17 +193,10 @@ Add yourself to this list by [sending a donation](https://www.paypal.me/MarkoLut
 
 Artisan builds on a large number of excellent open-source software.
 
-* [matplotlib](https://matplotlib.org){:target="_blank"}
-* [numpy/scipy](https://www.scipy.org){:target="_blank"}
-* [PyQt](https://riverbankcomputing.com){:target="_blank"}
-* [py2app](https://github.com/ronaldoussoren/py2app){:target="_blank"}
-* [pyinstaller](https://www.pyinstaller.org){:target="_blank"}
-* [pymodbus](https://github.com/riptideio/pymodbus){:target="_blank"}
-* [pyserial](https://github.com/pyserial/pyserial){:target="_blank"}
-* [Python](https://www.python.org){:target="_blank"}
-* [python-snap7](https://github.com/gijzelaerr/python-snap7){:target="_blank"}
-* [pyusb](https://github.com/pyusb/pyusb){:target="_blank"}
-* [Qt](https://www.qt.io){:target="_blank"}
+* [Python](https://www.python.org){:target="_blank"}, [Qt](https://www.qt.io){:target="_blank"}, [PyQt](https://riverbankcomputing.com){:target="_blank"}
+* [numpy/scipy](https://www.scipy.org){:target="_blank"}, [matplotlib](https://matplotlib.org){:target="_blank"}
+* [pyserial](https://github.com/pyserial/pyserial){:target="_blank"}, [pyusb](https://github.com/pyusb/pyusb){:target="_blank"}, [pymodbus](https://github.com/riptideio/pymodbus){:target="_blank"}, [python-snap7](https://github.com/gijzelaerr/python-snap7){:target="_blank"}
+* [py2app](https://github.com/ronaldoussoren/py2app){:target="_blank"}, [pyinstaller](https://www.pyinstaller.org){:target="_blank"}
 
 ..and many other packages. Thanks for releasing your work as open-source!
 
