@@ -84,8 +84,8 @@ class BleInterface(QtCore.QObject): # pyright: ignore [reportGeneralTypeIssues] 
         self.sendStop: Optional[Callable[[Callable[[Optional[bytes]],None]], None]] = sendStop
         self.connected: Optional[Callable[[], None]] = connected
 
-        self.ENABLE_NOTIFICATION_VALUE:QtCore.QByteArray = QtCore.QByteArray.fromHex(b'0100') # type: ignore
-        self.DISABLE_NOTIFICATION_VALUE:QtCore.QByteArray = QtCore.QByteArray.fromHex(b'0000') # type: ignore
+        self.ENABLE_NOTIFICATION_VALUE:QtCore.QByteArray = QtCore.QByteArray.fromHex(b'0100') # OFF type: ignore
+        self.DISABLE_NOTIFICATION_VALUE:QtCore.QByteArray = QtCore.QByteArray.fromHex(b'0000') # OFF type: ignore
 
         self.m_deviceDiscoveryAgent:QtBluetooth.QBluetoothDeviceDiscoveryAgent = QtBluetooth.QBluetoothDeviceDiscoveryAgent()
         self.m_deviceDiscoveryAgent.setLowEnergyDiscoveryTimeout(500)
@@ -108,7 +108,7 @@ class BleInterface(QtCore.QObject): # pyright: ignore [reportGeneralTypeIssues] 
 
         self.dataReceived.connect(self.dataReceivedProcessing)
 
-    def disconnectDiscovery(self):
+    def disconnectDiscovery(self) -> None:
         self.m_deviceDiscoveryAgent.deviceDiscovered.disconnect()
         self.m_deviceDiscoveryAgent.errorOccurred.disconnect()
         self.m_deviceDiscoveryAgent.finished.disconnect()
@@ -167,12 +167,12 @@ class BleInterface(QtCore.QObject): # pyright: ignore [reportGeneralTypeIssues] 
             if len(data) > self.CHUNK_SIZE:
                 sentBytes = 0
                 while sentBytes < len(data):
-                    self.m_service.writeCharacteristic(self.m_writeCharacteristic,data[sentBytes:sentBytes + self.CHUNK_SIZE],self.m_writemode) # type: ignore # "bytearray" is incompatible with "QByteArray"
+                    self.m_service.writeCharacteristic(self.m_writeCharacteristic,data[sentBytes:sentBytes + self.CHUNK_SIZE],self.m_writemode) # OFF type: ignore # "bytearray" is incompatible with "QByteArray"
                     sentBytes += self.CHUNK_SIZE
 #                    if self.m_writemode == QtBluetooth.QLowEnergyService.WriteMode.WriteWithResponse:
 #                        pass
             else:
-                self.m_service.writeCharacteristic(self.m_writeCharacteristic,data,self.m_writemode) # type: ignore # "bytearray" is incompatible with "QByteArray"
+                self.m_service.writeCharacteristic(self.m_writeCharacteristic,data,self.m_writemode) # OFF type: ignore # "bytearray" is incompatible with "QByteArray"
 
     def update_connected(self,connected:bool) -> None:
         _log.debug('update_connected(%s)', connected)
@@ -411,7 +411,7 @@ class BleInterface(QtCore.QObject): # pyright: ignore [reportGeneralTypeIssues] 
                     QBluetoothDeviceDiscoveryAgent_LowEnergyMethod))
 
 
-def main():
+def main() -> None:
     import sys
     app = QtCore.QCoreApplication(sys.argv)
     from artisanlib.acaia import AcaiaBLE

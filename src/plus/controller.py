@@ -83,7 +83,7 @@ def start(app_window:'ApplicationWindow') -> None:
 
 # toggles between connected and disconnected modes. If connected and
 # not is_synced() send current data to server
-def toggle(app_window):
+def toggle(app_window:'ApplicationWindow') -> None:
     _log.debug('toggle()')
     config.app_window = app_window
     if config.app_window is not None and config.app_window.plus_account is None:  # @UndefinedVariable

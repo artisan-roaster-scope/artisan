@@ -36,7 +36,7 @@ from typing import Final  # Python <=3.7
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from PyQt6.QtWidgets import QPushButton # pylint: disable=unused-import
-    from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
+    from PyQt6.QtGui import QCloseEvent, QDragEnterEvent, QDropEvent # pylint: disable=unused-import
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -226,21 +226,27 @@ class ArtisanInputDialog(ArtisanDialog):
             okButton.setFocus()
 
     @pyqtSlot()
-    def accept(self):
+    def accept(self) -> None:
         self.url = self.inputLine.text()
         super().accept()
 
     @staticmethod
-    def dragEnterEvent(event):
-        if event.mimeData().hasUrls():
-            event.accept()
-        else:
-            event.ignore()
+    def dragEnterEvent(event:Optional['QDragEnterEvent']) -> None:
+        if event is not None:
+            mimeData = event.mimeData()
+            if mimeData is not None:
+                if mimeData.hasUrls():
+                    event.accept()
+                else:
+                    event.ignore()
 
-    def dropEvent(self, event):
-        urls = event.mimeData().urls()
-        if urls and len(urls)>0:
-            self.inputLine.setText(urls[0].toString())
+    def dropEvent(self, event:Optional['QDropEvent']) -> None:
+        if event is not None:
+            mimeData = event.mimeData()
+            if mimeData is not None and mimeData.hasUrls():
+                urls = mimeData.urls()
+                if urls and len(urls)>0:
+                    self.inputLine.setText(urls[0].toString())
 
 
 class ArtisanComboBoxDialog(ArtisanDialog):

@@ -169,7 +169,7 @@ class AcaiaBLE:
                 self.resetProtocolParser()
 
 
-    def reset(self):
+    def reset(self) -> None:
         self.__init__() # type: ignore # pylint: disable=unnecessary-dunder-call
 
     # return a bytearray of len 2 containing the even and odd CRCs over the given payload

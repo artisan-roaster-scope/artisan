@@ -59,7 +59,7 @@ import logging
 from artisanlib.util import comma2dot
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
-from uic import BlendDialog # type: ignore[attr-defined] # pylint: disable=no-name-in-module
+from uic import BlendDialog # OFF type: ignore[attr-defined] # pylint: disable=no-name-in-module
 from typing import Final, Optional, List, Collection, Dict, Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -152,7 +152,7 @@ class CustomBlendDialog(ArtisanDialog):
 
         # configure UI
         self.ui = BlendDialog.Ui_customBlendDialog()
-        self.ui.setupUi(self) # type:ignore[no-untyped-call]
+        self.ui.setupUi(self) # OFF type:ignore[no-untyped-call]
         self.setWindowTitle(QApplication.translate('Form Caption','Custom Blend'))
         self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Apply)
         # hack to assign the Apply button the AcceptRole without losing default system translations

@@ -14894,7 +14894,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         return 4
 
     @staticmethod
-    def float2floatWeightVolume(v):
+    def float2floatWeightVolume(v:float) -> float:
         d = ApplicationWindow.weightVolumeDigits(v)
         return ApplicationWindow.float2float(v,d)
 
@@ -23705,7 +23705,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.saveVectorGraph(extension='*.pdf')
 
     #resizes and saves graph to a new width w and h preserving maximal image quality independent of screen resolution
-    def resizeImgToSize(self,w,h,filetype='PNG',fname=''):
+    def resizeImgToSize(self, w:int, h:int, filetype:str = 'PNG', fname:str = '') -> None:
         try:
             fileext = '.png'
             if filetype == 'JPEG':
@@ -23770,7 +23770,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
-    def saveVectorGraph(self,extension='*.pdf',fname=''):
+    def saveVectorGraph(self,extension:str = '*.pdf',fname:str = '') -> None:
         try:
             if fname == '' or fname is None:
                 if extension == '*.pdf':
@@ -23803,14 +23803,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     #displays Dialog for the setting of the curves parameters (like RoR, Filters,..)
     @pyqtSlot()
     @pyqtSlot(bool)
-    def setCurves(self,_=False):
+    def setCurves(self, _:bool = False) -> None:
         from artisanlib.curves import CurvesDlg
         curvesDlg = CurvesDlg(self,self,self.CurveDlg_activeTab)
         curvesDlg.show()
 
     #used by WheelGraphDlg()
     #wrap values in unicode(.) if and only if those are of type string
-    def getWheelGraph(self):
+    def getWheelGraph(self) -> Wheel:
         wheel:Wheel = {}
         #two dimension lists
         wheel['wheelnames'] = self.qmc.wheelnames
@@ -23829,7 +23829,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         wheel['wheelaspect'] = self.qmc.wheelaspect
         return wheel
 
-    def loadWheel(self,filename):
+    def loadWheel(self, filename:str) -> None:
         f = None
         try:
             f = QFile(filename)
@@ -23882,7 +23882,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if f:
                 f.close()
 
-    def standardButtonsVisibility(self):
+    def standardButtonsVisibility(self) -> None:
         if self.lowerbuttondialog.isVisible():
             self.lowerbuttondialog.setVisible(False)
             self.messagelabel.setVisible(False)
@@ -23890,19 +23890,20 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.lowerbuttondialog.setVisible(True)
             self.messagelabel.setVisible(True)
 
-    def toggleextraeventrows(self):
+    def toggleextraeventrows(self) -> None:
         if self.extrabuttondialogs.isVisible():
             self.hideExtraButtons()
         else:
             self.showExtraButtons()
 
     @staticmethod
-    def clearBoxLayout(layout):
+    def clearBoxLayout(layout:QLayout) -> None:
         while layout.count():
             item = layout.takeAt(0)
-            widget = item.widget()
-            if widget is not None:
-                widget.deleteLater()
+            if item is not None:
+                widget = item.widget()
+                if widget is not None:
+                    widget.deleteLater()
 
     # applies button label substitutions like \t => eventname, \0 => ON,...
     def substButtonLabel(self, buttonNr:int, label:str, eventtype:int) -> str:
@@ -23948,7 +23949,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     #orders extra event buttons based on max number of buttons
     @pyqtSlot()
-    def realignbuttons(self):
+    def realignbuttons(self) -> None:
         #clear buttons
         self.clearBoxLayout(self.e1buttonbarLayout)
         self.clearBoxLayout(self.e2buttonbarLayout)
@@ -24063,7 +24064,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.update_extraeventbuttons_visibility()
 
     #assigns tooltips to extra event buttons
-    def settooltip(self):
+    def settooltip(self) -> None:
         for i, bl in enumerate(self.buttonlist):
             if self.show_extrabutton_tooltips:
                 try:
@@ -24082,7 +24083,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 bl.setToolTip('')
 
     @pyqtSlot()
-    def update_extraeventbuttons_visibility(self):
+    def update_extraeventbuttons_visibility(self) -> None:
         for i, bl in enumerate(self.buttonlist):
             try:
                 if self.extraeventsvisibility[i]:
@@ -24100,7 +24101,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         return None
 
     #transfers current buttons to a palette number
-    def transferbuttonsto(self,pindex):
+    def transferbuttonsto(self, pindex:int) -> None:
         self.buttonpalette[pindex] = self.makePalette()
         self.buttonpalettemaxlen[pindex] = self.buttonlistmaxlen
         self.sendmessage(f"{QApplication.translate('Message','Buttons copied to Palette #')}{pindex}")
