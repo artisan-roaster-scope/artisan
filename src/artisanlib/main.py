@@ -23810,7 +23810,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     #used by WheelGraphDlg()
     #wrap values in unicode(.) if and only if those are of type string
-    def getWheelGraph(self) -> Wheel:
+    def getWheelGraph(self) -> 'Wheel':
         wheel:Wheel = {}
         #two dimension lists
         wheel['wheelnames'] = self.qmc.wheelnames
