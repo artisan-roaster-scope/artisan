@@ -70,7 +70,7 @@ aiohttp_jinja2==1.6
 # packages that differ per platform
 #
 ### yoctopuce 1.10.42060 on macOS 10.13
-yoctopuce==1.10.42060; sys_platform=='darwin' and platform_release<'20.0'' # last version supporting macOS 10.13
+yoctopuce==1.10.42060; sys_platform=='darwin' and platform_release<'20.0' # last version supporting macOS 10.13
 yoctopuce==1.10.57762; sys_platform!='darwin' or (sys_platform=='darwin' and platform_release>='20.0')
 ##
 ## Qt 5.15.x supports macOS 10.13 (Darwin 17.x) and higher as well as Windows 7/8
