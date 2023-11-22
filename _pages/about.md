@@ -31,14 +31,14 @@ gallery:
     image_path: /assets/images/kaleido-logo.jpg
     alt: "Kaleido"
     title: "Kalaido"
-  - url: https://acaia.co/
-    image_path: /assets/images/acaia-logo.jpeg
-    alt: "acaia"
-    title: "acaia"
   - url: https://www.paoloscimone.com/
     image_path: /assets/images/paoloscimone-logo.jpg
     alt: "Paolo Scimone Coffee Consulting"
     title: "Paolo Scimone Coffee Consulting"
+  - url: https://acaia.co/
+    image_path: /assets/images/acaia-logo.jpeg
+    alt: "acaia"
+    title: "acaia"
   - url: https://www.sivetz.com/
     image_path: /assets/images/sivetz-logo.png
     alt: "Sivetz"
@@ -198,7 +198,7 @@ Artisan builds on a large number of excellent open-source software.
 * [pyserial](https://github.com/pyserial/pyserial){:target="_blank"}, [pyusb](https://github.com/pyusb/pyusb){:target="_blank"}, [pymodbus](https://github.com/riptideio/pymodbus){:target="_blank"}, [python-snap7](https://github.com/gijzelaerr/python-snap7){:target="_blank"}
 * [py2app](https://github.com/ronaldoussoren/py2app){:target="_blank"}, [pyinstaller](https://www.pyinstaller.org){:target="_blank"}
 
-..and many other packages. Thanks for releasing your work as open-source!
+..and many more. Thanks for releasing your work as open-source!
 
 ## License
 
