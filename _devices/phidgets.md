@@ -147,6 +147,20 @@ Artisan can attach to all Phidgets IO ports. The input ports are configured as (
 	* `Phidget DAQ1000 45` : analog input (0-5V), ports 4 and 5
 	* `Phidget DAQ1000 67` : analog input (0-5V), ports 6 and 7
 
+* [Phidget DAQ1200](https://phidgets.com/?tier=3&catid=106&pcid=86&prodid=623){:target="_blank"} (VINT): 4x digital input
+	* `Phidget DAQ1200 01` : digital input (0 or 1), ports 0 and 1
+	* `Phidget DAQ1200 23` : digital input (0 or 1), ports 2 and 3
+
+* [Phidget DAQ1300](https://phidgets.com/?tier=3&catid=106&pcid=86&prodid=624){:target="_blank"} (VINT): 4x isolated digital input
+	* `Phidget DAQ1300 01` : digital input (0 or 1), ports 0 and 1
+	* `Phidget DAQ1300 23` : digital input (0 or 1), ports 2 and 3
+
+* [Phidget DAQ1301](https://phidgets.com/?tier=3&catid=106&pcid=86&prodid=625){:target="_blank"} (VINT): 16x digital input (only first 8 channels are supported!)
+	* `Phidget DAQ1301 01` : digital input (0 or 1), ports 0 and 1
+	* `Phidget DAQ1301 23` : digital input (0 or 1), ports 2 and 3
+	* `Phidget DAQ1301 45` : digital input (0 or 1), ports 4 and 5
+	* `Phidget DAQ1301 67` : digital input (0 or 1), ports 6 and 7
+
 * [Phidget DAQ1400](https://www.phidgets.com/?tier=3&catid=49&pcid=42&prodid=961){:target="_blank"} (VINT): 1x versatile input (current, digital , frequency, voltage)
 
 	* `Phidget DAQ1400 Current` : current input (A, 20mA max)
