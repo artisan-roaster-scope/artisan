@@ -34,7 +34,7 @@ if TYPE_CHECKING:
     from PyQt6.QtGui import QStandardItem, QKeyEvent, QDropEvent, QDragEnterEvent, QCloseEvent # pylint: disable=unused-import
     from PyQt6.QtCore import QMimeData # pylint: disable=unused-import
 
-from artisanlib.util import deltaLabelUTF8, decodeLocal, stringfromseconds, fromFtoCstrict, fromCtoFstrict, fill_gaps
+from artisanlib.util import deltaLabelUTF8, decodeLocal, decodeLocalStrict, stringfromseconds, fromFtoCstrict, fromCtoFstrict, fill_gaps
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
@@ -209,8 +209,8 @@ class RoastProfile:
                             self.extratemp2.append(fill_gaps(xtemp2[i]) if self.aw.qmc.interpolateDropsflag else xtemp2[i])
                         else:
                             self.extratemp2.append([-1.]*len(self.timex))
-                    self.extraname1 = [n.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3]) for n in xname1] # we apply event name substitutions
-                    self.extraname2 = [n.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3]) for n in xname2] # we apply event name substitutions
+                    self.extraname1 = [decodeLocalStrict(n).format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3]) for n in xname1] # we apply event name substitutions
+                    self.extraname2 = [decodeLocalStrict(n).format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3]) for n in xname2] # we apply event name substitutions
                     self.extraDelta1 = delta1
                     self.extraDelta2 = delta2
         # temperature conversion
