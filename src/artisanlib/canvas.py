@@ -350,25 +350,6 @@ class tgraphcanvas(FigureCanvas):
         # custom labels are stored in the application settings and can be edited by the user
         self.customflavorlabels = self.artisanflavordefaultlabels
 
-# old SCAA spec (note the typo in the variable name):
-# replaced by the specification below for v2.6.0:
-#        self.SCCAflavordefaultlabels: Final[List[str]] = [[QApplication.translate("Textbox", "Sour"),
-#                                        QApplication.translate("Textbox", "Flavor"),
-#                                        QApplication.translate("Textbox", "Critical\nStimulus"),
-#                                        QApplication.translate("Textbox", "Aftertaste"),
-#                                        QApplication.translate("Textbox", "Bitter"),
-#                                        QApplication.translate("Textbox", "Astringency"),
-#                                        QApplication.translate("Textbox", "Solubles\nConcentration"),
-#                                        QApplication.translate("Textbox", "Mouthfeel"),
-#                                        QApplication.translate("Textbox", "Other"),
-#                                        QApplication.translate("Textbox", "Aromatic\nComplexity"),
-#                                        QApplication.translate("Textbox", "Roast\nColor"),
-#                                        QApplication.translate("Textbox", "Aromatic\nPungency"),
-#                                        QApplication.translate("Textbox", "Sweet"),
-#                                        QApplication.translate("Textbox", "Acidity"),
-#                                        QApplication.translate("Textbox", "pH"),
-#                                        QApplication.translate("Textbox", "Balance")]
-
         self.SCAAflavordefaultlabels: Final[List[str]] = [QApplication.translate('Textbox', 'Fragrance-Aroma'),
                                         QApplication.translate('Textbox', 'Flavor'),
                                         QApplication.translate('Textbox', 'Aftertaste'),
@@ -861,7 +842,15 @@ class tgraphcanvas(FigureCanvas):
                        '+Phidget DAQ1000 45',       #148
                        '+Phidget DAQ1000 67',       #149
                        '+MODBUS 910',               #150
-                       '+S7 1112'                   #151
+                       '+S7 1112',                  #151
+                       'Phidget DAQ1200 01',        #152
+                       '+Phidget DAQ1200 23',       #153
+                       'Phidget DAQ1300 01',        #154
+                       '+Phidget DAQ1300 23',       #155
+                       'Phidget DAQ1301 01',        #156
+                       '+Phidget DAQ1301 23',       #157
+                       '+Phidget DAQ1301 45',       #158
+                       '+Phidget DAQ1301 67'        #159
                        ]
 
         # ADD DEVICE:
@@ -890,7 +879,10 @@ class tgraphcanvas(FigureCanvas):
             124, # Phidget VCP1001
             125, # Phidget VCP1002
             137, # Phidget DAQ1500
-            146  # Phidget DAQ1000 01
+            146, # Phidget DAQ1000 01
+            152, # Phidget DAQ1200 01
+            154, # Phidget DAQ1300 01
+            156  # Phidget DAQ1301 01
         ]
 
         # ADD DEVICE:
@@ -976,7 +968,15 @@ class tgraphcanvas(FigureCanvas):
             146, # Phidget DAQ1000 01
             147, # +Phidget DAQ1000 23
             148, # +Phidget DAQ1000 45
-            149  # +Phidget DAQ1000 67
+            149, # +Phidget DAQ1000 67
+            152, # Phidget DAQ1200 01
+            153, # +Phidget DAQ1200 23
+            154, # Phidget DAQ1300 01
+            155, # +Phidget DAQ1300 23
+            156, # Phidget DAQ1301 01
+            157, # +Phidget DAQ1301 23
+            158, # +Phidget DAQ1301 45
+            159  # +Phidget DAQ1301 67
         ]
 
         #extra devices

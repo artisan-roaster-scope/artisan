@@ -514,7 +514,15 @@ class serialport:
                                    self.PHIDGET_DAQ1000_45,   #148
                                    self.PHIDGET_DAQ1000_67,   #149
                                    self.MODBUS_910,           #150
-                                   self.S7_1112               #151
+                                   self.S7_1112,              #151
+                                   self.PHIDGET_DAQ1200_01,   #152
+                                   self.PHIDGET_DAQ1200_23,   #153
+                                   self.PHIDGET_DAQ1300_01,   #154
+                                   self.PHIDGET_DAQ1300_23,   #155
+                                   self.PHIDGET_DAQ1301_01,   #156
+                                   self.PHIDGET_DAQ1301_23,   #157
+                                   self.PHIDGET_DAQ1301_45,   #158
+                                   self.PHIDGET_DAQ1301_67    #159
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -975,6 +983,46 @@ class serialport:
     def PHIDGET1018_D_78(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,3,'digital')
+        return tx,v1,v2
+
+    def PHIDGET_DAQ1200_01(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1200,0,'digital')
+        return tx,v1,v2
+
+    def PHIDGET_DAQ1200_23(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1200,1,'digital')
+        return tx,v1,v2
+
+    def PHIDGET_DAQ1300_01(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1300,0,'digital')
+        return tx,v1,v2
+
+    def PHIDGET_DAQ1300_23(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1300,1,'digital')
+        return tx,v1,v2
+
+    def PHIDGET_DAQ1301_01(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1301,0,'digital')
+        return tx,v1,v2
+
+    def PHIDGET_DAQ1301_23(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1301,1,'digital')
+        return tx,v1,v2
+
+    def PHIDGET_DAQ1301_45(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1301,2,'digital')
+        return tx,v1,v2
+
+    def PHIDGET_DAQ1301_67(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_DAQ1301,3,'digital')
         return tx,v1,v2
 
     def PHIDGET_HUB0000_D(self) -> Tuple[float,float,float]:
@@ -5353,6 +5401,12 @@ class serialport:
                         self.aw.sendmessage(QApplication.translate('Message','Phidget IO 8/8/8 attached'))
                     elif deviceType == DeviceID.PHIDID_DAQ1000:
                         self.aw.sendmessage(QApplication.translate('Message','Phidget DAQ1000 attached'))
+                    elif deviceType == DeviceID.PHIDID_DAQ1200:
+                        self.aw.sendmessage(QApplication.translate('Message','Phidget DAQ1200 attached'))
+                    elif deviceType == DeviceID.PHIDID_DAQ1300:
+                        self.aw.sendmessage(QApplication.translate('Message','Phidget DAQ1300 attached'))
+                    elif deviceType == DeviceID.PHIDID_DAQ1301:
+                        self.aw.sendmessage(QApplication.translate('Message','Phidget DAQ1301 attached'))
                     elif deviceType == DeviceID.PHIDID_DAQ1400:
                         self.aw.sendmessage(QApplication.translate('Message','Phidget DAQ1400 attached'))
                     elif deviceType == DeviceID.PHIDID_VCP1000:
@@ -5381,6 +5435,12 @@ class serialport:
                         self.aw.sendmessage(QApplication.translate('Message','Phidget IO 8/8/8 detached'))
                     elif deviceType == DeviceID.PHIDID_DAQ1000:
                         self.aw.sendmessage(QApplication.translate('Message','Phidget DAQ1000 detached'))
+                    elif deviceType == DeviceID.PHIDID_DAQ1200:
+                        self.aw.sendmessage(QApplication.translate('Message','Phidget DAQ1200 detached'))
+                    elif deviceType == DeviceID.PHIDID_DAQ1300:
+                        self.aw.sendmessage(QApplication.translate('Message','Phidget DAQ1300 detached'))
+                    elif deviceType == DeviceID.PHIDID_DAQ1301:
+                        self.aw.sendmessage(QApplication.translate('Message','Phidget DAQ1301 detached'))
                     elif deviceType == DeviceID.PHIDID_DAQ1400:
                         self.aw.sendmessage(QApplication.translate('Message','Phidget DAQ1400 detached'))
                     elif deviceType == DeviceID.PHIDID_VCP1000:
@@ -5400,6 +5460,9 @@ class serialport:
     #  - Phidget IO 6/6/6 (HUB0000): DeviceID.PHIDID_HUB0000
     #  - Phidget IO 2/2/2 (1011): DeviceID.PHIDID_1011
     #  - Phidget DAQ1000 8x VoltageInput: PHIDID_DAQ1000
+    #  - Phidget DAQ1200 4xDigitalInput: PHIDID_DAQ1200
+    #  - Phidget DAQ1300 4xDigitalInput: PHIDID_DAQ1300
+    #  - Phidget DAQ1301 16xDigitalInput: PHIDID_DAQ1301 (only first 8 channels supported)
     #  - Phidget DAQ1400 Current/Frequency/Digital/VOLTAGE: PHIDID_DAQ1400
     #  - Phidget VCP1000: PHIDID_VCP1000 (20-bit ±40V Voltage Input Phidget; ±312mV, ±40V)
     #  - Phidget VCP1001: PHIDID_VCP1001 (±40V Voltage Input Phidget; ±5V, ±15V or ±40V)

@@ -25,7 +25,7 @@ v2.10.0 (November XX, 2023)
   - adds support for [Cogen](https://cogen-company.com/) machines
   - adds support for [Typhoon](https://typhoon.coffee/) Hybrid roasters
   - adds support for additional [Carmomaq](https://carmomaq.com.br/) machine ([PR #1233](../../../pull/1233))
-  - adds support for the [Phidget DAQ1000](https://phidgets.com/?prodid=622) 8x Voltage Input module ([Issue #1225](../../../issues/1225))
+  - adds support for the [Phidget DAQ1000](https://phidgets.com/?prodid=622) 8x Voltage Input module ([Issue #1225](../../../issues/1225)), [DAQ1200](https://phidgets.com/?prodid=623) 4x Digital Input module, [DAQ1300](https://phidgets.com/?prodid=624) 4x Isolated Digital Input, [DAQ1301](https://phidgets.com/?prodid=625) 16x Isolated Digital Input ([Discussion #1139](../../../discussions/1139))
   - adds two more MODBUS channels (now 10 in total)
   - adds two more S7 channels (now 12 in total)
   - adds Hottop device logging ([Issue #1257](../../../issues/1257))
