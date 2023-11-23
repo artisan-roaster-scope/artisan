@@ -46,7 +46,7 @@ xlrd==2.0.1
 websocket-client==1.6.4
 websockets==11.0.3
 PyYAML==6.0.1
-psutil==5.9.4
+psutil==5.9.6
 typing-extensions==4.8.0; python_version < '3.8' # required for supporting Final and TypeDict on Python <3.8
 protobuf==4.25.1
 numpy==1.24.3; python_version < '3.9' # last Python 3.8 release
