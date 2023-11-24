@@ -161,7 +161,7 @@ class RoastProfile:
         #
         self.etypes:List[str] = self.aw.qmc.etypes[:-1]
         if 'etypes' in profile:
-            self.etypes = profile['etypes'][:4]
+            self.etypes = [decodeLocalStrict(et) for et in profile['etypes'][:4]]
             if 'default_etypes' in profile:
                 default_etypes = profile['default_etypes']
                 for i, _ in enumerate(self.etypes):
