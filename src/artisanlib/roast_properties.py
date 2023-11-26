@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from artisanlib.types import RecentRoast, BTU
     from artisanlib.ble import BleInterface # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtWidgets import QLayout, QAbstractItemView, QCompleter # pylint: disable=unused-import
-    from PyQt6.QtGui import QClipboard, QCloseEvent # pylint: disable=unused-import
+    from PyQt6.QtGui import QClipboard, QCloseEvent, QKeyEvent # pylint: disable=unused-import
     from PyQt6.QtCore import QObject # pylint: disable=unused-import
 
 # import artisan.plus modules
@@ -346,17 +346,18 @@ class volumeCalculatorDlg(ArtisanDialog):
             _log.exception(e)
 
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work
-    def keyPressEvent(self,event):
-        key = int(event.key())
-        if key == 16777220 and self.scale_connected: # ENTER key pressed
-            v = self.retrieveWeight()
-            if v and v != 0:
-                if self.unitvolumeEdit.hasFocus():
-                    self.unitvolumeEdit.setText(f'{self.aw.float2float(v):g}')
-                elif self.coffeeinweightEdit.hasFocus():
-                    self.coffeeinweightEdit.setText(f'{self.aw.float2float(v):g}')
-                elif self.coffeeoutweightEdit.hasFocus():
-                    self.coffeeoutweightEdit.setText(f'{self.aw.float2float(v):g}')
+    def keyPressEvent(self, event: Optional['QKeyEvent']) -> None:
+        if event is not None:
+            key = int(event.key())
+            if key == 16777220 and self.scale_connected: # ENTER key pressed
+                v = self.retrieveWeight()
+                if v and v != 0:
+                    if self.unitvolumeEdit.hasFocus():
+                        self.unitvolumeEdit.setText(f'{self.aw.float2float(v):g}')
+                    elif self.coffeeinweightEdit.hasFocus():
+                        self.coffeeinweightEdit.setText(f'{self.aw.float2float(v):g}')
+                    elif self.coffeeoutweightEdit.hasFocus():
+                        self.coffeeoutweightEdit.setText(f'{self.aw.float2float(v):g}')
 
     def widgetWeight(self,widget):
         w = self.retrieveWeight()
@@ -2586,27 +2587,28 @@ class editGraphDlg(ArtisanResizeablDialog):
         return (1./density) * weight * 1000
 
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work
-    def keyPressEvent(self, event):
-        key = int(event.key())
-        #print(key)
-        modifiers = event.modifiers()
-        control_modifier = modifiers == Qt.KeyboardModifier.ControlModifier # command/apple k on macOS, CONTROL on Windows
-        if event.matches(QKeySequence.StandardKey.Copy) and self.TabWidget.currentIndex() == 3: # datatable
-            self.aw.copy_cells_to_clipboard(self.datatable,adjustment=1)
-            self.aw.sendmessage(QApplication.translate('Message','Data table copied to clipboard'))
-        if key == 16777220 and self.aw.scale.device is not None and self.aw.scale.device != '' and self.aw.scale.device != 'None': # ENTER key pressed and scale connected
-            if self.weightinedit.hasFocus():
-                self.inWeight(True,overwrite=True) # we don't add to current reading but overwrite
-            elif self.weightoutedit.hasFocus():
-                self.outWeight(True,overwrite=True) # we don't add to current reading but overwrite
-        if key == 76 and control_modifier and self.TabWidget.currentIndex() == 0: #ctrl L on Roast tab => open volume calculator
-            self.volumeCalculatorTimer(True)
-        if key == 73 and control_modifier and self.TabWidget.currentIndex() == 0: #ctrl I on Roast tab => send scale weight to in-weight field
-            self.inWeight(True)
-        if key == 79 and control_modifier and self.TabWidget.currentIndex() == 0: #ctrl O on Roast tab => send scale weight to out-weight field
-            self.outWeight(True)
-        if key == 80 and control_modifier and self.TabWidget.currentIndex() == 0: #ctrl P on Roast tab => send scale weight to in-weight field
-            self.resetScaleSet()
+    def keyPressEvent(self, event: Optional['QKeyEvent']) -> None:
+        if event is not None:
+            key = int(event.key())
+            #print(key)
+            modifiers = event.modifiers()
+            control_modifier = modifiers == Qt.KeyboardModifier.ControlModifier # command/apple k on macOS, CONTROL on Windows
+            if event.matches(QKeySequence.StandardKey.Copy) and self.TabWidget.currentIndex() == 3: # datatable
+                self.aw.copy_cells_to_clipboard(self.datatable,adjustment=1)
+                self.aw.sendmessage(QApplication.translate('Message','Data table copied to clipboard'))
+            if key == 16777220 and self.aw.scale.device is not None and self.aw.scale.device != '' and self.aw.scale.device != 'None': # ENTER key pressed and scale connected
+                if self.weightinedit.hasFocus():
+                    self.inWeight(True,overwrite=True) # we don't add to current reading but overwrite
+                elif self.weightoutedit.hasFocus():
+                    self.outWeight(True,overwrite=True) # we don't add to current reading but overwrite
+            if key == 76 and control_modifier and self.TabWidget.currentIndex() == 0: #ctrl L on Roast tab => open volume calculator
+                self.volumeCalculatorTimer(True)
+            if key == 73 and control_modifier and self.TabWidget.currentIndex() == 0: #ctrl I on Roast tab => send scale weight to in-weight field
+                self.inWeight(True)
+            if key == 79 and control_modifier and self.TabWidget.currentIndex() == 0: #ctrl O on Roast tab => send scale weight to out-weight field
+                self.outWeight(True)
+            if key == 80 and control_modifier and self.TabWidget.currentIndex() == 0: #ctrl P on Roast tab => send scale weight to in-weight field
+                self.resetScaleSet()
 
     @pyqtSlot(int)
     def tareChanged(self, i:int) -> None:

@@ -36,7 +36,8 @@ from typing import Final  # Python <=3.7
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from PyQt6.QtWidgets import QPushButton # pylint: disable=unused-import
-    from PyQt6.QtGui import QCloseEvent, QDragEnterEvent, QDropEvent # pylint: disable=unused-import
+    from PyQt6.QtGui import QCloseEvent, QDragEnterEvent, QDropEvent, QKeyEvent, QShowEvent  # pylint: disable=unused-import
+    from PyQt6.QtCore import QTimerEvent, QEvent, QObject # pylint: disable=unused-import
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -111,16 +112,17 @@ class ArtisanDialog(QDialog): # pyright: ignore [reportGeneralTypeIssues] # Argu
     def closeEvent(self,_:Optional['QCloseEvent'] = None) -> None:
         self.dialogbuttons.rejected.emit()
 
-    def keyPressEvent(self,event):
-        key = int(event.key())
-        #uncomment next line to find the integer value of a key
-        #print(key)
-        #modifiers = QApplication.keyboardModifiers()
-        modifiers = event.modifiers()
-        if key == 16777216 or (key == 87 and modifiers == Qt.KeyboardModifier.ControlModifier): #ESCAPE or CMD-W
-            self.close()
-        else:
-            super().keyPressEvent(event)
+    def keyPressEvent(self, event: Optional['QKeyEvent']) -> None:
+        if event is not None:
+            key = int(event.key())
+            #uncomment next line to find the integer value of a key
+            #print(key)
+            #modifiers = QApplication.keyboardModifiers()
+            modifiers = event.modifiers()
+            if key == 16777216 or (key == 87 and modifiers == Qt.KeyboardModifier.ControlModifier): #ESCAPE or CMD-W
+                self.close()
+            else:
+                super().keyPressEvent(event)
 
 class ArtisanResizeablDialog(ArtisanDialog):
     def __init__(self, parent:QWidget, aw:'ApplicationWindow') -> None:
@@ -147,12 +149,12 @@ class ArtisanMessageBox(QMessageBox): # pyright: ignore [reportGeneralTypeIssues
         self.timeout = timeout # configured timeout, defaults to 0 (no timeout)
         self.currentTime = 0 # counts seconds after timer start
 
-    def showEvent(self,_):
+    def showEvent(self, _:Optional['QShowEvent']) -> None:
         self.currentTime = 0
         if (self.timeout and self.timeout != 0):
             self.startTimer(1000)
 
-    def timerEvent(self,_):
+    def timerEvent(self, _:Optional['QTimerEvent']) -> None:
         self.currentTime = self.currentTime + 1
         if self.currentTime >= self.timeout:
             self.done(0)
@@ -278,7 +280,7 @@ class ArtisanComboBoxDialog(ArtisanDialog):
             okButton.setFocus()
 
     @pyqtSlot()
-    def accept(self):
+    def accept(self) -> None:
         self.idx = self.comboBox.currentIndex()
         QDialog.accept(self)
 
@@ -329,11 +331,11 @@ class PortComboBox(MyQComboBox):  # pyright: ignore [reportGeneralTypeIssues] # 
             except Exception: # pylint: disable=broad-except
                 pass
 
-    def eventFilter(self, obj, event):
+    def eventFilter(self, obj:Optional['QObject'], event:Optional['QEvent']) -> bool:
 # the next prevents correct setSelection on Windows
 #        if event.type() == QEvent.Type.FocusIn:
 #            self.setSelection(self.currentIndex())
-        if event.type() == QEvent.Type.MouseButtonPress:
+        if event is not None and event.type() == QEvent.Type.MouseButtonPress:
             self.updateMenu()
         return super().eventFilter(obj, event)
 
@@ -395,6 +397,6 @@ class ArtisanPortsDialog(ArtisanDialog):
         return self.comboBox.getSelection()
 
     @pyqtSlot()
-    def accept(self):
+    def accept(self) -> None:
         self.idx = self.comboBox.currentIndex()
         QDialog.accept(self)

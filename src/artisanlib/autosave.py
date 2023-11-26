@@ -150,7 +150,7 @@ class autosaveDlg(ArtisanDialog):
         self.setFixedHeight(self.sizeHint().height())
 
     @pyqtSlot(bool)
-    def showautosavehelp(self,_=False):
+    def showautosavehelp(self,_:bool = False) -> None:
         from help import autosave_help # type: ignore [attr-defined] # pylint: disable=no-name-in-module
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
@@ -158,11 +158,11 @@ class autosaveDlg(ArtisanDialog):
                 QApplication.translate('Form Caption','Autosave Fields Help'),
                 autosave_help.content())
 
-    def closeHelp(self):
+    def closeHelp(self) -> None:
         self.aw.closeHelpDialog(self.helpdialog)
 
     @pyqtSlot()
-    def prefixChanged(self):
+    def prefixChanged(self) -> None:
         preview = self.aw.generateFilename(self.prefixEdit.text(),previewmode=2)
         self.prefixPreview.setText(preview)
         previewrecording = self.aw.generateFilename(self.prefixEdit.text(),previewmode=1)
@@ -174,17 +174,17 @@ class autosaveDlg(ArtisanDialog):
             self.prefixPreviewrecording.setText(previewrecording)
 
     @pyqtSlot(bool)
-    def getpath(self,_):
+    def getpath(self,_:bool) -> None:
         filename = self.aw.ArtisanExistingDirectoryDialog(msg=QApplication.translate('Form Caption','AutoSave Path'))
         self.pathEdit.setText(filename)
 
     @pyqtSlot(bool)
-    def getalsopath(self,_):
+    def getalsopath(self,_:bool) -> None:
         filename = self.aw.ArtisanExistingDirectoryDialog(msg=QApplication.translate('Form Caption','AutoSave Save Also Path'))
         self.pathAlsoEdit.setText(filename)
 
     @pyqtSlot()
-    def autoChanged(self):
+    def autoChanged(self) -> None:
         self.aw.qmc.autosavepath = self.pathEdit.text()
         self.aw.qmc.autosavealsopath = self.pathAlsoEdit.text()
         if self.autocheckbox.isChecked():
@@ -200,7 +200,6 @@ class autosaveDlg(ArtisanDialog):
         self.aw.qmc.autosaveimage = self.autopdfcheckbox.isChecked()
         self.aw.qmc.autosaveimageformat = self.imageTypesComboBox.currentText()
         self.aw.qmc.autosaveaddtorecentfilesflag = self.addtorecentfiles.isChecked()
-#        self.aw.closeEventSettings()
         self.close()
 
     @pyqtSlot('QCloseEvent')

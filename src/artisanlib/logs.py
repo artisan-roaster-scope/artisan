@@ -56,7 +56,7 @@ class serialLogDlg(ArtisanDialog):
         layout.addWidget(self.serialEdit,1)
         self.setLayout(layout)
 
-    def getstring(self):
+    def getstring(self) -> str:
         #convert list of serial comm an html string
         htmlserial = 'version = ' +__version__ +'<br><br>'
         lenl = len(self.aw.seriallog)
@@ -64,19 +64,19 @@ class serialLogDlg(ArtisanDialog):
             htmlserial += '<b>' + str(lenl-i) + '</b> ' + self.aw.seriallog[-i-1] + '<br><br>'
         return htmlserial
 
-    def update(self):
+    def update_log(self) -> None:
         if self.aw.seriallogflag:
             self.serialEdit.setText(self.getstring())
 
     @pyqtSlot(int)
-    def serialcheckboxChanged(self,_):
+    def serialcheckboxChanged(self, _:int) -> None:
         if self.serialcheckbox.isChecked():
             self.aw.seriallogflag = True
         else:
             self.aw.seriallogflag = False
 
     @pyqtSlot('QCloseEvent')
-    def closeEvent(self,_:Optional['QCloseEvent'] = None) -> None:
+    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
         self.close()
         self.aw.serial_dlg = None
 
@@ -98,7 +98,7 @@ class errorDlg(ArtisanDialog):
         self.setLayout(layout)
         self.update()
 
-    def update(self):
+    def update_log(self) -> None:
         #convert list of errors to an html string
         lenl = len(self.aw.qmc.errorlog)
         htmlerr = ''.join([f'<b>{lenl-i}</b> {m}<br><br>' for i,m in enumerate(reversed(self.aw.qmc.errorlog))])
@@ -130,7 +130,7 @@ class messageDlg(ArtisanDialog):
         self.setLayout(layout)
         self.update()
 
-    def update(self):
+    def update_log(self) -> None:
         #convert list of messages to an html string
         lenl = len(self.aw.messagehist)
         htmlmessage = ''.join([f'<b>{lenl-i}</b> {m}<br><br>' for i,m in enumerate(reversed(self.aw.messagehist))])

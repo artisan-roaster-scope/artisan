@@ -101,18 +101,19 @@ class SamplingDlg(ArtisanDialog):
 
     #cancel button
     @pyqtSlot()
-    def close(self):
+    def close(self) -> bool:
         self.storeSettings()
         self.reject()
+        return True
 
-    def storeSettings(self):
+    def storeSettings(self) -> None:
         #save window position (only; not size!)
         settings = QSettings()
         settings.setValue('SamplingPosition',self.frameGeometry().topLeft())
 
     #ok button
     @pyqtSlot()
-    def ok(self):
+    def ok(self) -> None:
         self.aw.qmc.flagKeepON = bool(self.keepOnFlag.isChecked())
         self.aw.qmc.flagOpenCompleted = bool(self.openCompletedFlag.isChecked())
         self.aw.setSamplingRate(int(self.interval.value()*1000.))

@@ -107,7 +107,7 @@ class Simulator:
 
         self.removeEmptyPrefix()
 
-    def removeEmptyPrefix(self):
+    def removeEmptyPrefix(self) -> None:
         try:
             # select the first BT index not an error value to start with
             start = [i != -1 for i in self.temp2].index(True)

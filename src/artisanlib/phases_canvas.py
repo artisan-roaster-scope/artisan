@@ -20,7 +20,7 @@ import warnings
 import numpy
 import logging
 
-from typing import Final, Dict, Tuple, Optional, TYPE_CHECKING
+from typing import Final, Dict, Tuple, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
@@ -59,7 +59,7 @@ class tphasescanvas(FigureCanvas):
         self.m = 10             # width of batch number field and drop time field
         self.g = 2              # width of the gap between batch number field and drop time field and the actual phase percentage bars
         # set data
-        self.data:Optional[Tuple] = None  # the phases data per profile
+        self.data:Optional[List[Tuple]] = None  # the phases data per profile
         # the canvas
         self.fig = Figure(figsize=(1, 1), frameon=False, dpi=dpi+self.dpi_offset)
         # as alternative to the experimental constrained_layout we could use tight_layout as for them main canvas:
@@ -102,12 +102,12 @@ class tphasescanvas(FigureCanvas):
     # active is of type bool indicating the state of the corresponding profile
     # aligned is of type bool indicating that the profile is aligned to the current selected alignment target
     # color is a regular color string like '#00b950'
-    def set_phases(self, data):
+    def set_phases(self, data:Optional[List[Tuple]]) -> None:
         self.data = data
 
     # updates the phases graphs data and redraws its canvas
     # side condition: only profile data of visible profiles are contained in data
-    def update_phases(self, data):
+    def update_phases(self, data:Optional[List[Tuple]]) -> None:
         self.set_phases(data)
         self.redraw_phases()
 
@@ -116,7 +116,7 @@ class tphasescanvas(FigureCanvas):
             return
         # clear canvas
         self.clear_phases()
-        if self.data and len(self.data):
+        if self.data is not None and len(self.data):
             self.aw.scroller.setVisible(True)
             # set canvas background color
             background_color = self.aw.qmc.palette['background']

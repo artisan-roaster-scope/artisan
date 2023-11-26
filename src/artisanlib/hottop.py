@@ -200,7 +200,7 @@ class Hottop(AsyncComm):
             if cooling_motor is not None:
                 self._set_cooling_motor = (1 if cooling_motor else 0)
 
-def main():
+def main() -> None:
     hottop_serial:'SerialSettings' = {
         'port': '/dev/slave',
         'baudrate': 9600, # 115200

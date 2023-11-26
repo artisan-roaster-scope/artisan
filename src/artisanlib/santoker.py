@@ -213,7 +213,7 @@ class Santoker(AsyncComm):
 
 
 
-def main():
+def main() -> None:
     import time
     santoker = Santoker(host = '10.10.100.254', port = 20001)
     santoker.start()

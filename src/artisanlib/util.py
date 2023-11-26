@@ -104,11 +104,11 @@ def str2cmd(s:str) -> bytes:
     return bytes(s,'ascii')
 def cmd2str(c:bytes) -> str:
     return str(c,'latin1')
-def s2a(s):
+def s2a(s:str) -> str:
     return s.encode('ascii','ignore').decode('ascii')
 
 # returns True if x is not None, not NaN and not the error value -1 or 0
-def is_proper_temp(x):
+def is_proper_temp(x:Union[None, int, float]) -> bool:
     return x is not None and not numpy.isnan(x) and isinstance(x, (int, float)) and x not in [0, -1]
 
 # returns the prefix of length ll of s and adds eclipse
@@ -223,7 +223,7 @@ def convertTemp(t:float, source_unit:str, target_unit:str) -> float:
         return t
     return res
 
-def path2url(path):
+def path2url(path:str) -> str:
     import urllib.parse as urlparse  # @Reimport
     import urllib.request as urllib  # @Reimport
     return urlparse.urljoin(
@@ -274,7 +274,7 @@ def toStringList(x:List) -> List[str]:
         return [str(s) for s in x]
     return []
 
-def removeAll(ll, s):
+def removeAll(ll:List[str], s:str) -> None:
     for _ in range(ll.count(s)):  # @UndefinedVariable
         ll.remove(s)
 
@@ -327,9 +327,9 @@ def fill_gaps(ll:Union[Sequence[Union[float, int]], 'npt.NDArray[numpy.floating]
                 last_val = e
     return res
 
-def replace_duplicates(data):
-    lv = -1
-    data_core = []
+def replace_duplicates(data:List[float]) -> List[float]:
+    lv:float = -1
+    data_core:List[float] = []
     for v in data:
         if v == lv:
             data_core.append(-1)
@@ -428,7 +428,7 @@ def getDirectory(filename: str, ext: Optional[str] = None, share: bool = False) 
 
 
 # takes a hex color string and returns the same color as hex string with staturation set to 0 and incr. lightness
-def toGrey(color):
+def toGrey(color:str) -> str:
     h, _s, l, a = QColor(color).getHslF()
     if h is not None and l is not None and a is not None:
         gray = QColor.fromHslF(h,0,(1-l)/1.7+l,a) # saturation set to 0
@@ -437,7 +437,7 @@ def toGrey(color):
     return gray.name()
 
 # takes a hex color string and returns the same color as hex string with reduced staturation and incr. lightness
-def toDim(color):
+def toDim(color:str) -> str:
     h, s, l, a = QColor(color).getHslF()
     if h is not None and s is not None and l is not None and a is not None:
         gray = QColor.fromHslF(h,s/4,(1-l)/1.7+l,a)
@@ -447,7 +447,7 @@ def toDim(color):
 
 # creates QLinearGradient style from light to dark by default, or from dark to light if reverse is True
 @functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
-def createGradient(rgb, tint_factor=0.1, shade_factor=0.1, reverse=False):
+def createGradient(rgb:Union[QColor, str], tint_factor:float = 0.1, shade_factor:float = 0.1, reverse:bool = False) -> str:
     light_grad,dark_grad = createRGBGradient(rgb,tint_factor,shade_factor)
     if reverse:
         # dark to light
@@ -455,22 +455,22 @@ def createGradient(rgb, tint_factor=0.1, shade_factor=0.1, reverse=False):
     # light to dark (default)
     return f'QLinearGradient(x1:0,y1:0,x2:0,y2:1,stop:0 {light_grad}, stop:1 {dark_grad})'
 
-def createRGBGradient(rgb, tint_factor=0.3, shade_factor=0.3):
+def createRGBGradient(rgb:Union[QColor, str], tint_factor:float = 0.3, shade_factor:float = 0.3) -> Tuple[str,str]:
     try:
         rgb_tuple: Tuple[float, float, float]
         if isinstance(rgb, QColor):
-            r,g,b,_ = rgb.getRgbF()
+            r,g,b,_ = rgb.getRgbF() # type: ignore
             if r is not None and g is not None and b is not None:
                 rgb_tuple = (r,g,b)
             else:
                 rgb_tuple = (0.5,0.5,0.5)
-        elif rgb[0:1] == '#':   # hex input like "#ffaa00"
+        elif rgb[0:1] == '#':   # hex input like "#ffaa00" # type: ignore
 #            rgb_tuple = tuple(int(rgb[i:i+2], 16)/255 for i in (1, 3 ,5))
-            rgb_tuple = (float(int(rgb[1:3], 16)/255),float(int(rgb[3:5], 16)/255),float(int(rgb[5:7], 16)/255))
+            rgb_tuple = (float(int(rgb[1:3], 16)/255),float(int(rgb[3:5], 16)/255),float(int(rgb[5:7], 16)/255)) # type: ignore
         else:                 # color name
-            rgb_tuple = colors.hex2color(colors.cnames[rgb])
+            rgb_tuple = colors.hex2color(colors.cnames[rgb]) # type: ignore
         #ref: https://stackoverflow.com/questions/6615002/given-an-rgb-value-how-do-i-create-a-tint-or-shade
-        r,g,b = tuple(int(255 * (x * (1 - shade_factor))) for x in rgb_tuple)
+        r,g,b = tuple(int(255 * (x * (1 - shade_factor))) for x in rgb_tuple) # type: ignore
         darker_rgb = f'#{r:02x}{g:02x}{b:02x}'
         r,g,b = tuple(int(255 * (x + (1 - x) * tint_factor)) for x in rgb_tuple)
         lighter_rgb = f'#{r:02x}{g:02x}{b:02x}'

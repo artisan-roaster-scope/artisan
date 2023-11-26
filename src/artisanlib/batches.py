@@ -113,7 +113,7 @@ class batchDlg(ArtisanDialog):
         mainLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
 
     @pyqtSlot(int)
-    def toggleCounterFlag(self,_):
+    def toggleCounterFlag(self, _:int) -> None:
         if self.batchcheckbox.isChecked():
             self.prefixEdit.setEnabled(True)
             self.counterSpinBox.setEnabled(True)
@@ -124,7 +124,7 @@ class batchDlg(ArtisanDialog):
             self.neverOverwriteCheckbox.setEnabled(False)
 
     @pyqtSlot()
-    def batchChanged(self):
+    def batchChanged(self) -> None:
         self.aw.qmc.batchprefix = self.prefixEdit.text()
         if self.batchcheckbox.isChecked():
             self.aw.qmc.batchcounter = self.counterSpinBox.value()
@@ -136,8 +136,8 @@ class batchDlg(ArtisanDialog):
         self.close()
 
     @pyqtSlot()
-    def close(self):
+    def close(self) -> bool:
         #save window position (only; not size!)
         settings = QSettings()
         settings.setValue('BatchPosition',self.frameGeometry().topLeft())
-        super().close()
+        return super().close()

@@ -21,7 +21,7 @@ import asyncio
 from contextlib import suppress
 from threading import Thread
 from pymodbus.transport.transport_serial import create_serial_connection # patched pyserial-asyncio
-from typing import Final, Optional, Callable, TYPE_CHECKING
+from typing import Final, Optional, Union, Tuple, Callable, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.types import SerialSettings # pylint: disable=unused-import
@@ -67,7 +67,8 @@ class AsyncComm:
     # asyncio loop
 
     @staticmethod
-    async def open_serial_connection(*, loop=None, limit=None, **kwargs):
+    async def open_serial_connection(*, loop:Optional[asyncio.AbstractEventLoop] = None,
+            limit:Optional[int] = None, **kwargs:Union[int,float,str]) -> Tuple[asyncio.StreamReader, asyncio.StreamWriter]:
         """A wrapper for create_serial_connection() returning a (reader,
         writer) pair.
 

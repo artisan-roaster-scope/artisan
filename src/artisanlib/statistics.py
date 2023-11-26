@@ -182,7 +182,8 @@ class StatisticsDlg(ArtisanDialog):
 
         mainLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
 
-    def AUCLCFflagChanged(self,_):
+    @pyqtSlot(int)
+    def AUCLCFflagChanged(self, _:int) -> None:
         self.aw.qmc.AUClcdFlag = not self.aw.qmc.AUClcdFlag
         if self.aw.qmc.flagstart:
             if self.aw.qmc.AUClcdFlag:
@@ -193,26 +194,26 @@ class StatisticsDlg(ArtisanDialog):
             self.aw.largePhasesLCDs_dialog.updateVisiblitiesPhases()
 
     @pyqtSlot(int)
-    def changeAUCshowFlag(self,_):
+    def changeAUCshowFlag(self, _:int) -> None:
         self.aw.qmc.AUCshowFlag = not self.aw.qmc.AUCshowFlag
         self.aw.qmc.redraw(recomputeAllDeltas=False)
 
     @pyqtSlot(int)
-    def switchAUCbase(self,i):
+    def switchAUCbase(self, i:int) -> None:
         if i:
             self.baseedit.setEnabled(False)
         else:
             self.baseedit.setEnabled(True)
 
     @pyqtSlot(int)
-    def switchAUCtarget(self,i):
+    def switchAUCtarget(self, i:int) -> None:
         if i:
             self.targetedit.setEnabled(False)
         else:
             self.targetedit.setEnabled(True)
 
     @pyqtSlot(int)
-    def changeStatsSummary(self,_):
+    def changeStatsSummary(self, _:int) -> None:
         self.aw.qmc.statssummary = not self.aw.qmc.statssummary
         # IF Auto is set for the axis the recompute it
         if self.aw.qmc.autotimex and not self.aw.qmc.statssummary:
@@ -224,7 +225,7 @@ class StatisticsDlg(ArtisanDialog):
             self.aw.savestatisticsAction.setEnabled(False)
 
     @pyqtSlot(int)
-    def changeStatisticsflag(self,value):
+    def changeStatisticsflag(self, value:int) -> None:
         sender = self.sender()
         if sender == self.timez:
             i = 0
@@ -242,7 +243,7 @@ class StatisticsDlg(ArtisanDialog):
         self.aw.qmc.redraw(recomputeAllDeltas=False)
 
     @pyqtSlot()
-    def accept(self):
+    def accept(self) -> None:
         self.aw.qmc.statsmaxchrperline = self.statsmaxchrperlineedit.value()
         self.aw.qmc.AUCbegin = self.beginComboBox.currentIndex()
         self.aw.qmc.AUCbase = self.baseedit.value()

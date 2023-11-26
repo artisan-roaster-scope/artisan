@@ -339,7 +339,8 @@ class KaleidoPort:
 #---- Serial transport
 
     @staticmethod
-    async def open_serial_connection(*, loop=None, limit=None, **kwargs):
+    async def open_serial_connection(*, loop:Optional[asyncio.AbstractEventLoop] = None,
+            limit:Optional[int] = None, **kwargs:Union[int,float,str]) -> Tuple[asyncio.StreamReader, asyncio.StreamWriter]:
         """A wrapper for create_serial_connection() returning a (reader,
         writer) pair.
 
@@ -583,7 +584,7 @@ class KaleidoPort:
                     _log.error(ex)
         return None
 
-    def markTP(self):
+    def markTP(self) -> None:
         self.send_msg('EV', '2')
 
     # start/stop sample thread

@@ -131,12 +131,12 @@ class WebLCDs:
         return ws
 
     @staticmethod
-    async def on_shutdown(app):
+    async def on_shutdown(app:web.Application) -> None:
         for ws in set(app['websockets']):
             await ws.close(code=WSCloseCode.GOING_AWAY,
                            message='Server shutdown')
 
-    async def startup(self):
+    async def startup(self) -> None:
         runner = web.AppRunner(self._app)
         await runner.setup()
         site = web.TCPSite(runner, '0.0.0.0', self._port)

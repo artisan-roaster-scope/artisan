@@ -884,11 +884,11 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 #######################################################################################
 
 
-    def enable_edit_curve_parameters(self):
+    def enable_edit_curve_parameters(self) -> None:
         if self.edit_curve_parameters_action is not None:
             self.edit_curve_parameters_action.setEnabled(True)
 
-    def disable_edit_curve_parameters(self):
+    def disable_edit_curve_parameters(self) -> None:
         if self.edit_curve_parameters_action is not None:
             self.edit_curve_parameters_action.setEnabled(False)
 
@@ -3992,15 +3992,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     @pyqtSlot()
     def updateMessageLog(self) -> None:
         if self.message_dlg:
-            self.message_dlg.update()
+            self.message_dlg.update_log()
     @pyqtSlot()
     def updateSerialLog(self) -> None:
         if self.serial_dlg:
-            self.serial_dlg.update()
+            self.serial_dlg.update_log()
     @pyqtSlot()
     def updateErrorLog(self) -> None:
         if self.error_dlg:
-            self.error_dlg.update()
+            self.error_dlg.update_log()
 
     @pyqtSlot()
     def pidOn(self) -> None:
@@ -10106,7 +10106,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.buttonlist[tee].setText(self.substButtonLabel(tee, self.extraeventslabels[tee], self.extraeventstypes[tee]))
 
     @pyqtSlot(bool)
-    def recordextraevent_slot(self,_):
+    def recordextraevent_slot(self, _:bool) -> None:
         try:
             sender = self.sender()
             assert isinstance(sender, QPushButton)
@@ -10201,7 +10201,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def resetApplication(self,_=False):
+    def resetApplication(self, _:bool = False) -> None:
         if self.app.artisanviewerMode:
             string = QApplication.translate('Message','Do you want to reset all settings?<br> ArtisanViewer has to be restarted!')
         else:
@@ -10219,7 +10219,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def on_actionCut_triggered(self,_=False): # pylint: disable=no-self-use # used as slot
+    def on_actionCut_triggered(self, _:bool = False) -> None: # pylint: disable=no-self-use # used as slot
         try:
             active_window: Optional[QWidget] = self.app.activeWindow()
             if active_window is not None:
@@ -10231,7 +10231,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def on_actionCopy_triggered(self,_=False): # pylint: disable=no-self-use # used as slot
+    def on_actionCopy_triggered(self, _:bool = False) -> None: # pylint: disable=no-self-use # used as slot
         try:
             active_window: Optional[QWidget] = self.app.activeWindow()
             if active_window is not None:
@@ -10243,7 +10243,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def on_actionPaste_triggered(self,_=False): # pylint: disable=no-self-use # used as slot
+    def on_actionPaste_triggered(self, _:bool = False) -> None: # pylint: disable=no-self-use # used as slot
         try:
             active_window: Optional[QWidget] = self.app.activeWindow()
             if active_window is not None:
@@ -10254,12 +10254,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             pass # not every QWidget has a paste method
 
     # clears the message line without appending to the message log
-    def clearMessageLine(self,style=None):
+    def clearMessageLine(self, style:Optional[str] = None) -> None:
         self.sendmessage('',append=False,style=style)
 
     # this should only be called from within the main GUI thread (and never from the sampling thread!)
     @pyqtSlot(str,bool,str)
-    def sendmessage(self,message:str,append:bool = True, style:Optional[str] = None) -> None:
+    def sendmessage(self, message:str, append:bool = True, style:Optional[str] = None) -> None:
         if isinstance(threading.current_thread(), threading._MainThread): # type: ignore # pylint: disable=protected-access
             # we are running in the main thread thus we can call sendmessage_internal via a QTimer to avoid redraw issues
             QTimer.singleShot(2,lambda : self.sendmessage_internal(message,append,style))
@@ -10269,7 +10269,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             #self.sendmessage_internal(message,append,style,repaint=False)
             # if this is executed via a QTimer we receive "QObject::startTimer: Timers can only be used with threads started with QThread"
 
-    def sendmessage_internal(self,message,append=True,style=None,repaint=True):
+    def sendmessage_internal(self, message:str, append:bool = True, style:Optional[str] = None, repaint:bool = True) -> None:
         try:
             #### lock shared resources #####
             self.qmc.messagesemaphore.acquire(1)
@@ -10298,14 +10298,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if self.qmc.messagesemaphore.available() < 1:
                 self.qmc.messagesemaphore.release(1)
 
-    def hideDefaultButtons(self):
+    def hideDefaultButtons(self) -> None:
         self.lowerbuttondialog.setVisible(False)
 
-    def showDefaultButtons(self):
+    def showDefaultButtons(self) -> None:
         self.lowerbuttondialog.setVisible(True)
 
     # update the visibility of the extra event buttons based on the users preference for the current state
-    def updateExtraButtonsVisibility(self):
+    def updateExtraButtonsVisibility(self) -> None:
         # update visibility (based on the app state)
         if self.qmc.flagstart:
             visible = self.extraeventsbuttonsflags[2]
@@ -10320,7 +10320,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         if self.app.artisanviewerMode:
             self.hideExtraButtons(True)
 
-    def hideExtraButtons(self,changeDefault=True):
+    def hideExtraButtons(self, changeDefault:bool = True) -> None:
         focused_widget = QApplication.focusWidget()
         if focused_widget and focused_widget != self.centralWidget():
             focused_widget.clearFocus()
@@ -10335,7 +10335,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             else:
                 self.extraeventsbuttonsflags[0] = 0
 
-    def showExtraButtons(self,changeDefault=True):
+    def showExtraButtons(self, changeDefault:bool = True) -> None:
         focused_widget = QApplication.focusWidget()
         if focused_widget and focused_widget != self.centralWidget():
             focused_widget.clearFocus()
@@ -10352,14 +10352,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def toggleExtraButtons(self,_=False):
+    def toggleExtraButtons(self, _:bool = False) -> None:
         if self.extrabuttondialogs.isVisible():
             self.hideExtraButtons()
         else:
             self.showExtraButtons()
 
     # update the visibility of the sliders based on the users preference for the current state
-    def updateSlidersVisibility(self):
+    def updateSlidersVisibility(self) -> None:
         if self.app.artisanviewerMode:
             self.hideSliders(True)
         else:
@@ -10375,7 +10375,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             else:
                 self.hideSliders(False)
 
-    def hideSliders(self,changeDefault=True):
+    def hideSliders(self, changeDefault:bool = True) -> None:
         focused_widget = QApplication.focusWidget()
         if focused_widget and focused_widget != self.centralWidget():
             focused_widget.clearFocus()
@@ -10396,7 +10396,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             else:
                 self.eventslidersflags[0] = 0
 
-    def showSliders(self,changeDefault=True):
+    def showSliders(self, changeDefault:bool = True) -> None:
         focused_widget = QApplication.focusWidget()
         if focused_widget and focused_widget != self.centralWidget():
             focused_widget.clearFocus()
@@ -10446,7 +10446,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def toggleControls(self,_=False):
+    def toggleControls(self, _:bool = False) -> None:
         if self.level1frame.isVisible():
             self.hideControls()
         else:
@@ -10454,13 +10454,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def toggleReadings(self,_=False):
+    def toggleReadings(self,_:bool = False) -> None:
         if self.lcdFrame.isVisible():
             self.hideLCDs()
         else:
             self.showLCDs()
 
-    def updateSlidersProperties(self):
+    def updateSlidersProperties(self) -> None:
         # update slider properties and event type names
         if bool(self.eventslidervisibilities[0]):
             self.sliderGrpBox1.setVisible(True)
@@ -10487,7 +10487,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.sliderGrpBox4.setVisible(False)
             self.sliderGrpBox4.setTitle('')
 
-    def hideLCDs(self,changeDefault=True):
+    def hideLCDs(self, changeDefault:bool = True) -> None:
         self.lcd1.setVisible(False)
         self.lcdFrame.setVisible(False)
         self.readingsAction.setChecked(False)
@@ -10499,7 +10499,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             else:
                 self.readingslcdsflags[0] = 0
 
-    def showLCDs(self,changeDefault=True):
+    def showLCDs(self, changeDefault:bool = True) -> None:
         self.lcd1.setVisible(True)
         self.lcdFrame.setVisible(True)
         self.readingsAction.setChecked(True)
@@ -10511,7 +10511,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             else:
                 self.readingslcdsflags[0] = 1
 
-    def updateReadingsLCDsVisibility(self):
+    def updateReadingsLCDsVisibility(self) -> None:
         # update visibility (based on the app state)
         if self.qmc.flagstart:
             visible = self.readingslcdsflags[2]
@@ -10526,13 +10526,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         if self.app.artisanviewerMode:
             self.hideLCDs(True)
 
-    def hideEventsMinieditor(self):
+    def hideEventsMinieditor(self) -> None:
         self.EventsGroupLayout.setVisible(False)
 
-    def showEventsMinieditor(self):
+    def showEventsMinieditor(self) -> None:
         self.EventsGroupLayout.setVisible(True)
 
-    def updateLCDproperties(self):
+    def updateLCDproperties(self) -> None:
         # set LCDframe visibilities and labels
         ndev = len(self.qmc.extradevices)
         for i in range(ndev):
@@ -10585,7 +10585,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         else:
             self.setLCDsDigitCount(3)
 
-    def disableLoadImportConvertMenus(self):
+    def disableLoadImportConvertMenus(self) -> None:
         self.fileLoadAction.setEnabled(False) # open
         if self.openRecentMenu is not None:
             self.openRecentMenu.setEnabled(False) # open recent
@@ -10594,7 +10594,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         if self.convMenu is not None:
             self.convMenu.setEnabled(False) # convert
 
-    def enableLoadImportConvertMenus(self):
+    def enableLoadImportConvertMenus(self) -> None:
         self.fileLoadAction.setEnabled(True) # open
         if self.openRecentMenu is not None:
             self.openRecentMenu.setEnabled(True) # open recent
@@ -10603,7 +10603,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         if self.convMenu is not None:
             self.convMenu.setEnabled(True) # convert
 
-    def enableEditMenus(self):
+    def enableEditMenus(self) -> None:
         if self.newRoastMenu is not None:
             self.newRoastMenu.setEnabled(True)
         self.fileLoadAction.setEnabled(True) # open
@@ -10679,7 +10679,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.savestatisticsAction.setEnabled(True)
         self.displayonlymenus()
 
-    def disableEditMenus(self,designer=False,wheel=False,compare=False,sampling=False):
+    def disableEditMenus(self, designer:bool = False, wheel:bool = False, compare:bool = False, sampling:bool = False) -> None:
         # FILE menu
         if self.newRoastMenu is not None:
             if designer or wheel or compare:
@@ -12037,7 +12037,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' fileLoad() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     #loads stored profiles. Called from file menu
-    def loadFile(self,filename,quiet=False):
+    def loadFile(self, filename:str, quiet:bool = False) -> None:
         f = QFile(filename)
         try:
             if self.qmc.clearBgbeforeprofileload:
@@ -20107,7 +20107,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             co2kg_num = rd['co2kg_num'],
         )
 
-    def reportFiles(self):
+    def reportFiles(self) -> List[str]:
         import zipfile
         import tempfile
         # get profile filenames
@@ -21805,7 +21805,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     # and use "rt" as reference temperature (area above "rt" and below ET/BT)
     # if background=True, use the background time and temperature values
     # returns AUC(ET-BT), AUC(ET), AUC(BT), AUCbegin_idx
-    def ts(self,start=None,end=None,tp=None,background=False):
+    def ts(self, start:Optional[int] = None, end:Optional[int] = None, tp:Optional[int]=None, background:bool = False) -> Tuple[int, int, int, int]:
         if background:
             timeindex = self.qmc.timeindexB[:]
             timex = self.qmc.timeB[:]
@@ -21818,9 +21818,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             temp2 = self.qmc.temp2[:]
         return self.profileAUC(timeindex,timex,temp1,temp2,start,end,tp)
 
-    def profileAUC(self,timeindex,timex,temp1,temp2,start=None,end=None,tp=None):
+    def profileAUC(self, timeindex:List[int], timex:List[float], temp1:List[float], temp2:List[float],
+            start:Optional[int] = None, end:Optional[int] = None, tp:Optional[int] = None) -> Tuple[int, int, int, int]:
         delta = ET = BT = 0.0
-        AUCbegin_idx = 0
+        AUCbegin_idx:int = 0
         if (start == 0 and end == 0) or (start and (start < 0 or (start == 0 and timeindex[0] < 0))) or (len(timex) == 0):
             return 0,0,0,0
         try:
@@ -24525,8 +24526,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     analysis_endtime = droptimeB
 
             # replace a nan value with '--'. returns a string
-            def replNan(x):
-                if type(x) in [str]:
+            def replNan(x:Any) -> str:
+                if isinstance(x, str):
                     return x
                 return '--' if numpy.isnan(x) else f'{x:.2f}'
 

@@ -1262,10 +1262,10 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundmovespeed = 30
         self.backgroundShowFullflag:bool = False
         self.backgroundKeyboardControlFlag:bool = True
-        self.titleB = ''
-        self.roastbatchnrB = 0
-        self.roastbatchprefixB = ''
-        self.roastbatchposB = 1
+        self.titleB:str = ''
+        self.roastbatchnrB:int = 0
+        self.roastbatchprefixB:str = ''
+        self.roastbatchposB:int = 1
         self.temp1B:List[float] = []
         self.temp2B:List[float] = []
         self.temp1BX:List['npt.NDArray[numpy.double]'] = []
@@ -7454,7 +7454,7 @@ class tgraphcanvas(FigureCanvas):
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
-    def set_xlabel(self,xlabel):
+    def set_xlabel(self, xlabel:str) -> None:
         fontprop_medium = self.aw.mpl_fontproperties.copy()
         fontprop_medium.set_size('medium')
         self.xlabel_text = xlabel
@@ -10134,7 +10134,7 @@ class tgraphcanvas(FigureCanvas):
         return eventanno
 
     #watermark image
-    def placelogoimage(self):
+    def placelogoimage(self) -> None:
         if (self.flagon and self.aw.logoimgflag) or self.ax is None:  #if hide during roast
             return
         try:
@@ -10210,7 +10210,7 @@ class tgraphcanvas(FigureCanvas):
             self.aw.logofilename = ''
 
     #return a 'roast of the day' string with ordinals when english
-    def roastOfTheDay(self,roastbatchpos):
+    def roastOfTheDay(self, roastbatchpos:Optional[int]) -> str:
         if roastbatchpos is not None:
             #add an ordinal suffix for english
             if self.locale_str == 'en':
