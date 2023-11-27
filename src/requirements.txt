@@ -30,7 +30,7 @@
 # packages that are required on all platforms
 #
 setuptools==69.0.2
-wheel==0.41.3
+wheel==0.42.0
 pyserial==3.5
 pymodbus==3.5.4
 python-snap7==1.3
