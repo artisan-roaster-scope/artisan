@@ -8,7 +8,7 @@ types-requests==2.31.0.10
 types-setuptools==68.2.0.1
 types-urllib3==1.26.25.14
 lxml-stubs==0.4.0
-mypy==1.7.0
+mypy==1.7.1
 pyright==1.1.336
 ruff>=0.1.0
 pylint==3.0.2
