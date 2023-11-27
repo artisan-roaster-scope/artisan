@@ -1,7 +1,7 @@
 Detailed Release History
 ========================
 ----
-v2.10.0 (November XX, 2023)
+v2.10.0 (November 28, 2023)
 ------------------
 
 * NEW FEATURES
@@ -11,7 +11,7 @@ v2.10.0 (November XX, 2023)
   - adds alternative slider layout (controlled by the menu `Config >> Events`, Slider tab `Alternative Layout` flag)
   - adds optional alternative weight units in [artisan.plus](https://artisan.plus/) stock menus activated by holding the ALT (Windows) or OPTION (macOS) key
   - adds flags to control ET and BT projection lines separately
-  - adds support clicks on large LCDs to set tare and to show/hide curves
+  - adds actions to clicks on large LCDs to set tare and to show/hide curves
   - adds additional translatable button labels (`\i`: STIRRER, `\f`: FILL, `\r`: RELEASE)
   - adds support for event name substitution in ET, BT channel names
   - adds `Artisan Command` `visible(i,b)` to change visibility of button `i` to `b` which has to be an expression which evaluates to a boolean, like 0, 1, false, true, ... ([Issue #1301](../../../issues/1301))
