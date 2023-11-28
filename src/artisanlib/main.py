@@ -6917,7 +6917,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             return s
         if self.locale_str == 'he':
             if a:
-                return s[::-1].format(a[::-1])
+                return (s.format(a[::-1]))[::-1]
             return s[::-1]
         if a:
             return s.format(a)
