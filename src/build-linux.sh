@@ -103,8 +103,8 @@ cp includes/SourceHanSansJP-Regular.otf dist
 cp includes/SourceHanSansKR-Regular.otf dist
 cp includes/SourceHanSansTW-Regular.otf dist
 cp includes/dijkstra.ttf dist
-cp includes/ComicNeue-Regular.ttf
-cp includes/xkcd-script.ttf
+cp includes/ComicNeue-Regular.ttf dist
+cp includes/xkcd-script.ttf dist
 cp includes/alarmclock.eot dist
 cp includes/alarmclock.svg dist
 cp includes/alarmclock.ttf dist
