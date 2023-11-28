@@ -62,7 +62,8 @@ v2.10.0 (November 28, 2023)
   - fixes regression which broke S7 communnication on Linux builds in v2.8.4
   - fixes regression which broke even action Artisan Command `loadBackground` in v2.8.4 by substituting the underline symbol ([Issue #1288](../../../issues/1288))
   - fixes language selection for ArtisanViewer
-  - fixex wrong message on toggling the `Beep` flag of the UI tab ([Issue #1283](../../../issues/1283))
+  - fixes wrong message on toggling the `Beep` flag of the UI tab ([Issue #1283](../../../issues/1283))
+  - fixes missing event annotations in Hebrew ([Issue #1323](../../../issues/1323))
 
 
 ----
