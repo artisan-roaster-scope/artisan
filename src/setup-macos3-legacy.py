@@ -117,6 +117,8 @@ DATA_FILES = [
     ('../Resources', [r'includes/SourceHanSansKR-Regular.otf']),
     ('../Resources', [r'includes/SourceHanSansTW-Regular.otf']),
     ('../Resources', [r'includes/dijkstra.ttf']),
+    ('../Resources', [r'includes/ComicNeue-Regular.ttf']),
+    ('../Resources', [r'includes/xkcd-script.ttf']),
     ('../Resources', [r'includes/jquery-1.11.1.min.js']),
     ('../Resources', [r'includes/android-chrome-192x192.png']),
     ('../Resources', [r'includes/android-chrome-512x512.png']),

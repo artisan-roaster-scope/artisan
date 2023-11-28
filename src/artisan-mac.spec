@@ -80,6 +80,8 @@ DATA_FILES = [
         (r'includes/SourceHanSansKR-Regular.otf', '.'),
         (r'includes/SourceHanSansTW-Regular.otf', '.'),
         (r'includes/dijkstra.ttf', '.'),
+        (r'includes/ComicNeue-Regular.ttf', '.'),
+        (r'includes/xkcd-script.ttf', '.'),
         (r'includes/Machines', './Machines'),
         (r'includes/Themes', './Themes'),
         (r'includes/Icons', './Icons'),

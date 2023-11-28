@@ -247,6 +247,8 @@ for fn in [
     'artisanWheel.ico',
     r'includes\Humor-Sans.ttf',
     r'includes\dijkstra.ttf',
+    r'includes\ComicNeue-Regular.ttf',
+    r'includes\xkcd-script.ttf',
     r'includes\WenQuanYiZenHei-01.ttf',
     r'includes\WenQuanYiZenHeiMonoMedium.ttf',
     r'includes\SourceHanSansCN-Regular.otf',
