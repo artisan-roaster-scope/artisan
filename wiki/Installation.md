@@ -63,6 +63,8 @@ To operate some devices like Phidget modules or certain meters you need to insta
 
 ### Linux
 
+Under Manjaro (and presumably Arch and derivatives), the user has to be part of the uucp group. To do this, use `sudo gpasswd -a <username> uucp`, It is required to log out and back in for this to take effect.
+
 In case you run into permission problems such that Artisan is not allowed to read or write to the selected /dev/_USB_ device, you might need to add your account (username) to the dialout group via
 
 ```

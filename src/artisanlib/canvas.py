@@ -15257,8 +15257,7 @@ class tgraphcanvas(FigureCanvas):
 
         self.timealign(redraw=False)
 
-        if not self.locktimex:
-            self.xaxistosm(redraw=False)
+        self.xaxistosm(redraw=False)
 #        # import UnivariateSpline needed to draw the curve in designer
 #        from scipy.interpolate import UnivariateSpline # @UnusedImport # pylint: disable=import-error
 #        global UnivariateSpline # pylint: disable=global-statement
