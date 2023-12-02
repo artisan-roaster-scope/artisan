@@ -52,4 +52,4 @@ Finally, 1:21 ago we reached FCs, and the temp has changed 7.9C since then.  Dev
 
 ![time past FC](/assets/images/gsg/phases3 in 14.png)
 
-By ticking the From Background flag one can instruct Artisan to read phases information on loading a background profile and set the temperature limits of each phase based on the background roast.
+By ticking the From Background flag one can instruct Artisan to read phases information on loading a background profile and set the temperature limits of each phase based on the Dry End and First Crack start from the background roast.
