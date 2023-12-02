@@ -78,6 +78,8 @@ After this command you might need to logout and login again. Try
 
 that your account was successful added to the dialout group.
 
+Under Linux Manjaro (and presumably Arch and derivatives), the user has to be part of the uucp group. To do this, use "sudo gpasswd -a <username> uucp". You must log out and back in for this to take effect.
+
 
 Note that for apps running by non-root users access to Phidgets or Yoctopuce devices require the installation of corresponding udev rules. Check the [Phidgets](https://www.phidgets.com/docs/OS_-_Linux#Advanced_Information) and [Yoctopuce](https://www.yoctopuce.com/EN/article/how-to-begin-with-yoctopuce-devices-on-linux) platform installation notes. Those rules are installed automatically by Artisan, but require the users to be in the `sudo` group for security considerations.
 
