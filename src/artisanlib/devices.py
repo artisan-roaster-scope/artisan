@@ -949,7 +949,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         phidgetBox1018.addWidget(ratioLabel,6,0,Qt.AlignmentFlag.AlignRight)
         phidget1018HBox = QVBoxLayout()
         phidget1018HBox.addLayout(phidgetBox1018)
-        phidget1018GroupBox = QGroupBox('1010/1011/1013/1018/1019/HUB0000/SBC/DAQ1000/DAQ1400/VCP100x IO')
+        phidget1018GroupBox = QGroupBox('1010/1011/1013/1018/1019/HUB0000/SBC/DAQxxxx/VCP100x IO')
         phidget1018GroupBox.setLayout(phidget1018HBox)
         phidget1018HBox.setContentsMargins(0,0,0,0)
         self.phidgetBoxRemoteFlag = QCheckBox()

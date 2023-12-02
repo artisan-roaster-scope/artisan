@@ -96,7 +96,7 @@ class errorDlg(ArtisanDialog):
         layout.addWidget(self.elabel,0)
         layout.addWidget(self.errorEdit,1)
         self.setLayout(layout)
-        self.update()
+        self.update_log()
 
     def update_log(self) -> None:
         #convert list of errors to an html string
@@ -128,7 +128,7 @@ class messageDlg(ArtisanDialog):
         layout = QVBoxLayout()
         layout.addWidget(self.messageEdit,0)
         self.setLayout(layout)
-        self.update()
+        self.update_log()
 
     def update_log(self) -> None:
         #convert list of messages to an html string

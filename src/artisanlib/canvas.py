@@ -11562,11 +11562,11 @@ class tgraphcanvas(FigureCanvas):
 
             # update error dlg
             if self.aw.error_dlg:
-                self.aw.error_dlg.update()
+                self.aw.error_dlg.update_log()
             #update serial_dlg
             if self.aw.serial_dlg:
                 try:
-                    self.aw.serial_dlg.update()
+                    self.aw.serial_dlg.update_log()
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
 
