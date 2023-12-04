@@ -43,7 +43,7 @@ pyusb==1.2.1
 persist-queue==0.8.1
 portalocker==2.8.2
 xlrd==2.0.1
-websocket-client==1.6.4
+websocket-client==1.7.0
 websockets==12.0
 PyYAML==6.0.1
 psutil==5.9.6
