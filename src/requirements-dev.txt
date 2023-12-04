@@ -1,4 +1,4 @@
-types-openpyxl==3.1.0.28
+types-openpyxl==3.1.0.30
 types-protobuf==4.24.0.4
 types-psutil==5.9.5.17
 types-pyserial==3.5.0.11
