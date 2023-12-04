@@ -16512,7 +16512,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.modbus.inputSlaves[i] = toInt(settings.value(f'input{i+1}slave',self.modbus.inputSlaves[i]))
                 self.modbus.inputRegisters[i] = toInt(settings.value(f'input{i+1}register',self.modbus.inputRegisters[i]))
                 self.modbus.inputFloats[i] = bool(toBool(settings.value(f'input{i+1}float',self.modbus.inputFloats[i])))
-                self.modbus.inputBCDs[i] = bool(toBool(settings.value(f'input{i}bcd',self.modbus.inputBCDs[i])))
+                self.modbus.inputBCDs[i] = bool(toBool(settings.value(f'input{i+1}bcd',self.modbus.inputBCDs[i])))
                 self.modbus.inputCodes[i] = toInt(settings.value(f'input{i+1}code',self.modbus.inputCodes[i]))
                 self.modbus.inputModes[i] = s2a(toString(settings.value(f'input{i+1}mode',self.modbus.inputModes[i])))
                 self.modbus.inputDivs[i] = toInt(settings.value(f'input{i+1}div',self.modbus.inputDivs[i]))
