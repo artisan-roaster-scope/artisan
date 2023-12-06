@@ -41,7 +41,7 @@ v2.10.0 (November 28, 2023)
   - enable the import of IKAWA profiles from URLs on platforms without Bluetooth BLE support
   - roasting and cupping notes are always deleted on RESET even if `delete Roast Properties on RESET` is not ticked
   - use default spawn instead fork multiprocessing also on macOS and replaced troublesome multiprocessing for Hottop and WebLCDs communication by asyncio
-  - internal improvements leading to faster app start and exit as well as faster start of WebLCDs and more stable communication with Hottop roasters
+  - internal improvements leading to faster app start and exit as well as faster start of WebLCDs and more stable communication with Hottop roasters. As a consequence of this re-implementation, CONTROL can only be started after a connection to the Hottop via the button ON has been initialized.
   - upgrades dependencies (PyQt 6.6, matplotlib 3.8, pymodbus 3.5)
   - adds Idempotency-Key header to [artisan.plus](https://artisan.plus/) POST requests
 
