@@ -25,7 +25,7 @@ import random
 from typing import Final, List, Dict, Optional, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    import websocket # type: ignore # pylint: disable=unused-import
+    from websocket import WebSocketApp # type: ignore # pylint: disable=unused-import
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
 
 try:
@@ -100,7 +100,7 @@ class wsport:
         self.pending_events:Dict[int, Union[threading.Event, Dict]] = {} # message ids associated with pending threading.Event object or result
 
         self.active:bool = False
-        self.ws:Optional['websocket.WebSocketApp'] = None  # the WebService client object
+        self.ws:Optional['WebSocketApp'] = None  # the WebService client object
         self.wst:Optional[threading.Thread] = None # the WebService thread
 
     def onMessage(self, _, message):
@@ -215,16 +215,16 @@ class wsport:
             self.aw.addserial('wsport onPong()')
 
     def create(self):
-        import websocket # type: ignore
+        from websocket import WebSocketApp, setdefaulttimeout # type: ignore
         # initialize readings
         self.readings = [-1]*self.channels
         while self.active:
             try:
                 if self.aw.seriallogflag:
                     self.aw.addserial('wsport create()')
-                websocket.setdefaulttimeout(self.connect_timeout)
+                setdefaulttimeout(self.connect_timeout)
                 #websocket.enableTrace(True)
-                self.ws = websocket.WebSocketApp(f'ws://{self.host}:{self.port}/{self.path}',
+                self.ws = WebSocketApp(f'ws://{self.host}:{self.port}/{self.path}',
                                 on_message=self.onMessage,
                                 on_error=self.onError,
                                 on_ping=self.onPing,

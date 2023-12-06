@@ -339,7 +339,7 @@ class NotificationManager(QObject): # pyright: ignore [reportGeneralTypeIssues]
 
     # set the given notification as the active one and shows it to the user
     def setNotification(self, notification: Notification, addToQueue:bool = True) -> None:
-        _log.info('setNotification(%s %s %s, %s', notification.type.name, notification.formatedTitle(), notification.message, addToQueue)
+        _log.info('setNotification(%s %s %s, %s)', notification.type.name, notification.formatedTitle(), notification.message, addToQueue)
         try:
             self.active_notification = notification
             if addToQueue:

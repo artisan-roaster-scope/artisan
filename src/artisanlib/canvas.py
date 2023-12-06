@@ -4918,9 +4918,9 @@ class tgraphcanvas(FigureCanvas):
                     # SCe
                     if self.aw.buttonSCe.isEnabled():
                         self.markSCeSignal.emit(False) # queued
-                elif action == 13:
+                elif action == 13 and self.timex:
                     # DROP
-                    self.autoDropIdx = len(self.timex)
+                    self.autoDropIdx = max(0, len(self.timex) - 1)
                     self.markDropSignal.emit(False) # this queues an event which forces a realignment/redraw by resetting the cache ax_background and fires the CHARGE action
                 elif action == 14:
                     # COOL
@@ -16829,8 +16829,9 @@ class SampleThread(QThread): # pyright: ignore [reportGeneralTypeIssues] # Argum
 #                        pass
                     self.quit()
                     break  #thread ends
-                # skip tasks if we are behind schedule:
-                next_time += (libtime.perf_counter() - next_time) // interval * interval + interval
+                if next_time is not None:
+                    # skip tasks if we are behind schedule:
+                    next_time += (libtime.perf_counter() - next_time) // interval * interval + interval
         finally:
             self.terminatingSignal.emit()
             self.aw.qmc.flagsampling = False # we signal that we are done with sampling
