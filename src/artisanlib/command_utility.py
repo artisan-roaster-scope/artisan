@@ -18,7 +18,7 @@
 from artisanlib import __version__
 import sys
 
-def handleCommands():
+def handleCommands() -> bool:
     """ Handles incoming commands and decides on an action.
 
     args -- given command line arguments

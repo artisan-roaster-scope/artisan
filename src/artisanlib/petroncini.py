@@ -11,6 +11,7 @@ import logging
 from typing import Final, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from artisanlib.types import ProfileData # pylint: disable=unused-import
 from artisanlib.util import replace_duplicates, encodeLocal
 
@@ -25,8 +26,8 @@ except ImportError:
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given IKAWA CSV file
-def extractProfilePetronciniCSV(file,aw):
-    res:ProfileData = {}
+def extractProfilePetronciniCSV(file:str, aw:'ApplicationWindow') -> 'ProfileData':
+    res:'ProfileData' = {}
 
     res['samplinginterval'] = 1.0
 

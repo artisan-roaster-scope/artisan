@@ -8,6 +8,7 @@ import logging
 from typing import Final, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from artisanlib.types import ProfileData # pylint: disable=unused-import
 
 try:
@@ -20,8 +21,8 @@ from artisanlib.util import replace_duplicates
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given IKAWA CSV file
-def extractProfileGiesenCSV(file,aw):
-    res:ProfileData = {} # the interpreted data set
+def extractProfileGiesenCSV(file:str, aw:'ApplicationWindow') -> 'ProfileData':
+    res:'ProfileData' = {} # the interpreted data set
 
     res['samplinginterval'] = 1.0
 

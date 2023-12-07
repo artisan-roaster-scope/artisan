@@ -114,10 +114,13 @@ class Simulator:
             self.temp1_array = numpy.array(self.temp1[start:])
             self.temp2_array = numpy.array(self.temp2[start:])
             self.timex_array = numpy.array(self.timex[start:])
+            self.extratemp1_array = []
+            self.extratemp2_array = []
+            self.extratimex_array = []
             for i, _ in enumerate(self.extratimex):
-                self.extratemp1_array[i] = numpy.array(self.extratemp1[i][start:])
-                self.extratemp2_array[i] = numpy.array(self.extratemp2[i][start:])
-                self.extratimex_array[i] = numpy.array(self.extratimex[i][start:])
+                self.extratemp1_array.append(numpy.array(self.extratemp1[i][start:]))
+                self.extratemp2_array.append(numpy.array(self.extratemp2[i][start:]))
+                self.extratimex_array.append(numpy.array(self.extratimex[i][start:]))
             # shift timestamps such that they start with 0
             if len(self.timex_array) > 0:
                 self.timex_array = self.timex_array - self.timex_array[0]

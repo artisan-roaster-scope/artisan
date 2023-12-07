@@ -7756,7 +7756,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         label.setStyleSheet(f'QLabel {{ color: {color.name()}; }}')
 
     #adds to serial log
-    def addserial(self,serialstring):
+    def addserial(self, serialstring:str) -> None:
         if self.seriallogflag:
             try:
                 #### lock shared resources #####
@@ -7780,7 +7780,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.redrawTimer.start(500) # (re-) start the redraw time to be fired in half a second
         super().resizeEvent(event)
 
-    def setdpi(self,dpi,moveWindow=True):
+    def setdpi(self, dpi:int, moveWindow:bool = True) -> None:
         if dpi >= 40:
             try:
                 self.dpi = dpi
@@ -23485,15 +23485,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             _, _, exc_tb = sys.exc_info()
             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' {1} {0}').format(str(ex),message),getattr(exc_tb, 'tb_lineno', '?'))
 
-    def importExternal(self,extractor,message,extension):
+    def importExternal(self, extractor: Callable[[str, 'ApplicationWindow'], 'ProfileData'], message:str, extension:str) -> None:
         try:
             filename = self.ArtisanOpenFileDialog(msg=message,ext=extension)
             if len(filename) == 0:
                 return
             res = self.qmc.reset(redraw=False,soundOn=False)
             if res:
-                obj = extractor(filename, self)
-                res = self.setProfile(filename,obj)
+                obj:'ProfileData' = extractor(filename, self)
+                res = self.setProfile(filename, obj)
 
             if res:
                 #update etypes combo box
@@ -23523,7 +23523,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     @pyqtSlot(bool)
     def importCropster(self,_=False):
         from artisanlib.cropster import extractProfileCropsterXLS
-        self.importExternal(extractProfileCropsterXLS,QApplication.translate('Message','Import Cropster XLS'),'*.xls')
+        self.importExternal(extractProfileCropsterXLS, QApplication.translate('Message','Import Cropster XLS'),'*.xls')
 
     @pyqtSlot()
     @pyqtSlot(bool)

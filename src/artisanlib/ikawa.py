@@ -9,7 +9,7 @@ import base64
 import csv
 import re
 import logging
-from typing import Final, Optional, List, Tuple, Callable, ClassVar, Generator, TYPE_CHECKING
+from typing import Final, Optional, List, Tuple, Callable, ClassVar, Any, Generator, TYPE_CHECKING
 
 
 if TYPE_CHECKING:
@@ -60,7 +60,7 @@ def extractProfileIkawaURL(url:QUrl, aw:'ApplicationWindow') -> 'ProfileData':
     extra6:List[float] = []
     timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
 
-    fan_points:List = list(ikawa_profile.fan_points)
+    fan_points:List[Any] = list(ikawa_profile.fan_points)
     for idx, p in enumerate(ikawa_profile.temp_points):
         if idx != 0:
             # add additional fan_point before this temp point

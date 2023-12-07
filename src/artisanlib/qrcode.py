@@ -3,6 +3,8 @@
 import qrcode # type: ignore
 from qrcode.main import QRCode # type: ignore
 
+from typing import Dict, Optional, Any
+
 try:
     from PyQt6.QtGui import QImage, QPixmap,QPainter # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtCore import Qt # @UnusedImport @Reimport  @UnresolvedImport
@@ -16,15 +18,15 @@ except ImportError:
 
 class QRImage(qrcode.image.base.BaseImage): # type: ignore # pyright: "base" is not a known member of module "qrcode.image"
 
-    def new_image(self, **_kwargs):
+    def new_image(self, **_kwargs:Dict[Any,Any]) -> QImage:
         img = QImage(self.pixel_size, self.pixel_size, QImage.Format.Format_RGB16)
         img.fill(Qt.GlobalColor.white)
         return img
 
-    def pixmap(self):
+    def pixmap(self) -> QPixmap:
         return QPixmap.fromImage(self.get_image())
 
-    def drawrect(self, row, col):
+    def drawrect(self, row:int, col:int) -> None:
         painter = QPainter(self.get_image())
         painter.fillRect(
             (col + self.border) * self.box_size,
@@ -32,19 +34,19 @@ class QRImage(qrcode.image.base.BaseImage): # type: ignore # pyright: "base" is 
             self.box_size, self.box_size,
             Qt.GlobalColor.black)
 
-    def save(self, stream, kind=None):
+    def save(self, stream:Any, kind:Optional[str]=None) -> None:
         pass
 
-    def process(self):
+    def process(self) -> None:
         pass
 
     def drawrect_context(self, row: int, col: int, qr: QRCode) -> None:
         pass
 
-def QRlabel(url_str):
+def QRlabel(url_str:str) -> QRCode:
     qr = QRCode(
         version=None, # 1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L, # type:ignore # pyright: "constants" is not a known member of module "qrcode"
+        error_correction=qrcode.constants.ERROR_CORRECT_L, # pyright:ignore # pyright: "constants" is not a known member of module "qrcode"
         box_size=4,
         border=1,
         image_factory=QRImage)

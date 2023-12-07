@@ -9,6 +9,7 @@ import logging
 from typing import Final, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from artisanlib.types import ProfileData # pylint: disable=unused-import
 
 try:
@@ -23,8 +24,8 @@ from artisanlib.util import replace_duplicates, fromFtoCstrict, RoRfromFtoCstric
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given IKAWA CSV file
-def extractProfileLoringCSV(file,aw):
-    res:ProfileData = {} # the interpreted data set
+def extractProfileLoringCSV(file:str, aw:'ApplicationWindow') -> 'ProfileData':
+    res:'ProfileData' = {} # the interpreted data set
 
     with open(file, newline='',encoding='utf-8') as csvFile:
         data = csv.reader(csvFile,delimiter=',')

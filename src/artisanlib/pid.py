@@ -129,9 +129,9 @@ class PID:
 
 
     # update control value (the pid loop is running even if PID is inactive, just the control function is only called if active)
-    def update(self, i:float) -> None:
+    def update(self, i:Optional[float]) -> None:
         try:
-            if i == -1:
+            if i == -1 or i is None:
                 # reject error values
                 return
             self.pidSemaphore.acquire(1)

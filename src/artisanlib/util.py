@@ -30,6 +30,7 @@ from typing import Final, Optional, Tuple, List, Sequence, Union, Any, TYPE_CHEC
 from typing_extensions import TypeGuard  # Python <=3.10
 
 if TYPE_CHECKING:
+    from artisanlib.main import Artisan # pylint: disable=unused-import
     import numpy.typing as npt # pylint: disable=unused-import
 
 
@@ -243,7 +244,7 @@ def toInt(x:Optional[Union[int,str,float]]) -> int:
 def toString(x:Any) -> str:
     return str(x)
 
-def toList(x:Any) -> List:
+def toList(x:Any) -> List[Any]:
     if x is None:
         return []
     return list(x)
@@ -269,7 +270,7 @@ def toBool(x:Any) -> bool:
             return False
     return bool(x)
 
-def toStringList(x:List) -> List[str]:
+def toStringList(x:List[Any]) -> List[str]:
     if x:
         return [str(s) for s in x]
     return []
@@ -284,7 +285,7 @@ def removeAll(ll:List[str], s:str) -> None:
 # [-1,-1,2] => [2, 2, 2] # a prefix of -1 of max length 'interpolate_max' will be replaced by the first value in l that is not -1
 # INVARIANT: the resulting list has always the same length as l
 # only gaps of length interpolate_max (should be set to the global aw.qmc.interpolatemax), if not None, are interpolated
-def fill_gaps(ll:Union[Sequence[Union[float, int]], 'npt.NDArray[numpy.floating]'], interpolate_max:int=3) -> List[float]:
+def fill_gaps(ll:Union[Sequence[Union[float, int]], 'npt.NDArray[numpy.floating[Any]]'], interpolate_max:int=3) -> List[float]:
     res:List[float] = []
     last_val:float = -1
     skip:int = -1
@@ -354,13 +355,13 @@ def replace_duplicates(data:List[float]) -> List[float]:
 # otherwise the path is computed on first call and then memorized
 # if the computed path does not exists it is created
 # if creation or access of the path fails None is returned and memorized
-def getDataDirectory():
+def getDataDirectory() -> Optional[str]:
     app = QCoreApplication.instance()
     return _getAppDataDirectory(app)
 
 # internal function to return
 @functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
-def _getAppDataDirectory(app):
+def _getAppDataDirectory(app:'Artisan') -> Optional[str]:
     # temporarily switch app name to Artisan (as it might be ArtisanViewer)
     appName = app.applicationName()
     app.setApplicationName(application_name)
@@ -376,7 +377,7 @@ def _getAppDataDirectory(app):
         return None
 
 @functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
-def getAppPath():
+def getAppPath() -> str:
     platf = platform.system()
     if platf in {'Darwin','Linux'}:
         if appFrozen():
@@ -389,7 +390,7 @@ def getAppPath():
     return QCoreApplication.applicationDirPath() + '/'
 
 @functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
-def getResourcePath():
+def getResourcePath() -> str:
     platf = platform.system()
     if platf == 'Darwin':
         if appFrozen():
@@ -544,11 +545,11 @@ def debugLogLevelToggle() -> bool:
     setDebugLogLevel(newDebugLevel)
     return newDebugLevel
 
-def natsort(s):
+def natsort(s:str) -> List[Union[int,str]]:
     return [int(t) if t.isdigit() else t.lower() for t in re.split(r'(\d+)', s)]
 
 #convert number to string and auto set the number of decimal places 0, 0.999, 9.99, 999.9, 9999
-def scaleFloat2String(num):
+def scaleFloat2String(num:Union[float,str]) -> str:
     n = toFloat(num)
     if n == 0:
         return '0'

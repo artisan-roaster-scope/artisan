@@ -156,7 +156,7 @@ class autosaveDlg(ArtisanDialog):
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog
                 QApplication.translate('Form Caption','Autosave Fields Help'),
-                autosave_help.content())
+                autosave_help.content()) # type:ignore # "content" in typed context  [no-untyped-call]
 
     def closeHelp(self) -> None:
         self.aw.closeHelpDialog(self.helpdialog)

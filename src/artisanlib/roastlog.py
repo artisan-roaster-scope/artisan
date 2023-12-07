@@ -7,12 +7,14 @@ import dateutil.parser
 import requests
 from requests_file import FileAdapter # type: ignore  # @UnresolvedImport
 import re
-from lxml import html # type: ignore
+from lxml import html
 import logging
 from typing import Final, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from artisanlib.types import ProfileData # pylint: disable=unused-import
+    from PyQt6.QtCore import QUrl # pylint: disable=unused-import
 
 try:
     from PyQt6.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
@@ -26,8 +28,8 @@ from artisanlib.util import encodeLocal, stringtoseconds
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given RoastLog document pointed by the given QUrl
-def extractProfileRoastLog(url,_):
-    res:ProfileData = {} # the interpreted data set
+def extractProfileRoastLog(url:'QUrl', _:'ApplicationWindow') -> Optional['ProfileData']:
+    res:'ProfileData' = {} # the interpreted data set
     try:
         s = requests.Session()
         s.mount('file://', FileAdapter())
@@ -106,12 +108,12 @@ def extractProfileRoastLog(url,_):
             if len(d)>0:
                 rid = d[0]
 
-                url = f'https://roastlog.com/roasts/profiles/?rid={rid}'
+                url_str:str = f'https://roastlog.com/roasts/profiles/?rid={rid}'
                 headers = {
                     'X-Requested-With' : 'XMLHttpRequest',
                     'Accept' : 'application/json',
                     'Accept-Encoding' : 'gzip'}
-                response = requests.get(url, timeout=(4, 15), headers=headers)
+                response = requests.get(url_str, timeout=(4, 15), headers=headers)
                 data_json = response.json()
 
                 timeindex:List[int] = [-1,0,0,0,0,0,0,0]

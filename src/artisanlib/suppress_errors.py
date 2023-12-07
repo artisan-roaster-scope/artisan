@@ -2,7 +2,12 @@
 
 import os
 import sys
-from typing import Tuple
+from typing import Optional, Type, TYPE_CHECKING
+
+
+if TYPE_CHECKING:
+    from types import TracebackType # pylint: disable=unused-import
+
 
 # from https://stackoverflow.com/questions/11130156/suppress-stdout-stderr-print-from-python-functions
 
@@ -42,7 +47,11 @@ class suppress_stdout_stderr:
             os.dup2(self.null_fds[0],1)
             os.dup2(self.null_fds[1],2)
 
-    def __exit__(self, *_:Tuple) -> None:
+    def __exit__(self,
+        _exc_type: Optional[Type[BaseException]] = None,
+        _exc_val: Optional[BaseException] = None,
+        _exc_tb: Optional['TracebackType'] = None) -> None:
+
         # Re-assign the real stdout/stderr back to (1) and (2)
         try:
             if self.save_fds:
