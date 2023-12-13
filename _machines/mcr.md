@@ -2,6 +2,7 @@
 layout: single
 permalink: /machines/mcr/
 title: "Mill City Roasters"
+excerpt: ""
 header:
   overlay_image: /assets/images/mcr.jpg
   image: /assets/images/mcr.jpg
@@ -29,7 +30,7 @@ For some machines there are two setups. One for machines configured to report te
 * __Digital Control Panel - 1120__ – _control_  
 (1.5kg to 60kg, 2018 – Present)  
 `Mill City Roasters >> Digital Control Panel 1120`  
-  - BT (bean temperature) from Phidget 1048 channel 0 (k-type)
+  - BT (bean temperature)
   - ET (environmental temperature)
   - IT (incoming air temperature)
   - DT (drum temperature)
@@ -43,7 +44,7 @@ For some machines there are two setups. One for machines configured to report te
 * __Digital Control Panel - 1000__ _control_   
 (1.5kg to 60kg, 2018 – Present)  
 `Mill City Roasters >> Digital Control Panel 1000`  
-  - BT (bean temperature) from Phidget 1048 channel 0 (k-type)
+  - BT (bean temperature)
   - ET (environmental temperature)
   - IT (incoming air temperature)
   - burner (0-350 daPa)
