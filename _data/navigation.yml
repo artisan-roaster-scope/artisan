@@ -102,6 +102,8 @@ machines:
         url: /machines/lilla/
       - title: "Loring"
         url: /machines/loring/
+      - title: "Mill City Roasters"
+        url: /machines/mcr/
       - title: "NOR Coffee Roaster"
         url: /machines/nor/
       - title: "Nordic"
