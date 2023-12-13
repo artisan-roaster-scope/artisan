@@ -19,7 +19,7 @@ import sys
 import time
 import platform
 import logging
-from typing import Final, List, Optional, TYPE_CHECKING
+from typing import Final, List, Optional, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -1717,8 +1717,7 @@ class comportDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(int)
     def portComboBoxIndexChanged(self,i):
-        sender = self.sender()
-        assert isinstance(sender, PortComboBox)
+        sender = cast(PortComboBox, self.sender())
         sender.setSelection(i)
 
     def createserialTable(self):
@@ -1753,7 +1752,7 @@ class comportDlg(ArtisanResizeablDialog):
                             devname = devicename
                         device = QTableWidgetItem(devname)    #type identification of the device. Non editable
                         self.serialtable.setItem(i,0,device)
-                        if (devid not in self.aw.qmc.nonSerialDevices) and devicename[0] != '+': # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                        if (devid not in self.aw.qmc.nonSerialDevices) and devid != 29 and devicename[0] != '+': # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                             comportComboBox = PortComboBox(selection = self.aw.extracomport[i])
                             comportComboBox.activated.connect(self.portComboBoxIndexChanged)
                             comportComboBox.setMinimumContentsLength(15)
@@ -1798,24 +1797,18 @@ class comportDlg(ArtisanResizeablDialog):
                 if len(self.aw.qmc.extradevices) > i:
                     devid = self.aw.qmc.extradevices[i]
                     devicename = self.aw.qmc.devices[devid-1]    #type identification of the device. Non editable
-                    if (devid not in self.aw.qmc.nonSerialDevices) and devicename[0] != '+': # hide serial confs for MODBUS and "+XX" extra devices
-                        comportComboBox = self.serialtable.cellWidget(i,1)
-                        assert isinstance(comportComboBox, PortComboBox)
+                    if (devid not in self.aw.qmc.nonSerialDevices) and devid != 29 and devicename[0] != '+': # hide serial confs for MODBUS and "+XX" extra devices
+                        comportComboBox = cast(PortComboBox, self.serialtable.cellWidget(i,1))
                         self.aw.extracomport[i] = str(comportComboBox.getSelection())
-                        baudComboBox = self.serialtable.cellWidget(i,2)
-                        assert isinstance(baudComboBox, QComboBox)
+                        baudComboBox = cast(QComboBox, self.serialtable.cellWidget(i,2))
                         self.aw.extrabaudrate[i] = int(str(baudComboBox.currentText()))
-                        byteComboBox =  self.serialtable.cellWidget(i,3)
-                        assert isinstance(byteComboBox, QComboBox)
+                        byteComboBox = cast(QComboBox, self.serialtable.cellWidget(i,3))
                         self.aw.extrabytesize[i] = int(str(byteComboBox.currentText()))
-                        parityComboBox =  self.serialtable.cellWidget(i,4)
-                        assert isinstance(parityComboBox, QComboBox)
+                        parityComboBox = cast(QComboBox, self.serialtable.cellWidget(i,4))
                         self.aw.extraparity[i] = str(parityComboBox.currentText())
-                        stopbitsComboBox = self.serialtable.cellWidget(i,5)
-                        assert isinstance(stopbitsComboBox, QComboBox)
+                        stopbitsComboBox = cast(QComboBox, self.serialtable.cellWidget(i,5))
                         self.aw.extrastopbits[i] = int(str(stopbitsComboBox.currentText()))
-                        timeoutEdit = self.serialtable.cellWidget(i,6)
-                        assert isinstance(timeoutEdit, QLineEdit)
+                        timeoutEdit = cast(QLineEdit, self.serialtable.cellWidget(i,6))
                         self.aw.extratimeout[i] = float(str(timeoutEdit.text()))
             #create serial ports for each extra device
             self.aw.extraser = []

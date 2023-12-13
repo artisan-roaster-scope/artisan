@@ -4,26 +4,27 @@
 
 # Written by Abd Allah Diab (mpcabd)
 # Email: mpcabd ^at^ gmail ^dot^ com
-# Website: http://mpcabd.igeex.biz
+# GitHub: https://github.com/mpcabd/python-arabic-reshaper
 
 # Ported and tweaked from Java to Python, from Better Arabic Reshaper [https://github.com/agawish/Better-Arabic-Reshaper/]
 
 import re
+from typing import Final, Dict, Tuple, List
 
-DEFINED_CHARACTERS_ORGINAL_ALF_UPPER_MDD        = '\u0622'
-DEFINED_CHARACTERS_ORGINAL_ALF_UPPER_HAMAZA     = '\u0623'
-DEFINED_CHARACTERS_ORGINAL_ALF_LOWER_HAMAZA     = '\u0625'
-DEFINED_CHARACTERS_ORGINAL_ALF                  = '\u0627'
-DEFINED_CHARACTERS_ORGINAL_LAM                  = '\u0644'
+DEFINED_CHARACTERS_ORGINAL_ALF_UPPER_MDD:Final[str]        = '\u0622'
+DEFINED_CHARACTERS_ORGINAL_ALF_UPPER_HAMAZA:Final[str]     = '\u0623'
+DEFINED_CHARACTERS_ORGINAL_ALF_LOWER_HAMAZA:Final[str]     = '\u0625'
+DEFINED_CHARACTERS_ORGINAL_ALF:Final[str]                  = '\u0627'
+DEFINED_CHARACTERS_ORGINAL_LAM:Final[str]                  = '\u0644'
 
-LAM_ALEF_GLYPHS = [
-    ['\u3BA6', '\uFEF6', '\uFEF5'],
-    ['\u3BA7', '\uFEF8', '\uFEF7'],
-    ['\u0627', '\uFEFC', '\uFEFB'],
-    ['\u0625', '\uFEFA', '\uFEF9']
-]
+LAM_ALEF_GLYPHS:Final[Tuple[Tuple[str,str,str],Tuple[str,str,str],Tuple[str,str,str],Tuple[str,str,str]]] = (
+    ('\u3BA6', '\uFEF6', '\uFEF5'),
+    ('\u3BA7', '\uFEF8', '\uFEF7'),
+    ('\u0627', '\uFEFC', '\uFEFB'),
+    ('\u0625', '\uFEFA', '\uFEF9')
+)
 
-HARAKAT = [
+HARAKAT:Tuple[str, ...] = (
     '\u0600', '\u0601', '\u0602', '\u0603', '\u0606', '\u0607', '\u0608', '\u0609',
     '\u060A', '\u060B', '\u060D', '\u060E', '\u0610', '\u0611', '\u0612', '\u0613',
     '\u0614', '\u0615', '\u0616', '\u0617', '\u0618', '\u0619', '\u061A', '\u061B',
@@ -39,122 +40,122 @@ HARAKAT = [
     '\u06F0', '\u06FD', '\uFE70', '\uFE71', '\uFE72', '\uFE73', '\uFE74', '\uFE75',
     '\uFE76', '\uFE77', '\uFE78', '\uFE79', '\uFE7A', '\uFE7B', '\uFE7C', '\uFE7D',
     '\uFE7E', '\uFE7F', '\uFC5E', '\uFC5F', '\uFC60', '\uFC61', '\uFC62', '\uFC63'
-]
+)
 
-ARABIC_GLYPHS = {
-    '\u0622' : ['\u0622', '\uFE81', '\uFE81', '\uFE82', '\uFE82', 2],
-    '\u0623' : ['\u0623', '\uFE83', '\uFE83', '\uFE84', '\uFE84', 2],
-    '\u0624' : ['\u0624', '\uFE85', '\uFE85', '\uFE86', '\uFE86', 2],
-    '\u0625' : ['\u0625', '\uFE87', '\uFE87', '\uFE88', '\uFE88', 2],
-    '\u0626' : ['\u0626', '\uFE89', '\uFE8B', '\uFE8C', '\uFE8A', 4],
-    '\u0627' : ['\u0627', '\u0627', '\u0627', '\uFE8E', '\uFE8E', 2],
-    '\u0628' : ['\u0628', '\uFE8F', '\uFE91', '\uFE92', '\uFE90', 4],
-    '\u0629' : ['\u0629', '\uFE93', '\uFE93', '\uFE94', '\uFE94', 2],
-    '\u062A' : ['\u062A', '\uFE95', '\uFE97', '\uFE98', '\uFE96', 4],
-    '\u062B' : ['\u062B', '\uFE99', '\uFE9B', '\uFE9C', '\uFE9A', 4],
-    '\u062C' : ['\u062C', '\uFE9D', '\uFE9F', '\uFEA0', '\uFE9E', 4],
-    '\u062D' : ['\u062D', '\uFEA1', '\uFEA3', '\uFEA4', '\uFEA2', 4],
-    '\u062E' : ['\u062E', '\uFEA5', '\uFEA7', '\uFEA8', '\uFEA6', 4],
-    '\u062F' : ['\u062F', '\uFEA9', '\uFEA9', '\uFEAA', '\uFEAA', 2],
-    '\u0630' : ['\u0630', '\uFEAB', '\uFEAB', '\uFEAC', '\uFEAC', 2],
-    '\u0631' : ['\u0631', '\uFEAD', '\uFEAD', '\uFEAE', '\uFEAE', 2],
-    '\u0632' : ['\u0632', '\uFEAF', '\uFEAF', '\uFEB0', '\uFEB0', 2],
-    '\u0633' : ['\u0633', '\uFEB1', '\uFEB3', '\uFEB4', '\uFEB2', 4],
-    '\u0634' : ['\u0634', '\uFEB5', '\uFEB7', '\uFEB8', '\uFEB6', 4],
-    '\u0635' : ['\u0635', '\uFEB9', '\uFEBB', '\uFEBC', '\uFEBA', 4],
-    '\u0636' : ['\u0636', '\uFEBD', '\uFEBF', '\uFEC0', '\uFEBE', 4],
-    '\u0637' : ['\u0637', '\uFEC1', '\uFEC3', '\uFEC4', '\uFEC2', 4],
-    '\u0638' : ['\u0638', '\uFEC5', '\uFEC7', '\uFEC8', '\uFEC6', 4],
-    '\u0639' : ['\u0639', '\uFEC9', '\uFECB', '\uFECC', '\uFECA', 4],
-    '\u063A' : ['\u063A', '\uFECD', '\uFECF', '\uFED0', '\uFECE', 4],
-    '\u0641' : ['\u0641', '\uFED1', '\uFED3', '\uFED4', '\uFED2', 4],
-    '\u0642' : ['\u0642', '\uFED5', '\uFED7', '\uFED8', '\uFED6', 4],
-    '\u0643' : ['\u0643', '\uFED9', '\uFEDB', '\uFEDC', '\uFEDA', 4],
-    '\u0644' : ['\u0644', '\uFEDD', '\uFEDF', '\uFEE0', '\uFEDE', 4],
-    '\u0645' : ['\u0645', '\uFEE1', '\uFEE3', '\uFEE4', '\uFEE2', 4],
-    '\u0646' : ['\u0646', '\uFEE5', '\uFEE7', '\uFEE8', '\uFEE6', 4],
-    '\u0647' : ['\u0647', '\uFEE9', '\uFEEB', '\uFEEC', '\uFEEA', 4],
-    '\u0648' : ['\u0648', '\uFEED', '\uFEED', '\uFEEE', '\uFEEE', 2],
-    '\u0649' : ['\u0649', '\uFEEF', '\uFEEF', '\uFEF0', '\uFEF0', 2],
-    '\u0671' : ['\u0671', '\u0671', '\u0671', '\uFB51', '\uFB51', 2],
-    '\u064A' : ['\u064A', '\uFEF1', '\uFEF3', '\uFEF4', '\uFEF2', 4],
-    '\u066E' : ['\u066E', '\uFBE4', '\uFBE8', '\uFBE9', '\uFBE5', 4],
-    '\u06AA' : ['\u06AA', '\uFB8E', '\uFB90', '\uFB91', '\uFB8F', 4],
-    '\u06C1' : ['\u06C1', '\uFBA6', '\uFBA8', '\uFBA9', '\uFBA7', 4],
-    '\u06E4' : ['\u06E4', '\u06E4', '\u06E4', '\u06E4', '\uFEEE', 2],
-    '\u067E' : ['\u067E', '\uFB56', '\uFB58', '\uFB59', '\uFB57', 4],
-    '\u0698' : ['\u0698', '\uFB8A', '\uFB8A', '\uFB8A', '\uFB8B', 2],
-    '\u06AF' : ['\u06AF', '\uFB92', '\uFB94', '\uFB95', '\uFB93', 4],
-    '\u0686' : ['\u0686', '\uFB7A', '\uFB7C', '\uFB7D', '\uFB7B', 4],
-    '\u06A9' : ['\u06A9', '\uFB8E', '\uFB90', '\uFB91', '\uFB8F', 4],
-    '\u06CC' : ['\u06CC', '\uFEEF', '\uFEF3', '\uFEF4', '\uFEF0', 4]
+ARABIC_GLYPHS:Final[Dict[str,Tuple[str,str,str,str,str,int]]] = {
+    '\u0622' : ('\u0622', '\uFE81', '\uFE81', '\uFE82', '\uFE82', 2),
+    '\u0623' : ('\u0623', '\uFE83', '\uFE83', '\uFE84', '\uFE84', 2),
+    '\u0624' : ('\u0624', '\uFE85', '\uFE85', '\uFE86', '\uFE86', 2),
+    '\u0625' : ('\u0625', '\uFE87', '\uFE87', '\uFE88', '\uFE88', 2),
+    '\u0626' : ('\u0626', '\uFE89', '\uFE8B', '\uFE8C', '\uFE8A', 4),
+    '\u0627' : ('\u0627', '\u0627', '\u0627', '\uFE8E', '\uFE8E', 2),
+    '\u0628' : ('\u0628', '\uFE8F', '\uFE91', '\uFE92', '\uFE90', 4),
+    '\u0629' : ('\u0629', '\uFE93', '\uFE93', '\uFE94', '\uFE94', 2),
+    '\u062A' : ('\u062A', '\uFE95', '\uFE97', '\uFE98', '\uFE96', 4),
+    '\u062B' : ('\u062B', '\uFE99', '\uFE9B', '\uFE9C', '\uFE9A', 4),
+    '\u062C' : ('\u062C', '\uFE9D', '\uFE9F', '\uFEA0', '\uFE9E', 4),
+    '\u062D' : ('\u062D', '\uFEA1', '\uFEA3', '\uFEA4', '\uFEA2', 4),
+    '\u062E' : ('\u062E', '\uFEA5', '\uFEA7', '\uFEA8', '\uFEA6', 4),
+    '\u062F' : ('\u062F', '\uFEA9', '\uFEA9', '\uFEAA', '\uFEAA', 2),
+    '\u0630' : ('\u0630', '\uFEAB', '\uFEAB', '\uFEAC', '\uFEAC', 2),
+    '\u0631' : ('\u0631', '\uFEAD', '\uFEAD', '\uFEAE', '\uFEAE', 2),
+    '\u0632' : ('\u0632', '\uFEAF', '\uFEAF', '\uFEB0', '\uFEB0', 2),
+    '\u0633' : ('\u0633', '\uFEB1', '\uFEB3', '\uFEB4', '\uFEB2', 4),
+    '\u0634' : ('\u0634', '\uFEB5', '\uFEB7', '\uFEB8', '\uFEB6', 4),
+    '\u0635' : ('\u0635', '\uFEB9', '\uFEBB', '\uFEBC', '\uFEBA', 4),
+    '\u0636' : ('\u0636', '\uFEBD', '\uFEBF', '\uFEC0', '\uFEBE', 4),
+    '\u0637' : ('\u0637', '\uFEC1', '\uFEC3', '\uFEC4', '\uFEC2', 4),
+    '\u0638' : ('\u0638', '\uFEC5', '\uFEC7', '\uFEC8', '\uFEC6', 4),
+    '\u0639' : ('\u0639', '\uFEC9', '\uFECB', '\uFECC', '\uFECA', 4),
+    '\u063A' : ('\u063A', '\uFECD', '\uFECF', '\uFED0', '\uFECE', 4),
+    '\u0641' : ('\u0641', '\uFED1', '\uFED3', '\uFED4', '\uFED2', 4),
+    '\u0642' : ('\u0642', '\uFED5', '\uFED7', '\uFED8', '\uFED6', 4),
+    '\u0643' : ('\u0643', '\uFED9', '\uFEDB', '\uFEDC', '\uFEDA', 4),
+    '\u0644' : ('\u0644', '\uFEDD', '\uFEDF', '\uFEE0', '\uFEDE', 4),
+    '\u0645' : ('\u0645', '\uFEE1', '\uFEE3', '\uFEE4', '\uFEE2', 4),
+    '\u0646' : ('\u0646', '\uFEE5', '\uFEE7', '\uFEE8', '\uFEE6', 4),
+    '\u0647' : ('\u0647', '\uFEE9', '\uFEEB', '\uFEEC', '\uFEEA', 4),
+    '\u0648' : ('\u0648', '\uFEED', '\uFEED', '\uFEEE', '\uFEEE', 2),
+    '\u0649' : ('\u0649', '\uFEEF', '\uFEEF', '\uFEF0', '\uFEF0', 2),
+    '\u0671' : ('\u0671', '\u0671', '\u0671', '\uFB51', '\uFB51', 2),
+    '\u064A' : ('\u064A', '\uFEF1', '\uFEF3', '\uFEF4', '\uFEF2', 4),
+    '\u066E' : ('\u066E', '\uFBE4', '\uFBE8', '\uFBE9', '\uFBE5', 4),
+    '\u06AA' : ('\u06AA', '\uFB8E', '\uFB90', '\uFB91', '\uFB8F', 4),
+    '\u06C1' : ('\u06C1', '\uFBA6', '\uFBA8', '\uFBA9', '\uFBA7', 4),
+    '\u06E4' : ('\u06E4', '\u06E4', '\u06E4', '\u06E4', '\uFEEE', 2),
+    '\u067E' : ('\u067E', '\uFB56', '\uFB58', '\uFB59', '\uFB57', 4),
+    '\u0698' : ('\u0698', '\uFB8A', '\uFB8A', '\uFB8A', '\uFB8B', 2),
+    '\u06AF' : ('\u06AF', '\uFB92', '\uFB94', '\uFB95', '\uFB93', 4),
+    '\u0686' : ('\u0686', '\uFB7A', '\uFB7C', '\uFB7D', '\uFB7B', 4),
+    '\u06A9' : ('\u06A9', '\uFB8E', '\uFB90', '\uFB91', '\uFB8F', 4),
+    '\u06CC' : ('\u06CC', '\uFEEF', '\uFEF3', '\uFEF4', '\uFEF0', 4)
 }
 
-ARABIC_GLYPHS_LIST = [
-    ['\u0622', '\uFE81', '\uFE81', '\uFE82', '\uFE82', 2],
-    ['\u0623', '\uFE83', '\uFE83', '\uFE84', '\uFE84', 2],
-    ['\u0624', '\uFE85', '\uFE85', '\uFE86', '\uFE86', 2],
-    ['\u0625', '\uFE87', '\uFE87', '\uFE88', '\uFE88', 2],
-    ['\u0626', '\uFE89', '\uFE8B', '\uFE8C', '\uFE8A', 4],
-    ['\u0627', '\u0627', '\u0627', '\uFE8E', '\uFE8E', 2],
-    ['\u0628', '\uFE8F', '\uFE91', '\uFE92', '\uFE90', 4],
-    ['\u0629', '\uFE93', '\uFE93', '\uFE94', '\uFE94', 2],
-    ['\u062A', '\uFE95', '\uFE97', '\uFE98', '\uFE96', 4],
-    ['\u062B', '\uFE99', '\uFE9B', '\uFE9C', '\uFE9A', 4],
-    ['\u062C', '\uFE9D', '\uFE9F', '\uFEA0', '\uFE9E', 4],
-    ['\u062D', '\uFEA1', '\uFEA3', '\uFEA4', '\uFEA2', 4],
-    ['\u062E', '\uFEA5', '\uFEA7', '\uFEA8', '\uFEA6', 4],
-    ['\u062F', '\uFEA9', '\uFEA9', '\uFEAA', '\uFEAA', 2],
-    ['\u0630', '\uFEAB', '\uFEAB', '\uFEAC', '\uFEAC', 2],
-    ['\u0631', '\uFEAD', '\uFEAD', '\uFEAE', '\uFEAE', 2],
-    ['\u0632', '\uFEAF', '\uFEAF', '\uFEB0', '\uFEB0', 2],
-    ['\u0633', '\uFEB1', '\uFEB3', '\uFEB4', '\uFEB2', 4],
-    ['\u0634', '\uFEB5', '\uFEB7', '\uFEB8', '\uFEB6', 4],
-    ['\u0635', '\uFEB9', '\uFEBB', '\uFEBC', '\uFEBA', 4],
-    ['\u0636', '\uFEBD', '\uFEBF', '\uFEC0', '\uFEBE', 4],
-    ['\u0637', '\uFEC1', '\uFEC3', '\uFEC4', '\uFEC2', 4],
-    ['\u0638', '\uFEC5', '\uFEC7', '\uFEC8', '\uFEC6', 4],
-    ['\u0639', '\uFEC9', '\uFECB', '\uFECC', '\uFECA', 4],
-    ['\u063A', '\uFECD', '\uFECF', '\uFED0', '\uFECE', 4],
-    ['\u0641', '\uFED1', '\uFED3', '\uFED4', '\uFED2', 4],
-    ['\u0642', '\uFED5', '\uFED7', '\uFED8', '\uFED6', 4],
-    ['\u0643', '\uFED9', '\uFEDB', '\uFEDC', '\uFEDA', 4],
-    ['\u0644', '\uFEDD', '\uFEDF', '\uFEE0', '\uFEDE', 4],
-    ['\u0645', '\uFEE1', '\uFEE3', '\uFEE4', '\uFEE2', 4],
-    ['\u0646', '\uFEE5', '\uFEE7', '\uFEE8', '\uFEE6', 4],
-    ['\u0647', '\uFEE9', '\uFEEB', '\uFEEC', '\uFEEA', 4],
-    ['\u0648', '\uFEED', '\uFEED', '\uFEEE', '\uFEEE', 2],
-    ['\u0649', '\uFEEF', '\uFEEF', '\uFEF0', '\uFEF0', 2],
-    ['\u0671', '\u0671', '\u0671', '\uFB51', '\uFB51', 2],
-    ['\u064A', '\uFEF1', '\uFEF3', '\uFEF4', '\uFEF2', 4],
-    ['\u066E', '\uFBE4', '\uFBE8', '\uFBE9', '\uFBE5', 4],
-    ['\u06AA', '\uFB8E', '\uFB90', '\uFB91', '\uFB8F', 4],
-    ['\u06C1', '\uFBA6', '\uFBA8', '\uFBA9', '\uFBA7', 4],
-    ['\u067E', '\uFB56', '\uFB58', '\uFB59', '\uFB57', 4],
-    ['\u0698', '\uFB8A', '\uFB8A', '\uFB8A', '\uFB8B', 2],
-    ['\u06AF', '\uFB92', '\uFB94', '\uFB95', '\uFB93', 4],
-    ['\u0686', '\uFB7A', '\uFB7C', '\uFB7D', '\uFB7B', 4],
-    ['\u06A9', '\uFB8E', '\uFB90', '\uFB91', '\uFB8F', 4],
-    ['\u06CC', '\uFEEF', '\uFEF3', '\uFEF4', '\uFEF0', 4]
+ARABIC_GLYPHS_LIST:Final[List[Tuple[str,str,str,str,str,int]]] = [
+    ('\u0622', '\uFE81', '\uFE81', '\uFE82', '\uFE82', 2),
+    ('\u0623', '\uFE83', '\uFE83', '\uFE84', '\uFE84', 2),
+    ('\u0624', '\uFE85', '\uFE85', '\uFE86', '\uFE86', 2),
+    ('\u0625', '\uFE87', '\uFE87', '\uFE88', '\uFE88', 2),
+    ('\u0626', '\uFE89', '\uFE8B', '\uFE8C', '\uFE8A', 4),
+    ('\u0627', '\u0627', '\u0627', '\uFE8E', '\uFE8E', 2),
+    ('\u0628', '\uFE8F', '\uFE91', '\uFE92', '\uFE90', 4),
+    ('\u0629', '\uFE93', '\uFE93', '\uFE94', '\uFE94', 2),
+    ('\u062A', '\uFE95', '\uFE97', '\uFE98', '\uFE96', 4),
+    ('\u062B', '\uFE99', '\uFE9B', '\uFE9C', '\uFE9A', 4),
+    ('\u062C', '\uFE9D', '\uFE9F', '\uFEA0', '\uFE9E', 4),
+    ('\u062D', '\uFEA1', '\uFEA3', '\uFEA4', '\uFEA2', 4),
+    ('\u062E', '\uFEA5', '\uFEA7', '\uFEA8', '\uFEA6', 4),
+    ('\u062F', '\uFEA9', '\uFEA9', '\uFEAA', '\uFEAA', 2),
+    ('\u0630', '\uFEAB', '\uFEAB', '\uFEAC', '\uFEAC', 2),
+    ('\u0631', '\uFEAD', '\uFEAD', '\uFEAE', '\uFEAE', 2),
+    ('\u0632', '\uFEAF', '\uFEAF', '\uFEB0', '\uFEB0', 2),
+    ('\u0633', '\uFEB1', '\uFEB3', '\uFEB4', '\uFEB2', 4),
+    ('\u0634', '\uFEB5', '\uFEB7', '\uFEB8', '\uFEB6', 4),
+    ('\u0635', '\uFEB9', '\uFEBB', '\uFEBC', '\uFEBA', 4),
+    ('\u0636', '\uFEBD', '\uFEBF', '\uFEC0', '\uFEBE', 4),
+    ('\u0637', '\uFEC1', '\uFEC3', '\uFEC4', '\uFEC2', 4),
+    ('\u0638', '\uFEC5', '\uFEC7', '\uFEC8', '\uFEC6', 4),
+    ('\u0639', '\uFEC9', '\uFECB', '\uFECC', '\uFECA', 4),
+    ('\u063A', '\uFECD', '\uFECF', '\uFED0', '\uFECE', 4),
+    ('\u0641', '\uFED1', '\uFED3', '\uFED4', '\uFED2', 4),
+    ('\u0642', '\uFED5', '\uFED7', '\uFED8', '\uFED6', 4),
+    ('\u0643', '\uFED9', '\uFEDB', '\uFEDC', '\uFEDA', 4),
+    ('\u0644', '\uFEDD', '\uFEDF', '\uFEE0', '\uFEDE', 4),
+    ('\u0645', '\uFEE1', '\uFEE3', '\uFEE4', '\uFEE2', 4),
+    ('\u0646', '\uFEE5', '\uFEE7', '\uFEE8', '\uFEE6', 4),
+    ('\u0647', '\uFEE9', '\uFEEB', '\uFEEC', '\uFEEA', 4),
+    ('\u0648', '\uFEED', '\uFEED', '\uFEEE', '\uFEEE', 2),
+    ('\u0649', '\uFEEF', '\uFEEF', '\uFEF0', '\uFEF0', 2),
+    ('\u0671', '\u0671', '\u0671', '\uFB51', '\uFB51', 2),
+    ('\u064A', '\uFEF1', '\uFEF3', '\uFEF4', '\uFEF2', 4),
+    ('\u066E', '\uFBE4', '\uFBE8', '\uFBE9', '\uFBE5', 4),
+    ('\u06AA', '\uFB8E', '\uFB90', '\uFB91', '\uFB8F', 4),
+    ('\u06C1', '\uFBA6', '\uFBA8', '\uFBA9', '\uFBA7', 4),
+    ('\u067E', '\uFB56', '\uFB58', '\uFB59', '\uFB57', 4),
+    ('\u0698', '\uFB8A', '\uFB8A', '\uFB8A', '\uFB8B', 2),
+    ('\u06AF', '\uFB92', '\uFB94', '\uFB95', '\uFB93', 4),
+    ('\u0686', '\uFB7A', '\uFB7C', '\uFB7D', '\uFB7B', 4),
+    ('\u06A9', '\uFB8E', '\uFB90', '\uFB91', '\uFB8F', 4),
+    ('\u06CC', '\uFEEF', '\uFEF3', '\uFEF4', '\uFEF0', 4)
 ]
 
-def get_reshaped_glyph(target, location):
+def get_reshaped_glyph(target:str, location:int) -> str:
     if target in ARABIC_GLYPHS:
-        return ARABIC_GLYPHS[target][location]
+        return str(ARABIC_GLYPHS[target][location])
     return target
 
-def get_glyph_type(target):
+def get_glyph_type(target:str) -> int:
     if target in ARABIC_GLYPHS:
         return ARABIC_GLYPHS[target][5]
     return 2
 
-def is_haraka(target):
+def is_haraka(target:str) -> bool:
     return target in HARAKAT
 
-def replace_jalalah(unshaped_word):
+def replace_jalalah(unshaped_word:str) -> str:
     return re.sub('^\u0627\u0644\u0644\u0647$', '\uFDF2', unshaped_word)
 
-def replace_lam_alef(unshaped_word):
+def replace_lam_alef(unshaped_word:str) -> str:
     list_word = list(unshaped_word)
     letter_before = ''
     for i, _ in enumerate(unshaped_word):
@@ -180,7 +181,7 @@ def replace_lam_alef(unshaped_word):
 
     return ''.join(list_word).replace(' ', '')
 
-def get_lam_alef(candidate_alef, candidate_lam, is_end_of_word):
+def get_lam_alef(candidate_alef:str, candidate_lam:str, is_end_of_word:bool) -> str:
     shift_rate = 1
     if is_end_of_word:
         shift_rate += 1
@@ -216,7 +217,7 @@ class DecomposedWord: # pylint: disable=too-few-public-methods
                 self.letters_position.append(i)
                 self.stripped_regular_letters.append(c)
 
-    def reconstruct_word(self, reshaped_word):
+    def reconstruct_word(self, reshaped_word:str) -> str:
         ll = list('\x00' * (len(self.stripped_harakat) + len(reshaped_word)))
         for i, _ in enumerate(self.letters_position):
             ll[self.letters_position[i]] = reshaped_word[i]
@@ -224,7 +225,7 @@ class DecomposedWord: # pylint: disable=too-few-public-methods
             ll[self.harakat_positions[i]] = self.stripped_harakat[i]
         return ''.join(ll)
 
-def get_reshaped_word(unshaped_word):
+def get_reshaped_word(unshaped_word:str) -> str:
     unshaped_word = replace_jalalah(unshaped_word)
     unshaped_word = replace_lam_alef(unshaped_word)
     decomposed_word = DecomposedWord(unshaped_word)
@@ -233,7 +234,7 @@ def get_reshaped_word(unshaped_word):
         result = reshape_it(''.join(decomposed_word.stripped_regular_letters))
     return decomposed_word.reconstruct_word(result)
 
-def reshape_it(unshaped_word):
+def reshape_it(unshaped_word:str) -> str:
     if not unshaped_word:
         return ''
     if len(unshaped_word) == 1:
@@ -261,21 +262,21 @@ def reshape_it(unshaped_word):
     return ''.join(reshaped_word)
 
 
-def is_arabic_character(target):
+def is_arabic_character(target:str) -> bool:
     return target in ARABIC_GLYPHS or target in HARAKAT
 
-def get_words(sentence):
+def get_words(sentence:str) -> List[str]:
     if sentence:
         return re.split('\\s', sentence)
     return []
 
-def has_arabic_letters(word):
+def has_arabic_letters(word:str) -> bool:
     return any(is_arabic_character(c) for c in word)
 
-def is_arabic_word(word):
+def is_arabic_word(word:str) -> bool:
     return all(is_arabic_character(c) for c in word)
 
-def get_words_from_mixed_word(word):
+def get_words_from_mixed_word(word:str) -> List[str]:
     temp_word = ''
     words = []
     for c in word:
@@ -294,7 +295,7 @@ def get_words_from_mixed_word(word):
         words.append(temp_word)
     return words
 
-def reshape(text):
+def reshape(text:str) -> str:
     if text:
         lines = re.split('\\r?\\n', text)
         for i, _ in enumerate(lines):
@@ -302,7 +303,7 @@ def reshape(text):
         return '\n'.join(lines)
     return ''
 
-def reshape_sentence(sentence):
+def reshape_sentence(sentence:str) -> str:
     words = get_words(sentence)
     for i, _ in enumerate(words):
         word = words[i]

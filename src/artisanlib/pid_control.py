@@ -284,7 +284,7 @@ class FujiPID:
                 self.PXF[k] = [self.PXF[k][0]+1000]
 
     #writes new values for p - i - d
-    def setpidPXG(self,k,newPvalue,newIvalue,newDvalue):
+    def setpidPXG(self, k:int, newPvalue:float, newIvalue:float, newDvalue:float) -> None:
         if k is not None and k > 0:
             #send command to the right sv
             pkey = 'p' + str(k)
@@ -329,7 +329,7 @@ class FujiPID:
                 self.aw.qmc.adderror(message)
 
     #writes new values for p - i - d
-    def setpidPXF(self,k,newPvalue,newIvalue,newDvalue):
+    def setpidPXF(self, k:int, newPvalue:float, newIvalue:float, newDvalue:float) -> None:
         if k is not None and k > 0:
             #send command to the right sv
             pkey = 'p' + str(k)
@@ -400,27 +400,33 @@ class FujiPID:
                 self.aw.fujipid.PXF['rampsoakmode'][0] = currentmode
         return currentmode
 
-    def getCurrentPIDnumberPXG(self):
+    def getCurrentPIDnumberPXG(self) -> int:
+        N:int = -1
         if self.aw.ser.useModbusPort:
             reg = self.aw.modbus.address2register(self.aw.fujipid.PXG4['selectedpid'][1],3)
-            N = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
+            Nr = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
+            if Nr is None:
+                N = -1
         else:
             command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,int(self.aw.fujipid.PXG4['selectedpid'][1]),1)
             N = self.aw.fujipid.readoneword(command)
         libtime.sleep(0.035)
         return N
 
-    def getCurrentPIDnumberPXF(self):
+    def getCurrentPIDnumberPXF(self) -> int:
+        N:int = -1
         if self.aw.ser.useModbusPort:
             reg = self.aw.modbus.address2register(self.aw.fujipid.PXF['selectedpid'][1],3)
-            N = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
+            Nr = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
+            if Nr is None:
+                N = -1
         else:
             command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,int(self.aw.fujipid.PXF['selectedpid'][1]),1)
             N = self.aw.fujipid.readoneword(command)
         libtime.sleep(0.035)
         return N
 
-    def setpidPXR(self,var,v):
+    def setpidPXR(self, var:str, v:float) -> None:
         r = b''
         if var == 'p':
             p = int(v*10)
@@ -464,7 +470,7 @@ class FujiPID:
             self.aw.sendmessage(message)
             self.aw.qmc.adderror(message)
 
-    def calcSV(self,tx):
+    def calcSV(self, tx:float) -> Optional[float]:
         if self.aw.qmc.background:
             # Follow Background mode
             if self.aw.qmc.swapETBT: # we observe the BT
@@ -482,7 +488,7 @@ class FujiPID:
     #This function reads read-only memory (with 3xxxx memory we need function=4)
     #both PXR3 and PXG4 use the same memory location 31001 (3xxxx = read only)
     # pidType: 0=PXG, 1=PXR, 2=None, 3=DTA, 4=PXF (here we support only 0, 1 and 4 for now)
-    def gettemperature(self, pidType, stationNo):
+    def gettemperature(self, pidType:int, stationNo:int) -> Optional[int]:
         reg: int
         if pidType == 0:
             reg = int(self.PXG4['pv?'][1])
@@ -499,10 +505,10 @@ class FujiPID:
         return self.readoneword(self.message2send(stationNo,4,reg,1))
 
     # activates the SV slider
-    def activateONOFFsliderSV(self,flag):
+    def activateONOFFsliderSV(self, flag:bool) -> None:
         self.aw.pidcontrol.activateSVSlider(flag)
 
-    def readcurrentsv(self):
+    def readcurrentsv(self) -> float:
         val:float = -0.1
         if self.aw.ser.useModbusPort:
             reg:Optional[int] = None
@@ -537,7 +543,7 @@ class FujiPID:
         return -1
 
     # returns Fuji duty signal in the range 0-100 or -1
-    def readdutycycle(self):
+    def readdutycycle(self) -> float:
         v = None
         if self.aw.ser.useModbusPort:
             reg = None
@@ -604,7 +610,7 @@ class FujiPID:
         return currentmode
 
     # returns True on success and Fails otherwise
-    def setrampsoakmode(self,mode):
+    def setrampsoakmode(self, mode:int) -> bool:
         register: int
         if self.aw.ser.controlETpid[0] == 0: #Fuji PXG
             register = int(self.PXG4['rampsoakpattern'][1])
@@ -613,7 +619,7 @@ class FujiPID:
         elif self.aw.ser.controlETpid[0] == 4: #Fuji PXF
             register = int(self.PXF['rampsoakpattern'][1])
         else:
-            return 0
+            return False
         if self.aw.ser.useModbusPort:
             reg = self.aw.modbus.address2register(register,3)
             self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,mode)
@@ -635,7 +641,7 @@ class FujiPID:
     #flag =0 OFF, flag = 1 ON, flag = 2 hold
     #A ramp soak pattern defines a whole profile. They have a minimum of 4 segments.
     # returns True on success, False otherwise
-    def setrampsoak(self,flag):
+    def setrampsoak(self, flag:int) -> bool:
         register:Optional[int] = None
         if self.aw.ser.controlETpid[0] == 0: #Fuji PXG
             register = int(self.PXG4['rampsoak'][1])
@@ -675,7 +681,7 @@ class FujiPID:
         return False
 
     # returns True on success, False otherwise
-    def setONOFFstandby(self,flag):
+    def setONOFFstandby(self, flag:int) -> bool:
         _log.debug('setONOFFstandby(%s)',flag)
         #flag = 0 standby OFF, flag = 1 standby ON (pid off)
         #standby ON (pid off) will reset: rampsoak modes/autotuning/self tuning
@@ -688,7 +694,7 @@ class FujiPID:
         elif self.aw.ser.controlETpid[0] == 4:
             register = int(self.aw.fujipid.PXF['runstandby'][1])
         else:
-            return 0
+            return False
         r = None
         command = None
         if self.aw.ser.useModbusPort:
@@ -710,17 +716,17 @@ class FujiPID:
         self.aw.qmc.adderror(mssg)
         return False
 
-    def getONOFFstandby(self):
+    def getONOFFstandby(self) -> Optional[int]:
         if self.aw.ser.controlETpid[0] == 0:
-            return self.aw.fujipid.PXG4['runstandby'][0]
+            return int(self.aw.fujipid.PXG4['runstandby'][0])
         if self.aw.ser.controlETpid[0] == 1:
-            return self.aw.fujipid.PXR['runstandby'][0]
+            return int(self.aw.fujipid.PXR['runstandby'][0])
         if self.aw.ser.controlETpid[0] == 4:
-            return self.aw.fujipid.PXF['runstandby'][0]
+            return int(self.aw.fujipid.PXF['runstandby'][0])
         return None
 
     #sets a new sv value (if silent=False, no output nor event recording is done, if move is True the SV slider is moved)
-    def setsv(self,value,silent=False,move=True):
+    def setsv(self, value:float, silent:bool = False, move:bool = True) -> None:
         command = b''
         #Fuji PXG / PXF
         if self.aw.ser.controlETpid[0] in {0, 4}:  # Fuji PXG or PXF
@@ -801,7 +807,7 @@ class FujiPID:
                 self.aw.qmc.adderror(QApplication.translate('Error Message','Exception:') + ' setPXRsv()')
 
     #used to set up or down SV by diff degrees from current sv setting; if move is True the SV slider is moved
-    def adjustsv(self,diff,move=True):
+    def adjustsv(self, diff:float, move:bool = True) -> None:
         currentsv = self.readcurrentsv()
         if currentsv != -1:
             newsv = int((currentsv + diff)*10.)          #multiply by 10 because we use a decimal point
@@ -874,7 +880,7 @@ class FujiPID:
             self.aw.sendmessage(QApplication.translate('Message','Unable to set new sv'))
 
     #format of the input string Command: COMMAND::VALUE1::VALUE2::VALUE3::ETC
-    def replay(self,CommandString):
+    def replay(self, CommandString:str) -> None:
         parts = CommandString.split('::')
         command = parts[0]
         values = parts[1:]
@@ -886,7 +892,7 @@ class FujiPID:
 
     #example of command string with four segments (minimum for Fuji PIDs)
     # SETRS::270.0::3::0::SETRS::300.0::3::0::SETRS::350.0::3::0::SETRS::400.0::3::0
-    def replaysetrs(self,CommandString):
+    def replaysetrs(self, CommandString:str) -> None:
         segments =CommandString.split('SETRS')
         if len(segments[0]) == 0:
             segments = segments[1:]          #remove first empty [""] list [[""],[etc]]
@@ -951,7 +957,7 @@ class FujiPID:
         #start ramp soak ON
         self.setrampsoak(1)
 
-    def getsegment(self, idn):
+    def getsegment(self, idn:int) -> int:
         if self.aw.ser.controlETpid[0] == 0:
             reg_dict = self.PXG4
         elif self.aw.ser.controlETpid[0] == 1:
@@ -959,7 +965,7 @@ class FujiPID:
         elif self.aw.ser.controlETpid[0] == 4:
             reg_dict = self.PXF
         else:
-            return
+            return -1
         svkey = 'segment' + str(idn) + 'sv'
         register = int(reg_dict[svkey][1])
         if self.aw.ser.useModbusPort:
@@ -969,7 +975,7 @@ class FujiPID:
             svcommand = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,register,1)
             sv = self.aw.fujipid.readoneword(svcommand)
         if sv is None or sv == -1:
-            return
+            return -1
         reg_dict[svkey][0] = sv/10.              #divide by 10 because the decimal point is not sent by the PID
 
         rampkey = 'segment' + str(idn) + 'ramp'
@@ -982,7 +988,7 @@ class FujiPID:
             ramp = self.aw.fujipid.readoneword(rampcommand)
 
         if ramp is None or ramp == -1:
-            return
+            return -1
         reg_dict[rampkey][0] = ramp
 
         soakkey = 'segment' + str(idn) + 'soak'
@@ -994,13 +1000,14 @@ class FujiPID:
             soakcommand = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,register,1)
             soak = self.aw.fujipid.readoneword(soakcommand)
         if soak is None or soak == -1:
-            return
+            return -1
         reg_dict[soakkey][0] = soak
+        return 0
 
 
     #idn = id number, sv = float set value, ramp = ramp value, soak = soak value
     #used in replaysetrs()
-    def setsegment(self,idn,sv,ramp,soak):
+    def setsegment(self, idn:int, sv:float, ramp:float, soak:float) -> None:
         svkey = 'segment' + str(idn) + 'sv'
         rampkey = 'segment' + str(idn) + 'ramp'
         soakkey = 'segment' + str(idn) + 'soak'
@@ -1024,12 +1031,12 @@ class FujiPID:
         else:
             if self.aw.ser.controlETpid[0] == 0:
                 svcommand = self.message2send(self.aw.ser.controlETpid[1],6,int(self.PXG4[svkey][1]),int(sv*10))
-                rampcommand = self.message2send(self.aw.ser.controlETpid[1],6,int(self.PXG4[rampkey][1]),ramp)
-                soakcommand = self.message2send(self.aw.ser.controlETpid[1],6,int(self.PXG4[soakkey][1]),soak)
+                rampcommand = self.message2send(self.aw.ser.controlETpid[1],6,int(self.PXG4[rampkey][1]),int(round(ramp)))
+                soakcommand = self.message2send(self.aw.ser.controlETpid[1],6,int(self.PXG4[soakkey][1]),int(round(soak)))
             elif self.aw.ser.controlETpid[0] == 1:
                 svcommand = self.message2send(self.aw.ser.controlETpid[1],6,int(self.PXR[svkey][1]),int(sv*10))
-                rampcommand = self.message2send(self.aw.ser.controlETpid[1],6,int(self.PXR[rampkey][1]),ramp)
-                soakcommand = self.message2send(self.aw.ser.controlETpid[1],6,int(self.PXR[soakkey][1]),soak)
+                rampcommand = self.message2send(self.aw.ser.controlETpid[1],6,int(self.PXR[rampkey][1]),int(round(ramp)))
+                soakcommand = self.message2send(self.aw.ser.controlETpid[1],6,int(self.PXR[soakkey][1]),int(round(soak)))
             else:
                 return
             r1 = self.aw.ser.sendFUJIcommand(svcommand,8)
@@ -1082,7 +1089,7 @@ class FujiPID:
         return datastring + part5
 
     #input string command. Output integer (not binary string); used for example to read temperature or to obtain the value of a variable
-    def readoneword(self,command):
+    def readoneword(self, command:bytes) -> int:
         #takes an already formatted command to read 1 word data and returns the response from the pid
         #SEND command and RECEIVE 7 bytes back
         r = self.aw.ser.sendFUJIcommand(command,7)
@@ -1096,7 +1103,7 @@ class FujiPID:
 
     #FUJICRC16 function calculates the CRC16 of the data. It expects a binary string as input and returns an int
     @staticmethod
-    def fujiCrc16(string):
+    def fujiCrc16(string:bytes) -> int:
         crc16tab = (0x0000,
                     0xC0C1, 0xC181, 0x0140, 0xC301, 0x03C0, 0x0280, 0xC241, 0xC601, 0x06C0, 0x0780, 0xC741, 0x0500, 0xC5C1, 0xC481, 0x0440,
                     0xCC01, 0x0CC0, 0x0D80, 0xCD41, 0x0F00, 0xCFC1, 0xCE81, 0x0E40, 0x0A00, 0xCAC1, 0xCB81, 0x0B40, 0xC901, 0x09C0, 0x0880,
@@ -1781,7 +1788,7 @@ class DtaPID:
 
         #refer to Delta instruction manual for more information
         #dictionary "KEY": [VALUE,ASCII_MEMORY_ADDRESS]  note: address contains hex alpha characters
-        self.dtamem={
+        self.dtamem:Dict[str,List[Union[int,float,str]]]={
                   'pv': [0,'4700'],             # process value (temperature reading)
                   'sv': [100.0,'4701'],         # set point
                   'p': [5,'4708'],              # p value 0-9999
@@ -1802,7 +1809,7 @@ class DtaPID:
                                                 # 7 EEPROM error
                   }
     #command  string = ID (ADR)+ FUNCTION (CMD) + ADDRESS + NDATA + LRC_CHK
-    def writeDTE(self,value,DTAaddress):
+    def writeDTE(self, value:str, DTAaddress:str) -> None:
         newsv = hex(int(abs(float(str(value)))))[2:].upper()
         slaveID = self.aw.ser.controlETpid[1]
         if self.aw.ser.controlETpid[0] != 2: # control pid is not a DTA PID
@@ -1810,7 +1817,7 @@ class DtaPID:
         command = self.aw.dtapid.message2send(slaveID,6,str(DTAaddress),newsv)
         self.aw.ser.sendDTAcommand(command)
 
-    def message2send(self,unitID,FUNCTION,ADDRESS, NDATA):
+    def message2send(self, unitID:int, FUNCTION:int, ADDRESS:str, NDATA:Union[int,str]) -> str:
         #compose command
         string_unitID = str(unitID).zfill(2)
         string_FUNCTION = str(FUNCTION).zfill(2)
@@ -1821,10 +1828,10 @@ class DtaPID:
         return ':' + cmd + checksum + '\r\n'
 
     @staticmethod
-    def DTACalcChecksum(string):
-        def tobin(x, count=8):
+    def DTACalcChecksum(string:str) -> int:
+        def tobin(x:int, count:int=8) -> str:
             return ''.join([str((x>>y)&1) for y in range(count-1, -1, -1)])
-        def twoscomp(num_str):
+        def twoscomp(num_str:str) -> str:
             return tobin(-int(num_str,2),len(num_str))
         length = len(string)
         # start at index 1 because of heading ':' cmd

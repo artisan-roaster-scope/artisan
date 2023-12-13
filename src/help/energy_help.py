@@ -5,7 +5,7 @@ try:
 except Exception: # pylint: disable=broad-except
     from PyQt5.QtWidgets import QApplication # type: ignore # @Reimport @UnresolvedImport @UnusedImport
 
-def content():
+def content() -> str:
     strlist = []
     helpstr = ''  # noqa: F841 #@UnusedVariable # pylint: disable=unused-variable
     newline = '\n'  # noqa: F841 #@UnusedVariable  # pylint: disable=unused-variable

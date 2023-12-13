@@ -1716,10 +1716,10 @@ EIND</translation>
       <location filename="../artisanlib/canvas.py" line="1524" />
       <location filename="../artisanlib/canvas.py" line="1307" />
       <location filename="../artisanlib/rubasse.py" line="248" />
-      <location filename="../artisanlib/cropster.py" line="964" />
-      <location filename="../artisanlib/giesen.py" line="171" />
-      <location filename="../artisanlib/loring.py" line="271" />
-      <location filename="../artisanlib/petroncini.py" line="196" />
+      <location filename="../artisanlib/cropster.py" line="963" />
+      <location filename="../artisanlib/giesen.py" line="172" />
+      <location filename="../artisanlib/loring.py" line="272" />
+      <location filename="../artisanlib/petroncini.py" line="197" />
       <source>Air</source>
       <translation>Lucht</translation>
     </message>
@@ -1728,10 +1728,10 @@ EIND</translation>
       <location filename="../artisanlib/canvas.py" line="1525" />
       <location filename="../artisanlib/canvas.py" line="1308" />
       <location filename="../artisanlib/rubasse.py" line="249" />
-      <location filename="../artisanlib/cropster.py" line="965" />
-      <location filename="../artisanlib/giesen.py" line="172" />
-      <location filename="../artisanlib/loring.py" line="272" />
-      <location filename="../artisanlib/petroncini.py" line="197" />
+      <location filename="../artisanlib/cropster.py" line="964" />
+      <location filename="../artisanlib/giesen.py" line="173" />
+      <location filename="../artisanlib/loring.py" line="273" />
+      <location filename="../artisanlib/petroncini.py" line="198" />
       <source>Drum</source>
       <translation>Trommel</translation>
     </message>
@@ -1740,10 +1740,10 @@ EIND</translation>
       <location filename="../artisanlib/canvas.py" line="1526" />
       <location filename="../artisanlib/canvas.py" line="1309" />
       <location filename="../artisanlib/rubasse.py" line="250" />
-      <location filename="../artisanlib/cropster.py" line="966" />
-      <location filename="../artisanlib/giesen.py" line="173" />
-      <location filename="../artisanlib/loring.py" line="273" />
-      <location filename="../artisanlib/petroncini.py" line="198" />
+      <location filename="../artisanlib/cropster.py" line="965" />
+      <location filename="../artisanlib/giesen.py" line="174" />
+      <location filename="../artisanlib/loring.py" line="274" />
+      <location filename="../artisanlib/petroncini.py" line="199" />
       <source>Damper</source>
       <translation>Demper</translation>
     </message>
@@ -1752,10 +1752,10 @@ EIND</translation>
       <location filename="../artisanlib/canvas.py" line="1527" />
       <location filename="../artisanlib/canvas.py" line="1310" />
       <location filename="../artisanlib/rubasse.py" line="251" />
-      <location filename="../artisanlib/cropster.py" line="967" />
-      <location filename="../artisanlib/giesen.py" line="174" />
-      <location filename="../artisanlib/loring.py" line="274" />
-      <location filename="../artisanlib/petroncini.py" line="199" />
+      <location filename="../artisanlib/cropster.py" line="966" />
+      <location filename="../artisanlib/giesen.py" line="175" />
+      <location filename="../artisanlib/loring.py" line="275" />
+      <location filename="../artisanlib/petroncini.py" line="200" />
       <source>Burner</source>
       <translation>Brander</translation>
     </message>
@@ -2547,47 +2547,47 @@ EIND</translation>
   <context>
     <name>Contextual Menu</name>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15556" />
+      <location filename="../artisanlib/canvas.py" line="15555" />
       <source>Add point</source>
       <translation>Punt toevoegen</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15560" />
+      <location filename="../artisanlib/canvas.py" line="15559" />
       <source>Remove point</source>
       <translation>Punt verwijderen</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15566" />
+      <location filename="../artisanlib/canvas.py" line="15565" />
       <source>Load points</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15570" />
+      <location filename="../artisanlib/canvas.py" line="15569" />
       <source>Save points</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15576" />
+      <location filename="../artisanlib/canvas.py" line="15575" />
       <source>Reset Designer</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15580" />
+      <location filename="../artisanlib/canvas.py" line="15579" />
       <source>Config...</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16328" />
+      <location filename="../artisanlib/canvas.py" line="16327" />
       <source>Add to Cupping Notes</source>
       <translation>Cupping aantekening toevoegen</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16332" />
+      <location filename="../artisanlib/canvas.py" line="16331" />
       <source>Add to Roasting Notes</source>
       <translation>Branding aantekening toevoegen</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16338" />
+      <location filename="../artisanlib/canvas.py" line="16337" />
       <source>Edit</source>
       <translation>Bewerk</translation>
     </message>
@@ -3974,12 +3974,12 @@ EIND</translation>
       <translation>WebSocket opnieuw verbinden</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16515" />
-      <location filename="../artisanlib/canvas.py" line="16084" />
-      <location filename="../artisanlib/canvas.py" line="15984" />
-      <location filename="../artisanlib/canvas.py" line="15942" />
-      <location filename="../artisanlib/canvas.py" line="15837" />
-      <location filename="../artisanlib/canvas.py" line="15819" />
+      <location filename="../artisanlib/canvas.py" line="16514" />
+      <location filename="../artisanlib/canvas.py" line="16083" />
+      <location filename="../artisanlib/canvas.py" line="15983" />
+      <location filename="../artisanlib/canvas.py" line="15941" />
+      <location filename="../artisanlib/canvas.py" line="15836" />
+      <location filename="../artisanlib/canvas.py" line="15818" />
       <location filename="../artisanlib/canvas.py" line="15131" />
       <location filename="../artisanlib/canvas.py" line="15108" />
       <location filename="../artisanlib/canvas.py" line="14849" />
@@ -4351,8 +4351,8 @@ EIND</translation>
       <translation>Arduino kon geen filters instellen</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16509" />
-      <location filename="../artisanlib/canvas.py" line="16078" />
+      <location filename="../artisanlib/canvas.py" line="16508" />
+      <location filename="../artisanlib/canvas.py" line="16077" />
       <location filename="../artisanlib/canvas.py" line="14844" />
       <location filename="../artisanlib/canvas.py" line="14820" />
       <location filename="../artisanlib/canvas.py" line="14634" />
@@ -4556,7 +4556,7 @@ EIND</translation>
       <translation>Fout in lnRegression:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15491" />
+      <location filename="../artisanlib/canvas.py" line="15490" />
       <source>Exception: redrawdesigner() Roast events may be out of order. Resetting Designer.</source>
       <translation>Uitzondering: redrawdesigner() Roast-evenementen zijn mogelijk niet in gebruik. Ontwerper opnieuw instellen.</translation>
     </message>
@@ -11150,8 +11150,8 @@ Door wiskundige formules in de plotter te gebruiken, kunnen ook de symbolische v
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15422" />
-      <location filename="../artisanlib/canvas.py" line="15412" />
+      <location filename="../artisanlib/canvas.py" line="15421" />
+      <location filename="../artisanlib/canvas.py" line="15411" />
       <location filename="../artisanlib/canvas.py" line="7653" />
       <location filename="../artisanlib/canvas.py" line="7607" />
       <location filename="../artisanlib/main.py" line="16795" />
@@ -11182,8 +11182,8 @@ Door wiskundige formules in de plotter te gebruiken, kunnen ook de symbolische v
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15419" />
-      <location filename="../artisanlib/canvas.py" line="15408" />
+      <location filename="../artisanlib/canvas.py" line="15418" />
+      <location filename="../artisanlib/canvas.py" line="15407" />
       <location filename="../artisanlib/canvas.py" line="7628" />
       <location filename="../artisanlib/canvas.py" line="7584" />
       <location filename="../artisanlib/main.py" line="16789" />
@@ -13426,13 +13426,13 @@ Alle LCD-schermen</translation>
       <translation>AchtergrondYT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15387" />
+      <location filename="../artisanlib/canvas.py" line="15386" />
       <location filename="../artisanlib/canvas.py" line="8334" />
       <source>BackgroundET</source>
       <translation>AchtergrondET</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15391" />
+      <location filename="../artisanlib/canvas.py" line="15390" />
       <location filename="../artisanlib/canvas.py" line="8365" />
       <source>BackgroundBT</source>
       <translation>Achtergrond BT</translation>
@@ -13505,17 +13505,17 @@ Alle LCD-schermen</translation>
       <translation>LEERDE KENNEN</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15358" />
+      <location filename="../artisanlib/canvas.py" line="15357" />
       <source>Designer</source>
       <translation>Ontwerper</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16138" />
+      <location filename="../artisanlib/canvas.py" line="16137" />
       <source>BT {0} {1}/min for {2}</source>
       <translation>BT {0} {1} / min voor {2}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16151" />
+      <location filename="../artisanlib/canvas.py" line="16150" />
       <source>ET {0} {1}/min for {2}</source>
       <translation>ET {0} {1} / min voor {2}</translation>
     </message>
@@ -14373,7 +14373,7 @@ Alle LCD-schermen</translation>
       <translation>Wielgrafiek opgeslagen</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16274" />
+      <location filename="../artisanlib/canvas.py" line="16273" />
       <location filename="../artisanlib/wheels.py" line="664" />
       <source>Open Wheel Graph</source>
       <translation>Wielgrafiek openen</translation>
@@ -16817,67 +16817,67 @@ Profile missing [CHARGE] or [DROP]</source>
 Profiel ontbreekt [CHARGE] of [DROP]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15749" />
+      <location filename="../artisanlib/canvas.py" line="15748" />
       <source>[ CHARGE ]</source>
       <translation>[ AANVAL ]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15752" />
+      <location filename="../artisanlib/canvas.py" line="15751" />
       <source>[ DRY END ]</source>
       <translation>[DROOG EINDE]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15755" />
+      <location filename="../artisanlib/canvas.py" line="15754" />
       <source>[ FC START ]</source>
       <translation>[ FC-START ]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15758" />
+      <location filename="../artisanlib/canvas.py" line="15757" />
       <source>[ FC END ]</source>
       <translation>[FC EINDE]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15761" />
+      <location filename="../artisanlib/canvas.py" line="15760" />
       <source>[ SC START ]</source>
       <translation>[SC-START]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15764" />
+      <location filename="../artisanlib/canvas.py" line="15763" />
       <source>[ SC END ]</source>
       <translation>[ SC EINDE ]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15767" />
+      <location filename="../artisanlib/canvas.py" line="15766" />
       <source>[ DROP ]</source>
       <translation>[ DRUPPEL ]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15770" />
+      <location filename="../artisanlib/canvas.py" line="15769" />
       <source>[ COOL ]</source>
       <translation>[ KOEL ]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16074" />
+      <location filename="../artisanlib/canvas.py" line="16073" />
       <source>New profile created</source>
       <translation>Nieuw profiel aangemaakt</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16288" />
+      <location filename="../artisanlib/canvas.py" line="16287" />
       <source> added to cupping notes</source>
       <translation> toegevoegd aan cupping-notities</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16299" />
+      <location filename="../artisanlib/canvas.py" line="16298" />
       <source> added to roasting notes</source>
       <translation> toegevoegd aan braadtonen</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16563" />
+      <location filename="../artisanlib/canvas.py" line="16562" />
       <source>Mouse Cross ON: move mouse around</source>
       <translation>Mouse Cross ON: beweeg de muis rond</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16598" />
+      <location filename="../artisanlib/canvas.py" line="16597" />
       <source>Mouse cross OFF</source>
       <translation>Muiskruis UIT</translation>
     </message>

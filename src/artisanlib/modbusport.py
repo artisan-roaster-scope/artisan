@@ -81,7 +81,7 @@ def getBinaryPayloadBuilder(byteorderLittle:bool = True, wordorderLittle:bool = 
     from pymodbus.payload import BinaryPayloadBuilder
     byteorder = Endian.LITTLE if byteorderLittle else Endian.BIG
     wordorder = Endian.LITTLE if wordorderLittle else Endian.BIG
-    return BinaryPayloadBuilder(byteorder=byteorder, wordorder=wordorder)
+    return BinaryPayloadBuilder(byteorder=byteorder, wordorder=wordorder) # type:ignore[no-untyped-call]
 
 def getBinaryPayloadDecoderFromRegisters(registers:List[int], byteorderLittle:bool = True, wordorderLittle:bool = False) -> 'BinaryPayloadDecoder':
     from pymodbus.constants import Endian
@@ -352,7 +352,7 @@ class modbusport:
                     self.readRetries = self.serial_readRetries
                 _log.debug('connect(): connecting')
                 time.sleep(.2) # avoid possible hickups on startup
-                self.master.connect()
+                self.master.connect() # type:ignore[no-untyped-call]
                 if self.isConnected():
                     self.updateActiveRegisters()
                     self.clearReadingsCache()
@@ -771,7 +771,7 @@ class modbusport:
                     # cache hit
                     res_int:List[int] = [self.readingsCache[code][slave][register],self.readingsCache[code][slave][register+1]]
                     decoder = getBinaryPayloadDecoderFromRegisters(res_int, self.byteorderLittle, self.wordorderLittle)
-                    r = decoder.decode_32bit_float()
+                    r = decoder.decode_32bit_float() # type:ignore[no-untyped-call]
                     _log.debug('return cached value => %.3f', r)
                     return r
                 if self.fail_on_cache_miss:
@@ -803,7 +803,7 @@ class modbusport:
                         break
                 if res is not None and hasattr(res, 'registers'):
                     decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
-                    r = decoder.decode_32bit_float()
+                    r = decoder.decode_32bit_float() # type:ignore[no-untyped-call]
                     # we clear the previous error and send a message
                     self.clearCommError()
                     time.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
@@ -853,7 +853,7 @@ class modbusport:
                     # cache hit
                     res_int:List[int] = [self.readingsCache[code][slave][register],self.readingsCache[code][slave][register+1]]
                     decoder = getBinaryPayloadDecoderFromRegisters(res_int, self.byteorderLittle, self.wordorderLittle)
-                    r = convert_from_bcd(decoder.decode_32bit_uint())
+                    r = convert_from_bcd(decoder.decode_32bit_uint()) # type:ignore[no-untyped-call]
                     _log.debug('return cached value => %.3f', r)
                     return r
                 if self.fail_on_cache_miss:
@@ -885,7 +885,7 @@ class modbusport:
                         break
                 if res is not None and hasattr(res, 'registers'):
                     decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
-                    if (r := decoder.decode_32bit_uint()) is not None:
+                    if (r := decoder.decode_32bit_uint()) is not None: # type:ignore[no-untyped-call]
                         self.clearCommError()
                         time.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
                         return convert_from_bcd(r)
@@ -942,7 +942,7 @@ class modbusport:
                 return 0
             if hasattr(res, 'registers'):
                 decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
-                r = int(decoder.decode_16bit_uint())
+                r = int(decoder.decode_16bit_uint()) # type:ignore[no-untyped-call]
 #                _log.debug('  res.registers => %s', res.registers)
                 _log.debug('  decoder.decode_16bit_uint() => %s', r)
                 return r
@@ -973,9 +973,9 @@ class modbusport:
                     res_int:int = self.readingsCache[code][slave][register]
                     decoder = getBinaryPayloadDecoderFromRegisters([res_int], self.byteorderLittle, self.wordorderLittle)
                     if signed:
-                        r = decoder.decode_16bit_int()
+                        r = decoder.decode_16bit_int() # type:ignore[no-untyped-call]
                     else:
-                        r = decoder.decode_16bit_uint()
+                        r = decoder.decode_16bit_uint() # type:ignore[no-untyped-call]
                     _log.debug('return cached value => %d', r)
                     return r
                 if self.fail_on_cache_miss:
@@ -1018,9 +1018,9 @@ class modbusport:
                     if hasattr(res, 'registers'):
                         decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
                         if signed:
-                            r = decoder.decode_16bit_int()
+                            r = decoder.decode_16bit_int() # type:ignore[no-untyped-call]
                         else:
-                            r = decoder.decode_16bit_uint()
+                            r = decoder.decode_16bit_uint() # type:ignore[no-untyped-call]
                         # we clear the previous error and send a message
                         self.clearCommError()
                         return r
@@ -1069,9 +1069,9 @@ class modbusport:
                     res_int:List[int] = [self.readingsCache[code][slave][register],self.readingsCache[code][slave][register+1]]
                     decoder = getBinaryPayloadDecoderFromRegisters(res_int, self.byteorderLittle, self.wordorderLittle)
                     if signed:
-                        r = decoder.decode_32bit_int()
+                        r = decoder.decode_32bit_int() # type:ignore[no-untyped-call]
                     else:
-                        r = decoder.decode_32bit_uint()
+                        r = decoder.decode_32bit_uint() # type:ignore[no-untyped-call]
                     _log.debug('return cached value => %d', r)
                     return r
                 if self.fail_on_cache_miss:
@@ -1100,9 +1100,9 @@ class modbusport:
                 if res is not None and hasattr(res, 'registers'):
                     decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
                     if signed:
-                        r = decoder.decode_32bit_int()
+                        r = decoder.decode_32bit_int() # type:ignore[no-untyped-call]
                     else:
-                        r = decoder.decode_32bit_uint()
+                        r = decoder.decode_32bit_uint() # type:ignore[no-untyped-call]
                     # we clear the previous error and send a message
                     self.clearCommError()
                     return r
@@ -1151,7 +1151,7 @@ class modbusport:
                     # cache hit
                     res_int:int = self.readingsCache[code][slave][register]
                     decoder = getBinaryPayloadDecoderFromRegisters([res_int], self.byteorderLittle, self.wordorderLittle)
-                    r = convert_from_bcd(decoder.decode_16bit_uint())
+                    r = convert_from_bcd(decoder.decode_16bit_uint()) # type:ignore[no-untyped-call]
                     _log.debug('return cached value => %d', r)
                     return r
                 if self.fail_on_cache_miss:
@@ -1182,7 +1182,7 @@ class modbusport:
                         break
                 if res is not None and hasattr(res, 'registers'):
                     decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
-                    if (r := decoder.decode_16bit_uint()) is not None:
+                    if (r := decoder.decode_16bit_uint()) is not None: # type:ignore[no-untyped-call]
                         # we clear the previous error and send a message
                         self.clearCommError()
                         time.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic

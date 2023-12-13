@@ -16,9 +16,10 @@
 # Marko Luther, 2023
 
 from artisanlib.util import stringtoseconds, createGradient
-from typing import Optional, Dict, TYPE_CHECKING
+from typing import Optional, Dict, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from PyQt6.QtGui import QWheelEvent, QMouseEvent, QFocusEvent, QResizeEvent # pylint: disable=unused-import
     from PyQt6.QtWidgets import QWidget, QLineEdit, QTimeEdit, QCheckBox, QComboBox # pylint: disable=unused-import
 
 try:
@@ -29,40 +30,38 @@ try:
     from PyQt6.QtGui import QFontMetrics, QColor, QCursor # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QByteArray, QPropertyAnimation, QEasingCurve, QLocale) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QByteArray, QPropertyAnimation, QEasingCurve, QLocale) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QLabel, QComboBox, QTextEdit, QDoubleSpinBox, QPushButton, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QFontMetrics, QColor, QCursor # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
 class MyQComboBox(QComboBox): # pylint: disable=too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues]# Argument to class must be a base class
-    def __init__(self, parent:Optional['QWidget'] = None, **kwargs:Dict) -> None:
+    def __init__(self, parent:Optional['QWidget'] = None, **kwargs:Dict[Any,Any]) -> None:
         super().__init__(parent, **kwargs)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
 
-    def wheelEvent(self, *args, **kwargs):
+    def wheelEvent(self, event:'Optional[QWheelEvent]') -> None:
         if self.hasFocus():
-            return QComboBox.wheelEvent(self, *args, **kwargs)
-        return None
+            super().wheelEvent(event)
 
 class MyQDoubleSpinBox(QDoubleSpinBox):  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
-    def __init__(self, parent:Optional['QWidget'] = None, **kwargs:Dict) -> None:
+    def __init__(self, parent:Optional['QWidget'] = None, **kwargs:Dict[str,Any]) -> None:
         super().__init__(parent, **kwargs)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setLocale(QLocale('C'))
 
-    def wheelEvent(self, *args, **kwargs):
+    def wheelEvent(self, event:'Optional[QWheelEvent]') -> None:
         if self.hasFocus():
-            return QDoubleSpinBox.wheelEvent(self, *args, **kwargs)
-        return None
+            super().wheelEvent(event)
 
     # we re-direct the mouse double-click event to the standard mouse press event and add
     # the (at least in PyQt 5.12.2/5.12.3) missing mouse release event
     # which had the effect that a double click an DoubleSpinBox arrow in the Cup Profile dialog
     # leads to a non-terminating sequence of setvalue() calls until the end of the spinner is reached.
     # Note: a triple click still has this effect
-    def mouseDoubleClickEvent(self, event):
+    def mouseDoubleClickEvent(self, event:'Optional[QMouseEvent]') -> None:
         super().mouseReleaseEvent(event)
         super().mouseDoubleClickEvent(event)
         super().mouseReleaseEvent(event)
@@ -75,7 +74,7 @@ class MyTableWidgetItemQLineEdit(QTableWidgetItem): # pylint: disable= too-few-p
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
-    def __lt__(self, other):
+    def __lt__(self, other:'MyTableWidgetItemQLineEdit') -> bool: # type: ignore[override]
         a = self.sortKey.text()
         b = other.sortKey.text()
         if len(a) == 5 and len(b) == 5 and a[2] == ':' and b[2] == ':':
@@ -96,7 +95,7 @@ class MyTableWidgetItemQTime(QTableWidgetItem): # pylint: disable= too-few-publi
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
-    def __lt__(self, other):
+    def __lt__(self, other:'MyTableWidgetItemQTime') -> bool: # type: ignore[override]
         a = self.sortKey.time().minute() * 60 + self.sortKey.time().second()
         b = other.sortKey.time().minute() * 60 + other.sortKey.time().second()
         return a < b
@@ -108,7 +107,7 @@ class MyTableWidgetItemNumber(QTableWidgetItem): # pylint: disable= too-few-publ
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
-    def __lt__(self, other):
+    def __lt__(self, other:'MyTableWidgetItemNumber') -> bool: # type: ignore[override]
         return self.sortKey < other.sortKey
 
 class MyTableWidgetItemQCheckBox(QTableWidgetItem): # pylint: disable= too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base clas
@@ -119,7 +118,7 @@ class MyTableWidgetItemQCheckBox(QTableWidgetItem): # pylint: disable= too-few-p
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
-    def __lt__(self, other):
+    def __lt__(self, other:'MyTableWidgetItemQCheckBox') -> bool: # type: ignore[override]
         return self.sortKey.isChecked() < other.sortKey.isChecked()
 
 class MyTableWidgetItemQComboBox(QTableWidgetItem): # pylint: disable= too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
@@ -130,7 +129,7 @@ class MyTableWidgetItemQComboBox(QTableWidgetItem): # pylint: disable= too-few-p
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
-    def __lt__(self, other):
+    def __lt__(self, other:'MyTableWidgetItemQComboBox') -> bool: # type: ignore[override]
         return str(self.sortKey.currentText()) < str(other.sortKey.currentText())
 
 # QLabel that automatically resizes its text font
@@ -140,41 +139,42 @@ class MyQLabel(QLabel):  # pyright: ignore [reportGeneralTypeIssues] # Argument 
         self.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Ignored,QSizePolicy.Policy.Ignored))
         self.setMinSize(14)
 
-    def setMinSize(self, minfs):
+    def setMinSize(self, minfs:int) -> None:
         f = self.font()
         f.setPixelSize(minfs)
         br = QFontMetrics(f).boundingRect(self.text())
         self.setMinimumSize(br.width(), br.height())
 
-    def resizeEvent(self, event):
+    def resizeEvent(self, event:'Optional[QResizeEvent]') -> None:
         super().resizeEvent(event)
-        if not self.text():
-            return
-        #--- fetch current parameters ----
-        f = self.font()
-        cr = self.contentsRect()
-        #--- iterate to find the font size that fits the contentsRect ---
-        dw = event.size().width() - event.oldSize().width()   # width change
-        dh = event.size().height() - event.oldSize().height() # height change
-        fs = max(f.pixelSize(), 1)
-        while True:
-            f.setPixelSize(fs)
-            br =  QFontMetrics(f).boundingRect(self.text())
-            if dw >= 0 and dh >= 0: # label is expanding
-                if br.height() <= cr.height() and br.width() <= cr.width():
-                    fs += 1
+        if event is not None:
+            if not self.text():
+                return
+            #--- fetch current parameters ----
+            f = self.font()
+            cr = self.contentsRect()
+            #--- iterate to find the font size that fits the contentsRect ---
+            dw = event.size().width() - event.oldSize().width()   # width change
+            dh = event.size().height() - event.oldSize().height() # height change
+            fs = max(f.pixelSize(), 1)
+            while True:
+                f.setPixelSize(fs)
+                br =  QFontMetrics(f).boundingRect(self.text())
+                if dw >= 0 and dh >= 0: # label is expanding
+                    if br.height() <= cr.height() and br.width() <= cr.width():
+                        fs += 1
+                    else:
+                        f.setPixelSize(max(fs - 1, 1)) # backtrack
+                        break
+                # label is shrinking
+                elif br.height() > cr.height() or br.width() > cr.width():
+                    fs -= 1
                 else:
-                    f.setPixelSize(max(fs - 1, 1)) # backtrack
                     break
-            # label is shrinking
-            elif br.height() > cr.height() or br.width() > cr.width():
-                fs -= 1
-            else:
-                break
-            if fs < 1:
-                break
-        #--- update font size ---
-        self.setFont(f)
+                if fs < 1:
+                    break
+            #--- update font size ---
+            self.setFont(f)
 
 
 class ClickableQLabel(QLabel): # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
@@ -182,52 +182,56 @@ class ClickableQLabel(QLabel): # pylint: disable=too-few-public-methods # pyrigh
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event:'Optional[QMouseEvent]') -> None:
         super().mousePressEvent(event)
-        self.clicked.emit()
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.left_clicked.emit()
-        elif event.button() == Qt.MouseButton.RightButton:
-            self.right_clicked.emit()
+        if event is not None:
+            self.clicked.emit()
+            if event.button() == Qt.MouseButton.LeftButton:
+                self.left_clicked.emit()
+            elif event.button() == Qt.MouseButton.RightButton:
+                self.right_clicked.emit()
 
 class ClickableQGroupBox(QGroupBox): # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     clicked = pyqtSignal()
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event:'Optional[QMouseEvent]') -> None:
         super().mousePressEvent(event)
-        self.clicked.emit()
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.left_clicked.emit()
-        elif event.button() == Qt.MouseButton.RightButton:
-            self.right_clicked.emit()
+        if event is not None:
+            self.clicked.emit()
+            if event.button() == Qt.MouseButton.LeftButton:
+                self.left_clicked.emit()
+            elif event.button() == Qt.MouseButton.RightButton:
+                self.right_clicked.emit()
 
 class MyQLCDNumber(QLCDNumber): # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     clicked = pyqtSignal()
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event:'Optional[QMouseEvent]') -> None:
         super().mousePressEvent(event)
-        self.clicked.emit()
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.left_clicked.emit()
-        elif event.button() == Qt.MouseButton.RightButton:
-            self.right_clicked.emit()
+        if event is not None:
+            self.clicked.emit()
+            if event.button() == Qt.MouseButton.LeftButton:
+                self.left_clicked.emit()
+            elif event.button() == Qt.MouseButton.RightButton:
+                self.right_clicked.emit()
 
 class ClickableLCDFrame(QFrame): # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     clicked = pyqtSignal()
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event:'Optional[QMouseEvent]') -> None:
         super().mousePressEvent(event)
-        self.clicked.emit()
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.left_clicked.emit()
-        elif event.button() == Qt.MouseButton.RightButton:
-            self.right_clicked.emit()
+        if event is not None:
+            self.clicked.emit()
+            if event.button() == Qt.MouseButton.LeftButton:
+                self.left_clicked.emit()
+            elif event.button() == Qt.MouseButton.RightButton:
+                self.right_clicked.emit()
 
 
 # this one emits a clicked event on right-clicks and an editingFinished event when the text was changed and the focus got lost
@@ -236,34 +240,35 @@ class ClickableTextEdit(QTextEdit): # pylint: disable=too-few-public-methods # p
     editingFinished = pyqtSignal()
     receivedFocus = pyqtSignal()
 
-    def __init__(self, parent:Optional['QWidget'] = None, **kwargs:Dict) -> None:
+    def __init__(self, parent:Optional['QWidget'] = None, **kwargs:Dict[str,Any]) -> None:
         super().__init__(parent, **kwargs)
         self._changed = False
         self.setTabChangesFocus(True)
         self.textChanged.connect(self._handle_text_changed)
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event:'Optional[QMouseEvent]') -> None:
         super().mousePressEvent(event)
-        if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
+        if event is not None and event.modifiers() == Qt.KeyboardModifier.ControlModifier:
             self.clicked.emit()
 
-    def focusInEvent(self, event):
+    def focusInEvent(self, event:'Optional[QFocusEvent]') -> None:
         super().focusInEvent(event)
-        self.receivedFocus.emit()
+        if event is not None:
+            self.receivedFocus.emit()
 
-    def focusOutEvent(self, event):
-        if self._changed:
+    def focusOutEvent(self, event:'Optional[QFocusEvent]') -> None:
+        if event is not None and self._changed:
             self.editingFinished.emit()
         super().focusOutEvent(event)
 
     @pyqtSlot()
-    def _handle_text_changed(self):
+    def _handle_text_changed(self) -> None:
         self._changed = True
 
-    def setTextChanged(self, state=True):
+    def setTextChanged(self, state:bool = True) -> None:
         self._changed = state
 
-    def setNewPlainText(self, text):
+    def setNewPlainText(self, text:str) -> None:
         QTextEdit.setPlainText(self, text)
         self._changed = False
 
@@ -300,7 +305,7 @@ class EventPushButton(QPushButton): # pylint: disable=too-few-public-methods # p
         self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.setProperty('Selected', False)
 
-    def setSelected(self, b):
+    def setSelected(self, b:bool) -> None:
         self.setProperty('Selected', b)
         # Update the style
         self.setStyle(self.style())
@@ -362,14 +367,14 @@ class AnimatedMajorEventPushButton(MajorEventPushButton):
 
         self.current_style:str = ''
 
-    def setSelected(self, b):
+    def setSelected(self, b:bool) -> None:
         super().setSelected(b)
         if self.animating:
             # we stop the running animation and restart it to adjust to the changed selected state
             self.stopAnimation()
             self.startAnimation()
 
-    def startAnimation(self):
+    def startAnimation(self) -> None:
         self.current_style = self.styleSheet()
         if self.property('Selected'):
             self.selected_animation.start()
@@ -377,7 +382,7 @@ class AnimatedMajorEventPushButton(MajorEventPushButton):
             self.animation.start()
         self.animating = True
 
-    def stopAnimation(self):
+    def stopAnimation(self) -> None:
         self.animation.stop()
         self.selected_animation.stop()
         if self.current_style is not None:
@@ -385,10 +390,10 @@ class AnimatedMajorEventPushButton(MajorEventPushButton):
         self.animating = False
 
     # pylint: disable=no-self-use
-    def getBackColor(self):
+    def getBackColor(self) -> QColor:
         return QColor()
 
-    def setBackColor(self, color):
+    def setBackColor(self, color:QColor) -> None:
         self.setStyleSheet(f'QPushButton:!flat:!pressed{{background-color:{color.name()};}}')
 
     zcolor = pyqtProperty(QColor, getBackColor, setBackColor)

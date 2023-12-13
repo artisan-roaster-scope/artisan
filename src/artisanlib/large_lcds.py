@@ -41,8 +41,11 @@ class LargeLCDs(ArtisanDialog):
     __slots__ = ['lcds1', 'lcds2', 'lcds1styles', 'lcds2styles', 'lcds1labelsUpper', 'lcds2labelsUpper', 'lcds1labelsLower', 'lcds2labelsLower',
         'lcds1frames', 'lcds2frames', 'visibleFrames', 'tight', 'layoutNr', 'swaplcds']
 
-    def __init__(self, _parent:'QWidget', aw:'ApplicationWindow') -> None:
-        super().__init__(None, aw) # set the parent to None to make LargeLCD windows on RPi Bookworm non-modal (not blocking the main window)
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
+        if aw.get_os()[0] == 'RPi':
+            super().__init__(None, aw) # set the parent to None to make LargeLCD windows on RPi Bookworm non-modal (not blocking the main window)
+        else:
+            super().__init__(parent, aw) # if parent is set to None, largeLCD panels hide behind the main window in full screen mode on Windows!
         # it is assumed that both lists of lcds (lcd1 & lcd2) have the same length
         # the same is assumed for the other lists below:
         self.lcds1:List[QLCDNumber] = []
@@ -355,7 +358,7 @@ class LargeMainLCDs(LargeLCDs):
         if self.lcd0 is not None:
             self.lcd0.setStyleSheet(f'QLCDNumber {{ color: {fc}; background-color: {bc};}}')
 
-    def updateStyles(self):
+    def updateStyles(self) -> None:
         self.setTimerLCDcolor(self.aw.lcdpaletteF['timer'],self.aw.lcdpaletteB['timer'])
         super().updateStyles()
 
@@ -696,7 +699,7 @@ class LargeExtraLCDs(LargeLCDs):
     def updateVisiblitiesExtra(self):
         self.updateVisibilities(self.aw.extraLCDvisibility1,self.aw.extraLCDvisibility2)
 
-    def updateStyles(self):
+    def updateStyles(self) -> None:
         super().updateStyles()
         for i,s in enumerate(self.lcds1styles):
             try:

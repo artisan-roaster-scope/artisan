@@ -10,10 +10,15 @@ once.
 
 # by Aleš Erjavec
 # downloaded from https://gist.github.com/ales-erjavec/7624dd1d183dfbfb3354600b285abb94
-# updatet to PyQt6, by Marko Luther 2021
+# adjusted to PyQt6 by Marko Luther 2021
 
 import sys
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from PyQt6.QtGui import QPainter, QWheelEvent, QMouseEvent, QPaintEvent, QKeyEvent # pylint: disable=unused-import
+    from PyQt6.QtCore import QModelIndex, QPointF, QObject # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QStyleOption # pylint: disable=unused-import
 
 try:
     from PyQt6.QtCore import Qt, QEvent, QTimer, pyqtSignal, QSize # @UnusedImport @Reimport  @UnresolvedImport
@@ -28,12 +33,12 @@ try:
 except ImportError:
     from PyQt5.QtCore import Qt, QEvent, QTimer, pyqtSignal, QSize # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import ( QStandardItemModel, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QPalette, QFontMetrics, QBrush, QColor, QPixmap, QIcon # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QPalette, QFontMetrics, QBrush, QColor, QPixmap, QIcon # @UnusedImport @Reimport  @UnresolvedImport
     )
     from PyQt5.QtWidgets import ( # type: ignore
-        QComboBox, QAbstractItemDelegate, QStyledItemDelegate, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QApplication, QStyle, QStyleOptionComboBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QStyleOptionMenuItem, QStyleOptionViewItem, QStylePainter, QWidget # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QAbstractItemDelegate, QStyledItemDelegate, # @UnusedImport @Reimport  @UnresolvedImport
+        QApplication, QStyle, QStyleOptionComboBox, # @UnusedImport @Reimport  @UnresolvedImport
+        QStyleOptionMenuItem, QStyleOptionViewItem, QStylePainter, QWidget # @UnusedImport @Reimport  @UnresolvedImport
     )
 
 
@@ -49,10 +54,10 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
         delegate used by the QComboBox). Used to style the popup like a
         list view (e.g windows style).
         """
-        def isSeparator(self, index): # pylint: disable=no-self-use
+        def isSeparator(self, index:'QModelIndex') -> bool: # pylint: disable=no-self-use
             return str(index.data(Qt.ItemDataRole.AccessibleDescriptionRole)) == 'separator'
 
-        def paint(self, painter, option, index):
+        def paint(self, painter:'Optional[QPainter]', option:QStyleOptionViewItem, index:'QModelIndex') -> None:
 #            if option.widget is not None:
 #                style = option.widget.style()
 #            else:
@@ -81,10 +86,10 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
 
         __slots__ = [ '__popupIsShown', '__blockMouseReleaseTimer', '__initialMousePos', '__separator', '__placeholderText' ]
 
-        def isSeparator(self, index): # pylint: disable=no-self-use
+        def isSeparator(self, index:'QModelIndex') -> bool: # pylint: disable=no-self-use
             return str(index.data(Qt.ItemDataRole.AccessibleDescriptionRole)) == 'separator'
 
-        def paint(self, painter, option, index):
+        def paint(self, painter:'Optional[QPainter]', option:QStyleOptionViewItem, index:'QModelIndex') -> None:
             menuopt = self._getMenuStyleOption(option, index)
             style:Optional[QStyle] = QApplication.style()
             if option.widget is not None:
@@ -93,7 +98,7 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
                 style.drawControl(QStyle.ControlElement.CE_MenuItem, menuopt, painter,
                                   option.widget)
 
-        def sizeHint(self, option, index):
+        def sizeHint(self, option:QStyleOptionViewItem, index:'QModelIndex') -> QSize:
             menuopt = self._getMenuStyleOption(option, index)
             style:Optional[QStyle] = QApplication.style()
             if option.widget is not None:
@@ -104,7 +109,7 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
                     option.widget)
             return QSize()
 
-        def _getMenuStyleOption(self, option, index):
+        def _getMenuStyleOption(self, option:QStyleOptionViewItem, index:'QModelIndex') -> 'QStyleOption':
             menuoption = QStyleOptionMenuItem()
             palette = option.palette.resolve(QApplication.palette('QMenu'))
             foreground = index.data(Qt.ItemDataRole.ForegroundRole)
@@ -143,10 +148,11 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
             check = index.data(Qt.ItemDataRole.CheckStateRole)
             menuoption.checked = check == Qt.CheckState.Checked
 
-            if option.widget is not None:
-                menuoption.font = option.widget.font()
-            else:
-                menuoption.font = QApplication.font('QMenu')
+            menuoption.font = option.widget.font()
+#            if option.widget is not None:
+#                menuoption.font = option.widget.font()
+#            else:
+#                menuoption.font = QApplication.font('QMenu')
 
             menuoption.maxIconWidth = option.decorationSize.width() + 4
             menuoption.rect = option.rect
@@ -183,34 +189,35 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
             return menuoption
 
     def __init__(self, parent:Optional[QWidget] = None, placeholderText:str = '', separator:str = ', ',
-                 **kwargs:Dict) -> None:
+                 **kwargs:Dict[str,Any]) -> None:
         super().__init__(parent, **kwargs)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 
-        self.__popupIsShown = False
-        self.__blockMouseReleaseTimer = QTimer(self)
+        self.__popupIsShown:bool = False
+        self.__blockMouseReleaseTimer:QTimer = QTimer(self)
         self.__blockMouseReleaseTimer.setSingleShot(True)
-        self.__initialMousePos = None
-        self.__separator = separator
-        self.__placeholderText = placeholderText
+        self.__initialMousePos:'Optional[QPointF]' = None
+        self.__separator:str = separator
+        self.__placeholderText:str = placeholderText
+
         self.__updateItemDelegate()
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event:'Optional[QMouseEvent]') -> None:
         """Reimplemented."""
         self.__popupIsShown = False
         super().mousePressEvent(event)
-        if self.__popupIsShown:
-            self.__initialMousePos = self.mapToGlobal(event.pos())
+        if event is not None and self.__popupIsShown:
+            self.__initialMousePos = self.mapToGlobal(event.position())
             self.__blockMouseReleaseTimer.start(
                 QApplication.doubleClickInterval())
 
-    def changeEvent(self, event):
+    def changeEvent(self, event:Optional[QEvent]) -> None:
         """Reimplemented."""
-        if event.type() == QEvent.Type.StyleChange:
+        if event is not None and event.type() == QEvent.Type.StyleChange:
             self.__updateItemDelegate()
         super().changeEvent(event)
 
-    def showPopup(self):
+    def showPopup(self) -> None:
         """Reimplemented."""
         super().showPopup()
         view = self.view()
@@ -221,7 +228,7 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
                 vp.installEventFilter(self)
                 self.__popupIsShown = True
 
-    def hidePopup(self):
+    def hidePopup(self) -> None:
         """Reimplemented."""
         view = self.view()
         if view is not None:
@@ -234,29 +241,30 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
             super().hidePopup()
             view.clearFocus()
 
-    def eventFilter(self, obj, event):
+    def eventFilter(self, obj:Optional['QObject'] = None, event:Optional[QEvent] = None) -> bool:
         """Reimplemented."""
         view = self.view()
-        if view is not None:
+        if view is not None and event is not None:
+            # QMouseEvent
             if self.__popupIsShown and \
                     event.type() == QEvent.Type.MouseMove and \
                     view.isVisible() and self.__initialMousePos is not None:
-                diff = obj.mapToGlobal(event.pos()) - self.__initialMousePos # type: ignore # mypy: Statement is unreachable
+                diff = obj.mapToGlobal(event.position()) - self.__initialMousePos # type: ignore # mypy: Statement is unreachable
                 if diff.manhattanLength() > 9 and \
                         self.__blockMouseReleaseTimer.isActive():
                     self.__blockMouseReleaseTimer.stop()
                 # pass through
 
-            if self.__popupIsShown and \
-                    event.type() == QEvent.Type.MouseButtonRelease and \
-                    view.isVisible() and \
-                    view.rect().contains(event.pos()) and \
-                    view.currentIndex().isValid() and \
-                    view.currentIndex().flags() & Qt.ItemFlag.ItemIsSelectable and \
-                    view.currentIndex().flags() & Qt.ItemFlag.ItemIsEnabled and \
-                    view.currentIndex().flags() & Qt.ItemFlag.ItemIsUserCheckable and \
-                    view.visualRect(view.currentIndex()).contains(event.pos()) and \
-                    not self.__blockMouseReleaseTimer.isActive():
+            if (self.__popupIsShown and
+                    event.type() == QEvent.Type.MouseButtonRelease and
+                    view.isVisible() and
+                    view.rect().contains(event.position().toPoint()) and # type:ignore[attr-defined] # "QEvent" has no attribute "position"
+                    view.currentIndex().isValid() and
+                    view.currentIndex().flags() & Qt.ItemFlag.ItemIsSelectable and
+                    view.currentIndex().flags() & Qt.ItemFlag.ItemIsEnabled and
+                    view.currentIndex().flags() & Qt.ItemFlag.ItemIsUserCheckable and
+                    view.visualRect(view.currentIndex()).contains(event.position().toPoint()) and # type:ignore[attr-defined] # "QEvent" has no attribute "position"
+                    not self.__blockMouseReleaseTimer.isActive()):
                 index = view.currentIndex()
                 model = self.model()
                 if model is not None:
@@ -269,7 +277,8 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
                     self.flagChanged.emit(index.row(),state == Qt.CheckState.Unchecked)
                     return True
 
-            if self.__popupIsShown and event.type() == QEvent.Type.KeyPress and event.key() == Qt.Key.Key_Space:
+            # QKeyEvent
+            if self.__popupIsShown and event.type() == QEvent.Type.KeyPress and event.key() == Qt.Key.Key_Space: # type:ignore[attr-defined] # "QEvent" has no attribute "key"
                 # toggle the current items check state
                 index = view.currentIndex()
                 model = self.model()
@@ -290,7 +299,7 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
 
         return super().eventFilter(obj, event)
 
-    def paintEvent(self, _event):
+    def paintEvent(self, _event:'Optional[QPaintEvent]') -> None:
         """Reimplemented."""
         painter = QStylePainter(self)
         option = QStyleOptionComboBox()
@@ -360,25 +369,26 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
         """
         return self.__placeholderText
 
-    def wheelEvent(self, event): # pylint: disable=no-self-use
+    def wheelEvent(self, event:'Optional[QWheelEvent]') -> None: # pylint: disable=no-self-use
         """Reimplemented."""
-        event.ignore()
+        if event is not None:
+            event.ignore()
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event:'Optional[QKeyEvent]') -> None:
         """Reimplemented."""
         # Override the default QComboBox behavior
-        if event.key() == Qt.Key.Key_Down and event.modifiers() & Qt.KeyboardModifier.AltModifier:
-            self.showPopup()
-            return
+        if event is not None:
+            if event.key() == Qt.Key.Key_Down and event.modifiers() & Qt.KeyboardModifier.AltModifier:
+                self.showPopup()
+                return
 
-        ignored = {Qt.Key.Key_Up, Qt.Key.Key_Down,
-                   Qt.Key.Key_PageDown, Qt.Key.Key_PageUp,
-                   Qt.Key.Key_Home, Qt.Key.Key_End}
+            ignored = {Qt.Key.Key_Up, Qt.Key.Key_Down,
+                       Qt.Key.Key_PageDown, Qt.Key.Key_PageUp,
+                       Qt.Key.Key_Home, Qt.Key.Key_End}
 
-        if event.key() in ignored:
-            event.ignore()
-            return
-
+            if event.key() in ignored:
+                event.ignore()
+                return
         super().keyPressEvent(event)
 
     def __updateItemDelegate(self) -> None:

@@ -2534,40 +2534,31 @@ class EventsDlg(ArtisanResizeablDialog):
                 rows = []
                 rows.append(str(r+1))
                 # label
-                labeledit = self.eventbuttontable.cellWidget(r,0)
-                assert isinstance(labeledit, QLineEdit)
+                labeledit = cast(QLineEdit, self.eventbuttontable.cellWidget(r,0))
                 rows.append(labeledit.text())
                 # description
-                descriptionedit = self.eventbuttontable.cellWidget(r,1)
-                assert isinstance(descriptionedit, QLineEdit)
+                descriptionedit = cast(QLineEdit, self.eventbuttontable.cellWidget(r,1))
                 rows.append(descriptionedit.text())
                 # type
-                typeComboBox = self.eventbuttontable.cellWidget(r,2)
-                assert isinstance(typeComboBox, MyQComboBox)
+                typeComboBox = cast(MyQComboBox, self.eventbuttontable.cellWidget(r,2))
                 rows.append(typeComboBox.currentText())
                 # value
-                valueEdit = self.eventbuttontable.cellWidget(r,3)
-                assert isinstance(valueEdit, QLineEdit)
+                valueEdit = cast(QLineEdit, self.eventbuttontable.cellWidget(r,3))
                 rows.append(valueEdit.text())
                 # action
-                actionComboBox = self.eventbuttontable.cellWidget(r,4)
-                assert isinstance(actionComboBox, MyQComboBox)
+                actionComboBox = cast(MyQComboBox, self.eventbuttontable.cellWidget(r,4))
                 rows.append(actionComboBox.currentText())
                 # action description
-                actiondescriptionedit = self.eventbuttontable.cellWidget(r,5)
-                assert isinstance(actiondescriptionedit, QLineEdit)
+                actiondescriptionedit = cast(QLineEdit, self.eventbuttontable.cellWidget(r,5))
                 rows.append(actiondescriptionedit.text())
                 # visibility
-                visibilityComboBox = self.eventbuttontable.cellWidget(r,6)
-                assert isinstance(visibilityComboBox, MyQComboBox)
+                visibilityComboBox = cast(MyQComboBox, self.eventbuttontable.cellWidget(r,6))
                 rows.append(visibilityComboBox.currentText())
                 # color
-                colorButton = self.eventbuttontable.cellWidget(r,7)
-                assert isinstance(colorButton, QPushButton)
+                colorButton = cast(QPushButton, self.eventbuttontable.cellWidget(r,7))
                 rows.append(colorButton.palette().button().color().name())
                 # text color
-                colorTextButton = self.eventbuttontable.cellWidget(r,8)
-                assert isinstance(colorTextButton, QPushButton)
+                colorTextButton = cast(QPushButton, self.eventbuttontable.cellWidget(r,8))
                 rows.append(colorTextButton.palette().button().color().name())
                 tbl.add_row(rows)
             clipboard = tbl.get_string()
@@ -2582,32 +2573,23 @@ class EventsDlg(ArtisanResizeablDialog):
             clipboard += '\n'
             for r in range(nrows):
                 clipboard += str(r+1) + '\t'
-                labeledit = self.eventbuttontable.cellWidget(r,0)
-                assert isinstance(labeledit, QLineEdit)
+                labeledit = cast(QLineEdit, self.eventbuttontable.cellWidget(r,0))
                 clipboard += labeledit.text() + '\t'
-                descriptionedit = self.eventbuttontable.cellWidget(r,1)
-                assert isinstance(descriptionedit, QLineEdit)
+                descriptionedit = cast(QLineEdit, self.eventbuttontable.cellWidget(r,1))
                 clipboard += descriptionedit.text() + '\t'
-                typeComboBox = self.eventbuttontable.cellWidget(r,2)
-                assert isinstance(typeComboBox, MyQComboBox)
+                typeComboBox = cast(MyQComboBox, self.eventbuttontable.cellWidget(r,2))
                 clipboard += typeComboBox.currentText() + '\t'
-                valueEdit = self.eventbuttontable.cellWidget(r,3)
-                assert isinstance(valueEdit, QLineEdit)
+                valueEdit = cast(QLineEdit, self.eventbuttontable.cellWidget(r,3))
                 clipboard += valueEdit.text() + '\t'
-                actionComboBox = self.eventbuttontable.cellWidget(r,4)
-                assert isinstance(actionComboBox, MyQComboBox)
+                actionComboBox = cast(MyQComboBox, self.eventbuttontable.cellWidget(r,4))
                 clipboard += actionComboBox.currentText() + '\t'
-                actiondescriptionedit = self.eventbuttontable.cellWidget(r,5)
-                assert isinstance(actiondescriptionedit, QLineEdit)
+                actiondescriptionedit = cast(QLineEdit, self.eventbuttontable.cellWidget(r,5))
                 clipboard += actiondescriptionedit.text() + '\t'
-                visibilityComboBox = self.eventbuttontable.cellWidget(r,6)
-                assert isinstance(visibilityComboBox, MyQComboBox)
+                visibilityComboBox = cast(MyQComboBox, self.eventbuttontable.cellWidget(r,6))
                 clipboard += visibilityComboBox.currentText() + '\t'
-                colorButton = self.eventbuttontable.cellWidget(r,7)
-                assert isinstance(colorButton, QPushButton)
+                colorButton = cast(QPushButton, self.eventbuttontable.cellWidget(r,7))
                 clipboard += colorButton.palette().button().color().name() + '\t'
-                colorTextButton = self.eventbuttontable.cellWidget(r,8)
-                assert isinstance(colorTextButton, QPushButton)
+                colorTextButton = cast(QPushButton, self.eventbuttontable.cellWidget(r,8))
                 clipboard += colorTextButton.palette().button().color().name() + '\n'
         # copy to the system clipboard
         sys_clip = QApplication.clipboard()
@@ -2670,27 +2652,23 @@ class EventsDlg(ArtisanResizeablDialog):
     def setlabeleventbutton(self):
         i = self.aw.findWidgetsRow(self.eventbuttontable,self.sender(),0)
         if i is not None:
-            labeledit = self.eventbuttontable.cellWidget(i,0)
-            assert isinstance(labeledit, QLineEdit)
+            labeledit = cast(QLineEdit, self.eventbuttontable.cellWidget(i,0))
             label = labeledit.text()
             label = label.replace('\\n', chr(10))
             if i < len(self.extraeventslabels):
                 self.extraeventslabels[i] = label
                 label = self.aw.substButtonLabel(-1, label, self.extraeventstypes[i])
             #Update Color Buttons
-            colorButton = self.eventbuttontable.cellWidget(i,7)
-            assert isinstance(colorButton, QPushButton)
+            colorButton = cast(QPushButton, self.eventbuttontable.cellWidget(i,7))
             colorButton.setText(label)
-            colorTextButton = self.eventbuttontable.cellWidget(i,8)
-            assert isinstance(colorTextButton, QPushButton)
+            colorTextButton = cast(QPushButton, self.eventbuttontable.cellWidget(i,8))
             colorTextButton.setText(label)
 
     @pyqtSlot()
     def setdescriptioneventbutton(self):
         i = self.aw.findWidgetsRow(self.eventbuttontable,self.sender(),1)
         if i is not None:
-            descriptionedit = self.eventbuttontable.cellWidget(i,1)
-            assert isinstance(descriptionedit, QLineEdit)
+            descriptionedit = cast(QLineEdit, self.eventbuttontable.cellWidget(i,1))
             if i < len(self.extraeventsdescriptions):
                 self.extraeventsdescriptions[i] = descriptionedit.text()
 
@@ -2698,8 +2676,7 @@ class EventsDlg(ArtisanResizeablDialog):
     def settypeeventbutton(self,_):
         i = self.aw.findWidgetsRow(self.eventbuttontable,self.sender(),2)
         if i is not None:
-            typecombobox = self.eventbuttontable.cellWidget(i,2)
-            assert isinstance(typecombobox, MyQComboBox)
+            typecombobox = cast(MyQComboBox, self.eventbuttontable.cellWidget(i,2))
             evType = typecombobox.currentIndex() - 1 # we remove again the offset of 1 here to jump over the new EVENT entry
             if i < len(self.extraeventstypes):
                 if evType == -1:
@@ -2708,27 +2685,23 @@ class EventsDlg(ArtisanResizeablDialog):
                     evType = 9 # and map the entry 4 to 9
                 self.extraeventstypes[i] = evType
 
-            labeledit = self.eventbuttontable.cellWidget(i,0)
-            assert isinstance(labeledit, QLineEdit)
+            labeledit = cast(QLineEdit, self.eventbuttontable.cellWidget(i,0))
             label = labeledit.text()
             label = label.replace('\\n', chr(10))
             if i < len(self.extraeventslabels):
                 self.extraeventslabels[i] = label
                 label = self.aw.substButtonLabel(-1, label, self.extraeventstypes[i])
             #Update Color Buttons
-            colorButton = self.eventbuttontable.cellWidget(i,7)
-            assert isinstance(colorButton, QPushButton)
+            colorButton = cast(QPushButton, self.eventbuttontable.cellWidget(i,7))
             colorButton.setText(label)
-            colorTextButton = self.eventbuttontable.cellWidget(i,8)
-            assert isinstance(colorTextButton, QPushButton)
+            colorTextButton = cast(QPushButton, self.eventbuttontable.cellWidget(i,8))
             colorTextButton.setText(label)
 
     @pyqtSlot()
     def setvalueeventbutton(self):
         i = self.aw.findWidgetsRow(self.eventbuttontable,self.sender(),3)
         if i is not None:
-            valueedit = self.eventbuttontable.cellWidget(i,3)
-            assert isinstance(valueedit, QLineEdit)
+            valueedit = cast(QLineEdit, self.eventbuttontable.cellWidget(i,3))
             if i < len(self.extraeventsvalues):
                 self.extraeventsvalues[i] = self.aw.qmc.str2eventsvalue(str(valueedit.text()))
 
@@ -2736,8 +2709,7 @@ class EventsDlg(ArtisanResizeablDialog):
     def setactioneventbutton(self,_):
         i = self.aw.findWidgetsRow(self.eventbuttontable,self.sender(),4)
         if i is not None:
-            actioncombobox = self.eventbuttontable.cellWidget(i,4)
-            assert isinstance(actioncombobox, MyQComboBox)
+            actioncombobox = cast(MyQComboBox, self.eventbuttontable.cellWidget(i,4))
             if i < len(self.extraeventsactions):
                 self.extraeventsactions[i] = self.custom_button_actions.index(self.custom_button_actions_sorted[actioncombobox.currentIndex()])
                 if self.extraeventsactions[i] > 6: # increase action type as 7=CallProgramWithArg is not available for buttons
@@ -2747,8 +2719,7 @@ class EventsDlg(ArtisanResizeablDialog):
     def setactiondescriptioneventbutton(self):
         i = self.aw.findWidgetsRow(self.eventbuttontable,self.sender(),5)
         if i is not None:
-            actiondescriptionedit = self.eventbuttontable.cellWidget(i,5)
-            assert isinstance(actiondescriptionedit, QLineEdit)
+            actiondescriptionedit = cast(QLineEdit, self.eventbuttontable.cellWidget(i,5))
             if i < len(self.extraeventsactionstrings):
                 self.extraeventsactionstrings[i] = actiondescriptionedit.text()
 
@@ -2756,8 +2727,7 @@ class EventsDlg(ArtisanResizeablDialog):
     def setvisibilitytyeventbutton(self,_):
         i = self.aw.findWidgetsRow(self.eventbuttontable,self.sender(),6)
         if i is not None:
-            visibilityComboBox = self.eventbuttontable.cellWidget(i,6)
-            assert isinstance(visibilityComboBox, MyQComboBox)
+            visibilityComboBox = cast(MyQComboBox, self.eventbuttontable.cellWidget(i,6))
             if i < len(self.extraeventsvisibility):
                 self.extraeventsvisibility[i] = visibilityComboBox.currentIndex()
 
@@ -2803,40 +2773,31 @@ class EventsDlg(ArtisanResizeablDialog):
         for x in range(self.eventbuttontable.rowCount()):
             try:
                 #
-                labeledit = self.eventbuttontable.cellWidget(x,0)
-                assert isinstance(labeledit, QLineEdit)
+                labeledit = cast(QLineEdit, self.eventbuttontable.cellWidget(x,0))
                 labeledit.editingFinished.disconnect() # label edit
                 #
-                descriptionedit = self.eventbuttontable.cellWidget(x,1)
-                assert isinstance(descriptionedit, QLineEdit)
+                descriptionedit = cast(QLineEdit, self.eventbuttontable.cellWidget(x,1))
                 descriptionedit.editingFinished.disconnect() # description edit
                 #
-                typeComboBox = self.eventbuttontable.cellWidget(x,2)
-                assert isinstance(typeComboBox, MyQComboBox)
+                typeComboBox = cast(MyQComboBox, self.eventbuttontable.cellWidget(x,2))
                 typeComboBox.currentIndexChanged.disconnect() # type combo
                 #
-                valueEdit = self.eventbuttontable.cellWidget(x,3)
-                assert isinstance(valueEdit, QLineEdit)
+                valueEdit = cast(QLineEdit, self.eventbuttontable.cellWidget(x,3))
                 valueEdit.editingFinished.disconnect() # value edit
                 #
-                actionComboBox = self.eventbuttontable.cellWidget(x,4)
-                assert isinstance(actionComboBox, MyQComboBox)
+                actionComboBox = cast(MyQComboBox, self.eventbuttontable.cellWidget(x,4))
                 actionComboBox.currentIndexChanged.disconnect() # action combo
                 #
-                actiondescriptionedit = self.eventbuttontable.cellWidget(x,5)
-                assert isinstance(actiondescriptionedit, QLineEdit)
+                actiondescriptionedit = cast(QLineEdit, self.eventbuttontable.cellWidget(x,5))
                 actiondescriptionedit.editingFinished.disconnect() # action description
                 #
-                visibilityComboBox = self.eventbuttontable.cellWidget(x,6)
-                assert isinstance(visibilityComboBox, MyQComboBox)
+                visibilityComboBox = cast(MyQComboBox, self.eventbuttontable.cellWidget(x,6))
                 visibilityComboBox.currentIndexChanged.disconnect() # visibility combo
                 #
-                colorButton = self.eventbuttontable.cellWidget(x,7)
-                assert isinstance(colorButton, QPushButton)
+                colorButton = cast(QPushButton, self.eventbuttontable.cellWidget(x,7))
                 colorButton.clicked.disconnect() # color button
                 #
-                colorTextButton = self.eventbuttontable.cellWidget(x,8)
-                assert isinstance(colorTextButton, QPushButton)
+                colorTextButton = cast(QPushButton, self.eventbuttontable.cellWidget(x,8))
                 colorTextButton.clicked.disconnect() # color text button
             except Exception: # pylint: disable=broad-except
                 pass
@@ -2879,8 +2840,9 @@ class EventsDlg(ArtisanResizeablDialog):
             return
         try:
             focusWidget = QApplication.focusWidget()
-            if isinstance(focusWidget, QLineEdit):
-                focusWidget.editingFinished.emit()
+            if focusWidget is not None and isinstance(focusWidget, QLineEdit):
+                fw:QLineEdit = focusWidget
+                fw.editingFinished.emit()
         except Exception: # pylint: disable=broad-except
             pass
 
@@ -3429,10 +3391,8 @@ class EventsDlg(ArtisanResizeablDialog):
 
     @pyqtSlot()
     def calcSliderFactorOffset(self):
-        sender = self.sender()
-        assert isinstance(sender, QWidget)
-        dialog = sender.window()
-        assert isinstance(dialog, SliderCalculator)
+        sender = cast(QWidget, self.sender())
+        dialog = cast(SliderCalculator, sender.window())
         dialog.ui.lineEdit_TargetValue_min.setText(comma2dot(dialog.ui.lineEdit_TargetValue_min.text()))
         dialog.ui.lineEdit_TargetValue_min.repaint()
         dialog.ui.lineEdit_TargetValue_max.setText(comma2dot(dialog.ui.lineEdit_TargetValue_max.text()))
@@ -3447,8 +3407,8 @@ class EventsDlg(ArtisanResizeablDialog):
             dialog.applyButton.setEnabled(False)
         if min_text != '' and max_text != '':
             try:
-                min_slider = min(self.E1_min.value(), self.E1_max.value())
-                max_slider = max(self.E1_min.value(), self.E1_max.value())
+                min_slider = min(dialog.sliderMin, dialog.sliderMax)
+                max_slider = max(dialog.sliderMin, dialog.sliderMax)
                 tmin = float(min_text)
                 tmax = float(max_text)
                 min_target = min(tmin, tmax)
@@ -3467,7 +3427,7 @@ class EventsDlg(ArtisanResizeablDialog):
         dialog.ui.lineEdit_Offset.setText(offset)
 
     def openSliderCalculator(self,sliderMin:int, sliderMax:int, factorWidget:MyQDoubleSpinBox, offsetWidget:MyQDoubleSpinBox) -> None:
-        dialog = SliderCalculator(self, self.aw, factorWidget, offsetWidget)
+        dialog = SliderCalculator(self, self.aw, factorWidget, offsetWidget, sliderMin, sliderMax)
         # set data
         dialog.ui.lineEdit_SliderValue_min.setText(str(sliderMin))
         dialog.ui.lineEdit_SliderValue_max.setText(str(sliderMax))
@@ -3500,10 +3460,13 @@ class EventsDlg(ArtisanResizeablDialog):
 #########################################################################
 
 class SliderCalculator(ArtisanDialog):
-    def __init__(self, parent:QWidget, aw:'ApplicationWindow', factorWidget:MyQDoubleSpinBox, offsetWidget:MyQDoubleSpinBox) -> None:
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow', factorWidget:MyQDoubleSpinBox, offsetWidget:MyQDoubleSpinBox,
+            sliderMin:int, sliderMax:int) -> None:
         super().__init__(parent, aw)
         self.factorWidget = factorWidget
         self.offsetWidget = offsetWidget
+        self.sliderMin = sliderMin
+        self.sliderMax = sliderMax
         self.ui = SliderCalculatorDialog.Ui_SliderCalculator()
         self.ui.setupUi(self)
         self.setWindowTitle(QApplication.translate('Form Caption','Slider Calculator'))

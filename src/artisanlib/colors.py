@@ -19,7 +19,7 @@ import platform
 
 from artisanlib.util import deltaLabelUTF8
 from artisanlib.dialogs import ArtisanDialog
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, Dict, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -35,8 +35,8 @@ except ImportError:
     from PyQt5.QtCore import Qt, QTimer, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QColor, QFont, QPalette # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QPushButton, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QSizePolicy, QHBoxLayout, QVBoxLayout, QDialogButtonBox, QGridLayout, QGroupBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QLayout, QSpinBox, QTabWidget, QMessageBox) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QSizePolicy, QHBoxLayout, QVBoxLayout, QDialogButtonBox, QGridLayout, QGroupBox, # @UnusedImport @Reimport  @UnresolvedImport
+        QLayout, QSpinBox, QTabWidget, QMessageBox) # @UnusedImport @Reimport  @UnresolvedImport
 
 
 class graphColorDlg(ArtisanDialog):
@@ -620,7 +620,7 @@ class graphColorDlg(ArtisanDialog):
         self.aw.graphColorDlg_activeTab = self.TabWidget.currentIndex()
 
     @pyqtSlot(bool)
-    def setLCD_bw(self,_):
+    def setLCD_bw(self, _:bool) -> None:
         self.aw.setLCDsBW()
         self.setColorButtons()
 
@@ -677,7 +677,7 @@ class graphColorDlg(ArtisanDialog):
 #                self.aw.largePhasesLCDs_dialog.updateStyles()
 
     @pyqtSlot(bool)
-    def paintlcdsSlot(self,_):
+    def paintlcdsSlot(self, _:bool) -> None:
         lcdButton = self.sender()
         if lcdButton in [self.lcd1LEDButton,self.lcd1backButton]:
             if lcdButton == self.lcd1backButton:
@@ -751,7 +751,7 @@ class graphColorDlg(ArtisanDialog):
                 self.aw.largeLCDs_dialog.updateStyles()
         self.setColorButtons()
 
-    def setColorButtons(self):
+    def setColorButtons(self) -> None:
         for ll,tt in [
                 # Curves (background curves handled separately)
                 (self.metButton,'et'),
@@ -826,7 +826,7 @@ class graphColorDlg(ArtisanDialog):
 #            self.canvasLabel.setStyleSheet("QLabel { background-color: #f0f0f0 }")
             self.canvasLabel.setStyleSheet('QPushButton {background-color: #f0f0f0 ;' + self.commonstyle + '}')
 
-    def setColorButton(self,button,tag):
+    def setColorButton(self, button:QPushButton, tag:str) -> None:
         c = self.aw.qmc.palette[tag]
         button.setText(c)
         tc = self.aw.labelBorW(c)
@@ -834,16 +834,16 @@ class graphColorDlg(ArtisanDialog):
 
     # adds a new event to the Dlg
     @pyqtSlot(bool)
-    def recolor1(self,_):
+    def recolor1(self, _:bool) -> None:
         self.aw.qmc.changeGColor(1)
         self.setColorButtons()
 
     @pyqtSlot(bool)
-    def recolor2(self,_):
+    def recolor2(self, _:bool) -> None:
         self.aw.qmc.changeGColor(2)
         self.setColorButtons()
 
-    def adjustOpaqenesss(self,spinbox,coloralpha):
+    def adjustOpaqenesss(self, spinbox:QSpinBox, coloralpha:str) -> None:
         #block button
         spinbox.setDisabled(True)
         self.aw.qmc.alpha[coloralpha] = spinbox.value()/10.
@@ -853,7 +853,7 @@ class graphColorDlg(ArtisanDialog):
         spinbox.setDisabled(False)
 
     @pyqtSlot(int)
-    def adjustOpaqenesssSlot(self,_):
+    def adjustOpaqenesssSlot(self, _:int) -> None:
         widget = self.sender()
 #        if widget == self.opaqbgSpinBox:
 #            self.adjustOpaqenesss(self.opaqbgSpinBox,self.aw.qmc.backgroundalpha)
@@ -865,7 +865,7 @@ class graphColorDlg(ArtisanDialog):
             self.adjustOpaqenesss(self.statsanalysisbkgndSpinBox,'statsanalysisbkgnd')
 
     @pyqtSlot(bool)
-    def setbgColorSlot(self,_):
+    def setbgColorSlot(self, _:bool) -> None:
         widget = self.sender()
         if widget == self.bgmetButton:
             self.setbgColor('ET',self.bgmetButton,self.aw.qmc.backgroundmetcolor)
@@ -880,7 +880,7 @@ class graphColorDlg(ArtisanDialog):
         elif widget == self.bgextra2Button:
             self.setbgColor('Extra2',self.bgextra2Button,self.aw.qmc.backgroundytcolor)
 
-    def setbgColor(self,title,var,color):
+    def setbgColor(self, title:str, var:QPushButton, color:str) -> None:
         labelcolor = QColor(color)
         colorf = self.aw.colordialog(labelcolor)
         if colorf.isValid():
@@ -905,7 +905,7 @@ class graphColorDlg(ArtisanDialog):
                 self.aw.qmc.backgroundytcolor = color
             self.aw.sendmessage(QApplication.translate('Message','Color of {0} set to {1}').format(title,str(color)))
 
-    def setlcdColor(self,palette,disj_palette,select):
+    def setlcdColor(self, palette:Dict[str,str], disj_palette:Dict[str,str], select:str) -> None:
         res = self.aw.colordialog(QColor(palette[select]))
         if QColor.isValid(res):
             nc = str(res.name())
@@ -919,7 +919,7 @@ class graphColorDlg(ArtisanDialog):
                 palette[select] = nc
 
     @pyqtSlot(bool)
-    def setColorSlot(self,_):
+    def setColorSlot(self, _:bool) -> None:
         widget = self.sender()
         if widget == self.metButton:
             self.setColor('ET',self.metButton,'et')
@@ -984,13 +984,13 @@ class graphColorDlg(ArtisanDialog):
         elif widget == self.statsanalysisbkgndButton:
             self.setColor('Analysis Result',self.statsanalysisbkgndButton,'statsanalysisbkgnd')
 
-    def colorButton(self,s):
+    def colorButton(self, s:str) -> QPushButton:
         button = QPushButton(s)
         button.setPalette(QPalette(QColor(s)))
         button.setStyleSheet('QPushButton {background-color:' + s + ';' + self.commonstyle + '}')
         return button
 
-    def setColor(self,title,var,color):
+    def setColor(self, title:str, var:QPushButton, color:str) -> None:
         labelcolor = QColor(self.aw.qmc.palette[color])
         colorf = self.aw.colordialog(labelcolor)
         if colorf.isValid():
@@ -1014,7 +1014,7 @@ class graphColorDlg(ArtisanDialog):
             self.aw.sendmessage(QApplication.translate('Message','Color of {0} set to {1}').format(title,str(self.aw.qmc.palette[color])))
 
     @pyqtSlot(int)
-    def adjustintensity(self,_):
+    def adjustintensity(self, _:int) -> None:
         #block button
         self.opaqbgSpinBox.setDisabled(True)
         self.aw.qmc.backgroundalpha = self.opaqbgSpinBox.value()/10.

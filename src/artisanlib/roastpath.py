@@ -8,7 +8,7 @@ import requests
 from requests_file import FileAdapter # type: ignore # @UnresolvedImport
 import re
 import json
-from lxml import html # type: ignore
+from lxml import html
 import logging
 from typing import Final, TypedDict, Optional, List, TYPE_CHECKING
 

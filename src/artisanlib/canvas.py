@@ -37,7 +37,7 @@ from bisect import bisect_right
 import psutil
 from psutil._common import bytes2human
 
-from typing import Final, Optional, List, Dict, Callable, Tuple, Union, Any, Sequence, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
+from typing import Final, Optional, List, Dict, Callable, Tuple, Union, Any, Sequence, cast, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
 
 if TYPE_CHECKING:
     from artisanlib.types import ProfileData, EnergyMetrics, BTU # pylint: disable=unused-import
@@ -1052,7 +1052,7 @@ class tgraphcanvas(FigureCanvas):
 
         # important to make the Qt canvas transparent (note that this changes stylesheets of children like popups too!):
         if isinstance(self.fig.canvas, QWidget):
-            self.fig.canvas.setStyleSheet('background-color:transparent;') # default is white
+            cast(QWidget, self.fig.canvas).setStyleSheet('background-color:transparent;') # default is white
 
         self.onclick_cid = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
         self.oncpick_cid = self.fig.canvas.mpl_connect('pick_event', self.onpick) # type: ignore[arg-type] # incompatible type "Callable[[PickEvent], None]"; expected "Callable[[Event], Any]
@@ -3396,7 +3396,7 @@ class tgraphcanvas(FigureCanvas):
     # the temp gets averaged using the given decay weights after resampling
     # to linear time based on tx and the current sampling interval
     # -1 and None values are skipped/ignored
-    def decay_average(self, tx_in,temp_in,decay_weights):
+    def decay_average(self, tx_in,temp_in, decay_weights):
         if len(decay_weights)<2 or len(tx_in) != len(temp_in):
             if len(temp_in)>0:
                 return temp_in[-1]
@@ -9610,10 +9610,16 @@ class tgraphcanvas(FigureCanvas):
 
                     if self.DeltaETflag and self.l_delta1 is not None:
                         self.handles.append(self.l_delta1)
-                        self.labels.append(self.aw.arabicReshape(f'{deltaLabelMathPrefix}{self.aw.ETname}'))
+                        if self.aw.locale_str in {'ar', 'fa'}:
+                            self.labels.append(f'{self.aw.arabicReshape(self.aw.ETname)}{deltaLabelMathPrefix}')
+                        else:
+                            self.labels.append(f'{deltaLabelMathPrefix}{self.aw.ETname}')
                     if self.DeltaBTflag and self.l_delta2 is not None:
                         self.handles.append(self.l_delta2)
-                        self.labels.append(self.aw.arabicReshape(f'{deltaLabelMathPrefix}{self.aw.BTname}'))
+                        if self.aw.locale_str in {'ar', 'fa'}:
+                            self.labels.append(f'{self.aw.arabicReshape(self.aw.BTname)}{deltaLabelMathPrefix}')
+                        else:
+                            self.labels.append(f'{deltaLabelMathPrefix}{self.aw.BTname}')
 
                     nrdevices = len(self.extradevices)
 
@@ -10739,11 +10745,11 @@ class tgraphcanvas(FigureCanvas):
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def changeGColor3(self,_=False):
+    def changeGColor3(self, _:bool = False) -> None:
         self.changeGColor(3)
 
     #selects color mode: input 1=color mode; input 2=black and white mode (printing); input 3 = customize colors
-    def changeGColor(self,color):
+    def changeGColor(self, color:int) -> None:
         #load selected dictionary
         if color == 1:
             self.aw.sendmessage(QApplication.translate('Message','Colors set to defaults'))
@@ -10846,7 +10852,7 @@ class tgraphcanvas(FigureCanvas):
         self.aw.update_extraeventbuttons_visibility()
         self.fig.canvas.draw_idle() #.redraw()
 
-    def clearFlavorChart(self):
+    def clearFlavorChart(self) -> None:
         self.flavorchart_plotf = None
         self.flavorchart_angles = None
         self.flavorchart_plot = None
@@ -10855,7 +10861,7 @@ class tgraphcanvas(FigureCanvas):
         self.flavorchart_total = None
 
     #draws a polar star graph to score cupping. It does not delete any profile data.
-    def flavorchart(self):
+    def flavorchart(self) -> None:
         try:
             pi = math.pi
 
@@ -10980,7 +10986,7 @@ class tgraphcanvas(FigureCanvas):
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
 
-    def flavorChartLabelText(self,i):
+    def flavorChartLabelText(self, i:int) -> str:
         return f'{self.aw.arabicReshape(self.flavorlabels[i])}\n{self.flavors[i]:.2f}'
 
     #To close circle we need one more element. angle and values need same dimension in order to plot.
@@ -11010,7 +11016,7 @@ class tgraphcanvas(FigureCanvas):
         return score
 
     # an incremental redraw of the existing flavorchart
-    def updateFlavorchartValues(self):
+    def updateFlavorchartValues(self) -> None:
         # update data
         self.updateFlavorChartData()
         if self.flavorchart_plot is not None:
@@ -11038,7 +11044,7 @@ class tgraphcanvas(FigureCanvas):
             self.fig.canvas.draw()
         self.fig.canvas.flush_events()
 
-    def updateFlavorchartLabel(self,i):
+    def updateFlavorchartLabel(self, i:int) -> None:
         if self.flavorchart_labels is not None:
             label_anno = self.flavorchart_labels[i]
             label_anno.set_text(self.flavorChartLabelText(i))
@@ -11814,7 +11820,7 @@ class tgraphcanvas(FigureCanvas):
                         ser.YOCTOthread = None
                     ser.YOCTOvalues = [[],[]]
                     ser.YOCTOlastvalues = [-1]*2
-                    YAPI.FreeAPI()
+                    YAPI.FreeAPI() # type:ignore[reportUnboundVariable]
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
         finally:
@@ -13565,7 +13571,7 @@ class tgraphcanvas(FigureCanvas):
             self.updategraphicsSignal.emit() # we need this to have the projections redrawn immediately
 
     #called from controlling devices when roasting to record steps (commands) and produce a profile later
-    def DeviceEventRecord(self,command):
+    def DeviceEventRecord(self, command:str) -> None:
         try:
             self.profileDataSemaphore.acquire(1)
             if self.flagstart:
@@ -14850,19 +14856,24 @@ class tgraphcanvas(FigureCanvas):
 
     # calculates the (interpolated) temperature from the given time/temp arrays at timepoint "seconds"
     @staticmethod
-    def timetemparray2temp(timearray, temparray, seconds):
+    def timetemparray2temp(timearray:Union['npt.NDArray[numpy.double]',Sequence[float]],
+            temparray:Union['npt.NDArray[numpy.double]',Sequence[Optional[float]]], seconds:float) -> float:
         if timearray is not None and temparray is not None and len(timearray) and len(temparray) and len(timearray) == len(temparray):
             if seconds > timearray[-1] or seconds < timearray[0]:
                 # requested timepoint out of bonds
                 return -1
             # compute the closest index (left sided)
-            i = numpy.searchsorted(timearray,seconds,side='left')
+            i = int(numpy.searchsorted(timearray,seconds,side='left'))
             ti = timearray[i]
             tempi = temparray[i]
+            if tempi is None or numpy.isnan(tempi):
+                return -1
             if i < len(timearray) - 1:
                 j = i - 1
                 tj = timearray[j]
                 tempj = temparray[j]
+                if tempj is None or numpy.isnan(tempj):
+                    return -1
                 s = (tempi - tempj) / (ti - tj)
                 return tempj + s*(seconds - tj)
             # should not be reached (guarded by the outer if)
@@ -14871,7 +14882,7 @@ class tgraphcanvas(FigureCanvas):
 
     # if smoothed=True, the smoothed data is taken if available
     # if relative=True, the given time in seconds is interpreted relative to CHARGE, otherwise absolute from the first mesasurement
-    def BTat(self,seconds,smoothed=True,relative=False):
+    def BTat(self, seconds:float, smoothed:bool = True, relative:bool = False) -> float:
         if smoothed and self.stemp2 is not None and len(self.stemp2) != 0:
             temp = self.stemp2
         else:
@@ -14882,7 +14893,7 @@ class tgraphcanvas(FigureCanvas):
             offset = 0
         return self.timetemparray2temp(self.timex,temp,seconds + offset)
 
-    def ETat(self,seconds,smoothed=True,relative=False):
+    def ETat(self, seconds:float, smoothed:bool = True, relative:bool = False) -> float:
         if smoothed and self.stemp1 is not None and len(self.stemp1) != 0:
             temp = self.stemp1
         else:
@@ -14893,28 +14904,28 @@ class tgraphcanvas(FigureCanvas):
             offset = 0
         return self.timetemparray2temp(self.timex,temp,seconds + offset)
 
-    def backgroundBTat(self,seconds, relative=False):
+    def backgroundBTat(self, seconds:float, relative:bool = False) -> float:
         if self.timeindexB[0] > -1 and relative:
             offset = self.timeB[self.timeindexB[0]]
         else:
             offset = 0
         return self.timetemparray2temp(self.timeB,self.temp2B,seconds + offset)
 
-    def backgroundSmoothedBTat(self,seconds, relative=False):
+    def backgroundSmoothedBTat(self, seconds:float, relative:bool = False) -> float:
         if self.timeindexB[0] > -1 and relative:
             offset = self.timeB[self.timeindexB[0]]
         else:
             offset = 0
-        return self.timetemparray2temp(self.timeB,self.stemp2B,seconds + offset)
+        return self.timetemparray2temp(self.timeB, self.stemp2B, seconds + offset)
 
-    def backgroundETat(self,seconds,relative=False):
+    def backgroundETat(self, seconds:float, relative:bool = False) -> float:
         if self.timeindexB[0] > -1 and relative:
             offset = self.timeB[self.timeindexB[0]]
         else:
             offset = 0
         return self.timetemparray2temp(self.timeB,self.temp1B,seconds + offset)
 
-    def backgroundSmoothedETat(self,seconds,relative=False):
+    def backgroundSmoothedETat(self, seconds:float, relative:bool = False) -> float:
         if self.timeindexB[0] > -1 and relative:
             offset = self.timeB[self.timeindexB[0]]
         else:
@@ -14925,7 +14936,7 @@ class tgraphcanvas(FigureCanvas):
     # with n=0 => extra device 1, curve 1; n=1 => extra device 1, curve 2; n=2 => extra device 2, curve 1,....
     # if the selected extra curve does not exists, the error value -1 is returned
     # if smoothed is True, the value of the corresponding smoothed extra line is returned
-    def backgroundXTat(self, n, seconds, relative=False, smoothed=False):
+    def backgroundXTat(self, n:int, seconds:float, relative:bool = False, smoothed:bool = False) -> float:
         if self.timeindexB[0] > -1 and relative:
             offset = self.timeB[self.timeindexB[0]]
         else:
@@ -14946,7 +14957,7 @@ class tgraphcanvas(FigureCanvas):
             return -1
         return self.timetemparray2temp(self.timeB,temp,seconds + offset)
 
-    def backgroundDBTat(self,seconds, relative=False):
+    def backgroundDBTat(self, seconds:float, relative:bool = False) -> float:
         if self.timeindexB[0] > -1 and relative:
             offset = self.timeB[self.timeindexB[0]]
         else:

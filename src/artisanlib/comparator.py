@@ -51,10 +51,10 @@ try:
         QComboBox, QSizePolicy, QHBoxLayout, QVBoxLayout, QHeaderView, QTableWidgetItem, QCheckBox) # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, QSettings, QFile, QTextStream, QUrl, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QFileInfo, QDate, QTime, QDateTime) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QFileInfo, QDate, QTime, QDateTime) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import (QColor, QDesktopServices, QStandardItemModel) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QComboBox, QSizePolicy, QHBoxLayout, QVBoxLayout, QHeaderView, QTableWidgetItem, QCheckBox) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QSizePolicy, QHBoxLayout, QVBoxLayout, QHeaderView, QTableWidgetItem, QCheckBox) # @UnusedImport @Reimport  @UnresolvedImport
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -93,10 +93,13 @@ class RoastProfile:
         self.aligned:bool = True # if the profile could not be aligned it is not drawn
         self.active:bool = True # if selected or all are unselected; active profiles are drawn in color, inactive profiles in gray
         self.color:Tuple[float, float, float, float] = color
-        hslf = QColor.fromRgbF(*color).getHslF()
+        hslf:Tuple[Optional[float], Optional[float], Optional[float], Optional[float]] = QColor.fromRgbF(*color).getHslF()
         self.gray:Tuple[float, float, float, float]
-        if hslf[0] is not None and hslf[2] is not None and hslf[3] is not None:
-            g0 = QColor.fromHslF(hslf[0],0,hslf[2],hslf[3])
+        ch:Optional[float] = hslf[0]
+        cl:Optional[float] = hslf[2]
+        ca:Optional[float] = hslf[3]
+        if ch is not None and cl is not None and ca is not None:
+            g0 = QColor.fromHslF(ch,0,cl,ca)
         else:
             g0 = QColor.fromHslF(0.5,0,0.5,0.5) # saturation set to 0
         self.gray = (
@@ -623,7 +626,7 @@ class RoastProfile:
         if self.aw.qmc.swapdeltalcds:
             alpha[2] = self.alpha[3]
             alpha[3] = self.alpha[2]
-        for ll, a in zip( # type: ignore # pright: error: "object*" is not iterable
+        for ll, a in zip( # type:ignore[unused-ignore] # pright: error: "object*" is not iterable
                 [
                     self.l_mainEvents2, self.l_temp2,
                     self.l_mainEvents1, self.l_temp1,
@@ -1581,8 +1584,7 @@ class roastCompareDlg(ArtisanDialog):
                     if layout is not None:
                         layoutItem: Optional['QLayoutItem'] = layout.itemAt(0)
                         if layoutItem is not None:
-                            flag = layoutItem.widget()
-                            assert isinstance(flag, QCheckBox)
+                            flag = cast(QCheckBox, layoutItem.widget())
                             flag.blockSignals(True)
                             flag.setChecked(new_state)
                             flag.blockSignals(False)

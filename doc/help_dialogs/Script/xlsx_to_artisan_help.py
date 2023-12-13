@@ -83,10 +83,10 @@ import importlib
 import re
 from time import sleep
 import sys
-sys.dont_write_bytecode = True  #prevents __pycache__ folder written to help/ 
+sys.dont_write_bytecode = True  #prevents __pycache__ folder written to help/
 
 try:
-    from PyQt6.QtWidgets import QApplication  
+    from PyQt6.QtWidgets import QApplication
 except ImportError:
     from PyQt5.QtWidgets import QApplication # type: ignore # noqa: F401
 from openpyxl import load_workbook
@@ -188,7 +188,7 @@ def buildpyCode(filename_in):
     outstr += '\n' + 'except Exception: # pylint: disable=broad-except'
     outstr += '\n' + '    from PyQt5.QtWidgets import QApplication # type: ignore # @Reimport @UnresolvedImport @UnusedImport'
     outstr += '\n'
-    outstr += '\ndef content():'
+    outstr += '\ndef content() -> str:'
     outstr += nlind + 'strlist = []'
     outstr += nlind + "helpstr = ''  # noqa: F841 #@UnusedVariable # pylint: disable=unused-variable"
     outstr += nlind + "newline = '\\n'  # noqa: F841 #@UnusedVariable  # pylint: disable=unused-variable"
@@ -252,7 +252,7 @@ def buildpyCode(filename_in):
 
         # add bottom notes
         if nrows_bottomnotes > 0:
-            outstr += tbl_bottomnotes   
+            outstr += tbl_bottomnotes
             outstr += nlind + 'strlist.append(' + tbl_name + 'bottom' + '.get_html_string(attributes={' + note_table_attributes + '}))'
 
     # finalize outstr - py code

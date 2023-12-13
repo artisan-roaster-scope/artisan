@@ -4184,19 +4184,15 @@ class editGraphDlg(ArtisanResizeablDialog):
                 nevents = self.eventtable.rowCount()
                 for i in range(nevents):
                     try:
-                        timez = self.eventtable.cellWidget(i,0)
-                        assert isinstance(timez, QLineEdit)
+                        timez = cast(QLineEdit, self.eventtable.cellWidget(i,0))
                         time_idx: int
                         if self.aw.qmc.timeindex[0] > -1:
                             time_idx = self.aw.qmc.time2index(self.aw.qmc.timex[self.aw.qmc.timeindex[0]]+ stringtoseconds(str(timez.text())))
                         else:
                             time_idx = self.aw.qmc.time2index(stringtoseconds(str(timez.text())))
-                        description = self.eventtable.cellWidget(i,3)
-                        assert isinstance(description, QLineEdit)
-                        etype = self.eventtable.cellWidget(i,4)
-                        assert isinstance(etype, MyQComboBox)
-                        evalue = self.eventtable.cellWidget(i,5)
-                        assert isinstance(evalue, QLineEdit)
+                        description = cast(QLineEdit, self.eventtable.cellWidget(i,3))
+                        etype = cast(MyQComboBox, self.eventtable.cellWidget(i,4))
+                        evalue = cast(QLineEdit, self.eventtable.cellWidget(i,5))
                         self.aw.qmc.setEvent(i,
                             time_idx,
                             etype.currentIndex(),
@@ -4232,23 +4228,17 @@ class editGraphDlg(ArtisanResizeablDialog):
             tbl.field_names = fields
             for i in range(nrows):
                 rows = []
-                timeline = self.eventtable.cellWidget(i,0)
-                assert isinstance(timeline, QLineEdit)
+                timeline = cast(QLineEdit, self.eventtable.cellWidget(i,0))
                 rows.append(timeline.text())
-                etline = self.eventtable.cellWidget(i,1)
-                assert isinstance(etline, QLineEdit)
+                etline = cast(QLineEdit, self.eventtable.cellWidget(i,1))
                 rows.append(etline.text())
-                btline = self.eventtable.cellWidget(i,2)
-                assert isinstance(btline, QLineEdit)
+                btline = cast(QLineEdit, self.eventtable.cellWidget(i,2))
                 rows.append(btline.text())
-                stringline = self.eventtable.cellWidget(i,3)
-                assert isinstance(stringline, QLineEdit)
+                stringline = cast(QLineEdit, self.eventtable.cellWidget(i,3))
                 rows.append(stringline.text())
-                typeComboBox = self.eventtable.cellWidget(i,4)
-                assert isinstance(typeComboBox, MyQComboBox)
+                typeComboBox = cast(MyQComboBox, self.eventtable.cellWidget(i,4))
                 rows.append(typeComboBox.currentText())
-                valueEdit = self.eventtable.cellWidget(i,5)
-                assert isinstance(valueEdit, QLineEdit)
+                valueEdit = cast(QLineEdit, self.eventtable.cellWidget(i,5))
                 rows.append(valueEdit.text())
                 tbl.add_row(rows)
             clipboard = tbl.get_string()
@@ -4261,18 +4251,12 @@ class editGraphDlg(ArtisanResizeablDialog):
                         clipboard += '\t'
             clipboard += '\n'
             for r in range(nrows):
-                timeline = self.eventtable.cellWidget(r,0)
-                assert isinstance(timeline, QLineEdit)
-                etline = self.eventtable.cellWidget(r,1)
-                assert isinstance(etline, QLineEdit)
-                btline = self.eventtable.cellWidget(r,2)
-                assert isinstance(btline, QLineEdit)
-                stringline = self.eventtable.cellWidget(r,3)
-                assert isinstance(stringline, QLineEdit)
-                typeComboBox =self.eventtable.cellWidget(r,4)
-                assert isinstance(typeComboBox, MyQComboBox)
-                valueEdit = self.eventtable.cellWidget(r,5)
-                assert isinstance(valueEdit, QLineEdit)
+                timeline = cast(QLineEdit, self.eventtable.cellWidget(r,0))
+                etline = cast(QLineEdit, self.eventtable.cellWidget(r,1))
+                btline = cast(QLineEdit, self.eventtable.cellWidget(r,2))
+                stringline = cast(QLineEdit, self.eventtable.cellWidget(r,3))
+                typeComboBox = cast(MyQComboBox, self.eventtable.cellWidget(r,4))
+                valueEdit = cast(QLineEdit, self.eventtable.cellWidget(r,5))
                 clipboard += timeline.text() + '\t'
                 clipboard += etline.text() + '\t'
                 clipboard += btline.text() + '\t'
@@ -5278,11 +5262,9 @@ class tareDlg(ArtisanDialog):
         names = []
         weights = []
         for i in range(tars):
-            nameWidget = self.taretable.cellWidget(i,0)
-            assert isinstance(nameWidget, QLineEdit)
+            nameWidget = cast(QLineEdit, self.taretable.cellWidget(i,0))
             name = nameWidget.text()
-            weightWidget = self.taretable.cellWidget(i,1)
-            assert isinstance(weightWidget, QLineEdit)
+            weightWidget = cast(QLineEdit, self.taretable.cellWidget(i,1))
             weight = int(round(float(comma2dot(weightWidget.text()))))
             names.append(name)
             weights.append(weight)

@@ -29,17 +29,17 @@ if TYPE_CHECKING:
 class LiveFilter:
     """Base class for live filters.
     """
-    def process(self, x):
+    def process(self, x:float) -> float:
         # do not process NaNs
         if np.isnan(x):
             return x
 
         return self._process(x)
 
-    def __call__(self, x):
+    def __call__(self, x:float) -> float:
         return self.process(x)
 
-    def _process(self, x):
+    def _process(self, x:float) -> float:
         raise NotImplementedError('Derived class must implement _process')
 
 
@@ -94,7 +94,7 @@ class LiveSosFilter(LiveFilter):
         self.n_sections = self.sos.shape[0]
         self.state = np.zeros((self.n_sections, 2))
 
-    def _process(self, x):
+    def _process(self, x:float) -> float:
         """Filter incoming data with cascaded second-order sections.
         """
         y:float = 0
@@ -126,7 +126,7 @@ class LiveMedian(LiveFilter):
         self.l:Optional[List[float]] = None
         self.mididx:int = 0
 
-    def init_queue(self):
+    def init_queue(self) -> None:
         self.q = deque(self.init_list)
         if self.q is not None:
             self.l = list(self.q)

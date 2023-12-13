@@ -111,7 +111,7 @@ v2.8.4 (June 21, 2023)
 
 * FIXES
   - fixes regression which broke MODBUS port scan ([Issue #1056](../../../issues/1056))
-  - makes designer respect the auto DeltaET and DeltaBT axis ([Issue #1062]((../../../issues/1062)))
+  - makes designer respect the auto DeltaET and DeltaBT axis ([Issue #1062](../../../issues/1062))
   - don't deactivate auto DeltaET/DeltaBT axis without changing the delta max limit ([Issue #1062](../../../issues/1062))
   - fixes regression which broke channel tare function ([Issue #1063](../../../issues/1063))
   - fixes Aillio R1: unable to detach kernel driver ([Issue #1065](../../../issues/1065))

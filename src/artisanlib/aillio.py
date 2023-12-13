@@ -32,22 +32,22 @@ import array
 #from lxml import html # unused
 
 import logging
-from typing import Final, Optional, Dict, TYPE_CHECKING
+from typing import Final, Optional, List, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     try:
         from multiprocessing.connection import PipeConnection as Connection # type: ignore # pylint: disable=unused-import
     except ImportError:
-        from multiprocessing.connection import Connection # type:ignore # pylint: disable=unused-import
-    from artisanlib.types import ProfileData # pylint: disable=unused-import
-    from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
+        from multiprocessing.connection import Connection # pylint: disable=unused-import
+#    from artisanlib.types import ProfileData # pylint: disable=unused-import
+#    from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
 
-try:
-    from PyQt6.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import QDateTime, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+#try:
+#    from PyQt6.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
+#except ImportError:
+#    from PyQt5.QtCore import QDateTime, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
-from artisanlib.util import encodeLocal
+#from artisanlib.util import encodeLocal
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -92,10 +92,10 @@ class AillioR1:
         self.voltage:float = 0
         self.exitt:float = 0
         self.state_str:str = ''
-        self.r1state = 0
+        self.r1state:int = 0
         self.worker_thread:Optional[threading.Thread] = None
         self.worker_thread_run = True
-        self.roast_number = -1
+        self.roast_number:int = -1
         self.fan_rpm:float = 0
 
         self.parent_pipe:Optional['Connection'] = None
@@ -108,42 +108,42 @@ class AillioR1:
         self.minutes = 0
         self.seconds = 0
 
-    def __del__(self):
+    def __del__(self) -> None:
         if not self.simulated:
             self.__close()
 
-    def __dbg(self, msg):
+    def __dbg(self, msg:str) -> None:
         if self.AILLIO_DEBUG and not self.simulated:
             try:
                 print('AillioR1: ' + msg)
             except OSError:
                 pass
 
-    def __open(self):
+    def __open(self) -> None:
         if self.simulated:
             return
         if self.usbhandle is not None:
             return
         self.usbhandle = usb.core.find(idVendor=self.AILLIO_VID,
-                                       idProduct=self.AILLIO_PID) # type: ignore # "Generator[Device, Any, None]" is incompatible with "Device"
+                                       idProduct=self.AILLIO_PID)
         if self.usbhandle is None:
             self.usbhandle = usb.core.find(idVendor=self.AILLIO_VID,
-                                           idProduct=self.AILLIO_PID_REV3) # type: ignore # "Generator[Device, Any, None]" is incompatible with "Device"
+                                           idProduct=self.AILLIO_PID_REV3)
         if self.usbhandle is None:
             raise OSError('not found or no permission')
         self.__dbg('device found!')
-        if not system().startswith('Windows') and self.usbhandle.is_kernel_driver_active(self.AILLIO_INTERFACE): # type: ignore # Cannot access member "is_kernel_driver_active" for type "Generator[Device, Any, None]"
+        if not system().startswith('Windows') and self.usbhandle.is_kernel_driver_active(self.AILLIO_INTERFACE):
             try:
-                self.usbhandle.detach_kernel_driver(self.AILLIO_INTERFACE) # type: ignore # Cannot access member "detach_kernel_driver" for type "Generator[Device, Any, None]"
+                self.usbhandle.detach_kernel_driver(self.AILLIO_INTERFACE)
             except Exception: # pylint: disable=broad-except
                 pass
                 # detach fails on libusb 1.0.26 and newer on macOS >v12 if not running under sudo and seems not to be needed on those configurations
 #                self.usbhandle = None
 #                raise OSError('unable to detach kernel driver') from e
         try:
-            config = self.usbhandle.get_active_configuration() # type: ignore # Cannot access member "get_active_configuration" for type "Generator[Device, Any, None]"
+            config = self.usbhandle.get_active_configuration()
             if config.bConfigurationValue != self.AILLIO_CONFIGURATION:
-                self.usbhandle.set_configuration(configuration=self.AILLIO_CONFIGURATION) # type: ignore # Cannot access member "set_configuration" for type "Generator[Device, Any, None]"
+                self.usbhandle.set_configuration(configuration=self.AILLIO_CONFIGURATION)
         except Exception as e:  # pylint: disable=broad-except
             self.usbhandle = None
             raise OSError('unable to configure') from e
@@ -169,7 +169,7 @@ class AillioR1:
         if self.worker_thread is not None:
             self.worker_thread.start()
 
-    def __close(self):
+    def __close(self) -> None:
         if self.simulated:
             return
         if self.usbhandle is not None:
@@ -190,58 +190,58 @@ class AillioR1:
                 self.child_pipe.close()
             self.worker_thread = None
 
-    def get_roast_number(self):
+    def get_roast_number(self) -> int:
         self.__getstate()
         return self.roast_number
 
-    def get_bt(self):
+    def get_bt(self) -> float:
         self.__getstate()
         return self.bt
 
-    def get_dt(self):
+    def get_dt(self) -> float:
         self.__getstate()
         return self.dt
 
-    def get_heater(self):
+    def get_heater(self) -> float:
         self.__dbg('get_heater')
         self.__getstate()
         return self.heater
 
-    def get_fan(self):
+    def get_fan(self) -> float:
         self.__dbg('get_fan')
         self.__getstate()
         return self.fan
 
-    def get_fan_rpm(self):
+    def get_fan_rpm(self) -> float:
         self.__dbg('get_fan_rpm')
         self.__getstate()
         return self.fan_rpm
 
-    def get_drum(self):
+    def get_drum(self) -> float:
         self.__getstate()
         return self.drum
 
-    def get_voltage(self):
+    def get_voltage(self) -> float:
         self.__getstate()
         return self.voltage
 
-    def get_bt_ror(self):
+    def get_bt_ror(self) -> float:
         self.__getstate()
         return self.bt_ror
 
-    def get_exit_temperature(self):
+    def get_exit_temperature(self) -> float:
         self.__getstate()
         return self.exitt
 
-    def get_state_string(self):
+    def get_state_string(self) -> str:
         self.__getstate()
         return self.state_str
 
-    def get_state(self):
+    def get_state(self) -> int:
         self.__getstate()
         return self.r1state
 
-    def set_heater(self, value):
+    def set_heater(self, value:float) -> None:
         self.__dbg('set_heater ' + str(value))
         value = int(value)
         if value < 0:
@@ -262,7 +262,7 @@ class AillioR1:
                 self.parent_pipe.send(self.AILLIO_CMD_HEATER_INCR)
         self.heater = value
 
-    def set_fan(self, value):
+    def set_fan(self, value:float) -> None:
         self.__dbg('set_fan ' + str(value))
         value = int(value)
         if value < 1:
@@ -283,7 +283,7 @@ class AillioR1:
                 self.parent_pipe.send(self.AILLIO_CMD_FAN_INCR)
         self.fan = value
 
-    def set_drum(self, value):
+    def set_drum(self, value:float) -> None:
         self.__dbg('set_drum ' + str(value))
         value = int(value)
         if value < 1:
@@ -294,15 +294,15 @@ class AillioR1:
             self.parent_pipe.send([0x32, 0x01, value, 0x00])
         self.drum = value
 
-    def prs(self):
+    def prs(self) -> None:
         self.__dbg('PRS')
         if self.parent_pipe is not None:
             self.parent_pipe.send(self.AILLIO_CMD_PRS)
 
-    def __updatestate(self, p):
+    def __updatestate(self, p:'Connection') -> None:
         while self.worker_thread_run:
-            state1:array.array = array.array('B', bytes(0))
-            state2:array.array = array.array('B', bytes(0))
+            state1:'array.array[int]' = array.array('B', bytes(0))
+            state2:'array.array[int]' = array.array('B', bytes(0))
             try:
                 self.__dbg('updatestate')
                 self.__sendcmd(self.AILLIO_CMD_STATUS1)
@@ -318,7 +318,7 @@ class AillioR1:
                 p.send(state1 + state2)
             time.sleep(0.1)
 
-    def __getstate(self):
+    def __getstate(self) -> None:
         self.__dbg('getstate')
         if self.simulated:
             if random.random() > 0.05:
@@ -396,236 +396,236 @@ class AillioR1:
         self.__dbg('state: ' + self.state_str)
         self.__dbg('second coil fan: ' + str(self.coil_fan2))
 
-    def __sendcmd(self, cmd):
+    def __sendcmd(self, cmd:List[int]) -> None:
         self.__dbg('sending command: ' + str(cmd))
         if self.usbhandle is not None:
             self.usbhandle.write(self.AILLIO_ENDPOINT_WR, cmd)
 
-    def __readreply(self, length):
+    def __readreply(self, length:int) -> Any:
         if self.usbhandle is not None:
             return self.usbhandle.read(self.AILLIO_ENDPOINT_RD, length)
         raise OSError('not found or no permission')
 
-def extractProfileBulletDict(data:Dict, aw:'ApplicationWindow') -> 'ProfileData':
-    try:
-        res:'ProfileData' = {} # the interpreted data set
-
-        if 'celsius' in data and not data['celsius']:
-            res['mode'] = 'F'
-        else:
-            res['mode'] = 'C'
-        if 'comments' in data:
-            res['roastingnotes'] = data['comments']
-        try:
-            if 'dateTime' in data:
-                try:
-                    dateQt = QDateTime.fromString(data['dateTime'],Qt.DateFormat.ISODate) # RFC 3339 date time
-                except Exception: # pylint: disable=broad-except
-                    dateQt = QDateTime.fromMSecsSinceEpoch (data['dateTime'])
-                if dateQt.isValid():
-                    roastdate:Optional[str] = encodeLocal(dateQt.date().toString())
-                    if roastdate is not None:
-                        res['roastdate'] = roastdate
-                    roastisodate:Optional[str] = encodeLocal(dateQt.date().toString(Qt.DateFormat.ISODate))
-                    if roastisodate is not None:
-                        res['roastisodate'] = roastisodate
-                    roasttime:Optional[str] = encodeLocal(dateQt.time().toString())
-                    if roasttime is not None:
-                        res['roasttime'] = roasttime
-                    res['roastepoch'] = int(dateQt.toSecsSinceEpoch())
-                    res['roasttzoffset'] = time.timezone
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
-        try:
-            res['title'] = data['beanName']
-        except Exception: # pylint: disable=broad-except
-            pass
-        if 'roastName' in data:
-            res['title'] = data['roastName']
-        try:
-            if 'roastNumber' in data:
-                res['roastbatchnr'] = int(data['roastNumber'])
-        except Exception: # pylint: disable=broad-except
-            pass
-        if 'beanName' in data:
-            res['beans'] = data['beanName']
-        elif 'bean' in data and 'beanName' in data['bean']:
-            res['beans'] = data['bean']['beanName']
-        try:
-            if 'weightGreen' in data or 'weightRoasted' in data:
-                wunit = aw.qmc.weight_units.index(aw.qmc.weight[2])
-                if wunit in {1,3}: # turn Kg into g, and lb into oz
-                    wunit = wunit -1
-                wgreen:float = 0
-                if 'weightGreen' in data:
-                    wgreen = float(data['weightGreen'])
-                wroasted:float = 0
-                if 'weightRoasted' in data:
-                    wroasted = float(data['weightRoasted'])
-                res['weight'] = [wgreen,wroasted,aw.qmc.weight_units[wunit]]
-        except Exception: # pylint: disable=broad-except
-            pass
-        try:
-            if 'agtron' in data:
-                res['ground_color'] = int(round(data['agtron']))
-                if 'Agtron' in aw.qmc.color_systems:
-                    res['color_system'] = 'Agtron'
-        except Exception: # pylint: disable=broad-except
-            pass
-        try:
-            if 'roastMasterName' in data:
-                res['operator'] = data['roastMasterName']
-        except Exception: # pylint: disable=broad-except
-            pass
-        res['roastertype'] = 'Aillio Bullet R1'
-
-        if 'ambient' in data:
-            res['ambientTemp'] = data['ambient']
-        if 'humidity' in data:
-            res['ambient_humidity'] = data['humidity']
-
-        bt = data.get('beanTemperature', [])
-        dt = data.get('drumTemperature', [])
-        # make dt the same length as bt
-        dt = dt[:len(bt)]
-        dt.extend(-1 for _ in range(len(bt) - len(dt)))
-
-        et = data.get('exitTemperature', None)
-        if et is not None:
-            # make et the same length as bt
-            et = et[:len(bt)]
-            et.extend(-1 for _ in range(len(bt) - len(et)))
-
-        ror = data.get('beanDerivative', None)
-        if ror is not None:
-            # make et the same length as bt
-            ror = ror[:len(bt)]
-            ror.extend(-1 for _ in range(len(bt) - len(ror)))
-
-        sr = data.get('sampleRate', 2.)
-        res['samplinginterval'] = 1.0/sr
-        tx = [x/sr for x in range(len(bt))]
-        res['timex'] = tx
-        res['temp1'] = dt
-        res['temp2'] = bt
-
-        timeindex = [-1,0,0,0,0,0,0,0]
-        if 'roastStartIndex' in data:
-            timeindex[0] = min(max(data['roastStartIndex'],0),len(tx)-1)
-        else:
-            timeindex[0] = 0
-
-        labels = ['indexYellowingStart','indexFirstCrackStart','indexFirstCrackEnd','indexSecondCrackStart','indexSecondCrackEnd']
-        for i in range(1,6):
-            try:
-                idx = data[labels[i-1]]
-                # RoastTime seems to interpret all index values 1 based, while Artisan takes the 0 based approach. We substruct 1
-                if idx > 1:
-                    timeindex[i] = max(min(idx - 1,len(tx)-1),0)
-            except Exception: # pylint: disable=broad-except
-                pass
-
-        if 'roastEndIndex' in data:
-            timeindex[6] = max(0,min(data['roastEndIndex'],len(tx)-1))
-        else:
-            timeindex[6] = max(0,len(tx)-1)
-        res['timeindex'] = timeindex
-
-        # extract events from newer JSON format
-        specialevents = []
-        specialeventstype = []
-        specialeventsvalue = []
-        specialeventsStrings = []
-
-        # extract events from older JSON format
-        try:
-            eventtypes = ['blowerSetting','drumSpeedSetting','--','inductionPowerSetting']
-            for j, eventname in enumerate(eventtypes):
-                if eventname != '--' and eventname in data:
-                    last:Optional[float] = None
-                    ip = data[eventname]
-                    for i, _ in enumerate(ip):
-                        v = ip[i]+1
-                        if last is None or last != v:
-                            specialevents.append(i)
-                            specialeventstype.append(j)
-                            specialeventsvalue.append(v)
-                            specialeventsStrings.append('')
-                            last = v
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
-
-        # extract events from newer JSON format
-        try:
-            for action in data['actions']['actionTimeList']:
-                time_idx = action['index'] - 1
-                value = action['value'] + 1
-                event_type = None
-                if action['ctrlType'] == 0:
-                    event_type = 3
-                elif action['ctrlType'] == 1:
-                    event_type = 0
-                elif action['ctrlType'] == 2:
-                    event_type = 1
-                if event_type is not None:
-                    specialevents.append(time_idx)
-                    specialeventstype.append(event_type)
-                    specialeventsvalue.append(value)
-                    specialeventsStrings.append(str(value))
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
-        if len(specialevents) > 0:
-            res['specialevents'] = specialevents
-            res['specialeventstype'] = specialeventstype
-            res['specialeventsvalue'] = specialeventsvalue
-            res['specialeventsStrings'] = specialeventsStrings
-
-        if (ror is not None and len(ror) == len(tx)) or (et is not None and len(et) == len(tx)):
-            # add one (virtual) extra device
-            res['extradevices'] = [25]
-            res['extratimex'] = [tx]
-
-            temp3_visibility = True
-            temp4_visibility = False
-            if et is not None and len(et) == len(tx):
-                res['extratemp1'] = [et]
-            else:
-                res['extratemp1'] = [[-1]*len(tx)]
-                temp3_visibility = False
-            if ror is not None and len(ror) == len(tx):
-                res['extratemp2'] = [ror]
-            else:
-                res['extratemp2'] = [[-1]*len(tx)]
-                temp4_visibility = False
-            res['extraname1'] = ['Exhaust']
-            res['extraname2'] = ['RoR']
-            res['extramathexpression1'] = ['']
-            res['extramathexpression2'] = ['']
-            res['extraLCDvisibility1'] = [temp3_visibility]
-            res['extraLCDvisibility2'] = [temp4_visibility]
-            res['extraCurveVisibility1'] = [temp3_visibility]
-            res['extraCurveVisibility2'] = [temp4_visibility]
-            res['extraDelta1'] = [False]
-            res['extraDelta2'] = [True]
-            res['extraFill1'] = [False]
-            res['extraFill2'] = [False]
-            res['extradevicecolor1'] = ['black']
-            res['extradevicecolor2'] = ['black']
-            res['extramarkersizes1'] = [6.0]
-            res['extramarkersizes2'] = [6.0]
-            res['extramarkers1'] = ['None']
-            res['extramarkers2'] = ['None']
-            res['extralinewidths1'] = [aw.qmc.extra_linewidth_default]
-            res['extralinewidths2'] = [aw.qmc.extra_linewidth_default]
-            res['extralinestyles1'] = [aw.qmc.linestyle_default]
-            res['extralinestyles2'] = [aw.qmc.linestyle_default]
-            res['extradrawstyles1'] = [aw.qmc.drawstyle_default]
-            res['extradrawstyles2'] = [aw.qmc.drawstyle_default]
-
-        return res
-    except Exception as e: # pylint: disable=broad-except
-        _log.exception(e)
-        return {}
+#def extractProfileBulletDict(data:Dict, aw:'ApplicationWindow') -> 'ProfileData':
+#    try:
+#        res:'ProfileData' = {} # the interpreted data set
+#
+#        if 'celsius' in data and not data['celsius']:
+#            res['mode'] = 'F'
+#        else:
+#            res['mode'] = 'C'
+#        if 'comments' in data:
+#            res['roastingnotes'] = data['comments']
+#        try:
+#            if 'dateTime' in data:
+#                try:
+#                    dateQt = QDateTime.fromString(data['dateTime'],Qt.DateFormat.ISODate) # RFC 3339 date time
+#                except Exception: # pylint: disable=broad-except
+#                    dateQt = QDateTime.fromMSecsSinceEpoch (data['dateTime'])
+#                if dateQt.isValid():
+#                    roastdate:Optional[str] = encodeLocal(dateQt.date().toString())
+#                    if roastdate is not None:
+#                        res['roastdate'] = roastdate
+#                    roastisodate:Optional[str] = encodeLocal(dateQt.date().toString(Qt.DateFormat.ISODate))
+#                    if roastisodate is not None:
+#                        res['roastisodate'] = roastisodate
+#                    roasttime:Optional[str] = encodeLocal(dateQt.time().toString())
+#                    if roasttime is not None:
+#                        res['roasttime'] = roasttime
+#                    res['roastepoch'] = int(dateQt.toSecsSinceEpoch())
+#                    res['roasttzoffset'] = time.timezone
+#        except Exception as e: # pylint: disable=broad-except
+#            _log.exception(e)
+#        try:
+#            res['title'] = data['beanName']
+#        except Exception: # pylint: disable=broad-except
+#            pass
+#        if 'roastName' in data:
+#            res['title'] = data['roastName']
+#        try:
+#            if 'roastNumber' in data:
+#                res['roastbatchnr'] = int(data['roastNumber'])
+#        except Exception: # pylint: disable=broad-except
+#            pass
+#        if 'beanName' in data:
+#            res['beans'] = data['beanName']
+#        elif 'bean' in data and 'beanName' in data['bean']:
+#            res['beans'] = data['bean']['beanName']
+#        try:
+#            if 'weightGreen' in data or 'weightRoasted' in data:
+#                wunit = aw.qmc.weight_units.index(aw.qmc.weight[2])
+#                if wunit in {1,3}: # turn Kg into g, and lb into oz
+#                    wunit = wunit -1
+#                wgreen:float = 0
+#                if 'weightGreen' in data:
+#                    wgreen = float(data['weightGreen'])
+#                wroasted:float = 0
+#                if 'weightRoasted' in data:
+#                    wroasted = float(data['weightRoasted'])
+#                res['weight'] = [wgreen,wroasted,aw.qmc.weight_units[wunit]]
+#        except Exception: # pylint: disable=broad-except
+#            pass
+#        try:
+#            if 'agtron' in data:
+#                res['ground_color'] = int(round(data['agtron']))
+#                if 'Agtron' in aw.qmc.color_systems:
+#                    res['color_system'] = 'Agtron'
+#        except Exception: # pylint: disable=broad-except
+#            pass
+#        try:
+#            if 'roastMasterName' in data:
+#                res['operator'] = data['roastMasterName']
+#        except Exception: # pylint: disable=broad-except
+#            pass
+#        res['roastertype'] = 'Aillio Bullet R1'
+#
+#        if 'ambient' in data:
+#            res['ambientTemp'] = data['ambient']
+#        if 'humidity' in data:
+#            res['ambient_humidity'] = data['humidity']
+#
+#        bt = data.get('beanTemperature', [])
+#        dt = data.get('drumTemperature', [])
+#        # make dt the same length as bt
+#        dt = dt[:len(bt)]
+#        dt.extend(-1 for _ in range(len(bt) - len(dt)))
+#
+#        et = data.get('exitTemperature', None)
+#        if et is not None:
+#            # make et the same length as bt
+#            et = et[:len(bt)]
+#            et.extend(-1 for _ in range(len(bt) - len(et)))
+#
+#        ror = data.get('beanDerivative', None)
+#        if ror is not None:
+#            # make et the same length as bt
+#            ror = ror[:len(bt)]
+#            ror.extend(-1 for _ in range(len(bt) - len(ror)))
+#
+#        sr = data.get('sampleRate', 2.)
+#        res['samplinginterval'] = 1.0/sr
+#        tx = [x/sr for x in range(len(bt))]
+#        res['timex'] = tx
+#        res['temp1'] = dt
+#        res['temp2'] = bt
+#
+#        timeindex = [-1,0,0,0,0,0,0,0]
+#        if 'roastStartIndex' in data:
+#            timeindex[0] = min(max(data['roastStartIndex'],0),len(tx)-1)
+#        else:
+#            timeindex[0] = 0
+#
+#        labels = ['indexYellowingStart','indexFirstCrackStart','indexFirstCrackEnd','indexSecondCrackStart','indexSecondCrackEnd']
+#        for i in range(1,6):
+#            try:
+#                idx = data[labels[i-1]]
+#                # RoastTime seems to interpret all index values 1 based, while Artisan takes the 0 based approach. We substruct 1
+#                if idx > 1:
+#                    timeindex[i] = max(min(idx - 1,len(tx)-1),0)
+#            except Exception: # pylint: disable=broad-except
+#                pass
+#
+#        if 'roastEndIndex' in data:
+#            timeindex[6] = max(0,min(data['roastEndIndex'],len(tx)-1))
+#        else:
+#            timeindex[6] = max(0,len(tx)-1)
+#        res['timeindex'] = timeindex
+#
+#        # extract events from newer JSON format
+#        specialevents = []
+#        specialeventstype = []
+#        specialeventsvalue = []
+#        specialeventsStrings = []
+#
+#        # extract events from older JSON format
+#        try:
+#            eventtypes = ['blowerSetting','drumSpeedSetting','--','inductionPowerSetting']
+#            for j, eventname in enumerate(eventtypes):
+#                if eventname != '--' and eventname in data:
+#                    last:Optional[float] = None
+#                    ip = data[eventname]
+#                    for i, _ in enumerate(ip):
+#                        v = ip[i]+1
+#                        if last is None or last != v:
+#                            specialevents.append(i)
+#                            specialeventstype.append(j)
+#                            specialeventsvalue.append(v)
+#                            specialeventsStrings.append('')
+#                            last = v
+#        except Exception as e: # pylint: disable=broad-except
+#            _log.exception(e)
+#
+#        # extract events from newer JSON format
+#        try:
+#            for action in data['actions']['actionTimeList']:
+#                time_idx = action['index'] - 1
+#                value = action['value'] + 1
+#                event_type = None
+#                if action['ctrlType'] == 0:
+#                    event_type = 3
+#                elif action['ctrlType'] == 1:
+#                    event_type = 0
+#                elif action['ctrlType'] == 2:
+#                    event_type = 1
+#                if event_type is not None:
+#                    specialevents.append(time_idx)
+#                    specialeventstype.append(event_type)
+#                    specialeventsvalue.append(value)
+#                    specialeventsStrings.append(str(value))
+#        except Exception as e: # pylint: disable=broad-except
+#            _log.exception(e)
+#        if len(specialevents) > 0:
+#            res['specialevents'] = specialevents
+#            res['specialeventstype'] = specialeventstype
+#            res['specialeventsvalue'] = specialeventsvalue
+#            res['specialeventsStrings'] = specialeventsStrings
+#
+#        if (ror is not None and len(ror) == len(tx)) or (et is not None and len(et) == len(tx)):
+#            # add one (virtual) extra device
+#            res['extradevices'] = [25]
+#            res['extratimex'] = [tx]
+#
+#            temp3_visibility = True
+#            temp4_visibility = False
+#            if et is not None and len(et) == len(tx):
+#                res['extratemp1'] = [et]
+#            else:
+#                res['extratemp1'] = [[-1]*len(tx)]
+#                temp3_visibility = False
+#            if ror is not None and len(ror) == len(tx):
+#                res['extratemp2'] = [ror]
+#            else:
+#                res['extratemp2'] = [[-1]*len(tx)]
+#                temp4_visibility = False
+#            res['extraname1'] = ['Exhaust']
+#            res['extraname2'] = ['RoR']
+#            res['extramathexpression1'] = ['']
+#            res['extramathexpression2'] = ['']
+#            res['extraLCDvisibility1'] = [temp3_visibility]
+#            res['extraLCDvisibility2'] = [temp4_visibility]
+#            res['extraCurveVisibility1'] = [temp3_visibility]
+#            res['extraCurveVisibility2'] = [temp4_visibility]
+#            res['extraDelta1'] = [False]
+#            res['extraDelta2'] = [True]
+#            res['extraFill1'] = [False]
+#            res['extraFill2'] = [False]
+#            res['extradevicecolor1'] = ['black']
+#            res['extradevicecolor2'] = ['black']
+#            res['extramarkersizes1'] = [6.0]
+#            res['extramarkersizes2'] = [6.0]
+#            res['extramarkers1'] = ['None']
+#            res['extramarkers2'] = ['None']
+#            res['extralinewidths1'] = [aw.qmc.extra_linewidth_default]
+#            res['extralinewidths2'] = [aw.qmc.extra_linewidth_default]
+#            res['extralinestyles1'] = [aw.qmc.linestyle_default]
+#            res['extralinestyles2'] = [aw.qmc.linestyle_default]
+#            res['extradrawstyles1'] = [aw.qmc.drawstyle_default]
+#            res['extradrawstyles2'] = [aw.qmc.drawstyle_default]
+#
+#        return res
+#    except Exception as e: # pylint: disable=broad-except
+#        _log.exception(e)
+#        return {}
 
 #def extractProfileRoastWorld(url:'QUrl', aw:'ApplicationWindow') -> Optional['ProfileData']:
 #    s = requests.Session()

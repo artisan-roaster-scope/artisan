@@ -91,7 +91,7 @@ class tphasescanvas(FigureCanvas):
                         self.fig.canvas.draw()
 #                        self.fig.canvas.update()
                     FigureCanvas.updateGeometry(self)  #@UndefinedVariable
-                self.aw.scroller.setMaximumHeight(self.sizeHint().height()) # Call to untyped function "sizeHint" in typed context  [no-untyped-call]
+                self.aw.scroller.setMaximumHeight(self.sizeHint().height()) # type:ignore[no-untyped-call] # Call to untyped function "sizeHint" in typed context  [no-untyped-call]
             except Exception as e:  # pylint: disable=broad-except
                 _log.exception(e)
 
@@ -239,7 +239,7 @@ class tphasescanvas(FigureCanvas):
 #                  loc='upper center', fontsize='small', shadow=False, frameon=False, fancybox=False, labelcolor=legend_labelcolor)
 
             self.fig.canvas.draw_idle()
-            self.aw.scroller.setMaximumHeight(self.sizeHint().height()) # Call to untyped function "sizeHint" in typed context  [no-untyped-call]
+            self.aw.scroller.setMaximumHeight(self.sizeHint().height()) # type:ignore[no-untyped-call] # Call to untyped function "sizeHint" in typed context  [no-untyped-call]
         else:
             # if no profiles are given we set the canvas height to 0
             QSettings().setValue('MainSplitter',self.aw.splitter.saveState())

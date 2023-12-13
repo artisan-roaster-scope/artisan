@@ -16,7 +16,7 @@
 # Marko Luther, 2023
 
 from matplotlib import rcParams
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
@@ -285,8 +285,7 @@ class WheelDlg(ArtisanDialog):
     def setwheelcolorpattern(self,_):
         x = self.aw.findWidgetsRow(self.datatable,self.sender(),9)
         if x is not None:
-            wsb =  self.datatable.cellWidget(x,9)
-            assert isinstance(wsb, QSpinBox)
+            wsb = cast(QSpinBox, self.datatable.cellWidget(x,9))
             wpattern = wsb.value()
             wlen = len(self.aw.qmc.wheelcolor[x])
             for i in range(wlen):
@@ -496,8 +495,7 @@ class WheelDlg(ArtisanDialog):
     def updatelabels(self,_):
         x = self.aw.findWidgetsRow(self.datatable,self.sender(),2)
         if x is not None:
-            labelsedit =  self.datatable.cellWidget(x,1)
-            assert isinstance(labelsedit,QLineEdit)
+            labelsedit = cast(QLineEdit, self.datatable.cellWidget(x,1))
             text  = str(labelsedit.text())
             if '\\n' in text:              #make multiple line text if "\n" found in label string
                 parts = text.split('\\n')
@@ -519,8 +517,7 @@ class WheelDlg(ArtisanDialog):
     def setwidth(self,_):
         x = self.aw.findWidgetsRow(self.datatable,self.sender(),4)
         if x is not None:
-            widthSpinBox = self.datatable.cellWidget(x,4)
-            assert isinstance(widthSpinBox, QDoubleSpinBox)
+            widthSpinBox = cast(QDoubleSpinBox, self.datatable.cellWidget(x,4))
             newwidth = widthSpinBox.value()
             oldwidth = self.aw.qmc.wradii[x]
             diff = newwidth - oldwidth
@@ -549,8 +546,7 @@ class WheelDlg(ArtisanDialog):
     def setangle(self,_):
         x = self.aw.findWidgetsRow(self.datatable,self.sender(),5)
         if x is not None:
-            angleSpinBox = self.datatable.cellWidget(x,5)
-            assert isinstance(angleSpinBox, QSpinBox)
+            angleSpinBox = cast(QSpinBox, self.datatable.cellWidget(x,5))
             self.aw.qmc.startangle[x] = angleSpinBox.value()
             self.aw.qmc.drawWheel()
 
@@ -559,8 +555,7 @@ class WheelDlg(ArtisanDialog):
     def setprojection(self,_):
         x = self.aw.findWidgetsRow(self.datatable,self.sender(),6)
         if x is not None:
-            projectionComboBox = self.datatable.cellWidget(x,6)
-            assert isinstance(projectionComboBox, QComboBox)
+            projectionComboBox = cast(QComboBox, self.datatable.cellWidget(x,6))
             self.aw.qmc.projection[x] = projectionComboBox.currentIndex()
             self.aw.qmc.drawWheel()
 
@@ -569,8 +564,7 @@ class WheelDlg(ArtisanDialog):
     def setTextsizeX(self,_):
         x = self.aw.findWidgetsRow(self.datatable,self.sender(),7)
         if x is not None:
-            txtSpinBox = self.datatable.cellWidget(x,7)
-            assert isinstance(txtSpinBox, QSpinBox)
+            txtSpinBox = cast(QSpinBox, self.datatable.cellWidget(x,7))
             self.aw.qmc.wheeltextsize[x] = txtSpinBox.value()
             self.aw.qmc.drawWheel()
 

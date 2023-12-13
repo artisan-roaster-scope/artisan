@@ -18,7 +18,7 @@
 import sys
 import time as libtime
 import logging
-from typing import Final, Optional, Dict, List, Union, TYPE_CHECKING
+from typing import Final, Optional, Dict, List, Union, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -886,8 +886,7 @@ class PID_DlgControl(ArtisanDialog):
                 if layout is not None:
                     layoutItem = layout.itemAt(1)
                     if layoutItem is not None:
-                        beep = layoutItem.widget()
-                        assert isinstance(beep, QCheckBox)
+                        beep = cast(QCheckBox, layoutItem.widget())
                         self.aw.pidcontrol.svBeeps[i] = bool(beep.isChecked())
                 self.aw.pidcontrol.svDescriptions[i] = self.DescriptionWidgets[i].text()
         finally:
@@ -907,8 +906,7 @@ class PID_DlgControl(ArtisanDialog):
                 if layout is not None:
                     layoutItem = layout.itemAt(1)
                     if layoutItem is not None:
-                        beep = layoutItem.widget()
-                        assert isinstance(beep, QCheckBox)
+                        beep = cast(QCheckBox, layoutItem.widget())
                         if self.aw.pidcontrol.svBeeps[i]:
                             beep.setCheckState(Qt.CheckState.Checked)
                         else:
@@ -1886,7 +1884,7 @@ class PXRpidDlgControl(PXpidDlgControl):
 
     #get all Ramp Soak values for all 8 segments
     @pyqtSlot(bool)
-    def getallsegments(self,_):
+    def getallsegments(self, _:bool) -> None:
         for i in range(8):
             msg = QApplication.translate('StatusBar','Reading Ramp/Soak {0} ...').format(str(i+1))
             self.status.showMessage(msg,500)
@@ -1900,61 +1898,67 @@ class PXRpidDlgControl(PXpidDlgControl):
         self.createsegmenttable()
 
     @pyqtSlot(bool)
-    def getpid(self,_):
-        p:Optional[float]
+    def getpid(self, _:bool) -> None:
+        p:float
         if self.aw.ser.useModbusPort:
             reg = self.aw.modbus.address2register(self.aw.fujipid.PXR['p'][1],3)
-            p = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
+            pr = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
+            if pr is None or pr == -1:
+                return
         else:
-            pcommand= self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,self.aw.fujipid.PXR['p'][1],1)
-            p = self.aw.fujipid.readoneword(pcommand)
-        if p is None or p == -1 :
-            return
-        p = p/10.
+            pcommand = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,self.aw.fujipid.PXR['p'][1],1)
+            pr = self.aw.fujipid.readoneword(pcommand)
+            if pr == -1:
+                return
+        p = pr / 10
         self.pedit.setText(str(int(p)))
         self.aw.fujipid.PXR['p'][0] = p
         #i is int range 0-3200
-        i:Optional[float]
+        i:float
         if self.aw.ser.useModbusPort:
             reg = self.aw.modbus.address2register(self.aw.fujipid.PXR['i'][1],3)
-            i = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
+            ir = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
+            if ir is None or ir == -1:
+                return
         else:
             icommand = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,self.aw.fujipid.PXR['i'][1],1)
-            i = self.aw.fujipid.readoneword(icommand)
-        if i is None or i == -1:
-            return
-        i = i/10.
+            ir = self.aw.fujipid.readoneword(icommand)
+            if ir == -1:
+                return
+        i = ir / 10.
         self.iedit.setText(str(int(i)))
         self.aw.fujipid.PXR['i'][0] = i
-        d:Optional[float]
+        d:float
         if self.aw.ser.useModbusPort:
             reg = self.aw.modbus.address2register(self.aw.fujipid.PXR['d'][1],3)
-            d = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
+            dr = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
+            if dr is None or dr == -1:
+                return
         else:
             dcommand = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,self.aw.fujipid.PXR['d'][1],1)
-            d = self.aw.fujipid.readoneword(dcommand)
-        if d is None or d == -1:
-            return
-        d = d/10.
+            dr = self.aw.fujipid.readoneword(dcommand)
+            if dr == -1:
+                return
+        d = dr/10.
         self.dedit.setText(str(int(d)))
         self.aw.fujipid.PXR['d'][0] = d
 
         self.status.showMessage(QApplication.translate('StatusBar','Finished reading pid values'),5000)
 
     @pyqtSlot(bool)
-    def setpid_p(self,_):
+    def setpid_p(self, _:bool) -> None:
         if str(self.pedit.text()).isdigit():
             p = int(str(self.pedit.text()))
             self.aw.fujipid.setpidPXR('p',p)
 
     @pyqtSlot(bool)
-    def setpid_i(self,_):
+    def setpid_i(self, _:bool) -> None:
         if str(self.iedit.text()).isdigit():
             i = int(str(self.iedit.text()))
             self.aw.fujipid.setpidPXR('i',i)
 
     @pyqtSlot(bool)
-    def setpid_d(self,_):
+    def setpid_d(self, _:bool) -> None:
         if str(self.dedit.text()).isdigit():
             d = int(str(self.dedit.text()))
             self.aw.fujipid.setpidPXR('d',d)
@@ -2001,12 +2005,9 @@ class PXRpidDlgControl(PXpidDlgControl):
         i = self.aw.findWidgetsRow(self.segmenttable,self.sender(),3)
         if i is not None:
             idn = i+1
-            svedit =  self.segmenttable.cellWidget(i,0)
-            assert isinstance(svedit, QLineEdit)
-            rampedit = self.segmenttable.cellWidget(i,1)
-            assert isinstance(rampedit, QLineEdit)
-            soakedit = self.segmenttable.cellWidget(i,2)
-            assert isinstance(soakedit, QLineEdit)
+            svedit = cast(QLineEdit, self.segmenttable.cellWidget(i,0))
+            rampedit = cast(QLineEdit, self.segmenttable.cellWidget(i,1))
+            soakedit = cast(QLineEdit, self.segmenttable.cellWidget(i,2))
             sv = float(comma2dot(str(svedit.text())))
             ramp = stringtoseconds(str(rampedit.text()))
             soak = stringtoseconds(str(soakedit.text()))
@@ -3406,7 +3407,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
             self.aw.qmc.adderror(mssg)
 
     @pyqtSlot(bool)
-    def getallpid(self,_):
+    def getallpid(self, _:bool) -> None:
         if self.aw.ser.controlETpid[0] == 0:
             reg_dict = self.aw.fujipid.PXG4
         else:
@@ -3417,36 +3418,42 @@ class PXG4pidDlgControl(PXpidDlgControl):
             dkey = 'd' + str(k)
             msg = QApplication.translate('StatusBar','sending commands for p{0} i{1} d{2}',None).format(str(k),str(k),str(k))
             self.status.showMessage(msg,1000)
-            p:Optional[float]
+            p:float
             if self.aw.ser.useModbusPort:
                 reg = self.aw.modbus.address2register(reg_dict[pkey][1],3)
-                p = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
+                pr = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
+                if pr == -1 or pr is None:
+                    return
             else:
                 commandp = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,reg_dict[pkey][1],1)
-                p = self.aw.fujipid.readoneword(commandp)
-            if p is None:
-                return
-            p = p/10.
-            i:Optional[float]
+                pr = self.aw.fujipid.readoneword(commandp)
+                if pr == -1:
+                    return
+            p = pr/10
+            i:float
             if self.aw.ser.useModbusPort:
                 reg = self.aw.modbus.address2register(reg_dict[ikey][1],3)
-                i = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
+                ir = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
+                if ir == -1 or ir is None:
+                    return
             else:
                 commandi = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,reg_dict[ikey][1],1)
-                i = self.aw.fujipid.readoneword(commandi)
-            if i is None:
-                return
-            i = i/10
-            dd:Optional[float]
+                ir = self.aw.fujipid.readoneword(commandi)
+                if ir == -1:
+                    return
+            i = ir/10
+            dd:float
             if self.aw.ser.useModbusPort:
                 reg = self.aw.modbus.address2register(reg_dict[dkey][1],3)
-                dd = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
+                ddr = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
+                if ddr == -1 or ddr is None:
+                    return
             else:
                 commandd = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,reg_dict[dkey][1],1)
-                dd = self.aw.fujipid.readoneword(commandd)
-            if dd is None:
-                return
-            dd = dd/10
+                ddr = self.aw.fujipid.readoneword(commandd)
+                if ddr == -1:
+                    return
+            dd = ddr/10
             p = float(p)
             i = float(i)
             dd = float(dd)
@@ -3533,7 +3540,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
             self.aw.qmc.adderror(mssg)
 
     @pyqtSlot(bool)
-    def getallsv(self,_):
+    def getallsv(self, _:bool) -> None:
         if self.aw.ser.controlETpid[0] == 0:
             reg_dict = self.aw.fujipid.PXG4
         else:
@@ -3543,13 +3550,15 @@ class PXG4pidDlgControl(PXpidDlgControl):
             sv:Optional[float]
             if self.aw.ser.useModbusPort:
                 reg = self.aw.modbus.address2register(reg_dict[svkey][1],3)
-                sv = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
+                svr = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
+                if svr is None or svr == -1:
+                    return
             else:
                 command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,reg_dict[svkey][1],1)
-                sv = self.aw.fujipid.readoneword(command)
-            if sv is None:
-                return
-            sv = sv / 10
+                svr = self.aw.fujipid.readoneword(command)
+                if svr == -1:
+                    return
+            sv = svr / 10
             self.aw.fujipid.PXG4[svkey][0] = sv
             if i == 1:
                 self.sv1edit.setText(str(sv))
@@ -3607,7 +3616,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
         mssg = QApplication.translate('StatusBar','PID is using SV = {0}',None).format(str(N))
         self.status.showMessage(mssg,5000)
 
-    def checkrampsoakmode(self):
+    def checkrampsoakmode(self) -> int:
         currentmode = self.aw.fujipid.getCurrentRampSoakMode()
         if currentmode == 0:
             mode = ['0',
@@ -3944,14 +3953,11 @@ class PXG4pidDlgControl(PXpidDlgControl):
             svkey = 'segment' + str(i+1) + 'sv'
             rampkey = 'segment' + str(i+1) + 'ramp'
             soakkey = 'segment' + str(i+1) + 'soak'
-            svedit = self.segmenttable.cellWidget(i,0)
-            assert isinstance(svedit, QLineEdit)
+            svedit = cast(QLineEdit, self.segmenttable.cellWidget(i,0))
             self.aw.fujipid.PXG4[svkey][0] = float(svedit.text())
-            rampedit = self.segmenttable.cellWidget(i,1)
-            assert isinstance(rampedit, QLineEdit)
+            rampedit = cast(QLineEdit, self.segmenttable.cellWidget(i,1))
             self.aw.fujipid.PXG4[rampkey][0] = stringtoseconds(rampedit.text())
-            soakedit = self.segmenttable.cellWidget(i,2)
-            assert isinstance(soakedit, QLineEdit)
+            soakedit = cast(QLineEdit, self.segmenttable.cellWidget(i,2))
             self.aw.fujipid.PXG4[soakkey][0] = stringtoseconds(soakedit.text())
         # SV slider
         self.aw.pidcontrol.svSliderMin = min(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
@@ -3999,12 +4005,9 @@ class PXG4pidDlgControl(PXpidDlgControl):
         i = self.aw.findWidgetsRow(self.segmenttable,self.sender(),3)
         if i is not None:
             idn = i+1
-            svedit =  self.segmenttable.cellWidget(i,0)
-            assert isinstance(svedit, QLineEdit)
-            rampedit = self.segmenttable.cellWidget(i,1)
-            assert isinstance(rampedit, QLineEdit)
-            soakedit = self.segmenttable.cellWidget(i,2)
-            assert isinstance(soakedit, QLineEdit)
+            svedit = cast(QLineEdit, self.segmenttable.cellWidget(i,0))
+            rampedit = cast(QLineEdit, self.segmenttable.cellWidget(i,1))
+            soakedit = cast(QLineEdit, self.segmenttable.cellWidget(i,2))
             sv = float(comma2dot(str(svedit.text())))
             ramp = stringtoseconds(str(rampedit.text()))
             soak = stringtoseconds(str(soakedit.text()))
@@ -4083,7 +4086,7 @@ class DTApidDlgControl(ArtisanDialog):
     @pyqtSlot(bool)
     def readsv(self,_):
         ### create command message2send(unitID,function,address,ndata)
-        command = self.aw.dtapid.message2send(self.aw.ser.controlETpid[1],3,self.aw.dtapid.dtamem['sv'][1],1)
+        command = self.aw.dtapid.message2send(self.aw.ser.controlETpid[1],3,str(self.aw.dtapid.dtamem['sv'][1]),1)
         #read sv
         sv = self.aw.ser.sendDTAcommand(command)
         #update SV value
@@ -4103,6 +4106,6 @@ class DTApidDlgControl(ArtisanDialog):
         if v:
             newsv = hex(int(abs(float(str(v)))*10.))[2:].upper()
             ### create command message2send(unitID,function,address,ndata)
-            command = self.aw.dtapid.message2send(self.aw.ser.controlETpid[1],6,self.aw.dtapid.dtamem['sv'][1],newsv)
+            command = self.aw.dtapid.message2send(self.aw.ser.controlETpid[1],6,str(self.aw.dtapid.dtamem['sv'][1]),newsv)
                 #read sv
             self.aw.ser.sendDTAcommand(command)

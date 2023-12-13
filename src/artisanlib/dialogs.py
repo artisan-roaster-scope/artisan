@@ -26,7 +26,7 @@ try:
 except ImportError:
     from PyQt5.QtCore import Qt, QEvent, QSettings, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QAction, QDialog, QMessageBox, QDialogButtonBox, QTextEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                QHBoxLayout, QVBoxLayout, QLabel, QLineEdit) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                QHBoxLayout, QVBoxLayout, QLabel, QLineEdit) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QKeySequence # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.widgets import MyQComboBox

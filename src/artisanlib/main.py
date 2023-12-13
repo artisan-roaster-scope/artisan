@@ -63,6 +63,8 @@ import io
 import functools
 import dateutil.parser
 import copy as copyd
+import arabic_reshaper # type:ignore
+from bidi.algorithm import get_display # type:ignore
 
 # links CTR-C signals to the system default (ignore)
 import signal
@@ -223,7 +225,6 @@ except Exception: # pylint: disable=broad-except
     pass
 
 
-import artisanlib.arabic_reshaper
 from artisanlib.util import (appFrozen, uchr, decodeLocal, decodeLocalStrict, encodeLocal, encodeLocalStrict, s2a, fill_gaps,
         deltaLabelPrefix, deltaLabelUTF8, deltaLabelBigPrefix, stringfromseconds, stringtoseconds,
         fromFtoC, fromFtoCstrict, fromCtoF, fromCtoFstrict, RoRfromFtoCstrict, RoRfromCtoFstrict,
@@ -1445,7 +1446,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         # and s a string of length 0 (no digit yet), length 1 (if first digit is typed) or 2 (both digits are typed) indicating the value (00-99)
 
         # html2pdf() state:
-        self.html_loader:Optional[QWebEngineView] = None # holds the QWebEngineView during HTML2PDF generation in self.html2pdf()
+        self.html_loader:Optional[QWebEngineView] = None # type:ignore[reportUnboundVariable] # holds the QWebEngineView during HTML2PDF generation in self.html2pdf()
         self.pdf_page_layout:Optional[QPageLayout] = None # holds the QPageLayout used during HTML2PDF generation in self.html2pdf()
         self.pdf_rendering:bool = False # True while PDF is rendered by QWebEngineView
 
@@ -4444,25 +4445,32 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             for r in range(table.rowCount()):
                 cellWidget: Optional[QWidget] = table.cellWidget(r,col)
                 cellWidgetLayout: Optional[QLayout] = None
+                if cellWidget == widget or table.item(r,col) == widget:
+                    return r
                 if cellWidget is not None:
                     cellWidgetLayout = cellWidget.layout()
-                if cellWidget == widget or table.item(r,col) == widget or \
-                    (cellWidget is not None and cellWidgetLayout is not None and isinstance(widget, QWidget) and cellWidgetLayout.indexOf(widget) > -1):
-                    return r
+                if cellWidgetLayout is not None and isinstance(widget, QWidget):
+                    cw:QWidget = widget
+                    if cellWidgetLayout.indexOf(cw) > -1:
+                        return r
         return None
 
     # search the given QTable table for a column with the given widget in row
     # returns the column number if the widget was found or None
     @staticmethod
     def findWidgetsColumn(table:'QTableWidget', widget:Union['QObject', 'QTableWidgetItem', None], row:int) -> Optional[int]:
-        for c in range(table.columnCount()):
-            cellWidget: Optional[QWidget] = table.cellWidget(row,c)
-            cellWidgetLayout: Optional[QLayout] = None
-            if cellWidget is not None:
-                cellWidgetLayout = cellWidget.layout()
-            if cellWidget == widget or table.item(row,c) == widget or \
-                    (cellWidget is not None and cellWidgetLayout is not None and isinstance(widget, QWidget) and cellWidgetLayout.indexOf(widget) > -1):
-                return c
+        if widget is not None:
+            for c in range(table.columnCount()):
+                cellWidget: Optional[QWidget] = table.cellWidget(row,c)
+                cellWidgetLayout: Optional[QLayout] = None
+                if cellWidget == widget or table.item(row,c) == widget:
+                    return c
+                if cellWidget is not None:
+                    cellWidgetLayout = cellWidget.layout()
+                if cellWidgetLayout is not None and isinstance(widget, QWidget):
+                    cw:QWidget = widget
+                    if cellWidgetLayout.indexOf(cw) > -1:
+                        return c
         return None
 
     @pyqtSlot()
@@ -5134,29 +5142,29 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     else:
                         self.qmc.machinesetup = action.text()
                         res = True
-                    if self.qmc.device == 29 and self.modbus.type in {3,4}: # MODBUS TCP or UDP
+                    if (self.qmc.device == 29 or 29 in self.qmc.extradevices) and self.modbus.type in {3,4}: # MODBUS TCP or UDP
                         # as default we offer the current settings MODBUS host, or if this is set to its default as after a factory reset (self.modbus.default_host) we take the one from the machine setup
                         defaultModbusHost:str = (self.modbus.host if org_modbus_host == self.modbus.default_host else org_modbus_host)
                         host, res2 = QInputDialog.getText(self,
-                            QApplication.translate('Message', 'Machine'),
+                            f"{QApplication.translate('Message', 'Machine')} (MODBUS)",
                             QApplication.translate('Message', 'Network name or IP address'),text=defaultModbusHost)
                         if res2 is not None and res2:
                             res = res2
                             self.modbus.host = host
-                    elif self.qmc.device == 79: # S7
+                    elif self.qmc.device == 79 or 79 in self.qmc.extradevices: # S7
                         # as default we offer the current settings S7 host, or if this is set to its default as after a factory reset (self.s7.default_host) we take the one from the machine setup
                         defaultS7Host:str = (self.s7.host if org_s7_host == self.s7.default_host else org_s7_host)
                         host, res2 = QInputDialog.getText(self,
-                            QApplication.translate('Message', 'Machine'),
+                            f"{QApplication.translate('Message', 'Machine')} (S7)",
                             QApplication.translate('Message', 'Network name or IP address'),text=defaultS7Host)
                         if res2 is not None and res2:
                             res = res2
                             self.s7.host = host
-                    elif self.qmc.device == 111: # WebSocket
+                    elif self.qmc.device == 111 or 111 in self.qmc.extradevices: # WebSocket
                         # as default we offer the current settings WebSocket host, or if this is set to its default as after a factory reset (self.ws.default_host) we take the one from the machine setup
                         defaultWSHost:str = (self.ws.host if org_ws_host == self.ws.default_host else org_ws_host)
                         host, res2 = QInputDialog.getText(self,
-                            QApplication.translate('Message', 'Machine'),
+                            f"{QApplication.translate('Message', 'Machine')} (WebSocket)",
                             QApplication.translate('Message', 'Network name or IP address'),text=defaultWSHost)
                         if res2 is not None and res2:
                             res = res2
@@ -5170,20 +5178,26 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         if res2 is not None and res2:
                             res = res2
                             self.kaleidoHost = host
-                    elif (self.qmc.device in {0, 9, 19, 53, 101, 115, 126} or (self.qmc.device == 29 and self.modbus.type in {0, 1, 2}) or
+                    elif (self.qmc.device in {0, 9, 19, 53, 101, 115, 126} or ((self.qmc.device == 29 or 29 in self.qmc.extradevices) and self.modbus.type in {0, 1, 2}) or
                             (self.qmc.device == 134 and self.santokerSerial) or
                             (self.qmc.device == 138 and self.kaleidoSerial)): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial, HB/ARC
                         select_device_name = None
                         # as default we offer the current settings serial/modbus port, or if this is set to its default as after a factory reset (self.ser.default_comport or self.modbus.default_comport) we take the one from the machine setup
                         defaultComPort:str = ((self.modbus.comport if org_modbus_comport == self.modbus.default_comport else org_modbus_comport) if self.qmc.device == 29 else (self.ser.comport if org_comport == self.ser.default_comport else org_comport))
+                        select_modbus_serial_port:bool = self.qmc.device == 29 or (29 in self.qmc.extradevices and self.qmc.device not in {0, 9, 19, 53, 101, 115, 126, 134, 138})
+                        serial_port_dialog_title:str = QApplication.translate('Message', 'Port Configuration')
+                        if select_modbus_serial_port:
+                            serial_port_dialog_title = f'{serial_port_dialog_title} (MODBUS)'
                         if self.qmc.device == 53: # Hottop 2k+:
                             select_device_name = 'FT230X Basic UART'
-                        commPort_dlg:ArtisanPortsDialog = ArtisanPortsDialog(self, self, selection=defaultComPort, select_device_name=select_device_name)
+                        commPort_dlg:ArtisanPortsDialog = ArtisanPortsDialog(self, self,
+                            title = serial_port_dialog_title,
+                            selection=defaultComPort, select_device_name=select_device_name)
                         res = bool(commPort_dlg.exec())
                         if res:
                             new_port = commPort_dlg.getSelection()
                             if new_port is not None:
-                                if self.qmc.device == 29: # MODBUS serial
+                                if select_modbus_serial_port: # MODBUS serial
                                     self.modbus.comport = new_port
                                 else: # Fuji or HOTTOP
                                     self.ser.comport = new_port
@@ -5536,13 +5550,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' convertToGreyscale() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         return nc
 
-    def labelBorW(self,backgroundcolor):
+    def labelBorW(self, backgroundcolor:str) -> str:
         base = self.convertToGreyscale(backgroundcolor)
         if self.checkColors([('base',base,'white','#ffffff')], False) > self.checkColors([('base',base,'black','#000000')],False):
             return '#ffffff'
         return '#000000'
 
-    def setLCDsBW(self):
+    def setLCDsBW(self) -> None:
         self.lcdpaletteB['timer'] = '#000000'
         self.lcdpaletteF['timer'] = '#ffffff'
         self.lcdpaletteB['et'] = '#000000'
@@ -5596,7 +5610,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.sliderGrp34.addLayout(self.sliderGrpBox3x)
             self.eventsliderAlternativeLayout = alternativeLayout
 
-    def updateCanvasColors(self, checkColors=True):
+    def updateCanvasColors(self, checkColors:bool=True) -> None:
         canvas_color = self.qmc.palette['canvas']
         if canvas_color is not None and canvas_color != 'None' and not QColor.isValidColor(canvas_color):
             # we re-initialize broken canvas color
@@ -6164,7 +6178,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.largePhasesLCDs_dialog.updatePhasesLabels([None,None,None,label])
         self.updateAUCLCD()
 
-    def colordialog(self, c,noButtons=False,parent=None): # c a QColor
+    def colordialog(self, c:QColor, noButtons:bool=False, parent:Optional[QWidget] = None) -> QColor:
         if platform.system() == 'Darwin' and noButtons:
             if parent is None:
                 parent = self
@@ -6823,31 +6837,31 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             rcParams['axes.unicode_minus'] = False
 #            self.set_mpl_fontproperties(self.getResourcePath() + "wqy-zenhei.ttc") # .ttc fonts are not supported yet by the PDF backend
             self.set_mpl_fontproperties(getResourcePath() + 'WenQuanYiZenHei-01.ttf')
-        elif self.qmc.graphfont == 4: # Source Han Sans (CN, TW, HK, KR, JP)
+        elif self.qmc.graphfont == 4: # Source Han Sans CN
             # font Source Han Sans selected, Simplified Chinese
             rcParams['axes.unicode_minus'] = True
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Source Han Sans CN']
             self.set_mpl_fontproperties(getResourcePath() + 'SourceHanSansCN-Regular.otf')
-        elif self.qmc.graphfont == 5: # Source Han Sans (CN, TW, HK, KR, JP)
+        elif self.qmc.graphfont == 5: # Source Han Sans TW
             # font Source Han Sans selected, Traditional Chinese, Taiwan
             rcParams['axes.unicode_minus'] = True
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Source Han Sans TW']
             self.set_mpl_fontproperties(getResourcePath() + 'SourceHanSansTW-Regular.otf')
-        elif self.qmc.graphfont == 6: # Source Han Sans (CN, TW, HK, KR, JP)
+        elif self.qmc.graphfont == 6: # Source Han Sans HK
             # font Source Han Sans selected, Traditional Chinese, Hong Kong
             rcParams['axes.unicode_minus'] = True
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Source Han Sans HK']
             self.set_mpl_fontproperties(getResourcePath() + 'SourceHanSansHK-Regular.otf')
-        elif self.qmc.graphfont == 7: # Source Han Sans (CN, TW, HK, KR, JP)
+        elif self.qmc.graphfont == 7: # Source Han Sans KR
             # font Source Han Sans selected, Korean
             rcParams['axes.unicode_minus'] = True
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Source Han Sans KR']
             self.set_mpl_fontproperties(getResourcePath() + 'SourceHanSansKR-Regular.otf')
-        elif self.qmc.graphfont == 8: # Source Han Sans (CN, TW, HK, KR, JP)
+        elif self.qmc.graphfont == 8: # Source Han Sans JP
             # font Source Han Sans selected, Japanese
             rcParams['axes.unicode_minus'] = True
             rcParams['font.size'] = 12.0
@@ -6905,20 +6919,32 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     # trims arabic strings to be rendered correctly with unicode fonts if arabic locale is active
     # if s is a string with one {0} placeholder and a is an argument, the argument is reversed, and then the whole string result is reversed
     # if it contains any arabic characters
+#    def arabicReshape(self, s:str, a:Optional[str]=None) -> str:
+#        if self.locale_str in {'ar', 'fa'}:
+#            st = str(s)
+#            if artisanlib.arabic_reshaper.has_arabic_letters(st):
+#                if a:
+#                    return str(artisanlib.arabic_reshaper.reshape(str(s.format(a[::-1])))[::-1])
+#                return str(artisanlib.arabic_reshaper.reshape(st)[::-1])
+#            if a:
+#                return s.format(a)
+#            return s
+#        if self.locale_str == 'he':
+#            if a:
+#                return (s.format(a[::-1]))[::-1]
+#            return s[::-1]
+#        if a:
+#            return s.format(a)
+#        return s
     def arabicReshape(self, s:str, a:Optional[str]=None) -> str:
-        if self.locale_str == 'ar':
-            st = str(s)
-            if artisanlib.arabic_reshaper.has_arabic_letters(st):
-                if a:
-                    return str(artisanlib.arabic_reshaper.reshape(str(s.format(a[::-1])))[::-1])
-                return str(artisanlib.arabic_reshaper.reshape(st)[::-1])
+        if self.locale_str in {'ar', 'fa'}:
             if a:
-                return s.format(a)
-            return s
+                return str(get_display(arabic_reshaper.reshape(s.format(a))))
+            return str(get_display(arabic_reshaper.reshape(s)))
         if self.locale_str == 'he':
             if a:
-                return (s.format(a[::-1]))[::-1]
-            return s[::-1]
+                return str(get_display(s.format(a)))
+            return str(get_display(s))
         if a:
             return s.format(a)
         return s
@@ -7417,7 +7443,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.setSliderNumber(self.sliderLCD4,v)
 
     @pyqtSlot(int)
-    def updateSVSliderLCD(self,v):
+    def updateSVSliderLCD(self, v:int) -> None:
         if v > self.pidcontrol.svSliderMax:
             v = self.pidcontrol.svSliderMax
         if v < self.pidcontrol.svSliderMin:
@@ -7431,7 +7457,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.SVslidermoved = 0
 
     @pyqtSlot(int)
-    def sliderSVactionTriggered(self,n):
+    def sliderSVactionTriggered(self, n:int) -> None:
         if n in {
                     1, 2, 3, 4,
                 }: # keyboard moves enable the slider value change
@@ -7439,7 +7465,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.SVslidermoved = 1
 
     @pyqtSlot()
-    def sliderSVreleased(self):
+    def sliderSVreleased(self) -> None:
         try:
             if self.qmc.device == 0:
                 self.fujipid.setsv(self.sliderSV.value(),silent=True)
@@ -7752,7 +7778,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         return shadow
 
     @staticmethod
-    def setLabelColor(label,color):
+    def setLabelColor(label:QLabel, color:QColor) -> None:
         label.setStyleSheet(f'QLabel {{ color: {color.name()}; }}')
 
     #adds to serial log
@@ -8269,9 +8295,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 _log.info('MODBUS Command <%s> not recognized', cs)
                 elif action == 5: # DTA Command
                     try:
-                        DTAvalue=cmd_str.split(':')[1]
-                        DTAaddress=cmd_str.split(':')[0]
-                        self.dtapid.writeDTE(DTAvalue,DTAaddress)
+                        DTAvalue = cmd_str.split(':')[1]
+                        DTAaddress = cmd_str.split(':')[0]
+                        self.dtapid.writeDTE(DTAvalue, DTAaddress)
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
                 elif action == 6:  # IO Command
@@ -8674,8 +8700,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 if self.ser.controlETpid[0] == 0:
                                     # 1. get current PID
                                     N = self.fujipid.getCurrentPIDnumberPXG()
-                                    # 2. call setpid(self,k) with k that active pid
-                                    self.fujipid.setpidPXG(N,kp,ki,kd)
+                                    if N != -1:
+                                        # 2. call setpid(self,k) with k that active pid
+                                        self.fujipid.setpidPXG(N,kp,ki,kd)
                                 elif self.ser.controlETpid[0] == 1:
                                     self.fujipid.setpidPXR('p',kp)
                                     libtime.sleep(0.035)
@@ -8685,8 +8712,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 elif self.ser.controlETpid[0] == 4: # PXF
                                     # 1. get current PID
                                     N = self.fujipid.getCurrentPIDnumberPXF()
-                                    # 2. call setpid(self,k) with k that active pid
-                                    self.fujipid.setpidPXF(N,kp,ki,kd)
+                                    if N != -1:
+                                        # 2. call setpid(self,k) with k that active pid
+                                        self.fujipid.setpidPXF(N,kp,ki,kd)
                             else:
                                 self.pidcontrol.confPID(kp,ki,kd,pOnE=self.pidcontrol.pOnE)
                                 #self.pidcontrol.setPID(kp,ki,kd) # we don't set the new values in the dialog
@@ -9401,9 +9429,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                             if self.ser.controlETpid[0] == 0: # PXG
                                                 # 1. get current PID
                                                 N = self.fujipid.getCurrentPIDnumberPXG()
-                                                # 2. call setpid(self,k) with k that active pid
-                                                self.fujipid.setpidPXG(N,kp,ki,kd)
-                                                self.sendmessage(f'Artisan Command: {cs}')
+                                                if N != -1:
+                                                    # 2. call setpid(self,k) with k that active pid
+                                                    self.fujipid.setpidPXG(N,kp,ki,kd)
+                                                    self.sendmessage(f'Artisan Command: {cs}')
                                             elif self.ser.controlETpid[0] == 1: # PRG
                                                 self.fujipid.setpidPXR('p',kp)
                                                 libtime.sleep(0.035)
@@ -9414,9 +9443,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                             elif self.ser.controlETpid[0] == 4: # PXF
                                                 # 1. get current PID
                                                 N = self.fujipid.getCurrentPIDnumberPXF()
-                                                # 2. call setpid(self,k) with k that active pid
-                                                self.fujipid.setpidPXF(N,kp,ki,kd)
-                                                self.sendmessage(f'Artisan Command: {cs}')
+                                                if N != -1:
+                                                    # 2. call setpid(self,k) with k that active pid
+                                                    self.fujipid.setpidPXF(N,kp,ki,kd)
+                                                    self.sendmessage(f'Artisan Command: {cs}')
                                         else:
                                             self.pidcontrol.confPID(kp,ki,kd,pOnE=self.pidcontrol.pOnE)
                                             self.sendmessage(f'Artisan Command: {cs}')
@@ -10430,17 +10460,17 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def toggleSliders(self,_=False):
+    def toggleSliders(self,_:bool = False) -> None:
         if self.sliderFrame.isVisible():
             self.hideSliders()
         else:
             self.showSliders()
 
-    def hideControls(self):
+    def hideControls(self) -> None:
         self.level1frame.hide()
         self.controlsAction.setChecked(False)
 
-    def showControls(self):
+    def showControls(self) -> None:
         self.level1frame.show()
         self.controlsAction.setChecked(True)
 
@@ -10800,7 +10830,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.slidersAction.setEnabled(False)
             self.eventsEditorAction.setChecked(False)
             self.eventsEditorAction.setEnabled(False)
-            self.lcdsAction.setEnabled(False)
             self.simulatorAction.setEnabled(False)
         else:
             return
@@ -11835,18 +11864,18 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         return str(QFileInfo(fullFileName).dir().dirName())
 
     # fileNamePath holds the full path to the loaded profile
-    def setCurrentFile(self, fileNamePath,addToRecent=True):
+    def setCurrentFile(self, fileNamePath:Optional[str], addToRecent:bool = True) -> None:
         self.curFile = fileNamePath
-        if self.curFile:
+        if self.curFile is not None:
             try:
                 if addToRecent:
                     settings = QSettings()
                     files = toStringList(settings.value('recentFileList'))
                     try:
-                        removeAll(files,fileNamePath)
+                        removeAll(files, self.curFile)
                     except ValueError:
                         pass
-                    files.insert(0, fileNamePath)
+                    files.insert(0, self.curFile)
                     del files[self.MaxRecentFiles:]
                     settings.setValue('recentFileList', files)
                     for widget in QApplication.topLevelWidgets():
@@ -17516,7 +17545,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
-    def applyStandardButtonVisibility(self):
+    def applyStandardButtonVisibility(self) -> None:
         if self.eventsbuttonflag:
             self.buttonEVENT.setVisible(True)
         else:
@@ -17776,7 +17805,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     # ex: "macOS", "11.6",
     @staticmethod
     @functools.lru_cache(maxsize=None) #we cache the result to avoid re-compuation #for Python >=3.9 can use @functools.cache
-    def get_os():
+    def get_os() -> Tuple[str,str,str]:
         # subprocess above below is problematic in signed builds on macOS 14 especially on AppleSilicon
 #        def get_macOS_version():
 #            # platform.mac_ver() returns 10.16-style version info on BigSur
@@ -21068,7 +21097,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 libtime.sleep(0.001)
             self.pdf_rendering = True
             if self.html_loader is None:
-                self.html_loader = QWebEngineView()
+                self.html_loader = QWebEngineView() # type:ignore[reportUnboundVariable]
                 self.html_loader.setZoomFactor(1)
             if self.pdf_page_layout is None:
                 # lazy imports
@@ -22002,7 +22031,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         except Exception: # pylint: disable=broad-except
             pass
         try:
-            yocto_version = YAPI.GetAPIVersion()
+            yocto_version = YAPI.GetAPIVersion() # type:ignore[reportUnboundVariable]
             otherlibs += ', Yoctopuce ' + yocto_version
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -25059,7 +25088,7 @@ def qt_message_handler(_msg_type, _msg_log_context, _msg_string):
 def initialize_locale(my_app:Artisan) -> str:
     if QSettings().contains('resetqsettings') and not toInt(QSettings().value('resetqsettings')):
         locale = toString(QSettings().value('locale'))
-        if locale is None or locale == 'en_US':
+        if locale is None or locale == 'en_US' or locale == 'None':
             locale = 'en'
     else:
         locale = ''
@@ -25132,7 +25161,7 @@ def initialize_locale(my_app:Artisan) -> str:
         if locale in supported_languages:
             QSettings().setValue('locale', locale)
 
-    if locale is None or len(locale) == 0:
+    if locale is None or len(locale) == 0 or locale == 'None':
         locale = 'en'
 
     #load Qt default translations from QLibrary

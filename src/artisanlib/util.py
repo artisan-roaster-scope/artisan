@@ -460,18 +460,18 @@ def createRGBGradient(rgb:Union[QColor, str], tint_factor:float = 0.3, shade_fac
     try:
         rgb_tuple: Tuple[float, float, float]
         if isinstance(rgb, QColor):
-            r,g,b,_ = rgb.getRgbF() # type: ignore
+            r,g,b,_ = rgb.getRgbF() # type:ignore[unused-ignore]
             if r is not None and g is not None and b is not None:
                 rgb_tuple = (r,g,b)
             else:
                 rgb_tuple = (0.5,0.5,0.5)
         elif rgb[0:1] == '#':   # hex input like "#ffaa00" # type: ignore
 #            rgb_tuple = tuple(int(rgb[i:i+2], 16)/255 for i in (1, 3 ,5))
-            rgb_tuple = (float(int(rgb[1:3], 16)/255),float(int(rgb[3:5], 16)/255),float(int(rgb[5:7], 16)/255)) # type: ignore
+            rgb_tuple = (float(int(rgb[1:3], 16)/255),float(int(rgb[3:5], 16)/255),float(int(rgb[5:7], 16)/255)) # type:ignore[unused-ignore]
         else:                 # color name
-            rgb_tuple = colors.hex2color(colors.cnames[rgb]) # type: ignore
+            rgb_tuple = colors.hex2color(colors.cnames[rgb]) # type:ignore[unused-ignore]
         #ref: https://stackoverflow.com/questions/6615002/given-an-rgb-value-how-do-i-create-a-tint-or-shade
-        r,g,b = tuple(int(255 * (x * (1 - shade_factor))) for x in rgb_tuple) # type: ignore
+        r,g,b = tuple(int(255 * (x * (1 - shade_factor))) for x in rgb_tuple) # type:ignore[unused-ignore]
         darker_rgb = f'#{r:02x}{g:02x}{b:02x}'
         r,g,b = tuple(int(255 * (x + (1 - x) * tint_factor)) for x in rgb_tuple)
         lighter_rgb = f'#{r:02x}{g:02x}{b:02x}'

@@ -22,10 +22,10 @@ import threading
 import json
 import random
 
-from typing import Final, List, Dict, Optional, Union, TYPE_CHECKING
+from typing import Final, List, Dict, Optional, Union, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from websocket import WebSocketApp # type: ignore # pylint: disable=unused-import
+    from websocket import WebSocketApp, WebSocket # type: ignore # pylint: disable=unused-import
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
 
 try:
@@ -51,7 +51,7 @@ class wsport:
         self.path:str = 'WebSocket' # the ws path
         self.machineID:int = 0
 
-        self.lastReadResult:Optional[Dict] = {} # this is set by eventaction following some custom button/slider Modbus actions with "read" command
+        self.lastReadResult:Optional[Dict[str,Any]] = None # this is set by eventaction following some custom button/slider Modbus actions with "read" command
 
         self.channels:Final[int] = 10 # maximal number of WebSocket channels
 
@@ -97,13 +97,13 @@ class wsport:
         self.OFFonDROP:bool = False
 
         self.open_event:Optional[threading.Event] = None # an event set on connecting
-        self.pending_events:Dict[int, Union[threading.Event, Dict]] = {} # message ids associated with pending threading.Event object or result
+        self.pending_events:Dict[int, Union[threading.Event, Dict[str,Any]]] = {} # message ids associated with pending threading.Event object or result
 
         self.active:bool = False
         self.ws:Optional['WebSocketApp'] = None  # the WebService client object
         self.wst:Optional[threading.Thread] = None # the WebService thread
 
-    def onMessage(self, _, message):
+    def onMessage(self, _:'WebSocket', message:str) -> None:
         if message is not None:
             j = json.loads(message)
             if self.aw.seriallogflag:
@@ -189,32 +189,32 @@ class wsport:
                 # note of current roast set: {"pushMessage": "setRoastingProcessNote", "data": { "note": "A test comment" }}
                 # fill weight of current roast set: {"pushMessage": "setRoastingProcessFillWeight", "data": { "fillWeight": 12 }}
 
-    def onError(self, _, err):
+    def onError(self, _:'WebSocket', err:str) -> None:
         self.aw.qmc.adderror(QApplication.translate('Error Message','WebSocket connection failed: {}').format(err))
         if self.aw.seriallogflag:
             self.aw.addserial(f'wsport onError(): {err}')
 
-    def onClose(self, *_):
+    def onClose(self, _:'WebSocket', _status_code:Any, _close_msg:Any) -> None:
         self.aw.sendmessage(QApplication.translate('Message','WebSocket disconnected'))
         if self.aw.seriallogflag:
             self.aw.addserial('wsport onClose()')
 
-    def onOpen(self, *_):
+    def onOpen(self, _:'WebSocket') -> None:
         if self.open_event is not None:
             self.open_event.set() # unblock the connect action
         self.aw.sendmessage(QApplication.translate('Message','WebSocket connected'))
         if self.aw.seriallogflag:
             self.aw.addserial('wsport onOpen()')
 
-    def onPing(self, *_):
+    def onPing(self, _data:str) -> None:
         if self.aw.seriallogflag:
             self.aw.addserial('wsport onPing()')
 
-    def onPong(self, *_):
+    def onPong(self, _data:str) -> None:
         if self.aw.seriallogflag:
             self.aw.addserial('wsport onPong()')
 
-    def create(self):
+    def create(self) -> None:
         from websocket import WebSocketApp, setdefaulttimeout # type: ignore
         # initialize readings
         self.readings = [-1]*self.channels
@@ -235,7 +235,7 @@ class wsport:
                 if self.ws is not None:
                     self.ws.run_forever(
                         skip_utf8_validation=True,
-                        ping_interval=self.ping_interval, # type:ignore # pyright: Argument of type "float" cannot be assigned to parameter "ping_interval" of type "int" in function "run_forever"
+                        ping_interval=self.ping_interval,
                         ping_timeout=self.ping_timeout)
             except Exception as e: # pylint: disable=broad-except
                 self.aw.qmc.adderror(QApplication.translate('Error Message','WebSocket connection failed: {}').format(e))
@@ -262,10 +262,10 @@ class wsport:
 #            return False
         return True
 
-    def is_connected(self):
-        return self.ws is not None and self.ws.sock
+    def is_connected(self) -> bool:
+        return self.ws is not None and bool(self.ws.sock)
 
-    def disconnect(self):
+    def disconnect(self) -> None:
         if self.is_connected():
             if self.aw.seriallogflag:
                 self.aw.addserial('wsport disconnect()')
@@ -280,16 +280,16 @@ class wsport:
 
     # request event handling
 
-    def registerRequest(self,message_id):
+    def registerRequest(self ,message_id:int) -> threading.Event:
         e = threading.Event()
         self.pending_events[message_id] = e
         return e
 
-    def removeRequestResponse(self,message_id):
+    def removeRequestResponse(self, message_id:int) -> None:
         del self.pending_events[message_id]
 
     # replace the request event by its result
-    def setRequestResponse(self,message_id,v):
+    def setRequestResponse(self, message_id:int, v:Dict[str, Any]) -> None:
         if message_id in self.pending_events:
             pe = self.pending_events[message_id]
             if isinstance(pe,threading.Event):
@@ -298,7 +298,7 @@ class wsport:
                 self.pending_events[message_id] = v
 
     # returns the response received for request with id or None
-    def getRequestResponse(self, message_id:int) -> Optional[Dict]:
+    def getRequestResponse(self, message_id:int) -> Optional[Dict[str,Any]]:
         if message_id in self.pending_events:
             v = self.pending_events[message_id]
             del self.pending_events[message_id]
@@ -309,7 +309,7 @@ class wsport:
     # takes a request as dict to be send as JSON
     # and returns a dict generated from the JSON response
     # or None on exception or if block=False
-    def send(self, request:Dict, block:bool = True) -> Optional[Dict]:
+    def send(self, request:Dict[str,Any], block:bool = True) -> Optional[Dict[str,Any]]:
         try:
             connected = self.connect()
             if connected and self.ws is not None:
