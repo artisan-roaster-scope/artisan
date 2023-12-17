@@ -116,7 +116,7 @@ try:
     from PyQt6.QtGui import (QScreen, QPageLayout, QAction, QImageReader, QWindow, # @Reimport @UnresolvedImport @UnusedImport
                                 QKeySequence, QShortcut, # @Reimport @UnresolvedImport @UnusedImport
                                 QPixmap,QColor,QDesktopServices,QIcon, # @Reimport @UnresolvedImport @UnusedImport
-                                QRegularExpressionValidator,QDoubleValidator, QPainter, QCursor, QFont) # @Reimport @UnresolvedImport @UnusedImport
+                                QRegularExpressionValidator,QDoubleValidator, QPainter, QCursor) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt6.QtPrintSupport import (QPrinter,QPrintDialog) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt6.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot, QtMsgType, # @Reimport @UnresolvedImport @UnusedImport
 #                              QSize, pyqtProperty, # type: ignore # @Reimport @UnresolvedImport @UnusedImport
@@ -142,7 +142,7 @@ except ImportError:
     from PyQt5.QtGui import (QScreen, QPageLayout, QImageReader, QWindow,  # type: ignore # @Reimport @UnresolvedImport @UnusedImport
                                 QKeySequence, # @Reimport @UnresolvedImport @UnusedImport
                                 QPixmap,QColor,QDesktopServices,QIcon, # @Reimport @UnresolvedImport @UnusedImport
-                                QRegularExpressionValidator,QDoubleValidator, QPainter, QCursor, QFont) # @Reimport @UnresolvedImport @UnusedImport
+                                QRegularExpressionValidator,QDoubleValidator, QPainter, QCursor) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog) # type: ignore # @Reimport @UnresolvedImport @UnusedImport
     from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot, QtMsgType, # type: ignore # @Reimport @UnresolvedImport @UnusedImport
                               qVersion, QVersionNumber, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, # @Reimport @UnresolvedImport @UnusedImport
@@ -721,15 +721,16 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 
         # lets make the font of the coordinates QLabel a little larger
         f = self.locLabel.font()
+
         if platform.system() == 'Linux':
             f.setPointSize(f.pointSize()+2)
         else:
             f.setPointSize(f.pointSize()+4)
-#        f.setStyleHint(QFont.StyleHint.TypeWriter) # not monospaced!
-        f.setStyleHint(QFont.StyleHint.Monospace)
-        f.setFamily('monospace')
-#        f.setWeight(QFont.Bold)
-#        f.setBold(True)
+##        f.setStyleHint(QFont.StyleHint.TypeWriter) # not monospaced!
+#        f.setStyleHint(QFont.StyleHint.Monospace)
+#        f.setFamily('monospace')
+##        f.setWeight(QFont.Bold)
+##        f.setBold(True)
         self.locLabel.setFont(f)
 
 
@@ -1017,10 +1018,10 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         backgroundtimeindex = None # caches the background timex index computed at x cursor position
         # update xy cursor position widget
         if self._last_event is None:
-            self.set_message(self.mode) # type:ignore
+            self.set_message(f'<PRE>{self.mode}</PRE>') # type:ignore
         else:
             if not self.qmc.fmt_data_ON:
-                self.set_message(self.mode) # type:ignore
+                self.set_message(f'<PRE>{self.mode}</PRE>') # type:ignore
             else:
                 try:
                     channel = ''
@@ -1073,15 +1074,15 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                             if inaxes is not None and self._last_event.ydata is not None:
                                 ys = float(inaxes.format_ydata(self._last_event.ydata))
                 except Exception: # pylint: disable=broad-except
-                    self.set_message(self.mode) # type:ignore
+                    self.set_message(f'<PRE>{self.mode}</PRE>') # type:ignore
                 else:
                     min_temp_digits = 5 if self.qmc.LCDdecimalplaces else 3
                     if self.qmc.fmt_data_RoR:
                         min_temp_digits -= 1
                     if self.mode:
-                        self.set_message(f"{self.mode}  {xs: >5}\n{channel} {'' if ys is None else ys: >{min_temp_digits}}\u00B0{self.qmc.mode}{'/min' if self.qmc.fmt_data_RoR else ''}") # type:ignore
+                        self.set_message(f"<PRE>{self.mode}  {xs: >5}\n{channel} {'' if ys is None else ys: >{min_temp_digits}}\u00B0{self.qmc.mode}{'/min' if self.qmc.fmt_data_RoR else ''}</PRE>") # type:ignore
                     else:
-                        self.set_message(f"{xs: >5}\n{channel} {'' if ys is None else ys: >{min_temp_digits}}\u00B0{self.qmc.mode}{'/min' if self.qmc.fmt_data_RoR else ''}") # type:ignore
+                        self.set_message(f"<PRE>{xs: >5}\n{channel} {'' if ys is None else ys: >{min_temp_digits}}\u00B0{self.qmc.mode}{'/min' if self.qmc.fmt_data_RoR else ''}</PRE>") # type:ignore
             # update running LCDs
             if not self.qmc.flagon and self.aw.comparator is None and self._last_event.xdata is not None:
                 if self.qmc.running_LCDs == 1: # show foreground profile readings at cursor position in LCDs

@@ -15080,7 +15080,7 @@ class tgraphcanvas(FigureCanvas):
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
             # update the error dlg
-            if self.aw.error_dlg:
+            if hasattr(self.aw, 'error_dlg') and self.aw.error_dlg:
                 self.aw.updateErrorLogSignal.emit()
             self.aw.sendmessageSignal.emit(error,True,None)
         except Exception as e: # pylint: disable=broad-except

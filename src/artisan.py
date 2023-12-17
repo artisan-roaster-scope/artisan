@@ -17,8 +17,9 @@ os.environ['OMP_NUM_THREADS'] = '1'
 
 # highDPI support must be set before creating the Application instance
 try:
-    if system() == 'Darwin':
-        os.environ['QT_MAC_WANTS_LAYER'] = '1' # some widgets under PyQt  on macOS seem not to update properly without this (see the discussion on the pyqt mailing list from 15.6.2020 "Widgets are not updated - is this a bug?")
+# the following two lines seem not to be needed any longer with Qt6.1
+#    if system() == 'Darwin':
+#        os.environ['QT_MAC_WANTS_LAYER'] = '1' # some widgets under PyQt  on macOS seem not to update properly without this (see the discussion on the pyqt mailing list from 15.6.2020 "Widgets are not updated - is this a bug?")
     try:
         #pylint: disable = E, W, R, C
         from PyQt6.QtWidgets import QApplication  # @UnusedImport @Reimport  @UnresolvedImport

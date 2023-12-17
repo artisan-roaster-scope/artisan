@@ -702,8 +702,8 @@ class AlarmDlg(ArtisanResizeablDialog):
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' exportalarmsJSON(): {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return False
 
-    @pyqtSlot(bool)
-    def closealarms(self, _:bool = False) -> None:
+    @pyqtSlot()
+    def closealarms(self) -> None:
         self.savealarms()
         # save column widths
         self.aw.qmc.alarmtablecolumnwidths = [self.alarmtable.columnWidth(c) for c in range(self.alarmtable.columnCount())]
