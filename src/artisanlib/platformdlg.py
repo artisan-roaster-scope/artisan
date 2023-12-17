@@ -60,7 +60,7 @@ class platformDlg(ArtisanDialog):
             platformdic['Mac'] = str(platform.mac_ver())
         elif system == 'Linux':
             try:
-                import distro # type: ignore # @UnresolvedImport # pylint: disable=import-error
+                import distro # type: ignore[import-not-found,unused-ignore] # @UnresolvedImport # pylint: disable=import-error
                 platformdic['Linux'] = str(distro.linux_distribution())
                 platformdic['Libc'] = str(platform.libc_ver())
             except Exception: # pylint: disable=broad-except

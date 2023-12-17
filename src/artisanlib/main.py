@@ -25159,7 +25159,7 @@ def initialize_locale(my_app:Artisan) -> str:
 
     if len(locale) == 0:
         if platform.system() == 'Darwin':
-            from Cocoa import NSUserDefaults # type:ignore[unused-ignore]  # @UnresolvedImport # pylint: disable=import-error,no-name-in-module
+            from Cocoa import NSUserDefaults # type:ignore[import-not-found,unused-ignore]  # @UnresolvedImport # pylint: disable=import-error,no-name-in-module
             defs = NSUserDefaults.standardUserDefaults()
             langs = defs.objectForKey_('AppleLanguages')
             if langs.objectAtIndex_(0)[:7] == 'zh_Hans':
