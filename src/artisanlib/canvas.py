@@ -15720,7 +15720,7 @@ class tgraphcanvas(FigureCanvas):
             string2 = f" <font color = \"{text_color_rect2}\" style=\"BACKGROUND-COLOR: {self.palette['rect2']}\">{margin} {stringfromseconds(midphasetime)} {margin} {midphaseP}% {margin} {midroc} {margin}</font>"
             text_color_rect3 = '#ffffff' if self.aw.QColorBrightness(QColor(self.palette['rect3'])) < 128 else '#000000'
             string3 = f" <font color = \"{text_color_rect3}\" style=\"BACKGROUND-COLOR: {self.palette['rect3']}\">{margin} {stringfromseconds(finishphasetime)} {margin} {finishphaseP}% {margin} {finishroc} {margin}</font>"
-            self.aw.sendmessage(f'{string1}{string2}{string3}',append=False)
+            self.aw.sendmessage(f'<PRE>{string1}{string2}{string3}</PRE>',append=False)
 
     #handler for moving point
     def on_motion(self, event:'MouseEvent') -> None:

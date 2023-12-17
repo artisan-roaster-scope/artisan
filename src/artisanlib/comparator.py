@@ -1553,8 +1553,9 @@ class roastCompareDlg(ArtisanDialog):
             header: Optional[QHeaderView] = self.profileTable.horizontalHeader()
             if header is not None:
                 header.setStretchLastSection(True)
-                header.setMinimumSectionSize(10)       # color column size
-                header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
+                header.setMinimumSectionSize(10)  # color column size
+#                header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
+                header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
                 header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
                 header.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
 

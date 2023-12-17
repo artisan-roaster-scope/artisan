@@ -844,9 +844,9 @@ class profileTransformatorDlg(ArtisanDialog):
                             break
                     sources_i:Optional[float] = None
                     targets_i:Optional[float] = None
+                    sources_i = sources[i]
+                    targets_i = targets[i]
                     if next_idx is None:
-                        sources_i = sources[i]
-                        targets_i = targets[i]
                         if last_fit is not None:
                             fits[i] = last_fit # copy previous fit
                         elif sources_i is not None and targets_i is not None:
@@ -1003,8 +1003,6 @@ class profileTransformatorDlg(ArtisanDialog):
     def createPhasesTable(self) -> None:
         vheader = self.phasestable.verticalHeader()
         hheader = self.phasestable.horizontalHeader()
-
-        self.phasestable.setStyleSheet('QTableView { background-color: red); }')
 
         self.phasestable.setRowCount(3)
         self.phasestable.setColumnCount(3)
