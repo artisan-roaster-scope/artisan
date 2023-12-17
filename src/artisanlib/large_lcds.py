@@ -278,8 +278,8 @@ class LargeLCDs(ArtisanDialog):
                         lcd.display('   --')
 
     # note that values1 and values2 can contain None values indicating that those lcds are not updated in this round
-    def updateValues(self, values1, values2, *args, **kwargs):
-        del args, kwargs
+    def updateValues(self, values1:List[Optional[str]], values2:List[Optional[str]], **kwargs:Optional[str]) -> None:
+        del kwargs
         for i,v1 in enumerate(values1):
             try:
                 if v1 is not None:
@@ -294,8 +294,12 @@ class LargeLCDs(ArtisanDialog):
                 pass
 
     # note that all given values can contain None indicating that those labels are not updated in this round
-    def updateLabels(self, lowerlabels1, lowerlabels2, upperlabels1, upperlabels2, *args, **kwargs):
-        del args, kwargs
+    def updateLabels(self, lowerlabels1:List[Optional[str]],
+            lowerlabels2:List[Optional[str]],
+            upperlabels1:List[Optional[str]],
+            upperlabels2:List[Optional[str]],
+            **kwargs:str) -> None:
+        del kwargs
         if lowerlabels1 is not None:
             for i,v1 in enumerate(lowerlabels1):
                 try:
@@ -351,10 +355,10 @@ class LargeMainLCDs(LargeLCDs):
         self.chooseLayout(self.width(),self.height())
         self.setWindowTitle(QApplication.translate('Menu', 'Main LCDs'))
 
-    def updateVisiblitiesETBT(self):
+    def updateVisiblitiesETBT(self) -> None:
         self.updateVisibilities([self.aw.qmc.ETlcd],[self.aw.qmc.BTlcd])
 
-    def setTimerLCDcolor(self,fc,bc):
+    def setTimerLCDcolor(self, fc:str, bc:str) -> None:
         if self.lcd0 is not None:
             self.lcd0.setStyleSheet(f'QLCDNumber {{ color: {fc}; background-color: {bc};}}')
 
@@ -362,13 +366,14 @@ class LargeMainLCDs(LargeLCDs):
         self.setTimerLCDcolor(self.aw.lcdpaletteF['timer'],self.aw.lcdpaletteB['timer'])
         super().updateStyles()
 
-    def updateValues(self, values1, values2, *args, **kwargs):
-        super().updateValues(values1,values2,*args,**kwargs)
+    def updateValues(self, values1:List[Optional[str]], values2:List[Optional[str]],
+            **kwargs:Optional[str]) -> None:
+        super().updateValues(values1,values2,**kwargs)
         if self.lcd0 is not None and 'time' in kwargs and kwargs['time'] is not None:
             self.lcd0.display(kwargs['time'])
 
     # create LCDs, LCD labels and LCD frames
-    def makeLCDs(self):
+    def makeLCDs(self) -> None:
         # time LCD
         self.lcd0 = self.makeLCD('timer') # time
         self.lcd0.setDigitCount(5)
@@ -405,7 +410,7 @@ class LargeMainLCDs(LargeLCDs):
         self.updateStyles()
         self.updateDecimals()
 
-    def landscapeLayout(self):
+    def landscapeLayout(self) -> 'QLayout':
         self.tight = False
         self.makeLCDs()
         templayout = QHBoxLayout()
@@ -423,7 +428,7 @@ class LargeMainLCDs(LargeLCDs):
         landscapelayout.setContentsMargins(0, 0, 0, 0)
         return landscapelayout
 
-    def landscapeTightLayout(self):
+    def landscapeTightLayout(self) -> 'QLayout':
         self.tight = False
         self.makeLCDs()
         landscapetightlayout = QHBoxLayout()
@@ -439,7 +444,7 @@ class LargeMainLCDs(LargeLCDs):
         landscapetightlayout.setContentsMargins(0, 0, 0, 0)
         return landscapetightlayout
 
-    def portraitLayout(self):
+    def portraitLayout(self) -> 'QLayout':
         self.tight = True
         self.makeLCDs()
         portraitlayout = QVBoxLayout()
@@ -457,7 +462,7 @@ class LargeMainLCDs(LargeLCDs):
 
     # n the number of layout to be set (0: landscape, 1: landscape tight, 2: portrait)
     # calling reLayout() without arg will force a relayout using the current layout
-    def reLayout(self,n=None):
+    def reLayout(self, n:Optional[int] = None) -> None:
         if self.layoutNr != n:
             newLayoutNr = self.layoutNr if n is None else n
             newLayoutNr = max(newLayoutNr,0)
@@ -478,7 +483,7 @@ class LargeMainLCDs(LargeLCDs):
             self.activateWindow()
             self.layoutNr = newLayoutNr
 
-    def chooseLayout(self,w,h):
+    def chooseLayout(self, w:int, h:int) -> None:
         if w > h:
             if w > 3*h:
                 self.reLayout(1)
@@ -509,7 +514,7 @@ class LargeDeltaLCDs(LargeLCDs):
         self.setWindowTitle(QApplication.translate('Menu', 'Delta LCDs'))
         self.chooseLayout(self.width(),self.height())
 
-    def makeLCDs(self):
+    def makeLCDs(self) -> None:
         self.lcds1styles = ['deltaet']
         self.lcds1 = [self.makeLCD(self.lcds1styles[0])] # DeltaET
         label1Upper = self.makeLabel(f'<b>&Delta;{self.aw.ETname.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3])}</b> ')
@@ -532,10 +537,10 @@ class LargeDeltaLCDs(LargeLCDs):
         self.updateStyles()
         self.updateDecimals()
 
-    def updateVisiblitiesDeltaETBT(self):
+    def updateVisiblitiesDeltaETBT(self) -> None:
         self.updateVisibilities([self.aw.qmc.DeltaETlcdflag],[self.aw.qmc.DeltaBTlcdflag])
 
-    def reLayout(self,n=None):
+    def reLayout(self, n:Optional[int] = None) -> None:
         self.swaplcds = self.aw.qmc.swapdeltalcds
         super().reLayout(n)
 
@@ -559,7 +564,7 @@ class LargePIDLCDs(LargeLCDs):
         self.setWindowTitle(QApplication.translate('Menu', 'PID LCDs'))
         self.chooseLayout(self.width(),self.height())
 
-    def makeLCDs(self):
+    def makeLCDs(self) -> None:
         self.lcds1styles = ['sv']
         self.lcds1 = [self.makeLCD(self.lcds1styles[0])] # PID SV
         label1Upper = self.makeLabel('<b>' + QApplication.translate('Label', 'PID SV') + '</b> ')
@@ -580,7 +585,7 @@ class LargePIDLCDs(LargeLCDs):
         self.updateStyles()
         self.updateDecimals()
 
-    def updateVisiblitiesPID(self):
+    def updateVisiblitiesPID(self) -> None:
         if self.aw.ser.showFujiLCDs and self.aw.qmc.device == 0 or self.aw.qmc.device == 26:
             self.updateVisibilities([True],[True])
         else:
@@ -644,7 +649,7 @@ class LargeExtraLCDs(LargeLCDs):
             _log.exception(e)
         self.aw.qmc.redraw_keep_view(recomputeAllDeltas=False)
 
-    def makeLCDs(self):
+    def makeLCDs(self) -> None:
         self.lcds1 = []
         self.lcds2 = []
         self.lcds1styles = []
@@ -696,7 +701,7 @@ class LargeExtraLCDs(LargeLCDs):
         self.updateStyles()
         self.updateDecimals()
 
-    def updateVisiblitiesExtra(self):
+    def updateVisiblitiesExtra(self) -> None:
         self.updateVisibilities(self.aw.extraLCDvisibility1,self.aw.extraLCDvisibility2)
 
     def updateStyles(self) -> None:
@@ -726,9 +731,9 @@ class LargePhasesLCDs(LargeLCDs):
     __slots__ = ['labels', 'values1', 'values2']
 
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
-        self.labels = [' ', ' ', ' ', self.formatLabel('AUC')] # formatted labels
-        self.values1 = [' ']*2
-        self.values2 = [' ']*2
+        self.labels:List[str] = [' ', ' ', ' ', str(self.formatLabel('AUC'))] # formatted labels
+        self.values1:List[str] = [' ']*2
+        self.values2:List[str] = [' ']*2
         super().__init__(parent, aw)
         settings = QSettings()
         if settings.contains('PhasesLCDGeometry'):
@@ -739,13 +744,12 @@ class LargePhasesLCDs(LargeLCDs):
         self.setWindowTitle(QApplication.translate('Menu', 'Phases LCDs'))
 
     @staticmethod
-    def formatLabel(ll):
+    def formatLabel(ll:Optional[str]) -> Optional[str]:
         if ll is None:
             return None
-        label_fmt = '<b>{}</b>'
-        return label_fmt.format(ll)
+        return f'<b>{ll}</b>'
 
-    def makeLCDs(self):
+    def makeLCDs(self) -> None:
         self.lcds1styles = ['sv','sv']
         self.lcds1 = [
             self.makeLCD(self.lcds1styles[0]), # Phase 1
@@ -788,8 +792,9 @@ class LargePhasesLCDs(LargeLCDs):
         self.updateStyles()
         self.updateDecimals()
 
-    def updateValues(self,values1,values2, *args, **kwargs):
-        del args, kwargs
+    def updateValues(self, values1:List[Optional[str]], values2:List[Optional[str]],
+            **kwargs:Optional[str]) -> None:
+        del kwargs
         # don't update None values
         for i,v in enumerate(values1):
             if v is not None:
@@ -802,18 +807,18 @@ class LargePhasesLCDs(LargeLCDs):
     def updateVisiblitiesPhases(self) -> None:
         self.updateVisibilities([True,True],[True,self.aw.qmc.AUClcdFlag])
 
-    def updateDecimals(self):
+    def updateDecimals(self) -> None:
         for lcd in self.lcds1 + self.lcds2:
             lcd.setDigitCount(6)
 
-    def updatePhasesLabels(self,labels):
+    def updatePhasesLabels(self, labels:List[Optional[str]]) -> None:
         # don't update None values
         for i, ll in enumerate(map(self.formatLabel,labels)):
             if ll is not None:
                 self.labels[i] = ll
         super().updateLabels([' ']*2,[' ']*2,[self.labels[0],self.labels[2]],[self.labels[1],self.labels[3]])
 
-    def updateAUCstyle(self,style):
+    def updateAUCstyle(self, style:str) -> None:
         self.lcds2[1].setStyleSheet(style)
 
     @pyqtSlot('QCloseEvent')
@@ -837,29 +842,29 @@ class LargeScaleLCDs(LargeLCDs):
         self.chooseLayout(self.width(),self.height())
         self.updateValues([''],[''])
 
-    def weightLabel(self, unit=None):
+    def weightLabel(self, unit:Optional[str] = None) -> str:
         if unit is None:
             unit = self.aw.qmc.weight[2]
-        return '<b>' + QApplication.translate('Label', 'Weight') + f' ({unit})</b> '
+        return f"<b>{QApplication.translate('Label', 'Weight')} ({unit})</b> "
 
-    def totalLabel(self, unit=None):
+    def totalLabel(self, unit:Optional[str] = None) -> str:
         if unit is None:
             unit = self.aw.qmc.weight[2]
-        return '<b>' + QApplication.translate('Label', 'Total') + f' ({unit})</b> '
+        return f"<b>{QApplication.translate('Label', 'Total')} ({unit})</b> "
 
-    def updateWeightUnitWeight(self, unit=None):
+    def updateWeightUnitWeight(self, unit:Optional[str] = None) -> None:
         if len(self.lcds1labelsUpper)>0:
             self.lcds1labelsUpper[0].setText(self.weightLabel(unit))
 
-    def updateWeightUnitTotal(self, unit=None):
+    def updateWeightUnitTotal(self, unit:Optional[str] = None) -> None:
         if len(self.lcds2labelsUpper)>0:
             self.lcds2labelsUpper[0].setText(self.totalLabel(unit))
 
-    def updateWeightUnit(self, unit=None):
+    def updateWeightUnit(self, unit:Optional[str] = None) -> None:
         self.updateWeightUnitWeight(unit)
         self.updateWeightUnitTotal(unit)
 
-    def makeLCDs(self):
+    def makeLCDs(self) -> None:
         self.lcds1styles = ['slowcoolingtimer']
         self.lcds1 = [self.makeLCD(self.lcds1styles[0])] # Weight
         label1Upper = self.makeLabel(self.weightLabel())
@@ -880,10 +885,10 @@ class LargeScaleLCDs(LargeLCDs):
         self.updateStyles()
         self.updateDecimals()
 
-    def updateVisiblitiesScale(self):
+    def updateVisiblitiesScale(self) -> None:
         self.updateVisibilities([True],[True])
 
-    def updateDecimals(self):
+    def updateDecimals(self) -> None:
         for (lcd1,lcd2) in zip(self.lcds1,self.lcds2):
             for lcd in [lcd1,lcd2]:
                 if self.tight:

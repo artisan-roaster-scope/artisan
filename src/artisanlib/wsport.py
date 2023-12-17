@@ -25,7 +25,7 @@ import random
 from typing import Final, List, Dict, Optional, Union, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from websocket import WebSocketApp, WebSocket # type: ignore # pylint: disable=unused-import
+    from websocket import WebSocketApp, WebSocket # pyright:ignore[reportPrivateImportUsage] # pylint: disable=unused-import
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
 
 try:
@@ -215,7 +215,7 @@ class wsport:
             self.aw.addserial('wsport onPong()')
 
     def create(self) -> None:
-        from websocket import WebSocketApp, setdefaulttimeout # type: ignore
+        from websocket import WebSocketApp, setdefaulttimeout # pyright:ignore[reportPrivateImportUsage]
         # initialize readings
         self.readings = [-1]*self.channels
         while self.active:

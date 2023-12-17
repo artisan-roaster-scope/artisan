@@ -466,9 +466,9 @@ def getCoffeeCoffeeDict(coffee:Tuple[str, Tuple[Coffee, StockItem]]) -> Coffee:
 def getCoffeeStockDict(coffee:Tuple[str, Tuple[Coffee, StockItem]]) -> StockItem:
     return coffee[1][1]
 
-
-def getCoffeeId(coffee:Tuple[str, Tuple[Coffee, StockItem]]) -> str:
-    return getCoffeeCoffeeDict(coffee).get('hr_id','')
+# unused
+#def getCoffeeId(coffee:Tuple[str, Tuple[Coffee, StockItem]]) -> str:
+#    return getCoffeeCoffeeDict(coffee).get('hr_id','')
 
 
 def getCoffeesLabels(coffees:List[Tuple[str, Tuple[Coffee, StockItem]]]) -> List[str]:

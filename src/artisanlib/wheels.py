@@ -16,7 +16,7 @@
 # Marko Luther, 2023
 
 from matplotlib import rcParams
-from typing import Optional, cast, TYPE_CHECKING
+from typing import Dict, Optional, cast, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
@@ -36,8 +36,8 @@ except ImportError:
     from PyQt5.QtCore import Qt, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QColor # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QLabel, QTableWidget, QPushButton, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QComboBox, QHBoxLayout, QVBoxLayout, QTableWidgetItem, QDialogButtonBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QDoubleSpinBox, QGroupBox, QLineEdit, QSpinBox, QHeaderView) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QHBoxLayout, QVBoxLayout, QTableWidgetItem, QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
+        QDoubleSpinBox, QGroupBox, QLineEdit, QSpinBox, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
 
 
 class WheelDlg(ArtisanDialog):
@@ -188,17 +188,18 @@ class WheelDlg(ArtisanDialog):
         mainlayout.addLayout(buttonlayout)
         self.setLayout(mainlayout)
 
-    def close(self):
+    def close(self) -> bool:
         self.accept()
+        return True
 
     #creates config table for wheel with index x
     @pyqtSlot(bool)
-    def createlabeltable(self,_):
+    def createlabeltable(self, _:bool = False) -> None:
         x = self.aw.findWidgetsRow(self.datatable,self.sender(),3)
         if x is not None:
             self.createlabeltablex(x)
 
-    def createlabeltablex(self,x):
+    def createlabeltablex(self, x:int) -> None:
         self.labelwheelx = x                    #wheel being edited
         self.labelGroupLayout.setVisible(True)
         self.labeltable.setVisible(True)
@@ -256,7 +257,7 @@ class WheelDlg(ArtisanDialog):
                 self.labeltable.setCellWidget(i,4,alphaSpinBox)
 
     @pyqtSlot(bool)
-    def setsegmentcolor(self,_):
+    def setsegmentcolor(self, _:bool = False) -> None:
         i = self.aw.findWidgetsRow(self.labeltable,self.sender(),3)
         if i is not None:
             x = self.labelwheelx
@@ -269,7 +270,7 @@ class WheelDlg(ArtisanDialog):
 
     #sets a uniform color in wheel
     @pyqtSlot(bool)
-    def setwheelcolor(self,_):
+    def setwheelcolor(self, _:bool = False) -> None:
         x = self.aw.findWidgetsRow(self.datatable,self.sender(),8)
         if x is not None:
             colorf = self.aw.colordialog(QColor(self.aw.qmc.wheelcolor[x][0]))
@@ -282,7 +283,7 @@ class WheelDlg(ArtisanDialog):
 
     #sets color pattern (many colors) in wheel
     @pyqtSlot(int)
-    def setwheelcolorpattern(self,_):
+    def setwheelcolorpattern(self, _:int) -> None:
         x = self.aw.findWidgetsRow(self.datatable,self.sender(),9)
         if x is not None:
             wsb = cast(QSpinBox, self.datatable.cellWidget(x,9))
@@ -296,10 +297,10 @@ class WheelDlg(ArtisanDialog):
 
     #sets color pattern (many colors) for whole graph
     @pyqtSlot(int)
-    def setcolorpattern(self,_):
+    def setcolorpattern(self, _:int) -> None:
         self.aw.qmc.wheelcolorpattern = self.colorSpinBox.value()
         if self.aw.qmc.wheelcolorpattern:
-            for x, _ in enumerate(self.aw.qmc.wheelcolor):
+            for x, __ in enumerate(self.aw.qmc.wheelcolor):
                 wlen = len(self.aw.qmc.wheelcolor[x])
                 for i in range(wlen):
                     color = QColor()
@@ -308,7 +309,7 @@ class WheelDlg(ArtisanDialog):
             self.aw.qmc.drawWheel()
 
     @pyqtSlot(int)
-    def setsegmentalpha(self,z):
+    def setsegmentalpha(self, z:int) -> None:
         u = self.aw.findWidgetsRow(self.labeltable,self.sender(),4)
         if u is not None:
             x = self.labelwheelx
@@ -317,20 +318,20 @@ class WheelDlg(ArtisanDialog):
 
     #rotate whole graph
     @pyqtSlot(bool)
-    def rotatewheels1(self,_):
-        for i, _ in enumerate(self.aw.qmc.startangle):
+    def rotatewheels1(self, _:bool = False) -> None:
+        for i, __ in enumerate(self.aw.qmc.startangle):
             self.aw.qmc.startangle[i] += 1
         self.aw.qmc.drawWheel()
 
     @pyqtSlot(bool)
-    def rotatewheels0(self,_):
-        for i, _ in enumerate(self.aw.qmc.startangle):
+    def rotatewheels0(self, _:bool = False) -> None:
+        for i, __ in enumerate(self.aw.qmc.startangle):
             self.aw.qmc.startangle[i] -= 1
         self.aw.qmc.drawWheel()
 
     #z= new width%, x= wheel number index, u = index of segment in the wheel
     @pyqtSlot(float)
-    def setlabelwidth(self,z):
+    def setlabelwidth(self, z:float) -> None:
         u = self.aw.findWidgetsRow(self.labeltable,self.sender(),2)
         if u is not None:
             x = self.labelwheelx
@@ -349,7 +350,7 @@ class WheelDlg(ArtisanDialog):
 
     #input: z = index of parent in previous wheel; x = wheel number; i = index of element in wheel
     @pyqtSlot(int)
-    def setwheelchild(self,z):
+    def setwheelchild(self, z:int) -> None:
         i = self.aw.findWidgetsRow(self.labeltable,self.sender(),1)
         if i is not None:
             self.aw.qmc.setwheelchild(z,self.labelwheelx,i)
@@ -358,7 +359,7 @@ class WheelDlg(ArtisanDialog):
 
     #deletes parent-child relation in a wheel. It obtains the wheel index by self.labelwheelx
     @pyqtSlot(bool)
-    def resetlabelparents(self,_):
+    def resetlabelparents(self, _:bool = False) -> None:
         x = self.labelwheelx
         nsegments = len(self.aw.qmc.wheellabelparent[x])
         for i in range(nsegments):
@@ -368,25 +369,25 @@ class WheelDlg(ArtisanDialog):
         self.createlabeltablex(x)
 
     @pyqtSlot(float)
-    def setaspect(self,_):
+    def setaspect(self, _:float) -> None:
         self.aw.qmc.wheelaspect = self.aspectSpinBox.value()
         self.aw.qmc.drawWheel()
 
     #adjust decorative edge between wheels
     @pyqtSlot(int)
-    def setedge(self):
+    def setedge(self, _:int) -> None:
         self.aw.qmc.wheeledge = float(self.edgeSpinBox.value())/100.
         self.aw.qmc.drawWheel()
 
     #adjusts line thickness
     @pyqtSlot(int)
-    def setlinewidth(self,_):
+    def setlinewidth(self, _:int) -> None:
         self.aw.qmc.wheellinewidth = self.linewidthSpinBox.value()
         self.aw.qmc.drawWheel()
 
     #sets line color
     @pyqtSlot(bool)
-    def setlinecolor(self,_):
+    def setlinecolor(self, _:bool = False) -> None:
         colorf = self.aw.colordialog(QColor(self.aw.qmc.wheellinecolor))
         if colorf.isValid():
             colorname = str(colorf.name())
@@ -396,7 +397,7 @@ class WheelDlg(ArtisanDialog):
 
     #sets text color
     @pyqtSlot(bool)
-    def settextcolor(self,_):
+    def settextcolor(self, _:bool = False) -> None:
         colorf = self.aw.colordialog(QColor(self.aw.qmc.wheeltextcolor))
         if colorf.isValid():
             colorname = str(colorf.name())
@@ -406,7 +407,7 @@ class WheelDlg(ArtisanDialog):
 
     #makes not visible the wheel config table
     @pyqtSlot()
-    def closelabels(self):
+    def closelabels(self) -> None:
         self.labelGroupLayout.setVisible(False)
         self.labeltable.setVisible(False)
 #        self.labelCloseButton.setVisible(False)
@@ -414,7 +415,7 @@ class WheelDlg(ArtisanDialog):
         self.subdialogbuttons.setVisible(False)
 
     #creates graph table
-    def createdatatable(self):
+    def createdatatable(self) -> None:
         ndata = len(self.aw.qmc.wheelnames)
 
         # self.datatable.clear() # this crashes Ubuntu 16.04
@@ -492,7 +493,7 @@ class WheelDlg(ArtisanDialog):
 
     #reads label edit box for wheel with index x, and updates labels
     @pyqtSlot(bool)
-    def updatelabels(self,_):
+    def updatelabels(self, _:bool = False) -> None:
         x = self.aw.findWidgetsRow(self.datatable,self.sender(),2)
         if x is not None:
             labelsedit = cast(QLineEdit, self.datatable.cellWidget(x,1))
@@ -514,7 +515,7 @@ class WheelDlg(ArtisanDialog):
 
     #sets radii for a wheel
     @pyqtSlot(float)
-    def setwidth(self,_):
+    def setwidth(self, _:float) -> None:
         x = self.aw.findWidgetsRow(self.datatable,self.sender(),4)
         if x is not None:
             widthSpinBox = cast(QDoubleSpinBox, self.datatable.cellWidget(x,4))
@@ -543,7 +544,7 @@ class WheelDlg(ArtisanDialog):
 
     #sets starting angle (rotation) for a wheel with index x
     @pyqtSlot(int)
-    def setangle(self,_):
+    def setangle(self, _:int) -> None:
         x = self.aw.findWidgetsRow(self.datatable,self.sender(),5)
         if x is not None:
             angleSpinBox = cast(QSpinBox, self.datatable.cellWidget(x,5))
@@ -552,7 +553,7 @@ class WheelDlg(ArtisanDialog):
 
     #sets text projection style for a wheel with index x
     @pyqtSlot(int)
-    def setprojection(self,_):
+    def setprojection(self, _:int) -> None:
         x = self.aw.findWidgetsRow(self.datatable,self.sender(),6)
         if x is not None:
             projectionComboBox = cast(QComboBox, self.datatable.cellWidget(x,6))
@@ -561,7 +562,7 @@ class WheelDlg(ArtisanDialog):
 
     #changes text size in wheel with index x
     @pyqtSlot(int)
-    def setTextsizeX(self,_):
+    def setTextsizeX(self, _:int) -> None:
         x = self.aw.findWidgetsRow(self.datatable,self.sender(),7)
         if x is not None:
             txtSpinBox = cast(QSpinBox, self.datatable.cellWidget(x,7))
@@ -570,20 +571,20 @@ class WheelDlg(ArtisanDialog):
 
     #changes size of text in whole graph
     @pyqtSlot(bool)
-    def changetext1(self,_):
-        for i, _ in enumerate(self.aw.qmc.wheeltextsize):
+    def changetext1(self, _:bool = False) -> None:
+        for i, __ in enumerate(self.aw.qmc.wheeltextsize):
             self.aw.qmc.wheeltextsize[i] += 1
         self.aw.qmc.drawWheel()
 
     @pyqtSlot(bool)
-    def changetext0(self,_):
-        for i, _ in enumerate(self.aw.qmc.wheeltextsize):
+    def changetext0(self, _:bool = False) -> None:
+        for i, __ in enumerate(self.aw.qmc.wheeltextsize):
             self.aw.qmc.wheeltextsize[i] -= 1
         self.aw.qmc.drawWheel()
 
     #adds new top wheel
     @pyqtSlot(bool)
-    def insertwheel(self,_):
+    def insertwheel(self, _:bool = False) -> None:
         ndata = len(self.aw.qmc.wradii)
         if ndata:
             count = 0.
@@ -620,7 +621,7 @@ class WheelDlg(ArtisanDialog):
 
     #deletes wheel with index x
     @pyqtSlot(bool)
-    def popwheel(self,_):
+    def popwheel(self, _:bool = False) -> None:
         x = self.aw.findWidgetsRow(self.datatable,self.sender(),0)
         if x is not None:
             #correct raius of other wheels (to use 100% coverage)
@@ -642,19 +643,19 @@ class WheelDlg(ArtisanDialog):
             self.aw.qmc.drawWheel()
 
     @pyqtSlot(bool)
-    def fileSave(self,_):
+    def fileSave(self, _:bool = False) -> None:
         try:
             filename = self.aw.ArtisanSaveFileDialog(msg=QApplication.translate('Message','Save Wheel graph'),ext='*.wg')
             if filename:
                 #write
-                self.aw.serialize(filename,self.aw.getWheelGraph())
+                self.aw.serialize(filename, cast(Dict[str, Any], self.aw.getWheelGraph()))
                 self.aw.sendmessage(QApplication.translate('Message','Wheel Graph saved'))
         except OSError as e:
             self.aw.qmc.adderror((QApplication.translate('Error Message','IO Error:') + ' Wheel graph filesave(): {0}').format(str(e)))
             return
 
     @pyqtSlot(bool)
-    def loadWheel(self,_):
+    def loadWheel(self, _:bool = False) -> None:
         filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Open Wheel Graph'),path = self.aw.getDefaultPath(),ext='*.wg')
         if filename:
             self.aw.loadWheel(filename)
@@ -667,7 +668,7 @@ class WheelDlg(ArtisanDialog):
         self.viewmode(False)
 
     @pyqtSlot(bool)
-    def viewmode(self,_):
+    def viewmode(self, _:bool = False) -> None:
         self.close()
         self.aw.qmc.connectWheel()
         self.aw.qmc.drawWheel()

@@ -247,13 +247,13 @@ python_version = "3.9"
 # Ensure full coverage
 check_untyped_defs = true
 disallow_incomplete_defs = true
-#disallow_untyped_calls = true # Not yet
-#disallow_untyped_defs = true # Not yet
+disallow_untyped_calls = true
+disallow_untyped_defs = true
 disallow_untyped_decorators = true
 #disallow_any_unimported = true # Not yet
 
 # Restrict dynamic typing
-#disallow_any_generics = true # Not yet
+disallow_any_generics = true
 disallow_subclassing_any = true
 warn_return_any = true
 
@@ -264,7 +264,7 @@ strict_equality = true
 # Know exactly what we're doing
 warn_redundant_casts = true
 warn_unused_configs = true
-#warn_unused_ignores = true
+warn_unused_ignores = true
 warn_unreachable = true
 #show_error_codes = true
 

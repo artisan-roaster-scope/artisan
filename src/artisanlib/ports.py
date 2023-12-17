@@ -43,9 +43,9 @@ except ImportError:
     from PyQt5.QtCore import (Qt, pyqtSlot, QSettings) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QIntValidator # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                                 QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                                 QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QTextEdit, QDoubleSpinBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                                 QHeaderView, QMessageBox, QScrollArea, QFrame) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                                 QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QTextEdit, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QHeaderView, QMessageBox, QScrollArea, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -143,7 +143,7 @@ class scanModbusDlg(ArtisanDialog):
                 self.stop = True
 
     @pyqtSlot(bool)
-    def start_pressed(self):
+    def start_pressed(self, _:bool = False) -> None:
         try:
             # set MODBUS serial, type, host, port settings from dialog
             self.aw.modbus.comport = self.port
@@ -172,14 +172,14 @@ class scanModbusDlg(ArtisanDialog):
                     self.modbusEdit.setHtml(result)
                     break
                 if self.code4:
-                    for _ in range(10):
+                    for __ in range(10):
                         self.aw.modbus.sleepBetween()
                     res = self.aw.modbus.peekSingleRegister(self.slave,int(register),code=4)
                     if res is not None:
                         result += str(register) + '(4),' + str(res) + '<br>'
                         self.modbusEdit.setHtml(result)
                 if self.code3:
-                    for _ in range(10):
+                    for __ in range(10):
                         self.aw.modbus.sleepBetween()
                     res = self.aw.modbus.peekSingleRegister(self.slave,int(register),code=3)
                     if res is not None:
@@ -199,14 +199,14 @@ class scanModbusDlg(ArtisanDialog):
         self.aw.modbus.port = self.mport_aw
 
     @pyqtSlot(int)
-    def checkbox3Changed(self,_):
+    def checkbox3Changed(self, _:int) -> None:
         if self.checkbox3.isChecked():
             self.code3 = True
         else:
             self.code3 = False
 
     @pyqtSlot(int)
-    def checkbox4Changed(self,_):
+    def checkbox4Changed(self, _:int) -> None:
         if self.checkbox4.isChecked():
             self.code4 = True
         else:
@@ -307,7 +307,7 @@ class scanS7Dlg(ArtisanDialog):
                 self.stop = True
 
     @pyqtSlot(bool)
-    def start_pressed(self):
+    def start_pressed(self, _:bool = False) -> None:
         try:
             # set S7 host, port and other settings from dialog
 
@@ -350,7 +350,7 @@ class scanS7Dlg(ArtisanDialog):
         self.aw.s7.slot = self.sslot_aw
 
     @pyqtSlot(int)
-    def checkbox3Changed(self,_):
+    def checkbox3Changed(self, _:int) -> None:
         if self.checkbox3.isChecked():
             self.typeInt = True
             self.checkbox4.setChecked(not self.typeInt)
@@ -359,7 +359,7 @@ class scanS7Dlg(ArtisanDialog):
             self.checkbox4.setChecked(not self.typeInt)
 
     @pyqtSlot(int)
-    def checkbox4Changed(self,_):
+    def checkbox4Changed(self, _:int) -> None:
         if self.checkbox4.isChecked():
             self.typeFloat = True
             self.checkbox3.setChecked(not self.typeFloat)
@@ -1659,7 +1659,7 @@ class comportDlg(ArtisanResizeablDialog):
             self.restoreGeometry(settings.value('PortsGeometry'))
 
     @pyqtSlot(int)
-    def scaleDeviceIndexChanged(self,i):
+    def scaleDeviceIndexChanged(self, i:int) -> None:
         if self.supported_scales[i] in self.aw.scale.bluetooth_devices:
             permission_status:Optional[bool] = self.aw.app.getBluetoothPermission(request=True)
             if permission_status is False:
@@ -1668,21 +1668,21 @@ class comportDlg(ArtisanResizeablDialog):
 
 
     @pyqtSlot(int)
-    def s7_optimize_toggle(self,i):
+    def s7_optimize_toggle(self, i:int) -> None:
         if i:
             self.s7_full_block.setEnabled(True)
         else:
             self.s7_full_block.setEnabled(False)
 
     @pyqtSlot(int)
-    def modbus_optimize_toggle(self,i):
+    def modbus_optimize_toggle(self, i:int) -> None:
         if i:
             self.modbus_full_block.setEnabled(True)
         else:
             self.modbus_full_block.setEnabled(False)
 
     @pyqtSlot(int)
-    def colorDeviceIndexChanged(self,i):
+    def colorDeviceIndexChanged(self, i:int) -> None:
         try:
             if i==2: # Classic Tonino
                 self.aw.color.baudrate = 115200
@@ -1693,7 +1693,7 @@ class comportDlg(ArtisanResizeablDialog):
             _log.exception(e)
 
     @pyqtSlot(bool)
-    def scanS7(self,_):
+    def scanS7(self, _:bool = False) -> None:
         scan_S7_dlg = scanS7Dlg(self,self.aw)
         scan_S7_dlg.shost = str(self.s7_hostEdit.text())
         scan_S7_dlg.sport = int(str(self.s7_portEdit.text()))
@@ -1702,7 +1702,7 @@ class comportDlg(ArtisanResizeablDialog):
         scan_S7_dlg.show()
 
     @pyqtSlot(bool)
-    def scanModbus(self,_):
+    def scanModbus(self, _:bool = False) -> None:
         scan_modbuds_dlg = scanModbusDlg(self,self.aw)
         scan_modbuds_dlg.port = str(self.modbus_comportEdit.getSelection())
         scan_modbuds_dlg.baudrate = int(str(self.modbus_baudrateComboBox.currentText()))
@@ -1716,11 +1716,11 @@ class comportDlg(ArtisanResizeablDialog):
         scan_modbuds_dlg.show()
 
     @pyqtSlot(int)
-    def portComboBoxIndexChanged(self,i):
+    def portComboBoxIndexChanged(self, i:int) -> None:
         sender = cast(PortComboBox, self.sender())
         sender.setSelection(i)
 
-    def createserialTable(self):
+    def createserialTable(self) -> None:
         try:
             self.serialtable.clear()
             nssdevices = min(len(self.aw.extracomport),len(self.aw.qmc.extradevices))
@@ -1789,7 +1789,7 @@ class comportDlg(ArtisanResizeablDialog):
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' createserialTable(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
-    def saveserialtable(self):
+    def saveserialtable(self) -> None:
         try:
             ser_ports = min(len(self.aw.extracomport),len(self.aw.qmc.extradevices))
             self.closeserialports()
@@ -1833,27 +1833,27 @@ class comportDlg(ArtisanResizeablDialog):
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' saveserialtable(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
-    def showModbusbuttonhelp(self,_=False):
+    def showModbusbuttonhelp(self, _:bool = False) -> None:
         if self.TabWidget.currentIndex() == 2:
-            from help import modbus_help # type: ignore [attr-defined] # pylint: disable=no-name-in-module
+            from help import modbus_help # pyright: ignore [attr-defined] # pylint: disable=no-name-in-module
             self.helpdialog = self.aw.showHelpDialog(
                     self,            # this dialog as parent
                     self.helpdialog, # the existing help dialog
                     QApplication.translate('Form Caption','MODBUS Help'),
                     modbus_help.content())
         elif self.TabWidget.currentIndex() == 3:
-            from help import s7_help # type: ignore [attr-defined] # pylint: disable=no-name-in-module
+            from help import s7_help # pyright: ignore [attr-defined] # pylint: disable=no-name-in-module
             self.helpdialog = self.aw.showHelpDialog(
                     self,            # this dialog as parent
                     self.helpdialog, # the existing help dialog
                     QApplication.translate('Form Caption','S7 Help'),
                     s7_help.content())
 
-    def closeHelp(self):
+    def closeHelp(self) -> None:
         self.aw.closeHelpDialog(self.helpdialog)
 
     @pyqtSlot(int)
-    def tabSwitched(self,_):
+    def tabSwitched(self, _:int) -> None:
         self.closeHelp()
 
     @pyqtSlot('QCloseEvent')
@@ -1864,7 +1864,7 @@ class comportDlg(ArtisanResizeablDialog):
         settings.setValue('PortsGeometry',self.saveGeometry())
 
     @pyqtSlot()
-    def accept(self):
+    def accept(self) -> None:
         #validate serial parameter against input errors
         class comportError(Exception):
             pass
@@ -1899,5 +1899,5 @@ class comportDlg(ArtisanResizeablDialog):
         self.closeEvent(None)
         QDialog.accept(self)
 
-    def closeserialports(self):
+    def closeserialports(self) -> None:
         self.aw.closeserialports()

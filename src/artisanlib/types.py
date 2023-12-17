@@ -498,3 +498,17 @@ class BTBreakParams(TypedDict, total=False):
     maxdpre: float
     f_dtwice: float
     dpre_dpost_diff: float
+
+class AlarmSet(TypedDict):
+    label: str
+    flags: List[int]
+    guards: List[int]
+    negguards: List[int]
+    times: List[int]
+    offsets: List[int]
+    sources: List[int]
+    conditions: List[int]
+    temperatures: List[float]
+    actions: List[int]
+    beeps: List[int]
+    alarmstrings: List[str]

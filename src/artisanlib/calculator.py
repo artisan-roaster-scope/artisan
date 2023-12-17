@@ -29,7 +29,7 @@ except ImportError:
     from PyQt5.QtCore import pyqtSlot, QSettings, QRegularExpression # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QRegularExpressionValidator # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QLabel, QGridLayout, QGroupBox, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QComboBox, QHBoxLayout, QVBoxLayout) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QHBoxLayout, QVBoxLayout) # @UnusedImport @Reimport  @UnresolvedImport
 
 
 if TYPE_CHECKING:
@@ -214,7 +214,7 @@ class calculatorDlg(ArtisanDialog):
         self.setFixedHeight(self.sizeHint().height())
 
     @pyqtSlot(int)
-    def calcEventRC(self,_):
+    def calcEventRC(self, _:int) -> None:
         nevents = len(self.aw.qmc.specialevents)
         Aevent = int(self.eventAComboBox.currentIndex())
         Bevent = int(self.eventBComboBox.currentIndex())
@@ -229,7 +229,7 @@ class calculatorDlg(ArtisanDialog):
 
     #calculate rate of change
     @pyqtSlot()
-    def calculateRC(self):
+    def calculateRC(self) -> None:
         if len(self.aw.qmc.timex)>2:
             if not self.startEdit.text() or not self.endEdit.text():
                 #empty field
@@ -264,14 +264,14 @@ class calculatorDlg(ArtisanDialog):
             self.result2.setText('')
 
     @pyqtSlot()
-    def convertTempFtoC(self):
+    def convertTempFtoC(self) -> None:
         self.convertTempLocal('FtoC')
 
     @pyqtSlot()
-    def convertTempCtoF(self):
+    def convertTempCtoF(self) -> None:
         self.convertTempLocal('CtoF')
 
-    def convertTempLocal(self,x):
+    def convertTempLocal(self, x:str) -> None:
         self.faEdit.setText(comma2dot(str(self.faEdit.text())))
         self.ceEdit.setText(comma2dot(str(self.ceEdit.text())))
         if x == 'FtoC':
@@ -284,35 +284,35 @@ class calculatorDlg(ArtisanDialog):
             self.faEdit.setText(result)
 
     @pyqtSlot()
-    def convertWeightItoO(self):
+    def convertWeightItoO(self) -> None:
         self.WinEdit.setText(comma2dot(str(self.WinEdit.text())))
         inx = float(str(self.WinEdit.text()))
         outx = self.aw.convertWeight(inx,self.WinComboBox.currentIndex(),self.WoutComboBox.currentIndex())
         self.WoutEdit.setText(f'{outx:.2f}')
 
     @pyqtSlot()
-    def convertWeightOtoI(self):
+    def convertWeightOtoI(self) -> None:
         self.WoutEdit.setText(comma2dot(str(self.WoutEdit.text())))
         outx = float(str(self.WoutEdit.text()))
         inx = self.aw.convertWeight(outx,self.WoutComboBox.currentIndex(),self.WinComboBox.currentIndex())
         self.WinEdit.setText(f'{inx:.2f}')
 
     @pyqtSlot()
-    def convertVolumeItoO(self):
+    def convertVolumeItoO(self) -> None:
         self.VinEdit.setText(comma2dot(str(self.VinEdit.text())))
         inx = float(str(self.VinEdit.text()))
         outx = self.aw.convertVolume(inx,self.VinComboBox.currentIndex(),self.VoutComboBox.currentIndex())
         self.VoutEdit.setText(f'{outx:.3f}')
 
     @pyqtSlot()
-    def convertVolumeOtoI(self):
+    def convertVolumeOtoI(self) -> None:
         self.VoutEdit.setText(comma2dot(str(self.VoutEdit.text())))
         outx = float(str(self.VoutEdit.text()))
         inx = self.aw.convertVolume(outx,self.VoutComboBox.currentIndex(),self.VinComboBox.currentIndex())
         self.VinEdit.setText(f'{inx:.3f}')
 
     @pyqtSlot()
-    def calculateYield(self):
+    def calculateYield(self) -> None:
         self.groundsEdit.setText(comma2dot(str(self.groundsEdit.text())))
         self.tdsEdit.setText(comma2dot(str(self.tdsEdit.text())))
         self.coffeeEdit.setText(comma2dot(str(self.coffeeEdit.text())))

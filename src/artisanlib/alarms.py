@@ -22,7 +22,10 @@ from typing import Final, Dict, Union, List, Optional, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+    from artisanlib.types import ProfileData, AlarmSet # pylint: disable=unused-import
     from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QStyleOptionViewItem  # pylint: disable=unused-import
+    from PyQt6.QtCore import QModelIndex # pylint: disable=unused-import
 
 from artisanlib.util import deltaLabelUTF8, comma2dot
 from artisanlib.dialogs import ArtisanResizeablDialog
@@ -40,18 +43,19 @@ except ImportError:
     from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QTimer) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QColor, QIntValidator # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, QComboBox, QDialogButtonBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                QTableWidget, QHBoxLayout, QVBoxLayout, QCheckBox, QPushButton, QSizePolicy, QSpinBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                QTableWidgetSelectionRange, QTimeEdit, QTabWidget, QGridLayout, QGroupBox, QHeaderView, QStyledItemDelegate) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                QTableWidget, QHBoxLayout, QVBoxLayout, QCheckBox, QPushButton, QSizePolicy, QSpinBox, # # @UnusedImport @Reimport  @UnresolvedImport
+                QTableWidgetSelectionRange, QTimeEdit, QTabWidget, QGridLayout, QGroupBox, QHeaderView, QStyledItemDelegate) # @UnusedImport @Reimport  @UnresolvedImport
 
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
-class AlignDelegate(QStyledItemDelegate): # type:ignore[reportGeneralTypeIssues]
-    def initStyleOption(self, option, index):
+class AlignDelegate(QStyledItemDelegate): # pyright:ignore[reportGeneralTypeIssues]
+    def initStyleOption(self, option:Optional['QStyleOptionViewItem'], index:'QModelIndex') -> None:
         super().initStyleOption(option, index)
-        option.displayAlignment = Qt.AlignmentFlag.AlignCenter
+        if option is not None:
+            option.displayAlignment = Qt.AlignmentFlag.AlignCenter
 
 class AlarmDlg(ArtisanResizeablDialog):
     def __init__(self, parent:QWidget, aw:'ApplicationWindow', activeTab:int = 0) -> None:
@@ -257,12 +261,12 @@ class AlarmDlg(ArtisanResizeablDialog):
     def setActiveTab(self) -> None:
         self.TabWidget.setCurrentIndex(self.activeTab)
 
-    def setAlarmSetLabels(self):
+    def setAlarmSetLabels(self) -> None:
         alarmset_labels = []
         for i in range(self.aw.qmc.alarmsets_count):
-            alarmset = self.aw.qmc.getAlarmSet(i)
+            alarmset:'Optional[AlarmSet]' = self.aw.qmc.getAlarmSet(i)
             if alarmset is not None:
-                alarmset_labels.append(f'{str(i)} {alarmset[0]}')
+                alarmset_labels.append(f"{str(i)} {alarmset['label']}")
         self.transferalarmsetcombobox.clear()
         self.transferalarmsetcombobox.addItems(alarmset_labels)
         self.transferalarmsetcombobox.setCurrentIndex(-1)
@@ -270,7 +274,7 @@ class AlarmDlg(ArtisanResizeablDialog):
 
     # transfers the alarm table to the selected alarm set
     @pyqtSlot(bool)
-    def setAlarmSet(self,_):
+    def setAlarmSet(self, _:bool = False) -> None:
         i = self.transferalarmsetcombobox.currentIndex()
         if 0 <= i < len(self.aw.qmc.alarmsets):
             self.aw.qmc.alarmsetlabel = self.transferalarmesetcurrentset.text()
@@ -296,7 +300,7 @@ class AlarmDlg(ArtisanResizeablDialog):
 
     # transfers the selected alarm set to the alarm table
     @pyqtSlot(bool)
-    def setAlarmTable(self,_):
+    def setAlarmTable(self, _:bool = False) -> None:
         i = self.transferalarmsetcombobox.currentIndex()
         if 0 <= i < len(self.aw.qmc.alarmsets):
             self.aw.qmc.selectAlarmSet(i)
@@ -304,7 +308,7 @@ class AlarmDlg(ArtisanResizeablDialog):
             self.transferalarmsetcombobox.setCurrentIndex(-1)
 
     @pyqtSlot(int)
-    def tabSwitched(self,i):
+    def tabSwitched(self, i:int) -> None:
         if i == 0:
             # Alarm Table
             self.aw.qmc.alarmsetlabel = self.transferalarmesetcurrentset.text()
@@ -321,20 +325,20 @@ class AlarmDlg(ArtisanResizeablDialog):
             self.transferalarmesetcurrentset.setText(self.aw.qmc.alarmsetlabel)
 
     @pyqtSlot()
-    def selectionChanged(self):
+    def selectionChanged(self) -> None:
         selected = self.alarmtable.selectedRanges()
         if selected and len(selected) > 0:
             self.insertButton.setEnabled(True)
         else:
             self.insertButton.setEnabled(False)
 
-    def deselectAll(self):
+    def deselectAll(self) -> None:
         selected = self.alarmtable.selectedRanges()
         if selected and len(selected) > 0:
             self.alarmtable.setRangeSelected(selected[0],False)
 
     @pyqtSlot(bool)
-    def clearalarms(self):
+    def clearalarms(self, _:bool = False) -> None:
         self.aw.qmc.alarmtablecolumnwidths = [self.alarmtable.columnWidth(c) for c in range(self.alarmtable.columnCount())]
         self.aw.qmc.alarmsfile = ''
         self.alarmsfile.setText(self.aw.qmc.alarmsfile)
@@ -357,14 +361,14 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.alarmLabelEdit.setText('')
 
     @pyqtSlot(bool)
-    def alarmsAllOn(self,_):
+    def alarmsAllOn(self, _:bool = False) -> None:
         self.alarmson(1)
 
     @pyqtSlot(bool)
-    def alarmsAllOff(self,_):
+    def alarmsAllOff(self, _:bool = False) -> None:
         self.alarmson(0)
 
-    def alarmson(self,flag):
+    def alarmson(self, flag:int) -> None:
         for i, _ in enumerate(self.aw.qmc.alarmflag):
             if flag == 1:
                 self.aw.qmc.alarmflag[i] = 1
@@ -373,7 +377,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.createalarmtable()
 
     @pyqtSlot(bool)
-    def addalarm(self,_):
+    def addalarm(self, _:bool = False) -> None:
         alarm_flag = 1
         alarm_guard = -1
         alarm_negguard = -1
@@ -442,7 +446,7 @@ class AlarmDlg(ArtisanResizeablDialog):
             self.alarmtable.setColumnWidth(8,50)
             self.alarmtable.setColumnWidth(9,90)
             # remember the columnwidth
-            for i, _ in enumerate(self.aw.qmc.alarmtablecolumnwidths):
+            for i, __ in enumerate(self.aw.qmc.alarmtablecolumnwidths):
                 try:
                     self.alarmtable.setColumnWidth(i,self.aw.qmc.alarmtablecolumnwidths[i])
                 except Exception: # pylint: disable=broad-except
@@ -458,7 +462,7 @@ class AlarmDlg(ArtisanResizeablDialog):
             self.alarmtable.setSortingEnabled(True)
 
     @pyqtSlot(bool)
-    def insertalarm(self,_):
+    def insertalarm(self, _:bool = False) -> None:
         self.alarmtable.setSortingEnabled(False)
         nalarms = self.alarmtable.rowCount()
         if nalarms:
@@ -547,12 +551,12 @@ class AlarmDlg(ArtisanResizeablDialog):
                             nguard.setText(str(nguard_value+2))
         self.alarmtable.setSortingEnabled(True)
 
-    def renumberRows(self):
+    def renumberRows(self) -> None:
         for i in range(self.alarmtable.rowCount()):
             self.alarmtable.setItem(i, 0, MyTableWidgetItemNumber(str(i+1),i))
 
     @pyqtSlot(bool)
-    def deletealarm(self,_):
+    def deletealarm(self, _:bool = False) -> None:
         self.aw.qmc.alarmtablecolumnwidths = [self.alarmtable.columnWidth(c) for c in range(self.alarmtable.columnCount())]
         self.alarmtable.setSortingEnabled(False)
         nalarms = self.alarmtable.rowCount()
@@ -623,10 +627,10 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.alarmtable.setSortingEnabled(True)
 
     @pyqtSlot(bool)
-    def importalarms(self,_):
+    def importalarms(self, _:bool = False) -> None:
         self.aw.fileImport(QApplication.translate('Message', 'Load Alarms'),self.importalarmsJSON,ext='*.alrm *.alog')
 
-    def importalarmsJSON(self,filename):
+    def importalarmsJSON(self, filename:str) -> None:
         try:
             _,ext = os.path.splitext(filename)
             if ext == '.alrm':
@@ -653,8 +657,8 @@ class AlarmDlg(ArtisanResizeablDialog):
                     self.aw.qmc.alarmbeep = [0]*len(self.aw.qmc.alarmflag)
                 self.aw.qmc.alarmstrings = alarms['alarmstrings']
             elif ext == '.alog':
-                obj = self.aw.deserialize(filename)
-                self.aw.loadAlarmsFromProfile(filename,obj)
+                obj = cast('ProfileData', self.aw.deserialize(filename))
+                self.aw.loadAlarmsFromProfile(filename, obj)
                 self.alarmsfile.setText(self.aw.qmc.alarmsfile)
             self.aw.qmc.alarmstate = [-1]*len(self.aw.qmc.alarmflag)
             aitems = self.buildAlarmSourceList()
@@ -669,10 +673,10 @@ class AlarmDlg(ArtisanResizeablDialog):
             self.aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' importalarmsJSON() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
-    def exportalarms(self,_):
-        self.aw.fileExport(QApplication.translate('Message', 'Save Alarms'),'*.alrm',self.exportalarmsJSON)
+    def exportalarms(self, _:bool = False) -> None:
+        self.aw.fileExport(QApplication.translate('Message', 'Save Alarms'), '*.alrm', self.exportalarmsJSON)
 
-    def exportalarmsJSON(self,filename):
+    def exportalarmsJSON(self, filename:str) -> bool:
         try:
             self.savealarms()
             alarms:Dict[str,Union[List[int],List[float],List[str]]] = {}
@@ -698,8 +702,8 @@ class AlarmDlg(ArtisanResizeablDialog):
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' exportalarmsJSON(): {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return False
 
-    @pyqtSlot()
-    def closealarms(self):
+    @pyqtSlot(bool)
+    def closealarms(self, _:bool = False) -> None:
         self.savealarms()
         # save column widths
         self.aw.qmc.alarmtablecolumnwidths = [self.alarmtable.columnWidth(c) for c in range(self.alarmtable.columnCount())]
@@ -718,7 +722,7 @@ class AlarmDlg(ArtisanResizeablDialog):
     def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
         self.closealarms()
 
-    def savealarms(self):
+    def savealarms(self) -> None:
         try:
             self.alarmtable.sortItems(0)
             nalarms = self.alarmtable.rowCount()
@@ -787,7 +791,7 @@ class AlarmDlg(ArtisanResizeablDialog):
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' savealarms(): {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
-    def buildAlarmSourceList(self):
+    def buildAlarmSourceList(self) -> List[str]:
         extra_names = []
         for i in range(len(self.aw.qmc.extradevices)):
             extra_names.append(str(i) + 'xT1: ' + self.aw.qmc.extraname1[i])
@@ -799,7 +803,7 @@ class AlarmDlg(ArtisanResizeablDialog):
              QApplication.translate('ComboBox','BT')] + extra_names
 
     # creates Widget in row i of self.alarmtable and sets them to values from local dialog variables at position i
-    def setalarmtablerow(self,i):
+    def setalarmtablerow(self, i:int) -> None:
         #1: flag
         flagComboBox = QCheckBox()
         flagComboBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -958,7 +962,7 @@ class AlarmDlg(ArtisanResizeablDialog):
 
 
     # puts a gray background on alarm rows that have already been fired
-    def markNotEnabledAlarmRows(self):
+    def markNotEnabledAlarmRows(self) -> None:
         for i in range(self.alarmtable.rowCount()):
             for j in range(11):
                 try:
@@ -969,7 +973,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                 except Exception: # pylint: disable=broad-except
                     pass
 
-    def createalarmtable(self):
+    def createalarmtable(self) -> None:
         try:
             self.alarmtable.clear()
             self.alarmtable.setTabKeyNavigation(True)
@@ -1032,7 +1036,7 @@ class AlarmDlg(ArtisanResizeablDialog):
             self.aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' createalarmtable() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
-    def copyAlarmTabletoClipboard(self,_=False):
+    def copyAlarmTabletoClipboard(self, _:bool=False) -> None:
         import prettytable
         nrows = self.alarmtable.rowCount()
         ncols = self.alarmtable.columnCount()
@@ -1126,13 +1130,13 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.aw.sendmessage(QApplication.translate('Message','Alarm table copied to clipboard'))
 
     @pyqtSlot(bool)
-    def showAlarmbuttonhelp(self,_=False):
-        from help import alarms_help # type: ignore [attr-defined] # pylint: disable=no-name-in-module
+    def showAlarmbuttonhelp(self, _:bool=False) -> None:
+        from help import alarms_help # pyright: ignore [attr-defined] # pylint: disable=no-name-in-module
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog
                 QApplication.translate('Form Caption','Alarms Help'),
                 alarms_help.content())
 
-    def closeHelp(self):
+    def closeHelp(self) -> None:
         self.aw.closeHelpDialog(self.helpdialog)

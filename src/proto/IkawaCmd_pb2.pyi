@@ -2,7 +2,7 @@ from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
+from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union, Any as _Any
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -10,7 +10,7 @@ class CmdProfileSet(_message.Message):
     __slots__ = ["profile"]
     PROFILE_FIELD_NUMBER: _ClassVar[int]
     profile: RoastProfile
-    def __init__(self, profile: _Optional[_Union[RoastProfile, _Mapping]] = ...) -> None: ...
+    def __init__(self, profile: _Optional[_Union[RoastProfile, _Mapping[_Any,_Any]]] = ...) -> None: ...
 
 class CmdSettingGet(_message.Message):
     __slots__ = ["field"]
@@ -28,7 +28,7 @@ class FanPoint(_message.Message):
 
 class IkawaResponse(_message.Message):
     __slots__ = ["resp", "resp_bootloader_get_version", "resp_hist_get_total_roast_count", "resp_mach_id", "resp_mach_prop_get_support_info", "resp_mach_prop_type", "resp_mach_status_get_all", "resp_mach_status_get_error", "resp_profile_get", "resp_setting_get", "seq"]
-    class Resp(int, metaclass=_enum_type_wrapper.EnumTypeWrapper): # type: ignore
+    class Resp(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = [] # type: ignore
     A: IkawaResponse.Resp
     BOOTLOADER_GET_VERSION: IkawaResponse.Resp
@@ -71,7 +71,7 @@ class IkawaResponse(_message.Message):
     resp_profile_get: RespProfileGet
     resp_setting_get: RespSettingGet
     seq: int
-    def __init__(self, seq: _Optional[int] = ..., resp: _Optional[_Union[IkawaResponse.Resp, str]] = ..., resp_bootloader_get_version: _Optional[_Union[RespBootloaderGetVersion, _Mapping]] = ..., resp_mach_prop_type: _Optional[_Union[RespMachPropGetType, _Mapping]] = ..., resp_mach_id: _Optional[_Union[RespMachPropGetID, _Mapping]] = ..., resp_mach_status_get_error: _Optional[_Union[RespMachStatusGetError, _Mapping]] = ..., resp_mach_status_get_all: _Optional[_Union[RespMachStatusGetAll, _Mapping]] = ..., resp_hist_get_total_roast_count: _Optional[_Union[RespHistGetTotalRoastCount, _Mapping]] = ..., resp_profile_get: _Optional[_Union[RespProfileGet, _Mapping]] = ..., resp_setting_get: _Optional[_Union[RespSettingGet, _Mapping]] = ..., resp_mach_prop_get_support_info: _Optional[_Union[RespMachPropGetSupportInfo, _Mapping]] = ...) -> None: ...
+    def __init__(self, seq: _Optional[int] = ..., resp: _Optional[_Union[IkawaResponse.Resp, str]] = ..., resp_bootloader_get_version: _Optional[_Union[RespBootloaderGetVersion, _Mapping[_Any,_Any]]] = ..., resp_mach_prop_type: _Optional[_Union[RespMachPropGetType, _Mapping[_Any,_Any]]] = ..., resp_mach_id: _Optional[_Union[RespMachPropGetID, _Mapping[_Any,_Any]]] = ..., resp_mach_status_get_error: _Optional[_Union[RespMachStatusGetError, _Mapping[_Any,_Any]]] = ..., resp_mach_status_get_all: _Optional[_Union[RespMachStatusGetAll, _Mapping[_Any,_Any]]] = ..., resp_hist_get_total_roast_count: _Optional[_Union[RespHistGetTotalRoastCount, _Mapping[_Any,_Any]]] = ..., resp_profile_get: _Optional[_Union[RespProfileGet, _Mapping[_Any,_Any]]] = ..., resp_setting_get: _Optional[_Union[RespSettingGet, _Mapping[_Any,_Any]]] = ..., resp_mach_prop_get_support_info: _Optional[_Union[RespMachPropGetSupportInfo, _Mapping[_Any,_Any]]] = ...) -> None: ...
 
 class Message(_message.Message):
     __slots__ = ["cmd_type", "profile_set", "seq", "setting_get"]
@@ -83,7 +83,7 @@ class Message(_message.Message):
     profile_set: CmdProfileSet
     seq: int
     setting_get: CmdSettingGet
-    def __init__(self, cmd_type: _Optional[int] = ..., seq: _Optional[int] = ..., profile_set: _Optional[_Union[CmdProfileSet, _Mapping]] = ..., setting_get: _Optional[_Union[CmdSettingGet, _Mapping]] = ...) -> None: ...
+    def __init__(self, cmd_type: _Optional[int] = ..., seq: _Optional[int] = ..., profile_set: _Optional[_Union[CmdProfileSet, _Mapping[_Any,_Any]]] = ..., setting_get: _Optional[_Union[CmdSettingGet, _Mapping[_Any,_Any]]] = ...) -> None: ...
 
 class RespBootloaderGetVersion(_message.Message):
     __slots__ = ["revision", "version"]
@@ -183,7 +183,7 @@ class RespProfileGet(_message.Message):
     __slots__ = ["profile"]
     PROFILE_FIELD_NUMBER: _ClassVar[int]
     profile: RoastProfile
-    def __init__(self, profile: _Optional[_Union[RoastProfile, _Mapping]] = ...) -> None: ...
+    def __init__(self, profile: _Optional[_Union[RoastProfile, _Mapping[_Any,_Any]]] = ...) -> None: ...
 
 class RespSettingGet(_message.Message):
     __slots__ = ["field", "value"]
@@ -219,7 +219,7 @@ class RoastProfile(_message.Message):
     temp_points: _containers.RepeatedCompositeFieldContainer[TempPoint]
     temp_sensor: int
     user_id: str
-    def __init__(self, schema: _Optional[int] = ..., id: _Optional[bytes] = ..., name: _Optional[str] = ..., temp_points: _Optional[_Iterable[_Union[TempPoint, _Mapping]]] = ..., fan_points: _Optional[_Iterable[_Union[FanPoint, _Mapping]]] = ..., temp_sensor: _Optional[int] = ..., cooldown_fan: _Optional[_Union[FanPoint, _Mapping]] = ..., coffee_name: _Optional[str] = ..., user_id: _Optional[str] = ..., coffee_id: _Optional[str] = ..., coffee_web_url: _Optional[str] = ..., profile_type: _Optional[str] = ...) -> None: ...
+    def __init__(self, schema: _Optional[int] = ..., id: _Optional[bytes] = ..., name: _Optional[str] = ..., temp_points: _Optional[_Iterable[_Union[TempPoint, _Mapping[_Any,_Any]]]] = ..., fan_points: _Optional[_Iterable[_Union[FanPoint, _Mapping[_Any,_Any]]]] = ..., temp_sensor: _Optional[int] = ..., cooldown_fan: _Optional[_Union[FanPoint, _Mapping[_Any,_Any]]] = ..., coffee_name: _Optional[str] = ..., user_id: _Optional[str] = ..., coffee_id: _Optional[str] = ..., coffee_web_url: _Optional[str] = ..., profile_type: _Optional[str] = ...) -> None: ...
 
 class TempPoint(_message.Message):
     __slots__ = ["temp", "time"]

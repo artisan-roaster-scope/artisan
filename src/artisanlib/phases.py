@@ -25,7 +25,7 @@ try:
 except ImportError:
     from PyQt5.QtCore import Qt, pyqtSlot, QSettings # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QLayout, QSpinBox) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QLayout, QSpinBox) # @UnusedImport @Reimport  @UnresolvedImport
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -211,30 +211,30 @@ class phasesGraphDlg(ArtisanDialog):
         mainLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
 
     @pyqtSlot(int)
-    def lcdmodeFlagFinChanged(self,value):
+    def lcdmodeFlagFinChanged(self, value:int) -> None:
         self.aw.qmc.phasesLCDmode_all[2] = bool(value)
         self.lcdmodeComboBox_fin.setEnabled(not bool(self.aw.qmc.phasesLCDmode_all[2]))
 
     @pyqtSlot(int)
-    def lcdmodeComboBox_dryChanged(self,_):
+    def lcdmodeComboBox_dryChanged(self, _:int) -> None:
         self.aw.qmc.phasesLCDmode_l[0] = self.lcdmodeComboBox_dry.currentIndex()
         self.aw.qmc.phasesLCD = self.aw.qmc.phasesLCDmode_l[0]
 
     @pyqtSlot(int)
-    def lcdmodeComboBox_midChanged(self,_):
+    def lcdmodeComboBox_midChanged(self, _:int) -> None:
         self.aw.qmc.phasesLCDmode_l[1] = self.lcdmodeComboBox_mid.currentIndex()
 
     @pyqtSlot(int)
-    def lcdmodeComboBox_finChanged(self,_):
+    def lcdmodeComboBox_finChanged(self, _:int) -> None:
         self.aw.qmc.phasesLCDmode_l[2] = self.lcdmodeComboBox_fin.currentIndex()
 
-    def savePhasesSettings(self):
+    def savePhasesSettings(self) -> None:
         if not self.aw.qmc.phasesbuttonflag:
             settings = QSettings()
             #save phases
             settings.setValue('Phases',self.aw.qmc.phases)
 
-    def bevents2phases(self):
+    def bevents2phases(self) -> None:
         if self.aw.qmc.phasesfromBackgroundflag and self.aw.qmc.backgroundprofile is not None:
             # adjust phases by DryEnd and FCs events from background profile
             if self.aw.qmc.timeindexB[1]:
@@ -242,7 +242,7 @@ class phasesGraphDlg(ArtisanDialog):
             if self.aw.qmc.timeindexB[2]:
                 self.aw.qmc.phases[2] = int(round(self.aw.qmc.temp2B[self.aw.qmc.timeindexB[2]]))
 
-    def events2phases(self):
+    def events2phases(self) -> None:
         if self.aw.qmc.phasesbuttonflag:
             # adjust phases by DryEnd and FCs events
             if self.aw.qmc.timeindex[1]:
@@ -255,12 +255,12 @@ class phasesGraphDlg(ArtisanDialog):
             self.startfinish.setDisabled(True)
 
     @pyqtSlot(int)
-    def watermarksflagChanged(self,_):
+    def watermarksflagChanged(self, _:int) -> None:
         self.aw.qmc.watermarksflag = not self.aw.qmc.watermarksflag
         self.aw.qmc.redraw(recomputeAllDeltas=False)
 
     @pyqtSlot(int)
-    def phasesLCDsflagChanged(self,_):
+    def phasesLCDsflagChanged(self, _:int) -> None:
         self.aw.qmc.phasesLCDflag = not self.aw.qmc.phasesLCDflag
         if self.aw.qmc.flagstart:
             if self.aw.qmc.phasesLCDflag:
@@ -269,19 +269,19 @@ class phasesGraphDlg(ArtisanDialog):
                 self.aw.phasesLCDs.hide()
 
     @pyqtSlot(int)
-    def autoDRYflagChanged(self,_):
+    def autoDRYflagChanged(self, _:int) -> None:
         self.aw.qmc.autoDRYflag = not self.aw.qmc.autoDRYflag
         if self.aw.qmc.autoDRYflag:
             self.pushbuttonflag.setChecked(False)
 
     @pyqtSlot(int)
-    def autoFCsFlagChanged(self,_):
+    def autoFCsFlagChanged(self, _:int) -> None:
         self.aw.qmc.autoFCsFlag = not self.aw.qmc.autoFCsFlag
         if self.aw.qmc.autoFCsFlag:
             self.pushbuttonflag.setChecked(False)
 
     @pyqtSlot(int)
-    def fromBackgroundflagChanged(self,i):
+    def fromBackgroundflagChanged(self, i:int) -> None:
         if i:
             self.aw.qmc.phasesfromBackgroundflag = True
             self.bevents2phases()
@@ -291,7 +291,7 @@ class phasesGraphDlg(ArtisanDialog):
             self.aw.qmc.phasesfromBackgroundflag = False
 
     @pyqtSlot(int)
-    def pushbuttonflagChanged(self,i):
+    def pushbuttonflagChanged(self, i:int) -> None:
         if i:
             self.aw.qmc.phasesbuttonflag = True
             self.events2phases()
@@ -308,7 +308,7 @@ class phasesGraphDlg(ArtisanDialog):
             self.autoFCsFlag.setChecked(False)
 
     @pyqtSlot()
-    def updatephases(self):
+    def updatephases(self) -> None:
         self.aw.qmc.phases[0] = self.startdry.value()
         self.aw.qmc.phases[1] = self.enddry.value()
         self.aw.qmc.phases[2] = self.endmid.value()
@@ -327,7 +327,7 @@ class phasesGraphDlg(ArtisanDialog):
         self.accept()
 
     @pyqtSlot()
-    def cancel(self):
+    def cancel(self) -> None:
         self.aw.qmc.phases = list(self.phases)
         self.aw.qmc.phasesbuttonflag = bool(self.org_phasesbuttonflag)
         self.aw.qmc.phasesfromBackgroundflag = bool(self.org_fromBackgroundflag)
@@ -344,7 +344,7 @@ class phasesGraphDlg(ArtisanDialog):
         settings.setValue('PhasesPosition',self.frameGeometry().topLeft())
         self.reject()
 
-    def getphases(self):
+    def getphases(self) -> None:
         self.startdry.setValue(int(round(self.aw.qmc.phases[0])))
         self.startdry.repaint()
         self.enddry.setValue(int(round(self.aw.qmc.phases[1])))
@@ -355,7 +355,7 @@ class phasesGraphDlg(ArtisanDialog):
         self.endfinish.repaint()
 
     @pyqtSlot(bool)
-    def setdefault(self,_):
+    def setdefault(self, _:bool) -> None:
         if self.aw.qmc.mode == 'F':
             self.aw.qmc.phases = list(self.aw.qmc.phases_fahrenheit_defaults)
         elif self.aw.qmc.mode == 'C':

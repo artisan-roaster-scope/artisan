@@ -30,8 +30,8 @@ except ImportError:
     from PyQt5.QtCore import Qt, pyqtSlot, QRegularExpression, QSettings # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QIntValidator, QRegularExpressionValidator # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QLabel, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QDialogButtonBox, QGridLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QGroupBox, QLineEdit, QMessageBox, QLayout) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
+        QGroupBox, QLineEdit, QMessageBox, QLayout) # @UnusedImport @Reimport  @UnresolvedImport
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -46,7 +46,6 @@ class designerconfigDlg(ArtisanDialog):
         super().__init__(parent, aw)
         self.setWindowTitle(QApplication.translate('Form Caption','Designer Config'))
         self.setModal(True)
-
 
         #landmarks
         charge = QLabel(QApplication.translate('Label', 'CHARGE'))
@@ -318,7 +317,7 @@ class designerconfigDlg(ArtisanDialog):
         mainLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
 
     @pyqtSlot(int)
-    def redrawcurviness(self,_):
+    def redrawcurviness(self, _:int) -> None:
         ETcurviness = int(str(self.ETsplineComboBox.currentText()))
         BTcurviness = int(str(self.BTsplineComboBox.currentText()))
         timepoints = len(self.aw.qmc.timex)
@@ -339,7 +338,7 @@ class designerconfigDlg(ArtisanDialog):
         self.aw.qmc.redrawdesigner()
 
     @pyqtSlot(bool)
-    def settimes(self,_):
+    def settimes(self, _:bool = False) -> None:
         #check input
         strings = [QApplication.translate('Message','CHARGE'),
                    QApplication.translate('Message','DRY END'),
@@ -352,12 +351,12 @@ class designerconfigDlg(ArtisanDialog):
         if timecheck != 1000:
             st = QApplication.translate('Message','Incorrect time format. Please recheck {0} time').format(strings[timecheck])
             QMessageBox.information(self,QApplication.translate('Message','Designer Config'),st)
-            return 1
+            return
         checkvalue = self.validatetimeorder()
         if checkvalue != 1000:
             st = QApplication.translate('Message','Times need to be in ascending order. Please recheck {0} time').format(strings[checkvalue+1])
             QMessageBox.information(self,QApplication.translate('Message','Designer Config'),st)
-            return 1
+            return
         if self.Edit0bt.text() != self.Edit0btcopy:
             try:
                 self.aw.qmc.temp2[self.aw.qmc.timeindex[0]] = float(str(self.Edit0bt.text()))
@@ -493,10 +492,9 @@ class designerconfigDlg(ArtisanDialog):
             self.aw.qmc.designertimeinit[i] = self.aw.qmc.timex[self.aw.qmc.timeindex[i]]
         self.aw.qmc.xaxistosm(redraw=False)
         self.aw.qmc.redrawdesigner(force=True)
-        return 0
 
     #supporting function for settimes()
-    def validatetimeorder(self):
+    def validatetimeorder(self) -> int:
         time = []
         checks = self.readchecks()
         time.append(stringtoseconds(str(self.Edit0.text())))
@@ -511,7 +509,7 @@ class designerconfigDlg(ArtisanDialog):
                 return i
         return 1000
 
-    def validatetime(self):
+    def validatetime(self) -> int:
         strings:List[Tuple[int, str]] = []
 #        strings.append(self.Edit0.text()) # CHARGE cannot be edited
         if self.dryend.isChecked():
@@ -531,8 +529,7 @@ class designerconfigDlg(ArtisanDialog):
         return 1000
 
     #supporting function for settimes()
-    @pyqtSlot(bool)
-    def readchecks(self,_=False):
+    def readchecks(self) -> List[int]:
         checks = [0,0,0,0,0,0,1]
         if self.dryend.isChecked():
             checks[1] = 1
@@ -546,12 +543,12 @@ class designerconfigDlg(ArtisanDialog):
             checks[5] = 1
         return checks
 
-    def create(self):
-        self.close()
-        self.aw.qmc.convert_designer()
+#    def create(self) -> None:
+#        self.close()
+#        self.aw.qmc.convert_designer()
 
     @pyqtSlot()
-    def accept(self):
+    def accept(self) -> None:
         #save window position (only; not size!)
         settings = QSettings()
         settings.setValue('DesignerPosition',self.frameGeometry().topLeft())
@@ -559,7 +556,7 @@ class designerconfigDlg(ArtisanDialog):
 
     #reset
     @pyqtSlot(bool)
-    def reset(self,_):
+    def reset(self, _:bool = False) -> None:
         self.dryend.setChecked(True)
         self.fcs.setChecked(True)
         self.fce.setChecked(True)
@@ -591,7 +588,7 @@ class designerconfigDlg(ArtisanDialog):
         self.Edit6et.setText(f'{self.aw.qmc.temp1[self.aw.qmc.timeindex[6]]:.1f}')
         self.aw.sendmessage(QApplication.translate('Message','Designer has been reset'))
 
-    def loadconfigflags(self):
+    def loadconfigflags(self) -> None:
         self.dryend.setChecked(bool(self.aw.qmc.timeindex[1]))
         self.fcs.setChecked(bool(self.aw.qmc.timeindex[2]))
         self.fce.setChecked(bool(self.aw.qmc.timeindex[3]))
@@ -600,7 +597,7 @@ class designerconfigDlg(ArtisanDialog):
 
     #adds deletes landmarks
     @pyqtSlot(bool)
-    def changeflags(self,_):
+    def changeflags(self, _:bool = False) -> None:
         sender = self.sender()
         if sender == self.dryend:
             idi = 1
@@ -745,7 +742,7 @@ class pointDlg(ArtisanDialog):
             ok_button.setFocus()
 
     @pyqtSlot()
-    def return_values(self):
+    def return_values(self) -> None:
         self.values[0] = stringtoseconds(str(self.timeEdit.text()))
         self.values[1] = float(self.tempEdit.text())
         self.accept()

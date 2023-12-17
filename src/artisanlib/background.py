@@ -36,8 +36,8 @@ except ImportError:
     from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QTimer) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QColor, QKeySequence # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QCheckBox, QGridLayout, QHBoxLayout, QVBoxLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                                 QLabel, QLineEdit,QPushButton, QComboBox, QDialogButtonBox, QHeaderView, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                                 QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QWidget, QGroupBox) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                                 QLabel, QLineEdit,QPushButton, QComboBox, QDialogButtonBox, QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QWidget, QGroupBox) # @UnusedImport @Reimport  @UnresolvedImport
 
 
 
@@ -457,7 +457,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.TabWidget.setCurrentIndex(self.activeTab)
 
     @pyqtSlot(bool)
-    def timealign(self,_):
+    def timealign(self, _:bool = False) -> None:
         self.aw.qmc.timealign()
         self.aw.autoAdjustAxis()
 
@@ -471,7 +471,7 @@ class backgroundDlg(ArtisanResizeablDialog):
             super().keyPressEvent(event)
 
     @pyqtSlot()
-    def accept(self):
+    def accept(self) -> None:
         self.aw.qmc.backgroundmovespeed = self.speedSpinBox.value()
         self.aw.qmc.backgroundKeyboardControlFlag = bool(self.keyboardControlflag.isChecked())
         self.close()
@@ -494,7 +494,7 @@ class backgroundDlg(ArtisanResizeablDialog):
 #                return 0
 
     @pyqtSlot(int)
-    def setplaybackevent(self,_):
+    def setplaybackevent(self, _:int) -> None:
         s = None
         if self.backgroundPlaybackEvents.isChecked():
             self.aw.qmc.backgroundPlaybackEvents = True
@@ -517,7 +517,7 @@ class backgroundDlg(ArtisanResizeablDialog):
             widget.setEnabled(self.aw.qmc.backgroundPlaybackEvents)
 
     @pyqtSlot(int)
-    def setplaybackaideventtypeenabled(self,_):
+    def setplaybackaideventtypeenabled(self, _:int) -> None:
         for i, widget in enumerate([
                 self.backgroundPlaybackAid0,
                 self.backgroundPlaybackAid1,
@@ -526,7 +526,7 @@ class backgroundDlg(ArtisanResizeablDialog):
             self.aw.qmc.specialeventplaybackaid[i] = widget.isChecked()
 
     @pyqtSlot(int)
-    def setplaybackeventtypeenabled(self,_):
+    def setplaybackeventtypeenabled(self, _:int) -> None:
         for i, widget in enumerate([
                 self.backgroundPlaybackEvent0,
                 self.backgroundPlaybackEvent1,
@@ -535,7 +535,7 @@ class backgroundDlg(ArtisanResizeablDialog):
             self.aw.qmc.specialeventplayback[i] = widget.isChecked()
 
     @pyqtSlot(int)
-    def setplaybackdrop(self,_):
+    def setplaybackdrop(self, _:int) -> None:
         s = None
         if self.backgroundPlaybackDROP.isChecked():
             self.aw.qmc.backgroundPlaybackDROP = True
@@ -547,14 +547,14 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.aw.sendmessage(msg, style=s)
 
     @pyqtSlot(int)
-    def setreproduceBeep(self,_):
+    def setreproduceBeep(self, _:int) -> None:
         if self.backgroundReproduceBeep.isChecked():
             self.aw.qmc.backgroundReproduceBeep = True
         else:
             self.aw.qmc.backgroundReproduceBeep = False
 
     @pyqtSlot(int)
-    def setreproduce(self,_):
+    def setreproduce(self, _:int) -> None:
         self.aw.qmc.detectBackgroundEventTime = self.etimeSpinBox.value()
         s = None
         if self.backgroundReproduce.isChecked():
@@ -581,14 +581,14 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.etimeunit.setEnabled(self.aw.qmc.backgroundReproduce)
 
     @pyqtSlot(int)
-    def optclearbgbeforeprofileload(self,_):
+    def optclearbgbeforeprofileload(self, _:int) -> None:
         if self.clearBgbeforeprofileload.isChecked():
             self.aw.qmc.clearBgbeforeprofileload = True
         else:
             self.aw.qmc.clearBgbeforeprofileload = False
 
     @pyqtSlot(int)
-    def opthideBgafterprofileload(self,_):
+    def opthideBgafterprofileload(self, _:int) -> None:
         if self.hideBgafterprofileload.isChecked():
             self.aw.qmc.hideBgafterprofileload = True
         else:
@@ -639,7 +639,7 @@ class backgroundDlg(ArtisanResizeablDialog):
 #        self.aw.qmc.redraw(recomputeAllDeltas=False)
 
     @pyqtSlot(bool)
-    def delete(self,_):
+    def delete(self, _:bool = False) -> None:
         self.pathedit.setText('')
 # we should not overwrite the users app settings here, right:
 # but we have to deactivate the show flag
@@ -657,35 +657,35 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.aw.qmc.redraw(recomputeAllDeltas=False)
 
     @pyqtSlot(bool)
-    def moveUp(self,_):
+    def moveUp(self, _:bool = False) -> None:
         self.upButton.setDisabled(True)
-        self.move('up')
+        self.move_background('up')
         self.upButton.setDisabled(False)
     @pyqtSlot(bool)
-    def moveDown(self,_):
+    def moveDown(self,_:bool = False) -> None:
         self.downButton.setDisabled(True)
-        self.move('down')
+        self.move_background('down')
         self.downButton.setDisabled(False)
     @pyqtSlot(bool)
-    def moveLeft(self,_):
+    def moveLeft(self,_:bool = False) -> None:
         self.leftButton.setDisabled(True)
-        self.move('left')
+        self.move_background('left')
         self.leftButton.setDisabled(False)
     @pyqtSlot(bool)
-    def moveRight(self,_):
+    def moveRight(self,_:bool = False) -> None:
         self.rightButton.setDisabled(True)
-        self.move('right')
+        self.move_background('right')
         self.rightButton.setDisabled(False)
 
-    def move(self,m):
+    def move_background(self, m:str) -> None:
         step = self.speedSpinBox.value()
-        self.aw.qmc.movebackground(m,step)
+        self.aw.qmc.movebackground(m, step)
         self.createEventTable()
         self.createDataTable()
         self.aw.qmc.redraw(recomputeAllDeltas=False, re_smooth_foreground=False,
             re_smooth_background=False)
 
-    def readChecks(self):
+    def readChecks(self) -> None:
         self.aw.qmc.background = bool(self.backgroundCheck.isChecked())
         self.aw.qmc.backgroundDetails = bool(self.backgroundDetails.isChecked())
         self.aw.qmc.backgroundeventsflag = bool(self.backgroundeventsflag.isChecked())
@@ -697,27 +697,27 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.aw.qmc.redraw(recomputeAllDeltas=True)
 
     @pyqtSlot(int)
-    def changeAlignEventidx(self,i):
+    def changeAlignEventidx(self, i:int) -> None:
         self.aw.qmc.alignEvent = i
 
     @pyqtSlot(int)
-    def changeReplayTypeidx(self,i):
+    def changeReplayTypeidx(self, i:int) -> None:
         self.aw.qmc.replayType = i
 
     @pyqtSlot(int)
-    def changeXTcurveidx(self,i):
+    def changeXTcurveidx(self, i:int) -> None:
         self.aw.qmc.xtcurveidx = i
         self.createDataTable()
         self.aw.qmc.redraw(recomputeAllDeltas=False)
 
     @pyqtSlot(int)
-    def changeYTcurveidx(self,i):
+    def changeYTcurveidx(self, i:int) -> None:
         self.aw.qmc.ytcurveidx = i
         self.createDataTable()
         self.aw.qmc.redraw(recomputeAllDeltas=False)
 
     @pyqtSlot(bool)
-    def load(self,_):
+    def load(self, _:bool = False) -> None:
         self.filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background'),ext_alt='.alog')
         if len(self.filename) == 0:
             return
@@ -752,7 +752,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.createEventTable()
         self.createDataTable()
 
-    def createEventTable(self):
+    def createEventTable(self) -> None:
         ndata = len(self.aw.qmc.backgroundEvents)
 
         # self.eventtable.clear() # this crashes Ubuntu 16.04
@@ -817,7 +817,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.eventtable.setColumnWidth(1,65)
         self.eventtable.setColumnWidth(2,65)
 
-    def createDataTable(self):
+    def createDataTable(self) -> None:
         try:
             #### lock shared resources #####
             self.aw.qmc.profileDataSemaphore.acquire(1)
@@ -982,13 +982,13 @@ class backgroundDlg(ArtisanResizeablDialog):
                 self.aw.qmc.profileDataSemaphore.release(1)
 
     @pyqtSlot(bool)
-    def copyDataTabletoClipboard(self,_=False):
+    def copyDataTabletoClipboard(self, _:bool = False) -> None:
         self.datatable.selectAll()
         self.aw.copy_cells_to_clipboard(self.datatable,adjustment=7)
         self.datatable.clearSelection()
         self.aw.sendmessage(QApplication.translate('Message','Data table copied to clipboard'))
 
     @pyqtSlot(bool)
-    def copyEventTabletoClipboard(self,_=False):
+    def copyEventTabletoClipboard(self, _:bool = False) -> None:
         self.aw.copy_cells_to_clipboard(self.eventtable,adjustment=0)
         self.aw.sendmessage(QApplication.translate('Message','Event table copied to clipboard'))

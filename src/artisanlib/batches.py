@@ -30,7 +30,7 @@ try:
 except ImportError:
     from PyQt5.QtCore import Qt, pyqtSlot, QSettings # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QLabel, QHBoxLayout, QVBoxLayout, QCheckBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                                 QDialogButtonBox, QGridLayout, QLineEdit, QSpinBox, QLayout) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                                 QDialogButtonBox, QGridLayout, QLineEdit, QSpinBox, QLayout) # @UnusedImport @Reimport  @UnresolvedImport
 
 class batchDlg(ArtisanDialog):
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:

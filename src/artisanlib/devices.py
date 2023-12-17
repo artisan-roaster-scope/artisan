@@ -43,9 +43,9 @@ except ImportError:
     from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QTimer) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import (QStandardItemModel, QStandardItem, QColor) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                                 QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                                 QGroupBox, QRadioButton, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                                 QTableWidget, QMessageBox, QHeaderView) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+                                 QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGroupBox, QRadioButton, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QTableWidget, QMessageBox, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
 
 
 class DeviceAssignmentDlg(ArtisanResizeablDialog):
@@ -1475,15 +1475,15 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             _log.exception(e)
 
     @staticmethod
-    def createItems(strs):
-        items = []
+    def createItems(strs:List[str]) -> List[QStandardItem]:
+        items:List[QStandardItem] = []
         for st in strs:
             item = QStandardItem(st)
             items.append(item)
         return items
 
     @pyqtSlot(int)
-    def PIDfirmwareToggle(self,i):
+    def PIDfirmwareToggle(self, i:int) -> None:
         if i:
             self.aw.qmc.PIDbuttonflag = True
         else:
@@ -1491,14 +1491,14 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.aw.showControlButton()
 
     @pyqtSlot(int)
-    def showControlbuttonToggle(self,i):
+    def showControlbuttonToggle(self, i:int) -> None:
         if i:
             self.aw.qmc.Controlbuttonflag = True
         else:
             self.aw.qmc.Controlbuttonflag = False
         self.aw.showControlButton()
 
-    def createDeviceTable(self):
+    def createDeviceTable(self) -> None:
         try:
             columns = 15
             if self.devicetable is not None and self.devicetable.columnCount() == columns:
@@ -1673,11 +1673,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         except Exception: # pylint: disable=broad-except
                             pass
         except Exception as e: # pylint: disable=broad-except
-            _, _, exc_tb = sys.exc_info()
+            _t, _e, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' createDeviceTable(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
-    def copyDeviceTabletoClipboard(self,_=False):
+    def copyDeviceTabletoClipboard(self, _:bool = False) -> None:
         import prettytable
         nrows = self.devicetable.rowCount()
         ncols = self.devicetable.columnCount()
@@ -1802,7 +1802,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.aw.sendmessage(QApplication.translate('Message','Device table copied to clipboard'))
 
     @pyqtSlot(bool)
-    def loadprogramname(self,_):
+    def loadprogramname(self, _:bool) -> None:
         fileName = self.aw.ArtisanOpenFileDialog()
         if fileName:
             if ' ' in fileName:
@@ -1811,13 +1811,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 self.programedit.setText(fileName)
 
     @pyqtSlot(bool)
-    def loadoutprogramname(self,_):
+    def loadoutprogramname(self, _:bool) -> None:
         fileName = self.aw.ArtisanOpenFileDialog()
         if fileName:
             self.outprogramedit.setText(fileName)
             self.aw.ser.externaloutprogram = self.outprogramedit.text()
 
-    def enableDisableAddDeleteButtons(self):
+    def enableDisableAddDeleteButtons(self) -> None:
         if len(self.aw.qmc.extradevices) >= self.aw.nLCDS:
             self.addButton.setEnabled(False)
         else:
@@ -1833,7 +1833,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
     #adds extra device
     @pyqtSlot(bool)
-    def adddevice(self,_):
+    def adddevice(self, _:bool) -> None:
         try:
             self.savedevicetable()
             #addDevice() is located in aw so that the same function can be used in init after dynamically loading settings
@@ -1846,11 +1846,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.qmc.resetlinecountcaches()
             self.aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e: # pylint: disable=broad-except
-            _, _, exc_tb = sys.exc_info()
+            _t, _e, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' adddevice(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
-    def deldevice(self,_):
+    def deldevice(self, _:bool) -> None:
         try:
             self.savedevicetable()
             bindex = len(self.aw.qmc.extradevices)-1
@@ -1863,11 +1863,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.qmc.resetlinecountcaches()
             self.enableDisableAddDeleteButtons()
         except Exception as e: # pylint: disable=broad-except
-            _, _, exc_tb = sys.exc_info()
+            _t, _e, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' deldevice(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
-    def resetextradevices(self,_):
+    def resetextradevices(self, _:bool) -> None:
         try:
             self.aw.resetExtraDevices()
             #update table
@@ -1877,10 +1877,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             #redraw
             self.aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e: # pylint: disable=broad-except
-            _, _, exc_tb = sys.exc_info()
+            _t, _e, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' resetextradevices(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
-    def delextradevice(self,x):
+    def delextradevice(self, x:int) -> None:
         try:
             self.aw.qmc.extradevices.pop(x)
             self.aw.qmc.extradevicecolor1.pop(x)
@@ -1961,10 +1961,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.qmc.resetlinecountcaches()
             self.aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as ex: # pylint: disable=broad-except
-            _, _, exc_tb = sys.exc_info()
+            _t, _e, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + 'delextradevice(): {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
-    def savedevicetable(self,redraw=True):
+    def savedevicetable(self, redraw:bool = True) -> None:
         try:
             for i, _ in enumerate(self.aw.qmc.extradevices):
                 typecombobox = cast(MyQComboBox, self.devicetable.cellWidget(i,0))
@@ -2011,24 +2011,24 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             if redraw:
                 self.aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as ex: # pylint: disable=broad-except
-            _, _, exc_tb = sys.exc_info()
+            _t, _e, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + 'savedevicetable(): {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
-    def updateVirtualdevicesinprofile_clicked(self,_):
+    def updateVirtualdevicesinprofile_clicked(self, _:bool) -> None:
         self.updateVirtualdevicesinprofile(redraw=True)
 
-    def updateVirtualdevicesinprofile(self,redraw=True):
+    def updateVirtualdevicesinprofile(self, redraw:bool = True) -> None:
         try:
             self.savedevicetable(redraw=False)
             if self.aw.calcVirtualdevices(update=True) and redraw:
                 self.aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as ex: # pylint: disable=broad-except
-            _, _, exc_tb = sys.exc_info()
+            _t, _e, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + 'updateVirtualdevicesinprofile(): {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
-    def updateETBTinprofile(self,_):
+    def updateETBTinprofile(self, _:bool) -> None:
         try:
             # be sure there is an equation to process
             nonempty_ETfunction = bool(self.ETfunctionedit.text() is not None and len(self.ETfunctionedit.text().strip()))
@@ -2069,76 +2069,76 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             else:
                 self.aw.sendmessage(QApplication.translate('Message', 'Nothing here to process.'))
         except Exception as ex: # pylint: disable=broad-except
-            _, _, exc_tb = sys.exc_info()
+            _t, _e, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + 'updateETBTinprofile(): {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(int)
-    def updateLCDvisibility1(self,x):
+    def updateLCDvisibility1(self, x:int) -> None:
         r = self.aw.findWidgetsRow(self.devicetable,self.sender(),7)
         if r is not None:
             self.aw.extraLCDvisibility1[r] = bool(x)
             self.aw.extraLCDframe1[r].setVisible(bool(x))
 
     @pyqtSlot(int)
-    def updateLCDvisibility2(self,x):
+    def updateLCDvisibility2(self, x:int) -> None:
         r = self.aw.findWidgetsRow(self.devicetable,self.sender(),8)
         if r is not None:
             self.aw.extraLCDvisibility2[r] = bool(x)
             self.aw.extraLCDframe2[r].setVisible(bool(x))
 
     @pyqtSlot(int)
-    def updateCurveVisibility1(self,x):
+    def updateCurveVisibility1(self, x:int) -> None:
         r = self.aw.findWidgetsRow(self.devicetable,self.sender(),9)
         if r is not None:
             self.aw.extraCurveVisibility1[r] = bool(x)
             self.aw.qmc.resetlinecountcaches()
 
     @pyqtSlot(int)
-    def updateCurveVisibility2(self,x):
+    def updateCurveVisibility2(self, x:int) -> None:
         r = self.aw.findWidgetsRow(self.devicetable,self.sender(),10)
         if r is not None:
             self.aw.extraCurveVisibility2[r] = bool(x)
             self.aw.qmc.resetlinecountcaches()
 
     @pyqtSlot(int)
-    def updateDelta1(self,x):
+    def updateDelta1(self, x:int) -> None:
         r = self.aw.findWidgetsRow(self.devicetable,self.sender(),11)
         if r is not None:
             self.aw.extraDelta1[r] = bool(x)
 
     @pyqtSlot(int)
-    def updateDelta2(self,x):
+    def updateDelta2(self, x:int) -> None:
         r = self.aw.findWidgetsRow(self.devicetable,self.sender(),12)
         if r is not None:
             self.aw.extraDelta2[r] = bool(x)
 
     @pyqtSlot()
-    def updateFill1(self):
+    def updateFill1(self) -> None:
         r = self.aw.findWidgetsRow(self.devicetable,self.sender(),13)
         if r is not None:
             sender = cast(QSpinBox, self.sender())
             self.aw.extraFill1[r] = sender.value()
 
     @pyqtSlot()
-    def updateFill2(self):
+    def updateFill2(self) -> None:
         r = self.aw.findWidgetsRow(self.devicetable,self.sender(),14)
         if r is not None:
             sender = cast(QSpinBox, self.sender())
             self.aw.extraFill2[r] = sender.value()
 
     @pyqtSlot(bool)
-    def setextracolor1(self,_):
-        r = self.aw.findWidgetsRow(self.devicetable,self.sender(),1)
+    def setextracolor1(self, _:bool) -> None:
+        r = self.aw.findWidgetsRow(self.devicetable,self.sender(), 1)
         if r is not None:
-            self.setextracolor(1,r)
+            self.setextracolor(1, r)
 
     @pyqtSlot(bool)
-    def setextracolor2(self,_):
-        r = self.aw.findWidgetsRow(self.devicetable,self.sender(),2)
+    def setextracolor2(self, _:bool) -> None:
+        r = self.aw.findWidgetsRow(self.devicetable,self.sender(), 2)
         if r is not None:
-            self.setextracolor(2,r)
+            self.setextracolor(2, r)
 
-    def setextracolor(self,ll,i):
+    def setextracolor(self, ll:int, i:int) -> None:
         try:
             #line 1
             if ll == 1:
@@ -2169,19 +2169,20 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.checkColors([(self.aw.qmc.extraname2[i], self.aw.qmc.extradevicecolor2[i], QApplication.translate('Label','Background'), self.aw.qmc.palette['background'])])
                     self.aw.checkColors([(self.aw.qmc.extraname2[i], self.aw.qmc.extradevicecolor2[i], QApplication.translate('Label','Legend bkgnd'),self.aw.qmc.palette['background'])])
         except Exception as e: # pylint: disable=broad-except
-            _, _, exc_tb = sys.exc_info()
+            _t, _e, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' setextracolor(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
-    def close(self):
+    def close(self) -> bool:
         self.closeHelp()
         settings = QSettings()
         #save window geometry
         settings.setValue('DeviceAssignmentGeometry',self.saveGeometry())
         self.aw.DeviceAssignmentDlg_activeTab = self.TabWidget.currentIndex()
 #        self.aw.closeEventSettings() # save all app settings
+        return True
 
     @pyqtSlot()
-    def cancelEvent(self):
+    def cancelEvent(self) -> None:
         self.aw.DeviceAssignmentDlg_activeTab = self.TabWidget.currentIndex()
         self.close()
         self.aw.qmc.phidgetRemoteFlag = self.org_phidgetRemoteFlag
@@ -2191,7 +2192,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.reject()
 
     @pyqtSlot()
-    def okEvent(self): # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths
+    def okEvent(self) -> None: # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths
 
         try:
             self.aw.qmc.device_logging = self.deviceLoggingFlag.isChecked()
@@ -3400,12 +3401,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.accept()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-            _, _, exc_tb = sys.exc_info()
+            _t, _e, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' device accept(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
-    def showExtradevHelp(self):
-        from help import symbolic_help # type: ignore [attr-defined] # pylint: disable=no-name-in-module
+    def showExtradevHelp(self, _checked:bool = False) -> None:
+        from help import symbolic_help # type: ignore [attr-defined,unused-ignore] # pylint: disable=no-name-in-module
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog
@@ -3413,8 +3414,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 symbolic_help.content())
 
     @pyqtSlot(bool)
-    def showSymbolicHelp(self):
-        from help import symbolic_help # type: ignore [attr-defined] # pylint: disable=no-name-in-module
+    def showSymbolicHelp(self, _checked:bool = False) -> None:
+        from help import symbolic_help # type: ignore [attr-defined,unused-ignore] # pylint: disable=no-name-in-module
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog
@@ -3422,17 +3423,17 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 symbolic_help.content())
 
     @pyqtSlot(bool)
-    def showhelpprogram(self,_=False):
-        from help import programs_help # type: ignore [attr-defined] # pylint: disable=no-name-in-module
+    def showhelpprogram(self, _checked:bool = False) -> None:
+        from help import programs_help # type: ignore [attr-defined,unused-ignore] # pylint: disable=no-name-in-module
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog
                 QApplication.translate('Form Caption','External Programs Help'),
                 programs_help.content())
 
-    def closeHelp(self):
+    def closeHelp(self) -> None:
         self.aw.closeHelpDialog(self.helpdialog)
 
     @pyqtSlot(int)
-    def tabSwitched(self,_):
+    def tabSwitched(self, _:int) -> None:
         self.closeHelp()
