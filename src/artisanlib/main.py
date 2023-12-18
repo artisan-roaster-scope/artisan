@@ -16663,7 +16663,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.alarmsfile = toString(settings.value('alarmsfile',self.qmc.alarmsfile))
                 self.qmc.alarm_popup_timout = toInt(settings.value('alarm_popup_timout',self.qmc.alarm_popup_timout))
                 self.qmc.alarmtablecolumnwidths = [toInt(x) for x in toList(settings.value('alarmtablecolumnwidths',self.qmc.alarmtablecolumnwidths))]
-                self.qmc.alarmsets = toList(settings.value('alarmsets',self.qmc.alarmsets))
+                self.qmc.alarmsets = [self.qmc.lists2AlarmSet(alist) for alist in toList(settings.value('alarmsets',self.qmc.alarmsets))]
                 self.qmc.alarmsetlabel = toString(settings.value('alarmsetlabel',self.qmc.alarmsetlabel))
             settings.endGroup()
 #--- END GROUP Alarms
@@ -18587,7 +18587,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'alarmsfile',self.qmc.alarmsfile, read_defaults)
             self.settingsSetValue(settings, default_settings, 'alarm_popup_timout',self.qmc.alarm_popup_timout, read_defaults)
             self.settingsSetValue(settings, default_settings, 'alarmtablecolumnwidths',self.qmc.alarmtablecolumnwidths, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'alarmsets',self.qmc.alarmsets, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'alarmsets',[self.qmc.alarmSet2Lists(aset) for aset in self.qmc.alarmsets], read_defaults)
             settings.endGroup()
 #--- END GROUP Alarms
 

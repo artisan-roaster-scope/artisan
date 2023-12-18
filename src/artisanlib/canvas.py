@@ -4839,6 +4839,17 @@ class tgraphcanvas(FigureCanvas):
             'alarmstrings': alarmstrings
         }
 
+    @staticmethod
+    def lists2AlarmSet(l:List[Any]) -> 'AlarmSet':
+        if len(l) == 12:
+            return tgraphcanvas.makeAlarmSet(*l)
+        return tgraphcanvas.makeAlarmSet('',[],[],[],[],[],[],[],[],[],[],[])
+
+    @staticmethod
+    def alarmSet2Lists(aset:'AlarmSet') -> List[Any]:
+        return [aset['label'], aset['flags'], aset['guards'], aset['negguards'], aset['times'], aset['offsets'],
+            aset['sources'], aset['conditions'], aset['temperatures'], aset['actions'], aset['beeps'], aset['alarmstrings']]
+
     # number is alarmnumber+1 (the 1-based alarm number the user sees), for alarms triggered from outside the alarmtable (like PID RS alarms) number is 0
     @pyqtSlot(int,bool,int,str)
     def processAlarm(self,number:int, beep:bool, action:int, string:str) -> None:
