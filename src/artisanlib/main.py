@@ -1304,8 +1304,8 @@ class MyQDoubleValidator(QDoubleValidator): # pylint: disable=too-few-public-met
 ########################################################################################
 
 
-# NOTE: to have pylint to verify proper __slot__ definitions one has to remove the super class QMainWindow here temporarily
-#   as this does not has __slot__ definitions and thus __dict__ is contained which suppresses the warnings
+# NOTE: to have pylint to verify proper __slot__ definitions with pylint one has to remove the super class QMainWindow here temporarily
+#   as this class does not has __slot__ definitions and thus __dict__ is contained which suppresses the warnings
 class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
     singleShotPhidgetsPulseOFF = pyqtSignal(int,int,str) # signal to be called from the eventaction thread to realise Phidgets pulse via QTimer in the main thread
@@ -1358,7 +1358,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'simulator', 'simulatorpath', 'comparator', 'stack', 'eventsbuttonflag', 'minieventsflags', 'seriallogflag',
         'seriallog', 'ser', 'modbus', 'extraMODBUStemps', 'extraMODBUStx', 's7', 'extraS7tx', 'ws', 'scale', 'color', 'extraser', 'extracomport', 'extrabaudrate',
         'extrabytesize', 'extraparity', 'extrastopbits', 'extratimeout', 'hottop', 'santokerHost', 'santokerPort', 'santokerSerial', 'santoker', 'fujipid', 'dtapid', 'pidcontrol', 'soundflag', 'recentRoasts', 'maxRecentRoasts',
-        'kaleidoHost', 'kaleidoPort', 'kaleidoSerial', 'kaleidoPID', 'kaleido',
+        'kaleido_default_host', 'kaleidoHost', 'kaleidoPort', 'kaleidoSerial', 'kaleidoPID', 'kaleido', 'ikawa',
         'lcdpaletteB', 'lcdpaletteF', 'extraeventsbuttonsflags', 'extraeventslabels', 'extraeventbuttoncolor', 'extraeventsactionstrings',
         'extraeventbuttonround', 'block_quantification_sampling_ticks', 'sampling_seconds_to_block_quantifiction', 'sampling_ticks_to_block_quantifiction', 'extraeventsactionslastvalue',
         'org_extradevicesettings', 'eventslidervalues', 'eventslidervisibilities', 'eventsliderKeyboardControl', 'eventsliderAlternativeLayout', 'eventslideractions', 'eventslidercommands', 'eventslideroffsets',
@@ -1391,7 +1391,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'buttonpalette_default_label', 'buttonpalette_label', 'buttonpalettemaxlen', 'buttonpalette_shortcuts', 'buttonsize', 'mark_last_button_pressed', 'show_extrabutton_tooltips', 'eventbuttontablecolumnwidths',
         'lowerbuttondialogLayout', 'lowerbuttondialog', 'lowerbuttondialogLayout', 'e1buttonbarLayout', 'e1buttondialog', 'e2buttonbarLayout', 'e2buttondialog',
         'e3buttonbarLayout', 'e3buttondialog', 'e4buttonbarLayout', 'e4buttondialog', 'keyboardmove', 'keyboardButtonList', 'keyboardmoveindex',
-        'keyboardmoveflag', 'lastkeyboardcmd', 'error_dlg', 'serial_dlg', 'message_dlg', 'ETname', 'BTname', 'level1frame', 'level1layout', 'EventsGroupLayout',
+        'keyboardmoveflag', 'lastkeyboardcmd', 'error_dlg', 'serial_dlg', 'message_dlg', 'ETname', 'BTname', 'level1frame', 'level1layout', 'qpc', 'splitter', 'scroller', 'EventsGroupLayout',
         'LCD2frame', 'LCD3frame', 'LCD4frame', 'LCD5frame', 'LCD6frame', 'LCD7frame', 'TPlabel', 'TPlcd', 'TPlcdFrame', 'TP2DRYlabel', 'TP2DRYframe',
         'DRYlabel', 'DRYlcd', 'DRYlcdFrame', 'DRY2FCslabel', 'DRY2FCsframe', 'FCslabel', 'FCslcd', 'FCslcdFrame', 'AUClabel', 'AUClcd', 'AUClcdFrame',
         'AUCLCD', 'phasesLCDs', 'extrabuttonsLayout', 'extrabuttondialogs', 'slider1', 'slider2', 'slider3', 'slider4', 'sliderLCD1', 'sliderLCD2', 'sliderLCD3',
@@ -1402,7 +1402,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'minieventleft', 'minieventright', 'nLCDS', 'notificationManager', 'notificationsflag', 'ntb', 'pdf_page_layout', 'pdf_rendering', 'productionPDFAction',
         'rankingPDFAction', 'roastReportMenu', 'roastReportPDFAction', 'saveAsThemeAction', 'sliderGrp12', 'sliderGrp34', 'sliderGrpBox1x', 'sliderGrpBox2x', 'sliderGrpBox3x', 'sliderGrpBox4x',
         'small_button_min_width_str', 'standard_button_min_width_px', 'tiny_button_min_width_str', 'recording_version', 'recording_revision', 'recording_build',
-        'lastIOResult', 'max_palettes', 'palette_entries', 'eventsliders', 'defaultSettings' ]
+        'lastIOResult', 'lastArtisanResult', 'max_palettes', 'palette_entries', 'eventsliders', 'defaultSettings', 'zoomInShortcut', 'zoomOutShortcut' ]
 
 
 
@@ -16663,7 +16663,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.alarmsfile = toString(settings.value('alarmsfile',self.qmc.alarmsfile))
                 self.qmc.alarm_popup_timout = toInt(settings.value('alarm_popup_timout',self.qmc.alarm_popup_timout))
                 self.qmc.alarmtablecolumnwidths = [toInt(x) for x in toList(settings.value('alarmtablecolumnwidths',self.qmc.alarmtablecolumnwidths))]
-                self.qmc.alarmsets = [self.qmc.lists2AlarmSet(alist) for alist in toList(settings.value('alarmsets',self.qmc.alarmsets))]
+                if settings.contains('alarmsets'):
+                    aset_list = toList(settings.value('alarmsets'))
+                    if len(aset_list) == self.qmc.ALARMSET_COUNT and all(len(alist) == self.qmc.ALARMSET_ITEMS for alist in aset_list):
+                        self.qmc.alarmsets = [self.qmc.lists2AlarmSet(alist) for alist in aset_list]
                 self.qmc.alarmsetlabel = toString(settings.value('alarmsetlabel',self.qmc.alarmsetlabel))
             settings.endGroup()
 #--- END GROUP Alarms
@@ -25071,7 +25074,8 @@ def excepthook(excType:type, excValue:BaseException, tracebackobj:Optional['Trac
                 aw = widget
                 break
         if aw is not None:
-            aw.qmc.adderror('Error: ' + detailedmsg)
+            if hasattr(aw, 'qmc'):
+                aw.qmc.adderror('Error: ' + detailedmsg)
             errorbox = QMessageBox(aw)
             errorbox.about(aw, detailedmsg, f'{notice}{versionInfo}{msg}')
 

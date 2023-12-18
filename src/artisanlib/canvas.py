@@ -147,7 +147,7 @@ class AmbientWorker(QObject): # pylint: disable=too-few-public-methods # pyright
             self.finished.emit()
 
 
-# NOTE: to have pylint to verify proper __slot__ definitions one has to remove the super class FigureCanvas here temporarily
+# NOTE: to have pylint to verify proper __slot__ definitions using pylint one has to remove the super class FigureCanvas here temporarily
 #   as this does not has __slot__ definitions and thus __dict__ is contained which suppresses the warnings
 class tgraphcanvas(FigureCanvas):
     updategraphicsSignal = pyqtSignal()
@@ -190,6 +190,9 @@ class tgraphcanvas(FigureCanvas):
        uchr(220): 'UE',  # U+00DC   \xc3\x9c
        uchr(223): 'ss',  # U+00DF   \xc3\x9f
     }
+
+    ALARMSET_COUNT: Final[int] = 10 # number of alarm sets
+    ALARMSET_ITEMS: Final[int] = 12 # number of elements per alarm set
 
     __slots__ = [ 'aw', 'alignnames', 'locale_str', 'alpha', 'palette', 'palette1', 'EvalueColor_default', 'EvalueTextColor_default', 'artisanflavordefaultlabels', 'customflavorlabels',
         'SCAAflavordefaultlabels', 'SCAflavordefaultlabels', 'CQIflavordefaultlabels', 'SweetMariasflavordefaultlabels', 'Cflavordefaultlabels', 'Eflavordefaultlabels', 'coffeegeekflavordefaultlabels',
@@ -259,7 +262,7 @@ class tgraphcanvas(FigureCanvas):
         'YTbacklinewidth', 'YTbackmarker', 'YTbackmarkersize', 'BTBdeltalinestyle', 'BTBdeltadrawstyle', 'BTBdeltalinewidth', 'BTBdeltamarker', 'BTBdeltamarkersize',
         'ETBdeltalinestyle', 'ETBdeltadrawstyle', 'ETBdeltalinewidth', 'ETBdeltamarker', 'ETBdeltamarkersize', 'alarmsetlabel', 'alarmflag', 'alarmguard', 'alarmnegguard', 'alarmtime', 'alarmoffset', 'alarmtime2menuidx', 'menuidx2alarmtime',
         'alarmcond', 'alarmstate', 'alarmsource', 'alarmtemperature', 'alarmaction', 'alarmbeep', 'alarmstrings', 'alarmtablecolumnwidths', 'silent_alarms',
-        'alarmsets_count', 'alarmsets', 'loadalarmsfromprofile', 'loadalarmsfrombackground', 'alarmsfile', 'TPalarmtimeindex', 'rsfile',
+        'alarmsets', 'loadalarmsfromprofile', 'loadalarmsfrombackground', 'alarmsfile', 'TPalarmtimeindex', 'rsfile',
         'loadaxisfromprofile', 'startofx_default', 'endofx_default', 'xgrid_default', 'ylimit_F_default',
         'ylimit_min_F_default', 'ygrid_F_default', 'zlimit_F_default', 'zlimit_min_F_default', 'zgrid_F_default', 'ylimit_C_default', 'ylimit_min_C_default',
         'ygrid_C_default', 'zlimit_C_default', 'zlimit_min_C_default', 'zgrid_C_default', 'temp_grid', 'time_grid', 'zlimit_max', 'zlimit_min_max',
@@ -1675,24 +1678,9 @@ class tgraphcanvas(FigureCanvas):
         self.silent_alarms:bool = False # if this is true (can be set via a + button action "alarm(1)", alarms are triggered, but actions are not fired
 
         # alarm sets
-        self.alarmsets_count: Final[int] = 10 # number of alarm sets
         self.alarmsets:List['AlarmSet'] = []
-        for _ in range(self.alarmsets_count):
-            self.alarmsets.append(
-                self.makeAlarmSet(
-                    '',
-                    [], # alarmflags
-                    [], # alarmguards
-                    [], # alarmnegguards
-                    [], # alarmtimes
-                    [], # alarmoffsets
-                    [], # alarmsources
-                    [], # alarmconds
-                    [], # alarmtemperatures
-                    [], # alarmactions
-                    [], # alarmbeeps
-                    [], # alarmstrings
-                ))
+        for _ in range(self.ALARMSET_COUNT):
+            self.alarmsets.append(tgraphcanvas.emptyAlarmSet())
 
         self.loadalarmsfromprofile:bool = False # if set, alarms are loaded from profile
         self.loadalarmsfrombackground:bool = False # if set, alarms are loaded from background profiles
@@ -4841,8 +4829,12 @@ class tgraphcanvas(FigureCanvas):
 
     @staticmethod
     def lists2AlarmSet(l:List[Any]) -> 'AlarmSet':
-        if len(l) == 12:
+        if len(l) == tgraphcanvas.ALARMSET_ITEMS:
             return tgraphcanvas.makeAlarmSet(*l)
+        return tgraphcanvas.emptyAlarmSet()
+
+    @staticmethod
+    def emptyAlarmSet() -> 'AlarmSet':
         return tgraphcanvas.makeAlarmSet('',[],[],[],[],[],[],[],[],[],[],[])
 
     @staticmethod
