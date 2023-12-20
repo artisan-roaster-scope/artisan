@@ -91,7 +91,7 @@ bytesize=8
 comport=/dev/cu.usbserial-AH01B8JA
 parity=N
 stopbits=1
-timeout=1
+timeout=0.3
 
 [Sliders]
 ModeTempSliders=C

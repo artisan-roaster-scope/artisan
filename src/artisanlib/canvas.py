@@ -7678,7 +7678,7 @@ class tgraphcanvas(FigureCanvas):
                 pass
             if start < end < len(self.timex):
                 timex = numpy.array(self.timex[start:end])
-                delta2 = numpy.array(self.delta1[start:end])
+                delta2 = numpy.array(self.delta2[start:end])
             else:
                 timex = numpy.array([])
                 delta2 = numpy.array([])

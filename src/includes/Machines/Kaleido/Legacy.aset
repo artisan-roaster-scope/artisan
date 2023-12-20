@@ -137,7 +137,7 @@ bytesize=8
 comport=COM4
 parity=N
 stopbits=1
-timeout=0.6
+timeout=0.4
 
 [Quantifiers]
 clusterEventsFlag=false
