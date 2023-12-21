@@ -2953,7 +2953,7 @@ class tgraphcanvas(FigureCanvas):
                         # toggle background if right top corner above canvas where the subtitle is clicked
                         self.background = not self.background
                         self.aw.autoAdjustAxis(background=self.background and (not len(self.timex) > 3))
-                        self.redraw(recomputeAllDeltas=True)
+                        self.redraw_keep_view(recomputeAllDeltas=True)
                         return
 
             if event.button == 1 and event.inaxes and self.crossmarker and not self.designerflag and not self.wheelflag and not self.flagon:
@@ -3102,7 +3102,7 @@ class tgraphcanvas(FigureCanvas):
                 self.phases[2] = int(round(self.temp2[self.timeindex[2]]))
 
             self.fileDirtySignal.emit()
-            self.redraw(recomputeAllDeltas=(action.key[0] in {0, 6}))  # type: ignore[attr-defined] # "QAction" has no attribute "key" # on moving CHARGE or DROP, we have to recompute the Deltas
+            self.redraw_keep_view(recomputeAllDeltas=(action.key[0] in {0, 6}))  # type: ignore[attr-defined] # "QAction" has no attribute "key" # on moving CHARGE or DROP, we have to recompute the Deltas
         else:
             # add a special event at the current timepoint
             from artisanlib.events import customEventDlg
@@ -3114,7 +3114,7 @@ class tgraphcanvas(FigureCanvas):
                     dlg.value)
                 self.aw.orderEvents()
                 self.fileDirtySignal.emit()
-                self.redraw(recomputeAllDeltas=(action.key[0] in {0, 6}))  # type: ignore[attr-defined] # "QAction" has no attribute "key" # on moving CHARGE or DROP, we have to recompute the Deltas
+                self.redraw_keep_view(recomputeAllDeltas=(action.key[0] in {0, 6}))  # type: ignore[attr-defined] # "QAction" has no attribute "key" # on moving CHARGE or DROP, we have to recompute the Deltas
             try:
                 dlg.dialogbuttons.accepted.disconnect()
                 dlg.dialogbuttons.rejected.disconnect()
@@ -4655,11 +4655,11 @@ class tgraphcanvas(FigureCanvas):
                 if difference > 0:
                     self.movebackground('right',int(round(abs(difference))))
                     if redraw:
-                        self.redraw(recompute)
+                        self.redraw_keep_view(recomputeAllDeltas=recompute)
                 elif difference < 0:
                     self.movebackground('left',int(round(abs(difference))))
                     if redraw:
-                        self.redraw(recompute)
+                        self.redraw_keep_view(recomputeAllDeltas=recompute)
                 elif redraw and force: # ensure that we at least redraw the canvas
                     self.updateBackground()
             elif redraw and force: # only on aligning with CHARGE we redraw even if nothing is moved to redraw the time axis

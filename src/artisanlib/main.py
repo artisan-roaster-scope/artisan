@@ -12753,9 +12753,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 self.qmc.extratemp1[int(j/2)].append(float(item[ef]))
                     last_time = timez
             #set events
-            CHARGE = stringtoseconds(header[2].split('CHARGE:')[1])
-            if CHARGE > 0:
-                self.qmc.timeindex[0] = max(-1, self.qmc.time2index(CHARGE))
+            CHARGE_entry = header[2].split('CHARGE:')
+            if len(CHARGE_entry)>1:
+                CHARGE = stringtoseconds(CHARGE_entry[1])
+                if CHARGE >= 0:
+                    self.qmc.timeindex[0] = max(-1, self.qmc.time2index(CHARGE))
+                else:
+                    self.qmc.timeindex[0] = -1
+            else:
+                self.qmc.timeindex[0] = -1
             DRYe = stringtoseconds(header[4].split('DRYe:')[1])
             if DRYe > 0:
                 self.qmc.timeindex[1] = max(0, self.qmc.time2index(DRYe))
@@ -13127,6 +13133,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 #update etypes combo box
                 self.etypeComboBox.clear()
                 self.etypeComboBox.addItems(self.qmc.etypes)
+                self.qmc.fileDirtySignal.emit()
                 self.autoAdjustAxis()
                 self.qmc.redraw()
         except Exception as ex: # pylint: disable=broad-except
@@ -13444,53 +13451,58 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         import csv
         try:
             if len(self.qmc.timex) > 0:
-                CHARGE = self.qmc.timex[self.qmc.timeindex[0]]
+                # make timex zero based
+                timex_zero = [tx - self.qmc.timex[0] for tx in self.qmc.timex]
+                if self.qmc.timeindex[0] > -1:
+                    CHARGE = timex_zero[self.qmc.timeindex[0]]
+                else:
+                    CHARGE = -1
                 TP_index = self.findTP()
                 TP = 0.
-                if TP_index and TP_index < len(self.qmc.timex):
-                    TP = self.qmc.timex[TP_index]
+                if TP_index and TP_index < len(timex_zero):
+                    TP = timex_zero[TP_index]
                 dryEndIndex = self.findDryEnd(TP_index)
                 if self.qmc.timeindex[1]:
                     #manual dryend available
-                    DRYe = self.qmc.timex[self.qmc.timeindex[1]]
+                    DRYe = timex_zero[self.qmc.timeindex[1]]
                 #we use the dryEndIndex respecting the dry phase
-                elif dryEndIndex < len(self.qmc.timex):
-                    DRYe = self.qmc.timex[dryEndIndex]
+                elif dryEndIndex < len(timex_zero):
+                    DRYe = timex_zero[dryEndIndex]
                 else:
                     DRYe = 0.
                 if self.qmc.timeindex[2]:
-                    FCs = self.qmc.timex[self.qmc.timeindex[2]]
+                    FCs = timex_zero[self.qmc.timeindex[2]]
                 else:
                     FCs = 0
                 if self.qmc.timeindex[3]:
-                    FCe = self.qmc.timex[self.qmc.timeindex[3]]
+                    FCe = timex_zero[self.qmc.timeindex[3]]
                 else:
                     FCe = 0
                 if self.qmc.timeindex[4]:
-                    SCs = self.qmc.timex[self.qmc.timeindex[4]]
+                    SCs = timex_zero[self.qmc.timeindex[4]]
                 else:
                     SCs = 0
                 if self.qmc.timeindex[5]:
-                    SCe = self.qmc.timex[self.qmc.timeindex[5]]
+                    SCe = timex_zero[self.qmc.timeindex[5]]
                 else:
                     SCe = 0
                 if self.qmc.timeindex[6]:
-                    DROP = self.qmc.timex[self.qmc.timeindex[6]]
+                    DROP = timex_zero[self.qmc.timeindex[6]]
                 else:
                     DROP = 0
                 if self.qmc.timeindex[7]:
-                    COOL = self.qmc.timex[self.qmc.timeindex[7]]
+                    COOL = timex_zero[self.qmc.timeindex[7]]
                 else:
                     COOL = 0
                 events = [
-                    [CHARGE,'Charge',False],
+                    [CHARGE,'CHARGE',False],
                     [TP,'TP',False],
-                    [DRYe,'Dry End',False],
+                    [DRYe,'DRY End',False],
                     [FCs,'FCs',False],
                     [FCe,'FCe',False],
                     [SCs,'SCs',False],
                     [SCe,'SCe',False],
-                    [DROP, 'Drop',False],
+                    [DROP, 'DROP',False],
                     [COOL, 'COOL',False],
                     ]
                 with open(filename, 'w',newline='',encoding='utf8') as outfile:
@@ -13498,7 +13510,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     writer.writerow([
                         'Date:' + self.qmc.roastdate.date().toString("dd'.'MM'.'yyyy"),
                         'Unit:' + self.qmc.mode,
-                        'CHARGE:' + self.eventtime2string(CHARGE),
+                        'CHARGE:' + (self.eventtime2string(CHARGE) if CHARGE > 0 else ('' if CHARGE < 0 else '00:00')),
                         'TP:' + self.eventtime2string(TP),
                         'DRYe:' + self.eventtime2string(DRYe),
                         'FCs:' + self.eventtime2string(FCs),
@@ -13511,15 +13523,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     headrow:List[str] = (['Time1','Time2','ET','BT','Event'] + freduce(lambda x,y : x + [str(y[0]),str(y[1])], list(zip(self.qmc.extraname1[0:len(self.qmc.extradevices)],self.qmc.extraname2[0:len(self.qmc.extradevices)])),[])) # type: ignore
                     writer.writerow(headrow)
                     last_time:Optional[str] = None
-                    for i, tx in enumerate(self.qmc.timex):
-                        if tx >= CHARGE > 0:
+                    for i, tx in enumerate(timex_zero):
+                        if tx >= CHARGE >= 0:
                             di,mo = divmod(tx - CHARGE, 60)
                             time2 = f'{di:02.0f}:{mo:02.0f}'
                         else:
                             time2 = ''
                         event = ''
                         for ev in events:
-                            if not ev[2] and int(round(tx)) == int(round(ev[0])): # type: ignore
+                            if not ev[2] and (ev[0]!=0 or (ev[1]=='CHARGE' and ev[0]!=-1)) and int(round(tx)) == int(round(ev[0])): # type: ignore
                                 event = ev[1] # type: ignore # Incompatible types in assignment (expression has type "object", variable has type "str")
                                 ev[2] = True
                                 break
