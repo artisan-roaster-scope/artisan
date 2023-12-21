@@ -1,6 +1,29 @@
 Detailed Release History
 ========================
 ----
+v2.10.2 (XX, 2024)
+------------------
+
+* ADDITIONS
+  - adds machine setups for various machines of Mill City Roasters
+* CHANGES
+  - upgrades to Qt/PyQt 6.6.1, pymodbus 3.6.2
+* FIXES
+  - fixes axis limits on starting the designer from a profile with time axis locked ([Discussion #1325](../../../discussions/1325))
+  - fixes regresion that kept log dialogs (serial, message, error) empty
+  - fixes regression which broke loading of certain MODBUS configurations (eg. Loring)
+  - fixes regression which broke the DROP alarm action
+  - fixes regression which broke the PDF export on Linux
+  - fixes regression which broke the transposer calculations
+  - fixes regression which broke the simulator for profiles with extra device curves
+  - fixes regression which broke the CHARGE timer ([Discussion #1358](../../../discussions/1358))
+  - fixes broken computation of the event slider calculators
+  - fixes arabic reshaping and applies it also to Farsi
+  - fixes CSV export ([Discussion #1357](../../../discussions/1357))
+* REMOVALS
+
+
+----
 v2.10.0 (November 28, 2023)
 ------------------
 

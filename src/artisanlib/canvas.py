@@ -4604,10 +4604,10 @@ class tgraphcanvas(FigureCanvas):
                             timer_color = 'rstimer'
                         self.aw.setTimerColor(timer_color)
 
-                    if self.chargeTimerFlag and self.timeindex[0] == -1 and self.chargeTimerPeriod!= 0:
+                    if self.chargeTimerFlag and self.timeindex[0] == -1 and self.chargeTimerPeriod != 0:
                         if self.chargeTimerPeriod > ts:
                             ts = self.chargeTimerPeriod - ts
-                        else:
+                        elif self.chargeTimerPeriod <= ts < self.chargeTimerPeriod + 1:
                             ts = 0
 
                     self.setLCDtime(ts)
@@ -11971,6 +11971,7 @@ class tgraphcanvas(FigureCanvas):
         finally:
             if self.profileDataSemaphore.available() < 1:
                 self.profileDataSemaphore.release(1)
+        self.markChargeSignal.emit(False) # this queues an event which forces a realignment/redraw by resetting the cache ax_background and fires the CHARGE action
 
 
     def OnRecorder(self) -> None:

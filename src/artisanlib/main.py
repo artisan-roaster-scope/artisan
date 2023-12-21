@@ -21717,7 +21717,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         return bool(d3 < d and d4 < d and ((abs(dpost) > min(maxdpre, offset + (f * abs(dpre))))
                                            or (dpost < 0 and dpre < 0 and (-dpre - dpost) > dpre_dpost_diff)))
 
-    # returns True if a BT break at i-2 is detected
+    # returns (negativ) offset o>0 to current index i pointing to the index i-o at which a BTbreak was recognized or 0 if no BT break could be detected
     # i the index of the last reading to be considered to proof that i-2 (or i-4) is the index of the BT break
     # idea:
     # . average delta before i-2 is not negative
