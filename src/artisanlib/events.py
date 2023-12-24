@@ -536,7 +536,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.ShowMet.setChecked(self.aw.qmc.showmet)
         self.ShowMet.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.ShowMet.stateChanged.connect(self.changeShowMet)         #toggle
-        self.ShowTimeguide = QCheckBox(QApplication.translate('CheckBox', 'Show Time Guide'))
+        self.ShowTimeguide = QCheckBox(QApplication.translate('CheckBox', 'Time Guide'))
         self.ShowTimeguide.setChecked(self.aw.qmc.showtimeguide)
         self.ShowTimeguide.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.ShowTimeguide.stateChanged.connect(self.changeShowTimeguide)

@@ -107,7 +107,7 @@ with open('Info.plist', 'r+b') as fp:
     plistlib.dump(plist, fp)
 
 OPTIONS = {
-    'no_strip': False,
+    'no_strip': True,
     'argv_emulation': False, # this would confuses GUI processing
     'semi_standalone': False,
     'site_packages': True,

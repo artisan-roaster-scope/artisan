@@ -5,6 +5,7 @@ v2.10.2 (XX, 2024)
 ------------------
 
 * ADDITIONS
+* NEW HARDWARE SUPPORT
   - adds machine setups for various machines of Mill City Roasters
 * CHANGES
   - upgrades to Qt/PyQt 6.6.1, pymodbus 3.6.2
