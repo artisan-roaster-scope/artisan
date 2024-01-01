@@ -23,6 +23,6 @@ pytest-qt==4.2.0
 #pytest-benchmark==4.0.0
 #pytest-mock==3.11.1
 hypothesis==6.92.1
-coverage==7.3.3
+coverage==7.4.0
 coverage-badge==1.1.0
 codespell==2.2.6
