@@ -133,11 +133,11 @@ Artisan is an open-source software that helps coffee roasters record, analyze, a
 
 Artisan supports the following 64bit operating systems:
 
-* macOS BigSure (version 11)
-* Windows 10 (x64)
+* macOS 12 Monterey and higher incl. Sonoma macOS 14 (Intel & AppleSilicon)
+* Windows 10 and 11 (x64)
 * Ubuntu 22.04+ (GCC11), Red Hat 8.4+ (GCC10)
 
-There are also legacy builds for Windows 8 (x64) and macOS 10.13.
+There are also legacy builds for Windows 8 (x64) and macOS 10.13 as well as an experimental build for Raspberry Pi OS 12 bookworm 64bit.
 
 ## Notable Features
 
