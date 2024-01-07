@@ -18,6 +18,7 @@ v2.10.2 (XX, 2024)
   - fixes regression which broke the transposer calculations
   - fixes regression which broke the simulator for profiles with extra device curves
   - fixes regression which broke the CHARGE timer ([Discussion #1358](../../../discussions/1358))
+  - fixes a regression which failed to time align profiles on load ([Discussion #1366](../../../discussions/1366))
   - fixes broken computation of the event slider calculators
   - fixes arabic reshaping and applies it also to Farsi
   - fixes CSV export ([Discussion #1357](../../../discussions/1357))

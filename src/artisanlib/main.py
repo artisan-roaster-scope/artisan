@@ -12115,10 +12115,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.qmc.fileCleanSignal.emit()
                 # clear LCDs as the number of decimals based on self.qmc.intChannel() might have changed
                 self.qmc.clearLCDs()
+                if self.qmc.backgroundprofile is not None:
+                    self.qmc.timealign(redraw=False,recompute=False)
                 if self.qmc.hideBgafterprofileload:
                     self.qmc.background = False
                     self.autoAdjustAxis()
-
 
 
 #                #####
@@ -21717,7 +21718,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         return bool(d3 < d and d4 < d and ((abs(dpost) > min(maxdpre, offset + (f * abs(dpre))))
                                            or (dpost < 0 and dpre < 0 and (-dpre - dpost) > dpre_dpost_diff)))
 
-    # returns (negativ) offset o>0 to current index i pointing to the index i-o at which a BTbreak was recognized or 0 if no BT break could be detected
+    # returns (negative) offset o>0 to current index i pointing to the index i-o at which a BTbreak was recognized or 0 if no BT break could be detected
     # i the index of the last reading to be considered to proof that i-2 (or i-4) is the index of the BT break
     # idea:
     # . average delta before i-2 is not negative
@@ -23371,6 +23372,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 recipedata = None
                 historydata = None
                 recipedata = tree.find('recipedata')
+                m = None
                 if recipedata is not None:
                     m = recipedata.get('temp_unit')
                 else:
