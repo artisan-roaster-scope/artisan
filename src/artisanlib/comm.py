@@ -762,9 +762,9 @@ class serialport:
             # hide the console window on Windows
             startupinfo = None
             if self.platf == 'Windows':
-                startupinfo = subprocess.STARTUPINFO() # type: ignore
-                startupinfo.dwFlags = subprocess.CREATE_NEW_CONSOLE | subprocess.STARTF_USESHOWWINDOW # type: ignore
-                startupinfo.wShowWindow = subprocess.SW_HIDE # type: ignore
+                startupinfo = subprocess.STARTUPINFO() # type: ignore[unused-ignore,attr-defined]
+                startupinfo.dwFlags = subprocess.CREATE_NEW_CONSOLE | subprocess.STARTF_USESHOWWINDOW # type: ignore[unused-ignore,attr-defined]
+                startupinfo.wShowWindow = subprocess.SW_HIDE # type: ignore[unused-ignore,attr-defined]
 
             if self.platf == 'Windows':
                 cmd_str = os.path.expanduser(self.aw.ser.externalprogram)

@@ -422,7 +422,7 @@ class Artisan(QtSingleApplication):
                         application_path = sys.argv[0]
                     application_path = re.sub(r'\\',r'/',application_path)
                     # must start viewer without an argv else it thinks it was started from a link and sends back to artisan
-                    os.startfile(application_path) # type: ignore # @UndefinedVariable # pylint: disable=maybe-no-member
+                    os.startfile(application_path) # type:ignore[unused-ignore,attr-defined] # @UndefinedVariable # pylint: disable=maybe-no-member
                     QTimer.singleShot(3000,lambda : self._sendMessage2ArtisanInstanceShot(message,instance_id))
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
@@ -10029,9 +10029,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 QDir.setCurrent(getAppPath())
                 my_env = self.calc_env()
                 if platform.system() == 'Windows':
-                    startupinfo = subprocess.STARTUPINFO() # type: ignore
+                    startupinfo = subprocess.STARTUPINFO() # type:ignore[unused-ignore,attr-defined]
                     try:
-                        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW # type: ignore
+                        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW # type:ignore[unused-ignore,attr-defined]
                     except AttributeError:
                         try:
                             startupinfo.dwFlags |= subprocess._subprocess.STARTF_USESHOWWINDOW # type: ignore # @UndefinedVariable # pylint: disable=maybe-no-member # pylint: disable=protected-access
@@ -17870,8 +17870,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if platform.system().startswith('Windows'):
                 return 'Windows', platform.release(), platform.machine()
             # we assume Linux
-            if os.uname()[4][:3] == 'arm': # pylint: disable=no-member # not available on Windows
-                return 'RPi',platform.release(),os.uname()[4] # pylint: disable=no-member # not available on Windows
+            if os.uname()[4][:3] == 'arm': # type:ignore[unused-ignore,attr-defined] # pylint: disable=no-member # not available on Windows
+                return 'RPi',platform.release(),os.uname()[4] # type:ignore[unused-ignore,attr-defined] # pylint: disable=no-member # not available on Windows
             try:
                 lib,version = platform.libc_ver()
                 return 'Linux',f'{lib} {version}', platform.machine()

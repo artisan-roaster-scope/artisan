@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Start the application.
+"""Start the application.
 """
 
 import warnings
