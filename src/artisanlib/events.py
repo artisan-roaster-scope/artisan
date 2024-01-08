@@ -3272,6 +3272,9 @@ class EventsDlg(ArtisanResizeablDialog):
             #save default buttons
             self.aw.qmc.buttonvisibility[0] = self.CHARGEbutton.isChecked()
             self.aw.buttonCHARGE.setVisible(bool(self.aw.qmc.buttonvisibility[0]))
+            if bool(self.aw.qmc.buttonvisibility[0]) and not self.aw.buttonCHARGE.isFlat() and not self.aw.buttonCHARGE.animating:
+                # if animation is not running and button is enabled and not flat, we start the animation
+                self.aw.buttonCHARGE.startAnimation()
             self.aw.qmc.buttonvisibility[1] = self.DRYbutton.isChecked()
             self.aw.buttonDRY.setVisible(bool(self.aw.qmc.buttonvisibility[1]))
             self.aw.qmc.buttonvisibility[2] = self.FCSbutton.isChecked()
