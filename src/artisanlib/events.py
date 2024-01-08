@@ -510,8 +510,6 @@ class EventsDlg(ArtisanResizeablDialog):
         self.autoCharge.setChecked(self.aw.qmc.autoChargeFlag)
         self.autoCharge.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.autoCharge.setToolTip(QApplication.translate('Tooltip', 'If ticked the {} event is automatically registered').format(QApplication.translate('Scope Annotation','CHARGE')))
-        if self.app.artisanviewerMode:
-            self.autoCharge.setEnabled(False)
         self.chargeTimer = QCheckBox(QApplication.translate('CheckBox','CHARGE Timer'))
         self.chargeTimer.setChecked(self.aw.qmc.chargeTimerFlag)
         self.chargeTimer.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -528,6 +526,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.autoDrop.setChecked(self.aw.qmc.autoDropFlag)
         self.autoDrop.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.autoDrop.setToolTip(QApplication.translate('Tooltip', 'If ticked the {} event is automatically registered').format(QApplication.translate('Scope Annotation','DROP')))
+        self.autoDrop.stateChanged.connect(self.autoDropStateChanged)
 
         autoEventModes = [QApplication.translate('ComboBox','Standard'),
                     QApplication.translate('ComboBox','Sensitive')]
@@ -536,15 +535,13 @@ class EventsDlg(ArtisanResizeablDialog):
         self.autoChargeModeComboBox.addItems(autoEventModes)
         self.autoChargeModeComboBox.setCurrentIndex(self.aw.qmc.autoChargeMode)
         self.autoChargeModeComboBox.setToolTip(QApplication.translate('Tooltip', 'Sensitivity of event recognition'))
+        self.autoCharge.stateChanged.connect(self.autoChargeStateChanged)
+
         self.autoDropModeComboBox = QComboBox()
         self.autoDropModeComboBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.autoDropModeComboBox.addItems(autoEventModes)
         self.autoDropModeComboBox.setCurrentIndex(self.aw.qmc.autoDropMode)
         self.autoDropModeComboBox.setToolTip(QApplication.translate('Tooltip', 'Sensitivity of event recognition'))
-
-
-        if self.app.artisanviewerMode:
-            self.autoDrop.setEnabled(False)
 
         self.markTP = QCheckBox(QApplication.translate('Label','TP'))
         self.markTP.setChecked(self.aw.qmc.markTPflag)
@@ -558,6 +555,13 @@ class EventsDlg(ArtisanResizeablDialog):
         self.ShowTimeguide.setChecked(self.aw.qmc.showtimeguide)
         self.ShowTimeguide.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.ShowTimeguide.stateChanged.connect(self.changeShowTimeguide)
+
+        if self.app.artisanviewerMode:
+            self.autoCharge.setEnabled(False)
+            self.autoDrop.setEnabled(False)
+            self.autoChargeModeComboBox.setEnabled(False)
+            self.autoDropModeComboBox.setEnabled(False)
+            self.ShowTimeguide.setEnabled(False)
 
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.updatetypes)
@@ -1751,6 +1755,14 @@ class EventsDlg(ArtisanResizeablDialog):
     def changeShowMet(self, _:int) -> None:
         self.aw.qmc.showmet = not self.aw.qmc.showmet
         self.aw.qmc.redraw(recomputeAllDeltas=False)
+
+    @pyqtSlot(int)
+    def autoChargeStateChanged(self, state:int) -> None:
+        self.autoChargeModeComboBox.setEnabled(bool(state))
+
+    @pyqtSlot(int)
+    def autoDropStateChanged(self, state:int) -> None:
+        self.autoDropModeComboBox.setEnabled(bool(state))
 
     @pyqtSlot(int)
     def changeShowTimeguide(self, _:int) -> None:

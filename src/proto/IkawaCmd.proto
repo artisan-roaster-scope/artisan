@@ -106,7 +106,7 @@ message RoastProfile {
     required string name = 3;
     repeated TempPoint temp_points = 4;
     repeated FanPoint fan_points = 5;
-    required int32 temp_sensor = 6;
+    required int32 temp_sensor = 6; // 0:Exhaust Pro (0), 1: Inlet Home, 2: Exhaust Pro (2)
 
     required FanPoint cooldown_fan = 7;
     required string coffee_name = 8;

@@ -360,10 +360,10 @@ class BleInterface(QtCore.QObject): # pyright: ignore [reportGeneralTypeIssues] 
 
     @QtCore.pyqtSlot('QBluetoothDeviceInfo')
     def addDevice(self, device:QtBluetooth.QBluetoothDeviceInfo) -> None:
-        _log.debug('addDevice(%s)', device)
         # pylint: disable=maybe-no-member
         if self.m_device is None and device.coreConfigurations() & QtBluetooth.QBluetoothDeviceInfo.CoreConfiguration.LowEnergyCoreConfiguration:
             # a BLE device
+            _log.debug('discovered BLE device "%s" (%s))', device.name(), device.deviceUuid().toString())
             m_device = QtBluetooth.QBluetoothDeviceInfo(device)
             if self.device_names is None:
                 _log.debug('check device for matching services')
@@ -379,6 +379,8 @@ class BleInterface(QtCore.QObject): # pyright: ignore [reportGeneralTypeIssues] 
                 # we found our device and stop scanning
                 self.m_deviceDiscoveryAgent.stop()
                 _log.debug("discovered LE Device name: '%s',  device: %s, rssi: %s", self.m_device.name(), self.m_device.deviceUuid().toString(), self.m_device.rssi())
+            else:
+                _log.debug('no matching service found')
 
 #----------------
 
