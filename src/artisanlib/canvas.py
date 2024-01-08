@@ -15760,7 +15760,7 @@ class tgraphcanvas(FigureCanvas):
 
                 #check for possible CHARGE time moving
                 if self.indexpoint == self.timeindex[0]:
-                    self.designer_timez = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
+                    self.designer_timez = numpy.arange(self.timex[0],self.timex[-1]+1,1).tolist()
                     self.xaxistosm(redraw=False)
 
                 #check for possible DROP/COOL time moving
@@ -15886,7 +15886,7 @@ class tgraphcanvas(FigureCanvas):
         try:
             from scipy.interpolate import UnivariateSpline
             funcBT = UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree)
-            timez = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
+            timez = numpy.arange(self.timex[0],self.timex[-1]+1,1).tolist()
             btvals = funcBT(timez).tolist()
             min_bt = min(btvals)
             idx_min_bt = btvals.index(min_bt)
@@ -16079,7 +16079,7 @@ class tgraphcanvas(FigureCanvas):
             funcET = UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree)
 
             #create longer list of time values
-            timez = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
+            timez = numpy.arange(self.timex[0],self.timex[-1]+1,1).tolist()
 
             #convert all time values to temperature
             btvals = funcBT(timez).tolist()

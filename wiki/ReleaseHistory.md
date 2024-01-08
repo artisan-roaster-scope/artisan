@@ -21,6 +21,7 @@ v2.10.2 (XX, 2024)
   - fixes a regression which failed to time align profiles on load ([Discussion #1366](../../../discussions/1366))
   - fixes broken computation of the event slider calculators
   - fixes arabic reshaping and applies it also to Farsi
+  - fixes a long standing issue where the Designer looses one sample on each round-trip (thanks [/Terracotta-6](https://github.com/Terracotta-6) for reporting)
   - fixes CSV export ([Discussion #1357](../../../discussions/1357))
 * REMOVALS
 
