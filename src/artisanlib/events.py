@@ -294,7 +294,7 @@ class EventsDlg(ArtisanResizeablDialog):
                     QApplication.translate('ComboBox','Step+'),
                     QApplication.translate('ComboBox','Combo')]
 
-        self.bartypeComboBox =  QComboBox()
+        self.bartypeComboBox = QComboBox()
         self.bartypeComboBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 #        self.bartypeComboBox.setMaximumWidth(80)
         self.bartypeComboBox.addItems(barstyles)
@@ -506,9 +506,10 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E4sizeSpinBox.setRange(1,14)
         self.E4sizeSpinBox.setValue(self.aw.qmc.EvalueMarkerSize[3])
         self.E4sizeSpinBox.editingFinished.connect(self.setEmarkersize3)
-        self.autoCharge = QCheckBox(QApplication.translate('CheckBox','Auto CHARGE'))
+        self.autoCharge = QCheckBox(QApplication.translate('Scope Annotation','CHARGE'))
         self.autoCharge.setChecked(self.aw.qmc.autoChargeFlag)
         self.autoCharge.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.autoCharge.setToolTip(QApplication.translate('Tooltip', 'If ticked the {} event is automatically registered').format(QApplication.translate('Scope Annotation','CHARGE')))
         if self.app.artisanviewerMode:
             self.autoCharge.setEnabled(False)
         self.chargeTimer = QCheckBox(QApplication.translate('CheckBox','CHARGE Timer'))
@@ -523,16 +524,33 @@ class EventsDlg(ArtisanResizeablDialog):
         self.chargeTimerSpinner.setRange(0,60)
         self.chargeTimerSpinner.setSuffix('s')
         self.chargeTimerSpinner.setValue(int(self.aw.qmc.chargeTimerPeriod))
-        self.autoDrop = QCheckBox(QApplication.translate('CheckBox','Auto DROP'))
+        self.autoDrop = QCheckBox(QApplication.translate('Scope Annotation','DROP'))
         self.autoDrop.setChecked(self.aw.qmc.autoDropFlag)
         self.autoDrop.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.autoDrop.setToolTip(QApplication.translate('Tooltip', 'If ticked the {} event is automatically registered').format(QApplication.translate('Scope Annotation','DROP')))
+
+        autoEventModes = [QApplication.translate('ComboBox','Standard'),
+                    QApplication.translate('ComboBox','Sensitive')]
+        self.autoChargeModeComboBox = QComboBox()
+        self.autoChargeModeComboBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.autoChargeModeComboBox.addItems(autoEventModes)
+        self.autoChargeModeComboBox.setCurrentIndex(self.aw.qmc.autoChargeMode)
+        self.autoChargeModeComboBox.setToolTip(QApplication.translate('Tooltip', 'Sensitivity of event recognition'))
+        self.autoDropModeComboBox = QComboBox()
+        self.autoDropModeComboBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.autoDropModeComboBox.addItems(autoEventModes)
+        self.autoDropModeComboBox.setCurrentIndex(self.aw.qmc.autoDropMode)
+        self.autoDropModeComboBox.setToolTip(QApplication.translate('Tooltip', 'Sensitivity of event recognition'))
+
+
         if self.app.artisanviewerMode:
             self.autoDrop.setEnabled(False)
-        self.markTP = QCheckBox(QApplication.translate('CheckBox','Mark TP'))
+
+        self.markTP = QCheckBox(QApplication.translate('Label','TP'))
         self.markTP.setChecked(self.aw.qmc.markTPflag)
         self.markTP.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         #show met
-        self.ShowMet = QCheckBox(QApplication.translate('CheckBox', 'Mark MET'))
+        self.ShowMet = QCheckBox(QApplication.translate('Label', 'MET'))
         self.ShowMet.setChecked(self.aw.qmc.showmet)
         self.ShowMet.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.ShowMet.stateChanged.connect(self.changeShowMet)         #toggle
@@ -1066,9 +1084,9 @@ class EventsDlg(ArtisanResizeablDialog):
         FlagsLayout.addWidget(self.showeventsonbtbox)
         FlagsLayout.addSpacing(5)
         FlagsLayout.addWidget(self.annotationsflagbox)
+        FlagsLayout.addSpacing(5)
+        FlagsLayout.addWidget(self.ShowTimeguide)
         FlagsLayout.addStretch()
-#        FlagsLayout.addWidget(self.eventsshowflagbox)
-#        FlagsLayout.addSpacing(10)
         FlagsLayout.addLayout(bartypeLayout)
         FlagsLayout.addSpacing(10)
         FlagsLayout.addWidget(self.eventsclampflag)
@@ -1078,20 +1096,31 @@ class EventsDlg(ArtisanResizeablDialog):
         FlagsLayout.addWidget(self.eventslabelscharsSpinner)
         FlagsLayout.addStretch()
 
+        AutoMarkGroupBox = QGroupBox(QApplication.translate('GroupBox','Automatic Marking'))
+#        AutoMarkGroupBox.setSizePolicy(QSizePolicy.Policy.Fixed,QSizePolicy.Policy.Fixed)
+        AutoMarkHBox = QHBoxLayout()
+        AutoMarkHBox.addWidget(self.chargeTimer)
+        AutoMarkHBox.addSpacing(3)
+        AutoMarkHBox.addWidget(self.chargeTimerSpinner)
+        AutoMarkHBox.addSpacing(30)
+        AutoMarkGroupBox.setLayout(AutoMarkHBox)
+        AutoMarkHBox.addWidget(self.autoCharge)
+        AutoMarkHBox.addSpacing(3)
+        AutoMarkHBox.addWidget(self.autoChargeModeComboBox)
+        AutoMarkHBox.addSpacing(30)
+        AutoMarkHBox.addWidget(self.autoDrop)
+        AutoMarkHBox.addSpacing(3)
+        AutoMarkHBox.addWidget(self.autoDropModeComboBox)
+        AutoMarkHBox.addSpacing(30)
+        AutoMarkHBox.addWidget(self.markTP)
+        AutoMarkHBox.addSpacing(30)
+        AutoMarkHBox.addWidget(self.ShowMet)
+        AutoMarkHBox.setContentsMargins(5,0,5,0) # l,t,r,b
+        AutoMarkHBox.setSpacing(7)
+
         FlagsLayout2 = QHBoxLayout()
-        FlagsLayout2.addWidget(self.chargeTimer)
-        FlagsLayout2.addSpacing(3)
-        FlagsLayout2.addWidget(self.chargeTimerSpinner)
-        FlagsLayout2.addSpacing(15)
-        FlagsLayout2.addWidget(self.autoCharge)
-        FlagsLayout2.addSpacing(15)
-        FlagsLayout2.addWidget(self.autoDrop)
-        FlagsLayout2.addSpacing(15)
-        FlagsLayout2.addWidget(self.markTP)
-        FlagsLayout2.addSpacing(15)
-        FlagsLayout2.addWidget(self.ShowMet)
-        FlagsLayout2.addSpacing(15)
-        FlagsLayout2.addWidget(self.ShowTimeguide)
+        FlagsLayout2.addWidget(AutoMarkGroupBox)
+        FlagsLayout2.addStretch()
 
         typeLayout = QGridLayout()
         typeLayout.addWidget(typelabel1,0,0)
@@ -1109,13 +1138,22 @@ class EventsDlg(ArtisanResizeablDialog):
         typeLayout.addWidget(typelabel5,0,12)
         typeLayout.addWidget(self.showEtype5,0,13)
         typeLayout.addWidget(self.etype4,0,14)
+
+        dialogButtonsLayout = QVBoxLayout()
+        dialogButtonsLayout.addStretch()
+        dialogButtonsLayout.addWidget(self.dialogbuttons)
+        dialogButtonsLayout.addSpacing(15)
         buttonLayout = QHBoxLayout()
-        buttonLayout.addLayout(FlagsLayout2)
+#        buttonLayout.addLayout(FlagsLayout2)
         buttonLayout.addStretch()
-        buttonLayout.addWidget(self.dialogbuttons)
+        buttonLayout.addLayout(dialogButtonsLayout)
+        buttonLayout.addSpacing(10)
+        buttonLayout.setContentsMargins(0,0,0,0)
+        buttonLayout.setSpacing(0)
         typeHBox = QHBoxLayout()
         typeHBox.addLayout(typeLayout)
         typeHBox.addStretch()
+        typeHBox.setContentsMargins(5,0,5,0) # l,t,r,b
         TypeGroupLayout = QGroupBox(QApplication.translate('GroupBox','Event Types'))
         TypeGroupLayout.setLayout(typeHBox)
         self.buttonActionTypes = ['',#QApplication.translate("ComboBox", "None"),
@@ -1317,17 +1355,22 @@ class EventsDlg(ArtisanResizeablDialog):
         samplingLayout.addWidget(self.SAMPLINGbuttonActionString)
         samplingLayout.addWidget(self.SAMPLINGbuttonActionInterval)
         samplingLayout.addStretch()
+        samplingLayout.setContentsMargins(5,0,5,0) # l,t,r,b
         SamplingGroupLayout = QGroupBox(QApplication.translate('GroupBox','Sampling'))
         SamplingGroupLayout.setLayout(samplingLayout)
         if self.app.artisanviewerMode:
             SamplingGroupLayout.setEnabled(False)
         topLineLayout = QHBoxLayout()
         topLineLayout.addWidget(TypeGroupLayout)
+        topLineLayout.setSpacing(5)
+        topLineLayout.addStretch()
+        topLineLayout.setSpacing(5)
         topLineLayout.addWidget(SamplingGroupLayout)
         tab1layout = QVBoxLayout()
         tab1layout.addLayout(FlagsLayout)
         tab1layout.addLayout(topLineLayout)
         tab1layout.addWidget(ButtonGroupLayout)
+        tab1layout.addLayout(FlagsLayout2)
         tab1layout.addStretch()
         FlagsLayout.setContentsMargins(0,10,0,0)
         FlagsLayout.setSpacing(10)
@@ -1586,7 +1629,8 @@ class EventsDlg(ArtisanResizeablDialog):
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(self.TabWidget)
         mainLayout.setSpacing(5)
-        mainLayout.setContentsMargins(5, 15, 5, 5)
+        mainLayout.setContentsMargins(5, 15, 5, 0)
+        mainLayout.addStretch()
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
         if platform.system() != 'Windows':
@@ -3095,6 +3139,8 @@ class EventsDlg(ArtisanResizeablDialog):
         self.chargeTimerPeriodstored = self.aw.qmc.chargeTimerPeriod
         self.autoChargeFlagstored = self.aw.qmc.autoChargeFlag
         self.autoDropFlagstored = self.aw.qmc.autoDropFlag
+        self.autoChargeModestored = self.aw.qmc.autoChargeMode
+        self.autoDropModestored = self.aw.qmc.autoDropMode
         self.markTPFlagstored = self.aw.qmc.markTPflag
         self.eventsliderKeyboardControlstored = self.aw.eventsliderKeyboardControl
         self.eventsliderAlternativeLayoutstored = self.aw.eventsliderAlternativeLayout
@@ -3159,9 +3205,11 @@ class EventsDlg(ArtisanResizeablDialog):
         self.aw.qmc.chargeTimerPeriod = self.chargeTimerPeriodstored
         self.aw.qmc.autoChargeFlag = self.autoChargeFlagstored
         self.aw.qmc.autoDropFlag = self.autoDropFlagstored
+        self.aw.qmc.autoChargeMode = self.autoChargeModestored
+        self.aw.qmc.autoDropMode = self.autoDropModestored
+        self.aw.qmc.markTPflag = self.markTPFlagstored
         self.aw.eventsliderKeyboardControl = self.eventsliderKeyboardControlstored
         self.aw.eventsliderAlternativeLayout = self.eventsliderAlternativeLayoutstored
-        self.aw.qmc.markTPflag = self.markTPFlagstored
         # buttons saved only if ok is pressed, so no restore needed
         self.aw.buttonlistmaxlen = self.buttonlistmaxlen
         # sliders
@@ -3297,6 +3345,8 @@ class EventsDlg(ArtisanResizeablDialog):
                 self.aw.qmc.autoChargeFlag = self.autoCharge.isChecked()
                 self.aw.qmc.autoDropFlag = self.autoDrop.isChecked()
                 self.aw.qmc.markTPflag = self.markTP.isChecked()
+                self.aw.qmc.autoChargeMode = self.autoChargeModeComboBox.currentIndex()
+                self.aw.qmc.autoDropMode = self.autoDropModeComboBox.currentIndex()
                 # keyboard control flag
                 self.aw.eventsliderKeyboardControl = self.sliderKeyboardControlflag.isChecked()
                 if self.aw.eventsliderKeyboardControl != self.eventsliderKeyboardControlstored and self.aw.sliderFrame.isVisible():

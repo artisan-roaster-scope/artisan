@@ -16329,6 +16329,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.chargeTimerPeriod = toInt(settings.value('chargeTimerPeriod',int(self.qmc.chargeTimerPeriod)))
             self.qmc.autoChargeFlag = bool(toBool(settings.value('autoCharge',self.qmc.autoChargeFlag)))
             self.qmc.autoDropFlag = bool(toBool(settings.value('autoDrop',self.qmc.autoDropFlag)))
+            self.qmc.autoChargeMode = toInt(settings.value('autoChargeMode',self.qmc.autoChargeMode))
+            self.qmc.autoDropMode = toInt(settings.value('autoDropMode',self.qmc.autoDropMode))
             self.qmc.markTPflag = bool(toBool(settings.value('markTP',self.qmc.markTPflag)))
             if settings.contains('EvalueColor'):
                 self.qmc.EvalueColor = list(map(str,list(toStringList(settings.value('EvalueColor',self.qmc.EvalueColor)))))
@@ -18120,6 +18122,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'chargeTimerPeriod',self.qmc.chargeTimerPeriod, read_defaults)
             self.settingsSetValue(settings, default_settings, 'autoCharge',self.qmc.autoChargeFlag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'autoDrop',self.qmc.autoDropFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'autoChargeMode',self.qmc.autoChargeMode, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'autoDropMode',self.qmc.autoDropMode, read_defaults)
             self.settingsSetValue(settings, default_settings, 'markTP',self.qmc.markTPflag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'EvalueColor',self.qmc.EvalueColor, read_defaults)
             self.settingsSetValue(settings, default_settings, 'EvalueTextColor',self.qmc.EvalueTextColor, read_defaults)
