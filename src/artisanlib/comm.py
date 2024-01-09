@@ -270,7 +270,7 @@ class serialport:
         ##### SPECIAL METER FLAGS ########
         #stores the Phidget 1048 TemperatureSensor object (None if not initialized)
         self.PhidgetTemperatureSensor:Optional[List[PhidgetTemperatureSensor]] = None # either None or a list containing one PhidgetTemperatureSensor() object per channel
-        self.Phidget1048values:List[List[float]] = [[],[],[],[]] # the values for each of the 4 channels gathered by registered change triggers in the last period
+        self.Phidget1048values:List[List[Tuple[float,float]]] = [[],[],[],[]] # the values for each of the 4 channels as (value, time) tuples gathered by registered change triggers in the last period
         self.Phidget1048lastvalues:List[float] = [-1]*4 # the last async values returned
         self.Phidget1048semaphores:List[QSemaphore] = [QSemaphore(1),QSemaphore(1),QSemaphore(1),QSemaphore(1)] # semaphores protecting the access to self.Phidget1048values per channel
         # list of (serial,port) tuples filled on attaching the corresponding main device and consumed on attaching the other channel pairs
@@ -283,12 +283,12 @@ class serialport:
         self.Phidget1045semaphore:QSemaphore = QSemaphore(1) # semaphore protecting the access to self.Phidget1045values per channel
         #stores the Phidget BridgeSensor object (None if not initialized)
         self.PhidgetBridgeSensor:Optional[List[VoltageRatioInput]] = None
-        self.Phidget1046values:List[List[float]] = [[],[],[],[]] # the values for each of the 4 channels gathered by registered change triggers in the last period
+        self.Phidget1046values:List[List[Tuple[float,float]]] = [[],[],[],[]] # the values for each of the 4 channels, as (value, time) tuples, gathered by registered change triggers in the last period
         self.Phidget1046lastvalues:List[float] = [-1]*4 # the last async values returned
         self.Phidget1046semaphores:List[QSemaphore] = [QSemaphore(1),QSemaphore(1),QSemaphore(1),QSemaphore(1)] # semaphores protecting the access to self.Phidget1046values per channel
         #stores the Phidget IO object (None if not initialized)
         self.PhidgetIO:Optional[List[DigitalInput]] = None
-        self.PhidgetIOvalues:List[List[Tuple[float,float]]] = [[],[],[],[],[],[],[],[]] # the values gathered by registered change triggers
+        self.PhidgetIOvalues:List[List[Tuple[float,float]]] = [[], [], [], [], [], [], [], []] # the values gathered by registered change triggers for channel 0 - 8
         self.PhidgetIOlastvalues:List[float] = [-1]*8 # the values gathered by registered change triggers
         self.PhidgetIOsemaphores:List[QSemaphore] = [QSemaphore(1),QSemaphore(1),QSemaphore(1),QSemaphore(1)] # semaphores protecting the access to self.Phidget1048values per channel
         #stores the Phidget Digital Output PMW objects (None if not initialized)
@@ -5256,10 +5256,6 @@ class serialport:
                         res = wquantiles.median(numpy.array(readings),numpy.array(weights))
                         # 3. consume old readings
                         self.PhidgetIOvalues[i] = []
-#                    if len(self.PhidgetIOvalues[i]) > 0:
-##                        res = numpy.average(self.PhidgetIOvalues[i])
-#                        res = numpy.median(self.PhidgetIOvalues[i])
-#                        self.PhidgetIOvalues[i] = self.PhidgetIOvalues[i][-round((self.aw.qmc.delay/self.aw.qmc.phidget1018_dataRates[i])):]
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
                     self.PhidgetIOvalues[i] = []
@@ -5371,7 +5367,7 @@ class serialport:
             elif API == 'digital' and deviceType == DeviceID.PHIDID_DAQ1400:
                 # set the InputMode for the DAQ1400
                 self.setDAQ1400inputMode(idx)
-            self.PhidgetIOvalues[channel] = [[],[],[],[],[],[],[],[]]
+            self.PhidgetIOvalues[channel] = []
             self.PhidgetIOlastvalues = [-1]*8
 
     def setDAQ1400inputMode(self, idx:int) -> None:
@@ -5566,7 +5562,7 @@ class serialport:
                         except Exception: # pylint: disable=broad-except
                             pass
                         self.PhidgetIO = None
-                        self.PhidgetIOvalues = [[],[],[],[],[],[],[],[]]
+                        self.PhidgetIOvalues = [[], [], [], [], [], [], [], []]
                         self.PhidgetIOlastvalues = [-1]*8
             if deviceType == DeviceID.PHIDID_DAQ1400 and self.PhidgetIO is not None and self.PhidgetIO and self.PhidgetIO[0].getAttached():
                 probe:float = -1

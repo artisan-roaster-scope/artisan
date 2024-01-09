@@ -11,7 +11,7 @@ v2.10.2 (XX, 2024)
   - upgrades to Qt/PyQt 6.6.1, pymodbus 3.6.2
 * FIXES
   - fixes axis limits on starting the designer from a profile with time axis locked ([Discussion #1325](../../../discussions/1325))
-  - fixes regresion that kept log dialogs (serial, message, error) empty
+  - fixes regresion that kept log dialogs (serial, message, error) empty ([Issue #1393](../../../issues/1393))
   - fixes regression which broke loading of certain MODBUS configurations (eg. Loring)
   - fixes regression which broke the DROP alarm action
   - fixes regression which broke the PDF export on Linux
@@ -19,6 +19,7 @@ v2.10.2 (XX, 2024)
   - fixes regression which broke the simulator for profiles with extra device curves
   - fixes regression which broke the CHARGE timer ([Discussion #1358](../../../discussions/1358))
   - fixes a regression which failed to time align profiles on load ([Discussion #1366](../../../discussions/1366))
+  - fixes regression that caused IO Phidgets with channels in async ode to detach on ON ([Discussion #1394](../../../discussions/1394))
   - fixes broken computation of the event slider calculators
   - fixes arabic reshaping and applies it also to Farsi
   - fixes a long standing issue where the Designer looses one sample on each round-trip (thanks [/Terracotta-6](https://github.com/Terracotta-6) for reporting)
