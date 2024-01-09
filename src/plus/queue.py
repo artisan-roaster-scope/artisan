@@ -39,7 +39,7 @@ import logging
 from typing import Final, Any, List, Dict, Optional, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' and 'Dict' since type hints can use the generic 'list' and 'dict'
 
 if TYPE_CHECKING:
-    import persistqueue # type:ignore # pylint: disable=unused-import
+    import persistqueue # type:ignore[import-untyped] # pylint: disable=unused-import
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -48,7 +48,7 @@ queue_path = getDirectory(config.outbox_cache, share=False)
 
 app = QCoreApplication.instance()
 
-queue:Optional['persistqueue.SQLiteQueue'] = None # holdes the persistqueue.SQLiteQueue, initialized by start()
+queue:Optional['persistqueue.SQLiteQueue'] = None # type:ignore[no-any-unimported,unused-ignore] # holdes the persistqueue.SQLiteQueue, initialized by start()
 
 # queue entries are dictionaries with entries
 #   url   : the URL to send the request to

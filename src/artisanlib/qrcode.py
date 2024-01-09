@@ -40,10 +40,10 @@ class QRImage(qrcode.image.base.BaseImage): # type: ignore # pyright: "base" is 
     def process(self) -> None:
         pass
 
-    def drawrect_context(self, row: int, col: int, qr: QRCode) -> None:
+    def drawrect_context(self, row: int, col: int, qr: QRCode) -> None: # type:ignore[no-any-unimported,unused-ignore]
         pass
 
-def QRlabel(url_str:str) -> QRCode:
+def QRlabel(url_str:str) -> QRCode: # type:ignore[no-any-unimported,unused-ignore]
     qr = QRCode(
         version=None, # 1,
         error_correction=qrcode.constants.ERROR_CORRECT_L, # pyright:ignore # pyright: "constants" is not a known member of module "qrcode"

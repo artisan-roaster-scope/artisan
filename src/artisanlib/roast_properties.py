@@ -567,7 +567,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.org_weight = self.aw.qmc.weight
         self.org_volume = self.aw.qmc.volume
 
-        self.setup_ui:Optional[SetupWidget.Ui_SetupWidget] = None
+        self.setup_ui:Optional[SetupWidget.Ui_SetupWidget] = None # type:ignore[no-any-unimported,unused-ignore]
 
         self.pus_amount_selected = None
 

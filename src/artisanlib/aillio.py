@@ -82,7 +82,7 @@ class AillioR1:
         self.simulated = False
         self.AILLIO_DEBUG = debug
         self.__dbg('init')
-        self.usbhandle:Optional[usb.core.Device] = None
+        self.usbhandle:Optional[usb.core.Device] = None # type:ignore[no-any-unimported,unused-ignore]
         self.bt:float = 0
         self.dt:float = 0
         self.heater:float = 0
@@ -98,8 +98,8 @@ class AillioR1:
         self.roast_number:int = -1
         self.fan_rpm:float = 0
 
-        self.parent_pipe:Optional['Connection'] = None
-        self.child_pipe:Optional['Connection'] = None
+        self.parent_pipe:Optional['Connection'] = None # type:ignore[no-any-unimported,unused-ignore]
+        self.child_pipe:Optional['Connection'] = None # type:ignore[no-any-unimported,unused-ignore]
         self.irt:float = 0
         self.pcbt:float = 0
         self.coil_fan:int = 0
@@ -299,7 +299,7 @@ class AillioR1:
         if self.parent_pipe is not None:
             self.parent_pipe.send(self.AILLIO_CMD_PRS)
 
-    def __updatestate(self, p:'Connection') -> None:
+    def __updatestate(self, p:'Connection') -> None: # type:ignore[no-any-unimported,unused-ignore]
         while self.worker_thread_run:
             state1:'array.array[int]' = array.array('B', bytes(0))
             state2:'array.array[int]' = array.array('B', bytes(0))

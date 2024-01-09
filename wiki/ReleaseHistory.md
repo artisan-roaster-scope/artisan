@@ -18,11 +18,11 @@ v2.10.2 (XX, 2024)
   - fixes regression which broke the transposer calculations
   - fixes regression which broke the simulator for profiles with extra device curves
   - fixes regression which broke the CHARGE timer ([Discussion #1358](../../../discussions/1358))
-  - fixes a regression which failed to time align profiles on load ([Discussion #1366](../../../discussions/1366))
+  - fixes regression which failed to time align profiles on load ([Discussion #1366](../../../discussions/1366))
   - fixes regression that caused IO Phidgets with channels in async ode to detach on ON ([Discussion #1394](../../../discussions/1394))
   - fixes broken computation of the event slider calculators
   - fixes arabic reshaping and applies it also to Farsi
-  - fixes a long standing issue where the Designer looses one sample on each round-trip (thanks [/Terracotta-6](https://github.com/Terracotta-6) for reporting)
+  - fixes long standing issue where the Designer looses one sample on each round-trip (thanks [/Terracotta-6](https://github.com/Terracotta-6) for reporting)
   - fixes CSV export ([Discussion #1357](../../../discussions/1357))
 * REMOVALS
 
