@@ -38,7 +38,7 @@ if TYPE_CHECKING:
     try:
         from multiprocessing.connection import PipeConnection as Connection # type: ignore[unused-ignore,attr-defined,assignment] # pylint: disable=unused-import
     except ImportError:
-        from multiprocessing.connection import Connection # type: ignore[unused-ignore,attr-defined] # pylint: disable=unused-import
+        from multiprocessing.connection import Connection # type: ignore[unused-ignore,attr-defined,assignment] # pylint: disable=unused-import
 #    from artisanlib.types import ProfileData # pylint: disable=unused-import
 #    from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
 
