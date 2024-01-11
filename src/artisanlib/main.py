@@ -5106,7 +5106,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 if reply == QMessageBox.StandardButton.Cancel:
                     return
                 if reply == QMessageBox.StandardButton.Yes and hasattr(action,'data') and hasattr(action,'text'):
-                    self.qmc.etypes = self.qmc.etypesdefault
+                    self.qmc.etypes = self.qmc.etypesdefault[:]
                     # keep original information to Cancel
                     org_etypes = self.qmc.etypes
                     org_device = self.qmc.device
@@ -16305,6 +16305,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.eventsGraphflag = toInt(settings.value('eventsGraphflag',int(self.qmc.eventsGraphflag)))
             if settings.contains('etypes'):
                 self.qmc.etypes = toStringList(settings.value('etypes',self.qmc.etypes))
+                _log.info('PRINT etypes loaded: %s',self.qmc.etypes)
                 # etype specified as empty strings are replaced by their defaults to enable translations in partially customized etypes
                 for i, name in enumerate(self.qmc.etypes):
                     if name == '':
@@ -16314,7 +16315,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.etypeComboBox.addItems(self.qmc.etypes)
             else:
                 # etypes have not been saved in the setting to presever the translations, we have to reset those to their default
-                self.qmc.etypes = self.qmc.etypesdefault
+                self.qmc.etypes = self.qmc.etypesdefault[:]
             self.qmc.eventsshowflag = toInt(settings.value('eventsshowflag',int(self.qmc.eventsshowflag)))
             self.qmc.clampEvents = bool(toBool(settings.value('clampEvents',self.qmc.clampEvents)))
             self.qmc.renderEventsDescr = bool(toBool(settings.value('renderEventsDescr',self.qmc.renderEventsDescr)))
@@ -18108,8 +18109,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     for i, _ in enumerate(self.qmc.etypes):
                         if self.qmc.etypes[i] == self.qmc.etypesdefault[i]:
                             etypes[i] = '' # we save empty strings for default event type names to ensure correct translation on re-loading those settings
+                _log.info('PRINT save etypes (read_defaults= %s): %s', read_defaults, etypes)
                 self.settingsSetValue(settings, default_settings, 'etypes',etypes, read_defaults)
             else:
+                _log.info('PRINT etypes settings removed (read_defaults=%s)', read_defaults)
+                _log.info('PRINT etypes: %s', self.qmc.etypes)
+                _log.info('PRINT self.qmc.etypesdefault: %s', self.qmc.etypesdefault)
                 settings.remove('etypes')
             self.settingsSetValue(settings, default_settings, 'eventsshowflag',self.qmc.eventsshowflag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'clampEvents',self.qmc.clampEvents, read_defaults)
