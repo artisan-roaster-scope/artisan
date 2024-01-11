@@ -292,9 +292,9 @@ class modbusport:
                         self.master = ModbusTcpClient(
                                 host=self.host,
                                 port=self.port,
-                                retries=2, # number of send retries
+                                retries=1,                # number of send retries
                                 retry_on_empty=True,      # retry on empty response
-                                retry_on_invalid=True,   # retry on invalid response # retired
+                                retry_on_invalid=True,    # retry on invalid response # retired
                                 close_comm_on_error=self.reset_socket,
                                 reset_socket=self.reset_socket,
                                 reconnect_delay=0, # avoid automatic reconnection
@@ -314,12 +314,12 @@ class modbusport:
                         self.master = ModbusUdpClient(
                             host=self.host,
                             port=self.port,
-                            retries=2, # number of send retries
+                            retries=0,                # number of send retries (if set to n>0 each requests is sent n-types on MODBUS UDP!)
                             retry_on_empty=True,      # retry on empty response
-                            retry_on_invalid=True,   # retry on invalid response # retired
+                            retry_on_invalid=True,    # retry on invalid response # retired
                             close_comm_on_error=self.reset_socket,
                             reset_socket=self.reset_socket,
-                            reconnect_delay=0, # avoid automatic reconnection
+                            reconnect_delay=0,        # avoid automatic reconnection
                             on_reconnect_callback=self.reconnect,
                             # timeout is in seconds (int) and defaults to 3
                             timeout=min((self.aw.qmc.delay/2000), self.IP_timeout) # the timeout should not be larger than half of the sampling interval
