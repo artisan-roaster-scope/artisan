@@ -5,21 +5,23 @@ v2.10.2 (XX, 2024)
 ------------------
 
 * ADDITIONS
+  - adds sensitive variants to autoCHARGE and autoDROP detection algorithms
 * NEW HARDWARE SUPPORT
-  - adds machine setups for various machines of Mill City Roasters
+  - adds machine setups for various machines from Mill City Roasters
 * CHANGES
   - upgrades to Qt/PyQt 6.6.1, pymodbus 3.6.2
 * FIXES
   - fixes axis limits on starting the designer from a profile with time axis locked ([Discussion #1325](../../../discussions/1325))
   - fixes regresion that kept log dialogs (serial, message, error) empty ([Issue #1393](../../../issues/1393))
-  - fixes regression which broke loading of certain MODBUS configurations (eg. Loring)
+  - fixes regression which broke loading of certain MODBUS configurations correctly (eg. Loring)
+  - fixes issue with MODBUS UDP communication that caused unnecessary retries and could break control of some Probat machines
   - fixes regression which broke the DROP alarm action
   - fixes regression which broke the PDF export on Linux
   - fixes regression which broke the transposer calculations
   - fixes regression which broke the simulator for profiles with extra device curves
   - fixes regression which broke the CHARGE timer ([Discussion #1358](../../../discussions/1358))
   - fixes regression which failed to time align profiles on load ([Discussion #1366](../../../discussions/1366))
-  - fixes regression that caused IO Phidgets with channels in async ode to detach on ON ([Discussion #1394](../../../discussions/1394))
+  - fixes regression that caused IO Phidgets with channels in async mode to detach on ON ([Discussion #1394](../../../discussions/1394))
   - fixes regression which could lead to user customized event type names not being properly persisted in the application settings ([Issue #572](../../../issues/572))
   - fixes broken computation of the event slider calculators
   - fixes arabic reshaping and applies it also to Farsi
