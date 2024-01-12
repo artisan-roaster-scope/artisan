@@ -14164,12 +14164,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         else:
                             reply = QMessageBox.StandardButton.Yes
 
-#                        string = QApplication.translate("Message","To fully load this profile the extra device configuration needs to be modified.\n\nOverwrite your extra device definitions using the values from the profile?\n\nIt is advisable to save your current settings beforehand via menu Help >> Save Settings.")
-#                        if quiet:
-#                            reply = QMessageBox.StandardButton.Yes
-#                        else:
-#                            reply = QMessageBox.question(self, QApplication.translate("Message", "Found a different set of extra devices"), string,
-#                                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel, QMessageBox.StandardButton.No)
+                        # Shift+Alt modifier allows to overwrite extra devices (as was default in v2.4.6)
+                        if QApplication.queryKeyboardModifiers() == Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ShiftModifier:
+                            string = QApplication.translate("Message","To fully load this profile the extra device configuration needs to be modified.\n\nOverwrite your extra device definitions using the values from the profile?\n\nIt is advisable to save your current settings beforehand via menu Help >> Save Settings.")
+                            if quiet:
+                                reply = QMessageBox.StandardButton.Yes
+                            else:
+                                reply = QMessageBox.question(self, QApplication.translate("Message", "Found a different set of extra devices"), string,
+                                        QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel, QMessageBox.StandardButton.No)
 
                         if reply == QMessageBox.StandardButton.Yes:
                             if not reset or self.qmc.reset(redraw=False): # operation not canceled by the user in the save dirty state dialog
@@ -19059,7 +19061,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     # in case we have unsaved changes and the user decided to discard those, we first reset to have the correct settings (like axis limits) saved
                     self.qmc.reset(redraw=False,soundOn=False,keepProperties=False,fireResetAction=False)
                 self.qmc.flagKeepON = flagKeepON
-                if QApplication.queryKeyboardModifiers() != Qt.KeyboardModifier.AltModifier:
+                if QApplication.queryKeyboardModifiers() != (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ShiftModifier):
                     self.closeEventSettings() # it takes quite some time to write the >1000 setting items
 #                gc.collect() # this takes quite some time
                 QApplication.exit()
