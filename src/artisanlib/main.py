@@ -21696,7 +21696,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 index = i
         return index
 
-    def checkTop(self, d:float, offset:float, p0:float, p1:float, p2:float, p3:float, p4:float, p5:float, twice:bool = False) -> bool:
+    def checkTop(self, d:float, offset:float, dpre_dpost_diff:float, p0:float, p1:float, p2:float, p3:float, p4:float, p5:float, twice:bool = False) -> bool:
         d1 = p0 - p1
         d2 = p1 - p2
         #--
@@ -21708,7 +21708,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         f = self.qmc.btbreak_params['f']
         maxdpre = self.qmc.btbreak_params['maxdpre']
         f_dtwice = self.qmc.btbreak_params['f_dtwice']
-        dpre_dpost_diff = self.qmc.btbreak_params['dpre_dpost_diff']
 
         #scale parameters for temperature units
         if self.qmc.mode == 'F':
@@ -21731,17 +21730,27 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     # . average delta after i-2 is negative and twice as high (absolute) as the one before
     # d is minimum temperature delta of the two legs after the event to prevent too early recognition based on noise
     def BTbreak(self, i:int, event:str) -> int:
+        #Compensate for fast sample rates
+        if self.qmc.delay < self.qmc.btbreak_params['delay'][self.qmc.autoDropMode][2] :
+            sampleMode = 2
+        elif self.qmc.delay < self.qmc.btbreak_params['delay'][self.qmc.autoDropMode][1] :
+            sampleMode = 1
+        else:
+            sampleMode = 0
+
         if event in {'DROP','drop'}:
-            offset = self.qmc.btbreak_params['offset_drop']
-            d = self.qmc.btbreak_params['d_drop']
+            d = self.qmc.btbreak_params['d_drop'][self.qmc.autoDropMode][sampleMode]
+            offset = self.qmc.btbreak_params['offset_drop'][self.qmc.autoDropMode][sampleMode]
+            dpre_dpost_diff = self.qmc.btbreak_params['dpre_dpost_diff'][self.qmc.autoDropMode][sampleMode]
         else: #CHARGE
-            offset = self.qmc.btbreak_params['offset_charge']
-            d = self.qmc.btbreak_params['d_charge']
+            d = self.qmc.btbreak_params['d_charge'][self.qmc.autoChargeMode][sampleMode]
+            offset = self.qmc.btbreak_params['offset_charge'][self.qmc.autoChargeMode][sampleMode]
+            dpre_dpost_diff = self.qmc.btbreak_params['dpre_dpost_diff'][self.qmc.autoChargeMode][sampleMode]
 
         if len(self.qmc.timex)>5 and 4 < i < len(self.qmc.timex):  #'i>4' prevents reading temp2[-1] or worse when using BTbreak post recording
-            if self.checkTop(d,offset,self.qmc.temp2[i-5],self.qmc.temp2[i-4],self.qmc.temp2[i-3],self.qmc.temp2[i-2],self.qmc.temp2[i-1],self.qmc.temp2[i]):
+            if self.checkTop(d,offset,dpre_dpost_diff,self.qmc.temp2[i-5],self.qmc.temp2[i-4],self.qmc.temp2[i-3],self.qmc.temp2[i-2],self.qmc.temp2[i-1],self.qmc.temp2[i]):
                 return self.qmc.btbreak_params['tight']
-            if len(self.qmc.timex)>10 and i>10 and self.checkTop(d,offset,self.qmc.temp2[i-10],self.qmc.temp2[i-8],self.qmc.temp2[i-6],self.qmc.temp2[i-4],self.qmc.temp2[i-2],self.qmc.temp2[i],twice=True):
+            if len(self.qmc.timex)>10 and i>10 and self.checkTop(d,offset,dpre_dpost_diff,self.qmc.temp2[i-10],self.qmc.temp2[i-8],self.qmc.temp2[i-6],self.qmc.temp2[i-4],self.qmc.temp2[i-2],self.qmc.temp2[i],twice=True):
                 return self.qmc.btbreak_params['loose']
         return 0
 

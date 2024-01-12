@@ -461,16 +461,23 @@ class tgraphcanvas(FigureCanvas):
 
         # used by BTbreak
         self.btbreak_params:BTBreakParams = {
-            'd_drop': -0.34,
-            'd_charge': -0.67,
+            'delay': [[40000,1000,500],               #autoChargeMode="Standard"
+                      [40000,1000,500]],              #autoChargeMode="Sensitive"
+            'd_charge': [[-0.67, -0.34, -0.20],       #autoChargeMode="Standard"  [delay>=1000, 500<=delay<1000, delay<500]
+                         [ 0.00,  0.00,  0.00]],      #autoChargeMode="Sensitive" [delay>=1000, 500<=delay<1000, delay<500]
+            'd_drop':   [[-0.34, -0.20,  0.00],       #autoDropMode="Standard"    [delay>=1000, 500<=delay<1000, delay<500] 
+                         [ 0.00,  0.00,  0.00]],      #autoDropMode="Sensitive"   [delay>=1000, 500<=delay<1000, delay<500]
+            'offset_charge': [[0.5, 0.2, 0.0],        #autoChargeMode="Standard"  [delay>=1000, 500<=delay<1000, delay<500]  
+                              [0.5, 0.1, 0.0]],       #autoChargeMode="Sensitive" [delay>=1000, 500<=delay<1000, delay<500] 
+            'offset_drop':   [[0.2, 0.1, 0.0],        #autoDropMode="Standard"    [delay>=1000, 500<=delay<1000, delay<500]    
+                              [0.2, 0.05, 0.0]],      #autoDropMode="Sensitive"   [delay>=1000, 500<=delay<1000, delay<500]   
+            'dpre_dpost_diff': [[0.78, 0.78, 20.0],   #autoChargeMode="Standard"  [delay>=1000, 500<=delay<1000, delay<500]
+                                [20.0, 20.0, 20.0]],  #autoChargeMode="Sensitive" [delay>=1000, 500<=delay<1000, delay<500]
             'tight': 3,
             'loose': 5,
             'f': 2.5,
             'maxdpre': 6.4,
             'f_dtwice': 1.5,
-            'dpre_dpost_diff': 0.78,
-            'offset_charge': 0.5,
-            'offset_drop': 0.2
         }
 
         self.flavorlabels = list(self.artisanflavordefaultlabels)
