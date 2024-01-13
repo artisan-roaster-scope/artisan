@@ -56,6 +56,9 @@ The single temperature meters listed above are rather simple and cost-efficient.
 
 The dual temperature meters are perfect for the standard use of Artisan to log the BT and ET temperature curves. If your probe is a K-Type, which is the standard for measuring BT/ET in a coffee roaster, you can choose from any of the above meters. The Amprobe is especially interesting due to its competitive price tag (see [this post](http://artisan-roasterscope.blogspot.de/2013/06/artisan-monitoring-londinium.html) to learn how the Amprobe and Artisan helped to investigate the Londinium group temperature stability). The Omega HH506RA (or its EXTECH variant) is interesting for its optical-isolated serial2USB converter. However, this converter is an add-one that has to be purchased separately and the fixed serial speed of that device is quite low (although it works well with Artisan). All of the devices listed here exclusively run from battery, but for the last one which does not need any external power but for the USB connection
 
+**Watch out!** Artisan maps the first input channel of a connected meter to ET (environment temperature) and the second input channel to BT (bean temperature).  When using a single probe for BT only, be sure to connect it to the second input channel.  For example, with a Mastech MS6514 the temperature probe for BT connects to input 'T2'.
+{: .notice--primary}
+
 * [CENTER 301](http://www.centertek.com/product_d.php?lang=en&tb=1&id=67&cid=67)
   - Dual K-Type
   - RS232 Interface (9600-8N1)

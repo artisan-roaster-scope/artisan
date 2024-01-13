@@ -23,4 +23,11 @@ Home roasting enthusiasts often donate 10-100.- (in $ or EUR), while small roast
 ![image](/assets/images/artisan-plus-logo.svg)
 </a>
 
+
+## Legal Notice for PayPal donations
+
+Any donation that you make to the Artisan project via the above PayPal.Me link is voluntary and is not a fee for any services, goods, or advantages. By making a donation to the Artisan project, you acknowledge that we have the right to use the money you donate in any lawful way and for any lawful purpose we see fit and we are not obligated to disclose the way and purpose to any party unless required by applicable law. Although Artisan is free software, to the best of our knowledge the Artisan project does not have any tax exempt status. The Artisan project is neither a registered non-profit corporation nor a registered charity in any country. Your donation may or may not be tax-deductible; please consult your tax advisor in this matter. Your donation is non-refundable.
+
+## artisan.plus subscription
+
 Another way to support the Artisan project is to subscribe to the [inventory management system artisan.plus](https://artisan.plus){:target="_blank"}. A yearly subscription for HOME roasters is only 49.- EUR with the additional benefit of access to coupons by [green bean supplier partners](https://doc.artisan.plus/partners/){:target="_blank"}.
