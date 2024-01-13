@@ -465,12 +465,12 @@ class tgraphcanvas(FigureCanvas):
                       [40000,1000,500]],              #autoChargeMode="Sensitive"
             'd_charge': [[-0.67, -0.34, -0.20],       #autoChargeMode="Standard"  [delay>=1000, 500<=delay<1000, delay<500]
                          [ 0.00,  0.00,  0.00]],      #autoChargeMode="Sensitive" [delay>=1000, 500<=delay<1000, delay<500]
-            'd_drop':   [[-0.34, -0.20,  0.00],       #autoDropMode="Standard"    [delay>=1000, 500<=delay<1000, delay<500] 
+            'd_drop':   [[-0.34, -0.20,  0.00],       #autoDropMode="Standard"    [delay>=1000, 500<=delay<1000, delay<500]
                          [ 0.00,  0.00,  0.00]],      #autoDropMode="Sensitive"   [delay>=1000, 500<=delay<1000, delay<500]
-            'offset_charge': [[0.5, 0.2, 0.0],        #autoChargeMode="Standard"  [delay>=1000, 500<=delay<1000, delay<500]  
-                              [0.5, 0.1, 0.0]],       #autoChargeMode="Sensitive" [delay>=1000, 500<=delay<1000, delay<500] 
-            'offset_drop':   [[0.2, 0.1, 0.0],        #autoDropMode="Standard"    [delay>=1000, 500<=delay<1000, delay<500]    
-                              [0.2, 0.05, 0.0]],      #autoDropMode="Sensitive"   [delay>=1000, 500<=delay<1000, delay<500]   
+            'offset_charge': [[0.5, 0.2, 0.0],        #autoChargeMode="Standard"  [delay>=1000, 500<=delay<1000, delay<500]
+                              [0.5, 0.1, 0.0]],       #autoChargeMode="Sensitive" [delay>=1000, 500<=delay<1000, delay<500]
+            'offset_drop':   [[0.2, 0.1, 0.0],        #autoDropMode="Standard"    [delay>=1000, 500<=delay<1000, delay<500]
+                              [0.2, 0.05, 0.0]],      #autoDropMode="Sensitive"   [delay>=1000, 500<=delay<1000, delay<500]
             'dpre_dpost_diff': [[0.78, 0.78, 20.0],   #autoChargeMode="Standard"  [delay>=1000, 500<=delay<1000, delay<500]
                                 [20.0, 20.0, 20.0]],  #autoChargeMode="Sensitive" [delay>=1000, 500<=delay<1000, delay<500]
             'tight': 3,
@@ -11439,7 +11439,7 @@ class tgraphcanvas(FigureCanvas):
                             connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('IKAWA'),True,None),
                             disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('IKAWA'),True,None))
                         if self.aw.ikawa is not None:
-                            self.aw.ikawa.start()
+                            self.aw.ikawa.start(self.device_logging)
                             self.aw.sendmessageSignal.emit(QApplication.translate('Message', 'scanning for device'),True,None)
                     except Exception as ex:  # pylint: disable=broad-except
                         _log.error(ex)
