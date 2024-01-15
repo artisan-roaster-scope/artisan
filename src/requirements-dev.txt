@@ -7,7 +7,7 @@ types-PyYAML==6.0.12.12
 types-requests==2.31.0.20240106
 types-setuptools==69.0.0.20240106
 types-urllib3==1.26.25.14
-lxml-stubs==0.4.0
+lxml-stubs==0.5.1
 mypy==1.8.0
 pyright==1.1.345
 ruff>=0.1.11
