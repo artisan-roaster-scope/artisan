@@ -9,7 +9,7 @@ types-setuptools==69.0.0.20240106
 types-urllib3==1.26.25.14
 lxml-stubs==0.4.0
 mypy==1.8.0
-pyright==1.1.345
+pyright==1.1.346
 ruff>=0.1.11
 pylint==3.0.3
 pre-commit>=3.6.0
