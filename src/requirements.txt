@@ -20,7 +20,7 @@
 # the following commented package versions are read by appveyor.yml and downloaded outside of pip.
 #
 # pyinstaller==6.3.0; platform_system='Windows'
-# libusb==1.2.6.0; platform_system='Windows'  #1.2.6.0 # 1.2.7.3 seems to have a problem: no connect on R1
+# libusb==1.2.7.3; platform_system='Windows'  #1.2.6.0
 # libusb==1.0.26;  platform_system='Linux'
 #
 # HACK: temporary require an older version of Pillow (PIL) as the current v10.0.0 breaks py2app on macOS

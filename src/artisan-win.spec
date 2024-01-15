@@ -235,7 +235,7 @@ copy_file(SNAP7_BIN + r'\snap7.dll', TARGET)
 
 # copy libusb0.1 lib
 
-copy_file(LIBUSB_BIN + r'\libusb0.dll', TARGET)
+copy_file(LIBUSB_BIN + r'\libusb0.dll', TARGET + '_internal')
 
 for fn in [
     'artisan.png',
