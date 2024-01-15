@@ -22,7 +22,7 @@ pytest-cov==4.1.0
 #pytest-bdd==6.1.1
 #pytest-benchmark==4.0.0
 #pytest-mock==3.11.1
-hypothesis==6.92.5
+hypothesis==6.93.1
 coverage==7.4.0
 coverage-badge==1.1.0
 codespell==2.2.6
