@@ -623,8 +623,9 @@ if multiprocessing.current_process().name == 'MainProcess':
         str(__revision__),
         str(__build__),
     )
-    _log.info('platform: %s',str(platform.platform()))
-    _log.info('exec: %s', str(sys.executable))
+    _log.info('date: %s', datetime.datetime.now(datetime.timezone.utc))
+    _log.info('platform: %s',platform.platform())
+    _log.info('exec: %s', sys.executable)
 else:
     _log.info('child process loaded')
 
@@ -4142,11 +4143,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     @pyqtSlot()
     def toggleDeltaBTCurve(self) -> None:
+        twoAxis_before = self.qmc.twoAxisMode()
         if self.qmc.swapdeltalcds:
             self.qmc.DeltaETflag = not self.qmc.DeltaETflag
         else:
             self.qmc.DeltaBTflag = not self.qmc.DeltaBTflag
-        self.qmc.redraw_keep_view(recomputeAllDeltas=False)
+        twoAxis_after = self.qmc.twoAxisMode()
+        self.qmc.redraw_keep_view(recomputeAllDeltas=False,forceRenewAxis=(twoAxis_before != twoAxis_after))
 
     @pyqtSlot()
     def toggleExtraCurve1(self) -> None:
@@ -14166,11 +14169,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
                         # Shift+Alt modifier allows to overwrite extra devices (as was default in v2.4.6)
                         if QApplication.queryKeyboardModifiers() == Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ShiftModifier:
-                            string = QApplication.translate("Message","To fully load this profile the extra device configuration needs to be modified.\n\nOverwrite your extra device definitions using the values from the profile?\n\nIt is advisable to save your current settings beforehand via menu Help >> Save Settings.")
+                            string = QApplication.translate('Message','To fully load this profile the extra device configuration needs to be modified.\n\nOverwrite your extra device definitions using the values from the profile?\n\nIt is advisable to save your current settings beforehand via menu Help >> Save Settings.')
                             if quiet:
                                 reply = QMessageBox.StandardButton.Yes
                             else:
-                                reply = QMessageBox.question(self, QApplication.translate("Message", "Found a different set of extra devices"), string,
+                                reply = QMessageBox.question(self, QApplication.translate('Message', 'Found a different set of extra devices'), string,
                                         QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel, QMessageBox.StandardButton.No)
 
                         if reply == QMessageBox.StandardButton.Yes:

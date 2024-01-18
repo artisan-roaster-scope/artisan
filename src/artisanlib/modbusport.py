@@ -352,7 +352,8 @@ class modbusport:
                     self.readRetries = self.serial_readRetries
                 _log.debug('connect(): connecting')
                 time.sleep(.2) # avoid possible hickups on startup
-                self.master.connect() # type:ignore[no-untyped-call]
+                if self.master is not None:
+                    self.master.connect() # type:ignore[no-untyped-call]
                 if self.isConnected():
                     self.updateActiveRegisters()
                     self.clearReadingsCache()

@@ -2277,10 +2277,12 @@ class CurvesDlg(ArtisanDialog):
 
     @pyqtSlot(int)
     def changeDeltaBT(self, _:int = 0) -> None:
+        twoAxis_before = self.aw.qmc.twoAxisMode()
         self.aw.qmc.DeltaBTflag = not self.aw.qmc.DeltaBTflag
+        twoAxis_after = self.aw.qmc.twoAxisMode()
         if self.aw.qmc.crossmarker:
             self.aw.qmc.togglecrosslines() # turn crossmarks off to adjust for new coordinate system
-        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True)
+        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True, forceRenewAxis=(twoAxis_before != twoAxis_after))
 
     @pyqtSlot(int)
     def changeDeltaETlcd(self, _:int = 0) -> None:

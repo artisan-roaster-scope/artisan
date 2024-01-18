@@ -1717,8 +1717,9 @@ class serialport:
         t1:float = -1
         t2:float = -1
         if self.aw.ikawa is not None:
+            t1 = self.aw.ikawa.absolute_humidity
             t2 = self.aw.ikawa.state
-        return tx,t1,t2 # time, _ (chan2), State (chan1)
+        return tx,t1,t2 # time, Absolute Humidity [g/m^3] (chan2), State (chan1)
 
     def TEVA18B(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()

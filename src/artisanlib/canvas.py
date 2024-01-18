@@ -33,6 +33,7 @@ import warnings
 import numpy
 import logging
 import re
+import functools
 from bisect import bisect_right
 import psutil
 from psutil._common import bytes2human
@@ -848,7 +849,7 @@ class tgraphcanvas(FigureCanvas):
                        'IKAWA',                     #142
                        '+IKAWA SET/RPM',            #143
                        '+IKAWA Heater/Fan',         #144
-                       '+IKAWA State',              #145
+                       '+IKAWA State/Humidity',     #145
                        'Phidget DAQ1000 01',        #146
                        '+Phidget DAQ1000 23',       #147
                        '+Phidget DAQ1000 45',       #148
@@ -976,7 +977,7 @@ class tgraphcanvas(FigureCanvas):
             141, # Kaleido Heater/Fan
             143, # IKAWA Set/RPM
             144, # IKAWA Heater/Fan
-            145, # IKAWA State
+            145, # IKAWA State/Humidity
             146, # Phidget DAQ1000 01
             147, # +Phidget DAQ1000 23
             148, # +Phidget DAQ1000 45
@@ -3070,6 +3071,9 @@ class tgraphcanvas(FigureCanvas):
                         self.aw.buttonCHARGE.setFlat(True)
                         self.aw.buttonCHARGE.stopAnimation()
                         self.aw.onMarkMoveToNext(self.aw.buttonCHARGE)
+
+                    self.xaxistosm(redraw=False) # need to fix uneven x-axis labels like -0:13
+                    self.updateProjection() # we update the data here to have the projections drawn by the redraw() triggered by belows timealign
                 else:
                     # we keep xaxis limit the same but adjust to updated timeindex[0] mark
                     if timeindex_before > -1:
@@ -3077,7 +3081,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         self.startofx += self.timex[self.timeindex[0]]
                     self.aw.autoAdjustAxis(deltas=False)
-                self.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
+                self.timealign(redraw=True,recompute=False,force=True) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
             elif action.key[0] == 6: # type: ignore[attr-defined] # "QAction" has no attribute "key" # DROP
                 try:
                     # clear the TP mark position cache (TP depends on DROP!)
@@ -3249,6 +3253,7 @@ class tgraphcanvas(FigureCanvas):
 
     # returns True if the extra device n, channel c, is of type MODBUS or S7, has no factor defined, nor any math formula, and is of type int
     # channel c is either 0 or 1
+    @functools.lru_cache(maxsize=None) # noqa: B019 #for Python >= 3.9 can use @functools.cache; Not relevant here, as qmc is only created once: [B019] Use of `functools.lru_cache` or `functools.cache` on methods can lead to memory leaks
     def intChannel(self, n:int, c:int) -> bool:
         if self.aw is not None and len(self.extradevices) > n:
             no_math_formula_defined:bool = False
@@ -3312,7 +3317,7 @@ class tgraphcanvas(FigureCanvas):
                 return True
             if self.extradevices[n] in {140, 141}: # Kaleido drum/AH, heater/fan
                 return True
-            if self.extradevices[n] in {144, 145}: # IKAWA heater/fan, state
+            if self.extradevices[n] == 144: # IKAWA heater/fan, state/humidity
                 return True
             return False
         return False
@@ -3412,7 +3417,7 @@ class tgraphcanvas(FigureCanvas):
             return -1
         l = min(len(decay_weights),len(temp_in))
         # take trail of length l and remove items where temp[i]=None to fulfil precond. of numpy.interp
-        tx_org = []
+        tx_org:List[float] = []
         temp_trail:List[float] = []
         for x, tp in zip(tx_in[-l:],temp_in[-l:]): # we only iterate over l-elements
             if tp is not None and tp != -1:
@@ -3589,7 +3594,7 @@ class tgraphcanvas(FigureCanvas):
                                 sample_extratemp1[i].append(float(extrat1))
                                 sample_extratemp2[i].append(float(extrat2))
 
-                                # gaps larger than 3 readings are not connected in the graph (as util.py:fill_gaps() is not interpolating them)
+                                # gaps larger than self.interpolatemax readings are not connected in the graph (as util.py:fill_gaps() is not interpolating them)
                                 if extrat1 != -1:
                                     sample_extractimex1[i].append(float(extratx))
                                     sample_extractemp1[i].append(float(extrat1))
@@ -3764,63 +3769,71 @@ class tgraphcanvas(FigureCanvas):
                     #we need a minimum of two readings to calculate rate of change
                     if length_of_qmc_timex > 1:
                         # compute T1 RoR
-                        if t1_final == -1 or len(sample_ctimex1)<2:  # we repeat the last RoR if underlying temperature dropped
-                            if sample_unfiltereddelta1:
-                                self.rateofchange1 = sample_unfiltereddelta1[-1]
-                            else:
-                                self.rateofchange1 = 0.
-                        else: # normal data received
-                            #   Delta T = (changeTemp/ChangeTime)*60. =  degrees per minute;
-                            left_index = min(len(sample_ctimex1),len(sample_tstemp1),max(2, self.deltaETsamples + 1))
-                            # ****** Instead of basing the estimate on the window extremal points,
-                            #        grab the full set of points and do a formal LS solution to a straight line and use the slope estimate for RoR
-                            if self.polyfitRoRcalc:
-                                try:
-                                    time_vec = sample_ctimex1[-left_index:]
-                                    temp_samples = sample_tstemp1[-left_index:]
-                                    with warnings.catch_warnings():
-                                        warnings.simplefilter('ignore')
-                                        # using stable polyfit from numpy polyfit module
-                                        LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1) # type:ignore[no-untyped-call]
-                                        self.rateofchange1 = LS_fit[1]*60.
-                                except Exception: # pylint: disable=broad-except
-                                    # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an exception "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
-                                    # https://github.com/numpy/numpy/issues/16744
-                                    # we fall back to the two point algo
+                        try:
+                            if t1_final == -1 or len(sample_ctimex1)<2:  # we repeat the last RoR if underlying temperature dropped
+                                if sample_unfiltereddelta1:
+                                    self.rateofchange1 = sample_unfiltereddelta1[-1]
+                                else:
+                                    self.rateofchange1 = 0.
+                            else: # normal data received
+                                #   Delta T = (changeTemp/ChangeTime)*60. =  degrees per minute;
+                                left_index = min(len(sample_ctimex1),len(sample_tstemp1),max(2, self.deltaETsamples + 1))
+                                # ****** Instead of basing the estimate on the window extremal points,
+                                #        grab the full set of points and do a formal LS solution to a straight line and use the slope estimate for RoR
+                                if self.polyfitRoRcalc:
+                                    try:
+                                        time_vec = sample_ctimex1[-left_index:]
+                                        temp_samples = sample_tstemp1[-left_index:]
+                                        with warnings.catch_warnings():
+                                            warnings.simplefilter('ignore')
+                                            # using stable polyfit from numpy polyfit module
+                                            LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1) # type:ignore[no-untyped-call]
+                                            self.rateofchange1 = LS_fit[1]*60.
+                                    except Exception: # pylint: disable=broad-except
+                                        # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an exception "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
+                                        # https://github.com/numpy/numpy/issues/16744
+                                        # we fall back to the two point algo
+                                        timed = sample_ctimex1[-1] - sample_ctimex1[-left_index]   #time difference between last self.deltaETsamples readings
+                                        self.rateofchange1 = ((sample_tstemp1[-1] - sample_tstemp1[-left_index])/timed)*60.  #delta ET (degrees/minute)
+                                else:
                                     timed = sample_ctimex1[-1] - sample_ctimex1[-left_index]   #time difference between last self.deltaETsamples readings
                                     self.rateofchange1 = ((sample_tstemp1[-1] - sample_tstemp1[-left_index])/timed)*60.  #delta ET (degrees/minute)
-                            else:
-                                timed = sample_ctimex1[-1] - sample_ctimex1[-left_index]   #time difference between last self.deltaETsamples readings
-                                self.rateofchange1 = ((sample_tstemp1[-1] - sample_tstemp1[-left_index])/timed)*60.  #delta ET (degrees/minute)
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.error(e)
+                            self.rateofchange1 = 0.
 
                         # compute T2 RoR
-                        if t2_final == -1 or len(sample_ctimex2)<2:  # we repeat the last RoR if underlying temperature dropped
-                            if sample_unfiltereddelta2:
-                                self.rateofchange2 = sample_unfiltereddelta2[-1]
-                            else:
-                                self.rateofchange2 = 0.
-                        else: # normal data received
-                            #   Delta T = (changeTemp/ChangeTime)*60. =  degrees per minute;
-                            left_index = min(len(sample_ctimex2),len(sample_tstemp2),max(2, self.deltaBTsamples + 1))
-                            # ****** Instead of basing the estimate on the window extremal points,
-                            #        grab the full set of points and do a formal LS solution to a straight line and use the slope estimate for RoR
-                            if self.polyfitRoRcalc:
-                                try:
-                                    time_vec = sample_ctimex2[-left_index:]
-                                    temp_samples = sample_tstemp2[-left_index:]
-                                    with warnings.catch_warnings():
-                                        warnings.simplefilter('ignore')
-                                        LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1) # type:ignore[no-untyped-call]
-                                        self.rateofchange2 = LS_fit[1]*60.
-                                except Exception: # pylint: disable=broad-except
-                                    # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an exception "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
-                                    # https://github.com/numpy/numpy/issues/16744
-                                    # we fall back to the two point algo
+                        try:
+                            if t2_final == -1 or len(sample_ctimex2)<2:  # we repeat the last RoR if underlying temperature dropped
+                                if sample_unfiltereddelta2:
+                                    self.rateofchange2 = sample_unfiltereddelta2[-1]
+                                else:
+                                    self.rateofchange2 = 0.
+                            else: # normal data received
+                                #   Delta T = (changeTemp/ChangeTime)*60. =  degrees per minute;
+                                left_index = min(len(sample_ctimex2),len(sample_tstemp2),max(2, self.deltaBTsamples + 1))
+                                # ****** Instead of basing the estimate on the window extremal points,
+                                #        grab the full set of points and do a formal LS solution to a straight line and use the slope estimate for RoR
+                                if self.polyfitRoRcalc:
+                                    try:
+                                        time_vec = sample_ctimex2[-left_index:]
+                                        temp_samples = sample_tstemp2[-left_index:]
+                                        with warnings.catch_warnings():
+                                            warnings.simplefilter('ignore')
+                                            LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1) # type:ignore[no-untyped-call]
+                                            self.rateofchange2 = LS_fit[1]*60.
+                                    except Exception: # pylint: disable=broad-except
+                                        # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an exception "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
+                                        # https://github.com/numpy/numpy/issues/16744
+                                        # we fall back to the two point algo
+                                        timed = sample_ctimex2[-1] - sample_ctimex2[-left_index]   #time difference between last self.deltaBTsamples readings
+                                        self.rateofchange2 = ((sample_tstemp2[-1] - sample_tstemp2[-left_index])/timed)*60.  #delta BT (degrees/minute)
+                                else:
                                     timed = sample_ctimex2[-1] - sample_ctimex2[-left_index]   #time difference between last self.deltaBTsamples readings
                                     self.rateofchange2 = ((sample_tstemp2[-1] - sample_tstemp2[-left_index])/timed)*60.  #delta BT (degrees/minute)
-                            else:
-                                timed = sample_ctimex2[-1] - sample_ctimex2[-left_index]   #time difference between last self.deltaBTsamples readings
-                                self.rateofchange2 = ((sample_tstemp2[-1] - sample_tstemp2[-left_index])/timed)*60.  #delta BT (degrees/minute)
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.error(e)
+                            self.rateofchange1 = 0.
 
 
                         # self.unfiltereddelta{1,2}_pure contain the RoR values respecting the delta_span, but without any delta smoothing NOR delta mathformulas applied
@@ -7879,21 +7892,21 @@ class tgraphcanvas(FigureCanvas):
                     randomness = 12 # 2 (16 default)
                     rcParams['path.sketch'] = (scale, length, randomness)
 
+                    rcParams['axes.linewidth'] = 0.8
+                    rcParams['xtick.major.size'] = 6
+                    rcParams['xtick.major.width'] = 1
+                    rcParams['xtick.minor.width'] = 0.8
+
+                    rcParams['ytick.major.size'] = 4
+                    rcParams['ytick.major.width'] = 1
+                    rcParams['ytick.minor.width'] = 1
+
+                    rcParams['xtick.color'] = self.palette['xlabel']
+                    rcParams['ytick.color'] = self.palette['ylabel']
+
+                    #rcParams['text.antialiased'] = True
+
                     if forceRenewAxis:
-                        rcParams['axes.linewidth'] = 0.8
-                        rcParams['xtick.major.size'] = 6
-                        rcParams['xtick.major.width'] = 1
-                        rcParams['xtick.minor.width'] = 0.8
-
-                        rcParams['ytick.major.size'] = 4
-                        rcParams['ytick.major.width'] = 1
-                        rcParams['ytick.minor.width'] = 1
-
-                        rcParams['xtick.color'] = self.palette['xlabel']
-                        rcParams['ytick.color'] = self.palette['ylabel']
-
-                        #rcParams['text.antialiased'] = True
-
                         self.fig.clf()
 
                     if self.ax is None or forceRenewAxis:
@@ -8012,7 +8025,27 @@ class tgraphcanvas(FigureCanvas):
 
                     if self.delta_ax is not None:
                         self.ax.set_zorder(self.delta_ax.get_zorder()+1) # put ax in front of delta_ax (which remains empty!)
-                    if two_ax_mode and self.delta_ax is not None:
+
+                    self.ax.patch.set_visible(True)
+
+                    self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
+                    if self.zgrid > 0:
+                        self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
+                        self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+                        for ii in self.delta_ax.get_yticklines():
+                            ii.set_markersize(10)
+                        for iiii in self.delta_ax.yaxis.get_minorticklines():
+                            iiii.set_markersize(5)
+                        for label in self.delta_ax.get_yticklabels() :
+                            label.set_fontsize('small')
+                        if not self.LCDdecimalplaces:
+                            self.delta_ax.minorticks_off()
+                    # translate y-coordinate from delta into temp range to ensure the cursor position display (x,y) coordinate in the temp axis
+                    self.delta_ax.fmt_ydata = self.fmt_data
+                    self.delta_ax.fmt_xdata = self.fmt_timedata
+                    self.delta_ax.yaxis.set_label_position('right')
+
+                    if two_ax_mode:
                         #create a second set of axes in the same position as self.ax
                         self.delta_ax.tick_params(\
                             axis='y',           # changes apply to the y-axis
@@ -8024,7 +8057,6 @@ class tgraphcanvas(FigureCanvas):
                             labelright=True,
                             labelleft=False,
                             labelbottom=False)   # labels along the bottom edge are off
-                        self.ax.patch.set_visible(True)
 
                         if self.flagstart or self.zgrid == 0:
                             y_label = self.delta_ax.set_ylabel('')
@@ -8034,28 +8066,12 @@ class tgraphcanvas(FigureCanvas):
                                 fontsize='medium',
                                 fontfamily=prop.get_family()
                                 )
-                        self.delta_ax.yaxis.set_label_position('right')
                         try:
                             y_label.set_in_layout(False) # remove y-axis labels from tight_layout calculation
                         except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
                             pass
-                        self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
-                        if self.zgrid > 0:
-                            self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
-                            self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-                            for ii in self.delta_ax.get_yticklines():
-                                ii.set_markersize(10)
-                            for iiii in self.delta_ax.yaxis.get_minorticklines():
-                                iiii.set_markersize(5)
-                            for label in self.delta_ax.get_yticklabels() :
-                                label.set_fontsize('small')
-                            if not self.LCDdecimalplaces:
-                                self.delta_ax.minorticks_off()
-
-                        # translate y-coordinate from delta into temp range to ensure the cursor position display (x,y) coordinate in the temp axis
-                        self.delta_ax.fmt_ydata = self.fmt_data
-                        self.delta_ax.fmt_xdata = self.fmt_timedata
                     else:
+                        self.delta_ax.patch.set_visible(False)
                         self.delta_ax.tick_params(\
                             axis='y',
                             which='both',
@@ -11448,6 +11464,10 @@ class tgraphcanvas(FigureCanvas):
 
             self.aw.initializedMonitoringExtraDeviceStructures()
 
+            # reset LCD int/float cache
+            #_log.info("intChannel cache: %s",self.intChannel.cache_info())
+            self.intChannel.cache_clear()
+
             #reset alarms
             self.silent_alarms = False
             self.alarmstate = [-1]*len(self.alarmflag)  #1- = not triggered; any other value = triggered; value indicates the index in self.timex at which the alarm was triggered
@@ -11549,6 +11569,11 @@ class tgraphcanvas(FigureCanvas):
                 # disconnect IKAWA
                 if not bool(self.aw.simulator) and self.device == 142 and self.aw.ikawa is not None:
                     self.aw.ikawa.stop()
+                    try:
+                        if self.aw.ikawa.ambient_pressure != -1:
+                            self.ambient_pressure = self.aw.ikawa.ambient_pressure
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.error(e)
                     self.aw.ikawa = None
 
                 # at OFF we stop the follow-background on FujiPIDs and set the SV to 0

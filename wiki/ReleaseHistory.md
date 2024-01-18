@@ -5,11 +5,12 @@ v2.10.2 (XX, 2024)
 ------------------
 
 * ADDITIONS
-  - adds sensitive variants to autoCHARGE and autoDROP detection algorithms
+  - adds sensitive variants to autoCHARGE and autoDROP detection algorithms ([Issue #1358](../../../issues/1358))
 * NEW HARDWARE SUPPORT
   - adds machine setups for various machines from Mill City Roasters
+  - adds IKAWA PRO X machine support (records ambient pressure, humidity and inlet temperature)
 * CHANGES
-  - upgrades to Qt/PyQt 6.6.1, pymodbus 3.6.2
+  - upgrades to Qt/PyQt 6.6.2, pymodbus 3.6.3
 * FIXES
   - fixes axis limits on starting the designer from a profile with time axis locked ([Discussion #1325](../../../discussions/1325))
   - fixes regresion that kept log dialogs (serial, message, error) empty ([Issue #1393](../../../issues/1393))
@@ -23,9 +24,11 @@ v2.10.2 (XX, 2024)
   - fixes regression which failed to time align profiles on load ([Discussion #1366](../../../discussions/1366))
   - fixes regression that caused IO Phidgets with channels in async mode to detach on ON ([Discussion #1394](../../../discussions/1394))
   - fixes regression which could lead to user customized event type names not being properly persisted in the application settings ([Issue #572](../../../issues/572))
+  - fixes regression which broke PDF/PS export on macOS running on Apple Silicon (M1, M2, ..)
+  - fixes regression which broke Aillio R1 communication under Windows
   - fixes broken computation of the event slider calculators
   - fixes arabic reshaping and applies it also to Farsi
-  - fixes long standing issue where the Designer looses one sample on each round-trip (thanks [/Terracotta-6](https://github.com/Terracotta-6) for reporting)
+  - fixes long standing issue where the Designer looses one sample on each round-trip (thanks [Terracotta-6](https://github.com/Terracotta-6) for reporting)
   - fixes CSV export ([Discussion #1357](../../../discussions/1357))
 * REMOVALS
 

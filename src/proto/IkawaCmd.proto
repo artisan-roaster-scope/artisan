@@ -63,32 +63,37 @@ message IkawaResponse {
 
 }
 
-message RespMachStatusGetAll{
-    required int32 time = 1;
-    optional int32 temp_above = 2;
-    required int32 fan = 3;
-    required int32 state = 4;
-    required int32 heater = 5;
-    required int32 p = 6;
-    required int32 i = 7;
-    required int32 d = 8;
-    required int32 setpoint = 9;
-    required int32 fan_measured = 10;
-    optional int32 board_temp = 11;
-    optional int32 temp_below = 12;
-    optional int32 fan_rpm_measured = 13;
-    optional int32 fan_rpm_setpoint = 14;
-    optional int32 fan_i = 16;
-    optional int32 fan_p = 15;
-    optional int32 fan_d = 17;
-    optional int32 fan_power = 18;
-    optional int32 j = 19;
-    optional int32 relay_state = 20;
-    optional int32 pid_sensor = 21;
-    optional int32 temp_above_filtered = 22;
-    optional int32 temp_below_filtered = 23;
-    optional int32 ror_above = 24;
-    optional int32 ror_below = 25;
+message RespMachStatusGetAll {
+    required uint32 time = 1;
+    optional uint32 temp_above = 2;
+    optional uint32 temp_below = 12;
+    required uint32 fan = 3;
+    // The measured fan speed
+    optional uint32 fan_measured = 10;
+    required uint32 state = 4;
+    required uint32 heater = 5;
+    required uint32 p = 6;
+    required uint32 i = 7;
+    required uint32 d = 8;
+    optional sint32 j = 19;
+    required uint32 setpoint = 9;
+    optional uint32 board_temp = 11;
+    optional uint32 fan_rpm_measured = 13;
+    optional uint32 fan_rpm_setpoint = 14;
+    optional sint32 fan_p = 15;
+    optional sint32 fan_i = 16;
+    optional sint32 fan_d = 17;
+    optional uint32 fan_power = 18;
+    optional uint32 relay_state = 20;
+    optional uint32 pid_sensor = 21;
+    optional uint32 temp_above_filtered = 22;
+    optional uint32 temp_below_filtered = 23;
+    optional sint32 ror_above = 24;
+    optional sint32 ror_below = 25;
+    optional uint32 humidity_abs = 26;
+    optional sint32 humidity_roc = 27;
+    optional uint32 humidity_roc_direction = 28;
+    optional uint32 pressure_amb = 29;
 }
 
 message RespMachStatusGetError{

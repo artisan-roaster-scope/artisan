@@ -9,7 +9,7 @@ import base64
 import csv
 import re
 import logging
-from typing import Final, Optional, List, Tuple, Callable, ClassVar, Any, Generator, TYPE_CHECKING
+from typing import Final, Optional, List, Dict, Tuple, Callable, ClassVar, Any, Generator, TYPE_CHECKING
 
 
 if TYPE_CHECKING:
@@ -179,7 +179,7 @@ def extractProfileIkawaCSV(file:str, aw:'ApplicationWindow') -> 'ProfileData':
     with open(file, newline='',encoding='utf-8') as csvFile:
         data = csv.reader(csvFile,delimiter=',')
         #read file header
-        header = next(data)
+        header = [h.strip() for h in next(data)]
 
         fan:Optional[float] = None # holds last processed fan event value
         fan_last:Optional[float] = None # holds the fan event value before the last one
@@ -203,12 +203,14 @@ def extractProfileIkawaCSV(file:str, aw:'ApplicationWindow') -> 'ProfileData':
         timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
         i:int = 0
         v:Optional[float]
+        last_item:Optional[Dict[str,str]] = None
         for row in data:
             i = i + 1
             items = list(zip(header, row))
-            item = {}
+            item:Dict[str,str] = {}
             for (name, value) in items:
                 item[name] = value.strip()
+            last_item = item
             # take i as time in seconds
             timex.append(i)
             if 'inlet temp' in item:
@@ -248,7 +250,11 @@ def extractProfileIkawaCSV(file:str, aw:'ApplicationWindow') -> 'ProfileData':
             extra3.append(-1)
             extra4.append(-1)
             extra5.append(-1)
-            extra6.append(-1)
+            if 'abs_humidity' in item:
+                humidity = float(item['abs_humidity'])
+                extra6.append(humidity)
+            else:
+                extra6.append(-1)
 
             if 'fan set (%)' in item or 'fan set' in item:
                 try:
@@ -312,6 +318,15 @@ def extractProfileIkawaCSV(file:str, aw:'ApplicationWindow') -> 'ProfileData':
                         heater_last = None
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
+        if last_item is not None and timeindex[0]>-1 and 'adfc_timestamp' in last_item:
+            # if there is data at all, CHARGE is set and adfc_timestamp is given
+            # fcs_time is the time of FCs in seconds after CHARGE
+            fcs_time = float(last_item['adfc_timestamp'])
+            if fcs_time > 0:
+                # if fcs_time is given
+                FCs_idx = int(round(fcs_time + timeindex[0]))
+                if 0 < FCs_idx < len(timex):
+                    timeindex[2] = FCs_idx
 
     res['mode'] = 'C'
 
@@ -327,7 +342,7 @@ def extractProfileIkawaCSV(file:str, aw:'ApplicationWindow') -> 'ProfileData':
     res['extratemp1'] = [extra1, extra3, extra5]
     res['extramathexpression1'] = ['', '', '']
 
-    res['extraname2'] = ['RPM', '{0}', 'Extra 2']
+    res['extraname2'] = ['RPM', '{0}', 'Humidity']
     res['extratemp2'] = [extra2, extra4, extra6]
     res['extramathexpression2'] = ['x/100', '', '']
 
@@ -386,17 +401,22 @@ try: # BLE not available on some platforms
             self.heater:int = -1
             self.fan:int = -1
             self.state:int = -1
+            self.absolute_humidity:float = -1
+            self.ambient_pressure:float = -1
+            self.board_temp:float = -1
             # state is one of
-            #  0: on-roaster
+            #  0: on-roaster (IDLE)
             #  1: pre-heating (START)
             #  2: ready-to-roast
             #  3: roasting
-            #  4: roaster-is-busy
+            #  4: roaster-is-busy (BUSY)
             #  5: cooling (DROP)
             #  6: doser-open (CHARGE)
-            #  7: unexpected-problem
+            #  7: unexpected-problem (ERROR)
             #  8: ready-to-blow
             #  9: test-mode
+            # 10: detecting
+            # 11: development
 
             self.seq:Generator[int, None, None] = self.seqNum() # message sequence number generator
 
@@ -466,6 +486,9 @@ try: # BLE not available on some platforms
             self.heater = -1
             self.fan = -1
             self.state = -1
+            self.absolute_humidity = -1
+            self.ambient_pressure = -1
+            self.board_temp = -1
 
         def reset(self) -> None:
             self.rcv_buffer = None
@@ -509,23 +532,48 @@ try: # BLE not available on some platforms
                             if crc == self.crc16(payload, 65535):
                                 try:
                                     decoded_message = IkawaCmd_pb2.IkawaResponse().FromString(payload) # pylint: disable=no-member
-                                    _log.debug('IKAWA response.resp: %s (%s)', decoded_message.resp, decoded_message.MACH_STATUS_GET_ALL)
-                                    status_get_all = decoded_message.resp_mach_status_get_all
-                                    self.ET = status_get_all.temp_below / 10
-                                    if self.ET == 0:
-                                        self.ET = -1
-                                    self.BT = status_get_all.temp_above / 10
-                                    if self.BT == 0:
-                                        self.BT = -1
-                                    self.SP = status_get_all.setpoint / 10
-                                    if self.SP == 0:
-                                        self.SP = -1
-                                    self.RPM = (status_get_all.fan_measured / 12)*60 # RPM
-                                    self.heater = status_get_all.heater * 2
-                                    self.fan = int(round(status_get_all.fan / 2.55))
-                                    self.state = status_get_all.state
-                                    # add data received and registered, enable delivery
-                                    self.dataReceived.wakeAll()
+                                    if decoded_message.HasField('resp_mach_status_get_all'):
+                                        _log.debug('IKAWA response.resp: %s (%s)', decoded_message.resp, decoded_message.MACH_STATUS_GET_ALL)
+                                        status_get_all = decoded_message.resp_mach_status_get_all
+                                        # temp below is Inlet Temperature on PRO machines and Exaust Temperature on HOME machines
+                                        if status_get_all.HasField('temp_below'):
+                                            self.ET = status_get_all.temp_below / 10
+                                        elif status_get_all.HasField('temp_below_filtered'):
+                                            self.ET = status_get_all.temp_below_filtered / 10
+                                        else:
+                                            self.ET = -1
+                                        if status_get_all.HasField('temp_above'):
+                                            self.BT = status_get_all.temp_above / 10
+                                        elif status_get_all.HasField('temp_above_filtered'):
+                                            self.BT = status_get_all.temp_above_filtered / 10
+                                        else:
+                                            self.BT = -1
+                                        if status_get_all.HasField('setpoint'):
+                                            self.SP = status_get_all.setpoint / 10
+                                        else:
+                                            self.SP = -1
+                                        if status_get_all.HasField('fan_measured'):
+                                            self.RPM = (status_get_all.fan_measured / 12)*60 # RPM
+                                        else:
+                                            self.RPM = -1
+                                        self.heater = status_get_all.heater * 2
+                                        self.fan = int(round(status_get_all.fan / 2.55))
+                                        self.state = status_get_all.state
+                                        # compute the average of all received ambient pressure readings (in mbar)
+                                        if status_get_all.HasField('pressure_amb'):
+                                            self.ambient_pressure = (status_get_all.pressure_amb if self.ambient_pressure == -1 else (self.ambient_pressure + status_get_all.pressure_amb)/2)
+                                        # add absolute humidity in g/m^3
+                                        if status_get_all.HasField('humidity_abs'):
+                                            self.absolute_humidity = status_get_all.humidity_abs / 100
+                                        else:
+                                            self.absolute_humidity = -1
+                                        # add board temperature in C
+                                        if status_get_all.HasField('humidity_abs'):
+                                            self.board_temp = status_get_all.board_temp / 10
+                                        else:
+                                            self.board_temp = -1
+                                        # add data received and registered, enable delivery
+                                        self.dataReceived.wakeAll()
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.error(e)
                             else:
