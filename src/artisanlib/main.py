@@ -4149,7 +4149,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         else:
             self.qmc.DeltaBTflag = not self.qmc.DeltaBTflag
         twoAxis_after = self.qmc.twoAxisMode()
-        self.qmc.redraw_keep_view(recomputeAllDeltas=False,forceRenewAxis=(twoAxis_before != twoAxis_after))
+        self.qmc.redraw_keep_view(recomputeAllDeltas=False,forceRenewAxis=twoAxis_before != twoAxis_after)
 
     @pyqtSlot()
     def toggleExtraCurve1(self) -> None:
