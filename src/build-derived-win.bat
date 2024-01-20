@@ -51,6 +51,10 @@ if not defined PYUIC (
     echo PYUIC not set, defaulting to pyuic6.exe
     set PYUIC=pyuic6.exe
 )
+if not defined PYQT (
+    echo PYQT not set, defaulting to 6
+    set PYQT=6
+)
 
 ::
 :: Generate translation, ui, and help files derived from repository sources
