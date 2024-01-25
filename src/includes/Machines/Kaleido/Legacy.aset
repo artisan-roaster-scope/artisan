@@ -90,7 +90,7 @@ extrabytesize=8, 8
 extracomport=COM1, COM1
 extraparity=N, N
 extrastopbits=1, 1
-extratimeout=0.5, 0.5
+extratimeout=0.4, 0.4
 
 [ExtraDev]
 devicetablecolumnwidths=54, 76, 76, 126, 126, 126, 126, 40, 42, 51, 52, 54, 56, 42, 42

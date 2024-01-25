@@ -2057,18 +2057,21 @@ class serialport:
 ############################################################################
     def openport(self) -> None:
         try:
-            self.confport()
-            self.ArduinoIsInitialized = 0  # Assume the Arduino has to be reinitialized
             #open port
             if not self.SP.is_open:
+                self.confport()
+                #Reinitialize Arduino in case communication was interrupted
                 self.SP.open()
+                if self.aw.qmc.device == 19:
+                    libtime.sleep(1) # Arduino takes about 1s after port open until it communicates, as it first restarts
+                    self.ArduinoIsInitialized = 0  # Assume the Arduino has to be reinitialized
+                else:
+                    libtime.sleep(.1) # avoid possible hickups on startup
                 if self.aw.seriallogflag:
                     settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
                     self.aw.addserial('serial port opened: ' + settings)
-                libtime.sleep(.2) # avoid possible hickups on startup
         except Exception: # pylint: disable=broad-except
             self.SP.close()
-            libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port gets disabled
             error = QApplication.translate('Error Message','Serial Exception:') + ' ' + QApplication.translate('Error Message','Unable to open serial port')
             self.aw.qmc.adderror(error)
 
@@ -2085,7 +2088,6 @@ class serialport:
         try:
             if self.SP and self.SP.is_open:
                 self.SP.close()
-                libtime.sleep(0.1) # on OS X opening a serial port too fast after closing the port gets disabled
         except Exception: # pylint: disable=broad-except
             pass
 
@@ -6570,13 +6572,9 @@ class serialport:
             self.aw.qmc.samplingSemaphore.acquire(1)
             if not self.SP.is_open:
                 self.openport()
-                libtime.sleep(1)
-                #Reinitialize Arduino in case communication was interrupted
-                if self.aw.qmc.device == 19:
-                    self.ArduinoIsInitialized = 0
             if self.SP.is_open:
-                self.SP.reset_input_buffer() # self.SP.flushInput() # deprecated in v3
-                self.SP.reset_output_buffer() # self.SP.flushOutput() # deprecated in v3
+                self.SP.reset_input_buffer()
+                self.SP.reset_output_buffer()
                 if isinstance(command, str):
                     if self.aw.qmc.device == 19 and not command.endswith('\n'):
                         command += '\n'
@@ -6639,7 +6637,6 @@ class extraserialport:
         except Exception:  # pylint: disable=broad-except
             if self.SP is not None:
                 self.SP.close()
-#            libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port gets disabled
             error = QApplication.translate('Error Message','Serial Exception:')
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror(error + ' Unable to open serial port',getattr(exc_tb, 'tb_lineno', '?'))
@@ -6647,7 +6644,6 @@ class extraserialport:
     def closeport(self) -> None:
         if self.SP is not None:
             self.SP.close()
-            libtime.sleep(0.3) # on OS X opening a serial port too fast after closing the port gets disabled
 
     # this one is called from scale and color meter code
     def connect(self,error:bool=True) -> bool:
