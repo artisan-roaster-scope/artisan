@@ -43,6 +43,12 @@ clone_depth: 1
 init:
   # Sets the commit hash to "build version number" shown in appveyor build status, the build number keeps it unique
   - ps: Update-AppveyorBuild -Version "$($env:APPVEYOR_REPO_COMMIT.substring(0,7)) ($env:APPVEYOR_BUILD_NUMBER)"
+  # Env used to enable artifact upload for PR builds by providing a valid file name, invalid for REPO builds
+  - ps: |
+      $env:artifact_prefix = 'disable_artifact'
+      if ([bool]$env:APPVEYOR_PULL_REQUEST_NUMBER -eq $true) {
+        $env:artifact_prefix = 'artisan' 
+      }
 
 branches:
   only:
@@ -106,9 +112,9 @@ for:
 #  test_script:
 #    - cmd: python -m unittest discover
 
-#  artifacts:
+  artifacts:
 #    - path: 'generated-win-legacy.zip'
-#    - path: 'src\artisan-*.zip'
+    - path: 'src\%artifact_prefix%-*.zip'
 
   deploy_script:
     - cmd: bash ../.ci/upload.sh artisan-*.zip
@@ -175,9 +181,9 @@ for:
 #  test_script:
 #    - cmd: python -m unittest discover
 
-#  artifacts:
+  artifacts:
 #    - path: 'generated-win.zip'
-#    - path: 'src\artisan-*.zip'
+    - path: 'src\%artifact_prefix%-*.zip'
 
   deploy_script:
     - cmd: bash ../.ci/upload.sh artisan-*.zip
@@ -227,9 +233,9 @@ for:
 #  test_script:
 #    - python -m unittest discover -s src
 
-#  artifacts:
+  artifacts:
 #    - path: 'generated-macos.zip'
-#    - path: 'src/artisan-*.dmg'
+    - path: 'src/%artifact_prefix%-*.dmg'
 
   deploy_script:
     # we upgrade libidn2 and curl to prevent issues caused by the previous python update
@@ -287,11 +293,11 @@ for:
 #  test_script:
 #    - QT_QPA_PLATFORM=offscreen python -m unittest discover -s src
 
-#  artifacts:
+  artifacts:
 #    - path: 'generated-linux.zip'
-#    - path: 'src/artisan-*.deb'
-#    - path: 'src/artisan-*.rpm'
-#    - path: 'src/artisan-*.AppImage'
+    - path: 'src/%artifact_prefix%-*.deb'
+    - path: 'src/%artifact_prefix%-*.rpm'
+    - path: 'src/%artifact_prefix%-*.AppImage'
 
   deploy_script:
     - ../.ci/upload.sh artisan-*.deb

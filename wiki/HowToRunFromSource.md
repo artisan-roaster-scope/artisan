@@ -17,7 +17,7 @@ While this document is presumed free of errors as of January 2024, there is no g
 
 2. Install Python 3.11 from [python.org](https://www.python.org/)
 
-   >*Note for Windows: Python may also be installed from the Microsoft Store or by direct download from the link above.  When installed from the Microsoft Store it is normally started using `python3` as shown below.  When Python is installed by direct download it is normally started with the command `python`. Also note, the Windows command prompt is '>' where the macOS/Linux prompt is '#' as shown below.*
+   >*Note for Windows: Python may be installed from the Microsoft Store or by direct download from the link above.  When installed from the Microsoft Store it is normally started using `python3` as shown below.  When Python is installed by direct download it is normally started with the command `python`. Also note, the Windows command prompt is '>' where the macOS/Linux prompt is '#' as shown below.*
 
 
 3. Create and activate a virtual environment
