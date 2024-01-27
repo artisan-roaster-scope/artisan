@@ -99,7 +99,6 @@ PYQT_QT_BIN = PYQT_QT + r'\bin'
 PYQT_QT_TRANSLATIONS = QT_TRANSL
 YOCTO_BIN = PYTHON_PACKAGES + r'\yoctopuce\cdll'
 SNAP7_BIN = r'C:\Windows'
-LIBUSB_BIN = r'C:\Windows\SysWOW64'
 
 from PyInstaller.utils.hooks import is_module_satisfies
 if is_module_satisfies('scipy >= 1.3.2'):
@@ -232,10 +231,6 @@ copy_file(YOCTO_BIN + r'\yapi64.dll', TARGET + '_internal\yoctopuce\cdll')
 
 # copy Snap7 lib
 copy_file(SNAP7_BIN + r'\snap7.dll', TARGET)
-
-# copy libusb0.1 lib
-
-copy_file(LIBUSB_BIN + r'\libusb0.dll', TARGET + '_internal')
 
 for fn in [
     'artisan.png',

@@ -275,7 +275,7 @@ no_implicit_optional = true
 plugins = ["numpy.typing.mypy_plugin"]
 
 [[tool.mypy.overrides]]
-module = ["matplotlib.*", "aiohttp.*", "aiohttp.web.*", "aiohttp_jinja2.*"]
+module = ["matplotlib.*", "aiohttp.*", "aiohttp.web.*", "aiohttp_jinja2.*", "libusb_package.*"]
 ignore_missing_imports = true
 
 
