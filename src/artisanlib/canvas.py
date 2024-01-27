@@ -2468,7 +2468,7 @@ class tgraphcanvas(FigureCanvas):
             if self.ax is not None:
                 axfig = self.ax.get_figure()
                 if axfig is not None and hasattr(self.fig.canvas,'copy_from_bbox'):
-                    self.ax_background = self.fig.canvas.copy_from_bbox(axfig.bbox) # pyright: ignore[reportGeneralTypeIssues]
+                    self.ax_background = self.fig.canvas.copy_from_bbox(axfig.bbox) # pyright: ignore[reportAttributeAccessIssue]
                     # we redraw the additional artists like the projection lines, the timeline and the AUC guide line
                     self.update_additional_artists()
                     self.fig.canvas.blit(axfig.bbox)
@@ -15523,11 +15523,11 @@ class tgraphcanvas(FigureCanvas):
                 # initialize bitblit background
                 axfig = self.ax.get_figure()
                 if axfig is not None and hasattr(self.fig.canvas,'copy_from_bbox'):
-                    self.ax_background_designer = self.fig.canvas.copy_from_bbox(axfig.bbox)  # pyright: ignore[reportGeneralTypeIssues]
+                    self.ax_background_designer = self.fig.canvas.copy_from_bbox(axfig.bbox)  # pyright: ignore[reportAttributeAccessIssue]
 
             # restore background
             if hasattr(self.fig.canvas,'restore_region'):
-                self.fig.canvas.restore_region(self.ax_background_designer) # pyright: ignore[reportGeneralTypeIssues]
+                self.fig.canvas.restore_region(self.ax_background_designer) # pyright: ignore[reportAttributeAccessIssue]
 
 
             #create statistics bar

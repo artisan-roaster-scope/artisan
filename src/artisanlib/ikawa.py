@@ -375,8 +375,8 @@ try: # BLE not available on some platforms
 
         DEVICE_NAME_IKAWA:   ClassVar[str] = 'IKAWA'
         IKAWA_SERVICE_UUID:  ClassVar[str] = 'C92A6046-6C8D-4116-9D1D-D20A8F6A245F'
-        IKAWA_SEND_CHAR_UUID: ClassVar[Tuple[str,BLE_CHAR_TYPE]] = ('851A4582-19C1-4E6C-AB37-E7A03766BA16', BLE_CHAR_TYPE.BLE_CHAR_WRITE) # pyright: ignore[reportUnboundVariable]
-        IKAWA_RECEIVE_CHAR_UUID: ClassVar[Tuple[str,BLE_CHAR_TYPE]] = ('948C5059-7F00-46D9-AC55-BF090AE066E3', BLE_CHAR_TYPE.BLE_CHAR_NOTIFY) # pyright: ignore[reportUnboundVariable]
+        IKAWA_SEND_CHAR_UUID: ClassVar[Tuple[str,BLE_CHAR_TYPE]] = ('851A4582-19C1-4E6C-AB37-E7A03766BA16', BLE_CHAR_TYPE.BLE_CHAR_WRITE) # type:ignore[reportPossibleUnboundVariable,unused-ignore]
+        IKAWA_RECEIVE_CHAR_UUID: ClassVar[Tuple[str,BLE_CHAR_TYPE]] = ('948C5059-7F00-46D9-AC55-BF090AE066E3', BLE_CHAR_TYPE.BLE_CHAR_NOTIFY) # type:ignore[reportPossibleUnboundVariable,unused-ignore]
 
 
         def __init__(self,

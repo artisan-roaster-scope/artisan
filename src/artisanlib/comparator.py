@@ -677,16 +677,16 @@ class RoastProfile:
         for ll in [self.l_temp1,self.l_temp2]:
             if ll is not None:
                 ll.set_transform(tempTransZero) # we reset the transformation to avoid a double shift along the timeaxis
-                ll.set_xdata([x-offset if x is not None else None for x in self.timex]) # pyright: ignore[reportGeneralTypeIssues]
+                ll.set_xdata(numpy.array([x-offset if x is not None else None for x in self.timex]))
 
         # shifting the extra curves
         for i, (ll1, ll2) in enumerate(zip(self.l_extratemp1,self.l_extratemp2)):
             if ll1 is not None:
                 ll1.set_transform(deltaTransZero if self.extraDelta1[i] else tempTransZero) # we reset the transformation to avoid a double shift along the timeaxis
-                ll1.set_xdata([x-offset if x is not None else None for x in self.extratimex[i]]) # pyright: ignore[reportGeneralTypeIssues]
+                ll1.set_xdata(numpy.array([x-offset if x is not None else None for x in self.extratimex[i]]))
             if ll2 is not None:
                 ll2.set_transform(deltaTransZero if self.extraDelta2[i] else tempTransZero) # we reset the transformation to avoid a double shift along the timeaxis
-                ll2.set_xdata([x-offset if x is not None else None for x in self.extratimex[i]]) # pyright: ignore[reportGeneralTypeIssues]
+                ll2.set_xdata(numpy.array([x-offset if x is not None else None for x in self.extratimex[i]]))
 
         # shifting the delta curves does not work for some curves that hold many points resulting some at the end being not displayed
         # thus we update the xdata explicitly below
@@ -697,7 +697,7 @@ class RoastProfile:
         for ll in [self.l_delta1,self.l_delta2]:
             if ll is not None:
                 ll.set_transform(deltaTransZero) # we reset the transformation to avoid a double shift along the timeaxis
-                ll.set_xdata([x-offset if x is not None else None for x in self.timex]) # pyright: ignore[reportGeneralTypeIssues]
+                ll.set_xdata(numpy.array([x-offset if x is not None else None for x in self.timex]))
 
 #        # update RoR clippings
 #        self.l_delta1_clipping.set_transform(self.getDeltaTrans())

@@ -27,7 +27,7 @@ import usb.util # type: ignore
 import array
 
 if system().startswith('Windows'):
-    import libusb_package  # pylint: disable=import-error
+    import libusb_package # pyright:ignore[reportMissingImports] # pylint: disable=import-error
 
 #import requests
 #from requests_file import FileAdapter # type: ignore # @UnresolvedImport
@@ -134,10 +134,10 @@ class AillioR1:
                 self.usbhandle = usb.core.find(idVendor=self.AILLIO_VID,
                                                idProduct=self.AILLIO_PID_REV3)
         else:
-            self.usbhandle = libusb_package.find(idVendor=self.AILLIO_VID,
+            self.usbhandle = libusb_package.find(idVendor=self.AILLIO_VID, # pyright:ignore[reportPossiblyUnboundVariable]
                                                  idProduct=self.AILLIO_PID)
             if self.usbhandle is None:
-                self.usbhandle = libusb_package.find(idVendor=self.AILLIO_VID,
+                self.usbhandle = libusb_package.find(idVendor=self.AILLIO_VID, # pyright:ignore[reportPossiblyUnboundVariable]
                                                      idProduct=self.AILLIO_PID_REV3)
         if self.usbhandle is None:
             raise OSError('not found or no permission')

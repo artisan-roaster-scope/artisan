@@ -5276,8 +5276,8 @@ class serialport:
                             res = float(self.PhidgetIO[idx].getVoltageRatio())
                         else:
                             res = float(self.PhidgetIO[idx].getVoltage()) * self.aw.qmc.phidget1018valueFactor
-                        self.PhidgetIOlastvalues[i] = res # pyright: ignore[reportGeneralTypeIssues]
-                        return res # pyright: ignore[reportGeneralTypeIssues]
+                        self.PhidgetIOlastvalues[i] = res # pyright: ignore[reportCallIssue, reportArgumentType]
+                        return res # pyright: ignore[reportReturnType]
                     return self.PhidgetIOlastvalues[i] # return the previous result
                 self.PhidgetIOlastvalues[i] = res
                 return res

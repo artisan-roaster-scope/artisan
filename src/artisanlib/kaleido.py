@@ -225,7 +225,7 @@ class KaleidoPort:
     async def ws_handle_reads(self, websocket:websockets.client.WebSocketClientProtocol) -> None:
         while True:
             res:Union[str,bytes] = await asyncio.wait_for(websocket.recv(), timeout=self._read_timeout)
-            message:str = (str(res, 'utf-8') if isinstance(res, bytes) else res) # pyright: ignore[reportGeneralTypeIssues]
+            message:str = (str(res, 'utf-8') if isinstance(res, bytes) else res) # pyright: ignore[reportAssignmentType]
             if self._logging:
                 _log.info('received: %s',message.strip())
             await self.process_message(message)
@@ -247,7 +247,7 @@ class KaleidoPort:
             _log.info('ws_write_process(%s)',message)
         await asyncio.wait_for(self.ws_write(websocket, message), self._send_timeout)
         res:Union[str,bytes] = await asyncio.wait_for(websocket.recv(), self._ping_timeout)
-        response:str = (str(res, 'utf-8') if isinstance(res, bytes) else res) # pyright: ignore[reportGeneralTypeIssues]
+        response:str = (str(res, 'utf-8') if isinstance(res, bytes) else res) # pyright: ignore[reportAssignmentType]
         # register response
         await self.process_message(response.strip())
 
@@ -392,8 +392,8 @@ class KaleidoPort:
         if self._logging:
             _log.info('serial_write_process(%s)',message)
         await asyncio.wait_for(self.serial_write(writer, message), self._send_timeout)
-        res:Union[str,bytes] = await asyncio.wait_for(reader.readline(), self._ping_timeout)
-        response:str = (str(res, 'utf-8') if isinstance(res, bytes) else res) # pyright: ignore[reportGeneralTypeIssues]
+        res:bytes = await asyncio.wait_for(reader.readline(), self._ping_timeout)
+        response:str = str(res, 'utf-8')
         # register response
         await self.process_message(response.strip())
 
