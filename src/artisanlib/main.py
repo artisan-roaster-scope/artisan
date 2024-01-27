@@ -229,7 +229,7 @@ except Exception: # pylint: disable=broad-except
 
 from artisanlib.util import (appFrozen, uchr, decodeLocal, decodeLocalStrict, encodeLocal, encodeLocalStrict, s2a, fill_gaps,
         deltaLabelPrefix, deltaLabelUTF8, deltaLabelBigPrefix, stringfromseconds, stringtoseconds,
-        fromFtoC, fromFtoCstrict, fromCtoF, fromCtoFstrict, RoRfromFtoCstrict, RoRfromCtoFstrict,
+        fromFtoCstrict, fromCtoFstrict, RoRfromFtoCstrict, RoRfromCtoFstrict,
         convertRoR, convertRoRstrict, convertTemp, path2url, toInt, toString, toList, toFloat,
         toBool, toStringList, removeAll, application_name, application_viewer_name, application_organization_name,
         application_organization_domain, getDataDirectory, getAppPath, getResourcePath, debugLogLevelToggle,

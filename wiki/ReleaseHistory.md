@@ -10,6 +10,7 @@ v2.10.2 (XX, 2024)
   - adds machine setups for various machines from Mill City Roasters
   - adds IKAWA PRO X machine support (records ambient pressure, humidity and inlet temperature)
 * CHANGES
+  - replaces USB lib for Aillio connectivity on Windows from libusb-win32 to WinUSB ([PR #1358](../../../pull/1411))
   - upgrades to Qt/PyQt 6.6.2, pymodbus 3.6.3
 * FIXES
   - fixes axis limits on starting the designer from a profile with time axis locked ([Discussion #1325](../../../discussions/1325))
