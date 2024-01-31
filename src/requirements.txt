@@ -30,7 +30,7 @@ wheel==0.42.0
 pyserial==3.5
 pymodbus==3.6.3
 python-snap7==1.3
-Phidget22==1.17.20231004
+Phidget22==1.18.20240123
 Unidecode==1.3.8
 qrcode==7.4.2
 requests==2.31.0
