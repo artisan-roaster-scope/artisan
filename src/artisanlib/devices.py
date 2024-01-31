@@ -2014,6 +2014,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             _t, _e, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + 'savedevicetable(): {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
+
     @pyqtSlot(bool)
     def updateVirtualdevicesinprofile_clicked(self, _:bool) -> None:
         self.updateVirtualdevicesinprofile(redraw=True)
@@ -3014,7 +3015,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ####  DEVICE 144 is +IKAWA Heater/Fan but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
-                ####  DEVICE 145 is +IKAWA State but +DEVICE cannot be set as main device
+                ####  DEVICE 145 is +IKAWA State/Humidity but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
                 elif meter == 'Phidget DAQ1000 01':
@@ -3062,6 +3063,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ##########################
                 ####  DEVICE 159 is +Phidget DAQ1301 67 but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                ####  DEVICE 160 is +IKAWA \Delta Humidity / Humidity direction but +DEVICE cannot be set as main device
                 ##########################
 
                 # ADD DEVICE:
@@ -3241,7 +3245,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 156
                 1, # 157
                 1, # 158
-                1  # 159
+                1, # 159
+                9  # 160
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):
@@ -3396,7 +3401,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             #if device is not None or not external-program (don't need serial settings config)
             if (self.aw.qmc.device not in self.aw.qmc.nonSerialDevices or (self.aw.qmc.device == 134 and self.aw.santokerSerial) or
                 (self.aw.qmc.device == 138 and self.aw.kaleidoSerial)):
-                self.aw.setcommport()
+                QTimer.singleShot(700, self.aw.setcommport)
             self.close()
             self.accept()
         except Exception as e: # pylint: disable=broad-except

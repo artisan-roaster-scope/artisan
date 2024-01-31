@@ -402,6 +402,8 @@ try: # BLE not available on some platforms
             self.fan:int = -1
             self.state:int = -1
             self.absolute_humidity:float = -1
+            self.humidity_roc:float = -1
+            self.humidity_roc_dir:int = -1
             self.ambient_pressure:float = -1
             self.board_temp:float = -1
             # state is one of
@@ -487,6 +489,8 @@ try: # BLE not available on some platforms
             self.fan = -1
             self.state = -1
             self.absolute_humidity = -1
+            self.humidity_roc = -1
+            self.humidity_roc_dir = -1
             self.ambient_pressure = -1
             self.board_temp = -1
 
@@ -567,8 +571,18 @@ try: # BLE not available on some platforms
                                             self.absolute_humidity = status_get_all.humidity_abs / 100
                                         else:
                                             self.absolute_humidity = -1
+                                        # add humidity RoC in (g/m^3)/min
+                                        if status_get_all.HasField('humidity_roc'):
+                                            self.humidity_roc = status_get_all.humidity_roc / 10
+                                        else:
+                                            self.humidity_roc = -1
+                                        # add humidity RoC direction (1: down, 2: up)
+                                        if status_get_all.HasField('humidity_roc_direction'):
+                                            self.humidity_roc_dir = int(status_get_all.humidity_roc_direction)
+                                        else:
+                                            self.humidity_roc_dir = -1
                                         # add board temperature in C
-                                        if status_get_all.HasField('humidity_abs'):
+                                        if status_get_all.HasField('board_temp'):
                                             self.board_temp = status_get_all.board_temp / 10
                                         else:
                                             self.board_temp = -1

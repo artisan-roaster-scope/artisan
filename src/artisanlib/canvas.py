@@ -863,7 +863,8 @@ class tgraphcanvas(FigureCanvas):
                        'Phidget DAQ1301 01',        #156
                        '+Phidget DAQ1301 23',       #157
                        '+Phidget DAQ1301 45',       #158
-                       '+Phidget DAQ1301 67'        #159
+                       '+Phidget DAQ1301 67',       #159
+                       f'+IKAWA {deltaLabelUTF8}Humidity/{deltaLabelUTF8}Humidity Dir.' #160
                        ]
 
         # ADD DEVICE:
@@ -989,7 +990,8 @@ class tgraphcanvas(FigureCanvas):
             156, # Phidget DAQ1301 01
             157, # +Phidget DAQ1301 23
             158, # +Phidget DAQ1301 45
-            159  # +Phidget DAQ1301 67
+            159, # +Phidget DAQ1301 67
+            160  # IKAWA \Delta Humidity / \Delat Humidity direction
         ]
 
         #extra devices

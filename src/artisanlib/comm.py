@@ -522,7 +522,8 @@ class serialport:
                                    self.PHIDGET_DAQ1301_01,   #156
                                    self.PHIDGET_DAQ1301_23,   #157
                                    self.PHIDGET_DAQ1301_45,   #158
-                                   self.PHIDGET_DAQ1301_67    #159
+                                   self.PHIDGET_DAQ1301_67,   #159
+                                   self.Ikawa_MROR            #160
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -1720,6 +1721,15 @@ class serialport:
             t1 = self.aw.ikawa.absolute_humidity
             t2 = self.aw.ikawa.state
         return tx,t1,t2 # time, Absolute Humidity [g/m^3] (chan2), State (chan1)
+
+    def Ikawa_MROR(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        t1:float = -1
+        t2:float = -1
+        if self.aw.ikawa is not None:
+            t1 = self.aw.ikawa.humidity_roc_dir
+            t2 = self.aw.ikawa.humidity_roc
+        return tx,t1,t2 # time, Humidity/Moisture RoR Direction (chan2), Humidity/Moisture RoR (chan1)
 
     def TEVA18B(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
