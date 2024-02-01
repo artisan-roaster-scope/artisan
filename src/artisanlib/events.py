@@ -1186,11 +1186,9 @@ class EventsDlg(ArtisanResizeablDialog):
         typeLayout.addWidget(self.etype4,0,14)
 
         dialogButtonsLayout = QVBoxLayout()
-        dialogButtonsLayout.addStretch()
         dialogButtonsLayout.addWidget(self.dialogbuttons)
         dialogButtonsLayout.addSpacing(15)
         buttonLayout = QHBoxLayout()
-#        buttonLayout.addLayout(FlagsLayout2)
         buttonLayout.addStretch()
         buttonLayout.addLayout(dialogButtonsLayout)
         buttonLayout.addSpacing(10)
@@ -1686,7 +1684,6 @@ class EventsDlg(ArtisanResizeablDialog):
         mainLayout.addWidget(self.TabWidget)
         mainLayout.setSpacing(5)
         mainLayout.setContentsMargins(5, 15, 5, 0)
-        mainLayout.addStretch()
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
         if platform.system() != 'Windows':
