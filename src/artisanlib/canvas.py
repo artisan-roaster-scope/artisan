@@ -16584,9 +16584,8 @@ class tgraphcanvas(FigureCanvas):
 
                     barwheel.append(self.ax2.bar(theta, radii, width=segmentwidth, bottom=lbottom[z],edgecolor=self.wheellinecolor,
                                             linewidth=self.wheellinewidth,picker=3))
-                    count:int = 0
                     #set color, alpha, and text
-                    for _,barwheel[z] in zip(radii, barwheel[z]): # noqa: B020 # type:ignore # pyright: error: "object*" is not iterable
+                    for count, (_, barwheel[z]) in enumerate(zip(radii, barwheel[z])): # noqa: B020 # type:ignore # pyright: error: "object*" is not iterable
                         barwheel_z = barwheel[z]
                         if isinstance(barwheel_z, Rectangle):
                             barwheel_z.set_facecolor(self.wheelcolor[z][count])
@@ -16604,7 +16603,6 @@ class tgraphcanvas(FigureCanvas):
                             anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                         except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                             pass
-                        count += 1
                 with warnings.catch_warnings():
                     warnings.simplefilter('ignore')
                     self.fig.canvas.draw()

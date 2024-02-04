@@ -2368,7 +2368,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 else:
                     self.plus_coffee_selected_label = None
                 if 'plus_blend_spec' in rr:
-                    self.plus_blend_selected_label = (rr['plus_blend_label'] if 'plus_blend_label' in rr else None)
+                    self.plus_blend_selected_label = rr.get('plus_blend_label', None)
                     self.plus_blend_selected_spec = rr['plus_blend_spec']
                     if 'plus_blend_spec_labels' in rr:
                         self.plus_blend_selected_spec_labels = rr['plus_blend_spec_labels']

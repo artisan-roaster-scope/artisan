@@ -4952,7 +4952,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if hasattr(action, 'data'):
                 rr = action.data()
                 if 'background' in rr and rr['background'] is not None and rr['background'] != '':
-                    background_UUID = (rr['roastUUID'] if 'roastUUID' in rr else None)
+                    background_UUID = rr.get('roastUUID', None)
                     self.qmc.resetlinecountcaches()
                     if self.loadbackgroundUUID(rr['background'],background_UUID):
                         try:
@@ -19255,15 +19255,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             'weight_in_num': weight_in_num,
             'weight_out_num': weight_out_num,
             'weight_loss_num': weight_loss_num,
-            'whole_color': (data['whole_color'] if 'whole_color' in data else 0),
-            'ground_color': (data['ground_color'] if 'ground_color' in data else 0),
-            'color_system': (data['color_system'] if 'color_system' in data else ''),
-            'roastertype': (data['roastertype'] if 'roastertype' in data else ''),
-            'roastersize': (data['roastersize'] if 'roastersize' in data else 0),
-            'beansize_min': (data['beansize_min'] if 'beansize_min' in data else 0),
-            'beansize_max': (data['beansize_max'] if 'beansize_max' in data else 0),
-            'roastingnotes': (data['roastingnotes'] if 'roastingnotes' in data else ''),
-            'cuppingnotes': (data['cuppingnotes'] if 'cuppingnotes' in data else '')
+            'whole_color': data.get('whole_color', 0),
+            'ground_color': data.get('ground_color', 0),
+            'color_system': data.get('color_system', ''),
+            'roastertype': data.get('roastertype', ''),
+            'roastersize': data.get('roastersize', 0),
+            'beansize_min': data.get('beansize_min', 0),
+            'beansize_max': data.get('beansize_max', 0),
+            'roastingnotes': data.get('roastingnotes', ''),
+            'cuppingnotes': data.get('cuppingnotes', '')
         }
         return res
 
@@ -19839,8 +19839,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         res['MAI_percent'] = (f"{data['MAI_percent']:.1f}{('%' if units else '')}" if 'MAI_percent' in data else '')
         res['DEV_percent_num'] = (f"{data['DEV_percent']:.1f}" if 'DEV_percent' in data else '0')
         res['DEV_percent'] = (f"{data['DEV_percent']:.1f}{('%' if units else '')}" if 'DEV_percent' in data else '')
-        res['AUC_num'] = (data['AUC'] if 'AUC' in data else '0')
-        res['AUC'] = (data['AUC'] if 'AUC' in data else '')
+        res['AUC_num'] = data.get('AUC', '0')
+        res['AUC'] = data.get('AUC', '')
         res['energy_num'] = (f"{data['energy']:.1f}" if 'energy' in data else '0')
         res['energy'] = (f"{data['energy']:.1f}{'kWh' if units else ''}" if 'energy' in data else '')
         res['co2_num'] = (f"{data['co2']:.1f}" if 'co2' in data else '0')
@@ -20869,9 +20869,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         weight_unit = self.qmc.weight[2]
                         volume_unit = self.qmc.volume[2]
                         temperature_unit = self.qmc.mode
-                        cnum = col_ = 0
+                        col_ = 0
                         for i, rdf in enumerate(ranking_data_fields):
-                            cnum += 1
                             name:str = rdf[field_index.index('name')]
                             units:str = rdf[field_index.index('units')]
                             if units == 'temp':
@@ -20886,13 +20885,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 suffix = f' {units}'
                             else:
                                 suffix = ''
-                            cell = ws.cell(column=cnum, row=1, value=f'{name}{suffix}')
+                            cell = ws.cell(column=i+1, row=1, value=f'{name}{suffix}')
                             cell.font = bf
                             cell.alignment = Alignment(horizontal='center')
                             width = len(name + suffix) + 2.
                             if width > widths[i]:
                                 widths[i] = width
-                                ws.column_dimensions[get_column_letter(cnum)].width = width
+                                ws.column_dimensions[get_column_letter(i+1)].width = width
 
                         # write data
                         c = 1

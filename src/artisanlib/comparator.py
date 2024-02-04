@@ -1747,10 +1747,8 @@ class roastCompareDlg(ArtisanDialog):
     def updateZorders(self) -> None:
         profiles = self.getProfilesVisualOrder()
         profiles.reverse()
-        zorder = 0
-        for rp in profiles:
+        for zorder, rp in enumerate(profiles):
             rp.setZorder(zorder)
-            zorder += 1
 
     def updateVisibilities(self) -> None:
         visibilities:List[bool] = [

@@ -11,6 +11,7 @@ v2.10.2 (XX, 2024)
   - adds IKAWA PRO X machine support (records ambient pressure, humidity and inlet temperature)
 * CHANGES
   - replaces USB lib for Aillio connectivity on Windows from libusb-win32 to WinUSB ([PR #1358](../../../pull/1411))
+  - updates Caromaq machine setups ([PR #1419](../../../pull/1419))
   - upgrades to Qt/PyQt 6.6.2, pymodbus 3.6.3
 * FIXES
   - fixes axis limits on starting the designer from a profile with time axis locked ([Discussion #1325](../../../discussions/1325))
@@ -19,13 +20,13 @@ v2.10.2 (XX, 2024)
   - fixes issue with MODBUS UDP communication that caused unnecessary retries and could break control of some Probat machines
   - fixes regression which broke the DROP alarm action
   - fixes regression which broke the PDF export on Linux
+  - fixes regression which broke PDF/PS export on macOS running on Apple Silicon (M1, M2, ..) ([Issue #1430](../../../issues/1430))
   - fixes regression which broke the transposer calculations
   - fixes regression which broke the simulator for profiles with extra device curves
   - fixes regression which broke the CHARGE timer ([Discussion #1358](../../../discussions/1358))
   - fixes regression which failed to time align profiles on load ([Discussion #1366](../../../discussions/1366))
   - fixes regression that caused IO Phidgets with channels in async mode to detach on ON ([Discussion #1394](../../../discussions/1394))
   - fixes regression which could lead to user customized event type names not being properly persisted in the application settings ([Issue #572](../../../issues/572))
-  - fixes regression which broke PDF/PS export on macOS running on Apple Silicon (M1, M2, ..)
   - fixes regression which broke Aillio R1 communication under Windows
   - fixes broken computation of the event slider calculators
   - fixes arabic reshaping and applies it also to Farsi

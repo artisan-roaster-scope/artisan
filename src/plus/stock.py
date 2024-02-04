@@ -875,14 +875,10 @@ def getBlendBlendDict(blend:BlendStructure, weight:Optional[float]=None) -> Blen
                 else None
             )
             screen_mins.append(
-                components_screen_min[c]
-                if c in components_screen_min
-                else None
+                components_screen_min.get(c)
             )
             screen_maxs.append(
-                components_screen_max[c]
-                if c in components_screen_max
-                else None
+                components_screen_max.get(c)
             )
         res['ingredients'] = ingredients
         try:
@@ -1255,19 +1251,11 @@ def getBlends(weight_unit_idx:int, store:Optional[str] = None, customBlend:Optio
                                 for i in ingredients
                             ]
                             screen_mins = [
-                                (
-                                    coffee_screen_min[i['coffee']]
-                                    if i['coffee'] in coffee_screen_min
-                                    else None
-                                )
+                                coffee_screen_min.get(i['coffee'], None)
                                 for i in ingredients
                             ]
                             screen_maxs = [
-                                (
-                                    coffee_screen_max[i['coffee']]
-                                    if i['coffee'] in coffee_screen_max
-                                    else None
-                                )
+                                coffee_screen_max.get(i['coffee'], None)
                                 for i in ingredients
                             ]
                             # only if the moisture of all components is known,
