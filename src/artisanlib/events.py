@@ -1690,6 +1690,8 @@ class EventsDlg(ArtisanResizeablDialog):
             ok_button: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
             if ok_button is not None:
                 ok_button.setFocus()
+        else:
+            self.TabWidget.setFocus()
 
         self.TabWidget.currentChanged.connect(self.tabSwitched)
 

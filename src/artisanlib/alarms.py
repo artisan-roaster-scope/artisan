@@ -17,6 +17,7 @@
 
 import os
 import sys
+import platform
 import logging
 from typing import Final, Dict, Union, List, Optional, cast, TYPE_CHECKING
 
@@ -249,9 +250,12 @@ class AlarmDlg(ArtisanResizeablDialog):
         mainlayout.addWidget(self.TabWidget)
         mainlayout.addLayout(okbuttonlayout)
         self.setLayout(mainlayout)
-        ok_button = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
-        if ok_button is not None:
-            ok_button.setFocus()
+        if platform.system() != 'Windows':
+            ok_button: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+            if ok_button is not None:
+                ok_button.setFocus()
+        else:
+            self.TabWidget.setFocus()
 
         # we set the active tab with a QTimer after the tabbar has been rendered once, as otherwise
         # some tabs are not rendered at all on Winwos using Qt v6.5.1 (https://bugreports.qt.io/projects/QTBUG/issues/QTBUG-114204?filter=allissues)

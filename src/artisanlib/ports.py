@@ -1654,6 +1654,8 @@ class comportDlg(ArtisanResizeablDialog):
             ok_button: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
             if ok_button is not None:
                 ok_button.setFocus()
+        else:
+            self.TabWidget.setFocus()
         settings = QSettings()
         if settings.contains('PortsGeometry'):
             self.restoreGeometry(settings.value('PortsGeometry'))

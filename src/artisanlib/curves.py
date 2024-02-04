@@ -1409,6 +1409,8 @@ class CurvesDlg(ArtisanDialog):
             ok_button: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
             if ok_button is not None:
                 ok_button.setFocus()
+        else:
+            self.TabWidget.setFocus()
 
         settings = QSettings()
         if settings.contains('CurvesPosition'):

@@ -1371,9 +1371,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         Mlayout.setContentsMargins(5,10,5,5)
         self.setLayout(Mlayout)
         if platform.system() != 'Windows':
-            ok_button = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+            ok_button: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
             if ok_button is not None:
                 ok_button.setFocus()
+        else:
+            self.TabWidget.setFocus()
         settings = QSettings()
         if settings.contains('DeviceAssignmentGeometry'):
             self.restoreGeometry(settings.value('DeviceAssignmentGeometry'))
