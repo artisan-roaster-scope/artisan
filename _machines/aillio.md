@@ -20,7 +20,10 @@ sidebar:
   - support for the new [IBTS IR sensor](https://medium.com/@aillio/the-start-of-something-39aa01d08fa9){:target="_blank"} and newer models version 1.5 and 2, and firmware versions, has been added in Artisan v1.6.1
 
 > **Watch out!** 
-> To connect successfully, Artisan running on Windows
+> To connect successfully, Artisan running on macOS or Linux does not require any extra device driver to be installed.
+
+> **Watch out!** 
+> To connect successfully, Artisan v2.10.0 and older only(!), running on Windows
 > requires libusb-win32-bin-1.2.6.0 driver to be installed. 
 >  
 > To install the libusb driver:

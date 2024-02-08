@@ -104,7 +104,14 @@ The dual temperature meters are perfect for the standard use of Artisan to log t
   - Built in USB to serial converter (9600-8N1)
   - 3 x 1.5V AAA Batteries
   - USB Driver: [CP210x from Silicon Labs](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
+* [Digi-Sense 20250-07](https://www.coleparmer.com/i/digi-sense-ir-thermometer-thermocouple-probe-input-and-nist-traceable-calibration-30-1/2025007) / [Extech 42570](https://www.extech-online.com/index.php?main_page=product_info&cPath=78_21_35&products_id=99)
+  - 1x Dual Laser InfraRed + 1x Type K Input
+  - RS232 Interface (9600-8N1)
+  - Software included
+  - 9V Battery
+  - USB Driver: [CP210x from Silicon Labs](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
 
+ 
  
 ### Four Channel
 

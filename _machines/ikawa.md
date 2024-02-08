@@ -21,3 +21,6 @@ Import of IKAWA roasts from CSV files as well as well as profiles from IKAWA URL
 
 **Watch out!** On macOS Artisan needs permission to communicate via Bluetooth and will ask for it on setup.
 {: .notice--primary}
+
+**Watch out!** Running Artisan in parallel with another roast logging software, like the IKAWA app, connected to the same machine might lead to unstabilities and crashes.
+{: .notice--primary}
