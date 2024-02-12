@@ -19,7 +19,7 @@
 ######
 # the following commented package versions are read by appveyor.yml and downloaded outside of pip.
 #
-# pyinstaller==6.3.0; platform_system='Windows'
+# pyinstaller==6.4.0; platform_system='Windows'
 # libusb==1.0.26;  platform_system='Linux'
 #
 ######
@@ -82,7 +82,7 @@ PyQtWebEngine==5.15.6; (sys_platform=='darwin' and platform_release<'20.0') or (
 PyQt6==6.6.1; (sys_platform=='darwin' and platform_release>='20.0') or (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')
 PyQt6-WebEngine==6.6.0; (sys_platform=='darwin' and platform_release>='20.0') or (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')
 ###
-pyinstaller==6.3.0; platform_system=='Linux' # on Windows pyinstaller is separately installed (see above)
+pyinstaller==6.4.0; platform_system=='Linux' # on Windows pyinstaller is separately installed (see above)
 ###
 ### Qt build tools not part of PyQt but required by build-derived
 qt5-tools==5.15.2.1.3; (platform_system=='Windows' and python_version<'3.9')
