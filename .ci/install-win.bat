@@ -37,7 +37,7 @@ python -V
 ::
 :: Upgrade the Python version to PYUPGRADE_WIN_V when the environment variable exists. 
 ::
-if NOT %PYUPGRADE_WIN_V% == "" (
+if NOT "%PYUPGRADE_WIN_V%" == "" (
     echo ***** Upgrading from Python %PREV_PYTHON_V% to %PYUPGRADE_WIN_V%
     echo *** Downloading Python install exe
     curl -L -O https://www.python.org/ftp/python/%PYUPGRADE_WIN_V%/python-%PYUPGRADE_WIN_V%-amd64.exe
@@ -82,7 +82,6 @@ if /i "%BUILD_PYINSTALLER%"=="True" (
     python ./waf all --msvc_targets=x64
     cd ..
     echo ***** Start build pyinstaller v%PYINSTALLER_VER% wheel
-)
     rem redirect standard output to lower the noise in the logs
     python -m build --wheel > NUL
     if not exist dist/pyinstaller-%PYINSTALLER_VER%-py3-none-any.whl (exit /b 130)
