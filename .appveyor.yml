@@ -20,7 +20,8 @@ environment:
   # Set the Appveyor Python version for windows, macos and linux here. Does not affect windows_legacy.
   PYTHON_V: 3.11
   # Upgrade to specific version (for platforms supporting upgrade). Upgrade skipped if env var is missing or blank.
-  PYUPGRADE_V: 3.11.5
+  #PYUPGRADE_WIN_V: 3.12.2
+  PYUPGRADE_MACOS_V: 3.11.5
 
   matrix:
   - job_name: windows_legacy
@@ -139,6 +140,14 @@ for:
 
   install:
     - cmd: echo Windows Install
+
+    # Update the Python version when PYUPGRADE_WIN_V is set.  The upgrade happens in install-win.bat
+    # Note that the paths set below may not exist yet.
+    - ps: |
+        if (Test-Path env:PYUPGRADE_WIN_V) {
+            $env:PREV_PYTHON_V = $env:PYTHON_V 
+            $env:PYTHON_V = ($env:PYUPGRADE_WIN_V -split '\.')[0..1] -join '.'
+        }
 
     # derive the python path from the version number
     - ps: $env:PYTHON_PATH = "C:/Python$($env:PYTHON_V -replace '\.','')-x64"
@@ -266,9 +275,10 @@ for:
     - chmod +x .ci/*.sh
 
     # pull library versions from requirments file
-#    - ps: $env:LIBUSB_VER = Select-String -Path ./src/requirements.txt 'libusb==([\d\.]*)' -List | ForEach-Object {$_.Matches.Groups[1].Value}
     - ps: $env:LIBUSB_VER = Select-String -Path ./src/requirements.txt "libusb==([\d\.]*).*platform_system='Linux'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
     - ps: Write-Host "LIBUSB_VER= $env:LIBUSB_VER"
+    - ps: $env:DOTENV_VER = Select-String -Path ./src/requirements.txt "dotenv==([\d\.]*).*platform_system='Linux'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
+    - ps: Write-Host "DOTENV_VER= $env:DOTENV_VER"
 
     # update the __revision__ field with the left seven of the GIT commit hash
     - export GIT_VERSION=`git rev-parse --verify --short HEAD 2>/dev/null|| echo "???"`
