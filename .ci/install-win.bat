@@ -82,6 +82,7 @@ if /i "%BUILD_PYINSTALLER%"=="True" (
     python ./waf all --msvc_targets=x64
     cd ..
     echo ***** Start build pyinstaller v%PYINSTALLER_VER% wheel
+)
     rem redirect standard output to lower the noise in the logs
     python -m build --wheel > NUL
     if not exist dist/pyinstaller-%PYINSTALLER_VER%-py3-none-any.whl (exit /b 130)
