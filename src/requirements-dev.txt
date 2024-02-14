@@ -1,7 +1,7 @@
-types-openpyxl==3.1.0.20240106
-types-protobuf==4.24.0.20240106
-types-psutil==5.9.5.20240106
-types-pyserial==3.5.0.20240106
+types-openpyxl==3.1.0.20240205
+types-protobuf==4.24.0.20240129
+types-psutil==5.9.5.20240205
+types-pyserial==3.5.0.20240205
 types-python-dateutil==2.8.19.20240106
 types-PyYAML==6.0.12.12
 types-requests==2.31.0.20240125
@@ -9,7 +9,7 @@ types-setuptools==69.0.0.20240125
 types-urllib3==1.26.25.14
 lxml-stubs==0.5.1
 mypy==1.8.0
-pyright==1.1.349
+pyright==1.1.350
 ruff>=0.1.15
 pylint==3.0.3
 pre-commit>=3.6.0
@@ -26,3 +26,6 @@ hypothesis>=6.96.2
 coverage==7.4.1
 coverage-badge==1.1.0
 codespell==2.2.6
+# the following 2 packages are not installed along aiohttp on Python3.12 and make mypy complain
+async_timeout==4.0.3; python_version >= '3.12'
+cycler==0.12.1; python_version >= '3.12'

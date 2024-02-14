@@ -22,7 +22,7 @@ from typing import Final, Optional, List, Dict, Tuple, Union, Any, Awaitable, ca
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
-    from pymodbus.client.base import ModbusBaseSyncClient # pylint: disable=unused-import
+    from pymodbus.client import ModbusSerialClient, ModbusTcpClient, ModbusUdpClient # pylint: disable=unused-import
     from pymodbus.payload import BinaryPayloadBuilder # pylint: disable=unused-import
     from pymodbus.payload import BinaryPayloadDecoder # pylint: disable=unused-import
     from pymodbus.pdu import ModbusResponse # pylint: disable=unused-import
@@ -170,7 +170,8 @@ class modbusport:
         self.PIDmultiplier:int = 0  # 0:no, 1:10x, 2:100x # :Literal[0,1,2]
         self.byteorderLittle:bool = False
         self.wordorderLittle:bool = True
-        self.master:Optional['ModbusBaseSyncClient'] = None
+#        self.master:Optional['ModbusBaseSyncClient'] = None
+        self.master:Union[None, 'ModbusSerialClient', 'ModbusTcpClient', 'ModbusUdpClient'] = None
         self.COMsemaphore:QSemaphore = QSemaphore(1)
         self.default_host:Final[str] = '127.0.0.1'
         self.host:str = self.default_host # the TCP/UDP host
@@ -213,7 +214,7 @@ class modbusport:
         try:
             if self.master is not None:
                 _log.debug('disconnect()')
-                self.master.close()
+                self.master.close() # type:ignore[no-untyped-call]
                 self.clearReadingsCache()
                 self.aw.sendmessage(QApplication.translate('Message', 'MODBUS disconnected'))
                 del self.master

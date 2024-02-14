@@ -7,8 +7,9 @@ v2.10.2 (XX, 2024)
 * ADDITIONS
   - adds sensitive variants to autoCHARGE and autoDROP detection algorithms ([Issue #1358](../../../issues/1358))
 * NEW HARDWARE SUPPORT
-  - adds machine setups for various machines from Mill City Roasters
-  - adds IKAWA PRO X machine support (records ambient pressure, humidity and inlet temperature)
+  - adds machine setups for machines from [Mill City Roasters](https://millcityroasters.com/)
+  - adds [IKAWA](https://www.ikawacoffee.com/) PRO X machine support (records ambient pressure, humidity and inlet temperature)
+  - adds support for the [Digi-Sense 20250-07](https://www.coleparmer.com/i/digi-sense-ir-thermometer-thermocouple-probe-input-and-nist-traceable-calibration-30-1/2025007) and [Extech 42570](https://www.extech-online.com/index.php?main_page=product_info&cPath=78_21_35&products_id=99) IR and k-type dual-channel meters
 * CHANGES
   - replaces USB lib for Aillio connectivity on Windows from libusb-win32 to WinUSB ([PR #1358](../../../pull/1411))
   - updates Caromaq machine setups ([PR #1419](../../../pull/1419))
@@ -27,6 +28,7 @@ v2.10.2 (XX, 2024)
   - fixes regression which failed to time align profiles on load ([Discussion #1366](../../../discussions/1366))
   - fixes regression that caused IO Phidgets with channels in async mode to detach on ON ([Discussion #1394](../../../discussions/1394))
   - fixes regression which could lead to user customized event type names not being properly persisted in the application settings ([Issue #572](../../../issues/572))
+  - fixes regression which failed to apply RoR smoothing properly
   - fixes regression which broke Aillio R1 communication under Windows
   - fixes broken computation of the event slider calculators
   - fixes arabic reshaping and applies it also to Farsi

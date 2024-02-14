@@ -523,7 +523,10 @@ class serialport:
                                    self.PHIDGET_DAQ1301_23,   #157
                                    self.PHIDGET_DAQ1301_45,   #158
                                    self.PHIDGET_DAQ1301_67,   #159
-                                   self.Ikawa_MROR            #160
+                                   self.Ikawa_MROR,           #160
+                                   self.HH309_34,             #161
+                                   self.Digi_Sense_20250_07,  #162
+                                   self.Extech42570           #163
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -1279,6 +1282,20 @@ class serialport:
         return tx,t2,t1
 
     def HH309(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        t2,t1 = self.CENTER309temperature()
+        return tx,t2,t1
+
+    def HH309_34(self) -> Tuple[float,float,float]:
+        #return saved readings collected at self.CENTER309temperature()
+        return self.aw.qmc.extra309TX,self.aw.qmc.extra309T4,self.aw.qmc.extra309T3
+
+    def Digi_Sense_20250_07(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        t2,t1 = self.CENTER309temperature()
+        return tx,t2,t1
+
+    def Extech42570(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.CENTER309temperature()
         return tx,t2,t1
@@ -2093,6 +2110,8 @@ class serialport:
         self.SP.parity = self.parity
         self.SP.stopbits = self.stopbits
         self.SP.timeout = self.timeout
+        if self.platf != 'Windows':
+            self.SP.exclusive = True
 
     def closeport(self) -> None:
         try:
@@ -6159,7 +6178,7 @@ class serialport:
                 self.SP.flush()
                 libtime.sleep(.1)
                 rl = self.SP.readline().decode('utf-8', 'ignore')[:-2]
-                res = rl.rsplit(',')
+                res = [('-1' if el.strip() == '' else el) for el in rl.rsplit(',')]
 
                 if self.aw.seriallogflag:
                     self.aw.addserial('ArduinoTC4: Tx = ' + str(command) + ' || Rx = ' + str(rl))
@@ -6637,6 +6656,8 @@ class extraserialport:
             self.SP.parity = self.parity
             self.SP.stopbits = self.stopbits
             self.SP.timeout = self.timeout
+            if platform.system() != 'Windows':
+                self.SP.exclusive = True
 
     def openport(self) -> None:
         try:

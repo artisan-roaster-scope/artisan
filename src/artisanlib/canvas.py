@@ -865,6 +865,9 @@ class tgraphcanvas(FigureCanvas):
                        '+Phidget DAQ1301 45',       #158
                        '+Phidget DAQ1301 67',       #159
                        f'+IKAWA {deltaLabelUTF8}Humidity/{deltaLabelUTF8}Humidity Dir.' #160
+                       '+Omega HH309 34',           #161
+                       'Digi-Sense 20250-07',       #162
+                       'Extech 42570'               #163
                        ]
 
         # ADD DEVICE:
@@ -1952,7 +1955,7 @@ class tgraphcanvas(FigureCanvas):
         self.minmaxLimits:bool = False
         self.dropSpikes:bool = False
         self.dropDuplicates:bool = False
-        self.dropDuplicatesLimit:float = 0.3
+        self.dropDuplicatesLimit:float = 0.54
 
         # self.median_filter_factor: factor used for MedianFilter on both, temperature and RoR curves
         self.median_filter_factor:Final[int] = 5 # k=3 is conservative seems not to catch all spikes in all cases; k=5 and k=7 seems to be ok; 13 might be the maximum; k must be odd!
@@ -6836,7 +6839,6 @@ class tgraphcanvas(FigureCanvas):
         window_len:int = 7, window:str = 'hanning', decay_weights:Optional[List[int]] = None, decay_smoothing:bool = False,
         re_sample:bool = True, back_sample:bool = True, a_lin:Optional['npt.NDArray[numpy.double]'] = None,
         delta:bool=False) -> 'npt.NDArray[numpy.double]':
-
         # 1. re-sample
         if re_sample:
             if a_lin is None or len(a_lin) != len(a):
@@ -6885,7 +6887,7 @@ class tgraphcanvas(FigureCanvas):
                             result.append(v)
                         else:
                             result.append(numpy.average(seq,axis=0,weights=w)) # works only if len(seq) = len(w)
-                    res = numpy.array(res)
+                    res = numpy.array(result)
                     # postCond: len(res) = len(b)
             else:
                 # optimal smoothing (the default)
@@ -10608,6 +10610,9 @@ class tgraphcanvas(FigureCanvas):
             if self.step100temp is not None:
                 self.step100temp = int(round(fromCtoFstrict(self.step100temp)))
             self.AUCbase = int(round(fromCtoFstrict(self.AUCbase)))
+            self.dropDuplicatesLimit = fromCtoFstrict(100 + self.dropDuplicatesLimit) - fromCtoFstrict(100)
+            self.RoRlimitm = int(round(fromCtoFstrict(self.RoRlimitm)))
+            self.RoRlimit = int(round(fromCtoFstrict(self.RoRlimit)))
             self.alarmtemperature = [(fromCtoFstrict(t) if t != 500 else t) for t in self.alarmtemperature]
 #            # conv Arduino mode
 #            if self.aw:
@@ -10642,6 +10647,9 @@ class tgraphcanvas(FigureCanvas):
             if self.step100temp is not None:
                 self.step100temp = int(round(fromFtoCstrict(self.step100temp)))
             self.AUCbase = int(round(fromFtoCstrict(self.AUCbase)))
+            self.dropDuplicatesLimit = fromFtoCstrict(212 + self.dropDuplicatesLimit) - fromFtoCstrict(212)
+            self.RoRlimitm = int(round(fromFtoCstrict(self.RoRlimitm)))
+            self.RoRlimit = int(round(fromFtoCstrict(self.RoRlimit)))
             self.alarmtemperature = [(fromFtoCstrict(t) if t != 500 else t) for t in self.alarmtemperature]
 #            # conv Arduino mode
 #            self.aw.pidcontrol.conv2celsius()

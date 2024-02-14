@@ -3069,6 +3069,27 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 160 is +IKAWA \Delta Humidity / Humidity direction but +DEVICE cannot be set as main device
                 ##########################
+                ##########################
+                ####  DEVICE 161 is +Omega HH309 34 but +DEVICE cannot be set as main device
+                ##########################
+                elif meter == 'Digi-Sense 20250-07' and self.aw.qmc.device != 161:
+                    self.aw.qmc.device = 17
+                    #self.aw.ser.comport = "COM4"
+                    self.aw.ser.baudrate = 9600
+                    self.aw.ser.bytesize = 8
+                    self.aw.ser.parity= 'N'
+                    self.aw.ser.stopbits = 1
+                    self.aw.ser.timeout = 0.7
+                    message = QApplication.translate('Message','Device set to {0}. Now, choose serial port').format(meter)
+                elif meter == 'Extech 42570' and self.aw.qmc.device != 162:
+                    self.aw.qmc.device = 17
+                    #self.aw.ser.comport = "COM4"
+                    self.aw.ser.baudrate = 9600
+                    self.aw.ser.bytesize = 8
+                    self.aw.ser.parity= 'N'
+                    self.aw.ser.stopbits = 1
+                    self.aw.ser.timeout = 0.7
+                    message = QApplication.translate('Message','Device set to {0}. Now, choose serial port').format(meter)
 
                 # ADD DEVICE:
 
@@ -3248,7 +3269,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 157
                 1, # 158
                 1, # 159
-                9  # 160
+                9, # 160
+                3, # 161
+                3, # 162
+                3  # 163
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):

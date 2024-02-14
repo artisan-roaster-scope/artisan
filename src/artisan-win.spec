@@ -224,9 +224,9 @@ if not ARTISAN_LEGACY=='True':
 #remove_dir(TARGET + 'mpl-data\sample_data',False)
 
 # YOCTO HACK BEGIN: manually copy over the dlls
-make_dir(TARGET + '_internal\yoctopuce\cdll')
-copy_file(YOCTO_BIN + r'\yapi.dll', TARGET + '_internal\yoctopuce\cdll')
-copy_file(YOCTO_BIN + r'\yapi64.dll', TARGET + '_internal\yoctopuce\cdll')
+make_dir(TARGET + r'_internal\yoctopuce\cdll')
+copy_file(YOCTO_BIN + r'\yapi.dll', TARGET + r'_internal\yoctopuce\cdll')
+copy_file(YOCTO_BIN + r'\yapi64.dll', TARGET + r'_internal\yoctopuce\cdll')
 # YOCTO HACK END
 
 # copy Snap7 lib
@@ -277,10 +277,10 @@ for fn in [
   copy_file(fn, TARGET)
 
 make_dir(TARGET + 'Machines')
-xcopy_files('includes\Machines', TARGET + 'Machines')
+xcopy_files(r'includes\Machines', TARGET + 'Machines')
 
 make_dir(TARGET + 'Themes')
-xcopy_files('includes\Themes', TARGET + 'Themes')
+xcopy_files(r'includes\Themes', TARGET + 'Themes')
 
 make_dir(TARGET + 'Icons')
-xcopy_files('includes\Icons', TARGET + 'Icons')
+xcopy_files(r'includes\Icons', TARGET + 'Icons')

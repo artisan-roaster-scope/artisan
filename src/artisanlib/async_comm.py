@@ -20,7 +20,7 @@ import asyncio
 
 from contextlib import suppress
 from threading import Thread
-from pymodbus.transport.transport_serial import create_serial_connection # patched pyserial-asyncio
+from pymodbus.transport.serialtransport import create_serial_connection # patched pyserial-asyncio
 from typing import Final, Optional, Union, Tuple, Callable, TYPE_CHECKING
 
 if TYPE_CHECKING:
