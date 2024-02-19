@@ -38,16 +38,21 @@ python -V
 :: Upgrade the Python version to PYUPGRADE_WIN_V when the environment variable exists. 
 ::
 if NOT "%PYUPGRADE_WIN_V%" == "" (
-    echo ***** Upgrading from Python %PREV_PYTHON_V% to %PYUPGRADE_WIN_V%
-    echo *** Downloading Python install exe
-    curl -L -O https://www.python.org/ftp/python/%PYUPGRADE_WIN_V%/python-%PYUPGRADE_WIN_V%-amd64.exe
-    if not exist python-%PYUPGRADE_WIN_V%-amd64.exe (exit /b 80)
-    echo *** Installing Python %PYUPGRADE_WIN_V%
-    python-%PYUPGRADE_WIN_V%-amd64.exe /quiet PrependPath=1 Include_doc=0 Include_debug=0 Include_tcltk=0 Include_test=0 
-    if not exist %PYTHON_PATH%\python.exe (exit /b 90)
-    echo ***** Upgrade Complete
-    echo Python Version
-    python -V
+    if exist %PYTHON_PATH%\python.exe (
+        echo **** Python upgrade set to %PYUPGRADE_WIN_V%
+        echo **** Python version was changed from %PREV_PYTHON_V% to %PYUPGRADE_WIN_V%
+    ) else (
+        echo ***** Upgrading from Python %PREV_PYTHON_V% to %PYUPGRADE_WIN_V%
+        echo *** Downloading Python install exe
+        curl -L -O https://www.python.org/ftp/python/%PYUPGRADE_WIN_V%/python-%PYUPGRADE_WIN_V%-amd64.exe
+        if not exist python-%PYUPGRADE_WIN_V%-amd64.exe (exit /b 80)
+        echo *** Installing Python %PYUPGRADE_WIN_V%
+        python-%PYUPGRADE_WIN_V%-amd64.exe /quiet PrependPath=1
+        if not exist %PYTHON_PATH%\python.exe (exit /b 90)
+        echo ***** Upgrade Complete
+        echo Python Version
+        python -V
+    )
 )
 
 ::
