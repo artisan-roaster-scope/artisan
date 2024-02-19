@@ -31,7 +31,7 @@ environment:
   - job_name: macos
     appveyor_build_worker_image: macos-monterey # macos-bigsur (macOS 11 not support by brew any longer)
   - job_name: linux
-    appveyor_build_worker_image: Ubuntu2004
+    appveyor_build_worker_image: Ubuntu2204
 
 
 # Generic build number, later set to commit hash by init
