@@ -21,8 +21,8 @@ from struct import unpack
 from multiprocessing import Pipe
 import threading
 from platform import system
-import usb.core # type: ignore
-import usb.util # type: ignore
+import usb.core # type: ignore[import-untyped]
+import usb.util # type: ignore[import-untyped]
 
 import array
 
@@ -128,11 +128,26 @@ class AillioR1:
         if self.usbhandle is not None:
             return
         if not system().startswith('Windows'):
+            backend = None
+            if system().startswith('Linux'):
+                # we prefer a system installed libusb-1.0 shared lib if available on Linux (incl. RPi),
+                # especially since libusb-1.0.so is from removed from the AppImage installer
+                # if we could not find one, backend remains None and pyusb is searching for a backend
+                # within the app bundle
+                # on macOS libusb is never pre-installed thus we always take the bundled one
+                import os
+                for shared_libusb_path in [
+                        '/usr/lib/x86_64-linux-gnu/libusb-1.0.so.0',
+                        '/usr/lib/aarch64-linux-gnu/libusb-1.0.so.0']:
+                    if os.path.isfile(shared_libusb_path):
+                        from usb.backend.libusb1 import get_backend  # type: ignore[import-untyped]
+                        backend = get_backend(find_library=lambda _,shared_libusb_path=shared_libusb_path: shared_libusb_path)
+                        return
             self.usbhandle = usb.core.find(idVendor=self.AILLIO_VID,
-                                           idProduct=self.AILLIO_PID)
+                                           idProduct=self.AILLIO_PID, backend=backend)
             if self.usbhandle is None:
                 self.usbhandle = usb.core.find(idVendor=self.AILLIO_VID,
-                                               idProduct=self.AILLIO_PID_REV3)
+                                               idProduct=self.AILLIO_PID_REV3, backend=backend)
         else:
             self.usbhandle = libusb_package.find(idVendor=self.AILLIO_VID, # pyright:ignore[reportPossiblyUnboundVariable]
                                                  idProduct=self.AILLIO_PID)
