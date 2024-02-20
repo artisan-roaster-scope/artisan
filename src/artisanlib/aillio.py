@@ -57,7 +57,7 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 def _load_library(find_library:Any = None) -> Any:
-    import usb.libloader # type: ignore[import-untyped, unused-ignore]
+    import usb.libloader # type: ignore[import-untyped, unused-ignore] # pylint: disable=redefined-outer-name
     return usb.libloader.load_locate_library(
                 ('usb-1.0', 'libusb-1.0', 'usb'),
                 'cygusb-1.0.dll', 'Libusb 1',
@@ -137,7 +137,7 @@ class AillioR1:
         if not system().startswith('Windows'):
             backend = None
 
-            if True: #system().startswith('Linux'):
+            if system().startswith('Linux'):
                 # we prefer a system installed libusb-1.0 shared lib if available on Linux (incl. RPi),
                 # especially since libusb-1.0.so is from removed from the AppImage installer
                 # if we could not find one, backend remains None and pyusb is searching for a backend
@@ -149,14 +149,11 @@ class AillioR1:
                         '/usr/lib/x86_64-linux-gnu/libusb-1.0.so.0',
                         '/usr/lib/aarch64-linux-gnu/libusb-1.0.so'
                         '/usr/lib/aarch64-linux-gnu/libusb-1.0.so.0']:
-                    _log.info('PRINT searching for shared lib: %s',shared_libusb_path)
                     if os.path.isfile(shared_libusb_path):
-                        _log.info('PRINT found')
                         import usb.backend.libusb1 as libusb10 # type: ignore[import-untyped, unused-ignore]
-                        libusb10._load_library = _load_library # overwrite the overwrite of the pyinstaller runtime hook pyi_rth_usb.py
+                        libusb10._load_library = _load_library # pylint: disable=protected-access # overwrite the overwrite of the pyinstaller runtime hook pyi_rth_usb.py
                         from usb.backend.libusb1 import get_backend  # type: ignore[import-untyped, unused-ignore]
                         backend = get_backend(find_library=lambda _,shared_libusb_path=shared_libusb_path: shared_libusb_path)
-                        _log.info('PRINT backend: %s', backend)
                         break
             self.usbhandle = usb.core.find(idVendor=self.AILLIO_VID,
                                            idProduct=self.AILLIO_PID, backend=backend)
