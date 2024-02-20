@@ -142,7 +142,7 @@ class AillioR1:
                     if os.path.isfile(shared_libusb_path):
                         from usb.backend.libusb1 import get_backend  # type: ignore[import-untyped]
                         backend = get_backend(find_library=lambda _,shared_libusb_path=shared_libusb_path: shared_libusb_path)
-                        return
+                        break
             self.usbhandle = usb.core.find(idVendor=self.AILLIO_VID,
                                            idProduct=self.AILLIO_PID, backend=backend)
             if self.usbhandle is None:
