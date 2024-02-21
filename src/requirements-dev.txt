@@ -1,4 +1,4 @@
-types-openpyxl==3.1.0.20240205
+types-openpyxl==3.1.0.20240220
 types-protobuf==4.24.0.20240129
 types-psutil==5.9.5.20240205
 types-pyserial==3.5.0.20240205
@@ -10,9 +10,9 @@ types-urllib3==1.26.25.14
 lxml-stubs==0.5.1
 mypy==1.8.0
 pyright==1.1.351
-ruff>=0.1.15
+ruff>=0.2.2
 pylint==3.0.3
-pre-commit>=3.6.0
+pre-commit>=3.6.2
 pytest==8.0.1
 pytest-cov==4.1.0
 #pytest-qt==4.3.1
@@ -22,8 +22,8 @@ pytest-cov==4.1.0
 #pytest-bdd==6.1.1
 #pytest-benchmark==4.0.0
 #pytest-mock==3.11.1
-hypothesis>=6.96.2
-coverage==7.4.1
+hypothesis>=6.96.9
+coverage==7.4.2
 coverage-badge==1.1.0
 codespell==2.2.6
 # the following 2 packages are not installed along aiohttp on Python3.12 and make mypy complain
