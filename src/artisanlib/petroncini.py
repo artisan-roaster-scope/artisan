@@ -165,7 +165,7 @@ def extractProfilePetronciniCSV(file:str, aw:'ApplicationWindow') -> 'ProfileDat
     res['extratemp1'] = [extra2]
     res['extramathexpression1'] = ['']
 
-    res['extraname2'] = ['']
+    res['extraname2'] = ['IT']
     if aw.qmc.dropDuplicates:
         res['extratemp2'] = [replace_duplicates(extra1)]
     else:
