@@ -2,7 +2,7 @@ Source: artisan
 Package: artisan
 Version: _VERSION_
 Section: misc
-Depends: libc6 (>= 2.17)
+Depends: libc6 (>= 2.35)
 Priority: extra
 Architecture: x86_64
 Installed-Size: 305144

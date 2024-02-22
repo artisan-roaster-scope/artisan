@@ -159,8 +159,8 @@ OPTIONS = {
     'argv_emulation': False, # this would confuses GUI processing
     'semi_standalone': False,
     'site_packages': True,
-    'packages': ['yoctopuce','openpyxl','numpy','scipy','certifi',
-        'matplotlib','PIL', 'lxml', 'snap7'], # MPL and PIL added for mpl v3.3.x
+    'packages': ['yoctopuce','openpyxl','numpy','scipy','certifi', 'kiwisolver', 'psutil',
+        'matplotlib','PIL', 'lxml', 'snap7', 'google.protobuf', 'google._upb'], # MPL and PIL added for mpl v3.3.x
     'optimize':  2,
     'compressed': True,
     'iconfile': 'artisan.icns',

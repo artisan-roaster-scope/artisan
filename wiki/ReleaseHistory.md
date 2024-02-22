@@ -1,7 +1,7 @@
 Detailed Release History
 ========================
 ----
-v2.10.2 (XX, 2024)
+v2.10.2 (February XX, 2024)
 ------------------
 
 * ADDITIONS
@@ -17,9 +17,10 @@ v2.10.2 (XX, 2024)
   - upgrades to Python 3.12, Qt/PyQt 6.6.2, pymodbus 3.6.4 and matplotlib 3.8.3
 * FIXES
   - fixes axis limits on starting the designer from a profile with time axis locked ([Discussion #1325](../../../discussions/1325))
+  - fixes long standing issue where the Designer looses one sample on each round-trip (thanks [Terracotta-6](https://github.com/Terracotta-6) for reporting)
   - fixes regresion that kept log dialogs (serial, message, error) empty ([Issue #1393](../../../issues/1393))
   - fixes regression which broke loading of certain MODBUS configurations correctly (eg. Loring)
-  - fixes issue with MODBUS UDP communication that caused unnecessary retries and could break control of some Probat machines
+  - fixes issue with MODBUS UDP communication that caused unnecessary retries and could break control on some Probat machines
   - fixes regression which broke the DROP alarm action
   - fixes regression which broke the PDF export on Linux
   - fixes regression which broke PDF/PS export on macOS running on Apple Silicon (M1, M2, ..) ([Issue #1430](../../../issues/1430))
@@ -32,9 +33,8 @@ v2.10.2 (XX, 2024)
   - fixes regression which broke Aillio R1 communication under Windows
   - fixes broken computation of the event slider calculators
   - fixes arabic reshaping and applies it also to Farsi
-  - fixes long standing issue where the Designer looses one sample on each round-trip (thanks [Terracotta-6](https://github.com/Terracotta-6) for reporting)
   - fixes CSV export ([Discussion #1357](../../../discussions/1357))
-* REMOVALS
+  - fixes WebSocket connection handling ([Issue #1463](../../../issues/1463))
 
 
 ----
