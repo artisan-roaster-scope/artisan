@@ -33,6 +33,7 @@ try:
 except ImportError:
     from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
+
 class wsport:
 
     __slots__ = [ 'aw', 'default_host', 'host', 'port', 'path', 'machineID',  'lastReadResult', 'channels', 'readings', 'channel_requests', 'channel_nodes',
@@ -206,11 +207,11 @@ class wsport:
         if self.aw.seriallogflag:
             self.aw.addserial('wsport onOpen()')
 
-    def onPing(self, _data:str) -> None:
+    def onPing(self, _:'WebSocket', _data:str) -> None:
         if self.aw.seriallogflag:
             self.aw.addserial('wsport onPing()')
 
-    def onPong(self, _data:str) -> None:
+    def onPong(self, _:'WebSocket', _data:str) -> None:
         if self.aw.seriallogflag:
             self.aw.addserial('wsport onPong()')
 
@@ -252,30 +253,27 @@ class wsport:
                 self.aw.addserial('wsport connect()')
             self.active = True
             self.wst = threading.Thread(target=self.create)
-#            if self.wst is not None:
             self.open_event = threading.Event()
             if self.open_event is not None:
                 self.wst.start()
                 success = self.open_event.wait(timeout=self.connect_timeout + 0.3)
                 self.open_event = None
                 return success
-#            return False
         return True
 
     def is_connected(self) -> bool:
-        return self.ws is not None and bool(self.ws.sock)
+        return self.ws is not None and bool(self.ws.sock) and self.active
 
     def disconnect(self) -> None:
-        if self.is_connected():
-            if self.aw.seriallogflag:
-                self.aw.addserial('wsport disconnect()')
-            self.active = False
-            if self.ws is not None:
-                self.ws.close()
-                self.ws = None
-            if self.wst is not None:
-                self.wst.join()
-                self.wst = None
+        if self.is_connected() and self.aw.seriallogflag:
+            self.aw.addserial('wsport disconnect()')
+        self.active = False
+        if self.ws is not None:
+            self.ws.close()
+            self.ws = None
+        if self.wst is not None:
+            self.wst.join()
+            self.wst = None
 
 
     # request event handling
