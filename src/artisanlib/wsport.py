@@ -34,13 +34,12 @@ except ImportError:
     from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
-
 class wsport:
 
     __slots__ = [ 'aw', 'default_host', 'host', 'port', 'path', 'machineID',  'lastReadResult', 'channels', 'readings', 'channel_requests', 'channel_nodes',
                     'channel_modes', 'connect_timeout', 'request_timeout', 'reconnect_interval', 'ping_interval', 'ping_timeout', 'id_node', 'machine_node',
                     'command_node', 'data_node', 'pushMessage_node', 'request_data_command', 'charge_message', 'drop_message', 'addEvent_message', 'event_node',
-                    'DRY_node', 'FCs_node', 'FCe_node', 'SCs_node', 'SCe_node', 'STARTonCHARGE', 'OFFonDROP', 'open_event', 'pending_events', 'active',
+                    'DRY_node', 'FCs_node', 'FCe_node', 'SCs_node', 'SCe_node', 'STARTonCHARGE', 'OFFonDROP', 'open_event', 'pending_events',
                     'ws', 'wst' ]
 
     def __init__(self, aw:'ApplicationWindow') -> None:
@@ -67,7 +66,7 @@ class wsport:
         # configurable via the UI:
         self.connect_timeout:float = 4    # in seconds
         self.request_timeout:float = 0.5  # in seconds
-        self.reconnect_interval:float = 2 # in seconds
+        self.reconnect_interval:float = 2 # in seconds # not used for now
         # not configurable via the UI:
         self.ping_interval:float = 0      # in seconds; if 0 pings are not send automatically
         self.ping_timeout:Optional[float] = None    # in seconds
@@ -101,7 +100,6 @@ class wsport:
         self.open_event:Optional[threading.Event] = None # an event set on connecting
         self.pending_events:Dict[int, Union[threading.Event, Dict[str,Any]]] = {} # message ids associated with pending threading.Event object or result
 
-        self.active:bool = False
         self.ws:Optional['WebSocketApp'] = None  # the WebService client object
         self.wst:Optional[threading.Thread] = None # the WebService thread
 
@@ -220,41 +218,33 @@ class wsport:
         from websocket import WebSocketApp, setdefaulttimeout # pyright:ignore[reportPrivateImportUsage]
         # initialize readings
         self.readings = [-1]*self.channels
-        while self.active:
-            try:
-                if self.aw.seriallogflag:
-                    self.aw.addserial('wsport create()')
-                setdefaulttimeout(self.connect_timeout)
-                #websocket.enableTrace(True)
-                self.ws = WebSocketApp(f'ws://{self.host}:{self.port}/{self.path}',
+        try:
+            if self.aw.seriallogflag:
+                self.aw.addserial('wsport create()')
+            setdefaulttimeout(self.connect_timeout)
+            #websocket.enableTrace(True)
+            self.ws = WebSocketApp(f'ws://{self.host}:{self.port}/{self.path}',
                                 on_message=self.onMessage,
                                 on_error=self.onError,
                                 on_ping=self.onPing,
                                 on_pong=self.onPong,
                                 on_close=self.onClose,
-                                on_open=self.onOpen
-                                )
-                if self.ws is not None:
-                    self.ws.run_forever(
-                        skip_utf8_validation=True,
-                        ping_interval=self.ping_interval,
-                        ping_timeout=self.ping_timeout)
-            except Exception as e: # pylint: disable=broad-except
-                self.aw.qmc.adderror(QApplication.translate('Error Message','WebSocket connection failed: {}').format(e))
-                if self.aw.seriallogflag:
-                    self.aw.addserial(f'wsport create() error: {e}')
+                                on_open=self.onOpen)
             if self.ws is not None:
-                self.ws.teardown()
-            time.sleep(self.reconnect_interval)
-            if self.active:
-                self.aw.sendmessage(QApplication.translate('Error Message','Reconnecting WebSocket'))
+                self.ws.run_forever(
+                    skip_utf8_validation=True,
+                    ping_interval=self.ping_interval,
+                    ping_timeout=self.ping_timeout)
+        except Exception as e: # pylint: disable=broad-except
+            self.aw.qmc.adderror(QApplication.translate('Error Message','WebSocket connection failed: {}').format(e))
+            if self.aw.seriallogflag:
+                self.aw.addserial(f'wsport create() error: {e}')
         self.ws = None
 
     def connect(self) -> bool:
         if not self.is_connected():
             if self.aw.seriallogflag:
                 self.aw.addserial('wsport connect()')
-            self.active = True
             self.wst = threading.Thread(target=self.create)
             self.open_event = threading.Event()
             if self.open_event is not None:
@@ -265,13 +255,11 @@ class wsport:
         return True
 
     def is_connected(self) -> bool:
-        res = self.active and self.ws is not None and self.ws.sock is not None and self.ws.sock.connected
-        return res
+        return self.ws is not None and self.ws.sock is not None and self.ws.sock.connected
 
     def disconnect(self) -> None:
         if self.is_connected() and self.aw.seriallogflag:
             self.aw.addserial('wsport disconnect()')
-        self.active = False
         if self.ws is not None:
             self.ws.close()
             self.ws = None
