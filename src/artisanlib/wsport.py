@@ -34,6 +34,7 @@ except ImportError:
     from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
+
 class wsport:
 
     __slots__ = [ 'aw', 'default_host', 'host', 'port', 'path', 'machineID',  'lastReadResult', 'channels', 'readings', 'channel_requests', 'channel_nodes',
@@ -242,6 +243,8 @@ class wsport:
                 self.aw.qmc.adderror(QApplication.translate('Error Message','WebSocket connection failed: {}').format(e))
                 if self.aw.seriallogflag:
                     self.aw.addserial(f'wsport create() error: {e}')
+            if self.ws is not None:
+                self.ws.teardown()
             time.sleep(self.reconnect_interval)
             if self.active:
                 self.aw.sendmessage(QApplication.translate('Error Message','Reconnecting WebSocket'))
@@ -262,7 +265,8 @@ class wsport:
         return True
 
     def is_connected(self) -> bool:
-        return self.ws is not None and bool(self.ws.sock) and self.active
+        res = self.active and self.ws is not None and self.ws.sock is not None and self.ws.sock.connected
+        return res
 
     def disconnect(self) -> None:
         if self.is_connected() and self.aw.seriallogflag:
