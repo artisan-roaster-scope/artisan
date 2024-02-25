@@ -19,7 +19,6 @@ import sys
 import platform
 import numpy
 from matplotlib import ticker, transforms
-import matplotlib.patheffects as PathEffects
 from matplotlib import rcParams
 import logging
 from typing import Final, TypedDict, Sequence, List, Union, Tuple, Optional, Literal, Callable, cast, TYPE_CHECKING
@@ -781,8 +780,11 @@ class RoastProfile:
                 extradrawstyles1 = (self.aw.qmc.extradrawstyles1[i] if len(self.aw.qmc.extradrawstyles1)>i else self.aw.qmc.drawstyle_default)
                 l_temp1, = self.aw.qmc.ax.plot(self.extratimex[i],numpy.array(self.extrastemp1[i]),transform=(self.getDeltaTrans() if self.extraDelta1[i] else self.getTempTrans()),
                     markersize=extramarkersizes1,marker=extramarkers1,visible=(self.visible and self.aligned),
-                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=extralinewidths1+self.aw.qmc.patheffects,foreground=self.aw.qmc.palette['background'])],
-                    linewidth=extralinewidths1,linestyle=extralinestyles1,drawstyle=extradrawstyles1,
+                    sketch_params=None,
+                    path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, extralinewidths1),
+                    linewidth=extralinewidths1,
+                    linestyle=extralinestyles1,
+                    drawstyle=extradrawstyles1,
                     alpha=(self.alpha[0] if self.active else self.alpha[0]*self.alpha_dim_factor),
                     color=(self.color if self.active else self.gray),
                     label=f'{self.label} {self.aw.arabicReshape(self.extraname1[i])}')
@@ -795,8 +797,11 @@ class RoastProfile:
                 extradrawstyles2 = (self.aw.qmc.extradrawstyles2[i] if len(self.aw.qmc.extradrawstyles2)>i else self.aw.qmc.drawstyle_default)
                 l_temp2, = self.aw.qmc.ax.plot(self.extratimex[i],numpy.array(self.extrastemp2[i]),transform=(self.getDeltaTrans() if self.extraDelta2[i] else self.getTempTrans()),
                     markersize=extramarkersizes2,marker=extramarkers2,visible=(self.visible and self.aligned),
-                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=extralinewidths2+self.aw.qmc.patheffects,foreground=self.aw.qmc.palette['background'])],
-                    linewidth=extralinewidths2,linestyle=extralinestyles2,drawstyle=extradrawstyles2,
+                    sketch_params=None,
+                    path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, extralinewidths2),
+                    linewidth=extralinewidths2,
+                    linestyle=extralinestyles2,
+                    drawstyle=extradrawstyles2,
                     alpha=(self.alpha[0] if self.active else self.alpha[0]*self.alpha_dim_factor),
                     color=(self.color if self.active else self.gray),
                     label=f'{self.label} {self.aw.arabicReshape(self.extraname2[i])}')
@@ -805,8 +810,11 @@ class RoastProfile:
     def drawBT(self) -> None:
         if self.aw.qmc.ax is not None and self.timex is not None and self.stemp2 is not None:
             self.l_temp2, = self.aw.qmc.ax.plot(self.timex,numpy.array(self.stemp2),transform=self.getTempTrans(),markersize=self.aw.qmc.BTmarkersize,marker=self.aw.qmc.BTmarker,visible=(self.visible and self.aligned),
-                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.aw.qmc.BTlinewidth+self.aw.qmc.patheffects,foreground=self.aw.qmc.palette['background'])],
-                linewidth=self.aw.qmc.BTlinewidth,linestyle=self.aw.qmc.BTlinestyle,drawstyle=self.aw.qmc.BTdrawstyle,
+                sketch_params=None,
+                path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, self.aw.qmc.BTlinewidth),
+                linewidth=self.aw.qmc.BTlinewidth,
+                linestyle=self.aw.qmc.BTlinestyle,
+                drawstyle=self.aw.qmc.BTdrawstyle,
                 alpha=(self.alpha[0] if self.active else self.alpha[0]*self.alpha_dim_factor),
                 color=(self.color if self.active else self.gray),
                 label=f'{self.label} {self.aw.arabicReshape(self.aw.BTname)}')
@@ -814,8 +822,11 @@ class RoastProfile:
     def drawET(self) -> None:
         if self.aw.qmc.ax is not None and self.timex is not None and self.stemp1 is not None:
             self.l_temp1, = self.aw.qmc.ax.plot(self.timex,numpy.array(self.stemp1),transform=self.getTempTrans(),markersize=self.aw.qmc.ETmarkersize,marker=self.aw.qmc.ETmarker,visible=(self.visible and self.aligned),
-                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.aw.qmc.ETlinewidth+self.aw.qmc.patheffects,foreground=self.aw.qmc.palette['background'])],
-                linewidth=self.aw.qmc.ETlinewidth,linestyle=self.aw.qmc.ETlinestyle,drawstyle=self.aw.qmc.ETdrawstyle,
+                sketch_params=None,
+                path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, self.aw.qmc.ETlinewidth),
+                linewidth=self.aw.qmc.ETlinewidth,
+                linestyle=self.aw.qmc.ETlinestyle,
+                drawstyle=self.aw.qmc.ETdrawstyle,
                 alpha=(self.alpha[1] if self.active else self.alpha[1]*self.alpha_dim_factor),
                 color=(self.color if self.active else self.gray),
                 label=f'{self.label} {self.aw.arabicReshape(self.aw.ETname)}')
@@ -825,8 +836,11 @@ class RoastProfile:
             # we clip the RoR such that values below 0 are not displayed
 #            self.l_delta2_clipping = patches.Rectangle((0,0),self.timex[self.endTimeIdx],self.max_DeltaBT, transform=self.getDeltaTrans())
             self.l_delta2, = self.aw.qmc.ax.plot(self.timex, numpy.array(self.delta2),transform=self.getDeltaTrans(),markersize=self.aw.qmc.BTdeltamarkersize,marker=self.aw.qmc.BTdeltamarker,visible=(self.visible and self.aligned),
-                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.aw.qmc.BTdeltalinewidth+self.aw.qmc.patheffects,foreground=self.aw.qmc.palette['background'])],
-                linewidth=self.aw.qmc.BTdeltalinewidth,linestyle=self.aw.qmc.BTdeltalinestyle,drawstyle=self.aw.qmc.BTdeltadrawstyle,
+                sketch_params=None,
+                path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, self.aw.qmc.BTdeltalinewidth),
+                linewidth=self.aw.qmc.BTdeltalinewidth,
+                linestyle=self.aw.qmc.BTdeltalinestyle,
+                drawstyle=self.aw.qmc.BTdeltadrawstyle,
                 alpha=(self.alpha[2] if self.active else self.alpha[2]*self.alpha_dim_factor),
 #                clip_path=self.l_delta2_clipping,clip_on=True,
                 color=(self.color if self.active else self.gray),
@@ -837,8 +851,11 @@ class RoastProfile:
             # we clip the RoR such that values below 0 are not displayed
 #            self.l_delta1_clipping = patches.Rectangle((0,0),self.timex[self.endTimeIdx],self.max_DeltaET, transform=self.getDeltaTrans())
             self.l_delta1, = self.aw.qmc.ax.plot(self.timex, numpy.array(self.delta1),transform=self.getDeltaTrans(),markersize=self.aw.qmc.ETdeltamarkersize,marker=self.aw.qmc.ETdeltamarker,visible=(self.visible and self.aligned),
-                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.aw.qmc.ETdeltalinewidth+self.aw.qmc.patheffects,foreground=self.aw.qmc.palette['background'])],
-                linewidth=self.aw.qmc.ETdeltalinewidth,linestyle=self.aw.qmc.ETdeltalinestyle,drawstyle=self.aw.qmc.ETdeltadrawstyle,
+                sketch_params=None,
+                path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, self.aw.qmc.ETdeltalinewidth),
+                linewidth=self.aw.qmc.ETdeltalinewidth,
+                linestyle=self.aw.qmc.ETdeltalinestyle,
+                drawstyle=self.aw.qmc.ETdeltadrawstyle,
                 alpha=(self.alpha[3] if self.active else self.alpha[3]*self.alpha_dim_factor),
 #                clip_path=self.l_delta1_clipping,clip_on=True,
                 color=(self.color if self.active else self.gray),
@@ -849,7 +866,7 @@ class RoastProfile:
             self.l_mainEvents1, = self.aw.qmc.ax.plot(numpy.array(self.events_timex),numpy.array(self.events1),transform=self.getTempTrans(),
                 markersize=self.aw.qmc.ETlinewidth + 3,marker='o',visible=(self.visible and self.aligned),
                 sketch_params=None,
-                path_effects=[PathEffects.withStroke(linewidth=self.aw.qmc.ETlinewidth+self.aw.qmc.patheffects,foreground=self.aw.qmc.palette['background'])],
+                path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, self.aw.qmc.ETlinewidth),
                 linewidth=0,linestyle='',
                 alpha=(self.alpha[1] if self.active else self.alpha[1]*self.alpha_dim_factor),
                 color=(self.color if self.active else self.gray),
@@ -865,7 +882,7 @@ class RoastProfile:
             self.l_mainEvents2, = self.aw.qmc.ax.plot(numpy.array(self.events_timex),numpy.array(self.events2),transform=self.getTempTrans(),
                 markersize=self.aw.qmc.BTlinewidth + 3,marker='o',visible=(self.visible and self.aligned),
                 sketch_params=None,
-                path_effects=[PathEffects.withStroke(linewidth=self.aw.qmc.BTlinewidth+self.aw.qmc.patheffects,foreground=self.aw.qmc.palette['background'])],
+                path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, self.aw.qmc.BTlinewidth),
                 linewidth=0,linestyle='',
                 alpha=(self.alpha[0] if self.active else self.alpha[0]*self.alpha_dim_factor),
                 color=(self.color if self.active else self.gray),
@@ -1196,7 +1213,6 @@ class roastCompareDlg(ArtisanDialog):
                 self.aw.qmc.delta_ax.yaxis.set_minor_locator(ticker.NullLocator())
 
     def clearCanvas(self) -> None:
-        rcParams['path.effects'] = []
         scale = 1 if self.aw.qmc.graphstyle == 1 else 0
         length = 700 # 100 (128 the default)
         randomness = 12 # 2 (16 default)

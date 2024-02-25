@@ -10,6 +10,7 @@ v2.10.2 (February XX, 2024)
   - adds machine setups for machines from [Mill City Roasters](https://millcityroasters.com/)
   - adds [IKAWA](https://www.ikawacoffee.com/) PRO X machine support (records ambient pressure, humidity and inlet temperature)
   - adds support for the [Digi-Sense 20250-07](https://www.coleparmer.com/i/digi-sense-ir-thermometer-thermocouple-probe-input-and-nist-traceable-calibration-30-1/2025007) and [Extech 42570](https://www.extech-online.com/index.php?main_page=product_info&cPath=78_21_35&products_id=99) IR and k-type dual-channel meters
+  - adds glowing lines style
 * CHANGES
   - replaces USB lib for Aillio connectivity on Windows from libusb-win32 to WinUSB ([PR #1358](../../../pull/1411))
   - adds C/F conversion for the drop duplicates limit and the RoR limits ([Issue #1406](../../../issues/1406))

@@ -15,7 +15,6 @@
 # AUTHOR
 # Marko Luther, 2023
 
-from matplotlib import rcParams
 from typing import Dict, Optional, cast, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -44,8 +43,6 @@ class WheelDlg(ArtisanDialog):
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, False) # overwrite the ArtisanDialog class default here!!
-
-        rcParams['path.effects'] = []
 
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Wheel Graph Editor'))

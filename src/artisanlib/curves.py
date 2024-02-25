@@ -311,6 +311,7 @@ class CurvesDlg(ArtisanDialog):
         self.org_BTProjection = self.aw.qmc.BTprojectFlag
         self.org_ProjectionDelta = self.aw.qmc.projectDeltaFlag
         self.org_patheffects = self.aw.qmc.patheffects
+        self.org_glow = self.aw.qmc.glow
         self.org_graphstyle = self.aw.qmc.graphstyle
         self.org_graphfont = self.aw.qmc.graphfont
         self.org_filterDropOuts = self.aw.qmc.filterDropOuts
@@ -1185,16 +1186,22 @@ class CurvesDlg(ArtisanDialog):
         self.soundCheck.setChecked(bool(self.aw.soundflag))
         self.soundCheck.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.soundCheck.stateChanged.connect(self.soundset) #toggle
+        self.glowCheck = QCheckBox(QApplication.translate('CheckBox', 'Glow'))
+        self.glowCheck.setChecked(bool(self.aw.qmc.glow))
+        self.glowCheck.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.glowCheck.stateChanged.connect(self.glowset) #toggle
         self.notifications = QCheckBox(QApplication.translate('CheckBox', 'Notifications'))
         self.notifications.setChecked(self.aw.notificationsflag)
         self.notifications.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         notifyLayout = QHBoxLayout()
         notifyLayout.addWidget(self.notifications)
+        notifyLayout.addSpacing(15)
+        notifyLayout.addWidget(self.soundCheck)
         notifyLayout.addStretch()
         appLayout1 = QHBoxLayout()
         appLayout1.addLayout(pathEffectsLayout)
         appLayout1.addStretch()
-        appLayout1.addWidget(self.soundCheck)
+        appLayout1.addWidget(self.glowCheck)
         appLayout1.addStretch()
         appLayout1.addWidget(self.styleComboBox)
         appLayout2 = QHBoxLayout()
@@ -2249,6 +2256,11 @@ class CurvesDlg(ArtisanDialog):
             self.aw.sendmessage(QApplication.translate('Message','Sound turned OFF'))
 
     @pyqtSlot(int)
+    def glowset(self, _:int) -> None:
+        self.aw.qmc.glow = (self.aw.qmc.glow + 1) % 2
+        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=False)
+
+    @pyqtSlot(int)
     def changeDeltaET(self, _:int = 0) -> None:
         self.aw.qmc.DeltaETflag = not self.aw.qmc.DeltaETflag
         if self.aw.qmc.crossmarker:
@@ -2485,6 +2497,7 @@ class CurvesDlg(ArtisanDialog):
         self.aw.qmc.BTprojectFlag = self.org_BTProjection
         self.aw.qmc.projectDeltaFlag = self.org_ProjectionDelta
         self.aw.qmc.patheffects = self.org_patheffects
+        self.aw.qmc.glow = self.org_glow
         self.aw.qmc.graphstyle = self.org_graphstyle
         self.aw.qmc.graphfont = self.org_graphfont
         self.aw.qmc.filterDropOuts = self.org_filterDropOuts

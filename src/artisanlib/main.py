@@ -5624,6 +5624,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.sliderGrp34.addLayout(self.sliderGrpBox3x)
             self.eventsliderAlternativeLayout = alternativeLayout
 
+    # True if background color is light, otherwise false
+    @functools.cached_property
+    def light_background_p(self) -> bool:
+        background_color = self.qmc.palette['background']
+        return self.colorDifference('#ffffff', background_color) < self.colorDifference('#000000',background_color)
+
+
     def updateCanvasColors(self, checkColors:bool=True) -> None:
         canvas_color = self.qmc.palette['canvas']
         if canvas_color is not None and canvas_color != 'None' and not QColor.isValidColor(canvas_color):
@@ -5739,6 +5746,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         if checkColors:
             colorPairsToCheck = self.getcolorPairsToCheck()
             self.checkColors(colorPairsToCheck)
+
+
+        if hasattr(self, 'light_background_p'):
+            # reset the cached property self.light_background_p
+            del self.light_background_p
 
     # called from within the sample loop thread!
     def process_active_quantifiers(self) -> None:
@@ -16848,6 +16860,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #--- BEGIN GROUP Style
             settings.beginGroup('Style')
             self.qmc.patheffects = toInt(settings.value('patheffects',self.qmc.patheffects))
+            self.qmc.glow = toInt(settings.value('glow',self.qmc.glow))
             self.qmc.graphstyle = toInt(settings.value('graphstyle',self.qmc.graphstyle))
             self.qmc.graphfont = toInt(settings.value('graphfont',self.qmc.graphfont))
             if settings.contains('ETname'):
@@ -17599,7 +17612,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     def getColor(line:Any) -> Any:
         c = line.get_color()
         if isinstance(c, (str, tuple)):
-            return mpl.colors.rgb2hex(c) # pyright:ignore[reportAttributeAccessIssue] # tuple items expected to be of type float
+            return mpl.colors.rgb2hex(c, keep_alpha=True) # pyright:ignore[reportAttributeAccessIssue] # tuple items expected to be of type float
         return c
 
     def fetchCurveStyles(self) -> None:
@@ -18451,6 +18464,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #--- BEGIN GROUP Style
             settings.beginGroup('Style')
             self.settingsSetValue(settings, default_settings, 'patheffects',self.qmc.patheffects, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'glow',self.qmc.glow, read_defaults)
             self.settingsSetValue(settings, default_settings, 'graphstyle',self.qmc.graphstyle, read_defaults)
             self.settingsSetValue(settings, default_settings, 'graphfont',self.qmc.graphfont, read_defaults)
             self.settingsSetValue(settings, default_settings, 'ETname', self.ETname, read_defaults)

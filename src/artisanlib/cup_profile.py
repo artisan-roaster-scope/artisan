@@ -15,8 +15,6 @@
 # AUTHOR
 # Marko Luther, 2023
 
-from matplotlib import rcParams
-
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import MyQDoubleSpinBox
 
@@ -42,7 +40,6 @@ class flavorDlg(ArtisanResizeablDialog):
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         self.setModal(True)
-        rcParams['path.effects'] = []
         #avoid question mark context help
         flags = self.windowFlags()
         helpFlag = Qt.WindowType.WindowContextHelpButtonHint
