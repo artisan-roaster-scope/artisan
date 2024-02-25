@@ -3468,7 +3468,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.LCD2frame:ClickableLCDFrame = ClickableLCDFrame()
         self.LCD2frame.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.LCD2frame.customContextMenuRequested.connect(self.setTareET)
-        self.LCD2frame.left_clicked.connect(self.toggleETCurve)
+        self.LCD2frame.left_clicked.connect(self.toggleETlcdCurve)
         w = self.makeLCDbox(self.label2,self.lcd2,self.LCD2frame)
         LCDlayout.addWidget(w)
         LCDlayout.setAlignment(w,Qt.AlignmentFlag.AlignRight)
@@ -3476,20 +3476,20 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.LCD3frame:ClickableLCDFrame = ClickableLCDFrame()
         self.LCD3frame.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.LCD3frame.customContextMenuRequested.connect(self.setTareBT)
-        self.LCD3frame.left_clicked.connect(self.toggleBTCurve)
+        self.LCD3frame.left_clicked.connect(self.toggleBTlcdCurve)
         w = self.makeLCDbox(self.label3,self.lcd3,self.LCD3frame)
         LCDlayout.addWidget(w)
         LCDlayout.setAlignment(w,Qt.AlignmentFlag.AlignRight)
 
         self.LCD4frame:ClickableLCDFrame = ClickableLCDFrame()
-        self.LCD4frame.left_clicked.connect(self.toggleDeltaETCurve)
+        self.LCD4frame.left_clicked.connect(self.toggleDeltaETlcdCurve)
         w = self.makeLCDbox(self.label4,self.lcd4,self.LCD4frame)
         LCDlayout.addWidget(w)
         LCDlayout.setAlignment(w,Qt.AlignmentFlag.AlignRight)
         self.LCD4frame.setVisible(False) # by default this one is not visible
 
         self.LCD5frame:ClickableLCDFrame = ClickableLCDFrame()
-        self.LCD5frame.left_clicked.connect(self.toggleDeltaBTCurve)
+        self.LCD5frame.left_clicked.connect(self.toggleDeltaBTlcdCurve)
         w = self.makeLCDbox(self.label5,self.lcd5,self.LCD5frame)
         LCDlayout.addWidget(w)
         LCDlayout.setAlignment(w,Qt.AlignmentFlag.AlignRight)
@@ -4115,41 +4115,65 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
              self.extraCurveVisibility2) = self.qmc.curveVisibilityCache
 
     @pyqtSlot()
-    def toggleETCurve(self) -> None:
+    def toggleBTlcdCurve(self) -> None:
         if self.qmc.swaplcds:
-            self.qmc.BTcurve = not self.qmc.BTcurve
+            self.toggleETCurve()
         else:
-            self.qmc.ETcurve = not self.qmc.ETcurve
-        self.qmc.redraw_keep_view(recomputeAllDeltas=False)
+            self.toggleBTCurve()
 
     @pyqtSlot()
+    def toggleETlcdCurve(self) -> None:
+        if self.qmc.swaplcds:
+            self.toggleBTCurve()
+        else:
+            self.toggleETCurve()
+
     def toggleBTCurve(self) -> None:
-        if self.qmc.swaplcds:
-            self.qmc.ETcurve = not self.qmc.ETcurve
-        else:
+        if len(self.qmc.temp2) > 20:
+            # only if some data is given to have a visible clue
             self.qmc.BTcurve = not self.qmc.BTcurve
-        # we reset the cached main event annotation positions as those annotations are now rendered on the other curve
-        self.qmc.l_annotations_dict = {}
-        # and redraw
-        self.qmc.redraw_keep_view(recomputeAllDeltas=False)
+            # we reset the cached main event annotation positions as those annotations are now rendered on the other curve
+            self.qmc.l_annotations_dict = {}
+            # and redraw
+            self.qmc.redraw_keep_view(recomputeAllDeltas=False)
+
+    def toggleETCurve(self) -> None:
+        if len(self.qmc.temp1) > 20:
+            # only if some data is given to have a visible clue
+            self.qmc.ETcurve = not self.qmc.ETcurve
+            # we reset the cached main event annotation positions as those annotations are now rendered on the other curve
+            self.qmc.l_annotations_dict = {}
+            self.qmc.redraw_keep_view(recomputeAllDeltas=False)
 
     @pyqtSlot()
+    def toggleDeltaETlcdCurve(self) -> None:
+        if self.qmc.swapdeltalcds:
+            self.toggleDeltaBTCurve()
+        else:
+            self.toggleDeltaETCurve()
+
+    @pyqtSlot()
+    def toggleDeltaBTlcdCurve(self) -> None:
+        if self.qmc.swapdeltalcds:
+            self.toggleDeltaETCurve()
+        else:
+            self.toggleDeltaBTCurve()
+
     def toggleDeltaETCurve(self) -> None:
-        if self.qmc.swapdeltalcds:
-            self.qmc.DeltaBTflag = not self.qmc.DeltaBTflag
-        else:
+        if len(self.qmc.delta1) > 20:
+            # only if some data is given to have a visible clue
+            twoAxis_before = self.qmc.twoAxisMode()
             self.qmc.DeltaETflag = not self.qmc.DeltaETflag
-        self.qmc.redraw_keep_view(recomputeAllDeltas=False)
+            twoAxis_after = self.qmc.twoAxisMode()
+            self.qmc.redraw_keep_view(recomputeAllDeltas=False, forceRenewAxis=twoAxis_before != twoAxis_after)
 
-    @pyqtSlot()
     def toggleDeltaBTCurve(self) -> None:
-        twoAxis_before = self.qmc.twoAxisMode()
-        if self.qmc.swapdeltalcds:
-            self.qmc.DeltaETflag = not self.qmc.DeltaETflag
-        else:
+        if len(self.qmc.delta2) > 20:
+            # only if some data is given to have a visible clue
+            twoAxis_before = self.qmc.twoAxisMode()
             self.qmc.DeltaBTflag = not self.qmc.DeltaBTflag
-        twoAxis_after = self.qmc.twoAxisMode()
-        self.qmc.redraw_keep_view(recomputeAllDeltas=False,forceRenewAxis=twoAxis_before != twoAxis_after)
+            twoAxis_after = self.qmc.twoAxisMode()
+            self.qmc.redraw_keep_view(recomputeAllDeltas=False, forceRenewAxis=twoAxis_before != twoAxis_after)
 
     @pyqtSlot()
     def toggleExtraCurve1(self) -> None:
@@ -4157,7 +4181,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             sender = self.sender()
             assert isinstance(sender, ClickableLCDFrame)
             i = self.extraLCDframe1.index(sender)
-            self.extraCurveVisibility1[i] = not self.extraCurveVisibility1[i]
+            if len(self.qmc.extratemp1[i])>20:
+                # only if some data is given to have a visible clue
+                self.extraCurveVisibility1[i] = not self.extraCurveVisibility1[i]
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         self.qmc.redraw_keep_view(recomputeAllDeltas=False)
@@ -4168,7 +4194,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             sender = self.sender()
             assert isinstance(sender, ClickableLCDFrame)
             i = self.extraLCDframe2.index(sender)
-            self.extraCurveVisibility2[i] = not self.extraCurveVisibility2[i]
+            if len(self.qmc.extratemp2[i])>20:
+                # only if some data is given to have a visible clue
+                self.extraCurveVisibility2[i] = not self.extraCurveVisibility2[i]
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         self.qmc.redraw_keep_view(recomputeAllDeltas=False)

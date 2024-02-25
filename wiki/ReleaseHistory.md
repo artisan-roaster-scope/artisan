@@ -15,6 +15,7 @@ v2.10.2 (February XX, 2024)
   - replaces USB lib for Aillio connectivity on Windows from libusb-win32 to WinUSB ([PR #1358](../../../pull/1411))
   - adds C/F conversion for the drop duplicates limit and the RoR limits ([Issue #1406](../../../issues/1406))
   - updates Caromaq machine setups ([PR #1419](../../../pull/1419))
+  - prevents LCD curve visibility toggling if no data is displayed and thus no visible feedback is given
   - upgrades to Python 3.12, Qt/PyQt 6.6.2, pymodbus 3.6.4 and matplotlib 3.8.3
 * FIXES
   - fixes axis limits on starting the designer from a profile with time axis locked ([Discussion #1325](../../../discussions/1325))
