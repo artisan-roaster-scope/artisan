@@ -11,7 +11,7 @@ lxml-stubs==0.5.1
 mypy==1.8.0
 pyright==1.1.351
 ruff>=0.2.2
-pylint==3.0.3
+pylint==3.1.0
 pre-commit>=3.6.2
 pytest==8.0.1
 pytest-cov==4.1.0
