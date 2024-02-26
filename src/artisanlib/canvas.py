@@ -111,6 +111,7 @@ from matplotlib.projections.polar import PolarAxes
 from matplotlib.text import Annotation, Text
 from matplotlib.lines import Line2D
 from matplotlib.offsetbox import DraggableAnnotation
+from matplotlib.colors import to_hex, to_rgba
 
 from artisanlib.phidgets import PhidgetManager
 from Phidget22.VoltageRange import VoltageRange # type: ignore
@@ -7942,8 +7943,11 @@ class tgraphcanvas(FigureCanvas):
                     rcParams['ytick.major.width'] = 1
                     rcParams['ytick.minor.width'] = 1
 
-                    rcParams['xtick.color'] = self.palette['xlabel']
-                    rcParams['ytick.color'] = self.palette['ylabel']
+                    xlabel_alpha_color = to_hex(to_rgba(self.palette['xlabel'], 0.47), keep_alpha=True)
+                    ylabel_alpha_color = to_hex(to_rgba(self.palette['ylabel'], 0.47), keep_alpha=True)
+
+                    rcParams['xtick.color'] = xlabel_alpha_color
+                    rcParams['ytick.color'] = ylabel_alpha_color
 
                     #rcParams['text.antialiased'] = True
 
@@ -8119,10 +8123,10 @@ class tgraphcanvas(FigureCanvas):
                             right=False,
                             labelright=False)
 
-                    self.ax.spines['top'].set_color('0.40')
-                    self.ax.spines['bottom'].set_color('0.40')
-                    self.ax.spines['left'].set_color('0.40')
-                    self.ax.spines['right'].set_color('0.40')
+                    self.ax.spines['top'].set_color(xlabel_alpha_color)
+                    self.ax.spines['bottom'].set_color(xlabel_alpha_color)
+                    self.ax.spines['left'].set_color(ylabel_alpha_color)
+                    self.ax.spines['right'].set_color(ylabel_alpha_color)
 
                     self.ax.spines.top.set_visible(self.xgrid != 0 and self.ygrid != 0 and self.zgrid != 0)
                     self.ax.spines.bottom.set_visible(self.xgrid != 0)

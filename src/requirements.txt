@@ -26,7 +26,7 @@
 ######
 # packages that are required on all platforms
 #
-setuptools==69.1.0
+setuptools==69.1.1
 wheel==0.42.0
 pyserial==3.5
 pymodbus==3.6.4
@@ -70,7 +70,9 @@ arabic-reshaper==3.0.0
 #
 ### yoctopuce 1.10.42060 on macOS 10.13
 yoctopuce==1.10.42060; sys_platform=='darwin' and platform_release<'20.0' # last version supporting macOS 10.13
-yoctopuce==1.10.57762; sys_platform!='darwin' or (sys_platform=='darwin' and platform_release>='20.0') # 2.0.59414 is no longer universal2 lacking arm64 support
+yoctopuce==2.0.59503; sys_platform!='darwin' or (sys_platform=='darwin' and platform_release>='20.0')
+# last 1.x yoctopuce lib: 1.10.57762
+# 2.0.59414 is no longer universal2 lacking arm64 support; 2.0.59503 should fix this
 ##
 ## Qt 5.15.x supports macOS 10.13 (Darwin 17.x) and higher as well as Windows 7/8
 ## Qt 6.4.x supports macOS 10.15 (Darwin 19.x) and higher as well as Windows 10/11

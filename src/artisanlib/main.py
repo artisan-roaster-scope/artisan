@@ -1557,7 +1557,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         if settings.contains('dpi') and (not settings.contains('resetqsettings') or toInt(settings.value('resetqsettings',self.resetqsettings)) == 0) and QApplication.queryKeyboardModifiers() != Qt.KeyboardModifier.AltModifier:
             try:
                 dpi = toInt(settings.value('dpi',self.dpi))
-                if dpi >= 40:
+                if dpi >= 40: # pylint: disable=consider-using-min-builtin
                     self.dpi = dpi
             except Exception: # pylint: disable=broad-except
                 pass
@@ -7500,10 +7500,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     @pyqtSlot(int)
     def updateSVSliderLCD(self, v:int) -> None:
-        if v > self.pidcontrol.svSliderMax:
-            v = self.pidcontrol.svSliderMax
-        if v < self.pidcontrol.svSliderMin:
-            v = self.pidcontrol.svSliderMin
+        v = max(min(v, self.pidcontrol.svSliderMax), self.pidcontrol.svSliderMin)
         self.sliderLCDSV.display(v)
         if self.SVslidermoved:
             if self.sliderLCDSV.intValue() != self.sliderSV.value():
