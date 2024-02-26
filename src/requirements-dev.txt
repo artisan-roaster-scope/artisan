@@ -23,7 +23,7 @@ pytest-cov==4.1.0
 #pytest-benchmark==4.0.0
 #pytest-mock==3.11.1
 hypothesis>=6.96.9
-coverage==7.4.2
+coverage==7.4.3
 coverage-badge==1.1.0
 codespell==2.2.6
 # the following 2 packages are not installed along aiohttp on Python3.12 and make mypy complain
