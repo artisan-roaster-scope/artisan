@@ -19,8 +19,11 @@
 
 import time
 import numpy
+import scipy.signal # type:ignore[import-untyped]
 import logging
 from typing import Final, List, Optional, Callable
+
+from artisanlib.filters import LiveSosFilter
 
 try:
     from PyQt6.QtCore import QSemaphore # @Reimport @UnresolvedImport @UnusedImport
@@ -35,7 +38,8 @@ class PID:
     __slots__ = [ 'pidSemaphore', 'outMin', 'outMax', 'dutySteps', 'dutyMin', 'dutyMax', 'control', 'Kp',
             'Ki', 'Kd', 'pOnE', 'Pterm', 'errSum', 'Iterm', 'lastError', 'lastInput', 'lastOutput', 'lastTime',
             'lastDerr', 'target', 'active', 'derivative_on_error', 'output_smoothing_factor', 'output_decay_weights',
-            'previous_outputs', 'input_smoothing_factor', 'input_decay_weights', 'previous_inputs', 'force_duty', 'iterations_since_duty' ]
+            'previous_outputs', 'input_smoothing_factor', 'input_decay_weights', 'previous_inputs', 'force_duty', 'iterations_since_duty',
+            'derivative_filter_level', 'derivative_filter' ]
 
     def __init__(self, control:Callable[[float], None]=lambda _: None, p:float=2.0, i:float=0.03, d:float=0.0) -> None:
         self.pidSemaphore:QSemaphore = QSemaphore(1)
@@ -72,6 +76,9 @@ class PID:
         self.previous_inputs:List[float] = []
         self.force_duty:int = 3 # at least every n update cycles a new duty value is send, even if its duplicating a previous duty (within the duty step)
         self.iterations_since_duty:int = 0 # reset once a duty is send; incremented on every update cycle
+        # PID derivative smoothing
+        self.derivative_filter_level: int = 0 # 0: off, 1: on
+        self.derivative_filter:LiveSosFilter = self.derivativeFilter()
 
     def _smooth_output(self,output:float) -> float:
         # create or update smoothing decay weights
@@ -179,6 +186,8 @@ class PID:
                 else:
                     D = - self.Kd * dtinput
 
+                if self.derivative_filter_level > 0:
+                    D = self.derivative_filter(D)
                 output:float = self.Pterm + self.Iterm + D
 
                 output = self._smooth_output(output)
@@ -189,7 +198,7 @@ class PID:
                 elif output < self.outMin:
                     output = self.outMin
 
-                int_output = min(self.dutyMax,max(self.dutyMin,int(round(output))))
+                int_output = int(round(min(self.dutyMax,max(self.dutyMin,output))))
                 if self.lastOutput is None or self.iterations_since_duty >= self.force_duty or int_output >= self.lastOutput + self.dutySteps or int_output <= self.lastOutput - self.dutySteps:
                     if self.active:
                         self.control(int_output)
@@ -313,6 +322,24 @@ class PID:
         try:
             self.pidSemaphore.acquire(1)
             return self.lastOutput
+        finally:
+            if self.pidSemaphore.available() < 1:
+                self.pidSemaphore.release(1)
+
+    def derivativeFilter(self) -> LiveSosFilter:
+        return LiveSosFilter(
+                scipy.signal.iirfilter(1, # order
+                Wn=0.2, # 0 < Wn < fs/2 (fs=1 -> fs/2=0.5)
+                fs=1, # sampling rate, Hz
+                btype='low',
+                ftype='butter', output='sos'))
+
+    def setDerivativeFilterLevel(self, v:int) -> None:
+        try:
+            self.pidSemaphore.acquire(1)
+            self.derivative_filter_level = v
+            # reset the derivative filter on each filter level change (also on PID ON)
+            self.derivative_filter = self.derivativeFilter()
         finally:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)

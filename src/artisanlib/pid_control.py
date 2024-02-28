@@ -1139,7 +1139,8 @@ class PIDcontrol:
             'RS_svActions', 'RS_svBeeps', 'RS_svDescriptions', 'svSlider', 'svButtons', 'svMode', 'svLookahead', 'dutySteps', 'svSliderMin', 'svSliderMax', 'svValue',
             'dutyMin', 'dutyMax', 'pidKp', 'pidKi', 'pidKd', 'pOnE', 'pidSource', 'pidCycle', 'pidPositiveTarget', 'pidNegativeTarget', 'invertControl',
             'sv_smoothing_factor', 'sv_decay_weights', 'previous_svs', 'time_pidON', 'current_ramp_segment',  'current_soak_segment', 'ramp_soak_engaged',
-            'RS_total_time', 'slider_force_move' ]
+            'RS_total_time', 'slider_force_move', 'positiveTargetRangeLimit', 'positiveTargetMin', 'positiveTargetMax', 'negativeTargetRangeLimit',
+            'negativeTargetMin', 'negativeTargetMax', 'derivative_filter']
 
     def __init__(self, aw:'ApplicationWindow') -> None:
         self.aw:'ApplicationWindow' = aw
@@ -1174,12 +1175,19 @@ class PIDcontrol:
         self.svButtons:bool = False
         self.svMode:int = 0 # 0: manual, 1: Ramp/Soak, 2: Follow (background profile)
         self.svLookahead:int = 0
-        self.dutySteps:int = 1
         self.svSliderMin:int = 0
         self.svSliderMax:int = 230
         self.svValue:float = 180 # the value in the setSV textinput box of the PID dialog
+        self.dutySteps:int = 1
         self.dutyMin:int = -100
         self.dutyMax:int = 100
+        self.positiveTargetRangeLimit:bool = False # if True the duty is mapped to the target slider subrange [positiveTargetMin, positiveTargetMax]
+        self.positiveTargetMin:int = 0
+        self.positiveTargetMax:int = 100
+        self.negativeTargetRangeLimit:bool = False # if True the duty is mapped to the target slider subrange [negativeTargetMin, negativeTargetMax]
+        self.negativeTargetMin:int = 0
+        self.negativeTargetMax:int = 100
+        self.derivative_filter:int = 0 # 0: off, 1: on
         self.pidKp:float = 15.0
         self.pidKi:float = 0.01
         self.pidKd:float = 20.0
@@ -1236,19 +1244,32 @@ class PIDcontrol:
     # v is from [-min,max]
     def setEnergy(self, v:float) -> None:
         try:
-            if self.aw.pidcontrol.pidPositiveTarget:
-                slidernr = self.aw.pidcontrol.pidPositiveTarget - 1
-                vp = min(100,max(0,int(round(abs(100 - v) if self.aw.pidcontrol.invertControl else v))))
+            if self.pidPositiveTarget:
+                slidernr = self.pidPositiveTarget - 1
+                # if invertControl we limit vp to [0,100]
+                vp = min(100,max(0,int(round(abs(100 - v) if self.invertControl else v))))
                 # we need to map the duty [0%,100%] to the [slidermin,slidermax] range
-                heat = int(round(float(numpy.interp(vp,[0,100],[self.aw.eventslidermin[slidernr],self.aw.eventslidermax[slidernr]]))))
+                # NOTE: numpy.interp(v, [min_in,max_in], [min_out, max_out]) never results in values outside of [min_out, max_out]
+                slider_min = self.aw.eventslidermin[slidernr]
+                slider_max = self.aw.eventslidermax[slidernr]
+                # assumption: if self.positiveTargetRangeLimit then slider_min < self.positiveTargetMin < self.positiveTargetMax < slider_max
+                heat_min = (max(self.positiveTargetMin, slider_min) if self.positiveTargetRangeLimit else slider_min)
+                heat_max = (min(self.positiveTargetMax, slider_max) if self.positiveTargetRangeLimit else slider_max)
+                heat = int(round(float(numpy.interp(vp,[0,100],[heat_min,heat_max]))))
                 heat = self.aw.applySliderStepSize(slidernr, heat) # quantify by slider step size
                 self.aw.addEventSignal.emit(heat,slidernr,self.createEvents,True,self.slider_force_move)
                 self.aw.qmc.slider_force_move = False
-            if self.aw.pidcontrol.pidNegativeTarget:
-                slidernr = self.aw.pidcontrol.pidNegativeTarget - 1
-                vn = min(0,max(-100,int(round(0 - v if self.aw.pidcontrol.invertControl else v))))
+            if self.pidNegativeTarget:
+                slidernr = self.pidNegativeTarget - 1
+                vn = min(0,max(-100,int(round(0 - v if self.invertControl else v))))
                 # we need to map the duty [0%,-100%] to the [slidermin,slidermax] range
-                cool = int(round(float(numpy.interp(vn,[-100,0],[self.aw.eventslidermax[slidernr],self.aw.eventslidermin[slidernr]]))))
+                # NOTE: numpy.interp(v, [min_in,max_in], [min_out, max_out]) never results in values outside of [min_out, max_out]
+                slider_min = self.aw.eventslidermin[slidernr]
+                slider_max = self.aw.eventslidermax[slidernr]
+                # assumption: if self.positiveTargetRangeLimit then slider_min < self.positiveTargetMin < self.positiveTargetMax < slider_max
+                cool_min = (max(self.negativeTargetMin, slider_min) if self.negativeTargetRangeLimit else slider_min)
+                cool_max = (min(self.negativeTargetMax, slider_max) if self.negativeTargetRangeLimit else slider_max)
+                cool = int(round(float(numpy.interp(vn,[-100,0],[cool_max,cool_min]))))
                 cool = self.aw.applySliderStepSize(slidernr, cool) # quantify by slider step size
                 self.aw.addEventSignal.emit(cool,slidernr,self.createEvents,True,self.slider_force_move)
                 self.slider_force_move = False
@@ -1335,11 +1356,12 @@ class PIDcontrol:
         if self.aw.pidcontrol.externalPIDControl() not in [1, 2, 4] and not(self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag) and self.aw.qmc.Controlbuttonflag:
             # software PID
             self.aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd,self.pOnE)
-            self.aw.qmc.pid.setLimits((-100 if self.aw.pidcontrol.pidNegativeTarget else 0),(100 if self.aw.pidcontrol.pidPositiveTarget else 0))
-            self.aw.qmc.pid.setDutySteps(self.aw.pidcontrol.dutySteps)
-            self.aw.qmc.pid.setDutyMin(self.aw.pidcontrol.dutyMin)
-            self.aw.qmc.pid.setDutyMax(self.aw.pidcontrol.dutyMax)
-            self.aw.qmc.pid.setControl(self.aw.pidcontrol.setEnergy)
+            self.aw.qmc.pid.setLimits((-100 if self.pidNegativeTarget else 0),(100 if self.pidPositiveTarget else 0))
+            self.aw.qmc.pid.setDutySteps(self.dutySteps)
+            self.aw.qmc.pid.setDutyMin(self.dutyMin)
+            self.aw.qmc.pid.setDutyMax(self.dutyMax)
+            self.aw.qmc.pid.setControl(self.setEnergy)
+            self.aw.qmc.pid.setDerivativeFilterLevel(self.derivative_filter)
             if self.aw.pidcontrol.svMode == 0:
                 self.aw.pidcontrol.setSV(self.aw.sliderSV.value())
 
@@ -1389,11 +1411,12 @@ class PIDcontrol:
             elif self.aw.qmc.Controlbuttonflag:
                 # software PID
                 self.aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd,self.pOnE)
-                self.aw.qmc.pid.setLimits((-100 if self.aw.pidcontrol.pidNegativeTarget else 0),(100 if self.aw.pidcontrol.pidPositiveTarget else 0))
-                self.aw.qmc.pid.setDutySteps(self.aw.pidcontrol.dutySteps)
-                self.aw.qmc.pid.setDutyMin(self.aw.pidcontrol.dutyMin)
-                self.aw.qmc.pid.setDutyMax(self.aw.pidcontrol.dutyMax)
-                self.aw.qmc.pid.setControl(self.aw.pidcontrol.setEnergy)
+                self.aw.qmc.pid.setLimits((-100 if self.pidNegativeTarget else 0),(100 if self.pidPositiveTarget else 0))
+                self.aw.qmc.pid.setDutySteps(self.dutySteps)
+                self.aw.qmc.pid.setDutyMin(self.dutyMin)
+                self.aw.qmc.pid.setDutyMax(self.dutyMax)
+                self.aw.qmc.pid.setControl(self.setEnergy)
+                self.aw.qmc.pid.setDerivativeFilterLevel(self.derivative_filter)
                 if self.aw.pidcontrol.svMode == 0:
                     self.aw.pidcontrol.setSV(self.aw.sliderSV.value())
                 self.pidActive = True

@@ -1,3 +1,9 @@
+artisan (2.10.1-0) precise; urgency=low
+  * new upstream release
+  * changes since 2.10.0:
+   - bug fixes and performance enhancements
+ --  <marko.luther@gmx.net>  Wed, 29 Feb 2024 19:32:14 +0200
+
 artisan (2.10.0-0) precise; urgency=low
   * new upstream release
   * changes since 2.8.4:

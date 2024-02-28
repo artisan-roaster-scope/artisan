@@ -98,6 +98,7 @@ class PID_DlgControl(ArtisanDialog):
         pidSetPID.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         self.pidSource = QComboBox()
+        self.pidSource.setToolTip(QApplication.translate('Tooltip', 'PID input signal'))
         if self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag:
             # Arduino/TC4
             pidSourceItems = ['1','2','3','4']
@@ -129,7 +130,7 @@ class PID_DlgControl(ArtisanDialog):
             else:
                 self.pidSource.setCurrentIndex(1)
 
-        pidSourceLabel = QLabel(QApplication.translate('Label','Source'))
+        pidSourceLabel = QLabel(QApplication.translate('Label','Input'))
 
         pidGrid = QGridLayout()
         pidGrid.addWidget(pidKpLabel,0,0)
@@ -198,22 +199,88 @@ class PID_DlgControl(ArtisanDialog):
         self.positiveControlCombo.addItems(controlItems)
         self.positiveControlCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.positiveControlCombo.setCurrentIndex(self.aw.pidcontrol.pidPositiveTarget)
+        self.positiveControlCombo.currentIndexChanged.connect(self.updatePositiveTargetLimits)
+        self.positiveControlCombo.setToolTip(QApplication.translate('Tooltip', 'Slider to be set by the positive PID duty signal'))
         #negativeControl
         negativeControlLabel = QLabel(QApplication.translate('Label','Negative'))
         self.negativeControlCombo = QComboBox()
         self.negativeControlCombo.addItems(controlItems)
         self.negativeControlCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.negativeControlCombo.setCurrentIndex(self.aw.pidcontrol.pidNegativeTarget)
+        self.negativeControlCombo.currentIndexChanged.connect(self.updateNegativeTargetLimits)
+        self.negativeControlCombo.setToolTip(QApplication.translate('Tooltip', 'Slider to be set by the negative PID duty signal'))
+
+        targetSliderLabel = QLabel(QApplication.translate('Label', 'Slider'))
+        rangeLimitLabel = QLabel(QApplication.translate('Label', 'Limit'))
+        rangeLimitMinLabel = QLabel(QApplication.translate('Label', 'Min'))
+        rangeLimitMaxLabel = QLabel(QApplication.translate('Label', 'Max'))
+        self.positiveTargetRangeLimitFlag = QCheckBox()
+        self.positiveTargetRangeLimitFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.positiveTargetRangeLimitFlag.setChecked(self.aw.pidcontrol.positiveTargetRangeLimit)
+        self.positiveTargetRangeLimitFlag.stateChanged.connect(self.positiveTargetRangeLimitSlot)
+        self.positiveTargetRangeLimitFlag.setToolTip(QApplication.translate('Tooltip', 'Activate range limit for positive PID output slider'))
+        self.negativeTargetRangeLimitFlag = QCheckBox()
+        self.negativeTargetRangeLimitFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.negativeTargetRangeLimitFlag.setChecked(self.aw.pidcontrol.negativeTargetRangeLimit)
+        self.negativeTargetRangeLimitFlag.stateChanged.connect(self.negativeTargetRangeLimitSlot)
+        self.negativeTargetRangeLimitFlag.setToolTip(QApplication.translate('Tooltip', 'Activate range limit for negative PID output slider'))
+
+        self.positiveTargetMin = QSpinBox()
+        self.positiveTargetMin.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.positiveTargetMin.setRange(0,100)
+        self.positiveTargetMin.setSingleStep(10)
+        self.positiveTargetMin.setEnabled(self.aw.pidcontrol.positiveTargetRangeLimit)
+        self.positiveTargetMin.setToolTip(QApplication.translate('Tooltip', 'Positive output slider value at 0% duty'))
+
+        self.positiveTargetMax = QSpinBox()
+        self.positiveTargetMax.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.positiveTargetMax.setRange(0,100)
+        self.positiveTargetMax.setSingleStep(10)
+        self.positiveTargetMax.setEnabled(self.aw.pidcontrol.positiveTargetRangeLimit)
+        self.positiveTargetMax.setToolTip(QApplication.translate('Tooltip', 'Positive output slider value at 100% duty'))
+
+        self.updatePositiveTargetLimits(self.aw.pidcontrol.pidPositiveTarget)
+        self.positiveTargetMin.setValue(self.aw.pidcontrol.positiveTargetMin)
+        self.positiveTargetMax.setValue(self.aw.pidcontrol.positiveTargetMax)
+
+        self.negativeTargetMin = QSpinBox()
+        self.negativeTargetMin.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.negativeTargetMin.setRange(0,100)
+        self.negativeTargetMin.setSingleStep(10)
+        self.negativeTargetMin.setEnabled(self.aw.pidcontrol.negativeTargetRangeLimit)
+        self.negativeTargetMin.setToolTip(QApplication.translate('Tooltip', 'Negative output slider value at 0% duty'))
+
+        self.negativeTargetMax = QSpinBox()
+        self.negativeTargetMax.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.negativeTargetMax.setRange(0,100)
+        self.negativeTargetMax.setSingleStep(10)
+        self.negativeTargetMax.setEnabled(self.aw.pidcontrol.negativeTargetRangeLimit)
+        self.negativeTargetMax.setToolTip(QApplication.translate('Tooltip', 'Negative output slider value at -100% duty'))
+
+        self.updateNegativeTargetLimits(self.aw.pidcontrol.pidNegativeTarget)
+        self.negativeTargetMin.setValue(self.aw.pidcontrol.negativeTargetMin)
+        self.negativeTargetMax.setValue(self.aw.pidcontrol.negativeTargetMax)
 
         controlSelectorLayout = QGridLayout()
-        controlSelectorLayout.addWidget(positiveControlLabel,0,0)
-        controlSelectorLayout.addWidget(self.positiveControlCombo,0,1)
-        controlSelectorLayout.addWidget(negativeControlLabel,1,0)
-        controlSelectorLayout.addWidget(self.negativeControlCombo,1,1)
+        controlSelectorLayout.addWidget(targetSliderLabel,0,1,Qt.AlignmentFlag.AlignCenter)
+        controlSelectorLayout.addWidget(rangeLimitLabel,0,2,Qt.AlignmentFlag.AlignCenter)
+        controlSelectorLayout.addWidget(rangeLimitMinLabel,0,3,Qt.AlignmentFlag.AlignCenter)
+        controlSelectorLayout.addWidget(rangeLimitMaxLabel,0,4,Qt.AlignmentFlag.AlignCenter)
+        controlSelectorLayout.addWidget(positiveControlLabel,1,0)
+        controlSelectorLayout.addWidget(self.positiveControlCombo,1,1)
+        controlSelectorLayout.addWidget(self.positiveTargetRangeLimitFlag,1,2)
+        controlSelectorLayout.addWidget(self.positiveTargetMin,1,3)
+        controlSelectorLayout.addWidget(self.positiveTargetMax,1,4)
+        controlSelectorLayout.addWidget(negativeControlLabel,2,0)
+        controlSelectorLayout.addWidget(self.negativeControlCombo,2,1)
+        controlSelectorLayout.addWidget(self.negativeTargetRangeLimitFlag,2,2)
+        controlSelectorLayout.addWidget(self.negativeTargetMin,2,3)
+        controlSelectorLayout.addWidget(self.negativeTargetMax,2,4)
 
         self.invertControlFlag = QCheckBox(QApplication.translate('Label', 'Invert Control'))
         self.invertControlFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.invertControlFlag.setChecked(self.aw.pidcontrol.invertControl)
+        self.invertControlFlag.setToolTip(QApplication.translate('Tooltip', 'If active, positive duties set negative outputs and negative ones the positive outputs'))
 
         controlVBox = QVBoxLayout()
         controlVBox.addLayout(controlSelectorLayout)
@@ -224,7 +291,7 @@ class PID_DlgControl(ArtisanDialog):
         controlHBox.addLayout(controlVBox)
         controlHBox.addStretch()
 
-        pidTargetGrp = QGroupBox(QApplication.translate('GroupBox','Target'))
+        pidTargetGrp = QGroupBox(QApplication.translate('GroupBox','Output'))
         pidTargetGrp.setLayout(controlHBox)
         pidTargetGrp.setContentsMargins(0,10,0,0)
 
@@ -245,6 +312,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidSV.setRange(0,999)
         self.pidSV.setSingleStep(10)
         self.pidSV.setValue(int(self.aw.pidcontrol.svValue))
+        self.pidSV.setToolTip(QApplication.translate('Tooltip', 'Manual set value (SV)'))
         pidSVLabel = QLabel(QApplication.translate('Label','SV'))
 
         self.pidSVLookahead = QSpinBox()
@@ -253,6 +321,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidSVLookahead.setSingleStep(1)
         self.pidSVLookahead.setValue(int(round(self.aw.pidcontrol.svLookahead)))
         self.pidSVLookahead.setSuffix(' s')
+        self.pidSVLookahead.setToolTip(QApplication.translate('Tooltip', 'In background follow mode the set value (SV) is taken\nfrom the selected source signal with a positive time offset\nspecified by the lookahead'))
         pidSVLookaheadLabel = QLabel(QApplication.translate('Label','Lookahead'))
 
         self.pidDutySteps = QSpinBox()
@@ -261,6 +330,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidDutySteps.setSingleStep(1)
         self.pidDutySteps.setValue(int(self.aw.pidcontrol.dutySteps))
         self.pidDutySteps.setSuffix(' %')
+        self.pidDutySteps.setToolTip(QApplication.translate('Tooltip', 'Duty signal step size'))
         pidDutyStepsLabel = QLabel(QApplication.translate('Label','Steps'))
 
         pidSetSV = QPushButton(QApplication.translate('Button','Set'))
@@ -276,19 +346,23 @@ class PID_DlgControl(ArtisanDialog):
         self.pidMode.addItems(pidModeItems)
         self.pidMode.setCurrentIndex(self.aw.pidcontrol.svMode)
         self.pidMode.currentIndexChanged.connect(self.updatePidMode)
+        self.pidMode.setToolTip(QApplication.translate('Tooltip', 'PID mode, taking the target value from the manual set value (SV),\nthe specified Ramp/Soak pattern\nor the selected source signal of the background profiles'))
 
         self.pidSVbuttonsFlag = QCheckBox(QApplication.translate('Label','Buttons'))
         self.pidSVbuttonsFlag.setChecked(self.aw.pidcontrol.svButtons)
         self.pidSVbuttonsFlag.stateChanged.connect(self.activateONOFFeasySVslot)
+        self.pidSVbuttonsFlag.setToolTip(QApplication.translate('Tooltip', 'Show the set value (SV) buttons for manual input of the PID target'))
         self.pidSVsliderFlag = QCheckBox(QApplication.translate('Label','Slider'))
         self.pidSVsliderFlag.setChecked(self.aw.pidcontrol.svSlider)
         self.pidSVsliderFlag.stateChanged.connect(self.activateSVSlider)
+        self.pidSVsliderFlag.setToolTip(QApplication.translate('Tooltip', 'Show the set value (SV) slider for manual input of the PID target'))
 
         self.pidSVSliderMin = QSpinBox()
         self.pidSVSliderMin.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSVSliderMin.setRange(0,999)
         self.pidSVSliderMin.setSingleStep(10)
         self.pidSVSliderMin.setValue(int(self.aw.pidcontrol.svSliderMin))
+        self.pidSVSliderMin.setToolTip(QApplication.translate('Tooltip', 'Lower limit of the set value (SV) slider'))
         pidSVSliderMinLabel = QLabel(QApplication.translate('Label','Min'))
         self.pidSVSliderMin.valueChanged.connect(self.sliderMinValueChangedSlot)
 
@@ -297,6 +371,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidSVSliderMax.setRange(0,999)
         self.pidSVSliderMax.setSingleStep(10)
         self.pidSVSliderMax.setValue(int(self.aw.pidcontrol.svSliderMax))
+        self.pidSVSliderMax.setToolTip(QApplication.translate('Tooltip', 'Upper limit of the set value (SV) slider'))
         pidSVSliderMaxLabel = QLabel(QApplication.translate('Label','Max'))
         self.pidSVSliderMax.valueChanged.connect(self.sliderMaxValueChangedSlot)
 
@@ -358,22 +433,40 @@ class PID_DlgControl(ArtisanDialog):
         svGrp.setLayout(svGrpBox)
         svGrp.setContentsMargins(0,10,0,0)
 
+        dutyClampGrpBox = QGridLayout()
+        dutyClampGrpBox.addWidget(dutyMaxLabel,1,0)
+        dutyClampGrpBox.addWidget(self.dutyMax,1,1)
+        dutyClampGrpBox.addWidget(dutyMinLabel,2,0)
+        dutyClampGrpBox.addWidget(self.dutyMin,2,1)
+
+        dutyClampGrp = QGroupBox(QApplication.translate('GroupBox','Clamp'))
+        dutyClampGrp.setLayout(dutyClampGrpBox)
+        dutyClampGrp.setToolTip(QApplication.translate('Tooltip', 'With just a positive output active, the PID duty ranges from 0% to 100%.\nWith just a negative output it ranges from -100% to 0%.\nWith both outputs active the range is -100% to 100%.\nThis range can be clamped by setting tighter minimum and maximum  limits.'))
+
         dutyGrid = QGridLayout()
         dutyGrid.addWidget(pidDutyStepsLabel,0,0)
         dutyGrid.addWidget(self.pidDutySteps,0,1)
-        dutyGrid.addWidget(dutyMaxLabel,1,0)
-        dutyGrid.addWidget(self.dutyMax,1,1)
-        dutyGrid.addWidget(dutyMinLabel,2,0)
-        dutyGrid.addWidget(self.dutyMin,2,1)
-
 
         dutyGrpBox = QVBoxLayout()
         dutyGrpBox.addStretch()
         dutyGrpBox.addLayout(dutyGrid)
+        dutyGrpBox.addSpacing(10)
+        dutyGrpBox.addWidget(dutyClampGrp)
         dutyGrpBox.addStretch()
         dutyGrp = QGroupBox(QApplication.translate('GroupBox','Duty'))
         dutyGrp.setLayout(dutyGrpBox)
         dutyGrp.setContentsMargins(0,15,0,0)
+
+        self.derivativeFilterFlag = QCheckBox(QApplication.translate('Label','Derivative Filter'))
+        self.derivativeFilterFlag.setChecked(bool(self.aw.pidcontrol.derivative_filter))
+
+        filterGrpBox = QVBoxLayout()
+        filterGrpBox.addWidget(self.derivativeFilterFlag)
+        filterGrpBox.addStretch()
+
+        filterGrp = QGroupBox(QApplication.translate('GroupBox','Filter'))
+        filterGrp.setLayout(filterGrpBox)
+        filterGrp.setContentsMargins(0,15,0,0)
 
         pidBox = QHBoxLayout()
         pidBox.addWidget(pidGrp)
@@ -381,12 +474,16 @@ class PID_DlgControl(ArtisanDialog):
         svBox = QHBoxLayout()
         svBox.addWidget(svGrp)
         svBox.addWidget(dutyGrp)
+        svBox.addWidget(filterGrp)
+        svBox.addStretch()
 
         self.startPIDonCHARGE = QCheckBox(QApplication.translate('CheckBox', 'Start PID on CHARGE'))
+        self.startPIDonCHARGE.setToolTip(QApplication.translate('Tooltip', 'Automatically turn the PID ON on CHARGE'))
         self.startPIDonCHARGE.setChecked(self.aw.pidcontrol.pidOnCHARGE)
 
         self.createEvents = QCheckBox(QApplication.translate('CheckBox', 'Create Events'))
         self.createEvents.setChecked(self.aw.pidcontrol.createEvents)
+        self.createEvents.setToolTip(QApplication.translate('Tooltip', 'Generated an event mark on each output slider change\ninitiated by the PID'))
 
         flagsLayout = QHBoxLayout()
         flagsLayout.addWidget(self.startPIDonCHARGE)
@@ -530,10 +627,12 @@ class PID_DlgControl(ArtisanDialog):
         okButton = QPushButton(QApplication.translate('Button','OK'))
         okButton.clicked.connect(self.okAction)
         onButton = QPushButton(QApplication.translate('Button','On'))
+        onButton.setToolTip(QApplication.translate('Tooltip', 'Turn PID ON'))
         onButton.clicked.connect(self.pidONAction)
         onButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         offButton = QPushButton(QApplication.translate('Button','Off'))
         offButton.clicked.connect(self.pidOFFAction)
+        offButton.setToolTip(QApplication.translate('Tooltip', 'Turn PID OFF'))
         offButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         okButtonLayout = QHBoxLayout()
         okButtonLayout.addWidget(onButton)
@@ -699,7 +798,8 @@ class PID_DlgControl(ArtisanDialog):
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(self.tabWidget)
         mainLayout.addLayout(okButtonLayout)
-        mainLayout.setContentsMargins(2,10,2,2)
+        mainLayout.setContentsMargins(5,10,5,5)
+        mainLayout.setSpacing(5)
         self.setLayout(mainLayout)
         okButton.setFocus()
 
@@ -749,6 +849,62 @@ class PID_DlgControl(ArtisanDialog):
     @pyqtSlot(int)
     def activateONOFFeasySVslot(self, i:int) -> None:
         self.aw.pidcontrol.activateONOFFeasySV(bool(i))
+
+    @pyqtSlot(int)
+    def positiveTargetRangeLimitSlot(self, i:int) -> None:
+        self.aw.pidcontrol.positiveTargetRangeLimit = bool(i)
+        self.positiveTargetMin.setEnabled(self.aw.pidcontrol.positiveTargetRangeLimit)
+        self.positiveTargetMax.setEnabled(self.aw.pidcontrol.positiveTargetRangeLimit)
+
+    # ensure that the target limits are within the selected target sliders limits
+    @pyqtSlot(int)
+    def updatePositiveTargetLimits(self, i:int) -> None:
+        self.aw.pidcontrol.pidPositiveTarget = i
+        if self.aw.pidcontrol.pidPositiveTarget == 0:
+            # default to a range within [0,100]
+            slider_min = 0
+            slider_max = 100
+            self.positiveTargetRangeLimitFlag.setEnabled(False)
+            self.positiveTargetMin.setEnabled(False)
+            self.positiveTargetMax.setEnabled(False)
+        else:
+            slidernr = self.aw.pidcontrol.pidPositiveTarget - 1
+            slider_min = self.aw.eventslidermin[slidernr]
+            slider_max = self.aw.eventslidermax[slidernr]
+            self.positiveTargetRangeLimitFlag.setEnabled(True)
+            self.positiveTargetMin.setEnabled(self.aw.pidcontrol.positiveTargetRangeLimit)
+            self.positiveTargetMax.setEnabled(self.aw.pidcontrol.positiveTargetRangeLimit)
+        self.positiveTargetMin.setRange(slider_min, slider_max)
+        self.positiveTargetMax.setRange(slider_min, slider_max)
+
+
+    # ensure that the target limits are within the selected target sliders limits
+    @pyqtSlot(int)
+    def updateNegativeTargetLimits(self, i:int) -> None:
+        self.aw.pidcontrol.pidNegativeTarget = i
+        if self.aw.pidcontrol.pidNegativeTarget == 0:
+            # default to a range within [0,100]
+            slider_min = 0
+            slider_max = 100
+            self.negativeTargetRangeLimitFlag.setEnabled(False)
+            self.negativeTargetMin.setEnabled(False)
+            self.negativeTargetMax.setEnabled(False)
+        else:
+            slidernr = self.aw.pidcontrol.pidNegativeTarget - 1
+            slider_min = self.aw.eventslidermin[slidernr]
+            slider_max = self.aw.eventslidermax[slidernr]
+            self.negativeTargetRangeLimitFlag.setEnabled(True)
+            self.negativeTargetMin.setEnabled(self.aw.pidcontrol.negativeTargetRangeLimit)
+            self.negativeTargetMax.setEnabled(self.aw.pidcontrol.negativeTargetRangeLimit)
+        self.negativeTargetMin.setRange(slider_min, slider_max)
+        self.negativeTargetMax.setRange(slider_min, slider_max)
+
+
+    @pyqtSlot(int)
+    def negativeTargetRangeLimitSlot(self, i:int) -> None:
+        self.aw.pidcontrol.negativeTargetRangeLimit = bool(i)
+        self.negativeTargetMin.setEnabled(self.aw.pidcontrol.negativeTargetRangeLimit)
+        self.negativeTargetMax.setEnabled(self.aw.pidcontrol.negativeTargetRangeLimit)
 
     @pyqtSlot(int)
     def sliderMinValueChangedSlot(self, i:int) -> None:
@@ -1028,6 +1184,11 @@ class PID_DlgControl(ArtisanDialog):
         self.aw.pidcontrol.svMode = self.pidMode.currentIndex()
         self.aw.pidcontrol.dutyMin = min(self.dutyMin.value(),self.dutyMax.value())
         self.aw.pidcontrol.dutyMax = max(self.dutyMin.value(),self.dutyMax.value())
+        self.aw.pidcontrol.positiveTargetMin = min(self.positiveTargetMin.value(),self.positiveTargetMax.value())
+        self.aw.pidcontrol.positiveTargetMax = max(self.positiveTargetMin.value(),self.positiveTargetMax.value())
+        self.aw.pidcontrol.negativeTargetMin = min(self.negativeTargetMin.value(),self.negativeTargetMax.value())
+        self.aw.pidcontrol.negativeTargetMax = max(self.negativeTargetMin.value(),self.negativeTargetMax.value())
+        self.aw.pidcontrol.derivative_filter = int(self.derivativeFilterFlag.isChecked())
         self.aw.pidcontrol.svLookahead = self.pidSVLookahead.value()
         self.aw.pidcontrol.dutySteps = self.pidDutySteps.value()
         #

@@ -16046,8 +16046,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 if fire_slider_action:
                     self.fireslideractionSignal.emit(etype)
                 # create a new event
-                nv:float = self.qmc.eventsExternal2InternalValue(new_value)
                 if record and self.qmc.flagstart:
+                    nv:float = self.qmc.eventsExternal2InternalValue(new_value)
                     self.qmc.eventRecordActionSignal.emit(etype,nv,'',True)
 
     # kaleidoSendMessageAwait() sends out the message to the machine, awaits the reply and creates a corresponding event entry
@@ -16754,16 +16754,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.pidcontrol.svValue = toInt(settings.value('svValue',self.pidcontrol.svValue))
             self.pidcontrol.loadRampSoakFromBackground = bool(toBool(settings.value('loadRampSoakFromBackground',self.pidcontrol.loadRampSoakFromBackground)))
             self.pidcontrol.svLabel = toString(settings.value('svLabel',self.pidcontrol.svLabel))
-
-            self.sliderSV.blockSignals(True)
-            try:
-                if settings.contains('dutyMin'):
-                    self.pidcontrol.dutyMin = toInt(settings.value('dutyMin',self.pidcontrol.dutyMin))
-                if settings.contains('dutyMax'):
-                    self.pidcontrol.dutyMax = toInt(settings.value('dutyMax',self.pidcontrol.dutyMax))
-            finally:
-                self.sliderSV.blockSignals(False)
-
+            self.pidcontrol.dutyMin = toInt(settings.value('dutyMin',self.pidcontrol.dutyMin))
+            self.pidcontrol.dutyMax = toInt(settings.value('dutyMax',self.pidcontrol.dutyMax))
+            self.pidcontrol.positiveTargetRangeLimit = bool(toBool(settings.value('positiveTargetRangeLimit',self.pidcontrol.positiveTargetRangeLimit)))
+            self.pidcontrol.positiveTargetMin = toInt(settings.value('positiveTargetMin',self.pidcontrol.positiveTargetMin))
+            self.pidcontrol.positiveTargetMax = toInt(settings.value('positiveTargetMax',self.pidcontrol.positiveTargetMax))
+            self.pidcontrol.negativeTargetRangeLimit = bool(toBool(settings.value('negativeTargetRangeLimit',self.pidcontrol.negativeTargetRangeLimit)))
+            self.pidcontrol.negativeTargetMin = toInt(settings.value('negativeTargetMin',self.pidcontrol.negativeTargetMin))
+            self.pidcontrol.negativeTargetMax = toInt(settings.value('negativeTargetMax',self.pidcontrol.negativeTargetMax))
+            self.pidcontrol.derivative_filter = toInt(settings.value('derivative_filter',self.pidcontrol.derivative_filter))
             self.pidcontrol.activateSVSlider(self.pidcontrol.svSlider)
             self.pidcontrol.pidKp = toFloat(settings.value('pidKp',self.pidcontrol.pidKp))
             self.pidcontrol.pidKi = toFloat(settings.value('pidKi',self.pidcontrol.pidKi))
@@ -18392,6 +18391,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'svValue',self.pidcontrol.svValue, read_defaults)
             self.settingsSetValue(settings, default_settings, 'dutyMin',self.pidcontrol.dutyMin, read_defaults)
             self.settingsSetValue(settings, default_settings, 'dutyMax',self.pidcontrol.dutyMax, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'positiveTargetRangeLimit',self.pidcontrol.positiveTargetRangeLimit, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'positiveTargetMin',self.pidcontrol.positiveTargetMin, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'positiveTargetMax',self.pidcontrol.positiveTargetMax, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'negativeTargetRangeLimit',self.pidcontrol.negativeTargetRangeLimit, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'negativeTargetMin',self.pidcontrol.negativeTargetMin, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'negativeTargetMax',self.pidcontrol.negativeTargetMax, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'derivative_filter',self.pidcontrol.derivative_filter, read_defaults)
             self.settingsSetValue(settings, default_settings, 'pidKp',self.pidcontrol.pidKp, read_defaults)
             self.settingsSetValue(settings, default_settings, 'pidKi',self.pidcontrol.pidKi, read_defaults)
             self.settingsSetValue(settings, default_settings, 'pidKd',self.pidcontrol.pidKd, read_defaults)
@@ -22511,7 +22517,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 dialog.setModal(False)
                 dialog.show()
                 dialog.setFixedSize(dialog.size())
-#                QApplication.processEvents()
         # Hottop
         elif self.qmc.device == 53:
             modifiers = QApplication.keyboardModifiers()

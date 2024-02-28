@@ -175,7 +175,7 @@ if __name__ == '__main__':
     y_live_lfilter = [live_lfilter(y) for y in yraw]
 
 
-    # define lowpass filter with 2.5 Hz cutoff frequency if order 2
+    # define lowpass filter with 2.5 Hz cutoff frequency of order 2
     sos = scipy.signal.iirfilter(2, Wn=2.5, fs=fs, btype='low',
                                  ftype='butter', output='sos')
     y_scipy_sosfilt = scipy.signal.sosfilt(sos, yraw)
