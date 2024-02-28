@@ -326,7 +326,8 @@ class PID:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)
 
-    def derivativeFilter(self) -> LiveSosFilter:
+    @staticmethod
+    def derivativeFilter() -> LiveSosFilter:
         return LiveSosFilter(
                 scipy.signal.iirfilter(1, # order
                 Wn=0.2, # 0 < Wn < fs/2 (fs=1 -> fs/2=0.5)
