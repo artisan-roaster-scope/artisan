@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #set -ex
 set -e  # reduced logging
@@ -110,4 +110,5 @@ fi
 rm -rf build dist
 sleep .3 # sometimes it takes a little for dist to get really empty
 echo "************* 3 **************"
-$PYTHONBIN/python3 setup-macos3-legacy.py py2app | egrep -v '^(creating|copying file|byte-compiling|locate)'
+$PYTHONBIN/python3 setup-macos3-legacy.py py2app 2>&1 | egrep -v '^(creating|copying file|byte-compiling|locate|ADD INFO|changefunc)'
+if [ ${PIPESTATUS[0]} -ne 0 ]; then echo "Failed in py2app"; exit 1; else (echo "** Finished py2app"); fi
