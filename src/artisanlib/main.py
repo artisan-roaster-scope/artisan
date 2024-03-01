@@ -47,6 +47,7 @@ from artisanlib import __release_sponsor_name__
 
 import os
 import sys  # @UnusedImport
+import getpass
 import ast
 import platform
 import math
@@ -62,6 +63,7 @@ import functools
 import dateutil.parser
 import copy as copyd
 import arabic_reshaper # type:ignore
+from pathlib import Path
 from bidi.algorithm import get_display # type:ignore
 
 # links CTR-C signals to the system default (ignore)
@@ -23871,6 +23873,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 if len(self.logofilename) > 0 or self.qmc.logoimg is not None:
                     self.qmc.redraw()
                     self.qmc.placelogoimage()
+                if fileext == '.png':
+                    batch_nr_str = ('' if self.qmc.roastbatchnrB == 0 else self.qmc.roastbatchprefixB + str(self.qmc.roastbatchnrB) + ' ')
+                    metadata = {
+                        'Title': f'{batch_nr_str}{self.qmc.title}',
+                        'Author': getpass.getuser(),
+                        'Description': f'Artisan Roast Profile {batch_nr_str}{self.qmc.title}',
+                        'Software': f'Artisan v{__version__}, https://artisan-scope.org/'
+                    }
+                else:
+                    metadata = None
                 self.qmc.fig.savefig(filename,
                         dpi=fig_dpi,
                         backend='agg',
@@ -23878,7 +23890,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         #bbox_inches='tight',
                         #backend='pgf', # slow and fails on # characters in TeX backend
                         facecolor=str(self.qmc.palette['canvas']),
-                        edgecolor=None
+                        edgecolor=None,
+                        metadata=metadata
                 ) # transparent=True is need to get the delta curves and legend drawn
 
                 if adjust_fig_size:
@@ -23912,12 +23925,33 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     filename += extension
                     #mpl.rcParams['pdf.fonttype'] = 3   # 3 or 42
                     #mpl.rc('pdf', fonttype=3)
+                batch_nr_str = ('' if self.qmc.roastbatchnrB == 0 else self.qmc.roastbatchprefixB + str(self.qmc.roastbatchnrB) + ' ')
+                if extension == '*.pdf':
+                    metadata = {
+                            'Title': f'{batch_nr_str}{self.qmc.title}',
+                            'Author': getpass.getuser(),
+                            'Subject': f'Artisan Roast Profile {batch_nr_str}{self.qmc.title}',
+                            'Keywords': ', '.join(filter(None, ['Artisan', 'Roast Profile', batch_nr_str])),
+                            'Creator': f'Artisan v{__version__}, https://artisan-scope.org/'
+                            }
+                else: # SVG
+                    metadata = {
+                            'Title': f'{batch_nr_str}{self.qmc.title}',
+                            'Creator': getpass.getuser(),
+                            'Description': f'Artisan Roast Profile {batch_nr_str}{self.qmc.title}',
+                            'Keywords': ', '.join(filter(None, ['Artisan', 'Roast Profile', batch_nr_str])),
+                            'Publisher': f'Artisan v{__version__}, https://artisan-scope.org/'
+                    }
+                    if self.curFile is not None:
+                        metadata['Source'] = Path(self.curFile).name
+
                 self.qmc.fig.savefig(filename,
                         transparent=(self.qmc.palette['canvas'] is None or self.qmc.palette['canvas']=='None'),
                         #bbox_inches='tight',
                         #backend='pgf', # slow and fails on # characters in TeX backend
                         facecolor=str(self.qmc.palette['canvas']),
-                        edgecolor=None
+                        edgecolor=None,
+                        metadata=metadata
                         ) # transparent=True is need to get the delta curves and legend drawn
                 self.qmc.updateBackground() # that redraw is needed to avoid the "transparent flicker"
 
