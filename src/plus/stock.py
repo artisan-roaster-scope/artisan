@@ -1272,7 +1272,7 @@ def getBlends(weight_unit_idx:int, store:Optional[str] = None, customBlend:Optio
                                     blend['moisture'] = m
                             # only if the density of all components is known,
                             # we can estimate the density of this blend
-                            if is_int_list(densities):
+                            if is_float_list(densities): # component densities are floats as they are ints multiplied by ratio!
                                 new_blend['density'] = int(
                                     round(sum(densities))
                                 )  # @UndefinedVariable

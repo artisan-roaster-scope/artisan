@@ -4342,7 +4342,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #                message = QApplication.translate('Message', 'Artisan is free to use!<br><br>To keep it free and current please support us<br><br><a href="{0}">{0}</a><br><br>and book<br><br><a href="{1}">{1}</a><br><br>to suppress this dialog')
 #                message = message.format('https://artisan-scope.org/donate/', 'https://artisan.plus')
                 message = QApplication.translate('Message', 'Artisan is free to use!\n\nTo keep it free and current please support us with your donation and subscribe to artisan.plus to suppress this dialog!')
-                donate_message_box = QMessageBox(self)
+                donate_message_box = QMessageBox()
                 donate_message_box.setText(message)
                 donate_message_box.setIcon(QMessageBox.Icon.Information)
                 donate_message_box.setModal(True)
@@ -25189,7 +25189,7 @@ def excepthook(excType:type, excValue:BaseException, tracebackobj:Optional['Trac
         if aw is not None:
             if hasattr(aw, 'qmc'):
                 aw.qmc.adderror('Error: ' + detailedmsg)
-            errorbox = QMessageBox(aw)
+            errorbox = QMessageBox()
             errorbox.about(aw, detailedmsg, f'{notice}{versionInfo}{msg}')
 
             # using a (native) QErrorMessage dialog which does not allow styled text like bold/links

@@ -324,7 +324,7 @@ def disconnect_confirmed() -> bool:
 #        QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel,
 #    )
 #    return QMessageBox.StandardButton.Ok == reply
-    mbox = QMessageBox(aw)
+    mbox = QMessageBox() #(aw) # only without super this one shows the native dialog on macOS under Qt 6.6.2
     mbox.setText(string)
     basedir = os.path.join(getResourcePath(),'Icons')
     p = os.path.join(basedir, 'plus-notification.svg')

@@ -97,40 +97,48 @@ class PID_DlgControl(ArtisanDialog):
         pidSetPID.clicked.connect(self.pidConf)
         pidSetPID.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
-        self.pidSource = QComboBox()
-        self.pidSource.setToolTip(QApplication.translate('Tooltip', 'PID input signal'))
-        if self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag:
-            # Arduino/TC4
-            pidSourceItems = ['1','2','3','4']
-            self.pidSource.addItems(pidSourceItems)
-            self.pidSource.setCurrentIndex(self.aw.pidcontrol.pidSource - 1)
-        else:
-            # internal software PID
-            # Hottop or MODBUS or others (self.qmc.device in [53,29])
-#            pidSourceItems = ['BT','ET']
-#            self.pidSource.addItems(pidSourceItems)
-#            if self.aw.pidcontrol.pidSource == 1:
-#                self.pidSource.setCurrentIndex(0)
-#            else:
-#                self.pidSource.setCurrentIndex(1)
-            pidSourceItems = []
-            # NOTE: ET/BT inverted as pidSource=1 => BT and pidSource=2 => ET !!
-            pidSourceItems.append(QApplication.translate('ComboBox','ET'))
-            pidSourceItems.append(QApplication.translate('ComboBox','BT'))
-            for i in range(len(self.aw.qmc.extradevices)):
-                pidSourceItems.append(str(i) + 'xT1: ' + self.aw.qmc.extraname1[i])
-                pidSourceItems.append(str(i) + 'xT2: ' + self.aw.qmc.extraname2[i])
-            self.pidSource.addItems(pidSourceItems)
-            if self.aw.pidcontrol.pidSource in {0,1}:
-                self.pidSource.setCurrentIndex(1)
-            elif self.aw.pidcontrol.pidSource == 2:
-                self.pidSource.setCurrentIndex(0)
-            elif self.aw.pidcontrol.pidSource-1 < len(pidSourceItems):
-                self.pidSource.setCurrentIndex(self.aw.pidcontrol.pidSource-1)
-            else:
-                self.pidSource.setCurrentIndex(1)
 
-        pidSourceLabel = QLabel(QApplication.translate('Label','Input'))
+        if pid_controller in {0, 3, 4}: # only for internal PID and TC4/Kaleido
+            self.pidSource = QComboBox()
+            self.pidSource.setToolTip(QApplication.translate('Tooltip', 'PID input signal'))
+            if self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag:
+                # Arduino/TC4
+                pidSourceItems = ['1','2','3','4']
+                self.pidSource.addItems(pidSourceItems)
+                self.pidSource.setCurrentIndex(self.aw.pidcontrol.pidSource - 1)
+            else:
+                # internal software PID
+                # Hottop or MODBUS or others (self.qmc.device in [53,29])
+    #            pidSourceItems = ['BT','ET']
+    #            self.pidSource.addItems(pidSourceItems)
+    #            if self.aw.pidcontrol.pidSource == 1:
+    #                self.pidSource.setCurrentIndex(0)
+    #            else:
+    #                self.pidSource.setCurrentIndex(1)
+                pidSourceItems = []
+                # NOTE: ET/BT inverted as pidSource=1 => BT and pidSource=2 => ET !!
+                pidSourceItems.append(QApplication.translate('ComboBox','ET'))
+                pidSourceItems.append(QApplication.translate('ComboBox','BT'))
+                for i in range(len(self.aw.qmc.extradevices)):
+                    pidSourceItems.append(str(i) + 'xT1: ' + self.aw.qmc.extraname1[i])
+                    pidSourceItems.append(str(i) + 'xT2: ' + self.aw.qmc.extraname2[i])
+                self.pidSource.addItems(pidSourceItems)
+                if self.aw.pidcontrol.pidSource in {0,1}:
+                    self.pidSource.setCurrentIndex(1)
+                elif self.aw.pidcontrol.pidSource == 2:
+                    self.pidSource.setCurrentIndex(0)
+                elif self.aw.pidcontrol.pidSource-1 < len(pidSourceItems):
+                    self.pidSource.setCurrentIndex(self.aw.pidcontrol.pidSource-1)
+                else:
+                    self.pidSource.setCurrentIndex(1)
+            pidSourceLabel = QLabel(QApplication.translate('Label','Input'))
+            pidSourceBox = QHBoxLayout()
+            pidSourceBox.addStretch()
+            pidSourceBox.addWidget(pidSourceLabel)
+            pidSourceBox.addWidget(self.pidSource)
+            #pidSourceBox.addSpacing(80)
+            pidSourceBox.addStretch()
+
 
         pidGrid = QGridLayout()
         pidGrid.addWidget(pidKpLabel,0,0)
@@ -140,13 +148,6 @@ class PID_DlgControl(ArtisanDialog):
         pidGrid.addWidget(pidKdLabel,2,0)
         pidGrid.addWidget(self.pidKd,2,1)
 
-
-        pidSourceBox = QHBoxLayout()
-        pidSourceBox.addStretch()
-        pidSourceBox.addWidget(pidSourceLabel)
-        pidSourceBox.addWidget(self.pidSource)
-        #pidSourceBox.addSpacing(80)
-        pidSourceBox.addStretch()
 
         self.pidCycle = QSpinBox()
         self.pidCycle.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -174,7 +175,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pOnGroup.addButton(self.pOnM)
         self.pOnE.setChecked(self.aw.pidcontrol.pOnE)
         self.pOnM.setChecked(not self.aw.pidcontrol.pOnE)
-        if self.aw.pidcontrol.externalPIDControl() in {1,2}:
+        if pid_controller in {1,2}:
             self.pOnE.setEnabled(False)
             self.pOnM.setEnabled(False)
 
@@ -183,124 +184,126 @@ class PID_DlgControl(ArtisanDialog):
         pOnLayout.addWidget(self.pOnM)
 
         pidVBox = QVBoxLayout()
-        pidVBox.addLayout(pidSourceBox)
-        if self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag: # ArduinoTC4
-            pidVBox.addLayout(pidCycleBox)
+        if pid_controller in {0, 3, 4}: # internal PID, TC4/Kaleido
+            pidVBox.addLayout(pidSourceBox)
+            if pid_controller in {3, 4}: # TC4/Kaleido
+                pidVBox.addLayout(pidCycleBox)
         pidVBox.addLayout(pOnLayout)
         pidVBox.setAlignment(pOnLayout,Qt.AlignmentFlag.AlignRight)
         pidVBox.addLayout(pidSetBox)
         pidVBox.setAlignment(pidSetBox,Qt.AlignmentFlag.AlignRight)
 
-        #PID target (only shown if internal PID for hottop/modbus/TC4 is active
-        controlItems = ['None',self.aw.qmc.etypesf(0),self.aw.qmc.etypesf(1),self.aw.qmc.etypesf(2),self.aw.qmc.etypesf(3)]
-        #positiveControl
-        positiveControlLabel = QLabel(QApplication.translate('Label','Positive'))
-        self.positiveControlCombo = QComboBox()
-        self.positiveControlCombo.addItems(controlItems)
-        self.positiveControlCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.positiveControlCombo.setCurrentIndex(self.aw.pidcontrol.pidPositiveTarget)
-        self.positiveControlCombo.currentIndexChanged.connect(self.updatePositiveTargetLimits)
-        self.positiveControlCombo.setToolTip(QApplication.translate('Tooltip', 'Slider to be set by the positive PID duty signal'))
-        #negativeControl
-        negativeControlLabel = QLabel(QApplication.translate('Label','Negative'))
-        self.negativeControlCombo = QComboBox()
-        self.negativeControlCombo.addItems(controlItems)
-        self.negativeControlCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.negativeControlCombo.setCurrentIndex(self.aw.pidcontrol.pidNegativeTarget)
-        self.negativeControlCombo.currentIndexChanged.connect(self.updateNegativeTargetLimits)
-        self.negativeControlCombo.setToolTip(QApplication.translate('Tooltip', 'Slider to be set by the negative PID duty signal'))
+        if pid_controller == 0: # Output configuration only for internal PID
+            #PID target (only shown if internal PID for hottop/modbus/TC4 is active
+            controlItems = ['None',self.aw.qmc.etypesf(0),self.aw.qmc.etypesf(1),self.aw.qmc.etypesf(2),self.aw.qmc.etypesf(3)]
+            #positiveControl
+            positiveControlLabel = QLabel(QApplication.translate('Label','Positive'))
+            self.positiveControlCombo = QComboBox()
+            self.positiveControlCombo.addItems(controlItems)
+            self.positiveControlCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.positiveControlCombo.setCurrentIndex(self.aw.pidcontrol.pidPositiveTarget)
+            self.positiveControlCombo.currentIndexChanged.connect(self.updatePositiveTargetLimits)
+            self.positiveControlCombo.setToolTip(QApplication.translate('Tooltip', 'Slider to be set by the positive PID duty signal'))
+            #negativeControl
+            negativeControlLabel = QLabel(QApplication.translate('Label','Negative'))
+            self.negativeControlCombo = QComboBox()
+            self.negativeControlCombo.addItems(controlItems)
+            self.negativeControlCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.negativeControlCombo.setCurrentIndex(self.aw.pidcontrol.pidNegativeTarget)
+            self.negativeControlCombo.currentIndexChanged.connect(self.updateNegativeTargetLimits)
+            self.negativeControlCombo.setToolTip(QApplication.translate('Tooltip', 'Slider to be set by the negative PID duty signal'))
 
-        targetSliderLabel = QLabel(QApplication.translate('Label', 'Slider'))
-        rangeLimitLabel = QLabel(QApplication.translate('Label', 'Limit'))
-        rangeLimitMinLabel = QLabel(QApplication.translate('Label', 'Min'))
-        rangeLimitMaxLabel = QLabel(QApplication.translate('Label', 'Max'))
-        self.positiveTargetRangeLimitFlag = QCheckBox()
-        self.positiveTargetRangeLimitFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.positiveTargetRangeLimitFlag.setChecked(self.aw.pidcontrol.positiveTargetRangeLimit)
-        self.positiveTargetRangeLimitFlag.stateChanged.connect(self.positiveTargetRangeLimitSlot)
-        self.positiveTargetRangeLimitFlag.setToolTip(QApplication.translate('Tooltip', 'Activate range limit for positive PID output slider'))
-        self.negativeTargetRangeLimitFlag = QCheckBox()
-        self.negativeTargetRangeLimitFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.negativeTargetRangeLimitFlag.setChecked(self.aw.pidcontrol.negativeTargetRangeLimit)
-        self.negativeTargetRangeLimitFlag.stateChanged.connect(self.negativeTargetRangeLimitSlot)
-        self.negativeTargetRangeLimitFlag.setToolTip(QApplication.translate('Tooltip', 'Activate range limit for negative PID output slider'))
+            targetSliderLabel = QLabel(QApplication.translate('Label', 'Slider'))
+            rangeLimitLabel = QLabel(QApplication.translate('Label', 'Limit'))
+            rangeLimitMinLabel = QLabel(QApplication.translate('Label', 'Min'))
+            rangeLimitMaxLabel = QLabel(QApplication.translate('Label', 'Max'))
+            self.positiveTargetRangeLimitFlag = QCheckBox()
+            self.positiveTargetRangeLimitFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.positiveTargetRangeLimitFlag.setChecked(self.aw.pidcontrol.positiveTargetRangeLimit)
+            self.positiveTargetRangeLimitFlag.stateChanged.connect(self.positiveTargetRangeLimitSlot)
+            self.positiveTargetRangeLimitFlag.setToolTip(QApplication.translate('Tooltip', 'Activate range limit for positive PID output slider'))
+            self.negativeTargetRangeLimitFlag = QCheckBox()
+            self.negativeTargetRangeLimitFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.negativeTargetRangeLimitFlag.setChecked(self.aw.pidcontrol.negativeTargetRangeLimit)
+            self.negativeTargetRangeLimitFlag.stateChanged.connect(self.negativeTargetRangeLimitSlot)
+            self.negativeTargetRangeLimitFlag.setToolTip(QApplication.translate('Tooltip', 'Activate range limit for negative PID output slider'))
 
-        self.positiveTargetMin = QSpinBox()
-        self.positiveTargetMin.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.positiveTargetMin.setRange(0,100)
-        self.positiveTargetMin.setSingleStep(10)
-        self.positiveTargetMin.setEnabled(self.aw.pidcontrol.positiveTargetRangeLimit)
-        self.positiveTargetMin.setToolTip(QApplication.translate('Tooltip', 'Positive output slider value at 0% duty'))
+            self.positiveTargetMin = QSpinBox()
+            self.positiveTargetMin.setAlignment(Qt.AlignmentFlag.AlignRight)
+            self.positiveTargetMin.setRange(0,100)
+            self.positiveTargetMin.setSingleStep(10)
+            self.positiveTargetMin.setEnabled(self.aw.pidcontrol.positiveTargetRangeLimit)
+            self.positiveTargetMin.setToolTip(QApplication.translate('Tooltip', 'Positive output slider value at 0% duty'))
 
-        self.positiveTargetMax = QSpinBox()
-        self.positiveTargetMax.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.positiveTargetMax.setRange(0,100)
-        self.positiveTargetMax.setSingleStep(10)
-        self.positiveTargetMax.setEnabled(self.aw.pidcontrol.positiveTargetRangeLimit)
-        self.positiveTargetMax.setToolTip(QApplication.translate('Tooltip', 'Positive output slider value at 100% duty'))
+            self.positiveTargetMax = QSpinBox()
+            self.positiveTargetMax.setAlignment(Qt.AlignmentFlag.AlignRight)
+            self.positiveTargetMax.setRange(0,100)
+            self.positiveTargetMax.setSingleStep(10)
+            self.positiveTargetMax.setEnabled(self.aw.pidcontrol.positiveTargetRangeLimit)
+            self.positiveTargetMax.setToolTip(QApplication.translate('Tooltip', 'Positive output slider value at 100% duty'))
 
-        self.updatePositiveTargetLimits(self.aw.pidcontrol.pidPositiveTarget)
-        self.positiveTargetMin.setValue(self.aw.pidcontrol.positiveTargetMin)
-        self.positiveTargetMax.setValue(self.aw.pidcontrol.positiveTargetMax)
+            self.updatePositiveTargetLimits(self.aw.pidcontrol.pidPositiveTarget)
+            self.positiveTargetMin.setValue(self.aw.pidcontrol.positiveTargetMin)
+            self.positiveTargetMax.setValue(self.aw.pidcontrol.positiveTargetMax)
 
-        self.negativeTargetMin = QSpinBox()
-        self.negativeTargetMin.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.negativeTargetMin.setRange(0,100)
-        self.negativeTargetMin.setSingleStep(10)
-        self.negativeTargetMin.setEnabled(self.aw.pidcontrol.negativeTargetRangeLimit)
-        self.negativeTargetMin.setToolTip(QApplication.translate('Tooltip', 'Negative output slider value at 0% duty'))
+            self.negativeTargetMin = QSpinBox()
+            self.negativeTargetMin.setAlignment(Qt.AlignmentFlag.AlignRight)
+            self.negativeTargetMin.setRange(0,100)
+            self.negativeTargetMin.setSingleStep(10)
+            self.negativeTargetMin.setEnabled(self.aw.pidcontrol.negativeTargetRangeLimit)
+            self.negativeTargetMin.setToolTip(QApplication.translate('Tooltip', 'Negative output slider value at 0% duty'))
 
-        self.negativeTargetMax = QSpinBox()
-        self.negativeTargetMax.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.negativeTargetMax.setRange(0,100)
-        self.negativeTargetMax.setSingleStep(10)
-        self.negativeTargetMax.setEnabled(self.aw.pidcontrol.negativeTargetRangeLimit)
-        self.negativeTargetMax.setToolTip(QApplication.translate('Tooltip', 'Negative output slider value at -100% duty'))
+            self.negativeTargetMax = QSpinBox()
+            self.negativeTargetMax.setAlignment(Qt.AlignmentFlag.AlignRight)
+            self.negativeTargetMax.setRange(0,100)
+            self.negativeTargetMax.setSingleStep(10)
+            self.negativeTargetMax.setEnabled(self.aw.pidcontrol.negativeTargetRangeLimit)
+            self.negativeTargetMax.setToolTip(QApplication.translate('Tooltip', 'Negative output slider value at -100% duty'))
 
-        self.updateNegativeTargetLimits(self.aw.pidcontrol.pidNegativeTarget)
-        self.negativeTargetMin.setValue(self.aw.pidcontrol.negativeTargetMin)
-        self.negativeTargetMax.setValue(self.aw.pidcontrol.negativeTargetMax)
+            self.updateNegativeTargetLimits(self.aw.pidcontrol.pidNegativeTarget)
+            self.negativeTargetMin.setValue(self.aw.pidcontrol.negativeTargetMin)
+            self.negativeTargetMax.setValue(self.aw.pidcontrol.negativeTargetMax)
 
-        controlSelectorLayout = QGridLayout()
-        controlSelectorLayout.addWidget(targetSliderLabel,0,1,Qt.AlignmentFlag.AlignCenter)
-        controlSelectorLayout.addWidget(rangeLimitLabel,0,2,Qt.AlignmentFlag.AlignCenter)
-        controlSelectorLayout.addWidget(rangeLimitMinLabel,0,3,Qt.AlignmentFlag.AlignCenter)
-        controlSelectorLayout.addWidget(rangeLimitMaxLabel,0,4,Qt.AlignmentFlag.AlignCenter)
-        controlSelectorLayout.addWidget(positiveControlLabel,1,0)
-        controlSelectorLayout.addWidget(self.positiveControlCombo,1,1)
-        controlSelectorLayout.addWidget(self.positiveTargetRangeLimitFlag,1,2)
-        controlSelectorLayout.addWidget(self.positiveTargetMin,1,3)
-        controlSelectorLayout.addWidget(self.positiveTargetMax,1,4)
-        controlSelectorLayout.addWidget(negativeControlLabel,2,0)
-        controlSelectorLayout.addWidget(self.negativeControlCombo,2,1)
-        controlSelectorLayout.addWidget(self.negativeTargetRangeLimitFlag,2,2)
-        controlSelectorLayout.addWidget(self.negativeTargetMin,2,3)
-        controlSelectorLayout.addWidget(self.negativeTargetMax,2,4)
+            controlSelectorLayout = QGridLayout()
+            controlSelectorLayout.addWidget(targetSliderLabel,0,1,Qt.AlignmentFlag.AlignCenter)
+            controlSelectorLayout.addWidget(rangeLimitLabel,0,2,Qt.AlignmentFlag.AlignCenter)
+            controlSelectorLayout.addWidget(rangeLimitMinLabel,0,3,Qt.AlignmentFlag.AlignCenter)
+            controlSelectorLayout.addWidget(rangeLimitMaxLabel,0,4,Qt.AlignmentFlag.AlignCenter)
+            controlSelectorLayout.addWidget(positiveControlLabel,1,0)
+            controlSelectorLayout.addWidget(self.positiveControlCombo,1,1)
+            controlSelectorLayout.addWidget(self.positiveTargetRangeLimitFlag,1,2)
+            controlSelectorLayout.addWidget(self.positiveTargetMin,1,3)
+            controlSelectorLayout.addWidget(self.positiveTargetMax,1,4)
+            controlSelectorLayout.addWidget(negativeControlLabel,2,0)
+            controlSelectorLayout.addWidget(self.negativeControlCombo,2,1)
+            controlSelectorLayout.addWidget(self.negativeTargetRangeLimitFlag,2,2)
+            controlSelectorLayout.addWidget(self.negativeTargetMin,2,3)
+            controlSelectorLayout.addWidget(self.negativeTargetMax,2,4)
 
-        self.invertControlFlag = QCheckBox(QApplication.translate('Label', 'Invert Control'))
-        self.invertControlFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.invertControlFlag.setChecked(self.aw.pidcontrol.invertControl)
-        self.invertControlFlag.setToolTip(QApplication.translate('Tooltip', 'If active, positive duties set negative outputs and negative ones the positive outputs'))
+            self.invertControlFlag = QCheckBox(QApplication.translate('Label', 'Invert Control'))
+            self.invertControlFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.invertControlFlag.setChecked(self.aw.pidcontrol.invertControl)
+            self.invertControlFlag.setToolTip(QApplication.translate('Tooltip', 'If active, positive duties set negative outputs and negative ones the positive outputs'))
 
-        controlVBox = QVBoxLayout()
-        controlVBox.addLayout(controlSelectorLayout)
-        controlVBox.addWidget(self.invertControlFlag)
+            controlVBox = QVBoxLayout()
+            controlVBox.addLayout(controlSelectorLayout)
+            controlVBox.addWidget(self.invertControlFlag)
 
-        controlHBox = QHBoxLayout()
-        controlHBox.addStretch()
-        controlHBox.addLayout(controlVBox)
-        controlHBox.addStretch()
+            controlHBox = QHBoxLayout()
+            controlHBox.addStretch()
+            controlHBox.addLayout(controlVBox)
+            controlHBox.addStretch()
 
-        pidTargetGrp = QGroupBox(QApplication.translate('GroupBox','Output'))
-        pidTargetGrp.setLayout(controlHBox)
-        pidTargetGrp.setContentsMargins(0,10,0,0)
+            pidTargetGrp = QGroupBox(QApplication.translate('GroupBox','Output'))
+            pidTargetGrp.setLayout(controlHBox)
+            pidTargetGrp.setContentsMargins(0,10,0,0)
 
         pidGridBox = QHBoxLayout()
         pidGridBox.addLayout(pidGrid)
-        pidGridBox.addStretch()
         pidGridBox.addLayout(pidVBox)
-        if not (self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag): # don't show Targets if TC4 firmware PID is in use
+        if pid_controller == 0: # Output configuration only for internal PID
             pidGridBox.addWidget(pidTargetGrp)
+        pidGridBox.addStretch()
 
         pidGridVBox = QVBoxLayout()
         pidGridVBox.addLayout(pidGridBox)
@@ -324,14 +327,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidSVLookahead.setToolTip(QApplication.translate('Tooltip', 'In background follow mode the set value (SV) is taken\nfrom the selected source signal with a positive time offset\nspecified by the lookahead'))
         pidSVLookaheadLabel = QLabel(QApplication.translate('Label','Lookahead'))
 
-        self.pidDutySteps = QSpinBox()
-        self.pidDutySteps.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.pidDutySteps.setRange(1,10)
-        self.pidDutySteps.setSingleStep(1)
-        self.pidDutySteps.setValue(int(self.aw.pidcontrol.dutySteps))
-        self.pidDutySteps.setSuffix(' %')
-        self.pidDutySteps.setToolTip(QApplication.translate('Tooltip', 'Duty signal step size'))
-        pidDutyStepsLabel = QLabel(QApplication.translate('Label','Steps'))
+
 
         pidSetSV = QPushButton(QApplication.translate('Button','Set'))
         pidSetSV.clicked.connect(self.setSV)
@@ -433,48 +429,59 @@ class PID_DlgControl(ArtisanDialog):
         svGrp.setLayout(svGrpBox)
         svGrp.setContentsMargins(0,10,0,0)
 
-        dutyClampGrpBox = QGridLayout()
-        dutyClampGrpBox.addWidget(dutyMaxLabel,1,0)
-        dutyClampGrpBox.addWidget(self.dutyMax,1,1)
-        dutyClampGrpBox.addWidget(dutyMinLabel,2,0)
-        dutyClampGrpBox.addWidget(self.dutyMin,2,1)
+        if pid_controller == 0: # only the internal PID allows for duty control
+            self.pidDutySteps = QSpinBox()
+            self.pidDutySteps.setAlignment(Qt.AlignmentFlag.AlignRight)
+            self.pidDutySteps.setRange(1,10)
+            self.pidDutySteps.setSingleStep(1)
+            self.pidDutySteps.setValue(int(self.aw.pidcontrol.dutySteps))
+            self.pidDutySteps.setSuffix(' %')
+            self.pidDutySteps.setToolTip(QApplication.translate('Tooltip', 'Duty signal step size'))
+            pidDutyStepsLabel = QLabel(QApplication.translate('Label','Steps'))
 
-        dutyClampGrp = QGroupBox(QApplication.translate('GroupBox','Clamp'))
-        dutyClampGrp.setLayout(dutyClampGrpBox)
-        dutyClampGrp.setToolTip(QApplication.translate('Tooltip', 'With just a positive output active, the PID duty ranges from 0% to 100%.\nWith just a negative output it ranges from -100% to 0%.\nWith both outputs active the range is -100% to 100%.\nThis range can be clamped by setting tighter minimum and maximum  limits.'))
+            dutyClampGrpBox = QGridLayout()
+            dutyClampGrpBox.addWidget(dutyMaxLabel,1,0)
+            dutyClampGrpBox.addWidget(self.dutyMax,1,1)
+            dutyClampGrpBox.addWidget(dutyMinLabel,2,0)
+            dutyClampGrpBox.addWidget(self.dutyMin,2,1)
 
-        dutyGrid = QGridLayout()
-        dutyGrid.addWidget(pidDutyStepsLabel,0,0)
-        dutyGrid.addWidget(self.pidDutySteps,0,1)
+            dutyClampGrp = QGroupBox(QApplication.translate('GroupBox','Clamp'))
+            dutyClampGrp.setLayout(dutyClampGrpBox)
+            dutyClampGrp.setToolTip(QApplication.translate('Tooltip', 'With just a positive output active, the PID duty ranges from 0% to 100%.\nWith just a negative output it ranges from -100% to 0%.\nWith both outputs active the range is -100% to 100%.\nThis range can be clamped by setting tighter minimum and maximum  limits.'))
 
-        dutyGrpBox = QVBoxLayout()
-        dutyGrpBox.addStretch()
-        dutyGrpBox.addLayout(dutyGrid)
-        dutyGrpBox.addSpacing(10)
-        dutyGrpBox.addWidget(dutyClampGrp)
-        dutyGrpBox.addStretch()
-        dutyGrp = QGroupBox(QApplication.translate('GroupBox','Duty'))
-        dutyGrp.setLayout(dutyGrpBox)
-        dutyGrp.setContentsMargins(0,15,0,0)
+            dutyGrid = QGridLayout()
+            dutyGrid.addWidget(pidDutyStepsLabel,0,0)
+            dutyGrid.addWidget(self.pidDutySteps,0,1)
 
-        self.derivativeFilterFlag = QCheckBox(QApplication.translate('Label','Derivative Filter'))
-        self.derivativeFilterFlag.setChecked(bool(self.aw.pidcontrol.derivative_filter))
+            dutyGrpBox = QVBoxLayout()
+            dutyGrpBox.addStretch()
+            dutyGrpBox.addLayout(dutyGrid)
+            dutyGrpBox.addSpacing(10)
+            dutyGrpBox.addWidget(dutyClampGrp)
+            dutyGrpBox.addStretch()
+            dutyGrp = QGroupBox(QApplication.translate('GroupBox','Duty'))
+            dutyGrp.setLayout(dutyGrpBox)
+            dutyGrp.setContentsMargins(0,15,0,0)
 
-        filterGrpBox = QVBoxLayout()
-        filterGrpBox.addWidget(self.derivativeFilterFlag)
-        filterGrpBox.addStretch()
-
-        filterGrp = QGroupBox(QApplication.translate('GroupBox','Filter'))
-        filterGrp.setLayout(filterGrpBox)
-        filterGrp.setContentsMargins(0,15,0,0)
+        if pid_controller == 0:
+            # only for the internal PID we support a derative filter setting
+            self.derivativeFilterFlag = QCheckBox(QApplication.translate('Label','Derivative Filter'))
+            self.derivativeFilterFlag.setChecked(bool(self.aw.pidcontrol.derivative_filter))
+            filterGrpBox = QVBoxLayout()
+            filterGrpBox.addWidget(self.derivativeFilterFlag)
+            filterGrpBox.addStretch()
+            filterGrp = QGroupBox(QApplication.translate('GroupBox','Filter'))
+            filterGrp.setLayout(filterGrpBox)
+            filterGrp.setContentsMargins(0,15,0,0)
 
         pidBox = QHBoxLayout()
         pidBox.addWidget(pidGrp)
 
         svBox = QHBoxLayout()
         svBox.addWidget(svGrp)
-        svBox.addWidget(dutyGrp)
-        svBox.addWidget(filterGrp)
+        if pid_controller == 0:
+            svBox.addWidget(dutyGrp)
+            svBox.addWidget(filterGrp)
         svBox.addStretch()
 
         self.startPIDonCHARGE = QCheckBox(QApplication.translate('CheckBox', 'Start PID on CHARGE'))
@@ -484,6 +491,8 @@ class PID_DlgControl(ArtisanDialog):
         self.createEvents = QCheckBox(QApplication.translate('CheckBox', 'Create Events'))
         self.createEvents.setChecked(self.aw.pidcontrol.createEvents)
         self.createEvents.setToolTip(QApplication.translate('Tooltip', 'Generated an event mark on each output slider change\ninitiated by the PID'))
+        if pid_controller != 0:
+            self.createEvents.setEnabled(False)
 
         flagsLayout = QHBoxLayout()
         flagsLayout.addWidget(self.startPIDonCHARGE)
@@ -1128,17 +1137,21 @@ class PID_DlgControl(ArtisanDialog):
         kp = self.pidKp.value() # 5.00
         ki = self.pidKi.value() # 0.15
         kd = self.pidKd.value() # 0.00
-        pidSourceIdx = self.pidSource.currentIndex()
-        if pidSourceIdx == 0:
-            source = 2 # BT
-        elif pidSourceIdx == 1:
-            source = 1 # ET
-        else:
-            source = self.pidSource.currentIndex() + 1 # 3, 4, ... (extra device curves)
-        cycle = self.pidCycle.value() # def 1000 in ms
+        source:Optional[int] = None
+        cycle:Optional[int] = None
+        if self.aw.pidcontrol.externalPIDControl() in {0, 3, 4}: # only Internal PID and TC4/Kaleido
+            pidSourceIdx = self.pidSource.currentIndex()
+            if pidSourceIdx == 0:
+                source = 2 # BT
+            elif pidSourceIdx == 1:
+                source = 1 # ET
+            else:
+                source = self.pidSource.currentIndex() + 1 # 3, 4, ... (extra device curves)
+            if self.aw.pidcontrol.externalPIDControl() in {3, 4}: # only TC4/Kaleido
+                cycle = self.pidCycle.value() # def 1000 in ms
         pOnE = bool(self.pOnE.isChecked())
         self.aw.pidcontrol.confPID(kp,ki,kd,source,cycle,pOnE)
-        if not (self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag): # don't show Targets if TC4 firmware PID is in use
+        if self.aw.pidcontrol.externalPIDControl() == 0: # Targets only for internal PID
             self.aw.pidcontrol.pidPositiveTarget = self.positiveControlCombo.currentIndex()
             self.aw.pidcontrol.pidNegativeTarget = self.negativeControlCombo.currentIndex()
             self.aw.pidcontrol.invertControl = self.invertControlFlag.isChecked()
@@ -1152,21 +1165,23 @@ class PID_DlgControl(ArtisanDialog):
         kp = self.pidKp.value() # 5.00
         ki = self.pidKi.value() # 0.15
         kd = self.pidKd.value() # 0.00
-
-        pidSourceIdx = self.pidSource.currentIndex()
-        if self.aw.qmc.device == 19:
-            source = self.pidSource.currentIndex()+1 # one of the 4 TC channels, 1,..4
-        elif pidSourceIdx == 0:
-            source = 2 # BT
-        elif pidSourceIdx == 1:
-            source = 1 # ET
-        else:
-            source = self.pidSource.currentIndex() + 1 # 3, 4, ... (extra device curves)
-        if not (self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag): # don't show Targets if TC4 firmware PID is in use
-            self.aw.pidcontrol.pidPositiveTarget = self.positiveControlCombo.currentIndex()
-            self.aw.pidcontrol.pidNegativeTarget = self.negativeControlCombo.currentIndex()
-            self.aw.pidcontrol.invertControl = self.invertControlFlag.isChecked()
-        cycle = self.pidCycle.value() # def 1000 in ms
+        source:Optional[int] = None
+        cycle:Optional[int] = None
+        if self.aw.pidcontrol.externalPIDControl() == 0:
+            pidSourceIdx = self.pidSource.currentIndex()
+            if self.aw.qmc.device == 19:
+                source = self.pidSource.currentIndex()+1 # one of the 4 TC channels, 1,..4
+            elif pidSourceIdx == 0:
+                source = 2 # BT
+            elif pidSourceIdx == 1:
+                source = 1 # ET
+            else:
+                source = self.pidSource.currentIndex() + 1 # 3, 4, ... (extra device curves)
+            if not (self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag): # don't show Targets if TC4 firmware PID is in use
+                self.aw.pidcontrol.pidPositiveTarget = self.positiveControlCombo.currentIndex()
+                self.aw.pidcontrol.pidNegativeTarget = self.negativeControlCombo.currentIndex()
+                self.aw.pidcontrol.invertControl = self.invertControlFlag.isChecked()
+            cycle = self.pidCycle.value() # def 1000 in ms
         pOnE = bool(self.pOnE.isChecked())
         self.aw.pidcontrol.setPID(kp,ki,kd,source,cycle,pOnE)
         #
@@ -1182,15 +1197,17 @@ class PID_DlgControl(ArtisanDialog):
         self.aw.pidcontrol.svButtons = self.pidSVbuttonsFlag.isChecked()
         self.aw.pidcontrol.activateONOFFeasySV(self.aw.pidcontrol.svButtons)
         self.aw.pidcontrol.svMode = self.pidMode.currentIndex()
-        self.aw.pidcontrol.dutyMin = min(self.dutyMin.value(),self.dutyMax.value())
-        self.aw.pidcontrol.dutyMax = max(self.dutyMin.value(),self.dutyMax.value())
-        self.aw.pidcontrol.positiveTargetMin = min(self.positiveTargetMin.value(),self.positiveTargetMax.value())
-        self.aw.pidcontrol.positiveTargetMax = max(self.positiveTargetMin.value(),self.positiveTargetMax.value())
-        self.aw.pidcontrol.negativeTargetMin = min(self.negativeTargetMin.value(),self.negativeTargetMax.value())
-        self.aw.pidcontrol.negativeTargetMax = max(self.negativeTargetMin.value(),self.negativeTargetMax.value())
-        self.aw.pidcontrol.derivative_filter = int(self.derivativeFilterFlag.isChecked())
+        if self.aw.pidcontrol.externalPIDControl() == 0:
+            self.aw.pidcontrol.positiveTargetMin = min(self.positiveTargetMin.value(),self.positiveTargetMax.value())
+            self.aw.pidcontrol.positiveTargetMax = max(self.positiveTargetMin.value(),self.positiveTargetMax.value())
+            self.aw.pidcontrol.negativeTargetMin = min(self.negativeTargetMin.value(),self.negativeTargetMax.value())
+            self.aw.pidcontrol.negativeTargetMax = max(self.negativeTargetMin.value(),self.negativeTargetMax.value())
+            # only for internal PID there is a configuration derivative filter and configurable duty
+            self.aw.pidcontrol.dutyMin = min(self.dutyMin.value(),self.dutyMax.value())
+            self.aw.pidcontrol.dutyMax = max(self.dutyMin.value(),self.dutyMax.value())
+            self.aw.pidcontrol.dutySteps = self.pidDutySteps.value()
+            self.aw.pidcontrol.derivative_filter = int(self.derivativeFilterFlag.isChecked())
         self.aw.pidcontrol.svLookahead = self.pidSVLookahead.value()
-        self.aw.pidcontrol.dutySteps = self.pidDutySteps.value()
         #
         self.aw.PID_DlgControl_activeTab = self.tabWidget.currentIndex()
         #
