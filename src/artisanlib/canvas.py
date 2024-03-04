@@ -865,7 +865,7 @@ class tgraphcanvas(FigureCanvas):
                        '+Phidget DAQ1301 23',       #157
                        '+Phidget DAQ1301 45',       #158
                        '+Phidget DAQ1301 67',       #159
-                       f'+IKAWA {deltaLabelUTF8}Humidity/{deltaLabelUTF8}Humidity Dir.' #160
+                       f'+IKAWA {deltaLabelUTF8}Humidity/{deltaLabelUTF8}Humidity Dir.',    #160
                        '+Omega HH309 34',           #161
                        'Digi-Sense 20250-07',       #162
                        'Extech 42570'               #163
