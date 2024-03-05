@@ -1,5 +1,17 @@
 Detailed Release History
 ========================
+
+----
+v2.10.4 (XX, 2024)
+------------------
+
+* ADDITIONS
+* NEW HARDWARE SUPPORT
+* CHANGES
+* FIXES
+  - fixes regression which broke the PID dialog for MODBUS, S7, TC4 and Kaleido ([Issue #1480](../../../issues/1480))
+  - fixes regression which broke devices Omega HH309 34 and the just introduced Digi-Sense 20250-07 and Extech 42570 ([PR #1481](../../../pull/1481))
+
 ----
 v2.10.2 (February 29, 2024)
 ------------------

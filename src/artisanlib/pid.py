@@ -321,7 +321,9 @@ class PID:
     def getDuty(self) -> Optional[float]:
         try:
             self.pidSemaphore.acquire(1)
-            return self.lastOutput
+            if self.lastOutput is not None:
+                return int(round(min(self.dutyMax,max(self.dutyMin,self.lastOutput))))
+            return None
         finally:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)

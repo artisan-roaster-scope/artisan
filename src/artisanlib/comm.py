@@ -645,17 +645,14 @@ class serialport:
                 (self.aw.qmc.device == 29 and not self.aw.pidcontrol.externalPIDControl()):
                 # TC4 (19), HOTTOP (53) or MODBUS (29) with Artisan Software PID
             duty = self.aw.qmc.pid.getDuty()
-            if duty is None:
-                duty = -1
-            return self.aw.qmc.timeclock.elapsedMilli(), min(100,max(-100,duty)), self.aw.qmc.pid.target
+            duty = (-1 if duty is None else min(100,max(-100,duty)))
+            return self.aw.qmc.timeclock.elapsedMilli(), duty, self.aw.qmc.pid.target
         sv = self.aw.pidcontrol.sv if self.aw.pidcontrol.sv is not None else -1
         if self.aw.qmc.device == 29: # external MODBUS PID
             duty = -1
         else:
             duty = self.aw.qmc.pid.getDuty()
-            if duty is None:
-                duty = -1
-            duty = min(100,max(-100,duty))
+            duty = (-1 if duty is None else min(100,max(-100,duty)))
         return tx,duty,sv
 
     def DTAtemperature(self) -> Tuple[float,float,float]:

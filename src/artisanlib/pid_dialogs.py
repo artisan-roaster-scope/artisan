@@ -98,48 +98,6 @@ class PID_DlgControl(ArtisanDialog):
         pidSetPID.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
 
-        if pid_controller in {0, 3, 4}: # only for internal PID and TC4/Kaleido
-            self.pidSource = QComboBox()
-            self.pidSource.setToolTip(QApplication.translate('Tooltip', 'PID input signal'))
-            if self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag:
-                # Arduino/TC4
-                pidSourceItems = ['1','2','3','4']
-                self.pidSource.addItems(pidSourceItems)
-                self.pidSource.setCurrentIndex(self.aw.pidcontrol.pidSource - 1)
-            else:
-                # internal software PID
-                # Hottop or MODBUS or others (self.qmc.device in [53,29])
-    #            pidSourceItems = ['BT','ET']
-    #            self.pidSource.addItems(pidSourceItems)
-    #            if self.aw.pidcontrol.pidSource == 1:
-    #                self.pidSource.setCurrentIndex(0)
-    #            else:
-    #                self.pidSource.setCurrentIndex(1)
-                pidSourceItems = []
-                # NOTE: ET/BT inverted as pidSource=1 => BT and pidSource=2 => ET !!
-                pidSourceItems.append(QApplication.translate('ComboBox','ET'))
-                pidSourceItems.append(QApplication.translate('ComboBox','BT'))
-                for i in range(len(self.aw.qmc.extradevices)):
-                    pidSourceItems.append(str(i) + 'xT1: ' + self.aw.qmc.extraname1[i])
-                    pidSourceItems.append(str(i) + 'xT2: ' + self.aw.qmc.extraname2[i])
-                self.pidSource.addItems(pidSourceItems)
-                if self.aw.pidcontrol.pidSource in {0,1}:
-                    self.pidSource.setCurrentIndex(1)
-                elif self.aw.pidcontrol.pidSource == 2:
-                    self.pidSource.setCurrentIndex(0)
-                elif self.aw.pidcontrol.pidSource-1 < len(pidSourceItems):
-                    self.pidSource.setCurrentIndex(self.aw.pidcontrol.pidSource-1)
-                else:
-                    self.pidSource.setCurrentIndex(1)
-            pidSourceLabel = QLabel(QApplication.translate('Label','Input'))
-            pidSourceBox = QHBoxLayout()
-            pidSourceBox.addStretch()
-            pidSourceBox.addWidget(pidSourceLabel)
-            pidSourceBox.addWidget(self.pidSource)
-            #pidSourceBox.addSpacing(80)
-            pidSourceBox.addStretch()
-
-
         pidGrid = QGridLayout()
         pidGrid.addWidget(pidKpLabel,0,0)
         pidGrid.addWidget(self.pidKp,0,1)
@@ -184,7 +142,46 @@ class PID_DlgControl(ArtisanDialog):
         pOnLayout.addWidget(self.pOnM)
 
         pidVBox = QVBoxLayout()
-        if pid_controller in {0, 3, 4}: # internal PID, TC4/Kaleido
+        if pid_controller in {0, 3, 4}: # only for internal PID and TC4/Kaleido
+            self.pidSource = QComboBox()
+            self.pidSource.setToolTip(QApplication.translate('Tooltip', 'PID input signal'))
+            if self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag:
+                # Arduino/TC4
+                pidSourceItems = ['1','2','3','4']
+                self.pidSource.addItems(pidSourceItems)
+                self.pidSource.setCurrentIndex(self.aw.pidcontrol.pidSource - 1)
+            else:
+                # internal software PID
+                # Hottop or MODBUS or others (self.qmc.device in [53,29])
+    #            pidSourceItems = ['BT','ET']
+    #            self.pidSource.addItems(pidSourceItems)
+    #            if self.aw.pidcontrol.pidSource == 1:
+    #                self.pidSource.setCurrentIndex(0)
+    #            else:
+    #                self.pidSource.setCurrentIndex(1)
+                pidSourceItems = []
+                # NOTE: ET/BT inverted as pidSource=1 => BT and pidSource=2 => ET !!
+                pidSourceItems.append(QApplication.translate('ComboBox','ET'))
+                pidSourceItems.append(QApplication.translate('ComboBox','BT'))
+                for i in range(len(self.aw.qmc.extradevices)):
+                    pidSourceItems.append(str(i) + 'xT1: ' + self.aw.qmc.extraname1[i])
+                    pidSourceItems.append(str(i) + 'xT2: ' + self.aw.qmc.extraname2[i])
+                self.pidSource.addItems(pidSourceItems)
+                if self.aw.pidcontrol.pidSource in {0,1}:
+                    self.pidSource.setCurrentIndex(1)
+                elif self.aw.pidcontrol.pidSource == 2:
+                    self.pidSource.setCurrentIndex(0)
+                elif self.aw.pidcontrol.pidSource-1 < len(pidSourceItems):
+                    self.pidSource.setCurrentIndex(self.aw.pidcontrol.pidSource-1)
+                else:
+                    self.pidSource.setCurrentIndex(1)
+            pidSourceLabel = QLabel(QApplication.translate('Label','Input'))
+            pidSourceBox = QHBoxLayout()
+            pidSourceBox.addStretch()
+            pidSourceBox.addWidget(pidSourceLabel)
+            pidSourceBox.addWidget(self.pidSource)
+            #pidSourceBox.addSpacing(80)
+            pidSourceBox.addStretch()
             pidVBox.addLayout(pidSourceBox)
             if pid_controller in {3, 4}: # TC4/Kaleido
                 pidVBox.addLayout(pidCycleBox)
@@ -193,6 +190,9 @@ class PID_DlgControl(ArtisanDialog):
         pidVBox.addLayout(pidSetBox)
         pidVBox.setAlignment(pidSetBox,Qt.AlignmentFlag.AlignRight)
 
+        pidGridBox = QHBoxLayout()
+        pidGridBox.addLayout(pidGrid)
+        pidGridBox.addLayout(pidVBox)
         if pid_controller == 0: # Output configuration only for internal PID
             #PID target (only shown if internal PID for hottop/modbus/TC4 is active
             controlItems = ['None',self.aw.qmc.etypesf(0),self.aw.qmc.etypesf(1),self.aw.qmc.etypesf(2),self.aw.qmc.etypesf(3)]
@@ -297,11 +297,6 @@ class PID_DlgControl(ArtisanDialog):
             pidTargetGrp = QGroupBox(QApplication.translate('GroupBox','Output'))
             pidTargetGrp.setLayout(controlHBox)
             pidTargetGrp.setContentsMargins(0,10,0,0)
-
-        pidGridBox = QHBoxLayout()
-        pidGridBox.addLayout(pidGrid)
-        pidGridBox.addLayout(pidVBox)
-        if pid_controller == 0: # Output configuration only for internal PID
             pidGridBox.addWidget(pidTargetGrp)
         pidGridBox.addStretch()
 
@@ -429,6 +424,11 @@ class PID_DlgControl(ArtisanDialog):
         svGrp.setLayout(svGrpBox)
         svGrp.setContentsMargins(0,10,0,0)
 
+        pidBox = QHBoxLayout()
+        pidBox.addWidget(pidGrp)
+
+        svBox = QHBoxLayout()
+        svBox.addWidget(svGrp)
         if pid_controller == 0: # only the internal PID allows for duty control
             self.pidDutySteps = QSpinBox()
             self.pidDutySteps.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -462,8 +462,6 @@ class PID_DlgControl(ArtisanDialog):
             dutyGrp = QGroupBox(QApplication.translate('GroupBox','Duty'))
             dutyGrp.setLayout(dutyGrpBox)
             dutyGrp.setContentsMargins(0,15,0,0)
-
-        if pid_controller == 0:
             # only for the internal PID we support a derative filter setting
             self.derivativeFilterFlag = QCheckBox(QApplication.translate('Label','Derivative Filter'))
             self.derivativeFilterFlag.setChecked(bool(self.aw.pidcontrol.derivative_filter))
@@ -474,12 +472,6 @@ class PID_DlgControl(ArtisanDialog):
             filterGrp.setLayout(filterGrpBox)
             filterGrp.setContentsMargins(0,15,0,0)
 
-        pidBox = QHBoxLayout()
-        pidBox.addWidget(pidGrp)
-
-        svBox = QHBoxLayout()
-        svBox.addWidget(svGrp)
-        if pid_controller == 0:
             svBox.addWidget(dutyGrp)
             svBox.addWidget(filterGrp)
         svBox.addStretch()
