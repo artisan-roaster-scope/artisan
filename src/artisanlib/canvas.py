@@ -10205,17 +10205,17 @@ class tgraphcanvas(FigureCanvas):
 
             #text between single quotes ' will show only before FCs
 
-            eventanno = re.sub(r'{pd}([^{pd}]+){pd}'.format(pd=preFCsDelim), # noqa: UP032
-                r'\1',eventanno) if not postFCs else re.sub(r'{pd}([^{pd}]+){pd}'.format(pd=preFCsDelim),
+            eventanno = re.sub(fr'{preFCsDelim}([^{preFCsDelim}]+){preFCsDelim}',
+                r'\1',eventanno) if not postFCs else re.sub(fr'{preFCsDelim}([^{preFCsDelim}]+){preFCsDelim}',
                 r'',eventanno)
             #text between double quotes " will show only after FCs
-            eventanno = re.sub(r'{pd}([^{pd}]+){pd}'.format(pd=postFCsDelim),
-                r'\1',eventanno) if postFCs else re.sub(r'{pd}([^{pd}]+){pd}'.format(pd=postFCsDelim),
+            eventanno = re.sub(fr'{postFCsDelim}([^{postFCsDelim}]+){postFCsDelim}',
+                r'\1',eventanno) if postFCs else re.sub(fr'{postFCsDelim}([^{postFCsDelim}]+){postFCsDelim}',
                 r'',eventanno)
 
             #text between back ticks ` will show only within 90 seconds before FCs
-            eventanno = re.sub(r'{wd}([^{wd}]+){wd}'.format(wd=fcsWindowDelim),
-                r'\1',eventanno) if (fcsWindow) else re.sub(r'{wd}([^{wd}]+){wd}'.format(wd=fcsWindowDelim),
+            eventanno = re.sub(fr'{fcsWindowDelim}([^{fcsWindowDelim}]+){fcsWindowDelim}',
+                r'\1',eventanno) if (fcsWindow) else re.sub(fr'{fcsWindowDelim}([^{fcsWindowDelim}]+){fcsWindowDelim}',
                 r'',eventanno)
 
             # substitute numeric to nominal values if in the annotationstring

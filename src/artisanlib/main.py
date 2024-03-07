@@ -11709,13 +11709,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
             _ignorecase = re.IGNORECASE  # @UndefinedVariable
             #text between single quotes ' will show only when recording or for preview recording
-            fn = re.sub(r'{od}([^{od}]+){od}'.format(od=onDelim),  # noqa: UP032
-                r'\1',fn) if (previewmode==1 or (previewmode==0 and self.qmc.flagon)) else re.sub(r'{od}([^{od}]+){od}'.format(
-                    od=onDelim),r'',fn)
+            fn = re.sub(fr'{onDelim}([^{onDelim}]+){onDelim}',
+                r'\1',fn) if (previewmode==1 or (previewmode==0 and self.qmc.flagon)) else re.sub(fr'{onDelim}([^{onDelim}]+){onDelim}',r'',fn)
             #text between double quotes " will show only when flagon is False
-            fn = re.sub(r'{od}([^{od}]+){od}'.format(od=offDelim),  # noqa: UP032
-                r'\1',fn) if (previewmode==2 or (previewmode==0 and not self.qmc.flagon)) else re.sub(r'{od}([^{od}]+){od}'.format(
-                    od=offDelim),r'',fn)
+            fn = re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',
+                r'\1',fn) if (previewmode==2 or (previewmode==0 and not self.qmc.flagon)) else re.sub(fr'{offDelim}([^{offDelim}]+){offDelim}',r'',fn)
             #replace the fields with content
             for fi in fields:
                 fn = re.sub(fr'{fieldDelim}{fi[0]}', fr'{str(fi[1])}', fn, count=0, flags=_ignorecase)
