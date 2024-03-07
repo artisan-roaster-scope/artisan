@@ -1244,10 +1244,10 @@ class PIDcontrol:
     # v is from [-min,max]
     def setEnergy(self, v:float) -> None:
         try:
+            # if invertControl we invert min/max to max/min
+            vx = float(numpy.interp(v,[self.dutyMin,self.dutyMax],[self.dutyMax,self.dutyMin]) if self.invertControl else v)
             if self.pidPositiveTarget:
                 slidernr = self.pidPositiveTarget - 1
-                # if invertControl we limit vp to [0,100]
-                vp = min(100,max(0,int(round(abs(100 - v) if self.invertControl else v))))
                 # we need to map the duty [0%,100%] to the [slidermin,slidermax] range
                 # NOTE: numpy.interp(v, [min_in,max_in], [min_out, max_out]) never results in values outside of [min_out, max_out]
                 slider_min = self.aw.eventslidermin[slidernr]
@@ -1255,13 +1255,12 @@ class PIDcontrol:
                 # assumption: if self.positiveTargetRangeLimit then slider_min < self.positiveTargetMin < self.positiveTargetMax < slider_max
                 heat_min = (max(self.positiveTargetMin, slider_min) if self.positiveTargetRangeLimit else slider_min)
                 heat_max = (min(self.positiveTargetMax, slider_max) if self.positiveTargetRangeLimit else slider_max)
-                heat = int(round(float(numpy.interp(vp,[0,100],[heat_min,heat_max]))))
+                heat = int(round(float(numpy.interp(vx,[0,100],[heat_min,heat_max]))))
                 heat = self.aw.applySliderStepSize(slidernr, heat) # quantify by slider step size
                 self.aw.addEventSignal.emit(heat,slidernr,self.createEvents,True,self.slider_force_move)
                 self.aw.qmc.slider_force_move = False
             if self.pidNegativeTarget:
                 slidernr = self.pidNegativeTarget - 1
-                vn = min(0,max(-100,int(round(0 - v if self.invertControl else v))))
                 # we need to map the duty [0%,-100%] to the [slidermin,slidermax] range
                 # NOTE: numpy.interp(v, [min_in,max_in], [min_out, max_out]) never results in values outside of [min_out, max_out]
                 slider_min = self.aw.eventslidermin[slidernr]
@@ -1269,7 +1268,7 @@ class PIDcontrol:
                 # assumption: if self.positiveTargetRangeLimit then slider_min < self.positiveTargetMin < self.positiveTargetMax < slider_max
                 cool_min = (max(self.negativeTargetMin, slider_min) if self.negativeTargetRangeLimit else slider_min)
                 cool_max = (min(self.negativeTargetMax, slider_max) if self.negativeTargetRangeLimit else slider_max)
-                cool = int(round(float(numpy.interp(vn,[-100,0],[cool_max,cool_min]))))
+                cool = int(round(float(numpy.interp(vx,[-100,0],[cool_max,cool_min]))))
                 cool = self.aw.applySliderStepSize(slidernr, cool) # quantify by slider step size
                 self.aw.addEventSignal.emit(cool,slidernr,self.createEvents,True,self.slider_force_move)
                 self.slider_force_move = False
@@ -1391,8 +1390,8 @@ class PIDcontrol:
                         #### lock shared resources #####
                         self.aw.ser.COMsemaphore.acquire(1)
                         if self.aw.ser.SP.is_open:
-                            duty_min = min(100,max(0,self.aw.pidcontrol.dutyMin))
-                            duty_max = min(100,max(0,self.aw.pidcontrol.dutyMax))
+                            duty_min = min(100,max(0,self.dutyMin))
+                            duty_max = min(100,max(0,self.dutyMax))
                             self.aw.ser.SP.write(str2cmd('PID;LIMIT;' + str(duty_min) + ';' + str(duty_max) + '\n'))
                             self.aw.ser.SP.write(str2cmd('PID;ON\n'))
                             self.pidActive = True

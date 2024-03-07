@@ -47,7 +47,16 @@ exe = EXE(pyz,
           console=True)
 
 coll = COLLECT(exe,
-               a.binaries,
+               a.binaries - TOC([
+                  # excluding libwayland libs
+                  # see
+                  #   https://github.com/pyinstaller/pyinstaller/issues/7506
+                  #   https://github.com/gridsync/gridsync/issues/631
+                  #   https://stackoverflow.com/questions/57466637/how-to-exclude-unnecessary-qt-so-files-when-packaging-an-application
+                  ('libwayland-client.so.0', None, None),
+                  ('libwayland-cursor.so.0', None, None),
+                  ('libwayland-egl.so.0', None, None),
+               ])
                a.zipfiles,
                a.datas,
                strip=False,

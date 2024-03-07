@@ -153,12 +153,6 @@ class PID_DlgControl(ArtisanDialog):
             else:
                 # internal software PID
                 # Hottop or MODBUS or others (self.qmc.device in [53,29])
-    #            pidSourceItems = ['BT','ET']
-    #            self.pidSource.addItems(pidSourceItems)
-    #            if self.aw.pidcontrol.pidSource == 1:
-    #                self.pidSource.setCurrentIndex(0)
-    #            else:
-    #                self.pidSource.setCurrentIndex(1)
                 pidSourceItems = []
                 # NOTE: ET/BT inverted as pidSource=1 => BT and pidSource=2 => ET !!
                 pidSourceItems.append(QApplication.translate('ComboBox','ET'))
@@ -1134,9 +1128,9 @@ class PID_DlgControl(ArtisanDialog):
         if self.aw.pidcontrol.externalPIDControl() in {0, 3, 4}: # only Internal PID and TC4/Kaleido
             pidSourceIdx = self.pidSource.currentIndex()
             if pidSourceIdx == 0:
-                source = 2 # BT
+                source = 2 # ET
             elif pidSourceIdx == 1:
-                source = 1 # ET
+                source = 1 # BT
             else:
                 source = self.pidSource.currentIndex() + 1 # 3, 4, ... (extra device curves)
             if self.aw.pidcontrol.externalPIDControl() in {3, 4}: # only TC4/Kaleido
@@ -1164,9 +1158,9 @@ class PID_DlgControl(ArtisanDialog):
             if self.aw.qmc.device == 19:
                 source = self.pidSource.currentIndex()+1 # one of the 4 TC channels, 1,..4
             elif pidSourceIdx == 0:
-                source = 2 # BT
+                source = 2 # ET
             elif pidSourceIdx == 1:
-                source = 1 # ET
+                source = 1 # BT
             else:
                 source = self.pidSource.currentIndex() + 1 # 3, 4, ... (extra device curves)
             if not (self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag): # don't show Targets if TC4 firmware PID is in use

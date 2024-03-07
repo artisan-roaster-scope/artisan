@@ -150,6 +150,9 @@ class PID:
                 self.lastError = err
             elif (dt := now - self.lastTime) > 0.2:
                 derr = (err - self.lastError) / dt
+
+                # Derivative on Measurement to avoid the derivative kick on SV changes
+                # http://brettbeauregard.com/blog/2011/04/improving-the-beginner%e2%80%99s-pid-derivative-kick/
                 if self.lastInput:
                     dinput = i - self.lastInput
                     dtinput = dinput / dt
@@ -192,6 +195,15 @@ class PID:
 
                 output = self._smooth_output(output)
 
+                _log.info('PRINT -------')
+                _log.info('PRINT err: %s', err)
+                _log.info('PRINT derr: %s', derr)
+                _log.info('PRINT P: %s', self.Pterm)
+                _log.info('PRINT I: %s', self.Iterm)
+                _log.info('PRINT D: %s', D)
+                _log.info('PRINT out: %s', output)
+
+
                 # clamp output to [outMin,outMax] and avoid integral windup
                 if output > self.outMax:
                     output = self.outMax
@@ -199,6 +211,7 @@ class PID:
                     output = self.outMin
 
                 int_output = int(round(min(self.dutyMax,max(self.dutyMin,output))))
+                _log.info('PRINT int_out: %s', int_output)
                 if self.lastOutput is None or self.iterations_since_duty >= self.force_duty or int_output >= self.lastOutput + self.dutySteps or int_output <= self.lastOutput - self.dutySteps:
                     if self.active:
                         self.control(int_output)
