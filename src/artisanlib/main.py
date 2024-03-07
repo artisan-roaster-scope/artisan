@@ -6859,12 +6859,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     mpl.rcParams['font.family'] = 'Arial Unicode MS'
                     self.mpl_fontproperties = FontProperties()
                 elif platform.system() == 'Linux':
+                    mpl.rcParams['font.family'] = ['DejaVu Sans','DejaVu Sans Mono'] # default; works for Greek
                     if self.locale_str == 'ar':
                         mpl.rcParams['font.family'] = ['DejaVu Sans','DejaVu Sans Mono','Times New Roman']
                     elif self.locale_str == 'ja':
                         mpl.rcParams['font.family'] = ['TakaoPGothic']
-                    elif self.locale_str == 'el':
-                        mpl.rcParams['font.family'] = ['DejaVu Sans','DejaVu Sans Mono']
                     elif self.locale_str == 'zh_CN':
                         mpl.rcParams['font.family'] = ['NanumGothic','DejaVu Sans Mono']
                     elif self.locale_str == 'zh_TW':
@@ -6940,7 +6939,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             else:
                 rcParams['font.family'] = ['xkcd Script', 'Comic Sans MS']
             self.set_mpl_fontproperties(getResourcePath() + 'xkcd-script.ttf')
-        elif self.qmc.graphfont == 11:
+        elif self.qmc.graphfont == 11 or platform.system() == 'Linux': # no Comic on Linux, we subst it with Comic Neue
             # font Comic Neue selected
             # http://comicneue.com/
             rcParams['axes.unicode_minus'] = False
@@ -6950,7 +6949,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             else:
                 rcParams['font.family'] = ['Comic Neue', 'Comic Sans MS']
             self.set_mpl_fontproperties(getResourcePath() + 'ComicNeue-Regular.ttf')
-        elif self.qmc.graphfont == 1 or platform.system() == 'Linux': # no Comic on Linux!
+        elif self.qmc.graphfont == 1:
             # font Humor selected
             rcParams['axes.unicode_minus'] = False
             rcParams['font.size'] = 15.0

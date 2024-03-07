@@ -7104,8 +7104,6 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation', 'CHARGE'))
                             st1 = self.__dijstra_to_ascii(st1)
-                            if self.graphfont == 1:
-                                st1 = self.__to_ascii(st1)
                             e = 0
                             a = 1.
                         time_temp_annos = self.annotate(temp[t0idx],st1,t0,y,ystep_up,ystep_down,e,a,draggable,0+anno_key_offset)
@@ -7572,8 +7570,7 @@ class tgraphcanvas(FigureCanvas):
         self.background_title_width = 0
         backgroundtitle = backgroundtitle.strip()
         if backgroundtitle != '':
-            if self.graphfont in {1, 9}: # if selected font is Humor we translate the unicode title into pure ascii
-                backgroundtitle = self.__to_ascii(backgroundtitle)
+            backgroundtitle = self.__dijstra_to_ascii(backgroundtitle)
             backgroundtitle = f'\n{abbrevString(backgroundtitle, 32)}'
 
         self.l_subtitle = self.fig.suptitle(backgroundtitle,
@@ -7607,8 +7604,7 @@ class tgraphcanvas(FigureCanvas):
         elif bnr == 0 and title != '' and title != self.title != QApplication.translate('Scope Title', 'Roaster Scope') and bprefix != '':
             title = f'{bprefix} {title}'
 
-        if self.graphfont in {1,9}: # if selected font is Humor or Dijkstra we translate the unicode title into pure ascii
-            title = self.__to_ascii(title)
+        title = self.__dijstra_to_ascii(title)
 
         self.title_text = self.aw.arabicReshape(title.strip())
         if self.ax is not None and self.title_text is not None:
@@ -8037,7 +8033,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.flagstart or self.xgrid == 0:
                         self.set_xlabel('')
                     else:
-                        self.set_xlabel(f'{self.roastertype_setup} {self.roastersize_setup}kg')
+                        self.set_xlabel(f'{self.__dijstra_to_ascii(self.roastertype_setup)} {self.roastersize_setup}kg')
 
                     try:
                         y_label.set_in_layout(False) # remove y-axis labels from tight_layout calculation
@@ -9860,8 +9856,7 @@ class tgraphcanvas(FigureCanvas):
                             ncol = int(math.ceil(len(self.handles)/2.))
                         else:
                             ncol = int(math.ceil(len(self.handles)))
-                        if self.graphfont == 1:
-                            self.labels = [self.__to_ascii(l) for l in self.labels]
+                        self.labels = [self.__dijstra_to_ascii(l) for l in self.labels]
                         loc:Union[int, Tuple[float,float]]
                         if self.legend is None:
                             if self.legendloc_pos is None:
@@ -16858,15 +16853,14 @@ class tgraphcanvas(FigureCanvas):
 
     def __to_ascii(self, s:str) -> str:
         utf8_string = str(s)
-        if self.locale_str.startswith('de'):
-            for k, uml in self.umlaute_dict.items():
-                utf8_string = utf8_string.replace(k, uml)
+        for k, uml in self.umlaute_dict.items():
+            utf8_string = utf8_string.replace(k, uml)
         from unidecode import unidecode
         return unidecode(utf8_string)
 
     # convert German Umlauts if Dijkstra font is selected
     def __dijstra_to_ascii(self, s:str) -> str:
-        if self.graphfont == 9: # font Dijkstra selected
+        if self.graphfont in {1,9,10}: # font Humor, Dijkstra, or Xkcd selected
             return self.__to_ascii(s)
         return s
 
