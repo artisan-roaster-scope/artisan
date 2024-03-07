@@ -20,7 +20,11 @@
 
 PYUIC="${PYUIC:-pyuic6}"
 PYLUPDATE="${PYLUPDATE:-./pylupdate6pro.py}"
-QTTOOLS=qt6-tools
+if [[ "$OSTYPE" == 'linux-gnu' ]]; then
+    QTTOOLS=qt6_tools;
+else
+    QTTOOLS=qt6-tools;
+fi
 
 # List of accepted arguments
 
