@@ -56,7 +56,7 @@ coll = COLLECT(exe,
                   ('libwayland-client.so.0', None, None),
                   ('libwayland-cursor.so.0', None, None),
                   ('libwayland-egl.so.0', None, None),
-               ])
+               ]),
                a.zipfiles,
                a.datas,
                strip=False,
