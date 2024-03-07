@@ -267,13 +267,12 @@ for:
     ARTISAN_OS: linux
     PYTHONSITEPKGS: /home/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages
     QT_PATH: $PYTHON_PATH/PyQt6/Qt6
-    QT_SRC_PATH: /home/appveyor/Qt/6.4.2/gcc_64
+    QT_SRC_PATH: /home/appveyor/Qt/6.6/gcc_64
     PYUIC: pyuic6
     PYLUPDATE: ./pylupdate6pro.py  #the dot slash is necessary
 
   install:
     - echo "Linux Install"
-    - ls /home/appveyor/Qt/
     - chmod +x .ci/*.sh
 
     # pull library versions from requirments file
