@@ -48,7 +48,7 @@ init:
   - ps: |
       $env:artifact_prefix = 'disable_artifact'
       if ([bool]$env:APPVEYOR_PULL_REQUEST_NUMBER -eq $true) {
-        $env:artifact_prefix = 'artisan' 
+        $env:artifact_prefix = 'artisan'
       }
 
 branches:
@@ -145,7 +145,7 @@ for:
     # Note that the paths set below may not exist yet.
     - ps: |
         if (Test-Path env:PYUPGRADE_WIN_V) {
-            $env:PREV_PYTHON_V = $env:PYTHON_V 
+            $env:PREV_PYTHON_V = $env:PYTHON_V
             $env:PYTHON_V = ($env:PYUPGRADE_WIN_V -split '\.')[0..1] -join '.'
         }
 
@@ -210,7 +210,7 @@ for:
     MACOSX_DEPLOYMENT_TARGET: 11.0
     PYTHONSITEPKGS: /Users/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages
     QT_PATH: ${PYTHONSITEPKGS}/PyQt6/Qt6
-    QT_SRC_PATH: /Users/appveyor/Qt/6.4/macos
+    QT_SRC_PATH: /Users/appveyor/Qt/6.6/macos
     PYUIC: pyuic6
     PYLUPDATE: ./pylupdate6pro.py  #the dot slash is necessary
 
@@ -267,12 +267,13 @@ for:
     ARTISAN_OS: linux
     PYTHONSITEPKGS: /home/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages
     QT_PATH: $PYTHON_PATH/PyQt6/Qt6
-    QT_SRC_PATH: /home/appveyor/Qt/6.4/gcc_64
+    QT_SRC_PATH: /home/appveyor/Qt/6.4.2/gcc_64
     PYUIC: pyuic6
     PYLUPDATE: ./pylupdate6pro.py  #the dot slash is necessary
 
   install:
     - echo "Linux Install"
+    - ls /home/appveyor/Qt/
     - chmod +x .ci/*.sh
 
     # pull library versions from requirments file
