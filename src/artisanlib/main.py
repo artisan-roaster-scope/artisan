@@ -6939,6 +6939,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             else:
                 rcParams['font.family'] = ['xkcd Script', 'Comic Sans MS']
             self.set_mpl_fontproperties(getResourcePath() + 'xkcd-script.ttf')
+        elif self.qmc.graphfont == 1:
+            # font Humor selected
+            rcParams['axes.unicode_minus'] = False
+            rcParams['font.size'] = 15.0
+            if platform.system() == 'Linux':
+                rcParams['font.family'] = ['Humor Sans']
+            else:
+                rcParams['font.family'] = ['Humor Sans', 'Comic Sans MS']
+            self.set_mpl_fontproperties(getResourcePath() + 'Humor-Sans.ttf')
         elif self.qmc.graphfont == 11 or platform.system() == 'Linux': # no Comic on Linux, we subst it with Comic Neue
             # font Comic Neue selected
             # http://comicneue.com/
@@ -6949,15 +6958,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             else:
                 rcParams['font.family'] = ['Comic Neue', 'Comic Sans MS']
             self.set_mpl_fontproperties(getResourcePath() + 'ComicNeue-Regular.ttf')
-        elif self.qmc.graphfont == 1:
-            # font Humor selected
-            rcParams['axes.unicode_minus'] = False
-            rcParams['font.size'] = 15.0
-            if platform.system() == 'Linux':
-                rcParams['font.family'] = ['Humor Sans']
-            else:
-                rcParams['font.family'] = ['Humor Sans', 'Comic Sans MS']
-            self.set_mpl_fontproperties(getResourcePath() + 'Humor-Sans.ttf')
         elif self.qmc.graphfont == 2 and platform.system() != 'Linux':
             # font Comic selected
             rcParams['axes.unicode_minus'] = True
