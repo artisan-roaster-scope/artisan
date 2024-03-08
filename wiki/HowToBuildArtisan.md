@@ -83,7 +83,7 @@ PowerShell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -Command "
 ###### Add to .appveyor.yml  
 ```
 init:
-  - sh: export APPVEYOR_SSH_BLOCK=true`
+  - sh: export APPVEYOR_SSH_BLOCK=true
 ```  
 ##### Then add to the sh files (can be in multiple places)  
 ```
