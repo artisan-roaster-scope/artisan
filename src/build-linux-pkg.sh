@@ -42,7 +42,7 @@ mv debian/usr/share/dist debian/usr/share/artisan
 find debian -name .svn -exec rm -rf {} \; > /dev/null 2>&1
 fakeroot chown -R root:root debian
 fakeroot chmod -R go-w debian
-fakeroot chmod 0644 debian/usr/share/artisan/*.so* || true
+fakeroot chmod 0644 debian/usr/share/artisan/_internal/*.so* || true
 fakeroot chmod +x debian/usr/bin/artisan
 rm -f ${NAME}*.rpm
 
@@ -59,7 +59,7 @@ rm -rf usr/share/man/man1/._*
 rm -rf usr/share/pixmaps/._*
 rm -rf usr/share/applications/._*
 
-fpm -s dir -t rpm -n artisan --license GPL3 -m "Marko Luther <marko.luther@gmx.net>"  -p .. \
+sudo fpm -s dir -t rpm -n artisan --license GPL3 -m "Marko Luther <marko.luther@gmx.net>"  -p .. \
 --vendor "Artisan GitHub" \
 --url "https://github.com/artisan-roaster-scope/artisan" \
 --description "This program or software helps coffee roasters record, analyze, and control
@@ -73,7 +73,7 @@ flavor." \
 
 # Allow FPM to write some temporary files
 fakeroot chmod o+w .
-fpm --deb-no-default-config-files -s dir -t deb -n artisan --license GPL3 -m "Marko Luther <marko.luther@gmx.net>" -p .. \
+sudo fpm --deb-no-default-config-files -s dir -t deb -n artisan --license GPL3 -m "Marko Luther <marko.luther@gmx.net>" -p .. \
 --vendor "Artisan GitHub" \
 --no-auto-depends \
 --url "https://github.com/artisan-roaster-scope/artisan" \
