@@ -72,16 +72,16 @@ if [ $? -ne 0 ]; then exit $?; else echo "** Success"; fi
 
 echo "************* lrelease **************"
 echo "*** compiling translations"
-if [ -f "$QT_SRC_PATH/bin/lrelease" ]; then
-    $QT_SRC_PATH/bin/lrelease -verbose translations/*.ts
-    if [ $? -ne 0 ]; then exit $?; else echo "** Success"; fi
-elif [[ $(type -P "$QTTOOLS") ]]; then
+#if [ -f "$QT_SRC_PATH/bin/lrelease" ]; then
+#    $QT_SRC_PATH/bin/lrelease -verbose translations/*.ts
+#    if [ $? -ne 0 ]; then exit $?; else echo "** Success"; fi
+#elif [[ $(type -P "$QTTOOLS") ]]; then
     $QTTOOLS lrelease -verbose translations/*.ts
     if [ $? -ne 0 ]; then exit $?; else echo "** Success"; fi
-else
-    echo "Error: $QT_SRC_PATH/bin/lrelease does not exist"
-    exit 1
-fi
+#else
+#    echo "Error: $QT_SRC_PATH/bin/lrelease does not exist"
+#    exit 1
+#fi
 
 if [ $# != 0 ]; then
     # create a zip with the generated files
