@@ -1145,7 +1145,8 @@ class PID_DlgControl(ArtisanDialog):
     @pyqtSlot(bool)
     def setSV(self, _:bool = False) -> None: # and DutySteps
         self.aw.pidcontrol.setSV(self.pidSV.value())
-        self.aw.pidcontrol.setDutySteps(self.pidDutySteps.value())
+        if self.aw.pidcontrol.externalPIDControl() == 0: # only the internal PID allows for duty control
+            self.aw.pidcontrol.setDutySteps(self.pidDutySteps.value())
 
     def close(self) -> bool:
         kp = self.pidKp.value() # 5.00
@@ -1153,7 +1154,8 @@ class PID_DlgControl(ArtisanDialog):
         kd = self.pidKd.value() # 0.00
         source:Optional[int] = None
         cycle:Optional[int] = None
-        if self.aw.pidcontrol.externalPIDControl() in {0, 3, 4}:
+        pid_controller = self.aw.pidcontrol.externalPIDControl()
+        if pid_controller in {0, 3, 4}:
             pidSourceIdx = self.pidSource.currentIndex()
             if self.aw.qmc.device == 19:
                 source = self.pidSource.currentIndex()+1 # one of the 4 TC channels, 1,..4
@@ -1163,7 +1165,7 @@ class PID_DlgControl(ArtisanDialog):
                 source = 1 # BT
             else:
                 source = self.pidSource.currentIndex() + 1 # 3, 4, ... (extra device curves)
-            if not (self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag): # don't show Targets if TC4 firmware PID is in use
+            if pid_controller == 0 and not (self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag): # don't show Targets if TC4 firmware PID is in use
                 self.aw.pidcontrol.pidPositiveTarget = self.positiveControlCombo.currentIndex()
                 self.aw.pidcontrol.pidNegativeTarget = self.negativeControlCombo.currentIndex()
                 self.aw.pidcontrol.invertControl = self.invertControlFlag.isChecked()
