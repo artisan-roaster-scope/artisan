@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # ABOUT
 # Generate translation, ui, and help files derived from repository sources
 # for Artisan Linux and macOS builds
@@ -16,19 +16,12 @@
 # AUTHOR
 # Dave Baxter, Marko Luther 2023
 
-# requires environment variables...
+echo "build-derived.sh"
 
+# required environment variables...
 PYUIC="${PYUIC:-pyuic6}"
 PYLUPDATE="${PYLUPDATE:-./pylupdate6pro.py}"
-if [[ "$OSTYPE" == 'linux-gnu' ]]; then
-    QTTOOLS=qt6-tools;
-else
-    QTTOOLS=qt6-tools;
-fi
-
-# List of accepted arguments
-
-echo "build-derived.sh"
+QTTOOLS=qt6-tools;
 
 # Check if an argument was passed
 if [ $# != 0 ]; then
@@ -72,16 +65,20 @@ if [ $? -ne 0 ]; then exit $?; else echo "** Success"; fi
 
 echo "************* lrelease **************"
 echo "*** compiling translations"
-#if [ -f "$QT_SRC_PATH/bin/lrelease" ]; then
-#    $QT_SRC_PATH/bin/lrelease -verbose translations/*.ts
-#    if [ $? -ne 0 ]; then exit $?; else echo "** Success"; fi
-#elif [[ $(type -P "$QTTOOLS") ]]; then
+if [ -f "$QT_SRC_PATH/bin/lrelease" ]; then
+    echo "*** using env QT_SRC_PATH: $QT_SRC_PATH/bin/lrelease"
+    $QT_SRC_PATH/bin/lrelease -verbose translations/*.ts
+    if [ $? -ne 0 ]; then exit $?; else echo "** Success"; fi
+elif [[ $(type -P "$QTTOOLS") ]]; then
+    echo "*** using env QTTOOLS: $QTTOOLS"
     $QTTOOLS lrelease -verbose translations/*.ts
     if [ $? -ne 0 ]; then exit $?; else echo "** Success"; fi
-#else
-#    echo "Error: $QT_SRC_PATH/bin/lrelease does not exist"
-#    exit 1
-#fi
+else
+    echo "Error: $QT_SRC_PATH/bin/lrelease does not exist"
+    echo "Error: $QTTOOLS does not exist on the path"
+    echo $PATH
+    exit 1
+fi
 
 if [ $# != 0 ]; then
     # create a zip with the generated files
