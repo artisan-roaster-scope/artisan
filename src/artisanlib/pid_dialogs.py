@@ -1157,7 +1157,7 @@ class PID_DlgControl(ArtisanDialog):
         pid_controller = self.aw.pidcontrol.externalPIDControl()
         if pid_controller in {0, 3, 4}:
             pidSourceIdx = self.pidSource.currentIndex()
-            if self.aw.qmc.device == 19:
+            if self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag:
                 source = self.pidSource.currentIndex()+1 # one of the 4 TC channels, 1,..4
             elif pidSourceIdx == 0:
                 source = 2 # ET
