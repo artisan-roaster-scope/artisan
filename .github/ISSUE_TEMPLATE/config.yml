@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Discussions
+    url: https://github.com/artisan-roaster-scope/artisan/discussions
+    about: For questions, comments or anything else please create a Discussion item.
