@@ -264,7 +264,7 @@ for:
     fast_finish: false
 
   environment:
-    PYTHON_V: 3.11
+    #PYTHON_V: 3.11
     ARTISAN_OS: linux
     PYTHONSITEPKGS: /home/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages
     QT_PATH: $PYTHON_PATH/PyQt6/Qt6
