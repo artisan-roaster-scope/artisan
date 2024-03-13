@@ -10439,9 +10439,10 @@ class tgraphcanvas(FigureCanvas):
 
                 # Roast Info Section
                 statstr_segments.append(skipline)
-                if 'roasted_density' in cp:
-                    statstr_segments += ['\n', self.__dijstra_to_ascii(QApplication.translate('AddlInfo', 'Density Roasted')), ': ', str(cp['roasted_density']),
-                        ' ', self.density[1], '/', self.density[3]]
+                roasted_density = (self.aw.qmc.density_roasted[0] if self.aw.qmc.density_roasted[0] != 0 else cp.get('roasted_density', 0))
+                if roasted_density:
+                    statstr_segments += ['\n', self.__dijstra_to_ascii(QApplication.translate('AddlInfo', 'Density Roasted')), ': ', str(roasted_density),
+                        ' ', self.density_roasted[1], '/', self.density_roasted[3]]
                 if self.moisture_roasted:
                     statstr_segments += ['\n', self.__dijstra_to_ascii(QApplication.translate('AddlInfo', 'Moisture Roasted')), ': ', str(self.aw.float2float(self.moisture_roasted,1)), '%']
                 if self.whole_color > 0:

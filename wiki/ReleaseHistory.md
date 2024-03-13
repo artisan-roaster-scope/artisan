@@ -10,7 +10,7 @@ v2.10.4 (XX, 2024)
 * FIXES
   - fixes regression which broke the PID dialog for MODBUS, S7, TC4 and Kaleido ([Issue #1480](../../../issues/1480))
   - fixes regression which broke devices Omega HH309 34 and the just introduced Digi-Sense 20250-07 and Extech 42570 ([PR #1481](../../../pull/1481))
-  - fixes regression introduced in v2.8.4 which broke persisting volume changes made in Roast Properties dialog
+  - fixes regression introduced in v2.8.4 which broke persisting volume changes made in Roast Properties dialog ([Discussion #1511](../../../discussions/1511))
   - fixes Linux builds for some configuration
   - fixes phases bar rendering in case CHARGE is not set
 
