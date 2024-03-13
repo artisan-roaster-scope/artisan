@@ -588,7 +588,7 @@ app.setOrganizationName(application_organization_name)                  #needed 
 app.setOrganizationDomain(application_organization_domain)              #needed by QSettings() to store windows geometry in operating system
 
 # replace revision string with git hash when running from source
-if not appFrozen() and __revision__ == '0':
+if not appFrozen() and __revision__ in {'', '0'}:
     try:
         from subprocess import run as subprocessrun
         uncommittedChanges = subprocessrun(['git','status', '--porcelain=v1'], capture_output=True, check=True).stdout  #number of uncommitted changes
