@@ -4839,14 +4839,14 @@ class editGraphDlg(ArtisanResizeablDialog):
         v1 = self.aw.qmc.volume[1]
         v2 = self.aw.qmc.volume[2]
         try:
-            w0 = float(comma2dot(self.volumeinedit.text()))
+            v0 = float(comma2dot(self.volumeinedit.text()))
         except Exception: # pylint: disable=broad-except
-            w0 = 0
+            v0 = 0
         try:
-            w1 = float(comma2dot(self.volumeoutedit.text()))
+            v1 = float(comma2dot(self.volumeoutedit.text()))
         except Exception: # pylint: disable=broad-except
-            w1 = 0
-        w2 = self.volumeUnitsComboBox.currentText()
+            v1 = 0
+        v2 = self.volumeUnitsComboBox.currentText()
         self.aw.qmc.volume = (v0,v1,v2)
         #update density
         d0 = self.aw.qmc.density[0]

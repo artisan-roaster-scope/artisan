@@ -6175,7 +6175,7 @@ class tgraphcanvas(FigureCanvas):
 
             if bool(self.aw.comparator):
                 starttime = 0
-            elif self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
+            elif -1 < self.timeindex[0] < len(self.timex):
                 starttime = self.timex[self.timeindex[0]]
             else:
                 starttime = 0
@@ -11615,6 +11615,12 @@ class tgraphcanvas(FigureCanvas):
         _log.debug('MODE: OffMonitorCloseDown')
         try:
             self.threadserver.terminatingSignal.disconnect(self.OffMonitorCloseDown)
+
+            # reset WebLCDs
+            resLCD = '-.-' if self.LCDdecimalplaces else '--'
+            if self.aw.WebLCDs:
+                self.updateWebLCDs(bt=resLCD,et=resLCD)
+
             if len(self.timex) < 3:
                 # clear data from monitoring-only mode
                 self.clearMeasurements()
@@ -11690,10 +11696,7 @@ class tgraphcanvas(FigureCanvas):
             self.aw.buttonONOFF.setText(QApplication.translate('Button', 'ON')) # text means click to turn OFF (it is ON)
             # reset time LCD color to the default (might have been changed to red due to long cooling!)
             self.aw.updateReadingsLCDsVisibility()
-            # reset WebLCDs
-            resLCD = '-.-' if self.LCDdecimalplaces else '--'
-            if self.aw.WebLCDs:
-                self.updateWebLCDs(bt=resLCD,et=resLCD)
+
             if not self.aw.HottopControlActive:
                 self.aw.hideExtraButtons(changeDefault=False)
             self.aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
@@ -11784,6 +11787,7 @@ class tgraphcanvas(FigureCanvas):
                         self.aw.eventactionx(self.extrabuttonactions[1],self.extrabuttonactionstrings[1])
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
+
 
                 self.threadserver.terminatingSignal.connect(self.OffMonitorCloseDown)
                 self.flagon = False
@@ -14065,12 +14069,13 @@ class tgraphcanvas(FigureCanvas):
 
                 #if DROP
                 if self.timeindex[6] and self.timeindex[2]:
-                    totaltime = self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]
+                    starttime = (self.timex[self.timeindex[0]] if -1 < self.timeindex[0] < len(self.timex) else 0)
+                    totaltime = self.timex[self.timeindex[6]]-starttime
                     if totaltime == 0:
                         return dryEndIndex, statisticstimes
 
                     statisticstimes[0] = totaltime
-                    dryphasetime = dryEndTime - self.timex[self.timeindex[0]] # self.aw.float2float(dryEndTime - self.timex[self.timeindex[0]])
+                    dryphasetime = dryEndTime - starttime # self.aw.float2float(dryEndTime - starttime)
                     midphasetime = self.timex[self.timeindex[2]] - dryEndTime # self.aw.float2float(self.timex[self.timeindex[2]] - dryEndTime)
                     finishphasetime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]] # self.aw.float2float(self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]])
 
@@ -14097,6 +14102,8 @@ class tgraphcanvas(FigureCanvas):
                 return
 
             LP:Optional[float] = None
+
+            starttime = (self.timex[self.timeindex[0]] if -1 < self.timeindex[0] < len(self.timex) else 0)
 
             dryEndIndex, statisticstimes = self.calcStatistics(TP_index)
 
@@ -14167,7 +14174,7 @@ class tgraphcanvas(FigureCanvas):
 
                         # Draw mid phase rectangle
                         rect = patches.Rectangle(
-                                (self.timex[self.timeindex[0]]+self.statisticstimes[1],
+                                (starttime+self.statisticstimes[1],
                                 statisticsheight),
                                 width = self.statisticstimes[2],
                                 height = statisticsbarheight,
@@ -14177,15 +14184,17 @@ class tgraphcanvas(FigureCanvas):
                         self.ax.add_patch(rect)
 
                     # Draw dry phase rectangle
-                    rect = patches.Rectangle(
-                            (self.timex[self.timeindex[0]],
-                            statisticsheight),
-                            width = self.statisticstimes[1],
-                            height = statisticsbarheight,
-                            color = self.palette['rect1'],
-                            alpha=0.5,
-                            path_effects=[])
-                    self.ax.add_patch(rect)
+                    if self.timeindex[0] > -1:
+                        # only if CHARGE is set
+                        rect = patches.Rectangle(
+                                (starttime,
+                                statisticsheight),
+                                width = self.statisticstimes[1],
+                                height = statisticsbarheight,
+                                color = self.palette['rect1'],
+                                alpha=0.5,
+                                path_effects=[])
+                        self.ax.add_patch(rect)
 
                 fmtstr = '{0:.1f}' if self.LCDdecimalplaces else '{0:.0f}'
                 if self.statisticstimes[0]:
@@ -14203,23 +14212,31 @@ class tgraphcanvas(FigureCanvas):
                     LP = self.temp2[TP_index]
 
                 if self.statisticsflags[0]:
-                    text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]/2.,statisticsupper,st1 + '  '+ dryphaseP+'%',color=self.palette['text'],ha='center',
-                        fontsize='medium'
-                        )
-                    try:
-                        text.set_in_layout(False)
-                    except Exception: # pylint: disable=broad-except
-                        pass
+                    if self.timeindex[0] > -1:
+                        # only if CHARGE is set
+                        text = self.ax.text(starttime + self.statisticstimes[1]/2.,statisticsupper,
+                                f'{st1}  {dryphaseP}%',
+                                color=self.palette['text'],ha='center',
+                            fontsize='medium'
+                            )
+                        try:
+                            text.set_in_layout(False)
+                        except Exception: # pylint: disable=broad-except
+                            pass
                     if self.timeindex[2]: # only if FCs exists
                         if self.statisticstimes[2]*100./self.statisticstimes[0]>1: # annotate only if mid phase is at least 1% of the total
-                            text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]/2.,statisticsupper,st2+ '  ' + midphaseP+'%',color=self.palette['text'],ha='center',
+                            text = self.ax.text(starttime + self.statisticstimes[1]+self.statisticstimes[2]/2.,statisticsupper,
+                                    (f'{st2}  {midphaseP}%' if self.timeindex[0] > -1 else st2),
+                                    color=self.palette['text'],ha='center',
                                 fontsize='medium'
                                 )
                             try:
                                 text.set_in_layout(False)
                             except Exception: # pylint: disable=broad-except
                                 pass
-                        text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]/2.,statisticsupper,st3 + '  ' + finishphaseP+ '%',color=self.palette['text'],ha='center',
+                        text = self.ax.text(starttime + self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]/2.,statisticsupper,
+                                    (f'{st3}  {finishphaseP}%' if self.timeindex[0] > -1 else st3),
+                                    color=self.palette['text'],ha='center',
                             fontsize='medium'
                             )
                         try:
@@ -14227,7 +14244,7 @@ class tgraphcanvas(FigureCanvas):
                         except Exception:  # pylint: disable=broad-except
                             pass
                     if self.timeindex[7]: # only if COOL exists
-                        text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]+self.statisticstimes[4]/2.,statisticsupper,st4,color=self.palette['text'],ha='center',
+                        text = self.ax.text(starttime + self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]+self.statisticstimes[4]/2.,statisticsupper,st4,color=self.palette['text'],ha='center',
                             fontsize='medium'
                             )
                         try:
@@ -14255,17 +14272,19 @@ class tgraphcanvas(FigureCanvas):
                     if rates_of_changes[5] != -1:
                         st3 = st3 + fmtstr.format(rates_of_changes[5], self.mode, rates_of_changes[2], unit)
 
-                    text = self.ax.text(self.timex[self.timeindex[0]] + self.statisticstimes[1]/2.,statisticslower,st1,
-                        color=self.palette['text'],
-                        ha='center',
-                        fontsize='medium')
-                    try:
-                        text.set_in_layout(False)
-                    except Exception: # pylint: disable=broad-except
-                        pass
+
+                    if self.timeindex[0] > -1:
+                        text = self.ax.text(starttime + self.statisticstimes[1]/2.,statisticslower,st1,
+                            color=self.palette['text'],
+                            ha='center',
+                            fontsize='medium')
+                        try:
+                            text.set_in_layout(False)
+                        except Exception: # pylint: disable=broad-except
+                            pass
                     if self.timeindex[2]: # only if FCs exists
                         if self.statisticstimes[2]*100./self.statisticstimes[0]>1: # annotate only if mid phase is at least 1% of the total
-                            text = self.ax.text(self.timex[self.timeindex[0]] + self.statisticstimes[1]+self.statisticstimes[2]/2.,statisticslower,st2,color=self.palette['text'],ha='center',
+                            text = self.ax.text(starttime + self.statisticstimes[1]+self.statisticstimes[2]/2.,statisticslower,st2,color=self.palette['text'],ha='center',
                                 #fontproperties=statsprop # fails be rendered in PDF exports on MPL v3.4.x
                                 fontsize='medium'
                                 )
@@ -14273,7 +14292,7 @@ class tgraphcanvas(FigureCanvas):
                                 text.set_in_layout(False)
                             except Exception: # pylint: disable=broad-except
                                 pass
-                        text = self.ax.text(self.timex[self.timeindex[0]] + self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]/2.,statisticslower,st3,color=self.palette['text'],ha='center',
+                        text = self.ax.text(starttime + self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]/2.,statisticslower,st3,color=self.palette['text'],ha='center',
                             #fontproperties=statsprop # fails be rendered in PDF exports on MPL v3.4.x
                             fontsize='medium'
                             )
@@ -14282,7 +14301,7 @@ class tgraphcanvas(FigureCanvas):
                         except Exception: # pylint: disable=broad-except
                             pass
                     if self.timeindex[7]: # only if COOL exists
-                        text = self.ax.text(self.timex[self.timeindex[0]]+ self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]+max(self.statisticstimes[4]/2.,self.statisticstimes[4]/3.),statisticslower,st4,color=self.palette['text'],ha='center',
+                        text = self.ax.text(starttime + self.statisticstimes[1]+self.statisticstimes[2]+self.statisticstimes[3]+max(self.statisticstimes[4]/2.,self.statisticstimes[4]/3.),statisticslower,st4,color=self.palette['text'],ha='center',
                             #fontproperties=statsprop # fails be rendered in PDF exports on MPL v3.4.x
                             fontsize='medium'
                             )
