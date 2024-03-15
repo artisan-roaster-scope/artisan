@@ -164,7 +164,6 @@ class backgroundDlg(ArtisanResizeablDialog):
         #table for showing events
         self.eventtable = QTableWidget()
         self.eventtable.setTabKeyNavigation(True)
-        self.createEventTable()
         self.copyeventTableButton = QPushButton(QApplication.translate('Button', 'Copy Table'))
         self.copyeventTableButton.setToolTip(QApplication.translate('Tooltip','Copy table to clipboard, OPTION or ALT click for tabular text'))
         self.copyeventTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -175,7 +174,6 @@ class backgroundDlg(ArtisanResizeablDialog):
         #table for showing data
         self.datatable = QTableWidget()
         self.datatable.setTabKeyNavigation(True)
-        self.createDataTable()
         self.copydataTableButton = QPushButton(QApplication.translate('Button', 'Copy Table'))
         self.copydataTableButton.setToolTip(QApplication.translate('Tooltip','Copy table to clipboard, OPTION or ALT click for tabular text'))
         self.copydataTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -450,12 +448,25 @@ class backgroundDlg(ArtisanResizeablDialog):
         else:
             self.TabWidget.setFocus()
 
+        self.TabWidget.currentChanged.connect(self.tabSwitched)
+
         # we set the active tab with a QTimer after the tabbar has been rendered once, as otherwise
         # some tabs are not rendered at all on Winwos using Qt v6.5.1 (https://bugreports.qt.io/projects/QTBUG/issues/QTBUG-114204?filter=allissues)
         QTimer.singleShot(50, self.setActiveTab)
 
+    @pyqtSlot(int)
+    def tabSwitched(self, i:int) -> None:
+        if i == 1:
+            self.createEventTable()
+        elif i == 2:
+            self.createDataTable()
+
     @pyqtSlot()
     def setActiveTab(self) -> None:
+        if self.activeTab == 1:
+            self.createEventTable()
+        elif self.activeTab == 2:
+            self.createDataTable()
         self.TabWidget.setCurrentIndex(self.activeTab)
 
     @pyqtSlot(bool)
@@ -651,9 +662,6 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.xtcurveComboBox.blockSignals(True)
         self.xtcurveComboBox.clear()
         self.aw.deleteBackground()
-        self.eventtable.clear()
-        self.createEventTable()
-        self.createDataTable()
         self.aw.qmc.resetlinecountcaches()
         self.xtcurveComboBox.blockSignals(False)
         self.aw.qmc.redraw(recomputeAllDeltas=False)
@@ -682,8 +690,6 @@ class backgroundDlg(ArtisanResizeablDialog):
     def move_background(self, m:str) -> None:
         step = self.speedSpinBox.value()
         self.aw.qmc.movebackground(m, step)
-        self.createEventTable()
-        self.createDataTable()
         self.aw.qmc.redraw(recomputeAllDeltas=False, re_smooth_foreground=False,
             re_smooth_background=False)
 
@@ -709,13 +715,11 @@ class backgroundDlg(ArtisanResizeablDialog):
     @pyqtSlot(int)
     def changeXTcurveidx(self, i:int) -> None:
         self.aw.qmc.xtcurveidx = i
-        self.createDataTable()
         self.aw.qmc.redraw(recomputeAllDeltas=False)
 
     @pyqtSlot(int)
     def changeYTcurveidx(self, i:int) -> None:
         self.aw.qmc.ytcurveidx = i
-        self.createDataTable()
         self.aw.qmc.redraw(recomputeAllDeltas=False)
 
     @pyqtSlot(bool)
@@ -751,8 +755,6 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.backgroundCheck.setChecked(True)
         self.aw.qmc.timealign(redraw=False)
         self.readChecks()
-        self.createEventTable()
-        self.createDataTable()
 
     def createEventTable(self) -> None:
         ndata = len(self.aw.qmc.backgroundEvents)
@@ -805,19 +807,21 @@ class backgroundDlg(ArtisanResizeablDialog):
             self.eventtable.setItem(i,3,description)
             self.eventtable.setItem(i,4,etype)
             self.eventtable.setItem(i,5,evalue)
-        # improve width of Time column
-        self.eventtable.setColumnWidth(1,175)
         header: Optional[QHeaderView] = self.eventtable.horizontalHeader()
         if header is not None:
+            #header.setStretchLastSection(True)
             header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
             header.setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)
             header.setSectionResizeMode(2, QHeaderView.ResizeMode.Fixed)
             header.setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)
-            header.setSectionResizeMode(4, QHeaderView.ResizeMode.Fixed)
+            header.setSectionResizeMode(4, QHeaderView.ResizeMode.ResizeToContents)
             header.setSectionResizeMode(5, QHeaderView.ResizeMode.Fixed)
-        self.eventtable.resizeColumnsToContents()
+        # set width of temp / time columns
+        self.eventtable.setColumnWidth(0,60)
         self.eventtable.setColumnWidth(1,65)
         self.eventtable.setColumnWidth(2,65)
+        self.eventtable.setColumnWidth(5,55)
+
 
     def createDataTable(self) -> None:
         try:
@@ -865,7 +869,6 @@ class backgroundDlg(ArtisanResizeablDialog):
                     else:
                         headers.append(self.aw.qmc.extraname2B[n4])
 
-            headers.append('') # dummy column that stretches
             self.datatable.setColumnCount(len(headers))
             self.datatable.setHorizontalHeaderLabels(headers)
             self.datatable.setAlternatingRowColors(True)
@@ -945,17 +948,17 @@ class backgroundDlg(ArtisanResizeablDialog):
 
                 if xtcurve and n3 is not None and len(self.aw.qmc.temp1BX[n3]) > i: # an XT column is available, fill it with data
                     if self.aw.qmc.xtcurveidx % 2:
-                        XT = QTableWidgetItem(f'{self.aw.qmc.temp1BX[n3][i]}:.0f')
+                        XT = QTableWidgetItem(f'{self.aw.qmc.temp1BX[n3][i]:.0f}')
                     else:
-                        XT = QTableWidgetItem(f'{self.aw.qmc.temp2BX[n3][i]}:.0f')
+                        XT = QTableWidgetItem(f'{self.aw.qmc.temp2BX[n3][i]:.0f}')
                     XT.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
                     self.datatable.setItem(i,5,XT)
 
                 if ytcurve and n4 is not None and len(self.aw.qmc.temp1BX[n4]) > i: # an YT column is available, fill it with data
                     if self.aw.qmc.ytcurveidx % 2:
-                        YT = QTableWidgetItem(f'{self.aw.qmc.temp1BX[n4][i]}:.0f')
+                        YT = QTableWidgetItem(f'{self.aw.qmc.temp1BX[n4][i]:.0f}')
                     else:
-                        YT = QTableWidgetItem(f'{self.aw.qmc.temp2BX[n4][i]}:.0f')
+                        YT = QTableWidgetItem(f'{self.aw.qmc.temp2BX[n4][i]:.0f}')
                     YT.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
                     if xtcurve:
                         self.datatable.setItem(i,6,YT)
@@ -964,21 +967,11 @@ class backgroundDlg(ArtisanResizeablDialog):
 
             header: Optional[QHeaderView] = self.datatable.horizontalHeader()
             if header is not None:
-                header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
-                header.setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)
-                header.setSectionResizeMode(2, QHeaderView.ResizeMode.Fixed)
-                header.setSectionResizeMode(3, QHeaderView.ResizeMode.Fixed)
-                header.setSectionResizeMode(4, QHeaderView.ResizeMode.Fixed)
-                if (xtcurve and not ytcurve) or (ytcurve and not xtcurve):
-                    header.setSectionResizeMode(5, QHeaderView.ResizeMode.Fixed)
-                    header.setSectionResizeMode(6, QHeaderView.ResizeMode.Stretch)
-                elif xtcurve and ytcurve:
-                    header.setSectionResizeMode(5, QHeaderView.ResizeMode.Fixed)
-                    header.setSectionResizeMode(6, QHeaderView.ResizeMode.Fixed)
-                    header.setSectionResizeMode(7, QHeaderView.ResizeMode.Stretch)
-                else:
-                    header.setSectionResizeMode(5, QHeaderView.ResizeMode.Stretch)
-            self.datatable.resizeColumnsToContents()
+                self.datatable.resizeColumnsToContents()
+                for i in range(1, len(headers)):
+                    header.setSectionResizeMode(i, QHeaderView.ResizeMode.Fixed)
+                    header.resizeSection(i, max(header.sectionSize(i) + 5, 65))
+
         finally:
             if self.aw.qmc.profileDataSemaphore.available() < 1:
                 self.aw.qmc.profileDataSemaphore.release(1)

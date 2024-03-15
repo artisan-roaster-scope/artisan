@@ -257,7 +257,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         #table for showing data
         self.devicetable = QTableWidget()
         self.devicetable.setTabKeyNavigation(True)
-        self.createDeviceTable()
         self.copydeviceTableButton = QPushButton(QApplication.translate('Button', 'Copy Table'))
         self.copydeviceTableButton.setToolTip(QApplication.translate('Tooltip','Copy table to clipboard, OPTION or ALT click for tabular text'))
         self.copydeviceTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -1387,6 +1386,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def setActiveTab(self) -> None:
         self.TabWidget.setCurrentIndex(self.activeTab)
+        # we create the device table here instead of __init__ as otherwise setting the columnWidth to the saved defaults has no effect using Qt 6.2.2
+        self.createDeviceTable()
 
     @pyqtSlot(int)
     def yoctoBoxRemoteFlagStateChanged(self, _:int) -> None:
@@ -1500,6 +1501,29 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.qmc.Controlbuttonflag = False
         self.aw.showControlButton()
 
+    @staticmethod
+    def centeredCheckBox() -> Tuple[QWidget, QCheckBox]:
+        widget = QWidget()
+        checkBox = QCheckBox()
+        checkBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        layout = QHBoxLayout(widget)
+        layout.addWidget(checkBox)
+        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.setContentsMargins(0,0,0,0)
+        return widget, checkBox
+
+    @staticmethod
+    def centeredCheckBox_isChecked(widget:Optional[QWidget]) -> bool:
+        if widget is not None:
+            layout = widget.layout()
+            if layout is not None:
+                item0 = layout.itemAt(0)
+                if item0 is not None:
+                    checkBox = item0.widget()
+                    if checkBox is not None and isinstance(checkBox, QCheckBox):
+                        return checkBox.isChecked() # type:ignore[reportAttributeAccessIssue, unused-ignore] # pyright reports isChecked not known for QWidget
+        return False
+
     def createDeviceTable(self) -> None:
         try:
             columns = 15
@@ -1512,7 +1536,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             #self.devicetable.clear() # this crashes Ubuntu 16.04
 #            if nddevices != 0:
 #                self.devicetable.clearContents() # this crashes Ubuntu 16.04 if device table is empty
-            self.devicetable.clearSelection()
+#            self.devicetable.clearSelection()
             self.devicetable.setRowCount(nddevices)
             self.devicetable.setColumnCount(columns)
             self.devicetable.setHorizontalHeaderLabels([QApplication.translate('Table', 'Device'),
@@ -1538,6 +1562,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             vheader = self.devicetable.verticalHeader()
             if vheader is not None:
                 vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+
             if nddevices:
                 dev = self.aw.qmc.devices[:]             #deep copy
                 limit = len(dev)
@@ -1583,42 +1608,42 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         mexpr1edit.setToolTip(QApplication.translate('Tooltip','Example: 100 + 2*x'))
                         mexpr2edit.setToolTip(QApplication.translate('Tooltip','Example: 100 + x'))
                         # 7: lcd 1
-                        LCD1visibilityQCheckBox = QCheckBox()
+                        LCD1widget, LCD1visibilityQCheckBox = self.centeredCheckBox()
                         if self.aw.extraLCDvisibility1[i]:
                             LCD1visibilityQCheckBox.setCheckState(Qt.CheckState.Checked)
                         else:
                             LCD1visibilityQCheckBox.setCheckState(Qt.CheckState.Unchecked)
                         LCD1visibilityQCheckBox.stateChanged.connect(self.updateLCDvisibility1)
                         # 8: lcd 2
-                        LCD2visibilityQCheckBox = QCheckBox()
+                        LCD2widget, LCD2visibilityQCheckBox = self.centeredCheckBox()
                         if self.aw.extraLCDvisibility2[i]:
                             LCD2visibilityQCheckBox.setCheckState(Qt.CheckState.Checked)
                         else:
                             LCD2visibilityQCheckBox.setCheckState(Qt.CheckState.Unchecked)
                         LCD2visibilityQCheckBox.stateChanged.connect(self.updateLCDvisibility2)
                         # 9: curve 1
-                        Curve1visibilityQCheckBox = QCheckBox()
+                        Curve1widget, Curve1visibilityQCheckBox = self.centeredCheckBox()
                         if self.aw.extraCurveVisibility1[i]:
                             Curve1visibilityQCheckBox.setCheckState(Qt.CheckState.Checked)
                         else:
                             Curve1visibilityQCheckBox.setCheckState(Qt.CheckState.Unchecked)
                         Curve1visibilityQCheckBox.stateChanged.connect(self.updateCurveVisibility1)
                         # 10: curve 2
-                        Curve2visibilityQCheckBox = QCheckBox()
+                        Curve2widget, Curve2visibilityQCheckBox = self.centeredCheckBox()
                         if self.aw.extraCurveVisibility2[i]:
                             Curve2visibilityQCheckBox.setCheckState(Qt.CheckState.Checked)
                         else:
                             Curve2visibilityQCheckBox.setCheckState(Qt.CheckState.Unchecked)
                         Curve2visibilityQCheckBox.stateChanged.connect(self.updateCurveVisibility2)
                         # 11: delta 1
-                        Delta1QCheckBox = QCheckBox()
+                        Delta1widget, Delta1QCheckBox = self.centeredCheckBox()
                         if self.aw.extraDelta1[i]:
                             Delta1QCheckBox.setCheckState(Qt.CheckState.Checked)
                         else:
                             Delta1QCheckBox.setCheckState(Qt.CheckState.Unchecked)
                         Delta1QCheckBox.stateChanged.connect(self.updateDelta1)
                         # 12: delta 2
-                        Delta2QCheckBox = QCheckBox()
+                        Delta2widget, Delta2QCheckBox = self.centeredCheckBox()
                         if self.aw.extraDelta2[i]:
                             Delta2QCheckBox.setCheckState(Qt.CheckState.Checked)
                         else:
@@ -1646,34 +1671,38 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         self.devicetable.setCellWidget(i,4,name2edit)
                         self.devicetable.setCellWidget(i,5,mexpr1edit)
                         self.devicetable.setCellWidget(i,6,mexpr2edit)
-                        self.devicetable.setCellWidget(i,7,LCD1visibilityQCheckBox)
-                        self.devicetable.setCellWidget(i,8,LCD2visibilityQCheckBox)
-                        self.devicetable.setCellWidget(i,9,Curve1visibilityQCheckBox)
-                        self.devicetable.setCellWidget(i,10,Curve2visibilityQCheckBox)
-                        self.devicetable.setCellWidget(i,11,Delta1QCheckBox)
-                        self.devicetable.setCellWidget(i,12,Delta2QCheckBox)
+                        self.devicetable.setCellWidget(i,7,LCD1widget)
+                        self.devicetable.setCellWidget(i,8,LCD2widget)
+                        self.devicetable.setCellWidget(i,9,Curve1widget)
+                        self.devicetable.setCellWidget(i,10,Curve2widget)
+                        self.devicetable.setCellWidget(i,11,Delta1widget)
+                        self.devicetable.setCellWidget(i,12,Delta2widget)
                         self.devicetable.setCellWidget(i,13,Fill1SpinBox)
                         self.devicetable.setCellWidget(i,14,Fill2SpinBox)
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
+                fixed_size_sections = [7,8,9,10,11,12,13,14]
                 header = self.devicetable.horizontalHeader()
                 if header is not None:
-                    header.setStretchLastSection(True)
-                self.devicetable.resizeColumnsToContents()
+                    header.setStretchLastSection(False)
+                    self.devicetable.resizeColumnsToContents()
+                    for i in fixed_size_sections:
+                        header.setSectionResizeMode(i, QHeaderView.ResizeMode.Fixed)
+                        header.resizeSection(i, header.sectionSize(i) + 5)
                 if not self.aw.qmc.devicetablecolumnwidths:
                     self.devicetable.setColumnWidth(0, 100)
                     self.devicetable.setColumnWidth(3, 100)
                     self.devicetable.setColumnWidth(4, 100)
                     self.devicetable.setColumnWidth(5, 40)
                     self.devicetable.setColumnWidth(6, 40)
-                    self.devicetable.setColumnWidth(14, 30)
                 else:
                     # remember the columnwidth
                     for i, _ in enumerate(self.aw.qmc.devicetablecolumnwidths):
-                        try:
-                            self.devicetable.setColumnWidth(i, self.aw.qmc.devicetablecolumnwidths[i])
-                        except Exception: # pylint: disable=broad-except
-                            pass
+                        if i not in fixed_size_sections:
+                            try:
+                                self.devicetable.setColumnWidth(i, self.aw.qmc.devicetablecolumnwidths[i])
+                            except Exception: # pylint: disable=broad-except
+                                pass
         except Exception as e: # pylint: disable=broad-except
             _t, _e, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' createDeviceTable(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -1718,23 +1747,17 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 mexpr2edit = cast(QLineEdit, self.devicetable.cellWidget(r,6))
                 rows.append(mexpr2edit.text())
                 # lcd 1
-                LCD1visibilityQCheckBox = cast(QCheckBox, self.devicetable.cellWidget(r,7))
-                rows.append(str(LCD1visibilityQCheckBox.isChecked()))
+                rows.append(str(self.centeredCheckBox_isChecked(self.devicetable.cellWidget(r,7))))
                 # lcd 2
-                LCD2visibilityQCheckBox = cast(QCheckBox, self.devicetable.cellWidget(r,8))
-                rows.append(str(LCD2visibilityQCheckBox.isChecked()))
+                rows.append(str(self.centeredCheckBox_isChecked(self.devicetable.cellWidget(r,8))))
                 # curve 1
-                Curve1visibilityQCheckBox = cast(QCheckBox, self.devicetable.cellWidget(r,9))
-                rows.append(str(Curve1visibilityQCheckBox.isChecked()))
+                rows.append(str(self.centeredCheckBox_isChecked(self.devicetable.cellWidget(r,9))))
                 # curve 2
-                Curve2visibilityQCheckBox = cast(QCheckBox, self.devicetable.cellWidget(r,10))
-                rows.append(str(Curve2visibilityQCheckBox.isChecked()))
+                rows.append(str(self.centeredCheckBox_isChecked(self.devicetable.cellWidget(r,10))))
                 # delta 1
-                Delta1QCheckBox = cast(QCheckBox, self.devicetable.cellWidget(r,11))
-                rows.append(str(Delta1QCheckBox.isChecked()))
+                rows.append(str(self.centeredCheckBox_isChecked(self.devicetable.cellWidget(r,11))))
                 # delta 2
-                Delta2QCheckBox = cast(QCheckBox, self.devicetable.cellWidget(r,12))
-                rows.append(str(Delta2QCheckBox.isChecked()))
+                rows.append(str(self.centeredCheckBox_isChecked(self.devicetable.cellWidget(r,12))))
                 # fill 1
                 Fill1SpinBox = cast(QSpinBox, self.devicetable.cellWidget(r,13))
                 rows.append(str(Fill1SpinBox.value()))
@@ -1841,9 +1864,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             #addDevice() is located in aw so that the same function can be used in init after dynamically loading settings
             self.aw.addDevice()
             self.createDeviceTable()
-            # workaround a table redrawbug in PyQt 5.14.2 on macOS
-            if len(self.aw.qmc.extradevices)>1:
-                self.repaint()
             self.enableDisableAddDeleteButtons()
             self.aw.qmc.resetlinecountcaches()
             self.aw.qmc.redraw(recomputeAllDeltas=False)

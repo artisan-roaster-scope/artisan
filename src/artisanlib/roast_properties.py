@@ -3952,7 +3952,6 @@ class editGraphDlg(ArtisanResizeablDialog):
                 pass
             columns.append(en1)
             columns.append(en2)
-#        columns.append("") # add a last dummy table that extends
         self.datatable.setColumnCount(len(columns))
         self.datatable.setHorizontalHeaderLabels(columns)
         self.datatable.setAlternatingRowColors(True)
@@ -3963,6 +3962,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         vheader: Optional[QHeaderView] = self.datatable.verticalHeader()
         if vheader is not None:
             vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+
         offset:float = 0
         if self.aw.qmc.timeindex[0] > -1:
             offset = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
@@ -4068,6 +4068,14 @@ class editGraphDlg(ArtisanResizeablDialog):
                     self.datatable.setItem(i,j,extra_qtw2)
                     j = j + 1
 
+        header: Optional[QHeaderView] = self.datatable.horizontalHeader()
+        if header is not None:
+            self.datatable.resizeColumnsToContents()
+            for i in range(1,len(columns)):
+                #header.setSectionResizeMode(i, QHeaderView.ResizeMode.ResizeToContents)
+                header.setSectionResizeMode(i, QHeaderView.ResizeMode.Fixed)
+                header.resizeSection(i, max(header.sectionSize(i) + 5, 65))
+
     def createEventTable(self, force:bool = False) -> None:
         if force or not self.tabInitialized[2]:
             try:
@@ -4160,7 +4168,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     header.setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)
                     header.setSectionResizeMode(4, QHeaderView.ResizeMode.ResizeToContents)
                     header.setSectionResizeMode(5, QHeaderView.ResizeMode.Fixed)
-                # improve width of Time column
+                # set width of temp / time columns
                 self.eventtable.setColumnWidth(0,60)
                 self.eventtable.setColumnWidth(1,65)
                 self.eventtable.setColumnWidth(2,65)

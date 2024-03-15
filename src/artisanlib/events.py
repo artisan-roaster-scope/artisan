@@ -2470,7 +2470,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.aw.buttonlistmaxlen = self.nbuttonsSpinBox.value()
 
     def createEventbuttonTable(self) -> None:
-        columns = 10
+        columns = 9
         if self.eventbuttontable is not None and self.eventbuttontable.columnCount() == columns:
             # rows have been already established
             # save the current columnWidth to reset them afte table creation
@@ -2494,22 +2494,22 @@ class EventsDlg(ArtisanResizeablDialog):
                                                          QApplication.translate('Table','Documentation'),
                                                          QApplication.translate('Table','Visibility'),
                                                          QApplication.translate('Table','Color'),
-                                                         QApplication.translate('Table','Text Color'),''])
+                                                         QApplication.translate('Table','Text Color')
+                                                         #,''
+                                                         ])
         self.eventbuttontable.setAlternatingRowColors(True)
         self.eventbuttontable.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.eventbuttontable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.eventbuttontable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.eventbuttontable.setShowGrid(True)
 
-        vheader = self.eventbuttontable.verticalHeader()
-        if vheader is not None:
-            vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
-
         #Enable Drag Sorting
         self.eventbuttontable.setDragEnabled(False) # content not draggable, only vertical header!
         self.eventbuttontable.setAutoScroll(False)
+
         vheader = self.eventbuttontable.verticalHeader()
         if vheader is not None:
+            vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
             vheader.setSectionsMovable(True)
             vheader.setDragDropMode(QTableWidget.DragDropMode.InternalMove)
             vheader.setAutoScroll(False)
@@ -2588,8 +2588,6 @@ class EventsDlg(ArtisanResizeablDialog):
             colorTextButton.clicked.connect(self.setbuttontextcolor)
             colorTextButton.setText(label)
             colorTextButton.setStyleSheet(f'background-color: {self.extraeventbuttoncolor[i]}; color: {self.extraeventbuttontextcolor[i]};')
-            #9 Empty Cell
-            emptyCell = QLabel('')
             #add widgets to the table
             self.eventbuttontable.setCellWidget(i,0,labeledit)
             self.eventbuttontable.setCellWidget(i,1,descriptionedit)
@@ -2600,30 +2598,31 @@ class EventsDlg(ArtisanResizeablDialog):
             self.eventbuttontable.setCellWidget(i,6,visibilityComboBox)
             self.eventbuttontable.setCellWidget(i,7,colorButton)
             self.eventbuttontable.setCellWidget(i,8,colorTextButton)
-            self.eventbuttontable.setCellWidget(i,9,emptyCell)
+
 
         hheader = self.eventbuttontable.horizontalHeader()
         if hheader is not None:
             hheader.setStretchLastSection(False)
             self.eventbuttontable.resizeColumnsToContents()
-            hheader.setStretchLastSection(True)
+            hheader.setSectionResizeMode(6, QHeaderView.ResizeMode.Fixed)
+            hheader.resizeSection(6, hheader.sectionSize(6) + 5)
+            hheader.setSectionResizeMode(5, QHeaderView.ResizeMode.Stretch)
+            hheader.resizeSection(7, self.aw.standard_button_min_width_px)
+            hheader.resizeSection(8, self.aw.standard_button_min_width_px)
+
         self.eventbuttontable.setColumnWidth(0,70)
         self.eventbuttontable.setColumnWidth(1,80)
         self.eventbuttontable.setColumnWidth(2,100)
         self.eventbuttontable.setColumnWidth(3,50)
         self.eventbuttontable.setColumnWidth(4,150)
-        self.eventbuttontable.setColumnWidth(5,100)
-        self.eventbuttontable.setColumnWidth(6,80)
-        self.eventbuttontable.setColumnWidth(7,80)
-        self.eventbuttontable.setColumnWidth(8,80)
-
 
         # remember the columnwidth
         for i, _ in enumerate(self.aw.eventbuttontablecolumnwidths):
-            try:
-                self.eventbuttontable.setColumnWidth(i,self.aw.eventbuttontablecolumnwidths[i])
-            except Exception: # pylint: disable=broad-except
-                pass
+            if i not in [5,6,7,8]:
+                try:
+                    self.eventbuttontable.setColumnWidth(i,self.aw.eventbuttontablecolumnwidths[i])
+                except Exception: # pylint: disable=broad-except
+                    pass
 
     @pyqtSlot(bool)
     def copyEventButtonTabletoClipboard(self, _:bool=False) -> None:
@@ -2934,9 +2933,6 @@ class EventsDlg(ArtisanResizeablDialog):
             self.extraeventbuttontextcolor.pop(bindex)
 
             self.createEventbuttonTable()
-            # workaround a table redrawbug in PyQt 5.14.2 on macOS
-            if len(self.extraeventstypes) > 1:
-                self.repaint()
 
     @pyqtSlot(bool)
     def addextraeventbuttonSlot(self, _:bool = False) -> None:
@@ -3000,9 +2996,6 @@ class EventsDlg(ArtisanResizeablDialog):
             self.extraeventslabels.insert(bindex,event_label)
 
             self.createEventbuttonTable()
-            # workaround a table redrawbug in PyQt 5.14.2 on macOS
-            if len(self.extraeventstypes) > 1:
-                self.repaint()
 
     @pyqtSlot(int)
     def eventsbuttonflagChanged(self, _:int) -> None:
