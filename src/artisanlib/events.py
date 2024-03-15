@@ -2604,9 +2604,9 @@ class EventsDlg(ArtisanResizeablDialog):
         if hheader is not None:
             hheader.setStretchLastSection(False)
             self.eventbuttontable.resizeColumnsToContents()
-            hheader.setSectionResizeMode(6, QHeaderView.ResizeMode.Fixed)
-            hheader.resizeSection(6, hheader.sectionSize(6) + 5)
             hheader.setSectionResizeMode(5, QHeaderView.ResizeMode.Stretch)
+            hheader.setSectionResizeMode(6, QHeaderView.ResizeMode.Fixed)
+            hheader.resizeSection(6, hheader.sectionSize(6) + 15)
             hheader.resizeSection(7, self.aw.standard_button_min_width_px)
             hheader.resizeSection(8, self.aw.standard_button_min_width_px)
 
