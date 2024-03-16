@@ -3891,10 +3891,6 @@ class editGraphDlg(ArtisanResizeablDialog):
             else:
                 new_w = current_w + wf # we add the new weight to the already existing one!
                 self.scale_set = self.aw.convertWeight(new_w,self.aw.qmc.weight_units.index(self.aw.qmc.weight[2]),0) # convert to weight units
-#            weight_edit.setText("%g" % self.aw.float2float(new_w))
-            # updating this widget in a separate thread seems to be important on OS X 10.14 to avoid delayed updates and widget redraw problems
-            # a QApplication.processEvents() or an weight_edit.update() seems not to help
-            # no issue on OS X 10.13
             QTimer.singleShot(2,lambda : self.updateWeightEdits(weight_edit,new_w))
         if d is not None and d > -1:
             density_edit.setText(f'{self.aw.float2float(d):g}')
@@ -4655,56 +4651,56 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.modified_density_in_text = str(self.bean_density_in_edit.text())
         if self.bean_density_in_edit.text() != '':
             density_in = float(comma2dot(self.bean_density_in_edit.text()))
-            if density_in != 0 and self.weightinedit.text() != '':
-                # if density-in and weight-in is given, we re-calc volume-in:
-                weight_in = float(comma2dot(self.weightinedit.text()))
-                if weight_in != 0:
-                    weight_in = self.aw.convertWeight(weight_in,self.unitsComboBox.currentIndex(),self.aw.qmc.weight_units.index('g'))
-                    volume_in = weight_in / density_in # in g/l
-                    # convert to selected volume unit
-                    volume_in = self.aw.convertVolume(volume_in,self.aw.qmc.volume_units.index('l'),self.volumeUnitsComboBox.currentIndex())
-                    self.volumeinedit.setText(f'{self.aw.float2floatWeightVolume(volume_in):g}')
-                    self.volume_percent()
-# NEVER COMPUTE WEIGHT FROM VOLUME AND DENSITY not to run into rounding cycle issues
-#                if self.volumeinedit.text() != '':
-#                    # if density-in and volume-in is given, we re-calc weight-in:
-#                    volume_in = float(comma2dot(self.volumeinedit.text()))
-#                    if volume_in != 0:
-#                        # convert volume in to l and calculate weight in
-#                        volume_in = self.aw.convertVolume(volume_in,self.volumeUnitsComboBox.currentIndex(),self.aw.qmc.volume_units.index('l'))
-#                        weight_in =  volume_in * density_in # in g/l
-#                        weight_in = self.aw.convertWeight(weight_in,self.aw.qmc.weight_units.index('g'),self.unitsComboBox.currentIndex())
-#                        self.weightinedit.setText(f'{self.aw.float2floatWeightVolume(weight_in):g}')
-#                        self.percent()
-#                        self.calculated_organic_loss()
+            if density_in != 0:
+                if self.weightinedit.text() != '' and self.volumeinedit.text().strip() in {'0',''}:
+                    # if density-in and weight-in is given, we re-calc volume-in:
+                    weight_in = float(comma2dot(self.weightinedit.text()))
+                    if weight_in != 0:
+                        weight_in = self.aw.convertWeight(weight_in,self.unitsComboBox.currentIndex(),self.aw.qmc.weight_units.index('g'))
+                        volume_in = weight_in / density_in # in g/l
+                        # convert to selected volume unit
+                        volume_in = self.aw.convertVolume(volume_in,self.aw.qmc.volume_units.index('l'),self.volumeUnitsComboBox.currentIndex())
+                        self.volumeinedit.setText(f'{self.aw.float2floatWeightVolume(volume_in):g}')
+                        self.volume_percent()
+                if self.volumeinedit.text() != '' and self.weightinedit.text().strip() in {'0',''}:
+                    # if density-in and volume-in is given, we re-calc weight-in:
+                    volume_in = float(comma2dot(self.volumeinedit.text()))
+                    if volume_in != 0:
+                        # convert volume in to l and calculate weight in
+                        volume_in = self.aw.convertVolume(volume_in,self.volumeUnitsComboBox.currentIndex(),self.aw.qmc.volume_units.index('l'))
+                        weight_in =  volume_in * density_in # in g/l
+                        weight_in = self.aw.convertWeight(weight_in,self.aw.qmc.weight_units.index('g'),self.unitsComboBox.currentIndex())
+                        self.weightinedit.setText(f'{self.aw.float2floatWeightVolume(weight_in):g}')
+                        self.percent()
+                        self.calculated_organic_loss()
 
     @pyqtSlot()
     def density_out_editing_finished(self) -> None:
         self.bean_density_out_edit.setText(comma2dot(str(self.bean_density_out_edit.text())))
         if self.bean_density_out_edit.text() != '':
             density_out = float(self.bean_density_out_edit.text())
-            if density_out != 0 and self.weightoutedit.text() != '':
-                # if density-out and weight-out is given, we re-calc volume-out:
-                weight_out = float(comma2dot(self.weightoutedit.text()))
-                if weight_out != 0:
-                    weight_out = self.aw.convertWeight(weight_out,self.unitsComboBox.currentIndex(),self.aw.qmc.weight_units.index('g'))
-                    volume_out = weight_out / density_out # in g/l
-                    # convert to selected volume unit
-                    volume_out = self.aw.convertVolume(volume_out,self.aw.qmc.volume_units.index('l'),self.volumeUnitsComboBox.currentIndex())
-                    self.volumeoutedit.setText(f'{self.aw.float2floatWeightVolume(volume_out):g}')
-                    self.volume_percent()
-# NEVER COMPUTE WEIGHT FROM VOLUME AND DENSITY not to run into rounding cycle issues
-#                if self.volumeoutedit.text() != '':
-#                    # if density-out and volume-out is given, we re-calc weight-out:
-#                    volume_out = float(comma2dot(self.volumeoutedit.text()))
-#                    if volume_out != 0:
-#                        # convert volume out to l and calculate weight out
-#                        volume_out = self.aw.convertVolume(volume_out,self.volumeUnitsComboBox.currentIndex(),self.aw.qmc.volume_units.index('l'))
-#                        weight_out = volume_out * density_out # in g/l
-#                        weight_out = self.aw.convertWeight(weight_out,self.aw.qmc.weight_units.index('g'),self.unitsComboBox.currentIndex())
-#                        self.weightoutedit.setText(f'{self.aw.float2floatWeightVolume(weight_out):g}')
-#                        self.percent()
-#                        self.calculated_organic_loss()
+            if density_out != 0:
+                if self.weightoutedit.text() != '' and self.volumeoutedit.text().strip() in {'0',''}:
+                    # if density-out and weight-out is given, we re-calc volume-out:
+                    weight_out = float(comma2dot(self.weightoutedit.text()))
+                    if weight_out != 0:
+                        weight_out = self.aw.convertWeight(weight_out,self.unitsComboBox.currentIndex(),self.aw.qmc.weight_units.index('g'))
+                        volume_out = weight_out / density_out # in g/l
+                        # convert to selected volume unit
+                        volume_out = self.aw.convertVolume(volume_out,self.aw.qmc.volume_units.index('l'),self.volumeUnitsComboBox.currentIndex())
+                        self.volumeoutedit.setText(f'{self.aw.float2floatWeightVolume(volume_out):g}')
+                        self.volume_percent()
+                if self.volumeoutedit.text() != '' and self.weightoutedit.text().strip() in {'0',''}:
+                    # if density-out and volume-out is given, we re-calc weight-out:
+                    volume_out = float(comma2dot(self.volumeoutedit.text()))
+                    if volume_out != 0:
+                        # convert volume out to l and calculate weight out
+                        volume_out = self.aw.convertVolume(volume_out,self.volumeUnitsComboBox.currentIndex(),self.aw.qmc.volume_units.index('l'))
+                        weight_out = volume_out * density_out # in g/l
+                        weight_out = self.aw.convertWeight(weight_out,self.aw.qmc.weight_units.index('g'),self.unitsComboBox.currentIndex())
+                        self.weightoutedit.setText(f'{self.aw.float2floatWeightVolume(weight_out):g}')
+                        self.percent()
+                        self.calculated_organic_loss()
 
     @pyqtSlot()
     def volume_in_editing_finished(self) -> None:
@@ -4713,24 +4709,24 @@ class editGraphDlg(ArtisanResizeablDialog):
             volume_in = float(self.volumeinedit.text())
             # convert volume in to l and calculate volume in
             volume_in = self.aw.convertVolume(volume_in,self.volumeUnitsComboBox.currentIndex(),self.aw.qmc.volume_units.index('l'))
-            if volume_in != 0 and self.weightinedit.text() != '':
-                # if volume-in and weight-in is given, we re-calc density-in:
-                weight_in = float(comma2dot(self.weightinedit.text()))
-                if weight_in != 0:
-                    weight_in = self.aw.convertWeight(weight_in,self.unitsComboBox.currentIndex(),self.aw.qmc.weight_units.index('g'))
-                    density_in = weight_in / volume_in # in g/l
-                    self.bean_density_in_edit.setText(f'{self.aw.float2float(density_in):g}')
-                    self.volume_percent()
-# NEVER COMPUTE WEIGHT FROM VOLUME AND DENSITY not to run into rounding cycle issues
-#                if self.bean_density_in_edit.text() != '':
-#                    # if volume-in and density-in is given, we re-calc weight-in:
-#                    density_in = float(comma2dot(self.bean_density_in_edit.text()))
-#                    if density_in != 0:
-#                        weight_in =  volume_in * density_in # in g/l
-#                        weight_in = self.aw.convertWeight(weight_in,self.aw.qmc.weight_units.index('g'),self.unitsComboBox.currentIndex())
-#                        self.weightinedit.setText(f'{self.aw.float2floatWeightVolume(weight_in):g}')
-#                        self.percent()
-#                        self.calculated_organic_loss()
+            if volume_in != 0:
+                if self.weightinedit.text() != '' and self.bean_density_in_edit.text().strip() in {'0',''}:
+                    # if volume-in and weight-in is given, we re-calc density-in:
+                    weight_in = float(comma2dot(self.weightinedit.text()))
+                    if weight_in != 0:
+                        weight_in = self.aw.convertWeight(weight_in,self.unitsComboBox.currentIndex(),self.aw.qmc.weight_units.index('g'))
+                        density_in = weight_in / volume_in # in g/l
+                        self.bean_density_in_edit.setText(f'{self.aw.float2float(density_in):g}')
+                        self.volume_percent()
+                if self.bean_density_in_edit.text() != '' and self.weightinedit.text().strip() in {'0',''}:
+                    # if volume-in and density-in is given, we re-calc weight-in:
+                    density_in = float(comma2dot(self.bean_density_in_edit.text()))
+                    if density_in != 0:
+                        weight_in =  volume_in * density_in # in g/l
+                        weight_in = self.aw.convertWeight(weight_in,self.aw.qmc.weight_units.index('g'),self.unitsComboBox.currentIndex())
+                        self.weightinedit.setText(f'{self.aw.float2floatWeightVolume(weight_in):g}')
+                        self.percent()
+                        self.calculated_organic_loss()
 
     @pyqtSlot()
     def volume_out_editing_finished(self) -> None:
@@ -4739,24 +4735,24 @@ class editGraphDlg(ArtisanResizeablDialog):
             volume_out = float(self.volumeoutedit.text())
             # convert volume in to l and calculate volume in
             volume_out = self.aw.convertVolume(volume_out,self.volumeUnitsComboBox.currentIndex(),self.aw.qmc.volume_units.index('l'))
-            if volume_out != 0 and self.weightoutedit.text() != '':
-                # if volume-out and weight-out is given, we re-calc density-out:
-                weight_out = float(comma2dot(self.weightoutedit.text()))
-                if weight_out != 0:
-                    weight_out = self.aw.convertWeight(weight_out,self.unitsComboBox.currentIndex(),self.aw.qmc.weight_units.index('g'))
-                    density_out = weight_out / volume_out # in g/l
-                    self.bean_density_out_edit.setText(f'{self.aw.float2float(density_out):g}')
-                    self.volume_percent()
-# NEVER COMPUTE WEIGHT FROM VOLUME AND DENSITY not to run into rounding cycle issues
-#                if self.bean_density_out_edit.text() != '':
-#                    # if volume-out and density-out is given, we re-calc weight-out:
-#                    density_out = float(comma2dot(self.bean_density_out_edit.text()))
-#                    if density_out != 0:
-#                        weight_out =  volume_out * density_out # in g/l
-#                        weight_out = self.aw.convertWeight(weight_out,self.aw.qmc.weight_units.index('g'),self.unitsComboBox.currentIndex())
-#                        self.weightoutedit.setText(f'{self.aw.float2floatWeightVolume(weight_out):g}')
-#                        self.percent()
-#                        self.calculated_organic_loss()
+            if volume_out != 0:
+                if self.weightoutedit.text() != '' and self.bean_density_out_edit.text().strip() in {'0',''}:
+                    # if volume-out and weight-out is given, we re-calc density-out:
+                    weight_out = float(comma2dot(self.weightoutedit.text()))
+                    if weight_out != 0:
+                        weight_out = self.aw.convertWeight(weight_out,self.unitsComboBox.currentIndex(),self.aw.qmc.weight_units.index('g'))
+                        density_out = weight_out / volume_out # in g/l
+                        self.bean_density_out_edit.setText(f'{self.aw.float2float(density_out):g}')
+                        self.volume_percent()
+                if self.bean_density_out_edit.text() != '' and self.weightoutedit.text().strip() in {'0',''}:
+                    # if volume-out and density-out is given, we re-calc weight-out:
+                    density_out = float(comma2dot(self.bean_density_out_edit.text()))
+                    if density_out != 0:
+                        weight_out =  volume_out * density_out # in g/l
+                        weight_out = self.aw.convertWeight(weight_out,self.aw.qmc.weight_units.index('g'),self.unitsComboBox.currentIndex())
+                        self.weightoutedit.setText(f'{self.aw.float2floatWeightVolume(weight_out):g}')
+                        self.percent()
+                        self.calculated_organic_loss()
 
     def saveMainEvents(self) -> None:
         if self.chargeedit.text() == '':

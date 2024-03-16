@@ -11592,9 +11592,19 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             else:
                 density_loss = '0'
 
+            # strips trailing zero decimals from floats
+            # but keeps zeros without decimals
+            def drop_trailing_zero(s:str) -> str:
+                s = s.strip()
+                r = s.rstrip('0').rstrip('.')
+                if r == '':
+                    return s
+                return r
+
             # respect the Decimal Places setting (in Curves>> UI) for fields that are stored as float
+            # trailing zeros stripped
             def setdecimal(rawvalue:float) -> str:
-                return f'{rawvalue:.1f}' if self.qmc.LCDdecimalplaces else f'{rawvalue:.0f}'
+                return drop_trailing_zero(f'{rawvalue:.1f}' if self.qmc.LCDdecimalplaces else f'{rawvalue:.0f}')
 
             #note: fields are delimited only at the start, to avoid ambiguity the shortest similar field string
             #      must be last in the list.  Example, "date_time" must come before "date" in the list.
@@ -11614,21 +11624,21 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 ('operator',self.qmc.operator),
                 ('organization',self.qmc.organization),
                 ('machine',self.qmc.roastertype),
-                ('capacity',f'{self.qmc.roastersize}'),
+                ('capacity',drop_trailing_zero(f'{self.qmc.roastersize}')),
                 ('drumspeed',f'{self.qmc.drumspeed}'),
                 ('mode',self.qmc.mode),
                 ('test',setdecimal(cp['finish_phase_delta_temp']) if 'test' in cp else setdecimal(0.0)),
-                ('weightloss',f"{cp['weight_loss']}" if 'weight_loss' in cp else '0'),
-                ('volumegain',f"{cp['volume_gain']}" if 'volume_gain' in cp else '0'),
-                ('densityloss',density_loss),
-                ('moistureloss',f"{cp['moisture_loss']}" if 'moisture_loss' in cp else '0'),
+                ('weightloss',drop_trailing_zero(f"{cp['weight_loss']}") if 'weight_loss' in cp else '0'),
+                ('volumegain',drop_trailing_zero(f"{cp['volume_gain']}") if 'volume_gain' in cp else '0'),
+                ('densityloss',drop_trailing_zero(density_loss)),
+                ('moistureloss',drop_trailing_zero(f"{cp['moisture_loss']}") if 'moisture_loss' in cp else '0'),
                 ('weightunits',self.qmc.weight[2]),
-                ('weight',f'{self.qmc.weight[0]}'),
+                ('weight',drop_trailing_zero(f'{self.qmc.weight[0]}')),
                 ('volumeunits',self.qmc.volume[2]),
-                ('volume',f'{self.qmc.volume[0]}'),
+                ('volume',drop_trailing_zero(f'{self.qmc.volume[0]}')),
                 ('densityunits',f'{self.qmc.density[1]}_{self.qmc.density[3]}'),
-                ('density',f'{self.qmc.density[0]}'),
-                ('moisture',f'{self.qmc.moisture_greens}'),
+                ('density',drop_trailing_zero(f'{self.qmc.density[0]}')),
+                ('moisture',drop_trailing_zero(f'{self.qmc.moisture_greens}')),
                 ('beans_line',beansline),
                 ('beans_10',beansline[:10]),
                 ('beans_15',beansline[:15]),
@@ -11636,21 +11646,21 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 ('beans_25',beansline[:25]),
                 ('beans_30',beansline[:30]),
                 ('beans',beansline[:30]),   #deprecated, undocumented, remains here for hidden backward compatibility with v2.4RC
-                ('roastedweight',f'{self.float2float(float(self.qmc.weight[1]),1)}'),
-                ('roastedvolume',f'{self.float2float(float(self.qmc.volume[1]),1)}'),
-                ('roasteddensity',f'{self.float2float(float(self.qmc.density_roasted[0]),1)}'),
-                ('roastedmoisture',f'{self.float2float(float(self.qmc.moisture_roasted))}'),
+                ('roastedweight',drop_trailing_zero(f'{self.float2float(float(self.qmc.weight[1]),1)}')),
+                ('roastedvolume',drop_trailing_zero(f'{self.float2float(float(self.qmc.volume[1]),1)}')),
+                ('roasteddensity',drop_trailing_zero(f'{self.float2float(float(self.qmc.density_roasted[0]),1)}')),
+                ('roastedmoisture',drop_trailing_zero(f'{self.float2float(float(self.qmc.moisture_roasted))}')),
                 ('colorwhole',f'{self.qmc.whole_color}'),
                 ('colorground',f'{self.qmc.ground_color}'),
                 ('colorsystem',f'{self.qmc.color_systems[self.qmc.color_system_idx]}'),
                 ('screenmax',f'{self.qmc.beansize_max}'),
                 ('screenmin',f'{self.qmc.beansize_min}'),
-                ('greenstemp',f'{self.float2float(float(self.qmc.greens_temp))}'),
-                ('ambtemp',f"{cp['ambient_temperature']}" if 'ambient_temperature' in cp else '0'),
-                ('ambhumidity',f"{cp['ambient_humidity']}" if 'ambient_humidity' in cp else '0'),
-                ('ambpressure',f"{cp['ambient_pressure']}" if 'ambient_pressure' in cp else '0'),
-                ('aucbase',f"{cp['AUCbase']}" if 'AUCbase' in cp else '0'),
-                ('auc',f"{cp['AUC']}" if 'AUC' in cp else '0'),
+                ('greenstemp',drop_trailing_zero(f'{self.float2float(float(self.qmc.greens_temp))}')),
+                ('ambtemp',drop_trailing_zero(f"{cp['ambient_temperature']}") if 'ambient_temperature' in cp else '0'),
+                ('ambhumidity',drop_trailing_zero(f"{cp['ambient_humidity']}") if 'ambient_humidity' in cp else '0'),
+                ('ambpressure',drop_trailing_zero(f"{cp['ambient_pressure']}") if 'ambient_pressure' in cp else '0'),
+                ('aucbase',drop_trailing_zero(f"{cp['AUCbase']}") if 'AUCbase' in cp else '0'),
+                ('auc',drop_trailing_zero(f"{cp['AUC']}") if 'AUC' in cp else '0'),
                 ('chargeet',setdecimal(cp['CHARGE_ET']) if 'CHARGE_ET' in cp else setdecimal(0.0)),
                 ('chargebt',setdecimal(cp['CHARGE_BT']) if 'CHARGE_BT' in cp else setdecimal(0.0)),
                 ('fcset',setdecimal(cp['FCs_ET']) if 'FCs_ET' in cp else setdecimal(0.0)),
@@ -11681,10 +11691,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 ('cuppingnotes_25',cuppingnotesline[:25]),
                 ('cuppingnotes_30',cuppingnotesline[:30]),
 #                ("cuppingnotes",cuppingnotesline[:30]),
-                ('roastweight',f'{self.float2float(float(self.qmc.weight[1]),1)}'),            #deprecated, undocumented
-                ('roastvolume',f'{self.float2float(float(self.qmc.volume[1]),1)}'),            #deprecated, undocumented
-                ('roastdensity',f'{self.float2float(float(self.qmc.density_roasted[0]),1)}'),  #deprecated, undocumented
-                ('roastmoisture',f'{self.float2float(float(self.qmc.moisture_roasted))}'),     #deprecated, undocumented
+                ('roastweight',drop_trailing_zero(f'{self.float2float(float(self.qmc.weight[1]),1)}')),            #deprecated, undocumented
+                ('roastvolume',drop_trailing_zero(f'{self.float2float(float(self.qmc.volume[1]),1)}')),            #deprecated, undocumented
+                ('roastdensity',drop_trailing_zero(f'{self.float2float(float(self.qmc.density_roasted[0]),1)}')),  #deprecated, undocumented
+                ('roastmoisture',drop_trailing_zero(f'{self.float2float(float(self.qmc.moisture_roasted))}')),     #deprecated, undocumented
                 ('yyyy',self.qmc.roastdate.toString('yyyy')),
                 ('yy',self.qmc.roastdate.toString('yy')),
                 ('mmm',f"{encodeLocal(self.qmc.roastdate.toString('MMM'))}"),
