@@ -1017,7 +1017,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                 self.alarmtable.resizeColumnsToContents()
                 for i in fixed_columns:
                     header.setSectionResizeMode(i, QHeaderView.ResizeMode.Fixed)
-                    header.resizeSection(i, header.sectionSize(i) + (10 if i == 0 else 5))
+                    header.resizeSection(i, header.sectionSize(i) + (10 if i in {0,5} else 5))
             if not self.aw.qmc.alarmtablecolumnwidths:
                 self.alarmtable.setColumnWidth(2, 50)
                 self.alarmtable.setColumnWidth(3, 50)

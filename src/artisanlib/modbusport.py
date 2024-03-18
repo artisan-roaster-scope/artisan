@@ -939,7 +939,7 @@ class modbusport:
         error, _ = self.invalidResult(res,1)
         if res is not None and not error:
             if code in {1, 2}:
-                if hasattr(res, 'bits') and res.bits[0]:
+                if hasattr(res, 'bits') and len(res.bits)>0 and res.bits[0]:
                     return 1
                 return 0
             if hasattr(res, 'registers'):
@@ -1013,7 +1013,7 @@ class modbusport:
                         break
                 if res is not None:
                     if code in {1, 2} and hasattr(res, 'bits'):
-                        r = 1 if res is not None and res.bits[0] else 0
+                        r = 1 if len(res.bits)>0 and res.bits[0] else 0
                         # we clear the previous error and send a message
                         self.clearCommError()
                         return r

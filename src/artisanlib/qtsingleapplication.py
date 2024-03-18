@@ -29,6 +29,8 @@ except ImportError:
 class QtSingleApplication(QApplication): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     messageReceived = pyqtSignal(str)
 
+    activateWindowSignal = pyqtSignal()
+
     __slots__ = [ '_id', '_viewer_id', '_activationWindow', '_activateOnMessage', '_inSocket', '_outSocket', '_isRunning', '_server',
         '_isRunningViewer', '_outSocketViewer', '_inStream', '_outStream', '_outStreamViewer' ]
 
@@ -40,6 +42,8 @@ class QtSingleApplication(QApplication): # pyright: ignore [reportGeneralTypeIss
             info['LSBackgroundOnly'] = '1'
 
         super().__init__(*argv)
+
+        self.activateWindowSignal.connect(self.activateWindow, type=Qt.ConnectionType.QueuedConnection)  # type: ignore
 
         self._id:str = _id
         self._viewer_id:str = _viewer_id
@@ -123,6 +127,7 @@ class QtSingleApplication(QApplication): # pyright: ignore [reportGeneralTypeIss
         self._activationWindow = activationWindow
         self._activateOnMessage = activateOnMessage
 
+    @pyqtSlot()
     def activateWindow(self) -> None:
         if not self._activationWindow:
             return

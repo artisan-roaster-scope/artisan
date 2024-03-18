@@ -182,6 +182,7 @@ class tgraphcanvas(FigureCanvas):
     showExtraCurveSignal = pyqtSignal(int, str, bool)
     showEventsSignal = pyqtSignal(int, bool)
     showBackgroundEventsSignal = pyqtSignal(bool)
+    redrawSignal = pyqtSignal(bool,bool,bool,bool,bool)
 
     umlaute_dict : Final[Dict[str, str]] = {
        uchr(228): 'ae',  # U+00E4   \xc3\xa4
@@ -2261,6 +2262,7 @@ class tgraphcanvas(FigureCanvas):
         self.showExtraCurveSignal.connect(self.showExtraCurve)
         self.showEventsSignal.connect(self.showEvents)
         self.showBackgroundEventsSignal.connect(self.showBackgroundEvents)
+        self.redrawSignal.connect(self.redraw, type=Qt.ConnectionType.QueuedConnection) # type: ignore
 
     #NOTE: empty Figure is initially drawn at the end of self.awsettingsload()
     #################################    FUNCTIONS    ###################################
@@ -6411,7 +6413,8 @@ class tgraphcanvas(FigureCanvas):
     #Resets graph. Called from reset button. Deletes all data. Calls redraw() at the end
     # returns False if action was canceled, True otherwise
     # if keepProperties=True (a call from OnMonitor()), we keep all the pre-set roast properties
-    def reset(self,redraw:bool = True, soundOn:bool = True, keepProperties:bool = False, fireResetAction:bool = True) -> bool:
+    # onMonitor is set if called from onMonitor
+    def reset(self,redraw:bool = True, soundOn:bool = True, keepProperties:bool = False, fireResetAction:bool = True, onMonitor:bool = False) -> bool:
         try:
             focused_widget = QApplication.focusWidget()
             if focused_widget and focused_widget != self.aw.centralWidget():
@@ -6425,13 +6428,13 @@ class tgraphcanvas(FigureCanvas):
         # restore and clear extra device settings which might have been created on loading a profile with different extra devices settings configuration
         self.aw.restoreExtraDeviceSettingsBackup()
 
-        if self.flagon and self.flagOpenCompleted and self.aw.curFile is not None:
+        if onMonitor and self.flagOpenCompleted and self.aw.curFile is not None:
             # always if ON is pressed while a profile is loaded, the profile is send to the Viewer
             # the file URL of the saved profile (if any) is send to the ArtisanViewer app to be opened if already running
             try:
                 fileURL = QUrl.fromLocalFile(self.aw.curFile)
                 fileURL.setQuery('background') # open the file URL without raising the app to the foreground
-                QTimer.singleShot(10,lambda : self.aw.app.sendMessage2ArtisanInstance(fileURL.toString(),self.aw.app._viewer_id)) # pylint: disable=protected-access
+                self.aw.app.sendmessage2ArtisanViewerSignal.emit(fileURL.toString())
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
 
@@ -7899,10 +7902,11 @@ class tgraphcanvas(FigureCanvas):
     #Redraws data
     # if recomputeAllDeltas, the delta arrays and if smooth the smoothed line arrays are recomputed (incl. those of the background curves)
     # re_smooth_foreground: the foreground curves (incl. extras) will be re-smoothed if called while not recording. During recording foreground will never be smoothed here.
-    # re_smooth_background: the background curves (incl. extras) will be re-smoothed if True (default False), also during recording
+# re_smooth_background: the background curves (incl. extras) will be re-smoothed if True (default False), also during recording
     # NOTE: points for error values represented by None or masked arrays (where values are -1) are not drawn and lines are broken there
     #   see https://matplotlib.org/stable/gallery/lines_bars_and_markers/masked_demo.html
     #   to keep points and lines drawn without those breaks data should be interpolated via util:fill_gaps (controlled by the "Interpolate Drops" filter)
+    @pyqtSlot(bool,bool,bool,bool,bool)
     def redraw(self, recomputeAllDeltas:bool = True, re_smooth_foreground:bool = True, takelock:bool = True, forceRenewAxis:bool = False, re_smooth_background:bool = False) -> None: # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths
 #        _log.info("PRINT redraw(recomputeAllDeltas: %s, re_smooth_foreground: %s, takelock: %s, forceRenewAxis: %s, re_smooth_background: %s)",recomputeAllDeltas, re_smooth_foreground, takelock, forceRenewAxis, re_smooth_background)
         if self.designerflag:
@@ -10336,7 +10340,15 @@ class tgraphcanvas(FigureCanvas):
                 self.logoimg = self.convertQImageToNumpyArray(newImage)
                 self.aw.logofilename = filename
                 self.aw.sendmessage(QApplication.translate('Message','Loaded watermark image {0}').format(filename))
-                QTimer.singleShot(500, lambda : self.redraw(recomputeAllDeltas=False)) #some time needed before the redraw on artisan start with no profile loaded.  processevents() does not work here.
+#                QTimer.singleShot(500, lambda : self.redraw(recomputeAllDeltas=False)) #some time needed before the redraw on artisan start with no profile loaded.  processevents() does not work here.
+                # we avoid a potentially leaking QTimer.signleShot with lambda by emitting a signal
+                self.redrawSignal.emit(
+                    False, # recomputeAllDeltas (default: True)
+                    True, # re_smooth_foreground (default: True)
+                    True,  # takelock (default: True)
+                    False, # forceRenewAxis (default: False)
+                    False, # re_smooth_background (default: False)
+                    )
             else:
                 self.aw.sendmessage(QApplication.translate('Message','Unable to load watermark image {0}').format(filename))
                 _log.info('Unable to load watermark image %s', filename)
@@ -11447,7 +11459,7 @@ class tgraphcanvas(FigureCanvas):
         try:
             self.generateNoneTempHints()
             self.block_update = True # block the updating of the bitblit canvas (unblocked at the end of this function to avoid multiple redraws)
-            res = self.reset(redraw=False, soundOn=False, keepProperties=True)
+            res = self.reset(redraw=False, soundOn=False, keepProperties=True, onMonitor=True)
             if not res: # reset canceled
                 return
 
@@ -12475,7 +12487,7 @@ class tgraphcanvas(FigureCanvas):
                     if time_temp_annos is not None:
                         self.l_annotations += time_temp_annos
                     self.updateBackground() # but we need to update the background cache with the new annotation
-                    st2 = f'{temp:.1f} {self.mode}'
+                    st2 = f'{temp:.1f}{self.mode}'
                     message = QApplication.translate('Message','[TP] recorded at {0} BT = {1}').format(st,st2)
                     #set message at bottom
                     self.aw.sendmessage(message)
@@ -12596,7 +12608,7 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             start = 0
                         st = stringfromseconds(self.timex[self.timeindex[1]]-start)
-                        st2 = f'{self.temp2[self.timeindex[1]]:.1f} {self.mode}'
+                        st2 = f'{self.temp2[self.timeindex[1]]:.1f}{self.mode}'
                         message = QApplication.translate('Message','[DRY END] recorded at {0} BT = {1}').format(st,st2)
                         #set message at bottom
                         self.aw.sendmessage(message)
@@ -12711,7 +12723,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         start = 0
                     st1 = stringfromseconds(self.timex[self.timeindex[2]]-start)
-                    st2 = f'{self.temp2[self.timeindex[2]]:.1f} {self.mode}'
+                    st2 = f'{self.temp2[self.timeindex[2]]:.1f}{self.mode}'
                     message = QApplication.translate('Message','[FC START] recorded at {0} BT = {1}').format(st1,st2)
                     self.aw.sendmessage(message)
                 self.aw.onMarkMoveToNext(self.aw.buttonFCs)
@@ -12821,7 +12833,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         start = 0
                     st1 = stringfromseconds(self.timex[self.timeindex[3]]-start)
-                    st2 = f'{self.temp2[self.timeindex[3]]:.1f} {self.mode}'
+                    st2 = f'{self.temp2[self.timeindex[3]]:.1f}{self.mode}'
                     message = QApplication.translate('Message','[FC END] recorded at {0} BT = {1}').format(st1,st2)
                     self.aw.sendmessage(message)
                 self.aw.onMarkMoveToNext(self.aw.buttonFCe)
@@ -12935,7 +12947,7 @@ class tgraphcanvas(FigureCanvas):
                             start = 0
                         try:
                             st1 = stringfromseconds(self.timex[self.timeindex[4]]-start)
-                            st2 = f'{self.temp2[self.timeindex[4]]:.1f} {self.mode}'
+                            st2 = f'{self.temp2[self.timeindex[4]]:.1f}{self.mode}'
                         except Exception: # pylint: disable=broad-except
                             pass
                         message = QApplication.translate('Message','[SC START] recorded at {0} BT = {1}').format(st1,st2)
@@ -13052,7 +13064,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         start = 0
                     st1 = stringfromseconds(self.timex[self.timeindex[5]]-start)
-                    st2 = f'{self.temp2[self.timeindex[5]]:.1f} {self.mode}'
+                    st2 = f'{self.temp2[self.timeindex[5]]:.1f}{self.mode}'
                     message = QApplication.translate('Message','[SC END] recorded at {0} BT = {1}').format(st1,st2)
                     self.aw.sendmessage(message)
                 self.aw.onMarkMoveToNext(self.aw.buttonSCe)
@@ -13355,7 +13367,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         start = 0
                     st1 = stringfromseconds(self.timex[self.timeindex[7]]-start)
-                    st2 = f'{self.temp2[self.timeindex[7]]:.1f} {self.mode}'
+                    st2 = f'{self.temp2[self.timeindex[7]]:.1f}{self.mode}'
                     message = QApplication.translate('Message','[COOL END] recorded at {0} BT = {1}').format(st1,st2)
                     #set message at bottom
                     self.aw.sendmessage(message)
@@ -13693,7 +13705,7 @@ class tgraphcanvas(FigureCanvas):
                                         pass
                         if doupdatebackground:
                             self.updateBackground() # call to canvas.draw() not needed as self.annotate does the (partial) redraw, but updateBackground() is needed
-                        temp2 = f'{self.temp2[i]:.1f} {self.mode}'
+                        temp2 = f'{self.temp2[i]:.1f}{self.mode}'
                         if self.timeindex[0] != -1:
                             start = self.timex[self.timeindex[0]]
                         else:
@@ -13749,7 +13761,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         start = 0
                     timed = stringfromseconds(self.timex[i]-start)
-                    message = QApplication.translate('Message','Computer Event # {0} recorded at BT = {1} Time = {2}').format(str(Nevents+1),temp_str,timed)
+                    message = QApplication.translate('Message','Computer Event # {0} recorded at BT = {1}{self.mode} Time = {2}').format(str(Nevents+1),temp_str,timed)
                     self.aw.sendmessage(message)
                     #write label in mini recorder if flag checked
                     self.aw.eNumberSpinBox.setValue(Nevents+1)

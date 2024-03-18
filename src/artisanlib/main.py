@@ -265,15 +265,23 @@ appGuid:Final[str] = '9068bd2fa8e54945a6be1f1a0a589e92'
 viewerAppGuid:Final[str] = '9068bd2fa8e54945a6be1f1a0a589e93'
 
 class Artisan(QtSingleApplication):
+
+    sendmessage2ArtisanInstanceSignal = pyqtSignal(str,str)
+    sendmessage2ArtisanViewerSignal = pyqtSignal(str)
+
     __slots__ = [ 'sentToBackground', 'plus_sync_cache_expiration', 'artisanviewerMode', 'darkmode', 'style_hints' ]
 
     def __init__(self, args:Any) -> None:
         super().__init__(appGuid, viewerAppGuid, args)
 
+        # with Qt.ConnectionType.QueuedConnection the signal is queued even if called from the same thread
+        self.sendmessage2ArtisanInstanceSignal.connect(self._sendMessage2ArtisanInstanceSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
+        self.sendmessage2ArtisanViewerSignal.connect(self._sendMessage2ArtisanViewerSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
+
         self.sentToBackground:Optional[float] = None # set to timestamp on putting app to background without any open dialog
         self.plus_sync_cache_expiration = 1*60 # how long a plus sync is valid in seconds
 
-        self.artisanviewerMode: bool = False
+        self.artisanviewerMode: bool = False # true if this is the ArtianViewer running
         if multiprocessing.current_process().name == 'MainProcess' and self.isRunning():
             self.artisanviewerMode = True
             if self.isRunningViewer():
@@ -360,9 +368,9 @@ class Artisan(QtSingleApplication):
                         import requests
                         query_url = QUrl(requests.utils.unquote(query.queryItemValue('url'))) # type: ignore # Module has no attribute "unquote"
                         if aw.comparator is not None:
-                            QTimer.singleShot(5,lambda: (aw.comparator.addProfileFromURL(aw.artisanURLextractor, query_url) if aw is not None and aw.comparator is not None else None))
+                            aw.comparatorAddProfileURLSignal.emit(query_url)
                         else:
-                            QTimer.singleShot(5,lambda: (aw.importExternalURL(aw.artisanURLextractor, url=query_url) if aw is not None else None))
+                            aw.importArtisanURLSignal.emit(query_url)
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
             elif url.scheme() == 'file':
@@ -372,27 +380,28 @@ class Artisan(QtSingleApplication):
                     url_query = url.query()
                 if url_query is None or url_query != 'background':
                     # by default we raise Artisan to the foreground
-                    QTimer.singleShot(20,self.activateWindow)
+                    self.activateWindowSignal.emit()
                 url.setQuery(None) # Argument 1 to "setQuery" of "QUrl" has incompatible type "None"; expected "str" # remove any query to get a valid file path
                 url.setFragment(None) # Argument 1 to "setFragment" of "QUrl" has incompatible type "None"; expected "str" # remove also any potential fragment
                 filename = url.toString(QUrl.UrlFormattingOption.PreferLocalFile)
                 qfile = QFileInfo(filename)
                 file_suffix = qfile.suffix()
+
                 if file_suffix == 'alog':
                     if aw.comparator is not None:
                         # add Artisan profile to the comparator selection
-                        QTimer.singleShot(20,lambda : (aw.comparator.addProfiles([filename]) if (aw is not None and aw.comparator is not None) else None))
+                        aw.comparatorAddProfileSignal.emit(filename)
                     # load Artisan profile on double-click on *.alog file
                     elif url_query is not None and url_query == 'template':
                         aw.loadBackgroundSignal.emit(filename)
                     else:
-                        QTimer.singleShot(20,lambda : (aw.loadFile(filename) if aw is not None else None))
-                elif file_suffix == 'alrm':
+                        aw.loadFileSignal.emit(filename)
+                elif file_suffix == 'alrm' and aw.app is not None and not aw.app.artisanviewerMode:
                     # load Artisan alarms on double-click on *.alrm file
-                    QTimer.singleShot(20,lambda : (aw.loadAlarms(filename) if aw is not None else None))
-                elif file_suffix == 'apal':
+                    aw.loadAlarmsSignal.emit(filename)
+                elif file_suffix == 'apal' and aw.app is not None and not aw.app.artisanviewerMode:
                     # load Artisan palettes on double-click on *.apal file
-                    QTimer.singleShot(20,lambda : (aw.getPalettes(filename, aw.buttonpalette) if aw is not None else None))
+                    aw.loadPalettesSignal.emit(filename)
 
         elif platform.system() == 'Windows' and not self.artisanviewerMode:
             msg = url.toString()  #here we don't want a local file, preserve the windows file:///
@@ -425,16 +434,22 @@ class Artisan(QtSingleApplication):
                     application_path = re.sub(r'\\',r'/',application_path)
                     # must start viewer without an argv else it thinks it was started from a link and sends back to artisan
                     os.startfile(application_path) # type:ignore[unused-ignore,attr-defined] # @UndefinedVariable # pylint: disable=maybe-no-member
-                    QTimer.singleShot(3000,lambda : self._sendMessage2ArtisanInstanceShot(message,instance_id))
+                    self.sendmessage2ArtisanInstanceSignal.emit(message,instance_id)
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
         else:
-            self._sendMessage2ArtisanInstance(message,instance_id)
+            self.sendmessage2ArtisanInstanceSignal.emit(message,instance_id)
 
-    def _sendMessage2ArtisanInstanceShot(self, message:str, instance_id:str) -> None:
+    @pyqtSlot(str, str)
+    def _sendMessage2ArtisanInstanceSlot(self, message:str, instance_id:str) -> None:
         self._sendMessage2ArtisanInstance(message, instance_id)
 
+    @pyqtSlot(str)
+    def _sendMessage2ArtisanViewerSlot(self, message:str) -> None:
+        self._sendMessage2ArtisanInstance(message, self._viewer_id)
+
     def _sendMessage2ArtisanInstance(self, message:str, instance_id:str) -> bool:
+        _log.debug('_sendMessage2ArtisanInstance(%s,%s)',message, instance_id)
         try:
             self._outSocket = QLocalSocket()
             self._outSocket.connectToServer(instance_id)
@@ -1211,9 +1226,9 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                 res = subscription_message_box.exec()
                 plus_link = plus.config.shop_base_url
                 if self.aw.plus_subscription == 'PRO':
-                    plus_link += '/shop/professional-roasters/'
+                    plus_link += '/professional-roasters'
                 elif self.aw.plus_subscription == 'HOME':
-                    plus_link += '/shop/home-roasters/'
+                    plus_link += '/home-roasters'
                 if res == QMessageBox.StandardButton.Yes:
                     QDesktopServices.openUrl(QUrl(plus_link, QUrl.ParsingMode.TolerantMode))
 #                box = QMessageBox(self)
@@ -1354,6 +1369,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     establishQuantifiedEventSignal = pyqtSignal(int,float)
     updateExtraEventButtonsVisibilitySignal = pyqtSignal()
     realignButtonsSignal = pyqtSignal()
+    loadAlarmsSignal = pyqtSignal(str)
+    loadFileSignal = pyqtSignal(str)
+    loadPalettesSignal = pyqtSignal(str)
+    importArtisanURLSignal = pyqtSignal(QUrl)
+    comparatorAddProfileURLSignal = pyqtSignal(QUrl)
+    comparatorAddProfileSignal = pyqtSignal(str)
 
     __slots__ = [ 'locale_str', 'app', 'superusermode', 'sample_loop_running', 'time_stopped', 'plus_account', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription',
         'plus_paidUntil', 'plus_rlimit', 'plus_used', 'plus_readonly', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
@@ -3976,6 +3997,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.establishQuantifiedEventSignal.connect(self.establishQuantifiedEventSlot)
         self.updateExtraEventButtonsVisibilitySignal.connect(self.update_extraeventbuttons_visibility)
         self.realignButtonsSignal.connect(self.realignbuttons)
+        self.loadAlarmsSignal.connect(self.loadAlarms, type=Qt.ConnectionType.QueuedConnection)  # type: ignore
+        self.loadFileSignal.connect(self.loadFileSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore
+        self.loadPalettesSignal.connect(self.loadPalettesSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore
+        self.importArtisanURLSignal.connect(self.importArtisanURLSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore
+        self.comparatorAddProfileURLSignal.connect(self.comparatorAddProfileURLSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore
+        self.comparatorAddProfileSignal.connect(self.comparatorAddProfileSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore
 
         self.notificationManager:Optional[NotificationManager] = None
         if not self.app.artisanviewerMode:
@@ -12133,6 +12160,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             _log.exception(ex)
             _a, _b, exc_tb = sys.exc_info()
             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' fileLoad() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+
+    @pyqtSlot(str)
+    def loadFileSlot(self, filename:str) -> None:
+        self.loadFile(filename)
 
     #loads stored profiles. Called from file menu
     def loadFile(self, filename:str, quiet:bool = False) -> None:
@@ -23588,6 +23619,20 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #        except Exception as e: # pylint: disable=broad-except
 #            _log.exception(e)
 
+    @pyqtSlot(str)
+    def comparatorAddProfileSlot(self, filename:str) -> None:
+        if self.comparator is not None:
+            self.comparator.addProfiles([filename])
+
+    @pyqtSlot('QUrl')
+    def comparatorAddProfileURLSlot(self, url:QUrl) -> None:
+        if self.comparator is not None:
+            self.comparator.addProfileFromURL(self.artisanURLextractor, url)
+
+    @pyqtSlot('QUrl')
+    def importArtisanURLSlot(self, url:QUrl) -> None:
+        self.importExternalURL(self.artisanURLextractor, url=url)
+
     # url a QUrl
     def importExternalURL(self, extractor: Callable[[QUrl, 'ApplicationWindow'], Optional['ProfileData']], message:str='', url:Optional[QUrl] = None) -> None:
         try:
@@ -24370,6 +24415,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         except OSError as ex:
             self.qmc.adderror((QApplication.translate('Error Message','IO Error:') + ' backuppaletteeventbuttons(): {0}').format(str(ex)))
 
+    def loadPalettesSlot(self, filename:str) -> None:
+        self.getPalettes(filename, self.buttonpalette)
+
     def getPalettes(self, filename:str, pal:List['Palette']) -> None:
         maxlen = self.loadPalettes(filename,pal)
         if maxlen is not None:
@@ -24518,6 +24566,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #        if filename:
 #            self.getPalettes(filename,pal)
 
+    @pyqtSlot(str)
     def loadAlarms(self, filename:str) -> None:
         try:
             from json import load as json_load

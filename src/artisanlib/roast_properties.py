@@ -4135,7 +4135,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     valueEdit.setText(self.aw.qmc.eventsvalues(self.aw.qmc.specialeventsvalue[i]))
 
                     timeline = QLineEdit()
-                    timeline.setAlignment(Qt.AlignmentFlag.AlignRight)
+                    timeline.setAlignment(Qt.AlignmentFlag.AlignCenter)
                     if self.aw.qmc.timeindex[0] > -1 and len(self.aw.qmc.timex) > self.aw.qmc.timeindex[0]:
                         timez = stringfromseconds(self.aw.qmc.timex[self.aw.qmc.specialevents[i]]-self.aw.qmc.timex[self.aw.qmc.timeindex[0]])
                     else:
