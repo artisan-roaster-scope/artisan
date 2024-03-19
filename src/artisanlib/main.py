@@ -426,7 +426,7 @@ class Artisan(QtSingleApplication):
                 if not res:
                     # get the path of the artisan.exe file
                     if getattr(sys, 'frozen', False):
-                        application_path = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable))
+                        application_path = os.path.dirname(sys.executable)
                         application_path += '\\artisan.exe'
                     # or the artisan py file if running from source
                     else:
