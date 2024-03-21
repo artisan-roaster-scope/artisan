@@ -284,7 +284,7 @@ class Artisan(QtSingleApplication):
         self.artisanviewerMode: bool = False # true if this is the ArtianViewer running
         if multiprocessing.current_process().name == 'MainProcess' and self.isRunning():
             self.artisanviewerMode = True
-            if not str(platform.system())=="Windows" and self.isRunningViewer():
+            if str(platform.system()) != "Windows" and self.isRunningViewer():
                 sys.exit(0) # there is already one ArtisanViewer running, we terminate
 
         self.darkmode:bool = False # holds current darkmode state
