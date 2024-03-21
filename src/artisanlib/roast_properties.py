@@ -991,7 +991,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.whole_color_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         ground_color_label = QLabel('<b>' + QApplication.translate('Label', 'Ground') + '</b>')
         self.ground_color_edit = QLineEdit(str(self.aw.qmc.ground_color))
-        self.ground_color_edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 2, self.whole_color_edit))
+        self.ground_color_edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 2, self.ground_color_edit))
         self.ground_color_edit.setMinimumWidth(70)
         self.ground_color_edit.setMaximumWidth(70)
         self.ground_color_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
