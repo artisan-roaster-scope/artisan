@@ -284,7 +284,7 @@ class Artisan(QtSingleApplication):
         self.artisanviewerMode: bool = False # true if this is the ArtianViewer running
         if multiprocessing.current_process().name == 'MainProcess' and self.isRunning():
             self.artisanviewerMode = True
-            if self.isRunningViewer():
+            if not str(platform.system())=="Windows" and self.isRunningViewer():
                 sys.exit(0) # there is already one ArtisanViewer running, we terminate
 
         self.darkmode:bool = False # holds current darkmode state
@@ -430,10 +430,12 @@ class Artisan(QtSingleApplication):
                         application_path += '\\artisan.exe'
                     # or the artisan py file if running from source
                     else:
-                        application_path = sys.argv[0]
+                        application_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))  #grandparent path
+                        application_path += '\\artisan.py'
                     application_path = re.sub(r'\\',r'/',application_path)
                     # must start viewer without an argv else it thinks it was started from a link and sends back to artisan
                     os.startfile(application_path) # type:ignore[unused-ignore,attr-defined] # @UndefinedVariable # pylint: disable=maybe-no-member
+                    libtime.sleep(3)  #wait while the app opens
                     self.sendmessage2ArtisanInstanceSignal.emit(message,instance_id)
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
