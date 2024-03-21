@@ -2,7 +2,7 @@ Detailed Release History
 ========================
 
 ----
-v2.10.4 (XX, 2024)
+v2.10.4 (March 21, 2024)
 ------------------
 
 * ADDITIONS
@@ -12,10 +12,10 @@ v2.10.4 (XX, 2024)
   - fixes regression which broke devices Omega HH309 34 and the just introduced Digi-Sense 20250-07 and Extech 42570 ([PR #1481](../../../pull/1481))
   - fixes regression introduced in v2.8.4 which broke persisting volume changes made in Roast Properties dialog ([Discussion #1511](../../../discussions/1511))
   - fixes regression which broke persistence of custom column width of alarm and extra device and table
-  - fixes regression which broke formating of extra curve data in background event table
+  - fixes regression which broke the formating of extra curve data in background event table
   - fixes regression which broke the automatic opening of completed profiles in ArtisanViewer ([Issue #1516](../../../issues/1516))
   - improves formating of profile and background data tables, custom event button table, alarm table and extra device table
-  - fixes Linux builds for some configuration
+  - fixes Linux builds that failed to start on v2.10.2 on some configurations
   - fixes phases bar rendering in case CHARGE is not set
 
 ----

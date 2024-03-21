@@ -220,7 +220,9 @@ def authentify() -> bool:
                 config.app_window.plus_language = util.extractInfo(
                     res['result']['user'], 'language', 'en'
                 )
-
+                config.app_window.plus_user_id = util.extractInfo(
+                    res['result']['user'], 'user_id', None
+                )
                 config.app_window.plus_paidUntil = None
                 config.app_window.plus_subscription = None
                 config.app_window.plus_rlimit = 0

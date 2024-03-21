@@ -362,6 +362,7 @@ def disconnect(
                     remove_from_keychain=remove_credentials
                 )
             if config.app_window is not None:
+                config.app_window.plus_user_id = None
                 if remove_credentials:
                     config.app_window.sendmessageSignal.emit(
                         QApplication.translate(

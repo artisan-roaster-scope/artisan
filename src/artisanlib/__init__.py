@@ -1,4 +1,4 @@
-__version__ = '2.10.3'
+__version__ = '2.10.4'
 __revision__ = ''
 __build__ = '0'
 

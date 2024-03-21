@@ -561,7 +561,6 @@ def coffee2beans(coffee:Tuple[str, Tuple[Coffee, StockItem]]) -> str:
 # returns a dict with all coffees with stock associated as string of the form  "<origin> <picked>, <label>"
 # associated to their hr_id
 def getCoffeeLabels() -> Dict[str, str]:
-    _log.debug('getCoffeeList()')
     try:
         stock_semaphore.acquire(1)
         if stock is not None and 'coffees' in stock:
@@ -1095,7 +1094,8 @@ def getBlends(weight_unit_idx:int, store:Optional[str] = None, customBlend:Optio
                                         # used in the Roast Properties dialog
                                         # for links to the coffees
                                         try:
-                                            i['label'] = f"{cd['crop_date']['picked'][0]} {i['label']}"
+                                            if cd['crop_date']['picked'][0] is not None:
+                                                i['label'] = f"{cd['crop_date']['picked'][0]} {i['label']}"
                                             # pylint: disable=broad-except
                                         except Exception:
                                             pass
@@ -1163,9 +1163,10 @@ def getBlends(weight_unit_idx:int, store:Optional[str] = None, customBlend:Optio
                                             # used in the Roast Properties
                                             # dialog for links to the coffees
                                             try:
-                                                i[
-                                                    'replaceLabel'
-                                                ] = f"{cd['crop_date']['picked'][0]} {i['replaceLabel']}"
+                                                if cd['crop_date']['picked'][0] is not None:
+                                                    i[
+                                                        'replaceLabel'
+                                                    ] = f"{cd['crop_date']['picked'][0]} {i['replaceLabel']}"
                                                 # pylint: disable=broad-except
                                             except Exception:
                                                 pass
