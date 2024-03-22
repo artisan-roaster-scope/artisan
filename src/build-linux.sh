@@ -56,7 +56,7 @@ else
     ln -s /usr/lib/libusb-1.0.so.0
 fi
 
-pyinstaller -y --log-level=INFO artisan-linux.spec
+pyinstaller -y --log-level=INFO --exclude-module PyQt5 artisan-linux.spec
 
 mv dist/artisan dist/artisan.d
 mv dist/artisan.d/* dist
