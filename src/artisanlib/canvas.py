@@ -4222,7 +4222,7 @@ class tgraphcanvas(FigureCanvas):
                     except Exception: # pylint: disable=broad-except
                         pass
                 self.aw.lcd1.display(timestr)
-                if self.aw.largeLCDs_dialog:
+                if self.aw.largeLCDs_dialog is not None:
                     self.updateLargeLCDsTimeSignal.emit(timestr)
 
             ## ET LCD:
@@ -4594,9 +4594,9 @@ class tgraphcanvas(FigureCanvas):
     def setLCDtimestr(self, timestr:str) -> None:
         self.aw.lcd1.display(timestr)
         # update connected WebLCDs
-        if self.aw.WebLCDs:
+        if self.aw.WebLCDs is not None:
             self.updateWebLCDs(time=timestr)
-        if self.aw.largeLCDs_dialog:
+        if self.aw.largeLCDs_dialog is not None:
             self.updateLargeLCDsTimeSignal.emit(timestr)
 
     def setLCDtime(self, ts:float) -> None:
@@ -6381,7 +6381,7 @@ class tgraphcanvas(FigureCanvas):
             self.aw.lcd1.display('00:00')
             if self.aw.WebLCDs:
                 self.updateWebLCDs(time='00:00')
-            if self.aw.largeLCDs_dialog:
+            if self.aw.largeLCDs_dialog is not None:
                 self.updateLargeLCDsTimeSignal.emit('00:00')
             if andLCDs:
                 self.clearLCDs()
@@ -6539,7 +6539,9 @@ class tgraphcanvas(FigureCanvas):
             else:
                 self.weight = (self.weight[0],0,self.weight[2])
                 self.volume = (self.volume[0],0,self.volume[2])
-            self.roastingnotes = ''
+            if len(self.timex) > 20:
+                # roast notes of an existing roast are reset
+                self.roastingnotes = ''
             self.cuppingnotes = ''
             self.whole_color = 0
             self.ground_color = 0
