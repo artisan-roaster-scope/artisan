@@ -2628,7 +2628,7 @@ class EventsDlg(ArtisanResizeablDialog):
     def copyEventButtonTabletoClipboard(self, _:bool=False) -> None:
         import prettytable
         nrows = self.eventbuttontable.rowCount()
-        ncols = self.eventbuttontable.columnCount() - 1 #there is a dummy column at the end on the right
+        ncols = self.eventbuttontable.columnCount()
         clipboard = ''
         modifiers = QApplication.keyboardModifiers()
         if modifiers == Qt.KeyboardModifier.AltModifier:  #alt click

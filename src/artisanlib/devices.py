@@ -1797,23 +1797,53 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 mexpr2edit = cast(QLineEdit, self.devicetable.cellWidget(r,6))
                 clipboard += mexpr2edit.text() + '\t'
                 # lcd 1
-                LCD1visibilityQCheckBox = cast(QCheckBox, self.devicetable.cellWidget(r,7))
-                clipboard += str(LCD1visibilityQCheckBox.isChecked()) + '\t'
+                LCD1visibilityWidget = cast(QWidget, self.devicetable.cellWidget(r,7))
+                LCD1visibilityLayout = LCD1visibilityWidget.layout()
+                if LCD1visibilityLayout is not None:
+                    item0 = LCD1visibilityLayout.itemAt(0)
+                    if item0 is not None:
+                        LCD1visibilityCheckBox = cast(QCheckBox, item0.widget())
+                        clipboard += str(LCD1visibilityCheckBox.isChecked()) + '\t'
                 # lcde 2
-                LCD2visibilityQCheckBox = cast(QCheckBox, self.devicetable.cellWidget(r,8))
-                clipboard += str(LCD2visibilityQCheckBox.isChecked()) + '\t'
+                LCD2visibilityWidget = cast(QWidget, self.devicetable.cellWidget(r,8))
+                LCD2visibilityLayout = LCD2visibilityWidget.layout()
+                if LCD2visibilityLayout is not None:
+                    item0 = LCD2visibilityLayout.itemAt(0)
+                    if item0 is not None:
+                        LCD2visibilityCheckBox = cast(QCheckBox, item0.widget())
+                        clipboard += str(LCD2visibilityCheckBox.isChecked()) + '\t'
                 # curve 1
-                Curve1visibilityQCheckBox = cast(QCheckBox, self.devicetable.cellWidget(r,9))
-                clipboard += str(Curve1visibilityQCheckBox.isChecked()) + '\t'
+                Curve1visibilityWidget = cast(QWidget, self.devicetable.cellWidget(r,9))
+                Curve1visibilityLayout = Curve1visibilityWidget.layout()
+                if Curve1visibilityLayout is not None:
+                    item0 = Curve1visibilityLayout.itemAt(0)
+                    if item0 is not None:
+                        Curve1visibilityCheckBox = cast(QCheckBox, item0.widget())
+                        clipboard += str(Curve1visibilityCheckBox.isChecked()) + '\t'
                 # curve 2
-                Curve2visibilityQCheckBox = cast(QCheckBox, self.devicetable.cellWidget(r,10))
-                clipboard += str(Curve2visibilityQCheckBox.isChecked()) + '\t'
+                Curve2visibilityWidget = cast(QWidget, self.devicetable.cellWidget(r,10))
+                Curve2visibilityLayout = Curve2visibilityWidget.layout()
+                if Curve2visibilityLayout is not None:
+                    item0 = Curve2visibilityLayout.itemAt(0)
+                    if item0 is not None:
+                        Curve2visibilityCheckBox = cast(QCheckBox, item0.widget())
+                        clipboard += str(Curve2visibilityCheckBox.isChecked()) + '\t'
                 # delta 1
-                Delta1QCheckBox = cast(QCheckBox, self.devicetable.cellWidget(r,11))
-                clipboard += str(Delta1QCheckBox.isChecked()) + '\t'
+                Delta1Widget = cast(QWidget, self.devicetable.cellWidget(r,11))
+                Delta1Layout = Delta1Widget.layout()
+                if Delta1Layout is not None:
+                    item0 = Delta1Layout.itemAt(0)
+                    if item0 is not None:
+                        Delta1CheckBox = cast(QCheckBox, item0.widget())
+                        clipboard += str(Delta1CheckBox.isChecked()) + '\t'
                 # delta 2
-                Delta2QCheckBox = cast(QCheckBox, self.devicetable.cellWidget(r,12))
-                clipboard += str(Delta2QCheckBox.isChecked()) + '\t'
+                Delta2Widget = cast(QWidget, self.devicetable.cellWidget(r,12))
+                Delta2Layout = Delta2Widget.layout()
+                if Delta2Layout is not None:
+                    item0 = Delta2Layout.itemAt(0)
+                    if item0 is not None:
+                        Delta2CheckBox = cast(QCheckBox, item0.widget())
+                        clipboard += str(Delta2CheckBox.isChecked()) + '\t'
                 # fill 1
                 Fill1SpinBox = cast(QSpinBox, self.devicetable.cellWidget(r,13))
                 clipboard += str(Fill1SpinBox.value()) + '\t'

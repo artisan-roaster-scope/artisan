@@ -3379,7 +3379,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             tbl.field_names = fields
             for i in range(nrows):
                 rows = []
-                for j in range(7):
+                for j in range(ncols):
                     item = self.energy_ui.datatable.item(i,j)
                     if item is not None:
                         rows.append(item.text())
@@ -3394,10 +3394,14 @@ class editGraphDlg(ArtisanResizeablDialog):
                         clipboard += '\t'
             clipboard += '\n'
             for r in range(nrows):
-                for j in range(7):
+                for j in range(ncols):
                     item = self.energy_ui.datatable.item(r,j)
                     if item is not None:
-                        clipboard += item.text() + '\t'
+                        clipboard += item.text()
+                    if j != (ncols-1):
+                        clipboard += '\t'
+                    else:
+                        clipboard += '\n'
         # copy to the system clipboard
         sys_clip = QApplication.clipboard()
         if sys_clip is not None:

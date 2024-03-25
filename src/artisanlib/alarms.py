@@ -1086,10 +1086,11 @@ class AlarmDlg(ArtisanResizeablDialog):
                 beepWidget = cast(QWidget, self.alarmtable.cellWidget(r,10))
                 beepLayout = beepWidget.layout()
                 if beepLayout is not None:
-                    item1 = beepLayout.itemAt(1)
+                    item1 = beepLayout.itemAt(0)
                     if item1 is not None:
                         beepCheckBox = cast(QCheckBox, item1.widget())
-                        rows.append(str(beepCheckBox.isChecked()))
+                        if beepCheckBox and beepCheckBox is not None:
+                            rows.append(str(beepCheckBox.isChecked()))
                 descriptionedit = cast(QLineEdit, self.alarmtable.cellWidget(r,11))
                 rows.append(descriptionedit.text())
                 tbl.add_row(rows)
@@ -1127,10 +1128,13 @@ class AlarmDlg(ArtisanResizeablDialog):
                 beepWidget = cast(QWidget, self.alarmtable.cellWidget(r,10))
                 beepLayout = beepWidget.layout()
                 if beepLayout is not None:
-                    item1 = beepLayout.itemAt(1)
+                    item1 = beepLayout.itemAt(0)
                     if item1 is not None:
                         beepCheckBox = cast(QCheckBox, item1.widget())
-                        clipboard += str(beepCheckBox.isChecked()) + '\t'
+                        if beepCheckBox and beepCheckBox is not None:
+                            clipboard += str(beepCheckBox.isChecked()) + '\t'
+                        else:
+                            clipboard += ' ' + '\t'                            
                 descriptionedit = cast(QLineEdit, self.alarmtable.cellWidget(r,11))
                 clipboard += descriptionedit.text() + '\n'
         # copy to the system clipboard
