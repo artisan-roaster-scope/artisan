@@ -87,6 +87,7 @@ slideroffsets=0, 0, 0, 0
 slidervisibilities=0, 0, 0, 1
 
 [WebSocket]
+compression=true
 DRY_node=colorChangeEvent
 FCe_node=firstCrackEndEvent
 FCs_node=firstCrackBeginningEvent

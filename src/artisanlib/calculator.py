@@ -17,7 +17,7 @@
 
 from typing import Optional, TYPE_CHECKING
 
-from artisanlib.util import fromCtoF, fromFtoC, stringfromseconds, stringtoseconds, comma2dot
+from artisanlib.util import fromCtoF, fromFtoC, stringfromseconds, stringtoseconds, comma2dot, weight_units, convertWeight, convertVolume
 from artisanlib.dialogs import ArtisanDialog
 
 try:
@@ -81,13 +81,13 @@ class calculatorDlg(ArtisanDialog):
         self.ceEdit.editingFinished.connect(self.convertTempCtoF)
         #WEIGHT CONVERSION
         self.WinComboBox = QComboBox()
-        self.WinComboBox.addItems(self.aw.qmc.weight_units)
+        self.WinComboBox.addItems(weight_units)
         self.WinComboBox.setMaximumWidth(80)
         self.WinComboBox.setMinimumWidth(80)
         self.WoutComboBox = QComboBox()
         self.WoutComboBox.setMaximumWidth(80)
         self.WoutComboBox.setMinimumWidth(80)
-        self.WoutComboBox.addItems(self.aw.qmc.weight_units)
+        self.WoutComboBox.addItems(weight_units)
         self.WoutComboBox.setCurrentIndex(2)
         self.WinEdit = QLineEdit()
         self.WoutEdit = QLineEdit()
@@ -287,28 +287,28 @@ class calculatorDlg(ArtisanDialog):
     def convertWeightItoO(self) -> None:
         self.WinEdit.setText(comma2dot(str(self.WinEdit.text())))
         inx = float(str(self.WinEdit.text()))
-        outx = self.aw.convertWeight(inx,self.WinComboBox.currentIndex(),self.WoutComboBox.currentIndex())
+        outx = convertWeight(inx,self.WinComboBox.currentIndex(),self.WoutComboBox.currentIndex())
         self.WoutEdit.setText(f'{outx:.2f}')
 
     @pyqtSlot()
     def convertWeightOtoI(self) -> None:
         self.WoutEdit.setText(comma2dot(str(self.WoutEdit.text())))
         outx = float(str(self.WoutEdit.text()))
-        inx = self.aw.convertWeight(outx,self.WoutComboBox.currentIndex(),self.WinComboBox.currentIndex())
+        inx = convertWeight(outx,self.WoutComboBox.currentIndex(),self.WinComboBox.currentIndex())
         self.WinEdit.setText(f'{inx:.2f}')
 
     @pyqtSlot()
     def convertVolumeItoO(self) -> None:
         self.VinEdit.setText(comma2dot(str(self.VinEdit.text())))
         inx = float(str(self.VinEdit.text()))
-        outx = self.aw.convertVolume(inx,self.VinComboBox.currentIndex(),self.VoutComboBox.currentIndex())
+        outx = convertVolume(inx,self.VinComboBox.currentIndex(),self.VoutComboBox.currentIndex())
         self.VoutEdit.setText(f'{outx:.3f}')
 
     @pyqtSlot()
     def convertVolumeOtoI(self) -> None:
         self.VoutEdit.setText(comma2dot(str(self.VoutEdit.text())))
         outx = float(str(self.VoutEdit.text()))
-        inx = self.aw.convertVolume(outx,self.VoutComboBox.currentIndex(),self.VinComboBox.currentIndex())
+        inx = convertVolume(outx,self.VoutComboBox.currentIndex(),self.VinComboBox.currentIndex())
         self.VinEdit.setText(f'{inx:.3f}')
 
     @pyqtSlot()

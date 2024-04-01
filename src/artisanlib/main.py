@@ -76,18 +76,19 @@ from typing import Final, Optional, List, Dict, Tuple, Union, cast, Any, Callabl
 
 from functools import reduce as freduce
 
-## MONKEY PATCH BEGIN: importlib.metadata fix for macOS builds with py2app that fails to set proper metadata for prettytable >0.7.2 and thus fail
-## on import with importlib.metadata.PackageNotFoundError: prettytable on __version__ = importlib_metadata.version(__name__)
-try:
-    import importlib.metadata as importlib_metadata # @UnresolvedImport
-    def md_version(distribution_name:str) -> str:
-        if distribution_name == 'prettytable':
-            return '2.1.0'
-        return importlib_metadata.version(distribution_name)
-    importlib_metadata.version = md_version
-except Exception: # pylint: disable=broad-except
-    pass
-## MONKEY PATCH END:
+# hack is not needed any longer and can lead to non-termination eg on importing the humanize lib
+### MONKEY PATCH BEGIN: importlib.metadata fix for macOS builds with py2app that fails to set proper metadata for prettytable >0.7.2 and thus fail
+### on import with importlib.metadata.PackageNotFoundError: prettytable on __version__ = importlib_metadata.version(__name__)
+#try:
+#    import importlib.metadata as importlib_metadata # @UnresolvedImport
+#    def md_version(distribution_name:str) -> str:
+#        if distribution_name == 'prettytable':
+#            return '2.1.0'
+#        return importlib_metadata.version(distribution_name)
+#    importlib_metadata.version = md_version
+#except Exception: # pylint: disable=broad-except
+#    pass
+### MONKEY PATCH END:
 
 try: # activate support for hiDPI screens on Windows
     if str(platform.system()).startswith('Windows'):
@@ -236,7 +237,8 @@ from artisanlib.util import (appFrozen, uchr, decodeLocal, decodeLocalStrict, en
         toBool, toStringList, removeAll, application_name, application_viewer_name, application_organization_name,
         application_organization_domain, getDataDirectory, getAppPath, getResourcePath, debugLogLevelToggle,
         debugLogLevelActive, setDebugLogLevel, createGradient, natsort, setDeviceDebugLogLevel,
-        comma2dot, is_proper_temp)
+        comma2dot, is_proper_temp, weight_units, volume_units, float2float,
+        convertWeight, convertVolume)
 
 from artisanlib.qtsingleapplication import QtSingleApplication
 
@@ -560,6 +562,7 @@ if sys.platform.startswith('linux'):
 #        pass
 app = Artisan(app_args)
 
+
 # On the first run if there are legacy settings under "YourQuest" but no new settings under "artisan-scope" then the legacy settings
 # will be copied to the new settings location. Once settings exist under "artisan-scope" the legacy settings under "YourQuest" will
 # no longer be read or saved.  At start-up, versions of Artisan before to v2.0 will no longer share settings with versions v2.0 and after.
@@ -692,6 +695,7 @@ import plus.register
 import plus.notifications
 import plus.blend
 import plus.stock
+#import plus.schedule
 
 
 
@@ -1088,7 +1092,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                                 ys = float(inaxes.format_ydata(self._last_event.ydata))
                             if ys is not None:
                                 if self.qmc.LCDdecimalplaces:
-                                    ys = self.aw.float2float(ys)
+                                    ys = float2float(ys)
                                 else:
                                     ys = int(round(ys))
                         except Exception: # pylint: disable=broad-except
@@ -1217,15 +1221,12 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 #                subscription_message_box = ArtisanMessageBox(self.aw, QApplication.translate('Message', 'Subscription'), message)
                 subscription_message_box = QMessageBox() # only without super this one shows the native dialog on macOS under Qt 6.6.2
 #                subscription_message_box.setTextFormat(Qt.TextFormat.RichText)
-                basedir = os.path.join(getResourcePath(),'Icons')
-                p = os.path.join(basedir, 'plus-notification.svg')
-                subscription_message_box.setIconPixmap(QPixmap(p))
+                plus.util.setPlusIcon(subscription_message_box)
                 if percent_used_formatted != '':
                     percent_used_formatted = '\n' + percent_used_formatted
                 subscription_message_box.setText(QApplication.translate('Plus','Do you want to extend your subscription?'))
                 subscription_message_box.setInformativeText((QApplication.translate('Plus','Your subscription ends on') if remaining_days>0 else QApplication.translate('Plus','Your subscription ended on')) + f' {QDate(pu.year,pu.month,pu.day).toString(QLocale().dateFormat(QLocale.FormatType.ShortFormat))}\n{days}{percent_used_formatted}')
                 subscription_message_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-#                subscription_message_box.show()
                 res = subscription_message_box.exec()
                 plus_link = plus.config.shop_base_url
                 if self.aw.plus_subscription == 'PRO':
@@ -1379,12 +1380,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     importArtisanURLSignal = pyqtSignal(QUrl)
     comparatorAddProfileURLSignal = pyqtSignal(QUrl)
     comparatorAddProfileSignal = pyqtSignal(str)
+    updateScheduleSignal = pyqtSignal()
+    disconnectPlusSignal = pyqtSignal()
 
     __slots__ = [ 'locale_str', 'app', 'superusermode', 'sample_loop_running', 'time_stopped', 'plus_account', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription',
         'plus_paidUntil', 'plus_rlimit', 'plus_used', 'plus_readonly', 'plus_user_id', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
         'eventaction_running_threads', 'curFile', 'MaxRecentFiles', 'recentFileActs', 'recentSettingActs',
         'recentThemeActs', 'applicationDirectory', 'helpdialog', 'redrawTimer', 'lastLoadedProfile', 'lastLoadedBackground', 'LargeScaleLCDsFlag', 'largeScaleLCDs_dialog',
-        'analysisresultsanno', 'segmentresultsanno', 'largeLCDs_dialog', 'LargeLCDsFlag', 'largeDeltaLCDs_dialog', 'LargeDeltaLCDsFlag', 'largePIDLCDs_dialog',
+        'analysisresultsanno', 'segmentresultsanno', 'schedule_window', 'scheduleFlag', 'largeLCDs_dialog', 'LargeLCDsFlag', 'largeDeltaLCDs_dialog', 'LargeDeltaLCDsFlag', 'largePIDLCDs_dialog',
         'LargePIDLCDsFlag', 'largeExtraLCDs_dialog', 'LargeExtraLCDsFlag', 'largePhasesLCDs_dialog', 'LargePhasesLCDsFlag', 'WebLCDs', 'WebLCDsPort', 'weblcds_server',
         'WebLCDsAlerts', 'EventsDlg_activeTab', 'graphColorDlg_activeTab', 'PID_DlgControl_activeTab', 'CurveDlg_activeTab', 'editGraphDlg_activeTab',
         'backgroundDlg_activeTab', 'DeviceAssignmentDlg_activeTab', 'AlarmDlg_activeTab', 'resetqsettings', 'settingspath', 'wheelpath', 'profilepath',
@@ -1516,6 +1519,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         # analyzer
         self.analysisresultsanno:Optional['Annotation'] = None
         self.segmentresultsanno:Optional['Annotation'] = None
+
+        # Schedule
+#SCHEDULER:
+#        self.schedule_window:Optional[plus.schedule.ScheduleWindow] = None
+        self.scheduleFlag:bool = True
+        self.schedule_day_filter:bool = True
+        self.schedule_user_filter:bool = True
+        self.schedule_machine_filter:bool = True
 
         # large LCDs
         self.largeLCDs_dialog:Optional[LargeMainLCDs] = None
@@ -2489,6 +2500,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.slidersAction.setChecked(False)
             self.viewMenu.addAction(self.slidersAction)
 
+#SCHEDULER:
+#            self.viewMenu.addSeparator()
+#            self.scheduleAction: QAction = QAction(QApplication.translate('Menu', 'Schedule'), self)
+#            self.scheduleAction.triggered.connect(self.schedule)
+#            self.scheduleAction.setCheckable(True)
+#            self.scheduleAction.setChecked(False)
+#            self.viewMenu.addAction(self.scheduleAction)
+
             self.viewMenu.addSeparator()
 
             self.lcdsAction: QAction = QAction(QApplication.translate('Menu', 'Main LCDs'), self)
@@ -2686,7 +2705,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     """ + border_modern + """
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
-                    color: '#147bb3';
+                    color: #147bb3;
                     background-color: white;
                 }
                 QPushButton:!enabled {
@@ -2694,7 +2713,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     background-color: #E0E0E0;
                 }
                 QPushButton:pressed {
-                    color: 116D98;
+                    color: #116D98;
                     background-color: #EEEEEE;
                 }
                 QPushButton:hover:!pressed {
@@ -4008,6 +4027,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.importArtisanURLSignal.connect(self.importArtisanURLSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore
         self.comparatorAddProfileURLSignal.connect(self.comparatorAddProfileURLSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore
         self.comparatorAddProfileSignal.connect(self.comparatorAddProfileSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore
+        self.updateScheduleSignal.connect(self.updateSchedule, type=Qt.ConnectionType.QueuedConnection)  # type: ignore
 
         self.notificationManager:Optional[NotificationManager] = None
         if not self.app.artisanviewerMode:
@@ -4128,6 +4148,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.updatePlusPaidUntil(pu)
         self.updatePlusStatus()
         plus.notifications.updateNotifications(notifications, machines)
+
+
+    @pyqtSlot()
+    def updateSchedule(self) -> None:
+#SCHEDULER:
+        pass
+#        if self.schedule_window is not None:
+#            self.schedule_window.updateScheduleWindow()
 
     @pyqtSlot(str,str,NotificationType)
     def sendNotificationMessage(self, title:str, message:str, notification_type:NotificationType) -> None:
@@ -4951,12 +4979,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             # update blend spec/label/spec_labels and other attributes from current stock
             if self.qmc.plus_blend_spec is not None and 'hr_id' in self.qmc.plus_blend_spec and self.qmc.plus_store is not None:
                 try:
-                    weight_unit_idx = self.qmc. weight_units.index(rr['weightUnit'])
+                    weight_unit_idx = weight_units.index(rr['weightUnit'])
                     blends = plus.stock.getBlends(weight_unit_idx,self.qmc.plus_store)
                     blend = next(b for b in blends if \
                         plus.stock.getBlendId(b) == self.qmc.plus_blend_spec['hr_id'] and
                         plus.stock.getBlendStockDict(b)['location_hr_id'] == self.qmc.plus_store)
-                    w = self.convertWeight(self.qmc.weight[0],weight_unit_idx,self.qmc.weight_units.index('Kg')) # w is weightIn converted to kg
+                    w = convertWeight(self.qmc.weight[0],weight_unit_idx,weight_units.index('Kg')) # w is weightIn converted to kg
                     bd:plus.stock.Blend = plus.stock.getBlendBlendDict(blend,w)
                     self.qmc.plus_blend_label = bd['label']
                     if self.qmc.plus_blend_spec is not None:
@@ -5308,7 +5336,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         # first establish roastersize_setup batchsizes as default batchsize (potentially unit converted)
                         if self.qmc.roastersize_setup > 0:
                             weight_unit = self.qmc.weight[2]
-                            nominal_batch_size = self.convertWeight(self.qmc.roastersize_setup,1,self.qmc.weight_units.index(self.qmc.weight[2]))
+                            nominal_batch_size = convertWeight(self.qmc.roastersize_setup,1,weight_units.index(self.qmc.weight[2]))
                             self.qmc.last_batchsize = nominal_batch_size
                             self.qmc.weight = (nominal_batch_size,0,weight_unit)
                         # size set, ask for heating
@@ -5598,7 +5626,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     c3 = '#000000' if self.app.darkmode else '#ffffff'
                 val = self.colorDifference(c1,c3)
                 if val < self.qmc.colorDifferenceThreshold :
-                    val = self.float2float(val,1)
+                    val = float2float(val,1)
                     if showMsg:
                         self.sendmessage(QApplication.translate('Message','Detected a color pair that may be hard to see: ') + f'{c[0]!s} ({c[1]!s}) <-> {c[2]!s} ({c[3]!s}) [deltaE={val:.1f}]')
 #                    print("checkColors", str(c[0]), "/", str(c[2]), "  Too similar", str(c[1]), str(c[3]), str(val)) #debugprint
@@ -5801,7 +5829,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     + 'color: ' + str(title_color) + ';'
                                     + '}' )
 
-        self.qmc.setProfileTitle(self.qmc.title,updatebackground=True)
+        if self.comparator is None:
+            self.qmc.setProfileTitle(self.qmc.title,updatebackground=True)
 
         self.level1layout.insertWidget(0,self.ntb)
 
@@ -5855,7 +5884,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 self.lastdigitizedtemp[i] = t
                                 lv = self.lastEventValue(i)
                                 # now move corresponding slider and add event if its value is not equal to the previous one
-                                if (self.float2float((v + 10.0) / 10.0)) != lv:
+                                if (float2float((v + 10.0) / 10.0)) != lv:
                                     # we set the last value to be used for relative +- button action as base
                                     self.extraeventsactionslastvalue[i] = int(round(v))
                                     self.establishQuantifiedEventSignal.emit(i,v)
@@ -5866,7 +5895,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         try:
             self.moveslider(event_type, event_value)
             if self.qmc.flagstart:
-                evalue = self.float2float((event_value + 10.0) / 10.0)
+                evalue = float2float((event_value + 10.0) / 10.0)
                 self.qmc.eventRecordActionSignal.emit(event_type, evalue, 'Q'+self.qmc.eventsvalues(evalue), False) # don't call updategraphics!
             if self.qmc.flagon and self.eventquantifieraction[event_type]:
                 self.fireslideractionSignal.emit(event_type)
@@ -6175,33 +6204,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.buttonCONTROL.setVisible(res)
         self.LCD6frame.setVisible(lcds)
         self.LCD7frame.setVisible(lcds)
-
-    # i/o: 0:g, 1:Kg, 2:lb (pound), 3:oz (ounce)
-    @staticmethod
-    def convertWeight(v:float, i:int, o:int) -> float:
-        #                g,            kg,         lb,             oz,
-        convtable = [
-                        [1.,           0.001,      0.00220462262,  0.035274],  # g
-                        [1000,         1.,         2.205,          35.274],    # Kg
-                        [453.591999,   0.45359237, 1.,             16.],       # lb
-                        [28.3495,      0.0283495,  0.0625,         1.]         # oz
-                    ]
-        return v*convtable[i][o]
-
-    # i/o: 0:l (liter), 1:gal (gallons US), 2:qt, 3:pt, 4:cup, 5:cm^3/ml
-    @staticmethod
-    def convertVolume(v:float, i:int, o:int) -> float:
-                        #liter          gal             qt              pt              cup             ml/cm^3
-        convtable = [
-                        [1.,            0.26417205,     1.05668821,     2.11337643,     4.22675284,     1000.                ],    # liter
-                        [3.78541181,    1.,             4.,             8.,             16,             3785.4117884         ],    # gallon
-                        [0.94635294,    0.25,           1.,             2.,             4.,             946.352946           ],    # quart
-                        [0.47317647,    0.125,          0.5,            1.,             2.,             473.176473           ],    # pint
-                        [0.23658823,    0.0625,         0.25,           0.5,            1.,             236.5882365          ],    # cup
-                        [0.001,         2.6417205e-4,   1.05668821e-3,  2.11337641e-3,  4.2267528e-3,   1.                   ]     # cm^3
-                    ]
-        return v*convtable[i][o]
-
 
 
     @pyqtSlot()
@@ -7800,9 +7802,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.block_quantification_sampling_ticks[n] = self.sampling_ticks_to_block_quantifiction
         self.extraeventsactionslastvalue[n] = self.eventslidervalues[n]
         if self.qmc.flagstart:
-#            value = self.float2float((self.eventslidervalues[n] + 10.0) / 10.0)
+#            value = float2float((self.eventslidervalues[n] + 10.0) / 10.0)
             value = self.qmc.eventsExternal2InternalValue(self.eventslidervalues[n])
-            description = str(self.float2float(self.calcSliderSendValue(n),2)).rstrip('0').rstrip('.') + self.eventsliderunits[n]
+            description = str(float2float(self.calcSliderSendValue(n),2)).rstrip('0').rstrip('.') + self.eventsliderunits[n]
             self.qmc.EventRecordAction(extraevent = 1,eventtype=n,eventvalue=value,eventdescription=description)
         self.fireslideraction(n)
 
@@ -10772,6 +10774,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.roastCompareAction.setEnabled(True)
         self.designerAction.setEnabled(True)
         self.simulatorAction.setEnabled(True)
+#SCHEDULER:
+#        self.scheduleAction.setEnabled(True)
         self.wheeleditorAction.setEnabled(True)
         self.transformAction.setEnabled(True)
         self.loadSettingsAction.setEnabled(True)
@@ -10881,6 +10885,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         else:
             self.designerAction.setEnabled(True)
         self.simulatorAction.setEnabled(False)
+#SCHEDULER:
+#        self.scheduleAction.setEnabled(False)
         if not wheel:
             self.wheeleditorAction.setEnabled(False)
         else:
@@ -10924,6 +10930,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.eventsEditorAction.setChecked(False)
             self.eventsEditorAction.setEnabled(False)
             self.simulatorAction.setEnabled(False)
+#SCHEDULER:
+#            self.scheduleAction.setEnabled(False)
         else:
             return
 
@@ -11612,7 +11620,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 devtime = str(devtime_int)
                 m, s = divmod(devtime_int, 60)
                 devtime_long = f'{int(m):02.0f}_{int(s):02.0f}'
-                dtr = f"{self.float2float(100 * (cp['DROP_time'] - cp['FCs_time'])/cp['DROP_time'],1)}"
+                dtr = f"{float2float(100 * (cp['DROP_time'] - cp['FCs_time'])/cp['DROP_time'],1)}"
             else:
                 devtime = '0'
                 devtime_long = '00_00'
@@ -11620,7 +11628,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
             #calculate density loss
             if 'green_density' in cp and 'roasted_density' in cp:
-                density_loss = f"{self.float2float(100 *(cp['green_density'] - cp['roasted_density']) / cp['green_density'],1)}"
+                density_loss = f"{float2float(100 *(cp['green_density'] - cp['roasted_density']) / cp['green_density'],1)}"
             else:
                 density_loss = '0'
 
@@ -11678,16 +11686,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 ('beans_25',beansline[:25]),
                 ('beans_30',beansline[:30]),
                 ('beans',beansline[:30]),   #deprecated, undocumented, remains here for hidden backward compatibility with v2.4RC
-                ('roastedweight',drop_trailing_zero(f'{self.float2float(float(self.qmc.weight[1]),1)}')),
-                ('roastedvolume',drop_trailing_zero(f'{self.float2float(float(self.qmc.volume[1]),1)}')),
-                ('roasteddensity',drop_trailing_zero(f'{self.float2float(float(self.qmc.density_roasted[0]),1)}')),
-                ('roastedmoisture',drop_trailing_zero(f'{self.float2float(float(self.qmc.moisture_roasted))}')),
+                ('roastedweight',drop_trailing_zero(f'{float2float(float(self.qmc.weight[1]),1)}')),
+                ('roastedvolume',drop_trailing_zero(f'{float2float(float(self.qmc.volume[1]),1)}')),
+                ('roasteddensity',drop_trailing_zero(f'{float2float(float(self.qmc.density_roasted[0]),1)}')),
+                ('roastedmoisture',drop_trailing_zero(f'{float2float(float(self.qmc.moisture_roasted))}')),
                 ('colorwhole',f'{self.qmc.whole_color}'),
                 ('colorground',f'{self.qmc.ground_color}'),
                 ('colorsystem',f'{self.qmc.color_systems[self.qmc.color_system_idx]}'),
                 ('screenmax',f'{self.qmc.beansize_max}'),
                 ('screenmin',f'{self.qmc.beansize_min}'),
-                ('greenstemp',drop_trailing_zero(f'{self.float2float(float(self.qmc.greens_temp))}')),
+                ('greenstemp',drop_trailing_zero(f'{float2float(float(self.qmc.greens_temp))}')),
                 ('ambtemp',drop_trailing_zero(f"{cp['ambient_temperature']}") if 'ambient_temperature' in cp else '0'),
                 ('ambhumidity',drop_trailing_zero(f"{cp['ambient_humidity']}") if 'ambient_humidity' in cp else '0'),
                 ('ambpressure',drop_trailing_zero(f"{cp['ambient_pressure']}") if 'ambient_pressure' in cp else '0'),
@@ -11723,10 +11731,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 ('cuppingnotes_25',cuppingnotesline[:25]),
                 ('cuppingnotes_30',cuppingnotesline[:30]),
 #                ("cuppingnotes",cuppingnotesline[:30]),
-                ('roastweight',drop_trailing_zero(f'{self.float2float(float(self.qmc.weight[1]),1)}')),            #deprecated, undocumented
-                ('roastvolume',drop_trailing_zero(f'{self.float2float(float(self.qmc.volume[1]),1)}')),            #deprecated, undocumented
-                ('roastdensity',drop_trailing_zero(f'{self.float2float(float(self.qmc.density_roasted[0]),1)}')),  #deprecated, undocumented
-                ('roastmoisture',drop_trailing_zero(f'{self.float2float(float(self.qmc.moisture_roasted))}')),     #deprecated, undocumented
+                ('roastweight',drop_trailing_zero(f'{float2float(float(self.qmc.weight[1]),1)}')),            #deprecated, undocumented
+                ('roastvolume',drop_trailing_zero(f'{float2float(float(self.qmc.volume[1]),1)}')),            #deprecated, undocumented
+                ('roastdensity',drop_trailing_zero(f'{float2float(float(self.qmc.density_roasted[0]),1)}')),  #deprecated, undocumented
+                ('roastmoisture',drop_trailing_zero(f'{float2float(float(self.qmc.moisture_roasted))}')),     #deprecated, undocumented
                 ('yyyy',self.qmc.roastdate.toString('yyyy')),
                 ('yy',self.qmc.roastdate.toString('yy')),
                 ('mmm',f"{encodeLocal(self.qmc.roastdate.toString('MMM'))}"),
@@ -13029,7 +13037,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             tree = ET.Element('recipe')
 
             charge = ET.SubElement(tree, 'charge')
-            charge.text = str(self.float2float(self.convertWeight(self.qmc.weight[0],self.qmc.weight_units.index(self.qmc.weight[2]),1)))
+            charge.text = str(float2float(convertWeight(self.qmc.weight[0],weight_units.index(self.qmc.weight[2]),1)))
 
             beans = ET.SubElement(tree, 'coffeetype')
             if self.qmc.beans and self.qmc.beans != '':
@@ -14136,12 +14144,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.qmc.extradrawstyles1 = [self.qmc.drawstyle_default if s=='-' else s for s in self.qmc.extradrawstyles1]
         self.qmc.extradrawstyles2 = list(map(str,list(toStringList(settings.value('extradrawstyles2',self.qmc.extradrawstyles2)))))
         self.qmc.extradrawstyles2 = [self.qmc.drawstyle_default if s=='-' else s for s in self.qmc.extradrawstyles2]
-        self.qmc.extralinewidths1 = [max(self.qmc.linewidth_min,self.float2float(toFloat(x))) for x in toList(settings.value('extralinewidths1',self.qmc.extralinewidths1))]
-        self.qmc.extralinewidths2 = [max(self.qmc.linewidth_min,self.float2float(toFloat(x))) for x in toList(settings.value('extralinewidths2',self.qmc.extralinewidths2))]
+        self.qmc.extralinewidths1 = [max(self.qmc.linewidth_min,float2float(toFloat(x))) for x in toList(settings.value('extralinewidths1',self.qmc.extralinewidths1))]
+        self.qmc.extralinewidths2 = [max(self.qmc.linewidth_min,float2float(toFloat(x))) for x in toList(settings.value('extralinewidths2',self.qmc.extralinewidths2))]
         self.qmc.extramarkers1 = list(map(str,list(toStringList(settings.value('extramarkers1',self.qmc.extramarkers1)))))
         self.qmc.extramarkers2 = list(map(str,list(toStringList(settings.value('extramarkers2',self.qmc.extramarkers2)))))
-        self.qmc.extramarkersizes1 = [max(self.qmc.markersize_min,self.float2float(toFloat(x))) for x in toList(settings.value('extramarkersizes1',self.qmc.extramarkersizes1))]
-        self.qmc.extramarkersizes2 = [max(self.qmc.markersize_min,self.float2float(toFloat(x))) for x in toList(settings.value('extramarkersizes2',self.qmc.extramarkersizes2))]
+        self.qmc.extramarkersizes1 = [max(self.qmc.markersize_min,float2float(toFloat(x))) for x in toList(settings.value('extramarkersizes1',self.qmc.extramarkersizes1))]
+        self.qmc.extramarkersizes2 = [max(self.qmc.markersize_min,float2float(toFloat(x))) for x in toList(settings.value('extramarkersizes2',self.qmc.extramarkersizes2))]
 
     def getExtraDeviceCommSettings(self, settings:QSettings) -> None:
         self.extracomport = list(map(str,list(toStringList(settings.value('extracomport',self.extracomport)))))
@@ -14149,7 +14157,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.extrabytesize = [toInt(x) for x in toList(settings.value('extrabytesize',self.extrabytesize))]
         self.extraparity = list(map(str,list(toStringList(settings.value('extraparity',self.extraparity)))))
         self.extrastopbits = [toInt(x) for x in toList(settings.value('extrastopbits',self.extrastopbits))]
-        self.extratimeout = [self.float2float(toFloat(x)) for x in toList(settings.value('extratimeout',self.extratimeout))]
+        self.extratimeout = [float2float(toFloat(x)) for x in toList(settings.value('extratimeout',self.extratimeout))]
         lenextraports = len(self.extracomport)
         self.extraser = [serialport(self) for _ in range(lenextraports)]
         #populate self.extraser
@@ -15036,41 +15044,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             output = 'Metrics not available: exception'
         return output
 
-    @staticmethod
-    def weightVolumeDigits(v:float) -> int:
-        if v >= 1000:
-            return 1
-        if v >= 100:
-            return 2
-        if v >= 10:
-            return 3
-        return 4
-
-    @staticmethod
-    def float2floatWeightVolume(v:float) -> float:
-        d = ApplicationWindow.weightVolumeDigits(v)
-        return ApplicationWindow.float2float(v,d)
-
-
-    # the int n specifies the number of digits
-    @staticmethod
-    def float2floatNone(f:Optional[float], n:int=1) -> Optional[float]:
-        if f is None:
-            return None
-        return ApplicationWindow.float2float(f,n)
-
-    # the int n specifies the number of digits
-    @staticmethod
-    def float2float(f:float, n:int=1) -> float:
-        f = float(f)
-        if n==0:
-            if math.isnan(f):
-                return 0
-            return int(round(f))
-        res:float = float(f'%.{n}f'%f)
-        if math.isnan(res):
-            return 0.0
-        return res
 
     # returns data that is computed by Artisan out of raw profile data using some formulas
     # and displayed to users e.g. as part of the Report to users and stored along profiles to be used by external programs
@@ -15083,8 +15056,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         try:
             if self.qmc.timeindex[0] != -1:
                 start = self.qmc.timex[self.qmc.timeindex[0]]
-                computedProfile['CHARGE_ET'] = self.float2float(self.qmc.temp1[self.qmc.timeindex[0]])
-                computedProfile['CHARGE_BT'] = self.float2float(self.qmc.temp2[self.qmc.timeindex[0]])
+                computedProfile['CHARGE_ET'] = float2float(self.qmc.temp1[self.qmc.timeindex[0]])
+                computedProfile['CHARGE_BT'] = float2float(self.qmc.temp2[self.qmc.timeindex[0]])
             else:
                 start = 0
             ######### TP #########
@@ -15098,47 +15071,47 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 TP_time_idx = None
             if TP_time_idx:
                 computedProfile['TP_idx'] = TP_time_idx
-                computedProfile['TP_time'] = self.float2float(self.qmc.timex[TP_time_idx] - start)
-                computedProfile['TP_ET'] = self.float2float(self.qmc.temp1[TP_time_idx])
-                computedProfile['TP_BT'] = self.float2float(self.qmc.temp2[TP_time_idx])
+                computedProfile['TP_time'] = float2float(self.qmc.timex[TP_time_idx] - start)
+                computedProfile['TP_ET'] = float2float(self.qmc.temp1[TP_time_idx])
+                computedProfile['TP_BT'] = float2float(self.qmc.temp2[TP_time_idx])
                 if self.qmc.timeindex[6]:
                     relevant_ETs = self.qmc.temp1[TP_time_idx:self.qmc.timeindex[6]]
                     if relevant_ETs: # relevant_ETs might be the empty list!
-                        computedProfile['MET'] = self.float2float(max(relevant_ETs))
+                        computedProfile['MET'] = float2float(max(relevant_ETs))
             ######### DRY #########
             if self.qmc.timeindex[1]:
-                computedProfile['DRY_time'] = self.float2float(self.qmc.timex[self.qmc.timeindex[1]] - start)
-                computedProfile['DRY_ET'] = self.float2float(self.qmc.temp1[self.qmc.timeindex[1]])
-                computedProfile['DRY_BT'] = self.float2float(self.qmc.temp2[self.qmc.timeindex[1]])
+                computedProfile['DRY_time'] = float2float(self.qmc.timex[self.qmc.timeindex[1]] - start)
+                computedProfile['DRY_ET'] = float2float(self.qmc.temp1[self.qmc.timeindex[1]])
+                computedProfile['DRY_BT'] = float2float(self.qmc.temp2[self.qmc.timeindex[1]])
                 DRY_time_idx = self.qmc.timeindex[1]
             ######### FC #########
             if self.qmc.timeindex[2]:
-                computedProfile['FCs_time'] = self.float2float(self.qmc.timex[self.qmc.timeindex[2]] - start)
-                computedProfile['FCs_ET'] = self.float2float(self.qmc.temp1[self.qmc.timeindex[2]])
-                computedProfile['FCs_BT'] = self.float2float(self.qmc.temp2[self.qmc.timeindex[2]])
+                computedProfile['FCs_time'] = float2float(self.qmc.timex[self.qmc.timeindex[2]] - start)
+                computedProfile['FCs_ET'] = float2float(self.qmc.temp1[self.qmc.timeindex[2]])
+                computedProfile['FCs_BT'] = float2float(self.qmc.temp2[self.qmc.timeindex[2]])
             if self.qmc.timeindex[3]:
-                computedProfile['FCe_time'] = self.float2float(self.qmc.timex[self.qmc.timeindex[3]] - start)
-                computedProfile['FCe_ET'] = self.float2float(self.qmc.temp1[self.qmc.timeindex[3]])
-                computedProfile['FCe_BT'] = self.float2float(self.qmc.temp2[self.qmc.timeindex[3]])
+                computedProfile['FCe_time'] = float2float(self.qmc.timex[self.qmc.timeindex[3]] - start)
+                computedProfile['FCe_ET'] = float2float(self.qmc.temp1[self.qmc.timeindex[3]])
+                computedProfile['FCe_BT'] = float2float(self.qmc.temp2[self.qmc.timeindex[3]])
             ######### SC #########
             if self.qmc.timeindex[4]:
-                computedProfile['SCs_time'] = self.float2float(self.qmc.timex[self.qmc.timeindex[4]] - start)
-                computedProfile['SCs_ET'] = self.float2float(self.qmc.temp1[self.qmc.timeindex[4]])
-                computedProfile['SCs_BT'] = self.float2float(self.qmc.temp2[self.qmc.timeindex[4]])
+                computedProfile['SCs_time'] = float2float(self.qmc.timex[self.qmc.timeindex[4]] - start)
+                computedProfile['SCs_ET'] = float2float(self.qmc.temp1[self.qmc.timeindex[4]])
+                computedProfile['SCs_BT'] = float2float(self.qmc.temp2[self.qmc.timeindex[4]])
             if self.qmc.timeindex[5]:
-                computedProfile['SCe_time'] = self.float2float(self.qmc.timex[self.qmc.timeindex[5]] - start)
-                computedProfile['SCe_ET'] = self.float2float(self.qmc.temp1[self.qmc.timeindex[5]])
-                computedProfile['SCe_BT'] = self.float2float(self.qmc.temp2[self.qmc.timeindex[5]])
+                computedProfile['SCe_time'] = float2float(self.qmc.timex[self.qmc.timeindex[5]] - start)
+                computedProfile['SCe_ET'] = float2float(self.qmc.temp1[self.qmc.timeindex[5]])
+                computedProfile['SCe_BT'] = float2float(self.qmc.temp2[self.qmc.timeindex[5]])
             ######### DROP #########
             if self.qmc.timeindex[6]:
-                computedProfile['DROP_time'] = self.float2float(self.qmc.timex[self.qmc.timeindex[6]] - start)
-                computedProfile['DROP_ET'] = self.float2float(self.qmc.temp1[self.qmc.timeindex[6]])
-                computedProfile['DROP_BT'] = self.float2float(self.qmc.temp2[self.qmc.timeindex[6]])
+                computedProfile['DROP_time'] = float2float(self.qmc.timex[self.qmc.timeindex[6]] - start)
+                computedProfile['DROP_ET'] = float2float(self.qmc.temp1[self.qmc.timeindex[6]])
+                computedProfile['DROP_BT'] = float2float(self.qmc.temp2[self.qmc.timeindex[6]])
             ######### COOL #########
             if self.qmc.timeindex[7]:
-                computedProfile['COOL_time'] = self.float2float(self.qmc.timex[self.qmc.timeindex[7]] - start)
-                computedProfile['COOL_ET'] = self.float2float(self.qmc.temp1[self.qmc.timeindex[7]])
-                computedProfile['COOL_BT'] = self.float2float(self.qmc.temp2[self.qmc.timeindex[7]])
+                computedProfile['COOL_time'] = float2float(self.qmc.timex[self.qmc.timeindex[7]] - start)
+                computedProfile['COOL_ET'] = float2float(self.qmc.temp1[self.qmc.timeindex[7]])
+                computedProfile['COOL_BT'] = float2float(self.qmc.temp2[self.qmc.timeindex[7]])
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
@@ -15148,15 +15121,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             # we calculate the statistics here as the profile might not have yet been rendered and thus the statistics are not yet computed
             _,statisticstimes = self.qmc.calcStatistics(TP_index)
             if statisticstimes[0]:
-                computedProfile['totaltime'] = self.float2float(statisticstimes[0],3)
+                computedProfile['totaltime'] = float2float(statisticstimes[0],3)
             if statisticstimes[1]:
-                computedProfile['dryphasetime'] = self.float2float(statisticstimes[1],3)
+                computedProfile['dryphasetime'] = float2float(statisticstimes[1],3)
             if statisticstimes[2]:
-                computedProfile['midphasetime'] = self.float2float(statisticstimes[2],3)
+                computedProfile['midphasetime'] = float2float(statisticstimes[2],3)
             if statisticstimes[3]:
-                computedProfile['finishphasetime'] = self.float2float(statisticstimes[3],3)
+                computedProfile['finishphasetime'] = float2float(statisticstimes[3],3)
             if statisticstimes[4]:
-                computedProfile['coolphasetime'] = self.float2float(statisticstimes[4],3)
+                computedProfile['coolphasetime'] = float2float(statisticstimes[4],3)
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
@@ -15165,22 +15138,22 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         try:
             if TP_time_idx and DRY_time_idx:
                 ror = self.RoR(TP_time_idx,DRY_time_idx)
-                computedProfile['dry_phase_ror'] = self.float2float(ror[0])
-                computedProfile['mid_phase_ror'] = self.float2float(ror[1])
-                computedProfile['finish_phase_ror'] = self.float2float(ror[2])
+                computedProfile['dry_phase_ror'] = float2float(ror[0])
+                computedProfile['mid_phase_ror'] = float2float(ror[1])
+                computedProfile['finish_phase_ror'] = float2float(ror[2])
                 if 'TP_BT' in computedProfile and 'TP_time' in computedProfile and 'DROP_BT' in computedProfile and 'DROP_time' in computedProfile and \
                     (computedProfile['DROP_time']-computedProfile['TP_time']) != 0:
-                    computedProfile['total_ror'] = self.float2float(((computedProfile['DROP_BT']-computedProfile['TP_BT'])/(computedProfile['DROP_time']-computedProfile['TP_time']))*60.)
+                    computedProfile['total_ror'] = float2float(((computedProfile['DROP_BT']-computedProfile['TP_BT'])/(computedProfile['DROP_time']-computedProfile['TP_time']))*60.)
                 if self.qmc.timeindex[2] > 0 and self.qmc.delta2:
                     fcs_ror = self.qmc.delta2[self.qmc.timeindex[2]]
                     if fcs_ror is not None:
-                        computedProfile['fcs_ror'] = self.float2float(fcs_ror)
+                        computedProfile['fcs_ror'] = float2float(fcs_ror)
                 if ror[3] != -1:
-                    computedProfile['dry_phase_delta_temp'] = self.float2float(ror[3])
+                    computedProfile['dry_phase_delta_temp'] = float2float(ror[3])
                 if ror[4] != -1:
-                    computedProfile['mid_phase_delta_temp'] = self.float2float(ror[4])
+                    computedProfile['mid_phase_delta_temp'] = float2float(ror[4])
                 if ror[5] != -1:
-                    computedProfile['finish_phase_delta_temp'] = self.float2float(ror[5])
+                    computedProfile['finish_phase_delta_temp'] = float2float(ror[5])
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
@@ -15198,7 +15171,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             _,_,tsb,_ = self.ts()
             computedProfile['AUC'] = int(round(tsb,0))
             computedProfile['AUCbegin'] = ''
-            computedProfile['AUCbase'] = self.float2float(self.qmc.AUCbase,0)
+            computedProfile['AUCbase'] = float2float(self.qmc.AUCbase,0)
             computedProfile['AUCfromeventflag'] = int(self.qmc.AUCbaseFlag)
             if self.qmc.AUCbegin == 0:
                 computedProfile['AUCbegin'] = 'CHARGE'
@@ -15242,42 +15215,42 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             weight_loss = self.weight_loss(weightin,weightout)
             volume_gain = self.volume_increase(volumein,volumeout)
             if weight_loss:
-                computedProfile['weight_loss'] = self.float2float(weight_loss)
+                computedProfile['weight_loss'] = float2float(weight_loss)
             if volume_gain:
-                computedProfile['volume_gain'] = self.float2float(volume_gain)
+                computedProfile['volume_gain'] = float2float(volume_gain)
             if self.qmc.moisture_greens and self.qmc.moisture_roasted:
                 moisture_loss = self.qmc.moisture_greens - self.qmc.moisture_roasted
-                computedProfile['moisture_loss'] = self.float2float(moisture_loss)
+                computedProfile['moisture_loss'] = float2float(moisture_loss)
                 if weight_loss:
-                    computedProfile['organic_loss'] = self.float2float(weight_loss - moisture_loss)
+                    computedProfile['organic_loss'] = float2float(weight_loss - moisture_loss)
             din = dout = 0.
             # standardize unit of volume and weight to l and g
             if volumein != 0.0:
-                volumein = self.float2float(self.convertVolume(volumein,self.qmc.volume_units.index(self.qmc.volume[2]),0),4) # in l
+                volumein = float2float(convertVolume(volumein,volume_units.index(self.qmc.volume[2]),0),4) # in l
             if volumeout != 0.0:
-                volumeout = self.float2float(self.convertVolume(volumeout,self.qmc.volume_units.index(self.qmc.volume[2]),0),4) # in l
+                volumeout = float2float(convertVolume(volumeout,volume_units.index(self.qmc.volume[2]),0),4) # in l
             # store volume in l
             computedProfile['volumein'] = volumein
             computedProfile['volumeout'] = volumeout
             # store weight in kg
             if weightin != 0.0:
-                weightin = self.float2float(self.convertWeight(weightin,self.qmc.weight_units.index(self.qmc.weight[2]),0),1) # in g
+                weightin = float2float(convertWeight(weightin,weight_units.index(self.qmc.weight[2]),0),1) # in g
             if weightout != 0.0:
-                weightout = self.float2float(self.convertWeight(weightout,self.qmc.weight_units.index(self.qmc.weight[2]),0),1) # in g
+                weightout = float2float(convertWeight(weightout,weight_units.index(self.qmc.weight[2]),0),1) # in g
             computedProfile['weightin'] = weightin
             computedProfile['weightout'] = weightout
             if volumein != 0.0 and volumeout != 0.0 and weightin != 0.0 and weightout != 0.0:
                 din = weightin / volumein
                 dout = weightout / volumeout
             if din > 0.:
-                computedProfile['green_density'] = self.float2float(din,1)
+                computedProfile['green_density'] = float2float(din,1)
             if dout > 0.:
-                computedProfile['roasted_density'] = self.float2float(dout,1)
+                computedProfile['roasted_density'] = float2float(dout,1)
 
             if (self.qmc.density[0] != 0.0 and self.qmc.density[2] != 0.0):
                 setdensity = self.qmc.density[0] /  self.qmc.density[2]
-                setdensity = self.convertWeight(self.qmc.density[0],self.qmc.weight_units.index(self.qmc.density[1]),0) / self.convertVolume(self.qmc.density[2],self.qmc.volume_units.index(self.qmc.density[3]),0)
-                computedProfile['set_density'] = self.float2float(setdensity,1)
+                setdensity = convertWeight(self.qmc.density[0],weight_units.index(self.qmc.density[1]),0) / convertVolume(self.qmc.density[2],volume_units.index(self.qmc.density[3]),0)
+                computedProfile['set_density'] = float2float(setdensity,1)
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
@@ -15285,15 +15258,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         ######### Humidity / Pressure #########
         try:
             if self.qmc.moisture_greens != 0.0 and not math.isnan(self.qmc.moisture_greens):
-                computedProfile['moisture_greens'] = self.float2float(self.qmc.moisture_greens)
+                computedProfile['moisture_greens'] = float2float(self.qmc.moisture_greens)
             if self.qmc.moisture_roasted != 0.0 and not math.isnan(self.qmc.moisture_roasted):
-                computedProfile['moisture_roasted'] = self.float2float(self.qmc.moisture_roasted)
+                computedProfile['moisture_roasted'] = float2float(self.qmc.moisture_roasted)
             if self.qmc.ambient_humidity != 0.0 and not math.isnan(self.qmc.ambient_humidity):
-                computedProfile['ambient_humidity'] = self.float2float(self.qmc.ambient_humidity)
+                computedProfile['ambient_humidity'] = float2float(self.qmc.ambient_humidity)
             if self.qmc.ambient_pressure != 0.0 and not math.isnan(self.qmc.ambient_pressure):
-                computedProfile['ambient_pressure'] = self.float2float(self.qmc.ambient_pressure)
+                computedProfile['ambient_pressure'] = float2float(self.qmc.ambient_pressure)
             if self.qmc.ambientTemp != 0.0 and not math.isnan(self.qmc.ambientTemp):
-                computedProfile['ambient_temperature'] = self.float2float(self.qmc.ambientTemp)
+                computedProfile['ambient_temperature'] = float2float(self.qmc.ambientTemp)
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
@@ -15311,43 +15284,43 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         try:
             energymetrics,_ = self.qmc.calcEnergyuse()
             if 'BTU_preheat' in energymetrics:
-                computedProfile['BTU_preheat'] = self.float2float(energymetrics['BTU_preheat'],1)
+                computedProfile['BTU_preheat'] = float2float(energymetrics['BTU_preheat'],1)
             if 'CO2_preheat' in energymetrics:
-                computedProfile['CO2_preheat'] = self.float2float(energymetrics['CO2_preheat'],1)
+                computedProfile['CO2_preheat'] = float2float(energymetrics['CO2_preheat'],1)
             if 'BTU_bbp' in energymetrics:
-                computedProfile['BTU_bbp'] = self.float2float(energymetrics['BTU_bbp'],1)
+                computedProfile['BTU_bbp'] = float2float(energymetrics['BTU_bbp'],1)
             if 'CO2_bbp' in energymetrics:
-                computedProfile['CO2_bbp'] = self.float2float(energymetrics['CO2_bbp'],1)
+                computedProfile['CO2_bbp'] = float2float(energymetrics['CO2_bbp'],1)
             if 'BTU_cooling' in energymetrics:
-                computedProfile['BTU_cooling'] = self.float2float(energymetrics['BTU_cooling'],1)
+                computedProfile['BTU_cooling'] = float2float(energymetrics['BTU_cooling'],1)
             if 'CO2_cooling' in energymetrics:
-                computedProfile['CO2_cooling'] = self.float2float(energymetrics['CO2_cooling'],1)
+                computedProfile['CO2_cooling'] = float2float(energymetrics['CO2_cooling'],1)
             if 'BTU_LPG' in energymetrics:
-                computedProfile['BTU_LPG'] = self.float2float(energymetrics['BTU_LPG'],1)
+                computedProfile['BTU_LPG'] = float2float(energymetrics['BTU_LPG'],1)
             if 'BTU_NG' in energymetrics:
-                computedProfile['BTU_NG'] = self.float2float(energymetrics['BTU_NG'],1)
+                computedProfile['BTU_NG'] = float2float(energymetrics['BTU_NG'],1)
             if 'BTU_ELEC' in energymetrics:
-                computedProfile['BTU_ELEC'] = self.float2float(energymetrics['BTU_ELEC'],1)
+                computedProfile['BTU_ELEC'] = float2float(energymetrics['BTU_ELEC'],1)
             if 'BTU_batch' in energymetrics:
-                computedProfile['BTU_batch'] = self.float2float(energymetrics['BTU_batch'],1)
+                computedProfile['BTU_batch'] = float2float(energymetrics['BTU_batch'],1)
             if 'BTU_batch_per_green_kg' in energymetrics:
-                computedProfile['BTU_batch_per_green_kg'] = self.float2float(energymetrics['BTU_batch_per_green_kg'],1)
+                computedProfile['BTU_batch_per_green_kg'] = float2float(energymetrics['BTU_batch_per_green_kg'],1)
             if 'BTU_roast' in energymetrics:
-                computedProfile['BTU_roast'] = self.float2float(energymetrics['BTU_roast'],1)
+                computedProfile['BTU_roast'] = float2float(energymetrics['BTU_roast'],1)
             if 'BTU_roast_per_green_kg' in energymetrics:
-                computedProfile['BTU_roast_per_green_kg'] = self.float2float(energymetrics['BTU_roast_per_green_kg'],1)
+                computedProfile['BTU_roast_per_green_kg'] = float2float(energymetrics['BTU_roast_per_green_kg'],1)
             if 'CO2_batch' in energymetrics:
-                computedProfile['CO2_batch'] = self.float2float(energymetrics['CO2_batch'],1)
+                computedProfile['CO2_batch'] = float2float(energymetrics['CO2_batch'],1)
             if 'CO2_batch_per_green_kg' in energymetrics:
-                computedProfile['CO2_batch_per_green_kg'] = self.float2float(energymetrics['CO2_batch_per_green_kg'],1)
+                computedProfile['CO2_batch_per_green_kg'] = float2float(energymetrics['CO2_batch_per_green_kg'],1)
             if 'CO2_roast' in energymetrics:
-                computedProfile['CO2_roast'] = self.float2float(energymetrics['CO2_roast'],1)
+                computedProfile['CO2_roast'] = float2float(energymetrics['CO2_roast'],1)
             if 'CO2_roast_per_green_kg' in energymetrics:
-                computedProfile['CO2_roast_per_green_kg'] = self.float2float(energymetrics['CO2_roast_per_green_kg'],1)
+                computedProfile['CO2_roast_per_green_kg'] = float2float(energymetrics['CO2_roast_per_green_kg'],1)
             if 'KWH_batch_per_green_kg' in energymetrics:
-                computedProfile['KWH_batch_per_green_kg'] = self.float2float(energymetrics['KWH_batch_per_green_kg'],1)
+                computedProfile['KWH_batch_per_green_kg'] = float2float(energymetrics['KWH_batch_per_green_kg'],1)
             if 'KWH_roast_per_green_kg' in energymetrics:
-                computedProfile['KWH_roast_per_green_kg'] = self.float2float(energymetrics['KWH_roast_per_green_kg'],1)
+                computedProfile['KWH_roast_per_green_kg'] = float2float(energymetrics['KWH_roast_per_green_kg'],1)
 
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
@@ -15462,9 +15435,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             profile['etypes'] = [encodeLocalStrict(et) for et in self.qmc.etypes[:]]
             profile['roastingnotes'] = encodeLocalStrict(self.qmc.roastingnotes)
             profile['cuppingnotes'] = encodeLocalStrict(self.qmc.cuppingnotes)
-            profile['timex'] = [self.float2float(x,10) for x in self.qmc.timex]
-            profile['temp1'] = [self.float2float(x,8) for x in self.qmc.temp1]
-            profile['temp2'] = [self.float2float(x,8) for x in self.qmc.temp2]
+            profile['timex'] = [float2float(x,10) for x in self.qmc.timex]
+            profile['temp1'] = [float2float(x,8) for x in self.qmc.temp1]
+            profile['temp2'] = [float2float(x,8) for x in self.qmc.temp2]
             profile['phases'] = self.qmc.phases
             profile['zmax'] = int(self.qmc.zlimit)
             profile['zmin'] = int(self.qmc.zlimit_min)
@@ -15481,9 +15454,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             profile['extradevices'] = self.qmc.extradevices
             profile['extraname1'] = [encodeLocalStrict(n, 'Extra 1') for n in self.qmc.extraname1]
             profile['extraname2'] = [encodeLocalStrict(n, 'Extra 2') for n in self.qmc.extraname2]
-            profile['extratimex'] = [[self.float2float(t,10) for t in x] for x in self.qmc.extratimex]
-            profile['extratemp1'] = [[self.float2float(t,8) for t in x] for x in self.qmc.extratemp1]
-            profile['extratemp2'] = [[self.float2float(t,8) for t in x] for x in self.qmc.extratemp2]
+            profile['extratimex'] = [[float2float(t,10) for t in x] for x in self.qmc.extratimex]
+            profile['extratemp1'] = [[float2float(t,8) for t in x] for x in self.qmc.extratemp1]
+            profile['extratemp2'] = [[float2float(t,8) for t in x] for x in self.qmc.extratemp2]
             profile['extramathexpression1'] = [encodeLocalStrict(x) for x in self.qmc.extramathexpression1]
             profile['extramathexpression2'] = [encodeLocalStrict(x) for x in self.qmc.extramathexpression2]
             profile['extradevicecolor1'] = [encodeLocalStrict(x, '#000000') for x in self.qmc.extradevicecolor1]
@@ -16143,7 +16116,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     @staticmethod
     def clearWindowGeometry(settings:QSettings) -> None:
         for s in ['Geometry', 'BlendGeometry','RoastGeometry','FlavorProperties','CalculatorGeometry','EventsGeometry', 'CompareGeometry',
-                'BackgroundGeometry','LCDGeometry','DeltaLCDGeometry','ExtraLCDGeometry','PhasesLCDGeometry','AlarmsGeometry',
+                'BackgroundGeometry','ScheduleGeometry','LCDGeometry','DeltaLCDGeometry','ExtraLCDGeometry','PhasesLCDGeometry','AlarmsGeometry',
                 'DeviceAssignmentGeometry','PortsGeometry','TransformatorPosition', 'CurvesPosition', 'StatisticsPosition',
                 'AxisPosition','PhasesPosition', 'BatchPosition', 'SamplingPosition', 'autosaveGeometry', 'PIDPosition',
                 'DesignerPosition','PIDLCDGeometry','ScaleLCDGeometry', 'MainSplitter']:
@@ -16297,25 +16270,25 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             # Phidget configurations
             self.qmc.phidget1048_types = [toInt(x) for x in toList(settings.value('phidget1048_types',self.qmc.phidget1048_types))]
             self.qmc.phidget1048_async = [bool(toBool(x)) for x in toList(settings.value('phidget1048_async',self.qmc.phidget1048_async))]
-            self.qmc.phidget1048_changeTriggers = [self.float2float(toFloat(x)) for x in toList(settings.value('phidget1048_changeTriggers',self.qmc.phidget1048_changeTriggers))]
+            self.qmc.phidget1048_changeTriggers = [float2float(toFloat(x)) for x in toList(settings.value('phidget1048_changeTriggers',self.qmc.phidget1048_changeTriggers))]
             self.qmc.phidget1048_dataRate = toInt(settings.value('phidget1048_dataRate',self.qmc.phidget1048_dataRate))
             self.qmc.phidget1046_gain = [toInt(x) for x in toList(settings.value('phidget1046_gain',self.qmc.phidget1046_gain))]
             self.qmc.phidget1046_formula = [toInt(x) for x in toList(settings.value('phidget1046_formula',self.qmc.phidget1046_formula))]
             self.qmc.phidget1046_async = [bool(toBool(x)) for x in toList(settings.value('phidget1046_async',self.qmc.phidget1046_async))]
             self.qmc.phidget1046_dataRate = toInt(settings.value('phidget1046_dataRate',self.qmc.phidget1046_dataRate))
             self.qmc.phidget1045_async = bool(toBool(settings.value('phidget1045_async',self.qmc.phidget1045_async)))
-            self.qmc.phidget1045_changeTrigger = self.float2float(toFloat(settings.value('phidget1045_changeTrigger',self.qmc.phidget1045_changeTrigger)))
+            self.qmc.phidget1045_changeTrigger = float2float(toFloat(settings.value('phidget1045_changeTrigger',self.qmc.phidget1045_changeTrigger)))
             self.qmc.phidget1045_emissivity = toFloat(settings.value('phidget1045_emissivity',self.qmc.phidget1045_emissivity))
             self.qmc.phidget1045_dataRate = toInt(settings.value('phidget1045_dataRate',self.qmc.phidget1045_dataRate))
             self.qmc.phidget1200_formula = toInt(settings.value('phidget1200_formula',self.qmc.phidget1200_formula))
             self.qmc.phidget1200_wire = toInt(settings.value('phidget1200_wire',self.qmc.phidget1200_wire))
             self.qmc.phidget1200_async = bool(toBool(settings.value('phidget1200_async',self.qmc.phidget1200_async)))
-            self.qmc.phidget1200_changeTrigger = self.float2float(toFloat(settings.value('phidget1200_changeTrigger',self.qmc.phidget1200_changeTrigger)))
+            self.qmc.phidget1200_changeTrigger = float2float(toFloat(settings.value('phidget1200_changeTrigger',self.qmc.phidget1200_changeTrigger)))
             self.qmc.phidget1200_dataRate = toInt(settings.value('phidget1200_dataRate',self.qmc.phidget1200_dataRate))
             self.qmc.phidget1200_2_formula = toInt(settings.value('phidget1200_2_formula',self.qmc.phidget1200_2_formula))
             self.qmc.phidget1200_2_wire = toInt(settings.value('phidget1200_2_wire',self.qmc.phidget1200_2_wire))
             self.qmc.phidget1200_2_async = bool(toBool(settings.value('phidget1200_2_async',self.qmc.phidget1200_2_async)))
-            self.qmc.phidget1200_2_changeTrigger = self.float2float(toFloat(settings.value('phidget1200_2_changeTrigger',self.qmc.phidget1200_2_changeTrigger)))
+            self.qmc.phidget1200_2_changeTrigger = float2float(toFloat(settings.value('phidget1200_2_changeTrigger',self.qmc.phidget1200_2_changeTrigger)))
             self.qmc.phidget1200_2_dataRate = toInt(settings.value('phidget1200_2_dataRate',self.qmc.phidget1200_2_dataRate))
             self.qmc.phidgetDAQ1400_powerSupply = toInt(settings.value('phidgetDAQ1400_powerSupply',self.qmc.phidgetDAQ1400_powerSupply))
             self.qmc.phidgetDAQ1400_inputMode = toInt(settings.value('phidgetDAQ1400_inputMode',self.qmc.phidgetDAQ1400_inputMode))
@@ -16465,7 +16438,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.curvefitstartchoice = toInt(settings.value('curvefitstartchoice',int(self.qmc.curvefitstartchoice)))
             self.qmc.curvefitoffset = toInt(settings.value('curvefitoffset',int(self.qmc.curvefitoffset)))
             self.qmc.segmentsamplesthreshold = toInt(settings.value('segmentsamplesthreshold',int(self.qmc.segmentsamplesthreshold)))
-            self.qmc.segmentdeltathreshold = self.float2float(toFloat(settings.value('segmentdeltathreshold',self.qmc.segmentdeltathreshold)),4)
+            self.qmc.segmentdeltathreshold = float2float(toFloat(settings.value('segmentdeltathreshold',self.qmc.segmentdeltathreshold)),4)
             if settings.contains('projectFlag'): # deprecated flag controlling both projections
                 self.qmc.ETprojectFlag = self.qmc.BTprojectFlag = bool(toBool(settings.value('projectFlag')))
             self.qmc.ETprojectFlag = bool(toBool(settings.value('ETprojectFlag',self.qmc.ETprojectFlag)))
@@ -16512,7 +16485,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.backgroundbtcolor = s2a(toString(settings.value('BTBColor',self.qmc.backgroundbtcolor)))
             self.qmc.backgrounddeltaetcolor = s2a(toString(settings.value('ETBdeltaColor',self.qmc.backgrounddeltaetcolor)))
             self.qmc.backgrounddeltabtcolor = s2a(toString(settings.value('BTBdeltaColor',self.qmc.backgrounddeltabtcolor)))
-            self.qmc.backgroundalpha = min(0.5,self.float2float(toFloat(settings.value('BackgroundAlpha',self.qmc.backgroundalpha))))
+            self.qmc.backgroundalpha = min(0.5,float2float(toFloat(settings.value('BackgroundAlpha',self.qmc.backgroundalpha))))
             if settings.contains('LCDColors'):
                 for (k, v) in list(settings.value('LCDColors').items()):
                     self.lcdpaletteB[str(k)] = s2a(toString(v))
@@ -16555,7 +16528,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 # density units are now fixed to g/l
 #                self.qmc.density[1] = s2a(toString(settings.value("densityweight",self.qmc.density[1])))
 #                self.qmc.density[3] = s2a(toString(settings.value("densityvolume",self.qmc.density[3])))
-            self.qmc.volumeCalcUnit = self.float2float(toFloat(settings.value('volumeCalcUnit',self.qmc.volumeCalcUnit)))
+            self.qmc.volumeCalcUnit = float2float(toFloat(settings.value('volumeCalcUnit',self.qmc.volumeCalcUnit)))
             settings.endGroup()
 #--- END GROUP Units
 
@@ -16575,13 +16548,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.ser.bytesize = toInt(settings.value('bytesize',self.ser.bytesize))
             self.ser.stopbits = toInt(settings.value('stopbits',self.ser.stopbits))
             self.ser.parity = s2a(toString(settings.value('parity',self.ser.parity)))
-            self.ser.timeout = self.float2float(toFloat(settings.value('timeout',self.ser.timeout)))
+            self.ser.timeout = float2float(toFloat(settings.value('timeout',self.ser.timeout)))
             settings.endGroup()
 #--- END GROUP SerialPort
 
 #--- BEGIN GROUP WebSocket
             #restorer WebSocket port
             settings.beginGroup('WebSocket')
+            self.ws.compression = bool(toBool(settings.value('compression',self.ws.compression)))
             self.ws.host = toString(settings.value('host',self.ws.host))
             self.ws.port = toInt(settings.value('port',self.ws.port))
             self.ws.path = toString(settings.value('path',self.ws.path))
@@ -16658,10 +16632,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.modbus.bytesize = toInt(settings.value('bytesize',self.modbus.bytesize))
             self.modbus.stopbits = toInt(settings.value('stopbits',self.modbus.stopbits))
             self.modbus.parity = s2a(toString(settings.value('parity',self.modbus.parity)))
-            self.modbus.timeout = max(0.3, self.float2float(toFloat(settings.value('timeout',self.modbus.timeout)))) # min serial MODBUS timeout is 300ms
+            self.modbus.timeout = max(0.3, float2float(toFloat(settings.value('timeout',self.modbus.timeout)))) # min serial MODBUS timeout is 300ms
             self.modbus.modbus_serial_extra_read_delay = toFloat(settings.value('modbus_serial_extra_read_delay',self.modbus.modbus_serial_extra_read_delay))
             self.modbus.serial_readRetries = toInt(settings.value('serial_readRetries',self.modbus.serial_readRetries))
-            self.modbus.IP_timeout = self.float2float(toFloat(settings.value('IP_timeout',self.modbus.IP_timeout)))
+            self.modbus.IP_timeout = float2float(toFloat(settings.value('IP_timeout',self.modbus.IP_timeout)))
             self.modbus.IP_retries = toInt(settings.value('IP_retries',self.modbus.IP_retries))
             for i in range(self.modbus.channels):
                 self.modbus.inputSlaves[i] = toInt(settings.value(f'input{i+1}slave',self.modbus.inputSlaves[i]))
@@ -16704,7 +16678,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.scale.bytesize = toInt(settings.value('bytesize',self.scale.bytesize))
             self.scale.stopbits = toInt(settings.value('stopbits',self.scale.stopbits))
             self.scale.parity = s2a(toString(settings.value('parity',self.scale.parity)))
-            self.scale.timeout = self.float2float(toFloat(settings.value('timeout',self.scale.timeout)))
+            self.scale.timeout = float2float(toFloat(settings.value('timeout',self.scale.timeout)))
             settings.endGroup()
 #--- END GROUP Scale
 
@@ -16717,7 +16691,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.color.bytesize = toInt(settings.value('bytesize',self.color.bytesize))
             self.color.stopbits = toInt(settings.value('stopbits',self.color.stopbits))
             self.color.parity = s2a(toString(settings.value('parity',self.color.parity)))
-            self.color.timeout = self.float2float(toFloat(settings.value('timeout',self.color.timeout)))
+            self.color.timeout = float2float(toFloat(settings.value('timeout',self.color.timeout)))
             settings.endGroup()
 #--- END GROUP Color
 
@@ -17154,69 +17128,69 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.BTdrawstyle = s2a(toString(settings.value('BTdrawstyle',self.qmc.BTdrawstyle)))
             if self.qmc.BTdrawstyle == '-':
                 self.qmc.BTdrawstyle = self.qmc.drawstyle_default
-            self.qmc.BTlinewidth = max(0.1,self.float2float(toFloat(settings.value('BTlinewidth',self.qmc.BTlinewidth))))
+            self.qmc.BTlinewidth = max(0.1,float2float(toFloat(settings.value('BTlinewidth',self.qmc.BTlinewidth))))
             self.qmc.BTmarker = s2a(toString(settings.value('BTmarker',self.qmc.BTmarker)))
-            self.qmc.BTmarkersize = max(0.1,self.float2float(toFloat(settings.value('BTmarkersize',self.qmc.BTmarkersize))))
+            self.qmc.BTmarkersize = max(0.1,float2float(toFloat(settings.value('BTmarkersize',self.qmc.BTmarkersize))))
             self.qmc.ETlinestyle = s2a(toString(settings.value('ETlinestyle',self.qmc.ETlinestyle)))
             self.qmc.ETdrawstyle = s2a(toString(settings.value('ETdrawstyle',self.qmc.ETdrawstyle)))
             if self.qmc.ETdrawstyle == '-':
                 self.qmc.ETdrawstyle = self.qmc.drawstyle_default
-            self.qmc.ETlinewidth = max(0.1,self.float2float(toFloat(settings.value('ETlinewidth',self.qmc.ETlinewidth))))
+            self.qmc.ETlinewidth = max(0.1,float2float(toFloat(settings.value('ETlinewidth',self.qmc.ETlinewidth))))
             self.qmc.ETmarker = s2a(toString(settings.value('ETmarker',self.qmc.ETmarker)))
-            self.qmc.ETmarkersize = max(0.1,self.float2float(toFloat(settings.value('ETmarkersize',self.qmc.ETmarkersize))))
+            self.qmc.ETmarkersize = max(0.1,float2float(toFloat(settings.value('ETmarkersize',self.qmc.ETmarkersize))))
             self.qmc.BTdeltalinestyle = s2a(toString(settings.value('BTdeltalinestyle',self.qmc.BTdeltalinestyle)))
             self.qmc.BTdeltadrawstyle = s2a(toString(settings.value('BTdeltadrawstyle',self.qmc.BTdeltadrawstyle)))
             if self.qmc.BTdeltadrawstyle == '-':
                 self.qmc.BTdeltadrawstyle = self.qmc.drawstyle_default
-            self.qmc.BTdeltalinewidth = max(0.1,self.float2float(toFloat(settings.value('BTdeltalinewidth',self.qmc.BTdeltalinewidth))))
+            self.qmc.BTdeltalinewidth = max(0.1,float2float(toFloat(settings.value('BTdeltalinewidth',self.qmc.BTdeltalinewidth))))
             self.qmc.BTdeltamarker = s2a(toString(settings.value('BTdeltamarker',self.qmc.BTdeltamarker)))
-            self.qmc.BTdeltamarkersize = max(0.1,self.float2float(toFloat(settings.value('BTdeltamarkersize',self.qmc.BTdeltamarkersize))))
+            self.qmc.BTdeltamarkersize = max(0.1,float2float(toFloat(settings.value('BTdeltamarkersize',self.qmc.BTdeltamarkersize))))
             self.qmc.ETdeltalinestyle = s2a(toString(settings.value('ETdeltalinestyle',self.qmc.ETdeltalinestyle)))
             self.qmc.ETdeltadrawstyle = s2a(toString(settings.value('ETdeltadrawstyle',self.qmc.ETdeltadrawstyle)))
             if self.qmc.ETdeltadrawstyle == '-':
                 self.qmc.ETdeltadrawstyle = self.qmc.drawstyle_default
-            self.qmc.ETdeltalinewidth = max(0.1,self.float2float(toFloat(settings.value('ETdeltalinewidth',self.qmc.ETdeltalinewidth))))
+            self.qmc.ETdeltalinewidth = max(0.1,float2float(toFloat(settings.value('ETdeltalinewidth',self.qmc.ETdeltalinewidth))))
             self.qmc.ETdeltamarker = s2a(toString(settings.value('ETdeltamarker',self.qmc.ETdeltamarker)))
-            self.qmc.ETdeltamarkersize = max(0.1,self.float2float(toFloat(settings.value('ETdeltamarkersize',self.qmc.ETdeltamarkersize))))
+            self.qmc.ETdeltamarkersize = max(0.1,float2float(toFloat(settings.value('ETdeltamarkersize',self.qmc.ETdeltamarkersize))))
             self.qmc.BTbacklinestyle = s2a(toString(settings.value('BTbacklinestyle',self.qmc.BTbacklinestyle)))
             self.qmc.BTbackdrawstyle = s2a(toString(settings.value('BTbackdrawstyle',self.qmc.BTbackdrawstyle)))
             if self.qmc.BTbackdrawstyle == '-':
                 self.qmc.BTbackdrawstyle = self.qmc.drawstyle_default
-            self.qmc.BTbacklinewidth = max(0.1,self.float2float(toFloat(settings.value('BTbacklinewidth',self.qmc.BTbacklinewidth))))
+            self.qmc.BTbacklinewidth = max(0.1,float2float(toFloat(settings.value('BTbacklinewidth',self.qmc.BTbacklinewidth))))
             self.qmc.BTbackmarker = s2a(toString(settings.value('BTbackmarker',self.qmc.BTbackmarker)))
-            self.qmc.BTbackmarkersize = max(0.1,self.float2float(toFloat(settings.value('BTbackmarkersize',self.qmc.BTbackmarkersize))))
+            self.qmc.BTbackmarkersize = max(0.1,float2float(toFloat(settings.value('BTbackmarkersize',self.qmc.BTbackmarkersize))))
             self.qmc.ETbacklinestyle = s2a(toString(settings.value('ETbacklinestyle',self.qmc.ETbacklinestyle)))
             self.qmc.ETbackdrawstyle = s2a(toString(settings.value('ETbackdrawstyle',self.qmc.ETbackdrawstyle)))
             if self.qmc.ETbackdrawstyle == '-':
                 self.qmc.ETbackdrawstyle = self.qmc.drawstyle_default
-            self.qmc.ETbacklinewidth = max(0.1,self.float2float(toFloat(settings.value('ETbacklinewidth',self.qmc.ETbacklinewidth))))
+            self.qmc.ETbacklinewidth = max(0.1,float2float(toFloat(settings.value('ETbacklinewidth',self.qmc.ETbacklinewidth))))
             self.qmc.ETbackmarker = s2a(toString(settings.value('ETbackmarker',self.qmc.ETbackmarker)))
-            self.qmc.ETbackmarkersize = max(0.1,self.float2float(toFloat(settings.value('ETbackmarkersize',self.qmc.ETbackmarkersize))))
+            self.qmc.ETbackmarkersize = max(0.1,float2float(toFloat(settings.value('ETbackmarkersize',self.qmc.ETbackmarkersize))))
             self.qmc.XTbacklinestyle = s2a(toString(settings.value('XTbacklinestyle',self.qmc.XTbacklinestyle)))
             self.qmc.XTbackdrawstyle = s2a(toString(settings.value('XTbackdrawstyle',self.qmc.XTbackdrawstyle)))
             if self.qmc.XTbackdrawstyle == '-':
                 self.qmc.XTbackdrawstyle = self.qmc.drawstyle_default
-            self.qmc.XTbacklinewidth = max(0.1,self.float2float(toFloat(settings.value('XTbacklinewidth',self.qmc.XTbacklinewidth))))
+            self.qmc.XTbacklinewidth = max(0.1,float2float(toFloat(settings.value('XTbacklinewidth',self.qmc.XTbacklinewidth))))
             self.qmc.XTbackmarker = s2a(toString(settings.value('XTbackmarker',self.qmc.XTbackmarker)))
-            self.qmc.XTbackmarkersize = max(0.1,self.float2float(toFloat(settings.value('XTbackmarkersize',self.qmc.XTbackmarkersize))))
+            self.qmc.XTbackmarkersize = max(0.1,float2float(toFloat(settings.value('XTbackmarkersize',self.qmc.XTbackmarkersize))))
             self.qmc.YTbacklinestyle = s2a(toString(settings.value('YTbacklinestyle',self.qmc.XTbacklinestyle)))
             self.qmc.YTbackdrawstyle = s2a(toString(settings.value('YTbackdrawstyle',self.qmc.YTbackdrawstyle)))
             if self.qmc.YTbackdrawstyle == '-':
                 self.qmc.YTbackdrawstyle = self.qmc.drawstyle_default
-            self.qmc.YTbacklinewidth = max(0.1,self.float2float(toFloat(settings.value('YTbacklinewidth',self.qmc.YTbacklinewidth))))
+            self.qmc.YTbacklinewidth = max(0.1,float2float(toFloat(settings.value('YTbacklinewidth',self.qmc.YTbacklinewidth))))
             self.qmc.YTbackmarker = s2a(toString(settings.value('YTbackmarker',self.qmc.YTbackmarker)))
-            self.qmc.YTbackmarkersize = max(0.1,self.float2float(toFloat(settings.value('YTbackmarkersize',self.qmc.YTbackmarkersize))))
+            self.qmc.YTbackmarkersize = max(0.1,float2float(toFloat(settings.value('YTbackmarkersize',self.qmc.YTbackmarkersize))))
             self.getExtraDeviceCurveStyles(settings)
             self.qmc.BTBdeltalinestyle = s2a(toString(settings.value('BTBdeltalinestyle',self.qmc.BTBdeltalinestyle)))
             self.qmc.BTBdeltadrawstyle = s2a(toString(settings.value('BTBdeltadrawstyle',self.qmc.BTBdeltadrawstyle)))
-            self.qmc.BTBdeltalinewidth = max(0.1,self.float2float(toFloat(settings.value('BTBdeltalinewidth',self.qmc.BTBdeltalinewidth))))
+            self.qmc.BTBdeltalinewidth = max(0.1,float2float(toFloat(settings.value('BTBdeltalinewidth',self.qmc.BTBdeltalinewidth))))
             self.qmc.BTBdeltamarker = s2a(toString(settings.value('BTBdeltamarker',self.qmc.BTBdeltamarker)))
-            self.qmc.BTBdeltamarkersize = max(0.1,self.float2float(toFloat(settings.value('BTBdeltamarkersize',self.qmc.BTBdeltamarkersize))))
+            self.qmc.BTBdeltamarkersize = max(0.1,float2float(toFloat(settings.value('BTBdeltamarkersize',self.qmc.BTBdeltamarkersize))))
             self.qmc.ETBdeltalinestyle = s2a(toString(settings.value('ETBdeltalinestyle',self.qmc.ETBdeltalinestyle)))
             self.qmc.ETBdeltadrawstyle = s2a(toString(settings.value('ETBdeltadrawstyle',self.qmc.ETBdeltadrawstyle)))
-            self.qmc.ETBdeltalinewidth = max(0.1,self.float2float(toFloat(settings.value('ETBdeltalinewidth',self.qmc.ETBdeltalinewidth))))
+            self.qmc.ETBdeltalinewidth = max(0.1,float2float(toFloat(settings.value('ETBdeltalinewidth',self.qmc.ETBdeltalinewidth))))
             self.qmc.ETBdeltamarker = s2a(toString(settings.value('ETBdeltamarker',self.qmc.ETBdeltamarker)))
-            self.qmc.ETBdeltamarkersize = max(0.1,self.float2float(toFloat(settings.value('ETBdeltamarkersize',self.qmc.ETBdeltamarkersize))))
+            self.qmc.ETBdeltamarkersize = max(0.1,float2float(toFloat(settings.value('ETBdeltamarkersize',self.qmc.ETBdeltamarkersize))))
             settings.endGroup()
 #--- END GROUP CurveStyles
 
@@ -17404,6 +17378,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             settings.endGroup()
 #--- END GROUP WebLCDs
 
+            self.schedule_day_filter =toBool(settings.value('ScheduleDayFilter',self.schedule_day_filter))
+            self.schedule_user_filter = toBool(settings.value('ScheduleUserFilter',self.schedule_user_filter))
+            self.schedule_machine_filter = toBool(settings.value('ScheduleMachineFilter',self.schedule_machine_filter))
+#SCHEDULER:
+#            self.scheduleFlag = toBool(settings.value('Schedule',self.scheduleFlag))
+#            if self.scheduleFlag:
+#                self.schedule()
             self.LargeLCDsFlag = toBool(settings.value('LargeLCDs',self.LargeLCDsFlag))
             if self.LargeLCDsFlag:
                 self.largeLCDs()
@@ -18290,6 +18271,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #--- BEGIN GROUP WebSocket
             #save WebSocket port
             settings.beginGroup('WebSocket')
+            self.settingsSetValue(settings, default_settings, 'compression',self.ws.compression, read_defaults)
             self.settingsSetValue(settings, default_settings, 'host',self.ws.host, read_defaults)
             self.settingsSetValue(settings, default_settings, 'port',self.ws.port, read_defaults)
             self.settingsSetValue(settings, default_settings, 'path',self.ws.path, read_defaults)
@@ -18852,6 +18834,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             settings.endGroup()
 #--- END GROUP WebLCDs
 
+            self.settingsSetValue(settings, default_settings, 'ScheduleDayFilter',self.schedule_day_filter, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ScheduleUserFilter',self.schedule_user_filter, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ScheduleMachineFilter',self.schedule_machine_filter, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'Schedule',self.scheduleFlag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'LargeLCDs',self.LargeLCDsFlag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'LargeDeltaLCDs',self.LargeDeltaLCDsFlag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'LargePIDLCDs',self.LargePIDLCDsFlag, read_defaults)
@@ -19104,6 +19090,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         if self.WebLCDs:
             self.stopWebLCDs()
             self.WebLCDs = True # to ensure they are started again on restart
+#SCHEDULER:
+#        if self.scheduleFlag and self.schedule_window:
+#            tmp_Schedule = self.scheduleFlag # we keep the state to properly store it in the settings
+#            self.schedule_window.close()
+#            self.scheduleFlag = tmp_Schedule
         if self.LargeLCDsFlag and self.largeLCDs_dialog:
             tmp_LargeLCDs = self.LargeLCDsFlag # we keep the state to properly store it in the settings
             self.largeLCDs_dialog.close()
@@ -19313,8 +19304,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         if 'weight' in data and data['weight'] is not None:
             w = data['weight']
             unit = self.qmc.weight[2]
-            wi = self.convertWeight(w[0],self.qmc.weight_units.index(w[2]),self.qmc.weight_units.index(unit))
-            wo = self.convertWeight(w[1],self.qmc.weight_units.index(w[2]),self.qmc.weight_units.index(unit))
+            wi = convertWeight(w[0],weight_units.index(w[2]),weight_units.index(unit))
+            wo = convertWeight(w[1],weight_units.index(w[2]),weight_units.index(unit))
             if unit in {'Kg', 'lb', 'oz'}:
                 weight_in = f'{wi:.3f}'
                 weight_out = f'{wo:.3f}'
@@ -19324,8 +19315,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             un = self.qmc.weight[2].lower()
             loss = self.weight_loss(w[0],w[1])
             weight_loss = f'{loss:.1f}' if 0 < loss < 100 else ''
-            weight_in_num = self.convertWeight(w[0],self.qmc.weight_units.index(w[2]),self.qmc.weight_units.index('g'))
-            weight_out_num = self.convertWeight(w[1],self.qmc.weight_units.index(w[2]),self.qmc.weight_units.index('g'))
+            weight_in_num = convertWeight(w[0],weight_units.index(w[2]),weight_units.index('g'))
+            weight_out_num = convertWeight(w[1],weight_units.index(w[2]),weight_units.index('g'))
             weight_loss_num = loss
             if units:
                 if wi > 0:
@@ -19552,8 +19543,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     d = self.profileProductionData(p)
                     weight = d['weight']
                     last_unit = (weight[2] if weight is not None else 'kg')
-                    total_in += (self.convertWeight(weight[0],self.qmc.weight_units.index(last_unit),self.qmc.weight_units.index(unit)) if weight is not None else 0)
-                    total_out += (self.convertWeight(weight[1],self.qmc.weight_units.index(last_unit),self.qmc.weight_units.index(unit)) if weight is not None else 0)
+                    total_in += (convertWeight(weight[0],weight_units.index(last_unit),weight_units.index(unit)) if weight is not None else 0)
+                    total_out += (convertWeight(weight[1],weight_units.index(last_unit),weight_units.index(unit)) if weight is not None else 0)
                     entries += self.productionData2htmlentry(d) + '\n'
 
                 html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
@@ -19770,8 +19761,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 ws[f'C{c}'] = d['title']
                                 ws[f'D{c}'] = d['beans']
                                 weight = raw_data['weight']
-                                w_in = (self.convertWeight(weight[0],self.qmc.weight_units.index(weight[2]),self.qmc.weight_units.index(unit)) if weight is not None else 0)
-                                w_out = (self.convertWeight(weight[1],self.qmc.weight_units.index(weight[2]),self.qmc.weight_units.index(unit)) if weight is not None else 0)
+                                w_in = (convertWeight(weight[0],weight_units.index(weight[2]),weight_units.index(unit)) if weight is not None else 0)
+                                w_out = (convertWeight(weight[1],weight_units.index(weight[2]),weight_units.index(unit)) if weight is not None else 0)
                                 ws[f'E{c}'] = w_in # type: ignore # Incompatible types in assignment (expression has type "float", target has type "str")
                                 ws[f'E{c}'].number_format = num_format
                                 ws[f'F{c}'] = w_out # type: ignore # Incompatible types in assignment (expression has type "float", target has type "str")
@@ -20145,9 +20136,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         elif units == 'ror':
                             conv_fld = convertRoRstrict(res_fldf,dsd['mode'],temperature_unit)
                         elif units == 'volume':
-                            conv_fld = self.convertVolume(res_fldf,0,self.qmc.volume_units.index(volume_unit))
+                            conv_fld = convertVolume(res_fldf,0,volume_units.index(volume_unit))
                         elif units == 'weight':
-                            conv_fld = self.convertWeight(res_fldf,0,self.qmc.weight_units.index(weight_unit))
+                            conv_fld = convertWeight(res_fldf,0,weight_units.index(weight_unit))
                         else:
                             conv_fld = res_fldf
 
@@ -20392,8 +20383,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         i:float = 0
                         #o:float = 0
                         if 'weight' in pd and pd['weight'] is not None:
-                            i = self.convertWeight(pd['weight'][0],self.qmc.weight_units.index(pd['weight'][2]),self.qmc.weight_units.index(self.qmc.weight[2]))
-                            #o = self.convertWeight(pd["weight"][1],self.qmc.weight_units.index(pd["weight"][2]),self.qmc.weight_units.index(self.qmc.weight[2]))
+                            i = convertWeight(pd['weight'][0],weight_units.index(pd['weight'][2]),weight_units.index(self.qmc.weight[2]))
+                            #o = convertWeight(pd["weight"][1],weight_units.index(pd["weight"][2]),weight_units.index(self.qmc.weight[2]))
                         if i > 0:
                             charges += i
                             charges_count += 1
@@ -21023,15 +21014,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     else:
                                         continue
 
-                                    if (test0 == 'true' and self.float2float(toFloat(res_fld)) > 0) or test0 == 'false':
+                                    if (test0 == 'true' and float2float(toFloat(res_fld)) > 0) or test0 == 'false':
                                         if units == 'temp':
                                             conv_fld = convertTemp(res_fld,dsd['mode'],temperature_unit)
                                         elif units == 'ror':
                                             conv_fld = convertRoRstrict(res_fld,dsd['mode'],temperature_unit)
                                         elif units == 'volume':
-                                            conv_fld = self.convertVolume(res_fld,0,self.qmc.volume_units.index(volume_unit))
+                                            conv_fld = convertVolume(res_fld,0,volume_units.index(volume_unit))
                                         elif units == 'weight':
-                                            conv_fld = self.convertWeight(res_fld,0,self.qmc.weight_units.index(weight_unit))
+                                            conv_fld = convertWeight(res_fld,0,weight_units.index(weight_unit))
                                         else:
                                             conv_fld = res_fld
 
@@ -21056,10 +21047,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                             ws[cr] = conv_fld  # type: ignore
                                             ws[cr].number_format = '0.0000'
                                         elif typ == 'text2float1':
-                                            ws[cr] = self.float2float(toFloat(conv_fld)) # type: ignore #  Incompatible types in assignment (expression has type "float", target has type "str")
+                                            ws[cr] = float2float(toFloat(conv_fld)) # type: ignore #  Incompatible types in assignment (expression has type "float", target has type "str")
                                             ws[cr].number_format = '0.0'
                                         elif typ == 'text2float2':
-                                            ws[cr] = self.float2float(toFloat(conv_fld)) # type: ignore # Incompatible types in assignment (expression has type "float", target has type "str")
+                                            ws[cr] = float2float(toFloat(conv_fld)) # type: ignore # Incompatible types in assignment (expression has type "float", target has type "str")
                                             ws[cr].number_format = '0.00'
                                         elif typ == 'text2int':
                                             ws[cr] = toInt(conv_fld) # type: ignore
@@ -21400,7 +21391,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if 'CO2_batch' in cp and cp['CO2_batch']:
                 CO2 = f"{cp['CO2_batch']:.1f}g"
                 if 'CO2_batch_per_green_kg' in cp:
-                    CO2 += f" ({self.float2float(cp['CO2_batch_per_green_kg'])}g/kg)"
+                    CO2 += f" ({float2float(cp['CO2_batch_per_green_kg'])}g/kg)"
             else:
                 CO2 = '--'
             if 'det' in cp:
@@ -21463,7 +21454,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 organization_label=QApplication.translate('HTML Report Template', 'Organization:'),
                 organization=str(htmllib.escape(self.qmc.organization)),
                 cup_label=('' if cupping_all_default else QApplication.translate('HTML Report Template', 'Cupping:')),
-                cup=('' if cupping_all_default else str(self.float2float(cupping_score))),
+                cup=('' if cupping_all_default else str(float2float(cupping_score))),
                 color_label=QApplication.translate('HTML Report Template', 'Color:'),
                 color=color,
                 energy_label=QApplication.translate('HTML Report Template', 'Energy:'),
@@ -22307,21 +22298,21 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.ser.bytesize = int(str(dialog.bytesizeComboBox.currentText()))
             self.ser.stopbits = int(str(dialog.stopbitsComboBox.currentText()))
             self.ser.parity = str(dialog.parityComboBox.currentText())
-            self.ser.timeout = self.float2float(toFloat(comma2dot(str(dialog.timeoutEdit.text()))))
+            self.ser.timeout = float2float(toFloat(comma2dot(str(dialog.timeoutEdit.text()))))
             # set modbus port
             self.modbus.comport = str(dialog.modbus_comportEdit.getSelection())
             self.modbus.baudrate = int(str(dialog.modbus_baudrateComboBox.currentText()))              #int changes QString to int
             self.modbus.bytesize = int(str(dialog.modbus_bytesizeComboBox.currentText()))
             self.modbus.stopbits = int(str(dialog.modbus_stopbitsComboBox.currentText()))
             self.modbus.parity = str(dialog.modbus_parityComboBox.currentText())
-            self.modbus.timeout = max(0.3, self.float2float(toFloat(str(dialog.modbus_timeoutEdit.text()))))  # minimum serial timeout should be 300ms
+            self.modbus.timeout = max(0.3, float2float(toFloat(str(dialog.modbus_timeoutEdit.text()))))  # minimum serial timeout should be 300ms
             try:
                 self.modbus.modbus_serial_extra_read_delay = toInt(dialog.modbus_Serial_delayEdit.text()) / 1000
             except Exception: # pylint: disable=broad-except
                 pass
             self.modbus.serial_readRetries = dialog.modbus_Serial_retriesComboBox.currentIndex()
             try:
-                self.modbus.IP_timeout = self.float2float(toFloat(str(dialog.modbus_IP_timeoutEdit.text())))
+                self.modbus.IP_timeout = float2float(toFloat(str(dialog.modbus_IP_timeoutEdit.text())))
             except Exception: # pylint: disable=broad-except
                 pass
             self.modbus.IP_retries = dialog.modbus_IP_retriesComboBox.currentIndex()
@@ -22424,6 +22415,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 pass
 
             # WebSocket Setup
+            self.ws.compression = dialog.ws_compression.isChecked()
             self.ws.host = str(dialog.ws_hostEdit.text()).strip()
             self.ws.port = int(str(dialog.ws_portEdit.text()))
             self.ws.path = str(dialog.ws_pathEdit.text()).strip()
@@ -22491,7 +22483,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.scale.bytesize = int(str(dialog.scale_bytesizeComboBox.currentText()))
             self.scale.stopbits = int(str(dialog.scale_stopbitsComboBox.currentText()))
             self.scale.parity = str(dialog.scale_parityComboBox.currentText())
-            self.scale.timeout = self.float2float(toFloat(comma2dot(str(dialog.scale_timeoutEdit.text()))))
+            self.scale.timeout = float2float(toFloat(comma2dot(str(dialog.scale_timeoutEdit.text()))))
             # set color port
             self.color.device = str(dialog.color_deviceEdit.currentText())                #unicode() changes QString to a python string
             self.color.comport = str(dialog.color_comportEdit.getSelection())
@@ -22499,7 +22491,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.color.bytesize = int(str(dialog.color_bytesizeComboBox.currentText()))
             self.color.stopbits = int(str(dialog.color_stopbitsComboBox.currentText()))
             self.color.parity = str(dialog.color_parityComboBox.currentText())
-            self.color.timeout = self.float2float(toFloat(comma2dot(str(dialog.color_timeoutEdit.text()))))
+            self.color.timeout = float2float(toFloat(comma2dot(str(dialog.color_timeoutEdit.text()))))
 #        # deleteLater() will not work here as the dialog is still bound via the parent
 #        dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
 #        # the following will immediately release the memory despite this parent link
@@ -22914,6 +22906,18 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             _, _, exc_tb = sys.exc_info()
             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' loadSettings_theme() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
+
+#SCHEDULER:
+#    @pyqtSlot()
+#    @pyqtSlot(bool)
+#    def schedule(self, _:bool = False) -> None:
+#        if self.schedule_window is None:
+#            self.schedule_window = plus.schedule.ScheduleWindow(self, self)
+#            self.scheduleFlag = True
+#            self.scheduleAction.setChecked(True)
+#            self.schedule_window.show()
+#        else:
+#            self.schedule_window.close()
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -25310,6 +25314,7 @@ def initialize_locale(my_app:Artisan) -> str:
         'qtwebengine'
     ]
 
+    # NOTE: on updates, need to update util.py:locale2full_local() as well
     supported_languages:List[str] = [
         'ar',
         'da',
@@ -25333,8 +25338,8 @@ def initialize_locale(my_app:Artisan) -> str:
         'pt',
         'pt_BR',
         'pl',
-#        "ru",
-    'sk',
+        'ru',
+        'sk',
         'sv',
         'th',
         'tr',

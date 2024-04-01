@@ -23,12 +23,17 @@
 
 try:
     #pylint: disable = E, W, R, C
-    from PyQt6.QtCore import pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import QSize, pyqtSlot # @UnusedImport @Reimport @UnresolvedImport
+    from PyQt6.QtGui import QIcon # @UnusedImport @Reimport @UnresolvedImport
+    from PyQt6.QtWidgets import QApplication, QStyle # @UnusedImport @Reimport @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #pylint: disable = E, W, R, C
-    from PyQt5.QtCore import pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QSize, pyqtSlot # type: ignore # @UnusedImport @Reimport @UnresolvedImport
+    from PyQt5.QtGui import QIcon # type: ignore # @UnusedImport @Reimport @UnresolvedImport
+    from PyQt5.QtWidgets import QApplication, QStyle # type: ignore # @Reimport @UnresolvedImport @UnusedImport
 
-from artisanlib.util import decodeLocal
+
+from artisanlib.util import decodeLocal, getResourcePath, float2float
 from pathlib import Path
 from plus import config
 import datetime
@@ -40,6 +45,7 @@ from typing import Final, Optional, Union, Any, Dict, List, Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.types import ProfileData, ComputedProfileInformation # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QMessageBox # pylint: disable=unused-import
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -159,7 +165,7 @@ def float2floatMin(fs: Optional[float], n: int = 1) -> Optional[Union[float, int
     if fs is None:
         return None
     assert config.app_window is not None
-    f:float = config.app_window.float2float(float(fs), n)  # @UndefinedVariable
+    f:float = float2float(float(fs), n)  # @UndefinedVariable
     i:int = int(f)
     if f == i:
         return i
@@ -349,6 +355,11 @@ def updateLimits(rlimit:float, rused:float, pu:str, notifications:int, machines:
     if config.app_window:
         config.app_window.updateLimits(rlimit, rused, pu, notifications, machines)
 
+@pyqtSlot()
+def updateSchedule() -> None:
+    if config.app_window:
+        config.app_window.updateSchedule()
+
 # takes the JSON response dict and returns the account state as tuple
 # rlimit:float, rused:float, pu:str, notifications:int
 def extractAccountState(response: Dict[str,Any]) -> Tuple[float, float, str, int, List[str]]:
@@ -408,3 +419,17 @@ def roastLink(plus_roast:str) -> str:
 
 def remindersLink() -> str:
     return f'{config.web_base_url}/{getLanguage()}/reminders'
+
+
+# HiRes plus QMessageBox icon
+
+def setPlusIcon(mbox:'QMessageBox') -> None:
+    basedir = os.path.join(getResourcePath(),'Icons')
+    p = os.path.join(basedir, 'plus-notification.svg')
+    app_style:Optional[QStyle] = QApplication.style()
+    if app_style is not None:
+        icon_size = app_style.pixelMetric(QStyle.PixelMetric.PM_MessageBoxIconSize)
+    else:
+        icon_size = 64
+    pixmap = QIcon(p).pixmap(QSize(icon_size, icon_size),mbox.devicePixelRatio())
+    mbox.setIconPixmap(pixmap)

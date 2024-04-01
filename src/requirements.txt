@@ -44,7 +44,7 @@ websockets==12.0
 PyYAML==6.0.1
 psutil==5.9.8
 typing-extensions==4.10.0; python_version < '3.8' # required for supporting Final and TypeDict on Python <3.8
-protobuf==5.26.0
+protobuf==5.26.1
 numpy==1.24.3; python_version < '3.9' # last Python 3.8 release
 numpy==1.26.4; python_version >= '3.9'
 scipy==1.10.1; python_version < '3.9' # last Python 3.8 release
@@ -54,7 +54,7 @@ colorspacious==1.1.2
 openpyxl==3.1.2
 keyring==24.3.1
 prettytable==3.10.0
-lxml==5.1.0
+lxml==5.2.0
 matplotlib==3.7.3; python_version < '3.9' # last Python 3.8 release
 matplotlib==3.8.3; python_version >= '3.9'
 jinja2==3.1.3
@@ -62,6 +62,7 @@ aiohttp==3.9.3
 aiohttp_jinja2==1.6
 python-bidi==0.4.2
 arabic-reshaper==3.0.0
+pydantic==2.6.4
 #
 #
 ######
@@ -112,7 +113,7 @@ SecretStorage==3.3.3; platform_system=='Linux'
 ########
 ### Windows specific packages
 ###
-build==1.1.1; platform_system=='Windows'  # required to build pyinstaller bootloader
+build==1.2.1; platform_system=='Windows'  # required to build pyinstaller bootloader
 pywin32==306; platform_system=='Windows'
 pyinstaller-versionfile==2.1.1; platform_system=='Windows'
 libusb-package==1.0.26.2; platform_system=='Windows'

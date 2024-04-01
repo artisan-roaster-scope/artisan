@@ -47,7 +47,7 @@ if TYPE_CHECKING:
 
 
 
-from artisanlib.util import cmd2str, RoRfromCtoFstrict, fromCtoFstrict, fromFtoCstrict, hex2int, str2cmd, toFloat
+from artisanlib.util import cmd2str, RoRfromCtoFstrict, fromCtoFstrict, fromFtoCstrict, hex2int, str2cmd, toFloat, float2float
 
 try:
     from PyQt6.QtCore import Qt, QDateTime, QSemaphore, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
@@ -6737,11 +6737,11 @@ class scaleport(extraserialport):
             if device_fct is not None:
                 wei,den,moi = device_fct()
                 if moi is not None and moi > -1:
-                    return -1, -1, self.aw.float2float(moi)
+                    return -1, -1, float2float(moi)
                 if den is not None and den > -1:
-                    return -1, self.aw.float2float(den), -1
+                    return -1, float2float(den), -1
                 if wei is not None and wei > -1:
-                    return self.aw.float2float(wei), -1, -1
+                    return float2float(wei), -1, -1
             return -1,-1,-1
         return -1,-1,-1
 

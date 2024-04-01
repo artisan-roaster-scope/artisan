@@ -30,7 +30,7 @@ from typing import Final, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
-    from PyQt6.QtWidgets import QWidget, QLayout # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QLayout # pylint: disable=unused-import
     from PyQt6.QtGui import QCloseEvent, QResizeEvent # pylint: disable=unused-import
 
 
@@ -338,6 +338,7 @@ class LargeLCDs(ArtisanDialog):
         elif self.layoutNr == 0:
             # hide all empty upperlabels in landscape mode
             self.hideAllEmptyLabels()
+
 
 class LargeMainLCDs(LargeLCDs):
 

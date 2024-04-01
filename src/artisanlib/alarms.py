@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from PyQt6.QtWidgets import QStyleOptionViewItem  # pylint: disable=unused-import
     from PyQt6.QtCore import QModelIndex # pylint: disable=unused-import
 
-from artisanlib.util import deltaLabelUTF8, comma2dot
+from artisanlib.util import deltaLabelUTF8, comma2dot, float2float
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import (MyQComboBox, MyTableWidgetItemNumber, MyTableWidgetItemQCheckBox,
                                 MyTableWidgetItemQComboBox, MyTableWidgetItemQLineEdit, MyTableWidgetItemQTime)
@@ -878,7 +878,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         condComboBox.addItems(['<','>','=', '\u2260'])
         condComboBox.setCurrentIndex(self.aw.qmc.alarmcond[i])
         #8: temperature
-        tempedit = QLineEdit(str(self.aw.float2float(self.aw.qmc.alarmtemperature[i])))
+        tempedit = QLineEdit(str(float2float(self.aw.qmc.alarmtemperature[i])))
         tempedit.setAlignment(Qt.AlignmentFlag.AlignRight)
         tempedit.setMaximumWidth(130)
 #        tempedit.setValidator(QIntValidator(0, 999,tempedit))
@@ -1134,7 +1134,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                         if beepCheckBox and beepCheckBox is not None:
                             clipboard += str(beepCheckBox.isChecked()) + '\t'
                         else:
-                            clipboard += ' ' + '\t'                            
+                            clipboard += ' ' + '\t'
                 descriptionedit = cast(QLineEdit, self.alarmtable.cellWidget(r,11))
                 clipboard += descriptionedit.text() + '\n'
         # copy to the system clipboard

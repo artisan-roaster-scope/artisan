@@ -56,7 +56,7 @@ except Exception: # pylint: disable=broad-except
 #        import sip  # type: ignore # @Reimport @UnresolvedImport @UnusedImport
 
 import logging
-from artisanlib.util import comma2dot
+from artisanlib.util import comma2dot, float2floatWeightVolume
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
 from uic import BlendDialog # OFF type: ignore[attr-defined] # pylint: disable=no-name-in-module
@@ -165,7 +165,7 @@ class CustomBlendDialog(ArtisanDialog):
         self.ui.lineEdit_name.setText(self.blend.name)
         self.ui.label_weight.setText(QApplication.translate('Label','Weight'))
         self.ui.lineEdit_weight.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, self.ui.lineEdit_weight))  # the max limit has to be high enough otherwise the connected signals are not send!
-        inw = f'{self.aw.float2floatWeightVolume(self.inWeight):g}'
+        inw = f'{float2floatWeightVolume(self.inWeight):g}'
         self.ui.lineEdit_weight.setText(inw)
         self.ui.label_unit.setText(self.weightUnit)
         self.updateComponentTable()
@@ -197,7 +197,7 @@ class CustomBlendDialog(ArtisanDialog):
     def weighteditChanged(self) -> None:
         try:
             weight = float(comma2dot(self.ui.lineEdit_weight.text())) # text could be a non-float!
-            inw = f'{self.aw.float2floatWeightVolume(weight):g}'
+            inw = f'{float2floatWeightVolume(weight):g}'
             self.ui.lineEdit_weight.setText(inw)
             self.ui.lineEdit_weight.repaint()
             self.initialTotalWeight = float(self.ui.lineEdit_weight.text())
@@ -224,7 +224,7 @@ class CustomBlendDialog(ArtisanDialog):
         if i is not None:
             weightLineEdit = cast(QLineEdit, self.ui.tableWidget.cellWidget(i,1))
             weight = float(comma2dot(weightLineEdit.text()))
-            inw = f'{self.aw.float2floatWeightVolume(weight):g}'
+            inw = f'{float2floatWeightVolume(weight):g}'
             weightLineEdit.setText(inw)
             if self.initialTotalWeight == 0:
                 # we update the total weight
@@ -235,7 +235,7 @@ class CustomBlendDialog(ArtisanDialog):
                     cw = cast(QLineEdit, self.ui.tableWidget.cellWidget(j,1))
                     inWeight_sum += float(cw.text())
                 self.inWeight = inWeight_sum
-                inw = f'{self.aw.float2floatWeightVolume(self.inWeight):g}'
+                inw = f'{float2floatWeightVolume(self.inWeight):g}'
                 self.ui.lineEdit_weight.setText(inw)
                 self.ui.lineEdit_weight.repaint()
             if self.inWeight != 0:
@@ -354,7 +354,7 @@ class CustomBlendDialog(ArtisanDialog):
 
                 #weight
                 component_weight = c.ratio * self.inWeight
-                weightedit = QLineEdit(f'{self.aw.float2floatWeightVolume(component_weight):g}')
+                weightedit = QLineEdit(f'{float2floatWeightVolume(component_weight):g}')
                 weightedit.setAlignment(Qt.AlignmentFlag.AlignRight)
                 weightedit.setMinimumWidth(70)
                 weightedit.setMaximumWidth(70)

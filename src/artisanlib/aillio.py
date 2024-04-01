@@ -50,7 +50,7 @@ if TYPE_CHECKING:
 #except ImportError:
 #    from PyQt5.QtCore import QDateTime, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
-#from artisanlib.util import encodeLocal
+#from artisanlib.util import weight_units
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -490,7 +490,7 @@ class AillioR1:
 #            res['beans'] = data['bean']['beanName']
 #        try:
 #            if 'weightGreen' in data or 'weightRoasted' in data:
-#                wunit = aw.qmc.weight_units.index(aw.qmc.weight[2])
+#                wunit = weight_units.index(aw.qmc.weight[2])
 #                if wunit in {1,3}: # turn Kg into g, and lb into oz
 #                    wunit = wunit -1
 #                wgreen:float = 0
@@ -499,7 +499,7 @@ class AillioR1:
 #                wroasted:float = 0
 #                if 'weightRoasted' in data:
 #                    wroasted = float(data['weightRoasted'])
-#                res['weight'] = [wgreen,wroasted,aw.qmc.weight_units[wunit]]
+#                res['weight'] = [wgreen,wroasted,weight_units[wunit]]
 #        except Exception: # pylint: disable=broad-except
 #            pass
 #        try:

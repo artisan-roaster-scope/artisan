@@ -39,7 +39,9 @@ import plus.queue
 import plus.blend
 
 #from artisanlib.suppress_errors import suppress_stdout_stderr
-from artisanlib.util import deltaLabelUTF8, stringfromseconds,stringtoseconds, toInt, toFloat, abbrevString, scaleFloat2String, comma2dot
+from artisanlib.util import (deltaLabelUTF8, stringfromseconds,stringtoseconds, toInt, toFloat, abbrevString,
+        scaleFloat2String, comma2dot, weight_units, volume_units, float2floatWeightVolume, float2float,
+        convertWeight, convertVolume)
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog
 from artisanlib.widgets import MyQComboBox, ClickableQLabel, ClickableTextEdit, MyTableWidgetItemNumber
 
@@ -157,7 +159,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         coffeeinweightLabel = QLabel('<b>' + QApplication.translate('Label','Weight') + '</b>')
         self.coffeeinweight = QLineEdit()
         if self.weightIn:
-            self.coffeeinweight.setText(f'{self.aw.float2floatWeightVolume(self.weightIn):g}')
+            self.coffeeinweight.setText(f'{float2floatWeightVolume(self.weightIn):g}')
         self.coffeeinweight.setMinimumWidth(70)
         self.coffeeinweight.setMaximumWidth(70)
         self.coffeeinweight.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -167,7 +169,7 @@ class volumeCalculatorDlg(ArtisanDialog):
             self.coffeeinweight.setStyleSheet("border: 0.5px solid lightgrey; background-color:'lightgrey'")
         else:
             self.coffeeinweight.setStyleSheet("background-color:'lightgrey'")
-        coffeeinweightUnit = QLabel(self.aw.qmc.weight_units[weightunit])
+        coffeeinweightUnit = QLabel(weight_units[weightunit])
 
         coffeeinvolumeLabel = QLabel('<b>' + QApplication.translate('Label','Volume') + '</b>')
         self.coffeeinvolume = QLineEdit()
@@ -181,7 +183,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.coffeeinvolume.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.coffeeinvolume.setReadOnly(True)
         self.coffeeinvolume.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        coffeeinvolumeUnit = QLabel(self.aw.qmc.volume_units[volumeunit])
+        coffeeinvolumeUnit = QLabel(volume_units[volumeunit])
 
         # in button
         inButton = QPushButton(QApplication.translate('Button', 'in'))
@@ -230,7 +232,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         coffeeoutweightLabel = QLabel('<b>' + QApplication.translate('Label','Weight') + '</b>')
         self.coffeeoutweight = QLineEdit()
         if self.weightOut:
-            self.coffeeoutweight.setText(f'{self.aw.float2floatWeightVolume(self.weightOut):g}')
+            self.coffeeoutweight.setText(f'{float2floatWeightVolume(self.weightOut):g}')
         self.coffeeoutweight.setMinimumWidth(60)
         self.coffeeoutweight.setMaximumWidth(60)
         self.coffeeoutweight.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -240,7 +242,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         else:
             self.coffeeoutweight.setStyleSheet("background-color:'lightgrey'")
         self.coffeeoutweight.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        coffeeoutweightUnit = QLabel(self.aw.qmc.weight_units[weightunit])
+        coffeeoutweightUnit = QLabel(weight_units[weightunit])
 
         coffeeoutvolumeLabel = QLabel('<b>' + QApplication.translate('Label','Volume') + '</b>')
         self.coffeeoutvolume = QLineEdit()
@@ -254,7 +256,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.coffeeoutvolume.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.coffeeoutvolume.setReadOnly(True)
         self.coffeeoutvolume.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        coffeeoutvolumeUnit = QLabel(self.aw.qmc.volume_units[volumeunit])
+        coffeeoutvolumeUnit = QLabel(volume_units[volumeunit])
 
         # out button
         outButton = QPushButton(QApplication.translate('Button', 'out'))
@@ -353,18 +355,18 @@ class volumeCalculatorDlg(ArtisanDialog):
                 v = self.retrieveWeight()
                 if v and v != 0:
                     if self.unitvolumeEdit.hasFocus():
-                        self.unitvolumeEdit.setText(f'{self.aw.float2float(v):g}')
+                        self.unitvolumeEdit.setText(f'{float2float(v):g}')
                     elif self.coffeeinweightEdit.hasFocus():
-                        self.coffeeinweightEdit.setText(f'{self.aw.float2float(v):g}')
+                        self.coffeeinweightEdit.setText(f'{float2float(v):g}')
                     elif self.coffeeoutweightEdit.hasFocus():
-                        self.coffeeoutweightEdit.setText(f'{self.aw.float2float(v):g}')
+                        self.coffeeoutweightEdit.setText(f'{float2float(v):g}')
 
     def widgetWeight(self, widget:QLineEdit) -> None:
         w = self.retrieveWeight()
         if w is not None:
-            v = self.aw.float2floatWeightVolume(w)
+            v = float2floatWeightVolume(w)
             # updating this widget in a separate thread seems to be important on OS X 10.14 to avoid delayed updates and widget redraw problesm
-            QTimer.singleShot(2,lambda : widget.setText(f'{self.aw.float2float(v):g}'))
+            QTimer.singleShot(2,lambda : widget.setText(f'{float2float(v):g}'))
 
     @pyqtSlot(bool)
     def unitWeight(self, _:bool = False) -> None:
@@ -408,11 +410,11 @@ class volumeCalculatorDlg(ArtisanDialog):
                 self.coffeeinvolume.setText('')
                 self.inVolume = None
             else:
-                self.inVolume = self.aw.convertVolume(
-                    self.aw.convertWeight(self.weightIn,self.weightunit,0) * float(comma2dot(self.unitvolumeEdit.text())) / float(comma2dot(self.coffeeinweightEdit.text())),
+                self.inVolume = convertVolume(
+                    convertWeight(self.weightIn,self.weightunit,0) * float(comma2dot(self.unitvolumeEdit.text())) / float(comma2dot(self.coffeeinweightEdit.text())),
                     5,
                     self.volumeunit)
-                self.coffeeinvolume.setText(f'{self.aw.float2floatWeightVolume(self.inVolume):g}')
+                self.coffeeinvolume.setText(f'{float2floatWeightVolume(self.inVolume):g}')
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             self.inVolume = None
@@ -426,8 +428,8 @@ class volumeCalculatorDlg(ArtisanDialog):
                 self.coffeeoutvolume.setText('')
                 self.outVolume = None
             else:
-                self.outVolume = self.aw.convertVolume(self.aw.convertWeight(self.weightOut,self.weightunit,0) * float(comma2dot(str(self.unitvolumeEdit.text()))) / float(comma2dot(str(self.coffeeoutweightEdit.text()))),5,self.volumeunit)
-                self.coffeeoutvolume.setText(f'{self.aw.float2floatWeightVolume(self.outVolume):g}')
+                self.outVolume = convertVolume(convertWeight(self.weightOut,self.weightunit,0) * float(comma2dot(str(self.unitvolumeEdit.text()))) / float(comma2dot(str(self.coffeeoutweightEdit.text()))),5,self.volumeunit)
+                self.coffeeoutvolume.setText(f'{float2floatWeightVolume(self.outVolume):g}')
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             self.outVolume = None
@@ -436,9 +438,9 @@ class volumeCalculatorDlg(ArtisanDialog):
     @pyqtSlot()
     def updateVolumes(self) -> None:
         if self.inVolume:
-            self.inlineedit.setText(f'{self.aw.float2floatWeightVolume(self.inVolume):g}')
+            self.inlineedit.setText(f'{float2floatWeightVolume(self.inVolume):g}')
         if self.outVolume:
-            self.outlineedit.setText(f'{self.aw.float2floatWeightVolume(self.outVolume):g}')
+            self.outlineedit.setText(f'{float2floatWeightVolume(self.outVolume):g}')
         self.parent_dialog.volume_percent()
         self.closeEvent(None)
 
@@ -547,8 +549,8 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         # we remember user modifications to revert to them on deselecting a plus element
         self.modified_beans:str = self.aw.qmc.beans
-        self.modified_density_in_text:str = str(self.aw.float2float(self.aw.qmc.density[0]))
-        self.modified_volume_in_text:str = str(self.aw.float2float(self.aw.qmc.volume[0]))
+        self.modified_density_in_text:str = str(float2float(self.aw.qmc.density[0]))
+        self.modified_volume_in_text:str = str(float2float(self.aw.qmc.volume[0]))
         self.modified_beansize_min_text:str = str(self.aw.qmc.beansize_min)
         self.modified_beansize_max_text:str = str(self.aw.qmc.beansize_max)
         self.modified_moisture_greens_text:str = str(self.aw.qmc.moisture_greens)
@@ -867,8 +869,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         weightlabel = QLabel('<b>' + QApplication.translate('Label', 'Weight') + '</b>')
         green_label = QLabel('<b>' + QApplication.translate('Label', 'Green') + '</b>')
         roasted_label = QLabel('<b>' + QApplication.translate('Label', 'Roasted') + '</b>')
-        inw = f'{self.aw.float2floatWeightVolume(self.aw.qmc.weight[0]):g}'
-        outw = f'{self.aw.float2floatWeightVolume(self.aw.qmc.weight[1]):g}'
+        inw = f'{float2floatWeightVolume(self.aw.qmc.weight[0]):g}'
+        outw = f'{float2floatWeightVolume(self.aw.qmc.weight[1]):g}'
         self.weightinedit = QLineEdit(inw)
         self.weightinedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, self.weightinedit))  # the max limit has to be high enough otherwise the connected signals are not send!
         self.weightinedit.setMinimumWidth(70)
@@ -892,13 +894,13 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.unitsComboBox = QComboBox()
         self.unitsComboBox.setMaximumWidth(60)
         self.unitsComboBox.setMinimumWidth(60)
-        self.unitsComboBox.addItems(self.aw.qmc.weight_units)
-        self.unitsComboBox.setCurrentIndex(self.aw.qmc.weight_units.index(self.aw.qmc.weight[2]))
+        self.unitsComboBox.addItems(weight_units)
+        self.unitsComboBox.setCurrentIndex(weight_units.index(self.aw.qmc.weight[2]))
         self.unitsComboBox.currentIndexChanged.connect(self.changeWeightUnit)
         #volume
         volumelabel = QLabel('<b>' + QApplication.translate('Label', 'Volume') + '</b>')
-        inv = f'{self.aw.float2floatWeightVolume(self.aw.qmc.volume[0]):g}'
-        outv = f'{self.aw.float2floatWeightVolume(self.aw.qmc.volume[1]):g}'
+        inv = f'{float2floatWeightVolume(self.aw.qmc.volume[0]):g}'
+        outv = f'{float2floatWeightVolume(self.aw.qmc.volume[1]):g}'
         self.volumeinedit = QLineEdit(inv)
         self.volumeinedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999999., 4, self.volumeinedit)) # the max limit has to be high enough otherwise the connected signals are not send!
         self.volumeinedit.setMinimumWidth(70)
@@ -918,19 +920,19 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.volumeUnitsComboBox = QComboBox()
         self.volumeUnitsComboBox.setMaximumWidth(60)
         self.volumeUnitsComboBox.setMinimumWidth(60)
-        self.volumeUnitsComboBox.addItems(self.aw.qmc.volume_units)
-        self.volumeUnitsComboBox.setCurrentIndex(self.aw.qmc.volume_units.index(self.aw.qmc.volume[2]))
+        self.volumeUnitsComboBox.addItems(volume_units)
+        self.volumeUnitsComboBox.setCurrentIndex(volume_units.index(self.aw.qmc.volume[2]))
         self.volumeUnitsComboBox.currentIndexChanged.connect(self.changeVolumeUnit)
         self.unitsComboBox.currentIndexChanged.connect(self.calculated_density)
         #density
         bean_density_label = QLabel('<b>' + QApplication.translate('Label', 'Density') + '</b>')
         density_unit_label = QLabel('g/l')
-        self.bean_density_in_edit = QLineEdit(f'{self.aw.float2float(self.aw.qmc.density[0]):g}')
+        self.bean_density_in_edit = QLineEdit(f'{float2float(self.aw.qmc.density[0]):g}')
         self.bean_density_in_edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999999., 1,self.bean_density_in_edit))
         self.bean_density_in_edit.setMinimumWidth(70)
         self.bean_density_in_edit.setMaximumWidth(70)
         self.bean_density_in_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.bean_density_out_edit = QLineEdit(f'{self.aw.float2float(self.aw.qmc.density_roasted[0]):g}')
+        self.bean_density_out_edit = QLineEdit(f'{float2float(self.aw.qmc.density_roasted[0]):g}')
         self.bean_density_out_edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999999., 1,self.bean_density_out_edit))
         self.bean_density_out_edit.setMinimumWidth(70)
         self.bean_density_out_edit.setMaximumWidth(70)
@@ -1007,7 +1009,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         greens_temp_label = QLabel('<b>' + QApplication.translate('Label', 'Beans') + '</b>')
         greens_temp_unit_label = QLabel(self.aw.qmc.mode)
         self.greens_temp_edit = QLineEdit()
-        self.greens_temp_edit.setText(f'{self.aw.float2float(self.aw.qmc.greens_temp):g}')
+        self.greens_temp_edit.setText(f'{float2float(self.aw.qmc.greens_temp):g}')
         self.greens_temp_edit.setMaximumWidth(60)
         self.greens_temp_edit.setValidator(self.aw.createCLocaleDoubleValidator(-9999., 999999., 1, self.greens_temp_edit)) # range to 1000 needed to trigger editing_finished on input "12,2"
         self.greens_temp_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -1018,7 +1020,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         moisture_label = QLabel('<b>' + QApplication.translate('Label', 'Moisture') + '</b>')
         moisture_greens_unit_label = QLabel(QApplication.translate('Label', '%'))
         self.moisture_greens_edit = QLineEdit()
-        self.moisture_greens_edit.setText(f'{self.aw.float2float(self.aw.qmc.moisture_greens):g}')
+        self.moisture_greens_edit.setText(f'{float2float(self.aw.qmc.moisture_greens):g}')
         self.moisture_greens_edit.setMaximumWidth(70)
         self.moisture_greens_edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 100., 1, self.moisture_greens_edit))
         self.moisture_greens_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -1027,7 +1029,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         moisture_roasted_label = QLabel('<b>' + QApplication.translate('Label', 'Roasted') + '</b>')
         moisture_roasted_unit_label = QLabel(QApplication.translate('Label', '%'))
         self.moisture_roasted_edit = QLineEdit()
-        self.moisture_roasted_edit.setText(f'{self.aw.float2float(self.aw.qmc.moisture_roasted):g}')
+        self.moisture_roasted_edit.setText(f'{float2float(self.aw.qmc.moisture_roasted):g}')
         self.moisture_roasted_edit.setMaximumWidth(70)
         self.moisture_roasted_edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 100., 1, self.moisture_roasted_edit))
         self.moisture_roasted_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -1047,14 +1049,14 @@ class editGraphDlg(ArtisanResizeablDialog):
         ambientunitslabel = QLabel(self.aw.qmc.mode)
         ambient_humidity_unit_label = QLabel(QApplication.translate('Label', '%'))
         self.ambient_humidity_edit = QLineEdit()
-        self.ambient_humidity_edit.setText(f'{self.aw.float2float(self.aw.qmc.ambient_humidity):g}')
+        self.ambient_humidity_edit.setText(f'{float2float(self.aw.qmc.ambient_humidity):g}')
         self.ambient_humidity_edit.setMinimumWidth(50)
         self.ambient_humidity_edit.setMaximumWidth(50)
         self.ambient_humidity_edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 1, self.ambient_humidity_edit))
         self.ambient_humidity_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.ambient_humidity_edit.editingFinished.connect(self.ambient_humidity_editing_finished)
         self.ambientedit = QLineEdit()
-        self.ambientedit.setText(f'{self.aw.float2float(self.aw.qmc.ambientTemp):g}')
+        self.ambientedit.setText(f'{float2float(self.aw.qmc.ambientTemp):g}')
         self.ambientedit.setMinimumWidth(50)
         self.ambientedit.setMaximumWidth(50)
         self.ambientedit.setValidator(self.aw.createCLocaleDoubleValidator(-9999., 9999999., 1, self.ambientedit))  # larger range needed to trigger editing_finished
@@ -1062,7 +1064,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.ambientedit.editingFinished.connect(self.ambientedit_editing_finished)
         pressureunitslabel = QLabel('hPa')
         self.pressureedit = QLineEdit()
-        self.pressureedit.setText(f'{self.aw.float2float(self.aw.qmc.ambient_pressure):g}')
+        self.pressureedit.setText(f'{float2float(self.aw.qmc.ambient_pressure):g}')
         self.pressureedit.setMinimumWidth(55)
         self.pressureedit.setMaximumWidth(55)
         self.pressureedit.setValidator(self.aw.createCLocaleDoubleValidator(0, 9999999., 1, self.pressureedit))
@@ -1624,7 +1626,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     self.plus_blends_combo.setCurrentIndex(0)
                     self.blendSelectionChanged(0)
                 # update inweight
-                inw = f'{self.aw.float2floatWeightVolume(total_weight):g}'
+                inw = f'{float2floatWeightVolume(total_weight):g}'
                 self.weightinedit.setText(inw)
                 self.weightineditChanged()
 
@@ -1646,10 +1648,10 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.operator_setup = self.setup_ui.lineEditOperator.text()
             self.aw.qmc.roastertype_setup = self.setup_ui.lineEditMachine.text()
             self.aw.qmc.roastersize_setup = self.setup_ui.doubleSpinBoxRoasterSize.value()
-            nominal_batch_size = self.aw.convertWeight(self.aw.qmc.roastersize_setup,1,self.aw.qmc.weight_units.index(self.aw.qmc.weight[2]))
+            nominal_batch_size = convertWeight(self.aw.qmc.roastersize_setup,1,weight_units.index(self.aw.qmc.weight[2]))
             self.aw.qmc.last_batchsize = nominal_batch_size
             if self.weightinedit.text() == '0':
-                inw = f'{self.aw.float2floatWeightVolume(nominal_batch_size):g}'
+                inw = f'{float2floatWeightVolume(nominal_batch_size):g}'
                 self.weightinedit.setText(inw)
             self.aw.qmc.roasterheating_setup = self.setup_ui.comboBoxHeating.currentIndex()
             self.aw.qmc.drumspeed_setup = self.setup_ui.lineEditDrumSpeed.text()
@@ -1741,7 +1743,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         v_formatted:str = ''
         if self.scale_set is not None and weight is not None:
             v = weight + self.scale_set
-            if self.aw.qmc.weight_units.index(self.aw.qmc.weight[2]) in {0, 1}:
+            if weight_units.index(self.aw.qmc.weight[2]) in {0, 1}:
                 if v > 1000:
                     v_formatted = f'{v/1000:.2f}'
                     unit = 'kg'
@@ -1750,7 +1752,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     unit = 'g'
             # non-metric
             else:
-                v = self.aw.convertWeight(v,0,self.aw.qmc.weight_units.index(self.aw.qmc.weight[2]))
+                v = convertWeight(v,0,weight_units.index(self.aw.qmc.weight[2]))
                 v_formatted = f'{v:.2f}'
                 unit = self.aw.qmc.weight[2]
         return v_formatted, unit
@@ -1789,7 +1791,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             _log.exception(e)
         if self.scale_weight is not None and tare is not None:
             v = self.scale_weight - tare # weight in g
-            unit = self.aw.qmc.weight_units.index(self.aw.qmc.weight[2])
+            unit = weight_units.index(self.aw.qmc.weight[2])
             if unit == 0: # g selected
                 # metric
                 v_formatted = f'{v:.0f}' if v > 1000 else f'{v:.1f}'
@@ -1798,7 +1800,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 v_formatted = f'{v/1000:.3f}'
             # non-metric
             else:
-                v = self.aw.convertWeight(v,0,self.aw.qmc.weight_units.index(self.aw.qmc.weight[2]))
+                v = convertWeight(v,0,weight_units.index(self.aw.qmc.weight[2]))
                 v_formatted = f'{v:.2f}'
             self.updateWeightLCD(v_formatted, self.aw.qmc.weight[2], self.scale_weight - tare)
         else:
@@ -2088,7 +2090,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             density_txt = '0'
             try:
                 if 'density' in blend_dict and blend_dict['density'] is not None:
-                    density_txt = f"{self.aw.float2float(blend_dict['density']):g}"
+                    density_txt = f"{float2float(blend_dict['density']):g}"
             except Exception:  # pylint: disable=broad-except
                 pass
             self.bean_density_in_edit.setText(density_txt)
@@ -2131,7 +2133,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             density_txt = '0'
             try:
                 if 'density' in cd and cd['density'] is not None:
-                    density_txt = f"{self.aw.float2float(cd['density']):g}"
+                    density_txt = f"{float2float(cd['density']):g}"
             except Exception: # pylint: disable=broad-except
                 pass
             self.bean_density_in_edit.setText(density_txt)
@@ -2224,7 +2226,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         else:
             weightIn = 0.0
         weight_unit_idx = self.unitsComboBox.currentIndex()
-        v = self.aw.convertWeight(weightIn,weight_unit_idx,self.aw.qmc.weight_units.index('Kg')) # v is weightIn converted to kg
+        v = convertWeight(weightIn,weight_unit_idx,weight_units.index('Kg')) # v is weightIn converted to kg
         return plus.stock.getBlendBlendDict(blend,v)
 
     @pyqtSlot(int)
@@ -2284,7 +2286,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.titleedit.textEdited(rr['title'])
                 self.titleedit.setEditText(rr['title'])
             if 'weightUnit' in rr and rr['weightUnit'] is not None:
-                self.unitsComboBox.setCurrentIndex(self.aw.qmc.weight_units.index(rr['weightUnit']))
+                self.unitsComboBox.setCurrentIndex(weight_units.index(rr['weightUnit']))
             if 'weightIn' in rr and rr['weightIn'] is not None:
                 self.weightinedit.setText(f"{rr['weightIn']:g}")
             # all of the following items might not be in the dict
@@ -2301,17 +2303,17 @@ class editGraphDlg(ArtisanResizeablDialog):
             else:
                 self.volumeoutedit.setText('0')
             if 'volumeUnit' in rr and rr['volumeUnit'] is not None:
-                self.volumeUnitsComboBox.setCurrentIndex(self.aw.qmc.volume_units.index(rr['volumeUnit']))
+                self.volumeUnitsComboBox.setCurrentIndex(volume_units.index(rr['volumeUnit']))
             if 'densityWeight' in rr and rr['densityWeight'] is not None:
-                self.bean_density_in_edit.setText(f"{self.aw.float2float(rr['densityWeight']):g}")
+                self.bean_density_in_edit.setText(f"{float2float(rr['densityWeight']):g}")
             if 'densityRoasted' in rr and rr['densityRoasted'] is not None:
-                self.bean_density_out_edit.setText(f"{self.aw.float2float(rr['densityRoasted']):g}")
+                self.bean_density_out_edit.setText(f"{float2float(rr['densityRoasted']):g}")
             else:
                 self.bean_density_out_edit.setText('0')
             if 'moistureGreen' in rr and rr['moistureGreen'] is not None:
-                self.moisture_greens_edit.setText(f"{self.aw.float2float(rr['moistureGreen']):g}")
+                self.moisture_greens_edit.setText(f"{float2float(rr['moistureGreen']):g}")
             if 'moistureRoasted' in rr and rr['moistureRoasted'] is not None:
-                self.moisture_roasted_edit.setText(f"{self.aw.float2float(rr['moistureRoasted']):g}")
+                self.moisture_roasted_edit.setText(f"{float2float(rr['moistureRoasted']):g}")
             else:
                 self.moisture_roasted_edit.setText('0')
             if 'wholeColor' in rr and rr['wholeColor'] is not None:
@@ -2620,14 +2622,14 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(int)
     def changeWeightUnit(self, i:int) -> None:
-        o = self.aw.qmc.weight_units.index(self.aw.qmc.weight[2]) # previous unit index
+        o = weight_units.index(self.aw.qmc.weight[2]) # previous unit index
         self.aw.qmc.weight = (self.aw.qmc.weight[0],self.aw.qmc.weight[1],self.unitsComboBox.currentText())
         for le in [self.weightinedit,self.weightoutedit]:
             if le.text() and le.text() != '':
                 wi = float(comma2dot(le.text()))
                 if wi != 0.0:
-                    converted = self.aw.convertWeight(wi,o,i)
-                    le.setText(f'{self.aw.float2floatWeightVolume(converted):g}')
+                    converted = convertWeight(wi,o,i)
+                    le.setText(f'{float2floatWeightVolume(converted):g}')
         self.calculated_density()
 #PLUS
         self.populatePlusCoffeeBlendCombos() # update the plus stock popups to display the correct unit
@@ -2647,14 +2649,14 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(int)
     def changeVolumeUnit(self, i:int) -> None:
-        o = self.aw.qmc.volume_units.index(self.aw.qmc.volume[2]) # previous unit index
+        o = volume_units.index(self.aw.qmc.volume[2]) # previous unit index
         self.aw.qmc.volume = (self.aw.qmc.volume[0],self.aw.qmc.volume[1],self.volumeUnitsComboBox.currentText())
         for le in [self.volumeinedit,self.volumeoutedit]:
             if le.text() and le.text() != '':
                 wi = float(comma2dot(le.text()))
                 if wi != 0.0:
-                    converted = self.aw.convertVolume(wi,o,i)
-                    le.setText(f'{self.aw.float2floatWeightVolume(converted):g}')
+                    converted = convertVolume(wi,o,i)
+                    le.setText(f'{float2floatWeightVolume(converted):g}')
 #        self.calculated_density() # if just the unit changes, the density will not change as it is fixed now
 
     @pyqtSlot(int)
@@ -3637,7 +3639,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         res = ''
         try:
             if s == s.strip('%'):
-                f = self.aw.float2float(toFloat(comma2dot(str(s))),2)
+                f = float2float(toFloat(comma2dot(str(s))),2)
                 if f < 0:
                     res = str(abs(int(f*1000./10))) + '%'  # using 1000/10 to get around Pythons decimal error ex. .58*100 = 57.999
                 else:
@@ -3652,7 +3654,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             pass
         return res
 
-    def pctText2Num(self, s:str) -> float:
+    @staticmethod
+    def pctText2Num(s:str) -> float:
         try:
             res:float
             if len(s) == 0:
@@ -3661,7 +3664,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 res = toFloat(scaleFloat2String(s))
             else:
                 # percentage values are stored as a negative decimal
-                res = -self.aw.float2float(toFloat(s.strip('%'))/100,2)
+                res = -float2float(toFloat(s.strip('%'))/100,2)
         except Exception: # pylint: disable=broad-except
             res = 0
         return res
@@ -3804,11 +3807,11 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot(bool)
     def updateAmbientTemp(self, _:bool = False) -> None:
         self.aw.qmc.updateAmbientTemp()
-        self.ambientedit.setText(f'{self.aw.float2float(self.aw.qmc.ambientTemp):g}')
+        self.ambientedit.setText(f'{float2float(self.aw.qmc.ambientTemp):g}')
         self.ambientedit.repaint() # seems to be necessary in some PyQt versions!?
-        self.ambient_humidity_edit.setText(f'{self.aw.float2float(self.aw.qmc.ambient_humidity):g}')
+        self.ambient_humidity_edit.setText(f'{float2float(self.aw.qmc.ambient_humidity):g}')
         self.ambient_humidity_edit.repaint() # seems to be necessary in some PyQt versions!?
-        self.pressureedit.setText(f'{self.aw.float2float(self.aw.qmc.ambient_pressure):g}')
+        self.pressureedit.setText(f'{float2float(self.aw.qmc.ambient_pressure):g}')
         self.pressureedit.repaint() # seems to be necessary in some PyQt versions!?
 
     @pyqtSlot(bool)
@@ -3884,7 +3887,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         d,m = -1,-1
         if w is not None and w > -1:
             w = w - tare
-            wf = self.aw.convertWeight(w,0,self.aw.qmc.weight_units.index(self.aw.qmc.weight[2])) # convert to weight units
+            wf = convertWeight(w,0,weight_units.index(self.aw.qmc.weight[2])) # convert to weight units
             current_w:float = 0
             try:
                 current_w = float(comma2dot(weight_edit.text()))
@@ -3894,22 +3897,22 @@ class editGraphDlg(ArtisanResizeablDialog):
                 new_w = wf
             else:
                 new_w = current_w + wf # we add the new weight to the already existing one!
-                self.scale_set = self.aw.convertWeight(new_w,self.aw.qmc.weight_units.index(self.aw.qmc.weight[2]),0) # convert to weight units
+                self.scale_set = convertWeight(new_w,weight_units.index(self.aw.qmc.weight[2]),0) # convert to weight units
             QTimer.singleShot(2,lambda : self.updateWeightEdits(weight_edit,new_w))
         if d is not None and d > -1:
-            density_edit.setText(f'{self.aw.float2float(d):g}')
+            density_edit.setText(f'{float2float(d):g}')
         if m is not None and m > -1:
-            moisture_edit.setText(f'{self.aw.float2float(m):g}')
+            moisture_edit.setText(f'{float2float(m):g}')
 
     def updateWeightEdits(self, weight_edit:QLineEdit, w:float) -> None:
-        unit = self.aw.qmc.weight_units.index(self.aw.qmc.weight[2])
+        unit = weight_units.index(self.aw.qmc.weight[2])
         if unit == 0: # g selected
             decimals = 1
         elif unit == 1: # kg selected
             decimals = 3
         else:
             decimals = 2
-        weight_edit.setText(f'{self.aw.float2float(w,decimals):g}')
+        weight_edit.setText(f'{float2float(w,decimals):g}')
         self.weightouteditChanged()
 
     @pyqtSlot(int)
@@ -4467,7 +4470,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if self.plus_amount_selected is not None:
             try:
                 # convert weight to kg
-                wc = self.aw.convertWeight(weightIn,self.aw.qmc.weight_units.index(self.unitsComboBox.currentText()),self.aw.qmc.weight_units.index('Kg'))
+                wc = convertWeight(weightIn,weight_units.index(self.unitsComboBox.currentText()),weight_units.index('Kg'))
                 if wc > self.plus_amount_selected:
                     enough = False
             except Exception: # pylint: disable=broad-except
@@ -4475,7 +4478,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if self.plus_amount_replace_selected is not None:
             try:
                 # convert weight to kg
-                wc = self.aw.convertWeight(weightIn,self.aw.qmc.weight_units.index(self.unitsComboBox.currentText()),self.aw.qmc.weight_units.index('Kg'))
+                wc = convertWeight(weightIn,weight_units.index(self.unitsComboBox.currentText()),weight_units.index('Kg'))
                 if wc <= self.plus_amount_replace_selected:
                     enough_replacement = True
             except Exception: # pylint: disable=broad-except
@@ -4575,19 +4578,19 @@ class editGraphDlg(ArtisanResizeablDialog):
                 volumein = float(comma2dot(self.volumeinedit.text()))
                 weightin = float(comma2dot(self.weightinedit.text()))
                 if volumein != 0.0 and weightin != 0.0:
-                    vol_idx = self.aw.qmc.volume_units.index(self.volumeUnitsComboBox.currentText())
-                    volumein = self.aw.convertVolume(volumein,vol_idx,0)
-                    weight_idx = self.aw.qmc.weight_units.index(self.unitsComboBox.currentText())
-                    weightin = self.aw.convertWeight(weightin,weight_idx,0)
+                    vol_idx = volume_units.index(self.volumeUnitsComboBox.currentText())
+                    volumein = convertVolume(volumein,vol_idx,0)
+                    weight_idx = weight_units.index(self.unitsComboBox.currentText())
+                    weightin = convertWeight(weightin,weight_idx,0)
                     din = weightin / volumein
             if self.volumeoutedit.text() != ''  and self.weightoutedit.text() != '':
                 volumeout = float(comma2dot(self.volumeoutedit.text()))
                 weightout = float(comma2dot(self.weightoutedit.text()))
                 if volumeout != 0.0 and weightout != 0.0:
-                    vol_idx = self.aw.qmc.volume_units.index(self.volumeUnitsComboBox.currentText())
-                    volumeout = self.aw.convertVolume(volumeout,vol_idx,0)
-                    weight_idx = self.aw.qmc.weight_units.index(self.unitsComboBox.currentText())
-                    weightout = self.aw.convertWeight(weightout,weight_idx,0)
+                    vol_idx = volume_units.index(self.volumeUnitsComboBox.currentText())
+                    volumeout = convertVolume(volumeout,vol_idx,0)
+                    weight_idx = weight_units.index(self.unitsComboBox.currentText())
+                    weightout = convertWeight(weightout,weight_idx,0)
                     dout = weightout / volumeout
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -4598,10 +4601,10 @@ class editGraphDlg(ArtisanResizeablDialog):
         din, dout = self.calc_density()
         if din > 0.:
             # set also the green density if not yet set
-            self.bean_density_in_edit.setText(f'{self.aw.float2float(din):g}')
+            self.bean_density_in_edit.setText(f'{float2float(din):g}')
         if  dout > 0.:
             # set also the roasted density if not yet set
-            self.bean_density_out_edit.setText(f'{self.aw.float2float(dout):g}')
+            self.bean_density_out_edit.setText(f'{float2float(dout):g}')
         self.density_percent()
         self.calculated_organic_loss()
         self.checkDensityOut()
@@ -4620,7 +4623,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         except Exception: # pylint: disable=broad-except
             pass
         if mloss != 0. and wloss != 0.:
-            return mloss, self.aw.float2float(max(min(wloss - mloss,100),0))
+            return mloss, float2float(max(min(wloss - mloss,100),0))
         return 0., 0.
 
     def calculated_organic_loss(self) -> None:
@@ -4660,21 +4663,21 @@ class editGraphDlg(ArtisanResizeablDialog):
                     # if density-in and weight-in is given, we re-calc volume-in:
                     weight_in = float(comma2dot(self.weightinedit.text()))
                     if weight_in != 0:
-                        weight_in = self.aw.convertWeight(weight_in,self.unitsComboBox.currentIndex(),self.aw.qmc.weight_units.index('g'))
+                        weight_in = convertWeight(weight_in,self.unitsComboBox.currentIndex(),weight_units.index('g'))
                         volume_in = weight_in / density_in # in g/l
                         # convert to selected volume unit
-                        volume_in = self.aw.convertVolume(volume_in,self.aw.qmc.volume_units.index('l'),self.volumeUnitsComboBox.currentIndex())
-                        self.volumeinedit.setText(f'{self.aw.float2floatWeightVolume(volume_in):g}')
+                        volume_in = convertVolume(volume_in,volume_units.index('l'),self.volumeUnitsComboBox.currentIndex())
+                        self.volumeinedit.setText(f'{float2floatWeightVolume(volume_in):g}')
                         self.volume_percent()
                 if self.volumeinedit.text() != '' and self.weightinedit.text().strip() in {'0',''}:
                     # if density-in and volume-in is given, we re-calc weight-in:
                     volume_in = float(comma2dot(self.volumeinedit.text()))
                     if volume_in != 0:
                         # convert volume in to l and calculate weight in
-                        volume_in = self.aw.convertVolume(volume_in,self.volumeUnitsComboBox.currentIndex(),self.aw.qmc.volume_units.index('l'))
+                        volume_in = convertVolume(volume_in,self.volumeUnitsComboBox.currentIndex(),volume_units.index('l'))
                         weight_in =  volume_in * density_in # in g/l
-                        weight_in = self.aw.convertWeight(weight_in,self.aw.qmc.weight_units.index('g'),self.unitsComboBox.currentIndex())
-                        self.weightinedit.setText(f'{self.aw.float2floatWeightVolume(weight_in):g}')
+                        weight_in = convertWeight(weight_in,weight_units.index('g'),self.unitsComboBox.currentIndex())
+                        self.weightinedit.setText(f'{float2floatWeightVolume(weight_in):g}')
                         self.percent()
                         self.calculated_organic_loss()
 
@@ -4688,21 +4691,21 @@ class editGraphDlg(ArtisanResizeablDialog):
                     # if density-out and weight-out is given, we re-calc volume-out:
                     weight_out = float(comma2dot(self.weightoutedit.text()))
                     if weight_out != 0:
-                        weight_out = self.aw.convertWeight(weight_out,self.unitsComboBox.currentIndex(),self.aw.qmc.weight_units.index('g'))
+                        weight_out = convertWeight(weight_out,self.unitsComboBox.currentIndex(),weight_units.index('g'))
                         volume_out = weight_out / density_out # in g/l
                         # convert to selected volume unit
-                        volume_out = self.aw.convertVolume(volume_out,self.aw.qmc.volume_units.index('l'),self.volumeUnitsComboBox.currentIndex())
-                        self.volumeoutedit.setText(f'{self.aw.float2floatWeightVolume(volume_out):g}')
+                        volume_out = convertVolume(volume_out,volume_units.index('l'),self.volumeUnitsComboBox.currentIndex())
+                        self.volumeoutedit.setText(f'{float2floatWeightVolume(volume_out):g}')
                         self.volume_percent()
                 if self.volumeoutedit.text() != '' and self.weightoutedit.text().strip() in {'0',''}:
                     # if density-out and volume-out is given, we re-calc weight-out:
                     volume_out = float(comma2dot(self.volumeoutedit.text()))
                     if volume_out != 0:
                         # convert volume out to l and calculate weight out
-                        volume_out = self.aw.convertVolume(volume_out,self.volumeUnitsComboBox.currentIndex(),self.aw.qmc.volume_units.index('l'))
+                        volume_out = convertVolume(volume_out,self.volumeUnitsComboBox.currentIndex(),volume_units.index('l'))
                         weight_out = volume_out * density_out # in g/l
-                        weight_out = self.aw.convertWeight(weight_out,self.aw.qmc.weight_units.index('g'),self.unitsComboBox.currentIndex())
-                        self.weightoutedit.setText(f'{self.aw.float2floatWeightVolume(weight_out):g}')
+                        weight_out = convertWeight(weight_out,weight_units.index('g'),self.unitsComboBox.currentIndex())
+                        self.weightoutedit.setText(f'{float2floatWeightVolume(weight_out):g}')
                         self.percent()
                         self.calculated_organic_loss()
 
@@ -4712,23 +4715,23 @@ class editGraphDlg(ArtisanResizeablDialog):
         if self.volumeinedit.text() != '':
             volume_in = float(self.volumeinedit.text())
             # convert volume in to l and calculate volume in
-            volume_in = self.aw.convertVolume(volume_in,self.volumeUnitsComboBox.currentIndex(),self.aw.qmc.volume_units.index('l'))
+            volume_in = convertVolume(volume_in,self.volumeUnitsComboBox.currentIndex(),volume_units.index('l'))
             if volume_in != 0:
                 if self.weightinedit.text() != '' and self.bean_density_in_edit.text().strip() in {'0',''}:
                     # if volume-in and weight-in is given, we re-calc density-in:
                     weight_in = float(comma2dot(self.weightinedit.text()))
                     if weight_in != 0:
-                        weight_in = self.aw.convertWeight(weight_in,self.unitsComboBox.currentIndex(),self.aw.qmc.weight_units.index('g'))
+                        weight_in = convertWeight(weight_in,self.unitsComboBox.currentIndex(),weight_units.index('g'))
                         density_in = weight_in / volume_in # in g/l
-                        self.bean_density_in_edit.setText(f'{self.aw.float2float(density_in):g}')
+                        self.bean_density_in_edit.setText(f'{float2float(density_in):g}')
                         self.volume_percent()
                 if self.bean_density_in_edit.text() != '' and self.weightinedit.text().strip() in {'0',''}:
                     # if volume-in and density-in is given, we re-calc weight-in:
                     density_in = float(comma2dot(self.bean_density_in_edit.text()))
                     if density_in != 0:
                         weight_in =  volume_in * density_in # in g/l
-                        weight_in = self.aw.convertWeight(weight_in,self.aw.qmc.weight_units.index('g'),self.unitsComboBox.currentIndex())
-                        self.weightinedit.setText(f'{self.aw.float2floatWeightVolume(weight_in):g}')
+                        weight_in = convertWeight(weight_in,weight_units.index('g'),self.unitsComboBox.currentIndex())
+                        self.weightinedit.setText(f'{float2floatWeightVolume(weight_in):g}')
                         self.percent()
                         self.calculated_organic_loss()
 
@@ -4738,23 +4741,23 @@ class editGraphDlg(ArtisanResizeablDialog):
         if self.volumeoutedit.text() != '':
             volume_out = float(self.volumeoutedit.text())
             # convert volume in to l and calculate volume in
-            volume_out = self.aw.convertVolume(volume_out,self.volumeUnitsComboBox.currentIndex(),self.aw.qmc.volume_units.index('l'))
+            volume_out = convertVolume(volume_out,self.volumeUnitsComboBox.currentIndex(),volume_units.index('l'))
             if volume_out != 0:
                 if self.weightoutedit.text() != '' and self.bean_density_out_edit.text().strip() in {'0',''}:
                     # if volume-out and weight-out is given, we re-calc density-out:
                     weight_out = float(comma2dot(self.weightoutedit.text()))
                     if weight_out != 0:
-                        weight_out = self.aw.convertWeight(weight_out,self.unitsComboBox.currentIndex(),self.aw.qmc.weight_units.index('g'))
+                        weight_out = convertWeight(weight_out,self.unitsComboBox.currentIndex(),weight_units.index('g'))
                         density_out = weight_out / volume_out # in g/l
-                        self.bean_density_out_edit.setText(f'{self.aw.float2float(density_out):g}')
+                        self.bean_density_out_edit.setText(f'{float2float(density_out):g}')
                         self.volume_percent()
                 if self.bean_density_out_edit.text() != '' and self.weightoutedit.text().strip() in {'0',''}:
                     # if volume-out and density-out is given, we re-calc weight-out:
                     density_out = float(comma2dot(self.bean_density_out_edit.text()))
                     if density_out != 0:
                         weight_out =  volume_out * density_out # in g/l
-                        weight_out = self.aw.convertWeight(weight_out,self.aw.qmc.weight_units.index('g'),self.unitsComboBox.currentIndex())
-                        self.weightoutedit.setText(f'{self.aw.float2floatWeightVolume(weight_out):g}')
+                        weight_out = convertWeight(weight_out,weight_units.index('g'),self.unitsComboBox.currentIndex())
+                        self.weightoutedit.setText(f'{float2floatWeightVolume(weight_out):g}')
                         self.percent()
                         self.calculated_organic_loss()
 
@@ -4905,7 +4908,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         except Exception: # pylint: disable=broad-except
             w0 = 0
         if w0 == 0 and self.aw.qmc.last_batchsize == 0:
-            nominal_batch_size = self.aw.convertWeight(self.aw.qmc.roastersize_setup,1,self.aw.qmc.weight_units.index(w2))
+            nominal_batch_size = convertWeight(self.aw.qmc.roastersize_setup,1,weight_units.index(w2))
             self.aw.qmc.last_batchsize = nominal_batch_size
             w0 = nominal_batch_size
             w1 = 0

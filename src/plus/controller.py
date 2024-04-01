@@ -23,17 +23,14 @@
 
 try:
     #pylint: disable = E, W, R, C
-    from PyQt6.QtGui import QPixmap # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtCore import QSemaphore, QTimer, Qt, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import QWidget,QApplication, QMessageBox # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import QWidget, QApplication, QMessageBox # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #pylint: disable = E, W, R, C
-    from PyQt5.QtGui import QPixmap # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtCore import QSemaphore, QTimer, Qt, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QWidget, QApplication, QMessageBox # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
-import os
 import platform
 import threading
 import logging
@@ -42,8 +39,7 @@ from typing import Final, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
 
-from artisanlib.util import getResourcePath
-from plus import config, connection, stock, queue, sync, roast
+from plus import config, connection, stock, queue, sync, roast, util
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -326,9 +322,7 @@ def disconnect_confirmed() -> bool:
 #    return QMessageBox.StandardButton.Ok == reply
     mbox = QMessageBox() #(aw) # only without super this one shows the native dialog on macOS under Qt 6.6.2
     mbox.setText(string)
-    basedir = os.path.join(getResourcePath(),'Icons')
-    p = os.path.join(basedir, 'plus-notification.svg')
-    mbox.setIconPixmap(QPixmap(p))
+    util.setPlusIcon(mbox)
     mbox.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
     res = mbox.exec()
     return QMessageBox.StandardButton.Yes == res
@@ -387,6 +381,7 @@ def disconnect(
                 connect_semaphore.release(1)
         if config.app_window is not None:
             config.app_window.updatePlusStatusSignal.emit()  # @UndefinedVariable
+            config.app_window.disconnectPlusSignal.emit()  # @UndefinedVariable
 
 
 def reconnected() -> None:

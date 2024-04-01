@@ -584,6 +584,123 @@ def comma2dot(s:str) -> str:
         return s[:last_pos].replace(',','') + '.' + s[last_pos+1:]
     return s
 
+
+#--- weight / volume
+
+weight_units:Final[Tuple[str,str,str,str]] = ('g','Kg','lb','oz')
+volume_units:Final[Tuple[str,str,str,str,str,str]] = ('l','gal','qt','pt','cup','ml')
+
+
+def weightVolumeDigits(v:float) -> int:
+    if v >= 1000:
+        return 1
+    if v >= 100:
+        return 2
+    if v >= 10:
+        return 3
+    return 4
+
+def float2floatWeightVolume(v:float) -> float:
+    d = weightVolumeDigits(v)
+    return float2float(v,d)
+
+# the int n specifies the number of digits
+def float2floatNone(f:Optional[float], n:int=1) -> Optional[float]:
+    if f is None:
+        return None
+    return float2float(f,n)
+
+# the int n specifies the number of digits
+def float2float(f:float, n:int=1) -> float:
+    f = float(f)
+    if n==0:
+        if math.isnan(f):
+            return 0
+        return int(round(f))
+    res:float = float(f'%.{n}f'%f)
+    if math.isnan(res):
+        return 0.0
+    return res
+
+# i/o: 0:g, 1:Kg, 2:lb (pound), 3:oz (ounce)
+def convertWeight(v:float, i:int, o:int) -> float:
+    #                g,            kg,         lb,             oz,
+    convtable = [
+                    [1.,           0.001,      0.00220462262,  0.035274],  # g
+                    [1000,         1.,         2.205,          35.274],    # Kg
+                    [453.591999,   0.45359237, 1.,             16.],       # lb
+                    [28.3495,      0.0283495,  0.0625,         1.]         # oz
+                ]
+    return v*convtable[i][o]
+
+# i/o: 0:l (liter), 1:gal (gallons US), 2:qt, 3:pt, 4:cup, 5:cm^3/ml
+def convertVolume(v:float, i:int, o:int) -> float:
+                    #liter          gal             qt              pt              cup             ml/cm^3
+    convtable = [
+                    [1.,            0.26417205,     1.05668821,     2.11337643,     4.22675284,     1000.                ],    # liter
+                    [3.78541181,    1.,             4.,             8.,             16,             3785.4117884         ],    # gallon
+                    [0.94635294,    0.25,           1.,             2.,             4.,             946.352946           ],    # quart
+                    [0.47317647,    0.125,          0.5,            1.,             2.,             473.176473           ],    # pint
+                    [0.23658823,    0.0625,         0.25,           0.5,            1.,             236.5882365          ],    # cup
+                    [0.001,         2.6417205e-4,   1.05668821e-3,  2.11337641e-3,  4.2267528e-3,   1.                   ]     # cm^3
+                ]
+    return v*convtable[i][o]
+
+
+# takes a weight, its weight unit index, and a weight unit target index (decides over metric vs imperial)
+# and returns a string rendering the weight with unit, potentially adjusted by its magnitude
+def render_weight(amount:float, weight_unit_index:int, target_unit_idx:int) -> str:
+    w = convertWeight(
+        amount, weight_unit_index, target_unit_idx
+    )  # @UndefinedVariable
+    if w < 1 and target_unit_idx == 1:
+        # we convert Kg to the smaller unit g for readability
+        w = convertWeight(
+            amount, weight_unit_index, 0
+        )  # @UndefinedVariable
+        target_unit = weight_units[
+            0
+        ]  # @UndefinedVariable
+    elif w >= 1000000 and target_unit_idx == 0:
+        # we convert kg to tonnes
+        w = w / 1000000.0
+        target_unit = 't'
+    elif w > 999 and target_unit_idx == 0:
+        # we convert g to the larger unit kg for readability
+        w = convertWeight(
+            amount, weight_unit_index, 1
+        )  # @UndefinedVariable
+        target_unit = weight_units[
+            1
+        ]  # @UndefinedVariable
+    elif w >= 1000 and target_unit_idx == 1:
+        # we convert kg to tonnes
+        w = w / 1000.0
+        target_unit = 't'
+    elif w >= 2000 and target_unit_idx == 2:
+        # we convert lbs to tonnes
+        w = w / 2000.0
+        target_unit = 't'  # US tons
+    elif w >= 16 and target_unit_idx == 3:
+        if w >= 3200:
+            # we convert oz to US tonnes
+            w = w / 32000.0
+            target_unit = 't'  # US tons
+        else:  # 3200 > w >= 16
+            # we convert oz to lb
+            w = w / 16.0
+            target_unit = 'lb' if abs(abs(w) - 1.0) < 0.01 else 'lbs'
+    else:
+        target_unit = weight_units[
+            target_unit_idx
+        ]  # @UndefinedVariable
+        if target_unit_idx == 2 and abs(abs(w) - 1.00) >= 0.01:
+            # lb => lbs if |w|>1
+            target_unit = f'{target_unit}s'
+    w = int(round(w)) if w > 99 else float2float(w, 1) # @UndefinedVariable # we keep one decimal
+    return f'{w:g}{target_unit}'.lower()
+
+
 # typing tools
 
 def is_int_list(xs: List[Any]) -> TypeGuard[List[int]]:
@@ -591,3 +708,44 @@ def is_int_list(xs: List[Any]) -> TypeGuard[List[int]]:
 
 def is_float_list(xs: List[Any]) -> TypeGuard[List[float]]:
     return all(isinstance(x, float) for x in xs)
+
+
+# locale tools
+
+#def locale2full_local(locale:str) -> str:
+#    locale_map:Dict[str,str] = {
+#        'ar': 'ar_AA',
+#        'da': 'da_DK',
+#        'de': 'de_DE',
+#        'el': 'el_GR',
+#        'en': 'en_US',
+#        'es': 'es_ES',
+#        'fa': 'fa_IR',
+#        'fi': 'fi_FI',
+#        'fr': 'fr_FR',
+#        'gd': 'gd_GB',
+#        'he': 'he_IL',
+#        'hu': 'hu_HU',
+#        'id': 'id_ID',
+#        'it': 'it_IT',
+#        'ja': 'ja_JP',
+#        'ko': 'ko_KR',
+#        'lv': 'lv_LV',
+#        'nl': 'nl_NL',
+#        'no': 'nn_NO',
+#        'pt': 'pt_PT',
+#        'pt_BR': 'pt_BR',
+#        'pl': 'pl_PL',
+#        'ru': 'ru_RU',
+#        'sk': 'sk_SK',
+#        'sv': 'sv_SE',
+#        'th': 'th_TH',
+#        'tr': 'tr_TR',
+#        'uk': 'uk_UA',
+#        'vi': 'vi_VN',
+#        'zh_CN': 'zh_CN',
+#        'zh_TW': 'zh_TW'
+#    }
+#    if locale in locale_map:
+#        return locale_map[locale]
+#    return locale

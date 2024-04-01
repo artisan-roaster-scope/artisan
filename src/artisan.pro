@@ -73,6 +73,7 @@ SOURCES = \
     plus/countries.py \
     plus/login.py \
     plus/queue.py \
+    plus/schedule.py \
     plus/stock.py \
     plus/sync.py
 

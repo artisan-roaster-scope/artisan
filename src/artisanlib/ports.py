@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from PyQt6.QtWidgets import QWidget # pylint: disable=unused-import
     from PyQt6.QtGui import QCloseEvent, QKeyEvent # pylint: disable=unused-import
 
-from artisanlib.util import toFloat, uchr, comma2dot
+from artisanlib.util import toFloat, uchr, comma2dot, float2float
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog, PortComboBox
 from artisanlib.comm import serialport
 
@@ -796,7 +796,7 @@ class comportDlg(ArtisanResizeablDialog):
         self.scale_stopbitsComboBox.addItems(self.stopbits)
         self.scale_stopbitsComboBox.setCurrentIndex(self.aw.scale.stopbits - 1)
         scale_timeoutlabel = QLabel(QApplication.translate('Label', 'Timeout'))
-        self.scale_timeoutEdit = QLineEdit(str(self.aw.float2float(self.aw.scale.timeout)))
+        self.scale_timeoutEdit = QLineEdit(str(float2float(self.aw.scale.timeout)))
         self.scale_timeoutEdit.setValidator(self.aw.createCLocaleDoubleValidator(0,5,1,self.scale_timeoutEdit))
         ##########################    TAB 5 WIDGETS   COLOR
         color_devicelabel = QLabel(QApplication.translate('Label', 'Device'))
@@ -1598,11 +1598,17 @@ class comportDlg(ArtisanResizeablDialog):
             self.ws_modeCombos.append(mode)
             ws_grid.addWidget(mode,3,i+1,1,1) #Qt.AlignmentFlag.AlignRight)
 
+        self.ws_compression = QCheckBox(QApplication.translate('ComboBox','compression'))
+        self.ws_compression.setChecked(self.aw.ws.compression)
 
         ws_line4 = QHBoxLayout()
         ws_line4.addStretch()
         ws_line4.addLayout(ws_grid)
         ws_line4.addStretch()
+
+        ws_line5 = QHBoxLayout()
+        ws_line5.addWidget(self.ws_compression)
+        ws_line5.addStretch()
 
 
         tab7Layout = QVBoxLayout()
@@ -1610,6 +1616,7 @@ class comportDlg(ArtisanResizeablDialog):
         tab7Layout.addLayout(ws_line2)
         tab7Layout.addLayout(ws_line3)
         tab7Layout.addLayout(ws_line4)
+        tab7Layout.addLayout(ws_line5)
         tab7Layout.addStretch()
         tab7Layout.setSpacing(8)
         tab7Layout.setContentsMargins(5,5,5,5)
@@ -1643,6 +1650,8 @@ class comportDlg(ArtisanResizeablDialog):
             self.TabWidget.setCurrentIndex(2)
         elif devid == 79: # switch to S7 tab if S7 device was selected as main device
             self.TabWidget.setCurrentIndex(3)
+        elif devid == 111:  # switch to WebSocket tab if WebSocket device was selected as main device
+            self.TabWidget.setCurrentIndex(6)
         #incorporate layouts
         Mlayout = QVBoxLayout()
         Mlayout.addWidget(self.TabWidget)
@@ -1711,7 +1720,7 @@ class comportDlg(ArtisanResizeablDialog):
         scan_modbuds_dlg.bytesize = int(str(self.modbus_bytesizeComboBox.currentText()))
         scan_modbuds_dlg.stopbits = int(str(self.modbus_stopbitsComboBox.currentText()))
         scan_modbuds_dlg.parity = str(self.modbus_parityComboBox.currentText())
-        scan_modbuds_dlg.timeout = self.aw.float2float(toFloat(comma2dot(str(self.modbus_timeoutEdit.text()))))
+        scan_modbuds_dlg.timeout = float2float(toFloat(comma2dot(str(self.modbus_timeoutEdit.text()))))
         scan_modbuds_dlg.mtype = int(self.modbus_type.currentIndex())
         scan_modbuds_dlg.mhost = str(self.modbus_hostEdit.text())
         scan_modbuds_dlg.mport = int(str(self.modbus_portEdit.text()))

@@ -31,7 +31,7 @@ except Exception: # pylint: disable=broad-except
     from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from pathlib import Path
-from artisanlib.util import getDirectory
+from artisanlib.util import getDirectory, weight_units, convertWeight
 from plus import config, util, connection, controller, roast, stock
 import os
 import time
@@ -419,19 +419,19 @@ def applyServerUpdates(data:Dict[str, Any]) -> None:
             wunit:str = aw.qmc.weight[2]
             if 'amount' in data and data['amount'] is not None:
                 assert isinstance(data['amount'], (int, float))
-                w = aw.convertWeight(
+                w = convertWeight(
                     data['amount'],
-                    aw.qmc.weight_units.index('Kg'),
-                    aw.qmc.weight_units.index(wunit),
+                    weight_units.index('Kg'),
+                    weight_units.index(wunit),
                 )
                 if w != win:
                     win = w
                     dirty = True
             if 'end_weight' in data and data['end_weight'] is not None:
-                w = aw.convertWeight(
+                w = convertWeight(
                     data['end_weight'],
-                    aw.qmc.weight_units.index('Kg'),
-                    aw.qmc.weight_units.index(wunit),
+                    weight_units.index('Kg'),
+                    weight_units.index(wunit),
                 )
                 if w != wout:
                     wout = w
@@ -806,7 +806,6 @@ def getUpdate(uuid: Optional[str], file:Optional[str]=None) -> None:
                 QTimer.singleShot(2, lambda: (fetchServerUpdate(uuid, file) if isinstance(uuid, str) else None))
             except Exception as e:  # pylint: disable=broad-except
                 _log.exception(e)
-
 
 # Sync Action as issued on profile load and turning plus on
 

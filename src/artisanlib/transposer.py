@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     import numpy.typing as npt  # pylint: disable=unused-import
 
 from artisanlib.dialogs import ArtisanDialog
-from artisanlib.util import stringfromseconds, stringtoseconds
+from artisanlib.util import stringfromseconds, stringtoseconds, float2float
 
 
 try:
@@ -435,7 +435,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 elif self.aw.qmc.backgroundprofile is not None:
                     timeidx = [0,1,2,4,6][i]
                     if self.aw.qmc.timeindexB[timeidx] > 0:
-                        temp_target_widgets_i.setText(str(self.aw.float2float(self.aw.qmc.temp2B[self.aw.qmc.timeindexB[timeidx]])))
+                        temp_target_widgets_i.setText(str(float2float(self.aw.qmc.temp2B[self.aw.qmc.timeindexB[timeidx]])))
                         self.updateTempResults()
 
     @pyqtSlot(int)
@@ -507,7 +507,7 @@ class profileTransformatorDlg(ArtisanDialog):
                     drying_period = result_times[0]
                     drying_percentage = 100 * drying_period / result_times[3]
                     drying_str = \
-                            f'{stringfromseconds(drying_period,leadingzero=False)}    {self.aw.float2float(drying_percentage)}%'
+                            f'{stringfromseconds(drying_period,leadingzero=False)}    {float2float(drying_percentage)}%'
                     phases_result_widgets = self.phases_result_widgets[0]
                     if phases_result_widgets is not None:
                         phases_result_widgets.setText(drying_str)
@@ -515,7 +515,7 @@ class profileTransformatorDlg(ArtisanDialog):
                     mailard_period = result_times[1] - result_times[0]
                     mailard_percentage = 100 * mailard_period / result_times[3]
                     mailard_str = \
-                            f'{stringfromseconds(mailard_period,leadingzero=False)}    {self.aw.float2float(mailard_percentage)}%'
+                            f'{stringfromseconds(mailard_period,leadingzero=False)}    {float2float(mailard_percentage)}%'
                     phases_result_widgets= self.phases_result_widgets[1]
                     if phases_result_widgets is not None:
                         phases_result_widgets.setText(mailard_str)
@@ -523,7 +523,7 @@ class profileTransformatorDlg(ArtisanDialog):
                     finishing_period = result_times[3] - result_times[1]
                     finishing_percentage = 100 * finishing_period / result_times[3]
                     finishing_str = \
-                            f'{stringfromseconds(finishing_period,leadingzero=False)}    {self.aw.float2float(finishing_percentage)}%'
+                            f'{stringfromseconds(finishing_period,leadingzero=False)}    {float2float(finishing_percentage)}%'
                     phases_result_widgets = self.phases_result_widgets[2]
                     if phases_result_widgets is not None:
                         phases_result_widgets.setText(finishing_str)
@@ -545,7 +545,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 temp_result_widget:Optional[QTableWidgetItem] = self.temp_result_widgets[i]
                 result_temp = result_temps[i]
                 if temp_result_widget is not None and result_temp is not None:
-                    temp_result_widget.setText(str(self.aw.float2float(result_temp)) + self.aw.qmc.mode)
+                    temp_result_widget.setText(str(float2float(result_temp)) + self.aw.qmc.mode)
             s = ''
             if fit is not None:
                 s = fit
@@ -1062,7 +1062,7 @@ class profileTransformatorDlg(ArtisanDialog):
             profilePhasesPercentage = profilePhasesPercentages[i]
             if len(profilePhasesTimes) > i and profilePhasesTime is not None and profilePhasesPercentage is not None:
                 profile_phases_time_str = \
-                    f'{stringfromseconds(int(round(profilePhasesTime)),leadingzero=False)}    {self.aw.float2float(profilePhasesPercentage)}%'
+                    f'{stringfromseconds(int(round(profilePhasesTime)),leadingzero=False)}    {float2float(profilePhasesPercentage)}%'
                 profile_phases_widget = QTableWidgetItem(profile_phases_time_str)
                 profile_phases_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 self.phasestable.setItem(0,i,profile_phases_widget)
@@ -1218,7 +1218,7 @@ class profileTransformatorDlg(ArtisanDialog):
         for i in range(5):
             profileTemp = self.profileTemps[i]
             if len(self.profileTemps) > i and profileTemp is not None:
-                profile_temp_str = str(self.aw.float2float(profileTemp)) + self.aw.qmc.mode
+                profile_temp_str = str(float2float(profileTemp)) + self.aw.qmc.mode
                 profile_widget = QTableWidgetItem(profile_temp_str)
                 profile_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 self.temptable.setItem(0,i,profile_widget)

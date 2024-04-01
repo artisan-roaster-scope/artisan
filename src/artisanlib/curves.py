@@ -30,7 +30,7 @@ if TYPE_CHECKING:
     from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
 from artisanlib.util import (deltaLabelBigPrefix, deltaLabelPrefix, deltaLabelUTF8,
-                             stringtoseconds, stringfromseconds, toFloat)
+                             stringtoseconds, stringfromseconds, toFloat, float2float)
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQDoubleSpinBox
 from help import symbolic_help # pyright:ignore [attr-defined] # pylint: disable=no-name-in-module
@@ -1473,7 +1473,7 @@ class CurvesDlg(ArtisanDialog):
 
     @pyqtSlot()
     def segmentdeltathresholdChanged(self) -> None:
-        self.aw.qmc.segmentdeltathreshold = self.aw.float2float(toFloat(self.segmentdeltathreshold.text()),4)
+        self.aw.qmc.segmentdeltathreshold = float2float(toFloat(self.segmentdeltathreshold.text()),4)
 
     @pyqtSlot()
     def curvefittimeoffsetChanged(self) -> None:

@@ -33,7 +33,8 @@ if TYPE_CHECKING:
     from PyQt6.QtGui import QStandardItem, QKeyEvent, QDropEvent, QDragEnterEvent, QCloseEvent # pylint: disable=unused-import
     from PyQt6.QtCore import QMimeData # pylint: disable=unused-import
 
-from artisanlib.util import deltaLabelUTF8, decodeLocal, decodeLocalStrict, stringfromseconds, fromFtoCstrict, fromCtoFstrict, fill_gaps
+from artisanlib.util import (deltaLabelUTF8, decodeLocal, decodeLocalStrict, stringfromseconds, fromFtoCstrict,
+        fromCtoFstrict, fill_gaps, float2float)
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
@@ -330,16 +331,16 @@ class RoastProfile:
             weight_unit:Optional[str] = decodeLocal(profile['weight'][2])
             if weight_unit is not None:
                 if weight_unit != 'g':
-                    w = self.aw.float2float(w,1)
+                    w = float2float(w,1)
                 self.metadata['weight'] = str(w).rstrip('0').rstrip('.') + weight_unit
         if 'moisture_greens' in profile and profile['moisture_greens'] != 0.0:
             self.metadata['moisture_greens'] = profile['moisture_greens']
         if 'ambientTemp' in profile:
-            self.metadata['ambientTemp'] = f'{self.aw.float2float(self.ambientTemp):g}{self.aw.qmc.mode}'
+            self.metadata['ambientTemp'] = f'{float2float(self.ambientTemp):g}{self.aw.qmc.mode}'
         if 'ambient_humidity' in profile:
-            self.metadata['ambient_humidity'] = f"{self.aw.float2float(profile['ambient_humidity']):g}%"
+            self.metadata['ambient_humidity'] = f"{float2float(profile['ambient_humidity']):g}%"
         if 'ambient_pressure' in profile:
-            self.metadata['ambient_pressure'] = f"{self.aw.float2float(profile['ambient_pressure']):g}hPa"
+            self.metadata['ambient_pressure'] = f"{float2float(profile['ambient_pressure']):g}hPa"
         if 'computed' in profile and profile['computed'] is not None and 'weight_loss' in profile['computed'] and \
                 profile['computed']['weight_loss'] is not None:
             self.metadata['weight_loss'] = f"-{profile['computed']['weight_loss']:.1f}%"
@@ -1176,7 +1177,7 @@ class roastCompareDlg(ArtisanDialog):
             time = p.timex[p.timeindex[ind]]
             if p.timeindex[0] != -1:
                 time -= p.timex[p.timeindex[0]]
-            temp = self.aw.float2float(p.temp2[p.timeindex[ind]])
+            temp = float2float(p.temp2[p.timeindex[ind]])
             name_idx = ind + 1 if ind > 0 else ind
             event_name = self.alignnames[name_idx]
             event_name = self.aw.arabicReshape(event_name)
@@ -1468,7 +1469,8 @@ class roastCompareDlg(ArtisanDialog):
         header = QTableWidgetItem(profile.label)
         self.profileTable.setVerticalHeaderItem(i,header)
 
-    def renderToolTip(self, profile:RoastProfile) -> str:
+    @staticmethod
+    def renderToolTip(profile:RoastProfile) -> str:
         tooltip:str = ''
         if profile.metadata is not None:
             try:
@@ -1490,7 +1492,7 @@ class roastCompareDlg(ArtisanDialog):
                         tooltip += '\n'
                     tooltip += profile.metadata['beans'].strip()
                     if 'moisture_greens' in profile.metadata:
-                        tooltip += f" ({self.aw.float2float(profile.metadata['moisture_greens']):g}%)"
+                        tooltip += f" ({float2float(profile.metadata['moisture_greens']):g}%)"
                 if 'ambientTemp' in profile.metadata:
                     if tooltip != '':
                         tooltip += '\n'

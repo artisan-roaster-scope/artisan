@@ -34,7 +34,7 @@ from typing import Final, Union, List, Dict, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
 
-from artisanlib.util import decs2string, fromCtoFstrict, fromFtoCstrict, hex2int, str2cmd, stringfromseconds, cmd2str
+from artisanlib.util import decs2string, fromCtoFstrict, fromFtoCstrict, hex2int, str2cmd, stringfromseconds, cmd2str, float2float
 
 try:
     from PyQt6.QtCore import pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
@@ -1632,7 +1632,7 @@ class PIDcontrol:
         elif self.aw.qmc.device == 19 and self.aw.pidcontrol.externalPIDControl():
             # ArduinoTC4 firmware PID
             if self.aw.ser.ArduinoIsInitialized:
-                sv = max(0,self.aw.float2float(sv,2))
+                sv = max(0,float2float(sv,2))
                 if self.sv != sv: # nothing to do (avoid loops via moveslider!)
                     if move:
                         self.aw.moveSVslider(sv,setValue=True) # only move the slider

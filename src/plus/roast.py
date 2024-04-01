@@ -21,6 +21,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from artisanlib.util import weight_units, convertWeight
 from plus import config, util, stock
 import hashlib
 import logging
@@ -40,9 +41,6 @@ def getTemplate(bp: 'ProfileData', background:bool=False) -> Dict[str, Any]:  #f
     _log.debug('getTemplate()')
     d: Dict[str, Any] = {}
     try:
-        assert config.app_window is not None
-        aw = config.app_window
-
         try:
             util.addNum2dict(
                 bp, 'roastbatchnr', d, 'batch_number', 0, 65534, 0
@@ -76,10 +74,10 @@ def getTemplate(bp: 'ProfileData', background:bool=False) -> Dict[str, Any]:  #f
                 w = util.limitnum(
                     0,
                     65534,
-                    aw.convertWeight(
+                    convertWeight(
                         w_in,
-                        aw.qmc.weight_units.index(w_unit),
-                        aw.qmc.weight_units.index('Kg'),
+                        weight_units.index(w_unit),
+                        weight_units.index('Kg'),
                     ),
                 )
                 if w is not None:
@@ -96,10 +94,10 @@ def getTemplate(bp: 'ProfileData', background:bool=False) -> Dict[str, Any]:  #f
                 w = util.limitnum(
                     0,
                     65534,
-                    aw.convertWeight(
+                    convertWeight(
                         w_in,
-                        aw.qmc.weight_units.index(w_unit),
-                        aw.qmc.weight_units.index('Kg'),
+                        weight_units.index(w_unit),
+                        weight_units.index('Kg'),
                     ),
                 )
                 if w is not None:

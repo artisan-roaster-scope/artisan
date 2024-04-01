@@ -57,8 +57,9 @@ if TYPE_CHECKING:
     from PyQt6.QtGui import QResizeEvent # pylint: disable=unused-import
 
 from artisanlib.util import (uchr, fill_gaps, deltaLabelPrefix, deltaLabelUTF8, deltaLabelMathPrefix, stringfromseconds,
-        fromFtoC, fromFtoCstrict, fromCtoF, fromCtoFstrict, RoRfromFtoC, RoRfromFtoCstrict, RoRfromCtoF, toInt, toString, toFloat, application_name, getResourcePath, getDirectory,
-        abbrevString, scaleFloat2String, is_proper_temp)
+        fromFtoC, fromFtoCstrict, fromCtoF, fromCtoFstrict, RoRfromFtoC, RoRfromFtoCstrict, RoRfromCtoF, toInt, toString,
+        toFloat, application_name, getResourcePath, getDirectory, convertWeight,
+        abbrevString, scaleFloat2String, is_proper_temp, weight_units, volume_units, float2float)
 from artisanlib import pid
 from artisanlib.time import ArtisanTime
 from artisanlib.filters import LiveMedian
@@ -251,7 +252,7 @@ class tgraphcanvas(FigureCanvas):
         'patheffects', 'graphstyle', 'graphfont', 'buttonvisibility', 'buttonactions', 'buttonactionstrings', 'extrabuttonactions', 'extrabuttonactionstrings',
         'xextrabuttonactions', 'xextrabuttonactionstrings', 'chargeTimerFlag', 'autoChargeFlag', 'autoDropFlag', 'autoChargeMode', 'autoDropMode', 'autoChargeIdx', 'autoDropIdx', 'markTPflag',
         'autoDRYflag', 'autoFCsFlag', 'autoCHARGEenabled', 'autoDRYenabled', 'autoFCsenabled', 'autoDROPenabled', 'autoDryIdx', 'projectionconstant',
-        'projectionmode', 'transMappingMode', 'weight', 'volume_units', 'volume', 'density', 'density_roasted', 'volumeCalcUnit', 'volumeCalcWeightInStr',
+        'projectionmode', 'transMappingMode', 'weight', 'volume', 'density', 'density_roasted', 'volumeCalcUnit', 'volumeCalcWeightInStr',
         'volumeCalcWeightOutStr', 'container_names', 'container_weights', 'container_idx', 'specialevents', 'etypes', 'etypesdefault', 'specialeventstype',
         'specialeventsStrings', 'specialeventsvalue', 'eventsGraphflag', 'clampEvents', 'renderEventsDescr', 'eventslabelschars', 'eventsshowflag',
         'annotationsflag', 'showeventsonbt', 'showEtypes', 'E1timex', 'E2timex', 'E3timex', 'E4timex', 'E1values', 'E2values', 'E3values', 'E4values',
@@ -311,7 +312,7 @@ class tgraphcanvas(FigureCanvas):
         'segmentpickflag', 'segmentdeltathreshold', 'segmentsamplesthreshold', 'stats_summary_rect', 'title_text', 'title_artist', 'title_width',
         'background_title_width', 'xlabel_text', 'xlabel_artist', 'xlabel_width', 'lazyredraw_on_resize_timer', 'mathdictionary_base',
         'ambient_pressure_sampled', 'ambient_humidity_sampled', 'ambientTemp_sampled', 'backgroundmovespeed', 'chargeTimerPeriod', 'flavors_default_value',
-        'fmt_data_ON', 'l_subtitle', 'projectDeltaFlag', 'weight_units', 'btbreak_params']
+        'fmt_data_ON', 'l_subtitle', 'projectDeltaFlag', 'btbreak_params']
 
 
     def __init__(self, parent:QWidget, dpi:int, locale:str, aw:'ApplicationWindow') -> None:
@@ -1506,13 +1507,11 @@ class tgraphcanvas(FigureCanvas):
         # profile transformator mapping mode
         self.transMappingMode = 0 # 0: discrete, 1: linear, 2: quadratic
 
-        self.weight_units:List[str] = ['g','Kg','lb','oz']
         #[0]weight in, [1]weight out, [2]units (string)
-        self.weight:Tuple[float,float,str] = (0,0,self.weight_units[1])
+        self.weight:Tuple[float,float,str] = (0, 0, weight_units[1])
 
-        self.volume_units:List[str] = ['l','gal','qt','pt','cup','ml']
         #[0]volume in, [1]volume out, [2]units (string)
-        self.volume:Tuple[float,float,str] = (0,0,self.volume_units[0])
+        self.volume:Tuple[float,float,str] = (0, 0, volume_units[0])
 
         #[0]probe weight, [1]weight unit, [2]probe volume, [3]volume unit
         self.density:Tuple[float,str,float,str] = (0,'g',1.,'l')
@@ -1526,8 +1525,8 @@ class tgraphcanvas(FigureCanvas):
             # try to "guess" the users preferred temperature unit
             try:
                 if not QSettings().value('AppleMetricUnits'):
-                    self.weight = (0,0,self.weight_units[2])
-                    self.volume = (0,0,self.volume_units[1])
+                    self.weight = (0, 0, weight_units[2])
+                    self.volume = (0, 0, volume_units[1])
             except Exception: # pylint: disable=broad-except
                 pass
 
@@ -2526,7 +2525,7 @@ class tgraphcanvas(FigureCanvas):
             except Exception as ex: # pylint: disable=broad-except # the array to average over might get empty and mean thus invoking an exception
                 _log.exception(ex)
         if res is not None:
-            res = self.aw.float2float(res)
+            res = float2float(res)
         return res
 
     def updateAmbientTempFromPhidgetModulesOrCurve(self) -> None:
@@ -2547,8 +2546,8 @@ class tgraphcanvas(FigureCanvas):
                     if ser.PhidgetTemperatureSensor is not None:
                         at = ser.PhidgetTemperatureSensor[0].getTemperature()
                         if self.mode == 'F':
-                            at = self.aw.float2float(fromCtoFstrict(at))
-                        self.ambientTemp = self.aw.float2float(at)
+                            at = float2float(fromCtoFstrict(at))
+                        self.ambientTemp = float2float(at)
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
             # in case the AT channel of the 1048 or the TMP1101 is not used as extra device, we try to attach to it anyhow and read the temp off
@@ -2568,16 +2567,16 @@ class tgraphcanvas(FigureCanvas):
                             libtime.sleep(.5)
                         t = ambient.getTemperature()
                         if self.mode == 'F':
-                            self.ambientTemp = self.aw.float2float(fromCtoFstrict(t))
+                            self.ambientTemp = float2float(fromCtoFstrict(t))
                         else:
-                            self.ambientTemp = self.aw.float2float(t)
+                            self.ambientTemp = float2float(t)
                         if ambient.getAttached():
                             ambient.close()
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
         res = self.ambientTempSourceAvg()
         if res is not None and (isinstance(res, (float,int))) and not math.isnan(res):
-            self.ambientTemp = self.aw.float2float(float(res))
+            self.ambientTemp = float2float(float(res))
 
     def updateAmbientTemp(self) -> None:
         self.updateAmbientTempFromPhidgetModulesOrCurve()
@@ -2754,7 +2753,7 @@ class tgraphcanvas(FigureCanvas):
                     met_time_str = str(-1*self.met_timex_temp1_delta[2])
                     met_time_msg = QApplication.translate('Message','seconds after FCs')
 
-                self.aw.sendmessage(f'MET {self.aw.float2float(self.met_timex_temp1_delta[1],1)}{self.mode} @ {stringfromseconds(self.met_timex_temp1_delta[0])}, {met_time_str} {met_time_msg}')
+                self.aw.sendmessage(f'MET {float2float(self.met_timex_temp1_delta[1],1)}{self.mode} @ {stringfromseconds(self.met_timex_temp1_delta[0])}, {met_time_str} {met_time_msg}')
 
             # the analysis results were clicked
             elif self.aw.analysisresultsanno is not None and isinstance(event.artist, Annotation) and event.artist in [self.aw.analysisresultsanno]:
@@ -2855,7 +2854,7 @@ class tgraphcanvas(FigureCanvas):
                             self.backgroundeventmessage = f'{self.backgroundeventmessage}{self.Betypesf(self.backgroundEtypes[i])} = {self.eventsvalues(self.backgroundEvalues[i])}'
                             if self.renderEventsDescr and self.backgroundEStrings[i] and self.backgroundEStrings[i]!='':
                                 self.backgroundeventmessage = f'{self.backgroundeventmessage} ({self.backgroundEStrings[i].strip()[:self.eventslabelschars]})'
-                            self.backgroundeventmessage = f'{self.backgroundeventmessage} @ {(stringfromseconds(self.timeB[bge] - start))} {self.aw.float2float(self.temp2B[bge],digits)}{self.mode}'
+                            self.backgroundeventmessage = f'{self.backgroundeventmessage} @ {(stringfromseconds(self.timeB[bge] - start))} {float2float(self.temp2B[bge],digits)}{self.mode}'
                             self.starteventmessagetimer()
                             break
                 elif event.artist in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
@@ -2874,7 +2873,7 @@ class tgraphcanvas(FigureCanvas):
                             self.eventmessage = f'{self.eventmessage}{self.etypesf(self.specialeventstype[i])} = {self.eventsvalues(self.specialeventsvalue[i])}'
                             if self.renderEventsDescr and self.specialeventsStrings[i] and self.specialeventsStrings[i]!='':
                                 self.eventmessage = f'{self.eventmessage} ({self.specialeventsStrings[i].strip()[:self.eventslabelschars]})'
-                            self.eventmessage = f'{self.eventmessage} @ {stringfromseconds(self.timex[spe] - start)} {self.aw.float2float(self.temp2[spe],digits)}{self.mode}'
+                            self.eventmessage = f'{self.eventmessage} @ {stringfromseconds(self.timex[spe] - start)} {float2float(self.temp2[spe],digits)}{self.mode}'
                             self.starteventmessagetimer()
                             break
         except Exception as e: # pylint: disable=broad-except
@@ -4941,7 +4940,7 @@ class tgraphcanvas(FigureCanvas):
                             # we set the last value to be used for relative +- button action as base
                             self.aw.extraeventsactionslastvalue[slidernr] = int(round(slidervalue))
                             if self.flagstart:
-                                value = self.aw.float2float((slidervalue + 10.0) / 10.0)
+                                value = float2float((slidervalue + 10.0) / 10.0)
                                 self.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,eventdescription=f'A{number:d} (S{slidernr:d})')
                             self.aw.fireslideraction(slidernr)
                     except Exception as e: # pylint: disable=broad-except
@@ -5564,7 +5563,7 @@ class tgraphcanvas(FigureCanvas):
             # add Roast Properties
             try:
                 # weight-in in g
-                mathdictionary['WEIGHTin'] = int(round(self.aw.convertWeight(self.weight[0],self.weight_units.index(self.weight[2]),0)))
+                mathdictionary['WEIGHTin'] = int(round(convertWeight(self.weight[0], weight_units.index(self.weight[2]),0)))
                 mathdictionary['MOISTUREin'] = self.moisture_greens
                 mathdictionary['TEMPunit'] = (0 if self.mode == 'C' else 1) # 0:C and 1:F
             except Exception as e: # pylint: disable=broad-except
@@ -6259,7 +6258,7 @@ class tgraphcanvas(FigureCanvas):
             except Exception: # pylint: disable=broad-except
                 pass
         if self.LCDdecimalplaces:
-            return str(self.aw.float2float(res))
+            return str(float2float(res))
         return str(int(round(res)))
 
     #used by xaxistosm(). Provides also negative time
@@ -10043,16 +10042,16 @@ class tgraphcanvas(FigureCanvas):
             #background curve values
             if applyto == 'background':
                 e = self.backgroundEvalues[eventnum]
-                y1 = str(self.aw.float2float(self.temp1B[self.backgroundEvents[eventnum]],self.LCDdecimalplaces))
-                y2 = str(self.aw.float2float(self.temp2B[self.backgroundEvents[eventnum]],self.LCDdecimalplaces))
+                y1 = str(float2float(self.temp1B[self.backgroundEvents[eventnum]],self.LCDdecimalplaces))
+                y2 = str(float2float(self.temp2B[self.backgroundEvents[eventnum]],self.LCDdecimalplaces))
                 try:
                     d1b = self.delta1B[self.backgroundEvents[eventnum]]
-                    delta1 = str(self.aw.float2float(d1b)) if d1b is not None else '--'
+                    delta1 = str(float2float(d1b)) if d1b is not None else '--'
                 except Exception: # pylint: disable=broad-except
                     delta1 = '\u03C5\u03c5'
                 try:
                     d2b = self.delta2B[self.backgroundEvents[eventnum]]
-                    delta2 = str(self.aw.float2float(d2b)) if d2b is not None else '--'
+                    delta2 = str(float2float(d2b)) if d2b is not None else '--'
                 except Exception: # pylint: disable=broad-except
                     delta2 = '\u03C5\u03c5'
                 descr = str(self.backgroundEStrings[eventnum])
@@ -10061,26 +10060,26 @@ class tgraphcanvas(FigureCanvas):
 
                 if self.timeindexB[2] > 0 and self.timeB[self.backgroundEvents[eventnum]] > self.timeB[self.timeindexB[2]]:
                     postFCs = True
-                    dtr = str(self.aw.float2float(100 * (self.timeB[self.backgroundEvents[eventnum]] - self.timeB[self.timeindexB[2]]) / (self.timeB[self.backgroundEvents[eventnum]] - self.timeB[self.timeindexB[0]]),1))
+                    dtr = str(float2float(100 * (self.timeB[self.backgroundEvents[eventnum]] - self.timeB[self.timeindexB[2]]) / (self.timeB[self.backgroundEvents[eventnum]] - self.timeB[self.timeindexB[0]]),1))
                 else:
                     postFCs = False
                     dtr = '0'
                 if self.timeindexB[2] > 0:
-                    _dfcs = self.aw.float2float(self.timeB[self.backgroundEvents[eventnum]] - self.timeB[self.timeindexB[2]],0)
+                    _dfcs = float2float(self.timeB[self.backgroundEvents[eventnum]] - self.timeB[self.timeindexB[2]],0)
                     dfcs = str(_dfcs)
                     dfcs_ms = stringfromseconds(_dfcs,False)
                 else:
                     dfcs = '*'
                     dfcs_ms = '*'
                 if self.timeindexB[2] > 0 and self.timeB[self.backgroundEvents[eventnum]] < self.timeB[self.timeindexB[2]]:
-                    _prefcs = self.aw.float2float(self.timeB[self.timeindexB[2]] - self.timeB[self.backgroundEvents[eventnum]],0)
+                    _prefcs = float2float(self.timeB[self.timeindexB[2]] - self.timeB[self.backgroundEvents[eventnum]],0)
                     prefcs = str(_prefcs)
                     prefcs_ms = stringfromseconds(_prefcs,False)
                 else:
                     prefcs = '*'
                     prefcs_ms = '*'
                 if self.timeindexB[0] > -1:
-                    _dcharge = self.aw.float2float(self.timeB[self.backgroundEvents[eventnum]] - self.timeB[self.timeindexB[0]],0)
+                    _dcharge = float2float(self.timeB[self.backgroundEvents[eventnum]] - self.timeB[self.timeindexB[0]],0)
                     dcharge = str(_dcharge)
                     dcharge_ms = stringfromseconds(_dcharge,False)
                 else:
@@ -10115,16 +10114,16 @@ class tgraphcanvas(FigureCanvas):
             # foreground curve values
             else:
                 e = self.specialeventsvalue[eventnum]
-                y1 = str(self.aw.float2float(self.temp1[self.specialevents[eventnum]],self.LCDdecimalplaces))
-                y2 = str(self.aw.float2float(self.temp2[self.specialevents[eventnum]],self.LCDdecimalplaces))
+                y1 = str(float2float(self.temp1[self.specialevents[eventnum]],self.LCDdecimalplaces))
+                y2 = str(float2float(self.temp2[self.specialevents[eventnum]],self.LCDdecimalplaces))
                 try:
                     d1 = self.delta1[self.specialevents[eventnum]]
-                    delta1 = str(self.aw.float2float(d1)) if d1 is not None else '--'
+                    delta1 = str(float2float(d1)) if d1 is not None else '--'
                 except Exception: # pylint: disable=broad-except
                     delta1 = '\u03C5\u03c5'
                 try:
                     d2 = self.delta2[self.specialevents[eventnum]]
-                    delta2 = str(self.aw.float2float(d2)) if d2 is not None else '--'
+                    delta2 = str(float2float(d2)) if d2 is not None else '--'
                 except Exception: # pylint: disable=broad-except
                     delta2 = '\u03C5\u03c5'
                 descr = str(self.specialeventsStrings[eventnum])
@@ -10133,12 +10132,12 @@ class tgraphcanvas(FigureCanvas):
 
                 if self.timeindex[2] > 0 and self.timex[self.specialevents[eventnum]] > self.timex[self.timeindex[2]]:
                     postFCs = True
-                    dtr = str(self.aw.float2float(100 * (self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[2]]) / (self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[0]]),1))
+                    dtr = str(float2float(100 * (self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[2]]) / (self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[0]]),1))
                 else:
                     postFCs = False
                     dtr = '0'
                 if self.timeindex[2] > 0:
-                    _dfcs = self.aw.float2float(self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[2]],0)
+                    _dfcs = float2float(self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[2]],0)
                     dfcs = str(_dfcs)
                     dfcs_ms = stringfromseconds(_dfcs,False)
 #                    print(f'{dfcs_ms=}')
@@ -10146,14 +10145,14 @@ class tgraphcanvas(FigureCanvas):
                     dfcs = '*'
                     dfcs_ms = '*'
                 if self.timeindex[2] > 0 and self.timex[self.specialevents[eventnum]] < self.timex[self.timeindex[2]]:
-                    _prefcs = self.aw.float2float(self.timex[self.timeindex[2]] - self.timex[self.specialevents[eventnum]],0)
+                    _prefcs = float2float(self.timex[self.timeindex[2]] - self.timex[self.specialevents[eventnum]],0)
                     prefcs = str(_prefcs)
                     prefcs_ms = stringfromseconds(_prefcs,False)
                 else:
                     prefcs = '*'
                     prefcs_ms = '*'
                 if self.timeindex[0] > -1:
-                    _dcharge = self.aw.float2float(self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[0]],0)
+                    _dcharge = float2float(self.timex[self.specialevents[eventnum]] - self.timex[self.timeindex[0]],0)
                     dcharge = str(_dcharge)
                     dcharge_ms = stringfromseconds(_dcharge,False)
                 else:
@@ -10263,7 +10262,7 @@ class tgraphcanvas(FigureCanvas):
                     # do simple math if an operator is in the string
                     if matched.group('mathop') is not None:
                         replacestring += matched.group('mathop')
-                        replacestring = str(self.aw.float2float(eval(replacestring),1)) # pylint: disable=eval-used
+                        replacestring = str(float2float(eval(replacestring),1)) # pylint: disable=eval-used
 
                     pattern = re.compile(fr'{fieldDelim}{field[0]}([/*+-][0-9.]+)?',_ignorecase)
                     eventanno = pattern.sub(replacestring,eventanno)
@@ -10409,7 +10408,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.ambient_humidity not in [None,0]:
                         statstr_segments += [str(int(round(self.ambient_humidity))), '%  ']
                     if self.ambient_pressure not in [None,0]:
-                        statstr_segments += [str(self.aw.float2float(self.ambient_pressure,2)), 'hPa']
+                        statstr_segments += [str(float2float(self.ambient_pressure,2)), 'hPa']
                 if self.roastertype or self.drumspeed:
                     statstr_segments.append(skipline)
                     if self.roastertype:
@@ -10439,17 +10438,17 @@ class tgraphcanvas(FigureCanvas):
 
                 if self.density[0]!=0 and self.density[2] != 0:
                     statstr_segments += ['\n', QApplication.translate('AddlInfo', 'Density Green'), ': ',
-                        str(self.aw.float2float(self.density[0]/self.density[2],2)), ' ', self.density[1], '/', self.density[3]]
+                        str(float2float(self.density[0]/self.density[2],2)), ' ', self.density[1], '/', self.density[3]]
                 if self.moisture_greens:
-                    statstr_segments += ['\n', QApplication.translate('AddlInfo', 'Moisture Green'), ': ', str(self.aw.float2float(self.moisture_greens,1)), '%']
+                    statstr_segments += ['\n', QApplication.translate('AddlInfo', 'Moisture Green'), ': ', str(float2float(self.moisture_greens,1)), '%']
                 if self.weight[0] != 0:
                     if self.weight[2] == 'g':
-                        w =str(self.aw.float2float(self.weight[0],0))
+                        w =str(float2float(self.weight[0],0))
                     else:
-                        w = str(self.aw.float2float(self.weight[0],2))
+                        w = str(float2float(self.weight[0],2))
                     statstr_segments += ['\n', self.__dijstra_to_ascii(QApplication.translate('AddlInfo', 'Batch Size')) , ': ', w, self.weight[2], ' ']
                     if self.weight[1]:
-                        statstr_segments += ['(-', str(self.aw.float2float(self.aw.weight_loss(self.weight[0],self.weight[1]),1)), '%)']
+                        statstr_segments += ['(-', str(float2float(self.aw.weight_loss(self.weight[0],self.weight[1]),1)), '%)']
 
                 # Roast Info Section
                 statstr_segments.append(skipline)
@@ -10458,7 +10457,7 @@ class tgraphcanvas(FigureCanvas):
                     statstr_segments += ['\n', self.__dijstra_to_ascii(QApplication.translate('AddlInfo', 'Density Roasted')), ': ', str(roasted_density),
                         ' ', self.density_roasted[1], '/', self.density_roasted[3]]
                 if self.moisture_roasted:
-                    statstr_segments += ['\n', self.__dijstra_to_ascii(QApplication.translate('AddlInfo', 'Moisture Roasted')), ': ', str(self.aw.float2float(self.moisture_roasted,1)), '%']
+                    statstr_segments += ['\n', self.__dijstra_to_ascii(QApplication.translate('AddlInfo', 'Moisture Roasted')), ': ', str(float2float(self.moisture_roasted,1)), '%']
                 if self.whole_color > 0:
                     statstr_segments += ['\n', QApplication.translate('AddlInfo', 'Whole Color'), ': #', str(self.whole_color), ' ',
                         str(self.color_systems[self.color_system_idx])]
@@ -10467,13 +10466,13 @@ class tgraphcanvas(FigureCanvas):
                         str(self.color_systems[self.color_system_idx])]
                 if 'BTU_batch' in cp and cp['BTU_batch']:
                     statstr_segments += ['\n', QApplication.translate('AddlInfo', 'Energy'), ': ',
-                        str(self.aw.float2float(self.convertHeat(cp['BTU_batch'],0,3),2)), 'kWh']
+                        str(float2float(self.convertHeat(cp['BTU_batch'],0,3),2)), 'kWh']
                     if 'BTU_batch_per_green_kg' in cp and cp['BTU_batch_per_green_kg']:
-                        statstr_segments += [' (', str(self.aw.float2float(self.convertHeat(cp['BTU_batch_per_green_kg'], 0,3), 2)), 'kWh/kg)']
+                        statstr_segments += [' (', str(float2float(self.convertHeat(cp['BTU_batch_per_green_kg'], 0,3), 2)), 'kWh/kg)']
                 if 'CO2_batch' in cp and cp['CO2_batch']:
-                    statstr_segments += ['\n', QApplication.translate('AddlInfo', 'CO2'), ': ', str(self.aw.float2float(cp['CO2_batch'],0)),'g']
+                    statstr_segments += ['\n', QApplication.translate('AddlInfo', 'CO2'), ': ', str(float2float(cp['CO2_batch'],0)),'g']
                     if 'CO2_batch_per_green_kg' in cp and cp['CO2_batch_per_green_kg']:
-                        statstr_segments += [' (', str(self.aw.float2float(cp['CO2_batch_per_green_kg'],0)), 'g/kg)']
+                        statstr_segments += [' (', str(float2float(cp['CO2_batch_per_green_kg'],0)), 'g/kg)']
                 if cp['AUC']:
                     statstr_segments += ['\n', QApplication.translate('AddlInfo', 'AUC'), ': ', str(cp['AUC']), 'C*min [', str(cp['AUCbase']), '\u00b0', self.mode, ']']
 
@@ -10491,7 +10490,7 @@ class tgraphcanvas(FigureCanvas):
 
                 cupping_score, cupping_all_default = self.aw.cuppingSum(self.flavors)
                 if not cupping_all_default:
-                    statstr_segments += ['\n', QApplication.translate('HTML Report Template', 'Cupping:'), ' ', str(self.aw.float2float(cupping_score))]
+                    statstr_segments += ['\n', QApplication.translate('HTML Report Template', 'Cupping:'), ' ', str(float2float(cupping_score))]
 
                 render_notes(self.cuppingnotes,statstr_segments)
 
@@ -11616,7 +11615,7 @@ class tgraphcanvas(FigureCanvas):
 
             if not bool(self.aw.simulator):
                 QTimer.singleShot(300,self.StartAsyncSamplingAction)
-            _log.info('MODE: ON MONITOR (sampling @%ss)', self.aw.float2float(self.delay/1000))
+            _log.info('MODE: ON MONITOR (sampling @%ss)', float2float(self.delay/1000))
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
@@ -11854,7 +11853,7 @@ class tgraphcanvas(FigureCanvas):
 
             # set and report
             if humidity is not None:
-                self.ambient_humidity = self.aw.float2float(humidity,1)
+                self.ambient_humidity = float2float(humidity,1)
                 self.ambient_humidity_sampled = self.ambient_humidity
                 self.aw.sendmessage(QApplication.translate('Message','Humidity: {}%').format(self.ambient_humidity))
                 libtime.sleep(1)
@@ -11862,13 +11861,13 @@ class tgraphcanvas(FigureCanvas):
             if temp is not None:
                 if self.mode == 'F':
                     temp = fromCtoFstrict(temp)
-                self.ambientTemp = self.aw.float2float(temp,1)
+                self.ambientTemp = float2float(temp,1)
                 self.ambientTemp_sampled = self.ambientTemp
                 self.aw.sendmessage(QApplication.translate('Message','Temperature: {}{}').format(self.ambientTemp,self.mode))
                 libtime.sleep(1)
 
             if pressure is not None:
-                self.ambient_pressure = self.aw.float2float(pressure,1)
+                self.ambient_pressure = float2float(pressure,1)
                 self.ambient_pressure_sampled = self.ambient_pressure
                 self.aw.sendmessage(QApplication.translate('Message','Pressure: {}hPa').format(self.ambient_pressure))
         except Exception as e:  # pylint: disable=broad-except
@@ -12424,7 +12423,7 @@ class tgraphcanvas(FigureCanvas):
                                     slidervalue = self.aw.slider4.value()
                                 # only mark events that are non-zero # and have not been marked before not to duplicate the event values
                                 if slidervalue != 0: #  and slidernr not in self.specialeventstype:
-                                    value = self.aw.float2float((slidervalue + 10.0) / 10.0)
+                                    value = float2float((slidervalue + 10.0) / 10.0)
                                     # note that EventRecordAction avoids to generate events were type and value matches to the previously recorded one
                                     self.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,takeLock=False,doupdategraphics=False)
                                     # we don't take another lock in EventRecordAction as we already hold that lock!
@@ -13713,7 +13712,7 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             start = 0
                         timed = stringfromseconds(self.timex[i] - start)
-                        message = QApplication.translate('Message','Event # {0} recorded at BT = {1} Time = {2}').format(str(Nevents+1),temp2,timed)
+                        message = QApplication.translate('Message','Event # {0} recorded at BT = {1}{self.mode} Time = {2}').format(str(Nevents+1),temp2,timed)
                         self.aw.sendmessage(message)
                         #write label in mini recorder if flag checked
                         self.aw.eventlabel.setText(QApplication.translate('Label', 'Event #<b>{0} </b>').format(Nevents+1))
@@ -13763,7 +13762,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         start = 0
                     timed = stringfromseconds(self.timex[i]-start)
-                    message = QApplication.translate('Message','Computer Event # {0} recorded at BT = {1}{self.mode} Time = {2}').format(str(Nevents+1),temp_str,timed)
+                    message = QApplication.translate('Message','Event # {0} recorded at BT = {1}{self.mode} Time = {2}').format(str(Nevents+1),temp_str,timed)
                     self.aw.sendmessage(message)
                     #write label in mini recorder if flag checked
                     self.aw.eNumberSpinBox.setValue(Nevents+1)
@@ -13853,7 +13852,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.idx_met is not None:
                     if self.timeindex[2] != 0:
                         # time between MET and FCs
-                        met_delta = self.aw.float2float(self.timex[self.timeindex[2]] - self.timex[self.idx_met],0)
+                        met_delta = float2float(self.timex[self.timeindex[2]] - self.timex[self.idx_met],0)
                     else:
                         met_delta = None
                     self.met_timex_temp1_delta = ((self.timex[self.idx_met]-self.timex[self.timeindex[0]]), met_temp, met_delta) #used in onpick() to display the MET temp and time
@@ -13966,13 +13965,13 @@ class tgraphcanvas(FigureCanvas):
                         msg = f"{msg} {abbrevString(self.beans.replace(chr(10),' '),25)}"
                     if self.weight[0]:
                         if self.weight[2] in {'g', 'oz'}:
-                            msg += f'{sep}{self.aw.float2float(self.weight[0],0)}{self.weight[2]}'
+                            msg += f'{sep}{float2float(self.weight[0],0)}{self.weight[2]}'
                         else:
-                            msg += f'{sep}{self.aw.float2float(self.weight[0],1)}{self.weight[2]}'
+                            msg += f'{sep}{float2float(self.weight[0],1)}{self.weight[2]}'
                         if self.weight[1]:
-                            msg += f'{sep}{-1*self.aw.float2float(self.aw.weight_loss(self.weight[0],self.weight[1]),1)}%'
+                            msg += f'{sep}{-1*float2float(self.aw.weight_loss(self.weight[0],self.weight[1]),1)}%'
                     if self.volume[0] and self.volume[1]:
-                        msg += f'{sep}{self.aw.float2float(self.aw.volume_increase(self.volume[0],self.volume[1]),1)}%'
+                        msg += f'{sep}{float2float(self.aw.volume_increase(self.volume[0],self.volume[1]),1)}%'
                     if self.whole_color and self.ground_color:
                         msg += f'{sep}#{self.whole_color}/{self.ground_color}'
                     elif self.ground_color:
@@ -14090,9 +14089,9 @@ class tgraphcanvas(FigureCanvas):
                         return dryEndIndex, statisticstimes
 
                     statisticstimes[0] = totaltime
-                    dryphasetime = dryEndTime - starttime # self.aw.float2float(dryEndTime - starttime)
-                    midphasetime = self.timex[self.timeindex[2]] - dryEndTime # self.aw.float2float(self.timex[self.timeindex[2]] - dryEndTime)
-                    finishphasetime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]] # self.aw.float2float(self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]])
+                    dryphasetime = dryEndTime - starttime # float2float(dryEndTime - starttime)
+                    midphasetime = self.timex[self.timeindex[2]] - dryEndTime # float2float(self.timex[self.timeindex[2]] - dryEndTime)
+                    finishphasetime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]] # float2float(self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]])
 
                     if self.timeindex[7]:
                         coolphasetime = self.timex[self.timeindex[7]] - self.timex[self.timeindex[6]] # int(round(self.timex[self.timeindex[7]] - self.timex[self.timeindex[6]]))
@@ -14362,7 +14361,7 @@ class tgraphcanvas(FigureCanvas):
                 w = toFloat(beanweightstr)
             else:
                 w = self.weight[0]
-            bean_weight = self.aw.convertWeight(w,self.weight_units.index(self.weight[2]),1) # to kg
+            bean_weight = convertWeight(w, weight_units.index(self.weight[2]),1) # to kg
 
             #reference: https://www.eia.gov/environment/emissions/co2_vol_mass.php (dated Nov-18-2021, accessed Jan-02-2022)
             #           https://www.eia.gov/tools/faqs/faq.php?id=74&t=11 (referencing data from 2020, accessed Jan-02-2022)
@@ -14550,19 +14549,19 @@ class tgraphcanvas(FigureCanvas):
                 btu_lpg += item['BTUs'] if item['SourceType'] == 0 else 0
                 btu_ng += item['BTUs'] if item['SourceType'] == 1 else 0
                 btu_elec += item['BTUs'] if item['SourceType'] == 2 else 0
-            btu_batch = self.aw.float2float(btu_batch,3)
-            btu_preheat = self.aw.float2float(btu_preheat,3)
-            btu_bbp = self.aw.float2float(btu_bbp,3)
-            btu_cooling = self.aw.float2float(btu_cooling,3)
-            btu_roast = self.aw.float2float(btu_roast,3)
-            co2_batch = self.aw.float2float(co2_batch,3)
-            co2_preheat = self.aw.float2float(co2_preheat,3)
-            co2_bbp = self.aw.float2float(co2_bbp,3)
-            co2_cooling = self.aw.float2float(co2_cooling,3)
-            co2_roast = self.aw.float2float(co2_roast,3)
-            btu_lpg = self.aw.float2float(btu_lpg,3)
-            btu_ng = self.aw.float2float(btu_ng,3)
-            btu_elec = self.aw.float2float(btu_elec,3)
+            btu_batch = float2float(btu_batch,3)
+            btu_preheat = float2float(btu_preheat,3)
+            btu_bbp = float2float(btu_bbp,3)
+            btu_cooling = float2float(btu_cooling,3)
+            btu_roast = float2float(btu_roast,3)
+            co2_batch = float2float(co2_batch,3)
+            co2_preheat = float2float(co2_preheat,3)
+            co2_bbp = float2float(co2_bbp,3)
+            co2_cooling = float2float(co2_cooling,3)
+            co2_roast = float2float(co2_roast,3)
+            btu_lpg = float2float(btu_lpg,3)
+            btu_ng = float2float(btu_ng,3)
+            btu_elec = float2float(btu_elec,3)
             if bean_weight > 0:
                 co2_batch_per_green_kg = co2_batch / bean_weight
                 co2_roast_per_green_kg = co2_roast / bean_weight
@@ -14573,12 +14572,12 @@ class tgraphcanvas(FigureCanvas):
                 co2_roast_per_green_kg = 0
                 btu_batch_per_green_kg = 0
                 btu_roast_per_green_kg = 0
-            co2_batch_per_green_kg = self.aw.float2float(co2_batch_per_green_kg,3)
-            co2_roast_per_green_kg = self.aw.float2float(co2_roast_per_green_kg,3)
-            btu_batch_per_green_kg = self.aw.float2float(btu_batch_per_green_kg,3)
-            btu_roast_per_green_kg = self.aw.float2float(btu_roast_per_green_kg,3)
-            kwh_batch_per_green_kg = self.aw.float2float(self.convertHeat(btu_batch_per_green_kg,0,3),3)
-            kwh_roast_per_green_kg = self.aw.float2float(self.convertHeat(btu_roast_per_green_kg,0,3),3)
+            co2_batch_per_green_kg = float2float(co2_batch_per_green_kg,3)
+            co2_roast_per_green_kg = float2float(co2_roast_per_green_kg,3)
+            btu_batch_per_green_kg = float2float(btu_batch_per_green_kg,3)
+            btu_roast_per_green_kg = float2float(btu_roast_per_green_kg,3)
+            kwh_batch_per_green_kg = float2float(self.convertHeat(btu_batch_per_green_kg,0,3),3)
+            kwh_roast_per_green_kg = float2float(self.convertHeat(btu_roast_per_green_kg,0,3),3)
 
 
             # energymetrics
@@ -16844,14 +16843,14 @@ class tgraphcanvas(FigureCanvas):
                     y = event.ydata
                     if self.delta_ax is not None and x is not None and y is not None and self.baseX and self.baseY:
                         deltaX = stringfromseconds(x - self.baseX)
-                        deltaY = str(self.aw.float2float(y - self.baseY,1))
-                        RoR = str(self.aw.float2float(60 * (y - self.baseY) / (x - self.baseX),1))
+                        deltaY = str(float2float(y - self.baseY,1))
+                        RoR = str(float2float(60 * (y - self.baseY) / (x - self.baseX),1))
                         deltaRoR = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,y))[1]))[1]
                                     - self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,self.baseY))[1]))[1])
                         #RoRoR is always in C/min/min
                         if self.mode == 'F':
                             deltaRoR = RoRfromFtoCstrict(deltaRoR)
-                        RoRoR = str(self.aw.float2float(60 * (deltaRoR)/(x - self.baseX),1))
+                        RoRoR = str(float2float(60 * (deltaRoR)/(x - self.baseX),1))
                         message = f'delta Time= {deltaX},    delta Temp= {deltaY} {self.mode},    RoR= {RoR} {self.mode}/min,    RoRoR= {RoRoR} C/min/min'
                         self.aw.sendmessage(message)
                         self.base_messagevisible = True
