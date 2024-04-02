@@ -22,6 +22,7 @@ import logging
 import asyncio
 import websockets
 import contextlib
+import socket
 
 from contextlib import suppress
 from threading import Thread
@@ -265,7 +266,7 @@ class wsport:
                 async with websockets.connect(
                         f'ws://{hostport}/{self.path}',
                         compression=('deflate' if self.compression else None),
-                        origin=websockets.Origin(f'http://{hostport}'),
+                        origin=websockets.Origin(f'http://{socket.gethostname()}'),
                         user_agent_header = f'Artisan/{__version__} websockets') as websocket:
                     self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('WebSocket'),True,None)
                     if self._write_queue is None:
