@@ -6187,8 +6187,19 @@ class tgraphcanvas(FigureCanvas):
 
             if self.xgrid != 0:
 
-                mfactor1 =  round(float(2. + abs(int(round(startofx-starttime))/int(round(self.xgrid)))))
-                mfactor2 =  round(float(2. + abs(int(round(endofx))/int(round(self.xgrid)))))
+                first_reading_time = startofx-starttime
+                last_reading_time = endofx
+                if not self.flagon and min_time is None and max_time is None:
+                    if len(self.timex)>0:
+                        first_reading_time = min(first_reading_time, self.timex[0]-starttime)
+                        last_reading_time = max(last_reading_time, self.timex[-1]-starttime)
+                    if self.background and len(self.timeB)>0:
+                        first_reading_time = min(first_reading_time, self.timeB[0]-starttime)
+                        last_reading_time = max(last_reading_time, self.timeB[-1]-starttime)
+                # mfactor1: number of ticks before CHARGE
+                mfactor1 =  round(float(2. + abs( int(round(first_reading_time)) / int(round(self.xgrid)) )))
+                # mfactor2: number of ticks after CHARGE
+                mfactor2 =  round(float(2. + abs( int(round(last_reading_time)) / int(round(self.xgrid)) )))
 
                 majorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), self.xgrid)
                 if self.xgrid == 60:
@@ -6246,7 +6257,7 @@ class tgraphcanvas(FigureCanvas):
         sign = '' if x >= starttime else '-'
         m,s = divmod(abs(x - starttime), 60.)
 #        return '%s%d:%02d'%(sign,m,s)
-        return f'{sign}{m:.0f}:{s:02.0f}'
+        return f'{sign}{m:.0f}:{int(s):02.0f}'
 
     def fmt_data(self, x:float) -> str:
         res = x
