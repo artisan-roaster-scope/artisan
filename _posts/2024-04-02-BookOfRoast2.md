@@ -6,7 +6,7 @@ header:
 title: "Book of Roast 2"
 excerpt: "@SCA Expo, Chicago"
 author_profile: false
-date: 2024-04-03
+date: 2024-04-02
 categories:
   - announcement
   - publication
