@@ -39,7 +39,7 @@ try:
     from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,  # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QRadioButton, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QTableWidget, QMessageBox, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
+                                 QTableWidget, QMessageBox, QHeaderView, QTableWidgetItem) # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QTimer) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import (QStandardItemModel, QStandardItem, QColor) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
@@ -1538,6 +1538,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 #            if nddevices != 0:
 #                self.devicetable.clearContents() # this crashes Ubuntu 16.04 if device table is empty
 #            self.devicetable.clearSelection()
+
             self.devicetable.setRowCount(nddevices)
             self.devicetable.setColumnCount(columns)
             self.devicetable.setHorizontalHeaderLabels([QApplication.translate('Table', 'Device'),
@@ -1559,6 +1560,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.devicetable.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
             self.devicetable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
             self.devicetable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
+
+#            self.devicetable.setStyleSheet("selection-background-color: transparent;") # avoid the selection color to shine through transparent device color items
+
             self.devicetable.setShowGrid(True)
             vheader = self.devicetable.verticalHeader()
             if vheader is not None:
@@ -1590,16 +1594,16 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                             pass
                         # 1: color 1
                         color1Button = QPushButton(self.aw.qmc.extradevicecolor1[i])
-                        color1Button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                         color1Button.clicked.connect(self.setextracolor1)
                         textcolor = self.aw.labelBorW(self.aw.qmc.extradevicecolor1[i])
-                        color1Button.setStyleSheet(f'border: none; outline: none; background-color: rgba{ImageColor.getcolor(self.aw.qmc.extradevicecolor1[i], "RGBA")}; color: {textcolor}')
+                        color1Button.setStyleSheet(f'selection-background-color: transparent; border: none; outline: none; background-color: rgba{ImageColor.getcolor(self.aw.qmc.extradevicecolor1[i], "RGBA")}; color: {textcolor}')
+                        color1Button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                         # 2: color 2
                         color2Button = QPushButton(self.aw.qmc.extradevicecolor2[i])
                         color2Button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                         color2Button.clicked.connect(self.setextracolor2)
                         textcolor = self.aw.labelBorW(self.aw.qmc.extradevicecolor2[i])
-                        color2Button.setStyleSheet(f'border: none; outline: none; background-color: rgba{ImageColor.getcolor(self.aw.qmc.extradevicecolor2[i], "RGBA")}; color: {textcolor}')
+                        color2Button.setStyleSheet(f'selection-background-color: transparent; border: none; outline: none; background-color: rgba{ImageColor.getcolor(self.aw.qmc.extradevicecolor2[i], "RGBA")}; color: {textcolor}')
                         # 3+4: name 1 + 2
                         name1edit = QLineEdit(self.aw.qmc.extraname1[i])
                         name2edit = QLineEdit(self.aw.qmc.extraname2[i])
@@ -1680,6 +1684,19 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         self.devicetable.setCellWidget(i,12,Delta2widget)
                         self.devicetable.setCellWidget(i,13,Fill1SpinBox)
                         self.devicetable.setCellWidget(i,14,Fill2SpinBox)
+
+                        # we add QTableWidgetItems disable selection of cells and to have tab focus to jump over those cells
+                        color1item = QTableWidgetItem()
+                        color1item.setFlags(Qt.ItemFlag.NoItemFlags)
+                        self.devicetable.setItem(i,1,color1item)
+                        color2item = QTableWidgetItem()
+                        color2item.setFlags(Qt.ItemFlag.NoItemFlags)
+                        self.devicetable.setItem(i,2,color2item)
+                        for j in range(7, 13):
+                            item = QTableWidgetItem()
+                            item.setFlags(Qt.ItemFlag.NoItemFlags)
+                            self.devicetable.setItem(i,j,item)
+
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
                 fixed_size_sections = [7,8,9,10,11,12,13,14]
