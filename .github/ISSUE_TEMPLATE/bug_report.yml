@@ -43,8 +43,9 @@ body:
       description: Shown in the top window bar or in 'Help>> About'.
       options:
         - 
+        - 2.10.4
+        - 2.10.5 Continuous Build
         - 2.10.2
-        - 2.10.3 Continuous Build
         - 2.10.0
         - Other - include in Description
       default: 0
