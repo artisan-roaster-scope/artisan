@@ -773,6 +773,8 @@ class RoastProfile:
 
     def drawExtras(self, i:int) -> None:
         if self.aw.qmc.ax is not None and len(self.extratimex)> i and self.extratimex[i]:
+            c = (self.color if self.active else self.gray)
+            alpha = (self.alpha[0] if self.active else self.alpha[0]*self.alpha_dim_factor)
             if self.extrastemp1[i] is not None:
                 extramarkersizes1 = (self.aw.qmc.extramarkersizes1[i] if len(self.aw.qmc.extramarkersizes1)>i else self.aw.qmc.markersize_default)
                 extramarkers1 = (self.aw.qmc.extramarkers1[i] if len(self.aw.qmc.extramarkers1)>i else self.aw.qmc.marker_default)
@@ -782,12 +784,12 @@ class RoastProfile:
                 l_temp1, = self.aw.qmc.ax.plot(self.extratimex[i],numpy.array(self.extrastemp1[i]),transform=(self.getDeltaTrans() if self.extraDelta1[i] else self.getTempTrans()),
                     markersize=extramarkersizes1,marker=extramarkers1,visible=(self.visible and self.aligned),
                     sketch_params=None,
-                    path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, extralinewidths1),
+                    path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, extralinewidths1, alpha=alpha),
                     linewidth=extralinewidths1,
                     linestyle=extralinestyles1,
                     drawstyle=extradrawstyles1,
-                    alpha=(self.alpha[0] if self.active else self.alpha[0]*self.alpha_dim_factor),
-                    color=(self.color if self.active else self.gray),
+                    alpha=alpha,
+                    color=c,
                     label=f'{self.label} {self.aw.arabicReshape(self.extraname1[i])}')
                 self.l_extratemp1[i] = l_temp1
             if self.extrastemp2[i] is not None:
@@ -799,77 +801,82 @@ class RoastProfile:
                 l_temp2, = self.aw.qmc.ax.plot(self.extratimex[i],numpy.array(self.extrastemp2[i]),transform=(self.getDeltaTrans() if self.extraDelta2[i] else self.getTempTrans()),
                     markersize=extramarkersizes2,marker=extramarkers2,visible=(self.visible and self.aligned),
                     sketch_params=None,
-                    path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, extralinewidths2),
+                    path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, extralinewidths2, alpha=alpha),
                     linewidth=extralinewidths2,
                     linestyle=extralinestyles2,
                     drawstyle=extradrawstyles2,
-                    alpha=(self.alpha[0] if self.active else self.alpha[0]*self.alpha_dim_factor),
-                    color=(self.color if self.active else self.gray),
+                    alpha=alpha,
+                    color=c,
                     label=f'{self.label} {self.aw.arabicReshape(self.extraname2[i])}')
                 self.l_extratemp2[i] = l_temp2
 
     def drawBT(self) -> None:
         if self.aw.qmc.ax is not None and self.timex is not None and self.stemp2 is not None:
+            alpha = (self.alpha[0] if self.active else self.alpha[1]*self.alpha_dim_factor)
             self.l_temp2, = self.aw.qmc.ax.plot(self.timex,numpy.array(self.stemp2),transform=self.getTempTrans(),markersize=self.aw.qmc.BTmarkersize,marker=self.aw.qmc.BTmarker,visible=(self.visible and self.aligned),
                 sketch_params=None,
-                path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, self.aw.qmc.BTlinewidth),
+                path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, self.aw.qmc.BTlinewidth, alpha=alpha),
                 linewidth=self.aw.qmc.BTlinewidth,
                 linestyle=self.aw.qmc.BTlinestyle,
                 drawstyle=self.aw.qmc.BTdrawstyle,
-                alpha=(self.alpha[0] if self.active else self.alpha[0]*self.alpha_dim_factor),
+                alpha=alpha,
                 color=(self.color if self.active else self.gray),
                 label=f'{self.label} {self.aw.arabicReshape(self.aw.BTname)}')
 
     def drawET(self) -> None:
         if self.aw.qmc.ax is not None and self.timex is not None and self.stemp1 is not None:
+            alpha = (self.alpha[1] if self.active else self.alpha[1]*self.alpha_dim_factor)
             self.l_temp1, = self.aw.qmc.ax.plot(self.timex,numpy.array(self.stemp1),transform=self.getTempTrans(),markersize=self.aw.qmc.ETmarkersize,marker=self.aw.qmc.ETmarker,visible=(self.visible and self.aligned),
                 sketch_params=None,
-                path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, self.aw.qmc.ETlinewidth),
+                path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, self.aw.qmc.ETlinewidth, alpha=alpha),
                 linewidth=self.aw.qmc.ETlinewidth,
                 linestyle=self.aw.qmc.ETlinestyle,
                 drawstyle=self.aw.qmc.ETdrawstyle,
-                alpha=(self.alpha[1] if self.active else self.alpha[1]*self.alpha_dim_factor),
+                alpha=alpha,
                 color=(self.color if self.active else self.gray),
                 label=f'{self.label} {self.aw.arabicReshape(self.aw.ETname)}')
 
     def drawDeltaBT(self) -> None:
         if self.aw.qmc.ax is not None and self.timex is not None and self.delta2 is not None:
+            alpha = (self.alpha[2] if self.active else self.alpha[1]*self.alpha_dim_factor)
             # we clip the RoR such that values below 0 are not displayed
 #            self.l_delta2_clipping = patches.Rectangle((0,0),self.timex[self.endTimeIdx],self.max_DeltaBT, transform=self.getDeltaTrans())
             self.l_delta2, = self.aw.qmc.ax.plot(self.timex, numpy.array(self.delta2),transform=self.getDeltaTrans(),markersize=self.aw.qmc.BTdeltamarkersize,marker=self.aw.qmc.BTdeltamarker,visible=(self.visible and self.aligned),
                 sketch_params=None,
-                path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, self.aw.qmc.BTdeltalinewidth),
+                path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, self.aw.qmc.BTdeltalinewidth, alpha=alpha),
                 linewidth=self.aw.qmc.BTdeltalinewidth,
                 linestyle=self.aw.qmc.BTdeltalinestyle,
                 drawstyle=self.aw.qmc.BTdeltadrawstyle,
-                alpha=(self.alpha[2] if self.active else self.alpha[2]*self.alpha_dim_factor),
+                alpha=alpha,
 #                clip_path=self.l_delta2_clipping,clip_on=True,
                 color=(self.color if self.active else self.gray),
                 label=f"{self.label} {self.aw.arabicReshape(deltaLabelUTF8 + QApplication.translate('Label', 'BT'))}")
 
     def drawDeltaET(self) -> None:
         if self.aw.qmc.ax is not None and self.timex is not None and self.delta1 is not None:
+            alpha = (self.alpha[3] if self.active else self.alpha[3]*self.alpha_dim_factor)
             # we clip the RoR such that values below 0 are not displayed
 #            self.l_delta1_clipping = patches.Rectangle((0,0),self.timex[self.endTimeIdx],self.max_DeltaET, transform=self.getDeltaTrans())
             self.l_delta1, = self.aw.qmc.ax.plot(self.timex, numpy.array(self.delta1),transform=self.getDeltaTrans(),markersize=self.aw.qmc.ETdeltamarkersize,marker=self.aw.qmc.ETdeltamarker,visible=(self.visible and self.aligned),
                 sketch_params=None,
-                path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, self.aw.qmc.ETdeltalinewidth),
+                path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, self.aw.qmc.ETdeltalinewidth, alpha=alpha),
                 linewidth=self.aw.qmc.ETdeltalinewidth,
                 linestyle=self.aw.qmc.ETdeltalinestyle,
                 drawstyle=self.aw.qmc.ETdeltadrawstyle,
-                alpha=(self.alpha[3] if self.active else self.alpha[3]*self.alpha_dim_factor),
+                alpha=alpha,
 #                clip_path=self.l_delta1_clipping,clip_on=True,
                 color=(self.color if self.active else self.gray),
                 label=f"{self.label} {self.aw.arabicReshape(deltaLabelUTF8 + QApplication.translate('Label', 'ET'))}")
 
     def drawMainEvents1(self) -> None:
         if self.aw.qmc.ax is not None and self.events_timex is not None and self.events1 is not None:
+            alpha = (self.alpha[1] if self.active else self.alpha[1]*self.alpha_dim_factor)
             self.l_mainEvents1, = self.aw.qmc.ax.plot(numpy.array(self.events_timex),numpy.array(self.events1),transform=self.getTempTrans(),
                 markersize=self.aw.qmc.ETlinewidth + 3,marker='o',visible=(self.visible and self.aligned),
                 sketch_params=None,
-                path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, self.aw.qmc.ETlinewidth),
+                path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, self.aw.qmc.ETlinewidth, alpha=alpha),
                 linewidth=0,linestyle='',
-                alpha=(self.alpha[1] if self.active else self.alpha[1]*self.alpha_dim_factor),
+                alpha=alpha,
                 color=(self.color if self.active else self.gray),
 #                picker=5, # deprecated in MPL 3.3.x
                 picker=True,
@@ -880,12 +887,13 @@ class RoastProfile:
 
     def drawMainEvents2(self) -> None:
         if self.aw.qmc.ax is not None and self.events_timex is not None and self.events1 is not None:
+            alpha = (self.alpha[0] if self.active else self.alpha[0]*self.alpha_dim_factor)
             self.l_mainEvents2, = self.aw.qmc.ax.plot(numpy.array(self.events_timex),numpy.array(self.events2),transform=self.getTempTrans(),
                 markersize=self.aw.qmc.BTlinewidth + 3,marker='o',visible=(self.visible and self.aligned),
                 sketch_params=None,
-                path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, self.aw.qmc.BTlinewidth),
+                path_effects=self.aw.qmc.line_path_effects(self.aw.qmc.glow, self.aw.qmc.patheffects, self.aw.light_background_p, self.aw.qmc.BTlinewidth, alpha=alpha),
                 linewidth=0,linestyle='',
-                alpha=(self.alpha[0] if self.active else self.alpha[0]*self.alpha_dim_factor),
+                alpha=alpha,
                 color=(self.color if self.active else self.gray),
 #                picker=5, # deprecated in MPL 3.3.x
                 picker=True,

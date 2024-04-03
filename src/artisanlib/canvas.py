@@ -7657,10 +7657,15 @@ class tgraphcanvas(FigureCanvas):
         return (lst + [-1]*(ln-len(lst)))[:ln]
 
     @functools.lru_cache(maxsize=50) # noqa: B019 # pylint: disable=W1518 #for Python >= 3.9 can use @functools.cache; Not relevant here, as qmc is only created once: [B019] Use of `functools.lru_cache` or `functools.cache` on methods can lead to memory leaks
-    def line_path_effects(self, glow:int, patheffects:int, light_background:bool, linewidth:float) -> List[PathEffects.AbstractPathEffect]:
+    def line_path_effects(self, glow:int, patheffects:int, light_background:bool, linewidth:float, color:Optional[str]=None, alpha:Optional[float]=None) -> List[PathEffects.AbstractPathEffect]:
         path_effects:List[PathEffects.AbstractPathEffect] = []
         if patheffects:
-            path_effects.append(PathEffects.Stroke(linewidth=linewidth+self.patheffects,foreground=self.palette['background']))
+            line_alpha:float = 1
+            if alpha is not None:
+                line_alpha = alpha
+            elif color is not None and len(color) == 9 and color[0] == '#':
+                line_alpha = int(color[7:9], 16) / 255
+            path_effects.append(PathEffects.Stroke(alpha=line_alpha, linewidth=linewidth+self.patheffects,foreground=self.palette['background']))
         if glow:
             glow_alpha = (0.03 if light_background else 0.13)
             path_effects.extend(
@@ -7688,7 +7693,7 @@ class tgraphcanvas(FigureCanvas):
                 markersize=self.ETmarkersize,
                 marker=self.ETmarker,
                 sketch_params=None,
-                path_effects = self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.ETlinewidth),
+                path_effects = self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.ETlinewidth, self.palette['et']),
                 linewidth=self.ETlinewidth,
                 linestyle=self.ETlinestyle,
                 drawstyle=self.ETdrawstyle,
@@ -7710,7 +7715,7 @@ class tgraphcanvas(FigureCanvas):
                 markersize=self.BTmarkersize,
                 marker=self.BTmarker,
                 sketch_params=None,
-                path_effects = self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.BTlinewidth),
+                path_effects = self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.BTlinewidth, self.palette['bt']),
                 linewidth = self.BTlinewidth,
                 linestyle = self.BTlinestyle,
                 drawstyle = self.BTdrawstyle,
@@ -7739,7 +7744,7 @@ class tgraphcanvas(FigureCanvas):
                     markersize=self.ETdeltamarkersize,
                     marker=self.ETdeltamarker,
                     sketch_params=None,
-                    path_effects = self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.ETdeltalinewidth),
+                    path_effects = self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.ETdeltalinewidth, self.palette['deltaet']),
                     linewidth=self.ETdeltalinewidth,
                     linestyle=self.ETdeltalinestyle,
                     drawstyle=self.ETdeltadrawstyle,
@@ -7766,7 +7771,7 @@ class tgraphcanvas(FigureCanvas):
                     markersize=self.BTdeltamarkersize,
                     marker=self.BTdeltamarker,
                     sketch_params=None,
-                    path_effects = self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.BTdeltalinewidth),
+                    path_effects = self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.BTdeltalinewidth, self.palette['deltabt']),
                     linewidth=self.BTdeltalinewidth,
                     linestyle=self.BTdeltalinestyle,
                     drawstyle=self.BTdeltadrawstyle,
@@ -9667,7 +9672,7 @@ class tgraphcanvas(FigureCanvas):
                                     self.ax.fill_between(self.extratimex[i], 0, visible_extratemp1,transform=trans,color=self.extradevicecolor1[i],alpha=self.aw.extraFill1[i]/100.,sketch_params=None)
                                 self.extratemp1lines.append(self.ax.plot(self.extratimex[i],visible_extratemp1,transform=trans,color=self.extradevicecolor1[i],
                                     sketch_params=None,
-                                    path_effects=self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.extralinewidths1[i]),
+                                    path_effects=self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.extralinewidths1[i],self.extradevicecolor1[i]),
                                     markersize=self.extramarkersizes1[i],
                                     marker=self.extramarkers1[i],
                                     linewidth=self.extralinewidths1[i],
@@ -9710,7 +9715,7 @@ class tgraphcanvas(FigureCanvas):
                                     self.ax.fill_between(self.extratimex[i], 0, visible_extratemp2,transform=trans,color=self.extradevicecolor2[i],alpha=self.aw.extraFill2[i]/100.,sketch_params=None)
                                 self.extratemp2lines.append(self.ax.plot(self.extratimex[i],visible_extratemp2,transform=trans,color=self.extradevicecolor2[i],
                                     sketch_params=None,
-                                    path_effects=self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.extralinewidths2[i]),
+                                    path_effects=self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.extralinewidths2[i],self.extradevicecolor2[i]),
                                     markersize=self.extramarkersizes2[i],
                                     marker=self.extramarkers2[i],
                                     linewidth=self.extralinewidths2[i],
