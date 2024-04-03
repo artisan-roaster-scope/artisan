@@ -20,12 +20,13 @@ import time as libtime
 import re
 import platform
 import logging
+from PIL import ImageColor
 from typing import Final, Optional, List, Tuple, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
 
-from artisanlib.util import deltaLabelUTF8, setDeviceDebugLogLevel
+from artisanlib.util import deltaLabelUTF8, setDeviceDebugLogLevel, argb_colorname2rgba_colorname, rgba_colorname2argb_colorname
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import MyQComboBox, MyQDoubleSpinBox
 
@@ -1592,13 +1593,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         color1Button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                         color1Button.clicked.connect(self.setextracolor1)
                         textcolor = self.aw.labelBorW(self.aw.qmc.extradevicecolor1[i])
-                        color1Button.setStyleSheet(f'background-color: {self.aw.qmc.extradevicecolor1[i]}; color: {textcolor}')
+                        color1Button.setStyleSheet(f'border: none; outline: none; background-color: rgba{ImageColor.getcolor(self.aw.qmc.extradevicecolor1[i], "RGBA")}; color: {textcolor}')
                         # 2: color 2
                         color2Button = QPushButton(self.aw.qmc.extradevicecolor2[i])
                         color2Button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                         color2Button.clicked.connect(self.setextracolor2)
                         textcolor = self.aw.labelBorW(self.aw.qmc.extradevicecolor2[i])
-                        color2Button.setStyleSheet(f'background-color: {self.aw.qmc.extradevicecolor2[i]}; color: {textcolor}')
+                        color2Button.setStyleSheet(f'border: none; outline: none; background-color: rgba{ImageColor.getcolor(self.aw.qmc.extradevicecolor2[i], "RGBA")}; color: {textcolor}')
                         # 3+4: name 1 + 2
                         name1edit = QLineEdit(self.aw.qmc.extraname1[i])
                         name2edit = QLineEdit(self.aw.qmc.extraname2[i])
@@ -2196,28 +2197,28 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             #line 1
             if ll == 1:
                 # use native no buttons dialog on Mac OS X, blocks otherwise
-                colorf = self.aw.colordialog(QColor(self.aw.qmc.extradevicecolor1[i]),True,self)
+                colorf = self.aw.colordialog(QColor(rgba_colorname2argb_colorname(self.aw.qmc.extradevicecolor1[i])),True,self, alphasupport=True)
                 if colorf.isValid():
-                    colorname = str(colorf.name())
+                    colorname = argb_colorname2rgba_colorname(colorf.name(QColor.NameFormat.HexArgb))
                     self.aw.qmc.extradevicecolor1[i] = colorname
                     # set LCD label color
-                    self.aw.setLabelColor(self.aw.extraLCDlabel1[i],QColor(colorname))
+                    self.aw.setLabelColor(self.aw.extraLCDlabel1[i],QColor(colorname[:7]))
                     color1Button = cast(QPushButton, self.devicetable.cellWidget(i,1))
-                    color1Button.setStyleSheet(f'background-color: {self.aw.qmc.extradevicecolor1[i]}; color: { self.aw.labelBorW(self.aw.qmc.extradevicecolor1[i])}')
+                    color1Button.setStyleSheet(f'border: none; outline: none; background-color: rgba{ImageColor.getcolor(self.aw.qmc.extradevicecolor1[i], "RGBA")}; color: { self.aw.labelBorW(self.aw.qmc.extradevicecolor1[i])}')
                     color1Button.setText(colorname)
                     self.aw.checkColors([(self.aw.qmc.extraname1[i], self.aw.qmc.extradevicecolor1[i], QApplication.translate('Label','Background'), self.aw.qmc.palette['background'])])
                     self.aw.checkColors([(self.aw.qmc.extraname1[i], self.aw.qmc.extradevicecolor1[i], QApplication.translate('Label','Legend bkgnd'), self.aw.qmc.palette['background'])])
             #line 2
             elif ll == 2:
                 # use native no buttons dialog on Mac OS X, blocks otherwise
-                colorf = self.aw.colordialog(QColor(self.aw.qmc.extradevicecolor2[i]),True,self)
+                colorf = self.aw.colordialog(QColor(rgba_colorname2argb_colorname(self.aw.qmc.extradevicecolor2[i])),True,self, alphasupport=True)
                 if colorf.isValid():
-                    colorname = str(colorf.name())
+                    colorname = argb_colorname2rgba_colorname(colorf.name(QColor.NameFormat.HexArgb))
                     self.aw.qmc.extradevicecolor2[i] = colorname
                     # set LCD label color
                     self.aw.setLabelColor(self.aw.extraLCDlabel2[i],QColor(colorname))
                     color2Button = cast(QPushButton, self.devicetable.cellWidget(i,2))
-                    color2Button.setStyleSheet(f'background-color: {self.aw.qmc.extradevicecolor2[i]}; color: {self.aw.labelBorW(self.aw.qmc.extradevicecolor2[i])}')
+                    color2Button.setStyleSheet(f'border: none; outline: none; background-color: rgba{ImageColor.getcolor(self.aw.qmc.extradevicecolor2[i], "RGBA")}; color: {self.aw.labelBorW(self.aw.qmc.extradevicecolor2[i])}')
                     color2Button.setText(colorname)
                     self.aw.checkColors([(self.aw.qmc.extraname2[i], self.aw.qmc.extradevicecolor2[i], QApplication.translate('Label','Background'), self.aw.qmc.palette['background'])])
                     self.aw.checkColors([(self.aw.qmc.extraname2[i], self.aw.qmc.extradevicecolor2[i], QApplication.translate('Label','Legend bkgnd'),self.aw.qmc.palette['background'])])

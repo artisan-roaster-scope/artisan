@@ -6,12 +6,17 @@ v2.10.6 (XX, 2024)
 ------------------
 
 * ADDITIONS
+  - adds flag to toggle compression, detailed device logging, and origin header for WebSocket communication
 * NEW HARDWARE SUPPORT
+  - adds Bühler RM20 Simatic Legacy setup suporting older firmware versions not returning the machine state
 * CHANGES
   - only reset roasting notes on reset if profile is loaded ([Issue #1521](../../../issues/1521))
 * FIXES
+  - fixes regression preventing Artisan v2.10.2 and v2.10.4 to connect successfully to Probat Series III machines via WebSockets incl. the Probat Sample Roaster
   - fixes regression in Roast Properties, unable to change/add ground color value ([Issue #1520](../../../issues/1520))
   - fixes regressions in table copy functions
+  - avoids rendering timestamps as "xx:60" in mouse pointer time/temp/RoR widget
+  - ensures that time-axis ticks extend over the full range of readings w.r.t. the loaded background and foreground profiles
 * REMOVALS
 
 ----

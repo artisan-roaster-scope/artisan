@@ -695,6 +695,8 @@ import plus.register
 import plus.notifications
 import plus.blend
 import plus.stock
+
+#SCHEDULER:
 #import plus.schedule
 
 
@@ -1523,7 +1525,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         # Schedule
 #SCHEDULER:
 #        self.schedule_window:Optional[plus.schedule.ScheduleWindow] = None
-        self.scheduleFlag:bool = True
+
+        self.scheduleFlag:bool = False
         self.schedule_day_filter:bool = True
         self.schedule_user_filter:bool = True
         self.schedule_machine_filter:bool = True
@@ -4153,9 +4156,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     @pyqtSlot()
     def updateSchedule(self) -> None:
 #SCHEDULER:
-        pass
 #        if self.schedule_window is not None:
 #            self.schedule_window.updateScheduleWindow()
+        pass
 
     @pyqtSlot(str,str,NotificationType)
     def sendNotificationMessage(self, title:str, message:str, notification_type:NotificationType) -> None:
@@ -5641,13 +5644,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     def convertToGreyscale(self, c:str) -> str:
         nc = c
+        alpha = ''
         try:
             from colorspacious import cspace_convert
             if c is None or c == 'None':
                 return 'None'
             if isinstance(c,str) and c.lower() == 'transparent':
                 return 'transparent'
-            cq = str(QColor(c).name())
+            cq = str(QColor(c[:7]).name())
+            alpha = c[7:9]
             c_rgb = tuple(int(cq[i:i+2], 16) for i in (1, 3 ,5))
             nc_greyscale_JCh = cspace_convert(c_rgb, 'sRGB255', 'JCh')
             nc_greyscale_JCh[..., 1] = 0
@@ -5659,7 +5664,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' convertToGreyscale() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
-        return nc
+        return nc + alpha
 
     def labelBorW(self, backgroundcolor:str) -> str:
         base = self.convertToGreyscale(backgroundcolor)
@@ -6276,16 +6281,17 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.largePhasesLCDs_dialog.updatePhasesLabels([None,None,None,label])
         self.updateAUCLCD()
 
-    def colordialog(self, c:QColor, noButtons:bool=False, parent:Optional[QWidget] = None) -> QColor:
+    def colordialog(self, c:QColor, noButtons:bool=False, parent:Optional[QWidget] = None, alphasupport:bool=False) -> QColor:
         if platform.system() == 'Darwin' and noButtons:
             if parent is None:
                 parent = self
             cd = QColorDialog(parent)
             cd.setModal(True)
             cd.setWindowModality(Qt.WindowModality.ApplicationModal)
-            cd.setOption(QColorDialog.ColorDialogOption.NoButtons,True)
-            #cd.setOption(QColorDialog.ColorDialogOption.ShowAlphaChannel,True)
-            #cd.setOption(QColorDialog.ColorDialogOption.NoButtons | QColorDialog.ColorDialogOption.ShowAlphaChannel,True)
+            if alphasupport:
+                cd.setOption(QColorDialog.ColorDialogOption.NoButtons | QColorDialog.ColorDialogOption.ShowAlphaChannel,True)
+            else:
+                cd.setOption(QColorDialog.ColorDialogOption.NoButtons,True)
             cd.setCurrentColor(c)
             cd.exec()
             return cd.currentColor()
@@ -10774,8 +10780,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.roastCompareAction.setEnabled(True)
         self.designerAction.setEnabled(True)
         self.simulatorAction.setEnabled(True)
+
 #SCHEDULER:
 #        self.scheduleAction.setEnabled(True)
+
         self.wheeleditorAction.setEnabled(True)
         self.transformAction.setEnabled(True)
         self.loadSettingsAction.setEnabled(True)
@@ -10885,8 +10893,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         else:
             self.designerAction.setEnabled(True)
         self.simulatorAction.setEnabled(False)
+
 #SCHEDULER:
 #        self.scheduleAction.setEnabled(False)
+
         if not wheel:
             self.wheeleditorAction.setEnabled(False)
         else:
@@ -10930,8 +10940,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.eventsEditorAction.setChecked(False)
             self.eventsEditorAction.setEnabled(False)
             self.simulatorAction.setEnabled(False)
+
 #SCHEDULER:
 #            self.scheduleAction.setEnabled(False)
+
         else:
             return
 
@@ -17381,10 +17393,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.schedule_day_filter =toBool(settings.value('ScheduleDayFilter',self.schedule_day_filter))
             self.schedule_user_filter = toBool(settings.value('ScheduleUserFilter',self.schedule_user_filter))
             self.schedule_machine_filter = toBool(settings.value('ScheduleMachineFilter',self.schedule_machine_filter))
+
 #SCHEDULER:
 #            self.scheduleFlag = toBool(settings.value('Schedule',self.scheduleFlag))
 #            if self.scheduleFlag:
 #                self.schedule()
+
             self.LargeLCDsFlag = toBool(settings.value('LargeLCDs',self.LargeLCDsFlag))
             if self.LargeLCDsFlag:
                 self.largeLCDs()
@@ -19090,11 +19104,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         if self.WebLCDs:
             self.stopWebLCDs()
             self.WebLCDs = True # to ensure they are started again on restart
+
 #SCHEDULER:
 #        if self.scheduleFlag and self.schedule_window:
 #            tmp_Schedule = self.scheduleFlag # we keep the state to properly store it in the settings
 #            self.schedule_window.close()
 #            self.scheduleFlag = tmp_Schedule
+
         if self.LargeLCDsFlag and self.largeLCDs_dialog:
             tmp_LargeLCDs = self.LargeLCDsFlag # we keep the state to properly store it in the settings
             self.largeLCDs_dialog.close()

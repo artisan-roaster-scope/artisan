@@ -1963,14 +1963,14 @@ class EventsDlg(ArtisanResizeablDialog):
             ok_button_width = ok_button.width()
             self.E1colorButton.setMinimumWidth(max(ok_button_width,self.E1textcolorButton.minimumSizeHint().width()))
             self.E1textcolorButton.setMinimumWidth(max(ok_button_width,self.E1textcolorButton.minimumSizeHint().width()))
-        self.E1colorButton.setStyleSheet('background-color: ' + self.aw.qmc.EvalueColor[0] + '; color: ' + self.aw.qmc.EvalueTextColor[0] + '; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;')
-        self.E2colorButton.setStyleSheet('background-color: ' + self.aw.qmc.EvalueColor[1] + '; color: ' + self.aw.qmc.EvalueTextColor[1] + '; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;')
-        self.E3colorButton.setStyleSheet('background-color: ' + self.aw.qmc.EvalueColor[2] + '; color: ' + self.aw.qmc.EvalueTextColor[2] + '; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;')
-        self.E4colorButton.setStyleSheet('background-color: ' + self.aw.qmc.EvalueColor[3] + '; color: ' + self.aw.qmc.EvalueTextColor[3] + '; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;')
-        self.E1textcolorButton.setStyleSheet('background-color: ' + self.aw.qmc.EvalueColor[0] + '; color: ' + self.aw.qmc.EvalueTextColor[0] + '; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;')
-        self.E2textcolorButton.setStyleSheet('background-color: ' + self.aw.qmc.EvalueColor[1] + '; color: ' + self.aw.qmc.EvalueTextColor[1] + '; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;')
-        self.E3textcolorButton.setStyleSheet('background-color: ' + self.aw.qmc.EvalueColor[2] + '; color: ' + self.aw.qmc.EvalueTextColor[2] + '; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;')
-        self.E4textcolorButton.setStyleSheet('background-color: ' + self.aw.qmc.EvalueColor[3] + '; color: ' + self.aw.qmc.EvalueTextColor[3] + '; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;')
+        self.E1colorButton.setStyleSheet('border: none; outline: none; background-color: ' + self.aw.qmc.EvalueColor[0] + '; color: ' + self.aw.qmc.EvalueTextColor[0] + '; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;')
+        self.E2colorButton.setStyleSheet('border: none; outline: none; background-color: ' + self.aw.qmc.EvalueColor[1] + '; color: ' + self.aw.qmc.EvalueTextColor[1] + '; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;')
+        self.E3colorButton.setStyleSheet('border: none; outline: none; background-color: ' + self.aw.qmc.EvalueColor[2] + '; color: ' + self.aw.qmc.EvalueTextColor[2] + '; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;')
+        self.E4colorButton.setStyleSheet('border: none; outline: none; background-color: ' + self.aw.qmc.EvalueColor[3] + '; color: ' + self.aw.qmc.EvalueTextColor[3] + '; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;')
+        self.E1textcolorButton.setStyleSheet('border: none; outline: none; background-color: ' + self.aw.qmc.EvalueColor[0] + '; color: ' + self.aw.qmc.EvalueTextColor[0] + '; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;')
+        self.E2textcolorButton.setStyleSheet('border: none; outline: none; background-color: ' + self.aw.qmc.EvalueColor[1] + '; color: ' + self.aw.qmc.EvalueTextColor[1] + '; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;')
+        self.E3textcolorButton.setStyleSheet('border: none; outline: none; background-color: ' + self.aw.qmc.EvalueColor[2] + '; color: ' + self.aw.qmc.EvalueTextColor[2] + '; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;')
+        self.E4textcolorButton.setStyleSheet('border: none; outline: none; background-color: ' + self.aw.qmc.EvalueColor[3] + '; color: ' + self.aw.qmc.EvalueTextColor[3] + '; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;')
 
         # update markers
         if self.aw.qmc.EvalueMarker[0] in self.markervals:
@@ -2581,13 +2581,13 @@ class EventsDlg(ArtisanResizeablDialog):
             et = self.extraeventstypes[i]
             label = self.aw.substButtonLabel(-1,label,et)
             colorButton.setText(label)
-            colorButton.setStyleSheet(f'background-color: {self.extraeventbuttoncolor[i]}; color: {self.extraeventbuttontextcolor[i]};')
+            colorButton.setStyleSheet(f'border: none; outline: none; background-color: {self.extraeventbuttoncolor[i]}; color: {self.extraeventbuttontextcolor[i]};')
             #8 Text Color
             colorTextButton = QPushButton('Select')
             colorTextButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             colorTextButton.clicked.connect(self.setbuttontextcolor)
             colorTextButton.setText(label)
-            colorTextButton.setStyleSheet(f'background-color: {self.extraeventbuttoncolor[i]}; color: {self.extraeventbuttontextcolor[i]};')
+            colorTextButton.setStyleSheet(f'border: none; outline: none; background-color: {self.extraeventbuttoncolor[i]}; color: {self.extraeventbuttontextcolor[i]};')
             #add widgets to the table
             self.eventbuttontable.setCellWidget(i,0,labeledit)
             self.eventbuttontable.setCellWidget(i,1,descriptionedit)
@@ -2851,7 +2851,7 @@ class EventsDlg(ArtisanResizeablDialog):
                 textColor = self.extraeventbuttontextcolor[i]
                 backColor =  self.extraeventbuttoncolor[i]
                 label = self.extraeventslabels[i]
-                style = f'background-color: {backColor}; color: {textColor};'
+                style = f'border: none; outline: none; background-color: {backColor}; color: {textColor};'
                 widget7 = self.eventbuttontable.cellWidget(i,7)
                 if widget7 is not None:
                     widget7.setStyleSheet(style)
@@ -2870,7 +2870,7 @@ class EventsDlg(ArtisanResizeablDialog):
                 textColor = self.extraeventbuttontextcolor[i]
                 backColor =  self.extraeventbuttoncolor[i]
                 label = self.extraeventslabels[i]
-                style = f'background-color: {backColor}; color: {textColor};'
+                style = f'border: none; outline: none; background-color: {backColor}; color: {textColor};'
                 widget7 = self.eventbuttontable.cellWidget(i,7)
                 if widget7 is not None:
                     widget7.setStyleSheet(style)

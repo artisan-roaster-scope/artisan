@@ -428,23 +428,40 @@ def getDirectory(filename: str, ext: Optional[str] = None, share: bool = False) 
     return str(fp)
 
 
+
+# converts QColor ARGB names to a standard/MPL hex color strings with alpha values at the end
+def argb_colorname2rgba_colorname(c:str) -> str:
+    if len(c) == 9:
+        return f'#{c[3:9]}{c[1:3]}'
+    return c
+
+# converts standard/MPL hex color strings to QColor ARGB names with alpha at the begin
+def rgba_colorname2argb_colorname(c:str) -> str:
+    if len(c) == 9:
+        return f'#{c[7:9]}{c[1:7]}'
+    return c
+
 # takes a hex color string and returns the same color as hex string with staturation set to 0 and incr. lightness
 def toGrey(color:str) -> str:
-    h, _s, l, a = QColor(color).getHslF()
+    h, _s, l, a = QColor(rgba_colorname2argb_colorname(color)).getHslF()
     if h is not None and l is not None and a is not None:
         gray = QColor.fromHslF(h,0,(1-l)/1.7+l,a) # saturation set to 0
     else:
         gray = QColor.fromHslF(0.5,0,0.5,1.0)
-    return gray.name()
+    if len(color) == 9:
+        return gray.name(QColor.NameFormat.HexArgb)
+    return gray.name(QColor.NameFormat.HexRgb)
 
 # takes a hex color string and returns the same color as hex string with reduced staturation and incr. lightness
 def toDim(color:str) -> str:
-    h, s, l, a = QColor(color).getHslF()
+    h, s, l, a = QColor(rgba_colorname2argb_colorname(color)).getHslF()
     if h is not None and s is not None and l is not None and a is not None:
         gray = QColor.fromHslF(h,s/4,(1-l)/1.7+l,a)
     else:
         gray = QColor.fromHslF(0.5,0,0.5,1.0)
-    return gray.name()
+    if len(color) == 9:
+        return gray.name(QColor.NameFormat.HexArgb)
+    return gray.name(QColor.NameFormat.HexRgb)
 
 # creates QLinearGradient style from light to dark by default, or from dark to light if reverse is True
 @functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
@@ -456,6 +473,7 @@ def createGradient(rgb:Union[QColor, str], tint_factor:float = 0.1, shade_factor
     # light to dark (default)
     return f'QLinearGradient(x1:0,y1:0,x2:0,y2:1,stop:0 {light_grad}, stop:1 {dark_grad})'
 
+# NOTE: for now alpha values of the rgb argument are ignored and resulting colors are RGB without alphas
 def createRGBGradient(rgb:Union[QColor, str], tint_factor:float = 0.3, shade_factor:float = 0.3) -> Tuple[str,str]:
     try:
         rgb_tuple: Tuple[float, float, float]
@@ -479,6 +497,7 @@ def createRGBGradient(rgb:Union[QColor, str], tint_factor:float = 0.3, shade_fac
         _log.exception(e)
         lighter_rgb = darker_rgb = '#000000'
     return lighter_rgb,darker_rgb
+
 
 # Networking
 
