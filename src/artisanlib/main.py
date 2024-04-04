@@ -10340,19 +10340,21 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             string = QApplication.translate('Message','Do you want to reset all settings?<br> ArtisanViewer has to be restarted!')
         else:
             string = QApplication.translate('Message','Do you want to reset all settings?<br> Artisan has to be restarted!')
-        # non-native dialog
-#        reply = QMessageBox.warning(self, QApplication.translate('Message','Factory Reset'),string,
-#                            QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Reset, QMessageBox.StandardButton.Cancel)
 
         # native dialog
-        mbox = QMessageBox() # only without super this one shows the native dialog on macOS under Qt 6.6.2
-        # for native dialogs, text and informativetext need to be plain strings, no RTF incl. HTML instructions like <br>
-        mbox.setText(QApplication.translate('Message','Factory Reset'))
-        mbox.setInformativeText(string.replace('<br>',' '))
-        mbox.setWindowModality(Qt.WindowModality.ApplicationModal) # for native dialog it has to be ApplicationModal
-        mbox.setStandardButtons(QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Reset)
-        mbox.setDefaultButton(QMessageBox.StandardButton.Cancel)
-        reply = mbox.exec()
+        if platform.system() == 'Darwin':
+            mbox = QMessageBox() # only without super this one shows the native dialog on macOS under Qt 6.6.2
+            # for native dialogs, text and informativetext need to be plain strings, no RTF incl. HTML instructions like <br>
+            mbox.setText(QApplication.translate('Message','Factory Reset'))
+            mbox.setInformativeText(string.replace('<br>',' '))
+            mbox.setWindowModality(Qt.WindowModality.ApplicationModal) # for native dialog it has to be ApplicationModal
+            mbox.setStandardButtons(QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Reset)
+            mbox.setDefaultButton(QMessageBox.StandardButton.Cancel)
+            reply = mbox.exec()
+        else:
+            # non-native dialog
+            reply = QMessageBox.warning(self, QApplication.translate('Message','Factory Reset'),string,
+                            QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Reset, QMessageBox.StandardButton.Cancel)
 
         if reply == QMessageBox.StandardButton.Reset :
             #raise flag. Next time app will open, the settings (bad settings) will not be loaded.
