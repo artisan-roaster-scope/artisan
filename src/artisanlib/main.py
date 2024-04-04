@@ -6282,9 +6282,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.updateAUCLCD()
 
     def colordialog(self, c:QColor, noButtons:bool=False, parent:Optional[QWidget] = None, alphasupport:bool=False) -> QColor:
+        if parent is None:
+            parent = self
         if platform.system() == 'Darwin' and noButtons:
-            if parent is None:
-                parent = self
             cd = QColorDialog(parent)
             cd.setModal(True)
             cd.setWindowModality(Qt.WindowModality.ApplicationModal)
@@ -6295,7 +6295,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             cd.setCurrentColor(c)
             cd.exec()
             return cd.currentColor()
-        return QColorDialog.getColor(c)
+#        return QColorDialog.getColor(c)
+        return QColorDialog.getColor(c, parent, '',
+            (QColorDialog.ColorDialogOption.ShowAlphaChannel if alphasupport else
+                QColorDialog.ColorDialogOption(0)))
 
     @pyqtSlot(int)
     def adjustPIDsv(self, x:int) -> None:
@@ -10337,8 +10340,20 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             string = QApplication.translate('Message','Do you want to reset all settings?<br> ArtisanViewer has to be restarted!')
         else:
             string = QApplication.translate('Message','Do you want to reset all settings?<br> Artisan has to be restarted!')
-        reply = QMessageBox.warning(self, QApplication.translate('Message','Factory Reset'),string,
-                            QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Reset, QMessageBox.StandardButton.Cancel)
+        # non-native dialog
+#        reply = QMessageBox.warning(self, QApplication.translate('Message','Factory Reset'),string,
+#                            QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Reset, QMessageBox.StandardButton.Cancel)
+
+        # native dialog
+        mbox = QMessageBox() # only without super this one shows the native dialog on macOS under Qt 6.6.2
+        # for native dialogs, text and informativetext need to be plain strings, no RTF incl. HTML instructions like <br>
+        mbox.setText(QApplication.translate('Message','Factory Reset'))
+        mbox.setInformativeText(string.replace('<br>',' '))
+        mbox.setWindowModality(Qt.WindowModality.ApplicationModal) # for native dialog it has to be ApplicationModal
+        mbox.setStandardButtons(QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Reset)
+        mbox.setDefaultButton(QMessageBox.StandardButton.Cancel)
+        reply = mbox.exec()
+
         if reply == QMessageBox.StandardButton.Reset :
             #raise flag. Next time app will open, the settings (bad settings) will not be loaded.
             self.resetqsettings = 1

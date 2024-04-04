@@ -7659,13 +7659,20 @@ class tgraphcanvas(FigureCanvas):
     @functools.lru_cache(maxsize=50) # noqa: B019 # pylint: disable=W1518 #for Python >= 3.9 can use @functools.cache; Not relevant here, as qmc is only created once: [B019] Use of `functools.lru_cache` or `functools.cache` on methods can lead to memory leaks
     def line_path_effects(self, glow:int, patheffects:int, light_background:bool, linewidth:float, color:Optional[str]=None, alpha:Optional[float]=None) -> List[PathEffects.AbstractPathEffect]:
         path_effects:List[PathEffects.AbstractPathEffect] = []
+        foreground:str = self.palette['background']
         if patheffects:
-            line_alpha:float = 1
             if alpha is not None:
-                line_alpha = alpha
+                hex_alpha:str = f'{int(alpha*255):02x}'
+                if len(foreground) == 9:
+                    foreground = foreground[:7] + hex_alpha
+                elif len(foreground) == 7:
+                    foreground = foreground + hex_alpha
             elif color is not None and len(color) == 9 and color[0] == '#':
-                line_alpha = int(color[7:9], 16) / 255
-            path_effects.append(PathEffects.Stroke(alpha=line_alpha, linewidth=linewidth+self.patheffects,foreground=self.palette['background']))
+                if len(foreground) == 9:
+                    foreground = foreground[:7] + color[7:9]
+                elif len(foreground) == 7:
+                    foreground = foreground + color[7:9]
+            path_effects.append(PathEffects.Stroke(linewidth=linewidth+self.patheffects,foreground=foreground))
         if glow:
             glow_alpha = (0.03 if light_background else 0.13)
             path_effects.extend(
