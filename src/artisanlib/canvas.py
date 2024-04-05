@@ -10682,12 +10682,13 @@ class tgraphcanvas(FigureCanvas):
         if self.aw is not None and self.mode != self.mode_tempsliders:
             for i in range(4):
                 if self.aw.eventslidertemp[i]:
+                    # a minimum of 0 will be mapped to 0 always!
                     if self.mode == 'C':
-                        self.aw.eventslidermin[i] = int(round(fromFtoCstrict(self.aw.eventslidermin[i])))
-                        self.aw.eventslidermax[i] = int(round(fromFtoCstrict(self.aw.eventslidermax[i])))
+                        self.aw.eventslidermin[i] = (0 if self.aw.eventslidermin[i] == 0 else max(0, min(999, int(round(fromFtoCstrict(self.aw.eventslidermin[i]))))))
+                        self.aw.eventslidermax[i] = max(0, min(999, int(round(fromFtoCstrict(self.aw.eventslidermax[i])))))
                     else:
-                        self.aw.eventslidermin[i] = int(round(fromCtoFstrict(self.aw.eventslidermin[i])))
-                        self.aw.eventslidermax[i] = int(round(fromCtoFstrict(self.aw.eventslidermax[i])))
+                        self.aw.eventslidermin[i] = (0 if self.aw.eventslidermin[i] == 0 else max(0, min(999, int(round(fromCtoFstrict(self.aw.eventslidermin[i]))))))
+                        self.aw.eventslidermax[i] = max(0, min(999, int(round(fromCtoFstrict(self.aw.eventslidermax[i])))))
             self.aw.updateSliderMinMax()
             # adjust SV slider limits
             if self.mode == 'C':

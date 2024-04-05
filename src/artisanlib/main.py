@@ -16804,8 +16804,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.pidcontrol.svMode = toInt(settings.value('svMode',self.pidcontrol.svMode))
             self.pidcontrol.svLookahead = toInt(settings.value('svLookahead',self.pidcontrol.svLookahead))
             self.pidcontrol.dutySteps = toInt(settings.value('dutySteps',self.pidcontrol.dutySteps))
-            self.pidcontrol.svSliderMin = toInt(settings.value('svSliderMin',self.pidcontrol.svSliderMin))
-            self.pidcontrol.svSliderMax = toInt(settings.value('svSliderMax',self.pidcontrol.svSliderMax))
+            self.pidcontrol.svSliderMin = max(0, min(999, toInt(settings.value('svSliderMin',self.pidcontrol.svSliderMin))))
+            self.pidcontrol.svSliderMax = max(0, min(999, toInt(settings.value('svSliderMax',self.pidcontrol.svSliderMax))))
             self.pidcontrol.svValue = toInt(settings.value('svValue',self.pidcontrol.svValue))
             self.pidcontrol.loadRampSoakFromBackground = bool(toBool(settings.value('loadRampSoakFromBackground',self.pidcontrol.loadRampSoakFromBackground)))
             self.pidcontrol.svLabel = toString(settings.value('svLabel',self.pidcontrol.svLabel))
@@ -17289,10 +17289,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if settings.contains('eventsliderAlternativeLayout'):
                 new_eventsliderAlternativeLayout = bool(toBool(settings.value('eventsliderAlternativeLayout',self.eventsliderAlternativeLayout)))
                 self.updateSliderLayout(new_eventsliderAlternativeLayout)
-            eventslidermin = [toInt(x) for x in toList(settings.value('slidermin',self.eventslidermin))]
+            eventslidermin = [max(0, min(999, toInt(x))) for x in toList(settings.value('slidermin',self.eventslidermin))]
             if len(eventslidermin) == self.eventsliders:
                 self.eventslidermin = eventslidermin
-            eventslidermax = [toInt(x) for x in toList(settings.value('slidermax',self.eventslidermax))]
+            eventslidermax = [max(0, min(999, toInt(x))) for x in toList(settings.value('slidermax',self.eventslidermax))]
             if len(eventslidermax) == self.eventsliders:
                 self.eventslidermax = eventslidermax
             self.updateSliderMinMax()

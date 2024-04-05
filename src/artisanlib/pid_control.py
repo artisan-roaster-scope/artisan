@@ -1278,9 +1278,9 @@ class PIDcontrol:
     def conv2celsius(self) -> None:
         try:
             self.aw.qmc.rampSoakSemaphore.acquire(1)
-            self.svValue = int(round(fromFtoCstrict(self.svValue)))
-            self.svSliderMin = int(round(fromFtoCstrict(self.svSliderMin)))
-            self.svSliderMax = int(round(fromFtoCstrict(self.svSliderMax)))
+            self.svValue = (0 if self.svValue == 0 else max(0, int(round(fromFtoCstrict(self.svValue)))))
+            self.svSliderMin = (0 if self.svSliderMin == 0 else max(0, min(999, int(round(fromFtoCstrict(self.svSliderMin))))))
+            self.svSliderMax = (0 if self.svSliderMax == 0 else max(0, min(999, int(round(fromFtoCstrict(self.svSliderMax))))))
             # establish ne limits on sliders
             self.aw.sliderSV.setMinimum(self.svSliderMin)
             self.aw.sliderSV.setMaximum(self.svSliderMax)
@@ -1304,9 +1304,9 @@ class PIDcontrol:
     def conv2fahrenheit(self) -> None:
         try:
             self.aw.qmc.rampSoakSemaphore.acquire(1)
-            self.svValue = fromCtoFstrict(self.svValue)
-            self.svSliderMin = int(round(fromCtoFstrict(self.svSliderMin)))
-            self.svSliderMax = int(round(fromCtoFstrict(self.svSliderMax)))
+            self.svValue = (0 if self.svValue == 0 else max(0, fromCtoFstrict(self.svValue)))
+            self.svSliderMin = (0 if self.svSliderMin == 0 else max(0, min(999, int(round(fromCtoFstrict(self.svSliderMin))))))
+            self.svSliderMax = (0 if self.svSliderMax == 0 else max(0, min(999, int(round(fromCtoFstrict(self.svSliderMax))))))
             # establish ne limits on sliders
             self.aw.sliderSV.setMinimum(int(round(self.svSliderMin)))
             self.aw.sliderSV.setMaximum(int(round(self.svSliderMax)))
@@ -1352,7 +1352,7 @@ class PIDcontrol:
 
     # the internal software PID should be configured on ON, but not be activated yet to warm it up
     def confSoftwarePID(self) -> None:
-        if self.aw.pidcontrol.externalPIDControl() not in [1, 2, 4] and not(self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag) and self.aw.qmc.Controlbuttonflag:
+        if self.externalPIDControl() not in [1, 2, 4] and not(self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag) and self.aw.qmc.Controlbuttonflag:
             # software PID
             self.aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd,self.pOnE)
             self.aw.qmc.pid.setLimits((-100 if self.pidNegativeTarget else 0),(100 if self.pidPositiveTarget else 0))
@@ -1361,8 +1361,8 @@ class PIDcontrol:
             self.aw.qmc.pid.setDutyMax(self.dutyMax)
             self.aw.qmc.pid.setControl(self.setEnergy)
             self.aw.qmc.pid.setDerivativeFilterLevel(self.derivative_filter)
-            if self.aw.pidcontrol.svMode == 0:
-                self.aw.pidcontrol.setSV(self.aw.sliderSV.value())
+            if self.svMode == 0:
+                self.setSV(self.aw.sliderSV.value())
 
     # if send_command is False, the pidOn command is not forwarded to the external PID (TC4, Kaleido, ..)
     def pidOn(self, send_command:bool = True) -> None:
@@ -1374,18 +1374,18 @@ class PIDcontrol:
             self.slider_force_move = True
             # TC4 hardware PID
             # MODBUS hardware PID
-            if (self.aw.pidcontrol.externalPIDControl() == 1 and self.aw.modbus.PID_ON_action and self.aw.modbus.PID_ON_action != ''):
+            if (self.externalPIDControl() == 1 and self.aw.modbus.PID_ON_action and self.aw.modbus.PID_ON_action != ''):
                 self.aw.eventaction(4,self.aw.modbus.PID_ON_action)
                 self.pidActive = True
                 self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PIDactive'])
             # S7 hardware PID
-            elif (self.aw.pidcontrol.externalPIDControl() == 2 and self.aw.s7.PID_ON_action and self.aw.s7.PID_ON_action != ''):
+            elif (self.externalPIDControl() == 2 and self.aw.s7.PID_ON_action and self.aw.s7.PID_ON_action != ''):
                 self.aw.eventaction(15,self.aw.s7.PID_ON_action)
                 self.pidActive = True
                 self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PIDactive'])
             elif self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag: # ArduinoTC4 firmware PID
                 if send_command and self.aw.ser.ArduinoIsInitialized:
-                    self.confPID(self.pidKp,self.pidKi,self.pidKd,self.pidSource,self.pidCycle,self.aw.pidcontrol.pOnE) # first configure PID according to the actual settings
+                    self.confPID(self.pidKp,self.pidKi,self.pidKd,self.pidSource,self.pidCycle,self.pOnE) # first configure PID according to the actual settings
                     try:
                         #### lock shared resources #####
                         self.aw.ser.COMsemaphore.acquire(1)
@@ -1416,8 +1416,8 @@ class PIDcontrol:
                 self.aw.qmc.pid.setDutyMax(self.dutyMax)
                 self.aw.qmc.pid.setControl(self.setEnergy)
                 self.aw.qmc.pid.setDerivativeFilterLevel(self.derivative_filter)
-                if self.aw.pidcontrol.svMode == 0:
-                    self.aw.pidcontrol.setSV(self.aw.sliderSV.value())
+                if self.svMode == 0:
+                    self.setSV(self.aw.sliderSV.value())
                 self.pidActive = True
                 self.aw.qmc.pid.on()
                 self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PIDactive'])
@@ -1432,13 +1432,13 @@ class PIDcontrol:
         if self.aw.qmc.flagon and not self.aw.qmc.flagstart:
             self.aw.qmc.setLCDtime(0)
         # MODBUS hardware PID
-        if (self.aw.pidcontrol.externalPIDControl() == 1 and self.aw.modbus.PID_OFF_action and self.aw.modbus.PID_OFF_action != ''):
+        if (self.externalPIDControl() == 1 and self.aw.modbus.PID_OFF_action and self.aw.modbus.PID_OFF_action != ''):
             self.aw.eventaction(4,self.aw.modbus.PID_OFF_action)
             if not self.aw.HottopControlActive:
                 self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PID'])
             self.pidActive = False
         # S7 hardware PID
-        elif (self.aw.pidcontrol.externalPIDControl() == 2 and self.aw.s7.PID_OFF_action and self.aw.s7.PID_OFF_action != ''):
+        elif (self.externalPIDControl() == 2 and self.aw.s7.PID_OFF_action and self.aw.s7.PID_OFF_action != ''):
             self.aw.eventaction(15,self.aw.s7.PID_OFF_action)
             if not self.aw.HottopControlActive:
                 self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PID'])
@@ -1559,7 +1559,7 @@ class PIDcontrol:
             return self.svRampSoak(tx - self.time_pidON)
         if self.svMode == 2 and self.aw.qmc.background:
             # Follow Background mode
-            if self.aw.qmc.device == 19 and self.aw.pidcontrol.externalPIDControl(): # in case we run TC4 with the PIDfirmware
+            if self.aw.qmc.device == 19 and self.externalPIDControl(): # in case we run TC4 with the PIDfirmware
                 if int(self.aw.ser.arduinoETChannel) == self.pidSource: # we observe the ET
                     followCurveNr = 2
                 elif int(self.aw.ser.arduinoBTChannel) == self.pidSource: # we observe the BT
@@ -1573,11 +1573,11 @@ class PIDcontrol:
             #  1: BT, 2: ET, 3: as 0xT1, 4: as 0xT2, 5: as 1xT1, ...
 
             if self.aw.qmc.timeindex[6] > 0: # after DROP, the SV configured in the dialog is returned (min/maxed)
-                return max(self.aw.pidcontrol.svSliderMin, min(self.aw.pidcontrol.svSliderMax, self.aw.pidcontrol.svValue))
+                return max(self.svSliderMin, min(self.svSliderMax, self.svValue))
             if self.aw.qmc.timeindex[0] < 0: # before CHARGE, the CHARGE temp of the background profile is returned
                 if self.aw.qmc.timeindexB[0] < 0:
                     # no CHARGE in background, return manual SV
-                    return max(self.aw.pidcontrol.svSliderMin,(min(self.aw.pidcontrol.svSliderMax,self.aw.pidcontrol.svValue)))
+                    return max(self.svSliderMin,(min(self.svSliderMax,self.svValue)))
                 # if background contains a CHARGE event
                 if followCurveNr == 1: # we observe the BT
                     res = self.aw.qmc.backgroundBTat(self.aw.qmc.timeB[self.aw.qmc.timeindexB[0]]) # approximated background
@@ -1608,28 +1608,28 @@ class PIDcontrol:
         return None
 
     def setDutySteps(self, dutySteps:int) -> None:
-        if self.aw.qmc.Controlbuttonflag and not self.aw.pidcontrol.externalPIDControl():
+        if self.aw.qmc.Controlbuttonflag and not self.externalPIDControl():
             self.aw.qmc.pid.setDutySteps(dutySteps)
 
 
     def setSV(self, sv:float, move:bool = True, init:bool = False) -> None:
 #        if not move:
 #            self.aw.sendmessage(QApplication.translate("Message","SV set to %s"%sv))
-        if self.aw.pidcontrol.externalPIDControl() == 1:
+        if self.externalPIDControl() == 1:
             # MODBUS PID and Control ticked
             self.sv = max(0,sv)
             if move:
                 self.aw.moveSVslider(sv,setValue=True)
             self.aw.modbus.setTarget(sv)
             self.sv = sv # remember last sv
-        elif self.aw.pidcontrol.externalPIDControl() == 2:
+        elif self.externalPIDControl() == 2:
             # S7 PID and Control ticked
             self.sv = max(0,sv)
             if move:
                 self.aw.moveSVslider(sv,setValue=True)
             self.aw.s7.setTarget(sv,self.aw.s7.SVmultiplier)
             self.sv = sv # remember last sv
-        elif self.aw.qmc.device == 19 and self.aw.pidcontrol.externalPIDControl():
+        elif self.aw.qmc.device == 19 and self.externalPIDControl():
             # ArduinoTC4 firmware PID
             if self.aw.ser.ArduinoIsInitialized:
                 sv = max(0,float2float(sv,2))
@@ -1650,13 +1650,13 @@ class PIDcontrol:
                             self.aw.ser.COMsemaphore.release(1)
         elif self.externalPIDControl() == 4 and self.aw.kaleido is not None:
             # Kaleido PID
-            if move and self.aw.pidcontrol.svSlider:
+            if move and self.svSlider:
                 self.aw.moveSVslider(sv,setValue=True)
             self.aw.kaleido.setSV(sv)
             self.sv = sv # remember last sv
         elif self.aw.qmc.Controlbuttonflag:
             # in all other cases if the "Control" flag is ticked: software PID
-            if move and self.aw.pidcontrol.svSlider:
+            if move and self.svSlider:
                 self.aw.moveSVslider(sv,setValue=True)
             self.aw.qmc.pid.setTarget(sv,init=init)
             self.sv = sv # remember last sv
@@ -1703,10 +1703,10 @@ class PIDcontrol:
             self.aw.sliderSV.setMinimum(self.svSliderMin)
             self.aw.sliderSV.setMaximum(self.svSliderMax)
             # we set the SV slider/lcd to the last SV issues or the minimum
-            if self.aw.pidcontrol.sv is not None:
-                sv = self.aw.pidcontrol.sv
+            if self.sv is not None:
+                sv = self.sv
             else:
-                sv = min(self.svSliderMax, max(self.svSliderMin, self.aw.pidcontrol.svValue))
+                sv = min(self.svSliderMax, max(self.svSliderMin, self.svValue))
             sv = int(round(sv))
             self.aw.updateSVSliderLCD(sv)
             self.aw.sliderSV.setValue(sv)
@@ -1748,19 +1748,19 @@ class PIDcontrol:
 
     # send conf to connected PID
     def confPID(self, kp:float, ki:float, kd:float, source:Optional[int] = None, cycle:Optional[int] = None, pOnE:bool = True) -> None:
-        if self.aw.pidcontrol.externalPIDControl() == 1: # MODBUS (external) Control active
+        if self.externalPIDControl() == 1: # MODBUS (external) Control active
             self.aw.modbus.setPID(kp,ki,kd)
             self.pidKp = kp
             self.pidKi = ki
             self.pidKd = kd
             self.aw.sendmessage(QApplication.translate('Message','p-i-d values updated'))
-        elif self.aw.pidcontrol.externalPIDControl() == 2: # S7 (external) Control active
+        elif self.externalPIDControl() == 2: # S7 (external) Control active
             self.aw.s7.setPID(kp,ki,kd,self.aw.s7.PIDmultiplier)
             self.pidKp = kp
             self.pidKi = ki
             self.pidKd = kd
             self.aw.sendmessage(QApplication.translate('Message','p-i-d values updated'))
-        elif self.aw.qmc.device == 19 and self.aw.pidcontrol.externalPIDControl(): # ArduinoTC4 firmware PID
+        elif self.aw.qmc.device == 19 and self.externalPIDControl(): # ArduinoTC4 firmware PID
             self.pidKp = kp
             self.pidKi = ki
             self.pidKd = kd
@@ -1794,7 +1794,7 @@ class PIDcontrol:
             self.pidKi = ki
             self.pidKd = kd
             self.pOnE = pOnE
-            self.aw.qmc.pid.setLimits((-100 if self.aw.pidcontrol.pidNegativeTarget else 0),(100 if self.aw.pidcontrol.pidPositiveTarget else 0))
+            self.aw.qmc.pid.setLimits((-100 if self.pidNegativeTarget else 0),(100 if self.pidPositiveTarget else 0))
             if source is not None and source>0:
                 self.pidSource = source
             self.aw.sendmessage(QApplication.translate('Message','p-i-d values updated'))
