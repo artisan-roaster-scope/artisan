@@ -13736,7 +13736,7 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             start = 0
                         timed = stringfromseconds(self.timex[i] - start)
-                        message = QApplication.translate('Message','Event # {0} recorded at BT = {1}{self.mode} Time = {2}').format(str(Nevents+1),temp2,timed)
+                        message = QApplication.translate('Message','Event # {0} recorded at BT = {1}{2} Time = {3}').format(str(Nevents+1),temp2,self.mode,timed)
                         self.aw.sendmessage(message)
                         #write label in mini recorder if flag checked
                         self.aw.eventlabel.setText(QApplication.translate('Label', 'Event #<b>{0} </b>').format(Nevents+1))
@@ -13786,7 +13786,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         start = 0
                     timed = stringfromseconds(self.timex[i]-start)
-                    message = QApplication.translate('Message','Event # {0} recorded at BT = {1}{self.mode} Time = {2}').format(str(Nevents+1),temp_str,timed)
+                    message = QApplication.translate('Message','Event # {0} recorded at BT = {1}{2} Time = {3}').format(str(Nevents+1),temp_str,self.mode,timed)
                     self.aw.sendmessage(message)
                     #write label in mini recorder if flag checked
                     self.aw.eNumberSpinBox.setValue(Nevents+1)
