@@ -51,7 +51,7 @@ gallery:
     image_path: /assets/images/joper-logo.png
     alt: "Joper"
     title: "Joper"
-  - url: https://www.ip-cc.com/
+  - url: https://www.irm.coffee/
     image_path: /assets/images/IP-CC-logo.jpg
     alt: "IP-CC"
     title: "IP-CC"

@@ -12,7 +12,7 @@ sidebar:
 ---
 <img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
 
-* __Producer:__ [IP-CC Coffee Roasting Machines](https://www.ip-cc.com/){:target="_blank"}, Greece
+* __Producer:__ [iRm Coffee Roasting Machines](https://www.irm.coffee/){:target="_blank"}, Greece
 * __Machines:__ iRm Series with networked Omron or Mitshubishi PLC
 * __Connection:__ MODBUS TCP via the network
 * __Features:__
@@ -44,8 +44,10 @@ This can be done on Windows using the Network Sharing Center by adding a TCP/IPv
 |Model|Source|Burner (kW)|
 |:-----|:-----:|:-----:|
 |||
-| iRm_10 | LPG/NG | 45 |
-| iRm_20| LPG/NG | 90 |
-| iRm_35 | LPG/NG | 165 |
-| iRm_70 | LPG/NG | 450 |
-| iRm_140 | LPG/NG | 850 |
+| iRm 3 | LPG/NG/Elec | 35kw |
+| iRm 7 | LPG/NG/Elec | 60kw |
+| iRm 15 | LPG/NG/Elec | 90kw |
+| iRm 30 | LPG/NG/Elec | 120kw |
+| iRm 45 | LPG/NG | 150kw |
+| iRm 70 | LPG/NG | 260kw |
+| iRm 140 | LPG/NG | 350kw |
