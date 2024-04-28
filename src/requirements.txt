@@ -19,19 +19,19 @@
 ######
 # the following commented package versions are read by appveyor.yml and downloaded outside of pip.
 #
-# pyinstaller==6.5.0; platform_system='Windows'
+# pyinstaller==6.6.0; platform_system='Windows'
 # libusb==1.0.26;  platform_system='Linux'
 # dotenv==2.8.1;   platform_system='Linux'  # v3.0.0 not compatible with fpm  # gem installed, not pip
 #
 ######
 # packages that are required on all platforms
 #
-setuptools==69.2.0
+setuptools==69.5.1
 wheel==0.43.0
 pyserial==3.5
-pymodbus==3.6.6
+pymodbus==3.6.8
 python-snap7==1.3
-Phidget22==1.19.20240311
+Phidget22==1.19.20240411
 Unidecode==1.3.8
 qrcode==7.4.2
 requests==2.31.0
@@ -48,22 +48,23 @@ protobuf==5.26.1
 numpy==1.24.3; python_version < '3.9' # last Python 3.8 release
 numpy==1.26.4; python_version >= '3.9'
 scipy==1.10.1; python_version < '3.9' # last Python 3.8 release
-scipy==1.12.0; python_version >= '3.9'
+scipy==1.13.0; python_version >= '3.9'
 wquantiles==0.6
 colorspacious==1.1.2
 openpyxl==3.1.2
-keyring==24.3.1
+keyring==25.1.0
 prettytable==3.10.0
 lxml==5.2.0
 matplotlib==3.7.3; python_version < '3.9' # last Python 3.8 release
-matplotlib==3.8.3; python_version >= '3.9'
+matplotlib==3.8.4; python_version >= '3.9'
 jinja2==3.1.3
-aiohttp==3.9.3
+aiohttp==3.9.5
 aiohttp_jinja2==1.6
 python-bidi==0.4.2
 arabic-reshaper==3.0.0
-pydantic==2.6.4
 pillow>=10.2.0
+pydantic==2.71
+babel==2.14.0
 #
 #
 ######
@@ -71,7 +72,7 @@ pillow>=10.2.0
 #
 ### yoctopuce 1.10.42060 on macOS 10.13
 yoctopuce==1.10.42060; sys_platform=='darwin' and platform_release<'20.0' # last version supporting macOS 10.13
-yoctopuce==2.0.59526; sys_platform!='darwin' or (sys_platform=='darwin' and platform_release>='20.0')
+yoctopuce==2.0.60664; sys_platform!='darwin' or (sys_platform=='darwin' and platform_release>='20.0')
 # last 1.x yoctopuce lib: 1.10.57762
 # 2.0.59414 is no longer universal2 lacking arm64 support; 2.0.59503 should fix this
 ##
@@ -83,10 +84,12 @@ yoctopuce==2.0.59526; sys_platform!='darwin' or (sys_platform=='darwin' and plat
 PyQt5==5.15.10; (sys_platform=='darwin' and platform_release<'20.0') or (platform_system=='Windows' and python_version<'3.9')
 PyQtWebEngine==5.15.6; (sys_platform=='darwin' and platform_release<'20.0') or (platform_system=='Windows' and python_version<'3.9')
 # Qt6 on macOS 11+, Windows 10/11 and Linux
+PyQt6-Qt6==6.6.3; (sys_platform=='darwin' and platform_release>='20.0') or (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')
 PyQt6==6.6.1; (sys_platform=='darwin' and platform_release>='20.0') or (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')
+PyQt6-WebEngine-Qt6==6.6.3; (sys_platform=='darwin' and platform_release>='20.0') or (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')
 PyQt6-WebEngine==6.6.0; (sys_platform=='darwin' and platform_release>='20.0') or (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')
 ###
-pyinstaller==6.5.0; platform_system=='Linux' # on Windows pyinstaller is separately installed (see above)
+pyinstaller==6.6.0; platform_system=='Linux' # on Windows pyinstaller is separately installed (see above)
 ###
 ### Qt build tools not part of PyQt but required by build-derived
 qt5-tools==5.15.2.1.3; (platform_system=='Windows' and python_version<'3.9')
