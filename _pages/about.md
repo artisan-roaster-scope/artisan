@@ -51,6 +51,10 @@ gallery:
     image_path: /assets/images/joper-logo.png
     alt: "Joper"
     title: "Joper"
+  - url: https://www.ip-cc.com/
+    image_path: /assets/images/IP-CC-logo.jpg
+    alt: "IP-CC"
+    title: "IP-CC"
     
 ---
 
@@ -87,10 +91,6 @@ gallery:
     image_path: /assets/images/kapok-logo.png
     alt: "KapoK"
     title: "KapoK"
-  - url: https://www.ip-cc.com/
-    image_path: /assets/images/IP-CC-logo.jpg
-    alt: "IP-CC"
-    title: "IP-CC"
   - url: https://www.sweetmarias.com/
     image_path: /assets/images/sweet-marias-logo.jpeg
     alt: "Sweet Maria's"
