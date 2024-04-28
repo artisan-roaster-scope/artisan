@@ -510,10 +510,10 @@ class backgroundDlg(ArtisanResizeablDialog):
     def setplaybackevent(self, _:int) -> None:
         s = None
         if self.backgroundPlaybackEvents.isChecked():
-            self.aw.qmc.backgroundPlaybackEvents = True
+            self.aw.qmc.turn_playback_event_ON()
             msg = QApplication.translate('Message','Playback Events set ON')
         else:
-            self.aw.qmc.backgroundPlaybackEvents = False
+            self.aw.qmc.turn_playback_event_OFF()
             msg = QApplication.translate('StatusBar','Playback Events set OFF')
             s = "background-color:'transparent';"
         self.aw.sendmessage(msg, style=s)

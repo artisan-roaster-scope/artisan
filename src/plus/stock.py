@@ -108,7 +108,7 @@ class Blend(TypedDict):
 
 class ScheduledItem(TypedDict, total=False):
     id: str # ScheduledItem UUID
-    date: str # ISO date string 'YY-MM-DD'
+    date: str # ISO date string 'YYYY-MM-DD'
     count: int
     title: str
     weight: float
@@ -117,6 +117,7 @@ class ScheduledItem(TypedDict, total=False):
     blend: Optional[str]
     machine: Optional[str] # optional target machine name
     user: Optional[str] # optional target users UUID
+    nickname: Optional[str] # optional nickname of target user
     template: Optional[str]
     note: str
     roasts: List[str]
@@ -236,6 +237,8 @@ def update() -> None:
 ###################
 # stock cache access
 #
+# NOTE: stock cache data file access is not protected by portalocker for parallel access via a second Artisan instance
+#   as the ArtisanViewer handles is separate cache file
 
 # save stock data to local file cache
 def save() -> None:
@@ -470,7 +473,7 @@ def coffee2beans(coffee:Tuple[str, Tuple[Coffee, StockItem]]) -> str:
     c:Coffee = getCoffeeCoffeeDict(coffee)
     origin = ''
     try:
-        origin_str = c['origin'].strip()
+        origin_str = c['origin'].strip() # pyright:ignore[reportTypedDictNotRequiredAccess]
         if len(origin_str) > 0 and origin_str != 'null':
             origin = QApplication.translate('Countries', origin_str)
     except Exception:  # pylint: disable=broad-except
@@ -483,7 +486,7 @@ def coffee2beans(coffee:Tuple[str, Tuple[Coffee, StockItem]]) -> str:
         label = ''
     processing = ''
     try:
-        processing_str = c['processing'].strip()
+        processing_str = c['processing'].strip() # pyright:ignore[reportTypedDictNotRequiredAccess]
         # processing_str can have the form "fully washed" or with
         # newer servers "Wet/fully washed"
         processing_split = processing_str.split('/')
@@ -498,7 +501,7 @@ def coffee2beans(coffee:Tuple[str, Tuple[Coffee, StockItem]]) -> str:
         pass
     grade = ''
     try:
-        grade = f" {c['grade']}"
+        grade = f" {c['grade']}" # pyright:ignore[reportTypedDictNotRequiredAccess]
     except Exception:  # pylint: disable=broad-except
         pass
     varietals = ''
@@ -524,15 +527,15 @@ def coffee2beans(coffee:Tuple[str, Tuple[Coffee, StockItem]]) -> str:
         bean = f',{bean}'
     year = ''
     try:
-        cy = c['crop_date']
+        cy = c['crop_date'] # pyright:ignore[reportTypedDictNotRequiredAccess]
         picked = None
         landed = None
         try:
-            picked = int(cy['picked'][0])
+            picked = int(cy['picked'][0]) # pyright:ignore[reportTypedDictNotRequiredAccess]
         except Exception:  # pylint: disable=broad-except
             pass
         try:
-            landed = int(cy['landed'][0])
+            landed = int(cy['landed'][0]) # pyright:ignore[reportTypedDictNotRequiredAccess]
         except Exception:  # pylint: disable=broad-except
             pass
         if picked is not None and not bool(landed):
@@ -551,7 +554,7 @@ def coffee2beans(coffee:Tuple[str, Tuple[Coffee, StockItem]]) -> str:
 def coffeeLabel(c:Coffee) -> str:
     origin = ''
     try:
-        origin_str = c['origin'].strip()
+        origin_str = c['origin'].strip() # pyright:ignore[reportTypedDictNotRequiredAccess]
         if len(origin_str) > 0 and origin_str != 'null':
             origin = QApplication.translate(
                 'Countries', origin_str
@@ -620,7 +623,7 @@ def getCoffees(weight_unit_idx:int, store:Optional[str]=None) -> List[Tuple[str,
                 try:
                     origin = ''
                     try:
-                        origin_str = c['origin'].strip()
+                        origin_str = c['origin'].strip() # pyright:ignore[reportTypedDictNotRequiredAccess]
                         if len(origin_str) > 0 and origin_str != 'null':
                             origin = QApplication.translate(
                                 'Countries', origin_str
@@ -658,7 +661,7 @@ def getCoffees(weight_unit_idx:int, store:Optional[str]=None) -> List[Tuple[str,
                                     # is available in several locations
                                     loc = '' if store else f'{location}, '
                                     res[
-                                        f'{origin}{label} ({loc}{renderAmount(amount,default_unit,weight_unit_idx)})'
+                                        f'{origin}{label} [{loc}{renderAmount(amount,default_unit,weight_unit_idx)}]'
                                     ] = (c, s)
                 except Exception as e:  # pylint: disable=broad-except
                     _log.exception(e)
@@ -706,7 +709,7 @@ def getCoffeeStore(coffeeId:str, storeId:str, acquire_lock:bool = True) -> Tuple
             coffee = [c for c in stock['coffees'] if 'hr_id' in c and c['hr_id'] == coffeeId][0]
             return [
                 (coffee, s)
-                for s in coffee['stock']
+                for s in coffee['stock']  # pyright:ignore[reportTypedDictNotRequiredAccess]
                 if s['location_hr_id'] == storeId
             ][0]
         return None, None
@@ -1113,13 +1116,13 @@ def getBlends(weight_unit_idx:int, store:Optional[str] = None, customBlend:Optio
                                         # used in the Roast Properties dialog
                                         # for links to the coffees
                                         try:
-                                            if cd['crop_date']['picked'][0] is not None:
-                                                i['label'] = f"{cd['crop_date']['picked'][0]} {i['label']}"
+                                            if cd['crop_date']['picked'][0] is not None: # pyright:ignore[reportTypedDictNotRequiredAccess]
+                                                i['label'] = f"{cd['crop_date']['picked'][0]} {i['label']}" # pyright:ignore[reportTypedDictNotRequiredAccess]
                                             # pylint: disable=broad-except
                                         except Exception:
                                             pass
                                     try:
-                                        m = float(cd['moisture'])
+                                        m = float(cd['moisture']) # pyright:ignore[reportTypedDictNotRequiredAccess]
                                         if m > 0:
                                             coffee_moisture[coffee] = m
                                             i['moisture'] = m
@@ -1127,7 +1130,7 @@ def getBlends(weight_unit_idx:int, store:Optional[str] = None, customBlend:Optio
                                     except Exception:
                                         pass
                                     try:
-                                        d = int(cd['density'])
+                                        d = int(cd['density']) # pyright:ignore[reportTypedDictNotRequiredAccess]
                                         if d > 0:
                                             coffee_density[coffee] = d
                                             i['density'] = d
@@ -1136,7 +1139,7 @@ def getBlends(weight_unit_idx:int, store:Optional[str] = None, customBlend:Optio
                                         pass
                                     try:
                                         screen_size_min = int(
-                                            cd['screen_size']['min']
+                                            cd['screen_size']['min'] # pyright:ignore[reportTypedDictNotRequiredAccess]
                                         )
                                         if screen_size_min > 0:
                                             coffee_screen_min[
@@ -1148,7 +1151,7 @@ def getBlends(weight_unit_idx:int, store:Optional[str] = None, customBlend:Optio
                                         pass
                                     try:
                                         screen_size_max = int(
-                                            cd['screen_size']['max']
+                                            cd['screen_size']['max'] # pyright:ignore[reportTypedDictNotRequiredAccess]
                                         )
                                         if screen_size_max > 0:
                                             coffee_screen_max[
@@ -1182,15 +1185,15 @@ def getBlends(weight_unit_idx:int, store:Optional[str] = None, customBlend:Optio
                                             # used in the Roast Properties
                                             # dialog for links to the coffees
                                             try:
-                                                if cd['crop_date']['picked'][0] is not None:
+                                                if cd['crop_date']['picked'][0] is not None:  # pyright:ignore[reportTypedDictNotRequiredAccess]
                                                     i[
                                                         'replaceLabel'
-                                                    ] = f"{cd['crop_date']['picked'][0]} {i['replaceLabel']}"
+                                                    ] = f"{cd['crop_date']['picked'][0]} {i['replaceLabel']}"  # pyright:ignore[reportTypedDictNotRequiredAccess]
                                                 # pylint: disable=broad-except
                                             except Exception:
                                                 pass
                                         try:
-                                            m = float(cd['moisture'])
+                                            m = float(cd['moisture']) # pyright:ignore[reportTypedDictNotRequiredAccess]
                                             if m > 0:
                                                 coffee_moisture[
                                                     replaceCoffee
@@ -1199,7 +1202,7 @@ def getBlends(weight_unit_idx:int, store:Optional[str] = None, customBlend:Optio
                                         except Exception:
                                             pass
                                         try:
-                                            d = int(cd['density'])
+                                            d = int(cd['density']) # pyright:ignore[reportTypedDictNotRequiredAccess]
                                             if d > 0:
                                                 coffee_density[
                                                     replaceCoffee
@@ -1209,7 +1212,7 @@ def getBlends(weight_unit_idx:int, store:Optional[str] = None, customBlend:Optio
                                             pass
                                         try:
                                             screen_size_min = int(
-                                                cd['screen_size']['min']
+                                                cd['screen_size']['min'] # pyright:ignore[reportTypedDictNotRequiredAccess]
                                             )
                                             if screen_size_min > 0:
                                                 coffee_screen_min[
@@ -1220,7 +1223,7 @@ def getBlends(weight_unit_idx:int, store:Optional[str] = None, customBlend:Optio
                                             pass
                                         try:
                                             screen_size_max = int(
-                                                cd['screen_size']['max']
+                                                cd['screen_size']['max'] # pyright:ignore[reportTypedDictNotRequiredAccess]
                                             )
                                             if screen_size_max > 0:
                                                 coffee_screen_max[

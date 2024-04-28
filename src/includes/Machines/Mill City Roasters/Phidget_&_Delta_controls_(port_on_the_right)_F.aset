@@ -1,6 +1,6 @@
 [General]
 Delay=2000
-roastertype_setup=MCR Phidget & Delta controls (port on the right) F
+roastertype_setup=MCR Phidget & Delta controls (port on the right)
 dropDuplicates=true
 dropDuplicatesLimit=0.3
 BTfunction=Y9

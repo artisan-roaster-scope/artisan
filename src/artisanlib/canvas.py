@@ -217,7 +217,7 @@ class tgraphcanvas(FigureCanvas):
         'YOCTO_dataRate', 'YOCTO_dataRatesStrings', 'YOCTO_dataRatesValues', 'phidget1018valueFactor', 'phidget1018_async', 'phidget1018_ratio', 'phidget1018_dataRates',
         'phidget1018_changeTriggers', 'phidget1018_changeTriggersValues', 'phidget1018_changeTriggersStrings', 'phidgetVCP100x_voltageRanges', 'phidgetVCP100x_voltageRangeValues',
         'phidgetVCP100x_voltageRangeStrings', 'phidgetDAQ1400_powerSupplyStrings', 'phidgetDAQ1400_powerSupply', 'phidgetDAQ1400_inputModeStrings', 'phidgetDAQ1400_inputMode',
-        'devices', 'phidgetDevices', 'nonSerialDevices', 'nonTempDevices', 'extradevices', 'extratimex', 'extradevicecolor1', 'extradevicecolor2', 'extratemp1',
+        'devices', 'phidgetDevices', 'nonSerialDevices', 'nonTempDevices', 'specialDevices', 'binaryDevices', 'extradevices', 'extratimex', 'extradevicecolor1', 'extradevicecolor2', 'extratemp1',
         'extratemp2', 'extrastemp1', 'extrastemp2', 'extractimex1', 'extractimex2', 'extractemp1', 'extractemp2', 'extratemp1lines', 'extratemp2lines',
         'extraname1', 'extraname2', 'extramathexpression1', 'extramathexpression2', 'extralinestyles1', 'extralinestyles2', 'extradrawstyles1', 'extradrawstyles2',
         'extralinewidths1', 'extralinewidths2', 'extramarkers1', 'extramarkers2', 'extramarkersizes1', 'extramarkersizes2', 'devicetablecolumnwidths', 'extraNoneTempHint1',
@@ -295,7 +295,7 @@ class tgraphcanvas(FigureCanvas):
         'eventactionsemaphore', 'updateBackgroundSemaphore', 'alarmSemaphore', 'rampSoakSemaphore', 'crossmarker', 'crossmouseid', 'onreleaseid',
         'analyzer_connect_id', 'extra309T3', 'extra309T4', 'extra309TX', 'hottop_ET', 'hottop_BT', 'hottop_HEATER', 'hottop_MAIN_FAN', 'hottop_TX',
         'R1_DT', 'R1_BT', 'R1_BT_ROR', 'R1_EXIT_TEMP', 'R1_HEATER', 'R1_FAN', 'R1_DRUM', 'R1_VOLTAGE', 'R1_TX', 'R1_STATE', 'R1_FAN_RPM', 'R1_STATE_STR',
-        'extraArduinoT1', 'extraArduinoT2', 'extraArduinoT3', 'extraArduinoT4', 'extraArduinoT5', 'extraArduinoT6', 'program_t3', 'program_t4', 'program_t5', 'program_t6',
+        'extraArduinoTX', 'extraArduinoT1', 'extraArduinoT2', 'extraArduinoT3', 'extraArduinoT4', 'extraArduinoT5', 'extraArduinoT6', 'program_t3', 'program_tx', 'program_t4', 'program_t5', 'program_t6',
         'program_t7', 'program_t8', 'program_t9', 'program_t10', 'dutycycle', 'dutycycleTX', 'currentpidsv', 'linecount', 'deltalinecount',
         'ax_background', 'block_update', 'fmt_data_RoR', 'fmt_data_curve', 'running_LCDs', 'plotterstack', 'plotterequationresults', 'plottermessage', 'alarm_popup_timout',
         'RTtemp1', 'RTtemp2', 'RTextratemp1', 'RTextratemp2', 'RTextratx', 'idx_met', 'showmet', 'met_annotate', 'met_timex_temp1_delta',
@@ -885,10 +885,14 @@ class tgraphcanvas(FigureCanvas):
             61, # Phidget TMP1100
             62, # Phidget 1011
             63, # Phidget HUB IO 01
+            64, # Phidget HUB IO 23 # + device but need to be mounted directly
+            65, # Phidget HUB IO 45 # + device but need to be mounted directly
             68, # Phidget TMP1200
             69, # Phidget IO Digital
             73, # Phidget 1011 IO Digital
             74, # Phidget HUB IO Digital 01
+            75, # Phidget HUB IO Digital 23 # + device but need to be mounted directly
+            76, # Phidget HUB IO Digital 45 # + device but need to be mounted directly
             95, # Phidget DAQ1400 Current
             96, # Phidget DAQ1400 Frequency
             97, # Phidget DAQ1400 Digital
@@ -998,6 +1002,29 @@ class tgraphcanvas(FigureCanvas):
             158, # +Phidget DAQ1301 45
             159, # +Phidget DAQ1301 67
             160  # IKAWA \Delta Humidity / \Delat Humidity direction
+        ]
+
+        # ADD DEVICE:
+        # ids of special devices certain input filters should not be applied
+        self.specialDevices : Final[List[int]] = [
+            18, # NONE (Manual)
+            25, # Virtual
+            50, # Dummy
+            90, # Slider01
+            91  # Slider23
+        ]
+
+        # ADD DEVICE:
+        # ids of binary devices certain input filters should not be applied
+        self.binaryDevices : Final[List[int]] = [
+            69, # Phidget IO Digital 01
+            70, # Phidget IO Digital 23
+            71, # Phidget IO Digital 45
+            72, # Phidget IO Digital 67
+            73, # Phidget 1011 IO Digital 01
+            74, # Phidget HUB IO Digital 01
+            75, # Phidget HUB IO Digital 23
+            76  # Phidget HUB IO Digital 45
         ]
 
         #extra devices
@@ -1941,9 +1968,9 @@ class tgraphcanvas(FigureCanvas):
 
         # defaults
 
-        self.filterDropOut_tmin_C_default:Final[float] = 10
+        self.filterDropOut_tmin_C_default:Final[float] = 0
         self.filterDropOut_tmax_C_default:Final[float] = 700
-        self.filterDropOut_tmin_F_default:Final[float] = 50
+        self.filterDropOut_tmin_F_default:Final[float] = 0
         self.filterDropOut_tmax_F_default:Final[float] = 1292
         self.filterDropOut_spikeRoR_dRoR_limit_C_default:Final[float] = 4.2
         self.filterDropOut_spikeRoR_dRoR_limit_F_default:Final[float] = 7
@@ -2061,6 +2088,7 @@ class tgraphcanvas(FigureCanvas):
         self.R1_STATE_STR:str = ''
 
         #used by extra device +ArduinoTC4_XX to pass values
+        self.extraArduinoTX:float = 0.  # timestamp of retrieval
         self.extraArduinoT1:float = 0.  # Arduino T3: chan 3
         self.extraArduinoT2:float = 0.  # Arduino T4: chan 4
         self.extraArduinoT3:float = 0.  # Arduino T5: heater duty %
@@ -2069,6 +2097,7 @@ class tgraphcanvas(FigureCanvas):
         self.extraArduinoT6:float = 0.  # Arduino T8: TC4 internal ambient temperature
 
         #used by extra device +Program_34, +Program_56, +Program_78 and +Program_910 to pass values
+        self.program_tx:float = 0
         self.program_t3:float = -1
         self.program_t4:float = -1
         self.program_t5:float = -1
@@ -2266,6 +2295,26 @@ class tgraphcanvas(FigureCanvas):
     #NOTE: empty Figure is initially drawn at the end of self.awsettingsload()
     #################################    FUNCTIONS    ###################################
     #####################################################################################
+
+    # ADD DEVICE:
+    # returns True if the given device_id and channel_offset indicating if the devices first or second channel is addressed,
+    # is a binary or special device channel
+    # which should for example be excluded from filtering
+    def dummy_or_special_device(self, device_id:int, channel_offset:int) -> bool:
+        return (
+              # any S7 binary channel
+             (device_id == 79 and 2 < self.aw.s7.type[0+channel_offset] < 11) or # S7
+             (device_id == 80 and 2 < self.aw.s7.type[2+channel_offset] < 11) or # S7 34
+             (device_id == 81 and 2 < self.aw.s7.type[4+channel_offset] < 11) or # S7 56
+             (device_id == 82 and 2 < self.aw.s7.type[6+channel_offset] < 11) or # S7 78
+             (device_id == 83 and 2 < self.aw.s7.type[8+channel_offset] < 11) or # S7 910
+             (device_id == 151 and 2 < self.aw.s7.type[8+channel_offset] < 11) or # S7 1112
+              # any other binary device
+             device_id in self.binaryDevices or
+              # special device
+             device_id in self.specialDevices
+             )
+
 
     # toggles the y cursor coordinate see self.fmt_data_curve
     def nextFmtDataCurve(self) -> None:
@@ -3583,8 +3632,10 @@ class tgraphcanvas(FigureCanvas):
                                             et2_prev = sample_extratemp2[i][-1]
                                             if len(sample_extratemp2[i])>1:
                                                 et2_prevprev = sample_extratemp2[i][-2]
-                                    extrat1 = self.inputFilter(sample_extratimex[i],sample_extratemp1[i],extratx,extrat1)
-                                    extrat2 = self.inputFilter(sample_extratimex[i],sample_extratemp2[i],extratx,extrat2)
+                                    if not self.dummy_or_special_device(self.extradevices[i], 0):
+                                        extrat1 = self.inputFilter(sample_extratimex[i],sample_extratemp1[i],extratx,extrat1)
+                                    if not self.dummy_or_special_device(self.extradevices[i], 1):
+                                        extrat2 = self.inputFilter(sample_extratimex[i],sample_extratemp2[i],extratx,extrat2)
 
                                     # now copy the destructively modified values from temp1/2 to ctemp1/2 if any (to ensure to pick the right elements we compare the timestamps at those indices)
                                     if (self.minmaxLimits or self.dropSpikes or self.dropDuplicates):
@@ -3674,8 +3725,10 @@ class tgraphcanvas(FigureCanvas):
                             t2_prev = sample_temp2[-1]
                             if len(sample_temp2)>1:
                                 t2_prevprev = sample_temp2[-2]
-                    t1 = self.inputFilter(sample_timex,sample_temp1,tx,t1)
-                    t2 = self.inputFilter(sample_timex,sample_temp2,tx,t2,True)
+                    if not self.dummy_or_special_device(self.device, 0):
+                        t1 = self.inputFilter(sample_timex,sample_temp1,tx,t1)
+                    if not self.dummy_or_special_device(self.device, 0):
+                        t2 = self.inputFilter(sample_timex,sample_temp2,tx,t2,True)
 
                     length_of_qmc_timex = len(sample_timex)
 
@@ -5032,10 +5085,10 @@ class tgraphcanvas(FigureCanvas):
                         self.aw.sendmessage(QApplication.translate('Message',"Alarm trigger SV slider error, description '{0}' not a valid number").format(string))
                 elif action == 22:
                     # Playback ON
-                    self.backgroundPlaybackEvents = True
+                    self.turn_playback_event_ON()
                 elif action == 23:
                     # Playback OFF
-                    self.backgroundPlaybackEvents = False
+                    self.turn_playback_event_OFF()
                 elif action == 24:
                     # grab only the color definition
                     m = re.match('#[0-9,a-f,A-F]{6}',string.strip())
@@ -5067,6 +5120,21 @@ class tgraphcanvas(FigureCanvas):
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             self.adderror((QApplication.translate('Error Message','Exception:') + ' playbackdrop() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+
+
+    # turns playback event on and fills self.replayedBackgroundEvents with already passed events if any
+    def turn_playback_event_ON(self) -> None:
+        self.backgroundPlaybackEvents = True
+        self.replayedBackgroundEvents = []
+        if self.flagstart:
+            now = self.timeclock.elapsedMilli()
+            for i, bge in enumerate(self.backgroundEvents):
+                if (self.timeB[bge] - now) <= 0:
+                    self.replayedBackgroundEvents.append(i)
+
+    def turn_playback_event_OFF(self) -> None:
+        self.backgroundPlaybackEvents = False
+
 
     # called only after CHARGE
     def playbackevent(self) -> None:
@@ -11494,12 +11562,13 @@ class tgraphcanvas(FigureCanvas):
                 if self.ambient_pressure_device or self.ambient_humidity_device or self.ambient_temperature_device:
                     self.ambiThread = QThread()
                     self.ambiWorker = AmbientWorker(self.aw)
-                    self.ambiWorker.moveToThread(self.ambiThread)
-                    self.ambiThread.started.connect(self.ambiWorker.run)
-                    self.ambiWorker.finished.connect(self.ambiThread.quit)
-                    self.ambiWorker.finished.connect(self.ambiWorker.deleteLater)
-                    self.ambiThread.finished.connect(self.ambiThread.deleteLater)
-                    self.ambiThread.start()
+                    if self.ambiWorker is not None:
+                        self.ambiWorker.moveToThread(self.ambiThread)
+                        self.ambiThread.started.connect(self.ambiWorker.run)
+                        self.ambiWorker.finished.connect(self.ambiThread.quit)
+                        self.ambiWorker.finished.connect(self.ambiWorker.deleteLater)
+                        self.ambiThread.finished.connect(self.ambiThread.deleteLater)
+                        self.ambiThread.start()
 
             # warm up software PID (write current p-i-d settings,..)
             self.aw.pidcontrol.confSoftwarePID()
@@ -14010,8 +14079,8 @@ class tgraphcanvas(FigureCanvas):
                         CO2_label = CO2_label.replace('CO2','CO₂')
                     energy_unit = self.energyunits[self.energyresultunit_setup]
                     energymetrics,_ = self.calcEnergyuse()
-                    KWH_per_green = energymetrics['KWH_batch_per_green_kg']
-                    CO2_per_green = energymetrics['CO2_batch_per_green_kg']
+                    KWH_per_green = energymetrics.get('KWH_batch_per_green_kg', 0)
+                    CO2_per_green = energymetrics.get('CO2_batch_per_green_kg', 0)
 
                     # energy per kg
                     if KWH_per_green > 0:
@@ -14035,8 +14104,9 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         CO2perKgCoffeeLabel = ''
 
-                    total_energy = scaleFloat2String(self.convertHeat(energymetrics['BTU_batch'],0,self.energyresultunit_setup))
-                    scaled_co2_batch = str(scaleFloat2String(energymetrics['CO2_batch']))+'g' if energymetrics['CO2_batch']<1000 else str(scaleFloat2String(energymetrics['CO2_batch']/1000.)) +'kg'
+                    total_energy = scaleFloat2String(self.convertHeat(energymetrics.get('BTU_batch', 0), 0, self.energyresultunit_setup))
+                    CO2_batch = energymetrics.get('CO2_batch', 0)
+                    scaled_co2_batch = str(scaleFloat2String(CO2_batch))+'g' if CO2_batch<1000 else str(scaleFloat2String(CO2_batch/1000.)) +'kg'
 
 
                     msg = f'{energy_label}: {total_energy}{energy_unit}{energyPerKgCoffeeLabel}   {CO2_label}: {scaled_co2_batch}{CO2perKgCoffeeLabel}'
@@ -14051,8 +14121,8 @@ class tgraphcanvas(FigureCanvas):
                     energy_unit = self.energyunits[self.energyresultunit_setup]
                     roast_label = self.__dijstra_to_ascii(QApplication.translate('Label','Roast'))
                     energymetrics,_ = self.calcEnergyuse()
-                    KWH_per_green_roast = energymetrics['KWH_roast_per_green_kg']
-                    CO2_per_green_roast = energymetrics['CO2_roast_per_green_kg']
+                    KWH_per_green_roast = energymetrics.get('KWH_roast_per_green_kg', 0)
+                    CO2_per_green_roast = energymetrics.get('CO2_roast_per_green_kg', 0)
 
                     # energy per kg
                     if KWH_per_green_roast > 0:
@@ -14076,8 +14146,8 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         CO2perKgCoffeeLabel = ''
 
-                    total_energy = scaleFloat2String(self.convertHeat(energymetrics['BTU_roast'],0,self.energyresultunit_setup))
-                    scaled_co2_batch = str(scaleFloat2String(energymetrics['CO2_roast']))+'g' if energymetrics['CO2_roast']<1000 else str(scaleFloat2String(energymetrics['CO2_roast']/1000.)) +'kg'
+                    total_energy = (scaleFloat2String(self.convertHeat(energymetrics['BTU_roast'],0,self.energyresultunit_setup)) if 'BTU_roast' in energymetrics else '0')
+                    scaled_co2_batch = ((str(scaleFloat2String(energymetrics['CO2_roast']))+'g' if energymetrics['CO2_roast']<1000 else str(scaleFloat2String(energymetrics['CO2_roast']/1000.)) +'kg') if 'CO2_roast' in energymetrics else '0')
 
                     msg = f'{roast_label} {energy_label}: {total_energy}{energy_unit}{energyPerKgCoffeeLabel}   {roast_label} {CO2_label}: {scaled_co2_batch}{CO2perKgCoffeeLabel}'
                     self.set_xlabel(msg)

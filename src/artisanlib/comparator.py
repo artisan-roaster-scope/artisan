@@ -243,9 +243,9 @@ class RoastProfile:
                 self.title = title
         if 'roastbatchnr' in profile and profile['roastbatchnr'] != 0:
             try:
-                batchprefix:Optional[str] = decodeLocal(profile['roastbatchprefix'])
+                batchprefix:Optional[str] = decodeLocal(profile['roastbatchprefix']) # pyright:ignore[reportTypedDictNotRequiredAccess]
                 if batchprefix is not None:
-                    self.label = batchprefix + str(int(profile['roastbatchnr']))[:10]
+                    self.label = batchprefix + str(int(profile['roastbatchnr']))[:10] # pyright:ignore[reportTypedDictNotRequiredAccess]
             except Exception: # pylint: disable=broad-except
                 pass
         if 'specialevents' in profile:

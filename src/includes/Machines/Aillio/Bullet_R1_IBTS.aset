@@ -1,7 +1,7 @@
 w[General]
 Delay=1000
 Oversampling=true
-roastertype_setup=Aillio Bullet R1
+roastertype_setup=Aillio Bullet R1 IBTS
 roastersize_setup=1
 
 [Style]

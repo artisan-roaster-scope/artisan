@@ -394,6 +394,7 @@ try: # BLE not available on some platforms
 
             self.connected_state:bool = False
 
+            self.TX:float = 0
             self.ET:float = -1
             self.BT:float = -1
             self.SP:float = -1

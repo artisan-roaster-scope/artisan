@@ -1,7 +1,7 @@
 [General]
 Delay=2000
 Oversampling=false
-roastertype_setup=Sedona Elite PXF
+roastertype_setup=Wintop WS Fuji
 
 [Device]
 controlETpid=4, 2

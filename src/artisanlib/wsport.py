@@ -43,7 +43,7 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 class wsport:
 
-    __slots__ = [ 'aw', '_loop', '_thread', '_write_queue', 'default_host', 'host', 'port', 'path', 'machineID', 'lastReadResult', 'channels', 'readings',
+    __slots__ = [ 'aw', '_loop', '_thread', '_write_queue', 'default_host', 'host', 'port', 'path', 'machineID', 'lastReadResult', 'channels', 'readings', 'tx',
                     'channel_requests', 'channel_nodes', 'channel_modes', 'connect_timeout', 'request_timeout', 'compression',
                     'reconnect_interval', 'ping_interval', 'ping_timeout', 'id_node', 'machine_node',
                     'command_node', 'data_node', 'pushMessage_node', 'request_data_command', 'charge_message', 'drop_message', 'addEvent_message', 'event_node',
@@ -71,6 +71,7 @@ class wsport:
         self.channels:Final[int] = 10 # maximal number of WebSocket channels
 
         # WebSocket data
+        self.tx:float = 0 # timestamp as epoch of last read
         self.readings:List[float] = [-1]*self.channels
 
         self.channel_requests:List[str] = ['']*self.channels

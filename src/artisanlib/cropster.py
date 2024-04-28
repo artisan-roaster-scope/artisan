@@ -910,17 +910,17 @@ def extractProfileCropsterXLS(file:str, _:'ApplicationWindow') -> 'ProfileData':
                                 c = takeClosest(time,res['timex'])
                                 timex_idx = res['timex'].index(c)
                                 if comment_type in color_change_trans:
-                                    res['timeindex'][1] = max(0,timex_idx)
+                                    res['timeindex'][1] = max(0,timex_idx) # pyright:ignore[reportTypedDictNotRequiredAccess]
                                 elif comment_type in first_crack_trans:
-                                    res['timeindex'][2] = max(0,timex_idx)
+                                    res['timeindex'][2] = max(0,timex_idx) # pyright:ignore[reportTypedDictNotRequiredAccess]
                                 elif comment_type == 'First crack end':
-                                    res['timeindex'][3] = max(0,timex_idx)
+                                    res['timeindex'][3] = max(0,timex_idx) # pyright:ignore[reportTypedDictNotRequiredAccess]
                                 elif comment_type in second_crack_trans:
-                                    res['timeindex'][4] = max(0,timex_idx)
+                                    res['timeindex'][4] = max(0,timex_idx) # pyright:ignore[reportTypedDictNotRequiredAccess]
                                 elif comment_type == 'Second crack end':
-                                    res['timeindex'][5] = max(0,timex_idx)
+                                    res['timeindex'][5] = max(0,timex_idx) # pyright:ignore[reportTypedDictNotRequiredAccess]
                                 elif comment_type == 'Duration':
-                                    res['timeindex'][6] = max(0,timex_idx)
+                                    res['timeindex'][6] = max(0,timex_idx) # pyright:ignore[reportTypedDictNotRequiredAccess]
                                 else:
                                     specialevents.append(timex_idx)
                                     ae = False

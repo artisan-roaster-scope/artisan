@@ -591,22 +591,23 @@ def comma2dot(s:str) -> str:
         if last_dot + 1 == len(s):
             # this is just a trailing dot, we remove this and all other dots and commas
             return s.replace(',','').replace('.','')
-        # we just keep this one and remove all other comma and dots
-        return s[:last_dot].replace(',','').replace('.','') + s[last_dot:].replace(',','')
+        # we just keep this one and remove all other comma and dots; we also remove trailing zero decimals
+        return s[:last_dot].replace(',','').replace('.','') + s[last_dot:].replace(',','').rstrip('0').rstrip('.')
     # there is no dot in the string
     last_pos = s.rfind(',')
     if last_pos > -1:
         if last_pos + 1 == len(s):
             # this is just a trailing comma, we remove this and all other dots and commas
             return s.replace(',','').replace('.','')
-        # we turn the last comma into a dot and remove all others
-        return s[:last_pos].replace(',','') + '.' + s[last_pos+1:]
+        # we turn the last comma into a dot and remove all others; we also remove trailing zero decimals
+        return s[:last_pos].replace(',','') + '.' + s[last_pos+1:].rstrip('0').rstrip('.')
     return s
 
 
 #--- weight / volume
 
 weight_units:Final[Tuple[str,str,str,str]] = ('g','Kg','lb','oz')
+weight_units_lower:Final[Tuple[str,str,str,str]] = ('g','kg','lb','oz') # just for display use
 volume_units:Final[Tuple[str,str,str,str,str,str]] = ('l','gal','qt','pt','cup','ml')
 
 

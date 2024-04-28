@@ -1,6 +1,6 @@
 [General]
 Delay=3000
-roastertype_setup=D\xe4tgen
+roastertype_setup=D\xe4tgen DW
 
 [Device]
 id=29

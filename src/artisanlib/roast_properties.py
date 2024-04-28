@@ -40,7 +40,7 @@ import plus.blend
 
 #from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.util import (deltaLabelUTF8, stringfromseconds,stringtoseconds, toInt, toFloat, abbrevString,
-        scaleFloat2String, comma2dot, weight_units, volume_units, float2floatWeightVolume, float2float,
+        scaleFloat2String, comma2dot, weight_units, weight_units_lower, volume_units, float2floatWeightVolume, float2float,
         convertWeight, convertVolume)
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog
 from artisanlib.widgets import MyQComboBox, ClickableQLabel, ClickableTextEdit, MyTableWidgetItemNumber
@@ -894,7 +894,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.unitsComboBox = QComboBox()
         self.unitsComboBox.setMaximumWidth(60)
         self.unitsComboBox.setMinimumWidth(60)
-        self.unitsComboBox.addItems(weight_units)
+        self.unitsComboBox.addItems(weight_units_lower)
         self.unitsComboBox.setCurrentIndex(weight_units.index(self.aw.qmc.weight[2]))
         self.unitsComboBox.currentIndexChanged.connect(self.changeWeightUnit)
         #volume
@@ -2423,6 +2423,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             title = ' '.join(self.titleedit.currentText().split())
             weightIn = float(comma2dot(self.weightinedit.text()))
             weightUnit = self.unitsComboBox.currentText()
+            if weightUnit == 'kg':
+                weightUnit = 'Kg'
             self.aw.recentRoasts = self.aw.delRecentRoast(title,weightIn,weightUnit)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -2436,6 +2438,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             if title != QApplication.translate('Scope Title', 'Roaster Scope') and weightIn != 0:
                 beans = self.beansedit.toPlainText()
                 weightUnit = self.unitsComboBox.currentText()
+                if weightUnit == 'kg':
+                    weightUnit = 'Kg'
                 if self.volumeinedit.text() != '':
                     volumeIn = float(comma2dot(str(self.volumeinedit.text())))
                 else:
@@ -2623,7 +2627,10 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot(int)
     def changeWeightUnit(self, i:int) -> None:
         o = weight_units.index(self.aw.qmc.weight[2]) # previous unit index
-        self.aw.qmc.weight = (self.aw.qmc.weight[0],self.aw.qmc.weight[1],self.unitsComboBox.currentText())
+        weightUnit = self.unitsComboBox.currentText()
+        if weightUnit == 'kg':
+            weightUnit = 'Kg'
+        self.aw.qmc.weight = (self.aw.qmc.weight[0],self.aw.qmc.weight[1],weightUnit)
         for le in [self.weightinedit,self.weightoutedit]:
             if le.text() and le.text() != '':
                 wi = float(comma2dot(le.text()))
@@ -4470,7 +4477,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         if self.plus_amount_selected is not None:
             try:
                 # convert weight to kg
-                wc = convertWeight(weightIn,weight_units.index(self.unitsComboBox.currentText()),weight_units.index('Kg'))
+                weightUnit = self.unitsComboBox.currentText()
+                if weightUnit == 'kg':
+                    wc = weightIn
+                else:
+                    wc = convertWeight(weightIn,weight_units.index(weightUnit),weight_units.index('Kg'))
                 if wc > self.plus_amount_selected:
                     enough = False
             except Exception: # pylint: disable=broad-except
@@ -4478,7 +4489,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         if self.plus_amount_replace_selected is not None:
             try:
                 # convert weight to kg
-                wc = convertWeight(weightIn,weight_units.index(self.unitsComboBox.currentText()),weight_units.index('Kg'))
+                weightUnit = self.unitsComboBox.currentText()
+                if weightUnit == 'kg':
+                    wc = weightIn
+                else:
+                    wc = convertWeight(weightIn,weight_units.index(self.unitsComboBox.currentText()),weight_units.index('Kg'))
                 if wc <= self.plus_amount_replace_selected:
                     enough_replacement = True
             except Exception: # pylint: disable=broad-except
@@ -4580,7 +4595,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 if volumein != 0.0 and weightin != 0.0:
                     vol_idx = volume_units.index(self.volumeUnitsComboBox.currentText())
                     volumein = convertVolume(volumein,vol_idx,0)
-                    weight_idx = weight_units.index(self.unitsComboBox.currentText())
+                    weight_idx = weight_units_lower.index(self.unitsComboBox.currentText())
                     weightin = convertWeight(weightin,weight_idx,0)
                     din = weightin / volumein
             if self.volumeoutedit.text() != ''  and self.weightoutedit.text() != '':
@@ -4589,7 +4604,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 if volumeout != 0.0 and weightout != 0.0:
                     vol_idx = volume_units.index(self.volumeUnitsComboBox.currentText())
                     volumeout = convertVolume(volumeout,vol_idx,0)
-                    weight_idx = weight_units.index(self.unitsComboBox.currentText())
+                    weight_idx = weight_units_lower.index(self.unitsComboBox.currentText())
                     weightout = convertWeight(weightout,weight_idx,0)
                     dout = weightout / volumeout
         except Exception as e: # pylint: disable=broad-except
@@ -4919,6 +4934,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         except Exception: # pylint: disable=broad-except
             w1 = 0
         w2 = self.unitsComboBox.currentText()
+        if w2 == 'kg':
+            w2 = 'Kg'
         self.aw.qmc.weight = (w0,w1,w2)
         #update volume
         #  first try to recompute volume in and out from weight/density if possible

@@ -141,15 +141,15 @@ def extractProfileRoastPathHTML(url:'QUrl', _:'ApplicationWindow') -> Optional['
         if 'btData' in data and len(data['btData']) > 0 and 'Timestamp' in data['btData'][0]:
             # BT
             bt = data['btData']
-            baseTime = dateutil.parser.parse(bt[0]['Timestamp']).timestamp()
+            baseTime = (dateutil.parser.parse(bt[0]['Timestamp']).timestamp() if 'Timestamp' in bt[0] else -1)
             res['mode'] = 'C'
-            res['timex'] = [dateutil.parser.parse(d['Timestamp']).timestamp() - baseTime for d in bt]
-            res['temp2'] = [(d['StandardValue'] if d['StandardValue'] != 0 else -1) for d in bt] # we drop 0 values as -1 to have Artisan suppress them!
+            res['timex'] = [dateutil.parser.parse(d['Timestamp']).timestamp() - baseTime if 'Timestamp' in d else -1 for d in bt]
+            res['temp2'] = [(d['StandardValue'] if 'StandardValue' in d and d['StandardValue'] != 0 else -1) for d in bt] # we drop 0 values as -1 to have Artisan suppress them!
 
             # ET
             if 'etData' in data:
                 et = data['etData']
-                res['temp1'] = [(d['StandardValue'] if d['StandardValue'] != 0 else -1) for d in et]
+                res['temp1'] = [(d['StandardValue'] if 'StandardValue' in d and d['StandardValue'] != 0 else -1) for d in et]
                 temp2len = len(res['temp2'])
                 res['temp1'] = res['temp1'] + [-1]*(max(0,temp2len-len(res['temp1'])))  # extend if needed
                 res['temp1'] = res['temp1'][:temp2len] # truncate
@@ -282,9 +282,9 @@ def extractProfileRoastPathHTML(url:'QUrl', _:'ApplicationWindow') -> Optional['
                     res['extradrawstyles1'].append('default')
                     res['extradrawstyles2'].append('default')
                     at = data['atData']
-                    timex = [dateutil.parser.parse(d['Timestamp']).timestamp() - baseTime for d in at]
+                    timex = [dateutil.parser.parse(d['Timestamp']).timestamp() - baseTime if 'Timestamp' in d else 0 for d in at]
                     res['extratimex'].append(timex)
-                    res['extratemp1'].append([d['StandardValue'] for d in at])
+                    res['extratemp1'].append([d.get('StandardValue', -1) for d in at])
                     res['extratemp2'].append([-1]*len(timex))
 
                 # BT RoR
@@ -315,9 +315,9 @@ def extractProfileRoastPathHTML(url:'QUrl', _:'ApplicationWindow') -> Optional['
                     res['extradrawstyles1'].append('default')
                     res['extradrawstyles2'].append('default')
                     ror = data['rorData']
-                    timex = [dateutil.parser.parse(d['Timestamp']).timestamp() - baseTime for d in ror]
+                    timex = [dateutil.parser.parse(d['Timestamp']).timestamp() - baseTime if 'Tiestamp' in d else 0 for d in ror]
                     res['extratimex'].append(timex)
-                    res['extratemp1'].append([d['StandardValue'] for d in ror])
+                    res['extratemp1'].append([d.get('StandardValue', -1) for d in ror])
                     res['extratemp2'].append([-1]*len(timex))
 
     except Exception as e: # pylint: disable=broad-except

@@ -765,7 +765,7 @@ class FujiPID:
             if self.aw.ser.useModbusPort or (r is not None and r == command):
                 if not silent:
                     # [Not sure the following will translate or even format properly... Need testing!]
-                    message = QApplication.translate('Message','PXG/PXF sv#{0} set to {1}').format(reg_dict['selectsv'][0],'%.1f' % float(value)) # pylint: disable=consider-using-f-string
+                    message = QApplication.translate('Message','PXG/PXF sv#{0} set to {1}').format(reg_dict['selectsv'][0],'%.1f' % float(value)) # pylint: disable=consider-using-f-string # noqa: UP031
                     self.aw.sendmessage(message)
                     reg_dict[svkey][0] = value
                     #record command as an Event
@@ -794,7 +794,7 @@ class FujiPID:
             if self.aw.ser.useModbusPort or (r is not None and r == command):
                 if not silent:
                     # [Not sure the following will translate or even format properly... Need testing!]
-                    message = QApplication.translate('Message','PXR sv set to {0}').format('%.1f' % float(value)) # pylint: disable=consider-using-f-string
+                    message = QApplication.translate('Message','PXR sv set to {0}').format('%.1f' % float(value)) # pylint: disable=consider-using-f-string # noqa: UP031
                     self.aw.fujipid.PXR['sv0'][0] = value
                     self.aw.sendmessage(message)
                     #record command as an Event

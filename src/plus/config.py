@@ -92,6 +92,9 @@ queue_put_timeout: Final[float] = 0.5
 # gets automatically synced with the cloud
 stock_cache: Final[str] = 'cache'
 
+# the completed roasts cache reflects the last roasted scheduled items
+completed_roasts_cache: Final[str] = 'completed'
+
 # the uuid register that associates UUIDs with local filepaths where to
 # locate the corresponding Artisan profiles
 uuid_cache: Final[str] = 'uuids'

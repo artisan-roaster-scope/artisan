@@ -217,13 +217,13 @@ def extractProfileRoastLog(url:'QUrl', _:'ApplicationWindow') -> Optional['Profi
                         if 'label' in te and 'time' in te:
                             if te['label'] in timex_events:
                                 try:
-                                    timex_idx = res['timex'].index(stringtoseconds(te['time']))
+                                    timex_idx = res['timex'].index(stringtoseconds(te['time'])) # pyright:ignore[reportTypedDictNotRequiredAccess]
                                     timeindex[timex_events[te['label']]] = max(0,timex_idx)
                                 except Exception: # pylint: disable=broad-except
                                     pass
                             else:
                                 try:
-                                    timex_idx = res['timex'].index(stringtoseconds(te['time']))
+                                    timex_idx = res['timex'].index(stringtoseconds(te['time'])) # pyright:ignore[reportTypedDictNotRequiredAccess]
                                     specialeventsStrings.append(te['label'])
                                     specialevents.append(timex_idx)
                                     specialeventstype.append(4)
