@@ -12,7 +12,7 @@ sidebar:
 ---
 <img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
 
-* __Producer:__ [iRm – Intelligent Coffee Roasting Machines](https://www.irm.coffee/){:target="_blank"}, Greece
+* __Producer:__ [Intelligent Coffee Roasting Machines](https://www.irm.coffee/){:target="_blank"}, Greece
 * __Machines:__ iRm Series with networked Omron or Mitsubishi PLC
 * __Connection:__ MODBUS TCP via the network
 * __Features:__
