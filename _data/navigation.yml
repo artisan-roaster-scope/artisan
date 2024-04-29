@@ -88,8 +88,8 @@ machines:
         url: /machines/joper/
       - title: "Kaleido"
         url: /machines/kaleido/
-      - title: "IP-CC"
-        url: /machines/ip-cc/
+      - title: "iRm"
+        url: /machines/iRm/
       - title: "Kaldi"
         url: /machines/kaldi/
       - title: "KapoK"

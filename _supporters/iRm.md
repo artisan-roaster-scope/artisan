@@ -1,7 +1,7 @@
 ---
 layout: single
-permalink: /machines/ip-cc/
-title: "IP-CC"
+permalink: /machines/iRm/
+title: "iRm"
 excerpt: "iRm Series"
 header:
   overlay_image: /assets/images/ip2.jpg
@@ -12,8 +12,8 @@ sidebar:
 ---
 <img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
 
-* __Producer:__ [iRm Coffee Roasting Machines](https://www.irm.coffee/){:target="_blank"}, Greece
-* __Machines:__ iRm Series with networked Omron or Mitshubishi PLC
+* __Producer:__ [iRm – Intelligent Coffee Roasting Machines](https://www.irm.coffee/){:target="_blank"}, Greece
+* __Machines:__ iRm Series with networked Omron or Mitsubishi PLC
 * __Connection:__ MODBUS TCP via the network
 * __Features:__
   - logging of environmental temperature (ET), bean temperature (BT), burner temperature, and mixer temperature
