@@ -334,9 +334,10 @@ with
 
 Artisan v1.6 adds support for RC servo control.
 
-* [Phidget RCC 1000](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1015){:target="_blank"} (16x VINT, ext. powered)
-* [Phidget 1061](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1032){:target="_blank"} (8x USB, ext. powered)
-* [Phidget 1066](https://www.phidgets.com/?tier=3&catid=21&pcid=18&prodid=1044){:target="_blank"} (1x USB powered) 
+* [Phidget RCC 1000](https://www.phidgets.com/?prodid=1015){:target="_blank"} (16x VINT, ext. powered)
+* [Phidget RCC 0004](https://phidgets.com/?prodid=1147){:target="_blank"} (8x USB, ext. powered)
+* [Phidget 1061](https://www.phidgets.com/?prodid=1032){:target="_blank"} (8x USB, ext. powered)
+* [Phidget 1066](https://www.phidgets.com/?prodid=1044){:target="_blank"} (1x USB powered) 
 
 Phidget RC Servo modules can be controlled via `RC Command` actions triggered by buttons or sliders configured in the Events tab (menu `Config >> Events`). The following commands are supported:
 
