@@ -5109,7 +5109,12 @@ class serialport:
 
 
 #--- Phidget RC (only one supported for now)
-#  supporting up to 16 channels like those of the RCC1000
+#  supporting up to 16 channels for the following RC Phidgets
+    #  - Phidget RCC1000: 16 channels (RC Servo Phidget)
+    #  - Phidget RCC1061: 8 channels (AdvancedServo 8-Motor)
+    #  - Phidget RCC0004: 8 channels (AdvancedServo 8-Motor)
+    #  - Phidget RCC1066: 1 channels (AdvancedServo 1-Motor)
+
 #  commands:
 #     pulse(ch,min,max[,sn]) # sets min/max pulse width
 #     pos(ch,min,max[,sn])   # sets min/max position
@@ -5132,12 +5137,17 @@ class serialport:
                 ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetRCServo',DeviceID.PHIDID_RCC1000,
                             remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
                 ports = 16
-                # try to attach an Phidget RC 1061 module
+                # try to attach an Phidget RCC0004 module
+                if ser is None:
+                    ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetRCServo',DeviceID.PHIDID_RCC0004,
+                                    remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
+                    ports = 8
+                # try to attach an Phidget RCC1061 module
                 if ser is None:
                     ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetRCServo',DeviceID.PHIDID_1061,
                                     remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
                     ports = 8
-                # try to attach an Phidget RC 1066 module
+                # try to attach an Phidget RCC1066 module
                 if ser is None:
                     ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetRCServo',DeviceID.PHIDID_1066,
                                     remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)

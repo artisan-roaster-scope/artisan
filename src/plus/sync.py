@@ -654,7 +654,8 @@ def applyServerUpdates(data:Dict[str, Any]) -> None:
 
 # internal function fetching the update from server and then unblock the
 # Properties Dialog and update the plus icon
-def fetchServerUpdate(uuid: str, file:Optional[str]=None) -> None:
+# if return_data is set, the received data is not applied via applyServerUpdates, but returned instead
+def fetchServerUpdate(uuid: str, file:Optional[str]=None, return_data:bool = False) -> Optional[Dict[str, Any]]:
     assert config.app_window is not None
     aw = config.app_window
     import requests
@@ -729,7 +730,7 @@ def fetchServerUpdate(uuid: str, file:Optional[str]=None) -> None:
             data = res.json()
             util.updateLimitsFromResponse(data) # update account limits
             if 'result' in data:
-                r = data['result']
+                r:Dict[str, Any] = data['result']
                 _log.debug('-> fetch: %s', r)
 
                 if getSync(uuid) is None and 'modified_at' in r:
@@ -737,7 +738,8 @@ def fetchServerUpdate(uuid: str, file:Optional[str]=None) -> None:
                     _log.debug(
                         '-> added profile automatically to sync cache'
                     )
-
+                if return_data:
+                    return r
                 if file_last_modified is not None:
                     _log.debug(
                         '-> file last_modified date: %s',
@@ -782,6 +784,7 @@ def fetchServerUpdate(uuid: str, file:Optional[str]=None) -> None:
         # syncing from the server
         aw.editgraphdialog = None
         config.app_window.updatePlusStatusSignal.emit()  # @UndefinedVariable
+    return None
 
 
 # updates from server are only requested if connected (the uuid does not have

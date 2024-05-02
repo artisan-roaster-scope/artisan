@@ -330,6 +330,7 @@ class Artisan(QtSingleApplication):
                             plus.sync.getUpdate(aw.qmc.roastUUID,aw.curFile)
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
+                    aw.updateScheduleSignal.emit()
                     self.sentToBackground = None
 
                 elif oldFocusWidget is not None and newFocusWidget is None and aw is not None and aw.centralWidget() == oldFocusWidget:
@@ -5139,7 +5140,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             res[d] = []
                         res[d].append((f,p))
         keys = list(res.keys())
-        keys.sort()
+        keys.sort(key=lambda v: (v.upper(), v[0].islower()))
         for k in keys:
             if len(res[k]) > 1:
                 if len(keys) == 1 and not forceSubmenu:
@@ -11054,6 +11055,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.updatePlaybackIndicatorSignal.emit()
 
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work
+    @pyqtSlot('QKeyEvent')
     def keyPressEvent(self, event: Optional['QKeyEvent']) -> None:
         if not self.processingKeyEvent and event is not None:
             try:

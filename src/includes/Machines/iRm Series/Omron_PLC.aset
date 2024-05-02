@@ -2,7 +2,7 @@
 Delay=1000
 ExtraEventSamplingDelay=0
 Oversampling=false
-roastertype_setup=IP Xenakis iRm
+roastertype_setup=iRm Series Omron
 
 [ArduinoPID]
 dutyMax=100
