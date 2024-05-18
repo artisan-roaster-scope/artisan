@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from artisanlib.types import RecentRoast, BTU
     from artisanlib.ble import BleInterface # noqa: F401 # pylint: disable=unused-import
+    from plus.stock import Blend # noqa: F401  # pylint: disable=unused-import
     from PyQt6.QtWidgets import QLayout, QAbstractItemView, QCompleter # pylint: disable=unused-import
     from PyQt6.QtGui import QClipboard, QCloseEvent, QKeyEvent, QMouseEvent # pylint: disable=unused-import
     from PyQt6.QtCore import QObject # pylint: disable=unused-import
@@ -1240,14 +1241,14 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.plus_coffee_selected:Optional[str] = None # holds the hr_id of the selected coffee
         self.plus_coffee_selected_label:Optional[str] = None # the label of the selected coffee
         self.plus_blend_selected_label:Optional[str] = None # the name of the selected blend
-        self.plus_blend_selected_spec = None # holds the blend dict specification of the selected blend
-        self.plus_blend_selected_spec_labels = None # the list of coffee labels of the selected blend specification
+        self.plus_blend_selected_spec:Optional['Blend'] = None # holds the blend dict specification of the selected blend
+        self.plus_blend_selected_spec_labels:Optional[List[str]] = None # the list of coffee labels of the selected blend specification
         if self.aw.plus_account is not None:
             plus.stock.init() # we try to init the stock from the cache before populating the popups
             # variables populated by stock data as rendered in the corresponding popups
             self.plus_stores:Optional[List[Tuple[str, str]]] = None
             self.plus_coffees:Optional[List[Tuple[str, Tuple[plus.stock.Coffee, plus.stock.StockItem]]]] = None
-            self.plus_blends:Optional[List[Tuple[str, Tuple[plus.stock.Blend, plus.stock.StockItem, float, Dict[str, str], float, List[Tuple[float, plus.stock.Blend]]]]]] = None
+            self.plus_blends:Optional[List[plus.stock.BlendStructure]] = None
             self.plus_default_store = self.aw.qmc.plus_default_store
             # current selected stock/coffee/blend _id
             if self.aw.qmc.plus_store is not None:
@@ -1592,7 +1593,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 ok_button.setFocus()
 
         # we set the active tab with a QTimer after the tabbar has been rendered once, as otherwise
-        # some tabs are not rendered at all on Winwos using Qt v6.5.1 (https://bugreports.qt.io/projects/QTBUG/issues/QTBUG-114204?filter=allissues)
+        # some tabs are not rendered at all on Windows using Qt v6.5.1 (https://bugreports.qt.io/projects/QTBUG/issues/QTBUG-114204?filter=allissues)
         QTimer.singleShot(50, self.setActiveTab)
 
     @pyqtSlot()
@@ -2060,7 +2061,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.titleedit.textEdited(default_title)
                 self.titleedit.setEditText(default_title)
 
-    def updateBlendLines(self, blend:Tuple[str, Tuple[plus.stock.Blend, plus.stock.StockItem, float, Dict[str, str], float, List[Tuple[float, plus.stock.Blend]]]]) -> None:
+    def updateBlendLines(self, blend:plus.stock.BlendStructure) -> None:
         if self.weightinedit.text() != '':
             weightIn = float(comma2dot(self.weightinedit.text()))
         else:
@@ -2071,8 +2072,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         for ll in blend_lines:
             self.beansedit.append(ll)
 
-    def fillBlendData(self, blend:Tuple[str, Tuple[plus.stock.Blend, plus.stock.StockItem, float, Dict[str, str], float, List[Tuple[float, plus.stock.Blend]]]],
-            prev_coffee_label:Optional[str], prev_blend_label:Optional[str]) -> None:
+    def fillBlendData(self, blend:plus.stock.BlendStructure, prev_coffee_label:Optional[str], prev_blend_label:Optional[str]) -> None:
         try:
             self.updateBlendLines(blend)
             keep_modified_moisture = self.modified_moisture_greens_text
@@ -2120,7 +2120,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             prev_coffee_label:Optional[str], prev_blend_label:Optional[str]) -> None:
         try:
             cd = plus.stock.getCoffeeCoffeeDict(coffee)
-            self.beansedit.setPlainText(plus.stock.coffee2beans(coffee))
+            self.beansedit.setPlainText(plus.stock.coffee2beans(cd))
             keep_modified_moisture = self.modified_moisture_greens_text
             keep_modified_density = self.modified_density_in_text
             moisture_txt = '0'
@@ -2534,6 +2534,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.editGraphDlg_activeTab = self.TabWidget.currentIndex()
 #        self.aw.closeEventSettings() # save all app settings
         self.aw.editgraphdialog = None
+        self.aw.updateScheduleSignal.emit()
 
     # triggered via the cancel button
     @pyqtSlot()

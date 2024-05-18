@@ -244,7 +244,7 @@ class tgraphcanvas(FigureCanvas):
         'DeltaETBflag', 'DeltaBTBflag', 'clearBgbeforeprofileload', 'hideBgafterprofileload', 'heating_types', 'operator', 'organization', 'roastertype', 'roastersize', 'roasterheating', 'drumspeed',
         'organization_setup', 'operator_setup', 'roastertype_setup', 'roastersize_setup', 'roastersize_setup_default', 'roasterheating_setup', 'roasterheating_setup_default', 'drumspeed_setup', 'last_batchsize', 'machinesetup_energy_ratings',
         'machinesetup', 'roastingnotes', 'cuppingnotes', 'roastdate', 'roastepoch', 'roastepoch_timeout', 'lastroastepoch', 'batchcounter', 'batchsequence', 'batchprefix', 'neverUpdateBatchCounter',
-        'roastbatchnr', 'roastbatchprefix', 'roastbatchpos', 'roasttzoffset', 'roastUUID', 'plus_default_store', 'plus_store', 'plus_store_label', 'plus_coffee',
+        'roastbatchnr', 'roastbatchprefix', 'roastbatchpos', 'roasttzoffset', 'roastUUID', 'scheduleID', 'plus_default_store', 'plus_store', 'plus_store_label', 'plus_coffee',
         'plus_coffee_label', 'plus_blend_spec', 'plus_blend_spec_labels', 'plus_blend_label', 'plus_custom_blend', 'plus_sync_record_hash', 'plus_file_last_modified', 'beans', 'ETprojectFlag', 'BTprojectFlag', 'curveVisibilityCache', 'ETcurve', 'BTcurve',
         'ETlcd', 'BTlcd', 'swaplcds', 'LCDdecimalplaces', 'foregroundShowFullflag', 'interpolateDropsflag', 'DeltaETflag', 'DeltaBTflag', 'DeltaETlcdflag', 'DeltaBTlcdflag',
         'swapdeltalcds', 'PIDbuttonflag', 'Controlbuttonflag', 'deltaETfilter', 'deltaBTfilter', 'curvefilter', 'deltaETspan', 'deltaBTspan',
@@ -1427,6 +1427,7 @@ class tgraphcanvas(FigureCanvas):
         self.roasttzoffset:int = libtime.timezone # timezone offset to be added to roastepoch to get time in local timezone; NOTE: this is not set/updated on loading a .alog profile!
         # profile UUID
         self.roastUUID:Optional[str] = None
+        self.scheduleID:Optional[str] = None
 
 #PLUS
         # the default store selected by the user (save in the  app settings)
@@ -3153,16 +3154,19 @@ class tgraphcanvas(FigureCanvas):
                     pass
 #PLUS
                 # only on first setting the DROP event (not set yet and no previous DROP undone), we upload to PLUS
-                if firstDROP and self.autoDROPenabled and self.aw.plus_account is not None:
-                    try:
-                        self.aw.updatePlusStatus()
-                    except Exception: # pylint: disable=broad-except
-                        pass
-                        # add to out-queue
-                    try:
-                        addRoast()
-                    except Exception: # pylint: disable=broad-except
-                        pass
+                if firstDROP and self.autoDROPenabled:
+                    if self.aw.schedule_window is not None:
+                        self.aw.schedule_window.register_completed_roast.emit()
+                    if self.aw.plus_account is not None:
+                        try:
+                            self.aw.updatePlusStatus()
+                        except Exception: # pylint: disable=broad-except
+                            pass
+                            # add to out-queue
+                        try:
+                            addRoast()
+                        except Exception: # pylint: disable=broad-except
+                            pass
                 if not self.flagstart:
                     self.aw.autoAdjustAxis(deltas=False)
 
@@ -11556,6 +11560,12 @@ class tgraphcanvas(FigureCanvas):
             if not res: # reset canceled
                 return
 
+#SCHEDULER:
+            # set properties from selected Schedule
+            if self.aw.schedule_window is not None:
+                self.aw.schedule_window.set_selected_remaining_item_roast_properties()
+                self.aw.schedule_window.load_selected_remaining_item_template()
+
             if self.aw.simulator is None:
                 self.startPhidgetManager()
                 # collect ambient data if any
@@ -12287,6 +12297,8 @@ class tgraphcanvas(FigureCanvas):
             self.phasesLCDmode = self.phasesLCDmode_l[0]
 
             self.aw.update_minieventline_visibility()
+
+
 
             # set CHARGEtimer
             if self.chargeTimerFlag:
@@ -13267,16 +13279,19 @@ class tgraphcanvas(FigureCanvas):
                             _log.exception(e)
     #PLUS
                         # only on first setting the DROP event (not set yet and no previous DROP undone) and if not in simulator modus, we upload to PLUS
-                        if firstDROP and self.autoDROPenabled and self.aw.plus_account is not None and not bool(self.aw.simulator):
-                            try:
-                                self.aw.updatePlusStatus()
-                            except Exception as e: # pylint: disable=broad-except
-                                _log.exception(e)
-                                # add to out-queue
-                            try:
-                                addRoast()
-                            except Exception as e: # pylint: disable=broad-except
-                                _log.exception(e)
+                        if firstDROP and self.autoDROPenabled and not bool(self.aw.simulator):
+                            if self.aw.schedule_window is not None:
+                                self.aw.schedule_window.register_completed_roast.emit()
+                            if self.aw.plus_account is not None:
+                                try:
+                                    self.aw.updatePlusStatus()
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                                    # add to out-queue
+                                try:
+                                    addRoast()
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
                 else:
                     message = QApplication.translate('Message','DROP: Scope is not recording')
                     self.aw.sendmessage(message)

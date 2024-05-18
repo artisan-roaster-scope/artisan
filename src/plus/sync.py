@@ -390,7 +390,7 @@ def setApplidedServerUpdatesModifiedAt(modified_at:Optional[float]) -> None:
 
 
 def getApplidedServerUpdatesModifiedAt() -> Optional[float]:
-    # ylint: disable=global-statement
+    # pylint: disable=global-statement
     try:
         _log.debug('getApplidedServerUpdatesModifiedAt()')
         applied_server_updates_modified_at_semaphore.acquire(1)
@@ -552,10 +552,10 @@ def applyServerUpdates(data:Dict[str, Any]) -> None:
                 'ground_color' in data
                 and data['ground_color'] != aw.qmc.ground_color
             ):
-                aw.qmc.ground_color = data['ground_color']
+                aw.qmc.ground_color = int(round(float(data['ground_color'])))
                 dirty = True
             if 'whole_color' in data and data['whole_color'] != aw.qmc.whole_color:
-                aw.qmc.whole_color = data['whole_color']
+                aw.qmc.whole_color = int(round(float(data['whole_color'])))
                 dirty = True
             if 'machine' in data and data['machine'] != aw.qmc.roastertype:
                 aw.qmc.roastertype = data['machine']

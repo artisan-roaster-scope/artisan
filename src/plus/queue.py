@@ -115,7 +115,7 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                         _log.debug(
                             '-> remaining iterations: %s', iters
                         )
-                        r = None
+                        r:Any = None
                         try:
                             # we upload only full roast records, or partial updates
                             # in case the are under sync

@@ -51,6 +51,7 @@ stock_semaphore = QSemaphore(
 
 stock_cache_path = getDirectory(config.stock_cache)
 
+
 # stock data structures
 
 class CoffeeUnit(TypedDict):
@@ -107,20 +108,20 @@ class Blend(TypedDict):
     screen_max: NotRequired[int]
 
 class ScheduledItem(TypedDict, total=False):
-    id: str # ScheduledItem UUID
-    date: str # ISO date string 'YYYY-MM-DD'
-    count: int
+    _id: str                # ScheduledItem ObjectId
+    date: str               # ISO date string 'YYYY-MM-DD'
+    count: int              # number of roasts planned for this item
     title: str
-    weight: float
-    store: str
-    coffee: Optional[str]
-    blend: Optional[str]
-    machine: Optional[str] # optional target machine name
-    user: Optional[str] # optional target users UUID
+    amount: float           # planned batch size in kg
+    location: str           # location hr_id
+    coffee: Optional[str]   # coffee hr_id; only set if no blend is specified
+    blend: Optional[str]    # blend hr_id; only set if no coffee is specified
+    machine: Optional[str]  # optional target machine name
+    user: Optional[str]     # optional target users UUID
     nickname: Optional[str] # optional nickname of target user
-    template: Optional[str]
+    template: Optional[str] # roast_id (UUID) of the selected template profile if any
     note: str
-    roasts: List[str]
+    roasts: List[str]       # roast_id's (UUID) of already completed roasts of this item
 
 class Stock(TypedDict, total=False):
     coffees: List[Coffee]
@@ -372,6 +373,7 @@ def renderAmount(amount:float, default_unit:Optional[CoffeeUnit]=None, target_un
         res = render_weight(amount, 1, target_unit_idx)
     return res
 
+
 # ==================
 # Schedule
 
@@ -387,6 +389,7 @@ def getSchedule(acquire_lock:bool=True) -> List[ScheduledItem]:
     finally:
         if acquire_lock and stock_semaphore.available() < 1:
             stock_semaphore.release(1)
+
 
 # ==================
 # Stores
@@ -469,8 +472,7 @@ def getCoffeesLabels(coffees:List[Tuple[str, Tuple[Coffee, StockItem]]]) -> List
     return [getCoffeeLabel(c) for c in coffees]
 
 
-def coffee2beans(coffee:Tuple[str, Tuple[Coffee, StockItem]]) -> str:
-    c:Coffee = getCoffeeCoffeeDict(coffee)
+def coffee2beans(c:Coffee) -> str:
     origin = ''
     try:
         origin_str = c['origin'].strip() # pyright:ignore[reportTypedDictNotRequiredAccess]
@@ -723,8 +725,8 @@ def getCoffeeStore(coffeeId:str, storeId:str, acquire_lock:bool = True) -> Tuple
 
 # ==================
 # Blends
-#   blend:BlendStructure =  <blendLabel:str, [blendDict:Blend,stockDict:StockItem,maxAmount:float,coffeeLabelDict:Dict[hr_id:str, label:str],
-#             replaceMaxAmount:float,replacementBlends:List[Tuple[float, Blend]]]>
+#   blend:BlendStructure =  <blendLabel:str, <blendDict:Blend,stockDict:StockItem,maxAmount:float,coffeeLabelDict:Dict[hr_id:str, label:str],
+#             replaceMaxAmount:float,replacementBlends:List[Tuple[float, Blend]]>>
 #          for blends with replacement coffees defined
 #
 #   blendDict:Blend = { "label": <blend name>, "hr_id": <BlendID>, "ingredients" :
@@ -751,8 +753,11 @@ def getCoffeeStore(coffeeId:str, storeId:str, acquire_lock:bool = True) -> Tuple
 def getBlendLabel(blend:BlendStructure) -> str:
     return blend[0]
 
+def getBlendDict(blend:BlendStructure) -> Blend:
+    return blend[1][0]
+
 def getBlendName(blend:BlendStructure) -> str:
-    return blend[1][0]['label']
+    return getBlendDict(blend)['label']
 
 
 # composes a blend for weight in kg taking into account
@@ -954,7 +959,7 @@ def getReplacementBlendBlendDict(replacementBlend:ReplacementBlend) -> Blend:
 
 
 def getBlendId(blend:BlendStructure) -> str:
-    return getBlendBlendDict(blend).get('hr_id', '')
+    return getBlendDict(blend).get('hr_id', '')
 
 
 def hasBlendReplace(blend:BlendStructure) -> bool:
@@ -1106,9 +1111,7 @@ def getBlends(weight_unit_idx:int, store:Optional[str] = None, customBlend:Optio
                                 res_sd = sd
                                 coffee_stock[coffee] = sd['amount']
                                 coffee_data[coffee] = (cd, sd)
-                                coffeeLabels[coffee] = coffee2beans(
-                                    (coffee, (cd, sd))
-                                )
+                                coffeeLabels[coffee] = coffee2beans(cd)
                                 if cd is not None:
                                     if 'label' in cd:
                                         i['label'] = cd['label']
@@ -1175,9 +1178,7 @@ def getBlends(weight_unit_idx:int, store:Optional[str] = None, customBlend:Optio
                                     res_sd = sd
                                     coffee_stock[replaceCoffee] = sd['amount']
                                     coffee_data[replaceCoffee] = (cd, sd)
-                                    coffeeLabels[replaceCoffee] = coffee2beans(
-                                        (replaceCoffee, (cd, sd))
-                                    )
+                                    coffeeLabels[replaceCoffee] = coffee2beans(cd)
                                     if cd is not None:
                                         if 'label' in cd:
                                             i['replaceLabel'] = cd['label']

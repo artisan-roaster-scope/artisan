@@ -25,7 +25,8 @@ if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
 
 from snap7.types import Areas
-from snap7.util import get_bool, set_bool, get_int, set_int, get_real, set_real
+from snap7.util.getters import get_bool, get_int, get_real
+from snap7.util.setters import set_bool, set_int, set_real
 
 import artisanlib.util
 

@@ -30,7 +30,8 @@ if TYPE_CHECKING:
 # Constants
 app_name: Final[str] = 'artisan.plus'
 profile_ext: Final[str] = 'alog'
-uuid_tag: Final[str] = 'roastUUID'
+uuid_tag: Final[str] = 'roastUUID' # as used in .alog profiles, send as 'roast_id' as part of the sync record to the server
+schedule_uuid_tag: Final[str] = 'scheduleID' # send as 's_item_id' as part of the sync record to the server
 
 # Service URLs
 
@@ -116,7 +117,7 @@ sync_cache: Final[str] = 'sync'
 
 # the outbox queues the outgoing PUSH/PUT data requests
 # Note: the outbox_cache file is shared between the main Artisan and the
-# ArtisanViewer app, NOT protected by ab extra filelock
+# ArtisanViewer app, NOT protected by an extra filelock
 outbox_cache: Final[str] = 'outbox'
 
 

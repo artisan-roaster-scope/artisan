@@ -304,7 +304,8 @@ class Artisan(QtSingleApplication):
                 self.style_hints.colorSchemeChanged.connect(self.colorSchemeChanged)
 
         self.messageReceived.connect(self.receiveMessage)
-        self.focusChanged.connect(self.appRaised)
+#        self.focusChanged.connect(self.appRaised)
+        self.applicationStateChanged.connect(self.stateChanged)
 
     try:
         @pyqtSlot('Qt::ColorScheme')
@@ -316,30 +317,56 @@ class Artisan(QtSingleApplication):
     except Exception: # pylint: disable=broad-except
         pass
 
-    @pyqtSlot('QWidget*','QWidget*')
-    def appRaised(self, oldFocusWidget:Optional[QWidget], newFocusWidget:Optional[QWidget]) -> None:
+# NOTE: draback of this is that it might not work on some window managers
+    def stateChanged(self, state:Qt.ApplicationState) -> None:
         try:
             aw:Optional['ApplicationWindow'] = self.activationWindow()
             if aw is not None and not sip.isdeleted(aw): # sip not supported on older PyQt versions (eg. RPi)
-                if oldFocusWidget is None and newFocusWidget is not None and aw.centralWidget() == newFocusWidget and self.sentToBackground is not None:
-                    #focus gained
-#                    _log.debug('focus gained')
+                if state == Qt.ApplicationState.ApplicationActive and self.sentToBackground is not None:
+                    #app raised
+#                    _log.debug('app put to foreground')
                     try:
-                        if aw.plus_account is not None and aw.qmc.roastUUID is not None and aw.curFile is not None and \
-                                libtime.time() - self.sentToBackground > self.plus_sync_cache_expiration:
-                            plus.sync.getUpdate(aw.qmc.roastUUID,aw.curFile)
+                        if libtime.time() - self.sentToBackground > self.plus_sync_cache_expiration:
+                            if  aw.plus_account is not None and aw.qmc.roastUUID is not None and aw.curFile is not None:
+                                plus.sync.getUpdate(aw.qmc.roastUUID,aw.curFile)
+                            QTimer.singleShot(100, aw.updateScheduleSignal.emit)
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
-                    aw.updateScheduleSignal.emit()
                     self.sentToBackground = None
 
-                elif oldFocusWidget is not None and newFocusWidget is None and aw is not None and aw.centralWidget() == oldFocusWidget:
+                elif state == Qt.ApplicationState.ApplicationInactive:
                     # focus released
                     self.sentToBackground = libtime.time() # keep the timestamp on sending the app with the main window to background
-                else: # on raising another dialog/widget was open, reset timer
-                    self.sentToBackground = None
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
+
+# NOTE: drawback of the following: if moving focus from Scheduler window to main window, which has all widgets at NoFocus policy (to make cursor keys work),
+#       the oldfocusWidget is always None and thus an app raise is detected although only the active window changed
+#    @pyqtSlot('QWidget*','QWidget*')
+#    def appRaised(self, oldFocusWidget:Optional[QWidget], newFocusWidget:Optional[QWidget]) -> None:
+#
+#        try:
+#            aw:Optional['ApplicationWindow'] = self.activationWindow()
+#            if aw is not None and not sip.isdeleted(aw): # sip not supported on older PyQt versions (eg. RPi)
+#                if oldFocusWidget is None and newFocusWidget is not None and aw.centralWidget() == newFocusWidget and self.sentToBackground is not None:
+#                    #focus gained
+##                    _log.debug('focus gained')
+#                    try:
+#                        if aw.plus_account is not None and aw.qmc.roastUUID is not None and aw.curFile is not None and \
+#                                libtime.time() - self.sentToBackground > self.plus_sync_cache_expiration:
+#                            plus.sync.getUpdate(aw.qmc.roastUUID,aw.curFile)
+#                    except Exception as e: # pylint: disable=broad-except
+#                        _log.exception(e)
+#                    aw.updateScheduleSignal.emit()
+#                    self.sentToBackground = None
+#
+#                elif oldFocusWidget is not None and newFocusWidget is None and aw is not None and aw.centralWidget() == oldFocusWidget:
+#                    # focus released
+#                    self.sentToBackground = libtime.time() # keep the timestamp on sending the app with the main window to background
+#                else: # on raising another dialog/widget was open, reset timer
+#                    self.sentToBackground = None
+#        except Exception as e: # pylint: disable=broad-except
+#            _log.exception(e)
 
     # takes a QUrl and interprets it as follows
     # artisan://roast/<UUID>         : loads profile from path associated with the given roast <UUID>
@@ -698,7 +725,7 @@ import plus.blend
 import plus.stock
 
 #SCHEDULER:
-#import plus.schedule
+import plus.schedule
 
 
 
@@ -1342,7 +1369,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     singleShotPhidgetsPulseOFF = pyqtSignal(int,int,str) # signal to be called from the eventaction thread to realise Phidgets pulse via QTimer in the main thread
     singleShotPhidgetsPulseOFFSerial = pyqtSignal(int,int,str,str)
-#PLUS
     updatePlusStatusSignal = pyqtSignal() # can be called from another thread or a QTimer to trigger to update the plus icon status
     setTitleSignal = pyqtSignal(str,bool) # can be called from another thread or a QTimer to set the profile title in the main GUI thread
     sendmessageSignal = pyqtSignal(str,bool,str)
@@ -1390,7 +1416,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'plus_paidUntil', 'plus_rlimit', 'plus_used', 'plus_readonly', 'plus_user_id', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
         'eventaction_running_threads', 'curFile', 'MaxRecentFiles', 'recentFileActs', 'recentSettingActs',
         'recentThemeActs', 'applicationDirectory', 'helpdialog', 'redrawTimer', 'lastLoadedProfile', 'lastLoadedBackground', 'LargeScaleLCDsFlag', 'largeScaleLCDs_dialog',
-        'analysisresultsanno', 'segmentresultsanno', 'schedule_window', 'scheduleFlag', 'largeLCDs_dialog', 'LargeLCDsFlag', 'largeDeltaLCDs_dialog', 'LargeDeltaLCDsFlag', 'largePIDLCDs_dialog',
+        'analysisresultsanno', 'segmentresultsanno', 'schedule_window', 'scheduleFlag', 'scheduled_items_uuids', 'largeLCDs_dialog', 'LargeLCDsFlag', 'largeDeltaLCDs_dialog', 'LargeDeltaLCDsFlag', 'largePIDLCDs_dialog',
         'LargePIDLCDsFlag', 'largeExtraLCDs_dialog', 'LargeExtraLCDsFlag', 'largePhasesLCDs_dialog', 'LargePhasesLCDsFlag', 'WebLCDs', 'WebLCDsPort', 'weblcds_server',
         'WebLCDsAlerts', 'EventsDlg_activeTab', 'graphColorDlg_activeTab', 'PID_DlgControl_activeTab', 'CurveDlg_activeTab', 'editGraphDlg_activeTab',
         'backgroundDlg_activeTab', 'DeviceAssignmentDlg_activeTab', 'AlarmDlg_activeTab', 'schedule_activeTab', 'resetqsettings', 'settingspath', 'wheelpath', 'profilepath',
@@ -1525,7 +1551,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
         # Schedule
 #SCHEDULER:
-#        self.schedule_window:Optional[plus.schedule.ScheduleWindow] = None
+        self.schedule_window:Optional[plus.schedule.ScheduleWindow] = None
+        self.scheduled_items_uuids:List[str] = [] # the uuids of the scheduled items in local custom order on last closing the scheduler
 
         self.scheduleFlag:bool = False
         self.schedule_day_filter:bool = True
@@ -2506,11 +2533,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.viewMenu.addAction(self.slidersAction)
 
 #SCHEDULER:
+            self.scheduleAction: QAction = QAction(QApplication.translate('Menu', 'Schedule'), self)
+            self.scheduleAction.triggered.connect(self.schedule)
+            self.scheduleAction.setCheckable(True)
+            self.scheduleAction.setChecked(False)
 #            self.viewMenu.addSeparator()
-#            self.scheduleAction: QAction = QAction(QApplication.translate('Menu', 'Schedule'), self)
-#            self.scheduleAction.triggered.connect(self.schedule)
-#            self.scheduleAction.setCheckable(True)
-#            self.scheduleAction.setChecked(False)
 #            self.viewMenu.addAction(self.scheduleAction)
 
             self.viewMenu.addSeparator()
@@ -4158,9 +4185,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     @pyqtSlot()
     def updateSchedule(self) -> None:
 #SCHEDULER:
-#        if self.schedule_window is not None:
-#            self.schedule_window.updateScheduleWindow()
-        pass
+        if self.schedule_window is not None:
+            self.schedule_window.updateScheduleWindow()
 
     @pyqtSlot(str,str,NotificationType)
     def sendNotificationMessage(self, title:str, message:str, notification_type:NotificationType) -> None:
@@ -10800,10 +10826,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.roastCompareAction.setEnabled(True)
         self.designerAction.setEnabled(True)
         self.simulatorAction.setEnabled(True)
-
-#SCHEDULER:
-#        self.scheduleAction.setEnabled(True)
-
         self.wheeleditorAction.setEnabled(True)
         self.transformAction.setEnabled(True)
         self.loadSettingsAction.setEnabled(True)
@@ -10913,10 +10935,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         else:
             self.designerAction.setEnabled(True)
         self.simulatorAction.setEnabled(False)
-
-#SCHEDULER:
-#        self.scheduleAction.setEnabled(False)
-
         if not wheel:
             self.wheeleditorAction.setEnabled(False)
         else:
@@ -10960,10 +10978,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.eventsEditorAction.setChecked(False)
             self.eventsEditorAction.setEnabled(False)
             self.simulatorAction.setEnabled(False)
-
-#SCHEDULER:
-#            self.scheduleAction.setEnabled(False)
-
         else:
             return
 
@@ -14692,6 +14706,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 import uuid
                 self.qmc.roastUUID = uuid.uuid4().hex # generate UUID
                 self.qmc.fileDirtySignal.emit()
+            if 'scheduleID' in profile:
+                self.qmc.scheduleID = decodeLocal(profile['scheduleID'])
+            else:
+                self.qmc.scheduleID = None
             if 'roastbatchnr' in profile:
                 try:
                     self.qmc.roastbatchnr = int(profile['roastbatchnr'])
@@ -15468,6 +15486,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 import uuid
                 self.qmc.roastUUID = uuid.uuid4().hex # generate UUID
             profile['roastUUID'] = self.qmc.roastUUID
+            if self.qmc.scheduleID is not None:
+                profile['scheduleID'] = self.qmc.scheduleID
 #            profile['beansize'] = str(self.qmc.beansize) # legacy; not stored any longer
             profile['beansize_min'] = str(self.qmc.beansize_min) # int in str (legacy profiles may contain floats in str)
             profile['beansize_max'] = str(self.qmc.beansize_max) # int in str (legacy profiles may contain floats in str)
@@ -17428,9 +17448,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.schedule_machine_filter = toBool(settings.value('ScheduleMachineFilter',self.schedule_machine_filter))
 
 #SCHEDULER:
-#            self.scheduleFlag = toBool(settings.value('Schedule',self.scheduleFlag))
-#            if self.scheduleFlag:
-#                self.schedule()
+            self.scheduled_items_uuids = list(toStringList(settings.value('scheduled_items',self.scheduled_items_uuids)))
+            self.scheduleFlag = toBool(settings.value('Schedule',self.scheduleFlag))
+            if self.scheduleFlag:
+                self.schedule()
 
             self.LargeLCDsFlag = toBool(settings.value('LargeLCDs',self.LargeLCDsFlag))
             if self.LargeLCDsFlag:
@@ -18885,6 +18906,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'ScheduleUserFilter',self.schedule_user_filter, read_defaults)
             self.settingsSetValue(settings, default_settings, 'ScheduleMachineFilter',self.schedule_machine_filter, read_defaults)
             self.settingsSetValue(settings, default_settings, 'Schedule',self.scheduleFlag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'scheduled_items',self.scheduled_items_uuids, read_defaults)
             self.settingsSetValue(settings, default_settings, 'LargeLCDs',self.LargeLCDsFlag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'LargeDeltaLCDs',self.LargeDeltaLCDsFlag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'LargePIDLCDs',self.LargePIDLCDsFlag, read_defaults)
@@ -19139,10 +19161,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.WebLCDs = True # to ensure they are started again on restart
 
 #SCHEDULER:
-#        if self.scheduleFlag and self.schedule_window:
-#            tmp_Schedule = self.scheduleFlag # we keep the state to properly store it in the settings
-#            self.schedule_window.close()
-#            self.scheduleFlag = tmp_Schedule
+        if self.scheduleFlag and self.schedule_window:
+            tmp_Schedule = self.scheduleFlag # we keep the state to properly store it in the settings
+            self.schedule_window.close()
+            self.scheduleFlag = tmp_Schedule
 
         if self.LargeLCDsFlag and self.largeLCDs_dialog:
             tmp_LargeLCDs = self.LargeLCDsFlag # we keep the state to properly store it in the settings
@@ -22957,18 +22979,18 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
 
 #SCHEDULER:
-#    @pyqtSlot()
-#    @pyqtSlot(bool)
-#    def schedule(self, _:bool = False) -> None:
-#        if self.schedule_window is None:
-#            self.schedule_window = plus.schedule.ScheduleWindow(self, self, self.schedule_activeTab)
-#            if self.schedule_window is not None:
-#                self.scheduleFlag = True
-#                self.scheduleAction.setChecked(True)
-#                self.schedule_window.show()
-#        else:
-#            self.schedule_window.close()
-#            self.schedule_window = None
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def schedule(self, _:bool = False) -> None:
+        if self.schedule_window is None:
+            self.schedule_window = plus.schedule.ScheduleWindow(self, self, self.schedule_activeTab)
+            if self.schedule_window is not None:
+                self.scheduleFlag = True
+                self.scheduleAction.setChecked(True)
+                self.schedule_window.show()
+        else:
+            self.schedule_window.close()
+            self.schedule_window = None
 
     @pyqtSlot()
     @pyqtSlot(bool)
