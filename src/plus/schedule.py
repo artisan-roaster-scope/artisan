@@ -76,7 +76,7 @@ completed_roasts_cache_path = getDirectory(plus.config.completed_roasts_cache)
 
 ## Configuration
 
-# the minimal difference the editied roasted weight in kg of a completed item must have
+# the minimal difference the edited roasted weight in kg of a completed item must have
 # to be able to persist the change, compensating back-and-forth unit conversion errors
 roasted_weight_editing_minimal_diff: Final[float] = 0.07 # 70g
 
@@ -596,7 +596,7 @@ class NoDragItem(StandardItem):
         days_diff = (self.now.date() - self.data.roastdate.date()).days
         task_date_str = ''
         if days_diff == 0:
-            # for time formating we use the system locale
+            # for time formatting we use the system locale
             locale = QLocale()
             dt = QDateTime.fromSecsSinceEpoch(int(datetime2epoch(self.data.roastdate)))
             task_date_str = locale.toString(dt.time(), QLocale.FormatType.ShortFormat)
@@ -607,7 +607,7 @@ class NoDragItem(StandardItem):
             locale = QLocale(self.locale_str)
             task_date_str = locale.toString(QDate(self.data.roastdate.date().year, self.data.roastdate.date().month, self.data.roastdate.date().day), 'dddd').capitalize()
         else:
-            # date formated according to the locale without the year
+            # date formatted according to the locale without the year
             task_date_str = format_date(self.data.roastdate.date(), format='long', locale=self.locale_str).replace(format_date(self.data.roastdate.date(), 'Y', locale=self.locale_str),'').strip().rstrip(',')
         return task_date_str
 
@@ -645,7 +645,7 @@ class DragItem(StandardItem):
             locale = QLocale(locale_str)
             task_date = locale.toString(QDate(data.date.year, data.date.month, data.date.day), 'dddd').capitalize()
         else:
-            # date formated according to the locale without the year
+            # date formatted according to the locale without the year
             task_date = format_date(data.date, format='long', locale=locale_str).replace(format_date(data.date, 'Y', locale=locale_str),'').strip().rstrip(',')
 
         user_nickname:Optional[str] = plus.connection.getNickname()
@@ -1214,7 +1214,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         # some tabs are not rendered at all on Windows using Qt v6.5.1 (https://bugreports.qt.io/projects/QTBUG/issues/QTBUG-114204?filter=allissues)
         QTimer.singleShot(50, self.setActiveTab)
 
-        # set all childs to NoFocus to receive the up/down arrow key events in keyPressEvent
+        # set all child's to NoFocus to receive the up/down arrow key events in keyPressEvent
         self.setChildrenFocusPolicy(self, Qt.FocusPolicy.NoFocus)
 
         self.register_completed_roast.connect(self.register_completed_roast_slot)
@@ -1638,7 +1638,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
                         self.aw.sendmessageSignal.emit(QApplication.translate('Message', 'Updating completed roast properties failed'), True, None)
                         # we keep the selection
                         return
-                # in case data was not edited or updating the edits to server suceeded we
+                # in case data was not edited or updating the edits to server succeeded we
                 # clear previous selection
                 self.selected_completed_item.deselect()
             if sender != self.selected_completed_item:
