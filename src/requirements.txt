@@ -121,4 +121,4 @@ SecretStorage==3.3.3; platform_system=='Linux'
 build==1.2.1; platform_system=='Windows'  # required to build pyinstaller bootloader
 pywin32==306; platform_system=='Windows'
 pyinstaller-versionfile==2.1.1; platform_system=='Windows'
-libusb-package==1.0.26.2; platform_system=='Windows'
+libusb-package==1.0.26.1; platform_system=='Windows'
