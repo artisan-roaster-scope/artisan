@@ -1207,7 +1207,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
 
         self.aw.disconnectPlusSignal.connect(self.updateScheduleWindow)
 
-#        plus.stock.update() # explicit update stock on opening the scheduler!?
+        plus.stock.update() # explicit update stock on opening the scheduler!?
         self.updateScheduleWindow()
 
         # we set the active tab with a QTimer after the tabbar has been rendered once, as otherwise

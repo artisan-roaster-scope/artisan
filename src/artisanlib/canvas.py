@@ -9978,10 +9978,16 @@ class tgraphcanvas(FigureCanvas):
                                 pass
                             self.legend = leg
                             self.legend_lines = leg.get_lines()
-                            for h in leg.legendHandles:
-                                if h is not None:
-                                    h.set_picker(False) # we disable the click to hide on the handles feature
-                                #h.set_picker(self.aw.draggable_text_box_picker) # as setting this picker results in non-termination
+                            try:
+                                # for mpl>=3.9
+                                for h in leg.legend_handles:
+                                    if h is not None:
+                                        h.set_picker(False) # we disable the click to hide on the handles feature
+                            except Exception: # pylint: disable=broad-except # leg.legendHandles renamed in mpl 3.9 into leg.legend_handles
+                                # for mpl <3.9:
+                                for h in leg.legendHandles: # type:ignore[attr-defined]
+                                    if h is not None:
+                                        h.set_picker(False) # we disable the click to hide on the handles feature
                             for ll in leg.texts:
                                 #l.set_picker(5)
                                 ll.set_picker(self.aw.draggable_text_box_picker)
@@ -9997,8 +10003,8 @@ class tgraphcanvas(FigureCanvas):
                             frame.set_linewidth(0.5)
                             for line,text in zip(leg.get_lines(), leg.get_texts()):
                                 text.set_color(line.get_color())
-                        except Exception: # pylint: disable=broad-except
-                            pass
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.error(e)
 
                     else:
                         self.legend = None
