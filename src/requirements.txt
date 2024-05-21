@@ -35,7 +35,7 @@ python-snap7==1.4.1; python_version >= '3.10'
 Phidget22==1.19.20240513
 Unidecode==1.3.8
 qrcode==7.4.2
-requests==2.32.0
+requests==2.32.1
 requests-file==2.0.0
 pyusb==1.2.1
 persist-queue==0.8.1
