@@ -161,10 +161,10 @@ class AillioR1:
                 self.usbhandle = usb.core.find(idVendor=self.AILLIO_VID,
                                                idProduct=self.AILLIO_PID_REV3, backend=backend)
         else:
-            self.usbhandle = libusb_package.find(idVendor=self.AILLIO_VID, # pyright:ignore[reportPossiblyUnboundVariable]
+            self.usbhandle = libusb_package.find(idVendor=self.AILLIO_VID, # pyright:ignore[reportPossiblyUnboundVariable] # pylint: disable=possibly-used-before-assignment
                                                  idProduct=self.AILLIO_PID)
             if self.usbhandle is None:
-                self.usbhandle = libusb_package.find(idVendor=self.AILLIO_VID, # pyright:ignore[reportPossiblyUnboundVariable]
+                self.usbhandle = libusb_package.find(idVendor=self.AILLIO_VID, # pyright:ignore[reportPossiblyUnboundVariable] # pylint: disable=possibly-used-before-assignment
                                                      idProduct=self.AILLIO_PID_REV3)
         if self.usbhandle is None:
             raise OSError('not found or no permission')

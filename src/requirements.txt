@@ -32,10 +32,10 @@ pyserial==3.5
 pymodbus==3.6.8
 python-snap7==1.3; python_version < '3.10' # last Python 3.9 release
 python-snap7==1.4.1; python_version >= '3.10'
-Phidget22==1.19.20240429
+Phidget22==1.19.20240513
 Unidecode==1.3.8
 qrcode==7.4.2
-requests==2.31.0
+requests==2.32.0
 requests-file==2.0.0
 pyusb==1.2.1
 persist-queue==0.8.1
@@ -53,9 +53,9 @@ scipy==1.13.0; python_version >= '3.9'
 wquantiles==0.6
 colorspacious==1.1.2
 openpyxl==3.1.2
-keyring==25.2.0
+keyring==25.2.1
 prettytable==3.10.0
-lxml==5.2.0
+lxml==5.2.2
 matplotlib==3.7.3; python_version < '3.9' # last Python 3.8 release
 matplotlib==3.9.0; python_version >= '3.9'
 jinja2==3.1.4
@@ -84,11 +84,16 @@ yoctopuce==2.0.60664; sys_platform!='darwin' or (sys_platform=='darwin' and plat
 ## Qt5 on macOS <11 and Windows 7/8
 PyQt5==5.15.10; (sys_platform=='darwin' and platform_release<'20.0') or (platform_system=='Windows' and python_version<'3.9')
 PyQtWebEngine==5.15.6; (sys_platform=='darwin' and platform_release<'20.0') or (platform_system=='Windows' and python_version<'3.9')
+# Qt6 on macOS 11+ (no Intel build of pyqt6-webengine-qt6 v6.7.0 for size reasons!)
+PyQt6-Qt6==6.6.3; (sys_platform=='darwin' and platform_release>='20.0')
+PyQt6==6.6.1; (sys_platform=='darwin' and platform_release>='20.0')
+PyQt6-WebEngine-Qt6==6.6.3; (sys_platform=='darwin' and platform_release>='20.0')
+PyQt6-WebEngine==6.6.0; (sys_platform=='darwin' and platform_release>='20.0')
 # Qt6 on macOS 11+, Windows 10/11 and Linux
-PyQt6-Qt6==6.6.3; (sys_platform=='darwin' and platform_release>='20.0') or (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')
-PyQt6==6.6.1; (sys_platform=='darwin' and platform_release>='20.0') or (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')
-PyQt6-WebEngine-Qt6==6.6.3; (sys_platform=='darwin' and platform_release>='20.0') or (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')
-PyQt6-WebEngine==6.6.0; (sys_platform=='darwin' and platform_release>='20.0') or (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')
+PyQt6-Qt6==6.7.0; (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')
+PyQt6==6.7.0; (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')
+PyQt6-WebEngine-Qt6==6.7.0; (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')
+PyQt6-WebEngine==6.7.0; (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')
 ###
 pyinstaller==6.6.0; platform_system=='Linux' # on Windows pyinstaller is separately installed (see above)
 ###
