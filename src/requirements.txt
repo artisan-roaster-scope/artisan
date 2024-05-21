@@ -85,7 +85,7 @@ yoctopuce==2.0.60664; sys_platform!='darwin' or (sys_platform=='darwin' and plat
 PyQt5==5.15.10; (sys_platform=='darwin' and platform_release<'20.0') or (platform_system=='Windows' and python_version<'3.9')
 PyQtWebEngine==5.15.6; (sys_platform=='darwin' and platform_release<'20.0') or (platform_system=='Windows' and python_version<'3.9')
 # Qt6 on macOS 11+ (no Intel build of pyqt6-webengine-qt6 v6.7.0 for size reasons!)
-PyQt6-Qt6==6.6.3; (sys_platform=='darwin' and platform_release>='20.0')
+PyQt6-Qt6==6.7.0; (sys_platform=='darwin' and platform_release>='20.0')
 PyQt6==6.6.1; (sys_platform=='darwin' and platform_release>='20.0')
 PyQt6-WebEngine-Qt6==6.6.3; (sys_platform=='darwin' and platform_release>='20.0')
 PyQt6-WebEngine==6.6.0; (sys_platform=='darwin' and platform_release>='20.0')
