@@ -282,5 +282,7 @@ docs:
     children:
       - title: "Videos"
         url: /docs/videos/
+      - title: "Posts"
+        url: /docs/posts/
       - title: "Documents"
         url: /docs/documents/
