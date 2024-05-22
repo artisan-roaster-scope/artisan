@@ -8475,6 +8475,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 if c.startswith('set'):
                                     cs_a = re.findall(r'[0-9a-zA-Z-.:]+', c)
                                     cs_len = len(cs_a)
+                                    value:bool = False
+                                    channel:int = 0
                                     if cs_len > 2:
                                         channel=toInt(cs_a[1])
                                         value=toBool(cs_a[2])
@@ -10391,8 +10393,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.clearExtraDeviceSettingsBackup()
             _log.info('Factory reset')
             self.close()
-        elif reply == QMessageBox.StandardButton.Cancel:
-            return
+#        elif reply == QMessageBox.StandardButton.Cancel:
+#            return
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -10978,8 +10980,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.eventsEditorAction.setChecked(False)
             self.eventsEditorAction.setEnabled(False)
             self.simulatorAction.setEnabled(False)
-        else:
-            return
 
     def update_minieventline_visibility(self) -> None:
         # update visibility (based on the app state)
@@ -15733,7 +15733,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             self.qmc.adderror((QApplication.translate('Error Message', 'IO Error:') + ' fileExport(): {0}').format(str(ex)))
-            return
 
     @pyqtSlot()
     @pyqtSlot(bool)

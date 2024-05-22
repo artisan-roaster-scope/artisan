@@ -1441,8 +1441,6 @@ class CurvesDlg(ArtisanDialog):
             QApplication.processEvents()  #occasionally the fit curve remains showing.
             self.aw.qmc.redraw(recomputeAllDeltas=True)
             #self.updatetargets()  #accept and close dialog
-        else:
-            return
 
     @pyqtSlot(int)
     def changeAnalyzecombobox(self, i:int) -> None:

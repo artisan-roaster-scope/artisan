@@ -649,7 +649,6 @@ class WheelDlg(ArtisanDialog):
                 self.aw.sendmessage(QApplication.translate('Message','Wheel Graph saved'))
         except OSError as e:
             self.aw.qmc.adderror((QApplication.translate('Error Message','IO Error:') + ' Wheel graph filesave(): {0}').format(str(e)))
-            return
 
     @pyqtSlot(bool)
     def loadWheel(self, _:bool = False) -> None:

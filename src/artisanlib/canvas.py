@@ -4150,6 +4150,7 @@ class tgraphcanvas(FigureCanvas):
                                 #########
                                 # check alarmtemp:
                                 alarm_temp = None
+                                alarm_idx = None
                                 if self.alarmtime[i] == 10: # IF ALARM and only during recording as otherwise no data to refer to is available
                                     # and this is a conditional alarm with alarm_time set to IF ALARM
                                     if_alarm_state = self.alarmstate[self.alarmguard[i]] # reading when the IF ALARM triggered
@@ -8945,6 +8946,7 @@ class tgraphcanvas(FigureCanvas):
                                                                                 linestyle='-',drawstyle='steps-post',linewidth = self.Evaluelinethickness[3],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(3,True))
 
                             if len(self.backgroundEvents) > 0:
+                                Bevalues:List[List[float]] = [[],[],[],[]]
                                 if self.eventsGraphflag == 4:
                                     # we prepare copies of the background Evalues
                                     Bevalues = [self.E1backgroundvalues[:],self.E2backgroundvalues[:],self.E3backgroundvalues[:],self.E4backgroundvalues[:]]
@@ -8991,7 +8993,8 @@ class tgraphcanvas(FigureCanvas):
                                                 boxstyle = 'round4,pad=0.3,rounding_size=0.15'
                                                 boxcolor = self.EvalueColor[3]
                                                 textcolor = self.EvalueTextColor[3]
-                                            elif self.backgroundEtypes[i] == 4:
+                                            #elif self.backgroundEtypes[i] == 4:
+                                            else:
                                                 boxstyle = 'square,pad=0.1'
                                                 boxcolor = self.palette['specialeventbox']
                                                 textcolor = self.palette['specialeventtext']
@@ -9102,6 +9105,11 @@ class tgraphcanvas(FigureCanvas):
                     drop_idx = len(self.timex)-1
                     if self.timeindex[6] > 0:
                         drop_idx = self.timeindex[6]
+
+                    E1_nonempty:bool = False
+                    E2_nonempty:bool = False
+                    E3_nonempty:bool = False
+                    E4_nonempty:bool = False
 
                     if self.eventsshowflag != 0:
                         Nevents = len(self.specialevents)
@@ -9219,10 +9227,6 @@ class tgraphcanvas(FigureCanvas):
                         elif self.eventsGraphflag in {2, 3, 4}: # in this mode we have to generate the plots even if Nevents=0 to avoid redraw issues resulting from an incorrect number of plot count
                             self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
                             self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
-                            E1_nonempty:bool = False
-                            E2_nonempty:bool = False
-                            E3_nonempty:bool = False
-                            E4_nonempty:bool = False
                             #not really necessary but guarantees that Ex_last is defined
                             E1_last:int = 0
                             E2_last:int = 0
@@ -9535,6 +9539,7 @@ class tgraphcanvas(FigureCanvas):
                                                                 pickradius=2,#markevery=every,
                                                                 linestyle='-',drawstyle=ds,linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
                         if Nevents:
+                            evalues:List[List[float]] = [[],[],[],[]]
                             if self.eventsGraphflag == 4:
                                 # we prepare copies of the Evalues
                                 evalues = [self.E1values[:],self.E2values[:],self.E3values[:],self.E4values[:]]
@@ -9599,7 +9604,8 @@ class tgraphcanvas(FigureCanvas):
                                                 boxstyle = 'round4,pad=0.3,rounding_size=0.15'
                                                 boxcolor = self.EvalueColor[3]
                                                 textcolor = self.EvalueTextColor[3]
-                                            elif self.specialeventstype[i] == 4:
+                                            #elif self.specialeventstype[i] == 4:
+                                            else:
                                                 boxstyle = 'square,pad=0.1'
                                                 boxcolor = self.palette['specialeventbox']
                                                 textcolor = self.palette['specialeventtext']
@@ -14875,7 +14881,6 @@ class tgraphcanvas(FigureCanvas):
                 self.moveBackgroundAnnoPositionsY(-step)
         else:
             self.aw.sendmessage(QApplication.translate('Message','Unable to move background'))
-            return
 
     #points are used to draw interpolation
     def findpoints(self) -> Tuple[List[float],List[float]]:
