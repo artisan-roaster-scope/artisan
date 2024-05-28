@@ -338,8 +338,8 @@ class AillioR1:
 
     def __updatestate(self, p:'Connection') -> None: # type:ignore[no-any-unimported,unused-ignore]
         while self.worker_thread_run:
-            state1:array.array[int] = array.array('B', bytes(0))
-            state2:array.array[int] = array.array('B', bytes(0))
+            state1:array.array[int] = array.array('B', bytes(0)) # pylint: disable=unsubscriptable-object
+            state2:array.array[int] = array.array('B', bytes(0)) # pylint: disable=unsubscriptable-object
             try:
                 self.__dbg('updatestate')
                 self.__sendcmd(self.AILLIO_CMD_STATUS1)
