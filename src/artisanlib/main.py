@@ -290,7 +290,7 @@ class Artisan(QtSingleApplication):
                 sys.exit(0) # there is already one ArtisanViewer running, we terminate
 
         self.darkmode:bool = False # holds current darkmode state
-        self.style_hints:Optional['QStyleHints'] = None # holds the styleHints instance on Qt 6.5 and higher
+        self.style_hints:Optional[QStyleHints] = None # holds the styleHints instance on Qt 6.5 and higher
         if QVersionNumber.fromString(qVersion())[0] < QVersionNumber(6,5,0):
             if sys.platform.startswith('darwin'):
                 # remember darkmode using darkdetect on macOS Legacy with older Qt versions
@@ -310,7 +310,7 @@ class Artisan(QtSingleApplication):
     try:
         @pyqtSlot('Qt::ColorScheme')
         def colorSchemeChanged(self, colorScheme:'Qt.ColorScheme') -> None:
-            aw:Optional['ApplicationWindow'] = self.activationWindow()
+            aw:Optional[ApplicationWindow] = self.activationWindow()
             if aw is not None and self.darkmode != bool(colorScheme == Qt.ColorScheme.Dark):
                 self.darkmode = bool(colorScheme == Qt.ColorScheme.Dark)
                 aw.updateCanvasColors()
@@ -320,7 +320,7 @@ class Artisan(QtSingleApplication):
 # NOTE: draback of this is that it might not work on some window managers
     def stateChanged(self, state:Qt.ApplicationState) -> None:
         try:
-            aw:Optional['ApplicationWindow'] = self.activationWindow()
+            aw:Optional[ApplicationWindow] = self.activationWindow()
             if aw is not None and not sip.isdeleted(aw): # sip not supported on older PyQt versions (eg. RPi)
                 if state == Qt.ApplicationState.ApplicationActive and self.sentToBackground is not None:
                     #app raised
@@ -377,7 +377,7 @@ class Artisan(QtSingleApplication):
     #                                  if query is "template" and the file has an .alog extension, the profile is loaded as background profile
     def open_url(self, url:QUrl) -> None:
         _log.debug('open_url(%s)', url)
-        aw:Optional['ApplicationWindow'] = self.activationWindow()
+        aw:Optional[ApplicationWindow] = self.activationWindow()
         if aw is not None and not aw.qmc.flagon and not aw.qmc.designerflag and not aw.qmc.wheelflag and aw.qmc.flavorchart_plot is None: # only if not yet monitoring
             if url.scheme() == 'artisan' and url.authority() in {'roast','template'}:
                 # we try to resolve this one into a file URL and recurse
@@ -501,7 +501,7 @@ class Artisan(QtSingleApplication):
     def event(self, event:Optional[QEvent]) -> bool:
         if event is not None and event.type() == QEvent.Type.FileOpen:
             try:
-                aw:Optional['ApplicationWindow'] = self.activationWindow()
+                aw:Optional[ApplicationWindow] = self.activationWindow()
                 if aw is not None:
                     url = event.url() # type: ignore # "QEvent" has no attribute "url"
                     # files cannot be opend while
@@ -1325,7 +1325,7 @@ class EventActionThread(QThread): # pylint: disable=too-few-public-methods # pyr
 
     def __init__(self, aw:'ApplicationWindow', action:int, command:str, eventtype:Optional[int]) -> None:
         super().__init__()
-        self.aw:'ApplicationWindow' = aw
+        self.aw:ApplicationWindow = aw
         self.action:int = action
         self.command:str = command
         self.eventtype:Optional[int] = eventtype
@@ -1546,8 +1546,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.lastLoadedBackground:str = ''
 
         # analyzer
-        self.analysisresultsanno:Optional['Annotation'] = None
-        self.segmentresultsanno:Optional['Annotation'] = None
+        self.analysisresultsanno:Optional[Annotation] = None
+        self.segmentresultsanno:Optional[Annotation] = None
 
         # Schedule
 #SCHEDULER:
@@ -1655,12 +1655,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         #### Async Sampling Timer
         self.AsyncSamplingTimer:Optional[QTimer] = None
 
-        self.wheeldialog:Optional['WheelDlg'] = None
+        self.wheeldialog:Optional[WheelDlg] = None
 
         self.simulator:Optional[Simulator] = None # holds the simulator in simulation mode
         self.simulatorpath:str = '' # points to the last profile used by the simulator
 
-        self.comparator:Optional['roastCompareDlg'] = None # holds the profile comparator dialog
+        self.comparator:Optional[roastCompareDlg] = None # holds the profile comparator dialog
 
         self.qmc.setContentsMargins(0,0,0,0)
         #events config
@@ -1704,16 +1704,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.extratimeout:List[float] = []
 
         # WebLCDs
-        self.weblcds_server:Optional['WebLCDs'] = None # holds the WebLCD instance
+        self.weblcds_server:Optional[WebLCDs] = None # holds the WebLCD instance
 
         # Hottop
-        self.hottop:Optional['Hottop'] = None # holds the Hottop instance created on connect; reset to None on disconnect
+        self.hottop:Optional[Hottop] = None # holds the Hottop instance created on connect; reset to None on disconnect
 
         # Santoker Network
         self.santokerHost:str = '10.10.100.254'
         self.santokerPort:int = 20001
         self.santokerSerial:bool = False # if True connection is via the main serial port
-        self.santoker:Optional['Santoker'] = None # holds the Santoker instance created on connect; reset to None on disconnect
+        self.santoker:Optional[Santoker] = None # holds the Santoker instance created on connect; reset to None on disconnect
 
         # Kaleido Network
         self.kaleido_default_host:Final[str] = '127.0.0.1'
@@ -1721,10 +1721,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.kaleidoPort:int = 80
         self.kaleidoSerial:bool = False # if True connection is via the main serial port
         self.kaleidoPID:bool = True # if True the external Kaleido PID is operated, otherwise the internal Artisan PID is active
-        self.kaleido:Optional['KaleidoPort'] = None # holds the Kaleido instance created on connect; reset to None on disconnect
+        self.kaleido:Optional[KaleidoPort] = None # holds the Kaleido instance created on connect; reset to None on disconnect
 
         # Ikawa BLE
-        self.ikawa:Optional['IKAWA_BLE'] = None
+        self.ikawa:Optional[IKAWA_BLE] = None
 
         # create a ET control objects
         self.fujipid: FujiPID = FujiPID(self)
@@ -1826,7 +1826,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.eventquantifiercoarse:List[int] = [0]*self.eventsliders # 1: quantify in 10 steps, 2: quantify in steps of 5, otherwise quantify in steps of 1
         self.eventquantifieraction:List[int] = [0]*self.eventsliders
         self.clusterEventsFlag:bool = False
-        self.eventquantifierlinspaces:List['npt.NDArray[numpy.double]'] = [self.computeLinespace(0),self.computeLinespace(1),self.computeLinespace(2),self.computeLinespace(3)]
+        self.eventquantifierlinspaces:List[npt.NDArray[numpy.double]] = [self.computeLinespace(0),self.computeLinespace(1),self.computeLinespace(2),self.computeLinespace(3)]
         self.eventquantifierthresholdfine:float = .5 # original: 1.5, changed to 0.5 for Probat Probatone # for slider stepsize 1
         self.eventquantifierthresholdmed:float = .5
         self.eventquantifierthresholdcoarse:float = .5 # for slider stepsize 10
@@ -4118,7 +4118,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.setdpi(self.dpi-10)
 
     def scrollingPhases(self, event:'MplEvent') -> Any:
-        verticalScroller: Optional['QScrollBar'] = self.scroller.verticalScrollBar()
+        verticalScroller: Optional[QScrollBar] = self.scroller.verticalScrollBar()
         if verticalScroller is not None:
             val = verticalScroller.value()
             if hasattr(event, 'button') and event.button == 'down': # pyright: ignore[reportAttributeAccessIssue]
@@ -4877,7 +4877,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 clipboard += '\t'
                     clipboard = clipboard + '\n'
             # copy to the system clipboard
-            sys_clip: Optional['QClipboard'] = QApplication.clipboard()
+            sys_clip: Optional[QClipboard] = QApplication.clipboard()
             if sys_clip is not None:
                 sys_clip.setText(clipboard)
         # if nothing is selected, temporary select all and try to copy
@@ -6470,8 +6470,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         ioi_maxdelta = ''
         ioi_abcprime = ''
         maxdeltas_seg = numpy.empty(0)
-        deltatimes_seg:'npt.NDArray[numpy.double]' = numpy.empty(0)
-        timeindexs_seg:'npt.NDArray[numpy.int64]' = numpy.empty(0, dtype=numpy.int64)
+        deltatimes_seg:npt.NDArray[numpy.double] = numpy.empty(0)
+        timeindexs_seg:npt.NDArray[numpy.int64] = numpy.empty(0, dtype=numpy.int64)
         segment_rmse_deltas = numpy.empty(0) #segment root mean square error (difference)
         segment_mse_deltas = numpy.empty(0)  #segment mean square error (difference)
         segment_abc_deltas = numpy.empty(0)  #segmnt area between the curves
@@ -13363,7 +13363,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         roastlogger_action_section = ''
         # use io.open instead of open to have encoding support on Python 2
         with open(filename, encoding=enc) as infile:
-            obj:'ProfileData' = {}
+            obj:ProfileData = {}
             obj['mode'] = 'C'
             obj['title'] = str(QFileInfo(filename).fileName())
             roastdate_str = encodeLocal(QDate.currentDate().toString())
@@ -15115,7 +15115,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     # and displayed to users e.g. as part of the Report to users and stored along profiles to be used by external programs
     # in case a value cannot be computed the corresponding entry is missing in the resulting dict
     def computedProfileInformation(self) -> 'ComputedProfileInformation':
-        computedProfile:'ComputedProfileInformation' = {}
+        computedProfile:ComputedProfileInformation = {}
         TP_time_idx = None
         DRY_time_idx = None
         TP_index = 0
@@ -15399,7 +15399,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     #wrap values in unicode(.) if and only if those are of type string
     def getProfile(self) -> 'ProfileData':
         try:
-            profile:'ProfileData' = {}
+            profile:ProfileData = {}
             profile['recording_version'] = self.recording_version
             profile['recording_revision'] = self.recording_revision
             profile['recording_build'] = self.recording_build
@@ -19399,7 +19399,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 if 0 < loss < 100:
                     weight_loss += '%'
 
-        res:'ProductionDataStr' = {
+        res:ProductionDataStr = {
             # id (prefix+nr)
             'nr': str(data.get('batchnr','')),
             'id': ((data.get('batchprefix','') + str(data.get('batchnr',''))) if (data.get('batchnr',0) != 0) else ''),
@@ -19440,7 +19440,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 <td sorttable_customkey=\"$out_num\">$weightout</td>
 <td sorttable_customkey=\"$loss_num\">$weightloss</td>
 </tr>"""
-        ds:'ProductionDataStr' = self.productionData2string(data,units=False)
+        ds:ProductionDataStr = self.productionData2string(data,units=False)
         batch_html = ds['id']
         time_html = ds['time']
         title_html = ds['title']
@@ -21062,7 +21062,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 c += 1
                                 dsd:Dict[str,Any] = self.deserialize(p)
                                 rd = self.profileRankingData(dsd)
-                                pd:'ProductionDataStr' = self.productionData2string(self.profileProductionData(dsd),units=False)
+                                pd:ProductionDataStr = self.productionData2string(self.profileProductionData(dsd),units=False)
                                 cnum = col_
                                 for i, rdf in enumerate(ranking_data_fields):
                                     cnum += 1
@@ -23778,7 +23778,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 return
             res = self.qmc.reset(redraw=False,soundOn=False)
             if res:
-                obj:'ProfileData' = extractor(filename, self)
+                obj:ProfileData = extractor(filename, self)
                 res = self.setProfile(filename, obj)
 
             if res:

@@ -68,7 +68,7 @@ class tphasescanvas(FigureCanvas):
         self.fig.set_layout_engine('tight', **self.tight_layout_params)
         #
         super().__init__(self.fig) # type:ignore # Call to untyped function "__init__" in typed context
-        self.ax:Optional['Axes'] = None
+        self.ax:Optional[Axes] = None
         self.clear_phases()
 
     def clear_phases(self) -> None:

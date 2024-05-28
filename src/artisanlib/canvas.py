@@ -451,8 +451,8 @@ class tgraphcanvas(FigureCanvas):
                                             QApplication.translate('Textbox', 'Balance'),
                                             QApplication.translate('Textbox', 'Overall')]
 
-        self.ax1:Optional['Axes'] = None
-        self.ax2:Optional['Axes'] = None
+        self.ax1:Optional[Axes] = None
+        self.ax2:Optional[Axes] = None
 
         # Ambient Data Worker and Thread
         self.ambiWorker:Optional[AmbientWorker] = None
@@ -493,10 +493,10 @@ class tgraphcanvas(FigureCanvas):
         # flavor chart graph plots and annotations
         self.flavorchart_plotf:Optional[List[float]] = None
         self.flavorchart_angles:Optional[List[float]] = None
-        self.flavorchart_plot:Optional['Line2D'] = None
-        self.flavorchart_fill:Optional['PolyCollection'] = None
-        self.flavorchart_labels:Optional[List['Annotation']] = None
-        self.flavorchart_total:Optional['Text'] = None
+        self.flavorchart_plot:Optional[Line2D] = None
+        self.flavorchart_fill:Optional[PolyCollection] = None
+        self.flavorchart_labels:Optional[List[Annotation]] = None
+        self.flavorchart_total:Optional[Text] = None
 
         #F = Fahrenheit; C = Celsius
         self.mode:str = 'F'
@@ -1043,8 +1043,8 @@ class tgraphcanvas(FigureCanvas):
         self.extractemp2:List[List[Optional[float]]] = []
         # NOTE: those extractimexN, extractempBN lists can be shorter than the regular extratimexN, extratempN lists,
         # however, the invariants len(extractimex1) = len(extractemp1) and len(extractimex2) = len(extractemp2) always hold
-        self.extratemp1lines:List['Line2D'] = []                      # lists with extra lines for speed drawing
-        self.extratemp2lines:List['Line2D'] = []
+        self.extratemp1lines:List[Line2D] = []                      # lists with extra lines for speed drawing
+        self.extratemp2lines:List[Line2D] = []
         self.extraname1:List[str] = []                              # name of labels for line (like ET or BT) - legend
         self.extraname2:List[str] = []
         self.extramathexpression1:List[str] = []                    # list with user defined math evaluating strings. Example "2*cos(x)"
@@ -1080,9 +1080,9 @@ class tgraphcanvas(FigureCanvas):
 
         self.fig.patch.set_facecolor(str(self.palette['canvas']))
 
-        self.ax:Optional['Axes']
+        self.ax:Optional[Axes]
         self.ax = self.fig.add_subplot(111,facecolor=self.palette['background'])
-        self.delta_ax:Optional['_AxesBase'] = self.ax.twinx()
+        self.delta_ax:Optional[_AxesBase] = self.ax.twinx()
 
         #legend location
         self.legendloc:int = 7
@@ -1300,7 +1300,7 @@ class tgraphcanvas(FigureCanvas):
 
         #background profile
         self.background:bool = False # set to True if loaded background profile is shown and False if hidden
-        self.backgroundprofile:Optional['ProfileData'] = None # if not None, a background profile is loaded
+        self.backgroundprofile:Optional[ProfileData] = None # if not None, a background profile is loaded
         self.backgroundprofile_moved_x:int = 0 # background profile moved in horizontal direction
         self.backgroundprofile_moved_y:int = 0 # background profile moved in vertical direction
         self.backgroundDetails:bool = True
@@ -1316,17 +1316,17 @@ class tgraphcanvas(FigureCanvas):
         self.roastbatchposB:int = 1
         self.temp1B:List[float] = []
         self.temp2B:List[float] = []
-        self.temp1BX:List['npt.NDArray[numpy.double]'] = []
-        self.temp2BX:List['npt.NDArray[numpy.double]'] = []
+        self.temp1BX:List[npt.NDArray[numpy.double]] = []
+        self.temp2BX:List[npt.NDArray[numpy.double]] = []
         self.timeB:List[float] = []
         self.abs_timeB:List[float] = []
         self.temp1Bdelta:List[float] = []
         self.temp2Bdelta:List[float] = []
         # smoothed versions of the background curves
-        self.stemp1B:'npt.NDArray[numpy.double]' = numpy.empty(0)
-        self.stemp2B:'npt.NDArray[numpy.double]' = numpy.empty(0)
-        self.stemp1BX:List['npt.NDArray[numpy.double]'] = []
-        self.stemp2BX:List['npt.NDArray[numpy.double]'] = []
+        self.stemp1B:npt.NDArray[numpy.double] = numpy.empty(0)
+        self.stemp2B:npt.NDArray[numpy.double] = numpy.empty(0)
+        self.stemp1BX:List[npt.NDArray[numpy.double]] = []
+        self.stemp2BX:List[npt.NDArray[numpy.double]] = []
         self.extraname1B:List[str] = []
         self.extraname2B:List[str] = []
         self.extratimexB:List[List[float]] = []
@@ -1368,10 +1368,10 @@ class tgraphcanvas(FigureCanvas):
         self.E2backgroundvalues:List[float] = []
         self.E3backgroundvalues:List[float] = []
         self.E4backgroundvalues:List[float] = []
-        self.l_backgroundeventtype1dots:Optional['Line2D'] = None
-        self.l_backgroundeventtype2dots:Optional['Line2D'] = None
-        self.l_backgroundeventtype3dots:Optional['Line2D'] = None
-        self.l_backgroundeventtype4dots:Optional['Line2D'] = None
+        self.l_backgroundeventtype1dots:Optional[Line2D] = None
+        self.l_backgroundeventtype2dots:Optional[Line2D] = None
+        self.l_backgroundeventtype3dots:Optional[Line2D] = None
+        self.l_backgroundeventtype4dots:Optional[Line2D] = None
 
         # background Deltas
         self.DeltaETBflag:bool = False
@@ -1437,10 +1437,10 @@ class tgraphcanvas(FigureCanvas):
         self.plus_store_label:Optional[str] = None # holds the plus label of the selected store of the current profile or None
         self.plus_coffee:Optional[str] = None # holds the plus hr_id of the selected coffee of the current profile or None
         self.plus_coffee_label:Optional[str] = None # holds the plus label of the selected coffee of the current profile or None
-        self.plus_blend_spec:Optional['Blend'] = None # the plus blend structure [<blend_label>,[[<coffee_label>,<hr_id>,<ratio>],...,[<coffee_label>,<hr_id>,<ratio>]]] # label + ingredients
+        self.plus_blend_spec:Optional[Blend] = None # the plus blend structure [<blend_label>,[[<coffee_label>,<hr_id>,<ratio>],...,[<coffee_label>,<hr_id>,<ratio>]]] # label + ingredients
         self.plus_blend_spec_labels:Optional[List[str]] = None # a list of labels as long as the list of ingredients in self.plus_blend_spec or None
         self.plus_blend_label:Optional[str] = None # holds the plus selected label of the selected blend of the current profile or None
-        self.plus_custom_blend:Optional['CustomBlend'] = None # holds the one custom blend, an instance of plus.blend.Blend, or None
+        self.plus_custom_blend:Optional[CustomBlend] = None # holds the one custom blend, an instance of plus.blend.Blend, or None
         self.plus_sync_record_hash:Optional[str] = None
         self.plus_file_last_modified:Optional[float] = None # holds the last_modified timestamp of the loaded profile as EPOCH (float incl. milliseconds as returned by time.time())
         # plus_file_last_modified is set on load, reset on RESET, and updated on save. It is also update, if not None and new data is received from the server (sync:applyServerUpdates)
@@ -1724,7 +1724,7 @@ class tgraphcanvas(FigureCanvas):
         self.silent_alarms:bool = False # if this is true (can be set via a + button action "alarm(1)", alarms are triggered, but actions are not fired
 
         # alarm sets
-        self.alarmsets:List['AlarmSet'] = []
+        self.alarmsets:List[AlarmSet] = []
         for _ in range(self.ALARMSET_COUNT):
             self.alarmsets.append(tgraphcanvas.emptyAlarmSet())
 
@@ -1863,55 +1863,55 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundBTcurve:bool = True
 
         # generates first "empty" plot (lists are empty) of temperature and deltaT
-        self.l_temp1:Optional['Line2D'] = None
-        self.l_temp2:Optional['Line2D'] = None
-        self.l_delta1:Optional['Line2D'] = None
-        self.l_delta2:Optional['Line2D'] = None
-        self.l_back1:Optional['Line2D'] = None
-        self.l_back2:Optional['Line2D'] = None
-        self.l_back3:Optional['Line2D'] = None # first extra background curve
-        self.l_back4:Optional['Line2D'] = None # second extra background curve
-        self.l_delta1B:Optional['Line2D'] = None
-        self.l_delta2B:Optional['Line2D'] = None
+        self.l_temp1:Optional[Line2D] = None
+        self.l_temp2:Optional[Line2D] = None
+        self.l_delta1:Optional[Line2D] = None
+        self.l_delta2:Optional[Line2D] = None
+        self.l_back1:Optional[Line2D] = None
+        self.l_back2:Optional[Line2D] = None
+        self.l_back3:Optional[Line2D] = None # first extra background curve
+        self.l_back4:Optional[Line2D] = None # second extra background curve
+        self.l_delta1B:Optional[Line2D] = None
+        self.l_delta2B:Optional[Line2D] = None
 
-        self.l_subtitle:Optional['Text'] = None # the subtitle artist if any as used to render the background title
+        self.l_subtitle:Optional[Text] = None # the subtitle artist if any as used to render the background title
 
-        self.l_BTprojection:Optional['Line2D'] = None
-        self.l_ETprojection:Optional['Line2D'] = None
-        self.l_DeltaBTprojection:Optional['Line2D'] = None
-        self.l_DeltaETprojection:Optional['Line2D'] = None
+        self.l_BTprojection:Optional[Line2D] = None
+        self.l_ETprojection:Optional[Line2D] = None
+        self.l_DeltaBTprojection:Optional[Line2D] = None
+        self.l_DeltaETprojection:Optional[Line2D] = None
 
-        self.l_AUCguide:Optional['Line2D'] = None
+        self.l_AUCguide:Optional[Line2D] = None
 
-        self.l_horizontalcrossline:Optional['Line2D'] = None
-        self.l_verticalcrossline:Optional['Line2D'] = None
+        self.l_horizontalcrossline:Optional[Line2D] = None
+        self.l_verticalcrossline:Optional[Line2D] = None
 
-        self.l_timeline:Optional['Line2D'] = None
+        self.l_timeline:Optional[Line2D] = None
 
-        self.legend:Optional['Legend'] = None
+        self.legend:Optional[Legend] = None
 
-        self.l_eventtype1dots:Optional['Line2D'] = None
-        self.l_eventtype2dots:Optional['Line2D'] = None
-        self.l_eventtype3dots:Optional['Line2D'] = None
-        self.l_eventtype4dots:Optional['Line2D'] = None
+        self.l_eventtype1dots:Optional[Line2D] = None
+        self.l_eventtype2dots:Optional[Line2D] = None
+        self.l_eventtype3dots:Optional[Line2D] = None
+        self.l_eventtype4dots:Optional[Line2D] = None
 
-        self.l_eteventannos:List['Annotation'] = []
-        self.l_bteventannos:List['Annotation'] = []
-        self.l_eventtype1annos:List['Annotation'] = []
-        self.l_eventtype2annos:List['Annotation'] = []
-        self.l_eventtype3annos:List['Annotation'] = []
-        self.l_eventtype4annos:List['Annotation'] = []
+        self.l_eteventannos:List[Annotation] = []
+        self.l_bteventannos:List[Annotation] = []
+        self.l_eventtype1annos:List[Annotation] = []
+        self.l_eventtype2annos:List[Annotation] = []
+        self.l_eventtype3annos:List[Annotation] = []
+        self.l_eventtype4annos:List[Annotation] = []
 
-        self.l_annotations:List['Annotation'] = []
-        self.l_background_annotations:List['Annotation'] = []
+        self.l_annotations:List[Annotation] = []
+        self.l_background_annotations:List[Annotation] = []
 
         # NOTE: the l_annotations_pos_dict is set on profile load and its positions are preferred over those in l_annotations_dict, but deleted at the end of the first redraw()
-        self.l_annotations_dict:Dict[int,List['Annotation']] = {} # associating event ids (-1:TP, 0:CHARGE, 1:DRY,...) to its pair of draggable temp and time annotations
+        self.l_annotations_dict:Dict[int,List[Annotation]] = {} # associating event ids (-1:TP, 0:CHARGE, 1:DRY,...) to its pair of draggable temp and time annotations
         self.l_annotations_pos_dict:Dict[int,Tuple[Tuple[float,float],Tuple[float,float]]] = {} # associating event ids (-1:TP, 0:CHARGE, 1:DRY,...) to its pair of draggable temp and time xyann coordinate pairs
-        self.l_event_flags_dict:Dict[int,'Annotation'] = {} # associating event flag annotations id (event number) to its draggable text annotation
+        self.l_event_flags_dict:Dict[int,Annotation] = {} # associating event flag annotations id (event number) to its draggable text annotation
         self.l_event_flags_pos_dict:Dict[int,Tuple[float,float]] = {} # associating event flag annotations id (event number) to its draggable text xyann coordinates
 
-        self.ai:Optional['AxesImage'] = None # holds background logo image
+        self.ai:Optional[AxesImage] = None # holds background logo image
 
         ###########################  TIME  CLOCK     ##########################
         # create an object time to measure and record time (in milliseconds)
@@ -1945,19 +1945,19 @@ class tgraphcanvas(FigureCanvas):
         self.designer_timez:Optional[List[float]] = None
         self.time_step_size:Final[int] = 2 # only every 2sec a point to increase speed of redrawing
         # designer artist line caches
-        self._designer_orange_mark:Optional['Line2D'] = None
+        self._designer_orange_mark:Optional[Line2D] = None
         self._designer_orange_mark_shown:bool = False
-        self._designer_blue_mark:Optional['Line2D'] = None
+        self._designer_blue_mark:Optional[Line2D] = None
         self._designer_blue_mark_shown:bool = False
-        self.l_temp1_markers:Optional['Line2D'] = None
-        self.l_temp2_markers:Optional['Line2D'] = None
-        self.l_stat1:Optional['Line2D'] = None
-        self.l_stat2:Optional['Line2D'] = None
-        self.l_stat3:Optional['Line2D'] = None
-        self.l_div1:Optional['Line2D'] = None
-        self.l_div2:Optional['Line2D'] = None
-        self.l_div3:Optional['Line2D'] = None
-        self.l_div4:Optional['Line2D'] = None
+        self.l_temp1_markers:Optional[Line2D] = None
+        self.l_temp2_markers:Optional[Line2D] = None
+        self.l_stat1:Optional[Line2D] = None
+        self.l_stat2:Optional[Line2D] = None
+        self.l_stat3:Optional[Line2D] = None
+        self.l_div1:Optional[Line2D] = None
+        self.l_div2:Optional[Line2D] = None
+        self.l_div3:Optional[Line2D] = None
+        self.l_div4:Optional[Line2D] = None
 
         ###########################         filterDropOut variables     ################################
 
@@ -2148,7 +2148,7 @@ class tgraphcanvas(FigureCanvas):
         #Extras more info
         self.idx_met:Optional[int] = None
         self.showmet:bool = False
-        self.met_annotate:Optional['Annotation'] = None
+        self.met_annotate:Optional[Annotation] = None
         self.met_timex_temp1_delta:Optional[Tuple[float,float,Optional[float]]] = None # (time, temp, time delta) tuple
         self.extendevents:bool = True
         self.statssummary:bool = False
@@ -2212,17 +2212,17 @@ class tgraphcanvas(FigureCanvas):
         #mouse cross lines measurement
         self.baseX:Optional[float] = None
         self.baseY:Optional[float] = None
-        self.base_horizontalcrossline:Optional['Line2D'] = None
-        self.base_verticalcrossline:Optional['Line2D'] = None
+        self.base_horizontalcrossline:Optional[Line2D] = None
+        self.base_verticalcrossline:Optional[Line2D] = None
         self.base_messagevisible:bool = False
 
         #threshold for deltaE color difference comparisons
         self.colorDifferenceThreshold = 20
 
         #references to legend objects
-        self.handles:List['Line2D'] = []
+        self.handles:List[Line2D] = []
         self.labels:List[str] = []
-        self.legend_lines:List['Line2D'] = []
+        self.legend_lines:List[Line2D] = []
 
         #used for picked event messages
         self.eventmessage = ''
@@ -2231,7 +2231,7 @@ class tgraphcanvas(FigureCanvas):
 
         self.resizeredrawing = 0 # holds timestamp of last resize triggered redraw
 
-        self.logoimg:Optional['npt.NDArray[numpy.double]'] = None # holds the background logo image
+        self.logoimg:Optional[npt.NDArray[numpy.double]] = None # holds the background logo image
         self.analysisresultsloc_default: Final[Tuple[float, float]] = (.49, .5)
         self.analysisresultsloc:Tuple[float, float] = self.analysisresultsloc_default
         self.analysispickflag:bool = False
@@ -2250,11 +2250,11 @@ class tgraphcanvas(FigureCanvas):
 
         # temp vars used to truncate title and statistic line (x_label) to width of MPL canvas
         self.title_text:Optional[str] = None
-        self.title_artist:Optional['Text'] = None
+        self.title_artist:Optional[Text] = None
         self.title_width:Optional[float] = None
         self.background_title_width:float = 0
         self.xlabel_text:Optional[str] = None
-        self.xlabel_artist:Optional['Text'] = None
+        self.xlabel_artist:Optional[Text] = None
         self.xlabel_width:Optional[float] = None
 
         self.lazyredraw_on_resize_timer:QTimer =  QTimer()
@@ -4851,7 +4851,7 @@ class tgraphcanvas(FigureCanvas):
 
     @pyqtSlot(int)
     def selectAlarmSet(self, n:int) -> None:
-        alarmset:'Optional[AlarmSet]' = self.getAlarmSet(n)
+        alarmset:Optional[AlarmSet] = self.getAlarmSet(n)
         if alarmset is not None:
             try:
                 self.alarmSemaphore.acquire(1)
@@ -6935,7 +6935,7 @@ class tgraphcanvas(FigureCanvas):
             b = numpy.interp(a_mod, a, b) # resample data to linear spaced time
         else:
             a_mod = a
-        res:'npt.NDArray[numpy.float64]' = b # just in case the precondition (self.filterDropOuts or window_len>2) does not hold
+        res:npt.NDArray[numpy.float64] = b # just in case the precondition (self.filterDropOuts or window_len>2) does not hold
         # 2. filter spikes (only applied offline)
         if self.filterDropOuts and not self.flagon:
             try:
@@ -6954,7 +6954,7 @@ class tgraphcanvas(FigureCanvas):
         if window_len>2:
             if decay_smoothing:
                 # decay smoothing
-                decay_weights_internal:'npt.NDArray[numpy.int_]'
+                decay_weights_internal:npt.NDArray[numpy.int_]
                 if decay_weights is None:
                     decay_weights_internal = numpy.arange(1,window_len+1)
                 else:
@@ -7169,7 +7169,7 @@ class tgraphcanvas(FigureCanvas):
             startB:Optional[float] = None, timeindex2:Optional[List[int]] = None, TP_time_loaded:Optional[float] = None,
             draggable:bool = True) -> List['Annotation']:
         ystep_down = ystep_up = 0
-        anno_artists:List['Annotation'] = []
+        anno_artists:List[Annotation] = []
         if self.ax is None:
             return anno_artists
         #Add markers for CHARGE
@@ -7452,11 +7452,11 @@ class tgraphcanvas(FigureCanvas):
                 if optimalSmoothing and self.polyfitRoRcalc:
                     # optimal RoR computation using polynoms with out timeshift
                     dss = ds + 1 if ds % 2 == 0 else ds
-                    z1:'npt.NDArray[numpy.double]'
+                    z1:npt.NDArray[numpy.double]
                     if len(ntemp) > dss:
                         try:
                             # ntemp is not linearized yet:
-                            lin: 'npt.NDArray[numpy.double]'
+                            lin: npt.NDArray[numpy.double]
                             if timex_lin is None or len(timex_lin) != len(ntemp):
                                 lin = numpy.linspace(timex[0],timex[-1],lt)
                             else:
@@ -7812,8 +7812,8 @@ class tgraphcanvas(FigureCanvas):
                     self.l_delta1.remove()
             except Exception: # pylint: disable=broad-except
                 pass
-            timex:'npt.NDArray[numpy.double]'
-            delta1:'npt.NDArray[numpy.double]'
+            timex:npt.NDArray[numpy.double]
+            delta1:npt.NDArray[numpy.double]
             if start < end < len(self.timex):
                 timex = numpy.array(self.timex[start:end])
                 delta1 = numpy.array(self.delta1[start:end])
@@ -9697,10 +9697,10 @@ class tgraphcanvas(FigureCanvas):
                         if self.zgrid > 0:
                             self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
                             self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-                            delta_major_tick_lines:List['Line2D'] = self.delta_ax.get_yticklines()
+                            delta_major_tick_lines:List[Line2D] = self.delta_ax.get_yticklines()
                             for ytl in delta_major_tick_lines:
                                 ytl.set_markersize(10)
-                            delta_minor_tick_lines:List['Line2D'] = self.delta_ax.yaxis.get_minorticklines()
+                            delta_minor_tick_lines:List[Line2D] = self.delta_ax.yaxis.get_minorticklines()
                             for mtl in delta_minor_tick_lines:
                                 mtl.set_markersize(5)
                             for label in self.delta_ax.get_yticklabels() :
@@ -9743,7 +9743,7 @@ class tgraphcanvas(FigureCanvas):
                                     trans = self.delta_ax.transData
                                 else:
                                     trans = self.ax.transData
-                                visible_extratemp1 : 'npt.NDArray[numpy.double]'
+                                visible_extratemp1 : npt.NDArray[numpy.double]
                                 if not self.flagstart and not self.foregroundShowFullflag and (not self.autotimex or self.autotimexMode == 0) and len(self.extrastemp1[i]) > 0:
                                     visible_extratemp1 = numpy.concatenate((
                                         numpy.full(charge_idx, numpy.nan, dtype=numpy.double),
@@ -9786,7 +9786,7 @@ class tgraphcanvas(FigureCanvas):
                                     trans = self.delta_ax.transData
                                 else:
                                     trans = self.ax.transData
-                                visible_extratemp2 : 'npt.NDArray[numpy.double]'
+                                visible_extratemp2 : npt.NDArray[numpy.double]
                                 if not self.flagstart and not self.foregroundShowFullflag and (not self.autotimex or self.autotimexMode == 0) and len(self.extrastemp2[i]) > 0:
                                     visible_extratemp2 = numpy.concatenate((
                                         numpy.full(charge_idx, numpy.nan, dtype=numpy.double),
@@ -9815,8 +9815,8 @@ class tgraphcanvas(FigureCanvas):
                             _, _, exc_tb = sys.exc_info()
                             self.adderror((QApplication.translate('Error Message','Exception:') + ' redraw() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                     ##### ET,BT curves
-                    visible_et : 'npt.NDArray[numpy.double]'
-                    visible_bt : 'npt.NDArray[numpy.double]'
+                    visible_et : npt.NDArray[numpy.double]
+                    visible_bt : npt.NDArray[numpy.double]
                     if not self.flagstart and not self.foregroundShowFullflag and (not self.autotimex or self.autotimexMode == 0):
                         visible_et = numpy.concatenate((
                                         numpy.full(charge_idx, numpy.nan, dtype=numpy.double),
@@ -15026,7 +15026,7 @@ class tgraphcanvas(FigureCanvas):
                 c1 = numpy.array([numpy.nan if x == -1 else x for x in xa], dtype='float64')
                 c2 = numpy.array([numpy.nan if x == -1 else x for x in ya], dtype='float64')
                 idx = numpy.isfinite(c1) & numpy.isfinite(c2)
-                z:'npt.NDArray[numpy.double]' = numpy.polyfit(c1[idx],c2[idx],deg)
+                z:npt.NDArray[numpy.double] = numpy.polyfit(c1[idx],c2[idx],deg)
                 p = numpy.poly1d(z)
                 x = p(c1[startindex:endindex])
                 pad = max(0,len(self.timex) - startindex - len(x))

@@ -452,7 +452,7 @@ class QElidedLabel(QLabel): # pyright: ignore[reportGeneralTypeIssues] # Argumen
 
             line.setLineWidth(self.width())
 
-            cr:'QRect' = self.contentsRect()
+            cr:QRect = self.contentsRect()
 
             if text_width >= self.width():
                 elided_line = font_metrics.elidedText(self._contents, self._mode, self.width())
@@ -553,7 +553,7 @@ class NoDragItem(StandardItem):
         self.now = now
         self.weight_unit_idx = weight_unit_idx
         super().__init__()
-        layout:'Optional[QLayout]' = self.layout()
+        layout:Optional[QLayout] = self.layout()
         if layout is not None:
             layout.setContentsMargins(5,4,5,4) # left, top, right, bottom
 
@@ -770,7 +770,7 @@ class BaseWidget(QWidget): # pyright: ignore[reportGeneralTypeIssues] # Argument
         super().__init__(parent)
         # Store the orientation for drag checks later.
         self.orientation = orientation
-        self.blayout:'QBoxLayout'
+        self.blayout:QBoxLayout
         if self.orientation == Qt.Orientation.Vertical:
             self.blayout = QVBoxLayout()
         else:
@@ -819,7 +819,7 @@ class StandardWidget(BaseWidget):
     def get_items(self) -> List[NoDragItem]:
         items:List[NoDragItem] = []
         for n in range(self.blayout.count()):
-            li:'Optional[QLayoutItem]' = self.blayout.itemAt(n)
+            li:Optional[QLayoutItem] = self.blayout.itemAt(n)
             if li is not None:
                 w:Optional[QWidget] = li.widget()
                 if w is not None and isinstance(w, NoDragItem):
@@ -848,7 +848,7 @@ class DragWidget(BaseWidget):
         self._drag_target_indicator = DragTargetIndicator()
         self.blayout.addWidget(self._drag_target_indicator)
         self._drag_target_indicator.hide()
-        self.drag_source:'Optional[QObject]' = None
+        self.drag_source:Optional[QObject] = None
 
 
     def dragEnterEvent(self, e:'Optional[QDragEnterEvent]') -> None: # pylint: disable=no-self-argument,no-self-use
@@ -862,7 +862,7 @@ class DragWidget(BaseWidget):
             self._drag_target_indicator.hide()
 
             if self.drag_source is not None:
-                widget:'Optional[QObject]' = self.drag_source
+                widget:Optional[QObject] = self.drag_source
                 if widget is not None and isinstance(widget, QWidget):
                     # Use drop target location for destination, then remove it.
                     self._drag_target_indicator.hide()
@@ -884,7 +884,7 @@ class DragWidget(BaseWidget):
                 # Inserting moves the item if its alreaady in the layout.
                 self.blayout.insertWidget(index, self._drag_target_indicator)
                 # Hide the item being dragged.
-                source:'Optional[QObject]' = e.source()
+                source:Optional[QObject] = e.source()
                 if source is not None and isinstance(source, QWidget):
                     source.hide() # pyright:ignore[reportAttributeAccessIssue]
                 # Show the target.
@@ -894,7 +894,7 @@ class DragWidget(BaseWidget):
 
     def dropEvent(self, e:'Optional[QDropEvent]') -> None:
         if e is not None and e.source() is not None:
-            widget:'Optional[QObject]' = e.source()
+            widget:Optional[QObject] = e.source()
             if widget is not None and isinstance(widget, QWidget):
                 # Use drop target location for destination, then remove it.
                 self._drag_target_indicator.hide()
@@ -914,7 +914,7 @@ class DragWidget(BaseWidget):
         n = 0
         for n in range(self.blayout.count()):
             # Get the widget at each index in turn.
-            layoutItem:'Optional[QLayoutItem]' = self.blayout.itemAt(n)
+            layoutItem:Optional[QLayoutItem] = self.blayout.itemAt(n)
             if layoutItem is not None:
                 w:Optional[QWidget] = layoutItem.widget()
                 if w is not None:
@@ -961,7 +961,7 @@ class DragWidget(BaseWidget):
     def get_items(self) -> List[DragItem]:
         items:List[DragItem] = []
         for n in range(self.blayout.count()):
-            li:'Optional[QLayoutItem]' = self.blayout.itemAt(n)
+            li:Optional[QLayoutItem] = self.blayout.itemAt(n)
             if li is not None:
                 w:Optional[QWidget] = li.widget()
                 if w is not None and w != self._drag_target_indicator and isinstance(w, DragItem):
@@ -1147,13 +1147,13 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         lines:int = 2
         docMargin:float = 0
         lineSpacing:float = 1.5
-        roasted_notes_doc:'Optional[QTextDocument]' = self.roasted_notes.document()
+        roasted_notes_doc:Optional[QTextDocument] = self.roasted_notes.document()
         if roasted_notes_doc is not None:
             docMargin = roasted_notes_doc.documentMargin()
             font = roasted_notes_doc.defaultFont()
             fontMetrics = QFontMetrics(font)
             lineSpacing = fontMetrics.lineSpacing()
-        margins:'QMargins' = self.roasted_notes.contentsMargins()
+        margins:QMargins = self.roasted_notes.contentsMargins()
         notes_hight:int = math.ceil(lineSpacing * lines +
             (docMargin + self.roasted_notes.frameWidth()) * 2 + margins.top() + margins.bottom())
         self.roasted_notes.setFixedHeight(notes_hight)

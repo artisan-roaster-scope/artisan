@@ -316,7 +316,7 @@ class WindowsDlg(ArtisanDialog):
         self.dialogbuttons.accepted.connect(self.updatewindow)
         self.dialogbuttons.rejected.connect(self.restoreState)
 
-        resetButton: Optional['QPushButton'] = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
+        resetButton: Optional[QPushButton] = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
         if resetButton is not None:
             resetButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             resetButton.clicked.connect(self.reset)

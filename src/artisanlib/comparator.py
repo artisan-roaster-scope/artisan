@@ -255,18 +255,18 @@ class RoastProfile:
         if 'specialeventsvalue' in profile:
             self.specialeventsvalue = profile['specialeventsvalue']
         # artists
-        self.l_temp1:Optional['Line2D'] = None
-        self.l_temp2:Optional['Line2D'] = None
-        self.l_extratemp1:List[Optional['Line2D']] = [None]*len(self.extratimex)
-        self.l_extratemp2:List[Optional['Line2D']] = [None]*len(self.extratimex)
-        self.l_delta1:Optional['Line2D'] = None
-        self.l_delta2:Optional['Line2D'] = None
-        self.l_mainEvents1:Optional['Line2D'] = None
-        self.l_mainEvents2:Optional['Line2D'] = None
-        self.l_events1:Optional['Line2D'] = None
-        self.l_events2:Optional['Line2D'] = None
-        self.l_events3:Optional['Line2D'] = None
-        self.l_events4:Optional['Line2D'] = None
+        self.l_temp1:Optional[Line2D] = None
+        self.l_temp2:Optional[Line2D] = None
+        self.l_extratemp1:List[Optional[Line2D]] = [None]*len(self.extratimex)
+        self.l_extratemp2:List[Optional[Line2D]] = [None]*len(self.extratimex)
+        self.l_delta1:Optional[Line2D] = None
+        self.l_delta2:Optional[Line2D] = None
+        self.l_mainEvents1:Optional[Line2D] = None
+        self.l_mainEvents2:Optional[Line2D] = None
+        self.l_events1:Optional[Line2D] = None
+        self.l_events2:Optional[Line2D] = None
+        self.l_events3:Optional[Line2D] = None
+        self.l_events4:Optional[Line2D] = None
 #        # delta clipping paths
 #        self.l_delta1_clipping = None
 #        self.l_delta2_clipping = None
@@ -985,9 +985,9 @@ class roastCompareDlg(ArtisanDialog):
         #
         self.delta_axis_visible:Optional[bool] = None # True if twoAxisMode is active as detected by self.deltaAxisVisible()
         # align line
-        self.l_align:Optional['Line2D'] = None
+        self.l_align:Optional[Line2D] = None
         # legend
-        self.legend:Optional['Legend'] = None
+        self.legend:Optional[Legend] = None
         self.legendloc_pos:Optional[Tuple[float,float]] = None
         # table
         self.profileTable = CompareTableWidget()
@@ -1609,7 +1609,7 @@ class roastCompareDlg(ArtisanDialog):
                 if widget is not None:
                     layout: Optional[QLayout] = widget.layout()
                     if layout is not None:
-                        layoutItem: Optional['QLayoutItem'] = layout.itemAt(0)
+                        layoutItem: Optional[QLayoutItem] = layout.itemAt(0)
                         if layoutItem is not None:
                             flag = cast(QCheckBox, layoutItem.widget())
                             flag.blockSignals(True)
@@ -1999,7 +1999,7 @@ class roastCompareDlg(ArtisanDialog):
     def addProfileFromURL(self, extractor:Callable[[QUrl, 'ApplicationWindow'], Optional['ProfileData']], url:QUrl) -> None:
         _log.info('addProfileFromURL(%s)', url)
         try:
-            obj:Optional['ProfileData'] = extractor(url, self.aw)
+            obj:Optional[ProfileData] = extractor(url, self.aw)
             if obj:
                 self.addProfile(str(url), obj)
                 self.updateMenus()

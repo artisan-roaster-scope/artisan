@@ -116,7 +116,7 @@ class phasesGraphDlg(ArtisanDialog):
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.updatephases)
         self.dialogbuttons.rejected.connect(self.cancel)
-        setDefaultButton: Optional['QPushButton'] = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
+        setDefaultButton: Optional[QPushButton] = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
         if setDefaultButton is not None:
             setDefaultButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             setDefaultButton.clicked.connect(self.setdefault)
@@ -200,7 +200,7 @@ class phasesGraphDlg(ArtisanDialog):
         mainLayout.addLayout(buttonsLayout)
         self.setLayout(mainLayout)
         self.getphases()
-        ok_button: Optional['QPushButton'] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        ok_button: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
         if ok_button is not None:
             ok_button.setFocus()
 

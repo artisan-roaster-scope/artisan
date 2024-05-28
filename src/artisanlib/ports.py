@@ -379,7 +379,7 @@ class comportDlg(ArtisanResizeablDialog):
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, False) # overwrite the ArtisanDialog class default here!!
         self.setWindowTitle(QApplication.translate('Form Caption','Ports Configuration'))
         self.setModal(True)
-        self.helpdialog:Optional['HelpDlg'] = None
+        self.helpdialog:Optional[HelpDlg] = None
         ##########################    TAB 1 WIDGETS
         comportlabel =QLabel(QApplication.translate('Label', 'Comm Port'))
         self.comportEdit = PortComboBox(selection = self.aw.ser.comport)

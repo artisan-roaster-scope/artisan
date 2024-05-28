@@ -27,7 +27,7 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given IKAWA CSV file
 def extractProfilePetronciniCSV(file:str, aw:'ApplicationWindow') -> 'ProfileData':
-    res:'ProfileData' = {}
+    res:ProfileData = {}
 
     res['samplinginterval'] = 1.0
 

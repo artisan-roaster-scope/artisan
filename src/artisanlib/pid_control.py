@@ -1143,7 +1143,7 @@ class PIDcontrol:
             'negativeTargetMin', 'negativeTargetMax', 'derivative_filter']
 
     def __init__(self, aw:'ApplicationWindow') -> None:
-        self.aw:'ApplicationWindow' = aw
+        self.aw:ApplicationWindow = aw
         self.pidActive:bool = False
         self.sv:Optional[float] = None # the last sv send to the Arduino
         #

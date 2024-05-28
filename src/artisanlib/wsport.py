@@ -56,7 +56,7 @@ class wsport:
         # internals
         self._loop:        Optional[asyncio.AbstractEventLoop] = None # the asyncio loop
         self._thread:      Optional[Thread]                    = None # the thread running the asyncio loop
-        self._write_queue: Optional['asyncio.Queue[str]']    = None # the write queue
+        self._write_queue: Optional[asyncio.Queue[str]]    = None # the write queue
 
         # connects to "ws://<host>:<port>/<path>"
         self.default_host:Final[str] = '127.0.0.1'

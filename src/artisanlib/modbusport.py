@@ -171,7 +171,7 @@ class modbusport:
         self.byteorderLittle:bool = False
         self.wordorderLittle:bool = True
 #        self.master:Optional['ModbusBaseSyncClient'] = None
-        self.master:Union[None, 'ModbusSerialClient', 'ModbusTcpClient', 'ModbusUdpClient'] = None
+        self.master:Union[None, ModbusSerialClient, ModbusTcpClient, ModbusUdpClient] = None
         self.COMsemaphore:QSemaphore = QSemaphore(1)
         self.default_host:Final[str] = '127.0.0.1'
         self.host:str = self.default_host # the TCP/UDP host
@@ -455,7 +455,7 @@ class modbusport:
                             register:int = seq[0]
                             count:int = seq[1]-seq[0] + 1
                             if 0 < count <= self.maxCount:
-                                res:'Optional[Union[ModbusResponse,Awaitable[ModbusResponse]]]' = None
+                                res:Optional[Union[ModbusResponse,Awaitable[ModbusResponse]]] = None
                                 if just_send:
                                     self.sleepBetween() # we start with a sleep, as it could be that just a send command happened before the semaphore was caught
                                 just_send = True
@@ -780,7 +780,7 @@ class modbusport:
                     _log.debug('optimizer cache miss')
                     return None
             self.connect()
-            res: 'Optional[Union[ModbusResponse,Awaitable[ModbusResponse]]]'
+            res: Optional[Union[ModbusResponse,Awaitable[ModbusResponse]]]
             if self.isConnected():
                 assert self.master is not None
                 while True:
@@ -862,7 +862,7 @@ class modbusport:
                     _log.debug('optimizer cache miss')
                     return None
             self.connect()
-            res: 'Optional[Union[ModbusResponse,Awaitable[ModbusResponse]]]'
+            res: Optional[Union[ModbusResponse,Awaitable[ModbusResponse]]]
             if self.isConnected():
                 assert self.master is not None
                 while True:
@@ -920,7 +920,7 @@ class modbusport:
         _log.debug('peekSingleRegister(%d,%d,%d)', slave, register, code)
         if slave == 0:
             return None
-        res:'Optional[Union[ModbusResponse,Awaitable[ModbusResponse]]]' = None
+        res:Optional[Union[ModbusResponse,Awaitable[ModbusResponse]]] = None
         try:
             self.connect()
             if self.isConnected():
@@ -984,7 +984,7 @@ class modbusport:
                     _log.debug('optimizer cache miss')
                     return None
             self.connect()
-            res: 'Optional[Union[ModbusResponse,Awaitable[ModbusResponse]]]'
+            res: Optional[Union[ModbusResponse,Awaitable[ModbusResponse]]]
             if self.isConnected():
                 assert self.master is not None
                 while True:
@@ -1080,7 +1080,7 @@ class modbusport:
                     _log.debug('optimizer cache miss')
                     return None
             self.connect()
-            res: 'Optional[Union[ModbusResponse,Awaitable[ModbusResponse]]]'
+            res: Optional[Union[ModbusResponse,Awaitable[ModbusResponse]]]
             if self.isConnected():
                 assert self.master is not None
                 while True:
@@ -1160,7 +1160,7 @@ class modbusport:
                     _log.debug('optimizer cache miss')
                     return None
             self.connect()
-            res: 'Optional[Union[ModbusResponse,Awaitable[ModbusResponse]]]'
+            res: Optional[Union[ModbusResponse,Awaitable[ModbusResponse]]]
             if self.isConnected():
                 assert self.master is not None
                 while True:

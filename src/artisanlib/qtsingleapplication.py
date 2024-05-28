@@ -47,7 +47,7 @@ class QtSingleApplication(QApplication): # pyright: ignore [reportGeneralTypeIss
 
         self._id:str = _id
         self._viewer_id:str = _viewer_id
-        self._activationWindow:Optional['ApplicationWindow'] = None
+        self._activationWindow:Optional[ApplicationWindow] = None
         self._activateOnMessage:bool = False
 
         self._inSocket:Optional[QLocalSocket] = None

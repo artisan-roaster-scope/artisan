@@ -2183,7 +2183,7 @@ class EventsDlg(ArtisanResizeablDialog):
         if pindex is None:
             pindex = self.transferpalettecombobox.currentIndex()
         if 0 <= pindex < 10:
-            copy:'Palette' = (
+            copy:Palette = (
                 self.extraeventstypes[:],
                 self.extraeventsvalues[:],
                 self.extraeventsactions[:],

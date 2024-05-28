@@ -196,7 +196,7 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
         self.__popupIsShown:bool = False
         self.__blockMouseReleaseTimer:QTimer = QTimer(self)
         self.__blockMouseReleaseTimer.setSingleShot(True)
-        self.__initialMousePos:'Optional[QPointF]' = None
+        self.__initialMousePos:Optional[QPointF] = None
         self.__separator:str = separator
         self.__placeholderText:str = placeholderText
 

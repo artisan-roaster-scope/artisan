@@ -44,12 +44,12 @@ class Simulator:
         self.extratemp2: List[List[float]]
         self.extratimex: List[List[float]]
 
-        self.temp1_array:'npt.NDArray[numpy.double]'
-        self.temp2_array:'npt.NDArray[numpy.double]'
-        self.timex_array:'npt.NDArray[numpy.double]'
-        self.extratemp1_array: List['npt.NDArray[numpy.double]']
-        self.extratemp2_array: List['npt.NDArray[numpy.double]']
-        self.extratimex_array: List['npt.NDArray[numpy.double]']
+        self.temp1_array:npt.NDArray[numpy.double]
+        self.temp2_array:npt.NDArray[numpy.double]
+        self.timex_array:npt.NDArray[numpy.double]
+        self.extratemp1_array: List[npt.NDArray[numpy.double]]
+        self.extratemp2_array: List[npt.NDArray[numpy.double]]
+        self.extratimex_array: List[npt.NDArray[numpy.double]]
 
         self.profile = profile
         if profile is not None:

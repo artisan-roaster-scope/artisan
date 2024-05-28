@@ -201,7 +201,7 @@ class Hottop(AsyncComm):
                 self._set_cooling_motor = (1 if cooling_motor else 0)
 
 def main() -> None:
-    hottop_serial:'SerialSettings' = {
+    hottop_serial:SerialSettings = {
         'port': '/dev/slave',
         'baudrate': 9600, # 115200
         'bytesize': 8,

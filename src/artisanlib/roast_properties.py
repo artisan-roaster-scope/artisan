@@ -473,14 +473,14 @@ class volumeCalculatorDlg(ArtisanDialog):
 class RoastsComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     def __init__(self, parent:QWidget, aw:'ApplicationWindow', selection:Optional[str] = None) -> None:
         super().__init__(parent)
-        self.aw:'ApplicationWindow' = aw
+        self.aw:ApplicationWindow = aw
         self.installEventFilter(self)
         self.selection:Optional[str] = selection # just the roast title
         self.edited:Optional[str] = selection
         self.updateMenu()
         self.editTextChanged.connect(self.textEdited)
         self.setEditable(True)
-        completer: Optional['QCompleter'] = self.completer()
+        completer: Optional[QCompleter] = self.completer()
         if completer is not None:
             completer.setCaseSensitivity(Qt.CaseSensitivity.CaseSensitive)
 #        self.setMouseTracking(False)
@@ -580,7 +580,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         self.perKgRoastMode = False # if true only the amount during the roast and not the full batch (incl. preheat and BBP) are displayed), toggled by click on the result widget
 
-        self.ble:Optional['BleInterface'] = None # the BLE interface
+        self.ble:'Optional[BleInterface]' = None # the BLE interface # noqa: UP037
         self.scale_weight:Optional[float] = None # weight received from a connected scale
         self.scale_battery:Optional[int] = None # battery level of the connected scale in %
         self.scale_set:Optional[float] = None # set weight for accumulation in g
@@ -1140,7 +1140,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.tareComboBox.setMinimumWidth(80)
         self.tareComboBox.addItems(self.aw.qmc.container_names)
         width = self.tareComboBox.minimumSizeHint().width()
-        tare_view: Optional['QAbstractItemView'] = self.tareComboBox.view()
+        tare_view: Optional[QAbstractItemView] = self.tareComboBox.view()
         if tare_view is not None:
             tare_view.setMinimumWidth(width)
         self.tareComboBox.setCurrentIndex(self.aw.qmc.container_idx + 3)
@@ -1241,7 +1241,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.plus_coffee_selected:Optional[str] = None # holds the hr_id of the selected coffee
         self.plus_coffee_selected_label:Optional[str] = None # the label of the selected coffee
         self.plus_blend_selected_label:Optional[str] = None # the name of the selected blend
-        self.plus_blend_selected_spec:Optional['Blend'] = None # holds the blend dict specification of the selected blend
+        self.plus_blend_selected_spec:Optional[Blend] = None # holds the blend dict specification of the selected blend
         self.plus_blend_selected_spec_labels:Optional[List[str]] = None # the list of coffee labels of the selected blend specification
         if self.aw.plus_account is not None:
             plus.stock.init() # we try to init the stock from the cache before populating the popups
@@ -2281,7 +2281,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     def recentRoastActivated(self, n:int) -> None:
         # note, the first item is the edited text!
         if 0 < n <= len(self.aw.recentRoasts):
-            rr:'RecentRoast' = self.aw.recentRoasts[n-1]
+            rr:RecentRoast = self.aw.recentRoasts[n-1]
             if 'title' in rr and rr['title'] is not None:
                 self.titleedit.textEdited(rr['title'])
                 self.titleedit.setEditText(rr['title'])
@@ -2696,7 +2696,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui = EnergyWidget.Ui_EnergyWidget()
             self.energy_ui.setupUi(self.C5Widget)
 
-            self.btu_list:List['BTU'] = []
+            self.btu_list:List[BTU] = []
 
             # remember parameters to enable a Cancel action
             self.org_loadlabels = self.aw.qmc.loadlabels.copy()
@@ -4280,7 +4280,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 clipboard += typeComboBox.currentText() + '\t'
                 clipboard += valueEdit.text() + '\n'
         # copy to the system clipboard
-        sys_clip: Optional['QClipboard'] = QApplication.clipboard()
+        sys_clip: Optional[QClipboard] = QApplication.clipboard()
         if sys_clip is not None:
             sys_clip.setText(clipboard)
         self.aw.sendmessage(QApplication.translate('Message','Event table copied to clipboard'))
@@ -5165,7 +5165,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     def openEnergyMeasuringDialog(self, title:str, loadLabels:List[str], loadValues:List[str], loadUnits:List[str], protocolDuration:str) -> int:
         dialog = EnergyMeasuringDialog(self, self.aw)
-        layout: Optional['QLayout']  = dialog.layout()
+        layout: Optional[QLayout]  = dialog.layout()
         # set data
         dialog.ui.groupBox.setTitle(title)
         dialog.ui.loadAlabel.setText(loadLabels[0])
@@ -5328,7 +5328,7 @@ class tareDlg(ArtisanDialog):
         self.tarePopup.tareComboBox.addItem('')
         self.tarePopup.tareComboBox.addItems(self.aw.qmc.container_names)
         width = self.tarePopup.tareComboBox.minimumSizeHint().width()
-        view: Optional['QAbstractItemView'] = self.tarePopup.tareComboBox.view()
+        view: Optional[QAbstractItemView] = self.tarePopup.tareComboBox.view()
         if view is not None:
             view.setMinimumWidth(width)
         self.tarePopup.tareComboBox.setCurrentIndex(2) # reset to the empty entry

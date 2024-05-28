@@ -108,8 +108,8 @@ class AillioR1:
         self.roast_number:int = -1
         self.fan_rpm:float = 0
 
-        self.parent_pipe:Optional['Connection'] = None # type:ignore[no-any-unimported,unused-ignore]
-        self.child_pipe:Optional['Connection'] = None # type:ignore[no-any-unimported,unused-ignore]
+        self.parent_pipe:Optional[Connection] = None # type:ignore[no-any-unimported,unused-ignore]
+        self.child_pipe:Optional[Connection] = None # type:ignore[no-any-unimported,unused-ignore]
         self.irt:float = 0
         self.pcbt:float = 0
         self.coil_fan:int = 0
@@ -338,8 +338,8 @@ class AillioR1:
 
     def __updatestate(self, p:'Connection') -> None: # type:ignore[no-any-unimported,unused-ignore]
         while self.worker_thread_run:
-            state1:'array.array[int]' = array.array('B', bytes(0))
-            state2:'array.array[int]' = array.array('B', bytes(0))
+            state1:array.array[int] = array.array('B', bytes(0))
+            state2:array.array[int] = array.array('B', bytes(0))
             try:
                 self.__dbg('updatestate')
                 self.__sendcmd(self.AILLIO_CMD_STATUS1)

@@ -39,12 +39,12 @@ class AsyncComm:
         # internals
         self._loop:        Optional[asyncio.AbstractEventLoop] = None # the asyncio loop
         self._thread:      Optional[Thread]                    = None # the thread running the asyncio loop
-        self._write_queue: Optional['asyncio.Queue[bytes]']    = None # the write queue
+        self._write_queue: Optional[asyncio.Queue[bytes]]    = None # the write queue
 
         # connection
         self._host:str = host
         self._port:int = port
-        self._serial:Optional['SerialSettings'] = serial
+        self._serial:Optional[SerialSettings] = serial
 
         # handlers
         self._connected_handler:Optional[Callable[[], None]] = connected_handler

@@ -45,7 +45,7 @@ class PhidgetManager:
         #    False: occupied and connected to a software channel
         # access to this dict is protected by the managersemaphore and
         # should happen only via the methods addChannel and deleteChannel
-        self.attachedPhidgetChannels:Dict['Phidget', bool] = {} # type:ignore[no-any-unimported,unused-ignore]
+        self.attachedPhidgetChannels:Dict[Phidget, bool] = {} # type:ignore[no-any-unimported,unused-ignore]
         self.managersemaphore:QSemaphore = QSemaphore(1)
         self.manager:Manager = Manager() # type:ignore[no-any-unimported,unused-ignore]
 

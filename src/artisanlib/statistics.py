@@ -172,7 +172,7 @@ class StatisticsDlg(ArtisanDialog):
         mainLayout.addLayout(buttonsLayout)
         mainLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
         self.setLayout(mainLayout)
-        ok_button: Optional['QPushButton'] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        ok_button: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
         if ok_button is not None:
             ok_button.setFocus()
 

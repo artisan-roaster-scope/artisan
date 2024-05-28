@@ -219,7 +219,7 @@ class WheelDlg(ArtisanDialog):
             self.labeltable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
             self.labeltable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
             self.labeltable.setShowGrid(True)
-            vheader: Optional['QHeaderView'] = self.labeltable.verticalHeader()
+            vheader: Optional[QHeaderView] = self.labeltable.verticalHeader()
             if vheader is not None:
                 vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
             #populate table

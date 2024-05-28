@@ -108,7 +108,7 @@ class s7port:
 
         self.is_connected:bool = False # local cache of the connection state
 
-        self.plc:Optional['S7Client'] = None
+        self.plc:Optional[S7Client] = None
         self.commError:bool = False # True after a communication error was detected and not yet cleared by receiving proper data
 
 ################

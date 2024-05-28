@@ -240,9 +240,9 @@ class designerconfigDlg(ArtisanDialog):
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok))
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel))
 
-        close_button: Optional['QPushButton'] = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Close)
-        apply_button: Optional['QPushButton'] = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Apply)
-        defaults_button: Optional['QPushButton'] = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
+        close_button: Optional[QPushButton] = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Close)
+        apply_button: Optional[QPushButton] = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Apply)
+        defaults_button: Optional[QPushButton] = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
         if close_button is not None:
             self.setButtonTranslations(close_button,'Close',QApplication.translate('Button','Close'))
         if apply_button is not None:
@@ -737,7 +737,7 @@ class pointDlg(ArtisanDialog):
         mainLayout.addStretch()
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
-        ok_button: Optional['QPushButton'] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        ok_button: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
         if ok_button is not None:
             ok_button.setFocus()
 

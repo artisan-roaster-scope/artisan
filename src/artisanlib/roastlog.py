@@ -29,7 +29,7 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given RoastLog document pointed by the given QUrl
 def extractProfileRoastLog(url:'QUrl', _:'ApplicationWindow') -> Optional['ProfileData']:
-    res:'ProfileData' = {} # the interpreted data set
+    res:ProfileData = {} # the interpreted data set
     try:
         s = requests.Session()
         s.mount('file://', FileAdapter())

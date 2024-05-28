@@ -269,7 +269,7 @@ class AlarmDlg(ArtisanResizeablDialog):
     def setAlarmSetLabels(self) -> None:
         alarmset_labels = []
         for i in range(self.aw.qmc.ALARMSET_COUNT):
-            alarmset:'Optional[AlarmSet]' = self.aw.qmc.getAlarmSet(i)
+            alarmset:Optional[AlarmSet] = self.aw.qmc.getAlarmSet(i)
             if alarmset is not None:
                 alarmset_labels.append(f"{str(i)} {alarmset['label']}")
         self.transferalarmsetcombobox.clear()

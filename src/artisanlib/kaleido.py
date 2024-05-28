@@ -52,7 +52,7 @@ class KaleidoPort:
         # internals
         self._loop:        Optional[asyncio.AbstractEventLoop] = None # the asyncio loop
         self._thread:      Optional[Thread]                    = None # the thread running the asyncio loop
-        self._write_queue: Optional['asyncio.Queue[str]']      = None # the write queue
+        self._write_queue: Optional[asyncio.Queue[str]]      = None # the write queue
 
         self._default_data_stream:Final[str] = 'A0'
         self._open_timeout:Final[float] = 6      # in seconds
