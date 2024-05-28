@@ -1675,7 +1675,8 @@ class comportDlg(ArtisanResizeablDialog):
             permission_status:Optional[bool] = self.aw.app.getBluetoothPermission(request=True)
             if permission_status is False:
                 message:str = QApplication.translate('Message','Bluetootooth access denied')
-                QMessageBox.warning(self, message, message)
+                QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+                    message, message)
 
 
     @pyqtSlot(int)

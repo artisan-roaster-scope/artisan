@@ -2108,7 +2108,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
                 # confirm the action
                 string = QApplication.translate('Message', 'Overwrite existing ET and BT values?')
-                reply = QMessageBox.warning(self.aw,QApplication.translate('Message', 'Caution - About to overwrite profile data'),string,
+                reply = QMessageBox.warning(None, #self.aw, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+                            QApplication.translate('Message', 'Caution - About to overwrite profile data'),string,
                             QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
                 if reply == QMessageBox.StandardButton.Cancel:
                     return
@@ -2119,7 +2120,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 for j in range(len(self.aw.qmc.extradevices)):
                     if (re.search(etorbt,self.aw.qmc.extramathexpression1[j]) or re.search(etorbt,self.aw.qmc.extramathexpression2[j])):
                         string = QApplication.translate('Message', 'At least one Virtual Extra Device depends on ET or BT.  Do you want to update all the Virtual Extra Devices after ET and BT are updated?')
-                        reply = QMessageBox.warning(self.aw,QApplication.translate('Message', 'Caution - About to overwrite profile data'),string,
+                        reply = QMessageBox.warning(None, #self.aw, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+                                    QApplication.translate('Message', 'Caution - About to overwrite profile data'),string,
                                     QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.No)
                         if reply == QMessageBox.StandardButton.Yes:
                             updatevirtualextradevices = True
@@ -3077,7 +3079,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     permission_status:Optional[bool] = self.aw.app.getBluetoothPermission(request=True)
                     if permission_status is False:
                         msg:str = QApplication.translate('Message','Bluetootooth access denied')
-                        QMessageBox.warning(self, msg, msg)
+                        QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+                            msg, msg)
                 ##########################
                 ####  DEVICE 143 is +IKAWA SET/RPM but +DEVICE cannot be set as main device
                 ##########################

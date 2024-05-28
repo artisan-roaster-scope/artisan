@@ -3388,7 +3388,7 @@ class tgraphcanvas(FigureCanvas):
     def update_additional_artists(self) -> None:
         if self.ax is not None and self.flagstart:
             if self.l_timeline is not None and self.flagstart and ((self.device == 18 and self.aw.simulator is None) or self.showtimeguide): # not NONE device
-                self.l_timeline.set_xdata(self.timeclock.elapsedMilli() if self.aw.sample_loop_running else self.aw.time_stopped)
+                self.l_timeline.set_xdata([self.timeclock.elapsedMilli()] if self.aw.sample_loop_running else [self.aw.time_stopped])
                 self.l_timeline.set_visible(self.flagstart)
                 self.ax.draw_artist(self.l_timeline)
             if self.ETprojectFlag:
@@ -6389,13 +6389,16 @@ class tgraphcanvas(FigureCanvas):
         flag = self.safesaveflag
         self.safesaveflag = False
         if flag and len(self.timex) > 3:
+            string = QApplication.translate('Message','Save profile?')
             if allow_discard:
-                string = QApplication.translate('Message','Save profile?')
                 buttons = QMessageBox.StandardButton.Discard|QMessageBox.StandardButton.Save|QMessageBox.StandardButton.Cancel
             else:
-                string = QApplication.translate('Message','Save profile?')
                 buttons = QMessageBox.StandardButton.Save|QMessageBox.StandardButton.Cancel
-            reply = QMessageBox.warning(self.aw, QApplication.translate('Message','Profile unsaved'), string, buttons)
+#On macOS, if the modality is set to Qt::WindowModal and the message box has a parent, then the message box will be a Qt::Sheet,
+#otherwise the message box will be a standard dialog.
+# setWindowModality(Qt.WindowModality.WindowModal)
+            reply = QMessageBox.warning(None, #self.aw,  # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+                QApplication.translate('Message','Profile unsaved'), string, buttons)
             self.safesaveflag = flag
             if reply == QMessageBox.StandardButton.Save:
                 return bool(self.aw.fileSave(self.aw.curFile))  #if accepted, calls fileClean() and thus turns safesaveflag = False
@@ -11149,6 +11152,7 @@ class tgraphcanvas(FigureCanvas):
             self.ax1 = self.fig.add_subplot(111,projection='polar',facecolor='None') #) radar green facecolor='#d5de9c'
 
             # fixing yticks with matplotlib.ticker "FixedLocator"
+            self.updateFlavorChartData()
             if self.ax1 is not None and self.flavorchart_angles is not None:
                 try:
                     ticks_loc = self.ax1.get_yticks().tolist()
@@ -11202,7 +11206,6 @@ class tgraphcanvas(FigureCanvas):
                     stringlabel = str(int(round(loc*10)))
                     labels.append(stringlabel)
                 self.ax1.set_yticklabels(labels,color=self.palette['xlabel'],fontproperties=fontprop_small)
-                self.updateFlavorChartData()
 
                 #annotate labels
                 self.flavorchart_labels = []
@@ -16981,11 +16984,11 @@ class tgraphcanvas(FigureCanvas):
                         if self.l_horizontalcrossline is None:
                             self.l_horizontalcrossline = self.ax.axhline(y,color = self.palette['text'], linestyle = '-', linewidth= .5, alpha = 1.0,sketch_params=None,path_effects=[])
                         else:
-                            self.l_horizontalcrossline.set_ydata(y)
+                            self.l_horizontalcrossline.set_ydata([y])
                         if self.l_verticalcrossline is None:
                             self.l_verticalcrossline = self.ax.axvline(x,color = self.palette['text'], linestyle = '-', linewidth= .5, alpha = 1.0,sketch_params=None,path_effects=[])
                         else:
-                            self.l_verticalcrossline.set_xdata(x)
+                            self.l_verticalcrossline.set_xdata([x])
                         if self.ax_background:
                             self.fig.canvas.restore_region(self.ax_background) # type: ignore
                             self.ax.draw_artist(self.l_horizontalcrossline)

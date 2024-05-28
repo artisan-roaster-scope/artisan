@@ -1186,7 +1186,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
 #####
 
         self.TabWidget = QTabWidget()
-        self.TabWidget.addTab(self.remaining_splitter, QApplication.translate('Tab', 'To Do'))
+        self.TabWidget.addTab(self.remaining_splitter, QApplication.translate('Tab', 'To-Do'))
         self.TabWidget.addTab(self.completed_splitter, QApplication.translate('Tab', 'Done'))
 
         layout = QVBoxLayout()

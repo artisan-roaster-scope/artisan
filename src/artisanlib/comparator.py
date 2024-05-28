@@ -1919,7 +1919,7 @@ class roastCompareDlg(ArtisanDialog):
                     self.l_align.set_visible(False)
                 return
             if self.l_align is not None:
-                self.l_align.set_xdata(refTime)
+                self.l_align.set_xdata([refTime])
                 if any(p.visible for p in profiles):
                     self.l_align.set_visible(True)
                 else:

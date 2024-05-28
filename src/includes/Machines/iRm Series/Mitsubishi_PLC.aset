@@ -23,7 +23,7 @@ svButtons=false
 svLookahead=3
 svMode=1
 svRamps=240, 180, 120, 120, 60, 60, 60, 60
-svSlider=true
+svSlider=false
 svSliderMax=225
 svSliderMin=50
 svSoaks=0, 0, 0, 0, 0, 0, 0, 0
@@ -40,7 +40,7 @@ xextrabuttonactions=0, 0
 xextrabuttonactionstrings="write(1,11,0);write(1,12,0)", "write(1,11,0);write(1,12,0)"
 
 [Device]
-Controlbuttonflag=true
+Controlbuttonflag=false
 id=29
 
 [ExtraComm]
@@ -80,7 +80,7 @@ extraeventbuttoncolor=#b64c4e, #b6181a, #5ba1d2, #1e83c9, #4bb676, #00aa44
 extraeventbuttontextcolor=#ffffff, #ffffff, black, black, black, black
 extraeventsactions=4, 4, 4, 4, 4, 4
 extraeventsactionstrings="write(1,300,{})", "write(1,300,{})", "write(1,150,{})", "write(1,150,{})", "write(1,140,{})", "write(1,140,{})"
-extraeventsbuttonsflags=1, 1, 1
+extraeventsbuttonsflags=0, 1, 1
 extraeventsdescriptions=, , , , , 
 extraeventslabels=\\t\n-5%, \\t\n+5%, \\t\n-5%, \\t\n+5%, \\t\n-5%, \\t\n+5%
 extraeventstypes=8, 8, 5, 5, 6, 6
@@ -96,7 +96,7 @@ PID_SV_register=500
 PID_d_register=57
 PID_i_register=381
 PID_p_register=1083
-PID_slave_ID=1
+PID_slave_ID=0
 PIDmultiplier=0
 SVmultiplier=0
 baudrate=115200
@@ -189,7 +189,7 @@ quantifiersource=4, 5, 0, 6
 ModeTempSliders=C
 eventsliderBernoulli=0, 0, 0, 0
 eventslidercoarse=0, 0, 0, 0
-eventslidersflags=1, 1, 1
+eventslidersflags=0, 1, 1
 eventslidertemp=0, 0, 0, 0
 eventsliderunits=%, rpm, , %
 slideractions=2, 2, 0, 2

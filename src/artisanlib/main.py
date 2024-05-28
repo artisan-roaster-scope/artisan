@@ -5349,7 +5349,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         permission_status:Optional[bool] = self.app.getBluetoothPermission(request=True)
                         if permission_status is False:
                             message:str = QApplication.translate('Message','Bluetootooth access denied')
-                            QMessageBox.warning(self, message, message)
+                            QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+                                    message, message)
                     if res:
                         if self.qmc.roastersize_setup == 0:
                             batchsize, res2 = QInputDialog.getDouble(self,
@@ -10384,7 +10385,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             reply = mbox.exec()
         else:
             # non-native dialog
-            reply = QMessageBox.warning(self, QApplication.translate('Message','Factory Reset'),string,
+            reply = QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+                            QApplication.translate('Message','Factory Reset'),string,
                             QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Reset, QMessageBox.StandardButton.Cancel)
 
         if reply == QMessageBox.StandardButton.Reset :
@@ -13090,7 +13092,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             # only contain one _ followed by an index number like Name_0.xml
             s = filename.split('_')
             if (len(s) < 2 or len(s) > 2):
-                QMessageBox.warning(self, QApplication.translate('Message', 'Warning'),QApplication.translate('Message', 'The Probat Shop Pilot Software expects files named <Name>_<Index>.xml like in Test_0.xml on import'))
+                QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+                    QApplication.translate('Message', 'Warning'),QApplication.translate('Message', 'The Probat Shop Pilot Software expects files named <Name>_<Index>.xml like in Test_0.xml on import'))
 
             import xml.etree.ElementTree as ET
             tree = ET.Element('recipe')
@@ -21966,7 +21969,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     self.qmc.AUCguideTime = ts + roots[0]*60 # takes the first positive root and calculates the time in seconds until the target AUC is reached
                                 if self.qmc.l_AUCguide is not None:
                                     if self.qmc.AUCguideTime > 0 and self.qmc.AUCguideTime < self.qmc.endofx:
-                                        self.qmc.l_AUCguide.set_xdata(self.qmc.AUCguideTime)
+                                        self.qmc.l_AUCguide.set_xdata([self.qmc.AUCguideTime])
                                         self.qmc.l_AUCguide.set_visible(True)
                                     else:
                                         self.qmc.l_AUCguide.set_visible(False)
@@ -22599,7 +22602,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         self.sendmessage(QApplication.translate('Message','Hottop control turned on'))
                     self.HottopControlActive = True
         else:
-            QMessageBox.warning(self, QApplication.translate('Message', 'Warning'), QApplication.translate('Message',
+            QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+                QApplication.translate('Message', 'Warning'), QApplication.translate('Message',
                 'To control a Hottop you need to activate the super user mode via a right click on the timer LCD first!'))
 
     @pyqtSlot(bool)
@@ -23308,8 +23312,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     def changelocale(self, languagelocale:str) -> None:
         if self.locale_str != languagelocale:
             string = QApplication.translate('Message','Switching the language needs a restart. Restart now?')
-            reply = QMessageBox.warning(self, QApplication.translate('Message','Restart'),string,
-                              QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Yes)
+            reply = QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+                        QApplication.translate('Message','Restart'),string,
+                        QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Yes)
             if reply == QMessageBox.StandardButton.Yes:
                 # switch old flag off
                 self.switchLanguageFlag(self.locale_str, False)
@@ -25004,7 +25009,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             # show warning if the analysis starts earlier than curve fit
             if curvefit_starttime > analysis_starttime:
                 string = QApplication.translate('Message','Warning: The start of the analysis interval of interest is earlier than the start of curve fitting.\nCorrect this on the Config>Curves>Analyze tab.')
-                QMessageBox.warning(self,QApplication.translate('Message','Analysis earlier than Curve fit'),string)
+                QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+                        QApplication.translate('Message','Analysis earlier than Curve fit'),string)
 
             #reset the annotation location if the origin is out of the screen
             for dim in self.qmc.analysisresultsloc:
@@ -25103,7 +25109,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
         if error:
             string = QApplication.translate('Message','Incompatible variables found in %s')%error # pylint: disable=consider-using-f-string
-            QMessageBox.warning(self,QApplication.translate('Message','Assignment problem'),string)
+            QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+                QApplication.translate('Message','Assignment problem'),string)
         else:
             try:
                 equ = EQU[0]

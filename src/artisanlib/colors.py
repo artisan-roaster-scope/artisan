@@ -856,7 +856,7 @@ class graphColorDlg(ArtisanDialog):
             nc = str(res.name())
             if nc == disj_palette[select] or (nc in {'white', '#ffffff'} and disj_palette[select] in {'white', '#ffffff'}) or (nc in {'black', '#000000'} and disj_palette[select] in {'black', '#000000'}):
                 # this QMessageBox is not rendered native on macOS for unknown reason. The same dialog called from a different dialog is rendered nativ.
-                QMessageBox.warning(self.aw,
+                QMessageBox.warning(None, #self.aw, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
                     QApplication.translate('Message', 'Config LCD colors'),
                     QApplication.translate('Message', 'LCD digits color and background color cannot be the same.'),
                     QMessageBox.StandardButton.Ok)

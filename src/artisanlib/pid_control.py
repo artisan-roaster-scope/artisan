@@ -1577,7 +1577,7 @@ class PIDcontrol:
             if self.aw.qmc.timeindex[0] < 0: # before CHARGE, the CHARGE temp of the background profile is returned
                 if self.aw.qmc.timeindexB[0] < 0:
                     # no CHARGE in background, return manual SV
-                    return max(self.svSliderMin,(min(self.svSliderMax,self.svValue)))
+                    return max(float(self.svSliderMin),(min(float(self.svSliderMax),self.svValue)))
                 # if background contains a CHARGE event
                 if followCurveNr == 1: # we observe the BT
                     res = self.aw.qmc.backgroundBTat(self.aw.qmc.timeB[self.aw.qmc.timeindexB[0]]) # approximated background

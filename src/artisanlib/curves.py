@@ -1701,7 +1701,8 @@ class CurvesDlg(ArtisanDialog):
 
             if error:
                 string = QApplication.translate('Message','Incompatible variables found in %s')%error
-                QMessageBox.warning(self,QApplication.translate('Message','Assignment problem'),string)
+                QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+                    QApplication.translate('Message','Assignment problem'),string)
 
             else:
                 extratemp1:List[float] = []
