@@ -15818,10 +15818,10 @@ class tgraphcanvas(FigureCanvas):
                 self.l_div4.set_data([self.timex[self.timeindex[6]],self.timex[self.timeindex[6]]],ylist)
                 self.ax.draw_artist(self.l_div4)
 
-            if self.BTsplinedegree >= len(self.timex):  #max 5 or less. Cannot biger than points
+            if self.BTsplinedegree >= len(self.timex):  #max 5 or less. Cannot be bigger than points
                 self.BTsplinedegree = len(self.timex)-1
 
-            if self.ETsplinedegree >= len(self.timex):  #max 5 or less. Cannot biger than points
+            if self.ETsplinedegree >= len(self.timex):  #max 5 or less. Cannot be bigger than points
                 self.ETsplinedegree = len(self.timex)-1
 
             try:

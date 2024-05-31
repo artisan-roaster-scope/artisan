@@ -2334,11 +2334,11 @@ class PXG4pidDlgControl(PXpidDlgControl):
         button_writeall.clicked.connect(self.writeAll)
 
         #create layouts and place tab1 widgets inside
-        buttonRampSoakLayout1 = QVBoxLayout() #TAB1/COLUNM 1
+        buttonRampSoakLayout1 = QVBoxLayout() #TAB1/COLUMN 1
         buttonRampSoakLayout1.setSpacing(10)
         buttonRampSoakLayout2 = QVBoxLayout() #TAB1/COLUMN 2
         buttonRampSoakLayout2.setSpacing(10)
-        #place rs labels in RampSoakLayout1 #TAB1/COLUNM 1
+        #place rs labels in RampSoakLayout1 #TAB1/COLUMN 1
         buttonRampSoakLayout1.addWidget(labelrs1)
         buttonRampSoakLayout1.addWidget(self.label_rs1)
         buttonRampSoakLayout1.addWidget(self.label_rs2)

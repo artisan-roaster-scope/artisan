@@ -355,4 +355,4 @@ pythonpath = [
 skip = '*.ts,./coverage,./build,./dist*,./htmlcov,./*.spec'
 count = ''
 quiet-level = 3
-ignore-words-list = 'ser,alog,nd,iterm,dout,te,commandi,dout,exitt,currenty,exaust,controle,coment,controle,outweight,everytime,sade'
+ignore-words-list = 'ser,alog,nd,iterm,dout,te,commandi,dout,exitt,currenty,exaust,controle,coment,controle,outweight,everytime,sade,weightIn,weightin'
