@@ -8757,7 +8757,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 elif action == 9: # HOTTOP Main Fan
                     if self.hottop is not None:
                         self.hottop.setHottop(main_fan=int(cmd))
-                elif action == 10: # HOTTOP Command (one of "heater", "fan", "motor", "solenoid", "stirrer"); "drum" accepted as alias for "motor"
+                elif action == 10: # HOTTOP Command (one of "heater", "fan", "motor", "solenoid", "stirrer", "control"); "drum" accepted as alias for "motor"
                     if cmd_str and self.hottop is not None:
                         cmds = filter(None, cmd_str.split(';')) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
@@ -8818,6 +8818,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     if isinstance(cmds,(float,int)):
                                         # cmd has format "sleep(xx.yy)"
                                         libtime.sleep(cmds)
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            elif cs.startswith('control'):
+                                try:
+                                    cmds = eval(cs[len('control'):]) # pylint: disable=eval-used
+                                    if cmds:
+                                        QTimer.singleShot(1, self.HottopControlOn)
+                                    else:
+                                        QTimer.singleShot(1, self.HottopControlOff)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             else:
@@ -22580,7 +22589,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         if self.HottopControlActive:
             self.HottopControlOff()
         else:
-            self.HottopControlOn()
+            self.HottopControlOn(autosuper=False)
 
     def HottopControlOff(self) -> None:
         if self.hottop is not None:
@@ -22591,7 +22600,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.HottopControlActive = False
                 self.buttonCONTROL.setStyleSheet(self.pushbuttonstyles['PID'])
 
-    def HottopControlOn(self) -> None:
+    def HottopControlOn(self, autosuper:bool=True) -> None:
+        # if super holds, the superusermode is autoatically activated (if control is activated via an HOTTOP Command 'control')
+        # on just pressing the CONTROL button the superusermode is not automatically activated and has to be activated manually by the user (for safety reasons)
+        if autosuper:
+            self.superusermode = True
         if self.superusermode: # Hottop control mode can for now activated only in super user mode
             if self.hottop is not None:
                 res = self.hottop.takeHottopControl()
