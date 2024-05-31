@@ -191,6 +191,9 @@ If you need support please check the [documentation](#documentation) or ask the 
 **13) Can the buttons for First Crack, 2nd Crack, etc be programmed to a hot key or function key?**  
 : No. However, there is a keyboard mode. Just press your RETURN key and then select the key to be activated via the left/right cursor keys (note that the next events key is automatically pre-selected) and finally press the SPACE bar to fire the selected key.
   
+<a name="FAQ-Recording-14"></a>
+**14) How to display the development ratio of the background profile?**  
+: To see a background curve's DTR in an LCD while Artisan is ON or recording create a Virtual Device with this equation: `(100 * (b{DROP}-b{FCs}) / (b{DROP}-b{CHARGE}) if b{FCs} !=-1 else 0)`
 
 
 
