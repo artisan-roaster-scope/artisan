@@ -152,6 +152,7 @@ class AmbientWorker(QObject): # pylint: disable=too-few-public-methods # pyright
 
 # NOTE: to have pylint to verify proper __slot__ definitions using pylint one has to remove the super class FigureCanvas here temporarily
 #   as this does not has __slot__ definitions and thus __dict__ is contained which suppresses the warnings
+#class tgraphcanvas():
 class tgraphcanvas(FigureCanvas):
     updategraphicsSignal = pyqtSignal()
     updateLargeLCDsTimeSignal = pyqtSignal(str)
@@ -312,7 +313,7 @@ class tgraphcanvas(FigureCanvas):
         'segmentpickflag', 'segmentdeltathreshold', 'segmentsamplesthreshold', 'stats_summary_rect', 'title_text', 'title_artist', 'title_width',
         'background_title_width', 'xlabel_text', 'xlabel_artist', 'xlabel_width', 'lazyredraw_on_resize_timer', 'mathdictionary_base',
         'ambient_pressure_sampled', 'ambient_humidity_sampled', 'ambientTemp_sampled', 'backgroundmovespeed', 'chargeTimerPeriod', 'flavors_default_value',
-        'fmt_data_ON', 'l_subtitle', 'projectDeltaFlag', 'btbreak_params']
+        'fmt_data_ON', 'l_subtitle', 'projectDeltaFlag', 'btbreak_params', 'glow']
 
 
     def __init__(self, parent:QWidget, dpi:int, locale:str, aw:'ApplicationWindow') -> None:
@@ -16078,7 +16079,7 @@ class tgraphcanvas(FigureCanvas):
                                 orange_hit = True
                                 if not self._designer_orange_mark_shown and self._designer_orange_mark is not None:
                                     self._designer_orange_mark_shown = True
-                                    self._designer_orange_mark.set_data(self.timex[i],self.temp2[i])
+                                    self._designer_orange_mark.set_data([self.timex[i]],[self.temp2[i]])
                                     self.ax.draw_artist(self._designer_orange_mark)
                                     afig = self.ax.get_figure()
                                     if afig is not None:
@@ -16088,7 +16089,7 @@ class tgraphcanvas(FigureCanvas):
                                 orange_hit = True
                                 if not self._designer_orange_mark_shown and self._designer_orange_mark is not None:
                                     self._designer_orange_mark_shown = True
-                                    self._designer_orange_mark.set_data(self.timex[i],self.temp1[i])
+                                    self._designer_orange_mark.set_data([self.timex[i]],[self.temp1[i]])
                                     self.ax.draw_artist(self._designer_orange_mark)
                                     afig = self.ax.get_figure()
                                     if afig is not None:
@@ -16125,7 +16126,7 @@ class tgraphcanvas(FigureCanvas):
                             blue_hit = True
                             if not self._designer_blue_mark_shown and self._designer_blue_mark is not None:
                                 self._designer_blue_mark_shown = True
-                                self._designer_blue_mark.set_data(self.timex[i],self.temp2[i])
+                                self._designer_blue_mark.set_data([self.timex[i]],[self.temp2[i]])
                                 self.ax.draw_artist(self._designer_blue_mark)
 
                                 if axfig is not None:
@@ -16135,7 +16136,7 @@ class tgraphcanvas(FigureCanvas):
                             blue_hit = True
                             if not self._designer_blue_mark_shown and self._designer_blue_mark is not None:
                                 self._designer_blue_mark_shown = True
-                                self._designer_blue_mark.set_data(self.timex[i],self.temp1[i])
+                                self._designer_blue_mark.set_data([self.timex[i]],[self.temp1[i]])
                                 self.ax.draw_artist(self._designer_blue_mark)
                                 if axfig is not None:
                                     self.fig.canvas.blit(axfig.bbox)
