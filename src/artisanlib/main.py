@@ -12626,6 +12626,22 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         else:
             QTimer.singleShot(500,lambda : self.sendmessage(f'file not found: {filename}'))
 
+    def compute_auc_background(self) -> float:
+        try:
+            if self.qmc.TP_time_B_loaded is not None:
+                if self.qmc.timeindexB[0]>0:
+                    # CHARGE set
+                    shift = self.qmc.timeB[self.qmc.timeindexB[0]]
+                else:
+                    shift = 0
+                TP_index = self.qmc.backgroundtime2index(self.qmc.TP_time_B_loaded + shift)
+            else:
+                TP_index = None
+            _,_,auc,_ = self.ts(tp=TP_index,background=True)
+        except Exception: # pylint: disable=broad-except
+            _,_,auc,_ = self.ts(tp=None,background=True)
+        return auc
+
     # Loads background profile
     # NOTE: this does NOT set the self.qmc.background flag to make the loaded background visible.
     def loadbackground(self, filename:str) -> None:
@@ -12807,25 +12823,17 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.qmc.background_profile_sampling_interval = profile['samplinginterval']
                 except Exception: # pylint: disable=broad-except
                     pass # might not exist in older profiles
+
+                if 'computed' in profile and 'TP_time' in profile['computed']:
+                    self.qmc.TP_time_B_loaded = profile['computed']['TP_time']
+                else:
+                    self.qmc.TP_time_B_loaded = None
+
                 try:
-                    try:
-                        self.qmc.TP_time_B_loaded = None
-                        self.qmc.TP_time_B_loaded = profile['computed']['TP_time']
-                        if self.qmc.TP_time_B_loaded is not None:
-                            if self.qmc.timeindexB[0]>0:
-                                # CHARGE set
-                                shift = self.qmc.timeB[self.qmc.timeindexB[0]]
-                            else:
-                                shift = 0
-                            TP_index = self.qmc.backgroundtime2index(self.qmc.TP_time_B_loaded + shift)
-                        else:
-                            TP_index = None
-                        _,_,auc,_ = self.ts(tp=TP_index,background=True)
-                    except Exception: # pylint: disable=broad-except
-                        _,_,auc,_ = self.ts(tp=None,background=True)
-                    self.qmc.AUCbackground = auc
+                    self.qmc.AUCbackground = self.compute_auc_background()
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
+                    self.qmc.AUCbackground = -1
 
                 if not self.curFile and len(self.qmc.timex) < 10: # if no foreground is loaded, autoadjustAxis
                     self.autoAdjustAxis(True)
