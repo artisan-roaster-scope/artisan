@@ -54,8 +54,7 @@ During a roast it is now possible to have Artisan draw a line at the current poi
 
 To see the values of the TP, DE, FCs etc, check the box for Annotations.  **You can now drag these Annotations if they are covering something else you want to see to move them on the graph.** 
 
-For Events that you have defined, you will see to the right of Events a dropdown box called Markers with the following options:
-
+For Events that you have defined, you will see to the right of the Events a dropdown box called Markers (see image above) with the following options:
 
 Flag will render an event either on your ET line or your BT line (check the box “show on BT”) and your event value or description if you check the box for Descr. (number represents how many letters).  If you are using values, the first letter of your event name and the event value will be rendered.  
 
