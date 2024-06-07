@@ -75,9 +75,7 @@ If you want your alarms to talk to you, an Artisan blog posts explains [talking 
 
 ### Help Dialog
 
-Help dialog box for Alarms:
-
-![alarm help dialog](/assets/images/gsg/alarm help dialog.png)
+The Help dialog box for Alarms shows the types of Alarms, the Configuration Options, and the Actions that can be taken.  Review this in detail before planning your alarms.  
 
 Some things to remember
 
