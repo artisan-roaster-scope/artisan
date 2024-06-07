@@ -70,7 +70,7 @@ Assume you have a temperature probe in the air stream of the bean cooler.  Setti
 ### Talking Alarms
 
 
-If you want your alarms to talk to you, an Artisan blog posts explains [talking alarms](https://artisan-roasterscope.blogspot.com/2017/12/talking-alarms.html).  They are quite easy on a Mac as the software is built in and further explanation is [here](https://artisan-roasterscope.blogspot.com/2015/07/speaking-alarms-for-os-x.html).  Talking alarms have become one of my favorite features for making the roasting process semi-automatic.  
+If you want your alarms to talk to you, an Artisan blog posts explains [talking alarms](https://artisan-roasterscope.blogspot.com/2017/12/talking-alarms.html).  They are quite easy on a Mac as the software is built in and further explanation is [here](https://artisan-roasterscope.blogspot.com/2015/07/speaking-alarms-for-os-x.html).  Talking alarms have become one of my favorite features for making the roasting process semi-automatic.  The SAY command is not in the Help file action list but now you know what it is.  
 
 
 ### Help Dialog
