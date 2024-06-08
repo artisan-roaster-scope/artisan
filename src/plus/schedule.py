@@ -113,6 +113,7 @@ shadow_color: Final[str] = very_dark_grey
 
 
 class CompletedItemDict(TypedDict):
+    scheduleID:str   # the ID of the ScheduleItem this completed item belongs to
     roastUUID:str
     roastdate: float # as epoch
     roastbatchnr: int
@@ -122,7 +123,7 @@ class CompletedItemDict(TypedDict):
     title:str
     coffee_label: Optional[str]
     blend_label: Optional[str]
-    store_label: str
+    store_label: Optional[str]
     batchsize: float # in kg
     weight: float    # in kg (resulting weight)
     color: int
@@ -173,15 +174,16 @@ class ScheduledItem(BaseModel):
 
 class CompletedItem(BaseModel):
     count: PositiveInt       # total count >0 of corresponding ScheduleItem
+    scheduleID: str
     sequence_id: PositiveInt # sequence id of this roast (sequence_id <= count)
-    roastUUID:UUID4
+    roastUUID: UUID4
     roastdate: datetime.datetime
     roastbatchnr: int
     roastbatchprefix: str
     title: str
     coffee_label: Optional[str] = Field(default=None)
     blend_label: Optional[str] = Field(default=None)
-    store_label: str
+    store_label: Optional[str] = Field(default=None)
     batchsize: float # in kg
     weight: float    # in kg (resulting weight)
     color: int
@@ -199,10 +201,13 @@ class CompletedItem(BaseModel):
 
     @model_validator(mode='after') # pyright:ignore[reportArgumentType]
     def coffee_or_blend(self) -> 'CompletedItem':
-        if self.coffee_label is None and self.blend_label is None:
-            raise ValueError('Either coffee_label or blend_label must be specified')
-        if self.coffee_label is not None and self.blend_label is not None:
-            raise ValueError('Either coffee_label or blend_label must be specified, but not both')
+# as CompletedItems are generated for ScheduledItems where store and one of blend/coffee needs to be set
+# the store_label and one of the blend_label/coffee_label should never be empty, but in case they are we
+# handle this without further ado
+#        if self.coffee_label is None and self.blend_label is None:
+#            raise ValueError('Either coffee_label or blend_label must be specified')
+#        if self.coffee_label is not None and self.blend_label is not None:
+#            raise ValueError('Either coffee_label or blend_label must be specified, but not both')
         if len(self.title) == 0:
             raise ValueError('Title cannot be empty')
         if self.sequence_id > self.count:
@@ -568,9 +573,9 @@ class NoDragItem(StandardItem):
         wrapper =  textwrap.TextWrapper(width=tooltip_line_length, max_lines=tooltip_max_lines, placeholder=tooltip_placeholder)
         title = '<br>'.join(wrapper.wrap(html.escape(self.data.title)))
         title_line = f"<p style='white-space:pre'><font color=\"{plus_blue}\"><b><big>{title}</big></b></font></p>"
-        blend_label = (html.escape(self.data.blend_label) if self.data.blend_label is not None else '')
-        beans_description = f'{render_weight(self.data.batchsize, 1, self.weight_unit_idx)} {(html.escape(self.data.coffee_label) if self.data.coffee_label is not None else blend_label)}'
-        store_line = f'[{html.escape(self.data.store_label)}]'
+        coffee_blend_label = (f' {html.escape(self.data.coffee_label)}' if self.data.coffee_label is not None else (f' {html.escape(self.data.blend_label)}' if self.data.blend_label is not None else ''))
+        beans_description = f'{render_weight(self.data.batchsize, 1, self.weight_unit_idx)}{coffee_blend_label}'
+        store_line = (f'[{html.escape(self.data.store_label)}]' if self.data.store_label is not None else '')
         detailed_description = f"{head_line}{title_line}<p style='white-space:pre'>{beans_description}</b><br>{store_line}"
         self.setToolTip(detailed_description)
 
@@ -1221,6 +1226,11 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
 
         _log.info('Scheduler started')
 
+# WEIGHT:
+#        from plus.weight import DialogDisplay, WeightManager
+#        dd:DialogDisplay = DialogDisplay()
+#        wm:WeightManager = WeightManager([dd])
+
 
     @pyqtSlot(list)
     def update_order(self, l:List[ScheduledItem]) -> None:
@@ -1339,13 +1349,15 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         _log.info('Scheduler stopped')
 
 
-    # takes the current schedule and updates its items by joining its roast with those received as part of a stock update from the server
+    # updates the current schedule items by joining its roast with those received as part of a stock update from the server
     # adding new items at the end
-    def getScheduledItems(self, current_schedule:List[ScheduledItem]) -> List[ScheduledItem]:
+    def updateScheduledItems(self) -> None:
+        current_schedule:List[ScheduledItem] = self.scheduled_items[:]
         plus.stock.init()
         schedule:List[plus.stock.ScheduledItem] = plus.stock.getSchedule()
+        _log.debug('schedule: %s',schedule)
+        # sort current schedule by order cache (if any)
         if self.aw.scheduled_items_uuids != []:
-            # sort current schedule by order cache
             new_schedule:List[plus.stock.ScheduledItem] = []
             for uuid in self.aw.scheduled_items_uuids:
                 item = next((s for s in schedule if '_id' in s and s['_id'] == uuid), None)
@@ -1353,8 +1365,10 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
                     new_schedule.append(item)
             # append all schedule items with uuid not in the order cache
             schedule = new_schedule + [s for s in schedule if '_id' in s and s['_id'] not in self.aw.scheduled_items_uuids]
-            # rest sort cache to prevent resorting
+            # reset order cache to prevent resorting until next restart as this cached sort order is only used on startup to
+            # initially reconstruct the previous order w.r.t. the server ordered schedule loaded from the stock received
             self.aw.scheduled_items_uuids = []
+        # iterate over new schedule
         for s in schedule:
             try:
                 schedule_item:ScheduledItem = ScheduledItem.model_validate(s)
@@ -1364,12 +1378,20 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
                     if len(existing_item.roasts) >= existing_item.count:
                         # remove existing_item from schedule if completed (#roasts >= count)
                         current_schedule.remove(existing_item)
-                elif len(schedule_item.roasts) < schedule_item.count:
-                    # append non-completed new schedule item to schedule
+                elif (len(schedule_item.roasts) < schedule_item.count and
+                        (sum(1 for ci in self.completed_items if ci.scheduleID == schedule_item.id) < schedule_item.count)):
+                    # only if not yet enough roasts got registered in the local schedule_item.roasts
+                    # and there are not enough completed roasts registered locally belonging to this schedule_item by schedule_item.id
+                    # we append non-completed new schedule item to schedule
+                    # NOTE: this second condition is needed it might happen that the server did not receive (yet) all completed roasts
+                    #  for a ScheduleItem which was locally already removed as completed to prevent re-adding that same ScheduleItem
+                    #  on re-receiving the current schedule from the server as still received from the server,
+                    #  we check if locally we already have registered enough completed roasts in self.completed_items for this ScheduleItem
                     current_schedule.append(schedule_item)
             except Exception as e:  # pylint: disable=broad-except
                 _log.error(e)
-        return current_schedule
+        # update the list of schedule items to be displayed
+        self.scheduled_items = current_schedule
 
 
     @staticmethod
@@ -1397,6 +1419,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
 
     # sets the items values as properties of the current roast and links it back to this item
     def set_roast_properties(self, item:ScheduledItem) -> None:
+        _log.info('PRINT set_roast_properties')
         self.aw.qmc.scheduleID = item.id
         self.aw.qmc.title = item.title
         if not self.aw.qmc.flagstart or self.aw.qmc.title_show_always:
@@ -1748,6 +1771,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
             batchsize = convertWeight(self.aw.qmc.weight[0], weight_unit_idx, 1) # batchsize converted to kg
             weight = convertWeight(self.aw.qmc.weight[1], weight_unit_idx, 1)    # resulting weight converted to kg
             completed_item:CompletedItemDict = {
+                'scheduleID': self.selected_remaining_item.data.id,
                 'count': self.selected_remaining_item.data.count,
                 'sequence_id': len(self.selected_remaining_item.data.roasts),
                 'roastUUID': self.aw.qmc.roastUUID,
@@ -1757,7 +1781,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
                 'roastbatchprefix': self.aw.qmc.roastbatchprefix,
                 'coffee_label': self.aw.qmc.plus_coffee_label,
                 'blend_label': self.aw.qmc.plus_blend_label,
-                'store_label': (self.aw.qmc.plus_store_label if self.aw.qmc.plus_store_label is not None else ''),
+                'store_label': self.aw.qmc.plus_store_label,
                 'batchsize': batchsize,
                 'weight': weight,
                 'color': self.aw.qmc.ground_color,
@@ -1773,15 +1797,16 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
 
     # called from main:updateSchedule() on opening the scheduler dialog, on schedule filter changes, on app raise,
     # on stock updates (eg. after successful login) and on plus disconnect
+    # Note that on app raise (depending on the interval) also a stock update is triggered fetching the latest schedule from the server along
     @pyqtSlot()
     def updateScheduleWindow(self) -> None:
         # load completed roasts cache
         load_completed()
         # update scheduled and completed items
-        self.scheduled_items = self.getScheduledItems(self.scheduled_items)
-        self.completed_items = self.getCompletedItems()
-        self.updateFilters()
-        self.updateRemainingItems()
-        self.updateRoastedItems()
+        self.updateScheduledItems()                     # updates the current schedule items from received stock data
+        self.completed_items = self.getCompletedItems() # updates completed items from cache
+        self.updateFilters()                            # update filter widget (user and machine)
+        self.updateRemainingItems()                     # redraw To-Do's widget
+        self.updateRoastedItems()                       # redraw Completed widget
         # the weight unit might have changed, we update its label
         self.roasted_weight_suffix = QLabel(self.aw.qmc.weight[2].lower())

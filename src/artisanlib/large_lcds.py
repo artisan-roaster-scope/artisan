@@ -845,12 +845,12 @@ class LargeScaleLCDs(LargeLCDs):
 
     def weightLabel(self, unit:Optional[str] = None) -> str:
         if unit is None:
-            unit = self.aw.qmc.weight[2]
+            unit = self.aw.qmc.weight[2].lower()
         return f"<b>{QApplication.translate('Label', 'Weight')} ({unit})</b> "
 
     def totalLabel(self, unit:Optional[str] = None) -> str:
         if unit is None:
-            unit = self.aw.qmc.weight[2]
+            unit = self.aw.qmc.weight[2].lower()
         return f"<b>{QApplication.translate('Label', 'Total')} ({unit})</b> "
 
     def updateWeightUnitWeight(self, unit:Optional[str] = None) -> None:

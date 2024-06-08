@@ -14,6 +14,8 @@ v2.10.6 (XX, 2024)
   - adds [Bühler RM20](https://www.buhlergroup.com/global/de/products/roastmaster_coffeeroaster.html) Simatic Legacy setup supporting older firmware versions not returning the machine state
   - adds support for the [Phidget RCC0004 server motor controller](https://phidgets.com/?prodid=1147) ([Discussion #1546](../../../discussions/1546))
   - adds Hottop Command `control` to activate and deactivate the control function of the machine via event buttons and alarms
+  - adds `{WEIGHTin}` placeholder substitude by the current batch size (g) in command actions
+  - adds "Load p-i-d from background" setting to configure the PID to the settings stored in background profile
 
 * CHANGES
   - only reset roasting notes on reset if profile is loaded ([Issue #1521](../../../issues/1521))

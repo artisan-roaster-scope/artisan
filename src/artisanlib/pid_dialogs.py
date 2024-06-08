@@ -480,10 +480,16 @@ class PID_DlgControl(ArtisanDialog):
         if pid_controller != 0:
             self.createEvents.setEnabled(False)
 
+        self.loadPIDfromBackground = QCheckBox(QApplication.translate('CheckBox', 'Load p-i-d from background'))
+        self.loadPIDfromBackground.setToolTip(QApplication.translate('Tooltip', 'Load kp, ki, kd, PID Input, P on Error/Input and Lookahead settings from background profile'))
+        self.loadPIDfromBackground.setChecked(self.aw.pidcontrol.loadpidfrombackground)
+
         flagsLayout = QHBoxLayout()
         flagsLayout.addWidget(self.startPIDonCHARGE)
         flagsLayout.addSpacing(10)
         flagsLayout.addWidget(self.createEvents)
+        flagsLayout.addSpacing(10)
+        flagsLayout.addWidget(self.loadPIDfromBackground)
         flagsLayout.addStretch()
 
         tab1Layout.addLayout(pidBox)
@@ -1174,6 +1180,7 @@ class PID_DlgControl(ArtisanDialog):
         self.aw.pidcontrol.setPID(kp,ki,kd,source,cycle,pOnE)
         #
         self.aw.pidcontrol.pidOnCHARGE = self.startPIDonCHARGE.isChecked()
+        self.aw.pidcontrol.loadpidfrombackground = self.loadPIDfromBackground.isChecked()
         self.aw.pidcontrol.createEvents = self.createEvents.isChecked()
         self.aw.pidcontrol.loadRampSoakFromProfile = self.loadRampSoakFromProfile.isChecked()
         self.aw.pidcontrol.loadRampSoakFromBackground = self.loadRampSoakFromBackground.isChecked()

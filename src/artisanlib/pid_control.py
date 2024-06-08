@@ -1134,7 +1134,7 @@ class FujiPID:
 ###################################################################################
 
 class PIDcontrol:
-    __slots__ = [ 'aw', 'pidActive', 'sv', 'pidOnCHARGE', 'createEvents', 'loadRampSoakFromProfile', 'loadRampSoakFromBackground', 'svLen', 'svLabel',
+    __slots__ = [ 'aw', 'pidActive', 'sv', 'pidOnCHARGE', 'loadpidfrombackground', 'createEvents', 'loadRampSoakFromProfile', 'loadRampSoakFromBackground', 'svLen', 'svLabel',
             'svValues', 'svRamps', 'svSoaks', 'svActions', 'svBeeps', 'svDescriptions','svTriggeredAlarms', 'RSLen', 'RS_svLabels', 'RS_svValues', 'RS_svRamps', 'RS_svSoaks',
             'RS_svActions', 'RS_svBeeps', 'RS_svDescriptions', 'svSlider', 'svButtons', 'svMode', 'svLookahead', 'dutySteps', 'svSliderMin', 'svSliderMax', 'svValue',
             'dutyMin', 'dutyMax', 'pidKp', 'pidKi', 'pidKd', 'pOnE', 'pidSource', 'pidCycle', 'pidPositiveTarget', 'pidNegativeTarget', 'invertControl',
@@ -1148,6 +1148,7 @@ class PIDcontrol:
         self.sv:Optional[float] = None # the last sv send to the Arduino
         #
         self.pidOnCHARGE:bool = False
+        self.loadpidfrombackground = False # if True, p-i-d parameters pidKp, pidKi, pidKd, pidSource, pOnE and svLookahead are set from the background profile
         self.createEvents:bool = False
         self.loadRampSoakFromProfile:bool = False
         self.loadRampSoakFromBackground:bool = False

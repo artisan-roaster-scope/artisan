@@ -263,6 +263,12 @@ class ProfileData(TypedDict, total=False):
     svActions: List[int]
     svBeeps: List[bool]
     svDescriptions: List[str]
+    pidKp: float
+    pidKi: float
+    pidKd: float
+    pidSource: int
+    pOnE: bool
+    svLookahead: int
     devices: List[str]
     elevation: int
     computed: ComputedProfileInformation

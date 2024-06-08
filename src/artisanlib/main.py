@@ -329,7 +329,12 @@ class Artisan(QtSingleApplication):
                         if libtime.time() - self.sentToBackground > self.plus_sync_cache_expiration:
                             if  aw.plus_account is not None and aw.qmc.roastUUID is not None and aw.curFile is not None:
                                 plus.sync.getUpdate(aw.qmc.roastUUID,aw.curFile)
-                            QTimer.singleShot(100, aw.updateScheduleSignal.emit)
+
+                            #QTimer.singleShot(100, aw.updateScheduleSignal.emit) # only redraw scheduler window
+                            if aw.schedule_window is not None and plus.controller.is_connected():
+                                # only if scheduler is active and plus connected we update the stock on app raise which triggers a scheduler redraw implicitly
+                                plus.stock.update()
+
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
                     self.sentToBackground = None
@@ -723,8 +728,6 @@ import plus.register
 import plus.notifications
 import plus.blend
 import plus.stock
-
-#SCHEDULER:
 import plus.schedule
 
 
@@ -1552,9 +1555,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.segmentresultsanno:Optional[Annotation] = None
 
         # Schedule
-#SCHEDULER:
         self.schedule_window:Optional[plus.schedule.ScheduleWindow] = None
-        self.scheduled_items_uuids:List[str] = [] # the uuids of the scheduled items in local custom order on last closing the scheduler
+        # the uuids of the scheduled items in local custom order on last closing the scheduler
+        # persistet along the app settings
+        self.scheduled_items_uuids:List[str] = []
 
         self.scheduleFlag:bool = False
         self.schedule_day_filter:bool = True
@@ -2534,13 +2538,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.slidersAction.setChecked(False)
             self.viewMenu.addAction(self.slidersAction)
 
-#SCHEDULER:
             self.scheduleAction: QAction = QAction(QApplication.translate('Menu', 'Schedule'), self)
             self.scheduleAction.triggered.connect(self.schedule)
             self.scheduleAction.setCheckable(True)
             self.scheduleAction.setChecked(False)
-#            self.viewMenu.addSeparator()
-#            self.viewMenu.addAction(self.scheduleAction)
+#SCHEDULER:
+            self.viewMenu.addSeparator()
+            self.viewMenu.addAction(self.scheduleAction)
 
             self.viewMenu.addSeparator()
 
@@ -4186,7 +4190,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     @pyqtSlot()
     def updateSchedule(self) -> None:
-#SCHEDULER:
         if self.schedule_window is not None:
             self.schedule_window.updateScheduleWindow()
 
@@ -8043,6 +8046,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     timex = 0.
                     BTB_subst = -1.
                     ETB_subst = -1.
+                    WEIGHTin_subst = int(round(convertWeight(self.qmc.weight[0], weight_units.index(self.qmc.weight[2]),0))) # weight in in g
                     if (self.qmc.flagstart and len(self.qmc.timex) > 0 or (self.qmc.flagon and len(self.qmc.on_timex) > 0)):
                         try:
                             if self.qmc.flagstart and len(self.qmc.timex)>0:
@@ -8074,8 +8078,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             cmd_str = cmd_str.replace('{t}',str(timex))
                             cmd_str = cmd_str.replace('{BTB}',str(BTB_subst))
                             cmd_str = cmd_str.replace('{ETB}',str(ETB_subst))
+                            cmd_str = cmd_str.replace('{WEIGHTin}',str(WEIGHTin_subst))
                         else:
-                            cmd_str = cmd_str.format(BT=BT_subst,ET=ET_subst,t=timex,BTB=BTB_subst,ETB=ETB_subst)
+                            cmd_str = cmd_str.format(BT=BT_subst,ET=ET_subst,t=timex,BTB=BTB_subst,ETB=ETB_subst,WEIGHTin=WEIGHTin_subst)
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
 
@@ -10369,7 +10374,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             # just issue the eventaction (no cmd substitution here)
             # split on an octothorpe '#' that is not inside parentheses '()'
             cmd = re.split(r'\#(?![^\(]*\))',self.extraeventsactionstrings[ee])[0].strip()
-            cmd = cmd.format(*(tuple([cmdvalue]*cmd.count('{}'))))
+            if '{}' in cmd:
+                cmd = cmd.format(*(tuple([cmdvalue]*cmd.count('{}'))))
             if cmdvalue == 0 and eventtype == 4:
                 # no event type and cmdvalue is 0 => cmd actions should await response and bind result to _
                 self.eventaction(self.extraeventsactions[ee],cmd,parallel=parallel,eventtype=-1)
@@ -12421,6 +12427,23 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.alarmstrings = ['']*len(self.qmc.alarmflag)
         self.qmc.alarmstate = [-1]*len(self.qmc.alarmflag)  #-1 = not triggered; otherwise idx = triggered
 
+    def loadPIDFromProfile(self, profile:'ProfileData') -> None:
+        try:
+            if 'pidKp' in profile:
+                self.pidcontrol.pidKp = float(profile['pidKp'])
+            if 'pidKi' in profile:
+                self.pidcontrol.pidKi = float(profile['pidKi'])
+            if 'pidKd' in profile:
+                self.pidcontrol.pidKd = float(profile['pidKd'])
+            if 'pidSource' in profile:
+                self.pidcontrol.pidSource = int(profile['pidSource'])
+            if 'pOnE' in profile:
+                self.pidcontrol.pOnE = bool(profile['pOnE'])
+            if 'svLookahead' in profile:
+                self.pidcontrol.svLookahead = int(profile['svLookahead'])
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+
     def loadRampSoakFromProfile(self, filename:str, profile:'ProfileData') -> None:
         self.qmc.rsfile = filename
         if 'svLabel' in profile:
@@ -12779,6 +12802,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 # Ramp/Soak Profiles
                 if self.pidcontrol.loadRampSoakFromBackground:
                     self.loadRampSoakFromProfile(filename,self.qmc.backgroundprofile)
+
+                # PID settings
+                if self.pidcontrol.loadpidfrombackground:
+                    self.loadPIDFromProfile(self.qmc.backgroundprofile)
+
 
                 #if old format < 0.5.0 version  (identified by numbers less than 1.). convert
                 if self.qmc.backgroundFlavors[0] < 1. and self.qmc.backgroundFlavors[-1] < 1.:
@@ -15599,6 +15627,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             profile['svActions'] = self.pidcontrol.svActions
             profile['svBeeps'] = self.pidcontrol.svBeeps
             profile['svDescriptions'] = self.pidcontrol.svDescriptions
+            profile['pidKp'] = self.pidcontrol.pidKp
+            profile['pidKi'] = self.pidcontrol.pidKi
+            profile['pidKd'] = self.pidcontrol.pidKd
+            profile['pidSource'] = self.pidcontrol.pidSource
+            profile['pOnE'] = self.pidcontrol.pOnE
+            profile['svLookahead'] = self.pidcontrol.svLookahead
             try:
                 ds = list(self.qmc.extradevices)
                 ds.insert(0,self.qmc.device)
@@ -16848,6 +16882,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             #restore TC4/Arduino PID settings
             settings.beginGroup('ArduinoPID')
             self.pidcontrol.pidOnCHARGE = bool(toBool(settings.value('pidOnCHARGE',self.pidcontrol.pidOnCHARGE)))
+            self.pidcontrol.loadpidfrombackground = bool(toBool(settings.value('loadpidfrombackground',self.pidcontrol.loadpidfrombackground)))
             self.pidcontrol.createEvents = bool(toBool(settings.value('createEvents',self.pidcontrol.createEvents)))
             self.pidcontrol.loadRampSoakFromProfile = bool(toBool(settings.value('loadRampSoakFromProfile',self.pidcontrol.loadRampSoakFromProfile)))
             self.pidcontrol.svValues = [toInt(x) for x in toList(settings.value('svValues',self.pidcontrol.svValues))]
@@ -17468,7 +17503,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.schedule_user_filter = toBool(settings.value('ScheduleUserFilter',self.schedule_user_filter))
             self.schedule_machine_filter = toBool(settings.value('ScheduleMachineFilter',self.schedule_machine_filter))
 
-#SCHEDULER:
             self.scheduled_items_uuids = list(toStringList(settings.value('scheduled_items',self.scheduled_items_uuids)))
             self.scheduleFlag = toBool(settings.value('Schedule',self.scheduleFlag))
             if self.scheduleFlag:
@@ -18494,6 +18528,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             #save pid settings (only key and value[0])
             settings.beginGroup('ArduinoPID')
             self.settingsSetValue(settings, default_settings, 'pidOnCHARGE',self.pidcontrol.pidOnCHARGE, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'loadpidfrombackground',self.pidcontrol.loadpidfrombackground, read_defaults)
             self.settingsSetValue(settings, default_settings, 'createEvents',self.pidcontrol.createEvents, read_defaults)
             self.settingsSetValue(settings, default_settings, 'loadRampSoakFromProfile',self.pidcontrol.loadRampSoakFromProfile, read_defaults)
             self.settingsSetValue(settings, default_settings, 'loadRampSoakFromBackground',self.pidcontrol.loadRampSoakFromBackground, read_defaults)
@@ -19181,7 +19216,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.stopWebLCDs()
             self.WebLCDs = True # to ensure they are started again on restart
 
-#SCHEDULER:
         if self.scheduleFlag and self.schedule_window:
             tmp_Schedule = self.scheduleFlag # we keep the state to properly store it in the settings
             self.schedule_window.close()
@@ -23004,7 +23038,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' loadSettings_theme() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
 
-#SCHEDULER:
     @pyqtSlot()
     @pyqtSlot(bool)
     def schedule(self, _:bool = False) -> None:
