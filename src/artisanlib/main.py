@@ -314,10 +314,11 @@ class Artisan(QtSingleApplication):
             if aw is not None and self.darkmode != bool(colorScheme == Qt.ColorScheme.Dark):
                 self.darkmode = bool(colorScheme == Qt.ColorScheme.Dark)
                 aw.updateCanvasColors()
+                QTimer.singleShot(100, aw.updateScheduleSignal.emit) # only redraw scheduler window # to adjust its colors
     except Exception: # pylint: disable=broad-except
         pass
 
-# NOTE: draback of this is that it might not work on some window managers
+# NOTE: drawback of this is that it might not work on some window managers
     def stateChanged(self, state:Qt.ApplicationState) -> None:
         try:
             aw:Optional[ApplicationWindow] = self.activationWindow()

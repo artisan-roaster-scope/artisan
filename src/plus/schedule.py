@@ -551,12 +551,13 @@ class StandardItem(QFrame): # pyright: ignore[reportGeneralTypeIssues] # Argumen
 
 
 class NoDragItem(StandardItem):
-    def __init__(self, data:CompletedItem, locale_str:str, now:datetime.datetime, weight_unit_idx:int) -> None:
+    def __init__(self, data:CompletedItem, aw:'ApplicationWindow', now:datetime.datetime) -> None:
         # Store data separately from display label, but use label for default.
+        self.aw = aw
         self.data:CompletedItem = data
-        self.locale_str = locale_str
+        self.locale_str = self.aw.locale_str
         self.now = now
-        self.weight_unit_idx = weight_unit_idx
+        self.weight_unit_idx = weight_units.index(self.aw.qmc.weight[2])
         super().__init__()
         layout:Optional[QLayout] = self.layout()
         if layout is not None:
@@ -572,14 +573,16 @@ class NoDragItem(StandardItem):
         head_line =  ('' if self.data.count == 1 else f'{self.data.sequence_id}/{self.data.count}')
         wrapper =  textwrap.TextWrapper(width=tooltip_line_length, max_lines=tooltip_max_lines, placeholder=tooltip_placeholder)
         title = '<br>'.join(wrapper.wrap(html.escape(self.data.title)))
-        title_line = f"<p style='white-space:pre'><font color=\"{plus_blue}\"><b><big>{title}</big></b></font></p>"
+        accent_color = (white if self.aw.app.darkmode else plus_blue)
+        title_line = f"<p style='white-space:pre'><font color=\"{accent_color}\"><b><big>{title}</big></b></font></p>"
         coffee_blend_label = (f' {html.escape(self.data.coffee_label)}' if self.data.coffee_label is not None else (f' {html.escape(self.data.blend_label)}' if self.data.blend_label is not None else ''))
         beans_description = f'{render_weight(self.data.batchsize, 1, self.weight_unit_idx)}{coffee_blend_label}'
-        store_line = (f'[{html.escape(self.data.store_label)}]' if self.data.store_label is not None else '')
-        detailed_description = f"{head_line}{title_line}<p style='white-space:pre'>{beans_description}</b><br>{store_line}"
+        store_line = (f'</b><br>{html.escape(self.data.store_label)}]' if (self.data.store_label is not None and self.data.store_label != '') else '')
+        detailed_description = f"{head_line}{title_line}<p style='white-space:pre'>{beans_description}{store_line}"
         self.setToolTip(detailed_description)
 
         self.setStyleSheet(
+            'QToolTip { padding: 5px; opacity: 240; }'
             f'NoDragItem[Selected=false][Hover=false] {{ border:0px solid {item_color}; background: {item_color}; border-radius: {border_radius}px; }}'
             f'NoDragItem[Selected=false][Hover=true] {{ border:0px solid {item_color_hover}; background: {item_color_hover}; border-radius: {border_radius}px; }}'
             f'NoDragItem[Selected=true][Hover=false] {{ border:0px solid {plus_red}; background: {plus_red}; border-radius: {border_radius}px; }}'
@@ -625,11 +628,12 @@ class NoDragItem(StandardItem):
         self.setStyle(self.style())
 
 
+
 class DragItem(StandardItem):
-    def __init__(self, data:ScheduledItem, locale_str:str, today:datetime.date, user_id: Optional[str], machine: str,
-            weight_unit_idx:int) -> None:
+    def __init__(self, data:ScheduledItem, aw:'ApplicationWindow', today:datetime.date, user_id: Optional[str], machine: str) -> None:
+        self.aw = aw
         self.data:ScheduledItem = data
-        self.weight_unit_idx = weight_unit_idx
+        self.weight_unit_idx = weight_units.index(self.aw.qmc.weight[2])
 
         super().__init__()
         self.setGraphicsEffect(self.makeShadow())
@@ -647,11 +651,11 @@ class DragItem(StandardItem):
         elif days_diff == 1:
             task_date = QApplication.translate('Plus', 'Tomorrow')
         elif days_diff < 7:
-            locale = QLocale(locale_str)
+            locale = QLocale(self.aw.locale_str)
             task_date = locale.toString(QDate(data.date.year, data.date.month, data.date.day), 'dddd').capitalize()
         else:
             # date formatted according to the locale without the year
-            task_date = format_date(data.date, format='long', locale=locale_str).replace(format_date(data.date, 'Y', locale=locale_str),'').strip().rstrip(',')
+            task_date = format_date(data.date, format='long', locale=self.aw.locale_str).replace(format_date(data.date, 'Y', locale=self.aw.locale_str),'').strip().rstrip(',')
 
         user_nickname:Optional[str] = plus.connection.getNickname()
         task_operator = (QApplication.translate('Plus', 'by anybody') if data.user is None else
@@ -666,7 +670,8 @@ class DragItem(StandardItem):
         head_line = f'{task_date}{task_operator_and_machine}<br>{todo}'
         wrapper =  textwrap.TextWrapper(width=tooltip_line_length, max_lines=tooltip_max_lines, placeholder=tooltip_placeholder)
         title = '<br>'.join(wrapper.wrap(html.escape(self.data.title)))
-        title_line = f"<p style='white-space:pre'><font color=\"{plus_blue}\"><b><big>{title}</big></b></font></p>"
+        accent_color = (white if self.aw.app.darkmode else plus_blue)
+        title_line = f"<p style='white-space:pre'><font color=\"{accent_color}\"><b><big>{title}</big></b></font></p>"
 
         beans_description = ''
         if data.coffee is not None:
@@ -1050,8 +1055,8 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         remaining_scrollarea.setWidgetResizable(True)
         remaining_scrollarea.setWidget(remaining_widget)
         remaining_scrollarea.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
-        remaining_scrollarea.setFrameShadow(QFrame.Shadow.Sunken)
-        remaining_scrollarea.setFrameShape(QFrame.Shape.Panel)
+#        remaining_scrollarea.setFrameShadow(QFrame.Shadow.Sunken)
+#        remaining_scrollarea.setFrameShape(QFrame.Shape.Panel)
         remaining_scrollarea.setMinimumWidth(remaining_widget.minimumSizeHint().width())
 
         remaining_filter_scrollarea = QScrollArea()
@@ -1082,8 +1087,8 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         completed_scrollarea.setWidgetResizable(True)
         completed_scrollarea.setWidget(roasted_widget)
         completed_scrollarea.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
-        completed_scrollarea.setFrameShadow(QFrame.Shadow.Sunken)
-        completed_scrollarea.setFrameShape(QFrame.Shape.Panel)
+#        completed_scrollarea.setFrameShadow(QFrame.Shadow.Sunken)
+#        completed_scrollarea.setFrameShape(QFrame.Shape.Panel)
         completed_scrollarea.setMinimumWidth(remaining_widget.minimumSizeHint().width())
 
         self.roasted_weight = QLineEdit()
@@ -1193,6 +1198,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         self.TabWidget = QTabWidget()
         self.TabWidget.addTab(self.remaining_splitter, QApplication.translate('Tab', 'To-Do'))
         self.TabWidget.addTab(self.completed_splitter, QApplication.translate('Tab', 'Done'))
+        self.TabWidget.setStyleSheet('QToolTip { padding: 5px; opacity: 240; }')
 
         layout = QVBoxLayout()
         layout.addWidget(self.TabWidget)
@@ -1352,7 +1358,9 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
     # updates the current schedule items by joining its roast with those received as part of a stock update from the server
     # adding new items at the end
     def updateScheduledItems(self) -> None:
-        current_schedule:List[ScheduledItem] = self.scheduled_items[:]
+        today = datetime.datetime.now(datetime.timezone.utc).astimezone().date()
+        # remove outdated items which remained in the open app from yesterday
+        current_schedule:List[ScheduledItem] = [si for si in self.scheduled_items if (si.date - today).days >= 0]
         plus.stock.init()
         schedule:List[plus.stock.ScheduledItem] = plus.stock.getSchedule()
         _log.debug('schedule: %s',schedule)
@@ -1507,11 +1515,10 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         selected_item:Optional[DragItem] = None
         for item in filter(lambda x: self.scheduledItemsfilter(today, x), self.scheduled_items):
             drag_item = DragItem(item,
-                self.aw.locale_str,
+                self.aw,
                 today,
                 self.aw.plus_user_id,
-                self.aw.qmc.roastertype_setup.strip(),
-                weight_units.index(self.aw.qmc.weight[2]))
+                self.aw.qmc.roastertype_setup.strip())
             # remember selection
             if self.selected_remaining_item is not None and self.selected_remaining_item.data.id == item.id:
                 selected_item = drag_item
@@ -1536,6 +1543,36 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         # we set the first label width to the maximum first label width of all items
         for first_label in drag_first_labels:
             first_label.setFixedWidth(drag_items_first_label_max_width)
+        # updates the tabs tooltip
+        scheduled_items:List[ScheduledItem] = self.drag_remaining.get_item_data()
+        if len(scheduled_items) > 0:
+            todays_items = []
+            later_items = []
+            for si in scheduled_items:
+                if si.date == today:
+                    todays_items.append(si)
+                else:
+                    later_items.append(si)
+            batches_today, batches_later = (sum(max(0, (si.count - len(si.roasts))) for si in items) for items in (todays_items, later_items))
+            # total weight in kg
+            total_weight_today, total_weight_later = (sum(si.weight * max(0, (si.count - len(si.roasts))) for si in items) for items in (todays_items, later_items))
+            weight_unit_idx = weight_units.index(self.aw.qmc.weight[2])
+            one_batch_label = QApplication.translate('Message', '1 batch')
+            if batches_today > 0:
+                batches_today_label = (one_batch_label if batches_today == 1 else QApplication.translate('Message', '{} batches').format(batches_today))
+                todays_batches = f'{batches_today_label} • {render_weight(total_weight_today, 1, weight_unit_idx)}'
+            else:
+                todays_batches = ''
+            if batches_later > 0:
+                batches_later_label = (one_batch_label if batches_later == 1 else QApplication.translate('Message', '{} batches').format(batches_later))
+                later_batches = f'{batches_later_label} • {render_weight(total_weight_later, 1, weight_unit_idx)}'
+            else:
+                later_batches = ''
+            self.TabWidget.setTabToolTip(0, f"<p style='white-space:pre'><b>{todays_batches}</b>{('<br>' if (batches_today + batches_later) > 1 else '')}{later_batches}</p>")
+        else:
+            self.TabWidget.setTabToolTip(0,'')
+
+
 
 
     @pyqtSlot()
@@ -1733,7 +1770,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         nodrag_first_labels = []
         new_selected_completed_item:Optional[NoDragItem] = None
         for item in self.completed_items:
-            nodrag_item = NoDragItem(item, self.aw.locale_str, now, weight_units.index(self.aw.qmc.weight[2]))
+            nodrag_item = NoDragItem(item, self.aw, now)
             # take the maximum width over all first labels of the DragItems
             nodrag_first_label = nodrag_item.getFirstLabel()
             nodrag_first_labels.append(nodrag_first_label)
@@ -1752,6 +1789,36 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         self.selected_completed_item = new_selected_completed_item
         if self.selected_completed_item is not None:
             self.selected_completed_item.select()
+
+        # updates the tabs tooltip
+        today:datetime.date = datetime.datetime.now(datetime.timezone.utc).astimezone().date()
+        completed_items:List[CompletedItem] = self.completed_items
+        if len(completed_items) > 0:
+            todays_items = []
+            earlier_items = []
+            for ci in completed_items:
+                if ci.roastdate == today:
+                    todays_items.append(ci)
+                else:
+                    earlier_items.append(ci)
+            batches_today, batches_earlier = (len(items) for items in (todays_items, earlier_items))
+            # total batchsize in kg
+            total_batchsize_today, total_batchsize_earlier = (sum(si.batchsize for si in items) for items in (todays_items, earlier_items))
+            weight_unit_idx = weight_units.index(self.aw.qmc.weight[2])
+            one_batch_label = QApplication.translate('Message', '1 batch')
+            if batches_today > 0:
+                todays_batches_label = (one_batch_label if batches_today == 1 else QApplication.translate('Message', '{} batches').format(batches_today))
+                todays_batches = f'{todays_batches_label} • {render_weight(total_batchsize_today, 1, weight_unit_idx)}'
+            else:
+                todays_batches = ''
+            if batches_earlier > 0:
+                earlier_batches_label = (one_batch_label if batches_earlier == 1 else QApplication.translate('Message', '{} batches').format(batches_earlier))
+                earlier_batches = f'{earlier_batches_label} • {render_weight(total_batchsize_earlier, 1, weight_unit_idx)}'
+            else:
+                earlier_batches = ''
+            self.TabWidget.setTabToolTip(1, f"<p style='white-space:pre'><b>{todays_batches}</b>{('<br>' if (batches_today + batches_earlier) > 1 else '')}{earlier_batches}</p>")
+        else:
+            self.TabWidget.setTabToolTip(1, '')
 
 
     def get_scheduled_items_ids(self) -> List[str]:

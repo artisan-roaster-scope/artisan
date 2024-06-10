@@ -183,17 +183,24 @@ for lang in ['ar', 'da', 'de','el','en','es','fa','fi','fr','gd', 'he','hu','id'
 #  # brew install libusb
 #
 # to get libusb installed
-try:
-    subprocess.check_call(r'cp /usr/local/Cellar/libusb/1.0.27/lib/libusb-1.0.0.dylib Artisan.app/Contents/Frameworks/libusb-1.0.dylib',shell = True)
-except Exception: # pylint: disable=broad-except
+#
+# NOTE: brew does not install universal binaries. You need to fuse the libusb dynamic lib yourself from the Intel and arm brew binaries and
+#  place it in the brew Cellar
+
+brew_paths = ['/usr/local/Cellar', '/opt/homebrew/Cellar'] # path for Intel and arm brew installations
+libusb_versions = ['1.0.27', '1.0.26' , '1.0.25']
+success = False
+for libusb_cand in [rf'{p}/libusb/{v}/lib/libusb-1.0.0.dylib' for v in libusb_versions for p in brew_paths]:
+    print('libusb_cand',libusb_cand)
     try:
-        subprocess.check_call(r'cp /usr/local/Cellar/libusb/1.0.26/lib/libusb-1.0.0.dylib Artisan.app/Contents/Frameworks/libusb-1.0.dylib',shell = True)
+        subprocess.check_call(rf'cp {libusb_cand} Artisan.app/Contents/Frameworks/libusb-1.0.dylib',shell = True)
+        success = True
+        break
     except Exception: # pylint: disable=broad-except
-        try:
-            subprocess.check_call(r'cp /usr/local/Cellar/libusb/1.0.25/lib/libusb-1.0.0.dylib Artisan.app/Contents/Frameworks/libusb-1.0.dylib',shell = True)
-        except Exception: # pylint: disable=broad-except
-            print('ERROR: failed to locate libusb')
-            sys.exit(1)
+        pass
+if not success:
+    print('ERROR: libusb not found')
+    sys.exit(1)
 
 
 
