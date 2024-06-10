@@ -1427,7 +1427,6 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
 
     # sets the items values as properties of the current roast and links it back to this item
     def set_roast_properties(self, item:ScheduledItem) -> None:
-        _log.info('PRINT set_roast_properties')
         self.aw.qmc.scheduleID = item.id
         self.aw.qmc.title = item.title
         if not self.aw.qmc.flagstart or self.aw.qmc.title_show_always:
@@ -1568,7 +1567,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
                 later_batches = f'{batches_later_label} • {render_weight(total_weight_later, 1, weight_unit_idx)}'
             else:
                 later_batches = ''
-            self.TabWidget.setTabToolTip(0, f"<p style='white-space:pre'><b>{todays_batches}</b>{('<br>' if (batches_today + batches_later) > 1 else '')}{later_batches}</p>")
+            self.TabWidget.setTabToolTip(0, f"<p style='white-space:pre'><b>{todays_batches}</b>{('<br>' if (batches_today > 0 and batches_later > 0) else '')}{later_batches}</p>")
         else:
             self.TabWidget.setTabToolTip(0,'')
 
@@ -1816,7 +1815,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
                 earlier_batches = f'{earlier_batches_label} • {render_weight(total_batchsize_earlier, 1, weight_unit_idx)}'
             else:
                 earlier_batches = ''
-            self.TabWidget.setTabToolTip(1, f"<p style='white-space:pre'><b>{todays_batches}</b>{('<br>' if (batches_today + batches_earlier) > 1 else '')}{earlier_batches}</p>")
+            self.TabWidget.setTabToolTip(1, f"<p style='white-space:pre'><b>{todays_batches}</b>{('<br>' if (batches_today > 0 and batches_earlier > 1) else '')}{earlier_batches}</p>")
         else:
             self.TabWidget.setTabToolTip(1, '')
 
