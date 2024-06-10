@@ -288,12 +288,6 @@ class NotificationManager(QObject): # pyright: ignore [reportGeneralTypeIssues]
             if len(self.notifications_queue)>0 and self.notifications_visible:
                 self.tray_icon.show()
 
-                try:
-                    app = QApplication.instance()
-                    app.setBadgeNumber(len(self.notifications_queue)) # type: ignore # "QCoreApplication" has no attribute "setBadgeNumber"
-                except Exception: # pylint: disable=broad-except
-                    pass # setBadgeNumber only supported by Qt 6.5 and newer
-
                 for n in reversed(self.notifications_queue):
                     title = n.formatedTitle()
                     menu_title = (title[:25] + '...') if len(title) > 25 else title

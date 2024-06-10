@@ -1415,14 +1415,14 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         return res
 
 
-    def scheduledItemsfilter(self, today:datetime.date, item:ScheduledItem) -> bool:
-        # if user filter is active only items not for a specific user or for the current user (if available) are listed
-        # if machine filter is active only items not for a specific machine or for the current machine setup are listed in case a current machine is set
-        return ((not self.aw.schedule_day_filter or item.date == today) and
-                (not self.aw.schedule_user_filter or not bool(plus.connection.getNickname()) or item.user is None or item.user == self.aw.plus_user_id) and
-                (self.aw.qmc.roastertype_setup.strip() == '' or not self.aw.schedule_machine_filter or item.machine is None or
-                    (self.aw.qmc.roastertype_setup.strip() != '' and item.machine is not None and
-                        item.machine.strip() == self.aw.qmc.roastertype_setup.strip())))
+#    def scheduledItemsfilter(self, today:datetime.date, item:ScheduledItem) -> bool:
+#        # if user filter is active only items not for a specific user or for the current user (if available) are listed
+#        # if machine filter is active only items not for a specific machine or for the current machine setup are listed in case a current machine is set
+#        return ((not self.aw.schedule_day_filter or item.date == today) and
+#                (not self.aw.schedule_user_filter or not bool(plus.connection.getNickname()) or item.user is None or item.user == self.aw.plus_user_id) and
+#                (self.aw.qmc.roastertype_setup.strip() == '' or not self.aw.schedule_machine_filter or item.machine is None or
+#                    (self.aw.qmc.roastertype_setup.strip() != '' and item.machine is not None and
+#                        item.machine.strip() == self.aw.qmc.roastertype_setup.strip())))
 
 
     # sets the items values as properties of the current roast and links it back to this item
@@ -1512,7 +1512,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         drag_items_first_label_max_width = 0
         drag_first_labels = []
         selected_item:Optional[DragItem] = None
-        for item in filter(lambda x: self.scheduledItemsfilter(today, x), self.scheduled_items):
+        for item in filter(lambda x: self.aw.scheduledItemsfilter(today, x), self.scheduled_items):
             drag_item = DragItem(item,
                 self.aw,
                 today,
@@ -1570,8 +1570,31 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
             self.TabWidget.setTabToolTip(0, f"<p style='white-space:pre'><b>{todays_batches}</b>{('<br>' if (batches_today > 0 and batches_later > 0) else '')}{later_batches}</p>")
         else:
             self.TabWidget.setTabToolTip(0,'')
+        # update app badge number:
+        self.setAppBadge(len(scheduled_items))
 
+    @staticmethod
+    def setAppBadge(number:int) -> None:
+        try:
+            app = QApplication.instance()
+            app.setBadgeNumber(max(0, number)) # type: ignore # "QCoreApplication" has no attribute "setBadgeNumber"
+        except Exception: # pylint: disable=broad-except
+            pass # setBadgeNumber only supported by Qt 6.5 and newer
 
+    # update app badge to be called from outside of the ScheduleWindow if ScheduleWindow is not open, recomputing all data
+    @staticmethod
+    def updateAppBadge(aw:'ApplicationWindow') -> None:
+        try:
+            plus.stock.init()
+            schedule:List[plus.stock.ScheduledItem] = plus.stock.getSchedule()
+            scheduled_items:List[ScheduledItem] = []
+            for item in schedule:
+                schedule_item:ScheduledItem = ScheduledItem.model_validate(item)
+                scheduled_items.append(schedule_item)
+            today:datetime.date = datetime.datetime.now(datetime.timezone.utc).astimezone().date()
+            ScheduleWindow.setAppBadge(len([x for x in scheduled_items if aw.scheduledItemsfilter(today, x)]))
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
 
 
     @pyqtSlot()

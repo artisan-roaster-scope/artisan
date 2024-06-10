@@ -725,6 +725,7 @@ import plus.util
 import plus.sync
 import plus.queue
 import plus.controller
+import plus.connection
 import plus.register
 import plus.notifications
 import plus.blend
@@ -4082,11 +4083,26 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         QTimer.singleShot(2000,self.donate)
 
         QTimer.singleShot(0, self.logStartupTime)
+        QTimer.singleShot(200, self.updateBadge)
 
         self.zoomInShortcut = QShortcut(QKeySequence.StandardKey.ZoomIn, self)
         self.zoomInShortcut.activated.connect(self.zoomIn)
         self.zoomOutShortcut = QShortcut(QKeySequence.StandardKey.ZoomOut, self)
         self.zoomOutShortcut.activated.connect(self.zoomOut)
+
+
+    def scheduledItemsfilter(self, today:datetime.date, item:plus.schedule.ScheduledItem) -> bool:
+        # if user filter is active only items not for a specific user or for the current user (if available) are listed
+        # if machine filter is active only items not for a specific machine or for the current machine setup are listed in case a current machine is set
+        return ((not self.schedule_day_filter or item.date == today) and
+                (not self.schedule_user_filter or not bool(plus.connection.getNickname()) or item.user is None or item.user == self.plus_user_id) and
+                (self.qmc.roastertype_setup.strip() == '' or not self.schedule_machine_filter or item.machine is None or
+                    (self.qmc.roastertype_setup.strip() != '' and item.machine is not None and
+                        item.machine.strip() == self.qmc.roastertype_setup.strip())))
+
+    def updateBadge(self) -> None:
+        if self.schedule_window is None:
+            plus.schedule.ScheduleWindow.updateAppBadge(self)
 
     def blockTicks(self) -> int:
         return max(1, int(round(self.sampling_seconds_to_block_quantifiction / (self.qmc.delay / 1000))) + 1)
@@ -4191,7 +4207,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     @pyqtSlot()
     def updateSchedule(self) -> None:
-        if self.schedule_window is not None:
+        if self.schedule_window is None:
+            self.updateBadge()
+        else:
             self.schedule_window.updateScheduleWindow()
 
     @pyqtSlot(str,str,NotificationType)
