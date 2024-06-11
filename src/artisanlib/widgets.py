@@ -399,7 +399,7 @@ class AnimatedMajorEventPushButton(MajorEventPushButton):
     zcolor = pyqtProperty(QColor, getBackColor, setBackColor)
 
 class MinorEventPushButton(EventPushButton): # pylint: disable=too-few-public-methods
-    def __init__(self, text:str, parent:Optional['QWidget'] = None, background_color:str = '#66b8d7') -> None:
+    def __init__(self, text:str, parent:Optional['QWidget'] = None, background_color:str = '#4c97c3') -> None:
         super().__init__(text, parent, background_color)
 
 class AuxEventPushButton(EventPushButton): # pylint: disable=too-few-public-methods

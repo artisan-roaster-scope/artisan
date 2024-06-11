@@ -263,6 +263,9 @@ if sys.platform.startswith('darwin'):
 #################### Main Application  ################################################
 #######################################################################################
 
+light_blue: Final[str] = '#4c97c3' # buttons CONTROL & RESET (was #2298c7)
+dark_blue: Final[str] = '#3979ae' # buttons ON & START (was #147bb3)
+
 appGuid:Final[str] = '9068bd2fa8e54945a6be1f1a0a589e92'
 viewerAppGuid:Final[str] = '9068bd2fa8e54945a6be1f1a0a589e93'
 
@@ -2838,7 +2841,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
                     color: white;
-                    background-color: #2298c7;
+                    background-color: #4c97c3;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
@@ -2860,7 +2863,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
                     color: white;
-                    background-color: #147bb3;
+                    background-color: #3979ae;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
@@ -2904,7 +2907,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
                     color: white;
-                    background-color: #147bb3;
+                    background-color: #3979ae;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
@@ -2948,7 +2951,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     font-size: """ + self.button_font_size + """;
                     font-weight: bold;
                     color: white;
-                    background-color: #2298c7;
+                    background-color: #4c97c3;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
@@ -3106,7 +3109,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.buttonDROP.clicked.connect(self.qmc.markDrop)
 
         #create PID control button
-        self.buttonCONTROL: QPushButton = QPushButton(QApplication.translate('Button', 'Control'))
+        self.buttonCONTROL: QPushButton = QPushButton(QApplication.translate('Button', 'CONTROL'))
         self.buttonCONTROL.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.buttonCONTROL.setStyleSheet(self.pushbuttonstyles['PID'])
         self.buttonCONTROL.setGraphicsEffect(self.makeShadow())

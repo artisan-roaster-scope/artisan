@@ -93,8 +93,9 @@ plus_red_hover: Final[str] = '#B2153F'
 plus_red: Final[str] = '#BC2C52'
 plus_blue_hover: Final[str] = '#1985ba'
 plus_blue: Final[str] = '#147BB3'
-plus_alt_blue_hover: Final[str] = '#43a7cf'
-plus_alt_blue: Final[str] = '#2298c7'
+## for selected schedule item:
+plus_alt_blue_hover: Final[str] = '#3d81ba'
+plus_alt_blue: Final[str] = '#3979ae' # main.py:dark_blue
 #
 white: Final[str] = 'white'
 dim_white: Final[str] = '#EEEEEE'
@@ -1396,8 +1397,8 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
                     #  on re-receiving the current schedule from the server as still received from the server,
                     #  we check if locally we already have registered enough completed roasts in self.completed_items for this ScheduleItem
                     current_schedule.append(schedule_item)
-            except Exception as e:  # pylint: disable=broad-except
-                _log.error(e)
+            except Exception:  # pylint: disable=broad-except
+                pass # validation fails for outdated items
         # update the list of schedule items to be displayed
         self.scheduled_items = current_schedule
 
@@ -1589,8 +1590,11 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
             schedule:List[plus.stock.ScheduledItem] = plus.stock.getSchedule()
             scheduled_items:List[ScheduledItem] = []
             for item in schedule:
-                schedule_item:ScheduledItem = ScheduledItem.model_validate(item)
-                scheduled_items.append(schedule_item)
+                try:
+                    schedule_item:ScheduledItem = ScheduledItem.model_validate(item)
+                    scheduled_items.append(schedule_item)
+                except:  # pylint: disable=broad-except
+                    pass # validation fails for outdated items
             today:datetime.date = datetime.datetime.now(datetime.timezone.utc).astimezone().date()
             ScheduleWindow.setAppBadge(len([x for x in scheduled_items if aw.scheduledItemsfilter(today, x)]))
         except Exception as e:  # pylint: disable=broad-except
