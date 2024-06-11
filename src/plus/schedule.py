@@ -1593,7 +1593,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
                 try:
                     schedule_item:ScheduledItem = ScheduledItem.model_validate(item)
                     scheduled_items.append(schedule_item)
-                except:  # pylint: disable=broad-except
+                except Exception:  # pylint: disable=broad-except
                     pass # validation fails for outdated items
             today:datetime.date = datetime.datetime.now(datetime.timezone.utc).astimezone().date()
             ScheduleWindow.setAppBadge(len([x for x in scheduled_items if aw.scheduledItemsfilter(today, x)]))
