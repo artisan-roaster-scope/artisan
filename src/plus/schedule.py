@@ -490,9 +490,11 @@ class StandardItem(QFrame): # pyright: ignore[reportGeneralTypeIssues] # Argumen
     def __init__(self) -> None:
         super().__init__()
         layout = QHBoxLayout()
-        self.first_label = QLabel(self.getLeft())
-        self.first_label.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
-        layout.addWidget(self.first_label)
+        left:str = self.getLeft()
+        self.first_label = QLabel(left)
+        if left != '':
+            self.first_label.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
+            layout.addWidget(self.first_label)
         layout.addWidget(QElidedLabel(self.getMiddle()))
         layout.addWidget(QLabelRight(self.getRight()))
         layout.setSpacing(5)
@@ -562,7 +564,7 @@ class NoDragItem(StandardItem):
         super().__init__()
         layout:Optional[QLayout] = self.layout()
         if layout is not None:
-            layout.setContentsMargins(5,4,5,4) # left, top, right, bottom
+            layout.setContentsMargins(10,5,10,5) # left, top, right, bottom
 
         item_color = light_grey
         item_color_hover = light_grey_hover
@@ -1381,12 +1383,28 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         for s in schedule:
             try:
                 schedule_item:ScheduledItem = ScheduledItem.model_validate(s)
-                existing_item:Optional[ScheduledItem] = next((si for si in current_schedule if si.id == schedule_item.id), None)
-                if existing_item is not None:
-                    existing_item.roasts.update(schedule_item.roasts)
-                    if len(existing_item.roasts) >= existing_item.count:
+#                existing_item:Optional[ScheduledItem] = next((si for si in current_schedule if si.id == schedule_item.id), None)
+                idx_existing_item:Optional[int] = next((i for i, si in enumerate(current_schedule) if si.id == schedule_item.id), None)
+                # take new item (but merge completed items)
+                if idx_existing_item is not None:
+                    # remember existing item
+                    existing_item = current_schedule[idx_existing_item]
+                    # replace the current item with the updated one from the server
+                    current_schedule[idx_existing_item] = schedule_item
+                    # merge the completed roasts and set them to the newly received item
+                    schedule_item.roasts.update(existing_item.roasts)
+                    # if all done, remove that item as it is completed
+                    if len(schedule_item.roasts) >= schedule_item.count:
                         # remove existing_item from schedule if completed (#roasts >= count)
-                        current_schedule.remove(existing_item)
+                        current_schedule.remove(schedule_item)
+
+#                # keep old item (only update completed items)
+#                if existing_item is not None:
+#                    existing_item.roasts.update(schedule_item.roasts)
+#                    if len(existing_item.roasts) >= existing_item.count:
+#                        # remove existing_item from schedule if completed (#roasts >= count)
+#                        current_schedule.remove(existing_item)
+
                 elif (len(schedule_item.roasts) < schedule_item.count and
                         (sum(1 for ci in self.completed_items if ci.scheduleID == schedule_item.id) < schedule_item.count)):
                     # only if not yet enough roasts got registered in the local schedule_item.roasts
