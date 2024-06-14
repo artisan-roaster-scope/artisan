@@ -368,7 +368,7 @@ def renderAmount(amount:float, default_unit:Optional[CoffeeUnit]=None, target_un
         pass
     # if we could not convert to default_unit type,
     # we convert to the weightunit
-    if not res and config.app_window is not None:
+    if not res:
         # we convert the amount from Kg to the target_unit
         res = render_weight(amount, 1, target_unit_idx)
     return res

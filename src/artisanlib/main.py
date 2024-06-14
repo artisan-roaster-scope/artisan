@@ -209,6 +209,7 @@ if TYPE_CHECKING:
     from artisanlib.hottop import Hottop # pylint: disable=unused-import
     from artisanlib.weblcds import WebLCDs # pylint: disable=unused-import
     from artisanlib.santoker import Santoker # pylint: disable=unused-import
+    from artisanlib.mugma import Mugma # pylint: disable=unused-import
     from artisanlib.kaleido import KaleidoPort # pylint: disable=unused-import
     from artisanlib.ikawa import IKAWA_BLE # pylint: disable=unused-import
     from matplotlib.text import Annotation # pylint: disable=unused-import
@@ -1433,6 +1434,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'simulator', 'simulatorpath', 'comparator', 'stack', 'eventsbuttonflag', 'minieventsflags', 'seriallogflag',
         'seriallog', 'ser', 'modbus', 'extraMODBUStemps', 'extraMODBUStx', 's7', 'extraS7tx', 'ws', 'scale', 'color', 'extraser', 'extracomport', 'extrabaudrate',
         'extrabytesize', 'extraparity', 'extrastopbits', 'extratimeout', 'hottop', 'santokerHost', 'santokerPort', 'santokerSerial', 'santoker', 'fujipid', 'dtapid', 'pidcontrol', 'soundflag', 'recentRoasts', 'maxRecentRoasts',
+        'mugmaHost','mugmaPort', 'mugma', 'mugma_default_host',
         'kaleido_default_host', 'kaleidoHost', 'kaleidoPort', 'kaleidoSerial', 'kaleidoPID', 'kaleido', 'ikawa',
         'lcdpaletteB', 'lcdpaletteF', 'extraeventsbuttonsflags', 'extraeventslabels', 'extraeventbuttoncolor', 'extraeventsactionstrings',
         'extraeventbuttonround', 'block_quantification_sampling_ticks', 'sampling_seconds_to_block_quantifiction', 'sampling_ticks_to_block_quantifiction', 'extraeventsactionslastvalue',
@@ -1725,6 +1727,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.santokerPort:int = 20001
         self.santokerSerial:bool = False # if True connection is via the main serial port
         self.santoker:Optional[Santoker] = None # holds the Santoker instance created on connect; reset to None on disconnect
+
+        # Mugma Network
+        self.mugma_default_host:Final[str] = '127.0.0.1'
+        self.mugmaHost:str = '127.0.0.1'
+        self.mugmaPort:int = 1503
+        self.mugma:Optional[Mugma] = None # holds the Mugma instance created on connect; reset to None on disconnect
 
         # Kaleido Network
         self.kaleido_default_host:Final[str] = '127.0.0.1'
@@ -3251,22 +3259,22 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.label2:QLabel = QLabel()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
         self.label2.setText(f"<big><b>{QApplication.translate('Label', 'ET')}</b></big>")
-        self.setLabelColor(self.label2,QColor(self.qmc.palette['et']))
+        self.setLabelColor(self.label2,self.qmc.palette['et'])
         #BT
         self.label3:QLabel = QLabel()
         self.label3.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
         self.label3.setText(f"<big><b>{QApplication.translate('Label', 'BT')}</b></big>")
-        self.setLabelColor(self.label3,QColor(self.qmc.palette['bt']))
+        self.setLabelColor(self.label3,self.qmc.palette['bt'])
         #DELTA MET
         self.label4:QLabel = QLabel()
         self.label4.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
         self.label4.setText(f"{deltaLabelBigPrefix}{QApplication.translate('Label', 'ET')}</b></big>")
-        self.setLabelColor(self.label4,QColor(self.qmc.palette['deltaet']))
+        self.setLabelColor(self.label4,self.qmc.palette['deltaet'])
         # DELTA BT
         self.label5:QLabel = QLabel()
         self.label5.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
         self.label5.setText(f"{deltaLabelBigPrefix}{QApplication.translate('Label', 'BT')}</b></big>")
-        self.setLabelColor(self.label5,QColor(self.qmc.palette['deltabt']))
+        self.setLabelColor(self.label5,self.qmc.palette['deltabt'])
         # pid sv
         self.label6:QLabel = QLabel()
         self.label6.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
@@ -5274,6 +5282,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     org_s7_host = self.s7.host
                     org_ws_host = self.ws.host
                     org_kaleido_host = self.kaleidoHost
+                    org_mugma_host = self.mugmaHost
                     org_comport = self.ser.comport
                     org_modbus_comport = self.modbus.comport
                     org_roastersize_setup = self.qmc.roastersize_setup
@@ -5348,6 +5357,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         if res2 is not None and res2:
                             res = res2
                             self.kaleidoHost = host
+                    elif self.qmc.device == 164: # Mugma
+                        # as default we offer the current settings mugma host, or if this is set to its default as after a factory reset (self.mugma_default_host) we take the one from the machine setup
+                        defaultMugmaHost:str = (self.mugmaHost if org_mugma_host == self.mugma_default_host else org_mugma_host)
+                        host, res2 = QInputDialog.getText(self,
+                            QApplication.translate('Message', 'Machine'),
+                            QApplication.translate('Message', 'Network name or IP address'),text=defaultMugmaHost)
+                        if res2 is not None and res2:
+                            res = res2
+                            self.mugmaHost = host
                     elif (self.qmc.device in {0, 9, 19, 53, 101, 115, 126} or ((self.qmc.device == 29 or 29 in self.qmc.extradevices) and self.modbus.type in {0, 1, 2}) or
                             (self.qmc.device == 134 and self.santokerSerial) or
                             (self.qmc.device == 138 and self.kaleidoSerial)): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial, HB/ARC
@@ -5447,6 +5465,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         self.s7.host = org_s7_host
                         self.ws.host = org_ws_host
                         self.kaleidoHost = org_kaleido_host
+                        self.mugmaHost = org_mugma_host
                         self.ser.comport = org_comport
                         self.modbus.comport = org_modbus_comport
                         self.qmc.roastersize_setup = org_roastersize_setup
@@ -5658,11 +5677,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     color2 = '#f0f0f0'
                 else:
                     color2 = self.qmc.palette['canvas']
-            c1 = str(QColor(color1).name())
-            c2 = str(QColor(color2).name())
-            c1_rgb = tuple(int(c1[i:i+2], 16) for i in (1, 3 ,5))
-            c2_rgb = tuple(int(c2[i:i+2], 16) for i in (1, 3 ,5))
-            cDiff = deltaE(c1_rgb, c2_rgb, input_space='sRGB255', uniform_space='CIELab')
+            if color1 is not None and color2 is not None:
+                c1 = QColor(color1[:7]).name()
+                c2 = QColor(color2[:7]).name()
+                c1_rgb = tuple(int(c1[i:i+2], 16) for i in (1, 3 ,5))
+                c2_rgb = tuple(int(c2[i:i+2], 16) for i in (1, 3 ,5))
+                cDiff = deltaE(c1_rgb, c2_rgb, input_space='sRGB255', uniform_space='CIELab')
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
@@ -5748,10 +5768,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.lcdpaletteF['slowcoolingtimer'] = '#ffffff'
         self.setTimerColor('timer')
         self.lcd2.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.lcdpaletteF['et']}; background-color: {self.lcdpaletteB['et']};}}")
+        self.setLabelColor(self.label2,self.qmc.palette['et'])
         self.lcd3.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.lcdpaletteF['bt']}; background-color: {self.lcdpaletteB['bt']};}}")
+        self.setLabelColor(self.label3,self.qmc.palette['bt'])
         self.lcd4.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.lcdpaletteF['deltaet']}; background-color: {self.lcdpaletteB['deltaet']};}}")
+        self.setLabelColor(self.label4,self.qmc.palette['deltaet'])
         self.lcd5.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.lcdpaletteF['deltabt']}; background-color: {self.lcdpaletteB['deltabt']};}}")
+        self.setLabelColor(self.label5,self.qmc.palette['deltabt'])
         self.lcd6.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.lcdpaletteF['sv']}; background-color: {self.lcdpaletteB['sv']};}}")
+        # label always black?
         self.lcd7.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.lcdpaletteF['sv']}; background-color: {self.lcdpaletteB['sv']};}}")
         self.updateExtraLCDvisibility()
 
@@ -5892,7 +5917,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     + '}' )
 
         if self.comparator is None:
+            if self.qmc.background and not (self.qmc.title is None or self.qmc.title == ''):
+                if self.qmc.roastbatchnrB == 0:
+                    titleB = self.qmc.titleB
+                else:
+                    titleB = self.qmc.roastbatchprefixB + str(self.qmc.roastbatchnrB) + ' ' + self.qmc.titleB
+                self.qmc.setProfileBackgroundTitle(titleB)
             self.qmc.setProfileTitle(self.qmc.title,updatebackground=True)
+
+
 
         self.level1layout.insertWidget(0,self.ntb)
 
@@ -5911,6 +5944,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         if hasattr(self, 'light_background_p'):
             # reset the cached property self.light_background_p
             del self.light_background_p
+
 
     # called from within the sample loop thread!
     def process_active_quantifiers(self) -> None:
@@ -7938,8 +7972,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         shadow.setOffset(0,0.9)
         return shadow
 
+    # c is a hex color string in MPL format (cf. util:argb_colorname2rgba_colorname)
     @staticmethod
-    def setLabelColor(label:QLabel, color:QColor) -> None:
+    def setLabelColor(label:QLabel, c:str) -> None:
+        color = QColor(c[:7]) # we ignore the alpha information
         label.setStyleSheet(f'QLabel {{ color: {color.name()}; }}')
 
     #adds to serial log
@@ -10763,7 +10799,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.extraLCDlabel1[i].setText(l1.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
                 except Exception: # pylint: disable=broad-except
                     self.extraLCDlabel1[i].setText(l1)
-                self.setLabelColor(self.extraLCDlabel1[i],QColor(self.qmc.extradevicecolor1[i]))
+                self.setLabelColor(self.extraLCDlabel1[i],self.qmc.extradevicecolor1[i])
             self.extraLCD1[i].setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {self.lcdpaletteF['sv']}; background-color: {self.lcdpaletteB['sv']};}}")
             self.extraLCDframe2[i].setVisible(bool(self.extraLCDvisibility2[i]))
             if i < len(self.qmc.extraname2):
@@ -10772,7 +10808,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.extraLCDlabel2[i].setText(l2.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
                 except Exception: # pylint: disable=broad-except
                     self.extraLCDlabel2[i].setText(l2)
-                self.setLabelColor(self.extraLCDlabel2[i],QColor(self.qmc.extradevicecolor2[i]))
+                self.setLabelColor(self.extraLCDlabel2[i],self.qmc.extradevicecolor2[i])
             self.extraLCD2[i].setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {self.lcdpaletteF['sv']}; background-color: {self.lcdpaletteB['sv']};}}")
         #hide the rest (just in case)
         for i in range(ndev,self.nLCDS):
@@ -14122,8 +14158,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.updateLCDproperties()
         # set extraLCD colors
         for i in range(len(self.qmc.extradevices)):
-            self.setLabelColor(self.extraLCDlabel1[i],QColor(self.qmc.extradevicecolor1[i]))
-            self.setLabelColor(self.extraLCDlabel2[i],QColor(self.qmc.extradevicecolor2[i]))
+            self.setLabelColor(self.extraLCDlabel1[i],self.qmc.extradevicecolor1[i])
+            self.setLabelColor(self.extraLCDlabel2[i],self.qmc.extradevicecolor2[i])
 
     def initializedMonitoringExtraDeviceStructures(self) -> None:
         self.qmc.on_timex = []
@@ -16462,6 +16498,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.kaleidoPort = toInt(settings.value('kaleidoPort',self.kaleidoPort))
             self.kaleidoSerial = toBool(settings.value('kaleidoSerial',self.kaleidoSerial))
             self.kaleidoPID = bool(toBool(settings.value('kaleidoPID',self.kaleidoPID)))
+            self.mugmaHost = toString(settings.value('mugmaHost',self.mugmaHost))
+            self.mugmaPort = toInt(settings.value('mugmaPort',self.mugmaPort))
             # activate CONTROL BUTTON
             self.showControlButton()
             self.ser.controlETpid = [toInt(x) for x in toList(settings.value('controlETpid',self.ser.controlETpid))]
@@ -16607,15 +16645,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 for (k, v) in list(settings.value('Colors').items()):
                     self.qmc.palette[str(k)] = s2a(toString(v))
                 if 'messages' in self.qmc.palette:
-                    self.setLabelColor(self.messagelabel,QColor(self.qmc.palette['messages']))
+                    self.setLabelColor(self.messagelabel,self.qmc.palette['messages'])
                 if 'et' in self.qmc.palette:
-                    self.setLabelColor(self.label2,QColor(self.qmc.palette['et']))
+                    self.setLabelColor(self.label2,self.qmc.palette['et'])
                 if 'bt' in self.qmc.palette:
-                    self.setLabelColor(self.label3,QColor(self.qmc.palette['bt']))
+                    self.setLabelColor(self.label3,self.qmc.palette['bt'])
                 if 'deltaet' in self.qmc.palette:
-                    self.setLabelColor(self.label4,QColor(self.qmc.palette['deltaet']))
+                    self.setLabelColor(self.label4,self.qmc.palette['deltaet'])
                 if 'deltabt' in self.qmc.palette:
-                    self.setLabelColor(self.label5,QColor(self.qmc.palette['deltabt']))
+                    self.setLabelColor(self.label5,self.qmc.palette['deltabt'])
                 if 'canvas' in self.qmc.palette:
                     if len(self.qmc.palette['canvas']) == 0:  #revert the canvas element to default if it is blank in the settings.
                         self.qmc.palette['canvas'] = '#f8f8f8'
@@ -17987,7 +18025,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         self.qmc.extramarkers1[i] = m
                     self.qmc.extramarkersizes1[i] = max(self.qmc.markersize_min, l1.get_markersize())
                     self.qmc.extradevicecolor1[i] = self.getColor(l1)
-                    self.setLabelColor(self.extraLCDlabel1[i],QColor(self.qmc.extradevicecolor1[i]))
+                    self.setLabelColor(self.extraLCDlabel1[i],self.qmc.extradevicecolor1[i])
                     self.qmc.extraname1[i] = str(l1.get_label())
                     x1 = x1 + 1
                 if len(self.extraCurveVisibility2)> i and self.extraCurveVisibility2[i] and len(self.qmc.extratemp2lines) > x2:
@@ -18005,7 +18043,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         self.qmc.extramarkers2[i] = m
                     self.qmc.extramarkersizes2[i] = max(self.qmc.markersize_min, l2.get_markersize())
                     self.qmc.extradevicecolor2[i] = self.getColor(l2)
-                    self.setLabelColor(self.extraLCDlabel2[i],QColor(self.qmc.extradevicecolor2[i]))
+                    self.setLabelColor(self.extraLCDlabel2[i],self.qmc.extradevicecolor2[i])
                     self.qmc.extraname2[i] = str(l2.get_label())
                     x2 = x2 + 1
             if self.qmc.eventsGraphflag in {2, 3, 4}:
@@ -18260,6 +18298,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'kaleidoPort',self.kaleidoPort, read_defaults)
             self.settingsSetValue(settings, default_settings, 'kaleidoSerial',self.kaleidoSerial, read_defaults)
             self.settingsSetValue(settings, default_settings, 'kaleidoPID',self.kaleidoPID, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'mugmaHost',self.mugmaHost, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'mugmaPort',self.mugmaPort, read_defaults)
             settings.endGroup()
 #--- END GROUP System
 
@@ -19190,7 +19230,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             # substitution might fail if the label contains brackets like in "t{FCS}"
                             pass
                         self.extraLCDlabel1[i].setText(l1)
-                        self.setLabelColor(self.extraLCDlabel1[i],QColor(self.qmc.extradevicecolor1[i]))
+                        self.setLabelColor(self.extraLCDlabel1[i],self.qmc.extradevicecolor1[i])
                     self.extraLCDframe1[i].setVisible(True)
                     self.extraLCD1[i].setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.lcdpaletteF['sv']}; background-color: {self.lcdpaletteB['sv']};}}")
                 else:
@@ -19204,7 +19244,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             # substitution might fail if the label contains brackets like in "t{FCS}"
                             pass
                         self.extraLCDlabel2[i].setText(l2)
-                        self.setLabelColor(self.extraLCDlabel2[i],QColor(self.qmc.extradevicecolor2[i]))
+                        self.setLabelColor(self.extraLCDlabel2[i],self.qmc.extradevicecolor2[i])
                     self.extraLCDframe2[i].setVisible(True)
                     self.extraLCD2[i].setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.lcdpaletteF['sv']}; background-color: {self.lcdpaletteB['sv']};}}")
                 else:
@@ -19229,9 +19269,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.santoker.stop()
                 self.santoker = None
             elif self.qmc.device == 138 and self.kaleido is not None:
-                # disconnect Santoker
+                # disconnect Kaleido
                 self.kaleido.stop()
                 self.kaleido = None
+            elif self.qmc.device == 164 and self.mugma is not None:
+                # disconnect Mugma
+                self.mugma.stop()
+                self.mugma = None
         if self.qmc.flagon:
             self.qmc.ToggleMonitor()
         if self.WebLCDs:

@@ -16,6 +16,7 @@ v2.10.6 (XX, 2024)
   - adds Hottop Command `control` to activate and deactivate the control function of the machine via event buttons and alarms
   - adds `{WEIGHTin}` placeholder substitude by the current batch size (g) in command actions
   - adds "Load p-i-d from background" setting to configure the PID to the settings stored in background profile
+  - adds support for transparent colors
 
 * CHANGES
   - only reset roasting notes on reset if profile is loaded ([Issue #1521](../../../issues/1521))

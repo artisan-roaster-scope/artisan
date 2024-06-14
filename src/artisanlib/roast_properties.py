@@ -798,25 +798,25 @@ class editGraphDlg(ArtisanResizeablDialog):
             if self.aw.qmc.palette['canvas'] is None or self.aw.qmc.palette['canvas'] == 'None':
                 canvas_color = 'white'
             else:
-                canvas_color = self.aw.qmc.palette['canvas']
-            brightness_title = self.aw.QColorBrightness(QColor(self.aw.qmc.palette['title']))
+                canvas_color = self.aw.qmc.palette['canvas'][:7]
+            brightness_title = self.aw.QColorBrightness(QColor(self.aw.qmc.palette['title'][:7]))
             brightness_canvas = self.aw.QColorBrightness(QColor(canvas_color))
             # in dark mode we choose the darker color as background
             if brightness_title > brightness_canvas:
                 backgroundcolor = QColor(canvas_color).name()
-                color = QColor(self.aw.qmc.palette['title']).name()
+                color = QColor(self.aw.qmc.palette['title'][:7]).name()
             else:
-                backgroundcolor = QColor(self.aw.qmc.palette['title']).name()
+                backgroundcolor = QColor(self.aw.qmc.palette['title'][:7]).name()
                 color = QColor(canvas_color).name()
             self.titleedit.setStyleSheet(
                 'QComboBox {font-weight: bold; background-color: ' + backgroundcolor + '; color: ' + color + ';} QComboBox QAbstractItemView {font-weight: normal;}')
         else:
             color = ''
             if self.aw.qmc.palette['title'] is not None and self.aw.qmc.palette['title'] != 'None':
-                color = ' color: ' + QColor(self.aw.qmc.palette['title']).name() + ';'
+                color = ' color: ' + QColor(self.aw.qmc.palette['title'][:7]).name() + ';'
             backgroundcolor = ''
             if self.aw.qmc.palette['canvas'] is not None and self.aw.qmc.palette['canvas'] != 'None':
-                backgroundcolor = ' background-color: ' + QColor(self.aw.qmc.palette['canvas']).name() + ';'
+                backgroundcolor = ' background-color: ' + QColor(self.aw.qmc.palette['canvas'][:7]).name() + ';'
             self.titleedit.setStyleSheet(
                 'QComboBox {font-weight: bold;' + color + backgroundcolor + '} QComboBox QAbstractItemView {font-weight: normal;}')
         self.titleedit.setView(QListView())
@@ -5081,7 +5081,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.aw.qmc.fig.canvas.draw()
             else:
                 self.aw.qmc.setProfileTitle(self.aw.qmc.title)
-                titleB = ''
+#                titleB = ''
                 if self.aw.qmc.background and not (self.aw.qmc.title is None or self.aw.qmc.title == ''):
                     if self.aw.qmc.roastbatchnrB == 0:
                         titleB = self.aw.qmc.titleB

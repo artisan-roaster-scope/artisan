@@ -428,6 +428,7 @@ def getDirectory(filename: str, ext: Optional[str] = None, share: bool = False) 
     return str(fp)
 
 
+# standard/MPL hex color strings append alpha information to the end, while QColor assumes the alpha information in color name strings at the begin
 
 # converts QColor ARGB names to a standard/MPL hex color strings with alpha values at the end
 def argb_colorname2rgba_colorname(c:str) -> str:

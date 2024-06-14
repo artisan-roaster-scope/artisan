@@ -526,7 +526,11 @@ class serialport:
                                    self.Ikawa_MROR,           #160
                                    self.HH309_34,             #161
                                    self.Digi_Sense_20250_07,  #162
-                                   self.Extech42570           #163
+                                   self.Extech42570,          #163
+                                   self.Mugma_BTET,           #164
+                                   self.Mugma_HeaterFan,      #165
+                                   self.Mugma_Catalyzer,      #166
+                                   self.Mugma_SV              #167
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -1615,6 +1619,43 @@ class serialport:
         else:
             t1 = t2 = -1
         return tx,t1,t2 # time, -1 (chan2), Drum (chan1)
+
+    def Mugma_BTET(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        if self.aw.mugma is not None:
+            t1 = self.aw.mugma.getET()
+            t2 = self.aw.mugma.getBT()
+            if self.aw.qmc.mode == 'F':
+                t1 = fromCtoFstrict(t1)
+                t2 = fromCtoFstrict(t2)
+        else:
+            t1 = t2 = -1
+        return tx,t1,t2 # time, ET (chan2), BT (chan1)
+
+    def Mugma_HeaterFan(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        if self.aw.mugma is not None:
+            t1 = self.aw.mugma.getHeater()
+            t2 = self.aw.mugma.getFan()
+        else:
+            t1 = t2 = -1
+        return tx,t1,t2 # time, Fan (chan2), Heater (chan1)
+
+    def Mugma_Catalyzer(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        if self.aw.mugma is not None:
+            t1 = t2 = self.aw.mugma.getCatalyzer()
+        else:
+            t1 = t2 = -1
+        return tx,t1,t2 # time, Catalyzer (chan2), Catalyzer (chan1)
+
+    def Mugma_SV(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        if self.aw.mugma is not None:
+            t1 = t2 = self.aw.mugma.getSV()
+        else:
+            t1 = t2 = -1
+        return tx,t1,t2 # time, SV (chan2), SV (chan1)
 
     def Kaleido_BTET(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()

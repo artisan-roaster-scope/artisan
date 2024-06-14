@@ -18,6 +18,7 @@
 import logging
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQLabel, MyQLCDNumber, ClickableLCDFrame
+from artisanlib.util import rgba_colorname2argb_colorname
 
 try:
     from PyQt6.QtCore import (Qt, QSettings, pyqtSlot, QPoint) # @UnusedImport @Reimport  @UnresolvedImport
@@ -186,7 +187,7 @@ class LargeLCDs(ArtisanDialog):
         lcd.setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
         lcd.setFrameStyle(QFrame.Shadow.Plain)
         lcd.setSmallDecimalPoint(False)
-        lcd.setStyleSheet(f'QLCDNumber {{ color: {self.aw.lcdpaletteF[s]}; background-color: {self.aw.lcdpaletteB[s]};}}')
+        lcd.setStyleSheet(f'QLCDNumber {{ color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteF[s])}; background-color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteB[s])};}}')
         return lcd
 
     @staticmethod
@@ -229,28 +230,28 @@ class LargeLCDs(ArtisanDialog):
     def updateStyles(self) -> None:
         for i,s in enumerate(self.lcds1styles):
             try:
-                self.lcds1labelsUpper[i].setStyleSheet(f'QLabel {{ color: {self.aw.lcdpaletteF[s]}; background-color: {self.aw.lcdpaletteB[s]};}}')
+                self.lcds1labelsUpper[i].setStyleSheet(f'QLabel {{ color: {self.aw.lcdpaletteF[s][:7]}; background-color: {self.aw.lcdpaletteB[s][:7]};}}')
             except Exception: # pylint: disable=broad-except
                 pass
             try:
-                self.lcds1[i].setStyleSheet(f'QLCDNumber {{ color: {self.aw.lcdpaletteF[s]}; background-color: {self.aw.lcdpaletteB[s]};}}')
+                self.lcds1[i].setStyleSheet(f'QLCDNumber {{ color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteF[s])}; background-color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteB[s])};}}')
             except Exception: # pylint: disable=broad-except
                 pass
             try:
-                self.lcds1labelsLower[i].setStyleSheet(f'QLabel {{ color: {self.aw.lcdpaletteF[s]}; background-color: {self.aw.lcdpaletteB[s]};}}')
+                self.lcds1labelsLower[i].setStyleSheet(f'QLabel {{ color: {self.aw.lcdpaletteF[s][:7]}; background-color: {self.aw.lcdpaletteB[s][:7]};}}')
             except Exception: # pylint: disable=broad-except
                 pass
         for i,s in enumerate(self.lcds2styles):
             try:
-                self.lcds2labelsUpper[i].setStyleSheet(f'QLabel {{ color: {self.aw.lcdpaletteF[s]}; background-color: {self.aw.lcdpaletteB[s]};}}')
+                self.lcds2labelsUpper[i].setStyleSheet(f'QLabel {{ color: {self.aw.lcdpaletteF[s][:7]}; background-color: {self.aw.lcdpaletteB[s][:7]};}}')
             except Exception: # pylint: disable=broad-except
                 pass
             try:
-                self.lcds2[i].setStyleSheet(f'QLCDNumber {{ color: {self.aw.lcdpaletteF[s]}; background-color: {self.aw.lcdpaletteB[s]};}}')
+                self.lcds2[i].setStyleSheet(f'QLCDNumber {{ color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteF[s])}; background-color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteB[s])};}}')
             except Exception: # pylint: disable=broad-except
                 pass
             try:
-                self.lcds2labelsLower[i].setStyleSheet(f'QLabel {{ color: {self.aw.lcdpaletteF[s]}; background-color: {self.aw.lcdpaletteB[s]};}}')
+                self.lcds2labelsLower[i].setStyleSheet(f'QLabel {{ color: {self.aw.lcdpaletteF[s][:7]}; background-color: {self.aw.lcdpaletteB[s][:7]};}}')
             except Exception: # pylint: disable=broad-except
                 pass
 
@@ -361,10 +362,10 @@ class LargeMainLCDs(LargeLCDs):
 
     def setTimerLCDcolor(self, fc:str, bc:str) -> None:
         if self.lcd0 is not None:
-            self.lcd0.setStyleSheet(f'QLCDNumber {{ color: {fc}; background-color: {bc};}}')
+            self.lcd0.setStyleSheet(f'QLCDNumber {{ color: {rgba_colorname2argb_colorname(fc)}; background-color: {rgba_colorname2argb_colorname(bc)};}}')
 
     def updateStyles(self) -> None:
-        self.setTimerLCDcolor(self.aw.lcdpaletteF['timer'],self.aw.lcdpaletteB['timer'])
+        self.setTimerLCDcolor(self.aw.lcdpaletteF['timer'][:7],self.aw.lcdpaletteB['timer'][:7])
         super().updateStyles()
 
     def updateValues(self, values1:List[Optional[str]], values2:List[Optional[str]],
@@ -709,12 +710,12 @@ class LargeExtraLCDs(LargeLCDs):
         super().updateStyles()
         for i,s in enumerate(self.lcds1styles):
             try:
-                self.lcds1labelsUpper[i].setStyleSheet(f'QLabel {{ color: {self.aw.qmc.extradevicecolor1[i]}; background-color: {self.aw.lcdpaletteB[s]};}}')
+                self.lcds1labelsUpper[i].setStyleSheet(f'QLabel {{ color: {self.aw.qmc.extradevicecolor1[i][:7]}; background-color: {self.aw.lcdpaletteB[s][:7]};}}')
             except Exception: # pylint: disable=broad-except
                 pass
         for i,s in enumerate(self.lcds2styles):
             try:
-                self.lcds2labelsUpper[i].setStyleSheet(f'QLabel {{ color: {self.aw.qmc.extradevicecolor2[i]}; background-color: {self.aw.lcdpaletteB[s]};}}')
+                self.lcds2labelsUpper[i].setStyleSheet(f'QLabel {{ color: {self.aw.qmc.extradevicecolor2[i][:7]}; background-color: {self.aw.lcdpaletteB[s][:7]};}}')
             except Exception: # pylint: disable=broad-except
                 pass
 

@@ -17,7 +17,7 @@
 
 import platform
 
-from artisanlib.util import deltaLabelUTF8
+from artisanlib.util import deltaLabelUTF8, rgba_colorname2argb_colorname, argb_colorname2rgba_colorname
 from artisanlib.dialogs import ArtisanDialog
 from typing import Optional, Dict, TYPE_CHECKING
 
@@ -642,7 +642,7 @@ class graphColorDlg(ArtisanDialog):
                 self.setlcdColor(self.aw.lcdpaletteB,self.aw.lcdpaletteF,'et')
             else:
                 self.setlcdColor(self.aw.lcdpaletteF,self.aw.lcdpaletteB,'et')
-            self.aw.lcd2.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['et']}; background-color: {self.aw.lcdpaletteB['et']};}}")
+            self.aw.lcd2.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteF['et'])}; background-color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteB['et'])};}}")
             if self.aw.largeLCDs_dialog:
                 self.aw.largeLCDs_dialog.updateStyles()
         if lcdButton in [self.lcd3LEDButton,self.lcd3backButton]:
@@ -650,7 +650,7 @@ class graphColorDlg(ArtisanDialog):
                 self.setlcdColor(self.aw.lcdpaletteB,self.aw.lcdpaletteF,'bt')
             else:
                 self.setlcdColor(self.aw.lcdpaletteF,self.aw.lcdpaletteB,'bt')
-            self.aw.lcd3.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['bt']}; background-color: {self.aw.lcdpaletteB['bt']};}}")
+            self.aw.lcd3.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteF['bt'])}; background-color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteB['bt'])};}}")
             if self.aw.largeLCDs_dialog:
                 self.aw.largeLCDs_dialog.updateStyles()
         if lcdButton in [self.lcd4LEDButton,self.lcd4backButton]:
@@ -658,7 +658,7 @@ class graphColorDlg(ArtisanDialog):
                 self.setlcdColor(self.aw.lcdpaletteB,self.aw.lcdpaletteF,'deltaet')
             else:
                 self.setlcdColor(self.aw.lcdpaletteF,self.aw.lcdpaletteB,'deltaet')
-            self.aw.lcd4.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['deltaet']}; background-color: {self.aw.lcdpaletteB['deltaet']};}}")
+            self.aw.lcd4.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteF['deltaet'])}; background-color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteB['deltaet'])};}}")
             if self.aw.largeDeltaLCDs_dialog:
                 self.aw.largeDeltaLCDs_dialog.updateStyles()
         if lcdButton in [self.lcd5LEDButton,self.lcd5backButton]:
@@ -666,7 +666,7 @@ class graphColorDlg(ArtisanDialog):
                 self.setlcdColor(self.aw.lcdpaletteB,self.aw.lcdpaletteF,'deltabt')
             else:
                 self.setlcdColor(self.aw.lcdpaletteF,self.aw.lcdpaletteB,'deltabt')
-            self.aw.lcd5.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['deltabt']}; background-color: {self.aw.lcdpaletteB['deltabt']};}}")
+            self.aw.lcd5.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteF['deltabt'])}; background-color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteB['deltabt'])};}}")
             if self.aw.largeDeltaLCDs_dialog:
                 self.aw.largeDeltaLCDs_dialog.updateStyles()
         if lcdButton in [self.lcd6LEDButton,self.lcd6backButton]:
@@ -674,11 +674,11 @@ class graphColorDlg(ArtisanDialog):
                 self.setlcdColor(self.aw.lcdpaletteB,self.aw.lcdpaletteF,'sv')
             else:
                 self.setlcdColor(self.aw.lcdpaletteF,self.aw.lcdpaletteB,'sv')
-            self.aw.lcd6.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['sv']}; background-color: {self.aw.lcdpaletteB['sv']};}}")
-            self.aw.lcd7.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['sv']}; background-color: {self.aw.lcdpaletteB['sv']};}}")
+            self.aw.lcd6.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteB['sv'])};}}")
+            self.aw.lcd7.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteB['sv'])};}}")
             for i in range(len(self.aw.qmc.extradevices)):
-                self.aw.extraLCD1[i].setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['sv']}; background-color: {self.aw.lcdpaletteB['sv']};}}")
-                self.aw.extraLCD2[i].setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {self.aw.lcdpaletteF['sv']}; background-color: {self.aw.lcdpaletteB['sv']};}}")
+                self.aw.extraLCD1[i].setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteB['sv'])};}}")
+                self.aw.extraLCD2[i].setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteB['sv'])};}}")
             if self.aw.largePIDLCDs_dialog:
                 self.aw.largePIDLCDs_dialog.updateStyles()
             if self.aw.largeExtraLCDs_dialog:
@@ -746,31 +746,31 @@ class graphColorDlg(ArtisanDialog):
         self.bgdeltabtButton.setText(self.aw.qmc.backgrounddeltabtcolor)
         self.bgextraButton.setText(self.aw.qmc.backgroundxtcolor)
         self.bgextra2Button.setText(self.aw.qmc.backgroundytcolor)
-        self.bgmetButton.setStyleSheet('QPushButton { background-color: ' + self.aw.qmc.backgroundmetcolor + '; color: ' + self.aw.labelBorW(self.aw.qmc.backgroundmetcolor) + ';' + self.commonstyle + '}')
-        self.bgbtButton.setStyleSheet('QPushButton { background-color: ' + self.aw.qmc.backgroundbtcolor + '; color: ' + self.aw.labelBorW(self.aw.qmc.backgroundbtcolor) + ';' + self.commonstyle + '}')
-        self.bgdeltametButton.setStyleSheet('QPushButton { background-color: ' + self.aw.qmc.backgrounddeltaetcolor + '; color: ' + self.aw.labelBorW(self.aw.qmc.backgrounddeltaetcolor) + ';' + self.commonstyle + '}')
-        self.bgdeltabtButton.setStyleSheet('QPushButton { background-color: ' + self.aw.qmc.backgrounddeltabtcolor + '; color: ' + self.aw.labelBorW(self.aw.qmc.backgrounddeltabtcolor) + ';' + self.commonstyle + '}')
-        self.bgextraButton.setStyleSheet('QPushButton { background-color: ' + self.aw.qmc.backgroundxtcolor + '; color: ' + self.aw.labelBorW(self.aw.qmc.backgroundxtcolor) + ';' + self.commonstyle + '}')
-        self.bgextra2Button.setStyleSheet('QPushButton { background-color: ' + self.aw.qmc.backgroundytcolor + '; color: ' + self.aw.labelBorW(self.aw.qmc.backgroundytcolor) + ';' + self.commonstyle + '}')
+        self.bgmetButton.setStyleSheet('QPushButton { background-color: ' + rgba_colorname2argb_colorname(self.aw.qmc.backgroundmetcolor) + '; color: ' + self.aw.labelBorW(self.aw.qmc.backgroundmetcolor) + ';' + self.commonstyle + '}')
+        self.bgbtButton.setStyleSheet('QPushButton { background-color: ' + rgba_colorname2argb_colorname(self.aw.qmc.backgroundbtcolor) + '; color: ' + self.aw.labelBorW(self.aw.qmc.backgroundbtcolor) + ';' + self.commonstyle + '}')
+        self.bgdeltametButton.setStyleSheet('QPushButton { background-color: ' + rgba_colorname2argb_colorname(self.aw.qmc.backgrounddeltaetcolor) + '; color: ' + self.aw.labelBorW(self.aw.qmc.backgrounddeltaetcolor) + ';' + self.commonstyle + '}')
+        self.bgdeltabtButton.setStyleSheet('QPushButton { background-color: ' + rgba_colorname2argb_colorname(self.aw.qmc.backgrounddeltabtcolor) + '; color: ' + self.aw.labelBorW(self.aw.qmc.backgrounddeltabtcolor) + ';' + self.commonstyle + '}')
+        self.bgextraButton.setStyleSheet('QPushButton { background-color: ' + rgba_colorname2argb_colorname(self.aw.qmc.backgroundxtcolor) + '; color: ' + self.aw.labelBorW(self.aw.qmc.backgroundxtcolor) + ';' + self.commonstyle + '}')
+        self.bgextra2Button.setStyleSheet('QPushButton { background-color: ' + rgba_colorname2argb_colorname(self.aw.qmc.backgroundytcolor) + '; color: ' + self.aw.labelBorW(self.aw.qmc.backgroundytcolor) + ';' + self.commonstyle + '}')
         self.opaqbgSpinBox.setValue(int(round(self.aw.qmc.backgroundalpha * 10)))
 
         # LEDs
-        self.lcd1backButton.setStyleSheet('background-color: ' + self.aw.lcdpaletteB['timer'] + '; color: ' + self.aw.lcdpaletteF['timer'] + ';' + self.commonstyle)
-        self.lcd1LEDButton.setStyleSheet('background-color: ' + self.aw.lcdpaletteB['timer'] + '; color: ' + self.aw.lcdpaletteF['timer'] + ';' + self.commonstyle)
-        self.lcd2backButton.setStyleSheet('background-color: ' + self.aw.lcdpaletteB['et'] + '; color: ' + self.aw.lcdpaletteF['et'] + ';' + self.commonstyle)
-        self.lcd2LEDButton.setStyleSheet('background-color: ' + self.aw.lcdpaletteB['et'] + '; color: ' + self.aw.lcdpaletteF['et'] + ';' + self.commonstyle)
-        self.lcd3backButton.setStyleSheet('background-color: ' + self.aw.lcdpaletteB['bt'] + '; color: ' + self.aw.lcdpaletteF['bt'] + ';' + self.commonstyle)
-        self.lcd3LEDButton.setStyleSheet('background-color: ' + self.aw.lcdpaletteB['bt'] + '; color: ' + self.aw.lcdpaletteF['bt'] + ';' + self.commonstyle)
-        self.lcd4backButton.setStyleSheet('background-color: ' + self.aw.lcdpaletteB['deltaet'] + '; color: ' + self.aw.lcdpaletteF['deltaet'] + ';' + self.commonstyle)
-        self.lcd4LEDButton.setStyleSheet('background-color: ' + self.aw.lcdpaletteB['deltaet'] + '; color: ' + self.aw.lcdpaletteF['deltaet'] + ';' + self.commonstyle)
-        self.lcd5backButton.setStyleSheet('background-color: ' + self.aw.lcdpaletteB['deltabt'] + '; color: ' + self.aw.lcdpaletteF['deltabt'] + ';' + self.commonstyle)
-        self.lcd5LEDButton.setStyleSheet('background-color: ' + self.aw.lcdpaletteB['deltabt'] + '; color: ' + self.aw.lcdpaletteF['deltabt'] + ';' + self.commonstyle)
-        self.lcd6backButton.setStyleSheet('background-color: ' + self.aw.lcdpaletteB['sv'] + '; color: ' + self.aw.lcdpaletteF['sv'] + ';' + self.commonstyle)
-        self.lcd6LEDButton.setStyleSheet('background-color: ' + self.aw.lcdpaletteB['sv'] + '; color: ' + self.aw.lcdpaletteF['sv'] + ';' + self.commonstyle)
-        self.lcd7backButton.setStyleSheet('background-color: ' + self.aw.lcdpaletteB['rstimer'] + '; color: ' + self.aw.lcdpaletteF['rstimer'] + ';' + self.commonstyle)
-        self.lcd7LEDButton.setStyleSheet('background-color: ' + self.aw.lcdpaletteB['rstimer'] + '; color: ' + self.aw.lcdpaletteF['rstimer'] + ';' + self.commonstyle)
-        self.lcd8backButton.setStyleSheet('background-color: ' + self.aw.lcdpaletteB['slowcoolingtimer'] + '; color: ' + self.aw.lcdpaletteF['slowcoolingtimer'] + ';' + self.commonstyle)
-        self.lcd8LEDButton.setStyleSheet('background-color: ' + self.aw.lcdpaletteB['slowcoolingtimer'] + '; color: ' + self.aw.lcdpaletteF['slowcoolingtimer'] + ';' + self.commonstyle)
+        self.lcd1backButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['timer']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['timer']) + ';' + self.commonstyle)
+        self.lcd1LEDButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['timer']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['timer']) + ';' + self.commonstyle)
+        self.lcd2backButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['et']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['et']) + ';' + self.commonstyle)
+        self.lcd2LEDButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['et']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['et']) + ';' + self.commonstyle)
+        self.lcd3backButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['bt']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['bt']) + ';' + self.commonstyle)
+        self.lcd3LEDButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['bt']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['bt']) + ';' + self.commonstyle)
+        self.lcd4backButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['deltaet']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['deltaet']) + ';' + self.commonstyle)
+        self.lcd4LEDButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['deltaet']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['deltaet']) + ';' + self.commonstyle)
+        self.lcd5backButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['deltabt']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['deltabt']) + ';' + self.commonstyle)
+        self.lcd5LEDButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['deltabt']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['deltabt']) + ';' + self.commonstyle)
+        self.lcd6backButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['sv']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['sv']) + ';' + self.commonstyle)
+        self.lcd6LEDButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['sv']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['sv']) + ';' + self.commonstyle)
+        self.lcd7backButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['rstimer']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['rstimer']) + ';' + self.commonstyle)
+        self.lcd7LEDButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['rstimer']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['rstimer']) + ';' + self.commonstyle)
+        self.lcd8backButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['slowcoolingtimer']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['slowcoolingtimer']) + ';' + self.commonstyle)
+        self.lcd8LEDButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['slowcoolingtimer']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['slowcoolingtimer']) + ';' + self.commonstyle)
 
         if str(self.aw.qmc.palette['canvas']) == 'None':
             self.canvasLabel.setStyleSheet('QPushButton {background-color: #f0f0f0 ;' + self.commonstyle + '}')
@@ -779,7 +779,7 @@ class graphColorDlg(ArtisanDialog):
         c = self.aw.qmc.palette[tag]
         button.setText(c)
         tc = self.aw.labelBorW(c)
-        button.setStyleSheet('QPushButton {background: ' + c + '; color: ' + tc + ';' + self.commonstyle + '}')
+        button.setStyleSheet('QPushButton {background: ' + rgba_colorname2argb_colorname(c) + '; color: ' + tc + ';' + self.commonstyle + '}')
 
     # adds a new event to the Dlg
     @pyqtSlot(bool)
@@ -826,16 +826,15 @@ class graphColorDlg(ArtisanDialog):
         elif widget == self.bgextra2Button:
             self.setbgColor('Extra2',self.bgextra2Button,self.aw.qmc.backgroundytcolor)
 
+    # background colors
     def setbgColor(self, title:str, var:QPushButton, color:str) -> None:
-        labelcolor = QColor(color)
-        colorf = self.aw.colordialog(labelcolor)
+        labelcolor = QColor(rgba_colorname2argb_colorname(color))
+        colorf = self.aw.colordialog(labelcolor, alphasupport=True)
         if colorf.isValid():
-            color = str(colorf.name())
-            self.aw.updateCanvasColors()
+            color = argb_colorname2rgba_colorname(colorf.name(QColor.NameFormat.HexArgb))
             tc = self.aw.labelBorW(color)
-            var.setText(colorf.name())
-            var.setStyleSheet('QPushButton { background-color: ' + color + '; color: ' + tc + ';' + self.commonstyle + '}')
-            self.aw.qmc.redraw(recomputeAllDeltas=False)
+            var.setText(color)
+            var.setStyleSheet('QPushButton { background-color: ' + rgba_colorname2argb_colorname(color) + '; color: ' + tc + ';' + self.commonstyle + '}')
             if title == 'ET':
                 self.aw.qmc.backgroundmetcolor = color
             elif title == 'BT':
@@ -848,13 +847,15 @@ class graphColorDlg(ArtisanDialog):
                 self.aw.qmc.backgroundxtcolor = color
             elif title == 'Extra2':
                 self.aw.qmc.backgroundytcolor = color
+            self.aw.updateCanvasColors()
+            self.aw.qmc.redraw(recomputeAllDeltas=False)
             self.aw.sendmessage(QApplication.translate('Message','Color of {0} set to {1}').format(title,str(color)))
 
     def setlcdColor(self, palette:Dict[str,str], disj_palette:Dict[str,str], select:str) -> None:
-        res = self.aw.colordialog(QColor(palette[select]))
+        res = self.aw.colordialog(QColor(rgba_colorname2argb_colorname(palette[select])), alphasupport=True)
         if QColor.isValid(res):
-            nc = str(res.name())
-            if nc == disj_palette[select] or (nc in {'white', '#ffffff'} and disj_palette[select] in {'white', '#ffffff'}) or (nc in {'black', '#000000'} and disj_palette[select] in {'black', '#000000'}):
+            nc = argb_colorname2rgba_colorname(res.name(QColor.NameFormat.HexArgb))
+            if nc == disj_palette[select] or (nc in {'white', '#ffffff', '#fffffffff'} and disj_palette[select] in {'white', '#ffffff', '#fffffffff'}) or (nc in {'black', '#000000', '#000000ff'} and disj_palette[select] in {'black', '#000000', '#000000ff'}):
                 # this QMessageBox is not rendered native on macOS for unknown reason. The same dialog called from a different dialog is rendered nativ.
                 QMessageBox.warning(None, #self.aw, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
                     QApplication.translate('Message', 'Config LCD colors'),
@@ -935,27 +936,27 @@ class graphColorDlg(ArtisanDialog):
         button.setStyleSheet('QPushButton {background-color:' + s + ';' + self.commonstyle + '}')
         return button
 
+    # foreground colors
     def setColor(self, title:str, var:QPushButton, color:str) -> None:
-        labelcolor = QColor(self.aw.qmc.palette[color])
-        colorf = self.aw.colordialog(labelcolor)
+        labelcolor = QColor(rgba_colorname2argb_colorname(self.aw.qmc.palette[color]))
+        colorf = self.aw.colordialog(labelcolor, alphasupport=True)
         if colorf.isValid():
-            self.aw.qmc.palette[color] = str(colorf.name())
+            self.aw.qmc.palette[color] = argb_colorname2rgba_colorname(colorf.name(QColor.NameFormat.HexArgb))
             self.aw.updateCanvasColors()
             self.aw.applyStandardButtonVisibility()
             self.aw.update_extraeventbuttons_visibility()
-            var.setText(colorf.name())
+            var.setText(self.aw.qmc.palette[color])
             tc = self.aw.labelBorW(self.aw.qmc.palette[color])
-            var.setStyleSheet('QPushButton { background: ' + self.aw.qmc.palette[color] + '; color: ' + tc + ';' + self.commonstyle + '}')
-#            var.setPalette(QPalette(colorf))
+            var.setStyleSheet('QPushButton { background: ' + rgba_colorname2argb_colorname(self.aw.qmc.palette[color]) + '; color: ' + tc + ';' + self.commonstyle + '}')
             self.aw.qmc.redraw(recomputeAllDeltas=False)
             if title == 'ET':
-                self.aw.setLabelColor(self.aw.label2, QColor(self.aw.qmc.palette[color]))
+                self.aw.setLabelColor(self.aw.label2, self.aw.qmc.palette[color])
             elif title == 'BT':
-                self.aw.setLabelColor(self.aw.label3,QColor(self.aw.qmc.palette[color]))
+                self.aw.setLabelColor(self.aw.label3, self.aw.qmc.palette[color])
             elif title == 'DeltaET':
-                self.aw.setLabelColor(self.aw.label4,QColor(self.aw.qmc.palette[color]))
+                self.aw.setLabelColor(self.aw.label4, self.aw.qmc.palette[color])
             elif title == 'DeltaBT':
-                self.aw.setLabelColor(self.aw.label5,QColor(self.aw.qmc.palette[color]))
+                self.aw.setLabelColor(self.aw.label5, self.aw.qmc.palette[color])
             self.aw.sendmessage(QApplication.translate('Message','Color of {0} set to {1}').format(title,str(self.aw.qmc.palette[color])))
 
     @pyqtSlot(int)

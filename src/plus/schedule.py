@@ -21,6 +21,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 import time
 import math
 import datetime
@@ -56,6 +57,7 @@ if TYPE_CHECKING:
     from PyQt6.QtWidgets import QLayout, QLayoutItem, QBoxLayout # noqa: F401 # pylint: disable=unused-import
 
 
+import plus.register
 import plus.controller
 import plus.connection
 import plus.stock
@@ -1366,7 +1368,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         current_schedule:List[ScheduledItem] = [si for si in self.scheduled_items if (si.date - today).days >= 0]
         plus.stock.init()
         schedule:List[plus.stock.ScheduledItem] = plus.stock.getSchedule()
-        _log.debug('schedule: %s',schedule)
+#        _log.debug('schedule: %s',schedule)
         # sort current schedule by order cache (if any)
         if self.aw.scheduled_items_uuids != []:
             new_schedule:List[plus.stock.ScheduledItem] = []
@@ -1433,7 +1435,6 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
                 _log.error(e)
         return res
 
-
 #    def scheduledItemsfilter(self, today:datetime.date, item:ScheduledItem) -> bool:
 #        # if user filter is active only items not for a specific user or for the current user (if available) are listed
 #        # if machine filter is active only items not for a specific machine or for the current machine setup are listed in case a current machine is set
@@ -1442,7 +1443,6 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
 #                (self.aw.qmc.roastertype_setup.strip() == '' or not self.aw.schedule_machine_filter or item.machine is None or
 #                    (self.aw.qmc.roastertype_setup.strip() != '' and item.machine is not None and
 #                        item.machine.strip() == self.aw.qmc.roastertype_setup.strip())))
-
 
     # sets the items values as properties of the current roast and links it back to this item
     def set_roast_properties(self, item:ScheduledItem) -> None:
@@ -1473,6 +1473,35 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
                     self.aw.qmc.plus_coffee = item.coffee
                     self.aw.qmc.plus_coffee_label = plus.stock.coffeeLabel(coffee)
                     self.aw.qmc.beans = plus.stock.coffee2beans(coffee)
+                    # set coffee attributes from stock (moisture, density, screen size):
+                    try:
+                        coffees:Optional[List[Tuple[str, Tuple[plus.stock.Coffee, plus.stock.StockItem]]]] = plus.stock.getCoffees(weight_unit_idx, item.store)
+                        idx:Optional[int] = plus.stock.getCoffeeStockPosition(item.coffee, item.store, coffees)
+                        if coffees is not None and idx is not None:
+                            cd = plus.stock.getCoffeeCoffeeDict(coffees[idx])
+                            if 'moisture' in cd and cd['moisture'] is not None:
+                                self.aw.qmc.moisture_greens = cd['moisture']
+                            else:
+                                self.aw.qmc.moisture_greens = 0
+                            if 'density' in cd and cd['density'] is not None:
+                                self.aw.qmc.density = (cd['density'],'g',1.,'l')
+                            else:
+                                self.aw.qmc.density = (0,'g',1.,'l')
+                            screen_size_min:int = 0
+                            screen_size_max:int = 0
+                            try:
+                                if 'screen_size' in cd and cd['screen_size'] is not None:
+                                    screen = cd['screen_size']
+                                    if 'min' in screen and screen['min'] is not None:
+                                        screen_size_min = int(screen['min'])
+                                    if 'max' in screen and screen['max'] is not None:
+                                        screen_size_max = int(screen['max'])
+                            except Exception:  # pylint: disable=broad-except
+                                pass
+                            self.aw.qmc.beansize_min = screen_size_min
+                            self.aw.qmc.beansize_max = screen_size_max
+                    except Exception as e:  # pylint: disable=broad-except
+                        _log.error(e)
             elif item.blend is not None:
                 blends:List[plus.stock.BlendStructure] = plus.stock.getBlends(weight_unit_idx, item.store)
                 # NOTE: a blend might not have an hr_id as is the case for all custom blends
@@ -1495,6 +1524,23 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
                     # set beans description
                     blend_lines = plus.stock.blend2beans(blend_structure, weight_unit_idx, self.aw.qmc.weight[0])
                     self.aw.qmc.beans = '\n'.join(blend_lines)
+                    # set blend attributes from stock (moisture, density, screen size):
+                    if 'moisture' in blend and blend['moisture'] is not None:
+                        self.aw.qmc.moisture_greens = blend['moisture']
+                    else:
+                        self.aw.qmc.moisture_greens = 0
+                    if 'density' in blend and blend['density'] is not None:
+                        self.aw.qmc.density = (blend['density'],'g',1.,'l')
+                    else:
+                        self.aw.qmc.density = (0,'g',1.,'l')
+                    if 'screen_min' in blend and blend['screen_min'] is not None:
+                        self.aw.qmc.beansize_min = blend['screen_min']
+                    else:
+                        self.aw.qmc.beansize_min = 0
+                    if 'screen_max' in blend and blend['screen_max'] is not None:
+                        self.aw.qmc.beansize_max = blend['screen_max']
+                    else:
+                        self.aw.qmc.beansize_max = 0
 
 
     def set_selected_remaining_item_roast_properties(self) -> None:
@@ -1660,13 +1706,13 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         data = item.data
         changes:Dict[str, Any] = {}
         try:
-            converted_data_weight = convertWeight(data.weight, 1, weight_units.index(self.aw.qmc.weight[2], 1))
+            converted_data_weight = convertWeight(data.weight, 1, weight_units.index(self.aw.qmc.weight[2]))
             converted_data_weight_str = f'{float2floatWeightVolume(converted_data_weight):g}'
             roasted_weight_value_str = comma2dot(self.roasted_weight.text())
             if converted_data_weight_str != roasted_weight_value_str:
                 # on textual changes, send updated weight
-                changes['end_weight'] = convertWeight(float(roasted_weight_value_str), weight_units.index(self.aw.qmc.weight[2], 1), 1)
-        except Exception:  # pylint: disable=broad-except
+                changes['end_weight'] = convertWeight(float(roasted_weight_value_str), weight_units.index(self.aw.qmc.weight[2]), 1)
+        except Exception as e:  # pylint: disable=broad-except
             pass
         current_roasted_color = int(round(float(self.roasted_color.text())))
         if current_roasted_color != data.color:
@@ -1712,100 +1758,127 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
     @pyqtSlot()
     def completed_items_selection_changed(self) -> None:
         sender = self.sender()
-        if sender is not None and isinstance(sender, NoDragItem) and plus.controller.is_on():
-            # editing is only possible if artisan.plus is connected or at least ON
+        if sender is not None and isinstance(sender, NoDragItem):
             splitter_sizes = self.completed_splitter.sizes()
-            # save previous edits and clear previous selection
-            if self.selected_completed_item is not None:
-                # compute the difference between the 5 property edit widget values and the corresponding CompletedItem values linked
-                # to the currently selected NoDragItem as sync_record
-                changes:Dict[str, Any] = self.changes(self.selected_completed_item)
-                if changes:
-                    # something got edited, we have to send the changes back to the server
-                    # first add essential metadata
-                    changes['roast_id'] = self.selected_completed_item.data.roastUUID.hex
-                    changes['modified_at'] = plus.util.epoch2ISO8601(time.time())
-                    try:
-                        plus.controller.connect(clear_on_failure=False, interactive=False)
-                        r = plus.connection.sendData(plus.config.roast_url, changes, 'POST')
-                        r.raise_for_status()
-                        # update successfully transmitted, we now also add/update the CompletedItem linked to self.selected_completed_item
-                        updated_completed_item:bool = self.selected_completed_item.data.update_completed_item(changes)
-                        if updated_completed_item:
-                            save_completed()
-                        # if previous selected roast is loaded we write the changes to its roast properties
-                        if self.selected_completed_item.data.roastUUID.hex == self.aw.qmc.roastUUID:
-                            self.updates_roast_properties_from_completed(self.selected_completed_item.data)
-                    except Exception as e:  # pylint: disable=broad-except
-                        # updating data to server failed, we keep the selection
-                        _log.error(e)
-                        self.aw.sendmessageSignal.emit(QApplication.translate('Message', 'Updating completed roast properties failed'), True, None)
-                        # we keep the selection
-                        return
-                # in case data was not edited or updating the edits to server succeeded we
-                # clear previous selection
-                self.selected_completed_item.deselect()
-            if sender != self.selected_completed_item:
-                if plus.sync.getSync(sender.data.roastUUID.hex) is None:
-                    _log.info('completed roast %s could not be edited as corresponding sync record is missing', sender.data.roastUUID.hex)
-                else:
-                    # fetch data if roast is participating in the sync record game
-                    profile_data: Optional[Dict[str, Any]] = plus.sync.fetchServerUpdate(sender.data.roastUUID.hex, return_data = True)
-                    if profile_data is not None:
-                        # update completed items data from received profile_data
-                        updated:bool = sender.data.update_completed_item(profile_data)
-                        # on changes, update loaded profile if saved earlier
-                        if (updated and self.aw.curFile is not None and sender.data.roastUUID.hex == self.aw.qmc.roastUUID and
-                                self.aw.qmc.plus_file_last_modified is not None and 'modified_at' in profile_data and
-                                plus.util.ISO86012epoch(profile_data['modified_at']) > self.aw.qmc.plus_file_last_modified):
-                            plus.sync.applyServerUpdates(profile_data)
-                            # we update the loaded profile timestamp to avoid receiving the same update again
-                            self.aw.qmc.plus_file_last_modified = time.time()
-                        # start item editing mode
-                        sender.select()
-                        self.selected_completed_item = sender
-                        # update UI item
-                        self.set_details(sender)
-                        if len(splitter_sizes)>1:
-                            # enable focus on input widgets
-                            self.roasted_weight.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-                            self.roasted_color.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-                            self.roasted_density.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-                            self.roasted_moisture.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-                            self.roasted_notes.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-                            if splitter_sizes[1] == 0:
-                                if self.completed_splitter_open_height != 0:
-                                    self.completed_splitter.setSizes([
-                                        sum(splitter_sizes) - self.completed_splitter_open_height,
-                                        self.completed_splitter_open_height])
-                                else:
-                                    second_split_widget = self.completed_splitter.widget(1)
-                                    if second_split_widget is not None:
-                                        max_details_height = second_split_widget.sizeHint().height()
-                                        self.completed_splitter.setSizes([
-                                            sum(splitter_sizes) - max_details_height,
-                                            max_details_height])
-                            else:
-                                self.completed_splitter_open_height = splitter_sizes[1]
+            if plus.controller.is_on():
+                # editing is only possible if artisan.plus is connected or at least ON
+                # save previous edits and clear previous selection
+                if self.selected_completed_item is not None:
+                    # compute the difference between the 5 property edit widget values and the corresponding CompletedItem values linked
+                    # to the currently selected NoDragItem as sync_record
+                    changes:Dict[str, Any] = self.changes(self.selected_completed_item)
+                    if changes:
+                        # something got edited, we have to send the changes back to the server
+                        # first add essential metadata
+                        changes['roast_id'] = self.selected_completed_item.data.roastUUID.hex
+                        changes['modified_at'] = plus.util.epoch2ISO8601(time.time())
+                        try:
+                            plus.controller.connect(clear_on_failure=False, interactive=False)
+                            r = plus.connection.sendData(plus.config.roast_url, changes, 'POST')
+                            r.raise_for_status()
+                            # update successfully transmitted, we now also add/update the CompletedItem linked to self.selected_completed_item
+                            updated_completed_item:bool = self.selected_completed_item.data.update_completed_item(changes)
+                            if updated_completed_item:
+                                save_completed()
+                            # if previous selected roast is loaded we write the changes to its roast properties
+                            if self.selected_completed_item.data.roastUUID.hex == self.aw.qmc.roastUUID:
+                                self.updates_roast_properties_from_completed(self.selected_completed_item.data)
+                        except Exception as e:  # pylint: disable=broad-except
+                            # updating data to server failed, we keep the selection
+                            _log.error(e)
+                            self.aw.sendmessageSignal.emit(QApplication.translate('Message', 'Updating completed roast properties failed'), True, None)
+                            # we keep the selection
+                            return
+                    # in case data was not edited or updating the edits to server succeeded we
+                    # clear previous selection
+                    self.selected_completed_item.deselect()
+                if sender != self.selected_completed_item:
+                    if plus.sync.getSync(sender.data.roastUUID.hex) is None:
+                        _log.info('completed roast %s could not be edited as corresponding sync record is missing', sender.data.roastUUID.hex)
                     else:
-                        self.aw.sendmessageSignal.emit(QApplication.translate('Message', 'Fetching completed roast properties failed'), True, None)
-            else:
-                # edits completed, reset selection
-                self.selected_completed_item = None
-                # clear details split view
-                self.set_details(None)
-                # remember open height (might be user set)
-                if len(splitter_sizes)>1:
-                    self.completed_splitter_open_height = splitter_sizes[1]
-                # close details split
-                self.completed_splitter.setSizes([sum(splitter_sizes),0])
-                # disable focus on input widgets to return keyboard focus to parent
-                self.roasted_weight.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-                self.roasted_color.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-                self.roasted_density.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-                self.roasted_moisture.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-                self.roasted_notes.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-
+                        # fetch data if roast is participating in the sync record game
+                        profile_data: Optional[Dict[str, Any]] = plus.sync.fetchServerUpdate(sender.data.roastUUID.hex, return_data = True)
+                        if profile_data is not None:
+                            # update completed items data from received profile_data
+                            updated:bool = sender.data.update_completed_item(profile_data)
+                            # on changes, update loaded profile if saved earlier
+                            if (updated and self.aw.curFile is not None and sender.data.roastUUID.hex == self.aw.qmc.roastUUID and
+                                    self.aw.qmc.plus_file_last_modified is not None and 'modified_at' in profile_data and
+                                    plus.util.ISO86012epoch(profile_data['modified_at']) > self.aw.qmc.plus_file_last_modified):
+                                plus.sync.applyServerUpdates(profile_data)
+                                # we update the loaded profile timestamp to avoid receiving the same update again
+                                self.aw.qmc.plus_file_last_modified = time.time()
+                            # start item editing mode
+                            sender.select()
+                            self.selected_completed_item = sender
+                            # update UI item
+                            self.set_details(sender)
+                            if len(splitter_sizes)>1:
+                                # enable focus on input widgets
+                                self.roasted_weight.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+                                self.roasted_color.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+                                self.roasted_density.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+                                self.roasted_moisture.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+                                self.roasted_notes.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+                                if splitter_sizes[1] == 0:
+                                    if self.completed_splitter_open_height != 0:
+                                        self.completed_splitter.setSizes([
+                                            sum(splitter_sizes) - self.completed_splitter_open_height,
+                                            self.completed_splitter_open_height])
+                                    else:
+                                        second_split_widget = self.completed_splitter.widget(1)
+                                        if second_split_widget is not None:
+                                            max_details_height = second_split_widget.sizeHint().height()
+                                            self.completed_splitter.setSizes([
+                                                sum(splitter_sizes) - max_details_height,
+                                                max_details_height])
+                                else:
+                                    self.completed_splitter_open_height = splitter_sizes[1]
+                        else:
+                            self.aw.sendmessageSignal.emit(QApplication.translate('Message', 'Fetching completed roast properties failed'), True, None)
+                else:
+                    # edits completed, reset selection
+                    self.selected_completed_item = None
+                    # clear details split view
+                    self.set_details(None)
+                    # remember open height (might be user set)
+                    if len(splitter_sizes)>1:
+                        self.completed_splitter_open_height = splitter_sizes[1]
+                    # close details split
+                    self.completed_splitter.setSizes([sum(splitter_sizes),0])
+                    # disable focus on input widgets to return keyboard focus to parent
+                    self.roasted_weight.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+                    self.roasted_color.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+                    self.roasted_density.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+                    self.roasted_moisture.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+                    self.roasted_notes.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            elif not self.aw.qmc.flagon:
+                # plus controller is not on and Artisan is OFF we first close a potentially pending edit section and then try to load that profile
+                if self.selected_completed_item is not None:
+                    # we terminate editing mode if offline and reset selection
+                    self.selected_completed_item = None
+                    # clear details split view
+                    self.set_details(None)
+                    # remember open height (might be user set)
+                    if len(splitter_sizes)>1:
+                        self.completed_splitter_open_height = splitter_sizes[1]
+                    # close details split
+                    self.completed_splitter.setSizes([sum(splitter_sizes),0])
+                    # disable focus on input widgets to return keyboard focus to parent
+                    self.roasted_weight.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+                    self.roasted_color.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+                    self.roasted_density.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+                    self.roasted_moisture.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+                    self.roasted_notes.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+                # we try to load the clicked completed items profile if not yet loaded
+                sender_roastUUID = sender.data.roastUUID.hex
+                if sender_roastUUID != self.aw.qmc.roastUUID:
+                    item_path = plus.register.getPath(sender_roastUUID)
+                    if item_path is not None and os.path.isfile(item_path):
+                        try:
+                            self.aw.loadFile(item_path)
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.exception(e)
 
     def updateRoastedItems(self) -> None:
         self.nodrag_roasted.clearItems()

@@ -119,7 +119,7 @@ class tphasescanvas(FigureCanvas):
             self.aw.scroller.setVisible(True)
             # set canvas background color
             background_color = self.aw.qmc.palette['background']
-            self.setStyleSheet(f'background-color: {background_color}')
+            self.setStyleSheet(f'background-color: {background_color[:7]}')
             # maximum total roast time of all given profiles
             max_total_time = max(p[1] for p in self.data)
             # set font

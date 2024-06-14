@@ -871,7 +871,11 @@ class tgraphcanvas(FigureCanvas):
                        f'+IKAWA {deltaLabelUTF8}Humidity/{deltaLabelUTF8}Humidity Dir.',    #160
                        '+Omega HH309 34',           #161
                        'Digi-Sense 20250-07',       #162
-                       'Extech 42570'               #163
+                       'Extech 42570',              #163
+                       'Mugma BT/ET',               #164
+                       '+Mugma Heater/Fan',         #165
+                       '+Mugma Catalyzer',          #166
+                       '+Mugma SV'                  #167
                        ]
 
         # ADD DEVICE:
@@ -933,7 +937,8 @@ class tgraphcanvas(FigureCanvas):
             133, # Yocto Sensor
             134, # Santoker BT/ET
             138, # Kaleido BT/ET
-            142  # IKAWA
+            142, # IKAWA,
+            164  # Mugma BT/ET
         ]
 
         # ADD DEVICE:
@@ -1002,7 +1007,9 @@ class tgraphcanvas(FigureCanvas):
             157, # +Phidget DAQ1301 23
             158, # +Phidget DAQ1301 45
             159, # +Phidget DAQ1301 67
-            160  # IKAWA \Delta Humidity / \Delat Humidity direction
+            160, # IKAWA \Delta Humidity / \Delat Humidity direction
+            165, # +Mugma Heater/Fan
+            166  # +Mugma Catalyzer
         ]
 
         # ADD DEVICE:
@@ -1031,6 +1038,8 @@ class tgraphcanvas(FigureCanvas):
         #extra devices
         self.extradevices:List[int] = []                            # list with indexes for extra devices
         self.extratimex:List[List[float]] = []                      # individual time for each extra device (more accurate). List of lists (2 dimension)
+        #NOTE: extra device colors may contain alpha information thus to turn them into QColors, one needs to truncate the string by [:7] to remove the alpha or
+        #  or first convert the color string using util.rgba_colorname2argb_colorname to preserve the alpha information
         self.extradevicecolor1:List[str] = []                       # extra line 1 color. list with colors.
         self.extradevicecolor2:List[str] = []                       # extra line 2 color. list with colors.
         self.extratemp1:List[List[float]] = []                      # extra temp1. List of lists
@@ -3314,6 +3323,9 @@ class tgraphcanvas(FigureCanvas):
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
+
+    # ADD DEVICE:
+
     # returns True if the extra device n, channel c, is of type MODBUS or S7, has no factor defined, nor any math formula, and is of type int
     # channel c is either 0 or 1
     @functools.lru_cache(maxsize=None) # noqa: B019 # pylint: disable=W1518 #for Python >= 3.9 can use @functools.cache; Not relevant here, as qmc is only created once: [B019] Use of `functools.lru_cache` or `functools.cache` on methods can lead to memory leaks
@@ -3374,7 +3386,7 @@ class tgraphcanvas(FigureCanvas):
                 return self.aw.s7.type[6+c] != 1 and self.aw.s7.mode[6+c] == 0 and (self.aw.s7.div[6+c] == 0 or self.aw.s7.type[6+c] == 2) and no_math_formula_defined
             if self.extradevices[n] == 110: # S7_910
                 return self.aw.s7.type[8+c] != 1 and self.aw.s7.mode[8+c] == 0 and (self.aw.s7.div[8+c] == 0 or self.aw.s7.type[8+c] == 2) and no_math_formula_defined
-            if self.extradevices[n] in {54, 90, 91, 135, 136, 140, 141}: # Hottop Heater/Fan, Slider 12, Slider 34, Santoker Power / Fan, Kaleido Fan/Drum, Kaleido Heater/AH
+            if self.extradevices[n] in {54, 90, 91, 135, 136, 140, 141, 165}: # Hottop Heater/Fan, Slider 12, Slider 34, Santoker Power / Fan, Kaleido Fan/Drum, Kaleido Heater/AH, Mugma Heater/Fan
                 return True
             if self.extradevices[n] == 136 and c == 0: # Santoker Drum
                 return True
@@ -6365,7 +6377,7 @@ class tgraphcanvas(FigureCanvas):
             if s >= 59:
                 return f'{m+1:.0f}'
             if abs(s - 30) < 1:
-                return f'{m:d.5}'
+                return f'{m:d}.5'
             if s > 1:
                 return  f'{m:.0f}:{s:02.0f}'
             return f'{m:.0f}'
@@ -6377,7 +6389,7 @@ class tgraphcanvas(FigureCanvas):
         if s >= 59:
             return f'-{m+1:.0f}'
         if abs(s-30) < 1:
-            return f'-{m:d.5}'
+            return f'-{m:d}.5'
         if s > 1:
             return  f'-{m:.0f}:{s:02.0f}'
         if m == 0:
@@ -11670,6 +11682,15 @@ class tgraphcanvas(FigureCanvas):
                         _log.error(ex)
                         _, _, exc_tb = sys.exc_info()
                         self.adderror((QApplication.translate('Error Message', 'Exception:') + ' Bluetooth BLE support not available {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+                elif self.device == 164:
+                    # connect Mugma
+                    from artisanlib.mugma import Mugma
+                    self.aw.mugma = Mugma(self.aw.mugmaHost, self.aw.mugmaPort,
+                        connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Mugma'),True,None),
+                        disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Mugma'),True,None))
+                    self.aw.mugma.setLogging(self.device_logging)
+                    self.aw.mugma.start()
+
 
             self.aw.initializedMonitoringExtraDeviceStructures()
 
@@ -11790,6 +11811,11 @@ class tgraphcanvas(FigureCanvas):
                     except Exception as e: # pylint: disable=broad-except
                         _log.error(e)
                     self.aw.ikawa = None
+
+                # disconnect Mugma
+                if not bool(self.aw.simulator) and self.device == 164 and self.aw.mugma is not None:
+                    self.aw.mugma.stop()
+                    self.aw.mugma = None
 
                 # at OFF we stop the follow-background on FujiPIDs and set the SV to 0
                 if self.device == 0 and self.aw.fujipid.followBackground and self.aw.fujipid.sv and self.aw.fujipid.sv > 0:
@@ -12305,8 +12331,8 @@ class tgraphcanvas(FigureCanvas):
             self.aw.updateReadingsLCDsVisibility() # update visibility of reading LCDs based on the user preference
             if self.phasesLCDflag:
                 self.aw.phasesLCDs.show()
-                self.aw.TP2DRYlabel.setStyleSheet("background-color:'transparent'; color: " + self.palette['messages'] + ';')
-                self.aw.DRY2FCslabel.setStyleSheet("background-color:'transparent'; color: " + self.palette['messages'] + ';')
+                self.aw.TP2DRYlabel.setStyleSheet("background-color:'transparent'; color: " + self.palette['messages'][:7] + ';')
+                self.aw.DRY2FCslabel.setStyleSheet("background-color:'transparent'; color: " + self.palette['messages'][:7] + ';')
             if self.AUClcdFlag:
                 self.aw.AUCLCD.show()
 
@@ -16009,11 +16035,11 @@ class tgraphcanvas(FigureCanvas):
 
             margin = '&nbsp;&nbsp;&nbsp;'
             text_color_rect1 = '#ffffff' if self.aw.QColorBrightness(QColor(self.palette['rect1'])) < 128 else '#000000'
-            string1 = f" <font color = \"{text_color_rect1}\" style=\"BACKGROUND-COLOR: {self.palette['rect1']}\">{margin}{stringfromseconds(dryphasetime)}{margin}{dryphaseP}%{margin}{dryroc}{margin}</font>"
+            string1 = f" <font color = \"{text_color_rect1[:7]}\" style=\"BACKGROUND-COLOR: {self.palette['rect1'][:7]}\">{margin}{stringfromseconds(dryphasetime)}{margin}{dryphaseP}%{margin}{dryroc}{margin}</font>"
             text_color_rect2 = '#ffffff' if self.aw.QColorBrightness(QColor(self.palette['rect2'])) < 128 else '#000000'
-            string2 = f" <font color = \"{text_color_rect2}\" style=\"BACKGROUND-COLOR: {self.palette['rect2']}\">{margin} {stringfromseconds(midphasetime)} {margin} {midphaseP}% {margin} {midroc} {margin}</font>"
+            string2 = f" <font color = \"{text_color_rect2[:7]}\" style=\"BACKGROUND-COLOR: {self.palette['rect2'][:7]}\">{margin} {stringfromseconds(midphasetime)} {margin} {midphaseP}% {margin} {midroc} {margin}</font>"
             text_color_rect3 = '#ffffff' if self.aw.QColorBrightness(QColor(self.palette['rect3'])) < 128 else '#000000'
-            string3 = f" <font color = \"{text_color_rect3}\" style=\"BACKGROUND-COLOR: {self.palette['rect3']}\">{margin} {stringfromseconds(finishphasetime)} {margin} {finishphaseP}% {margin} {finishroc} {margin}</font>"
+            string3 = f" <font color = \"{text_color_rect3[:7]}\" style=\"BACKGROUND-COLOR: {self.palette['rect3'][:7]}\">{margin} {stringfromseconds(finishphasetime)} {margin} {finishphaseP}% {margin} {finishroc} {margin}</font>"
             self.aw.sendmessage(f'<PRE>{string1}{string2}{string3}</PRE>',append=False)
 
     #handler for moving point
