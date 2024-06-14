@@ -5778,7 +5778,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.lcd6.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
         # label always black?
         self.lcd7.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
-        self.updateExtraLCDvisibility()
+        self.updateLCDproperties()
 
     # switches slider layout to its alternative layout if 'alternativeLayout' is True,
     # other wise to standard layout
@@ -10792,24 +10792,29 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         # set LCDframe visibilities and labels
         ndev = len(self.qmc.extradevices)
         for i in range(ndev):
-            self.extraLCDframe1[i].setVisible(bool(self.extraLCDvisibility1[i]))
-            if i < len(self.qmc.extraname1):
-                l1 = '<b>' + self.qmc.extraname1[i] + '</b>'
-                try:
-                    self.extraLCDlabel1[i].setText(l1.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
-                except Exception: # pylint: disable=broad-except
+            if i < self.nLCDS:
+                self.extraLCDframe1[i].setVisible(bool(self.extraLCDvisibility1[i]))
+                if i < len(self.qmc.extraname1):
+                    l1 = '<b>' + self.qmc.extraname1[i] + '</b>'
+                    try:
+                        l1 = l1.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3])
+                    except Exception: # pylint: disable=broad-except
+                        # substitution might fail if the label contains brackets like in "t{FCS}"
+                        pass
                     self.extraLCDlabel1[i].setText(l1)
-                self.setLabelColor(self.extraLCDlabel1[i],self.qmc.extradevicecolor1[i])
-            self.extraLCD1[i].setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
-            self.extraLCDframe2[i].setVisible(bool(self.extraLCDvisibility2[i]))
-            if i < len(self.qmc.extraname2):
-                l2 = '<b>' + self.qmc.extraname2[i] + '</b>'
-                try:
-                    self.extraLCDlabel2[i].setText(l2.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
-                except Exception: # pylint: disable=broad-except
+                    self.setLabelColor(self.extraLCDlabel1[i],self.qmc.extradevicecolor1[i])
+                self.extraLCD1[i].setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
+                self.extraLCDframe2[i].setVisible(bool(self.extraLCDvisibility2[i]))
+                if i < len(self.qmc.extraname2):
+                    l2 = '<b>' + self.qmc.extraname2[i] + '</b>'
+                    try:
+                        l2 = l2.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3])
+                    except Exception: # pylint: disable=broad-except
+                        # substitution might fail if the label contains brackets like in "t{FCS}"
+                        pass
                     self.extraLCDlabel2[i].setText(l2)
-                self.setLabelColor(self.extraLCDlabel2[i],self.qmc.extradevicecolor2[i])
-            self.extraLCD2[i].setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
+                    self.setLabelColor(self.extraLCDlabel2[i],self.qmc.extradevicecolor2[i])
+                self.extraLCD2[i].setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
         #hide the rest (just in case)
         for i in range(ndev,self.nLCDS):
             self.extraLCDframe1[i].setVisible(False)
@@ -13159,7 +13164,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.extratemp1lines.append(self.qmc.ax.plot(self.qmc.extratimex[l], self.qmc.extratemp1[l],color=self.qmc.extradevicecolor1[l],markersize=self.qmc.extramarkersizes1[l],marker=self.qmc.extramarkers1[l],linewidth=self.qmc.extralinewidths1[l],linestyle=self.qmc.extralinestyles1[l],drawstyle=self.qmc.extradrawstyles1[l],label=self.qmc.extraname1[l])[0])
                 self.qmc.extratemp2lines.append(self.qmc.ax.plot(self.qmc.extratimex[l], self.qmc.extratemp2[l],color=self.qmc.extradevicecolor2[l],markersize=self.qmc.extramarkersizes2[l],marker=self.qmc.extramarkers2[l],linewidth=self.qmc.extralinewidths2[l],linestyle=self.qmc.extralinestyles2[l],drawstyle=self.qmc.extradrawstyles2[l],label=self.qmc.extraname2[l])[0])
 
-            self.updateExtraLCDvisibility()
+            self.updateLCDproperties()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
@@ -14156,10 +14161,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.extractemp2.append([])
         #extra LCDs and other LCDs visibility
         self.updateLCDproperties()
-        # set extraLCD colors
-        for i in range(len(self.qmc.extradevices)):
-            self.setLabelColor(self.extraLCDlabel1[i],self.qmc.extradevicecolor1[i])
-            self.setLabelColor(self.extraLCDlabel2[i],self.qmc.extradevicecolor2[i])
 
     def initializedMonitoringExtraDeviceStructures(self) -> None:
         self.qmc.on_timex = []
@@ -14607,7 +14608,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 # ensure that extra list length are of the size of the extradevices:
                 self.ensureCorrectExtraDeviceListLength()
 
-            self.updateExtraLCDvisibility()
+            self.updateLCDproperties()
 
             self.recording_version = profile.get('recording_version', 'unknown')
             if 'recording_revision' in profile:
@@ -19217,42 +19218,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             _, _, exc_tb = sys.exc_info()
             QMessageBox.information(self, QApplication.translate('Error Message', 'Error',None),QApplication.translate('Error Message', 'Exception:') + ' closeEventSettings_theme()  @line ' + str(getattr(exc_tb, 'tb_lineno', '?')))
 
-    def updateExtraLCDvisibility(self) -> None:
-        n = len(self.qmc.extradevices)
-        for i in range(n):
-            if i < self.nLCDS:
-                if self.extraLCDvisibility1[i]:
-                    if i < len(self.qmc.extraname1):
-                        l1 = '<b>' + self.qmc.extraname1[i] + '</b>'
-                        try:
-                            l1 = l1.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3])
-                        except Exception: # pylint: disable=broad-except
-                            # substitution might fail if the label contains brackets like in "t{FCS}"
-                            pass
-                        self.extraLCDlabel1[i].setText(l1)
-                        self.setLabelColor(self.extraLCDlabel1[i],self.qmc.extradevicecolor1[i])
-                    self.extraLCDframe1[i].setVisible(True)
-                    self.extraLCD1[i].setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
-                else:
-                    self.extraLCDframe1[i].setVisible(False)
-                if self.extraLCDvisibility2[i]:
-                    if i < len(self.qmc.extraname2):
-                        l2 = '<b>' + self.qmc.extraname2[i] + '</b>'
-                        try:
-                            l2 = l2.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3])
-                        except Exception: # pylint: disable=broad-except
-                            # substitution might fail if the label contains brackets like in "t{FCS}"
-                            pass
-                        self.extraLCDlabel2[i].setText(l2)
-                        self.setLabelColor(self.extraLCDlabel2[i],self.qmc.extradevicecolor2[i])
-                    self.extraLCDframe2[i].setVisible(True)
-                    self.extraLCD2[i].setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
-                else:
-                    self.extraLCDframe2[i].setVisible(False)
-        #hide the rest (just in case)
-        for i in range(n,self.nLCDS):
-            self.extraLCDframe1[i].setVisible(False)
-            self.extraLCDframe2[i].setVisible(False)
 
     def stopActivities(self) -> None:
         if self.full_screen_mode_active:

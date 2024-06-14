@@ -2049,7 +2049,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.qmc.extraname2.pop(x)
             self.aw.qmc.extramathexpression1.pop(x)
             self.aw.qmc.extramathexpression2.pop(x)
-            self.aw.updateExtraLCDvisibility()
+            self.aw.updateLCDproperties()
             #pop serial port settings
             if len(self.aw.extracomport) > x:
                 self.aw.extracomport.pop(x)
