@@ -1712,7 +1712,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
             if converted_data_weight_str != roasted_weight_value_str:
                 # on textual changes, send updated weight
                 changes['end_weight'] = convertWeight(float(roasted_weight_value_str), weight_units.index(self.aw.qmc.weight[2]), 1)
-        except Exception as e:  # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             pass
         current_roasted_color = int(round(float(self.roasted_color.text())))
         if current_roasted_color != data.color:
