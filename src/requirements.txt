@@ -52,7 +52,7 @@ scipy==1.10.1; python_version < '3.9' # last Python 3.8 release
 scipy==1.13.1; python_version >= '3.9'
 wquantiles==0.6
 colorspacious==1.1.2
-openpyxl==3.1.3
+openpyxl==3.1.4
 keyring==25.2.1
 prettytable==3.10.0
 lxml==5.2.2
