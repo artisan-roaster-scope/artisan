@@ -98,7 +98,7 @@ qt6-tools==6.5.0.1.3; (sys_platform=='darwin' and platform_release>='20.0') or (
 ### macOS specific packages
 ###
 appnope==0.1.4; sys_platform=='darwin'
-pyobjc-core==10.3; sys_platform=='darwin'
+pyobjc-core==10.3.1; sys_platform=='darwin'
 pyobjc-framework-Cocoa==10.3; sys_platform=='darwin'
 py2app==0.28.8; sys_platform=='darwin'
 #py-cpuinfo==9.0.0; sys_platform=='darwin' # used for proper CPU arch detection running under Rosetta2
