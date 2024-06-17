@@ -47,7 +47,7 @@ psutil==5.9.8
 typing-extensions==4.10.0; python_version < '3.8' # required for supporting Final and TypeDict on Python <3.8
 protobuf==5.27.1
 numpy==1.24.3; python_version < '3.9' # last Python 3.8 release
-numpy==1.26.4; python_version >= '3.9'
+numpy==2.0.0; python_version >= '3.9'
 scipy==1.10.1; python_version < '3.9' # last Python 3.8 release
 scipy==1.13.1; python_version >= '3.9'
 wquantiles==0.6
