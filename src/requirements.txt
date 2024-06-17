@@ -73,7 +73,7 @@ babel==2.15.0
 #
 ### yoctopuce 1.10.42060 on macOS 10.13
 yoctopuce==1.10.42060; sys_platform=='darwin' and platform_release<'20.0' # last version supporting macOS 10.13
-yoctopuce==2.0.61039; sys_platform!='darwin' or (sys_platform=='darwin' and platform_release>='20.0')
+yoctopuce==2.0.61305; sys_platform!='darwin' or (sys_platform=='darwin' and platform_release>='20.0')
 # last 1.x yoctopuce lib: 1.10.57762
 # 2.0.59414 is no longer universal2 lacking arm64 support; 2.0.59503 should fix this
 ##
