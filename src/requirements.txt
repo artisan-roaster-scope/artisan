@@ -64,7 +64,7 @@ aiohttp_jinja2==1.6
 python-bidi==0.4.2
 arabic-reshaper==3.0.0
 pillow>=10.2.0
-pydantic==2.7.3
+pydantic==2.7.4
 babel==2.15.0
 #
 #
