@@ -357,7 +357,7 @@ def disconnect(
                 )
             if config.app_window is not None:
                 if not keepON:
-                    config.app_window.plus_user_id = None # if this is cleared, the Scheduler cannnot filter by user in this ON (dark-grey) state
+                    config.app_window.plus_user_id = None # if this is cleared, the Scheduler cannot filter by user in this ON (dark-grey) state
                 if remove_credentials:
                     config.app_window.sendmessageSignal.emit(
                         QApplication.translate(
