@@ -487,6 +487,9 @@ class backgroundDlg(ArtisanResizeablDialog):
     def accept(self) -> None:
         self.aw.qmc.backgroundmovespeed = self.speedSpinBox.value()
         self.aw.qmc.backgroundKeyboardControlFlag = bool(self.keyboardControlflag.isChecked())
+        if self.aw.qmc.backgroundPlaybackEvents:
+            # turn on again after background load to ignore already passed events
+            self.aw.qmc.turn_playback_event_ON()
         self.close()
 
     @pyqtSlot('QCloseEvent')

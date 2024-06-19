@@ -229,6 +229,8 @@ def authentify() -> bool:
                 config.app_window.plus_used = 0
                 if 'account' in res['result']['user']:
                     res_account = res['result']['user']['account']
+                    if '_id' in res_account:
+                        config.app_window.plus_account_id = res_account['_id']
                     subscription = util.extractInfo(
                         res_account, 'subscription', ''
                     )

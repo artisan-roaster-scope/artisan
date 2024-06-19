@@ -660,7 +660,7 @@ class profileTransformatorDlg(ArtisanDialog):
                             res.append(fit_fuc(profileTime))
                         else:
                             res.append(None)
-                except numpy.RankWarning:
+                except numpy.exceptions.RankWarning:
                     pass
                 except Exception: # pylint: disable=broad-except
                     pass
@@ -711,7 +711,7 @@ class profileTransformatorDlg(ArtisanDialog):
                         fit_str = self.aw.fit2str(fit_func)
                     else:
                         res = [None]*5
-                except numpy.RankWarning:
+                except numpy.exceptions.RankWarning:
                     pass
                 except Exception: # pylint: disable=broad-except
                     pass
@@ -948,7 +948,7 @@ class profileTransformatorDlg(ArtisanDialog):
                                 new_timex = [tx+foffset for tx in new_timex]
                             extratimex.append(new_timex)
                         self.aw.qmc.extratimex = extratimex
-                except numpy.RankWarning:
+                except numpy.exceptions.RankWarning:
                     pass
         return True
 
@@ -994,7 +994,7 @@ class profileTransformatorDlg(ArtisanDialog):
                     fit = numpy.poly1d(p)
                     if fit is not None:
                         self.aw.qmc.temp2 = [(-1 if (temp is None) or (temp == -1) else fit(temp)) for temp in self.org_temp2]
-            except numpy.RankWarning:
+            except numpy.exceptions.RankWarning:
                 pass
         return True
 

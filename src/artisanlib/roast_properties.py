@@ -702,7 +702,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         droplabel.setStyleSheet("background-color:'#f07800';")
         droplabel.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         if self.aw.qmc.timeindex[6] and self.aw.qmc.timeindex[6] < len(self.aw.qmc.timex):
-            t7 = self.aw.qmc.timex[self.aw.qmc.timeindex[6]]-self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
+            t7 = self.aw.qmc.timex[self.aw.qmc.timeindex[6]]-(0 if self.aw.qmc.timeindex[0] == -1 else self.aw.qmc.timex[self.aw.qmc.timeindex[0]])
         else:
             t7 = 0
         self.dropeditcopy = stringfromseconds(t7)

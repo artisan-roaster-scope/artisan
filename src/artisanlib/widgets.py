@@ -20,18 +20,18 @@ from typing import Optional, Dict, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from PyQt6.QtGui import QWheelEvent, QMouseEvent, QFocusEvent, QResizeEvent # pylint: disable=unused-import
-    from PyQt6.QtWidgets import QWidget, QLineEdit, QTimeEdit, QCheckBox, QComboBox # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QWidget, QTimeEdit, QCheckBox, QComboBox # pylint: disable=unused-import
 
 try:
     from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QByteArray, QPropertyAnimation, QEasingCurve, QLocale) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import (QLabel, QComboBox, QTextEdit, QDoubleSpinBox, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import (QLabel, QComboBox, QLineEdit, QTextEdit, QDoubleSpinBox, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
         QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QFontMetrics, QColor, QCursor # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QByteArray, QPropertyAnimation, QEasingCurve, QLocale) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QLabel, QComboBox, QTextEdit, QDoubleSpinBox, QPushButton, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QLabel, QComboBox, QLineEdit, QTextEdit, QDoubleSpinBox, QPushButton, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QFontMetrics, QColor, QCursor # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
@@ -68,7 +68,7 @@ class MyQDoubleSpinBox(QDoubleSpinBox):  # pyright: ignore [reportGeneralTypeIss
 
 class MyTableWidgetItemQLineEdit(QTableWidgetItem): # pylint: disable= too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     __slots__ = ['sortKey'] # save some memory by using slots
-    def __init__(self, sortKey:'QLineEdit') -> None:
+    def __init__(self, sortKey:QLineEdit) -> None:
         #call custom constructor with UserType item type
         super().__init__('', 1001) #QTableWidgetItem.ItemType.UserType)
         self.sortKey = sortKey
@@ -270,6 +270,43 @@ class ClickableTextEdit(QTextEdit): # pylint: disable=too-few-public-methods # p
 
     def setNewPlainText(self, text:str) -> None:
         QTextEdit.setPlainText(self, text)
+        self._changed = False
+
+# this one emits a clicked event on right-clicks and an editingFinished event when the text was changed and the focus got lost
+class ClickableQLineEdit(QLineEdit): # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+    clicked = pyqtSignal()
+    editingFinished = pyqtSignal()
+    receivedFocus = pyqtSignal()
+
+    def __init__(self, parent:Optional['QWidget'] = None, **kwargs:Dict[str,Any]) -> None:
+        super().__init__(parent, **kwargs)
+        self._changed = False
+        self.textChanged.connect(self._handle_text_changed)
+
+    def mousePressEvent(self, event:'Optional[QMouseEvent]') -> None:
+        super().mousePressEvent(event)
+        if event is not None and event.modifiers() == Qt.KeyboardModifier.ControlModifier:
+            self.clicked.emit()
+
+    def focusInEvent(self, event:'Optional[QFocusEvent]') -> None:
+        super().focusInEvent(event)
+        if event is not None:
+            self.receivedFocus.emit()
+
+    def focusOutEvent(self, event:'Optional[QFocusEvent]') -> None:
+        if event is not None and self._changed:
+            self.editingFinished.emit()
+        super().focusOutEvent(event)
+
+    @pyqtSlot()
+    def _handle_text_changed(self) -> None:
+        self._changed = True
+
+    def setTextChanged(self, state:bool = True) -> None:
+        self._changed = state
+
+    def setNewText(self, text:str) -> None:
+        QLineEdit.setText(self, text)
         self._changed = False
 
 

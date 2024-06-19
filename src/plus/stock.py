@@ -113,6 +113,7 @@ class ScheduledItem(TypedDict, total=False):
     count: int              # number of roasts planned for this item
     title: str
     amount: float           # planned batch size in kg
+    loss: Optional[float]   # default loss based calculated by magic on the server in % (either not given or guaranteed to be in range 5% < loss < 25%)
     location: str           # location hr_id
     coffee: Optional[str]   # coffee hr_id; only set if no blend is specified
     blend: Optional[str]    # blend hr_id; only set if no coffee is specified
@@ -155,7 +156,8 @@ worker_thread:Optional[QThread] = None
 class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     startSignal = pyqtSignal()
     replySignal = pyqtSignal(float, float, str, int, list) # rlimit:float, rused:float, pu:str, notifications:int, machines:List[str]
-    updatedSignal = pyqtSignal() # issued once the stock was updated
+    updatedSignal = pyqtSignal()  # issued once the stock was updated
+    upToDateSignal = pyqtSignal() # issued if the stock was still valid and did NOT get update
 
     @pyqtSlot()
     def update_blocking(self) -> None:
@@ -183,6 +185,7 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                 self.updatedSignal.emit()
         else:
             _log.debug('-> stock valid')
+            self.upToDateSignal.emit()
 
     # requests stock data from server and fills the stock cache
     def fetch(self) -> bool:
@@ -229,6 +232,7 @@ def update() -> None:
             worker.startSignal.connect(worker.update_blocking)
             worker.replySignal.connect(util.updateLimits)
             worker.updatedSignal.connect(util.updateSchedule)
+            worker.upToDateSignal.connect(util.updateSchedule)
         if worker is not None:
             worker.startSignal.emit()
     except Exception as e:  # pylint: disable=broad-except

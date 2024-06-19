@@ -10093,15 +10093,18 @@ class tgraphcanvas(FigureCanvas):
                 if takelock and self.profileDataSemaphore.available() < 1:
                     self.profileDataSemaphore.release(1)
 
+                self.setProfileBackgroundTitle(titleB)
+
                 # to allow the fit_title to work on the proper value we ping the redraw explicitly again after processing events
                 # we need to use draw_idle here to allow Qt for relayout event processing
                 # calling QApplication.processEvents() is not an option here as the event loop might not have been started yet
                 # alternatively one could call canvas.draw() using a QTimer.singleShot(self.fig.canvas.draw())
-                if not self.flagstart:
-                    with warnings.catch_warnings():
-                        warnings.simplefilter('ignore')
-                        self.fig.canvas.draw_idle()
-                self.setProfileBackgroundTitle(titleB)
+
+                # also the background title set above is not always redrawn and sometimes requires a window resiize to trigger the redraw without the draw_idle() below
+
+                with warnings.catch_warnings():
+                    warnings.simplefilter('ignore')
+                    self.fig.canvas.draw_idle()
 
     def checkOverlap(self, anno:'Annotation') -> bool:
         if self.ax is None:
@@ -13320,8 +13323,8 @@ class tgraphcanvas(FigureCanvas):
                         except Exception as e: # pylint: disable=broad-except
                             _log.exception(e)
     #PLUS
-                        # only on first setting the DROP event (not set yet and no previous DROP undone) and if not in simulator modus, we upload to PLUS
-                        if firstDROP and self.autoDROPenabled and not bool(self.aw.simulator):
+                        # only on first setting the DROP event (not set yet and no previous DROP undone) and (not anymore: if not in simulator modus, we upload to PLUS)
+                        if firstDROP and self.autoDROPenabled:  # and not bool(self.aw.simulator): # we also upload simulated roasts to PLUS
                             if self.aw.schedule_window is not None:
                                 self.aw.schedule_window.register_completed_roast.emit()
                             if self.aw.plus_account is not None:
@@ -14113,6 +14116,11 @@ class tgraphcanvas(FigureCanvas):
                         msg = f'{msg}, {tm}'
                     if self.beans and self.beans != '':
                         msg = f"{msg} {abbrevString(self.beans.replace(chr(10),' '),25)}"
+                    starttime = (self.timex[self.timeindex[0]] if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex) else 0)
+                    endtime = (self.timex[self.timeindex[6]] if self.timeindex[6] > 0  and self.timeindex[6] < len(self.timex) else self.timex[-1])
+                    totaltime = endtime - starttime
+                    if totaltime > 0:
+                        msg = f'{msg} {stringfromseconds(totaltime)}'
                     if self.weight[0]:
                         if self.weight[2] in {'g', 'oz'}:
                             msg += f'{sep}{float2float(self.weight[0],0)}{self.weight[2]}'
@@ -14909,6 +14917,11 @@ class tgraphcanvas(FigureCanvas):
                         self.stemp2BX[i][j] -= step
                 self.backgroundprofile_moved_y -= step
                 self.moveBackgroundAnnoPositionsY(-step)
+
+            # ensure to deactivate passed background events to prevent their replay
+            if self.backgroundPlaybackEvents:
+                # turn on again after background load to ignore already passed events
+                self.turn_playback_event_ON()
         else:
             self.aw.sendmessage(QApplication.translate('Message','Unable to move background'))
 

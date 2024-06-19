@@ -324,6 +324,7 @@ class Artisan(QtSingleApplication):
 
 # NOTE: drawback of this is that it might not work on some window managers
     def stateChanged(self, state:Qt.ApplicationState) -> None:
+#        _log.debug("stateChanged(%s): %s", state, self.sentToBackground)
         try:
             aw:Optional[ApplicationWindow] = self.activationWindow()
             if aw is not None and not sip.isdeleted(aw): # sip not supported on older PyQt versions (eg. RPi)
@@ -336,9 +337,11 @@ class Artisan(QtSingleApplication):
                                 plus.sync.getUpdate(aw.qmc.roastUUID,aw.curFile)
 
                             #QTimer.singleShot(100, aw.updateScheduleSignal.emit) # only redraw scheduler window
-                            if aw.schedule_window is not None and plus.controller.is_connected():
+                            if aw.schedule_window is not None and aw.plus_account is not None:
                                 # only if scheduler is active and plus connected we update the stock on app raise which triggers a scheduler redraw implicitly
                                 plus.stock.update()
+#                        else:
+#                            _log.info("PRINT missed by %ss",int(self.plus_sync_cache_expiration - (libtime.time() - self.sentToBackground)))
 
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
@@ -1350,17 +1353,21 @@ class EventActionThread(QThread): # pylint: disable=too-few-public-methods # pyr
 # applies comma2dot as fixup to automatically turn numbers like "1,2" into valid numbers like "1.0" and the empty entry into "0.0"
 class MyQDoubleValidator(QDoubleValidator): # pylint: disable=too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
-    def __init__(self, bottom:float, top:float, decimals:int, lineedit:QLineEdit) -> None:
+    def __init__(self, bottom:float, top:float, decimals:int, lineedit:QLineEdit, empty_default:str = '0') -> None:
         super().__init__(bottom, top, decimals, lineedit)
         self.lineedit = lineedit
+        self.empty_default = empty_default
 
     def validate(self, _s:Optional[str], p:int) -> 'Tuple[QValidator.State, str, int]':
         return super().validate(self.lineedit.text(), p)
 
+    def set_empty_default(self, empty_default:str) -> None:
+        self.empty_default = empty_default
+
     def fixup(self, input_value: Optional[str]) -> Any: # -> str/None, but also Optional[str] is not accepted!?
         try:
             if input_value is not None:
-                input_value = '0' if input_value == '' else comma2dot(input_value)
+                input_value = self.empty_default if input_value == '' else comma2dot(input_value)
                 self.lineedit.setText(input_value)
     #            super().fixup(input_value)
         except Exception: # pylint: disable=broad-except
@@ -1422,7 +1429,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     updateScheduleSignal = pyqtSignal()
     disconnectPlusSignal = pyqtSignal()
 
-    __slots__ = [ 'locale_str', 'app', 'superusermode', 'sample_loop_running', 'time_stopped', 'plus_account', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription',
+    __slots__ = [ 'locale_str', 'app', 'superusermode', 'sample_loop_running', 'time_stopped', 'plus_account', 'plus_account_id', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription',
         'plus_paidUntil', 'plus_rlimit', 'plus_used', 'plus_readonly', 'plus_user_id', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
         'eventaction_running_threads', 'curFile', 'MaxRecentFiles', 'recentFileActs', 'recentSettingActs',
         'recentThemeActs', 'applicationDirectory', 'helpdialog', 'redrawTimer', 'lastLoadedProfile', 'lastLoadedBackground', 'LargeScaleLCDsFlag', 'largeScaleLCDs_dialog',
@@ -1502,7 +1509,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
 #PLUS
         self.plus_account:Optional[str] = None # if set to a login string, Artisan plus features are enabled
-        self.plus_user_id:Optional[str] = None # holds the UUID of the logged in user
+        self.plus_account_id:Optional[str] = None # holds last used account_id; not reset on loggout
+        self.plus_user_id:Optional[str] = None # holds the UUID of the last logged in user; preserved over restart
         self.plus_remember_credentials:bool = True # store plus account credentials in systems keychain
         self.plus_email:Optional[str] = None # if self.plus_remember_credentials is ticked, we remember here the login to be pre-set as plus_account in the dialog
         self.plus_language:str = 'en' # one of ["en", "de", "it", ..] indicates the language setting of the plus_account used on the artisan.plus platform,
@@ -4662,8 +4670,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     # this is important to have . as decimal separator independent of the systems locale
     @staticmethod
-    def createCLocaleDoubleValidator(bot:float, top:float, dec:int, w:QLineEdit) -> MyQDoubleValidator:
-        validator = MyQDoubleValidator(bot,top,dec,w)
+    def createCLocaleDoubleValidator(bot:float, top:float, dec:int, w:QLineEdit, empty_default:str = '0') -> MyQDoubleValidator:
+        validator = MyQDoubleValidator(bot,top,dec,w,empty_default)
         validator.setLocale(QLocale.c())
         validator.setNotation(QDoubleValidator.Notation.StandardNotation)
         return validator
@@ -6705,7 +6713,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     segment_rmse_deltas = numpy.append(segment_rmse_deltas, numpy.sqrt(numpy.mean(numpy.square(segment_deltas))))
                     segment_mse_deltas = numpy.append(segment_mse_deltas, numpy.mean(numpy.square(segment_deltas)))
                     segment_times = times_all[ss:ss+lengths_seg[i]+1]
-                    segment_abc_deltas = numpy.append(segment_abc_deltas, numpy.trapz(segment_abs_deltas, x=segment_times))
+                    try:
+                        tra = numpy.trapezoid(segment_abs_deltas, x=segment_times) # type:ignore [attr-defined]
+                    except Exception:  # pylint: disable=broad-except
+                        tra = numpy.trapz(segment_abs_deltas, x=segment_times) # type:ignore [attr-defined]
+                    segment_abc_deltas = numpy.append(segment_abc_deltas, tra)
+
 
                 # interval of interest metrics
                 ioi_start = self.eventtime2string(self.qmc.timex[timeindexs_seg[0]] - self.qmc.timex[self.qmc.timeindex[0]])
@@ -6713,7 +6726,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 ioi_duration = self.eventtime2string(ioi_seconds)
                 ioi_abs_deltas = numpy.absolute(deltas_all)
                 ioi_maxdelta = deltas_all[numpy.asarray(ioi_abs_deltas == numpy.amax(ioi_abs_deltas)).nonzero()[0][0]]
-                ioi_abc_deltas = numpy.sum(numpy.trapz(ioi_abs_deltas, x=times_all))
+                try:
+                    tra = numpy.trapezoid(ioi_abs_deltas, x=times_all) # type:ignore [attr-defined]
+                except Exception:  # pylint: disable=broad-except
+                    tra = numpy.trapz(ioi_abs_deltas, x=times_all) # type:ignore [attr-defined]
+                ioi_abc_deltas = numpy.sum(tra)
                 ioi_abcprime = ioi_abc_deltas / ioi_seconds
 
                 # fit RoR in C/min/min
@@ -11211,15 +11228,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         else:
                             filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background'),ext_alt='.alog')
                             if len(filename) != 0:
-                                try:
-                                    self.qmc.resetlinecountcaches()
-                                    self.loadbackground(filename)
-                                except Exception as e: # pylint: disable=broad-except
-                                    _log.exception(e)
-                                self.qmc.background = True
-                                self.autoAdjustAxis()
-                                self.qmc.timealign(redraw=False)
-                                self.qmc.redraw()
+                                self.loadBackgroundSignal.emit(filename)
+#                                try:
+#                                    self.qmc.resetlinecountcaches()
+#                                    self.loadbackground(filename)
+#                                except Exception as e: # pylint: disable=broad-except
+#                                    _log.exception(e)
+#                                self.qmc.background = True
+#                                self.autoAdjustAxis()
+#                                self.qmc.timealign(redraw=False)
+#                                self.qmc.redraw()
                 elif k == 76:                       #L (load alarms)
                     if not self.qmc.designerflag and self.comparator is None:
                         filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Alarms'),ext='*.alrm')
@@ -12654,8 +12672,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         if self.loadbackgroundUUID(filename, UUID, force_reload):
             try:
                 self.qmc.background = not self.qmc.hideBgafterprofileload
+                self.autoAdjustAxis()
                 self.qmc.timealign(redraw=False)
                 self.qmc.redraw()
+                if self.qmc.backgroundPlaybackEvents:
+                    # turn on again after background load to ignore already passed events
+                    self.qmc.turn_playback_event_ON()
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
 
@@ -12689,7 +12711,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     @pyqtSlot(str)
     def loadbackgroundRedraw(self, filename:str) -> None:
-        _log.info('loadbackgroundRedraw(%s)',filename)
         if filename is None or len(filename) == 0:
             return
         try:
@@ -12705,6 +12726,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.autoAdjustAxis()
                 self.qmc.timealign(redraw=False)
                 self.qmc.redraw()
+                if self.qmc.backgroundPlaybackEvents:
+                    # turn on again after background load to ignore already passed events
+                    self.qmc.turn_playback_event_ON()
 
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
@@ -16397,6 +16421,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.plus_remember_credentials = bool(toBool(settings.value('plus_remember_credentials',self.plus_remember_credentials)))
             self.plus_email = settings.value('plus_email',self.plus_email)
             self.plus_language = settings.value('plus_language',self.plus_language)
+            self.plus_user_id = settings.value('plus_user_id',self.plus_user_id)
+            self.plus_account_id = settings.value('plus_account_id',self.plus_account_id)
             #remember swaplcds and swapdeltalcds
             old_swaplcds = self.qmc.swaplcds
             old_swapdeltalcds = self.qmc.swapdeltalcds
@@ -16704,8 +16730,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #--- BEGIN GROUP Units
             #restore units
             settings.beginGroup('Units')
-            self.qmc.weight = (self.qmc.weight[0],self.qmc.weight[1],s2a(toString(settings.value('weight',self.qmc.weight[2]))))
-            self.qmc.volume = (self.qmc.volume[0],self.qmc.volume[1],s2a(toString(settings.value('volume',self.qmc.volume[2]))))
+            weight_unit:str = s2a(toString(settings.value('weight',self.qmc.weight[2])))
+            self.qmc.weight = (self.qmc.weight[0],self.qmc.weight[1], (weight_unit if weight_unit in weight_units else weight_units[1]))
+            volume_unit:str = s2a(toString(settings.value('volume',self.qmc.volume[2])))
+            self.qmc.volume = (self.qmc.volume[0],self.qmc.volume[1], (volume_unit if volume_unit in volume_units else volume_units[0]))
 # density units are now fixed to g/l
 #                self.qmc.density[1] = s2a(toString(settings.value("densityweight",self.qmc.density[1])))
 #                self.qmc.density[3] = s2a(toString(settings.value("densityvolume",self.qmc.density[3])))
@@ -18193,6 +18221,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.settingsSetValue(settings, default_settings, 'plus_remember_credentials', self.plus_remember_credentials, read_defaults)
                 self.settingsSetValue(settings, default_settings, 'plus_email', self.plus_email, read_defaults)
                 self.settingsSetValue(settings, default_settings, 'plus_language', self.plus_language, read_defaults)
+                self.settingsSetValue(settings, default_settings, 'plus_user_id', self.plus_user_id, read_defaults)
+                self.settingsSetValue(settings, default_settings, 'plus_account_id', self.plus_account_id, read_defaults)
 
             if not read_defaults: # we don't add those to the cache forcing those settings to be saved always
                 #save window geometry if not in fullscreen mode
@@ -23424,6 +23454,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         if float(green) == 0.0 or float(green) < float(roasted):
             return 0.
         return 100. * ((float(green) - float(roasted)) / float(green))
+
+    # apply given weight loss in percentage as float to a weight of green coffee returning the weight of the corresponding
+    # roasted batch
+    @staticmethod
+    def apply_weight_loss(loss:float, batchsize:float) -> float:
+        return batchsize - batchsize * loss / 100
 
     # takes the weight of the green and roasted coffee as floats and
     # returns the weight loss in percentage as float

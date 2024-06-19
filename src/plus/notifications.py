@@ -54,7 +54,7 @@ def updateNotifications(notifications: int, machines:List[str]) -> None:
             # we fetch notifications if notifications are enabled within the Artisan settings, there are some unqualified notifications, or
             # our machine name is in the list of machines indicating that there is a qualified notification for us
             if aw.notificationsflag and (notifications>0 or aw.qmc.roastertype_setup in machines):
-                # should happen with less delay (0.7s) then the stock.update() (2.5s) triggered controller.connect() to avoid duplicate fetching on startup
+                # should happen with less delay (0.7s) then the stock.update() (2s) triggered controller.connect() to avoid duplicate fetching on startup
                 QTimer.singleShot(700, retrieveNotifications)
     except Exception as e: # pylint: disable=broad-except
         _log.exception(e)
