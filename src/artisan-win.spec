@@ -111,6 +111,7 @@ else:
 hiddenimports_list=['charset_normalizer.md__mypyc', # part of requests 2.28.2 # see https://github.com/pyinstaller/pyinstaller-hooks-contrib/issues/534
                             'matplotlib.backends.backend_pdf',
                             'matplotlib.backends.backend_svg',
+                            'numpy.f2py',
                             'scipy.spatial.transform._rotation_groups',
                             'scipy.special.cython_special',
                             'scipy._lib.messagestream',
