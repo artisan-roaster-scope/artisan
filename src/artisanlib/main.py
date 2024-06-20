@@ -6716,7 +6716,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     try:
                         tra = numpy.trapezoid(segment_abs_deltas, x=segment_times) # type:ignore [attr-defined]
                     except Exception:  # pylint: disable=broad-except
-                        tra = numpy.trapz(segment_abs_deltas, x=segment_times) # type:ignore [attr-defined]
+                        tra = numpy.trapz(segment_abs_deltas, x=segment_times) # type:ignore [attr-defined, unused-ignore]
                     segment_abc_deltas = numpy.append(segment_abc_deltas, tra)
 
 
@@ -6729,7 +6729,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 try:
                     tra = numpy.trapezoid(ioi_abs_deltas, x=times_all) # type:ignore [attr-defined]
                 except Exception:  # pylint: disable=broad-except
-                    tra = numpy.trapz(ioi_abs_deltas, x=times_all) # type:ignore [attr-defined]
+                    tra = numpy.trapz(ioi_abs_deltas, x=times_all) # type:ignore [attr-defined, unused-ignore]
                 ioi_abc_deltas = numpy.sum(tra)
                 ioi_abcprime = ioi_abc_deltas / ioi_seconds
 
