@@ -140,26 +140,6 @@
   <context>
     <name>Button</name>
     <message>
-      <location filename="../artisanlib/dialogs.py" line="92" />
-      <location filename="../artisanlib/roast_properties.py" line="5287" />
-      <location filename="../artisanlib/comm.py" line="200" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2327" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1456" />
-      <location filename="../artisanlib/pid_dialogs.py" line="628" />
-      <location filename="../plus/login.py" line="100" />
-      <source>OK</source>
-      <translation>Okay</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/dialogs.py" line="93" />
-      <location filename="../artisanlib/roast_properties.py" line="5288" />
-      <location filename="../artisanlib/comm.py" line="201" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2615" />
-      <location filename="../plus/login.py" line="105" />
-      <source>Cancel</source>
-      <translation>Afbestille</translation>
-    </message>
-    <message>
       <location filename="../artisanlib/colors.py" line="574" />
       <location filename="../artisanlib/designer.py" line="252" />
       <location filename="../artisanlib/phases.py" line="123" />
@@ -277,6 +257,17 @@
       <location filename="../artisanlib/pid_dialogs.py" line="608" />
       <source>Save</source>
       <translation>Gemme</translation>
+    </message>
+    <message>
+      <location filename="../plus/login.py" line="100" />
+      <location filename="../artisanlib/dialogs.py" line="92" />
+      <location filename="../artisanlib/roast_properties.py" line="5287" />
+      <location filename="../artisanlib/comm.py" line="200" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2327" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1456" />
+      <location filename="../artisanlib/pid_dialogs.py" line="628" />
+      <source>OK</source>
+      <translation>Okay</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="630" />
@@ -489,6 +480,15 @@
       <location filename="../artisanlib/pid_dialogs.py" line="2609" />
       <source>Write PIDs</source>
       <translation>Skriv PID'er</translation>
+    </message>
+    <message>
+      <location filename="../plus/login.py" line="105" />
+      <location filename="../artisanlib/dialogs.py" line="93" />
+      <location filename="../artisanlib/roast_properties.py" line="5288" />
+      <location filename="../artisanlib/comm.py" line="201" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2615" />
+      <source>Cancel</source>
+      <translation>Afbestille</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2683" />
@@ -2424,16 +2424,6 @@ ENDE</translation>
   <context>
     <name>Contextual Menu</name>
     <message>
-      <location filename="../plus/schedule.py" line="947" />
-      <source>All batches prepared</source>
-      <translation>Alle partier forberedt</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="951" />
-      <source>No batch prepared</source>
-      <translation>Ingen batch forberedt</translation>
-    </message>
-    <message>
       <location filename="../artisanlib/canvas.py" line="15942" />
       <source>Add point</source>
       <translation>Tilføj punkt</translation>
@@ -2477,6 +2467,16 @@ ENDE</translation>
       <location filename="../artisanlib/canvas.py" line="16734" />
       <source>Edit</source>
       <translation>Redigere</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="969" />
+      <source>All batches prepared</source>
+      <translation>Alle partier forberedt</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="973" />
+      <source>No batch prepared</source>
+      <translation>Ingen batch forberedt</translation>
     </message>
   </context>
   <context>
@@ -4429,12 +4429,6 @@ ENDE</translation>
   <context>
     <name>Form Caption</name>
     <message>
-      <location filename="../artisanlib/roast_properties.py" line="1617" />
-      <location filename="../plus/blend.py" line="156" />
-      <source>Custom Blend</source>
-      <translation>Brugerdefineret blanding</translation>
-    </message>
-    <message>
       <location filename="../artisanlib/axis.py" line="77" />
       <source>Axes</source>
       <translation>Akser</translation>
@@ -4591,6 +4585,12 @@ ENDE</translation>
       <location filename="../artisanlib/roast_properties.py" line="545" />
       <source>Roast Properties</source>
       <translation>Stegt egenskaber</translation>
+    </message>
+    <message>
+      <location filename="../plus/blend.py" line="156" />
+      <location filename="../artisanlib/roast_properties.py" line="1617" />
+      <source>Custom Blend</source>
+      <translation>Brugerdefineret blanding</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="3771" />
@@ -11100,56 +11100,6 @@ Optagelse 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
   <context>
     <name>Label</name>
     <message>
-      <location filename="../artisanlib/large_lcds.py" line="850" />
-      <location filename="../artisanlib/roast_properties.py" line="870" />
-      <location filename="../artisanlib/roast_properties.py" line="233" />
-      <location filename="../artisanlib/roast_properties.py" line="160" />
-      <location filename="../plus/schedule.py" line="1331" />
-      <location filename="../plus/blend.py" line="166" />
-      <source>Weight</source>
-      <translation>Vægt</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/roast_properties.py" line="1010" />
-      <location filename="../artisanlib/roast_properties.py" line="862" />
-      <location filename="../plus/blend.py" line="329" />
-      <source>Beans</source>
-      <translation>Bønner</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/roast_properties.py" line="929" />
-      <location filename="../plus/schedule.py" line="1349" />
-      <source>Density</source>
-      <translation>Massefylde</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/roast_properties.py" line="988" />
-      <location filename="../artisanlib/events.py" line="433" />
-      <location filename="../plus/schedule.py" line="1359" />
-      <source>Color</source>
-      <translation>Farve</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/roast_properties.py" line="1021" />
-      <location filename="../plus/schedule.py" line="1369" />
-      <source>Moisture</source>
-      <translation>Fugtighed</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/roast_properties.py" line="1092" />
-      <location filename="../plus/schedule.py" line="1380" />
-      <source>Roasting Notes</source>
-      <translation>Stegt noter</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/roast_properties.py" line="1030" />
-      <location filename="../artisanlib/roast_properties.py" line="872" />
-      <location filename="../artisanlib/roast_properties.py" line="291" />
-      <location filename="../plus/schedule.py" line="1431" />
-      <source>Roasted</source>
-      <translation>Ristede</translation>
-    </message>
-    <message>
       <location filename="../artisanlib/events.py" line="3562" />
       <location filename="../artisanlib/events.py" line="988" />
       <location filename="../artisanlib/events.py" line="731" />
@@ -11331,7 +11281,7 @@ Optagelse 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     <message>
       <location filename="../artisanlib/canvas.py" line="3070" />
       <location filename="../artisanlib/canvas.py" line="1146" />
-      <location filename="../artisanlib/transposer.py" line="1186" />
+      <location filename="../artisanlib/transposer.py" line="1190" />
       <location filename="../artisanlib/statistics.py" line="82" />
       <location filename="../artisanlib/designer.py" line="51" />
       <location filename="../artisanlib/roast_properties.py" line="615" />
@@ -11417,8 +11367,8 @@ Optagelse 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     <message>
       <location filename="../artisanlib/canvas.py" line="3076" />
       <location filename="../artisanlib/canvas.py" line="1152" />
-      <location filename="../artisanlib/transposer.py" line="1190" />
-      <location filename="../artisanlib/transposer.py" line="1119" />
+      <location filename="../artisanlib/transposer.py" line="1194" />
+      <location filename="../artisanlib/transposer.py" line="1123" />
       <location filename="../artisanlib/designer.py" line="64" />
       <location filename="../artisanlib/roast_properties.py" line="701" />
       <location filename="../artisanlib/background.py" line="104" />
@@ -11777,6 +11727,13 @@ Optagelse 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
       <location filename="../artisanlib/events.py" line="301" />
       <source>Markers</source>
       <translation>Markører</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="1381" />
+      <location filename="../artisanlib/roast_properties.py" line="988" />
+      <location filename="../artisanlib/events.py" line="433" />
+      <source>Color</source>
+      <translation>Farve</translation>
     </message>
     <message>
       <location filename="../artisanlib/events.py" line="435" />
@@ -12246,6 +12203,16 @@ Optagelse 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
       <translation type="unfinished" />
     </message>
     <message>
+      <location filename="../plus/schedule.py" line="1353" />
+      <location filename="../plus/blend.py" line="166" />
+      <location filename="../artisanlib/large_lcds.py" line="850" />
+      <location filename="../artisanlib/roast_properties.py" line="870" />
+      <location filename="../artisanlib/roast_properties.py" line="233" />
+      <location filename="../artisanlib/roast_properties.py" line="160" />
+      <source>Weight</source>
+      <translation>Vægt</translation>
+    </message>
+    <message>
       <location filename="../artisanlib/roast_properties.py" line="902" />
       <location filename="../artisanlib/roast_properties.py" line="248" />
       <location filename="../artisanlib/roast_properties.py" line="175" />
@@ -12259,9 +12226,17 @@ Optagelse 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
       <translation>Grøn</translation>
     </message>
     <message>
+      <location filename="../plus/schedule.py" line="1453" />
+      <location filename="../artisanlib/roast_properties.py" line="1030" />
+      <location filename="../artisanlib/roast_properties.py" line="872" />
+      <location filename="../artisanlib/roast_properties.py" line="291" />
+      <source>Roasted</source>
+      <translation>Ristede</translation>
+    </message>
+    <message>
       <location filename="../artisanlib/canvas.py" line="3071" />
-      <location filename="../artisanlib/transposer.py" line="1187" />
-      <location filename="../artisanlib/transposer.py" line="1116" />
+      <location filename="../artisanlib/transposer.py" line="1191" />
+      <location filename="../artisanlib/transposer.py" line="1120" />
       <location filename="../artisanlib/statistics.py" line="84" />
       <location filename="../artisanlib/roast_properties.py" line="626" />
       <source>DRY END</source>
@@ -12269,8 +12244,8 @@ Optagelse 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="3072" />
-      <location filename="../artisanlib/transposer.py" line="1188" />
-      <location filename="../artisanlib/transposer.py" line="1117" />
+      <location filename="../artisanlib/transposer.py" line="1192" />
+      <location filename="../artisanlib/transposer.py" line="1121" />
       <location filename="../artisanlib/statistics.py" line="85" />
       <location filename="../artisanlib/roast_properties.py" line="640" />
       <source>FC START</source>
@@ -12284,8 +12259,8 @@ Optagelse 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="3074" />
-      <location filename="../artisanlib/transposer.py" line="1189" />
-      <location filename="../artisanlib/transposer.py" line="1118" />
+      <location filename="../artisanlib/transposer.py" line="1193" />
+      <location filename="../artisanlib/transposer.py" line="1122" />
       <location filename="../artisanlib/roast_properties.py" line="671" />
       <source>SC START</source>
       <translation type="unfinished" />
@@ -12314,9 +12289,22 @@ Optagelse 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
       <translation>Parti</translation>
     </message>
     <message>
+      <location filename="../plus/blend.py" line="329" />
+      <location filename="../artisanlib/roast_properties.py" line="1010" />
+      <location filename="../artisanlib/roast_properties.py" line="862" />
+      <source>Beans</source>
+      <translation>Bønner</translation>
+    </message>
+    <message>
       <location filename="../artisanlib/roast_properties.py" line="915" />
       <source> %</source>
       <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="1371" />
+      <location filename="../artisanlib/roast_properties.py" line="929" />
+      <source>Density</source>
+      <translation>Massefylde</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="972" />
@@ -12334,6 +12322,12 @@ Optagelse 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
       <translation>Jord</translation>
     </message>
     <message>
+      <location filename="../plus/schedule.py" line="1391" />
+      <location filename="../artisanlib/roast_properties.py" line="1021" />
+      <source>Moisture</source>
+      <translation>Fugtighed</translation>
+    </message>
+    <message>
       <location filename="../artisanlib/roast_properties.py" line="1051" />
       <location filename="../artisanlib/roast_properties.py" line="1031" />
       <location filename="../artisanlib/roast_properties.py" line="1022" />
@@ -12344,6 +12338,12 @@ Optagelse 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
       <location filename="../artisanlib/roast_properties.py" line="1049" />
       <source>Ambient Conditions</source>
       <translation>Omgivelsesbetingelser</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="1402" />
+      <location filename="../artisanlib/roast_properties.py" line="1092" />
+      <source>Roasting Notes</source>
+      <translation>Stegt noter</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="1097" />
@@ -12508,19 +12508,19 @@ Optagelse 1380 Burundi KigandaMurambi 2020-04-25_113809.alog</translation>
       <translation>organisk materiale</translation>
     </message>
     <message>
-      <location filename="../artisanlib/transposer.py" line="1016" />
+      <location filename="../artisanlib/transposer.py" line="1020" />
       <location filename="../artisanlib/phases.py" line="50" />
       <source>Drying</source>
       <translation>Tørring</translation>
     </message>
     <message>
-      <location filename="../artisanlib/transposer.py" line="1017" />
+      <location filename="../artisanlib/transposer.py" line="1021" />
       <location filename="../artisanlib/phases.py" line="51" />
       <source>Maillard</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/transposer.py" line="1018" />
+      <location filename="../artisanlib/transposer.py" line="1022" />
       <location filename="../artisanlib/phases.py" line="52" />
       <source>Finishing</source>
       <translation>Efterbehandling</translation>
@@ -13812,12 +13812,6 @@ LCD-skærme alle</translation>
   <context>
     <name>Menu</name>
     <message>
-      <location filename="../artisanlib/main.py" line="2562" />
-      <location filename="../plus/schedule.py" line="1469" />
-      <source>Schedule</source>
-      <translation>Plan</translation>
-    </message>
-    <message>
       <location filename="../artisanlib/main.py" line="2572" />
       <location filename="../artisanlib/large_lcds.py" line="358" />
       <source>Main LCDs</source>
@@ -14283,6 +14277,12 @@ LCD-skærme alle</translation>
       <translation>Glidere</translation>
     </message>
     <message>
+      <location filename="../plus/schedule.py" line="1491" />
+      <location filename="../artisanlib/main.py" line="2562" />
+      <source>Schedule</source>
+      <translation>Plan</translation>
+    </message>
+    <message>
       <location filename="../artisanlib/main.py" line="2612" />
       <source>Full Screen</source>
       <translation>Fuld skærm</translation>
@@ -14370,30 +14370,6 @@ LCD-skærme alle</translation>
   </context>
   <context>
     <name>Message</name>
-    <message>
-      <location filename="../plus/schedule.py" line="2229" />
-      <location filename="../plus/schedule.py" line="1904" />
-      <source>1 batch</source>
-      <translation type="unfinished" />
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2236" />
-      <location filename="../plus/schedule.py" line="2231" />
-      <location filename="../plus/schedule.py" line="1911" />
-      <location filename="../plus/schedule.py" line="1906" />
-      <source>{} batches</source>
-      <translation>{} partier</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2091" />
-      <source>Updating completed roast properties failed</source>
-      <translation>Opdatering af færdige stegeegenskaber mislykkedes</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2142" />
-      <source>Fetching completed roast properties failed</source>
-      <translation>Hentning af færdige stegeegenskaber mislykkedes</translation>
-    </message>
     <message>
       <location filename="../artisanlib/axis.py" line="882" />
       <source>xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})</source>
@@ -16949,6 +16925,30 @@ Profil mangler [CHARGE] eller [DROP]</translation>
       <translation>Baggrundsprofil blev ikke fundet</translation>
     </message>
     <message>
+      <location filename="../plus/schedule.py" line="2247" />
+      <location filename="../plus/schedule.py" line="1924" />
+      <source>1 batch</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="2254" />
+      <location filename="../plus/schedule.py" line="2249" />
+      <location filename="../plus/schedule.py" line="1931" />
+      <location filename="../plus/schedule.py" line="1926" />
+      <source>{} batches</source>
+      <translation>{} partier</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="2109" />
+      <source>Updating completed roast properties failed</source>
+      <translation>Opdatering af færdige stegeegenskaber mislykkedes</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="2160" />
+      <source>Fetching completed roast properties failed</source>
+      <translation>Hentning af færdige stegeegenskaber mislykkedes</translation>
+    </message>
+    <message>
       <source>Event # {0} recorded at BT = {1} Time = {2}</source>
       <translation type="vanished">Hændelse # {0} optaget ved BT = {1} Tid = {2}</translation>
     </message>
@@ -17015,6 +17015,51 @@ For at holde det gratis og opdateret, bedes du støtte os med din donation og ab
   </context>
   <context>
     <name>Plus</name>
+    <message>
+      <location filename="../artisanlib/main.py" line="1211" />
+      <source>debug logging ON</source>
+      <translation>fejlretning logning TIL</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1212" />
+      <source>debug logging OFF</source>
+      <translation>fejlretning logning FRA</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1225" />
+      <source>1 day left</source>
+      <translation>1 dag tilbage</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1227" />
+      <source>{} days left</source>
+      <translation>{} dage tilbage</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1229" />
+      <source>Paid until</source>
+      <translation>Betalt indtil</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1256" />
+      <source>Please visit our {0}shop{1} to extend your subscription</source>
+      <translation>Besøg vores {0} butik {1} for at udvide dit abonnement</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1269" />
+      <source>Do you want to extend your subscription?</source>
+      <translation>Vil du forlænge dit abonnement?</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1270" />
+      <source>Your subscription ends on</source>
+      <translation>Dit abonnement slutter d</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1270" />
+      <source>Your subscription ended on</source>
+      <translation>Dit abonnement sluttede d</translation>
+    </message>
     <message>
       <location filename="../plus/queue.py" line="363" />
       <source>Queuing roast for upload to artisan.plus</source>
@@ -17103,44 +17148,44 @@ For at holde det gratis og opdateret, bedes du støtte os med din donation og ab
       <translation>tønder</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="803" />
+      <location filename="../plus/schedule.py" line="825" />
       <source>Yesterday</source>
       <translation>I går</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1267" />
-      <location filename="../plus/schedule.py" line="853" />
+      <location filename="../plus/schedule.py" line="1289" />
+      <location filename="../plus/schedule.py" line="875" />
       <source>Today</source>
       <translation>I dag</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="855" />
+      <location filename="../plus/schedule.py" line="877" />
       <source>Tomorrow</source>
       <translation>I morgen</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="864" />
+      <location filename="../plus/schedule.py" line="886" />
       <source>by anybody</source>
       <translation>af nogen</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="866" />
-      <location filename="../plus/schedule.py" line="865" />
+      <location filename="../plus/schedule.py" line="888" />
+      <location filename="../plus/schedule.py" line="887" />
       <source>by</source>
       <translation>ved</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="868" />
+      <location filename="../plus/schedule.py" line="890" />
       <source>on</source>
       <translation>på</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="874" />
+      <location filename="../plus/schedule.py" line="896" />
       <source>prepared</source>
       <translation>forberedt</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="875" />
+      <location filename="../plus/schedule.py" line="897" />
       <source>({} of {} done{})</source>
       <translation>({} af {} udført{})</translation>
     </message>
@@ -17168,51 +17213,6 @@ For at holde det gratis og opdateret, bedes du støtte os med din donation og ab
       <location filename="../plus/login.py" line="148" />
       <source>Remember</source>
       <translation>Husk</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1211" />
-      <source>debug logging ON</source>
-      <translation>fejlretning logning TIL</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1212" />
-      <source>debug logging OFF</source>
-      <translation>fejlretning logning FRA</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1225" />
-      <source>1 day left</source>
-      <translation>1 dag tilbage</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1227" />
-      <source>{} days left</source>
-      <translation>{} dage tilbage</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1229" />
-      <source>Paid until</source>
-      <translation>Betalt indtil</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1256" />
-      <source>Please visit our {0}shop{1} to extend your subscription</source>
-      <translation>Besøg vores {0} butik {1} for at udvide dit abonnement</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1269" />
-      <source>Do you want to extend your subscription?</source>
-      <translation>Vil du forlænge dit abonnement?</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1270" />
-      <source>Your subscription ends on</source>
-      <translation>Dit abonnement slutter d</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1270" />
-      <source>Your subscription ended on</source>
-      <translation>Dit abonnement sluttede d</translation>
     </message>
     <message>
       <source>({} of {} done)</source>
@@ -17707,16 +17707,6 @@ For at holde det gratis og opdateret, bedes du støtte os med din donation og ab
   <context>
     <name>Tab</name>
     <message>
-      <location filename="../plus/schedule.py" line="1451" />
-      <source>To-Do</source>
-      <translation>At gøre</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="1452" />
-      <source>Done</source>
-      <translation>Færdig</translation>
-    </message>
-    <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2849" />
       <location filename="../artisanlib/pid_dialogs.py" line="1696" />
       <location filename="../artisanlib/pid_dialogs.py" line="653" />
@@ -17948,6 +17938,16 @@ For at holde det gratis og opdateret, bedes du støtte os med din donation og ab
       <location filename="../artisanlib/colors.py" line="564" />
       <source>LCDs</source>
       <translation>LCD-skærme</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="1473" />
+      <source>To-Do</source>
+      <translation>At gøre</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="1474" />
+      <source>Done</source>
+      <translation>Færdig</translation>
     </message>
     <message>
       <source>Phidgets</source>
@@ -18433,23 +18433,23 @@ For at holde det gratis og opdateret, bedes du støtte os med din donation og ab
       <translation>Faser</translation>
     </message>
     <message>
-      <location filename="../artisanlib/transposer.py" line="1191" />
-      <location filename="../artisanlib/transposer.py" line="1120" />
-      <location filename="../artisanlib/transposer.py" line="1019" />
+      <location filename="../artisanlib/transposer.py" line="1195" />
+      <location filename="../artisanlib/transposer.py" line="1124" />
+      <location filename="../artisanlib/transposer.py" line="1023" />
       <source>Profile</source>
       <translation>Profil</translation>
     </message>
     <message>
-      <location filename="../artisanlib/transposer.py" line="1192" />
-      <location filename="../artisanlib/transposer.py" line="1121" />
-      <location filename="../artisanlib/transposer.py" line="1020" />
+      <location filename="../artisanlib/transposer.py" line="1196" />
+      <location filename="../artisanlib/transposer.py" line="1125" />
+      <location filename="../artisanlib/transposer.py" line="1024" />
       <source>Target</source>
       <translation>Mål</translation>
     </message>
     <message>
-      <location filename="../artisanlib/transposer.py" line="1193" />
-      <location filename="../artisanlib/transposer.py" line="1122" />
-      <location filename="../artisanlib/transposer.py" line="1021" />
+      <location filename="../artisanlib/transposer.py" line="1197" />
+      <location filename="../artisanlib/transposer.py" line="1126" />
+      <location filename="../artisanlib/transposer.py" line="1025" />
       <source>Result</source>
       <translation>Resultat</translation>
     </message>

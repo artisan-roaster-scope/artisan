@@ -255,7 +255,7 @@ class CompletedItem(BaseModel):
 
 
     # updates this CompletedItem with the data given in profile_data
-    def update_completed_item(self, profile_data:Dict[str, Any]) -> bool:
+    def update_completed_item(self, plus_account_id:Optional[str], profile_data:Dict[str, Any]) -> bool:
         updated:bool = False
         if 'batch_number' in profile_data:
             batch_number = int(profile_data['batch_number'])
@@ -322,7 +322,7 @@ class CompletedItem(BaseModel):
             completed_item_dict = self.model_dump(mode='json')
             if 'prefix' in completed_item_dict:
                 del completed_item_dict['prefix']
-            add_completed(cast(CompletedItemDict, completed_item_dict))
+            add_completed(plus_account_id, cast(CompletedItemDict, completed_item_dict))
         return updated
 
 
@@ -331,6 +331,8 @@ class CompletedItem(BaseModel):
 #
 # NOTE: completed roasts data file access is not protected by portalocker for parallel access via a second Artisan instance
 #   as the ArtisanViewer disables the scheduler, thus only one Artisan instance is handling this file
+#
+# NOTE: changes applied to the completed roasts cache via add_completed() are automatically persisted by a call to save_completed()
 
 
 # save completed roasts data to local file cache
@@ -405,8 +407,9 @@ def get_all_completed() -> List[CompletedItemDict]:
 
 # add the given CompletedItemDict if it contains a roastUUID which does not occurs yet in the completed_roasts_cache
 # if there is already a completed roast with the given UUID, its content is replaced by the given CompletedItemDict
-def add_completed(ci:CompletedItemDict) -> None:
+def add_completed(plus_account_id:Optional[str], ci:CompletedItemDict) -> None:
     if 'roastUUID' in ci:
+        modified: bool = False
         try:
             completed_roasts_semaphore.acquire(1)
             # test if there is already a completed roasts with that UUID
@@ -417,11 +420,14 @@ def add_completed(ci:CompletedItemDict) -> None:
             else:
                 # we replace the existing entry by ci
                 completed_roasts_cache[idx] = ci
+            modified = True
         except Exception as e:  # pylint: disable=broad-except
             _log.error(e)
         finally:
             if completed_roasts_semaphore.available() < 1:
                 completed_roasts_semaphore.release(1)
+        if modified:
+            save_completed(plus_account_id)
 
 
 
@@ -430,6 +436,9 @@ def add_completed(ci:CompletedItemDict) -> None:
 #
 # NOTE: prepared scheduled items data file access is not protected by portalocker for parallel access via a second Artisan instance
 #   as the ArtisanViewer disables the scheduler, thus only one Artisan instance is handling this file
+#
+# NOTE: changes applied to the prepared schedule item cache via take_prepared(), set_prepared() and set_unprepared()
+#   are automatically persisted by a call to save_prepared()
 
 
 # save prepared schedule items information to local file cache
@@ -491,7 +500,9 @@ def get_prepared(item:ScheduledItem) -> List[float]:
     return []
 
 # reduce the list of prepared weights by taking the first one (FIFO)
-def take_prepared(item:ScheduledItem) -> Optional[float]:
+def take_prepared(plus_account_id:Optional[str], item:ScheduledItem) -> Optional[float]:
+    _log.debug('take_prepared(%s, %s)', plus_account_id, item)
+    modified: bool = False
     try:
         prepared_items_semaphore.acquire(1)
         prepared_items = prepared_items_cache.get(item.id, [])
@@ -502,12 +513,15 @@ def take_prepared(item:ScheduledItem) -> Optional[float]:
                 prepared_items_cache[item.id] = remaining_prepared_items
             else:
                 del prepared_items_cache[item.id]
+            modified = True
             return first_prepared_item
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
     finally:
         if prepared_items_semaphore.available() < 1:
             prepared_items_semaphore.release(1)
+    if modified:
+        save_prepared(plus_account_id)
     return None
 
 # returns true if all remaining batches are prepared
@@ -535,27 +549,35 @@ def fully_unprepared(item:ScheduledItem) -> bool:
     return False
 
 # set all remaining batches as prepared
-def set_prepared(item:ScheduledItem) -> None:
+def set_prepared(plus_account_id:Optional[str], item:ScheduledItem) -> None:
+    modified: bool = False
     try:
         prepared_items_semaphore.acquire(1)
         current_prepared = (prepared_items_cache[item.id][:item.count] if item.id in prepared_items_cache else [])
         prepared_items_cache[item.id] = current_prepared + [item.weight]*(item.count - len(item.roasts) - len(current_prepared))
+        modified = True
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
     finally:
         if prepared_items_semaphore.available() < 1:
             prepared_items_semaphore.release(1)
+    if modified:
+        save_prepared(plus_account_id)
 
 # set all batches as unprepared
-def set_unprepared(item:ScheduledItem) -> None:
+def set_unprepared(plus_account_id:Optional[str], item:ScheduledItem) -> None:
+    modified: bool = False
     try:
         prepared_items_semaphore.acquire(1)
         del prepared_items_cache[item.id]
+        modified = True
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
     finally:
         if prepared_items_semaphore.available() < 1:
             prepared_items_semaphore.release(1)
+    if modified:
+        save_prepared(plus_account_id)
 
 #--------
 
@@ -934,11 +956,11 @@ class DragItem(StandardItem):
 
 
     def allPrepared(self) -> None:
-        set_prepared(self.data)
+        set_prepared(self.aw.plus_account_id, self.data)
         self.update_widget()
 
     def nonePrepared(self) -> None:
-        set_unprepared(self.data)
+        set_unprepared(self.aw.plus_account_id, self.data)
         self.update_widget()
 
     def preparedMenu(self) -> None:
@@ -1609,11 +1631,6 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
 
     @pyqtSlot('QCloseEvent')
     def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
-        # save prepared scheduled items cache
-        save_prepared(self.aw.plus_account_id)
-        # save completed roasts cache
-        save_completed(self.aw.plus_account_id)
-        # remember custom schedule item order
         self.aw.scheduled_items_uuids = self.get_scheduled_items_ids()
         # remember Dialog geometry
         settings = QSettings()
@@ -1723,8 +1740,11 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         if not self.aw.qmc.flagstart or self.aw.qmc.title_show_always:
             self.aw.qmc.setProfileTitle(self.aw.qmc.title)
             self.aw.qmc.fig.canvas.draw()
+        prepared:List[float] = get_prepared(item)
+        # we take the next prepared item weight if any, else the planned batch size from the item
         weight_unit_idx:int = weight_units.index(self.aw.qmc.weight[2])
-        self.aw.qmc.weight = (convertWeight(item.weight, 1, weight_unit_idx), self.aw.qmc.weight[1], self.aw.qmc.weight[2])
+        schedule_item_weight = (prepared[0] if len(prepared)>0 else item.weight)
+        self.aw.qmc.weight = (convertWeight(schedule_item_weight, 1, weight_unit_idx), self.aw.qmc.weight[1], self.aw.qmc.weight[2])
         # initialize all aplus properties
         self.aw.qmc.plus_store = None
         self.aw.qmc.plus_store_label = None
@@ -1779,7 +1799,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
                 # NOTE: a blend might not have an hr_id as is the case for all custom blends
                 blend_structure:Optional[plus.stock.BlendStructure] = next((bs for bs in blends if plus.stock.getBlendId(bs) == item.blend), None)
                 if blend_structure is not None:
-                    blend:plus.stock.Blend = plus.stock.getBlendBlendDict(blend_structure, item.weight)
+                    blend:plus.stock.Blend = plus.stock.getBlendBlendDict(blend_structure, schedule_item_weight)
                     self.aw.qmc.plus_blend_label = blend['label']
                     self.aw.qmc.plus_blend_spec = cast(plus.stock.Blend, dict(blend)) # make a copy of the blend dict
                     self.aw.qmc.plus_blend_spec_labels = [i.get('label','') for i in self.aw.qmc.plus_blend_spec['ingredients']]
@@ -1984,7 +2004,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
                 completed_item_dict = data.model_dump(mode='json')
                 if 'prefix' in completed_item_dict:
                     del completed_item_dict['prefix']
-                add_completed(cast(CompletedItemDict, completed_item_dict))
+                add_completed(self.aw.plus_account_id, cast(CompletedItemDict, completed_item_dict))
             if data.measured:
                 self.roasted_weight.setText(converted_weight_str)
                 self.roasted_weight_suffix.setEnabled(True)
@@ -2079,9 +2099,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
                             r = plus.connection.sendData(plus.config.roast_url, changes, 'POST')
                             r.raise_for_status()
                             # update successfully transmitted, we now also add/update the CompletedItem linked to self.selected_completed_item
-                            updated_completed_item:bool = self.selected_completed_item.data.update_completed_item(changes)
-                            if updated_completed_item:
-                                save_completed(self.aw.plus_account_id)
+                            self.selected_completed_item.data.update_completed_item(self.aw.plus_account_id, changes)
                             # if previous selected roast is loaded we write the changes to its roast properties
                             if self.selected_completed_item.data.roastUUID.hex == self.aw.qmc.roastUUID:
                                 self.updates_roast_properties_from_completed(self.selected_completed_item.data)
@@ -2104,7 +2122,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
                         profile_data: Optional[Dict[str, Any]] = plus.sync.fetchServerUpdate(sender.data.roastUUID.hex, return_data = True)
                         if profile_data is not None:
                             # update completed items data from received profile_data
-                            updated:bool = sender.data.update_completed_item(profile_data)
+                            updated:bool = sender.data.update_completed_item(self.aw.plus_account_id, profile_data)
                             # on changes, update loaded profile if saved earlier
                             if (updated and self.aw.curFile is not None and sender.data.roastUUID.hex == self.aw.qmc.roastUUID and
                                     self.aw.qmc.plus_file_last_modified is not None and 'modified_at' in profile_data and
@@ -2336,8 +2354,8 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
             # register roastUUID in (local) currently selected ScheduleItem
             # add roast to list of completed roasts
             self.selected_remaining_item.data.roasts.add(UUID(self.aw.qmc.roastUUID, version=4))
-            # reduce number of prepared
-            take_prepared(self.selected_remaining_item.data)
+            # reduce number of prepared batches of the currently selected remaining item
+            take_prepared(self.aw.plus_account_id, self.selected_remaining_item.data)
             # calculate weight estimate
             weight_unit_idx:int = weight_units.index(self.aw.qmc.weight[2])
             batchsize:float = convertWeight(self.aw.qmc.weight[0], weight_unit_idx, 1) # batchsize converted to kg
@@ -2375,8 +2393,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
                 'density': self.aw.qmc.density_roasted[0],
                 'roastingnotes': self.aw.qmc.roastingnotes
             }
-            add_completed(completed_item)
-            save_completed(self.aw.plus_account_id)
+            add_completed(self.aw.plus_account_id, completed_item)
             # update schedule, removing completed items and selecting the next one
             self.updateScheduleWindow()
 
