@@ -1,0 +1,22 @@
+---
+header:
+  image: /assets/images/posts/2024-06-27-WoC-Copenhagen.png
+  teaser: /assets/images/posts/2024-06-27-WoC-Copenhagen-teaser.png
+  og_image: /assets/images/posts/2024-06-27-WoC-Copenhagen-teaser.png
+title: "World of Coffee 2024"
+excerpt: "WoC Copenhagen, Denmark"
+date: 2024-06-27
+categories:
+  - event
+tags: 
+  - artisan
+  - artisan.plus
+link: https://worldofcoffee.org/
+---
+
+Marko and Paul will introduce Roast Scheduling for Artisan and its inventory platform [artisan.plus](https://artisan.plus){:target="_blank"} at this years [World of Coffee](https://worldofcoffee.org/){:target="_blank"} fair in Copenhagen. Meet us in booth CJ-035, next to the Roasters Village South.
+
+> [World of Coffee](https://worldofcoffee.org/), booth **CJ-035**   
+Jun 27 – 29 2024, Copenhagen, Denmark
+
+---
