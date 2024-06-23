@@ -17595,7 +17595,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.scheduled_items_uuids = list(toStringList(settings.value('scheduled_items',self.scheduled_items_uuids)))
             self.scheduleFlag = toBool(settings.value('Schedule',self.scheduleFlag))
             if self.scheduleFlag:
-                self.schedule()
+                try:
+                    self.schedule()
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
 
             self.LargeLCDsFlag = toBool(settings.value('LargeLCDs',self.LargeLCDsFlag))
             if self.LargeLCDsFlag:

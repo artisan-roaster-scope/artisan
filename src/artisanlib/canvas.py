@@ -8150,7 +8150,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.flagstart or self.xgrid == 0:
                         self.set_xlabel('')
                     else:
-                        self.set_xlabel(f'{self.__dijstra_to_ascii(self.roastertype_setup)} {self.roastersize_setup}kg')
+                        self.set_xlabel(f'{self.__dijstra_to_ascii(self.roastertype_setup)} {self.roastersize_setup:g}kg')
 
                     try:
                         y_label.set_in_layout(False) # remove y-axis labels from tight_layout calculation

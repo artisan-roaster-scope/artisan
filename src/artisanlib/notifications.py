@@ -137,7 +137,7 @@ class NotificationManager(QObject): # pyright: ignore [reportGeneralTypeIssues]
         super().__init__()
 
         # time to display a notification
-        self.notification_timeout: Final = 6000 # in ms
+        self.notification_timeout: Final = 12000 # 6000 # in ms
         # we keep the last n notifications in the tray icon menu
         self.notification_queue_max_length: Final = 5
         # notifications older then queue_max_age are automatically removed from the try icon menu and newly received not even added to the queue
@@ -211,7 +211,11 @@ class NotificationManager(QObject): # pyright: ignore [reportGeneralTypeIssues]
                             # open artisan.plus
                             QDesktopServices.openUrl(QUrl(plus.util.plusLink()))
                         else:
-                            QDesktopServices.openUrl(QUrl(self.active_notification.link))
+                            try:
+                                QDesktopServices.openUrl(QUrl(self.active_notification.link))
+                            except Exception:  # pylint: disable=broad-except
+                                # if given link URL is not valid still open artisan.plus
+                                QDesktopServices.openUrl(QUrl(plus.util.plusLink()))
                     elif self.active_notification.type == NotificationType.PLUS_REMINDER:
                         # open artisan.plus reminder tab
                         QDesktopServices.openUrl(QUrl(plus.util.remindersLink()))
@@ -299,11 +303,11 @@ class NotificationManager(QObject): # pyright: ignore [reportGeneralTypeIssues]
                     self.tray_menu.addAction(action)
             else:
                 self.tray_icon.hide()
-                try:
-                    app = QApplication.instance()
-                    app.setBadgeNumber(0) # type: ignore # "QCoreApplication" has no attribute "setBadgeNumber"
-                except Exception: # pylint: disable=broad-except
-                    pass # setBadgeNumber only supported by Qt 6.5 and newer
+#                try:
+#                    app = QApplication.instance()
+#                    app.setBadgeNumber(0) # type: ignore # "QCoreApplication" has no attribute "setBadgeNumber"
+#                except Exception: # pylint: disable=broad-except
+#                    pass # setBadgeNumber only supported by Qt 6.5 and newer
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
@@ -333,7 +337,7 @@ class NotificationManager(QObject): # pyright: ignore [reportGeneralTypeIssues]
 
     # set the given notification as the active one and shows it to the user
     def setNotification(self, notification: Notification, addToQueue:bool = True) -> None:
-        _log.info('setNotification(%s %s %s, %s)', notification.type.name, notification.formatedTitle(), notification.message, addToQueue)
+        _log.info('setNotification(%s, %s, %s, %s)', notification.type.name, notification.formatedTitle(), notification.message, addToQueue)
         try:
             self.active_notification = notification
             if addToQueue:

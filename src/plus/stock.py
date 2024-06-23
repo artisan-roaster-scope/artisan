@@ -1030,7 +1030,7 @@ def blend2beans(blend:BlendStructure, weight_unit_idx:int, weightIn:float=0) -> 
 # Blend is an extra locally defined blend that gets added to the result if it has a non-empty ingredients list
 #    it is a dict of the form { 'hr_id': '', 'label': <some string>, 'ingredients': [ {'ratio':<num>, 'coffee':<hr_id_str>},...] }
 def getBlends(weight_unit_idx:int, store:Optional[str] = None, customBlend:Optional[Blend] = None) -> List[BlendStructure]:
-    _log.debug('getBlends(%s,%s)', weight_unit_idx, store)
+#    _log.debug('getBlends(%s,%s)', weight_unit_idx, store)
     try:
         stock_semaphore.acquire(1)
         if stock is not None and ('blends' in stock or customBlend is not None):
