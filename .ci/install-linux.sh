@@ -29,7 +29,7 @@ sudo apt-get install -y -q libdbus-1-3 libxkbcommon-x11-0 libxcb-icccm4 libxcb-i
 
 sudo gem install dotenv -v ${DOTENV_VER}
 sudo gem install fpm # Linux build fails using 1.13.0
-pip install --upgrade pip
+# pip install --upgrade pip # pip update to 24.1 breaks CI
 pip install -r src/requirements.txt | sed '/^Ignoring/d'
 
 .ci/install-libusb.sh

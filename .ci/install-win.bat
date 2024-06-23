@@ -35,7 +35,7 @@ echo Python Version
 python -V
 
 ::
-:: Upgrade the Python version to PYUPGRADE_WIN_V when the environment variable exists. 
+:: Upgrade the Python version to PYUPGRADE_WIN_V when the environment variable exists.
 ::
 if NOT "%PYUPGRADE_WIN_V%" == "" (
     if exist %PYTHON_PATH%\python.exe (
@@ -58,7 +58,7 @@ if NOT "%PYUPGRADE_WIN_V%" == "" (
 ::
 :: get pip up to date
 ::
-python -m pip install --upgrade pip
+#python -m pip install --upgrade pip # pip update to 24.1 breaks CI
 python -m pip install wheel
 
 ::
