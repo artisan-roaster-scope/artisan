@@ -43,7 +43,7 @@ portalocker==2.8.2
 xlrd==2.0.1
 websockets==12.0
 PyYAML==6.0.1
-psutil==5.9.8
+psutil==6.0.0
 typing-extensions==4.10.0; python_version < '3.8' # required for supporting Final and TypeDict on Python <3.8
 protobuf==5.27.1
 numpy==1.24.3; python_version < '3.9' # last Python 3.8 release
