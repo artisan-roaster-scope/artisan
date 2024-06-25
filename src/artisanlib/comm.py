@@ -5716,8 +5716,8 @@ class serialport:
         if YOCTOsensor:
             productName = YOCTOsensor.get_module().get_productName()
             if (YOCTOsensor.get_hardwareId() not in connected_yoctos) and  \
-                ((mode == 0 and productName == 'Yocto-Thermocouple') or (mode == 1 and productName == 'Yocto-PT100') or \
-                 (mode == 2 and productName == 'Yocto-Temperature-IR') or \
+                ((mode == 0 and productName.startswith('Yocto-Thermocouple')) or (mode == 1 and productName.startswith('Yocto-PT100')) or \
+                 (mode == 2 and productName.startswith('Yocto-Temperature-IR')) or \
                  (mode == 3 and productName.startswith('Yocto-Meteo')) or \
                  (mode == 4 and productName is not None and productName.startswith(productNameFilter)) or \
                  (mode in {5, 6, 7, 8} and productName.startswith('Yocto-Watt')) or \
