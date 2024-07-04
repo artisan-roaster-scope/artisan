@@ -1844,8 +1844,7 @@ class EventsDlg(ArtisanResizeablDialog):
                     # loop over that data and classify each value
                     ld:Optional[float] = None # last digitized value
                     lt:Optional[float] = None # last digitized temp value
-                    for ii, __ in enumerate(temp):
-                        t = temp[ii]
+                    for ii, t in enumerate(temp):
                         if t != -1: # -1 is an error value
                             d = self.aw.digitize(t,linespace,self.aw.eventquantifiercoarse[i],i)
                             if d is not None and (ld is None or ld != d) and (ld is None or lt is None or linespacethreshold < abs(t - lt)):

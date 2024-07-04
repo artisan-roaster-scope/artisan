@@ -529,8 +529,8 @@ class WheelDlg(ArtisanDialog):
             self.aw.qmc.wradii[x] = newwidth
             #Need 100.0% coverage. Correct for numerical floating point rounding errors:
             count = 0.
-            for i, _ in enumerate(self.aw.qmc.wradii):
-                count +=  self.aw.qmc.wradii[i]
+            for wrad in self.aw.qmc.wradii:
+                count += wrad
             diff = 100. - count
             if diff  != 0.:
                 if diff > 0.000:  #if count smaller

@@ -35,7 +35,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-          cache: 'pip' # caching pip dependencies
+#          cache: 'pip' # caching pip dependencies
       - name: Install dependencies
         run: |
           pip install -r src/requirements-dev.txt

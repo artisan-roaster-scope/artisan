@@ -3388,7 +3388,7 @@ class tgraphcanvas(FigureCanvas):
                 return True
             if self.extradevices[n] == 144 or (self.extradevices[n] == 145 and c==0): # IKAWA heater/fan, state
                 return True
-            if self.extradevices[n] == 165: # MUGMA heater/fan
+            if self.extradevices[n] == 165: # noqa: SIM103 # MUGMA heater/fan
                 return True
             return False
         return False
@@ -15378,7 +15378,7 @@ class tgraphcanvas(FigureCanvas):
 ##        #          START            DRYEND          FCs             FCe         SCs         SCe         DROP
 ##        times = [self.startend[0],self.dryend[0],self.varC[0],self.varC[2],self.varC[4],self.varC[6],self.startend[2]]
         for i,tms in enumerate(times):
-            if times[i]:
+            if tms:
                 self.timeindex[i] = max(0,self.time2index(tms))
             else:
                 self.timeindex[i] = 0
@@ -15388,7 +15388,7 @@ class tgraphcanvas(FigureCanvas):
 ##        #          STARTB            DRYENDB          FCsB       FCeB         SCsB         SCeB               DROPB
 ##        times = [self.startendB[0],self.dryendB[0],self.varCB[0],self.varCB[2],self.varCB[4],self.varCB[6],self.startendB[2]]
         for i,tms in enumerate(times):
-            if times[i]:
+            if tms:
                 self.timeindexB[i] = max(0,self.backgroundtime2index(tms))
             else:
                 self.timeindexB[i] = 0

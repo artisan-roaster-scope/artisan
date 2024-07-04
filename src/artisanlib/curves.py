@@ -1693,11 +1693,11 @@ class CurvesDlg(ArtisanDialog):
             EQU = [str(self.equedit1.text()),str(self.equedit2.text())]
             incompatiblevars:List[str] = ['P','F','$','#']
             error = ''
-            for i, _iv in enumerate(incompatiblevars):
-                if incompatiblevars[i] in EQU[0]:
-                    error = f'P1: \n-{incompatiblevars[i]}\n\n[{EQU[0]}]'
-                elif incompatiblevars[i] in EQU[1]:
-                    error = f'P2: \n-{incompatiblevars[i]}\n\n[{EQU[1]}]'
+            for iv in incompatiblevars:
+                if iv in EQU[0]:
+                    error = f'P1: \n-{iv}\n\n[{EQU[0]}]'
+                elif iv in EQU[1]:
+                    error = f'P2: \n-{iv}\n\n[{EQU[1]}]'
 
             if error:
                 string = QApplication.translate('Message','Incompatible variables found in %s')%error
