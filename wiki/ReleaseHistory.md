@@ -10,7 +10,8 @@ v2.10.6 (XX, 2024)
   - adds compression toggle, detailed device logging, and origin header to WebSocket communication
 
 * NEW HARDWARE SUPPORT
-  - adds setups for [IP CC machines]() featuring Mitshubishi PLCs
+  - adds machine support for [MUGMA Roasters](https://finecoffeeroaster.com/)
+  - adds machine support for [iRm roasting machines](https://www.irm.coffee/) featuring Mitshubishi PLCs
   - adds [Bühler RM20](https://www.buhlergroup.com/global/de/products/roastmaster_coffeeroaster.html) Simatic Legacy setup supporting older firmware versions not returning the machine state
   - adds support for the [Phidget RCC0004 server motor controller](https://phidgets.com/?prodid=1147) ([Discussion #1546](../../../discussions/1546))
   - adds Hottop Command `control` to activate and deactivate the control function of the machine via event buttons and alarms

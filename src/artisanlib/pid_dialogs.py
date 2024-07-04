@@ -1039,7 +1039,7 @@ class PID_DlgControl(ArtisanDialog):
             rampsoaks['mode'] = self.aw.qmc.mode
             from json import dump as json_dump
             with open(filename, 'w', encoding='utf-8') as outfile:
-                json_dump(rampsoaks, outfile, ensure_ascii=True)
+                json_dump(rampsoaks, outfile, indent=None, separators=(',', ':'), ensure_ascii=False)
                 outfile.write('\n')
             self.aw.qmc.rsfile = filename
             self.rsfile.setText(self.aw.qmc.rsfile)
@@ -3015,7 +3015,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
             pids['segments'] = segments
             from json import dump as json_dump
             with open(filename, 'w', encoding='utf-8') as outfile:
-                json_dump(pids, outfile, ensure_ascii=True)
+                json_dump(pids, outfile, indent=None, separators=(',', ':'), ensure_ascii=False)
                 outfile.write('\n')
             return True
         except Exception as ex: # pylint: disable=broad-exception-caught

@@ -25,21 +25,23 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 class Mugma(AsyncComm):
 
-    __slots__ = [ '_bt', '_et', '_heater', '_fan', '_catalyzer', '_sv' ]
+    __slots__ = [ 'device_logging', '_bt', '_et', '_heater', '_fan', '_catalyzer', '_sv' ]
 
-    def __init__(self, host:str = '127.0.0.1', port:int = 1503,
+    def __init__(self, host:str = '127.0.0.1', port:int = 1504, device_logging:bool = False,
                 connected_handler:Optional[Callable[[], None]] = None,
                 disconnected_handler:Optional[Callable[[], None]] = None) -> None:
+
+        self.device_logging = device_logging
 
         super().__init__(host, port, None, connected_handler, disconnected_handler)
 
         # current readings
         self._et:float = -1         # environmental temperature in °C
         self._bt:float = -1         # bean temperature in °C
-        self._fan:int = -1          # fan speed in % [0-100]
-        self._heater:int = -1       # heater power in % [0-100]
+        self._fan:float = -1        # fan speed in % [0-100]
+        self._heater:float = -1     # heater power in % [0-100]
         self._catalyzer:float = -1  # catalyzer heating power in %
-        self._sv:float = -1         # target temperature in °C
+        self._sv:float = -1         # target temperature (SV) in °C
 
 
     # external API to access machine state
@@ -48,9 +50,9 @@ class Mugma(AsyncComm):
         return self._et
     def getBT(self) -> float:
         return self._bt
-    def getFan(self) -> int:
+    def getFan(self) -> float:
         return self._fan
-    def getHeater(self) -> int:
+    def getHeater(self) -> float:
         return self._heater
     def getCatalyzer(self) -> float:
         return self._catalyzer
@@ -66,27 +68,22 @@ class Mugma(AsyncComm):
         self._sv = -1
 
 
-    @staticmethod
-    def average(current_value:float, new_value:float) -> float:
-        if current_value == -1 or new_value == -1:
-            return new_value
-        return (current_value + new_value) / 2
-
-
     # https://www.oreilly.com/library/view/using-asyncio-in/9781492075325/ch04.html
     async def read_msg(self, stream: asyncio.StreamReader) -> None:
         # read line
         try:
             data:bytes = await stream.readline()
+            if self.device_logging:
+                _log.info('data: %s', data)
             reading = data.decode('utf-8').strip().split(',')
             if len(reading) > 9 and reading[0] == '1':
                 # system status received
-                self._et = self.average(self._et, float(reading[4]))
-                self._bt = self.average(self._bt, float(reading[5]))
-                self._fan = int(reading[6])
-                self._heater = int(reading[7])
-                self._catalyzer = self.average(self._catalyzer, float(reading[8]))
-                self._sv = self.average(self._sv, float(reading[9]))
+                self._et = float(reading[4]) / 10
+                self._bt = float(reading[5]) / 10
+                self._fan = int(reading[6])  # investigate: should this also be divided by 10!?
+                self._heater = float(reading[7]) / 10
+                self._catalyzer = float(reading[8]) / 10
+                self._sv = float(reading[9]) / 10
         except ValueError:
             # buffer overrun
             pass
@@ -95,7 +92,7 @@ class Mugma(AsyncComm):
 
 def main() -> None:
     import time
-    mugma = Mugma(host = '127.0.0.1', port = 1503)
+    mugma = Mugma(host = '127.0.0.1', port = 1504)
     mugma.start()
     for _ in range(4):
         print('>>> hallo')

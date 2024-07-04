@@ -36,7 +36,7 @@ from plus import config
 
 import os
 import logging
-from typing import Final, Optional, TextIO
+from typing import Final, Optional, IO
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -55,7 +55,7 @@ account_cache_lock_path:str = getDirectory(
 )
 
 
-def setAccountShelve(account_id: str, fh:TextIO) -> Optional[int]:
+def setAccountShelve(account_id: str, fh:IO[str]) -> Optional[int]:
     _log.debug('setAccountShelve(%s,_fh_)', account_id)
     import dbm
     import shelve
@@ -119,7 +119,7 @@ def setAccountShelve(account_id: str, fh:TextIO) -> Optional[int]:
 def setAccount(account_id: str) -> Optional[int]:
     import portalocker
     try:
-        fh:TextIO
+        fh:IO[str]
         account_cache_semaphore.acquire(1)
         _log.debug('setAccount(%s)', account_id)
         with portalocker.Lock(account_cache_lock_path, timeout=0.5) as fh:

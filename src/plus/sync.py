@@ -36,7 +36,7 @@ from plus import config, util, connection, controller, roast, stock
 import os
 import time
 import logging
-from typing import Final, Optional, Dict, Any, List, TextIO
+from typing import Final, Optional, Dict, Any, List, IO
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -61,7 +61,7 @@ def getSyncPath(lock: bool = False) -> str:
     return getDirectory(fn, share=True)
 
 
-def addSyncShelve(uuid: str, modified_at:float, fh:TextIO) -> None:
+def addSyncShelve(uuid: str, modified_at:float, fh:IO[str]) -> None:
     _log.debug('addSyncShelve(%s,%s,_fh_)', uuid, modified_at)
     import dbm
     import shelve
@@ -109,7 +109,7 @@ def addSyncShelve(uuid: str, modified_at:float, fh:TextIO) -> None:
 # last synced with the server
 def addSync(uuid:str, modified_at:float) -> None:
     import portalocker
-    fh:TextIO
+    fh:IO[str]
     try:
         sync_cache_semaphore.acquire(1)
         _log.debug('addSync(%s,%s)', uuid, modified_at)
@@ -140,7 +140,7 @@ def addSync(uuid:str, modified_at:float) -> None:
 def getSync(uuid:str) -> Optional[float]:
     import portalocker
     import shelve
-    fh:TextIO
+    fh:IO[str]
     db:shelve.Shelf[float]
     try:
         sync_cache_semaphore.acquire(1)
@@ -197,7 +197,7 @@ def getSync(uuid:str) -> Optional[float]:
 def delSync(uuid:str) -> None:
     import portalocker
     import shelve
-    fh:TextIO
+    fh:IO[str]
     try:
         sync_cache_semaphore.acquire(1)
         _log.debug('delSync(%s)', str(uuid))

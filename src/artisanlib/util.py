@@ -432,13 +432,13 @@ def getDirectory(filename: str, ext: Optional[str] = None, share: bool = False) 
 
 # converts QColor ARGB names to a standard/MPL hex color strings with alpha values at the end
 def argb_colorname2rgba_colorname(c:str) -> str:
-    if len(c) == 9 and c[0] == '#' and c[1:].isdigit():
+    if len(c) == 9 and c[0] == '#':
         return f'#{c[3:9]}{c[1:3]}'
     return c
 
 # converts standard/MPL hex color strings to QColor ARGB names with alpha at the begin
 def rgba_colorname2argb_colorname(c:str) -> str:
-    if len(c) == 9 and c[0] == '#' and c[1:].isdigit():
+    if len(c) == 9 and c[0] == '#':
         return f'#{c[7:9]}{c[1:7]}'
     return c
 

@@ -41,7 +41,7 @@ import plus.blend
 
 #from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.util import (deltaLabelUTF8, stringfromseconds,stringtoseconds, toInt, toFloat, abbrevString,
-        scaleFloat2String, comma2dot, weight_units, weight_units_lower, volume_units, float2floatWeightVolume, float2float,
+        scaleFloat2String, comma2dot, weight_units, render_weight, weight_units_lower, volume_units, float2floatWeightVolume, float2float,
         convertWeight, convertVolume)
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog
 from artisanlib.widgets import MyQComboBox, ClickableQLabel, ClickableTextEdit, MyTableWidgetItemNumber
@@ -3684,7 +3684,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if self.setup_ui is not None:
             self.setup_ui.labelOrganizationDefault.setText(self.aw.qmc.organization_setup)
             self.setup_ui.labelOperatorDefault.setText(self.aw.qmc.operator_setup)
-            self.setup_ui.labelMachineSizeDefault.setText(f'{self.aw.qmc.roastertype_setup} {self.aw.qmc.roastersize_setup}kg')
+            self.setup_ui.labelMachineSizeDefault.setText(f'{self.aw.qmc.roastertype_setup} {render_weight(self.aw.qmc.roastersize_setup, 1, weight_units.index(self.aw.qmc.weight[2]))}')
             self.setup_ui.labelHeatingDefault.setText(self.aw.qmc.heating_types[self.aw.qmc.roasterheating_setup])
             self.setup_ui.labelDrumSpeedDefault.setText(self.aw.qmc.drumspeed_setup)
 

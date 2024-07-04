@@ -59,7 +59,7 @@ if TYPE_CHECKING:
 from artisanlib.util import (uchr, fill_gaps, deltaLabelPrefix, deltaLabelUTF8, deltaLabelMathPrefix, stringfromseconds,
         fromFtoC, fromFtoCstrict, fromCtoF, fromCtoFstrict, RoRfromFtoC, RoRfromFtoCstrict, RoRfromCtoF, toInt, toString,
         toFloat, application_name, getResourcePath, getDirectory, convertWeight,
-        abbrevString, scaleFloat2String, is_proper_temp, weight_units, volume_units, float2float)
+        abbrevString, scaleFloat2String, is_proper_temp, weight_units, render_weight, volume_units, float2float)
 from artisanlib import pid
 from artisanlib.time import ArtisanTime
 from artisanlib.filters import LiveMedian
@@ -874,7 +874,7 @@ class tgraphcanvas(FigureCanvas):
                        'Extech 42570',              #163
                        'Mugma BT/ET',               #164
                        '+Mugma Heater/Fan',         #165
-                       '+Mugma Catalyzer',          #166
+                       '+Mugma Heater/Catalyzer',   #166
                        '+Mugma SV'                  #167
                        ]
 
@@ -1009,7 +1009,7 @@ class tgraphcanvas(FigureCanvas):
             159, # +Phidget DAQ1301 67
             160, # IKAWA \Delta Humidity / \Delat Humidity direction
             165, # +Mugma Heater/Fan
-            166  # +Mugma Catalyzer
+            166  # +Mugma Heater/Catalyzer
         ]
 
         # ADD DEVICE:
@@ -3232,15 +3232,9 @@ class tgraphcanvas(FigureCanvas):
                     payload['alert']['title'] = alertTitle
                 if alertTimeout:
                     payload['alert']['timeout'] = alertTimeout
-# send update via http:
-#            import requests
-#            url = f'http://127.0.0.1:{self.aw.WebLCDsPort}/send'
-#            headers = {'content-type': 'application/json'}
-#            requests.post(url, data=json_dumps(payload), headers=headers, timeout=0.3)
-# send update directly:
             if self.aw.weblcds_server is not None:
                 from json import dumps as json_dumps
-                self.aw.weblcds_server.send_msg(json_dumps(payload))
+                self.aw.weblcds_server.send_msg(json_dumps(payload, indent=None, separators=(',', ':')))
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
@@ -3392,7 +3386,9 @@ class tgraphcanvas(FigureCanvas):
                 return True
             if self.extradevices[n] in {140, 141}: # Kaleido drum/AH, heater/fan
                 return True
-            if self.extradevices[n] == 144: # IKAWA heater/fan, state/humidity
+            if self.extradevices[n] == 144 or (self.extradevices[n] == 145 and c==0): # IKAWA heater/fan, state
+                return True
+            if self.extradevices[n] == 165: # MUGMA heater/fan
                 return True
             return False
         return False
@@ -4372,6 +4368,7 @@ class tgraphcanvas(FigureCanvas):
             ndev = min(len(XTs1),len(XTs2))
             extra1_values:List[Optional[str]] = []
             extra2_values:List[Optional[str]] = []
+
             for i in range(ndev):
                 if i < self.aw.nLCDS:
                     try:
@@ -7080,7 +7077,7 @@ class tgraphcanvas(FigureCanvas):
                 time_anno = v[1].xyann
                 if all(not numpy.isnan(e) for e in temp_anno + time_anno):
                     # we add the entry only if all of the coordinates are proper numpers and not nan
-                    res.append([k,temp_anno[0],temp_anno[1],time_anno[0],time_anno[1]])
+                    res.append([k,float(temp_anno[0]),float(temp_anno[1]),float(time_anno[0]),float(time_anno[1])])
         return res
 
     def setAnnoPositions(self, anno_positions:List[List[Union[int,float]]]) -> None:
@@ -7101,7 +7098,7 @@ class tgraphcanvas(FigureCanvas):
         for k,v in self.l_event_flags_dict.items():
             flag_anno = v.xyann
             if all(not numpy.isnan(e) for e in flag_anno):
-                res.append([k,flag_anno[0],flag_anno[1]])
+                res.append([k,float(flag_anno[0]),float(flag_anno[1])])
         return res
 
     def setFlagPositions(self, flag_positions:List[List[float]]) -> None:
@@ -8150,7 +8147,11 @@ class tgraphcanvas(FigureCanvas):
                     if self.flagstart or self.xgrid == 0:
                         self.set_xlabel('')
                     else:
-                        self.set_xlabel(f'{self.__dijstra_to_ascii(self.roastertype_setup)} {self.roastersize_setup:g}kg')
+                        self.set_xlabel(f'{self.__dijstra_to_ascii(self.roastertype_setup)} {render_weight(self.roastersize_setup, 1, weight_units.index(self.weight[2]))}')
+
+
+
+
 
                     try:
                         y_label.set_in_layout(False) # remove y-axis labels from tight_layout calculation
@@ -11688,7 +11689,7 @@ class tgraphcanvas(FigureCanvas):
                 elif self.device == 164:
                     # connect Mugma
                     from artisanlib.mugma import Mugma
-                    self.aw.mugma = Mugma(self.aw.mugmaHost, self.aw.mugmaPort,
+                    self.aw.mugma = Mugma(self.aw.mugmaHost, self.aw.mugmaPort, self.device_logging,
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Mugma'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Mugma'),True,None))
                     self.aw.mugma.setLogging(self.device_logging)

@@ -3212,7 +3212,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ####  DEVICE 165 is +Mugma Heater/Fan but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
-                ####  DEVICE 166 is +Mugma Catalyzer but +DEVICE cannot be set as main device
+                ####  DEVICE 166 is +Mugma Heater/Catalyzer but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
                 ####  DEVICE 167 is +Mugma SV but +DEVICE cannot be set as main device
@@ -3558,6 +3558,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
 
+            self.aw.qmc.intChannel.cache_clear() # device type and thus int channels might have been changed
+            self.aw.qmc.clearLCDs()
             self.aw.qmc.redraw(recomputeAllDeltas=False)
             self.aw.sendmessage(message)
             #open serial conf Dialog

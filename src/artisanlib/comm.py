@@ -529,7 +529,7 @@ class serialport:
                                    self.Extech42570,          #163
                                    self.Mugma_BTET,           #164
                                    self.Mugma_HeaterFan,      #165
-                                   self.Mugma_Catalyzer,      #166
+                                   self.Mugma_HeaterCatalyzer, #166
                                    self.Mugma_SV              #167
                                    ]
         #string with the name of the program for device #27
@@ -1635,19 +1635,20 @@ class serialport:
     def Mugma_HeaterFan(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
         if self.aw.mugma is not None:
-            t1 = self.aw.mugma.getHeater()
-            t2 = self.aw.mugma.getFan()
+            t1 = self.aw.mugma.getFan()
+            t2 = self.aw.mugma.getHeater()
         else:
             t1 = t2 = -1
         return tx,t1,t2 # time, Fan (chan2), Heater (chan1)
 
-    def Mugma_Catalyzer(self) -> Tuple[float,float,float]:
+    def Mugma_HeaterCatalyzer(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
         if self.aw.mugma is not None:
-            t1 = t2 = self.aw.mugma.getCatalyzer()
+            t1 = self.aw.mugma.getCatalyzer()
+            t2 = self.aw.mugma.getHeater()
         else:
             t1 = t2 = -1
-        return tx,t1,t2 # time, Catalyzer (chan2), Catalyzer (chan1)
+        return tx,t1,t2 # time, Catalyzer (chan2), Heater (chan1)
 
     def Mugma_SV(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()

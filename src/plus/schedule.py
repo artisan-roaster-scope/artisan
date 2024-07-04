@@ -357,7 +357,7 @@ def save_completed(plus_account_id:Optional[str]) -> None:
                 except Exception:   # pylint: disable=broad-except
                     completed_roasts_cache_data = {}
                 completed_roasts_cache_data[plus_account_id] = completed_roasts_cache
-                json.dump(completed_roasts_cache_data, f)
+                json.dump(completed_roasts_cache_data, f, indent=None, separators=(',', ':'), ensure_ascii=False)
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
         finally:
@@ -417,6 +417,7 @@ def get_all_completed() -> List[CompletedItemDict]:
 # add the given CompletedItemDict if it contains a roastUUID which does not occurs yet in the completed_roasts_cache
 # if there is already a completed roast with the given UUID, its content is replaced by the given CompletedItemDict
 def add_completed(plus_account_id:Optional[str], ci:CompletedItemDict) -> None:
+    _log.info('add_completed')
     if 'roastUUID' in ci:
         modified: bool = False
         try:
@@ -427,7 +428,6 @@ def add_completed(plus_account_id:Optional[str], ci:CompletedItemDict) -> None:
                 # add ci to front
                 completed_roasts_cache.insert(0, ci)
             else:
-                # we replace the existing entry by ci
                 completed_roasts_cache[idx] = ci
             modified = True
         except Exception as e:  # pylint: disable=broad-except
@@ -457,13 +457,13 @@ def save_prepared(plus_account_id:Optional[str]) -> None:
         try:
             prepared_items_semaphore.acquire(1)
             f:TextIO
-            with open(prepared_items_cache_path, 'w', encoding='utf-8') as f:
+            with open(prepared_items_cache_path, 'w+', encoding='utf-8') as f:
                 try:
                     prepared_items_cache_data = json.load(f)
                 except Exception:   # pylint: disable=broad-except
                     prepared_items_cache_data = {}
                 prepared_items_cache_data[plus_account_id] = prepared_items_cache
-                json.dump(prepared_items_cache_data, f)
+                json.dump(prepared_items_cache_data, f, indent=None, separators=(',', ':'), ensure_ascii=False)
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
         finally:
@@ -2222,12 +2222,62 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
             #        roastbatchnr
             #        roastbatchprefix
             #        title
-            # don't update the coffee/blend/store labels as we do not maintaine the corresponding hr_ids in CompletedItems
+            # don't update the coffee/blend/store labels as we do not maintain the corresponding hr_ids in CompletedItems
             #        coffee_label
             #        blend_label
             #        store_label
             #        batchsize
 
+    # updates all roast properties (the changeable as well as the non-changeable from the loaded profiles roast properties to the give CompletedItem
+    # such that changes in the RoastProperties are reflected in the items visualization (even if not yet established to the server)
+    def updates_completed_from_roast_properties(self, ci:CompletedItem) -> bool:
+        updated:bool = False
+        weight_unit_idx = weight_units.index(self.aw.qmc.weight[2])
+        weight = convertWeight(self.aw.qmc.weight[0], weight_unit_idx, 1)
+        if ci.weight != weight:
+            ci.weight = weight
+            updated = True
+        if ci.color != self.aw.qmc.ground_color:
+            ci.color = self.aw.qmc.ground_color
+            updated = True
+        if ci.moisture != self.aw.qmc.moisture_roasted:
+            ci.moisture = self.aw.qmc.moisture_roasted
+            updated = True
+        if ci.density != self.aw.qmc.density_roasted[0]:
+            ci.density = self.aw.qmc.density_roasted[0]
+            updated = True
+        if ci.roastingnotes != self.aw.qmc.roastingnotes:
+            ci.roastingnotes = self.aw.qmc.roastingnotes
+            updated = True
+        # non_changeable attributes:
+        if ci.roastbatchnr != self.aw.qmc.roastbatchnr:
+            ci.roastbatchnr = self.aw.qmc.roastbatchnr
+            updated = True
+        if ci.roastbatchprefix != self.aw.qmc.roastbatchprefix:
+            ci.roastbatchprefix = self.aw.qmc.roastbatchprefix
+            updated = True
+        if ci.title != self.aw.qmc.title:
+            ci.title = self.aw.qmc.title
+            updated = True
+        if ci.coffee_label != self.aw.qmc.plus_coffee_label:
+            ci.coffee_label = self.aw.qmc.plus_coffee_label
+            updated = True
+        if ci.blend_label != self.aw.qmc.plus_blend_label:
+            ci.blend_label = self.aw.qmc.plus_blend_label
+            updated = True
+        if ci.store_label != self.aw.qmc.plus_store_label:
+            ci.store_label = self.aw.qmc.plus_store_label
+            updated = True
+        # not editable in RoastProperties (only available from the corresponding creating ScheduledItem) thus not modified
+        #batchsize
+
+        if updated:
+            # we update the completed_roasts_cache entry
+            completed_item_dict = ci.model_dump(mode='json')
+            if 'prefix' in completed_item_dict:
+                del completed_item_dict['prefix']
+            add_completed(self.aw.plus_account_id, cast(CompletedItemDict, completed_item_dict))
+        return updated
 
     @pyqtSlot()
     def completed_items_selection_changed(self) -> None:
@@ -2261,6 +2311,9 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
                             self.aw.sendmessageSignal.emit(QApplication.translate('Message', 'Updating completed roast properties failed'), True, None)
                             # we keep the selection
                             return
+                    # we update the completed_roasts_cache entry
+                    completed_item_dict = self.selected_completed_item.data.model_dump(mode='json')
+                    add_completed(self.aw.plus_account_id, cast(CompletedItemDict, completed_item_dict))
                     # in case data was not edited or updating the edits to server succeeded we
                     # clear previous selection
                     self.selected_completed_item.deselect()
@@ -2577,6 +2630,12 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         self.update_styles()
         # load completed roasts cache
         load_completed(self.aw.plus_account_id)
+        # if the currently loaded profile is among the completed_items, its corresponding entry in that completed list is updated with the
+        # from the current loaded profile as properties might have been changed via the RoastProperties dialog
+        if self.aw.qmc.roastUUID is not None:
+            completed_item:Optional[CompletedItem] = next((ci for ci in self.completed_items if ci.roastUUID.hex == self.aw.qmc.roastUUID), None)
+            if completed_item is not None:
+                self.updates_completed_from_roast_properties(completed_item)
         # update scheduled and completed items
         self.updateScheduledItems()                                 # updates the current schedule items from received stock data
         load_prepared(self.aw.plus_account_id, self.scheduled_items)   # load the prepared items cache and update according to the valid schedule items

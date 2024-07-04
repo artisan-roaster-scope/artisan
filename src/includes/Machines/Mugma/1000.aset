@@ -1,0 +1,51 @@
+[General]
+Delay=1000
+roastertype_setup=Mugma 1000
+roastersize_setup_default=1
+roastersize_setup=1
+roasterheating_setup_default=3
+roasterheating_setup=3
+
+[Device]
+id=164
+mugmaHost=127.0.0.1
+mugmaPort=1504
+
+[ExtraComm]
+extrabaudrate=19200, 19200, 19200
+extrabytesize=8, 8, 8
+extracomport=COM1, COM1, COM1
+extraparity=E, E, E
+extrastopbits=1, 1, 1
+extratimeout=0.5, 0.5, 0.5
+
+[ExtraDev]
+extraCurveVisibility1=true, false, false, true, true, true, true, true, true, true
+extraCurveVisibility2=false, false, false, true, true, true, true, true, true, true
+extraDelta1=false, false, false, false, false, false, false, false, false, false
+extraDelta2=false, false, false, false, false, false, false, false, false, false
+extraFill1=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+extraFill2=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+extraLCDvisibility1=true, true, false, false, false, false, false, false, true, true
+extraLCDvisibility2=false, true, false, false, false, false, false, false, true, true
+extradevicecolor1=#ff5d00ff, #ad0427ff, #ad0427ff
+extradevicecolor2=#000000, #43a7cfff, #000000
+extradevices=167, 165, 166
+extramathexpression1=, , 
+extramathexpression2=, , 
+extraname1=SV, {3}, {3}
+extraname2=, {0}, Catalyzer
+
+[Sliders]
+eventsliderunits=%, , , %
+
+[Quantifiers]
+clusterEventsFlag=false
+eventquantifierSV=0, 0, 0, 0
+eventquantifieraction=0, 0, 0, 0
+quantifieractive=1, 0, 0, 1
+quantifiercoarse=0, 0, 0, 0
+quantifiermax=100, 100, 100, 100
+quantifiermin=0, 0, 0, 0
+quantifiersource=3, 0, 0, 2
+

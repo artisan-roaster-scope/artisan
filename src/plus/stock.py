@@ -253,7 +253,7 @@ def save() -> None:
         if stock is not None:
             f:TextIO
             with open(stock_cache_path, 'w', encoding='utf-8') as f:
-                json.dump(stock, f)
+                json.dump(stock, f, indent=None, separators=(',', ':'), ensure_ascii=False)
     except Exception as e:  # pylint: disable=broad-except
         _log.error(e)
     finally:

@@ -1739,7 +1739,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         # Mugma Network
         self.mugma_default_host:Final[str] = '127.0.0.1'
         self.mugmaHost:str = '127.0.0.1'
-        self.mugmaPort:int = 1503
+        self.mugmaPort:int = 1504
         self.mugma:Optional[Mugma] = None # holds the Mugma instance created on connect; reset to None on disconnect
 
         # Kaleido Network
@@ -10806,6 +10806,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.EventsGroupLayout.setVisible(True)
 
     def updateLCDproperties(self) -> None:
+        # clear intChannel cache
+        self.qmc.intChannel.cache_clear()
         # set LCDframe visibilities and labels
         ndev = len(self.qmc.extradevices)
         for i in range(ndev):
@@ -13197,7 +13199,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         try:
             with open(filename, 'w', encoding='utf-8') as outfile:
                 from json import dump as json_dump
-                json_dump(self.getProfile(), outfile, ensure_ascii=True)
+                json_dump(self.getProfile(), outfile, indent=None, separators=(',', ':'), ensure_ascii=False)
                 outfile.write('\n')
             return True
         except Exception as ex: # pylint: disable=broad-except
@@ -15471,9 +15473,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         try:
             det,dbt = self.curveSimilarity()
             if det is not None and not math.isnan(det):
-                computedProfile['det'] = det
+                computedProfile['det'] = float(det)
             if dbt is not None and not math.isnan(dbt):
-                computedProfile['dbt'] = dbt
+                computedProfile['dbt'] = float(dbt)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         ######### Energy Use #########

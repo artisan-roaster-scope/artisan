@@ -698,7 +698,7 @@ class AlarmDlg(ArtisanResizeablDialog):
             alarms['alarmstrings'] = list(self.aw.qmc.alarmstrings)
             from json import dump as json_dump
             with open(filename, 'w', encoding='utf-8') as outfile:
-                json_dump(alarms, outfile, ensure_ascii=True)
+                json_dump(alarms, outfile, indent=None, separators=(',', ':'), ensure_ascii=False)
                 outfile.write('\n')
             return True
         except Exception as ex: # pylint: disable=broad-except
