@@ -347,7 +347,7 @@ class wsport:
                 request[self.id_node] = message_id
                 if self.machine_node:
                     request[self.machine_node] = self.machineID
-                json_req = json.dumps(request, indent=None, separators=(',', ':'), ensure_ascii=True) # we conservatively use escaping for accent characters here dispite the utf-8 encoding as some clients might not be able to process non-ascii data
+                json_req = json.dumps(request, indent=None, separators=(',', ':'), ensure_ascii=True) # we conservatively use escaping for accent characters here despite the utf-8 encoding as some clients might not be able to process non-ascii data
                 if self._write_queue is not None:
                     if block:
                         future = asyncio.run_coroutine_threadsafe(self.registerRequest(message_id), self._loop)
