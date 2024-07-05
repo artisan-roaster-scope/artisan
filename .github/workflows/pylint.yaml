@@ -40,8 +40,8 @@ jobs:
         cache: 'pip' # caching pip dependencies
     - name: Install dependencies
       run: |
-        pip install -r src/requirements-dev.txt
-        pip install -r src/requirements.txt
+        pip install -r src/requirements-dev.txt --use-deprecated=legacy-resolver
+        pip install -r src/requirements.txt --use-deprecated=legacy-resolver
     - name: Set up reviewdog
       run: |
         mkdir -p "$HOME/bin"
