@@ -28,7 +28,7 @@ on:
         required: true
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04 # ubuntu-latest # (latest: ubuntu-24.04)
 #    if: github.ref == 'refs/heads/master'
 
     steps:
