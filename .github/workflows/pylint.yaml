@@ -40,6 +40,7 @@ jobs:
         cache: 'pip' # caching pip dependencies
     - name: Install dependencies
       run: |
+        pip install --upgrade pip==24.0 # downgrade pip as pip v24.1 fails with pip._vendor.packaging.version.InvalidVersion: Invalid version: '6.5.0-1022-azure' (image name!)
         pip install -r src/requirements-dev.txt
         pip install -r src/requirements.txt
     - name: Set up reviewdog
