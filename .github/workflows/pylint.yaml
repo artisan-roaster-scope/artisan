@@ -28,21 +28,21 @@ on:
         required: true
 jobs:
   build:
-    runs-on: ubuntu-22.04 # ubuntu-latest # (latest: ubuntu-24.04)
+    runs-on: ubuntu-24.04
 #    if: github.ref == 'refs/heads/master'
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python 3.11
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
-#        cache: 'pip' # caching pip dependencies
+        python-version: '3.12'
+        cache: 'pip' # caching pip dependencies
     - name: Install dependencies
       run: |
-        pip install --upgrade setuptools==65.7.0
-        pip install -v -r src/requirements-dev.txt --use-deprecated=legacy-resolver
-        pip install -v -r src/requirements.txt --use-deprecated=legacy-resolver
+        pip install --upgrade pip==24.0
+        pip install -v -r src/requirements-dev.txt
+        pip install -v -r src/requirements.txt
     - name: Set up reviewdog
       run: |
         mkdir -p "$HOME/bin"
