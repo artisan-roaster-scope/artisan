@@ -128,7 +128,7 @@ super_light_grey_hover: Final[str] = '#EEEEEE'
 super_light_grey: Final[str] = '#E3E3E3'
 very_light_grey: Final[str] = '#dddddd'
 light_grey_hover: Final[str] = '#D0D0D0'
-light_grey: Final[str] = '#C0C0C0'
+light_grey: Final[str] = '#BBBBBB'
 dark_grey_hover: Final[str] = '#909090'
 dark_grey: Final[str] = '#808080'
 dull_dark_grey: Final[str] = '#606060'
@@ -854,7 +854,7 @@ class NoDragItem(StandardItem):
             f'NoDragItem[Selected=false][Hover=true] {{ border:0px solid {item_color_hover}; background: {item_color_hover}; border-radius: {border_radius}px; }}'
             f'NoDragItem[Selected=true][Hover=false] {{ border:0px solid {plus_red}; background: {plus_red}; border-radius: {border_radius}px; }}'
             f'NoDragItem[Selected=true][Hover=true] {{ border:0px solid {plus_red_hover}; background: {plus_red_hover}; border-radius: {border_radius}px; }}'
-            f'QLabel {{ font-weight: bold; color: {dim_white}; }}'
+            f'QLabel {{ font-weight: bold; color: {white}; }}'
             f'QLabelRight {{ font-size: 10pt; }}'
             'QElidedLabel { font-weight: normal; }')
 
@@ -1561,7 +1561,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         self.weight_item_display:WeightItemDisplay = WeightItemDisplay(self)
         self.weight_manager:WeightManager = WeightManager([self.weight_item_display])
 
-        plus.stock.update() # explicit update stock on opening the scheduler!?
+        plus.stock.update() # explicit update stock on opening the scheduler
         self.updateScheduleWindow()
 
         # set all child's to NoFocus to receive the up/down arrow key events in keyPressEvent
@@ -1756,6 +1756,10 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
             # reset order cache to prevent resorting until next restart as this cached sort order is only used on startup to
             # initially reconstruct the previous order w.r.t. the server ordered schedule loaded from the stock received
             self.aw.scheduled_items_uuids = []
+            # schedule now only contains items received from the server (in local order)
+        else:
+            # remove items from current_schedule that are not in schedule
+            current_schedule = [si for si in current_schedule if next((s for s in schedule if '_id' in s and s['_id'] == si.id), None) is not None]
         # iterate over new schedule
         for s in schedule:
             try:
@@ -1787,7 +1791,6 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
                 pass # validation fails for outdated items
         # update the list of schedule items to be displayed
         self.scheduled_items = current_schedule
-
 
     @staticmethod
     def getCompletedItems() -> List[CompletedItem]:
@@ -2627,6 +2630,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
     # Note that on app raise (depending on the interval) also a stock update is triggered fetching the latest schedule from the server along
     @pyqtSlot()
     def updateScheduleWindow(self) -> None:
+        _log.debug('updateScheduleWindow()')
         self.update_styles()
         # load completed roasts cache
         load_completed(self.aw.plus_account_id)
