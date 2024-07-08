@@ -53,8 +53,12 @@ gallery:
     title: "Joper"
   - url: https://www.irm.coffee/
     image_path: /assets/images/iRm-logo.jpg
-    alt: "IP-CC"
-    title: "IP-CC"
+    alt: "IP-CC iRm"
+    title: "IP-CC iRm"
+  - url: https://finecoffeeroaster.com/
+    image_path: /assets/images/mugma-logo.png
+    alt: "Mugma Roasters"
+    title: "Mugma Roasters"
     
 ---
 

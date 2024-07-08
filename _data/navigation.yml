@@ -104,6 +104,8 @@ machines:
         url: /machines/loring/
       - title: "Mill City Roasters"
         url: /machines/mcr/
+      - title: "Mugma Roasters"
+        url: /machines/mugma/
       - title: "NOR Coffee Roaster"
         url: /machines/nor/
       - title: "Nordic"
