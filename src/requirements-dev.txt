@@ -10,7 +10,7 @@ types-requests>=2.32.0.20240622
 types-setuptools>=70.2.0.20240704
 types-urllib3>=1.26.25.14
 lxml-stubs>=0.5.1
-mypy==1.10.0
+mypy==1.10.1
 pyright==1.1.370
 ruff>=0.5.1
 pylint==3.2.5
