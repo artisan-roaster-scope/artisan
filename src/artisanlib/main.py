@@ -11688,7 +11688,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #        validFilenameChars = f'-_.() {libstring.ascii_letters}{libstring.digits}'
 #        return ''.join(c for c in decodeLocal(cleanedFilename) if c in validFilenameChars)
 
-    def removeDisallowedFilenameChars(self,filename):
+    def removeDisallowedFilenameChars(self,filename:str) -> str:
         invalidFilenameChars = r'[<>:"/\\|?*]'
         return re.sub(invalidFilenameChars, '', filename)
 
