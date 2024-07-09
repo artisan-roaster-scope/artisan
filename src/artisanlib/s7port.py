@@ -18,13 +18,18 @@
 import time
 import sys
 import logging
-from typing import Final, List, Dict, Tuple, Optional, Iterator, TYPE_CHECKING
+from typing import Final, List, Dict, Tuple, Optional, Iterator, TYPE_CHECKING, no_type_check
 
 if TYPE_CHECKING:
     from snap7.client import Client as S7Client
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
 
-from snap7.types import Areas
+try:
+    # >= v2.0
+    from snap7.type import Area # type:ignore[import-not-found, unused-ignore]
+except Exception: # pylint: disable=broad-except
+    # < v2.0
+    from snap7.types import Areas # type:ignore[import-not-found, unused-ignore] # noqa: F401 # pylint: disable=unused-import
 from snap7.util.getters import get_bool, get_int, get_real
 from snap7.util.setters import set_bool, set_int, set_real
 
@@ -102,7 +107,7 @@ class s7port:
         self.COMsemaphore:QSemaphore = QSemaphore(1)
 
         # we do not use the snap7 enums here to avoid the import for non S7 users
-        self.areas:Optional[List[Areas]] = None # lazy initialized in initArray() on connect
+        self.areas:Optional[List[Area]] = None # type:ignore[reportPossiblyUnboundVariable, unused-ignore, no-any-unimported] # lazy initialized in initArray() on connect
         self.last_request_timestamp:float = time.time()
         self.min_time_between_requests:float = 0.04
 
@@ -113,16 +118,29 @@ class s7port:
 
 ################
 
+    @no_type_check # as types changed between vs 1.x and 2.x
     def initArrays(self) -> None:
         if self.areas is None:
-            self.areas = [
-                Areas.PE, # 129, 0x81
-                Areas.PA, # 130, 0x82
-                Areas.MK, # 131, 0x83
-                Areas.CT, #  28, 0x1C
-                Areas.TM, #  29, 0x1D
-                Areas.DB  # 132, 0x84
-            ]
+            try:
+                # >= v2.0
+                self.areas = [
+                    Area.PE, # 129, 0x81
+                    Area.PA, # 130, 0x82
+                    Area.MK, # 131, 0x83
+                    Area.CT, #  28, 0x1C
+                    Area.TM, #  29, 0x1D
+                    Area.DB  # 132, 0x84
+                ]
+            except Exception: # pylint: disable=broad-except
+                # < v2.0
+                self.areas = [
+                    Areas.PE, # 129, 0x81 # pylint: disable=used-before-assignment
+                    Areas.PA, # 130, 0x82
+                    Areas.MK, # 131, 0x83
+                    Areas.CT, #  28, 0x1C
+                    Areas.TM, #  29, 0x1D
+                    Areas.DB  # 132, 0x84
+                ]
 
     # waits if need to ensure a minimal time delta between network requests which are scheduled directly after this functions evaluation and set the new timestamp
     def waitToEnsureMinTimeBetweenRequests(self) -> None:
@@ -462,7 +480,7 @@ class s7port:
                 self.aw.addserial(f'S7 writeInt({area},{dbnumber},{start},{value})')
 
     def writeBool(self, area:int, dbnumber:int, start:int, index:int, value:bool) -> None:
-        _log.debug('writeInt(%d,%d,%d,%d,%s)',area,dbnumber,start,index,value)
+        _log.debug('writeBool(%d,%d,%d,%d,%s)',area,dbnumber,start,index,value)
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -481,7 +499,7 @@ class s7port:
                 self.commError = True
                 self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Error: connecting to PLC failed'))
         except Exception as e: # pylint: disable=broad-except
-            _log.info('writeInt(%d,%d,%d,%d,%s) failed',area,dbnumber,start,index,value)
+            _log.info('writeBool(%d,%d,%d,%d,%s) failed',area,dbnumber,start,index,value)
             _log.debug(e)
             if self.aw.qmc.flagon:
                 _, _, exc_tb = sys.exc_info()

@@ -394,7 +394,7 @@ def load_completed(plus_account_id:Optional[str]) -> None:
                     # we keep all roasts completed today as well as all from the previous roast session
                     completed_roasts_cache = today_completed + previously_completed
     except FileNotFoundError:
-        _log.info('no completed roast cache file found')
+        _log.debug('no completed roast cache file found')
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
     finally:
@@ -490,7 +490,7 @@ def load_prepared(plus_account_id:Optional[str], scheduled_items:List[ScheduledI
                             prepared_items[item_id] = prepared_weights
                     prepared_items_cache = prepared_items
     except FileNotFoundError:
-        _log.info('no prepared items cache file found')
+        _log.debug('no prepared items cache file found')
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
     finally:
