@@ -11688,6 +11688,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #        validFilenameChars = f'-_.() {libstring.ascii_letters}{libstring.digits}'
 #        return ''.join(c for c in decodeLocal(cleanedFilename) if c in validFilenameChars)
 
+    def removeDisallowedFilenameChars(self,filename):
+        invalidFilenameChars = r'[<>:"/\\|?*]'
+        return re.sub(invalidFilenameChars, '', filename)
 
     def generateFilename(self,prefix:str='',previewmode:int=0) -> str:
         filename = ''
@@ -11704,8 +11707,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             else:
                 filename = self.parseAutosaveprefix(prefix,previewmode=previewmode)
             filename += '.alog'
-#            #clean name (disabled now since Artisan >2.6.0)
-#            filename = self.removeDisallowedFilenameChars(filename)
+            #clean name
+            filename = self.removeDisallowedFilenameChars(filename)
             filename = filename.strip()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
