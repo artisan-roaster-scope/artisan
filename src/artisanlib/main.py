@@ -10260,8 +10260,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         env=my_env,
                         stdin=None,
                         # suppress output:
-                        stdout=subprocess.DEVNULL,
-                        stderr=subprocess.STDOUT
+                        # In commit d153f2 these redirects were changed from None to subprocess.DEVNULL and subprocess.STDOUT.
+                        #   The motivation for this change is lost. This form has worked for years, across many applications, 
+                        #   with no reported problems. Recently one application, voice.exe, was reported as not operating. 
+                        #   Reverting the redirects to None resolves that specific issue, and ought to work with other applications.
+                        stdout=None, #subprocess.DEVNULL,
+                        stderr=None #subprocess.STDOUT
                         ) #.wait() # with this wait(), the script blocks the Artisan event loop
                 else:
                     subprocess.Popen(os.path.expanduser(cmd_str), # pylint: disable=consider-using-with
