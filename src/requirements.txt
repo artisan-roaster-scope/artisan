@@ -26,7 +26,7 @@
 ######
 # packages that are required on all platforms
 #
-setuptools==70.2.0
+setuptools==70.3.0
 wheel==0.43.0
 pyserial==3.5
 pymodbus==3.6.9

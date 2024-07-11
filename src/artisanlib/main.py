@@ -11688,7 +11688,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #        validFilenameChars = f'-_.() {libstring.ascii_letters}{libstring.digits}'
 #        return ''.join(c for c in decodeLocal(cleanedFilename) if c in validFilenameChars)
 
-    def removeDisallowedFilenameChars(self,filename:str) -> str:
+    @staticmethod
+    def removeDisallowedFilenameChars(filename:str) -> str:
         invalidFilenameChars = r'[<>:"/\\|?*]'
         return re.sub(invalidFilenameChars, '', filename)
 
@@ -25742,6 +25743,10 @@ def main() -> None:
             if appWindow.lastLoadedProfile:
                 try:
                     appWindow.loadFile(appWindow.lastLoadedProfile)
+                    if appWindow.curFile is None:
+                        # load failed
+                        appWindow.lastLoadedProfile = ''
+                        appWindow.qmc.reset(redraw=False, soundOn=False)
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
             elif appWindow.logofilename != '':  #ensure background image aspect ratio is calculated
@@ -25749,16 +25754,24 @@ def main() -> None:
             if appWindow.lastLoadedBackground and appWindow.lastLoadedBackground != '' and not appWindow.curFile:
                 try:
                     appWindow.loadbackground(appWindow.lastLoadedBackground)
-                    appWindow.qmc.background = not appWindow.qmc.hideBgafterprofileload
-                    if not appWindow.lastLoadedProfile and not(appWindow.logofilename != '' and appWindow.logoimgflag):
-                        # this extra redraw is not needed if a watermark is loaded as it is triggered by the resize-redraw mechanism
-                        appWindow.qmc.timealign(redraw=False)
-                        appWindow.autoAdjustAxis(background=appWindow.qmc.background and (not len(appWindow.qmc.timex) > 3))
-                        appWindow.qmc.redraw()
+                    if appWindow.qmc.backgroundpath:
+                        appWindow.qmc.background = not appWindow.qmc.hideBgafterprofileload
+                        if not appWindow.lastLoadedProfile and not(appWindow.logofilename != '' and appWindow.logoimgflag):
+                            # this extra redraw is not needed if a watermark is loaded as it is triggered by the resize-redraw mechanism
+                            appWindow.qmc.timealign(redraw=False)
+                            appWindow.autoAdjustAxis(background=appWindow.qmc.background and (not len(appWindow.qmc.timex) > 3))
+                            appWindow.qmc.redraw()
+                        else:
+                            appWindow.qmc.timealign(redraw=True,recompute=True)
                     else:
-                        appWindow.qmc.timealign(redraw=True,recompute=True)
+                        appWindow.lastLoadedProfile = ''
+                        appWindow.qmc.background = False
+                        appWindow.qmc.backgroundprofile = None
+                        appWindow.qmc.backgroundprofile_moved_x = 0
+                        appWindow.qmc.backgroundprofile_moved_y = 0
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
+                    appWindow.lastLoadedProfile = ''
                     appWindow.qmc.background = False
                     appWindow.qmc.backgroundprofile = None
                     appWindow.qmc.backgroundprofile_moved_x = 0

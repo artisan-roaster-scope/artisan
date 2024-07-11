@@ -420,6 +420,8 @@ def roastLink(plus_roast:str) -> str:
 def remindersLink() -> str:
     return f'{config.web_base_url}/{getLanguage()}/reminders'
 
+def schedulerLink() -> str:
+    return f'{config.web_base_url}/{getLanguage()}/schedule'
 
 # HiRes plus QMessageBox icon
 

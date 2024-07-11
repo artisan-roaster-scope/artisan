@@ -240,6 +240,7 @@ class flavorDlg(ArtisanResizeablDialog):
             self.aw.qmc.flavors[x] = valueSpinBox.value()
 #            self.aw.qmc.flavorchart() # slow full redraw
             self.aw.qmc.updateFlavorchartValues() # fast incremental redraw
+            self.aw.qmc.updateFlavorchartLabel(x) # fast incremental redraw
 
     @pyqtSlot(int)
     def setdefault(self,_:int) -> None:

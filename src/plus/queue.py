@@ -131,6 +131,13 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                                     item['url'], item['data'], item['verb']
                                 )
                                 r.raise_for_status()
+                                if config.app_window is not None:
+                                    config.app_window.sendmessage(
+                                        QApplication.translate(
+                                            'Plus',
+                                            'Roast successfully upload to {}'
+                                        ).format(config.app_name)
+                                    )  # @UndefinedVariable
                                 # successfully transmitted, we add/update the
                                 # roasts UUID sync-cache
                                 self.addSyncItem(item)
