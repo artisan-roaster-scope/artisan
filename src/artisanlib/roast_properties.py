@@ -1580,7 +1580,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         try:
             if self.aw.plus_account is not None:
                 if plus.controller.is_connected():
-                    plus.stock.update()
+                    QTimer.singleShot(10, plus.stock.update)
                 else: # we are in ON mode, but not connected, we connect which triggers a stock update if successful
                     plus.controller.connect(interactive=False)
                 if plus.controller.is_connected():

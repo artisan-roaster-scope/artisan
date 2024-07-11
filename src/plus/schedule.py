@@ -1536,7 +1536,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
 
         self.TabWidget = QTabWidget()
         self.TabWidget.addTab(self.remaining_splitter, QApplication.translate('Tab', 'To-Do'))
-        self.TabWidget.addTab(self.completed_stacked_widget, QApplication.translate('Tab', 'Done'))
+        self.TabWidget.addTab(self.completed_stacked_widget, QApplication.translate('Tab', 'Completed'))
         self.TabWidget.setStyleSheet(tooltip_style)
 
         self.task_type = QLabel()
@@ -2680,7 +2680,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         self.update_styles()
         # load completed roasts cache
         load_completed(self.aw.plus_account_id)
-        # if the currently loaded profile is among the completed_items, its corresponding entry in that completed list is updated with the
+        # if the currently loaded profile is among the completed_items, its corresponding entry in that completed list is updated with the information
         # from the current loaded profile as properties might have been changed via the RoastProperties dialog
         if self.aw.qmc.roastUUID is not None:
             completed_item:Optional[CompletedItem] = next((ci for ci in self.completed_items if ci.roastUUID.hex == self.aw.qmc.roastUUID), None)

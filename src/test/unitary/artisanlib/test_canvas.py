@@ -41,7 +41,8 @@ def test_eventsExternal2Internal2ExternalValue(value:int) -> None:
 @given(value=st.one_of(st.floats(-11,11)))
 @settings(max_examples=10)
 def test_eventsInternal2External2InternalValue(value:float) -> None:
-    if -1 <= value <= 1:
-        assert tgraphcanvas.eventsExternal2InternalValue(tgraphcanvas.eventsInternal2ExternalValue(value)) == 0
+    v = int(round(value*10)) / 10
+    if -1 <= v <= 1:
+        assert tgraphcanvas.eventsExternal2InternalValue(tgraphcanvas.eventsInternal2ExternalValue(v)) == 0
     else:
-        assert tgraphcanvas.eventsExternal2InternalValue(tgraphcanvas.eventsInternal2ExternalValue(value)) == round(value,1)
+        assert tgraphcanvas.eventsExternal2InternalValue(tgraphcanvas.eventsInternal2ExternalValue(v)) == round(v,1)

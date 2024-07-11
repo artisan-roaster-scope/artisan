@@ -33,6 +33,7 @@ except Exception: # pylint: disable=broad-except
 import copy
 import json
 import time
+import datetime
 import logging
 
 from artisanlib.util import (decodeLocal, encodeLocal, getDirectory, is_int_list, is_float_list, render_weight,
@@ -192,8 +193,8 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
         global stock  # pylint: disable=global-statement
         _log.debug('fetch()')
         try:
-            # fetch from server
-            d = connection.getData(config.stock_url)
+            # fetch from server (send along the current date to have the server filter the schedule correctly for the local timezone)
+            d = connection.getData(f'{config.stock_url}?today={datetime.datetime.now().astimezone().date()}')
             _log.debug('-> %s', d.status_code)
             j = d.json()
             if j:

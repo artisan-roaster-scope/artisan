@@ -328,7 +328,7 @@ class Artisan(QtSingleApplication):
         try:
             aw:Optional[ApplicationWindow] = self.activationWindow()
             if aw is not None and not sip.isdeleted(aw): # sip not supported on older PyQt versions (eg. RPi)
-                if state == Qt.ApplicationState.ApplicationActive and self.sentToBackground is not None:
+                if state == Qt.ApplicationState.ApplicationActive and self.sentToBackground is not None and aw.editgraphdialog is None:
                     #app raised
 #                    _log.debug('app put to foreground')
                     try:
@@ -345,7 +345,8 @@ class Artisan(QtSingleApplication):
                         _log.exception(e)
                     self.sentToBackground = None
 
-                elif state == Qt.ApplicationState.ApplicationInactive:
+                #elif state == Qt.ApplicationState.ApplicationInactive:
+                else:
                     # focus released
                     self.sentToBackground = libtime.time() # keep the timestamp on sending the app with the main window to background
         except Exception as e: # pylint: disable=broad-except
@@ -10261,8 +10262,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         stdin=None,
                         # suppress output:
                         # In commit d153f2 these redirects were changed from None to subprocess.DEVNULL and subprocess.STDOUT.
-                        #   The motivation for this change is lost. This form has worked for years, across many applications, 
-                        #   with no reported problems. Recently one application, voice.exe, was reported as not operating. 
+                        #   The motivation for this change is lost. This form has worked for years, across many applications,
+                        #   with no reported problems. Recently one application, voice.exe, was reported as not operating.
                         #   Reverting the redirects to None resolves that specific issue, and ought to work with other applications.
                         stdout=None, #subprocess.DEVNULL,
                         stderr=None #subprocess.STDOUT
