@@ -50,6 +50,7 @@ reset_passwd_url: Final[str] = web_base_url + '/resetPassword'
 auth_url: Final[str] = api_base_url + '/accounts/users/authenticate'
 stock_url: Final[str] = api_base_url + '/acoffees'
 roast_url: Final[str] = api_base_url + '/aroast'
+lock_schedule_url: Final[str] = api_base_url + '/aschedule/lock'
 notifications_url: Final[str] = api_base_url + '/notifications'
 
 # Connection configurations

@@ -15,25 +15,27 @@
 # AUTHOR
 # Marko Luther, 2023
 
+#from artisanlib.main import Artisan
 from artisanlib.util import stringtoseconds, createGradient
 from typing import Optional, Dict, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from PyQt6.QtCore import QCoreApplication # pylint: disable=unused-import
     from PyQt6.QtGui import QWheelEvent, QMouseEvent, QFocusEvent, QResizeEvent # pylint: disable=unused-import
     from PyQt6.QtWidgets import QWidget, QTimeEdit, QCheckBox, QComboBox # pylint: disable=unused-import
 
 try:
-    from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, QLine, QEvent, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QByteArray, QPropertyAnimation, QEasingCurve, QLocale) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import (QLabel, QComboBox, QLineEdit, QTextEdit, QDoubleSpinBox, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import (QApplication, QSplitter, QSplitterHandle, QLabel, QComboBox, QLineEdit, QTextEdit, QDoubleSpinBox, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
         QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtGui import QFontMetrics, QColor, QCursor # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import QPen, QPainter, QFontMetrics, QColor, QCursor, QEnterEvent, QPaintEvent # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
-    from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, QLine, QEvent, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QByteArray, QPropertyAnimation, QEasingCurve, QLocale) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QLabel, QComboBox, QLineEdit, QTextEdit, QDoubleSpinBox, QPushButton, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import (QApplication, QSplitter, QSplitterHandle, QLabel, QComboBox, QLineEdit, QTextEdit, QDoubleSpinBox, QPushButton, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QFontMetrics, QColor, QCursor # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QPen, QPainter, QFontMetrics, QColor, QCursor, QEnterEvent, QPaintEvent # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
 class MyQComboBox(QComboBox): # pylint: disable=too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues]# Argument to class must be a base class
@@ -442,3 +444,62 @@ class MinorEventPushButton(EventPushButton): # pylint: disable=too-few-public-me
 class AuxEventPushButton(EventPushButton): # pylint: disable=too-few-public-methods
     def __init__(self, text:str, parent:Optional['QWidget'] = None, background_color:str = '#bdbdbd') -> None:
         super().__init__(text, parent, background_color)
+
+
+
+###
+
+# only vertical mode supported by SplitterHandler for now
+class SplitterHandle(QSplitterHandle):  # pyright: ignore [reportGeneralTypeIssues]# Argument to class must be a base class
+
+    def __init__(self, *args:Any, **kwargs:Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.pen_color_normal = QColor(150, 150, 150)
+        self.pen_color_hover_lightmode = QColor(110, 110, 110)
+        self.pen_color_hover_darkmode = QColor(190, 190, 190)
+        self.pen_color = self.pen_color_normal
+
+    def enterEvent(self, event:Optional[QEnterEvent]) -> None:
+        if event is not None:
+            app:Optional[QCoreApplication] = QApplication.instance()
+            if app is not None and app.darkmode: # type:ignore[attr-defined]
+                self.pen_color = self.pen_color_hover_darkmode
+            else:
+                self.pen_color = self.pen_color_hover_lightmode
+            self.repaint()
+
+    def leaveEvent(self, event:Optional[QEvent]) -> None:
+        if event is not None:
+            self.pen_color = self.pen_color_normal
+            self.repaint()
+
+    def paintEvent(self, event:Optional[QPaintEvent]) -> None:
+        super().paintEvent(event)
+        painter = QPainter(self)
+        pen = QPen()
+        pen.setColor(self.pen_color)
+        pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+        pen.setWidth(2)
+        painter.setPen(pen)
+        painter.setRenderHint(painter.RenderHint.Antialiasing)
+
+        h = self.height()
+        hh = int(round(h/2))
+        ww = int(round(self.width()/2))
+
+        x0 = ww - h
+        x1 = ww + h
+
+        painter.drawLines(
+            QLine(x0, hh + 2, x1, hh + 2),
+            QLine(x0, hh - 2, x1, hh - 2))
+
+
+# only vertical mode supported by SplitterHandler for now
+class Splitter(QSplitter):   # pyright: ignore [reportGeneralTypeIssues]# Argument to class must be a base class
+    def __init__(self, *args:Any, **kwargs:Any):
+        super().__init__(*args, *kwargs)
+        self.setHandleWidth(10)
+
+    def createHandle(self) -> QSplitterHandle:
+        return SplitterHandle(self.orientation(), self)

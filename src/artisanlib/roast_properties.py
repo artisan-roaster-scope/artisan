@@ -1889,11 +1889,19 @@ class editGraphDlg(ArtisanResizeablDialog):
                         if len(self.plus_stores) == 1:
                             self.plus_default_store = plus.stock.getStoreId(self.plus_stores[0])
                         if len(self.plus_stores) < 2:
-                            self.plusStoreslabel.setVisible(False)
-                            self.plus_stores_combo.setVisible(False)
+                            #self.plusStoreslabel.setVisible(False)
+                            if self.plusStoreslabel.isVisible():
+                                self.plusStoreslabel.hide()
+                            #self.plus_stores_combo.setVisible(False)
+                            if self.plus_stores_combo.isVisible():
+                                self.plus_stores_combo.hide()
                         else:
-                            self.plusStoreslabel.setVisible(True)
-                            self.plus_stores_combo.setVisible(True)
+                            #self.plusStoreslabel.setVisible(True)
+                            if not self.plusStoreslabel.isVisible():
+                                self.plusStoreslabel.show()
+                            #self.plus_stores_combo.setVisible(True)
+                            if not self.plus_stores_combo.isVisible():
+                                self.plus_stores_combo.show()
                     except Exception as e:  # pylint: disable=broad-except
                         _log.exception(e)
                     self.plus_stores_combo.blockSignals(True)

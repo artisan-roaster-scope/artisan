@@ -69,7 +69,7 @@ from artisanlib.types import BTBreakParams
 
 # import artisan.plus module
 from plus.util import roastLink
-from plus.queue import addRoast
+from plus.queue import addRoast, sendLockSchedule
 
 try:
     #pylint: disable-next = E, W, R, C
@@ -12344,7 +12344,12 @@ class tgraphcanvas(FigureCanvas):
 
             self.aw.update_minieventline_visibility()
 
-
+            # lock todays schedule
+            if self.aw.plus_account is not None and self.aw.schedule_window is not None:
+                try:
+                    sendLockSchedule()
+                except Exception: # pylint: disable=broad-except
+                    pass
 
             # set CHARGEtimer
             if self.chargeTimerFlag:

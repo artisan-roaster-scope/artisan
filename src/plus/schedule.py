@@ -31,16 +31,16 @@ import textwrap
 import logging
 from uuid import UUID
 try:
-    from PyQt6.QtCore import (Qt, QMimeData, QSettings, pyqtSlot, pyqtSignal, QPoint, QPointF, QLocale, QDate, QDateTime, QSemaphore, QTimer) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import (QRect, Qt, QMimeData, QSettings, pyqtSlot, pyqtSignal, QPoint, QPointF, QLocale, QDate, QDateTime, QSemaphore, QTimer) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import (QDrag, QPixmap, QPainter, QTextLayout, QTextLine, QColor, QFontMetrics, QCursor, QAction) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QStackedWidget, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QFrame, QTabWidget,  # @UnusedImport @Reimport  @UnresolvedImport
-            QCheckBox, QGroupBox, QScrollArea, QSplitter, QLabel, QSizePolicy,  # @UnusedImport @Reimport  @UnresolvedImport
+            QCheckBox, QGroupBox, QScrollArea, QLabel, QSizePolicy,  # @UnusedImport @Reimport  @UnresolvedImport
             QGraphicsDropShadowEffect, QPlainTextEdit, QLineEdit, QMenu)  # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
-    from PyQt5.QtCore import (Qt, QMimeData, QSettings, pyqtSlot, pyqtSignal, QPoint, QPointF, QLocale, QDate, QDateTime, QSemaphore, QTimer) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import (QRect, Qt, QMimeData, QSettings, pyqtSlot, pyqtSignal, QPoint, QPointF, QLocale, QDate, QDateTime, QSemaphore, QTimer) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import (QDrag, QPixmap, QPainter, QTextLayout, QTextLine, QColor, QFontMetrics, QCursor, QAction) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QStackedWidget, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QFrame, QTabWidget, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-            QCheckBox, QGroupBox, QScrollArea, QSplitter, QLabel, QSizePolicy,  # @UnusedImport @Reimport  @UnresolvedImport
+            QCheckBox, QGroupBox, QScrollArea, QLabel, QSizePolicy,  # @UnusedImport @Reimport  @UnresolvedImport
             QGraphicsDropShadowEffect, QPlainTextEdit, QLineEdit, QMenu)  # @UnusedImport @Reimport  @UnresolvedImport
 
 
@@ -67,7 +67,7 @@ import plus.sync
 import plus.util
 from plus.util import datetime2epoch, epoch2datetime, schedulerLink, epoch2ISO8601, ISO86012epoch, plusLink
 from plus.weight import Display, WeightManager, GreenWeightItem, RoastedWeightItem
-from artisanlib.widgets import ClickableQLabel, ClickableQLineEdit
+from artisanlib.widgets import ClickableQLabel, ClickableQLineEdit, Splitter
 from artisanlib.util import (convertWeight, weight_units, render_weight, comma2dot, float2floatWeightVolume, getDirectory)
 
 
@@ -141,6 +141,7 @@ shadow_color: Final[str] = very_dark_grey
 tooltip_style: Final[str] = 'QToolTip { padding: 5px; opacity: 240; }'
 tooltip_light_background_style: Final[str] = f'QToolTip {{ background: {light_grey}; padding: 5px; opacity: 240; }}'
 tooltip_dull_dark_background_style: Final[str] = f'QToolTip {{ background: {dull_dark_grey}; padding: 5px; opacity: 240; }}'
+
 
 
 class CompletedItemDict(TypedDict):
@@ -1338,19 +1339,17 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         remaining_filter_layout.addWidget(self.day_filter)
         remaining_filter_layout.addWidget(self.user_filter)
         remaining_filter_layout.addWidget(self.machine_filter)
-        remaining_filter_group = QGroupBox(QApplication.translate('Plus', 'Filters'))
-        remaining_filter_group.setLayout(remaining_filter_layout)
+        self.remaining_filter_group = QGroupBox(QApplication.translate('Plus', 'Filters'))
+        self.remaining_filter_group.setLayout(remaining_filter_layout)
 
         self.remaining_scrollarea = QScrollArea()
         self.remaining_scrollarea.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.remaining_scrollarea.setWidgetResizable(True)
         self.remaining_scrollarea.setWidget(remaining_widget)
         self.remaining_scrollarea.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
-#        self.remaining_scrollarea.setFrameShadow(QFrame.Shadow.Sunken)
-#        self.remaining_scrollarea.setFrameShape(QFrame.Shape.Panel)
-        self.remaining_scrollarea.setMinimumWidth(remaining_widget.minimumSizeHint().width())
+#        self.remaining_scrollarea.setMinimumWidth(remaining_widget.minimumSizeHint().width())
 
-        remaining_filter_group.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
+        self.remaining_filter_group.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 
         self.remaining_message = QLabel()
         self.remaining_message.setTextFormat(Qt.TextFormat.RichText)
@@ -1369,10 +1368,22 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         self.stacked_remaining_widget.addWidget(self.remaining_scrollarea)
         self.stacked_remaining_widget.addWidget(self.remaining_message_widget)
 
-        self.remaining_splitter = QSplitter(Qt.Orientation.Vertical)
+        remaining_filter_layout2 =  QVBoxLayout()
+        remaining_filter_layout2.addSpacing(2) # ensures a minimum hight to keep the handle movable
+        remaining_filter_layout2.addWidget(self.remaining_filter_group)
+        remaining_filter_layout2.setContentsMargins(2, 10, 2, 2) # left, top, right, bottom # NOTE: if top is reduced to 2, on macOS the spacing of the single filters gets too small
+        remaining_filter_group2 = QFrame()
+        remaining_filter_group2.setLayout(remaining_filter_layout2)
+        self.remaining_filter_group.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
+        remaining_filter_group2.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
+
+        self.remaining_splitter = Splitter(Qt.Orientation.Vertical)
         self.remaining_splitter.addWidget(self.stacked_remaining_widget)
-        self.remaining_splitter.addWidget(remaining_filter_group)
+        self.remaining_splitter.addWidget(remaining_filter_group2)
         self.remaining_splitter.setSizes([100,0])
+
+        self.remaining_filter_group.hide()
+        self.remaining_splitter.splitterMoved.connect(self.remainingSplitterMoved)
 
 #####
         self.nodrag_roasted = StandardWidget(self, orientation=Qt.Orientation.Vertical)
@@ -1505,18 +1516,29 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         self.completed_details_group.setLayout(completed_details_layout)
         self.completed_details_group.setEnabled(False)
 
+        self.completed_details_scrollarea = QScrollArea()
+        self.completed_details_scrollarea.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.completed_details_scrollarea.setWidgetResizable(True)
+        self.completed_details_scrollarea.setWidget(self.completed_details_group)
+        self.completed_details_scrollarea.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 
-        completed_details_scrollarea = QScrollArea()
-        completed_details_scrollarea.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        completed_details_scrollarea.setWidgetResizable(True)
-        completed_details_scrollarea.setWidget(self.completed_details_group)
-        completed_details_scrollarea.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
+        completed_details_layout2 =  QVBoxLayout()
+        completed_details_layout2.addSpacing(2) # ensures a minimum hight to keep the handle movable
+        completed_details_layout2.addWidget(self.completed_details_scrollarea)
+        completed_details_layout2.setSpacing(0)
+        completed_details_layout2.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom
+        self.completed_frame = QFrame()
+        self.completed_frame.setLayout(completed_details_layout2)
+        self.completed_frame.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 
-        self.completed_splitter = QSplitter(Qt.Orientation.Vertical)
+        self.completed_splitter = Splitter(Qt.Orientation.Vertical)
         self.completed_splitter.addWidget(completed_scrollarea)
-        self.completed_splitter.addWidget(completed_details_scrollarea)
+        self.completed_splitter.addWidget(self.completed_frame)
         self.completed_splitter.setSizes([100,0])
         self.completed_splitter_open_height: int = 0
+
+        self.completed_details_scrollarea.hide()
+        self.completed_splitter.splitterMoved.connect(self.completedSplitterMoved)
 
         completed_message = QLabel(f"{QApplication.translate('Plus', 'No completed roasts')}<br>")
         completed_message.setWordWrap(True)
@@ -1566,10 +1588,24 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         self.task_frame.setLayout(task_layout)
         self.task_frame.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 
-        self.main_splitter = QSplitter(Qt.Orientation.Vertical)
-        self.main_splitter.addWidget(self.task_frame)
+        task2_layout =  QVBoxLayout()
+        task2_layout.addSpacing(2) # ensures a minimum hight to keep the handle movable
+        task2_layout.addWidget(self.task_frame)
+        task2_layout.setSpacing(0)
+        task2_layout.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom
+        self.task2_frame = QFrame()
+        self.task2_frame.setLayout(task2_layout)
+        self.task2_frame.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
+
+        self.main_splitter = Splitter(Qt.Orientation.Vertical)
+        self.main_splitter.addWidget(self.task2_frame)
         self.main_splitter.addWidget(self.TabWidget)
         self.main_splitter.setSizes([0,100])
+        self.main_splitter.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+
+        self.task_frame.hide()
+        self.main_splitter.splitterMoved.connect(self.mainSplitterMoved)
+
 
         disconnected_widget = QLabel()
         disconnected_widget.setTextFormat(Qt.TextFormat.RichText)
@@ -1597,7 +1633,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         self.main_layout.addWidget(self.stacked_widget)
         self.main_layout.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom
 
-        self.setMinimumWidth(175)
+#        self.setMinimumWidth(175)
 
         self.setLayout(self.main_layout)
 
@@ -1635,6 +1671,35 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
             self.set_next()
 
         self.aw.sendmessage(QApplication.translate('Message','Scheduler started'))
+
+
+    @pyqtSlot(int,int)
+    def mainSplitterMoved(self, pos: int, index: int) -> None:
+        # hide upper splitter content to allow minimizing the window
+        if index == 1 and pos>0 and not self.task_frame.isVisible():
+            self.task_frame.show()
+        elif index == 1 and pos == 0 and self.task_frame.isVisible():
+            self.task_frame.hide()
+
+    @pyqtSlot(int,int)
+    def remainingSplitterMoved(self, _pos: int, index: int) -> None:
+        splitter_sizes = self.remaining_splitter.sizes()
+        if len(splitter_sizes)>1:
+            # hide lower splitter content to allow minimizing the window
+            if index == 1 and splitter_sizes[1] > 0 and not self.remaining_filter_group.isVisible():
+                self.remaining_filter_group.show()
+            elif index == 1 and splitter_sizes[1] == 0 and self.remaining_filter_group.isVisible():
+                self.remaining_filter_group.hide()
+
+    @pyqtSlot(int,int)
+    def completedSplitterMoved(self, _pos: int, index: int) -> None:
+        splitter_sizes = self.completed_splitter.sizes()
+        if len(splitter_sizes)>1:
+            # hide lower completed splitter content to allow minimizing the window
+            if index == 1 and splitter_sizes[1] > 0 and not self.completed_details_scrollarea.isVisible():
+                self.completed_details_scrollarea.show()
+            elif index == 1 and splitter_sizes[1] == 0 and self.completed_details_scrollarea.isVisible():
+                self.completed_details_scrollarea.hide()
 
     @pyqtSlot(str)
     def disconnected_link_handler(self, _link:str) -> None:
@@ -2398,6 +2463,9 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
                                 self.roasted_density.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
                                 self.roasted_moisture.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
                                 self.roasted_notes.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+                                if not self.completed_details_scrollarea.isVisible():
+                                    self.completed_details_scrollarea.show()
+                                    self.update()
                                 if splitter_sizes[1] == 0:
                                     if self.completed_splitter_open_height != 0:
                                         self.completed_splitter.setSizes([
@@ -2430,6 +2498,8 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
                     self.roasted_density.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                     self.roasted_moisture.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                     self.roasted_notes.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+                    if self.completed_details_scrollarea.isVisible():
+                        self.completed_details_scrollarea.hide()
             elif not self.aw.qmc.flagon:
                 # plus controller is not on and Artisan is OFF we first close a potentially pending edit section and then try to load that profile
                 if self.selected_completed_item is not None:
@@ -2448,6 +2518,8 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
                     self.roasted_density.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                     self.roasted_moisture.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                     self.roasted_notes.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+                    if self.completed_details_scrollarea.isVisible():
+                        self.completed_details_scrollarea.hide()
                 # we try to load the clicked completed items profile if not yet loaded
                 sender_roastUUID = sender.data.roastUUID.hex
                 if sender_roastUUID != self.aw.qmc.roastUUID:

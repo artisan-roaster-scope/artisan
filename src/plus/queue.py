@@ -35,6 +35,7 @@ from artisanlib.util import getDirectory
 from plus import config, util, roast, connection, sync, controller
 import threading
 import time
+import datetime
 import logging
 from typing import Final, Any, List, Dict, Optional, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' and 'Dict' since type hints can use the generic 'list' and 'dict'
 
@@ -397,5 +398,30 @@ def addRoast(roast_record:Optional[Dict[str, Any]] = None) -> None:
                 _log.debug(
                     '-> roast not queued as mandatory info missing'
                 )
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
+
+def sendLockSchedule() -> None:
+    try:
+        _log.debug('sendLockSchedule()')
+        if config.app_window is None:
+            _log.info('config.app_window is None')
+        elif config.app_window.plus_readonly:
+            _log.info(
+                '-> lockSchedule not queued as users'
+                 ' account access is readonly'
+            )
+        elif queue is None:
+            _log.info(
+                '-> lockSchedule not queued as queue'
+                 ' is not running'
+            )
+        else:
+            queue.put(
+                {'url': f'config.lock_schedule_url?today={datetime.datetime.now().astimezone().date()}', 'data': {}, 'verb': 'POST'},
+                # timeout=config.queue_put_timeout
+                # sql queue does not feature a timeout
+            )
+            _log.debug('-> lockSchedule queued up')
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
