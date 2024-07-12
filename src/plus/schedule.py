@@ -1369,7 +1369,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         self.stacked_remaining_widget.addWidget(self.remaining_message_widget)
 
         remaining_filter_layout2 =  QVBoxLayout()
-        remaining_filter_layout2.addSpacing(2) # ensures a minimum hight to keep the handle movable
+        remaining_filter_layout2.addSpacing(2) # ensures a minimum height to keep the handle movable
         remaining_filter_layout2.addWidget(self.remaining_filter_group)
         remaining_filter_layout2.setContentsMargins(2, 10, 2, 2) # left, top, right, bottom # NOTE: if top is reduced to 2, on macOS the spacing of the single filters gets too small
         remaining_filter_group2 = QFrame()
@@ -1523,7 +1523,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         self.completed_details_scrollarea.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 
         completed_details_layout2 =  QVBoxLayout()
-        completed_details_layout2.addSpacing(2) # ensures a minimum hight to keep the handle movable
+        completed_details_layout2.addSpacing(2) # ensures a minimum height to keep the handle movable
         completed_details_layout2.addWidget(self.completed_details_scrollarea)
         completed_details_layout2.setSpacing(0)
         completed_details_layout2.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom
@@ -1589,7 +1589,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
         self.task_frame.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 
         task2_layout =  QVBoxLayout()
-        task2_layout.addSpacing(2) # ensures a minimum hight to keep the handle movable
+        task2_layout.addSpacing(2) # ensures a minimum height to keep the handle movable
         task2_layout.addWidget(self.task_frame)
         task2_layout.setSpacing(0)
         task2_layout.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom
