@@ -219,11 +219,8 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
             controller.disconnect(remove_credentials=False, stop_queue=False)
             return False
 
-@pyqtSlot()
-def update() -> None:
-    _log.debug('update()')
+def getWorker() -> Optional['Worker']:
     global worker, worker_thread  # pylint: disable=global-statement
-
     try:
         if worker_thread is None:
             worker_thread = QThread()
@@ -234,6 +231,16 @@ def update() -> None:
             worker.replySignal.connect(util.updateLimits)
             worker.updatedSignal.connect(util.updateSchedule)
             worker.upToDateSignal.connect(util.updateSchedule)
+        return worker
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
+    return None
+
+@pyqtSlot()
+def update() -> None:
+    _log.debug('update()')
+    try:
+        getWorker()
         if worker is not None:
             worker.startSignal.emit()
     except Exception as e:  # pylint: disable=broad-except

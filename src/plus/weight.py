@@ -82,7 +82,8 @@ class PhidgetScaleDisplay(Display):
 
     def show_item(self, item:WeightItem) -> None:
         if self.active:
-            print(item)
+            pass
+            #print(item)
 
 class DialogDisplay(Display):
 #    def __init__(self) -> None:

@@ -105,6 +105,9 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                         '-> worker processing item: %s', item
                     )
                     iters = 1 # by default, if no modified_at timestamp is given (no roast; maybe just a lock schedule message) thus we don't retry this
+                    if 'url' not in item:
+                        # items without an url are discarded
+                        iters = 0
                     if 'data' in item and 'modified_at' in item['data']:
                         item_age = time.time()-util.ISO86012epoch(item['data']['modified_at'])
                         if (config.queue_discard_after > 0 and item_age > config.queue_discard_after):
@@ -158,6 +161,24 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                                         self.replySignal.emit(rlimit,rused,pu,notifications,machines)
                                 except Exception as e:  # pylint: disable=broad-except
                                     _log.exception(e)
+                            elif 'url' in item and item['url'].startswith(config.lock_schedule_url):
+                                # this is not be a roast record, but a lock schedule message to be send to the server
+                                controller.connect(
+                                    clear_on_failure=False, interactive=False
+                                )
+                                r = connection.sendData(
+                                    item['url'], item['data'], item['verb']
+                                )
+                                r.raise_for_status()
+# maybe to much noise, this message would be send on each START
+#                                if config.app_window is not None:
+#                                    config.app_window.sendmessage(
+#                                        QApplication.translate(
+#                                            'Plus',
+#                                            'Roast schedule of today locked on {}'
+#                                        ).format(config.app_name)
+#                                    )  # @UndefinedVariable
+
                             # partial sync updates for roasts not registered
                             # for syncing are ignored
                             iters = 0
@@ -419,7 +440,7 @@ def sendLockSchedule() -> None:
             )
         else:
             queue.put(
-                {'url': f'config.lock_schedule_url?today={datetime.datetime.now().astimezone().date()}', 'data': {}, 'verb': 'POST'},
+                {'url': f'{config.lock_schedule_url}?today={datetime.datetime.now().astimezone().date()}', 'data': {}, 'verb': 'POST'},
                 # timeout=config.queue_put_timeout
                 # sql queue does not feature a timeout
             )

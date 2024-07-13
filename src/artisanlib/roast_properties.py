@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from plus.stock import Blend # noqa: F401  # pylint: disable=unused-import
     from PyQt6.QtWidgets import QLayout, QAbstractItemView, QCompleter # pylint: disable=unused-import
     from PyQt6.QtGui import QClipboard, QCloseEvent, QKeyEvent, QMouseEvent # pylint: disable=unused-import
-    from PyQt6.QtCore import QObject # pylint: disable=unused-import
+    from PyQt6.QtCore import QObject, QMetaObject # pylint: disable=unused-import
 
 
 # import artisan.plus modules
@@ -1577,14 +1577,17 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.updateWeightLCD('')
 
 #PLUS
+        self.updateStockSignalConnection:'Optional[QMetaObject.Connection]' = None
+        self.stockWorker:Optional[plus.stock.Worker] = None
         try:
             if self.aw.plus_account is not None:
                 if plus.controller.is_connected():
-                    QTimer.singleShot(10, plus.stock.update)
+                    self.stockWorker= plus.stock.getWorker()
+                    if self.stockWorker is not None:
+                        self.updateStockSignalConnection = self.stockWorker.updatedSignal.connect(self.populatePlusCoffeeBlendCombos)
+                        QTimer.singleShot(10, plus.stock.update)
                 else: # we are in ON mode, but not connected, we connect which triggers a stock update if successful
                     plus.controller.connect(interactive=False)
-                if plus.controller.is_connected():
-                    QTimer.singleShot(1500, self.populatePlusCoffeeBlendCombos)
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
         if platform.system() != 'Windows':
@@ -2543,6 +2546,9 @@ class editGraphDlg(ArtisanResizeablDialog):
 #        self.aw.closeEventSettings() # save all app settings
         self.aw.editgraphdialog = None
         self.aw.updateScheduleSignal.emit()
+        if self.stockWorker is not None and self.updateStockSignalConnection is not None:
+            self.stockWorker.updatedSignal.disconnect(self.updateStockSignalConnection)
+
 
     # triggered via the cancel button
     @pyqtSlot()

@@ -2570,8 +2570,6 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             todays_items = []
             earlier_items = []
             for ci in completed_items:
-                _log.info('PRINT ci.roastdate.astimezone().date(): %s',ci.roastdate.astimezone().date())
-                _log.info('PRINT today: %s',today)
                 if ci.roastdate.astimezone().date() == today:
                     todays_items.append(ci)
                 else:

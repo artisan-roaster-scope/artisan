@@ -3164,19 +3164,19 @@ class tgraphcanvas(FigureCanvas):
                     pass
 #PLUS
                 # only on first setting the DROP event (not set yet and no previous DROP undone), we upload to PLUS
-                if firstDROP and self.autoDROPenabled:
+                if firstDROP and self.autoDROPenabled and self.aw.plus_account is not None:
+                    # NOTE: scheduler is only active if connected to artisan.plus
                     if self.aw.schedule_window is not None:
                         self.aw.schedule_window.register_completed_roast.emit()
-                    if self.aw.plus_account is not None:
-                        try:
-                            self.aw.updatePlusStatus()
-                        except Exception: # pylint: disable=broad-except
-                            pass
-                            # add to out-queue
-                        try:
-                            addRoast()
-                        except Exception: # pylint: disable=broad-except
-                            pass
+                    try:
+                        self.aw.updatePlusStatus()
+                    except Exception: # pylint: disable=broad-except
+                        pass
+                        # add to out-queue
+                    try:
+                        addRoast()
+                    except Exception: # pylint: disable=broad-except
+                        pass
                 if not self.flagstart:
                     self.aw.autoAdjustAxis(deltas=False)
 
@@ -11594,7 +11594,8 @@ class tgraphcanvas(FigureCanvas):
 
 #SCHEDULER:
             # set properties from selected Schedule
-            if self.aw.schedule_window is not None:
+            if self.aw.schedule_window is not None and self.aw.plus_account is not None:
+                # NOTE: scheduler is only active if connected to artisan.plus
                 self.aw.schedule_window.set_selected_remaining_item_roast_properties()
                 self.aw.schedule_window.load_selected_remaining_item_template()
 
@@ -13330,19 +13331,19 @@ class tgraphcanvas(FigureCanvas):
                             _log.exception(e)
     #PLUS
                         # only on first setting the DROP event (not set yet and no previous DROP undone) and (not anymore: if not in simulator modus, we upload to PLUS)
-                        if firstDROP and self.autoDROPenabled:  # and not bool(self.aw.simulator): # we also upload simulated roasts to PLUS
+                        if firstDROP and self.autoDROPenabled and self.aw.plus_account is not None:  # and not bool(self.aw.simulator): # we also upload simulated roasts to PLUS
+                            # NOTE: scheduler is only active if connected to artisan.plus
                             if self.aw.schedule_window is not None:
                                 self.aw.schedule_window.register_completed_roast.emit()
-                            if self.aw.plus_account is not None:
-                                try:
-                                    self.aw.updatePlusStatus()
-                                except Exception as e: # pylint: disable=broad-except
-                                    _log.exception(e)
-                                    # add to out-queue
-                                try:
-                                    addRoast()
-                                except Exception as e: # pylint: disable=broad-except
-                                    _log.exception(e)
+                            try:
+                                self.aw.updatePlusStatus()
+                            except Exception as e: # pylint: disable=broad-except
+                                _log.exception(e)
+                                # add to out-queue
+                            try:
+                                addRoast()
+                            except Exception as e: # pylint: disable=broad-except
+                                _log.exception(e)
                 else:
                     message = QApplication.translate('Message','DROP: Scope is not recording')
                     self.aw.sendmessage(message)
