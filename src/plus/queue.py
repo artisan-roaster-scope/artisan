@@ -104,14 +104,15 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                     _log.debug(
                         '-> worker processing item: %s', item
                     )
-                    item_age = time.time()-util.ISO86012epoch(item['data']['modified_at'])
-                    if (config.queue_discard_after > 0 and 'data' in item and
-                            'modified_at' in item['data'] and item_age > config.queue_discard_after):
-                        # old item scheduled to be removed from the queue
-                        iters = 0
-                        _log.debug('-> expired item %s removed from queue (%s min)',item['data']['roast_id'],int(round(item_age/60)))
-                    else:
-                        iters = config.queue_retries + 1
+                    iters = 1 # by default, if no modified_at timestamp is given (no roast; maybe just a lock schedule message) thus we don't retry this
+                    if 'data' in item and 'modified_at' in item['data']:
+                        item_age = time.time()-util.ISO86012epoch(item['data']['modified_at'])
+                        if (config.queue_discard_after > 0 and item_age > config.queue_discard_after):
+                            # old item scheduled to be removed from the queue
+                            iters = 0
+                            _log.debug('-> expired item %s removed from queue (%s min)',item['data']['roast_id'],int(round(item_age/60)))
+                        else:
+                            iters = config.queue_retries + 1
                     while iters > 0:
                         _log.debug(
                             '-> remaining iterations: %s', iters

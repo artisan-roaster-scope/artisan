@@ -869,7 +869,7 @@ class NoDragItem(StandardItem):
 
 
     def getRight(self) -> str:
-        days_diff = (self.now.date() - self.data.roastdate.date()).days
+        days_diff = (self.now.astimezone().date() - self.data.roastdate.date()).days
         task_date_str = ''
         if days_diff == 0:
             # for time formatting we use the system locale
