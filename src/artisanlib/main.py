@@ -4109,6 +4109,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.zoomOutShortcut.activated.connect(self.zoomOut)
 
 
+    # today is expected to be w.r.t. local timezone
     def scheduledItemsfilter(self, today:datetime.date, item:plus.schedule.ScheduledItem) -> bool:
         # if user filter is active only items not for a specific user or for the current user (if available) are listed
         # if machine filter is active only items not for a specific machine or for the current machine setup are listed in case a current machine is set

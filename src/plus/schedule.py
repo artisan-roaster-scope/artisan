@@ -381,17 +381,17 @@ def load_completed(plus_account_id:Optional[str]) -> None:
                     completed_roasts = completed_roasts_cache_data[plus_account_id]
                     today_completed = []
                     previously_completed = []
-                    today = datetime.datetime.now(tz=datetime.timezone.utc)
+                    today = datetime.datetime.now(datetime.timezone.utc)
                     for ci in completed_roasts:
                         if 'roastdate' in ci:
-                            if epoch2datetime(ci['roastdate']).date() == today.date():
+                            if epoch2datetime(ci['roastdate']).astimezone().date() == today.astimezone().date():
                                 today_completed.append(ci)
                             else:
                                 previously_completed.append(ci)
                     if len(previously_completed)>0:
                         previous_session_epoch:float = previously_completed[0].get('roastdate', datetime2epoch(today))
-                        previous_session_date = epoch2datetime(previous_session_epoch).date()
-                        previously_completed = [pc for pc in previously_completed if 'roastdate' in pc and epoch2datetime(pc['roastdate']).date() == previous_session_date]
+                        previous_session_date = epoch2datetime(previous_session_epoch).astimezone().date()
+                        previously_completed = [pc for pc in previously_completed if 'roastdate' in pc and epoch2datetime(pc['roastdate']).astimezone().date() == previous_session_date]
                     # we keep all roasts completed today as well as all from the previous roast session
                     completed_roasts_cache = today_completed + previously_completed
     except FileNotFoundError:
@@ -821,6 +821,7 @@ class StandardItem(QFrame): # pyright: ignore[reportGeneralTypeIssues] # Argumen
 
 
 class NoDragItem(StandardItem):
+    # now a datetime in UTC timezone
     def __init__(self, data:CompletedItem, aw:'ApplicationWindow', now:datetime.datetime) -> None:
         # Store data separately from display label, but use label for default.
         self.aw = aw
@@ -835,7 +836,7 @@ class NoDragItem(StandardItem):
 
         item_color = light_grey
         item_color_hover = light_grey_hover
-        if self.data.roastdate.date() == now.date():
+        if self.data.roastdate.astimezone().date() == now.astimezone().date():
             # item roasted today
             item_color = plus_alt_blue
             item_color_hover = plus_alt_blue_hover
@@ -869,22 +870,25 @@ class NoDragItem(StandardItem):
 
 
     def getRight(self) -> str:
-        days_diff = (self.now.astimezone().date() - self.data.roastdate.date()).days
+        # the datetimes now and roastdate are in UTC, we need to compare the dates w.r.t. the local timezone thus we have to convert both via astimezone()
+        roastdate = self.data.roastdate
+        roastdate_date_local = roastdate.astimezone().date()
+        days_diff = (self.now.astimezone().date() - roastdate_date_local).days
         task_date_str = ''
         if days_diff == 0:
             # for time formatting we use the system locale
             locale = QLocale()
-            dt = QDateTime.fromSecsSinceEpoch(int(datetime2epoch(self.data.roastdate)))
+            dt = QDateTime.fromSecsSinceEpoch(int(datetime2epoch(roastdate)))
             task_date_str = locale.toString(dt.time(), QLocale.FormatType.ShortFormat)
         elif days_diff == 1:
             task_date_str = QApplication.translate('Plus', 'Yesterday').capitalize()
         elif days_diff < 7:
             # for date formatting we use the artisan-language locale
             locale = QLocale(self.locale_str)
-            task_date_str = locale.toString(QDate(self.data.roastdate.date().year, self.data.roastdate.date().month, self.data.roastdate.date().day), 'dddd').capitalize()
+            task_date_str = locale.toString(QDate(roastdate_date_local.year, roastdate_date_local.month, roastdate_date_local.day), 'dddd').capitalize()
         else:
             # date formatted according to the locale without the year
-            task_date_str = format_date(self.data.roastdate.date(), format='long', locale=self.locale_str).replace(format_date(self.data.roastdate.date(), 'Y', locale=self.locale_str),'').strip().rstrip(',')
+            task_date_str = format_date(roastdate_date_local, format='long', locale=self.locale_str).replace(format_date(roastdate_date_local, 'Y', locale=self.locale_str),'').strip().rstrip(',')
 
         weight = (f'{render_weight(self.data.weight, 1, self.weight_unit_idx)}  ' if self.data.measured else '')
 
@@ -901,6 +905,7 @@ class NoDragItem(StandardItem):
 
 
 class DragItem(StandardItem):
+    # today a date in local timezone
     def __init__(self, data:ScheduledItem, aw:'ApplicationWindow', today:datetime.date, user_id: Optional[str], machine: str) -> None:
         self.data:ScheduledItem = data
         self.aw = aw
@@ -925,6 +930,7 @@ class DragItem(StandardItem):
 
     # need to be called if prepared information changes
     def update_widget(self) -> None:
+        date_local = self.data.date
         task_date:str
         if self.days_diff == 0:
             task_date = QApplication.translate('Plus', 'Today')
@@ -932,10 +938,10 @@ class DragItem(StandardItem):
             task_date = QApplication.translate('Plus', 'Tomorrow')
         elif self.days_diff < 7:
             locale = QLocale(self.aw.locale_str)
-            task_date = locale.toString(QDate(self.data.date.year, self.data.date.month, self.data.date.day), 'dddd').capitalize()
+            task_date = locale.toString(QDate(date_local.year, date_local.month, date_local.day), 'dddd').capitalize()
         else:
             # date formatted according to the locale without the year
-            task_date = format_date(self.data.date, format='long', locale=self.aw.locale_str).replace(format_date(self.data.date, 'Y', locale=self.aw.locale_str),'').strip().rstrip(',')
+            task_date = format_date(date_local, format='long', locale=self.aw.locale_str).replace(format_date(date_local, 'Y', locale=self.aw.locale_str),'').strip().rstrip(',')
 
         user_nickname:Optional[str] = plus.connection.getNickname()
         task_operator = (QApplication.translate('Plus', 'by anybody') if self.data.user is None else
@@ -2532,7 +2538,7 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
 
     def updateRoastedItems(self) -> None:
         self.nodrag_roasted.clearItems()
-        now:datetime.datetime = datetime.datetime.now(datetime.timezone.utc).astimezone()
+        now:datetime.datetime = datetime.datetime.now(datetime.timezone.utc)
         nodrag_items_first_label_max_width = 0
         nodrag_first_labels = []
         new_selected_completed_item:Optional[NoDragItem] = None
@@ -2558,13 +2564,15 @@ class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
             self.selected_completed_item.select()
 
         # updates the tabs tooltip
-        today:datetime.date = datetime.datetime.now(datetime.timezone.utc).astimezone().date()
+        today:datetime.date = now.astimezone().date() # today in local timezone
         completed_items:List[CompletedItem] = self.completed_items
         if len(completed_items) > 0:
             todays_items = []
             earlier_items = []
             for ci in completed_items:
-                if ci.roastdate == today:
+                _log.info('PRINT ci.roastdate.astimezone().date(): %s',ci.roastdate.astimezone().date())
+                _log.info('PRINT today: %s',today)
+                if ci.roastdate.astimezone().date() == today:
                     todays_items.append(ci)
                 else:
                     earlier_items.append(ci)
