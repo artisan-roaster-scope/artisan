@@ -68,6 +68,7 @@ import plus.util
 from plus.util import datetime2epoch, epoch2datetime, schedulerLink, epoch2ISO8601, ISO86012epoch, plusLink
 from plus.weight import Display, WeightManager, GreenWeightItem, RoastedWeightItem
 from artisanlib.widgets import ClickableQLabel, ClickableQLineEdit, Splitter
+from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.util import (convertWeight, weight_units, render_weight, comma2dot, float2floatWeightVolume, getDirectory)
 
 
@@ -1283,16 +1284,15 @@ class DragWidget(BaseWidget):
     def get_item_data(self) -> List[ScheduledItem]:
         return [item.data for item in self.get_items()]
 
-
-class ScheduleWindow(QWidget): # pyright:ignore[reportGeneralTypeIssues]
+class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralTypeIssues]
 
     register_completed_roast = pyqtSignal()
 
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow', activeTab:int = 0) -> None:
         if aw.get_os()[0] == 'RPi':
-            super().__init__(None) # set the parent to None to make Schedule windows on RPi Bookworm non-modal (not blocking the main window)
+            super().__init__(None, aw) # set the parent to None to make Schedule windows on RPi Bookworm non-modal (not blocking the main window)
         else:
-            super().__init__(parent) # if parent is set to None, Schedule panels hide behind the main window in full screen mode on Windows!
+            super().__init__(parent, aw) # if parent is set to None, Schedule panels hide behind the main window in full screen mode on Windows!
 
         self.aw = aw # the Artisan application window
         self.activeTab:int = activeTab

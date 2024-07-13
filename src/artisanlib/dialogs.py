@@ -125,10 +125,11 @@ class ArtisanDialog(QDialog): # pyright: ignore [reportGeneralTypeIssues] # Argu
                 super().keyPressEvent(event)
 
 class ArtisanResizeablDialog(ArtisanDialog):
-    def __init__(self, parent:QWidget, aw:'ApplicationWindow') -> None:
+    def __init__(self, parent:Optional[QWidget], aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         if str(platform.system()) == 'Windows':
             windowFlags = self.windowFlags()
+#            windowFlags |= Qt.WindowType.CustomizeWindowHint # turn off default window title hints
             windowFlags |= Qt.WindowType.WindowMinMaxButtonsHint  # add min/max combo
             self.setWindowFlags(windowFlags)
 
