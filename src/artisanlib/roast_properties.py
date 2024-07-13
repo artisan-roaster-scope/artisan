@@ -1577,7 +1577,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.updateWeightLCD('')
 
 #PLUS
-        self.updateStockSignalConnection:'Optional[QMetaObject.Connection]' = None
+        self.updateStockSignalConnection:Optional[QMetaObject.Connection] = None
         self.stockWorker:Optional[plus.stock.Worker] = None
         try:
             if self.aw.plus_account is not None:
