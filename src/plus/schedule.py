@@ -1630,14 +1630,6 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.message_widget = QWidget()
         self.message_widget.setLayout(disconnected_layout)
 
-        settings = QSettings()
-        if settings.contains('ScheduleRemainingSplitter'):
-            self.remaining_splitter.restoreState(settings.value('ScheduleRemainingSplitter'))
-        if settings.contains('ScheduleMainSplitter'):
-            self.main_splitter.restoreState(settings.value('ScheduleMainSplitter'))
-        if settings.contains('ScheduleCompletedSplitter'):
-            self.completed_splitter.restoreState(settings.value('ScheduleCompletedSplitter'))
-
         self.stacked_widget = QStackedWidget()
         self.stacked_widget.addWidget(self.main_splitter)
         self.stacked_widget.addWidget(self.message_widget)
@@ -1650,16 +1642,25 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
         self.setLayout(self.main_layout)
 
-        if platform.system().startswith('Windows'):
-            self.setWindowFlag(Qt.WindowType.WindowMaximizeButtonHint, False)
-        else:
+        settings = QSettings()
+        if settings.contains('ScheduleRemainingSplitter'):
+            self.remaining_splitter.restoreState(settings.value('ScheduleRemainingSplitter'))
+        if settings.contains('ScheduleMainSplitter'):
+            self.main_splitter.restoreState(settings.value('ScheduleMainSplitter'))
+        if settings.contains('ScheduleCompletedSplitter'):
+            self.completed_splitter.restoreState(settings.value('ScheduleCompletedSplitter'))
+
+        # we want minimize and close buttons, but no maximize buttons
+        if not platform.system().startswith('Windows'):
             windowFlags = self.windowFlags()
             windowFlags |= Qt.WindowType.Tool
             windowFlags |= Qt.WindowType.CustomizeWindowHint # needed to be able to customize the close/min/max controls (at least on macOS)
             windowFlags |= Qt.WindowType.WindowMinimizeButtonHint
+            windowFlags |= Qt.WindowType.WindowCloseButtonHint # not needed on macOS, but maybe on Linux
             #windowFlags |= Qt.WindowType.WindowMinMaxButtonsHint # not needed on macOS
             #windowFlags &= ~Qt.WindowType.WindowMaximizeButtonHint # not needed on macOS as the CustomizeWindowHint is removing min/max controls already
             self.setWindowFlags(windowFlags)
+        self.setWindowFlag(Qt.WindowType.WindowMaximizeButtonHint, False)
 
         if platform.system() == 'Darwin':
             self.setAttribute(Qt.WidgetAttribute.WA_MacAlwaysShowToolWindow) # show tool window even if app is in background (see https://bugreports.qt.io/browse/QTBUG-57581)

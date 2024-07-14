@@ -1084,11 +1084,15 @@ class roastCompareDlg(ArtisanDialog):
         mainLayout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(mainLayout)
 
-        windowFlags = self.windowFlags()
-        windowFlags |= Qt.WindowType.Tool
-        if platform.system() == 'Windows':
-            windowFlags |= Qt.WindowType.WindowMinimizeButtonHint  # Add minimize  button
-        self.setWindowFlags(windowFlags)
+        # we want minimize and close buttons, but no maximize buttons
+        if not platform.system().startswith('Windows'):
+            windowFlags = self.windowFlags()
+            windowFlags |= Qt.WindowType.Tool
+            windowFlags |= Qt.WindowType.CustomizeWindowHint # needed to be able to customize the close/min/max controls (at least on macOS)
+            windowFlags |= Qt.WindowType.WindowMinimizeButtonHint
+            windowFlags |= Qt.WindowType.WindowCloseButtonHint
+            self.setWindowFlags(windowFlags)
+        self.setWindowFlag(Qt.WindowType.WindowMaximizeButtonHint, False)
 
         self.redraw()
 
