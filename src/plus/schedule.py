@@ -2843,6 +2843,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             if self.scheduled_items == []:
                 self.remaining_message.setText(QApplication.translate('Plus', 'Schedule empty!{}Plan your schedule on {}').format('<BR><BR>', f'<a href="{schedulerLink()}">{plus.config.app_name}</a><br>'))
                 self.stacked_remaining_widget.setCurrentWidget(self.remaining_message_widget)
+                self.setAppBadge(0)
             else:
                 displayed_scheduled_items = self.updateRemainingItems() # redraw To-Do's widget
                 if displayed_scheduled_items > 0:
