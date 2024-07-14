@@ -1280,7 +1280,6 @@ class editGraphDlg(ArtisanResizeablDialog):
             label_font = self.plus_selected_line.font()
             label_font.setPointSize(label_font.pointSize() -2)
             self.plus_selected_line.setFont(label_font)
-            self.populatePlusCoffeeBlendCombos()
             # layouting
             self.plus_coffees_combo.setMinimumContentsLength(15)
             self.plus_blends_combo.setMinimumContentsLength(10)
@@ -1557,6 +1556,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         totallayout.setSpacing(0)
         self.volume_percent()
         self.setLayout(totallayout)
+
+        self.populatePlusCoffeeBlendCombos()
 
         self.titleedit.setFocus()
 

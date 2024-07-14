@@ -971,7 +971,7 @@ class roastCompareDlg(ArtisanDialog):
         super().__init__(parent, aw)
 
         if platform.system() == 'Darwin':
-            self.setAttribute(Qt.WidgetAttribute.WA_MacAlwaysShowToolWindow)
+            self.setAttribute(Qt.WidgetAttribute.WA_MacAlwaysShowToolWindow) # show tool window even if app is in background (see https://bugreports.qt.io/browse/QTBUG-57581)
 
         self.setAcceptDrops(True)
 

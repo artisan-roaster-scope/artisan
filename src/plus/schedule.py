@@ -28,6 +28,7 @@ import datetime
 import json
 import html
 import textwrap
+import platform
 import logging
 from uuid import UUID
 try:
@@ -147,6 +148,7 @@ tooltip_dull_dark_background_style: Final[str] = f'QToolTip {{ background: {dull
 
 class CompletedItemDict(TypedDict):
     scheduleID:str         # the ID of the ScheduleItem this completed item belongs to
+    scheduleDate:str       # the date of the ScheduleItem this completed item belongs to
     roastUUID:str          # the UUID of this roast
     roastdate: float       # as epoch
     roastbatchnr: int      # set to zero if no batch number is assigned
@@ -215,6 +217,7 @@ class ScheduledItem(BaseModel):
 class CompletedItem(BaseModel):
     count: PositiveInt       # total count >0 of corresponding ScheduleItem
     scheduleID: str
+    scheduleDate: str
     sequence_id: PositiveInt # sequence id of this roast (sequence_id <= count)
     roastUUID: UUID4
     roastdate: datetime.datetime
@@ -419,7 +422,6 @@ def get_all_completed() -> List[CompletedItemDict]:
 # add the given CompletedItemDict if it contains a roastUUID which does not occurs yet in the completed_roasts_cache
 # if there is already a completed roast with the given UUID, its content is replaced by the given CompletedItemDict
 def add_completed(plus_account_id:Optional[str], ci:CompletedItemDict) -> None:
-    _log.info('add_completed')
     if 'roastUUID' in ci:
         modified: bool = False
         try:
@@ -1306,12 +1308,6 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         # holds the currently selected completed NoDragItem widget if any
         self.selected_completed_item:Optional[NoDragItem] = None
 
-        settings = QSettings()
-        if settings.contains('ScheduleGeometry'):
-            self.restoreGeometry(settings.value('ScheduleGeometry'))
-        else:
-            self.resize(250,300)
-
         # IMPORTANT NOTE: if dialog items have to be access after it has been closed, this Qt.WidgetAttribute.WA_DeleteOnClose attribute
         # has to be set to False explicitly in its initializer (like in comportDlg) to avoid the early GC and one might
         # want to use a dialog.deleteLater() call to explicitly have the dialog and its widgets GCe
@@ -1375,7 +1371,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.stacked_remaining_widget.addWidget(self.remaining_message_widget)
 
         remaining_filter_layout2 =  QVBoxLayout()
-        remaining_filter_layout2.addSpacing(2) # ensures a minimum height to keep the handle movable
+        remaining_filter_layout2.addSpacing(1) # ensures a minimum height to keep the handle movable
         remaining_filter_layout2.addWidget(self.remaining_filter_group)
         remaining_filter_layout2.setContentsMargins(2, 10, 2, 2) # left, top, right, bottom # NOTE: if top is reduced to 2, on macOS the spacing of the single filters gets too small
         remaining_filter_group2 = QFrame()
@@ -1388,8 +1384,11 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.remaining_splitter.addWidget(remaining_filter_group2)
         self.remaining_splitter.setSizes([100,0])
 
-        self.remaining_filter_group.hide()
+
+        if not self.aw.scheduler_completed_details_visible:
+            self.remaining_filter_group.hide()
         self.remaining_splitter.splitterMoved.connect(self.remainingSplitterMoved)
+        self.filter_frame_hide = False
 
 #####
         self.nodrag_roasted = StandardWidget(self, orientation=Qt.Orientation.Vertical)
@@ -1529,7 +1528,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.completed_details_scrollarea.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 
         completed_details_layout2 =  QVBoxLayout()
-        completed_details_layout2.addSpacing(2) # ensures a minimum height to keep the handle movable
+        completed_details_layout2.addSpacing(1) # ensures a minimum height to keep the handle movable
         completed_details_layout2.addWidget(self.completed_details_scrollarea)
         completed_details_layout2.setSpacing(0)
         completed_details_layout2.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom
@@ -1543,8 +1542,10 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.completed_splitter.setSizes([100,0])
         self.completed_splitter_open_height: int = 0
 
-        self.completed_details_scrollarea.hide()
+        if not self.aw.scheduler_filters_visible:
+            self.completed_details_scrollarea.hide()
         self.completed_splitter.splitterMoved.connect(self.completedSplitterMoved)
+        self.completed_details_scrollarea_hide = False
 
         completed_message = QLabel(f"{QApplication.translate('Plus', 'No completed roasts')}<br>")
         completed_message.setWordWrap(True)
@@ -1595,7 +1596,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.task_frame.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 
         task2_layout =  QVBoxLayout()
-        task2_layout.addSpacing(2) # ensures a minimum height to keep the handle movable
+        task2_layout.addSpacing(1) # ensures a minimum height to keep the handle movable
         task2_layout.addWidget(self.task_frame)
         task2_layout.setSpacing(0)
         task2_layout.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom
@@ -1609,8 +1610,10 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.main_splitter.setSizes([0,100])
         self.main_splitter.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
 
-        self.task_frame.hide()
+        if not self.aw.scheduler_tasks_visible:
+            self.task_frame.hide()
         self.main_splitter.splitterMoved.connect(self.mainSplitterMoved)
+        self.task_frame_hide = False # flag used by mainSplitterMoved()/hide_task_frame() to hide task frame again after closing the drawer
 
 
         disconnected_widget = QLabel()
@@ -1630,6 +1633,10 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         settings = QSettings()
         if settings.contains('ScheduleRemainingSplitter'):
             self.remaining_splitter.restoreState(settings.value('ScheduleRemainingSplitter'))
+        if settings.contains('ScheduleMainSplitter'):
+            self.main_splitter.restoreState(settings.value('ScheduleMainSplitter'))
+        if settings.contains('ScheduleCompletedSplitter'):
+            self.completed_splitter.restoreState(settings.value('ScheduleCompletedSplitter'))
 
         self.stacked_widget = QStackedWidget()
         self.stacked_widget.addWidget(self.main_splitter)
@@ -1643,9 +1650,19 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
         self.setLayout(self.main_layout)
 
-        windowFlags = self.windowFlags()
-        windowFlags |= Qt.WindowType.Tool
-        self.setWindowFlags(windowFlags)
+        if platform.system().startswith('Windows'):
+            self.setWindowFlag(Qt.WindowType.WindowMaximizeButtonHint, False)
+        else:
+            windowFlags = self.windowFlags()
+            windowFlags |= Qt.WindowType.Tool
+            windowFlags |= Qt.WindowType.CustomizeWindowHint # needed to be able to customize the close/min/max controls (at least on macOS)
+            windowFlags |= Qt.WindowType.WindowMinimizeButtonHint
+            #windowFlags |= Qt.WindowType.WindowMinMaxButtonsHint # not needed on macOS
+            #windowFlags &= ~Qt.WindowType.WindowMaximizeButtonHint # not needed on macOS as the CustomizeWindowHint is removing min/max controls already
+            self.setWindowFlags(windowFlags)
+
+        if platform.system() == 'Darwin':
+            self.setAttribute(Qt.WidgetAttribute.WA_MacAlwaysShowToolWindow) # show tool window even if app is in background (see https://bugreports.qt.io/browse/QTBUG-57581)
 
         self.setWindowTitle(QApplication.translate('Menu', 'Schedule'))
 
@@ -1676,36 +1693,79 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             # no tabswitch will be triggered, thus we need to "manually" set the next weight item
             self.set_next()
 
+        settings = QSettings()
+        if settings.contains('ScheduleGeometry'):
+            self.restoreGeometry(settings.value('ScheduleGeometry'))
+        else:
+            self.resize(250,300)
+
         self.aw.sendmessage(QApplication.translate('Message','Scheduler started'))
 
+    def hide_task_frame(self) -> None:
+        if self.task_frame_hide:
+            splitter_sizes = self.main_splitter.sizes()
+            if len(splitter_sizes)>0 and splitter_sizes[0] == 0:
+                self.task_frame.hide()
+            self.task_frame_hide = False
 
     @pyqtSlot(int,int)
-    def mainSplitterMoved(self, pos: int, index: int) -> None:
-        # hide upper splitter content to allow minimizing the window
-        if index == 1 and pos>0 and not self.task_frame.isVisible():
-            self.task_frame.show()
-        elif index == 1 and pos == 0 and self.task_frame.isVisible():
-            self.task_frame.hide()
+    def mainSplitterMoved(self, _pos: int, index: int) -> None:
+        splitter_sizes = self.main_splitter.sizes()
+        if len(splitter_sizes)>1:
+            # hide upper splitter content to allow minimizing the window
+            if index == 1 and splitter_sizes[0] > 0 and not self.task_frame.isVisible() and not self.task_frame_hide:
+                self.setUpdatesEnabled(False)
+                self.task_frame.show()
+                self.main_splitter.setSizes([0, splitter_sizes[0]+splitter_sizes[1]])
+                self.setUpdatesEnabled(True)
+            elif index == 1 and splitter_sizes[0] == 0 and self.task_frame.isVisible():
+                if not self.task_frame_hide:
+                    self.task_frame_hide = True
+                    QTimer.singleShot(1000, self.hide_task_frame)
+
+    def hide_filter_frame(self) -> None:
+        if self.filter_frame_hide:
+            splitter_sizes = self.remaining_splitter.sizes()
+            if len(splitter_sizes)>0 and splitter_sizes[1] == 0:
+                self.remaining_filter_group.hide()
+            self.filter_frame_hide = False
 
     @pyqtSlot(int,int)
     def remainingSplitterMoved(self, _pos: int, index: int) -> None:
         splitter_sizes = self.remaining_splitter.sizes()
         if len(splitter_sizes)>1:
             # hide lower splitter content to allow minimizing the window
-            if index == 1 and splitter_sizes[1] > 0 and not self.remaining_filter_group.isVisible():
+            if index == 1 and splitter_sizes[1] > 0 and not self.remaining_filter_group.isVisible() and not self.filter_frame_hide:
+                self.setUpdatesEnabled(False)
                 self.remaining_filter_group.show()
+                self.remaining_splitter.setSizes([splitter_sizes[0]+splitter_sizes[1], 0])
+                self.setUpdatesEnabled(True)
             elif index == 1 and splitter_sizes[1] == 0 and self.remaining_filter_group.isVisible():
-                self.remaining_filter_group.hide()
+                if not self.filter_frame_hide:
+                    self.filter_frame_hide = True
+                    QTimer.singleShot(1000, self.hide_filter_frame)
+
+    def hide_completed_frame(self) -> None:
+        if self.completed_details_scrollarea_hide:
+            splitter_sizes = self.completed_splitter.sizes()
+            if len(splitter_sizes)>0 and splitter_sizes[1] == 0:
+                self.completed_details_scrollarea.hide()
+            self.completed_details_scrollarea_hide = False
 
     @pyqtSlot(int,int)
     def completedSplitterMoved(self, _pos: int, index: int) -> None:
         splitter_sizes = self.completed_splitter.sizes()
         if len(splitter_sizes)>1:
             # hide lower completed splitter content to allow minimizing the window
-            if index == 1 and splitter_sizes[1] > 0 and not self.completed_details_scrollarea.isVisible():
+            if index == 1 and splitter_sizes[1] > 0 and not self.completed_details_scrollarea.isVisible() and not self.completed_details_scrollarea_hide:
+                self.setUpdatesEnabled(False)
                 self.completed_details_scrollarea.show()
+                self.completed_splitter.setSizes([splitter_sizes[0]+splitter_sizes[1], 0])
+                self.setUpdatesEnabled(True)
             elif index == 1 and splitter_sizes[1] == 0 and self.completed_details_scrollarea.isVisible():
-                self.completed_details_scrollarea.hide()
+                if not self.completed_details_scrollarea_hide:
+                    self.completed_details_scrollarea_hide = True
+                    QTimer.singleShot(1000, self.hide_completed_frame)
 
     @pyqtSlot(str)
     def disconnected_link_handler(self, _link:str) -> None:
@@ -1846,16 +1906,22 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         settings = QSettings()
         #save window geometry
         settings.setValue('ScheduleGeometry', self.saveGeometry())
-        #save splitter state
+        #save splitter states
         QSettings().setValue('ScheduleRemainingSplitter',self.remaining_splitter.saveState())
+        QSettings().setValue('ScheduleMainSplitter',self.main_splitter.saveState())
+        QSettings().setValue('ScheduleCompletedSplitter',self.completed_splitter.saveState())
+        self.aw.scheduler_tasks_visible = self.task_frame.isVisible()
+        self.aw.scheduler_completed_details_visible = self.completed_details_scrollarea.isVisible()
+        self.aw.scheduler_filters_visible = self.completed_details_scrollarea.isVisible()
         #free resources
         self.aw.schedule_window = None
         self.aw.scheduleFlag = False
         self.aw.scheduleAction.setChecked(False)
         self.aw.schedule_activeTab = self.TabWidget.currentIndex()
         if self.aw.qmc.timeindex[6] == 0:
-            # if DROP is not set we clear the ScheduleItem UUID
+            # if DROP is not set we clear the ScheduleItem UUID/Date
             self.aw.qmc.scheduleID = None
+            self.aw.qmc.scheduleDate = None
         self.aw.sendmessage(QApplication.translate('Message','Scheduler stopped'))
 
 
@@ -1928,9 +1994,10 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                 _log.error(e)
         return res
 
-    # sets the items values as properties of the current roast and links it back to this item
+    # sets the items values as properties of the current roast and links it back to this schedule item
     def set_roast_properties(self, item:ScheduledItem) -> None:
         self.aw.qmc.scheduleID = item.id
+        self.aw.qmc.scheduleDate = item.date.isoformat()
         self.aw.qmc.title = item.title
         if not self.aw.qmc.flagstart or self.aw.qmc.title_show_always:
             self.aw.qmc.setProfileTitle(self.aw.qmc.title)
@@ -2137,7 +2204,6 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
     # returns number of visible scheduled items
     def updateRemainingItems(self) -> int:
         self.drag_remaining.clearItems()
-#        connected:bool = plus.controller.is_on()
         today:datetime.date = datetime.datetime.now(datetime.timezone.utc).astimezone().date()
         drag_items_first_label_max_width = 0
         drag_first_labels = []
@@ -2158,9 +2224,6 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             # connect the selection signal
             drag_item.selected.connect(self.remaining_items_selection_changed)
             drag_item.prepared.connect(self.prepared_items_changed)
-#            if not connected:
-#                # if not connected we don't draw any item
-#                drag_item.hide()
             # append item to list
             self.drag_remaining.add_item(drag_item)
         if selected_item is not None:
@@ -2708,6 +2771,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
             completed_item:CompletedItemDict = {
                 'scheduleID': self.selected_remaining_item.data.id,
+                'scheduleDate': self.selected_remaining_item.data.date.isoformat(),
                 'count': self.selected_remaining_item.data.count,
                 'sequence_id': len(self.selected_remaining_item.data.roasts),
                 'roastUUID': self.aw.qmc.roastUUID,

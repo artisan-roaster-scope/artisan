@@ -117,8 +117,9 @@ def getTemplate(bp: 'ProfileData', background:bool=False) -> Dict[str, Any]:  #f
             except Exception as e:  # pylint: disable=broad-except
                 _log.exception(e)
 
-        util.add2dict(bp, config.uuid_tag, d, 'id')                 # roast UUID
-        util.add2dict(bp, config.schedule_uuid_tag, d, 's_item_id') # ScheduleItem UUID
+        util.add2dict(bp, config.uuid_tag, d, 'id')                   # roast UUID
+        util.add2dict(bp, config.schedule_uuid_tag, d, 's_item_id')   # ScheduleItem UUID
+        util.add2dict(bp, config.schedule_date_tag, d, 's_item_date') # ScheduleItem date
 
         try:
             util.addNum2dict(bp, 'moisture_roasted', d, 'moisture', 0, 100, 1)

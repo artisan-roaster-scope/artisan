@@ -1578,6 +1578,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.schedule_day_filter:bool = True
         self.schedule_user_filter:bool = True
         self.schedule_machine_filter:bool = True
+        self.scheduler_tasks_visible:bool = False # scheduler tasks pane visible?
+        self.scheduler_completed_details_visible:bool = False # scheduler completed items details pane visible?
+        self.scheduler_filters_visible:bool = False # scheduler filter pane visible?
 
         # large LCDs
         self.largeLCDs_dialog:Optional[LargeMainLCDs] = None
@@ -14853,6 +14856,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.scheduleID = decodeLocal(profile['scheduleID'])
             else:
                 self.qmc.scheduleID = None
+            if 'scheduleDate' in profile:
+                self.qmc.scheduleDate = decodeLocal(profile['scheduleDate'])
+            else:
+                self.qmc.scheduleDate = None
             if 'roastbatchnr' in profile:
                 try:
                     self.qmc.roastbatchnr = int(profile['roastbatchnr'])
@@ -15631,6 +15638,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             profile['roastUUID'] = self.qmc.roastUUID
             if self.qmc.scheduleID is not None:
                 profile['scheduleID'] = self.qmc.scheduleID
+            if self.qmc.scheduleDate is not None:
+                profile['scheduleDate'] = self.qmc.scheduleDate
 #            profile['beansize'] = str(self.qmc.beansize) # legacy; not stored any longer
             profile['beansize_min'] = str(self.qmc.beansize_min) # int in str (legacy profiles may contain floats in str)
             profile['beansize_max'] = str(self.qmc.beansize_max) # int in str (legacy profiles may contain floats in str)
@@ -16329,7 +16338,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     @staticmethod
     def clearWindowGeometry(settings:QSettings) -> None:
         for s in ['Geometry', 'BlendGeometry','RoastGeometry','FlavorProperties','CalculatorGeometry','EventsGeometry', 'CompareGeometry',
-                'BackgroundGeometry','ScheduleGeometry','LCDGeometry','DeltaLCDGeometry','ExtraLCDGeometry','PhasesLCDGeometry','AlarmsGeometry',
+                'BackgroundGeometry','ScheduleGeometry','ScheduleRemainingSplitter', 'ScheduleMainSplitter', 'ScheduleCompletedSplitter', 'LCDGeometry','DeltaLCDGeometry','ExtraLCDGeometry','PhasesLCDGeometry','AlarmsGeometry',
                 'DeviceAssignmentGeometry','PortsGeometry','TransformatorPosition', 'CurvesPosition', 'StatisticsPosition',
                 'AxisPosition','PhasesPosition', 'BatchPosition', 'SamplingPosition', 'autosaveGeometry', 'PIDPosition',
                 'DesignerPosition','PIDLCDGeometry','ScaleLCDGeometry', 'MainSplitter']:
@@ -17601,9 +17610,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.schedule_day_filter =toBool(settings.value('ScheduleDayFilter',self.schedule_day_filter))
             self.schedule_user_filter = toBool(settings.value('ScheduleUserFilter',self.schedule_user_filter))
             self.schedule_machine_filter = toBool(settings.value('ScheduleMachineFilter',self.schedule_machine_filter))
-
             self.scheduled_items_uuids = list(toStringList(settings.value('scheduled_items',self.scheduled_items_uuids)))
             self.scheduleFlag = toBool(settings.value('Schedule',self.scheduleFlag))
+            self.scheduler_tasks_visible = toBool(settings.value('SchedulerTasks',self.scheduler_tasks_visible))
+            self.scheduler_completed_details_visible = toBool(settings.value('SchedulerCompletedDetails',self.scheduler_completed_details_visible))
+            self.scheduler_filters_visible = toBool(settings.value('SchedulerFilter',self.scheduler_filters_visible))
             if self.scheduleFlag:
                 try:
                     self.schedule()
@@ -19069,6 +19080,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'ScheduleMachineFilter',self.schedule_machine_filter, read_defaults)
             self.settingsSetValue(settings, default_settings, 'Schedule',self.scheduleFlag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'scheduled_items',self.scheduled_items_uuids, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'SchedulerTasks',self.scheduler_tasks_visible, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'SchedulerCompletedDetails',self.scheduler_completed_details_visible, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'SchedulerFilter',self.scheduler_filters_visible, read_defaults)
             self.settingsSetValue(settings, default_settings, 'LargeLCDs',self.LargeLCDsFlag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'LargeDeltaLCDs',self.LargeDeltaLCDsFlag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'LargePIDLCDs',self.LargePIDLCDsFlag, read_defaults)

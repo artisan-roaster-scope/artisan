@@ -32,6 +32,7 @@ app_name: Final[str] = 'artisan.plus'
 profile_ext: Final[str] = 'alog'
 uuid_tag: Final[str] = 'roastUUID' # as used in .alog profiles, send as 'roast_id' as part of the sync record to the server
 schedule_uuid_tag: Final[str] = 'scheduleID' # send as 's_item_id' as part of the sync record to the server
+schedule_date_tag: Final[str] = 'scheduleDate' # send as 's_item_date' as part of the sync record to the server
 
 # Service URLs
 

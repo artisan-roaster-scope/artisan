@@ -182,6 +182,7 @@ class ProfileData(TypedDict, total=False):
     roastbatchpos: int
     roastUUID: str
     scheduleID: str
+    scheduleDate: str
     beansize:str # legacy; float in str mapped to beansize_max
     beansize_min:str # int saved as str to external profiles (internal variable of type int)
     beansize_max:str # int saved as str to external profiles (internal variable of type int)
