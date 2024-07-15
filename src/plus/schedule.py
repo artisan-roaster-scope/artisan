@@ -246,17 +246,22 @@ class CompletedItem(BaseModel):
 
     @model_validator(mode='after') # pyright:ignore[reportArgumentType]
     def coffee_or_blend(self) -> 'CompletedItem':
+        if len(self.title) == 0:
+            raise ValueError('Title cannot be empty')
 # as CompletedItems are generated for ScheduledItems where store and one of blend/coffee needs to be set
 # the store_label and one of the blend_label/coffee_label should never be empty, but in case they are we
 # handle this without further ado
-#        if self.coffee_label is None and self.blend_label is None:
+        if self.coffee_label is None and self.blend_label is None:
 #            raise ValueError('Either coffee_label or blend_label must be specified')
-#        if self.coffee_label is not None and self.blend_label is not None:
+            _log.info('CompletedItem validation: Either coffee_label (%s) or blend_label (%s) must be specified (%s)', self.coffee_label, self.blend_label, self.scheduleID)
+        if self.coffee_label is not None and self.blend_label is not None:
 #            raise ValueError('Either coffee_label or blend_label must be specified, but not both')
-        if len(self.title) == 0:
-            raise ValueError('Title cannot be empty')
+            _log.info('CompletedItem validation: Either coffee_label (%s) or blend_label (%s) must be specified, but not both (%s)', self.coffee_label, self.blend_label, self.scheduleID)
+# you should not be able to complete more roasts than the items coount, but in case it happens we
+# handle this without further ado
         if self.sequence_id > self.count:
-            raise ValueError('sequence_id cannot be larger than total count of roasts per ScheduleItem')
+#            raise ValueError('sequence_id cannot be larger than total count of roasts per ScheduleItem')
+            _log.info('CompletedItem validation: sequence_id (%s) cannot be larger than total count (%s) of roasts per ScheduleItem (%s)', self.sequence_id, self.count, self.scheduleID)
         return self
 
     @field_serializer('roastdate', when_used='json')
@@ -2749,51 +2754,56 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         # if there is a non-empty schedule with a selected item
         if self.selected_remaining_item is not None and self.aw.qmc.roastUUID is not None:
             _log.info('register completed roast %s', self.aw.qmc.roastUUID)
-            # register roastUUID in (local) currently selected ScheduleItem
-            # add roast to list of completed roasts
-            self.selected_remaining_item.data.roasts.add(UUID(self.aw.qmc.roastUUID, version=4))
-            # reduce number of prepared batches of the currently selected remaining item
-            take_prepared(self.aw.plus_account_id, self.selected_remaining_item.data)
-            # calculate weight estimate
-            weight_unit_idx:int = weight_units.index(self.aw.qmc.weight[2])
-            batchsize:float = convertWeight(self.aw.qmc.weight[0], weight_unit_idx, 1) # batchsize converted to kg
-            weight_estimate = self.weight_estimate(self.selected_remaining_item.data, batchsize) # in kg
+            try:
+                # register roastUUID in (local) currently selected ScheduleItem
+                # add roast to list of completed roasts
+                self.selected_remaining_item.data.roasts.add(UUID(self.aw.qmc.roastUUID, version=4))
+                # reduce number of prepared batches of the currently selected remaining item
+                take_prepared(self.aw.plus_account_id, self.selected_remaining_item.data)
+                # calculate weight estimate
+                weight_unit_idx:int = weight_units.index(self.aw.qmc.weight[2])
+                batchsize:float = convertWeight(self.aw.qmc.weight[0], weight_unit_idx, 1) # batchsize converted to kg
+                weight_estimate = self.weight_estimate(self.selected_remaining_item.data, batchsize) # in kg
 
-            measured:bool
+                measured:bool
 
-            if self.aw.qmc.weight[1] == 0:
-                # roasted weight not set
-                measured = False
-                self.aw.qmc.weight = (self.aw.qmc.weight[0], convertWeight(weight_estimate, 1, weight_unit_idx), self.aw.qmc.weight[2])
-                weight = weight_estimate
-            else:
-                measured = True
-                weight = convertWeight(self.aw.qmc.weight[1], weight_unit_idx, 1)    # resulting weight converted to kg
+                if self.aw.qmc.weight[1] == 0:
+                    # roasted weight not set
+                    measured = False
+                    self.aw.qmc.weight = (self.aw.qmc.weight[0], convertWeight(weight_estimate, 1, weight_unit_idx), self.aw.qmc.weight[2])
+                    weight = weight_estimate
+                else:
+                    measured = True
+                    weight = convertWeight(self.aw.qmc.weight[1], weight_unit_idx, 1)    # resulting weight converted to kg
 
-            completed_item:CompletedItemDict = {
-                'scheduleID': self.selected_remaining_item.data.id,
-                'scheduleDate': self.selected_remaining_item.data.date.isoformat(),
-                'count': self.selected_remaining_item.data.count,
-                'sequence_id': len(self.selected_remaining_item.data.roasts),
-                'roastUUID': self.aw.qmc.roastUUID,
-                'roastdate': self.aw.qmc.roastdate.toSecsSinceEpoch(),
-                'title': self.aw.qmc.title,
-                'roastbatchnr' : self.aw.qmc.roastbatchnr,
-                'roastbatchprefix': self.aw.qmc.roastbatchprefix,
-                'coffee_label': self.aw.qmc.plus_coffee_label,
-                'blend_label': self.aw.qmc.plus_blend_label,
-                'store_label': self.aw.qmc.plus_store_label,
-                'batchsize': batchsize,
-                'weight': weight,
-                'weight_estimate': weight_estimate,
-                'measured': measured,
-                'color': self.aw.qmc.ground_color,
-                'moisture': self.aw.qmc.moisture_roasted,
-                'density': self.aw.qmc.density_roasted[0],
-                'roastingnotes': self.aw.qmc.roastingnotes
-            }
-            add_completed(self.aw.plus_account_id, completed_item)
-            # update schedule, removing completed items and selecting the next one
+                completed_item:CompletedItemDict = {
+                    'scheduleID': self.selected_remaining_item.data.id,
+                    'scheduleDate': self.selected_remaining_item.data.date.isoformat(),
+                    'count': self.selected_remaining_item.data.count,
+                    'sequence_id': len(self.selected_remaining_item.data.roasts),
+                    'roastUUID': self.aw.qmc.roastUUID,
+                    'roastdate': self.aw.qmc.roastdate.toSecsSinceEpoch(),
+                    'title': self.aw.qmc.title,
+                    'roastbatchnr' : self.aw.qmc.roastbatchnr,
+                    'roastbatchprefix': self.aw.qmc.roastbatchprefix,
+                    'coffee_label': self.aw.qmc.plus_coffee_label,
+                    'blend_label': self.aw.qmc.plus_blend_label,
+                    'store_label': self.aw.qmc.plus_store_label,
+                    'batchsize': batchsize,
+                    'weight': weight,
+                    'weight_estimate': weight_estimate,
+                    'measured': measured,
+                    'color': self.aw.qmc.ground_color,
+                    'moisture': self.aw.qmc.moisture_roasted,
+                    'density': self.aw.qmc.density_roasted[0],
+                    'roastingnotes': self.aw.qmc.roastingnotes
+                }
+                add_completed(self.aw.plus_account_id, completed_item)
+                # update schedule, removing completed items and selecting the next one
+
+                # we catch potential validation errors for CompletedItemDict here to ensure that the updateScheduleWindow() is always correctly called
+            except Exception as e:   # pylint: disable=broad-except
+                _log.error(e)
             self.updateScheduleWindow()
 
     def update_styles(self) -> None:
