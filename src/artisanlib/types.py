@@ -118,6 +118,12 @@ class ComputedProfileInformation(TypedDict, total=False):
     CO2_roast_per_green_kg: float
     KWH_batch_per_green_kg: float
     KWH_roast_per_green_kg: float
+    bbp_total_time: float
+    bbp_bottom_temp: float
+    bbp_begin_to_bottom_time: float
+    bbp_bottom_to_charge_time: float
+    bbp_begin_to_bottom_ror: float
+    bbp_bottom_to_charge_ror: float
 
 class ProfileData(TypedDict, total=False):
     recording_version: str
@@ -293,7 +299,14 @@ class ProfileData(TypedDict, total=False):
     betweenbatch_after_preheat: bool
     electricEnergyMix: int
     plus_sync_record_hash: str
-
+    bbp_begin: str
+    bbp_time_added_from_prev: float
+    bbp_endroast_epoch_msec: int
+    bbp_endevents: List[List[Optional[float]]]
+    bbp_dropevents: List[List[Optional[float]]]
+    bbp_dropbt: float
+    bbp_dropet: float
+    bbp_drop_to_end: float
 
 class ExtraDeviceSettings(TypedDict):
     extradevices           : List[int]
@@ -521,3 +534,12 @@ class AlarmSet(TypedDict):
     actions: List[int]
     beeps: List[int]
     alarmstrings: List[str]
+
+class BbpCache(TypedDict, total=False):
+    mode: str
+    drop_bt: float
+    drop_et: float
+    end_roastepoch_msec: int
+    end_events: List[List[Optional[float]]]
+    drop_events: List[List[Optional[float]]]
+    drop_to_end: float

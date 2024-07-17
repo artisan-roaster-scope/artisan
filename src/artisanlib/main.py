@@ -1453,7 +1453,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'RoastMenu', 'ConfMenu', 'ToolkitMenu', 'viewMenu', 'helpMenu', 'newRoastMenu', 'fileLoadAction', 'openRecentMenu', 'importMenu',
         'fileSaveAction', 'fileSaveCopyAsAction', 'exportMenu', 'convMenu', 'saveGraphMenu', 'reportMenu', 'htmlAction', 'productionMenu',
         'productionWebAction', 'productionCsvAction', 'productionExcelAction', 'rankingMenu', 'rankingWebAction', 'rankingCsvAction', 'rankingExcelAction',
-        'savestatisticsAction', 'printAction', 'quitAction', 'cutAction', 'copyAction', 'pasteAction', 'editGraphAction', 'backgroundAction',
+        'saveStatisticsMenu', 'printAction', 'quitAction', 'cutAction', 'copyAction', 'pasteAction', 'editGraphAction', 'backgroundAction',
         'flavorAction', 'switchAction', 'switchETBTAction', 'machineMenu', 'deviceAction', 'commportAction', 'calibrateDelayAction', 'curvesAction',
         'eventsAction', 'alarmAction', 'phasesGraphAction', 'StatisticsAction', 'WindowconfigAction', 'colorsAction', 'themeMenu', 'autosaveAction',
         'batchAction', 'temperatureConfMenu', 'FahrenheitAction', 'CelsiusAction', 'languageMenu', 'analyzeMenu', 'fitIdealautoAction',
@@ -1486,8 +1486,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'rankingPDFAction', 'roastReportMenu', 'roastReportPDFAction', 'saveAsThemeAction', 'sliderGrp12', 'sliderGrp34', 'sliderGrpBox1x', 'sliderGrpBox2x', 'sliderGrpBox3x', 'sliderGrpBox4x',
         'small_button_min_width_str', 'standard_button_min_width_px', 'tiny_button_min_width_str', 'recording_version', 'recording_revision', 'recording_build',
         'lastIOResult', 'lastArtisanResult', 'max_palettes', 'palette_entries', 'eventsliders', 'defaultSettings', 'zoomInShortcut', 'zoomOutShortcut',
-        'schedule_day_filter', 'schedule_user_filter', 'schedule_machine_filter' ]
-
+        'summarystatstypes','summarystatsvisibility','summarystatsfontsize','bbp_total_time','bbp_bottom_temp','bbp_begin_to_bottom_time','bbp_bottom_to_charge_time',
+        'bbp_begin_to_bottom_ror', 'bbp_bottom_to_charge_ror', 'bbp_time_added_from_prev', 'bbp_begin', 'bbp_endroast_epoch_msec', 'bbp_endevents',
+        'bbp_dropevents', 'bbp_dropbt', 'bbp_dropet', 'bbp_drop_to_end', 'schedule_day_filter', 'schedule_user_filter', 'schedule_machine_filter']
 
 
     def __init__(self, parent:Optional[QWidget] = None, *, locale:str, WebEngineSupport:bool, artisanviewerFirstStart:bool) -> None:
@@ -1609,6 +1610,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.DeviceAssignmentDlg_activeTab:int = 0
         self.AlarmDlg_activeTab:int = 0
         self.schedule_activeTab:int = 0
+        self.StatisticsDlg_activeTab:int = 0
 
         #flag to reset Qsettings
         self.resetqsettings:int = 0
@@ -1863,6 +1865,29 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.lastdigitizedtemp:List[Optional[float]] = [None,None,None,None] # last digitized temp value per quantifier
 
         self.readingslcdsflags: List[int] = [0,1,1] # readings LCD visibility per state OFF, ON, START
+
+        #SummaryStatistics
+        self.summarystatstypes_default:List[int] = [1,2,3,4,5,0,6,7,8,9,10,0,11,12,13,14,15,16,17]
+        self.summarystatstypes:List[int] = self.summarystatstypes_default.copy()
+        self.summarystats_startup:bool = True
+        self.summarystatsfontsize:int = 2
+
+        # BBP Metrics
+        self.bbp_total_time: float = -1
+        self.bbp_bottom_temp: float = -1
+        self.bbp_begin_to_bottom_time: float = -1
+        self.bbp_bottom_to_charge_time: float = -1
+        self.bbp_begin_to_bottom_ror: float = -1
+        self.bbp_bottom_to_charge_ror: float = -1
+        # BBP Data
+        self.bbp_time_added_from_prev: float = 0
+        self.bbp_begin: str = "Start"  #Start|DROP
+        self.bbp_endroast_epoch_msec: int = 0
+        self.bbp_endevents: List[List[Optional[float]]] = []
+        self.bbp_dropevents: List[List[Optional[float]]] = []
+        self.bbp_dropbt: float = 0
+        self.bbp_dropet: float = 0
+        self.bbp_drop_to_end: float = 0
 
         #watermark image
         self.logoimgalpha: float = 2.0
@@ -2246,9 +2271,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.rankingExcelAction.triggered.connect(self.rankingExcelReport)
                     self.rankingMenu.addAction(self.rankingExcelAction)
 
-            self.savestatisticsAction:QAction = QAction(QApplication.translate('Menu', 'Save Statistics...'), self)
-            self.savestatisticsAction.triggered.connect(self.saveStatistics)
-            self.fileMenu.addAction(self.savestatisticsAction)
+            self.saveStatisticsMenu: Optional[QMenu] = self.fileMenu.addMenu(QApplication.translate('Menu', 'Save Statistics'))
+            if self.saveStatisticsMenu is not None:
+                savestatisticsIMGAction = QAction(QApplication.translate('Menu', 'Image...'), self)
+                savestatisticsIMGAction.triggered.connect(self.saveStatistics_IMG)
+                self.saveStatisticsMenu.addAction(savestatisticsIMGAction)
+                savestatisticsTXTAction = QAction(QApplication.translate('Menu', 'Text...'),self)
+                savestatisticsTXTAction.triggered.connect(self.saveStatistics_TXT)
+                self.saveStatisticsMenu.addAction(savestatisticsTXTAction)
 
             self.fileMenu.addSeparator()
 
@@ -2527,6 +2557,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             calculatorAction.triggered.connect(self.calculator)
             self.ToolkitMenu.addAction(calculatorAction)
 
+        self.redrawAction = QAction(QApplication.translate('Menu', 'Redraw'), self)
+        self.redrawAction.triggered.connect(self.qmc.redraw_menu_slot)
+        self.ToolkitMenu.addAction(self.redrawAction)  #type: ignore[union-attr]
 
         # VIEW menu
 
@@ -10962,8 +10995,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.buttonsAction.setEnabled(True)
         self.slidersAction.setEnabled(True)
 
-        if self.qmc.statssummary:
-            self.savestatisticsAction.setEnabled(True)
+        if self.qmc.statssummary and self.saveStatisticsMenu is not None:
+            self.saveStatisticsMenu.setEnabled(True)
         self.displayonlymenus()
 
     def disableEditMenus(self, designer:bool = False, wheel:bool = False, compare:bool = False, sampling:bool = False) -> None:
@@ -11003,7 +11036,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.rankingMenu.setEnabled(False)
         if not compare and not sampling:
             self.printAction.setEnabled(False)
-        self.savestatisticsAction.setEnabled(False)
+        if self.saveStatisticsMenu is not None:
+            self.saveStatisticsMenu.setEnabled(False)
         # EDIT menu
         # ROAST menu
         if compare or wheel:
@@ -12435,6 +12469,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
 
                 #Plot everything
+
+                # For statsSummary() to calculate auto geometries correctly, updateBackground() must have run once
+                if self.qmc.statssummary and self.summarystats_startup and self.qmc.autotimex:
+                    # allow only once, at startup
+                    self.summarystats_startup = False
+                    self.qmc.redraw(False)
+
+
                 self.qmc.redraw()
                 self.updatePhasesLCDs()
                 message = QApplication.translate('Message','{0}  loaded ').format(filename)
@@ -12588,6 +12630,33 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.betweenbatch_after_preheat = profile['betweenbatch_after_preheat']
         if 'electricEnergyMix' in profile:
             self.qmc.electricEnergyMix = profile['electricEnergyMix']
+
+    #TODO remove try/except??  # pylint: disable=fixme
+    def loadBbpFromProfile(self, profile:'ProfileData') -> None:
+        try:
+            if 'bbp_begin' in profile:
+                self.bbp_begin = profile['bbp_begin']
+            if 'bbp_time_added_from_prev' in profile:
+                self.bbp_time_added_from_prev = profile['bbp_time_added_from_prev']
+            if 'bbp_endroast_epoch_msec' in profile:
+                self.bbp_endroast_epoch_msec = profile['bbp_endroast_epoch_msec']
+            if 'bbp_endevents' in profile:
+                l = len(profile['bbp_endevents'])
+                self.bbp_endevents = profile['bbp_endevents'][:l]
+            if 'bbp_dropevents' in profile:
+                l = len(profile['bbp_dropevents'])
+                self.bbp_dropevents = profile['bbp_dropevents'][:l]
+            if 'bbp_dropbt' in profile:
+                self.bbp_dropbt = profile['bbp_dropbt']
+            if 'bbp_dropet' in profile:
+                self.bbp_dropet = profile['bbp_dropet']
+            if 'bbp_drop_to_end' in profile:
+                self.bbp_drop_to_end = profile['bbp_drop_to_end']
+        except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
+            _a, _b, exc_tb = sys.exc_info()
+            self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' loadBbpFromProfile() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+
 
     # returns True if data got updated, False otherwise
     def updateSymbolicETBT(self) -> bool:
@@ -15046,6 +15115,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             # Energy
             self.loadEnergyFromProfile(profile)
 
+            # BBP
+            self.loadBbpFromProfile(profile)
+
             if 'timeindex' in profile:
                 self.qmc.timeindex = [max(0,v) if i>0 else max(-1,v) for i,v in enumerate(profile['timeindex'])]
                 if self.qmc.locktimex:
@@ -15252,10 +15324,108 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 )
             else:
                 output = 'Metrics not available: profile is zero length.'
+
+            # Find some BBP data
+            if ( ( self.qmc.timex[self.qmc.timeindex[0]] > 0 ) and ( self.qmc.timex[self.qmc.timeindex[0]] - self.qmc.timex[0] >= 60 ) ):  #greater than 1 minute
+                try:
+                    # fake the events
+                    bbp_timeindex = [0, 0, self.qmc.timeindex[0], 0, 0, 0, self.qmc.timeindex[0], 0]
+                    bbp_tpidx = self.findTPint(bbp_timeindex, self.qmc.timex, self.qmc.temp2)
+                    if bbp_tpidx > 0:
+                        bbp_bottom_temp = self.qmc.temp2[bbp_tpidx]
+                        bbp_total_time = stringfromseconds(self.qmc.timex[self.qmc.timeindex[0]] - self.qmc.timex[0])
+                        bbp_begin_to_bottom_time = stringfromseconds(self.qmc.timex[bbp_tpidx] - self.qmc.timex[0])
+                        bbp_bottom_to_charge_time = stringfromseconds(self.qmc.timex[self.qmc.timeindex[0]] - self.qmc.timex[bbp_tpidx])
+                        bbp_begin_to_bottom_ror = 60 * (bbp_bottom_temp - self.qmc.temp2[0]) / (self.qmc.timex[bbp_tpidx] - self.qmc.timex[0])
+                        bbp_bottom_to_charge_ror = 60 * (self.qmc.temp2[self.qmc.timeindex[0]] - bbp_bottom_temp) / (self.qmc.timex[self.qmc.timeindex[0]] - self.qmc.timex[bbp_tpidx])
+                        #Bottom temp@170 - 3min 58sec from drop to bottom temp
+                        #Charge temp: 190°C - 25sec from bottom temp to charge
+                        output += (
+                            f'\n\n  BBP Metrics'
+                            f'\n  Bottom temp: {bbp_bottom_temp:.2f}{self.qmc.mode} - {bbp_begin_to_bottom_time} from DROP@{self.qmc.temp2[0]:.2f}{self.qmc.mode} to bottom temp'
+                            f'\n  Charge temp: {self.qmc.temp2[self.qmc.timeindex[0]]:.2f} - {bbp_bottom_to_charge_time} from bottom to CHARGE'
+                            f'\n  BBP Low Temp: {bbp_bottom_temp:.2f} {self.qmc.mode}'
+                            f'\n  BBP Time Start to Bottom Temp: {bbp_begin_to_bottom_time} at RoR: {bbp_begin_to_bottom_ror:.2f} {self.qmc.mode}/min'
+                            f'\n  BBP RoR Start to Bottom Temp: {bbp_begin_to_bottom_time} at RoR: {bbp_bottom_to_charge_ror:.2f} {self.qmc.mode}/min'
+                            f'\n  BBP Time Bottom Temp to CHARGE: {bbp_bottom_to_charge_time}'
+                            f'\n  BBP Total Time: {bbp_total_time}'
+                            f'\n  '
+                        )
+                    else:
+                        output += '\n\n  No BBP TP found - Metrics Not Available\n'
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
+                    _, _, exc_tb = sys.exc_info()
+                    self.qmc.adderror((QApplication.translate('Error Message', 'Error:') + ' profilequality() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+            else:
+                output += '\n\n  No BBP - Metrics Not Available\n'
+
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             output = 'Metrics not available: exception'
         return output
+
+    def resetBBPMetrics(self) -> None:
+        self.bbp_drop_bt = -1
+        self.bbp_drop_et = -1
+        self.bbp_total_time = -1
+        self.bbp_bottom_temp = -1
+        self.bbp_begin_to_bottom_time = -1
+        self.bbp_bottom_to_charge_time = -1
+        self.bbp_begin_to_bottom_ror = -1
+        self.bbp_bottom_to_charge_ror = -1
+        self.bbp_time_added_from_prev = 0
+        self.bbp_begin = "Start"
+        self.bbp_endroast_epoch_msec = 0
+        self.bbp_endevents = []
+        self.bbp_dropevents = []
+        self.bbp_drop_to_end = 0
+
+
+    #TODO Decide where else to display BBP metrics # pylint: disable=fixme
+    # bbpCache holds data from the previous roast.  Set in cacheforBbp() which is called from OffRecorder()
+    # Needs to be called from somewhere betw CHARGE and OFF
+    def calcBBPMetrics(self,checkCache:bool=False) -> None:
+        try:
+            #TODO revisit these preset times  # pylint: disable=fixme
+            maxAllowedTime_fromPrevEnd_toStart = 60 #seconds, max gap time between roast recordings
+            minBbpTime = 90 #seconds, the minimum amount of time recorded in the current roast before CHARGE
+            # is there data from a prev roast?
+            if self.qmc.bbpCache and checkCache:
+                _log.debug('bbpCache exists')
+                bbpGap = self.qmc.roastepoch - (self.qmc.bbpCache['end_roastepoch_msec']/1000)
+                # did the prev roast end shortly before this roast began?  If not clear bbpCache
+                if bbpGap < maxAllowedTime_fromPrevEnd_toStart:
+                    self.bbp_time_added_from_prev = bbpGap + self.qmc.bbpCache['drop_to_end']
+                    self.bbp_begin = "DROP"
+                    self.bbp_dropbt = self.qmc.bbpCache['drop_bt']
+                    self.bbp_dropet = self.qmc.bbpCache['drop_et']
+                    self.bbp_endroast_epoch_msec = self.qmc.bbpCache['end_roastepoch_msec']
+                    self.bbp_endevents = self.qmc.bbpCache['end_events']
+                    self.bbp_dropevents = self.qmc.bbpCache['drop_events']
+                    self.bbp_drop_to_end = self.qmc.bbpCache['drop_to_end']
+                else:
+                    self.qmc.bbpCache = {}  # make empty to use as easy test later, "if self.qmc.bbpCache:"
+                    _log.debug('clearing bbpCache')
+            # now calculate all the bbp data
+            # does the current profile have the minimum time for bbp?
+            if (len(self.qmc.timeindex) > 0) and (self.qmc.timex[self.qmc.timeindex[0]] > 0) and (self.qmc.timex[self.qmc.timeindex[0]] - self.qmc.timex[0] >= minBbpTime):
+                self.bbp_total_time = self.qmc.timex[self.qmc.timeindex[0]] - self.qmc.timex[0] + self.bbp_time_added_from_prev
+                # fake the events to use with findTPint
+                bbp_timeindex = [0, 0, self.qmc.timeindex[0], 0, 0, 0, self.qmc.timeindex[0], 0]
+                bbp_tpidx = self.findTPint(bbp_timeindex, self.qmc.timex, self.qmc.temp2)
+                if bbp_tpidx > 0:
+                    self.bbp_bottom_temp = self.qmc.temp2[bbp_tpidx]
+                    self.bbp_begin_to_bottom_time = self.qmc.timex[bbp_tpidx] - self.qmc.timex[0] + self.bbp_time_added_from_prev
+                    self.bbp_bottom_to_charge_time = self.qmc.timex[self.qmc.timeindex[0]] - self.qmc.timex[bbp_tpidx]
+                    self.bbp_begin_to_bottom_ror = 60 * (self.bbp_bottom_temp - self.qmc.temp2[0]) / (self.qmc.timex[bbp_tpidx] - self.qmc.timex[0] + self.bbp_time_added_from_prev)
+                    self.bbp_bottom_to_charge_ror = 60 * (self.qmc.temp2[self.qmc.timeindex[0]] - self.bbp_bottom_temp) / (self.qmc.timex[self.qmc.timeindex[0]] - self.qmc.timex[bbp_tpidx])
+            #TODO now deal with the special events from the previous roast  # pylint: disable=fixme
+
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+            _, _, exc_tb = sys.exc_info()
+            self.qmc.adderror((QApplication.translate('Error Message', 'Error:') + ' calcBBP() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
 
     # returns data that is computed by Artisan out of raw profile data using some formulas
@@ -15534,7 +15704,19 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 computedProfile['KWH_batch_per_green_kg'] = float2float(energymetrics['KWH_batch_per_green_kg'],1)
             if 'KWH_roast_per_green_kg' in energymetrics:
                 computedProfile['KWH_roast_per_green_kg'] = float2float(energymetrics['KWH_roast_per_green_kg'],1)
-
+        except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
+            _, _, exc_tb = sys.exc_info()
+            self.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' computedProfileInformation() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+        ######### BBP Metrics #########
+        try:
+            self.calcBBPMetrics()
+            computedProfile['bbp_total_time'] = float2float(self.bbp_total_time,1)
+            computedProfile['bbp_bottom_temp'] = float2float(self.bbp_bottom_temp,2)
+            computedProfile['bbp_begin_to_bottom_time'] = float2float(self.bbp_begin_to_bottom_time,1)
+            computedProfile['bbp_bottom_to_charge_time'] = float2float(self.bbp_bottom_to_charge_time,1)
+            computedProfile['bbp_begin_to_bottom_ror'] = float2float(self.bbp_begin_to_bottom_ror,2)
+            computedProfile['bbp_bottom_to_charge_ror'] = float2float(self.bbp_bottom_to_charge_ror,2)
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
@@ -15773,6 +15955,21 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 profile['coolingenergies'] = self.qmc.coolingenergies
                 profile['betweenbatch_after_preheat'] = self.qmc.betweenbatch_after_preheat
                 profile['electricEnergyMix'] = self.qmc.electricEnergyMix
+            except Exception as ex: # pylint: disable=broad-except
+                _log.exception(ex)
+                _, _, exc_tb = sys.exc_info()
+                self.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' getProfile(): {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+
+            # BBP data
+            try:
+                profile['bbp_begin'] = self.bbp_begin
+                profile['bbp_time_added_from_prev'] = float2float(self.bbp_time_added_from_prev,2)
+                profile['bbp_endroast_epoch_msec'] = self.bbp_endroast_epoch_msec
+                profile['bbp_endevents'] = self.bbp_endevents
+                profile['bbp_dropevents'] = self.bbp_dropevents
+                profile['bbp_dropbt'] = float2float(self.bbp_dropbt,2)
+                profile['bbp_dropet'] = float2float(self.bbp_dropet,2)
+                profile['bbp_drop_to_end'] = float2float(self.bbp_drop_to_end)
             except Exception as ex: # pylint: disable=broad-except
                 _log.exception(ex)
                 _, _, exc_tb = sys.exc_info()
@@ -17711,12 +17908,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.showmet = bool(toBool(settings.value('showmet',self.qmc.showmet)))
             if settings.contains('statssummary'):
                 self.qmc.statssummary = bool(toBool(settings.value('statssummary')))
-                if self.qmc.statssummary:
-                    self.savestatisticsAction.setEnabled(True)
-                else:
-                    self.savestatisticsAction.setEnabled(False)
+            if self.qmc.statssummary is not None and self.qmc.statssummary and self.saveStatisticsMenu is not None:
+                self.saveStatisticsMenu.setEnabled(True)
+            elif self.saveStatisticsMenu is not None:
+                self.saveStatisticsMenu.setEnabled(False)
             self.qmc.statsmaxchrperline = int(settings.value('statsmaxchrperline', self.qmc.statsmaxchrperline))
             self.qmc.showtimeguide = bool(toBool(settings.value('showtimeguide',self.qmc.showtimeguide)))
+            if settings.contains('summarystatstypes'):
+                self.summarystatstypes = [toInt(x) for x in toList(settings.value('summarystatstypes',self.summarystatstypes))]
+            if settings.contains('summarystatsfontsize'):
+                self.summarystatsfontsize = toInt(settings.value('summarystatsfontsize', int(self.summarystatsfontsize)))
             settings.endGroup()
 #--- END GROUP ExtrasMoreInfo
 
@@ -18394,6 +18595,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'curvefitoffset',self.qmc.curvefitoffset, read_defaults)
             self.settingsSetValue(settings, default_settings, 'segmentsamplesthreshold',self.qmc.segmentsamplesthreshold, read_defaults)
             self.settingsSetValue(settings, default_settings, 'segmentdeltathreshold',self.qmc.segmentdeltathreshold, read_defaults)
+
             #projection
             self.settingsSetValue(settings, default_settings, 'ETprojectFlag',self.qmc.ETprojectFlag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'BTprojectFlag',self.qmc.BTprojectFlag, read_defaults)
@@ -19191,6 +19393,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'statssummary',self.qmc.statssummary, read_defaults)
             self.settingsSetValue(settings, default_settings, 'statsmaxchrperline', self.qmc.statsmaxchrperline, read_defaults)
             self.settingsSetValue(settings, default_settings, 'showtimeguide',self.qmc.showtimeguide, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'summarystatstypes',self.summarystatstypes, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'summarystatsfontsize',self.summarystatsfontsize, read_defaults)
             settings.endGroup()
 #--- END GROUP ExtrasMoreInfo
 
@@ -19815,7 +20019,26 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def saveStatistics(self, _:bool = False) -> None:
+    def saveStatistics_TXT(self, _:bool = False) -> None:
+        if self.qmc.ax is None:
+            return
+#TODO need to fix for right to left languages! # pylint: disable=fixme
+        try:
+            filename = self.ArtisanSaveFileDialog(msg=QApplication.translate('Message', 'Save Statistics'), ext='*.txt')
+            if filename:
+                statstr = cast(str,self.qmc.statsSummary(txt=True))
+                with open(filename, 'w', encoding='utf8') as file:
+                    file.write(statstr)
+                self.sendmessage(QApplication.translate('Message','Statistics Saved'))
+
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+            _a, _b, exc_tb = sys.exc_info()
+            self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' saveStatistics() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def saveStatistics_IMG(self, _:bool = False) -> None:
         if self.qmc.ax is None:
             return
         try:
@@ -19841,7 +20064,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             # 5. fig.save
             # MPL 3.1.1 does not properly handle saving pdf on Windows when figure dpi not 72.  Maybe fixed in a future version.
             # ref: https://github.com/matplotlib/matplotlib/issues/15497#issuecomment-548072609
-            ext = '*.png' if platform.system() == 'Windows' else '*.pdf'
+            # ext = '*.png' if platform.system() == 'Windows' else '*.pdf'
+            # appears to work properly for this usage when checked with MPL 3.8.4
+            # Use png for legacy Windows, pdf for all others. Test PyQt version for legacy even though the mpl version is the problem.
+            ext = '*.png' if platform.system() == 'Windows' and 'PyQt5' in sys.modules else '*.pdf'
             filename = self.ArtisanSaveFileDialog(msg=QApplication.translate('Message', 'Save Statistics'), ext=ext)
             if filename:
                 self.qmc.fig.set_layout_engine('none')
@@ -20156,7 +20382,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     def rankingdataDef() -> Tuple[List[List[str]], List[str]]:
         field_index:List[str] = [
             'fld',     #field name as used in source list or an eval string
-            'src',     #data source from where to pull fld [prof,comp,rank,prod,eval,]
+            'src',     #data source from where to pull fld [prof,comp,rank,prod,eval,self,]
             'typ',     #content type [text,int,float1,float2,float4,text2float1,text2float2,text2int,percent,time,bool,]
             'test0',   #test for a zero value and substitute an empty string
             'units',   #conversion units [temp,weight,volume,ror,] or maxlen when typ=="text"
@@ -20284,6 +20510,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             ['BTU_ELEC',            'comp',  'float1',   'false',  '(BTU)', QApplication.translate('HTML Report Template','BTU ELEC')             ],
             ['KWH_batch_per_green_kg','comp','float1',   'false',  '(kWh/kg)', QApplication.translate('HTML Report Template','Efficiency Batch')  ],
             ['KWH_roast_per_green_kg','comp','float1',   'false',  '(kWh/kg)', QApplication.translate('HTML Report Template','Efficiency Roast')  ],
+            ['bbp_begin'            ,'prof', 'text',     'false',  '',      QApplication.translate('HTML Report Template','BBP Begin')            ],
+            ['bbp_total_time'        ,'comp','float1',   'false',  'sec',   QApplication.translate('HTML Report Template','BBP Total Time')       ],
+            ['bbp_bottom_temp'       ,'comp','float2',   'false',  'temp',  QApplication.translate('HTML Report Template','BBP Bottom Temp')      ],
+            ['bbp_begin_to_bottom_time','comp', 'float1','false',  'sec',   QApplication.translate('HTML Report Template','BBP Begin to Bottom Time')],
+            ['bbp_bottom_to_charge_time','comp','float1','false',  'sec',   QApplication.translate('HTML Report Template','BBP Bottom to CHARGE Time')],
+            ['bbp_begin_to_bottom_ror','comp',  'float2','false',  'ror',   QApplication.translate('HTML Report Template','BBP Begin to Bottom RoR')],
+            ['bbp_bottom_to_charge_ror','comp', 'float2','false',  'ror',   QApplication.translate('HTML Report Template','BBP Bottom to CHARGE RoR')],
+            # add new fields above, file name should always be the last field
+            ['curFile',             'self',  'text',     'false',  '',      QApplication.translate('HTML Report Template','File Name')  ],
         ]
         return ranking_data_fields, field_index
 
@@ -21224,7 +21459,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     elif src == 'prod' and fld in pd:
                                         res_fld = pd[fld] # type:ignore[literal-required]
                                     elif src == 'eval':
-                                        res_fld = eval(fld) # pylint: disable=eval-used
+                                        try:
+                                            res_fld = eval(fld) # pylint: disable=eval-used
+                                        except Exception:
+                                            res_fld = -1
+                                    elif src == 'self':
+                                        res_fld = getattr(self,f'{fld}')
                                     else:
                                         continue
 
@@ -21497,7 +21737,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 charge = '--'
             dryphase, midphase, finishphase, coolphase = self.phases2html(cp)
             etbta = '--'
-            #Dave new way of presenting AUC
+
             if ('AUC' in cp and cp['AUC'] != 0):
                 etbta = f"{cp['AUC']:.0f}C*min"
                 if ('AUCbegin' in cp and cp['AUCbegin'] != '' and 'AUCbase' in cp):
@@ -22814,7 +23054,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     @pyqtSlot(bool)
     def showstatistics(self, _:bool = False) -> None:
         from artisanlib.statistics import StatisticsDlg
-        dialog = StatisticsDlg(self,self)
+        dialog = StatisticsDlg(self,self,self.StatisticsDlg_activeTab)
         dialog.show()
 
     @pyqtSlot()
