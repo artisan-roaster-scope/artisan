@@ -487,6 +487,7 @@ class tgraphcanvas(FigureCanvas):
             'f_dtwice': 1.5,
         }
 
+        # invariants: len(self.flavorlabels) == len(self.flavors) > 0
         self.flavorlabels = list(self.artisanflavordefaultlabels)
         #Initial flavor parameters.
         self.flavors_default_value:float = 5.
@@ -10523,9 +10524,9 @@ class tgraphcanvas(FigureCanvas):
             notestr = ''
             notes_lines = textwrap.wrap(notes, width=self.statsmaxchrperline)
             if len(notes_lines) > 0:
-                notestr += f"{newline}{notes_lines[0]}"
+                notestr += f'{newline}{notes_lines[0]}'
                 if len(notes_lines) > 1:
-                    notestr += f"{newline}  {notes_lines[1]}"
+                    notestr += f'{newline}  {notes_lines[1]}'
                     if len(notes_lines) > 2:
                         notestr += '..'
             return notestr
@@ -10536,7 +10537,7 @@ class tgraphcanvas(FigureCanvas):
                          break_long_words=False, subsequent_indent='  ', max_lines=max_lines, placeholder='..', replace_whitespace=False))
                          for line in in_string.splitlines() if line.strip() != ''])
             return f'\n{res}'
-            
+
         def dropZeroDecimal(value:float, decimals:int) -> float:
             if int(value) == float2float(value,decimals):
                 return float2float(value,0)
@@ -10565,7 +10566,7 @@ class tgraphcanvas(FigureCanvas):
             from_s = QApplication.translate('AddlInfo', 'from')
             bottom = QApplication.translate('AddlInfo', 'Bottom')
             if n == 0:  #Blank line
-                stattype_str = f"{newline}"
+                stattype_str = f'{newline}'
             elif n == 1:  #Title
                 if self.roastbatchnr > 0 or len(self.title) > 0:
                     stattype_str = f'{newline}'
@@ -10690,28 +10691,28 @@ class tgraphcanvas(FigureCanvas):
                     stattype_str += f"{newline}{QApplication.translate('AddlInfo', 'BBP Bottom Temp')} {self.aw.bbp_bottom_temp:.1f}{degree}{self.aw.qmc.mode}"
             elif n == 25:  # BBP summary
                 if self.aw.bbp_total_time:  # noqa: SIM102
-                    stattype_str += f"{newline}{bottom}@{self.aw.bbp_bottom_temp:.0f}{degree}{self.mode}, "
-                    stattype_str += f"{stringfromseconds(self.aw.bbp_begin_to_bottom_time,False)} {from_s} {begin}"
-                    stattype_str += f"{newline}{charge}@{self.temp2[self.timeindex[0]]:.0f}{degree}{self.mode}, "
-                    stattype_str += f"{stringfromseconds(self.aw.bbp_bottom_to_charge_time,False)} {from_s} {bottom}"
+                    stattype_str += f'{newline}{bottom}@{self.aw.bbp_bottom_temp:.0f}{degree}{self.mode}, '
+                    stattype_str += f'{stringfromseconds(self.aw.bbp_begin_to_bottom_time,False)} {from_s} {begin}'
+                    stattype_str += f'{newline}{charge}@{self.temp2[self.timeindex[0]]:.0f}{degree}{self.mode}, '
+                    stattype_str += f'{stringfromseconds(self.aw.bbp_bottom_to_charge_time,False)} {from_s} {bottom}'
             elif n == 26:  # BBP summary long  (2 lines minimum)
                 if self.aw.bbp_total_time:  # noqa: SIM102
                     seconds = int(math.floor(self.aw.bbp_begin_to_bottom_time + 0.5))
                     d, m = divmod(seconds, 60)
-                    bbp_str = f"{bottom} temp@{self.aw.bbp_bottom_temp:.0f}{degree}{self.mode} - "
+                    bbp_str = f'{bottom} temp@{self.aw.bbp_bottom_temp:.0f}{degree}{self.mode} - '
                     bbp_str += f"{d}min {m}sec {from_s} {begin} {QApplication.translate('AddlInfo', 'to bottom temp')}"
                     stattype_str += wrapString(bbp_str)
-                    bbp_str = f"{newline}{charge} temp: {self.temp2[self.timeindex[0]]:.0f}{degree}{self.mode} - "
+                    bbp_str = f'{newline}{charge} temp: {self.temp2[self.timeindex[0]]:.0f}{degree}{self.mode} - '
                     bbp_str += f"{self.aw.bbp_bottom_to_charge_time:.0f}{QApplication.translate('AddlInfo', 'sec')} {from_s} {bottom} {QApplication.translate('AddlInfo', 'temp to charge')}"
                     stattype_str += wrapString(bbp_str)
             elif n == 27:  # BBP summary compact
                 if self.aw.bbp_total_time:  # noqa: SIM102
                     startingtemp = self.aw.bbp_dropbt if self.aw.bbp_begin == 'DROP' else self.temp2[0]
-                    stattype_str += f"{newline}{startingtemp:.0f}{degree}{self.mode} "
-                    stattype_str += f"({stringfromseconds(self.aw.bbp_begin_to_bottom_time,False)}) "
-                    stattype_str += f"{self.aw.bbp_bottom_temp:.0f}{degree}{self.mode} "
-                    stattype_str += f"({stringfromseconds(self.aw.bbp_bottom_to_charge_time,False)}) "
-                    stattype_str += f"{self.temp2[self.timeindex[0]]:.0f}{degree}{self.mode}"
+                    stattype_str += f'{newline}{startingtemp:.0f}{degree}{self.mode} '
+                    stattype_str += f'({stringfromseconds(self.aw.bbp_begin_to_bottom_time,False)}) '
+                    stattype_str += f'{self.aw.bbp_bottom_temp:.0f}{degree}{self.mode} '
+                    stattype_str += f'({stringfromseconds(self.aw.bbp_bottom_to_charge_time,False)}) '
+                    stattype_str += f'{self.temp2[self.timeindex[0]]:.0f}{degree}{self.mode}'
             elif n == 28:  # delta T FCs to DROP
                 if 'finish_phase_delta_temp' in cp:  # noqa: SIM102
                     stattype_str += f"{newline}{deltaLabelUTF8}T {QApplication.translate('AddlInfo', 'FCs to Drop')}: "
@@ -10726,7 +10727,7 @@ class tgraphcanvas(FigureCanvas):
 
             # reformat string as necessary
             stattype_str = self.__dijkstra_to_ascii(stattype_str)
-            
+
             # Trim the long lines
             trimmedstatype_segments:List[str] = []
             for line in stattype_str.split('\n'):
@@ -11563,14 +11564,30 @@ class tgraphcanvas(FigureCanvas):
         for i,_ in enumerate(self.flavorchart_plotf):
             self.flavorchart_plotf[i] /= 10.
 
-    def calcFlavorChartScore(self) -> float:
+    @staticmethod
+    def calcFlavorChartScoreFromFlavors(flavors:List[float]) -> float:
+        if len(flavors) < 1:
+            return 50
         score:float = 0.
-        nflavors = len(self.flavors)
+        nflavors = len(flavors)
         for i in range(nflavors):
-            score += self.flavors[i]
+            score += flavors[i]
         score /= (nflavors)
         score *= 10.
         return score
+
+    def calcFlavorChartScore(self) -> float:
+        return self.calcFlavorChartScoreFromFlavors(self.flavors)
+
+    # set the flavor chart scores such that the given overall score is reached
+    def setFlavorChartScore(self, value:float) -> None:
+        if value <= 0 or value > 100:
+            # we treat the nonset value 0 as the (default) 50
+            value = 50
+        nflavors = len(self.flavors)
+        nValue = value / 10
+        for i in range(nflavors):
+            self.flavors[i] = nValue
 
     # an incremental redraw of the existing flavorchart
     def updateFlavorchartValues(self) -> None:

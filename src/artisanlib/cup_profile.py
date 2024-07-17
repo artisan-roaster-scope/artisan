@@ -15,6 +15,7 @@
 # AUTHOR
 # Marko Luther, 2023
 
+import platform
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import MyQDoubleSpinBox
 
@@ -44,6 +45,12 @@ class flavorDlg(ArtisanResizeablDialog):
         flags = self.windowFlags()
         helpFlag = Qt.WindowType.WindowContextHelpButtonHint
         flags = flags & (~helpFlag)
+        if not platform.system().startswith('Windows'):
+            flags |= Qt.WindowType.Tool
+            flags |= Qt.WindowType.CustomizeWindowHint # needed to be able to customize the close/min/max controls (at least on macOS)
+            flags |= Qt.WindowType.WindowMinimizeButtonHint
+            flags |= Qt.WindowType.WindowCloseButtonHint # not needed on macOS, but maybe on Linux
+        self.setWindowFlag(Qt.WindowType.WindowMaximizeButtonHint, False)
         self.setWindowFlags(flags)
         self.setWindowTitle(QApplication.translate('Form Caption','Cup Profile'))
 
@@ -294,10 +301,11 @@ class flavorDlg(ArtisanResizeablDialog):
     @pyqtSlot(bool)
     def poplabel(self,_:bool = False) -> None:
         fn = len(self.aw.qmc.flavors)
-        self.aw.qmc.flavors = self.aw.qmc.flavors[:(fn-1)]
-        self.aw.qmc.flavorlabels = self.aw.qmc.flavorlabels[:(fn -1)]
-        self.createFlavorTable()
-        self.aw.qmc.flavorchart()
+        if fn>1:
+            self.aw.qmc.flavors = self.aw.qmc.flavors[:(fn-1)]
+            self.aw.qmc.flavorlabels = self.aw.qmc.flavorlabels[:(fn -1)]
+            self.createFlavorTable()
+            self.aw.qmc.flavorchart()
 
     @pyqtSlot('QCloseEvent')
     def closeEvent(self,_:Optional['QCloseEvent'] = None) -> None:

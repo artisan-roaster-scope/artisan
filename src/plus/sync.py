@@ -342,6 +342,22 @@ def diffCachedSyncRecord(roast_record:Optional[Dict[str, Any]]) -> Optional[Dict
                 # to sync back the local 0 value with the non-zero value
                 # currently on the server
                 res[key] = 0
+        # for items where we suppress fifty values we need to force the
+        # propagate of fifty in case on server there is no fifty
+        # established yet
+        for key in roast.sync_record_fifty_supressed_attributes:
+            if (
+                key in cached_sync_record
+                and cached_sync_record[key]
+                and key not in res
+                and key not in keys_with_equal_values
+            ):  # not if data is equal on both sides and thus the key got
+                # deleted from res in the step before
+                # we explicitly set the value of key to 0 despite it is
+                # part of the sync_record_fifty_supressed_attributes
+                # to sync back the local fifty value with the non-fifty value
+                # currently on the server
+                res[key] = 50
         # for items where we suppress empty string values we need to force
         # the propagate of empty strings in case on server there is no
         # zero established yet
@@ -439,22 +455,31 @@ def applyServerUpdates(data:Dict[str, Any]) -> None:
             if dirty:
                 # register new data
                 aw.qmc.weight = (win,wout,wunit)
-            if (
-                'batch_number' in data
-                and data['batch_number'] != aw.qmc.roastbatchnr
-            ):
-                aw.qmc.roastbatchnr = data['batch_number']
+            if 'batch_number' in data:
+                if data['batch_number'] != aw.qmc.roastbatchnr:
+                    aw.qmc.roastbatchnr = data['batch_number']
+                    dirty = True
+                    title_changed = True
+            elif aw.qmc.roastbatchnr != 0:
+                aw.qmc.roastbatchnr = 0
                 dirty = True
                 title_changed = True
-            if (
-                'batch_prefix' in data
-                and data['batch_prefix'] != aw.qmc.roastbatchprefix
-            ):
-                aw.qmc.roastbatchprefix = data['batch_prefix']
+            if 'batch_prefix' in data:
+                if data['batch_prefix'] != aw.qmc.roastbatchprefix:
+                    aw.qmc.roastbatchprefix = data['batch_prefix']
+                    dirty = True
+                    title_changed = True
+            elif aw.qmc.roastbatchprefix != '':
+                aw.qmc.roastbatchprefix = ''
                 dirty = True
                 title_changed = True
-            if 'batch_pos' in data and data['batch_pos'] != aw.qmc.roastbatchpos:
-                aw.qmc.roastbatchpos = data['batch_pos']
+            if 'batch_pos' in data:
+                if data['batch_pos'] != aw.qmc.roastbatchpos:
+                    aw.qmc.roastbatchpos = data['batch_pos']
+                    dirty = True
+                    title_changed = True
+            elif aw.qmc.roastbatchpos != 0:
+                aw.qmc.roastbatchpos = 0
                 dirty = True
                 title_changed = True
             if 'label' in data and data['label'] != aw.qmc.title:
@@ -534,65 +559,99 @@ def applyServerUpdates(data:Dict[str, Any]) -> None:
                 and aw.qmc.plus_store is not None
             ):
                 aw.qmc.plus_store = None
-
-            if (
-                'color_system' in data
-                and data['color_system']
-                != aw.qmc.color_systems[aw.qmc.color_system_idx]
-            ):
-                try:
-                    aw.qmc.color_system_idx = aw.qmc.color_systems.index(
-                        data['color_system']
-                    )
+            if 'color_system' in data:
+                if data['color_system'] != aw.qmc.color_systems[aw.qmc.color_system_idx]:
+                    try:
+                        aw.qmc.color_system_idx = aw.qmc.color_systems.index(
+                            data['color_system']
+                        )
+                        dirty = True
+                    except Exception as e:  # pylint: disable=broad-except
+                        # cloud color system not known by Artisan client
+                        _log.exception(e)
+            elif aw.qmc.color_system_idx != 0:
+                aw.qmc.color_system_idx = 0
+                dirty = True
+            if 'ground_color' in data:
+                if data['ground_color'] != aw.qmc.ground_color:
+                    aw.qmc.ground_color = int(round(float(data['ground_color'])))
                     dirty = True
-                except Exception as e:  # pylint: disable=broad-except
-                    # cloud color system not known by Artisan client
-                    _log.exception(e)
-            if (
-                'ground_color' in data
-                and data['ground_color'] != aw.qmc.ground_color
-            ):
-                aw.qmc.ground_color = int(round(float(data['ground_color'])))
+            elif aw.qmc.ground_color != 0:
+                aw.qmc.ground_color = 0
                 dirty = True
-            if 'whole_color' in data and data['whole_color'] != aw.qmc.whole_color:
-                aw.qmc.whole_color = int(round(float(data['whole_color'])))
+            if 'whole_color' in data:
+                if data['whole_color'] != aw.qmc.whole_color:
+                    aw.qmc.whole_color = int(round(float(data['whole_color'])))
+                    dirty = True
+            elif aw.qmc.whole_color != 0:
+                aw.qmc.whole_color = 0
                 dirty = True
-            if 'machine' in data and data['machine'] != aw.qmc.roastertype:
-                aw.qmc.roastertype = data['machine']
+            if 'machine' in data:
+                if data['machine'] != aw.qmc.roastertype:
+                    aw.qmc.roastertype = data['machine']
+                    dirty = True
+            elif aw.qmc.roastertype != '':
+                aw.qmc.roastertype = ''
                 dirty = True
-            if 'notes' in data and data['notes'] != aw.qmc.roastingnotes:
-                aw.qmc.roastingnotes = data['notes']
+            if 'notes' in data:
+                if data['notes'] != aw.qmc.roastingnotes:
+                    aw.qmc.roastingnotes = data['notes']
+                    dirty = True
+            elif aw.qmc.roastingnotes != '':
+                aw.qmc.roastingnotes = ''
                 dirty = True
-            if (
-                'density_roasted' in data
-                and data['density_roasted'] != aw.qmc.density_roasted[0]
-            ):
-                aw.qmc.density_roasted = (data['density_roasted'],aw.qmc.density_roasted[1],aw.qmc.density_roasted[2],aw.qmc.density_roasted[3])
+            if 'cupping_notes' in data:
+                if data['cupping_notes'] != aw.qmc.cuppingnotes:
+                    aw.qmc.cuppingnotes = data['cupping_notes']
+                    dirty = True
+            elif aw.qmc.cuppingnotes != '':
+                aw.qmc.cuppingnotes = ''
                 dirty = True
-            if (
-                'moisture' in data
-                and data['moisture'] != aw.qmc.moisture_roasted
-            ):
-                aw.qmc.moisture_roasted = data['moisture']
+            cupping_value = aw.qmc.calcFlavorChartScore()
+            if 'cupping_score' in data:
+                if data['cupping_score'] != cupping_value:
+                    aw.qmc.setFlavorChartScore(float(data['cupping_score']))
+                    dirty = True
+            elif cupping_value != 50: # NOTE: default value is 50 and not 0 as with other attributes
+                aw.qmc.setFlavorChartScore(50)
                 dirty = True
-            if 'temperature' in data and data['temperature'] != aw.qmc.ambientTemp:
-                aw.qmc.ambientTemp = data['temperature']
+            if 'density_roasted' in data:
+                if data['density_roasted'] != aw.qmc.density_roasted[0]:
+                    aw.qmc.density_roasted = (data['density_roasted'],aw.qmc.density_roasted[1],aw.qmc.density_roasted[2],aw.qmc.density_roasted[3])
+                    dirty = True
+            elif aw.qmc.density_roasted[0] != 0:
+                aw.qmc.density_roasted = (0,aw.qmc.density_roasted[1],aw.qmc.density_roasted[2],aw.qmc.density_roasted[3])
                 dirty = True
-            if 'pressure' in data and data['pressure'] != aw.qmc.ambient_pressure:
-                aw.qmc.ambient_pressure = data['pressure']
+            if 'moisture' in data:
+                if data['moisture'] != aw.qmc.moisture_roasted:
+                    aw.qmc.moisture_roasted = data['moisture']
+                    dirty = True
+            elif aw.qmc.moisture_roasted != 0:
+                aw.qmc.moisture_roasted = 0
                 dirty = True
-            if 'humidity' in data and data['humidity'] != aw.qmc.ambient_humidity:
-                aw.qmc.ambient_humidity = data['humidity']
-                dirty = True
-            if 'roastersize' in data and data['roastersize'] != aw.qmc.roastersize:
-                aw.qmc.roastersize = data['roastersize']
-                dirty = True
-            if (
-                'roasterheating' in data
-                and data['roasterheating'] != aw.qmc.roasterheating
-            ):
-                aw.qmc.roasterheating = data['roasterheating']
-                dirty = True
+# those attributes cannot be modified on the WebApp and are thus not forwarded from the server
+#            if 'temperature' in data:
+#                if data['temperature'] != aw.qmc.ambientTemp:
+#                    aw.qmc.ambientTemp = data['temperature']
+#                    dirty = True
+#            elif aw.qmc.ambientTemp != 0:
+#                aw.qmc.ambientTemp = 0
+#                dirty = True
+#            if 'pressure' in data and data['pressure'] != aw.qmc.ambient_pressure:
+#                aw.qmc.ambient_pressure = data['pressure']
+#                dirty = True
+#            if 'humidity' in data and data['humidity'] != aw.qmc.ambient_humidity:
+#                aw.qmc.ambient_humidity = data['humidity']
+#                dirty = True
+#            if 'roastersize' in data and data['roastersize'] != aw.qmc.roastersize:
+#                aw.qmc.roastersize = data['roastersize']
+#                dirty = True
+#            if (
+#                'roasterheating' in data
+#                and data['roasterheating'] != aw.qmc.roasterheating
+#            ):
+#                aw.qmc.roasterheating = data['roasterheating']
+#                dirty = True
             setSyncRecordHash()
             # here the sync record is taken form the profiles data after
             # application of the received server updates
@@ -606,13 +665,18 @@ def applyServerUpdates(data:Dict[str, Any]) -> None:
             if cached_sync_record is not None:
                 for key, value in cached_sync_record.items():
                     if key not in data:
-                        # we explicitly add the implicit null value (0 or "")
+                        # we explicitly add the implicit null value (0, 50 or "")
                         # for that key
                         if (
                             key in roast.sync_record_zero_supressed_attributes
                             and value != 0
                         ):
                             updated_record[key] = 0
+                        elif (
+                            key in roast.sync_record_fifty_supressed_attributes
+                            and value != 50
+                        ):
+                            updated_record[key] = 50
                         elif (
                             key in roast.sync_record_empty_string_supressed_attributes
                             and value != ''

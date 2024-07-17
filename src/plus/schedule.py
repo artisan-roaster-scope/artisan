@@ -70,7 +70,7 @@ from plus.util import datetime2epoch, epoch2datetime, schedulerLink, epoch2ISO86
 from plus.weight import Display, WeightManager, GreenWeightItem, RoastedWeightItem
 from artisanlib.widgets import ClickableQLabel, ClickableQLineEdit, Splitter
 from artisanlib.dialogs import ArtisanResizeablDialog
-from artisanlib.util import (convertWeight, weight_units, render_weight, comma2dot, float2floatWeightVolume, getDirectory)
+from artisanlib.util import (float2float, convertWeight, weight_units, render_weight, comma2dot, float2floatWeightVolume, getDirectory)
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -167,6 +167,8 @@ class CompletedItemDict(TypedDict):
     moisture: float  # in %
     density: float   # in g/l
     roastingnotes: str
+    cupping_score: float
+    cuppingnotes: str
 
 
 # ordered list of dict with the completed roasts data (latest roast first)
@@ -235,6 +237,8 @@ class CompletedItem(BaseModel):
     moisture: float # in %
     density: float  # in g/l
     roastingnotes: str = Field(default='')
+    cupping_score: float
+    cuppingnotes: str = Field(default='')
 
     @computed_field  # type:ignore[misc] # Decorators on top of @property are not supported
     @property
@@ -274,7 +278,7 @@ class CompletedItem(BaseModel):
 
 
     # updates this CompletedItem with the data given in profile_data
-    def update_completed_item(self, plus_account_id:Optional[str], profile_data:Dict[str, Any]) -> bool:
+    def update_completed_item(self, aw:'ApplicationWindow', profile_data:Dict[str, Any]) -> bool:
         updated:bool = False
         if 'batch_number' in profile_data:
             batch_number = int(profile_data['batch_number'])
@@ -336,12 +340,22 @@ class CompletedItem(BaseModel):
             if notes != self.roastingnotes:
                 updated = True
                 self.roastingnotes = notes
+        if 'cupping_score' in profile_data:
+            cupping_score = profile_data['cupping_score']
+            if cupping_score != self.cupping_score:
+                updated = True
+                self.cupping_score = cupping_score
+        if 'cupping_notes' in profile_data:
+            cupping_notes = str(profile_data['cupping_notes'])
+            if cupping_notes != self.cuppingnotes:
+                updated = True
+                self.cuppingnotes = cupping_notes
         if updated:
             # we update the completed_roasts_cache entry
             completed_item_dict = self.model_dump(mode='json')
             if 'prefix' in completed_item_dict:
                 del completed_item_dict['prefix']
-            add_completed(plus_account_id, cast(CompletedItemDict, completed_item_dict))
+            add_completed(aw.plus_account_id, cast(CompletedItemDict, completed_item_dict))
         return updated
 
 
@@ -745,6 +759,7 @@ class DragTargetIndicator(QFrame): # pyright: ignore[reportGeneralTypeIssues] # 
 
 class StandardItem(QFrame): # pyright: ignore[reportGeneralTypeIssues] # Argument to class must be a base class
 
+    clicked = pyqtSignal()
     selected = pyqtSignal()
     prepared = pyqtSignal()
 
@@ -807,9 +822,18 @@ class StandardItem(QFrame): # pyright: ignore[reportGeneralTypeIssues] # Argumen
         pass
 
 
+    def mousePressEvent(self, event:'Optional[QMouseEvent]') -> None:
+        if event is not None:
+            modifiers = QApplication.keyboardModifiers()
+            if modifiers == Qt.KeyboardModifier.AltModifier:  #alt click
+                self.clicked.emit()
+        super().mousePressEvent(event)
+
     def mouseReleaseEvent(self, event:'Optional[QMouseEvent]') -> None:
         if event is not None:
-            self.selected.emit()
+            modifiers = QApplication.keyboardModifiers()
+            if modifiers != Qt.KeyboardModifier.AltModifier:  #no alt click
+                self.selected.emit()
         super().mouseReleaseEvent(event)
 
 
@@ -1451,7 +1475,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
         self.roasted_color = QLineEdit()
         self.roasted_color.setToolTip(QApplication.translate('Label','Color'))
-        self.roasted_color.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 2, self.roasted_color))
+        self.roasted_color.setValidator(self.aw.createCLocaleDoubleValidator(0., 255., 2, self.roasted_color))
         self.roasted_color.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.roasted_color.editingFinished.connect(self.roasted_color_changed)
         roasted_color_suffix = QLabel(color_unit_str)
@@ -1461,7 +1485,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
         self.roasted_moisture = QLineEdit()
         self.roasted_moisture.setToolTip(QApplication.translate('Label','Moisture'))
-        self.roasted_moisture.setValidator(self.aw.createCLocaleDoubleValidator(0., 99., 1, self.roasted_moisture))
+        self.roasted_moisture.setValidator(self.aw.createCLocaleDoubleValidator(0., 100., 1, self.roasted_moisture))
         self.roasted_moisture.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.roasted_moisture.editingFinished.connect(self.roasted_moisture_changed)
 
@@ -1472,6 +1496,19 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
         self.roasted_notes = QPlainTextEdit()
         self.roasted_notes.setPlaceholderText(QApplication.translate('Label', 'Roasting Notes'))
+        self.roasted_notes.setToolTip(QApplication.translate('Label', 'Roasting Notes'))
+
+        self.cupping_score = QLineEdit()
+        self.cupping_score.setFixedWidth(42)
+        self.cupping_score.setPlaceholderText(QApplication.translate('Label', 'Score'))
+        self.cupping_score.setToolTip(QApplication.translate('Label','Cupping Score'))
+        self.cupping_score.setValidator(self.aw.createCLocaleDoubleValidator(0., 100., 2, self.cupping_score))
+        self.cupping_score.setAlignment(Qt.AlignmentFlag.AlignCenter) #Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+        self.cupping_score.editingFinished.connect(self.cupping_score_changed)
+
+        self.cupping_notes = QPlainTextEdit()
+        self.cupping_notes.setPlaceholderText(QApplication.translate('Label', 'Cupping Notes'))
+        self.cupping_notes.setToolTip(QApplication.translate('Label', 'Cupping Notes'))
 
         roasted_first_line_layout = QHBoxLayout()
         roasted_first_line_layout.setSpacing(0)
@@ -1503,6 +1540,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         lines:int = 2
         docMargin:float = 0
         lineSpacing:float = 1.5
+
         roasted_notes_doc:Optional[QTextDocument] = self.roasted_notes.document()
         if roasted_notes_doc is not None:
             docMargin = roasted_notes_doc.documentMargin()
@@ -1517,11 +1555,30 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.roasted_notes.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.roasted_notes.setContentsMargins(0, 0, 0, 0)
 
+        cupping_notes_doc:Optional[QTextDocument] = self.cupping_notes.document()
+        if cupping_notes_doc is not None:
+            docMargin = cupping_notes_doc.documentMargin()
+            font = cupping_notes_doc.defaultFont()
+            fontMetrics = QFontMetrics(font)
+            lineSpacing = fontMetrics.lineSpacing()
+        margins = self.cupping_notes.contentsMargins()
+        cupping_notes_hight:int = math.ceil(lineSpacing * lines +
+            (docMargin + self.cupping_notes.frameWidth()) * 2 + margins.top() + margins.bottom())
+        self.cupping_notes.setFixedHeight(cupping_notes_hight)
+        self.cupping_notes.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.cupping_notes.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.cupping_notes.setContentsMargins(0, 0, 0, 0)
+
+        cupping_layout = QHBoxLayout()
+        cupping_layout.addWidget(self.cupping_score)
+        cupping_layout.addWidget(self.cupping_notes)
 
         completed_details_layout = QVBoxLayout()
         completed_details_layout.addLayout(roasted_details_layout)
         completed_details_layout.addWidget(self.roasted_notes)
+        completed_details_layout.addLayout(cupping_layout)
         completed_details_layout.setContentsMargins(0, 0, 0, 0)
+        completed_details_layout.setSpacing(3)
         self.completed_details_group = QGroupBox(QApplication.translate('Label','Roasted'))
         self.completed_details_group.setLayout(completed_details_layout)
         self.completed_details_group.setEnabled(False)
@@ -1582,27 +1639,35 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         task_type_layout.addWidget(self.task_position)
         task_type_layout.addStretch()
         task_type_layout.addWidget(self.task_type)
+        task_type_layout.setSpacing(0)
+        task_type_layout.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom
 
         task_weight_layout = QHBoxLayout()
         task_weight_layout.addStretch()
         task_weight_layout.addWidget(self.task_weight)
         task_weight_layout.addStretch()
+        task_weight_layout.setSpacing(0)
+        task_weight_layout.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom
 
         task_title_layout = QHBoxLayout()
         task_title_layout.addWidget(self.task_title)
+        task_title_layout.setSpacing(0)
+        task_title_layout.setContentsMargins(0, 5, 5, 0) # left, top, right, bottom
 
         task_layout =  QVBoxLayout()
         task_layout.addLayout(task_type_layout)
         task_layout.addLayout(task_weight_layout)
         task_layout.addLayout(task_title_layout)
         task_layout.setSpacing(0)
+        task_layout.setContentsMargins(10, 5, 10, 15) # left, top, right, bottom
         self.task_frame = QFrame()
         self.task_frame.setLayout(task_layout)
         self.task_frame.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 
+
         task2_layout =  QVBoxLayout()
-        task2_layout.addSpacing(1) # ensures a minimum height to keep the handle movable
         task2_layout.addWidget(self.task_frame)
+        task2_layout.addSpacing(1) # ensures a minimum height to keep the handle movable
         task2_layout.setSpacing(0)
         task2_layout.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom
         self.task2_frame = QFrame()
@@ -1840,6 +1905,13 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
     def roasted_density_changed(self) -> None:
         self.roasted_density.setText(comma2dot(self.roasted_density.text()))
 
+    @pyqtSlot()
+    def cupping_score_changed(self) -> None:
+        if self.cupping_score.text() == '0':
+            self.cupping_score.setText('')
+        else:
+            self.cupping_score.setText(str(float2float(float(comma2dot(self.cupping_score.text())), 2)).rstrip('0').rstrip('.'))
+
 
     @pyqtSlot(int)
     def remainingFilterChanged(self, _:int = 0) -> None:
@@ -1900,7 +1972,11 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             elif k == 16777220:  # ENTER
                 active_tab = self.TabWidget.currentIndex()
                 if active_tab == 1 and self.selected_completed_item:
-                    self.selected_completed_item.selected.emit()
+                    modifiers = QApplication.keyboardModifiers()
+                    if modifiers == Qt.KeyboardModifier.AltModifier:  #alt click
+                        self.selected_completed_item.clicked.emit()
+                    else:
+                        self.selected_completed_item.selected.emit()
             else:
                 super().keyPressEvent(event)
 
@@ -2330,6 +2406,8 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             self.roasted_density.setText('')
             self.roasted_moisture.setText('')
             self.roasted_notes.setPlainText('')
+            self.cupping_score.setText('')
+            self.cupping_notes.setPlainText('')
             self.completed_details_group.setEnabled(False)
         else:
             data = item.data
@@ -2356,6 +2434,11 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             self.roasted_density.setText(f'{data.density:g}')
             self.roasted_moisture.setText(f'{data.moisture:g}')
             self.roasted_notes.setPlainText(data.roastingnotes)
+            if data.cupping_score == 50:
+                self.cupping_score.setText('')
+            else:
+                self.cupping_score.setText(str(float2float(data.cupping_score, 2)).rstrip('0').rstrip('.'))
+            self.cupping_notes.setPlainText(data.cuppingnotes)
             self.completed_details_group.setEnabled(True)
 
 
@@ -2389,6 +2472,12 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         current_notes = self.roasted_notes.toPlainText()
         if current_notes != data.roastingnotes:
             changes['notes'] = current_notes
+        current_cupping_score = (50 if self.cupping_score.text() == '' else float2float(float(self.cupping_score.text()), 2))
+        if current_cupping_score != data.cupping_score:
+            changes['cupping_score'] = current_cupping_score
+        current_cupping_notes = self.cupping_notes.toPlainText()
+        if current_cupping_notes != data.cuppingnotes:
+            changes['cupping_notes'] = current_cupping_notes
         return changes
 
 
@@ -2407,6 +2496,11 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             self.aw.qmc.moisture_roasted = ci.moisture
             self.aw.qmc.density_roasted = (ci.density, self.aw.qmc.density_roasted[1], self.aw.qmc.density_roasted[2], self.aw.qmc.density_roasted[3])
             self.aw.qmc.roastingnotes = ci.roastingnotes
+            cupping_value = self.aw.qmc.calcFlavorChartScore()
+            if ci.cupping_score != cupping_value:
+                # as cupping score is only computed from the single values we try to keep things as if the resuting score did not change
+                self.aw.qmc.setFlavorChartScore(ci.cupping_score)
+            self.aw.qmc.cuppingnotes = ci.cuppingnotes
             # not updated:
             #        roastbatchnr
             #        roastbatchprefix
@@ -2438,6 +2532,13 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         if ci.roastingnotes != self.aw.qmc.roastingnotes:
             ci.roastingnotes = self.aw.qmc.roastingnotes
             updated = True
+        cupping_value = self.aw.qmc.calcFlavorChartScore()
+        if ci.cupping_score != cupping_value:
+            ci.cupping_score = cupping_value
+            updated = True
+        if ci.cuppingnotes != self.aw.qmc.cuppingnotes:
+            ci.cuppingnotes = self.aw.qmc.cuppingnotes
+            updated = True
         # non_changeable attributes:
         if ci.roastbatchnr != self.aw.qmc.roastbatchnr:
             ci.roastbatchnr = self.aw.qmc.roastbatchnr
@@ -2468,6 +2569,24 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             add_completed(self.aw.plus_account_id, cast(CompletedItemDict, completed_item_dict))
         return updated
 
+
+    @pyqtSlot()
+    def completed_item_clicked(self) -> None:
+        sender = self.sender()
+        if not self.aw.qmc.flagon and sender is not None and isinstance(sender, NoDragItem):
+            # Artisan is OFF
+            # we try to load the clicked completed items profile if not yet loaded
+            sender_roastUUID = sender.data.roastUUID.hex
+            if sender_roastUUID != self.aw.qmc.roastUUID:
+                item_path = plus.register.getPath(sender_roastUUID)
+                if item_path is not None and os.path.isfile(item_path):
+                    try:
+#                        self.aw.loadFile(item_path)
+                        self.aw.loadFileSignal.emit(item_path)
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
+
+
     @pyqtSlot()
     def completed_items_selection_changed(self) -> None:
         sender = self.sender()
@@ -2485,12 +2604,13 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                         # first add essential metadata
                         changes['roast_id'] = self.selected_completed_item.data.roastUUID.hex
                         changes['modified_at'] = epoch2ISO8601(time.time())
+                        _log.info('PRINT changes: %s',changes)
                         try:
                             plus.controller.connect(clear_on_failure=False, interactive=False)
                             r = plus.connection.sendData(plus.config.roast_url, changes, 'POST')
                             r.raise_for_status()
                             # update successfully transmitted, we now also add/update the CompletedItem linked to self.selected_completed_item
-                            self.selected_completed_item.data.update_completed_item(self.aw.plus_account_id, changes)
+                            self.selected_completed_item.data.update_completed_item(self.aw, changes)
                             # if previous selected roast is loaded we write the changes to its roast properties
                             if self.selected_completed_item.data.roastUUID.hex == self.aw.qmc.roastUUID:
                                 self.updates_roast_properties_from_completed(self.selected_completed_item.data)
@@ -2516,9 +2636,10 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     else:
                         # fetch data if roast is participating in the sync record game
                         profile_data: Optional[Dict[str, Any]] = plus.sync.fetchServerUpdate(sender.data.roastUUID.hex, return_data = True)
+                        _log.info('PRINT profile_data recieved: %s',profile_data)
                         if profile_data is not None:
                             # update completed items data from received profile_data
-                            updated:bool = sender.data.update_completed_item(self.aw.plus_account_id, profile_data)
+                            updated:bool = sender.data.update_completed_item(self.aw, profile_data)
                             # on changes, update loaded profile if saved earlier
                             if (updated and self.aw.curFile is not None and sender.data.roastUUID.hex == self.aw.qmc.roastUUID and
                                     self.aw.qmc.plus_file_last_modified is not None and 'modified_at' in profile_data and
@@ -2538,6 +2659,9 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                                 self.roasted_density.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
                                 self.roasted_moisture.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
                                 self.roasted_notes.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+                                self.roasted_moisture.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+                                self.cupping_score.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+                                self.cupping_notes.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
                                 if not self.completed_details_scrollarea.isVisible():
                                     self.completed_details_scrollarea.show()
                                     self.update()
@@ -2573,8 +2697,11 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     self.roasted_density.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                     self.roasted_moisture.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                     self.roasted_notes.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+                    self.cupping_score.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+                    self.cupping_notes.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                     if self.completed_details_scrollarea.isVisible():
                         self.completed_details_scrollarea.hide()
+            # NOTE: this branch is not reached any longer as if not connected to artisan.plus, the schedule window remains empty with a note
             elif not self.aw.qmc.flagon:
                 # plus controller is not on and Artisan is OFF we first close a potentially pending edit section and then try to load that profile
                 if self.selected_completed_item is not None:
@@ -2593,6 +2720,8 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     self.roasted_density.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                     self.roasted_moisture.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                     self.roasted_notes.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+                    self.cupping_score.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+                    self.cupping_notes.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                     if self.completed_details_scrollarea.isVisible():
                         self.completed_details_scrollarea.hide()
                 # we try to load the clicked completed items profile if not yet loaded
@@ -2618,6 +2747,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             nodrag_first_labels.append(nodrag_first_label)
             nodrag_items_first_label_max_width = max(nodrag_items_first_label_max_width, nodrag_first_label.sizeHint().width())
             # connect the selection signal
+            nodrag_item.clicked.connect(self.completed_item_clicked)
             nodrag_item.selected.connect(self.completed_items_selection_changed)
             # append item to list
             self.nodrag_roasted.add_item(nodrag_item)
@@ -2796,7 +2926,9 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     'color': self.aw.qmc.ground_color,
                     'moisture': self.aw.qmc.moisture_roasted,
                     'density': self.aw.qmc.density_roasted[0],
-                    'roastingnotes': self.aw.qmc.roastingnotes
+                    'roastingnotes': self.aw.qmc.roastingnotes,
+                    'cupping_score': self.aw.qmc.calcFlavorChartScore(),
+                    'cuppingnotes': self.aw.qmc.cuppingnotes
                 }
                 add_completed(self.aw.plus_account_id, completed_item)
                 # update schedule, removing completed items and selecting the next one

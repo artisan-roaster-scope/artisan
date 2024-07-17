@@ -1881,7 +1881,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.bbp_bottom_to_charge_ror: float = -1
         # BBP Data
         self.bbp_time_added_from_prev: float = 0
-        self.bbp_begin: str = "Start"  #Start|DROP
+        self.bbp_begin: str = 'Start'  #Start|DROP
         self.bbp_endroast_epoch_msec: int = 0
         self.bbp_endevents: List[List[Optional[float]]] = []
         self.bbp_dropevents: List[List[Optional[float]]] = []
@@ -2598,9 +2598,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.scheduleAction.triggered.connect(self.schedule)
             self.scheduleAction.setCheckable(True)
             self.scheduleAction.setChecked(False)
-#SCHEDULER:
             self.viewMenu.addSeparator()
             self.viewMenu.addAction(self.scheduleAction)
+            if self.app.artisanviewerMode:
+                self.scheduleAction.setEnabled(False) # no scheduler in ArtisanViewer mode
 
             self.viewMenu.addSeparator()
 
@@ -12377,6 +12378,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     #loads stored profiles. Called from file menu
     def loadFile(self, filename:str, quiet:bool = False) -> None:
+        if self.comparator is not None or self.qmc.designerflag or self.qmc.wheelflag or self.qmc.ax is None:
+            # only load a profile if not in Comparator/Designer/WheelChart/FlavorChart mode
+            return
         f = QFile(filename)
         try:
             if self.qmc.clearBgbeforeprofileload:
@@ -12766,6 +12770,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     # tries to load background from the given path, if that fails try to deref the given UUID
     # returns True on success, Fail otherwise
     def loadbackgroundUUID(self, filename:Optional[str] = None, UUID:Optional[str] = None, force_reload:bool=True) -> bool:
+        if self.comparator is not None or self.qmc.designerflag or self.qmc.wheelflag or self.qmc.ax is None:
+            # only load a background profile if not in Comparator/Designer/WheelChart/FlavorChart mode
+            return False
         if filename is not None and filename != '' and os.path.isfile(filename) and (force_reload or str(filename) != self.qmc.backgroundpath):
             try:
                 self.loadbackground(filename)
@@ -15375,7 +15382,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.bbp_begin_to_bottom_ror = -1
         self.bbp_bottom_to_charge_ror = -1
         self.bbp_time_added_from_prev = 0
-        self.bbp_begin = "Start"
+        self.bbp_begin = 'Start'
         self.bbp_endroast_epoch_msec = 0
         self.bbp_endevents = []
         self.bbp_dropevents = []
@@ -15397,7 +15404,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 # did the prev roast end shortly before this roast began?  If not clear bbpCache
                 if bbpGap < maxAllowedTime_fromPrevEnd_toStart:
                     self.bbp_time_added_from_prev = bbpGap + self.qmc.bbpCache['drop_to_end']
-                    self.bbp_begin = "DROP"
+                    self.bbp_begin = 'DROP'
                     self.bbp_dropbt = self.qmc.bbpCache['drop_bt']
                     self.bbp_dropet = self.qmc.bbpCache['drop_et']
                     self.bbp_endroast_epoch_msec = self.qmc.bbpCache['end_roastepoch_msec']
@@ -23370,11 +23377,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     @pyqtSlot(bool)
     def schedule(self, _:bool = False) -> None:
         if self.schedule_window is None:
-            self.schedule_window = plus.schedule.ScheduleWindow(self, self, self.schedule_activeTab)
-            if self.schedule_window is not None:
-                self.scheduleFlag = True
-                self.scheduleAction.setChecked(True)
-                self.schedule_window.show()
+            if  not self.app.artisanviewerMode:  # no scheduler in ArtisanViewer mode
+                self.schedule_window = plus.schedule.ScheduleWindow(self, self, self.schedule_activeTab)
+                if self.schedule_window is not None:
+                    self.scheduleFlag = True
+                    self.scheduleAction.setChecked(True)
+                    self.schedule_window.show()
         else:
             self.schedule_window.close()
             self.schedule_window = None

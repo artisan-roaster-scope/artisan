@@ -1684,7 +1684,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     def defineBatchEditor(self) -> None:
         self.batchprefixedit = QLineEdit(self.aw.qmc.roastbatchprefix)
         self.batchcounterSpinBox = QSpinBox()
-        self.batchcounterSpinBox.setRange(0,999999)
+        self.batchcounterSpinBox.setRange(0,65534)
         self.batchcounterSpinBox.setSingleStep(1)
         self.batchcounterSpinBox.setValue(int(self.aw.qmc.roastbatchnr))
         self.batchcounterSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
@@ -4985,13 +4985,16 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.density_roasted = (dr0, 'g', 1, 'l')
         #update bean size
         try:
-            self.aw.qmc.beansize_min = int(self.bean_size_min_edit.text())
+            self.aw.qmc.beansize_min = max(0, min(30, int(self.bean_size_min_edit.text())))
         except Exception: # pylint: disable=broad-except
             self.aw.qmc.beansize_min = 0
         try:
-            self.aw.qmc.beansize_max = int(self.bean_size_max_edit.text())
+            self.aw.qmc.beansize_max = max(0, min(30, int(self.bean_size_max_edit.text())))
         except Exception: # pylint: disable=broad-except
             self.aw.qmc.beansize_max = 0
+        if self.aw.qmc.beansize_min > self.aw.qmc.beansize_max:
+            # swap order if needed
+            self.aw.qmc.beansize_min, self.aw.qmc.beansize_max = self.aw.qmc.beansize_max, self.aw.qmc.beansize_min
         #update roastflags
         self.aw.qmc.heavyFC_flag = self.heavyFC.isChecked()
         self.aw.qmc.lowFC_flag = self.lowFC.isChecked()

@@ -26,7 +26,7 @@ from plus import config, util, stock
 import hashlib
 import logging
 
-from typing import Final, Any, Optional, Dict, List, Tuple, TYPE_CHECKING  #for Python >= 3.9: can remove 'List', 'Dict' and 'Tuple' since type hints can use the generic 'list', 'dict' and 'tuple'
+from typing import Final, Any, Optional, Dict, List, Tuple, Union, TYPE_CHECKING  #for Python >= 3.9: can remove 'List', 'Dict' and 'Tuple' since type hints can use the generic 'list', 'dict' and 'tuple'
 
 
 if TYPE_CHECKING:
@@ -371,6 +371,21 @@ def getRoast() -> Dict[str, Any]:  #for Python >= 3.9 can replace 'Dict' with th
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
 
+        try:
+            util.addString2dict(p, 'cuppingnotes', d, 'cupping_notes', 1023)
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
+
+        try:
+            if 'flavors' in p:
+                cupping_value:Optional[Union[float, int]] = aw.qmc.calcFlavorChartScoreFromFlavors(p['flavors'])
+                cupping_value = util.float2floatMin(cupping_value, 2)
+                if cupping_value != 50:
+                    # a cupping_value of 50 is dropped as this is the default
+                    d['cupping_score'] = cupping_value
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
+
         if aw.qmc.backgroundprofile:
             bp = aw.qmc.backgroundprofile
             template = getTemplate(bp,background=True)
@@ -429,6 +444,12 @@ sync_record_zero_supressed_attributes: List[str] = [  #for Python >= 3.9 can rep
     'CO2_batch',
 ]
 
+# the following data items are suppressed from the roast record if they have a value of 50
+# to avoid sending just tags with this default value:
+sync_record_fifty_supressed_attributes: List[str] = [  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
+    'cupping_score',
+]
+
 # the following data items are suppressed from the roast record if they hold the empty string
 # to avoid sending just tags with empty strings:
 sync_record_empty_string_supressed_attributes: List[str] = [  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
@@ -437,6 +458,7 @@ sync_record_empty_string_supressed_attributes: List[str] = [  #for Python >= 3.9
     'color_system',
     'machine',
     'notes',
+    'cupping_notes',
 ]
 
 sync_record_non_supressed_attributes: List[str] = [  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
@@ -452,6 +474,7 @@ sync_record_non_supressed_attributes: List[str] = [  #for Python >= 3.9 can repl
 sync_record_attributes: List[str] = (  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
     sync_record_non_supressed_attributes
     + sync_record_zero_supressed_attributes
+    + sync_record_fifty_supressed_attributes
     + sync_record_empty_string_supressed_attributes
 )
 
