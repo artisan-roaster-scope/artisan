@@ -251,10 +251,10 @@ cached_sync_record:Optional[Dict[str,Any]] = None  # the actual sync record the 
 # to the current sync record and send only those in updates
 
 
-# called before local edits can start to remember the original state of
+# called before local edits can start, to remember the original state of
 # the sync record
 # if provided, roast_record is assumed to be a full roast record as provided by
-# roast.getRoast() and h its hash, otherwise the roast record is taken from the current data
+# roast.getRoast() and h its hash, otherwise the roast record is taken from the current data (not surpressing any default zero values like 0, '', 50)
 def setSyncRecordHash(sync_record:Optional[Dict[str, Any]] = None, h:Optional[str] = None) -> None:
     # pylint: disable=global-statement
     global cached_sync_record_hash, cached_sync_record
@@ -308,11 +308,25 @@ def syncRecordUpdated(roast_record:Optional[Dict[str, Any]] = None) -> bool:
             sync_record_semaphore.release(1)
 
 
+# replaces zero values like 0 and '' by None for attributes enabled for supression to save data space on server
+def surpress_zero_values(roast_record:Dict[str, Any]) -> Dict[str, Any]:
+    for key in roast.sync_record_zero_supressed_attributes:
+        if key in roast_record and roast_record[key] == 0:
+            roast_record[key] = None
+    for key in roast.sync_record_fifty_supressed_attributes:
+        if key in roast_record and roast_record[key] == 50:
+            roast_record[key] = None
+    for key in roast.sync_record_empty_string_supressed_attributes:
+        if key in roast_record and roast_record[key] == '':
+            roast_record[key] = None
+    return roast_record
+
+
 # returns the roast_record with all attributes, but for the roast_id, with
-# the same value as in the current cached_sync_record removed
+# the attributes holding the same values as in the current cached_sync_record removed
 # the result is the roast_record with all unchanged attributes, which do not
 # need to synced on updates, removed
-def diffCachedSyncRecord(roast_record:Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+def diffCachedSyncRecord(roast_record:Dict[str, Any]) -> Dict[str, Any]:
     try:
         _log.debug('diffCachedSyncRecord()')
         sync_record_semaphore.acquire(1)
@@ -326,6 +340,7 @@ def diffCachedSyncRecord(roast_record:Optional[Dict[str, Any]]) -> Optional[Dict
             if key != 'roast_id' and key in res and res[key] == value:
                 del res[key]
                 keys_with_equal_values.append(key)
+        # NOTE: the cached_sync_record does not contain null values like 0 and '' as those might have been surpressed
         # for items where we suppress zero values we need to force the
         # propagate of zeros in case on server there is no zero
         # established yet
@@ -430,6 +445,20 @@ def applyServerUpdates(data:Dict[str, Any]) -> None:
         _log.debug('-> apply: %s', data)
 
         if aw is not None:
+
+            # add to transmitted zero/null values
+            for key in roast.sync_record_zero_supressed_attributes_synced:
+                # NOTE that the attributes in sync_record_zero_supressed_attributes_unsynced are NOT added here with defaults as those are never returned from the server (unsynced)
+                if key not in data:
+                    data[key] = 0
+            for key in roast.sync_record_fifty_supressed_attributes:
+                if key not in data:
+                    data[key] = 50
+            for key in roast.sync_record_empty_string_supressed_attributes:
+                if key not in data:
+                    data[key] = ''
+#            _log.debug('-> apply data with reconstructed suppressed null values: %s', data)
+
             win:float = aw.qmc.weight[0]
             wout:float = aw.qmc.weight[1]
             wunit:str = aw.qmc.weight[2]
@@ -629,68 +658,15 @@ def applyServerUpdates(data:Dict[str, Any]) -> None:
             elif aw.qmc.moisture_roasted != 0:
                 aw.qmc.moisture_roasted = 0
                 dirty = True
-# those attributes cannot be modified on the WebApp and are thus not forwarded from the server
-#            if 'temperature' in data:
-#                if data['temperature'] != aw.qmc.ambientTemp:
-#                    aw.qmc.ambientTemp = data['temperature']
-#                    dirty = True
-#            elif aw.qmc.ambientTemp != 0:
-#                aw.qmc.ambientTemp = 0
-#                dirty = True
-#            if 'pressure' in data and data['pressure'] != aw.qmc.ambient_pressure:
-#                aw.qmc.ambient_pressure = data['pressure']
-#                dirty = True
-#            if 'humidity' in data and data['humidity'] != aw.qmc.ambient_humidity:
-#                aw.qmc.ambient_humidity = data['humidity']
-#                dirty = True
-#            if 'roastersize' in data and data['roastersize'] != aw.qmc.roastersize:
-#                aw.qmc.roastersize = data['roastersize']
-#                dirty = True
-#            if (
-#                'roasterheating' in data
-#                and data['roasterheating'] != aw.qmc.roasterheating
-#            ):
-#                aw.qmc.roasterheating = data['roasterheating']
-#                dirty = True
+# NOTE: all attributes in roast.sync_record_zero_supressed_attributes_unsynced are not send back from the server and thus not synced bi-directional
+            # we exclude the following attributes in roast.sync_record_zero_supressed_attributes_unsynced from the syncing as those are computed and
+            # cannot set directly by the user
+            # On syncing two Artisan versions with the same over the server, the readings generate those values cannot be updated
+            # as a consequence those attribtues are only set once on initially sending a roast record and never upated
+
             setSyncRecordHash()
-            # here the sync record is taken form the profiles data after
+            # here the set sync record is taken form the profiles data after
             # application of the received server updates
-            # Note that this sync record does not contain null values not
-            # transferred for attributes from the server side.
-            # To fix this, we will update that sync record with all attributes not
-            # in the server data set to null values
-            # this forces those non-null values from the profile to be transmitted
-            # to the server on next sync
-            updated_record:Dict[str, Any] = {}
-            if cached_sync_record is not None:
-                for key, value in cached_sync_record.items():
-                    if key not in data:
-                        # we explicitly add the implicit null value (0, 50 or "")
-                        # for that key
-                        if (
-                            key in roast.sync_record_zero_supressed_attributes
-                            and value != 0
-                        ):
-                            updated_record[key] = 0
-                        elif (
-                            key in roast.sync_record_fifty_supressed_attributes
-                            and value != 50
-                        ):
-                            updated_record[key] = 50
-                        elif (
-                            key in roast.sync_record_empty_string_supressed_attributes
-                            and value != ''
-                        ):
-                            updated_record[key] = ''
-                    else:
-                        updated_record[key] = value
-            (
-                cached_sync_record_updated,
-                cached_sync_record_hash_updated,
-            ) = roast.getSyncRecord(updated_record)
-            setSyncRecordHash(
-                cached_sync_record_updated, cached_sync_record_hash_updated
-            )
 
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
@@ -792,6 +768,7 @@ def fetchServerUpdate(uuid: str, file:Optional[str]=None, return_data:bool = Fal
                 'fetchServerUpdate() -> 200 data on server is newer'
             )
             data = res.json()
+#            _log.info("PRINT data received: %s",data)
             util.updateLimitsFromResponse(data) # update account limits
             if 'result' in data:
                 r:Dict[str, Any] = data['result']
@@ -875,7 +852,6 @@ def getUpdate(uuid: Optional[str], file:Optional[str]=None) -> None:
                 _log.exception(e)
 
 # Sync Action as issued on profile load and turning plus on
-
 @pyqtSlot()
 def sync() -> None:
     try:

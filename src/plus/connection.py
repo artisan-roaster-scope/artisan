@@ -434,7 +434,7 @@ def getData(url: str, authorized: bool = True, params:Optional[Dict[str,str]]=No
         timeout=(config.connect_timeout, config.read_timeout),
     )
     _log.debug('-> status %s', r.status_code)
-    #    _log.debug("-> headers %s",r.headers)
+    # _log.debug("-> headers %s",r.headers)
     _log.debug('-> time %s', r.elapsed.total_seconds())
     if authorized and r.status_code == 401:  # authorisation failed
         _log.debug(

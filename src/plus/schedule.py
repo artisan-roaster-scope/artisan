@@ -278,6 +278,7 @@ class CompletedItem(BaseModel):
 
 
     # updates this CompletedItem with the data given in profile_data
+    # NOTE: values in profile_data may be None here as those are produced by changes()
     def update_completed_item(self, aw:'ApplicationWindow', profile_data:Dict[str, Any]) -> bool:
         updated:bool = False
         if 'batch_number' in profile_data:
@@ -321,32 +322,32 @@ class CompletedItem(BaseModel):
                 updated = True
                 self.weight = end_weight
         if 'ground_color' in profile_data:
-            ground_color = int(float(round(profile_data['ground_color'])))
+            ground_color = (0 if profile_data['ground_color'] is None else int(float(round(profile_data['ground_color']))))
             if ground_color != self.color:
                 updated = True
                 self.color = ground_color
         if 'density_roasted' in profile_data:
-            density_roasted = float(profile_data['density_roasted'])
+            density_roasted = (0 if profile_data['density_roasted'] is None else float(profile_data['density_roasted']))
             if density_roasted != self.density:
                 updated = True
                 self.density = density_roasted
         if 'moisture' in profile_data:
-            moisture = float(profile_data['moisture'])
+            moisture = (0 if profile_data['moisture'] is None else float(profile_data['moisture']))
             if moisture != self.moisture:
                 updated = True
                 self.moisture = moisture
         if 'notes' in profile_data:
-            notes = str(profile_data['notes'])
+            notes = ('' if profile_data['notes'] is None else str(profile_data['notes']).strip())
             if notes != self.roastingnotes:
                 updated = True
                 self.roastingnotes = notes
         if 'cupping_score' in profile_data:
-            cupping_score = profile_data['cupping_score']
+            cupping_score = (50 if profile_data['cupping_score'] is None else float2float(profile_data['cupping_score'], 2))
             if cupping_score != self.cupping_score:
                 updated = True
                 self.cupping_score = cupping_score
         if 'cupping_notes' in profile_data:
-            cupping_notes = str(profile_data['cupping_notes'])
+            cupping_notes = ('' if profile_data['cupping_notes'] is None else str(profile_data['cupping_notes']).strip())
             if cupping_notes != self.cuppingnotes:
                 updated = True
                 self.cuppingnotes = cupping_notes
@@ -2444,6 +2445,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
     # computes the difference between the UI NoDragItem and the linked CompletedItem
     # and returns only changed attributes as partial sync_record (lacking the roast_id)
+    # NOTE: resulting dict values may be None to represent default values (removing corresponding data item on the server)
     def changes(self, item:NoDragItem) -> Dict[str, Any]:
         data = item.data
         changes:Dict[str, Any] = {}
@@ -2462,22 +2464,40 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             pass
         current_roasted_color = int(round(float(self.roasted_color.text())))
         if current_roasted_color != data.color:
-            changes['ground_color'] = current_roasted_color
+            if current_roasted_color == 0:
+                changes['ground_color'] = None # remove entry on server as this is the default value
+            else:
+                changes['ground_color'] = current_roasted_color
         current_roasted_density = float(self.roasted_density.text())
         if current_roasted_density != data.density:
-            changes['density_roasted'] = current_roasted_density
+            if current_roasted_density == 0:
+                changes['density_roasted'] = None # remove entry on server as this is the default value
+            else:
+                changes['density_roasted'] = current_roasted_density
         current_roasted_moisture = float(self.roasted_moisture.text())
         if current_roasted_moisture != data.moisture:
-            changes['moisture'] = current_roasted_moisture
-        current_notes = self.roasted_notes.toPlainText()
+            if current_roasted_moisture == 0:
+                changes['moisture'] = None # remove entry on server as this is the default value
+            else:
+                changes['moisture'] = current_roasted_moisture
+        current_notes = self.roasted_notes.toPlainText().strip()
         if current_notes != data.roastingnotes:
-            changes['notes'] = current_notes
+            if current_notes == '':
+                changes['notes'] = None # remove entry on server as this is the default value
+            else:
+                changes['notes'] = current_notes
         current_cupping_score = (50 if self.cupping_score.text() == '' else float2float(float(self.cupping_score.text()), 2))
         if current_cupping_score != data.cupping_score:
-            changes['cupping_score'] = current_cupping_score
-        current_cupping_notes = self.cupping_notes.toPlainText()
+            if current_cupping_score == 50:
+                changes['cupping_score'] = None # remove entry on server as this is the default value
+            else:
+                changes['cupping_score'] = current_cupping_score
+        current_cupping_notes = self.cupping_notes.toPlainText().strip()
         if current_cupping_notes != data.cuppingnotes:
-            changes['cupping_notes'] = current_cupping_notes
+            if current_cupping_notes == '':
+                changes['cupping_notes'] = None # remove entry on server as this is the default value
+            else:
+                changes['cupping_notes'] = current_cupping_notes
         return changes
 
 
@@ -2606,6 +2626,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                         changes['modified_at'] = epoch2ISO8601(time.time())
                         try:
                             plus.controller.connect(clear_on_failure=False, interactive=False)
+#                            _log.info("PRINT change record: %s", changes)
                             r = plus.connection.sendData(plus.config.roast_url, changes, 'POST')
                             r.raise_for_status()
                             # update successfully transmitted, we now also add/update the CompletedItem linked to self.selected_completed_item

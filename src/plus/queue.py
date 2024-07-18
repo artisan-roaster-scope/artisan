@@ -395,27 +395,24 @@ def addRoast(roast_record:Optional[Dict[str, Any]] = None) -> None:
                         'Queuing roast for upload to artisan.plus'
                     )
                 )  # @UndefinedVariable
-                rr: Optional[Dict[str, Any]]
+                rr: Dict[str, Any]
                 if roast_record is not None:
                     # on updates only changed attributes w.r.t. the current
                     # cached sync record are uploaded
                     rr = sync.diffCachedSyncRecord(r)
                 else:
                     rr = r
-                if rr is not None:
-                    queue.put(
-                        {'url': config.roast_url, 'data': rr, 'verb': 'POST'},
-                        # timeout=config.queue_put_timeout
-                        # sql queue does not feature a timeout
-                    )
-                    _log.debug('-> roast queued up')
-                    if 'roast_id' in rr:
-                        _log.info('roast queued: %s', rr['roast_id'])
-                    _log.debug('-> qsize: %s', queue.qsize())
-                else:
-                    _log.debug(
-                        '-> roast not queued as mandatory info missing'
-                    )
+                # send zero values like 0 and '' for corresponding attributes as None to allow the server to clean those up
+                rr = sync.surpress_zero_values(rr)
+                queue.put(
+                    {'url': config.roast_url, 'data': rr, 'verb': 'POST'},
+                    # timeout=config.queue_put_timeout
+                    # sql queue does not feature a timeout
+                )
+                _log.debug('-> roast queued up')
+                if 'roast_id' in rr:
+                    _log.info('roast queued: %s', rr['roast_id'])
+                _log.debug('-> qsize: %s', queue.qsize())
             else:
                 _log.debug(
                     '-> roast not queued as mandatory info missing'

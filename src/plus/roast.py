@@ -261,6 +261,7 @@ def trimBlendSpec(blend_spec:stock.Blend) -> Optional[stock.Blend]:
         return None
 
 
+# the resulting dictionary returned by getRoast() does not contain null values like 0 or '' as those are supressed
 def getRoast() -> Dict[str, Any]:  #for Python >= 3.9 can replace 'Dict' with the generic type hint 'dict'
     d = {}
     try:
@@ -410,20 +411,34 @@ def getRoast() -> Dict[str, Any]:  #for Python >= 3.9 can replace 'Dict' with th
 # the client and the server)
 
 # the following data items are suppressed from the roast record if they have 0
-# values to avoid sending just tags with zeros:
-sync_record_zero_supressed_attributes: List[str] = [  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
+# values to avoid sending just tags with zeros. Those come in two sets, the first one
+# (sync_record_zero_supressed_attributes_synced) is the regular one which is
+# synced both directions with the server, the second one (sync_record_zero_supressed_attributes_unsynced)
+# are only send to the server (as those are computed values) , but never
+# received and thus not synced between clients.
+
+sync_record_zero_supressed_attributes_synced: List[str] = [  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
     'density_roasted',
     'batch_number',
     'batch_pos',
     'whole_color',
     'ground_color',
     'moisture',
+]
+
+# the following attributes are send on changes from Artisan to the server, but the server never sends those back
+# in response on aroast requests. Thus synchornization of those is one-way only and those are not synced between
+# two Artisan clients.
+sync_record_zero_supressed_attributes_unsynced: List[str] = [  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
+    # ambient information can edited in Artisan.
+    # It cannot be edited in the WebApp, but it is displayed as part of a roast chart on artisan.plus
+    #
     'temperature',
     'pressure',
     'humidity',
     'roastersize',
-    'roasterheating',
-    # ENERGY DATA
+    'roasterheating'
+    # computed ENERGY DATA
     # energy consumption by source type in BTU
     'BTU_ELEC',
     'BTU_LPG',
@@ -443,6 +458,8 @@ sync_record_zero_supressed_attributes: List[str] = [  #for Python >= 3.9 can rep
     # total CO2 production per batch
     'CO2_batch',
 ]
+
+sync_record_zero_supressed_attributes: List[str] = sync_record_zero_supressed_attributes_synced + sync_record_zero_supressed_attributes_unsynced
 
 # the following data items are suppressed from the roast record if they have a value of 50
 # to avoid sending just tags with this default value:
@@ -481,9 +498,9 @@ sync_record_attributes: List[str] = (  #for Python >= 3.9 can replace 'List' wit
 
 # returns the current plus record and a hash over the plus record
 # if applied, r is assumed to contain the complete roast data as returned
-# by roast.getRoast()
+# by roast.getRoast() # NOTE: this dict has zero values like 0 or '' surpressed
 def getSyncRecord(r: Optional[Dict[str, Any]] = None) -> Tuple[Dict[str, Any], str]:  #for Python >= 3.9 can replace 'Dict' and 'Tuple' with the generic type hints 'dict' and 'tuple'
-    _log.debug('getSyncRecord()')
+    _log.debug('getSyncRecord(%s)', r)
     m = hashlib.sha256()
     d: Dict[str, Any] = {}
     try:
