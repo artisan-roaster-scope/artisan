@@ -25798,7 +25798,7 @@ def qt_message_handler(mode:QtMsgType, context:'QMessageLogContext', message:Opt
 def initialize_locale(my_app:Artisan) -> str:
     if QSettings().contains('resetqsettings') and not toInt(QSettings().value('resetqsettings')):
         locale = toString(QSettings().value('locale'))
-        if locale is None or locale == 'en_US' or locale == 'None':
+        if locale in {'en_US', 'None'}:
             locale = 'en'
     else:
         locale = ''

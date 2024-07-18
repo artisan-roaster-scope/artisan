@@ -6815,7 +6815,7 @@ class scaleport(extraserialport):
     def readWeight(self, scale_weight:Optional[float]=None) -> Tuple[float,float,float]:
         if scale_weight is not None:
             return scale_weight,-1,-1
-        if self.device is not None and self.device != 'None' and self.device != '' and self.device != 'acaia':
+        if self.device is not None and self.device not in {'None', '', 'acaia'}:
             device_fct = self.devicefunctionlist[self.device]
             if device_fct is not None:
                 wei,den,moi = device_fct()
@@ -6923,7 +6923,7 @@ class colorport(extraserialport):
 
     # returns color as int or -1 if something went wrong
     def readColor(self) -> int:
-        if self.device is not None and self.device != 'None' and self.device != '':
+        if self.device is not None and self.device not in {'None', ''}:
             device_fct = self.devicefunctionlist[self.device]
             if device_fct is not None:
                 return int(round(device_fct()[0]))

@@ -12,7 +12,7 @@ types-urllib3>=1.26.25.14
 lxml-stubs>=0.5.1
 mypy==1.10.1
 pyright==1.1.372
-ruff>=0.5.2
+ruff>=0.5.3
 pylint==3.2.5
 pre-commit>=3.7.0
 pytest>=8.2.2

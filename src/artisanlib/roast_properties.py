@@ -89,7 +89,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Volume Calculator'))
 
-        if self.aw.scale.device is not None and self.aw.scale.device != '' and self.aw.scale.device != 'None':
+        if self.aw.scale.device is not None and self.aw.scale.device not in {'', 'None'}:
             self.scale_connected = True
         else:
             self.scale_connected = False
@@ -1341,7 +1341,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         propGrid.setColumnStretch(5,10)
 
-        if self.aw.scale.device is not None and self.aw.scale.device != '' and self.aw.scale.device != 'None':
+        if self.aw.scale.device is not None and self.aw.scale.device not in {'', 'None'}:
             propGrid.addWidget(self.tareComboBox,1,7)
             propGrid.addLayout(inButtonLayout,1,8)
             propGrid.addLayout(outButtonLayout,1,9)
@@ -1423,7 +1423,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         if self.aw.color.device is not None and self.aw.color.device != '' and self.aw.color.device not in ['None','Tiny Tonino', 'Classic Tonino']:
             propGrid.addWidget(scanWholeButton,8,6)
-        if self.aw.color.device is not None and self.aw.color.device != '' and self.aw.color.device != 'None':
+        if self.aw.color.device not in (None, '', 'None'):
             propGrid.addWidget(scanGroundButton,8,7)
 
         propGrid.addWidget(ambientSourceLabel,8,8,1,2,Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignBottom)
@@ -2616,7 +2616,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             if event.matches(QKeySequence.StandardKey.Copy) and self.TabWidget.currentIndex() == 3: # datatable
                 self.aw.copy_cells_to_clipboard(self.datatable,adjustment=1)
                 self.aw.sendmessage(QApplication.translate('Message','Data table copied to clipboard'))
-            if key == 16777220 and self.aw.scale.device is not None and self.aw.scale.device != '' and self.aw.scale.device != 'None': # ENTER key pressed and scale connected
+            if key == 16777220 and self.aw.scale.device not in (None, '', 'None'): # ENTER key pressed and scale connected
                 if self.weightinedit.hasFocus():
                     self.inWeight(True,overwrite=True) # we don't add to current reading but overwrite
                 elif self.weightoutedit.hasFocus():

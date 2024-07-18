@@ -528,7 +528,7 @@ def coffee2beans(c:Coffee) -> str:
             vs = [
                 v.strip()
                 for v in c['varietals']
-                if v is not None and v != 'null' and v != ''
+                if v is not None and v not in {'null', ''}
             ]
             if processing == '':
                 varietals = f" {', '.join(vs)}"
