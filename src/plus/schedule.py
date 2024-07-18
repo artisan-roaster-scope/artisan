@@ -2498,7 +2498,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             self.aw.qmc.roastingnotes = ci.roastingnotes
             cupping_value = self.aw.qmc.calcFlavorChartScore()
             if ci.cupping_score != cupping_value:
-                # as cupping score is only computed from the single values we try to keep things as if the resuting score did not change
+                # as cupping score is only computed from the single values we try to keep things as if the resulting score did not change
                 self.aw.qmc.setFlavorChartScore(ci.cupping_score)
             self.aw.qmc.cuppingnotes = ci.cuppingnotes
             # not updated:
@@ -2604,7 +2604,6 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                         # first add essential metadata
                         changes['roast_id'] = self.selected_completed_item.data.roastUUID.hex
                         changes['modified_at'] = epoch2ISO8601(time.time())
-                        _log.info('PRINT changes: %s',changes)
                         try:
                             plus.controller.connect(clear_on_failure=False, interactive=False)
                             r = plus.connection.sendData(plus.config.roast_url, changes, 'POST')
@@ -2636,7 +2635,6 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     else:
                         # fetch data if roast is participating in the sync record game
                         profile_data: Optional[Dict[str, Any]] = plus.sync.fetchServerUpdate(sender.data.roastUUID.hex, return_data = True)
-                        _log.info('PRINT profile_data recieved: %s',profile_data)
                         if profile_data is not None:
                             # update completed items data from received profile_data
                             updated:bool = sender.data.update_completed_item(self.aw, profile_data)
