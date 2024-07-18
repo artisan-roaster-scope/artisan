@@ -261,7 +261,7 @@ def trimBlendSpec(blend_spec:stock.Blend) -> Optional[stock.Blend]:
         return None
 
 
-# the resulting dictionary returned by getRoast() does not contain null values like 0 or '' as those are supressed
+# the resulting dictionary returned by getRoast() does not contain null values like 0 or '' as those are suppressed
 def getRoast() -> Dict[str, Any]:  #for Python >= 3.9 can replace 'Dict' with the generic type hint 'dict'
     d = {}
     try:
@@ -498,7 +498,7 @@ sync_record_attributes: List[str] = (  #for Python >= 3.9 can replace 'List' wit
 
 # returns the current plus record and a hash over the plus record
 # if applied, r is assumed to contain the complete roast data as returned
-# by roast.getRoast() # NOTE: this dict has zero values like 0 or '' surpressed
+# by roast.getRoast() # NOTE: this dict has zero values like 0 or '' suppressed
 def getSyncRecord(r: Optional[Dict[str, Any]] = None) -> Tuple[Dict[str, Any], str]:  #for Python >= 3.9 can replace 'Dict' and 'Tuple' with the generic type hints 'dict' and 'tuple'
     _log.debug('getSyncRecord(%s)', r)
     m = hashlib.sha256()

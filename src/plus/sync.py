@@ -254,7 +254,7 @@ cached_sync_record:Optional[Dict[str,Any]] = None  # the actual sync record the 
 # called before local edits can start, to remember the original state of
 # the sync record
 # if provided, roast_record is assumed to be a full roast record as provided by
-# roast.getRoast() and h its hash, otherwise the roast record is taken from the current data (not surpressing any default zero values like 0, '', 50)
+# roast.getRoast() and h its hash, otherwise the roast record is taken from the current data (not suppressing any default zero values like 0, '', 50)
 def setSyncRecordHash(sync_record:Optional[Dict[str, Any]] = None, h:Optional[str] = None) -> None:
     # pylint: disable=global-statement
     global cached_sync_record_hash, cached_sync_record
@@ -308,7 +308,7 @@ def syncRecordUpdated(roast_record:Optional[Dict[str, Any]] = None) -> bool:
             sync_record_semaphore.release(1)
 
 
-# replaces zero values like 0 and '' by None for attributes enabled for supression to save data space on server
+# replaces zero values like 0 and '' by None for attributes enabled for suppression to save data space on server
 def surpress_zero_values(roast_record:Dict[str, Any]) -> Dict[str, Any]:
     for key in roast.sync_record_zero_supressed_attributes:
         if key in roast_record and roast_record[key] == 0:
@@ -340,7 +340,7 @@ def diffCachedSyncRecord(roast_record:Dict[str, Any]) -> Dict[str, Any]:
             if key != 'roast_id' and key in res and res[key] == value:
                 del res[key]
                 keys_with_equal_values.append(key)
-        # NOTE: the cached_sync_record does not contain null values like 0 and '' as those might have been surpressed
+        # NOTE: the cached_sync_record does not contain null values like 0 and '' as those might have been suppressed
         # for items where we suppress zero values we need to force the
         # propagate of zeros in case on server there is no zero
         # established yet
@@ -662,7 +662,7 @@ def applyServerUpdates(data:Dict[str, Any]) -> None:
             # we exclude the following attributes in roast.sync_record_zero_supressed_attributes_unsynced from the syncing as those are computed and
             # cannot set directly by the user
             # On syncing two Artisan versions with the same over the server, the readings generate those values cannot be updated
-            # as a consequence those attribtues are only set once on initially sending a roast record and never upated
+            # as a consequence those attributes are only set once on initially sending a roast record and never updated
 
             setSyncRecordHash()
             # here the set sync record is taken form the profiles data after
