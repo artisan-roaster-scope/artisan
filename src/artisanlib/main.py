@@ -12761,7 +12761,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.timealign(redraw=False)
                 self.qmc.redraw()
                 if self.qmc.backgroundPlaybackEvents:
-                    # turn on again after background load to ignore already passed events
+                    # first turn playback off to clean previous disabled events
+                    self.qmc.turn_playback_event_OFF()
+                    # then turn on again after background load to ignore already passed events
                     self.qmc.turn_playback_event_ON()
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
@@ -12815,6 +12817,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.timealign(redraw=False)
                 self.qmc.redraw()
                 if self.qmc.backgroundPlaybackEvents:
+                    # first turn playback off to clean previous disabled events
+                    self.qmc.turn_playback_event_OFF()
                     # turn on again after background load to ignore already passed events
                     self.qmc.turn_playback_event_ON()
 
@@ -20209,9 +20213,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 weight = raw_data.get('weight', (0, 0, weight_units[1]))
                                 w_in = (convertWeight(weight[0],weight_units.index(weight[2]),weight_units.index(unit)) if weight is not None else 0)
                                 w_out = (convertWeight(weight[1],weight_units.index(weight[2]),weight_units.index(unit)) if weight is not None else 0)
-                                ws[f'E{c}'] = w_in # type: ignore[assignment] # Incompatible types in assignment (expression has type "float", target has type "str")
+                                ws[f'E{c}'] = w_in # type: ignore[assignment, unused-ignore] # Incompatible types in assignment (expression has type "float", target has type "str")
                                 ws[f'E{c}'].number_format = num_format
-                                ws[f'F{c}'] = w_out # type: ignore[assignment] # Incompatible types in assignment (expression has type "float", target has type "str")
+                                ws[f'F{c}'] = w_out # type: ignore[assignment, unused-ignore] # Incompatible types in assignment (expression has type "float", target has type "str")
                                 ws[f'F{c}'].number_format = num_format
                                 ws[f'G{c}'] = avgFormat(c,'E','F')
                                 ws[f'G{c}'].number_format = '0.0%'
@@ -21487,7 +21491,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                             conv_fld = res_fld
 
                                         if typ == 'text':
-                                            ws[cr] = conv_fld # type: ignore[assignment]
+                                            ws[cr] = conv_fld # type: ignore[assignment, unused-ignore]
                                             width = len(str(conv_fld)) + 2.
                                             if re.match(r'[0-9]+',units) and width > float(units):
                                                 width = float(units)
@@ -21496,32 +21500,32 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                                 ws.column_dimensions[get_column_letter(cnum)].width = width
                                             ws[cr].alignment = Alignment(wrap_text=True)
                                         elif typ == 'int':
-                                            ws[cr] = conv_fld  # type: ignore[assignment]
+                                            ws[cr] = conv_fld  # type: ignore[assignment, unused-ignore]
                                         elif typ == 'float1':
-                                            ws[cr] = conv_fld  # type: ignore[assignment]
+                                            ws[cr] = conv_fld  # type: ignore[assignment, unused-ignore]
                                             ws[cr].number_format = '0.0'
                                         elif typ == 'float2':
-                                            ws[cr] = conv_fld  # type: ignore[assignment]
+                                            ws[cr] = conv_fld  # type: ignore[assignment, unused-ignore]
                                             ws[cr].number_format = '0.00'
                                         elif typ == 'float4':
-                                            ws[cr] = conv_fld  # type: ignore[assignment]
+                                            ws[cr] = conv_fld  # type: ignore[assignment, unused-ignore]
                                             ws[cr].number_format = '0.0000'
                                         elif typ == 'text2float1':
-                                            ws[cr] = float2float(toFloat(conv_fld)) # type: ignore[assignment] #  Incompatible types in assignment (expression has type "float", target has type "str")
+                                            ws[cr] = float2float(toFloat(conv_fld)) # type: ignore[assignment, unused-ignore] #  Incompatible types in assignment (expression has type "float", target has type "str")
                                             ws[cr].number_format = '0.0'
                                         elif typ == 'text2float2':
-                                            ws[cr] = float2float(toFloat(conv_fld)) # type: ignore[assignment] # Incompatible types in assignment (expression has type "float", target has type "str")
+                                            ws[cr] = float2float(toFloat(conv_fld)) # type: ignore[assignment, unused-ignore] # Incompatible types in assignment (expression has type "float", target has type "str")
                                             ws[cr].number_format = '0.00'
                                         elif typ == 'text2int':
-                                            ws[cr] = toInt(conv_fld) # type: ignore[assignment]
+                                            ws[cr] = toInt(conv_fld) # type: ignore[assignment, unused-ignore]
                                             ws[cr].number_format = '0'
                                         elif typ == 'percent':
-                                            ws[cr] = conv_fld/100. # type: ignore[assignment]
+                                            ws[cr] = conv_fld/100. # type: ignore[assignment, unused-ignore]
                                             ws[cr].number_format = '0.0%'
                                         elif typ == 'time':
                                             h,m = divmod(conv_fld,60)
                                             dt = datetime.time(int(h),int(m),0) # note that rounding h and m might lead to failure of .time() as round(59.99) = 60 which is >59 thus not accepted by .time()
-                                            ws[cr] = dt # type: ignore[assignment] # Incompatible types in assignment (expression has type "time", target has type "str")
+                                            ws[cr] = dt # type: ignore[assignment, unused-ignore] # Incompatible types in assignment (expression has type "time", target has type "str")
                                             ws[cr].number_format = 'H:MM'
                                         elif typ == 'date':
                                             ws[cr] = QDateTime(conv_fld).toPyDateTime() # type: ignore # Incompatible types in assignment (expression has type "datetime", target has type "str")

@@ -5158,16 +5158,29 @@ class tgraphcanvas(FigureCanvas):
 
     # turns playback event on and fills self.replayedBackgroundEvents with already passed events if any
     def turn_playback_event_ON(self) -> None:
-        self.backgroundPlaybackEvents = True
-        self.replayedBackgroundEvents = []
+        if not self.backgroundPlaybackEvents:
+            # only if playback is freshly turned ON we consider to enable (potentially) already fired background events to be replayed
+            self.backgroundPlaybackEvents = True
+            self.replayedBackgroundEvents = []
         if self.flagstart:
-            now = self.timeclock.elapsedMilli()
+            sample_interval = self.delay/1000. # in sec
+            if self.timeindex[0] != -1:
+                start = self.timex[self.timeindex[0]]
+            else:
+                start = 0
+            now = self.timeclock.elapsedMilli() # time since ON
+            additional_samples = (3 if self.autoChargeFlag else 2)
+            # to catch also background events scheduled for around 00:00 we relax the condition to mark
+            # events before now where time has already passed by 2 (or 3 with autoCHARGE) samples
+            if self.timeindex[0] != -1 and now - start <  additional_samples*sample_interval:
+                now -= additional_samples*sample_interval
             for i, bge in enumerate(self.backgroundEvents):
                 if (self.timeB[bge] - now) <= 0:
                     self.replayedBackgroundEvents.append(i)
 
     def turn_playback_event_OFF(self) -> None:
         self.backgroundPlaybackEvents = False
+        self.replayedBackgroundEvents = []
 
 
     # called only after CHARGE
