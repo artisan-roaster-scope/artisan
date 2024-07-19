@@ -14818,18 +14818,21 @@ class tgraphcanvas(FigureCanvas):
             self.adderror((QApplication.translate('Error Message','Exception:') + ' writestatistics() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def cacheforBbp(self) -> None:
-        # mode
-        self.bbpCache['mode'] = self.mode
-        # drop temps
-        self.bbpCache['drop_bt'] = self.temp2[self.timeindex[6]]
-        self.bbpCache['drop_et'] = self.temp1[self.timeindex[6]]
-        # ending time epoch in mSec
-        self.bbpCache['end_roastepoch_msec'] = QDateTime.currentDateTime().toMSecsSinceEpoch()
-        # get the special events values at OFF and time of previous change relative to end
-        self.bbpCache['end_events'] = self.get_specialevents_at_timeindex(len(self.timex)-1)
-        # get the special events values at DROP and time of previous change relative to end
-        self.bbpCache['drop_events'] = self.get_specialevents_at_timeindex(self.timeindex[6])
-        self.bbpCache['drop_to_end'] = self.timex[-1] - self.timex[self.timeindex[6]]
+        try:
+            # mode
+            self.bbpCache['mode'] = self.mode
+            # drop temps
+            self.bbpCache['drop_bt'] = self.temp2[self.timeindex[6]]
+            self.bbpCache['drop_et'] = self.temp1[self.timeindex[6]]
+            # ending time epoch in mSec
+            self.bbpCache['end_roastepoch_msec'] = QDateTime.currentDateTime().toMSecsSinceEpoch()
+            # get the special events values at OFF and time of previous change relative to end
+            self.bbpCache['end_events'] = self.get_specialevents_at_timeindex(len(self.timex)-1)
+            # get the special events values at DROP and time of previous change relative to end
+            self.bbpCache['drop_events'] = self.get_specialevents_at_timeindex(self.timeindex[6])
+            self.bbpCache['drop_to_end'] = self.timex[-1] - self.timex[self.timeindex[6]]
+        except Exception as ex: # pylint: disable=broad-except
+            self.bbpCache = {}
 
     def get_specialevents_at_timeindex(self, timeindex:int) -> List[List[Optional[float]]]:
         # note: event values are returned as actual_value+1
