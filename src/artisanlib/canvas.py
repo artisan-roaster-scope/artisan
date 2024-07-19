@@ -8030,9 +8030,6 @@ class tgraphcanvas(FigureCanvas):
             self.delta_ax.set_xlim(xlimit_min, xlimit)
             self.delta_ax.set_ylim(zlimit_min, zlimit)
 
-    @pyqtSlot(bool)
-    def redraw_menu_slot(self, _:bool = False) -> None:
-        self.redraw()
     #Redraws data
     # if recomputeAllDeltas, the delta arrays and if smooth the smoothed line arrays are recomputed (incl. those of the background curves)
     # re_smooth_foreground: the foreground curves (incl. extras) will be re-smoothed if called while not recording. During recording foreground will never be smoothed here.
@@ -10557,7 +10554,13 @@ class tgraphcanvas(FigureCanvas):
             return '' #return an empty string if roastbatchpos is None
 
         # Create each statistic
-        # Statistic entries are made here and self.summarystats_types[] in statistics.py
+        # Statistic entries are made here and corresponding entries in statistics.py:self.summarystats_types[]
+        # Add new stats at the end of the list.
+        # To remove a stat: 
+        #   Do not delete it, change its entry in self.summarystats_types[] in statistics.py to'Unused' and do not translate it.
+        #   The handler in canvas:statsSummary():buildStat() for the stattype must remain, it should be changed to "stattype_str = f'{newline}'".
+        #       This is to maintain compatibility with previous settings.
+        #   Once the createSummarystatsTable is opened the change(s) to 'Blank Line' will be updated in settings. 
         def buildStat(n:int) -> str:
             stattype_str = ''
             degree = '\u00b0'
@@ -10713,17 +10716,35 @@ class tgraphcanvas(FigureCanvas):
                     stattype_str += f'{self.aw.bbp_bottom_temp:.0f}{degree}{self.mode} '
                     stattype_str += f'({stringfromseconds(self.aw.bbp_bottom_to_charge_time,False)}) '
                     stattype_str += f'{self.temp2[self.timeindex[0]]:.0f}{degree}{self.mode}'
-            elif n == 28:  # delta T FCs to DROP
-                if 'finish_phase_delta_temp' in cp:  # noqa: SIM102
-                    stattype_str += f"{newline}{deltaLabelUTF8}T {QApplication.translate('AddlInfo', 'FCs to Drop')}: "
-                    stattype_str += f"{dropZeroDecimal(cp['finish_phase_delta_temp'], self.LCDdecimalplaces)}{degree}{self.mode}"
+            elif n == 28:  # Finish Phase Time and Temp
+                if 'finish_phase_delta_temp' in cp and 'finishphasetime' in cp and 'totaltime' in cp:  # noqa: SIM102
+                    stattype_str += (f"{newline}{QApplication.translate('AddlInfo', 'Finish Phase')}: "
+                                     f"{int(cp['finish_phase_delta_temp'])}{degree}{self.mode}, "
+                                     f"{stringfromseconds(cp['finishphasetime'])}, "
+                                     f"{int(round(cp['finishphasetime']*100./cp['totaltime']))}%"
+                                     )
+
+            elif n == 29:  # Finish Phase Time and Temp
+                if 'mid_phase_delta_temp' in cp and 'midphasetime' in cp and 'totaltime' in cp:  # noqa: SIM102
+                    stattype_str += (f"{newline}{QApplication.translate('AddlInfo', 'Mid Phase')}: "
+                                     f"{int(cp['mid_phase_delta_temp'])}{degree}{self.mode}, "
+                                     f"{stringfromseconds(cp['midphasetime'])}, "
+                                     f"{int(round(cp['midphasetime']*100./cp['totaltime']))}%"
+                                     )
+            elif n == 30:  # Finish Phase Time and Temp
+                if 'dry_phase_delta_temp' in cp and 'dryphasetime' in cp and 'totaltime' in cp:  # noqa: SIM102
+                    stattype_str += (f"{newline}{QApplication.translate('AddlInfo', 'Dry Phase')}: "
+                                     f"{int(cp['dry_phase_delta_temp'])}{degree}{self.mode}, "
+                                     f"{stringfromseconds(cp['dryphasetime'])}, "
+                                     f"{int(round(cp['dryphasetime']*100./cp['totaltime']))}%"
+                                     )
             else:
                 errmsg = (f"{QApplication.translate('Error Message','Exception:')} buildStat() "
                           f"{QApplication.translate('Error Message','Unexpected value for n, got')} {n}")
                 self.adderror(errmsg)
                 #raise ValueError(errmsg)
 
-            #TODO add more stats  MET, CM, RoR, Profile quality, RoR at FCs, Temp Rise FCs to DROP, RMSE BT (Bckgd), BBP Metrics (New) # pylint: disable=fixme
+            #TODO add more stats  MET, CM, RoR, Profile quality, RoR at FCs, RMSE BT (Bckgd) # pylint: disable=fixme
 
             # reformat string as necessary
             stattype_str = self.__dijkstra_to_ascii(stattype_str)
@@ -14806,7 +14827,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.specialeventstype[i] == event_type and self.specialevents[i] <= timeindex:
                         last_change_after_drop = None
                         if self.specialevents[i] > self.timeindex[6]:
-                            last_change_after_drop = self.timex[self.specialevents[i]] - self.timex[-1]
+                            last_change_after_drop = float2float(self.timex[self.specialevents[i]] - self.timex[-1],2)
                         values_at_timeindex[event_type] = [self.specialeventsvalue[i], last_change_after_drop]
                         break
         except Exception as ex: # pylint: disable=broad-except
