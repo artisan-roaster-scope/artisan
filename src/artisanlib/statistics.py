@@ -700,9 +700,9 @@ class StatisticsDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(int)
     def setitemsummarystat(self, _:int) -> None:
-        i = self.aw.findWidgetsRow(self.summarystatstable,self.sender(),0)
+        i = self.aw.findWidgetsRow(self.summarystatstable,self.sender(),1)
         if i is not None:
-            typecombobox = cast(MyQComboBox, self.summarystatstable.cellWidget(i,0))
+            typecombobox = cast(MyQComboBox, self.summarystatstable.cellWidget(i,1))
             if i < len(self.summarystatstypes):
                 self.summarystatstypes[i] = self.summarystats_types.index(self.summarystats_types_sorted[typecombobox.currentIndex()])
                 self.savetablesummarystats()
@@ -710,7 +710,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
     def disconnectTableItemActions(self) -> None:
         for x in range(self.summarystatstable.rowCount()):
             try:
-                typeComboBox = cast(MyQComboBox, self.summarystatstable.cellWidget(x,0))
+                typeComboBox = cast(MyQComboBox, self.summarystatstable.cellWidget(x,1))
                 typeComboBox.currentIndexChanged.disconnect() # type combo
             except Exception: # pylint: disable=broad-except
                 pass
