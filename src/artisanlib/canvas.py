@@ -10509,6 +10509,20 @@ class tgraphcanvas(FigureCanvas):
             self.adderror((QApplication.translate('Error Message','Exception:') + ' logoloadfile() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             self.aw.logofilename = ''
 
+
+    # Return a 'roast of the day' string with ordinals when english
+    def roastOfTheDay(self, roastbatchpos:Optional[int]) -> str:
+        if roastbatchpos is not None:
+            #add an ordinal suffix for english
+            if self.locale_str == 'en':
+                prefix = ''
+                suffix = f"{ {1: 'st', 2: 'nd', 3: 'rd'}.get(0 if roastbatchpos % 100 in {11, 12, 13} else roastbatchpos % 10, 'th')}" # noqa: E731
+            else:
+                prefix = '#'
+                suffix = ''
+            return f'{prefix}{roastbatchpos}{suffix} {QApplication.translate("AddlInfo", "Roast of the Day")}'
+        return '' #return an empty string if roastbatchpos is None
+
     #add stats summary to graph, called from redraw()
     def statsSummary(self, txt:bool=False) -> Optional[str]:
         if self.ax is None:
@@ -10540,27 +10554,14 @@ class tgraphcanvas(FigureCanvas):
                 return float2float(value,0)
             return float2float(value, decimals)
 
-        # Return a 'roast of the day' string with ordinals when english
-        def roastOfTheDay(roastbatchpos:Optional[int]) -> str:
-            if roastbatchpos is not None:
-                #add an ordinal suffix for english
-                if self.locale_str == 'en':
-                    prefix = ''
-                    suffix = f"{ {1: 'st', 2: 'nd', 3: 'rd'}.get(0 if roastbatchpos % 100 in {11, 12, 13} else roastbatchpos % 10, 'th')}" # noqa: E731
-                else:
-                    prefix = '#'
-                    suffix = ''
-                return f'{prefix}{roastbatchpos}{suffix} {QApplication.translate("AddlInfo", "Roast of the Day")}'
-            return '' #return an empty string if roastbatchpos is None
-
         # Create each statistic
         # Statistic entries are made here and corresponding entries in statistics.py:self.summarystats_types[]
         # Add new stats at the end of the list.
-        # To remove a stat: 
+        # To remove a stat:
         #   Do not delete it, change its entry in self.summarystats_types[] in statistics.py to'Unused' and do not translate it.
         #   The handler in canvas:statsSummary():buildStat() for the stattype must remain, it should be changed to "stattype_str = f'{newline}'".
         #       This is to maintain compatibility with previous settings.
-        #   Once the createSummarystatsTable is opened the change(s) to 'Blank Line' will be updated in settings. 
+        #   Once the createSummarystatsTable is opened the change(s) to 'Blank Line' will be updated in settings.
         def buildStat(n:int) -> str:
             stattype_str = ''
             degree = '\u00b0'
@@ -10581,7 +10582,7 @@ class tgraphcanvas(FigureCanvas):
                 stattype_str = f'{newline}{self.roastdate.date().toString()} {self.roastdate.time().toString()}'
             elif n == 3:  #Roast of the day
                 if self.roastbatchpos is not None and self.roastbatchpos != 0:
-                    stattype_str = f'{newline}{roastOfTheDay(self.roastbatchpos)}'
+                    stattype_str = f'{newline}{self.roastOfTheDay(self.roastbatchpos)}'
             elif n == 4:  #Ambient Temp, Hum, Pressure
                 if self.ambientTemp not in [None,0] or self.ambient_humidity not in [None,0] or self.ambient_pressure not in [None,0]:
                     stattype_str = f'{newline}'
