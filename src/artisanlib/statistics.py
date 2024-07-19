@@ -18,7 +18,7 @@
 import sys
 import platform
 from typing import Optional, List, Any, cast, TYPE_CHECKING, Final
-from artisanlib.dialogs import ArtisanDialog
+from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.util import deltaLabelUTF8
 from artisanlib.widgets import MyQComboBox
 
@@ -27,12 +27,12 @@ import logging
 try:
     from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QTimer # @XUnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout, # @XUnusedImport @Reimport  @UnresolvedImport
-        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGroupBox, QLayout, # @XUnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGroupBox, QTableWidgetItem, # @XUnusedImport @Reimport  @UnresolvedImport
         QSpinBox, QWidget, QTabWidget, QTableWidget, QPushButton, QHeaderView, QLineEdit) # @XUnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import Qt, pyqtSlot, QSettings, QTimer # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGroupBox, QLayout, # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGroupBox, QTableWidgetItem, # @UnusedImport @Reimport  @UnresolvedImport
         QSpinBox, QWidget, QTabWidget, QTableWidget, QPushButton, QHeaderView, QLineEdit) # @UnusedImport @Reimport  @UnresolvedImport
 
 if TYPE_CHECKING:
@@ -42,7 +42,7 @@ if TYPE_CHECKING:
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
-class StatisticsDlg(ArtisanDialog):
+class StatisticsDlg(ArtisanResizeablDialog):
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow', activeTab:int = 0) -> None:
         super().__init__(parent, aw)
 
@@ -50,6 +50,11 @@ class StatisticsDlg(ArtisanDialog):
         self.setWindowTitle(QApplication.translate('Form Caption','Statistics'))
         self.setModal(True)
 #        self.helpdialog = None
+
+        # restore window position
+        settings = QSettings()
+        if settings.contains('StatisticsGeometry'):
+            self.restoreGeometry(settings.value('StatisticsGeometry'))
 
         ### Tab 1 - Statistics
         #Display
@@ -186,7 +191,14 @@ class StatisticsDlg(ArtisanDialog):
         self.buttonlistmaxlen:int = self.aw.buttonlistmaxlen
         # Statistic entries are made here and in buildStat() in canvas.py
         self.summarystats_types:List[str] = [ 
-                # presentation of these stats is done with corresponding entries in canvas:statsSummary())
+                # Presentation of these stats is done with corresponding entries in canvas:statsSummary():buildStat()
+                # Add new stats at the end of the list. 
+                # The string used to identify a statistic may be changed without causing compatibility issues
+                # To remove a stat: 
+                #   Do not delete it, change its entry to 'Unused' and do not translate it.
+                #   The handler in canvas:statsSummary():buildStat() for the stattype must remain, it should be changed to "stattype_str = f'{newline}'".
+                #       This is to maintain compatibility with previous settings.
+                #   Once the createSummarystatsTable is opened the change(s) to 'Blank Line' will be updated in settings. 
                 self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Blank Line')),                      # 0
                 self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Title')),                           # 1
                 self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Roast Date, Time')),                # 2
@@ -215,9 +227,17 @@ class StatisticsDlg(ArtisanDialog):
                 self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','BBP Summary')),                     # 25
                 self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','BBP Summary long')),                # 26
                 self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','BBP Summary compact')),             # 27
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Delta T, FCS to DROP')),            # 28
-                                     ]
-        self.summarystats_types_sorted:List[str] = sorted(self.summarystats_types)
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Phases-Finish Time and Temp')),     # 28
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Phases-Mid Time and Temp')),        # 29
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Phases-Dry Time and Temp')),        # 30
+                ]
+
+        # function to remove from a list any elements matching string_to_remove
+        def remove_matching_strings(input_list:List[str], string_to_remove:str) -> List[str]:
+            return [s for s in input_list if string_to_remove not in s ]
+
+        # remove entries designated as 'Unused' from the sorted list of statistic types
+        self.summarystats_types_sorted:List[str] = sorted(remove_matching_strings(self.summarystats_types,'Unused'))
 
 #        helpDialogButton = QDialogButtonBox()
 
@@ -361,11 +381,12 @@ class StatisticsDlg(ArtisanDialog):
         # some tabs are not rendered at all on Windows using Qt v6.5.1 (https://bugreports.qt.io/projects/QTBUG/issues/QTBUG-114204?filter=allissues)
         QTimer.singleShot(50, self.setActiveTab)
 
-        settings = QSettings()
-        if settings.contains('StatisticsPosition'):
-            self.move(settings.value('StatisticsPosition'))
+# removed when making the dialog resizeable
+#        settings = QSettings()
+#        if settings.contains('StatisticsPosition'):
+#            self.move(settings.value('StatisticsPosition'))
 
-        mainLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
+#        mainLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
 
     @pyqtSlot(int)
     def AUCLCDflagChanged(self, _:int) -> None:
@@ -529,7 +550,11 @@ class StatisticsDlg(ArtisanDialog):
         self.aw.qmc.redraw(recomputeAllDeltas=False)
 
     def createSummarystatsTable(self) -> None:
-        columns = 1  # With one column we don't need lists, but the plumbing is here if more columns are needed in the future
+        # Column zero with the row numbers is added, and the row header disabled to improve keyboard navigation.  With only 
+        # one column that is a ComboBox, the row selector also selects the ComboBox and the down arrow opens the combo.  No 
+        # solution was found, tus this alternate implementaition.
+
+        columns = 2  # With one column we don't need lists, but the plumbing is here if more columns are needed in the future
 
 #        if self.summarystatstable is not None and self.summarystatstable.columnCount() == columns:
 #            # rows have been already established
@@ -550,13 +575,17 @@ class StatisticsDlg(ArtisanDialog):
         self.summarystatstable.setRowCount(nstats)
         self.summarystatstable.setColumnCount(columns)
         self.summarystatstable.setHorizontalHeaderLabels([
+                                                         '',
                                                          QApplication.translate('Table','Statistic'),
                                                          ])
-        self.summarystatstable.setAlternatingRowColors(True)
-        self.summarystatstable.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        self.summarystatstable.setEditTriggers(QTableWidget.EditTrigger.SelectedClicked)
         self.summarystatstable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.summarystatstable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.summarystatstable.setShowGrid(True)
+
+        # Turn off row header
+        self.summarystatstable.verticalHeader().setVisible(False)  # type: ignore[union-attr]  # pyright: ignore[reportOptionalMemberAccess] #TODO figure out why this fails mypy and pyright  # pylint: disable=fixme
+
 
         vheader = self.summarystatstable.verticalHeader()
         if vheader is not None:
@@ -578,17 +607,24 @@ class StatisticsDlg(ArtisanDialog):
             typeComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
             typeComboBox.setToolTip(QApplication.translate('Tooltip','Choose a statistic to display'))
             typeComboBox.addItems(self.summarystats_types_sorted)
-            typeComboBox.setCurrentIndex(self.summarystats_types_sorted.index(self.summarystats_types[self.summarystatstypes[i]]))
+            # change table entries that point to a statistic type that is 'Unused' to point to 'Blank Line' instead
+            if self.summarystats_types[self.summarystatstypes[i]] == 'Unused':
+                typeComboBox.setCurrentIndex(self.summarystats_types_sorted.index(self.summarystats_types[0]))
+                self.summarystatstypes[i] = 0  # updates to settings on 
+            else:
+                typeComboBox.setCurrentIndex(self.summarystats_types_sorted.index(self.summarystats_types[self.summarystatstypes[i]]))
             typeComboBox.currentIndexChanged.connect(self.setitemsummarystat)
             #add widgets to the table
-            self.summarystatstable.setCellWidget(i,0,typeComboBox)
+            rowlabel = QTableWidgetItem(str(i+1))  #pyright: ignore[reportPossiblyUnboundVariable]  #TODO why does pyright error?  # pylint: disable=fixme
+            rowlabel.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.summarystatstable.setItem(i,0,rowlabel)
+            self.summarystatstable.setCellWidget(i,1,typeComboBox)
 
         hheader = self.summarystatstable.horizontalHeader()
         if hheader is not None:
             hheader.setStretchLastSection(False)
             self.summarystatstable.resizeColumnsToContents()
             hheader.setStretchLastSection(True)
-#        self.summarystatstable.setColumnWidth(0,250)
 
 #        # remember the columnwidth
 #        for i, _ in enumerate(self.aw.summarystatstablecolumnwidths):

@@ -2560,10 +2560,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             calculatorAction.triggered.connect(self.calculator)
             self.ToolkitMenu.addAction(calculatorAction)
 
-        self.redrawAction = QAction(QApplication.translate('Menu', 'Redraw'), self)
-        self.redrawAction.triggered.connect(self.qmc.redraw_menu_slot)
-        self.ToolkitMenu.addAction(self.redrawAction)  #type: ignore[union-attr]
-
         # VIEW menu
 
         if self.viewMenu is not None:
@@ -15376,8 +15372,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         return output
 
     def resetBBPMetrics(self) -> None:
-        self.bbp_drop_bt = -1
-        self.bbp_drop_et = -1
+        self.bbp_dropbt = 0
+        self.bbp_dropet = 0
         self.bbp_total_time = -1
         self.bbp_bottom_temp = -1
         self.bbp_begin_to_bottom_time = -1
