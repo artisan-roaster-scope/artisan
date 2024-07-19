@@ -14831,7 +14831,7 @@ class tgraphcanvas(FigureCanvas):
             # get the special events values at DROP and time of previous change relative to end
             self.bbpCache['drop_events'] = self.get_specialevents_at_timeindex(self.timeindex[6])
             self.bbpCache['drop_to_end'] = self.timex[-1] - self.timex[self.timeindex[6]]
-        except Exception as ex: # pylint: disable=broad-except
+        except Exception: # pylint: disable=broad-except
             self.bbpCache = {}
 
     def get_specialevents_at_timeindex(self, timeindex:int) -> List[List[Optional[float]]]:

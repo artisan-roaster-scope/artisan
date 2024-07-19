@@ -20206,7 +20206,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 c += 1
                                 d = self.productionData2string(raw_data,units=False)
                                 ws[f'A{c}'] = d['id']
-                                ws[f'B{c}'] = QDateTime(d['datetime']).toPyDateTime() # type: ignore # Incompatible types in assignment (expression has type "datetime", target has type "str")
+                                ws[f'B{c}'] = QDateTime(d['datetime']).toPyDateTime() # type: ignore[assignment, unused-ignore] # Incompatible types in assignment (expression has type "datetime", target has type "str")
                                 ws[f'B{c}'].number_format = 'YYYY-MM-DD HH:MM'
                                 ws[f'C{c}'] = d['title']
                                 ws[f'D{c}'] = d['beans']
