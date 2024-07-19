@@ -15,7 +15,7 @@ v2.10.6 (XX, 2024)
   - adds [Bühler RM20](https://www.buhlergroup.com/global/de/products/roastmaster_coffeeroaster.html) Simatic Legacy setup supporting older firmware versions not returning the machine state
   - adds support for the [Phidget RCC0004 server motor controller](https://phidgets.com/?prodid=1147) ([Discussion #1546](../../../discussions/1546))
   - adds Hottop Command `control` to activate and deactivate the control function of the machine via event buttons and alarms
-  - adds `{WEIGHTin}` placeholder substitude by the current batch size (g) in command actions
+  - adds `{WEIGHTin}` placeholder substitute by the current batch size (g) in command actions
   - adds "Load p-i-d from background" setting to configure the PID to the settings stored in background profile
   - adds support for transparent colors
 
@@ -47,9 +47,9 @@ v2.10.4 (March 21, 2024)
   - fixes regression which broke devices Omega HH309 34 and the just introduced Digi-Sense 20250-07 and Extech 42570 ([PR #1481](../../../pull/1481))
   - fixes regression introduced in v2.8.4 which broke persisting volume changes made in Roast Properties dialog ([Discussion #1511](../../../discussions/1511))
   - fixes regression which broke persistence of custom column width of alarm and extra device and table
-  - fixes regression which broke the formating of extra curve data in background event table
+  - fixes regression which broke the formatting of extra curve data in background event table
   - fixes regression which broke the automatic opening of completed profiles in ArtisanViewer ([Issue #1516](../../../issues/1516))
-  - improves formating of profile and background data tables, custom event button table, alarm table and extra device table
+  - improves formatting of profile and background data tables, custom event button table, alarm table and extra device table
   - fixes Linux builds that failed to start Artisan v2.10.2 on some configurations
   - fixes phases bar rendering in case CHARGE is not set
 

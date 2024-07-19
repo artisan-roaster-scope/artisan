@@ -29,7 +29,7 @@ try:
     from snap7.type import Area # type:ignore[import-not-found, unused-ignore]
 except Exception: # pylint: disable=broad-except
     # < v2.0
-    from snap7.types import Areas as Area # type:ignore[import-not-found, unused-ignore] # noqa: F401 # pylint: disable=unused-import
+    from snap7.types import Areas as Area # type:ignore[import-not-found, unused-ignore, no-redef] # noqa: F401 # pylint: disable=unused-import
 from snap7.util.getters import get_bool, get_int, get_real
 from snap7.util.setters import set_bool, set_int, set_real
 
