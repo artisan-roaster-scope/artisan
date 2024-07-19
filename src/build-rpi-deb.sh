@@ -19,8 +19,8 @@ chmod +r debian/usr/share/man/man1/artisan.1.gz
 gzip -9 debian/usr/share/doc/artisan/changelog
 chmod +r debian/usr/share/doc/artisan/changelog.gz
 
-chmod +r debian/usr/share/applications/artisan.desktop
-chmod -x debian/usr/share/applications/artisan.desktop
+chmod +r debian/usr/share/applications/org.artisan_scope.artisan.desktop
+chmod -x debian/usr/share/applications/org.artisan_scope.artisan.desktop
 chmod +rx debian/usr/bin/artisan
 chmod -R +r dist
 chmod +x dist/icons

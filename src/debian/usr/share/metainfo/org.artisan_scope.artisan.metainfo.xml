@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>org.artisan_scope.artisan</id>
+
+  <name>Artisan</name>
+  <summary>Visual scope for coffee roasters</summary>
+
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <control>touch</control>
+  </supports>
+
+  <description>
+    <p>Artisan is an open-source software that helps coffee roasters record, analyze, and control roast profiles. This software can automate the creation of roasting metrics to help make decisions that influence the final coffee flavor.</p>
+
+    <p>Notable features</p>
+    <ul>
+      <li>we believe in Open-Source, check out our code and contribute</li>
+      <li>seamless integration into the artisan.plus inventory management service</li>
+      <li>extensive machine and device support including control</li>
+      <li>unlimited number of curves</li>
+      <li>rate-of-rise (RoR), area-under-the-curve (AUC), development-time-ratio (DTR) calculations and projection lines</li>
+      <li>statistics, roast profile evaluation, Profile Analyzerg, Roast Comparatorg, Profile Transposerg and Roast Simulatorg</li>
+      <li>roast-, production- and ranking reportsg</li>
+      <li>automated reproduction of roasts via alarm programsg, replay of eventsg or PID controlg</li>
+      <li>batch counterg</li>
+      <li>profile designerg, cupping editor, spider- and wheel graph</li>
+      <li>user defined buttons and slidersg with programmable actions</li>
+      <li>many import and export formats like Aillio Roastime, Cropster XLS, Giesen CSV, IKAWA CSV, Probat Pilot, RoastLogger, RoastLog, RoastPath,..</li>
+    </ul>
+
+    <p>The Artisan project runs on donations from individuals and companies recognising the value of Artisan for their work or leisure. Consider supporting this project with your donation, or even better, purchase an artisan.plus membership!</p>
+  </description>
+
+  <developer id="org.artisan-scope">
+    <name>Artisan developers</name>
+  </developer>
+
+  <url type="bugtracker">https://github.com/artisan-roaster-scope/artisan/issues</url>
+  <url type="homepage">https://artisan-scope.org/</url>
+  <url type="donation">https://artisan-scope.org/donate/</url>
+  <url type="contact">https://artisan-roasterscope.blogspot.com/p/contact-me.html</url>
+  <url type="faq">https://artisan-scope.org/help/#faq</url>
+  <url type="vcs-browser">https://github.com/artisan-roaster-scope/artisan</url>
+
+  <launchable type="desktop-id">org.artisan_scope.artisan.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://github.com/artisan-roaster-scope/artisan/blob/2c94e7d03f51221771a6f5e10c3a55fd1a26e744/wiki/screenshots/artisan-cover.png?raw=true</image>
+    </screenshot>
+    <screenshot>
+      <image>https://github.com/artisan-roaster-scope/artisan/blob/2c94e7d03f51221771a6f5e10c3a55fd1a26e744/wiki/screenshots/artisan-cover2.png?raw=true</image>
+    </screenshot>
+  </screenshots>
+
+  <content_rating type="oars-1.1">
+    <content_attribute id="money-purchasing">mild</content_attribute>
+  </content_rating>
+
+  <branding>
+    <color type="primary" scheme_preference="light">#d8ebf1</color>
+    <color type="primary" scheme_preference="dark">#0c6aa6</color>
+  </branding>
+
+  <releases>
+    <release version="2.10.4" date="2024-03-22">
+      <url type="details">https://github.com/artisan-roaster-scope/artisan/releases/tag/v2.10.4</url>
+      <description>
+        <p>This version is a bug fix release.</p>
+
+	<ul>
+          <li>adds metadata to PDF, SVG and PNG exports</li>
+	  <li>fixes regression which broke the PID dialog for MODBUS, S7, TC4 and Kaleido (Issue #1480 and Issue #1515)</li>
+	  <li>fixes regression which broke devices Omega HH309 34 and the just introduced Digi-Sense 20250-07 and Extech 42570 (PR #1481)</li>
+	  <li>fixes regression introduced in v2.8.4 which broke persisting volume changes made in Roast Properties dialog (Discussion #1511)</li>
+	  <li>fixes regression which broke persistence of custom column width of alarm and extra device and table</li>
+	  <li>fixes regression which broke the formating of extra curve data in background event table</li>
+	  <li>fixes regression which broke the automatic opening of completed profiles in ArtisanViewer (Issue #1516)</li>
+	  <li>improves formating of profile and background data tables, custom event button table, alarm table and extra device table</li>
+	  <li>fixes Linux builds that failed to start Artisan v2.10.2 on some configurations</li>
+	  <li>fixes phases bar rendering in case CHARGE is not set</li>
+	</ul>
+
+	<p>IMPORTANT NOTE</p>
+	<p>The following issues have found in this release and are being worked on:</p>
+	<ul>
+          <li>this version does not play well with Probat Series III and Sample Roaster on all supported platforms. Please keep using the v2.8.4 release until v2.10.6 has been released</li>
+	</ul>
+      </description>
+    </release>
+  </releases>
+</component>
