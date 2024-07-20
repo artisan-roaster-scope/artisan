@@ -792,7 +792,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         f = self.locLabel.font()
 
         if platform.system() == 'Linux':
-            f.setPointSize(f.pointSize())
+            f.setPointSize(f.pointSize()-1)
         else:
             f.setPointSize(f.pointSize()+4)
 ##        f.setStyleHint(QFont.StyleHint.TypeWriter) # not monospaced!
