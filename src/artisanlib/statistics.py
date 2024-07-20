@@ -201,9 +201,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
                 #   Once the createSummarystatsTable is opened the change(s) to 'Blank Line' will be updated in settings.
                 self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Blank Line')),                      # 0
                 self.aw.qmc.dijkstra_to_ascii(QApplication.translate('Label','Title')),                              # 1
-                self.aw.qmc.dijkstra_to_ascii(f"{QApplication.translate('Dialog','Roast')} "                         # 2
-                                              f"{QApplication.translate('Label','Date')}, "
-                                              f"{QApplication.translate('CheckBox','Time')}"),
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Roast Date, Time')),                # 2
                 self.aw.qmc.dijkstra_to_ascii(QApplication.translate('AddlInfo','Roast of the Day')),                # 3
                 self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Ambient Conditions')),              # 4
                 self.aw.qmc.dijkstra_to_ascii(f"{QApplication.translate('Label','Roaster')}, "                       # 5
@@ -222,17 +220,14 @@ class StatisticsDlg(ArtisanResizeablDialog):
                 self.aw.qmc.dijkstra_to_ascii(QApplication.translate('Label','Roasting Notes')),                     # 17
                 self.aw.qmc.dijkstra_to_ascii(QApplication.translate('Label','Cupping Score')),                      # 18
                 self.aw.qmc.dijkstra_to_ascii(QApplication.translate('Label','Cupping Notes')),                      # 19
-                self.aw.qmc.dijkstra_to_ascii(f"{QApplication.translate('Label','Weight')} "                         # 20
-                                              f"{QApplication.translate('Label','Green')}"),
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Weight Green')),                    # 20
                 self.aw.qmc.dijkstra_to_ascii(QApplication.translate('AddlInfo','Weight Roasted')),                  # 21
                 self.aw.qmc.dijkstra_to_ascii(QApplication.translate('AddlInfo','Weight Loss')),                     # 22
-                self.aw.qmc.dijkstra_to_ascii(f"{QApplication.translate('AddlInfo', 'Total')} "                      # 23
-                                              f"{QApplication.translate('CheckBox', 'Time')}"),
-                self.aw.qmc.dijkstra_to_ascii(f"BBP {QApplication.translate('AddlInfo', 'Bottom')} "                 # 24
-                                              f"{QApplication.translate('CheckBox', 'Temp')}"),
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','BBP Summary')),                     # 25
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','BBP Summary long')),                # 26
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','BBP Summary compact')),             # 27
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('HTML Report Template','BBP Total Time')),      # 23
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('HTML Report Template','BBP Bottom Temp')),     # 24
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('HTML Report Template','BBP Summary')),         # 25
+                'Unused',                                                                                            # 26
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('HTML Report Template','BBP Summary compact')), # 27
                 self.aw.qmc.dijkstra_to_ascii(f"{QApplication.translate('Table','Phases')} - {QApplication.translate('Label','Finishing')}"), # 28
                 self.aw.qmc.dijkstra_to_ascii(f"{QApplication.translate('Table','Phases')} - {QApplication.translate('Label','Maillard')}"),  # 29
                 self.aw.qmc.dijkstra_to_ascii(f"{QApplication.translate('Table','Phases')} - {QApplication.translate('Label','Drying')}"),    # 30

@@ -10555,13 +10555,6 @@ class tgraphcanvas(FigureCanvas):
                         notestr += '..'
             return notestr
 
-        # Format a long text string for stats display
-        def wrapString(in_string:str, line_length:int=self.statsmaxchrperline, max_lines:Optional[int]=None) -> str:
-            res = f'{newline}'.join([f'{newline}'.join(textwrap.wrap(line, line_length,
-                         break_long_words=False, subsequent_indent='  ', max_lines=max_lines, placeholder='..', replace_whitespace=False))
-                         for line in in_string.splitlines() if line.strip() != ''])
-            return f'\n{res}'
-
         def dropZeroDecimal(value:float, decimals:int) -> float:
             if int(value) == float2float(value,decimals):
                 return float2float(value,0)
@@ -10702,10 +10695,10 @@ class tgraphcanvas(FigureCanvas):
                     stattype_str += f"{newline}{QApplication.translate('AddlInfo', 'Weight Loss')} -{dropZeroDecimal(self.aw.weight_loss(self.weight[0],self.weight[1]),1)}%"
             elif n == 23:  # BBP total time
                 if self.aw.bbp_total_time:
-                    stattype_str += f"{newline}BBP {QApplication.translate('AddlInfo', 'Total')} {QApplication.translate('CheckBox', 'Time')} {stringfromseconds(self.aw.bbp_total_time)}"
+                    stattype_str += f"{newline}{QApplication.translate('HTML Report Template', 'BBP Total Time')} {stringfromseconds(self.aw.bbp_total_time)}"
             elif n == 24:  # BBP bottom temp (BT)
                 if self.aw.bbp_bottom_temp:
-                    stattype_str += f"{newline}BBP {QApplication.translate('AddlInfo', 'Bottom')} {QApplication.translate('CheckBox', 'Temp')} {self.aw.bbp_bottom_temp:.1f}{degree}{self.aw.qmc.mode}"
+                    stattype_str += f"{newline}{QApplication.translate('HTML Report Template', 'BBP Bottom Temp')} {self.aw.bbp_bottom_temp:.1f}{degree}{self.aw.qmc.mode}"
             elif n == 25:  # BBP summary
                 if self.aw.bbp_total_time:  # noqa: SIM102
                     stattype_str += f'{newline}{bottom}@{self.aw.bbp_bottom_temp:.0f}{degree}{self.mode}, '
@@ -10713,18 +10706,8 @@ class tgraphcanvas(FigureCanvas):
                     stattype_str += f'{newline}{charge}@{self.temp2[self.timeindex[0]]:.0f}{degree}{self.mode}, '
                     stattype_str += f'{stringfromseconds(self.aw.bbp_bottom_to_charge_time,False)} {from_s} {bottom}'
             elif n == 26:  # BBP summary long  (2 lines minimum)
-                if self.aw.bbp_total_time:  # noqa: SIM102
-                    seconds = int(math.floor(self.aw.bbp_begin_to_bottom_time + 0.5))
-                    d, m = divmod(seconds, 60)
-                    bbp_str = f'{bottom} temp@{self.aw.bbp_bottom_temp:.0f}{degree}{self.mode} - '
-                    bbp_str += f"{d}min {m}sec {from_s} {begin} {QApplication.translate('AddlInfo', 'to')} {QApplication.translate('AddlInfo', 'Bottom')} {QApplication.translate('CheckBox', 'Temp')}"
-                    stattype_str += wrapString(bbp_str)
-                    bbp_str = f'{newline}{charge} temp: {self.temp2[self.timeindex[0]]:.0f}{degree}{self.mode} - '
-                    bbp_str += (f"{self.aw.bbp_bottom_to_charge_time:.0f}{QApplication.translate('AddlInfo', 'sec')} "
-                                f"{from_s} {bottom} "
-                                f"{QApplication.translate('CheckBox', 'Temp')} {QApplication.translate('AddlInfo', 'to')} {QApplication.translate('AddlInfo', 'CHARGE')}"
-                                )
-                    stattype_str += wrapString(bbp_str)
+                # removed
+                stattype_str = f'{newline}'
             elif n == 27:  # BBP summary compact
                 if self.aw.bbp_total_time:  # noqa: SIM102
                     startingtemp = self.aw.bbp_dropbt if self.aw.bbp_begin == 'DROP' else self.temp2[0]
