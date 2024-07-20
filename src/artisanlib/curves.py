@@ -2330,7 +2330,9 @@ class CurvesDlg(ArtisanDialog):
         self.aw.qmc.graphfont = n
         #self.aw.setFonts()
         self.aw.setFonts(redraw=True)
-        self.aw.qmc.redraw(recomputeAllDeltas=True, re_smooth_background=True)  #note:for summary statistics there is still a slight shift seen on redraw() at accept.
+        # addl redraw only when not ON and Show Summary is enabled
+        if not self.aw.qmc.flagon and self.aw.qmc.statssummary:
+            self.aw.qmc.redraw(recomputeAllDeltas=True, re_smooth_background=True)  #note:for summary statistics there is still a slight shift seen on redraw() at accept.
 
     @pyqtSlot()
     def changeDeltaBTfilter(self) -> None:

@@ -200,36 +200,42 @@ class StatisticsDlg(ArtisanResizeablDialog):
                 #       This is to maintain compatibility with previous settings.
                 #   Once the createSummarystatsTable is opened the change(s) to 'Blank Line' will be updated in settings. 
                 self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Blank Line')),                      # 0
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Title')),                           # 1
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Roast Date, Time')),                # 2
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Roast of the Day')),                # 3
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Ambient Temp, Hum, Pres')),         # 4
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Roaster, RPM')),                    # 5
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Bean')),                            # 6
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Screen Size')),                     # 7
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Density Green')),                   # 8
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Moisture Green')),                  # 9
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Batch Size')),                      # 10
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Density Roasted')),                 # 11
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Moisture Roasted')),                # 12
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Ground Color')),                    # 13
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Energy')),                          # 14
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','CO2')),                             # 15
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','AUC')),                             # 16
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Notes (Roast)')),                   # 17
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Cupping Score')),                   # 18
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Notes (Cupping)')),                 # 19
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Weight Green')),                    # 20
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Weight Roasted')),                  # 21
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Weight Loss')),                     # 22
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','BBP Total Time')),                  # 23
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','BBP Bottom Temp')),                 # 24
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('Label','Title')),                              # 1
+                self.aw.qmc.dijkstra_to_ascii(f"{QApplication.translate('Dialog','Roast')} "                         # 2
+                                              f"{QApplication.translate('Label','Date')}, "
+                                              f"{QApplication.translate('CheckBox','Time')}"),
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('AddlInfo','Roast of the Day')),                # 3
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Ambient Conditions')),              # 4
+                self.aw.qmc.dijkstra_to_ascii(f"{QApplication.translate('Label','Roaster')}, "                       # 5
+                                              f"{QApplication.translate('Label','Drum Speed')}"),
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('Label','Beans')),                              # 6
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('AddlInfo','Screen Size')),                     # 7
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('AddlInfo','Density Green')),                   # 8
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('AddlInfo','Moisture Green')),                  # 9
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('AddlInfo','Batch Size')),                      # 10
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('AddlInfo','Density Roasted')),                 # 11
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('AddlInfo','Moisture Roasted')),                # 12
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('AddlInfo','Ground Color')),                    # 13
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('AddlInfo','Energy')),                          # 14
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('AddlInfo','CO2')),                             # 15
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('GroupBox','AUC')),                             # 16
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('Label','Roasting Notes')),                     # 17
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('Label','Cupping Score')),                      # 18
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('Label','Cupping Notes')),                      # 19
+                self.aw.qmc.dijkstra_to_ascii(f"{QApplication.translate('Label','Weight')} "                         # 20
+                                              f"{QApplication.translate('Label','Green')}"),
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('AddlInfo','Weight Roasted')),                  # 21
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('AddlInfo','Weight Loss')),                     # 22
+                self.aw.qmc.dijkstra_to_ascii(f"{QApplication.translate('AddlInfo', 'Total')} "                      # 23
+                                              f"{QApplication.translate('CheckBox', 'Time')}"),
+                self.aw.qmc.dijkstra_to_ascii(f"BBP {QApplication.translate('AddlInfo', 'Bottom')} "                 # 24
+                                              f"{QApplication.translate('CheckBox', 'Temp')}"),
                 self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','BBP Summary')),                     # 25
                 self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','BBP Summary long')),                # 26
                 self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','BBP Summary compact')),             # 27
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Phases-Finish Time and Temp')),     # 28
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Phases-Mid Time and Temp')),        # 29
-                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Phases-Dry Time and Temp')),        # 30
+                self.aw.qmc.dijkstra_to_ascii(f"{QApplication.translate('Table','Phases')} - {QApplication.translate('Label','Finishing')}"), # 28
+                self.aw.qmc.dijkstra_to_ascii(f"{QApplication.translate('Table','Phases')} - {QApplication.translate('Label','Maillard')}"),  # 29
+                self.aw.qmc.dijkstra_to_ascii(f"{QApplication.translate('Table','Phases')} - {QApplication.translate('Label','Drying')}"),    # 30
                 ]
 
         # function to remove from a list any elements matching string_to_remove
@@ -244,7 +250,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
         self.storeState()
 
         # show statistics summary
-        self.ShowStatsSummary = QCheckBox(QApplication.translate('CheckBox', 'Show Summary'))
+        self.ShowStatsSummary = QCheckBox(f"{QApplication.translate('Label', 'Show')} {QApplication.translate('CheckBox', 'Summary')}")
         self.ShowStatsSummary.setToolTip(QApplication.translate('Tooltip','Show Summary Statistics'))
         self.ShowStatsSummary.setChecked(self.aw.qmc.statssummary)
         self.ShowStatsSummary.stateChanged.connect(self.changeStatsSummary)         #toggle
@@ -302,7 +308,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
             self.copyTableButton.setToolTip(QApplication.translate('Tooltip','Copy table to clipboard, OPTION or ALT click for tabular text'))
             self.copyTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             self.copyTableButton.clicked.connect(self.copyEventButtonTabletoClipboard)
-        self.defaultButton = QPushButton(QApplication.translate('Button', 'Default'))
+        self.defaultButton = QPushButton(QApplication.translate('Button', 'Defaults'))
         if self.defaultButton is not None:
             self.defaultButton.setToolTip(QApplication.translate('Tooltip','Set Statistics Summary to default settings'))
             self.defaultButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -345,7 +351,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
         tab1layout.addLayout(vgroupLayout)
         C1Widget = QWidget()
         C1Widget.setLayout(tab1layout)
-        self.TabWidget.addTab(C1Widget,QApplication.translate('Tab','Statistics'))
+        self.TabWidget.addTab(C1Widget,QApplication.translate('Form Caption','Statistics'))
         C1Widget.setContentsMargins(5, 0, 5, 0)
 
         ### tab2 layout
@@ -358,7 +364,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
 
         C2Widget = QWidget()
         C2Widget.setLayout(tab2layout)
-        self.TabWidget.addTab(C2Widget,QApplication.translate('Tab','Summary Stats'))
+        self.TabWidget.addTab(C2Widget,QApplication.translate('GroupBox','Stats Summary'))
         C2Widget.setContentsMargins(5, 0, 5, 0)
 
         self.TabWidget.currentChanged.connect(self.tabSwitched)
@@ -576,7 +582,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
         self.summarystatstable.setColumnCount(columns)
         self.summarystatstable.setHorizontalHeaderLabels([
                                                          '',
-                                                         QApplication.translate('Table','Statistic'),
+                                                         QApplication.translate('Tab','Statistics'),
                                                          ])
         self.summarystatstable.setEditTriggers(QTableWidget.EditTrigger.SelectedClicked)
         self.summarystatstable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)

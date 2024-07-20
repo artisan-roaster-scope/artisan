@@ -10578,9 +10578,9 @@ class tgraphcanvas(FigureCanvas):
         def buildStat(n:int) -> str:
             stattype_str = ''
             degree = '\u00b0'
-            charge = QApplication.translate('AddlInfo', 'Charge')
-            begin = QApplication.translate('AddlInfo', 'Drop') if self.aw.bbp_begin == 'DROP' else QApplication.translate('AddlInfo', 'Start')
-            from_s = QApplication.translate('AddlInfo', 'from')
+            charge = QApplication.translate('Button', 'CHARGE')
+            begin = QApplication.translate('Button', 'DROP') if self.aw.bbp_begin == 'DROP' else QApplication.translate('Button', 'START')
+            from_s = QApplication.translate('AddlInfo', 'From')
             bottom = QApplication.translate('AddlInfo', 'Bottom')
             if n == 0:  #Blank line
                 stattype_str = f'{newline}'
@@ -10602,7 +10602,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.ambientTemp not in [None,0]:
                         stattype_str += f'{str(int(round(self.ambientTemp)))}{degree}{self.mode}  '
                     if self.ambient_humidity not in [None,0]:
-                        stattype_str += f'{str(int(round(self.ambient_humidity)))}%  '
+                        stattype_str += f'{str(int(round(self.ambient_humidity)))}% RH '
                     if self.ambient_pressure not in [None,0]:
                         stattype_str += f'{str(float2float(self.ambient_pressure,2))}hPa'
             elif n == 5:  #Roaster, RPM
@@ -10611,7 +10611,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.roastertype:
                         stattype_str += f'{self.roastertype} '
                     if self.drumspeed:
-                        stattype_str += f"({self.drumspeed}{QApplication.translate('AddlInfo', 'RPM')})"
+                        stattype_str += f'({self.drumspeed}RPM)'
             elif n == 6:  #Bean
                 if self.beans is not None and len(self.beans)>0:
                     stattype_str = wrapNotes(self.beans)
@@ -10626,12 +10626,12 @@ class tgraphcanvas(FigureCanvas):
                         stattype_str += f'{int(round(self.beansize_max))}'
             elif n == 8:  #Density Green
                 if self.density[0]!=0 and self.density[2] != 0:
-                    stattype_str += (f"{newline}{QApplication.translate('AddlInfo', 'Density Green')}: "
+                    stattype_str += (f"{newline}{QApplication.translate('Label', 'Density')} {QApplication.translate('Label', 'Green')}: "
                         f'{dropZeroDecimal(self.density[0]/self.density[2],1)}'
                         f'{self.density[1]}/{self.density[3]}')
             elif n == 9:  #Moisture Green
                 if self.moisture_greens:
-                    stattype_str += f"{newline}{QApplication.translate('AddlInfo', 'Moisture Green')}: {dropZeroDecimal(self.moisture_greens,1)}%"
+                    stattype_str += f"{newline}{QApplication.translate('Label', 'Moisture')} {QApplication.translate('Label', 'Green')}: {dropZeroDecimal(self.moisture_greens,1)}%"
             elif n == 10:  #Batch Size
                 if self.weight[0] != 0:
                     if self.weight[2] == 'g':
@@ -10687,7 +10687,7 @@ class tgraphcanvas(FigureCanvas):
                         w = f'{float2float(self.weight[0],0)}'
                     else:
                         w = f'{dropZeroDecimal(self.weight[0],2)}'
-                    stattype_str += (f"{newline}{QApplication.translate('AddlInfo', 'Weight Green')}: "
+                    stattype_str += (f"{newline}{QApplication.translate('Label', 'Weight')} {QApplication.translate('Label', 'Green')}: "
                         f'{w}{self.weight[2]} ')
             elif n == 21:  #Weight Roasted
                 if self.weight[1] != 0:
@@ -10702,10 +10702,10 @@ class tgraphcanvas(FigureCanvas):
                     stattype_str += f"{newline}{QApplication.translate('AddlInfo', 'Weight Loss')} -{dropZeroDecimal(self.aw.weight_loss(self.weight[0],self.weight[1]),1)}%"
             elif n == 23:  # BBP total time
                 if self.aw.bbp_total_time:
-                    stattype_str += f"{newline}{QApplication.translate('AddlInfo', 'BBP Total Time')} {stringfromseconds(self.aw.bbp_total_time)}"
+                    stattype_str += f"{newline}BBP {QApplication.translate('AddlInfo', 'Total')} {QApplication.translate('CheckBox', 'Time')} {stringfromseconds(self.aw.bbp_total_time)}"
             elif n == 24:  # BBP bottom temp (BT)
                 if self.aw.bbp_bottom_temp:
-                    stattype_str += f"{newline}{QApplication.translate('AddlInfo', 'BBP Bottom Temp')} {self.aw.bbp_bottom_temp:.1f}{degree}{self.aw.qmc.mode}"
+                    stattype_str += f"{newline}BBP {QApplication.translate('AddlInfo', 'Bottom')} {QApplication.translate('CheckBox', 'Temp')} {self.aw.bbp_bottom_temp:.1f}{degree}{self.aw.qmc.mode}"
             elif n == 25:  # BBP summary
                 if self.aw.bbp_total_time:  # noqa: SIM102
                     stattype_str += f'{newline}{bottom}@{self.aw.bbp_bottom_temp:.0f}{degree}{self.mode}, '
@@ -10717,10 +10717,13 @@ class tgraphcanvas(FigureCanvas):
                     seconds = int(math.floor(self.aw.bbp_begin_to_bottom_time + 0.5))
                     d, m = divmod(seconds, 60)
                     bbp_str = f'{bottom} temp@{self.aw.bbp_bottom_temp:.0f}{degree}{self.mode} - '
-                    bbp_str += f"{d}min {m}sec {from_s} {begin} {QApplication.translate('AddlInfo', 'to bottom temp')}"
+                    bbp_str += f"{d}min {m}sec {from_s} {begin} {QApplication.translate('AddlInfo', 'to')} {QApplication.translate('AddlInfo', 'Bottom')} {QApplication.translate('CheckBox', 'Temp')}"
                     stattype_str += wrapString(bbp_str)
                     bbp_str = f'{newline}{charge} temp: {self.temp2[self.timeindex[0]]:.0f}{degree}{self.mode} - '
-                    bbp_str += f"{self.aw.bbp_bottom_to_charge_time:.0f}{QApplication.translate('AddlInfo', 'sec')} {from_s} {bottom} {QApplication.translate('AddlInfo', 'temp to charge')}"
+                    bbp_str += (f"{self.aw.bbp_bottom_to_charge_time:.0f}{QApplication.translate('AddlInfo', 'sec')} "
+                                f"{from_s} {bottom} "
+                                f"{QApplication.translate('CheckBox', 'Temp')} {QApplication.translate('AddlInfo', 'to')} {QApplication.translate('AddlInfo', 'CHARGE')}"
+                                )
                     stattype_str += wrapString(bbp_str)
             elif n == 27:  # BBP summary compact
                 if self.aw.bbp_total_time:  # noqa: SIM102
@@ -10732,7 +10735,7 @@ class tgraphcanvas(FigureCanvas):
                     stattype_str += f'{self.temp2[self.timeindex[0]]:.0f}{degree}{self.mode}'
             elif n == 28:  # Finish Phase Time and Temp
                 if 'finish_phase_delta_temp' in cp and 'finishphasetime' in cp and 'totaltime' in cp:  # noqa: SIM102
-                    stattype_str += (f"{newline}{QApplication.translate('AddlInfo', 'Finish Phase')}: "
+                    stattype_str += (f"{newline}{QApplication.translate('Button', 'Finishing Phase')}: "
                                      f"{int(cp['finish_phase_delta_temp'])}{degree}{self.mode}, "
                                      f"{stringfromseconds(cp['finishphasetime'])}, "
                                      f"{int(round(cp['finishphasetime']*100./cp['totaltime']))}%"
@@ -10740,14 +10743,14 @@ class tgraphcanvas(FigureCanvas):
 
             elif n == 29:  # Finish Phase Time and Temp
                 if 'mid_phase_delta_temp' in cp and 'midphasetime' in cp and 'totaltime' in cp:  # noqa: SIM102
-                    stattype_str += (f"{newline}{QApplication.translate('AddlInfo', 'Mid Phase')}: "
+                    stattype_str += (f"{newline}{QApplication.translate('Button', 'Maillard Phase')}: "
                                      f"{int(cp['mid_phase_delta_temp'])}{degree}{self.mode}, "
                                      f"{stringfromseconds(cp['midphasetime'])}, "
                                      f"{int(round(cp['midphasetime']*100./cp['totaltime']))}%"
                                      )
             elif n == 30:  # Finish Phase Time and Temp
                 if 'dry_phase_delta_temp' in cp and 'dryphasetime' in cp and 'totaltime' in cp:  # noqa: SIM102
-                    stattype_str += (f"{newline}{QApplication.translate('AddlInfo', 'Dry Phase')}: "
+                    stattype_str += (f"{newline}{QApplication.translate('Button', 'Drying Phase')}: "
                                      f"{int(cp['dry_phase_delta_temp'])}{degree}{self.mode}, "
                                      f"{stringfromseconds(cp['dryphasetime'])}, "
                                      f"{int(round(cp['dryphasetime']*100./cp['totaltime']))}%"

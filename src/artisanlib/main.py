@@ -2274,12 +2274,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.rankingExcelAction.triggered.connect(self.rankingExcelReport)
                     self.rankingMenu.addAction(self.rankingExcelAction)
 
-            self.saveStatisticsMenu: Optional[QMenu] = self.fileMenu.addMenu(QApplication.translate('Menu', 'Save Statistics'))
+            self.saveStatisticsMenu: Optional[QMenu] = self.fileMenu.addMenu(QApplication.translate('Message', 'Save Statistics'))
             if self.saveStatisticsMenu is not None:
-                savestatisticsIMGAction = QAction(QApplication.translate('Menu', 'Image...'), self)
+                savestatisticsIMGAction = QAction(f"{QApplication.translate('Menu', 'Image')}...", self)
                 savestatisticsIMGAction.triggered.connect(self.saveStatistics_IMG)
                 self.saveStatisticsMenu.addAction(savestatisticsIMGAction)
-                savestatisticsTXTAction = QAction(QApplication.translate('Menu', 'Text...'),self)
+                savestatisticsTXTAction = QAction(f"{QApplication.translate('Menu', 'Text')}...",self)
                 savestatisticsTXTAction.triggered.connect(self.saveStatistics_TXT)
                 self.saveStatisticsMenu.addAction(savestatisticsTXTAction)
 
