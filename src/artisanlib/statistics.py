@@ -190,15 +190,15 @@ class StatisticsDlg(ArtisanResizeablDialog):
         self.summarystatstypes:List[int] = []
         self.buttonlistmaxlen:int = self.aw.buttonlistmaxlen
         # Statistic entries are made here and in buildStat() in canvas.py
-        self.summarystats_types:List[str] = [ 
+        self.summarystats_types:List[str] = [
                 # Presentation of these stats is done with corresponding entries in canvas:statsSummary():buildStat()
-                # Add new stats at the end of the list. 
+                # Add new stats at the end of the list.
                 # The string used to identify a statistic may be changed without causing compatibility issues
-                # To remove a stat: 
+                # To remove a stat:
                 #   Do not delete it, change its entry to 'Unused' and do not translate it.
                 #   The handler in canvas:statsSummary():buildStat() for the stattype must remain, it should be changed to "stattype_str = f'{newline}'".
                 #       This is to maintain compatibility with previous settings.
-                #   Once the createSummarystatsTable is opened the change(s) to 'Blank Line' will be updated in settings. 
+                #   Once the createSummarystatsTable is opened the change(s) to 'Blank Line' will be updated in settings.
                 self.aw.qmc.dijkstra_to_ascii(QApplication.translate('ComboBox','Blank Line')),                      # 0
                 self.aw.qmc.dijkstra_to_ascii(QApplication.translate('Label','Title')),                              # 1
                 self.aw.qmc.dijkstra_to_ascii(f"{QApplication.translate('Dialog','Roast')} "                         # 2
@@ -250,7 +250,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
         self.storeState()
 
         # show statistics summary
-        self.ShowStatsSummary = QCheckBox(f"{QApplication.translate('Label', 'Show')} {QApplication.translate('CheckBox', 'Summary')}")
+        self.ShowStatsSummary = QCheckBox(QApplication.translate('CheckBox', 'Show summary'))
         self.ShowStatsSummary.setToolTip(QApplication.translate('Tooltip','Show Summary Statistics'))
         self.ShowStatsSummary.setChecked(self.aw.qmc.statssummary)
         self.ShowStatsSummary.stateChanged.connect(self.changeStatsSummary)         #toggle
@@ -323,11 +323,11 @@ class StatisticsDlg(ArtisanResizeablDialog):
 
         statstablebuttonslayout = QHBoxLayout()
         statstablebuttonslayout.addWidget(self.ShowStatsSummary)
-#        statstablebuttonslayout.addSpacing(15)
+        statstablebuttonslayout.addSpacing(10)
         statstablebuttonslayout.addStretch()
         statstablebuttonslayout.addWidget(self.statsmaxchrperlinelabel)
         statstablebuttonslayout.addWidget(self.statsmaxchrperlineSpinBox)
- #       statstablebuttonslayout.addSpacing(15)
+        statstablebuttonslayout.addSpacing(5)
         statstablebuttonslayout.addStretch()
         statstablebuttonslayout.addWidget(self.fontsizeLabel)
         statstablebuttonslayout.addWidget(self.fontsizeSpinBox)
@@ -340,12 +340,14 @@ class StatisticsDlg(ArtisanResizeablDialog):
         tab2buttonlayout.addStretch()
         tab2buttonlayout.addWidget(self.defaultButton)
 #        tab2buttonlayout.addWidget(helpDialogButton)
+        tab2buttonlayout.setContentsMargins(10, 0, 0, 0)  # left, top, right, bottom
 
         self.dialogbuttons.accepted.connect(self.accept)
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel))
 
         ### tab1 layout
         self.TabWidget = QTabWidget()
+        self.TabWidget.setContentsMargins(0, 0, 0, 0)  # left, top, right, bottom
         tab1layout = QVBoxLayout()
         tab1layout.addWidget(displayGroupLayout)
         tab1layout.addLayout(vgroupLayout)
@@ -360,18 +362,20 @@ class StatisticsDlg(ArtisanResizeablDialog):
         tab2layout.addLayout(statstablebuttonslayout)
         tab2layout.addLayout(tab2buttonlayout)
         tab2layout.setSpacing(5)
-        tab2layout.setContentsMargins(0,10,0,5)
+        tab2layout.setContentsMargins(0,10,0,5)  # left, top, right, bottom
 
         C2Widget = QWidget()
         C2Widget.setLayout(tab2layout)
         self.TabWidget.addTab(C2Widget,QApplication.translate('GroupBox','Stats Summary'))
-        C2Widget.setContentsMargins(5, 0, 5, 0)
+        C2Widget.setContentsMargins(0, 0, 0, 0)  # left, top, right, bottom
 
         self.TabWidget.currentChanged.connect(self.tabSwitched)
 
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(self.TabWidget)
         mainLayout.addLayout(buttonsLayout)
+        mainLayout.setSpacing(0)
+        mainLayout.setContentsMargins(5, 10, 5, 0)  # left, top, right, bottom
         self.setLayout(mainLayout)
 
         if platform.system() != 'Windows':
@@ -556,8 +560,8 @@ class StatisticsDlg(ArtisanResizeablDialog):
         self.aw.qmc.redraw(recomputeAllDeltas=False)
 
     def createSummarystatsTable(self) -> None:
-        # Column zero with the row numbers is added, and the row header disabled to improve keyboard navigation.  With only 
-        # one column that is a ComboBox, the row selector also selects the ComboBox and the down arrow opens the combo.  No 
+        # Column zero with the row numbers is added, and the row header disabled to improve keyboard navigation.  With only
+        # one column that is a ComboBox, the row selector also selects the ComboBox and the down arrow opens the combo.  No
         # solution was found, tus this alternate implementaition.
 
         columns = 2  # With one column we don't need lists, but the plumbing is here if more columns are needed in the future
@@ -616,7 +620,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
             # change table entries that point to a statistic type that is 'Unused' to point to 'Blank Line' instead
             if self.summarystats_types[self.summarystatstypes[i]] == 'Unused':
                 typeComboBox.setCurrentIndex(self.summarystats_types_sorted.index(self.summarystats_types[0]))
-                self.summarystatstypes[i] = 0  # updates to settings on 
+                self.summarystatstypes[i] = 0  # updates to settings on
             else:
                 typeComboBox.setCurrentIndex(self.summarystats_types_sorted.index(self.summarystats_types[self.summarystatstypes[i]]))
             typeComboBox.currentIndexChanged.connect(self.setitemsummarystat)
@@ -819,5 +823,3 @@ class StatisticsDlg(ArtisanResizeablDialog):
 #
 #    def closeHelp(self) -> None:
 #        self.aw.closeHelpDialog(self.helpdialog)
-
-

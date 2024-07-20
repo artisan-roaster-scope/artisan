@@ -2276,7 +2276,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
             self.saveStatisticsMenu: Optional[QMenu] = self.fileMenu.addMenu(QApplication.translate('Message', 'Save Statistics'))
             if self.saveStatisticsMenu is not None:
-                savestatisticsIMGAction = QAction(f"{QApplication.translate('Menu', 'Image')}...", self)
+                savestatisticsIMGAction = QAction(f"{QApplication.translate('Menu', 'PDF...')}", self)
                 savestatisticsIMGAction.triggered.connect(self.saveStatistics_IMG)
                 self.saveStatisticsMenu.addAction(savestatisticsIMGAction)
                 savestatisticsTXTAction = QAction(f"{QApplication.translate('Menu', 'Text')}...",self)
