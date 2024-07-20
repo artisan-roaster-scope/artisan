@@ -42,6 +42,7 @@ application_name: Final[str] = 'Artisan'
 application_viewer_name: Final[str] = 'ArtisanViewer'
 application_organization_name: Final[str] = 'artisan-scope'
 application_organization_domain: Final[str] = 'artisan-scope.org'
+application_desktop_file_name: Final[str] = 'org.artisan_scope.artisan'
 
 
 try:

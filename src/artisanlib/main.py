@@ -236,7 +236,7 @@ from artisanlib.util import (appFrozen, uchr, decodeLocal, decodeLocalStrict, en
         fromFtoCstrict, fromCtoFstrict, RoRfromFtoCstrict, RoRfromCtoFstrict,
         convertRoR, convertRoRstrict, convertTemp, path2url, toInt, toString, toList, toFloat,
         toBool, toStringList, removeAll, application_name, application_viewer_name, application_organization_name,
-        application_organization_domain, getDataDirectory, getAppPath, getResourcePath, debugLogLevelToggle,
+        application_organization_domain, application_desktop_file_name, getDataDirectory, getAppPath, getResourcePath, debugLogLevelToggle,
         debugLogLevelActive, setDebugLogLevel, createGradient, natsort, setDeviceDebugLogLevel,
         comma2dot, is_proper_temp, weight_units, volume_units, float2float,
         convertWeight, convertVolume, rgba_colorname2argb_colorname)
@@ -647,6 +647,9 @@ app.setApplicationName(application_name)                                #needed 
 app.setOrganizationName(application_organization_name)                  #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationDomain(application_organization_domain)              #needed by QSettings() to store windows geometry in operating system
 
+if sys.platform.startswith('linux'):
+    app.setDesktopFileName(application_desktop_file_name)
+
 # replace revision string with git hash when running from source
 if not appFrozen() and __revision__ in {'', '0'}:
     try:
@@ -789,7 +792,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         f = self.locLabel.font()
 
         if platform.system() == 'Linux':
-            f.setPointSize(f.pointSize()+2)
+            f.setPointSize(f.pointSize())
         else:
             f.setPointSize(f.pointSize()+4)
 ##        f.setStyleHint(QFont.StyleHint.TypeWriter) # not monospaced!
