@@ -183,6 +183,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
         displayGroupLayout.setLayout(flagsLayout)
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addWidget(self.dialogbuttons)
+        buttonsLayout.setContentsMargins(15, 15, 15, 15)  # left, top, right, bottom
         vgroupLayout = QVBoxLayout()
         vgroupLayout.addWidget(AUCgroupLayout)
 
@@ -259,10 +260,10 @@ class StatisticsDlg(ArtisanResizeablDialog):
         self.statsmaxchrperlineSpinBox.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.statsmaxchrperlineSpinBox.valueChanged.connect(self.setstatsmaxchrperline)
         # Font size
-        self.fontsizeLabel = QLabel(QApplication.translate('Label', 'Font size'))
+        self.fontsizeLabel = QLabel(QApplication.translate('Table', 'Text Size'))
         self.fontsizeSpinBox = QSpinBox()
         self.fontsizeSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.fontsizeSpinBox.setToolTip(QApplication.translate('Tooltip','Choose the font size, note Humor can not be resized\nFont type is set in Config>> Curves>> UI tab'))
+        self.fontsizeSpinBox.setToolTip(QApplication.translate('Tooltip','Choose the font size\nFont type is set in Config>> Curves>> UI tab'))
         self.fontsizeSpinBox.setRange(1,4)
         self.fontsizeSpinBox.setValue(int(round(self.aw.summarystatsfontsize)))
         self.fontsizeSpinBox.setFocusPolicy(Qt.FocusPolicy.StrongFocus)

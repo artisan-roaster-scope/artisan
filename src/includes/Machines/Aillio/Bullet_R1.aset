@@ -4,6 +4,9 @@ Oversampling=true
 roastertype_setup=Aillio Bullet R1
 roastersize_setup=1
 
+[Units]
+weight=g
+
 [Style]
 ETname=DT
 

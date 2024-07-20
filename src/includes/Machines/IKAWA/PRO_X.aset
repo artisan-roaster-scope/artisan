@@ -10,6 +10,9 @@ BTlcd=true
 BTBflag=true
 curvefilter=1
 
+[Units]
+weight=g
+
 [Alarms]
 alarm_popup_timout=10
 alarmaction=7, -1, 16, -1, 13, 15

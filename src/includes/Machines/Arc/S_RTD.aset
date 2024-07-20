@@ -8,6 +8,9 @@ roastertype_setup=ARC S RTD
 ETfunction=Y3
 roastersize_setup=0.2
 
+[Units]
+weight=g
+
 [Device]
 id=126
 

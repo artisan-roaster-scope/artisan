@@ -26,7 +26,7 @@
 ######
 # packages that are required on all platforms
 #
-setuptools==70.3.0 # py2app fails on 71.0.3; pyinstaller windows/linux fails on 71.0.0 <= < 71.0.3
+setuptools==70.3.0 # py2app fails on 71.0.3 and 71.0.4; pyinstaller windows/linux fails on 71.0.0 <= < 71.0.3
 wheel==0.43.0
 pyserial==3.5
 pymodbus==3.6.9
@@ -85,7 +85,7 @@ yoctopuce==2.0.61813; sys_platform!='darwin' or (sys_platform=='darwin' and plat
 PyQt5==5.15.10; (sys_platform=='darwin' and platform_release<'20.0') or (platform_system=='Windows' and python_version<'3.9')
 PyQtWebEngine==5.15.6; (sys_platform=='darwin' and platform_release<'20.0') or (platform_system=='Windows' and python_version<'3.9')
 # Qt6 on macOS 11+, Windows 10/11 and Linux
-PyQt6==6.7.0; (sys_platform=='darwin' and platform_release>='20.0') or (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')
+PyQt6==6.7.1; (sys_platform=='darwin' and platform_release>='20.0') or (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')
 PyQt6-WebEngine==6.7.0; (sys_platform=='darwin' and platform_release>='20.0') or (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')
 ###
 pyinstaller==6.9.0; platform_system=='Linux' # on Windows pyinstaller is separately installed (see above)

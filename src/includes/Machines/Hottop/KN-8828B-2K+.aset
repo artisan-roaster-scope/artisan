@@ -3,6 +3,9 @@ Delay=1000
 roastertype_setup=Hottop 2K+
 dropDuplicates=true
 
+[Units]
+weight=g
+
 [ArduinoPID]
 dutyMax=100
 dutyMin=-100

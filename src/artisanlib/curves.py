@@ -2526,7 +2526,7 @@ class CurvesDlg(ArtisanDialog):
         self.aw.qmc.resetlinecountcaches()
         self.aw.qmc.resetlines()
         self.aw.qmc.updateDeltaSamples()
-        
+
         if self.aw.qmc.statssummary and self.aw.qmc.autotimex:
             self.aw.qmc.redraw(recomputeAllDeltas=True, re_smooth_background=True)
         else:
@@ -2575,7 +2575,7 @@ class CurvesDlg(ArtisanDialog):
         self.aw.qmc.filterDropOuts = self.FilterSpikes.isChecked()
         self.aw.qmc.dropSpikes = self.DropSpikes.isChecked()
         self.aw.qmc.dropDuplicates = self.DropDuplicates.isChecked()
-        self.aw.qmc.dropDuplicatesLimit = self.DropDuplicatesLimit.value()
+        self.aw.qmc.dropDuplicatesLimit = float2float(self.DropDuplicatesLimit.value(),2)
         self.aw.qmc.minmaxLimits = self.MinMaxLimits.isChecked()
         self.aw.qmc.filterDropOut_tmin = int(self.minLimit.value())
         self.aw.qmc.filterDropOut_tmax = int(self.maxLimit.value())

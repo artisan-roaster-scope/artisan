@@ -240,7 +240,7 @@ class CompletedItem(BaseModel):
     cupping_score: float
     cuppingnotes: str = Field(default='')
 
-    @computed_field  # type:ignore[misc] # Decorators on top of @property are not supported
+    @computed_field  # type:ignore[prop-decorator] # Decorators on top of @property are not supported
     @property
     def prefix(self) -> str:
         res = ''

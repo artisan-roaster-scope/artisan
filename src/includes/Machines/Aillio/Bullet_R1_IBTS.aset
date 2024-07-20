@@ -1,8 +1,11 @@
-w[General]
+[General]
 Delay=1000
 Oversampling=true
 roastertype_setup=Aillio Bullet R1 IBTS
 roastersize_setup=1
+
+[Units]
+weight=g
 
 [Style]
 BTname=IBTS

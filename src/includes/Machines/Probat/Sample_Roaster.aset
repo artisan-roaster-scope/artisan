@@ -6,6 +6,9 @@ roastertype_setup=Probat Sample
 roastersize_setup=0.2
 roasterheating_setup=3
 
+[Units]
+weight=g
+
 [DefaultButtons]
 buttonactions=0, 21, 21, 21, 21, 21, 0, 0
 buttonactionstrings="send({\"command\":\"startRoasting\",\"params\":{\"mode\":\"manual\"}})", "send({\"command\":\"addEvent\",\"params\":{\"type\":\"colorChangeEvent\"}})", "send({\"command\":\"addEvent\",\"params\":{\"type\":\"firstCrackBeginningEvent\"}})", "send({\"command\":\"addEvent\",\"params\":{\"type\":\"firstCrackEndEvent\"}})", "send({\"command\":\"addEvent\",\"params\":{\"type\":\"secondCrackBeginningEvent\"}})", "send({\"command\":\"addEvent\",\"params\":{\"type\":\"secondCrackEndEvent\"}})", send({\"command\":\"stopRoasting\"}), 

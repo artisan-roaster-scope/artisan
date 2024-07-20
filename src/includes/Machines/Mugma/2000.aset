@@ -6,6 +6,9 @@ roastersize_setup=2
 roasterheating_setup_default=3
 roasterheating_setup=3
 
+[Units]
+weight=g
+
 [Device]
 id=164
 mugmaHost=127.0.0.1

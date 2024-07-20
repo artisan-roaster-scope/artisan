@@ -3,6 +3,9 @@ Delay=2000
 Oversampling=true
 roastertype_setup=Hottop TC4
 
+[Units]
+weight=g
+
 [ArduinoPID]
 dutyMax=100
 dutyMin=-100

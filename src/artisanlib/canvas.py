@@ -11109,7 +11109,7 @@ class tgraphcanvas(FigureCanvas):
             if self.step100temp is not None:
                 self.step100temp = int(round(fromCtoFstrict(self.step100temp)))
             self.AUCbase = int(round(fromCtoFstrict(self.AUCbase)))
-            self.dropDuplicatesLimit = fromCtoFstrict(100 + self.dropDuplicatesLimit) - fromCtoFstrict(100)
+            self.dropDuplicatesLimit = float2float(fromCtoFstrict(100 + self.dropDuplicatesLimit) - fromCtoFstrict(100),2)
             self.RoRlimitm = int(round(fromCtoFstrict(self.RoRlimitm)))
             self.RoRlimit = int(round(fromCtoFstrict(self.RoRlimit)))
             self.alarmtemperature = [(fromCtoFstrict(t) if t != 500 else t) for t in self.alarmtemperature]
@@ -11146,7 +11146,7 @@ class tgraphcanvas(FigureCanvas):
             if self.step100temp is not None:
                 self.step100temp = int(round(fromFtoCstrict(self.step100temp)))
             self.AUCbase = int(round(fromFtoCstrict(self.AUCbase)))
-            self.dropDuplicatesLimit = fromFtoCstrict(212 + self.dropDuplicatesLimit) - fromFtoCstrict(212)
+            self.dropDuplicatesLimit = float2float(fromFtoCstrict(212 + self.dropDuplicatesLimit) - fromFtoCstrict(212),2)
             self.RoRlimitm = int(round(fromFtoCstrict(self.RoRlimitm)))
             self.RoRlimit = int(round(fromFtoCstrict(self.RoRlimit)))
             self.alarmtemperature = [(fromFtoCstrict(t) if t != 500 else t) for t in self.alarmtemperature]

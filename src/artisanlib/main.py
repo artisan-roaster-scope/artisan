@@ -2279,7 +2279,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 savestatisticsIMGAction = QAction(f"{QApplication.translate('Menu', 'PDF...')}", self)
                 savestatisticsIMGAction.triggered.connect(self.saveStatistics_IMG)
                 self.saveStatisticsMenu.addAction(savestatisticsIMGAction)
-                savestatisticsTXTAction = QAction(f"{QApplication.translate('Menu', 'Text')}...",self)
+                savestatisticsTXTAction = QAction(f"{QApplication.translate('Button', 'Text')}...",self)
                 savestatisticsTXTAction.triggered.connect(self.saveStatistics_TXT)
                 self.saveStatisticsMenu.addAction(savestatisticsTXTAction)
 
@@ -24659,7 +24659,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 ('\\r', self.qmc.etypes[3]),
                 ('\\i', QApplication.translate('Label','STIRRER')),
                 ('\\f', QApplication.translate('Label','FILL')),
-                ('\\r', QApplication.translate('Label','RELEASE')),
+                ('\\R', QApplication.translate('Label','RELEASE')),
                 ('\\h', QApplication.translate('Label','HEATING')),
                 ('\\l', QApplication.translate('Label','COOLING'))
                 ]:

@@ -1,4 +1,4 @@
-types-openpyxl>=3.1.5.20240630
+types-openpyxl>=3.1.5.20240719
 types-Pillow>=10.2.0.20240520
 types-protobuf>=5.27.0.20240626
 types-psutil>=6.0.0.20240621
@@ -10,12 +10,12 @@ types-requests>=2.32.0.20240712
 types-setuptools>=70.3.0.20240710
 types-urllib3>=1.26.25.14
 lxml-stubs>=0.5.1
-mypy==1.10.1
+mypy==1.11.0
 pyright==1.1.372
 ruff>=0.5.3
 pylint==3.2.5
 pre-commit>=3.7.0
-pytest>=8.2.2
+pytest>=8.3.1
 pytest-cov==5.0.0
 #pytest-qt==4.4.0
 #pytest-xvfb==3.0.0

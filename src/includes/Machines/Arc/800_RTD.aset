@@ -8,6 +8,9 @@ roastertype_setup=ARC 800 RTD
 ETfunction=
 roastersize_setup=0.8
 
+[Units]
+weight=g
+
 [Device]
 id=126
 

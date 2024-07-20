@@ -8,6 +8,9 @@ roastertype_setup=Arc S
 ETfunction=
 roastersize_setup=0.2
 
+[Units]
+weight=g
+
 [Device]
 id=115
 

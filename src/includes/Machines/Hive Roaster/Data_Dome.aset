@@ -1,3 +1,6 @@
 [Device]
 id=52
 roastertype_setup=Hive Roaster Data Dome
+
+[Units]
+weight=g
