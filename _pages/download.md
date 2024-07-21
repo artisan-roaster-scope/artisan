@@ -35,14 +35,7 @@ gallery:
     image_path: /assets/images/download-icon-rpi.png
     alt: "RPi"
     title: "RPi"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/latest/
-    image_path: /assets/images/download-icon-src.png
-    alt: "Source"
-    title: "Source"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/latest/
-    image_path: /assets/images/download-icon-github.png
-    alt: "GitHub"
-    title: "GitHub"
+
 ---
 
 [Artisan v2.10.4](https://github.com/artisan-roaster-scope/artisan/releases/tag/v2.10.4)
