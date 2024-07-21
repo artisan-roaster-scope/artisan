@@ -45,7 +45,7 @@ gallery:
     title: "GitHub"
 ---
 
-[Artisan v2.10.4](ttps://github.com/artisan-roaster-scope/artisan/releases/tag/v2.10.4)
+[Artisan v2.10.4](https://github.com/artisan-roaster-scope/artisan/releases/tag/v2.10.4)
 {: target="_blank" style="text-align: center; font-weight:bold;"}
 
 
