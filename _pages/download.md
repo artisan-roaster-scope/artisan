@@ -11,7 +11,7 @@ author_profile: false
 
 
 gallery:
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/latest/download/Windows.dmg
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/latest/download/Windows.zip
     image_path: /assets/images/download-icon-windows.png
     alt: "Windows"
     title: "Windows"
@@ -23,7 +23,7 @@ gallery:
     image_path: /assets/images/download-icon-linux.png
     alt: "Linux"
     title: "Linux"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/latest/download/Windows-legacy.dmg
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/latest/download/Windows-legacy.zip
     image_path: /assets/images/download-icon-windows-legacy.png
     alt: "Windows legacy"
     title: "Windows legacy"
@@ -31,7 +31,7 @@ gallery:
     image_path: /assets/images/download-icon-macos-legacy.png
     alt: "macOS legacy"
     title: "macOS legacy"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/latest/download/RPi.dmg
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/latest/download/RPi.deb
     image_path: /assets/images/download-icon-rpi.png
     alt: "RPi"
     title: "RPi"
