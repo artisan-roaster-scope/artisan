@@ -202,120 +202,127 @@ def authentify() -> bool:
                 r.status_code,
             )  # @UndefinedVariable
             # returns 404: login wrong and 401: passwd wrong
-            res = r.json()
-            if (
-                'success' in res
-                and res['success']
-                and 'result' in res
-                and 'user' in res['result']
-                and 'token' in res['result']['user']
-            ):
-                _log.debug(
-                    '-> authentified, token received'
-                )
-                # extract in user/account data
-                nickname = util.extractInfo(
-                    res['result']['user'], 'nickname', None
-                )
-                config.app_window.plus_language = util.extractInfo(
-                    res['result']['user'], 'language', 'en'
-                )
-                config.app_window.plus_user_id = util.extractInfo(
-                    res['result']['user'], 'user_id', None
-                )
-                config.app_window.plus_paidUntil = None
-                config.app_window.plus_subscription = None
-                config.app_window.plus_rlimit = 0
-                config.app_window.plus_used = 0
-                if 'account' in res['result']['user']:
-                    res_account = res['result']['user']['account']
-                    if '_id' in res_account:
-                        config.app_window.plus_account_id = res_account['_id']
-                    subscription = util.extractInfo(
-                        res_account, 'subscription', ''
+            if r.status_code != 204 and r.headers['content-type'].strip().startswith('application/json'):
+                res = r.json()
+                if (
+                    'success' in res
+                    and res['success']
+                    and 'result' in res
+                    and 'user' in res['result']
+                    and 'token' in res['result']['user']
+                ):
+                    _log.debug(
+                        '-> authentified, token received'
                     )
-                    config.app_window.updateSubscriptionSignal.emit(subscription)
-                    paidUntil = util.extractInfo(
-                        res_account, 'paidUntil', ''
+                    # extract in user/account data
+                    nickname = util.extractInfo(
+                        res['result']['user'], 'nickname', None
                     )
-                    rlimit = -1
-                    rused = -1
-                    notifications = 0 # unqualified notifications
-                    machines = [] # list of machine names with matching notifications
-                    try:
-                        if 'limit' in res['result']['user']['account']:
-                            ol = res_account['limit']
-                            if 'rlimit' in ol:
-                                rlimit = ol['rlimit']
-                            if 'rused' in ol:
-                                rused = ol['rused']
-                    except Exception as e:  # pylint: disable=broad-except
-                        _log.exception(e)
-
-                    if 'notifications' in res:
-                        notificationDict = res['notifications']
-                        if notificationDict:
-                            notifications = util.extractInfo(notificationDict, 'unqualified', 0)
-                            machines = util.extractInfo(notificationDict, 'machines', [])
+                    config.app_window.plus_language = util.extractInfo(
+                        res['result']['user'], 'language', 'en'
+                    )
+                    config.app_window.plus_user_id = util.extractInfo(
+                        res['result']['user'], 'user_id', None
+                    )
+                    config.app_window.plus_paidUntil = None
+                    config.app_window.plus_subscription = None
+                    config.app_window.plus_rlimit = 0
+                    config.app_window.plus_used = 0
+                    if 'account' in res['result']['user']:
+                        res_account = res['result']['user']['account']
+                        if '_id' in res_account:
+                            config.app_window.plus_account_id = res_account['_id']
+                        subscription = util.extractInfo(
+                            res_account, 'subscription', ''
+                        )
+                        config.app_window.updateSubscriptionSignal.emit(subscription)
+                        paidUntil = util.extractInfo(
+                            res_account, 'paidUntil', ''
+                        )
+                        rlimit = -1
+                        rused = -1
+                        notifications = 0 # unqualified notifications
+                        machines = [] # list of machine names with matching notifications
                         try:
-                            config.app_window.updateLimitsSignal.emit(rlimit,rused,paidUntil,notifications,machines)
+                            if 'limit' in res['result']['user']['account']:
+                                ol = res_account['limit']
+                                if 'rlimit' in ol:
+                                    rlimit = ol['rlimit']
+                                if 'rused' in ol:
+                                    rused = ol['rused']
                         except Exception as e:  # pylint: disable=broad-except
                             _log.exception(e)
 
+                        if 'notifications' in res:
+                            notificationDict = res['notifications']
+                            if notificationDict:
+                                notifications = util.extractInfo(notificationDict, 'unqualified', 0)
+                                machines = util.extractInfo(notificationDict, 'machines', [])
+                            try:
+                                config.app_window.updateLimitsSignal.emit(rlimit,rused,paidUntil,notifications,machines)
+                            except Exception as e:  # pylint: disable=broad-except
+                                _log.exception(e)
 
-                    # note, here we have to convert the dateUtil string locally , instead of accessing aw.plus_paidUntil which might not yet have been set via the signal processing above
-                    try:
-                        if paidUntil != '' and (
-                            dateutil.parser.parse(paidUntil).date()
-#                            - datetime.datetime.now().date()  # DTZ005 The use of `datetime.datetime.now()` without `tz` argument is not allowed
-                            - datetime.datetime.now(datetime.timezone.utc).date()
-                        ).days < (-config.expired_subscription_max_days):
-                            _log.debug(
-                                    '-> authentication failed due to'
-                                    ' long expired subscription'
-                            )
-                            if 'error' in res:
-                                config.app_window.sendmessage(
-                                    res['error']
-                                )  # @UndefinedVariable
-                            clearCredentials()
-                            return False
-                    except Exception as e:  # pylint: disable=broad-except
-                        _log.exception(e)
 
-                if 'readonly' in res['result']['user'] and isinstance(
-                    res['result']['user']['readonly'], bool
-                ):
-                    config.app_window.plus_readonly = res['result']['user'][
-                        'readonly'
-                    ]
-                else:
-                    config.app_window.plus_readonly = False
-                #
-                setToken(res['result']['user']['token'], nickname)
-                if (
-                    'account' in res['result']['user']
-                    and '_id' in res['result']['user']['account']
-                ):
-                    account_nr = account.setAccount(
-                        res['result']['user']['account']['_id']
-                    )
-                    config.account_nr = account_nr
-                    _log.debug(
-                        '-> account: %s', account_nr
-                    )
-                return True
-            _log.debug('-> authentication failed')
-            if 'error' in res:
-                config.app_window.sendmessage(
-                    res['error']
-                )  # @UndefinedVariable
+                        # note, here we have to convert the dateUtil string locally , instead of accessing aw.plus_paidUntil which might not yet have been set via the signal processing above
+                        try:
+                            if paidUntil != '' and (
+                                dateutil.parser.parse(paidUntil).date()
+    #                            - datetime.datetime.now().date()  # DTZ005 The use of `datetime.datetime.now()` without `tz` argument is not allowed
+                                - datetime.datetime.now(datetime.timezone.utc).date()
+                            ).days < (-config.expired_subscription_max_days):
+                                _log.debug(
+                                        '-> authentication failed due to'
+                                        ' long expired subscription'
+                                )
+                                if 'error' in res:
+                                    config.app_window.sendmessage(
+                                        res['error']
+                                    )  # @UndefinedVariable
+                                clearCredentials()
+                                return False
+                        except Exception as e:  # pylint: disable=broad-except
+                            _log.exception(e)
+
+                    if 'readonly' in res['result']['user'] and isinstance(
+                        res['result']['user']['readonly'], bool
+                    ):
+                        config.app_window.plus_readonly = res['result']['user'][
+                            'readonly'
+                        ]
+                    else:
+                        config.app_window.plus_readonly = False
+                    #
+                    setToken(res['result']['user']['token'], nickname)
+                    if (
+                        'account' in res['result']['user']
+                        and '_id' in res['result']['user']['account']
+                    ):
+                        account_nr = account.setAccount(
+                            res['result']['user']['account']['_id']
+                        )
+                        config.account_nr = account_nr
+                        _log.debug(
+                            '-> account: %s', account_nr
+                        )
+                    return True
+                _log.debug('-> authentication failed')
+                if 'error' in res:
+                    config.app_window.sendmessage(
+                        res['error']
+                    )  # @UndefinedVariable
+                clearCredentials()
+                return False
+            _log.error('204: empty response')
             clearCredentials()
-            return False
         return False
     except requests.exceptions.RequestException as e:
         _log.info(e)
         raise e
+    except json.decoder.JSONDecodeError as e:
+        if not e.doc:
+            raise ValueError('Empty response.') from e
+        raise ValueError(f"Decoding error at char {e.pos} (line {e.lineno}, col {e.colno}): '{e.doc}'") from e
     except Exception as e:  # ylint: disable=broad-except
         _log.exception(e)
         clearCredentials()

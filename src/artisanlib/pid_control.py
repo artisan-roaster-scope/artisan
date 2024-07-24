@@ -1177,8 +1177,8 @@ class PIDcontrol:
         self.svMode:int = 0 # 0: manual, 1: Ramp/Soak, 2: Follow (background profile)
         self.svLookahead:int = 0
         self.svSliderMin:int = 0
-        self.svSliderMax:int = 230
-        self.svValue:float = 180 # the value in the setSV textinput box of the PID dialog
+        self.svSliderMax:int = (230 if self.aw.qmc.mode == 'C' else 446) # 446F / 230C
+        self.svValue:float = (180 if self.aw.qmc.mode == 'C' else 356) # 356F / 180C # the value in the setSV textinput box of the PID dialog
         self.dutySteps:int = 1
         self.dutyMin:int = -100
         self.dutyMax:int = 100
@@ -1189,9 +1189,9 @@ class PIDcontrol:
         self.negativeTargetMin:int = 0
         self.negativeTargetMax:int = 100
         self.derivative_filter:int = 0 # 0: off, 1: on
-        self.pidKp:float = 15.0
-        self.pidKi:float = 0.01
-        self.pidKd:float = 20.0
+        self.pidKp:float = (15.0 if self.aw.qmc.mode == 'C' else 8.3334) # 15.0 in C
+        self.pidKi:float = (0.01 if self.aw.qmc.mode == 'C' else 0.00556) # 0.01 in C
+        self.pidKd:float = (20.0 if self.aw.qmc.mode == 'C' else 11.1111) # 20.0 in C
         # Proposional on Measurement mode see: http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/
         self.pOnE:bool = True # True for Proposional on Error mode, False for Proposional on Measurement Mode
         # pidSource

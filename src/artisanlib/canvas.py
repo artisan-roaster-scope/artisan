@@ -504,6 +504,8 @@ class tgraphcanvas(FigureCanvas):
 
         #F = Fahrenheit; C = Celsius
         self.mode:str = 'F'
+
+        # default mode on platforms we can detect it like macOS:
         if platform.system() == 'Darwin':
             # try to "guess" the users preferred temperature unit
             try:
@@ -11113,9 +11115,6 @@ class tgraphcanvas(FigureCanvas):
             self.RoRlimitm = int(round(fromCtoFstrict(self.RoRlimitm)))
             self.RoRlimit = int(round(fromCtoFstrict(self.RoRlimit)))
             self.alarmtemperature = [(fromCtoFstrict(t) if t != 500 else t) for t in self.alarmtemperature]
-#            # conv Arduino mode
-#            if self.aw:
-#                self.aw.pidcontrol.conv2fahrenheit()
         if self.ax is not None:
             self.ax.set_ylabel('F',size=16,color = self.palette['ylabel']) #Write "F" on Y axis
         self.mode = 'F'
@@ -11150,8 +11149,6 @@ class tgraphcanvas(FigureCanvas):
             self.RoRlimitm = int(round(fromFtoCstrict(self.RoRlimitm)))
             self.RoRlimit = int(round(fromFtoCstrict(self.RoRlimit)))
             self.alarmtemperature = [(fromFtoCstrict(t) if t != 500 else t) for t in self.alarmtemperature]
-#            # conv Arduino mode
-#            self.aw.pidcontrol.conv2celsius()
         if self.ax is not None:
             self.ax.set_ylabel('C',size=16,color = self.palette['ylabel']) #Write "C" on Y axis
         self.mode = 'C'
@@ -12782,6 +12779,11 @@ class tgraphcanvas(FigureCanvas):
     # if noaction is True, the button event action is not triggered
     @pyqtSlot(bool)
     def markCharge(self, noaction:bool = False) -> None:
+        try:
+            if self.aw.ntb._nav_stack(): # pylint: disable=protected-access # if ZOOMED in we push state on stack
+                self.aw.ntb.push_current() # remember current canvas ZOOM/POSITION on stack
+        except Exception: # pylint: disable=broad-except
+            pass
         removed = False
         try:
             self.profileDataSemaphore.acquire(1)
@@ -12927,6 +12929,10 @@ class tgraphcanvas(FigureCanvas):
                 if self.roastpropertiesAutoOpenFlag:
                     self.aw.openPropertiesSignal.emit()
             self.aw.onMarkMoveToNext(self.aw.buttonCHARGE)
+        try:
+            self.aw.ntb._update_view() # type:ignore[has-type] # pylint: disable=protected-access # recallcanvas ZOOM/POSITION from stack
+        except Exception: # pylint: disable=broad-except
+            pass
 
     # called via markTPSignal (queued), triggered by external device
     # does directly call markTP()

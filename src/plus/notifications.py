@@ -30,7 +30,7 @@ except Exception: # pylint: disable=broad-except
 
 from typing import Final, List, Dict, Any
 
-
+import json
 import logging
 
 from artisanlib.notifications import ntype2NotificationType
@@ -77,23 +77,31 @@ def retrieveNotifications() -> None:
                 # fetch from server
                 d = connection.getData(config.notifications_url, params=params)
                 _log.debug('-> %s', d.status_code)
-                res = d.json()
-                _log.debug('-> retrieved')
-                _log.debug('notifications = %s', res)
-                if ('success' in res
-                        and res['success']
-                        and 'result' in res
-                        and res['result']
-                        and isinstance(res['result'],list)):
-                    # we remove notifications that are tagged not_for_artisan:True
-                    results = [r for r in res['result'] if not ('not_for_artisan' in r and r['not_for_artisan'])]
-                    sorted_results = sorted(results, key=lambda nd: (util.ISO86012epoch(nd['added_on']) if 'added_on' in nd else 0))
-                    # we present the notifications in reverse order, oldest first
-                    for i, n in enumerate(sorted_results):
-                        processNotification(n, i)
+                if d.status_code != 204 and d.headers['content-type'].strip().startswith('application/json'):
+                    res = d.json()
+                    _log.debug('-> retrieved')
+                    _log.debug('notifications = %s', res)
+                    if ('success' in res
+                            and res['success']
+                            and 'result' in res
+                            and res['result']
+                            and isinstance(res['result'],list)):
+                        # we remove notifications that are tagged not_for_artisan:True
+                        results = [r for r in res['result'] if not ('not_for_artisan' in r and r['not_for_artisan'])]
+                        sorted_results = sorted(results, key=lambda nd: (util.ISO86012epoch(nd['added_on']) if 'added_on' in nd else 0))
+                        # we present the notifications in reverse order, oldest first
+                        for i, n in enumerate(sorted_results):
+                            processNotification(n, i)
 
-                # NOTE: we do not updateLimitsFromResponse(res) here to avoid an infinite loop if
-                # the server does not reset the notifications counter. Further notifications will be retrieved on next request
+                    # NOTE: we do not updateLimitsFromResponse(res) here to avoid an infinite loop if
+                    # the server does not reset the notifications counter. Further notifications will be retrieved on next request
+        except json.decoder.JSONDecodeError as e:
+            if not e.doc:
+                _log.error('Empty response.')
+            else:
+                _log.error("Decoding error at char %s (line %s, col %s): '%s'", e.pos, e.lineno, e.colno, e.doc)
+        except ValueError:
+            _log.error('Response content is not valid JSON')
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
         finally:

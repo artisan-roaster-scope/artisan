@@ -129,6 +129,7 @@ try:
     #QtWebEngineWidgets must be imported before a QCoreApplication instance is created
     try:
         from PyQt6.QtWebEngineWidgets import QWebEngineView # @Reimport @UnresolvedImport @UnusedImport  # pylint: disable=import-error,no-name-in-module
+        from PyQt6.QtWebEngineCore import QWebEngineProfile
         QtWebEngineSupport = True
     except ImportError:
         # on the RPi platform there is no native package PyQt-WebEngine nor PyQt6-WebEngine for Raspebarry 32bit
@@ -153,7 +154,8 @@ except ImportError:
     from PyQt5.QtNetwork import QLocalSocket # type: ignore # @Reimport @UnresolvedImport @UnusedImport
     #QtWebEngineWidgets must be imported before a QCoreApplication instance is created
     try:
-        from PyQt5.QtWebEngineWidgets import QWebEngineView # type: ignore # @Reimport @UnresolvedImport @UnusedImport # pylint: disable=import-error,no-name-in-module
+        from PyQt5.QtWebEngineWidgets import QWebEngineView # type: ignore[import-not-found, no-redef] # @Reimport @UnresolvedImport @UnusedImport # pylint: disable=import-error,no-name-in-module
+        from PyQt5.QtWebEngineCore import QWebEngineProfile # type: ignore[import-not-found, no-redef]
         QtWebEngineSupport = True
     except ImportError:
         # on the RPi platform there is no native package PyQt-WebEngine nor PyQt6-WebEngine for Raspebarry 32bit
@@ -4480,11 +4482,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             elif self.curFile:
                 # profile loaded
                 self.setWindowTitle(f'{dirtySign}{self.strippedName(self.curFile)} – {appTitle}')
+                # if not Simulator, Comparator, Designer, WheelGraph
+                if self.comparator is None and not self.qmc.designerflag and not self.qmc.wheelflag and self.qmc.ax is not None:
+                    self.setWindowFilePath(self.curFile)
             # no profile loaded
             elif __release_sponsor_name__:
                 self.setWindowTitle(f"{dirtySign}{appTitle} – {__release_sponsor_name__} ({QApplication.translate('About','Release Sponsor')})")
+                self.setWindowFilePath('')
             else:
                 self.setWindowTitle(f'{dirtySign}{appTitle}')
+                self.setWindowFilePath('')
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
@@ -12480,7 +12487,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 if self.qmc.statssummary and self.summarystats_startup and self.qmc.autotimex:
                     # allow only once, at startup
                     self.summarystats_startup = False
-                    self.qmc.redraw(False)
+                    self.qmc.redraw(recomputeAllDeltas = False, re_smooth_foreground = False)
 
 
                 self.qmc.redraw()
@@ -15422,7 +15429,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     _log.debug('clearing bbpCache')
             # now calculate all the bbp data
             # does the current profile have the minimum time for bbp?
-            if (len(self.qmc.timeindex) > 0) and (self.qmc.timex[self.qmc.timeindex[0]] > 0) and (self.qmc.timex[self.qmc.timeindex[0]] - self.qmc.timex[0] >= minBbpTime):
+            if (len(self.qmc.timeindex) > 0 and len(self.qmc.timex) > self.qmc.timeindex[0] > -1 and (self.qmc.timex[self.qmc.timeindex[0]] > 0) and
+                (self.qmc.timex[self.qmc.timeindex[0]] - self.qmc.timex[0] >= minBbpTime)):
                 self.bbp_total_time = self.qmc.timex[self.qmc.timeindex[0]] - self.qmc.timex[0] + self.bbp_time_added_from_prev
                 # fake the events to use with findTPint
                 bbp_timeindex = [0, 0, self.qmc.timeindex[0], 0, 0, 0, self.qmc.timeindex[0], 0]
@@ -21694,7 +21702,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 libtime.sleep(0.001)
             self.pdf_rendering = True
             if self.html_loader is None:
-                self.html_loader = QWebEngineView() # pyright:ignore[reportPossiblyUnboundVariable]
+                try:
+                    profile = QWebEngineProfile() # pyright:ignore[reportPossiblyUnboundVariable]
+                    profile.setSpellCheckEnabled(False) # disable spell checker
+                    profile.setHttpCacheType(QWebEngineProfile.HttpCacheType.NoCache) # pyright:ignore[reportPossiblyUnboundVariable]
+                    self.html_loader = QWebEngineView(profile) # pyright:ignore[reportPossiblyUnboundVariable]
+                except: # pylint: disable=broad-except
+                    self.html_loader = QWebEngineView() # pyright:ignore[reportPossiblyUnboundVariable]
                 self.html_loader.setZoomFactor(1)
             if self.pdf_page_layout is None:
                 # lazy imports
@@ -22689,24 +22703,35 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     def checkUpdate(self, _:bool = False) -> None:
         update_url = '<a href="https://artisan-scope.org">https://artisan-scope.org</a>'
         update_str = QApplication.translate('About', 'There was a problem retrieving the latest version information.  Please check your Internet connection, try again later, or check manually.')
+        import json
         try:
             import requests
             r = requests.get('https://api.github.com/repos/artisan-roaster-scope/artisan/releases/latest', timeout=(2,4))
-            tag_name = r.json()['tag_name']
-            match = re.search(r'[\d\.]+',tag_name)
-            if match is not None:
-                latest = match.group(0)
-                if latest > __version__:
-                    update_str = QApplication.translate('About', 'A new release is available.')
-                    update_str += '<br/><a href="https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/ReleaseHistory.md">'
-                    update_str +=  QApplication.translate('About', 'Show Change list')
-                    update_str += '<br/><a href="https://github.com/artisan-roaster-scope/artisan/releases/tag/' + str(tag_name) + '">'
-                    update_str +=  QApplication.translate('About', 'Download Release') + ' ' + str(tag_name)
-                elif latest == __version__ :
-                    update_str = QApplication.translate('About', 'You are using the latest release.')
-                elif latest < __version__:
-                    update_str = QApplication.translate('About', 'You are using a beta continuous build.')
-                    update_str += '<br/><br/>' + QApplication.translate('About', 'You will see a notice here once a new official release is available.')
+            if r.status_code != 204 and r.headers['content-type'].strip().startswith('application/json'):
+                response = r.json()
+                if 'tag_name' in response:
+                    tag_name = r.json()['tag_name']
+                    match = re.search(r'[\d\.]+',tag_name)
+                    if match is not None:
+                        latest = match.group(0)
+                        if latest > __version__:
+                            update_str = QApplication.translate('About', 'A new release is available.')
+                            update_str += '<br/><a href="https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/ReleaseHistory.md">'
+                            update_str +=  QApplication.translate('About', 'Show Change list')
+                            update_str += '<br/><a href="https://github.com/artisan-roaster-scope/artisan/releases/tag/' + str(tag_name) + '">'
+                            update_str +=  QApplication.translate('About', 'Download Release') + ' ' + str(tag_name)
+                        elif latest == __version__ :
+                            update_str = QApplication.translate('About', 'You are using the latest release.')
+                        elif latest < __version__:
+                            update_str = QApplication.translate('About', 'You are using a beta continuous build.')
+                            update_str += '<br/><br/>' + QApplication.translate('About', 'You will see a notice here once a new official release is available.')
+        except json.decoder.JSONDecodeError as e:
+            if not e.doc:
+                _log.error('Empty response in checkUpdate.')
+            else:
+                _log.error("Decoding error at char %s (line %s, col %s): '%s'", e.pos, e.lineno, e.colno, e.doc)
+        except ValueError:
+            _log.error('checkUpdate response content is not valid JSON')
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _a, _b, exc_tb = sys.exc_info()
@@ -25958,6 +25983,8 @@ def main() -> None:
     start_time = libtime.process_time() # begin of settings load
     # fill self.defaultSettings with default app QSettings values before loading app settings from system via settingsLoad()
     appWindow.saveAllSettings(QSettings(), appWindow.defaultSettings, read_defaults=True) # don't save any settings, but just read in the defaults
+
+    # now load the app settings
     appWindow.settingsLoad(redraw=False) # redraw is triggered later in the startup process again
     appWindow.restoreExtraDeviceSettingsBackup() # load settings backup if it exists (like on RESET)
     _log.info('loaded %s settings in %.2fs', len(QSettings().allKeys()), libtime.process_time() - start_time)

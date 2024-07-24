@@ -196,23 +196,25 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
             # fetch from server (send along the current date to have the server filter the schedule correctly for the local timezone)
             d = connection.getData(f'{config.stock_url}?today={datetime.datetime.now().astimezone().date()}')
             _log.debug('-> %s', d.status_code)
-            j = d.json()
-            if j:
-                rlimit,rused,pu,notifications,machines = util.extractAccountState(j)
-                self.replySignal.emit(rlimit,rused,pu,notifications,machines)
-            if 'success' in j and j['success'] and 'result' in j and j['result'] is not None:
-                try:
-                    stock_semaphore.acquire(1)
-                    stock = j['result']
-                    if stock is not None:
-                        stock['retrieved'] = time.time()
-                    _log.debug('-> retrieved')
-#                    _log.debug("stock = %s", stock)
-                finally:
-                    if stock_semaphore.available() < 1:
-                        stock_semaphore.release(1)
-                controller.reconnected()
-                return True
+            if d.status_code != 204 and d.headers['content-type'].strip().startswith('application/json'):
+                j = d.json()
+                if j:
+                    rlimit,rused,pu,notifications,machines = util.extractAccountState(j)
+                    self.replySignal.emit(rlimit,rused,pu,notifications,machines)
+                if 'success' in j and j['success'] and 'result' in j and j['result'] is not None:
+                    try:
+                        stock_semaphore.acquire(1)
+                        stock = j['result']
+                        if stock is not None:
+                            stock['retrieved'] = time.time()
+                        _log.debug('-> retrieved')
+    #                    _log.debug("stock = %s", stock)
+                    finally:
+                        if stock_semaphore.available() < 1:
+                            stock_semaphore.release(1)
+                    controller.reconnected()
+                    return True
+            _log.error('204: empty response on fetching stock')
             return False
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)

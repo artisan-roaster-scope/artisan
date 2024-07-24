@@ -36,6 +36,7 @@ from plus import config, util, connection, controller, roast, stock
 import os
 import time
 import logging
+import json
 from typing import Final, Optional, Dict, Any, List, IO
 
 
@@ -745,73 +746,82 @@ def fetchServerUpdate(uuid: str, file:Optional[str]=None, return_data:bool = Fal
                 fetchServerUpdate(uuid)
         elif status == 404:
             try:
-                data = res.json()
-                util.updateLimitsFromResponse(data) # update account limits
-                if 'success' in data and not data['success']:
-                    _log.debug(
-                        'fetchServerUpdate() ->'
-                         ' 404 roast record deleted on server'
-                    )
-                    # data not found on server, remove UUID from sync cache
-                    delSync(uuid)
-                # else there must be another cause of the 404
+                if res.headers['content-type'].strip().startswith('application/json'):
+                    data = res.json()
+                    util.updateLimitsFromResponse(data) # update account limits
+                    if 'success' in data and not data['success']:
+                        _log.debug(
+                            'fetchServerUpdate() ->'
+                             ' 404 roast record deleted on server'
+                        )
+                        # data not found on server, remove UUID from sync cache
+                        delSync(uuid)
+                    # else there must be another cause of the 404
+                    else:
+                        _log.debug(
+                            'fetchServerUpdate() -> 404 server error'
+                        )
+                _log.error('empty 404 response on fetchServerUpdate')
+            except json.decoder.JSONDecodeError as e:
+                if not e.doc:
+                    _log.error('Empty response.')
                 else:
-                    _log.debug(
-                        'fetchServerUpdate() -> 404 server error'
-                    )
-            except Exception:  # pylint: disable=broad-except
-                pass
+                    _log.error("Decoding error at char %s (line %s, col %s): '%s'", e.pos, e.lineno, e.colno, e.doc)
+            except Exception as e:  # pylint: disable=broad-except
+                _log.error(e)
         elif (
             status == 200
         ):  # data on server is newer than ours => update with data from server
             _log.debug(
                 'fetchServerUpdate() -> 200 data on server is newer'
             )
-            data = res.json()
-#            _log.info("PRINT data received: %s",data)
-            util.updateLimitsFromResponse(data) # update account limits
-            if 'result' in data:
-                r:Dict[str, Any] = data['result']
-                _log.debug('-> fetch: %s', r)
+            if res.headers['content-type'].strip().startswith('application/json'):
+                data = res.json()
+    #            _log.info("PRINT data received: %s",data)
+                util.updateLimitsFromResponse(data) # update account limits
+                if 'result' in data:
+                    r:Dict[str, Any] = data['result']
+                    _log.debug('-> fetch: %s', r)
 
-                if getSync(uuid) is None and 'modified_at' in r:
-                    addSync(uuid, util.ISO86012epoch(r['modified_at']))
-                    _log.debug(
-                        '-> added profile automatically to sync cache'
-                    )
-                if return_data:
-                    return r
-                if file_last_modified is not None:
-                    _log.debug(
-                        '-> file last_modified date: %s',
-                        util.epoch2ISO8601(file_last_modified),
-                    )
-                if (
-                    'modified_at' in r
-                    and file_last_modified is not None
-                    and util.ISO86012epoch(r['modified_at'])
-                    > file_last_modified
-                ):
-                    applyServerUpdates(r)
-                    if aw.qmc.plus_file_last_modified is not None:
-                        # we update the loaded profile timestamp to avoid receiving the same update again
-                        aw.qmc.plus_file_last_modified = time.time()
-                else:
-                    _log.debug(
-                        '-> data received from server was older!?'
-                    )
-                    _log.debug(
-                        '-> file last_modified epoch: %s',
-                        file_last_modified,
-                    )
-                    _log.debug(
-                        '-> server last_modified epoch: %s',
-                        util.ISO86012epoch(r['modified_at']),
-                    )
-                    _log.debug(
-                        '-> server last_modified date: %s',
-                        r['modified_at'],
-                    )
+                    if getSync(uuid) is None and 'modified_at' in r:
+                        addSync(uuid, util.ISO86012epoch(r['modified_at']))
+                        _log.debug(
+                            '-> added profile automatically to sync cache'
+                        )
+                    if return_data:
+                        return r
+                    if file_last_modified is not None:
+                        _log.debug(
+                            '-> file last_modified date: %s',
+                            util.epoch2ISO8601(file_last_modified),
+                        )
+                    if (
+                        'modified_at' in r
+                        and file_last_modified is not None
+                        and util.ISO86012epoch(r['modified_at'])
+                        > file_last_modified
+                    ):
+                        applyServerUpdates(r)
+                        if aw.qmc.plus_file_last_modified is not None:
+                            # we update the loaded profile timestamp to avoid receiving the same update again
+                            aw.qmc.plus_file_last_modified = time.time()
+                    else:
+                        _log.debug(
+                            '-> data received from server was older!?'
+                        )
+                        _log.debug(
+                            '-> file last_modified epoch: %s',
+                            file_last_modified,
+                        )
+                        _log.debug(
+                            '-> server last_modified epoch: %s',
+                            util.ISO86012epoch(r['modified_at']),
+                        )
+                        _log.debug(
+                            '-> server last_modified date: %s',
+                            r['modified_at'],
+                        )
+            _log.error('received empty response on fetchServerUpdate')
     except requests.exceptions.ConnectionError as e:
         # more general: requests.exceptions.RequestException
         _log.exception(e)

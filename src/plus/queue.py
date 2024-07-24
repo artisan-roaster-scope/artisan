@@ -36,6 +36,7 @@ from plus import config, util, roast, connection, sync, controller
 import threading
 import time
 import datetime
+import json
 import logging
 from typing import Final, Any, List, Dict, Optional, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' and 'Dict' since type hints can use the generic 'list' and 'dict'
 
@@ -155,10 +156,19 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                                 if item['data']['roast_id'] == sr['roast_id']:
                                     sync.setSyncRecordHash(sync_record=sr, h=h)
                                 try:
-                                    response = r.json()
-                                    if response:
-                                        rlimit,rused,pu,notifications, machines = util.extractAccountState(response)
-                                        self.replySignal.emit(rlimit,rused,pu,notifications,machines)
+                                    if r.status_code != 204 and r.headers['content-type'].strip().startswith('application/json'):
+                                        response = r.json()
+                                        if response:
+                                            rlimit,rused,pu,notifications, machines = util.extractAccountState(response)
+                                            self.replySignal.emit(rlimit,rused,pu,notifications,machines)
+
+                                except json.decoder.JSONDecodeError as e:
+                                    if not e.doc:
+                                        _log.error('Empty response.')
+                                    else:
+                                        _log.error("Decoding error at char %s (line %s, col %s): '%s'", e.pos, e.lineno, e.colno, e.doc)
+                                except ValueError:
+                                    _log.error('Response content is not valid JSON')
                                 except Exception as e:  # pylint: disable=broad-except
                                     _log.exception(e)
                             elif 'url' in item and item['url'].startswith(config.lock_schedule_url):
