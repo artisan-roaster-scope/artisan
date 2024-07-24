@@ -43,17 +43,23 @@ jobs:
         pip install --upgrade pip==24.0 # downgrade pip as pip v24.1 fails with pip._vendor.packaging.version.InvalidVersion: Invalid version: '6.5.0-1022-azure' (image name!)
         pip install -r src/requirements-dev.txt
         pip install -r src/requirements.txt
-    - name: Set up reviewdog
-      run: |
-        mkdir -p "$HOME/bin"
-        curl -sfL \
-          https://github.com/reviewdog/reviewdog/raw/master/install.sh | \
-            sh -s -- -b "$HOME/bin"
-        echo "$HOME/bin" >> $GITHUB_PATH
     - name: Analysing the code with pylint
       env:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        set -o pipefail
-        pylint --disable=C --disable=R --extension-pkg-allow-list=PyQt6 --load-plugins=pylint.extensions.no_self_use src/plus | reviewdog -efm="%f:%l:%c: %m" -reporter=github-check
-        pylint --disable=C --disable=R --extension-pkg-allow-list=PyQt6 --load-plugins=pylint.extensions.no_self_use src/artisanlib | reviewdog -efm="%f:%l:%c: %m" -reporter=github-check
+        pylint --disable=C --disable=R --extension-pkg-allow-list=PyQt6 --load-plugins=pylint.extensions.no_self_use src/plus
+        pylint --disable=C --disable=R --extension-pkg-allow-list=PyQt6 --load-plugins=pylint.extensions.no_self_use src/artisanlib
+#    - name: Set up reviewdog
+#      run: |
+#        mkdir -p "$HOME/bin"
+#        curl -sfL \
+#          https://github.com/reviewdog/reviewdog/raw/master/install.sh | \
+#            sh -s -- -b "$HOME/bin"
+#        echo "$HOME/bin" >> $GITHUB_PATH
+#    - name: Analysing the code with pylint
+#      env:
+#        REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      run: |
+#        set -o pipefail
+#        pylint --disable=C --disable=R --extension-pkg-allow-list=PyQt6 --load-plugins=pylint.extensions.no_self_use src/plus | reviewdog -efm="%f:%l:%c: %m" -reporter=github-check
+#        pylint --disable=C --disable=R --extension-pkg-allow-list=PyQt6 --load-plugins=pylint.extensions.no_self_use src/artisanlib | reviewdog -efm="%f:%l:%c: %m" -reporter=github-check
