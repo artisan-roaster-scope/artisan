@@ -65,7 +65,8 @@ python-bidi==0.4.2; python_version < '3.9' # last Python 3.8 release
 python-bidi==0.5.1; python_version >= '3.9'
 arabic-reshaper==3.0.0
 pillow>=10.4.0
-pydantic==2.8.2
+pydantic==2.8.2; (platform_system=='Windows' and python_version>'3.10') or sys_platform=='darwin' or platform_system=='Linux'
+pydantic==2.7.1; (platform_system=='Windows' and python_version<'3.9')  # last version working with Windows 7/8 pending resolution of pydantic Issue #9920
 babel==2.15.0
 #
 #
