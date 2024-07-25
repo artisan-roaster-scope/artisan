@@ -154,8 +154,7 @@ except ImportError:
     from PyQt5.QtNetwork import QLocalSocket # type: ignore # @Reimport @UnresolvedImport @UnusedImport
     #QtWebEngineWidgets must be imported before a QCoreApplication instance is created
     try:
-        from PyQt5.QtWebEngineWidgets import QWebEngineView # type: ignore[import-not-found, no-redef] # @Reimport @UnresolvedImport @UnusedImport # pylint: disable=import-error,no-name-in-module
-        from PyQt5.QtWebEngineCore import QWebEngineProfile # type: ignore[import-not-found, no-redef]
+        from PyQt5.QtWebEngineWidgets import (QWebEngineView, QWebEngineProfile) # type: ignore[import-not-found, no-redef] # @Reimport @UnresolvedImport @UnusedImport # pylint: disable=import-error,no-name-in-module
         QtWebEngineSupport = True
     except ImportError:
         # on the RPi platform there is no native package PyQt-WebEngine nor PyQt6-WebEngine for Raspebarry 32bit
