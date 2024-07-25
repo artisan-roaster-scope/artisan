@@ -124,15 +124,15 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
             connect_semaphore.acquire(1)
             if config.app_window is not None:
 
-                if platform.system().startswith('Windows'):
-                    import keyring.backends.Windows  # @UnusedImport
-                elif platform.system() == 'Darwin':
-                    import keyring.backends.macOS  # @UnusedImport @UnresolvedImport
-                else:
-                    import keyring.backends.SecretService  # @UnusedImport
+#                if platform.system().startswith('Windows'):
+#                    import keyring.backends.Windows  # @UnusedImport
+#                elif platform.system() == 'Darwin':
+#                    import keyring.backends.macOS  # @UnusedImport @UnresolvedImport
+#                else:
+#                    import keyring.backends.SecretService  # @UnusedImport
                 import keyring  # @Reimport # imported last to make py2app work
 
-                connection.setKeyring()
+#                connection.setKeyring()
                 account = config.app_window.plus_account
                 if account is None:
                     account = config.app_window.plus_email
