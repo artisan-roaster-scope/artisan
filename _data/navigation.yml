@@ -9,6 +9,8 @@ main:
     url: /donate/
   - title: "Download"
     url: /download/
+  - title: "Discussions"
+    url: /discussions/
   - title: "About"
     url: /about/
 
@@ -44,7 +46,7 @@ machines:
         url: /machines/caparao/
       - title: "Carmomaq"
         url: /machines/carmomaq/
-      - title: "Coffeed"
+      - title: "Coffed"
         url: /machines/coffed/
       - title: "Coffee Machines Sale"
         url: /machines/cms/
