@@ -10498,8 +10498,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             # just issue the eventaction (no cmd substitution here)
             # split on an octothorpe '#' that is not inside parentheses '()'
             cmd = re.split(r'\#(?![^\(]*\))',self.extraeventsactionstrings[ee])[0].strip()
-            if '{}' in cmd:
-                cmd = cmd.format(*(tuple([cmdvalue]*cmd.count('{}'))))
+            cmd = cmd.format(*(tuple([cmdvalue]*cmd.count('{}'))))
             if cmdvalue == 0 and eventtype == 4:
                 # no event type and cmdvalue is 0 => cmd actions should await response and bind result to _
                 self.eventaction(self.extraeventsactions[ee],cmd,parallel=parallel,eventtype=-1)

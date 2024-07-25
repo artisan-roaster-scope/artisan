@@ -35,7 +35,7 @@ import uuid
 import datetime
 import gzip
 import json
-import platform
+#import platform
 import logging
 import dateutil.parser
 

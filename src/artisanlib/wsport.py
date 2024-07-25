@@ -236,12 +236,19 @@ class wsport:
             # fill weight of current roast set: {"pushMessage": "setRoastingProcessFillWeight", "data": { "fillWeight": 12 }}
 
 
+    async def split_and_consume_message(self, message:str) -> None:
+        # a message may contain several lines of JSON data separated by \n, like in "{'a':1}\n{'b':2}\n"
+        for m in message.strip().split('\n'):
+            single_message = m.strip()
+            if single_message != '':
+                await self.consumer(single_message)
+
     async def consumer_handler(self, websocket:'WebSocketClientProtocol') -> None:
         async for message in websocket:
             if isinstance(message, str):
-                await self.consumer(message)
+                await self.split_and_consume_message(message)
             elif isinstance(message, bytes):
-                await self.consumer(message.decode('utf-8'))
+                await self.split_and_consume_message(message.decode('utf-8'))
 
 
     async def producer_handler(self, websocket:'WebSocketClientProtocol') -> None:
