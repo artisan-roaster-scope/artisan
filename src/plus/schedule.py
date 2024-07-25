@@ -175,7 +175,7 @@ class CompletedItemDict(TypedDict):
 # ordered list of dict with the completed roasts data (latest roast first)
 completed_roasts_cache:List[CompletedItemDict] = []
 
-# dict associating ScheduleItem IDs to a list of prepared green weights interpreted in order. Weights beyond item.count will be ignored.
+# dict associating ScheduledItem IDs to a list of prepared green weights interpreted in order. Weights beyond item.count will be ignored.
 prepared_items_cache:Dict[str, List[float]] = {}
 
 
@@ -2193,18 +2193,19 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         if self.selected_remaining_item is not None:
             self.selected_remaining_item.load_template(self.aw)
 
-
     def select_item(self, item:DragItem) -> None:
         if self.selected_remaining_item != item:
+            previous_selected_item_data:Optional[ScheduledItem] = None
             previous_selected_id:Optional[str] = None
             if self.selected_remaining_item is not None:
-                previous_selected_id = self.selected_remaining_item.data.id
+                previous_selected_item_data = self.selected_remaining_item.data
+                previous_selected_id = previous_selected_item_data.id
                 # clear previous selection
                 self.selected_remaining_item.deselect()
             # on selecting the item we only load the template if the item.data.id is different to the previous selected one
             item.select(self.aw, load_template = previous_selected_id != item.data.id)
             self.selected_remaining_item = item
-            if self.aw.qmc.flagon and self.aw.qmc.timeindex[6] == 0:
+            if self.aw.qmc.flagon and self.aw.qmc.timeindex[6] == 0 and (previous_selected_item_data is None or (previous_selected_item_data != item.data)):
                 # while sampling and DROP not yet set, we update the roast properties on schedule item changes
                 self.set_selected_remaining_item_roast_properties()
 

@@ -2546,7 +2546,6 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.editGraphDlg_activeTab = self.TabWidget.currentIndex()
 #        self.aw.closeEventSettings() # save all app settings
         self.aw.editgraphdialog = None
-        self.aw.updateScheduleSignal.emit()
         if self.stockWorker is not None and self.updateStockSignalConnection is not None:
             self.stockWorker.updatedSignal.disconnect(self.updateStockSignalConnection)
 
