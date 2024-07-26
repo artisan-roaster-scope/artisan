@@ -1947,8 +1947,10 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E3max.setValue(self.aw.eventquantifiermax[2])
         self.E4max.setValue(self.aw.eventquantifiermax[3])
         self.curvenames = []
-        self.curvenames.append(QApplication.translate('ComboBox','ET'))
-        self.curvenames.append(QApplication.translate('ComboBox','BT'))
+#        self.curvenames.append(QApplication.translate('ComboBox','ET'))
+#        self.curvenames.append(QApplication.translate('ComboBox','BT'))
+        self.curvenames.append(self.aw.ETname.format(self.etype0.text(),self.etype1.text(),self.etype2.text(),self.etype3.text()))
+        self.curvenames.append(self.aw.BTname.format(self.etype0.text(),self.etype1.text(),self.etype2.text(),self.etype3.text()))
         for i in range(len(self.aw.qmc.extradevices)):
             self.curvenames.append(self.aw.qmc.extraname1[i].format(self.etype0.text(),self.etype1.text(),self.etype2.text(),self.etype3.text()))
             self.curvenames.append(self.aw.qmc.extraname2[i].format(self.etype0.text(),self.etype1.text(),self.etype2.text(),self.etype3.text()))

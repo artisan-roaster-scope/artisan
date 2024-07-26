@@ -118,8 +118,8 @@ class backgroundDlg(ArtisanResizeablDialog):
 
         curvenames = [''] # first entry is the empty one, no extra curve displayed
         for i in range(min(len(self.aw.qmc.extraname1B),len(self.aw.qmc.extraname2B),len(self.aw.qmc.extratimexB))):
-            curvenames.append('B' + str(2*i+3) + ': ' + self.aw.qmc.extraname1B[i])
-            curvenames.append('B' + str(2*i+4) + ': ' + self.aw.qmc.extraname2B[i])
+            curvenames.append('B' + str(2*i+3) + ': ' + self.aw.qmc.extraname1B[i].format(self.aw.qmc.Betypesf(0),self.aw.qmc.Betypesf(1),self.aw.qmc.Betypesf(2),self.aw.qmc.Betypesf(3)))
+            curvenames.append('B' + str(2*i+4) + ': ' + self.aw.qmc.extraname2B[i].format(self.aw.qmc.Betypesf(0),self.aw.qmc.Betypesf(1),self.aw.qmc.Betypesf(2),self.aw.qmc.Betypesf(3)))
 
         self.xtcurvelabel = QLabel(QApplication.translate('Label', 'Extra 1'))
         self.xtcurveComboBox = QComboBox()

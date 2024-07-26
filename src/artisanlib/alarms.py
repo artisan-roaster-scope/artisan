@@ -799,13 +799,16 @@ class AlarmDlg(ArtisanResizeablDialog):
     def buildAlarmSourceList(self) -> List[str]:
         extra_names = []
         for i in range(len(self.aw.qmc.extradevices)):
-            extra_names.append(str(i) + 'xT1: ' + self.aw.qmc.extraname1[i])
-            extra_names.append(str(i) + 'xT2: ' + self.aw.qmc.extraname2[i])
+            extra_names.append(self.aw.qmc.extraname1[i].format(self.aw.qmc.etypesf(0),self.aw.qmc.etypesf(1),self.aw.qmc.etypesf(2),self.aw.qmc.etypesf(3)))
+            extra_names.append(self.aw.qmc.extraname2[i].format(self.aw.qmc.etypesf(0),self.aw.qmc.etypesf(1),self.aw.qmc.etypesf(2),self.aw.qmc.etypesf(3)))
+        et_name = self.aw.ETname.format(self.aw.qmc.etypesf(0),self.aw.qmc.etypesf(1),self.aw.qmc.etypesf(2),self.aw.qmc.etypesf(3))
+        bt_name = self.aw.BTname.format(self.aw.qmc.etypesf(0),self.aw.qmc.etypesf(1),self.aw.qmc.etypesf(2),self.aw.qmc.etypesf(3))
         return ['',
-             deltaLabelUTF8 + QApplication.translate('Label','ET'),
-             deltaLabelUTF8 + QApplication.translate('Label','BT'),
-             QApplication.translate('ComboBox','ET'),
-             QApplication.translate('ComboBox','BT')] + extra_names
+             deltaLabelUTF8 + et_name,
+             deltaLabelUTF8 + bt_name,
+             et_name,
+             bt_name] + extra_names
+
 
     # creates Widget in row i of self.alarmtable and sets them to values from local dialog variables at position i
     def setalarmtablerow(self, i:int) -> None:
