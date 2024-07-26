@@ -17451,8 +17451,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.roastersize_setup_default = toFloat(settings.value('roastersize_setup_default',self.qmc.roastersize_setup_default))
             self.qmc.roastersize_setup = toFloat(settings.value('roastersize_setup',self.qmc.roastersize_setup))
             self.qmc.last_batchsize = toFloat(settings.value('last_batchsize',self.qmc.last_batchsize))
-            # we set the default in-weight from the given last_batchsize
-            self.qmc.weight = (self.qmc.last_batchsize,self.qmc.weight[1],self.qmc.weight[2])
             self.qmc.roasterheating_setup = toInt(settings.value('roasterheating_setup',self.qmc.roasterheating_setup))
             self.qmc.roasterheating_setup_default = toInt(settings.value('roasterheating_setup_default',self.qmc.roasterheating_setup_default))
             self.qmc.drumspeed_setup = toString(settings.value('drumspeed_setup',self.qmc.drumspeed_setup))
@@ -17862,62 +17860,63 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #--- BEGIN GROUP ExtraEventButtons
             #restore buttons
             settings.beginGroup('ExtraEventButtons')
-            self.buttonlistmaxlen = toInt(settings.value('buttonlistmaxlen',self.buttonlistmaxlen))
-            self.extraeventsbuttonsflags = [toInt(x) for x in toList(settings.value('extraeventsbuttonsflags',self.extraeventsbuttonsflags))]
-            extraeventstypes = [toInt(x) for x in toList(settings.value('extraeventstypes',self.extraeventstypes))]
-            extraeventsvalues = [toFloat(x) for x in toList(settings.value('extraeventsvalues',self.extraeventsvalues))]
-            extraeventsactions = [toInt(x) for x in toList(settings.value('extraeventsactions',self.extraeventsactions))]
-            extraeventsvisibility = [toInt(x) for x in toList(settings.value('extraeventsvisibility',self.extraeventsvisibility))]
-            extraeventsactionstrings = list(toStringList(settings.value('extraeventsactionstrings',self.extraeventsactionstrings)))
-            extraeventslabels = list(toStringList(settings.value('extraeventslabels',self.extraeventslabels)))
-            extraeventsdescriptions= list(toStringList(settings.value('extraeventsdescriptions',self.extraeventsdescriptions)))
-            if settings.contains('extraeventbuttoncolor'):
-                extraeventbuttoncolor = list(toStringList(settings.value('extraeventbuttoncolor',self.extraeventbuttoncolor)))
-            else:
-                extraeventbuttoncolor = ['yellow']*len(extraeventstypes)
-            if settings.contains('extraeventbuttontextcolor'):
-                extraeventbuttontextcolor = list(toStringList(settings.value('extraeventbuttontextcolor',self.extraeventbuttontextcolor)))
-            else:
-                extraeventbuttontextcolor = ['#000000']*len(extraeventstypes)
-            if len(extraeventstypes) == len(extraeventsvalues) == len(extraeventsactions) == len(extraeventsvisibility) ==\
-                    len(extraeventsactionstrings) == len(extraeventslabels) == len(extraeventsdescriptions) == \
-                    len(extraeventbuttoncolor) == len(extraeventbuttontextcolor):
-                self.extraeventstypes = extraeventstypes
-                self.extraeventsvalues = extraeventsvalues
-                self.extraeventsactions = extraeventsactions
-                self.extraeventsvisibility = extraeventsvisibility
-                self.extraeventsactionstrings = extraeventsactionstrings
-                self.extraeventslabels = extraeventslabels
-                self.extraeventsdescriptions = extraeventsdescriptions
-                self.extraeventbuttoncolor = extraeventbuttoncolor
-                self.extraeventbuttontextcolor = extraeventbuttontextcolor
-            self.buttonpalettemaxlen = [min(30,max(6,toInt(x))) for x in toList(settings.value('buttonpalettemaxlen',self.buttonpalettemaxlen))]
-            bp = toList(settings.value('buttonpalette',self.buttonpalette))
-            self.buttonpalette = []
-            if not bp:
-                self.buttonpalette = [ self.makePalette() for _ in range(10) ] # initialize empty palettes
-            else:
-                for p in bp[:self.max_palettes]:
-                    if p is None or len(p)>self.palette_entries:
-                        # we generate a new default palette
-                        self.buttonpalette.append(self.makePalette())
-                    elif len(p) == self.palette_entries:
-                        # we convert the list into a Palette tuple
-                        if self.paletteValid(p):
-                            tp = cast('Palette', tuple(p))
-                            self.buttonpalette.append(tp)
-                        else:
+            if settings.contains('extraeventsactions'):
+                self.buttonlistmaxlen = toInt(settings.value('buttonlistmaxlen',self.buttonlistmaxlen))
+                self.extraeventsbuttonsflags = [toInt(x) for x in toList(settings.value('extraeventsbuttonsflags',self.extraeventsbuttonsflags))]
+                extraeventstypes = [toInt(x) for x in toList(settings.value('extraeventstypes',self.extraeventstypes))]
+                extraeventsvalues = [toFloat(x) for x in toList(settings.value('extraeventsvalues',self.extraeventsvalues))]
+                extraeventsactions = [toInt(x) for x in toList(settings.value('extraeventsactions',self.extraeventsactions))]
+                extraeventsvisibility = [toInt(x) for x in toList(settings.value('extraeventsvisibility',self.extraeventsvisibility))]
+                extraeventsactionstrings = list(toStringList(settings.value('extraeventsactionstrings',self.extraeventsactionstrings)))
+                extraeventslabels = list(toStringList(settings.value('extraeventslabels',self.extraeventslabels)))
+                extraeventsdescriptions= list(toStringList(settings.value('extraeventsdescriptions',self.extraeventsdescriptions)))
+                if settings.contains('extraeventbuttoncolor'):
+                    extraeventbuttoncolor = list(toStringList(settings.value('extraeventbuttoncolor',self.extraeventbuttoncolor)))
+                else:
+                    extraeventbuttoncolor = ['#808080']*len(extraeventstypes)
+                if settings.contains('extraeventbuttontextcolor'):
+                    extraeventbuttontextcolor = list(toStringList(settings.value('extraeventbuttontextcolor',self.extraeventbuttontextcolor)))
+                else:
+                    extraeventbuttontextcolor = ['white']*len(extraeventstypes)
+                if len(extraeventstypes) == len(extraeventsvalues) == len(extraeventsactions) == len(extraeventsvisibility) ==\
+                        len(extraeventsactionstrings) == len(extraeventslabels) == len(extraeventsdescriptions) == \
+                        len(extraeventbuttoncolor) == len(extraeventbuttontextcolor):
+                    self.extraeventstypes = extraeventstypes
+                    self.extraeventsvalues = extraeventsvalues
+                    self.extraeventsactions = extraeventsactions
+                    self.extraeventsvisibility = extraeventsvisibility
+                    self.extraeventsactionstrings = extraeventsactionstrings
+                    self.extraeventslabels = extraeventslabels
+                    self.extraeventsdescriptions = extraeventsdescriptions
+                    self.extraeventbuttoncolor = extraeventbuttoncolor
+                    self.extraeventbuttontextcolor = extraeventbuttontextcolor
+                self.buttonpalettemaxlen = [min(30,max(6,toInt(x))) for x in toList(settings.value('buttonpalettemaxlen',self.buttonpalettemaxlen))]
+                bp = toList(settings.value('buttonpalette',self.buttonpalette))
+                self.buttonpalette = []
+                if not bp:
+                    self.buttonpalette = [ self.makePalette() for _ in range(10) ] # initialize empty palettes
+                else:
+                    for p in bp[:self.max_palettes]:
+                        if p is None or len(p)>self.palette_entries:
+                            # we generate a new default palette
                             self.buttonpalette.append(self.makePalette())
-                    else:
-                        # to be compatible to older Artisan versions with smaller palettes we fill the list from the defaults and convert it into a Palette
-                        tp = cast('Palette', tuple(p + list(self.makePalette(empty=False))[len(p):]))
-                        self.buttonpalette.append(tp)
-            self.buttonpalette_shortcuts = bool(toBool(settings.value('buttonpalette_shortcuts',self.buttonpalette_shortcuts)))
-            self.eventbuttontablecolumnwidths = [toInt(x) for x in toList(settings.value('eventbuttontablecolumnwidths',self.eventbuttontablecolumnwidths))]
-            self.buttonsize = toInt(settings.value('buttonsize',self.buttonsize))
-            self.mark_last_button_pressed = bool(toBool(settings.value('marklastbuttonpressed',self.mark_last_button_pressed)))
-            self.show_extrabutton_tooltips = bool(toBool(settings.value('showextrabuttontooltips',self.show_extrabutton_tooltips)))
-            self.buttonpalette_label = toString(settings.value('buttonpalette_label',self.buttonpalette_label))
+                        elif len(p) == self.palette_entries:
+                            # we convert the list into a Palette tuple
+                            if self.paletteValid(p):
+                                tp = cast('Palette', tuple(p))
+                                self.buttonpalette.append(tp)
+                            else:
+                                self.buttonpalette.append(self.makePalette())
+                        else:
+                            # to be compatible to older Artisan versions with smaller palettes we fill the list from the defaults and convert it into a Palette
+                            tp = cast('Palette', tuple(p + list(self.makePalette(empty=False))[len(p):]))
+                            self.buttonpalette.append(tp)
+                self.buttonpalette_shortcuts = bool(toBool(settings.value('buttonpalette_shortcuts',self.buttonpalette_shortcuts)))
+                self.eventbuttontablecolumnwidths = [toInt(x) for x in toList(settings.value('eventbuttontablecolumnwidths',self.eventbuttontablecolumnwidths))]
+                self.buttonsize = toInt(settings.value('buttonsize',self.buttonsize))
+                self.mark_last_button_pressed = bool(toBool(settings.value('marklastbuttonpressed',self.mark_last_button_pressed)))
+                self.show_extrabutton_tooltips = bool(toBool(settings.value('showextrabuttontooltips',self.show_extrabutton_tooltips)))
+                self.buttonpalette_label = toString(settings.value('buttonpalette_label',self.buttonpalette_label))
             settings.endGroup()
 #--- END GROUP ExtraEventButtons
 
@@ -26048,7 +26047,7 @@ def main() -> None:
                         appWindow.qmc.reset(redraw=False, soundOn=False)
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
-            elif appWindow.logofilename != '':  #ensure background image aspect ratio is calculated
+            else:  #ensure background image aspect ratio is calculated and default weight from last_batchsize is set
                 appWindow.qmc.reset(redraw=False, soundOn=False)
             if appWindow.lastLoadedBackground and appWindow.lastLoadedBackground != '' and not appWindow.curFile:
                 try:
