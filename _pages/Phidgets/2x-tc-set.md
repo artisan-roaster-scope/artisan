@@ -76,8 +76,9 @@ Download and install the Phidget driver following the instructions for your plat
 
 ### Artisan Installation
 
-Download and install the [latest Artisan version](https://github.com/artisan-roaster-scope/artisan/releases/latest){:target="_blank"}. Choose the correct installer according your operating system:
+Download and install the [latest Artisan version](https://artisan-scope.org/download/){:target="_blank"}. 
 
+<!--
 - `artisan-win-XX.XX.XX.zip` (Windows)
 - `artisan-mac-XX.XX.XX.dmg` (macOS)
 - `artisan-linux-XX.XX.XX.rpm` (Linux Redhat/CentOS)
@@ -87,6 +88,7 @@ Download and install the [latest Artisan version](https://github.com/artisan-roa
 **Watch out!** 
 Artisan for macOS is also available via the Homebrew Cask package manager. See the [Artisan installation instructions](https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/Installation.md){:target="_blank"} for further details.
 {: .notice--primary}
+-->
 
 
 ### Artisan Configuration
