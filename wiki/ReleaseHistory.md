@@ -17,6 +17,7 @@ v2.10.6 (XX, 2024)
 * NEW HARDWARE SUPPORT
   - adds machine support for the [BeanGo Cube X](https://www.beangocube.com/en/products/beangocube-x/)
   - adds machine support for [MUGMA Roasters](https://finecoffeeroaster.com/)
+  - adds updated [Sivetz fluid bed roasting machines](https://artisan-scope.org/machines/sivetz/) support for the latest machines recording also fan changes
   - adds machine support for [iRm roasting machines](https://www.irm.coffee/) featuring Mitshubishi PLCs
   - adds [Bühler RM20](https://www.buhlergroup.com/global/de/products/roastmaster_coffeeroaster.html) Simatic Legacy setup supporting older firmware versions not returning the machine state
   - adds support for the [Phidget RCC0004 server motor controller](https://phidgets.com/?prodid=1147) ([Discussion #1546](../../../discussions/1546))

@@ -1059,8 +1059,8 @@ class EventsDlg(ArtisanResizeablDialog):
         self.curvenames.append(QApplication.translate('ComboBox','ET'))
         self.curvenames.append(QApplication.translate('ComboBox','BT'))
         for i in range(len(self.aw.qmc.extradevices)):
-            self.curvenames.append(str(i) + 'xT1: ' + self.aw.qmc.extraname1[i])
-            self.curvenames.append(str(i) + 'xT2: ' + self.aw.qmc.extraname2[i])
+            self.curvenames.append(self.aw.qmc.extraname1[i].format(self.etype0.text(),self.etype1.text(),self.etype2.text(),self.etype3.text()))
+            self.curvenames.append(self.aw.qmc.extraname2[i].format(self.etype0.text(),self.etype1.text(),self.etype2.text(),self.etype3.text()))
         self.E1SourceComboBox = QComboBox()
         self.E1SourceComboBox.addItems(self.curvenames)
         if self.aw.eventquantifiersource[0] < len(self.curvenames):
@@ -1946,6 +1946,29 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E2max.setValue(self.aw.eventquantifiermax[1])
         self.E3max.setValue(self.aw.eventquantifiermax[2])
         self.E4max.setValue(self.aw.eventquantifiermax[3])
+        self.curvenames = []
+        self.curvenames.append(QApplication.translate('ComboBox','ET'))
+        self.curvenames.append(QApplication.translate('ComboBox','BT'))
+        for i in range(len(self.aw.qmc.extradevices)):
+            self.curvenames.append(self.aw.qmc.extraname1[i].format(self.etype0.text(),self.etype1.text(),self.etype2.text(),self.etype3.text()))
+            self.curvenames.append(self.aw.qmc.extraname2[i].format(self.etype0.text(),self.etype1.text(),self.etype2.text(),self.etype3.text()))
+        self.E1SourceComboBox.clear()
+        self.E1SourceComboBox.addItems(self.curvenames)
+        if self.aw.eventquantifiersource[0] < len(self.curvenames):
+            self.E1SourceComboBox.setCurrentIndex(self.aw.eventquantifiersource[0])
+        self.E2SourceComboBox.clear()
+        self.E2SourceComboBox.addItems(self.curvenames)
+        if self.aw.eventquantifiersource[1] < len(self.curvenames):
+            self.E2SourceComboBox.setCurrentIndex(self.aw.eventquantifiersource[1])
+        self.E3SourceComboBox.clear()
+        self.E3SourceComboBox.addItems(self.curvenames)
+        if self.aw.eventquantifiersource[2] < len(self.curvenames):
+            self.E3SourceComboBox.setCurrentIndex(self.aw.eventquantifiersource[2])
+        self.E4SourceComboBox.clear()
+        self.E4SourceComboBox.addItems(self.curvenames)
+        if self.aw.eventquantifiersource[3] < len(self.curvenames):
+            self.E4SourceComboBox.setCurrentIndex(self.aw.eventquantifiersource[3])
+
 
     def updateStyleTab(self) -> None:
         # update color button texts
