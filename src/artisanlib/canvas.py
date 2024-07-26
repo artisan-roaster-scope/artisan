@@ -10750,6 +10750,7 @@ class tgraphcanvas(FigureCanvas):
 
             # reformat string as necessary
             stattype_str = self.__dijkstra_to_ascii(stattype_str)
+            stattype_str = self.aw.arabicReshape(stattype_str)
 
             # Trim the long lines
             trimmedstatype_segments:List[str] = []
