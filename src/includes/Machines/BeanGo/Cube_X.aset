@@ -23,7 +23,7 @@ buttonactionstrings=, , , , , , ,
 buttonvisibility=true, true, true, false, false, false, true, false
 extrabuttonactions=0, 3, 0
 extrabuttonactionstrings=, "write([1,11,0])", 
-xextrabuttonactions=0, 3
+xextrabuttonactions=0, 0
 xextrabuttonactionstrings=, "write([1,15,0])"
 
 [Device]
@@ -61,20 +61,33 @@ buttonpalette_label=
 buttonpalette_shortcuts=true
 buttonpalettemaxlen=14, 14, 14, 14, 14, 14, 14, 14, 14, 14
 buttonsize=1
-eventbuttontablecolumnwidths=70, 80, 100, 50, 150, 290, 73, 75, 75
+eventbuttontablecolumnwidths=120, 80, 118, 39, 184, 301, 73, 75, 75
 extraeventbuttoncolor=#0071bc, #0071bc, #0071bc, yellow, #93278f, #93278f, #93278f, yellow, #c1272d, #c1272d, #c1272d, #009245, #009245, #009245, #009245, #897e62, #897e62
 extraeventbuttontextcolor=#ffffff, #ffffff, #ffffff, #000000, #ffffff, #ffffff, #ffffff, #000000, #ffffff, #ffffff, #ffffff, #ffffff, #ffffff, #ffffff, #ffffff, #fffcee, #fffcee
 extraeventsactions=4, 4, 4, 0, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4
-extraeventsactionstrings="write(1,17,0)", "write(1,17,{})", "write(1,17,{})", , "write(1,18,0)", "write(1,18,{})", "write(1,18,{})", , "write(1,16,0)", "write(1,16,{})", "write(1,16,{})", "write(1,10,0)", "write(1,20,{})", "write(1,20,{})", "write(1,12,0)", "write(1,13,0)", "write(1,9,0)"
+extraeventsactionstrings="write(1,17,0)", "write(1,17,{})", "write(1,17,{})", , "write(1,18,0)", "write(1,18,{})", "write(1,18,{})", , "write(1,16,0)", "write(1,16,{})", "write(1,16,{})", "write(1,10,0)", "write(1,20,{TEMP})", "write(1,20,{TEMP})", "write(1,12,0)", "write(1,13,0)", "write(1,9,0)"
 extraeventsbuttonsflags=0, 1, 1
 extraeventsdescriptions=, , , , , , , #Heater, , , , , , , , , 
-extraeventslabels=\\t\n\\2, -10%, +10%, , \\t\n\\p, -5 RPM, +5 RPM, , \\r\n\\2, -10%, +10%, Preheating\n\\s, Auto\n@ 185°, Auto\n@ 205°, Preheating\n\\p, StandBy, \\R
+extraeventslabels=\\t\n\\2, \\V%, \\V%, , \\t\n\\p, \\V RPM, \\V RPM, , \\r\n\\2, \\V%, \\V%, Preheating\n\\s, Fixed\n@ \\T°, Fixed\n@ \\T°, Preheating\n\\p, StandBy, Empty the\nDrum
 extraeventstypes=0, 5, 5, 4, 1, 6, 6, 4, 4, 8, 8, 4, 4, 4, 4, 4, 4
-extraeventsvalues=1, -2, 2, 1, 1, -1.5, 1.5, 1, 0, -2, 2, 1, 19.5, 21.5, 0, 0, 0
+extraeventsvalues=1, -1.5, 1.5, 1, 1, -1.5, 1.5, 1, 0, -1.5, 1.5, 1, 37.5, 41.1, 0, 0, 0
 extraeventsvisibility=1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1
 marklastbuttonpressed=true
 showextrabuttontooltips=false
 
+[Alarms]
+alarmaction=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x10)
+alarmbeep=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\0)
+alarmcond=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x1)
+alarmflag=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x1)
+alarmguard=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\xff\xff\xff\xff)
+alarmnegguard=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\xff\xff\xff\xff)
+alarmoffset=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\0)
+alarmsetlabel=
+alarmsource=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x2)
+alarmstrings=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0>\0#\0 \0\x61\0u\0t\0o\0\x43\0H\0\x41\0R\0G\0\x45\0 \0o\0n\0 \0\x63\0r\0\x61\0\x63\0k\0 \0\x64\0\x65\0t\0\x65\0\x63\0t\0i\0o\0n)
+alarmtemperature=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x6@\x10\0\0\0\0\0\0)
+alarmtime=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\b)
 
 [Modbus]
 IP_timeout=0.4
@@ -221,5 +234,6 @@ graphfont=5
 weight=g
 
 [events]
+EvalueColor=#43a7cf, #93278f, #49b160, #ad0427
 etypes=Fan, , , Heat, 
 eventsGraphflag=4

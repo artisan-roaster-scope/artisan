@@ -142,7 +142,7 @@ class PID_DlgControl(ArtisanDialog):
         pOnLayout.addWidget(self.pOnM)
 
         pidVBox = QVBoxLayout()
-        if pid_controller in {0, 3, 4}: # only for internal PID and TC4/Kaleido
+        if pid_controller in {0, 1, 2, 3, 4}: # only for internal PID, MODBUS/S7 PID and TC4/Kaleido; NOTE: for MODBUS/S7 the input is used only to decide on the source for the background follow mode SV
             self.pidSource = QComboBox()
             self.pidSource.setToolTip(QApplication.translate('Tooltip', 'PID input signal'))
             if self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag:

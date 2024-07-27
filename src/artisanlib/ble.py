@@ -257,19 +257,29 @@ class BleInterface(QtCore.QObject): # pyright: ignore [reportGeneralTypeIssues] 
         pass
 
     @QtCore.pyqtSlot('QLowEnergyService::ServiceState')
+#    def onServiceStateChanged(self, s:QtBluetooth.QLowEnergyService.ServiceState) -> None:
+#        _log.debug('onServiceStateChanged(%s)',s)
+#        # pylint: disable=maybe-no-member
+#        if s == QtBluetooth.QLowEnergyService.ServiceState.InvalidService:
+#            pass
+#        elif s == QtBluetooth.QLowEnergyService.ServiceState.DiscoveryRequired and self.m_service is not None:
+#            self.m_service.discoverDetails()
+#        elif s == QtBluetooth.QLowEnergyService.ServiceState.RemoteServiceDiscovering:
+#            pass
+#        elif s == QtBluetooth.QLowEnergyService.ServiceState.ServiceDiscovered:
+#            self.searchCharacteristic()
+#        elif s == QtBluetooth.QLowEnergyService.ServiceState.LocalService:
+#            pass
+
+    # a simplified version of the above
+    @QtCore.pyqtSlot('QLowEnergyService::ServiceState')
     def onServiceStateChanged(self, s:QtBluetooth.QLowEnergyService.ServiceState) -> None:
         _log.debug('onServiceStateChanged(%s)',s)
         # pylint: disable=maybe-no-member
-        if s == QtBluetooth.QLowEnergyService.ServiceState.InvalidService:
-            pass
-        elif s == QtBluetooth.QLowEnergyService.ServiceState.DiscoveryRequired and self.m_service is not None:
+        if s == QtBluetooth.QLowEnergyService.ServiceState.DiscoveryRequired and self.m_service is not None:
             self.m_service.discoverDetails()
-        elif s == QtBluetooth.QLowEnergyService.ServiceState.RemoteServiceDiscovering:
-            pass
         elif s == QtBluetooth.QLowEnergyService.ServiceState.ServiceDiscovered:
             self.searchCharacteristic()
-        elif s == QtBluetooth.QLowEnergyService.ServiceState.LocalService:
-            pass
 
     @QtCore.pyqtSlot('QLowEnergyService::ServiceError')
     def serviceError(self, _error:QtBluetooth.QLowEnergyService.ServiceError) -> None:

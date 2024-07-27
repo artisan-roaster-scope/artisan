@@ -2603,7 +2603,7 @@ class EventsDlg(ArtisanResizeablDialog):
             colorButton.clicked.connect(self.setbuttoncolor)
             label = self.extraeventslabels[i][:]
             et = self.extraeventstypes[i]
-            label = self.aw.substButtonLabel(-1,label,et)
+            label = self.aw.substButtonLabel(-1,label,et, self.extraeventsvalues[i])
             colorButton.setText(label)
             colorButton.setStyleSheet(f'border: none; outline: none; background-color: {self.extraeventbuttoncolor[i]}; color: {self.extraeventbuttontextcolor[i]};')
             #8 Text Color
@@ -2791,7 +2791,7 @@ class EventsDlg(ArtisanResizeablDialog):
             label = label.replace('\\n', chr(10))
             if i < len(self.extraeventslabels):
                 self.extraeventslabels[i] = label
-                label = self.aw.substButtonLabel(-1, label, self.extraeventstypes[i])
+                label = self.aw.substButtonLabel(-1, label, self.extraeventstypes[i], self.extraeventsvalues[i])
             #Update Color Buttons
             colorButton = cast(QPushButton, self.eventbuttontable.cellWidget(i,7))
             colorButton.setText(label)
@@ -2818,13 +2818,12 @@ class EventsDlg(ArtisanResizeablDialog):
                 elif evType == 4:
                     evType = 9 # and map the entry 4 to 9
                 self.extraeventstypes[i] = evType
-
             labeledit = cast(QLineEdit, self.eventbuttontable.cellWidget(i,0))
             label = labeledit.text()
             label = label.replace('\\n', chr(10))
             if i < len(self.extraeventslabels):
                 self.extraeventslabels[i] = label
-                label = self.aw.substButtonLabel(-1, label, self.extraeventstypes[i])
+                label = self.aw.substButtonLabel(-1, label, self.extraeventstypes[i], self.extraeventsvalues[i])
             #Update Color Buttons
             colorButton = cast(QPushButton, self.eventbuttontable.cellWidget(i,7))
             colorButton.setText(label)
@@ -2838,6 +2837,18 @@ class EventsDlg(ArtisanResizeablDialog):
             valueedit = cast(QLineEdit, self.eventbuttontable.cellWidget(i,3))
             if i < len(self.extraeventsvalues):
                 self.extraeventsvalues[i] = self.aw.qmc.str2eventsvalue(str(valueedit.text()))
+                labeledit = cast(QLineEdit, self.eventbuttontable.cellWidget(i,0))
+                label = labeledit.text()
+                label = label.replace('\\n', chr(10))
+                if i < len(self.extraeventslabels):
+                    self.extraeventslabels[i] = label
+                    label = self.aw.substButtonLabel(-1, label, self.extraeventstypes[i], self.extraeventsvalues[i])
+                #Update Color Buttons
+                colorButton = cast(QPushButton, self.eventbuttontable.cellWidget(i,7))
+                colorButton.setText(label)
+                colorTextButton = cast(QPushButton, self.eventbuttontable.cellWidget(i,8))
+                colorTextButton.setText(label)
+
 
     @pyqtSlot(int)
     def setactioneventbutton(self, _:int) -> None:

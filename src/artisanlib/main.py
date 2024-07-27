@@ -10409,7 +10409,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         if len(self.extraeventstypes)>tee and len(self.buttonlist)>tee:
             button_style = self.extraEventButtonStyle(tee, style)
             self.buttonlist[tee].setStyleSheet(button_style)
-            self.buttonlist[tee].setText(self.substButtonLabel(tee, self.extraeventslabels[tee], self.extraeventstypes[tee]))
+            self.buttonlist[tee].setText(self.substButtonLabel(tee, self.extraeventslabels[tee], self.extraeventstypes[tee], self.extraeventsvalues[tee]))
 
     @pyqtSlot(bool)
     def recordextraevent_slot(self, _:bool) -> None:
@@ -10450,6 +10450,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 # we just fire the action
                 # split on an octothorpe '#' that is not inside parentheses '()'
                 cmd = re.split(r'\#(?![^\(]*\))',self.extraeventsactionstrings[ee])[0].strip()
+                try:
+                    # subst {TEMP} by given event value interpreted as temperature in Fahrenheit, potentially converted to C if self.qmc.mode='C'
+                    cmd = cmd.format(TEMP=(cmdvalue if self.qmc.mode == 'F' else int(round(fromFtoCstrict(cmdvalue)))))
+                except Exception:  # pylint: disable=broad-except
+                    pass
                 cmd = cmd.format(*(tuple([cmdvalue]*cmd.count('{}'))))
                 self.eventaction(self.extraeventsactions[ee],cmd,parallel=parallel)
                 # and record the event
@@ -10478,6 +10483,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     # split on an octothorpe '#' that is not inside parentheses '()'
                     cmd = re.split(r'\#(?![^\(]*\))',self.extraeventsactionstrings[ee])[0].strip()
                     try:
+                        # subst {TEMP} by given event value interpreted as temperature in Fahrenheit, potentially converted to C if self.qmc.mode='C'
+                        cmd = cmd.format(TEMP=(actionvalue if self.qmc.mode == 'F' else int(round(fromFtoCstrict(actionvalue)))))
+                    except Exception: # pylint: disable=broad-except
+                        pass
+                    try:
                         cmd = cmd.format(*(tuple([actionvalue]*cmd.count('{}'))))
                     except Exception: # pylint: disable=broad-except
                         pass
@@ -10498,6 +10508,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             # just issue the eventaction (no cmd substitution here)
             # split on an octothorpe '#' that is not inside parentheses '()'
             cmd = re.split(r'\#(?![^\(]*\))',self.extraeventsactionstrings[ee])[0].strip()
+            try:
+                # subst {TEMP} by given event value interpreted as temperature in Fahrenheit, potentially converted to C if self.qmc.mode='C'
+                cmd = cmd.format(TEMP=(cmdvalue if self.qmc.mode == 'F' else int(round(fromFtoCstrict(cmdvalue)))))
+            except Exception:  # pylint: disable=broad-except
+                pass
             cmd = cmd.format(*(tuple([cmdvalue]*cmd.count('{}'))))
             if cmdvalue == 0 and eventtype == 4:
                 # no event type and cmdvalue is 0 => cmd actions should await response and bind result to _
@@ -24651,9 +24666,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     widget.deleteLater()
 
     # applies button label substitutions like \t => eventname, \0 => ON,...
-    def substButtonLabel(self, buttonNr:int, label:str, eventtype:int) -> str:
+    # supplied eventvalue as stored, not yet converted to the visible int value
+    def substButtonLabel(self, buttonNr:int, label:str, eventtype:int, eventvalue:float) -> str:
         et:int = eventtype
         res:str = label
+        value = self.qmc.eventsInternal2ExternalValue(eventvalue)
+        tempvalue = (value if self.qmc.mode == 'F' else int(round(fromFtoCstrict(value))))
+        sign = ''
+        if 4 < et < 9 and value > 0:
+            sign = '+'
         if et > 4:
             et = et - 5
         if et < 4:
@@ -24686,7 +24707,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 ('\\f', QApplication.translate('Label','FILL')),
                 ('\\R', QApplication.translate('Label','RELEASE')),
                 ('\\h', QApplication.translate('Label','HEATING')),
-                ('\\l', QApplication.translate('Label','COOLING'))
+                ('\\l', QApplication.translate('Label','COOLING')),
+                ('\\V', f'{sign}{value}'),
+                ('\\T', f'{tempvalue}{self.qmc.mode}')
                 ]:
             res = res.replace(var,subst)
         return res
@@ -24760,7 +24783,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
             p.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
-            p.setText(self.substButtonLabel(i, self.extraeventslabels[i], eet))
+            p.setText(self.substButtonLabel(i, self.extraeventslabels[i], eet, self.extraeventsvalues[i]))
             p.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             p.clicked.connect(self.recordextraevent_slot)
             self.buttonlist.append(p)

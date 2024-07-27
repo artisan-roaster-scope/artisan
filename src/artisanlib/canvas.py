@@ -513,6 +513,13 @@ class tgraphcanvas(FigureCanvas):
                     self.mode = 'C'
             except Exception: # pylint: disable=broad-except
                 pass
+        else:
+            # try to "guess" the users preferred temperature unit also on Windows and Linux
+            try:
+                if QLocale.system().countryToString(QLocale.system().country()) != 'United States':
+                    self.mode = 'C'
+            except Exception: # pylint: disable=broad-except
+                pass
 
         self.mode_tempsliders = self.mode # the temperature mode of event slider to convert min/max limits
 
@@ -10989,7 +10996,11 @@ class tgraphcanvas(FigureCanvas):
         try:
             if self.legendloc > 0 and self.ax is not None and self.legend is not None:
                 # Get the legend bounding box in axes-relative coordinates
-                legend_bb_axes = self.legend.get_window_extent().transformed(self.ax.transAxes.inverted())
+
+                with warnings.catch_warnings():
+                    warnings.simplefilter('ignore')
+                    # supress font warnings (eg. with language arabic on using Han Sans TW font) like: UserWarning: Glyph 65166 (\N{ARABIC LETTER ALEF FINAL FORM}) missing from font(s) Source Han Sans TW.
+                    legend_bb_axes = self.legend.get_window_extent().transformed(self.ax.transAxes.inverted())
 
                 # Get the data range
                 x_min, x_max = self.ax.get_xlim()
@@ -11129,6 +11140,7 @@ class tgraphcanvas(FigureCanvas):
             self.filterDropOut_tmax = self.filterDropOut_tmax_F_default
             self.filterDropOut_spikeRoR_dRoR_limit = self.filterDropOut_spikeRoR_dRoR_limit_F_default
             self.adjustTempSliders()
+            self.aw.realignbuttons() # reset buttton labels as they might refer to the temperature mode via {TEMP}
 
     #sets the graph display in Celsius mode
     def celsiusMode(self, setdefaultaxes:bool = True) -> None:
@@ -11163,6 +11175,7 @@ class tgraphcanvas(FigureCanvas):
             self.filterDropOut_tmax = self.filterDropOut_tmax_C_default
             self.filterDropOut_spikeRoR_dRoR_limit = self.filterDropOut_spikeRoR_dRoR_limit_C_default
             self.adjustTempSliders()
+            self.aw.realignbuttons() # reset buttton labels as they might refer to the temperature mode via {TEMP}
 
     @pyqtSlot()
     @pyqtSlot(bool)
