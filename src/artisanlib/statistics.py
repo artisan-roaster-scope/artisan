@@ -651,7 +651,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
         if modifiers == Qt.KeyboardModifier.AltModifier:  #alt click
             tbl = prettytable.PrettyTable()
             fields = []
-            fields.append(' ')  # this column shows the row number
+            #fields.append(' ')  # this column shows the row number
             for c in range(ncols):
                 item = self.summarystatstable.horizontalHeaderItem(c)
                 if item is not None:
@@ -661,7 +661,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
                 rows = []
                 rows.append(str(r+1))
                 # type
-                typeComboBox = cast(MyQComboBox, self.summarystatstable.cellWidget(r,0))
+                typeComboBox = cast(MyQComboBox, self.summarystatstable.cellWidget(r,1))
                 rows.append(typeComboBox.currentText())
                 tbl.add_row(rows)
             clipboard = tbl.get_string()
@@ -676,7 +676,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
             clipboard += '\n'
             for r in range(nrows):
                 clipboard += str(r+1) + '\t'
-                typeComboBox = cast(MyQComboBox, self.summarystatstable.cellWidget(r,0))
+                typeComboBox = cast(MyQComboBox, self.summarystatstable.cellWidget(r,1))
                 clipboard += typeComboBox.currentText() + '\t'
         # copy to the system clipboard
         sys_clip = QApplication.clipboard()

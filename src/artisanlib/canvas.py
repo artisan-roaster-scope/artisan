@@ -10999,7 +10999,7 @@ class tgraphcanvas(FigureCanvas):
 
                 with warnings.catch_warnings():
                     warnings.simplefilter('ignore')
-                    # supress font warnings (eg. with language arabic on using Han Sans TW font) like: UserWarning: Glyph 65166 (\N{ARABIC LETTER ALEF FINAL FORM}) missing from font(s) Source Han Sans TW.
+                    # suppress font warnings (eg. with language arabic on using Han Sans TW font) like: UserWarning: Glyph 65166 (\N{ARABIC LETTER ALEF FINAL FORM}) missing from font(s) Source Han Sans TW.
                     legend_bb_axes = self.legend.get_window_extent().transformed(self.ax.transAxes.inverted())
 
                 # Get the data range
@@ -11140,7 +11140,7 @@ class tgraphcanvas(FigureCanvas):
             self.filterDropOut_tmax = self.filterDropOut_tmax_F_default
             self.filterDropOut_spikeRoR_dRoR_limit = self.filterDropOut_spikeRoR_dRoR_limit_F_default
             self.adjustTempSliders()
-            self.aw.realignbuttons() # reset buttton labels as they might refer to the temperature mode via {TEMP}
+            self.aw.realignbuttons() # reset button labels as they might refer to the temperature mode via {TEMP}
 
     #sets the graph display in Celsius mode
     def celsiusMode(self, setdefaultaxes:bool = True) -> None:
@@ -11175,7 +11175,7 @@ class tgraphcanvas(FigureCanvas):
             self.filterDropOut_tmax = self.filterDropOut_tmax_C_default
             self.filterDropOut_spikeRoR_dRoR_limit = self.filterDropOut_spikeRoR_dRoR_limit_C_default
             self.adjustTempSliders()
-            self.aw.realignbuttons() # reset buttton labels as they might refer to the temperature mode via {TEMP}
+            self.aw.realignbuttons() # reset button labels as they might refer to the temperature mode via {TEMP}
 
     @pyqtSlot()
     @pyqtSlot(bool)
