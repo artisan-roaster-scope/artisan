@@ -1,7 +1,7 @@
 main:
-  - title: "Supported Machines"
+  - title: "Machines"
     url: /machines/index
-  - title: "Supported Devices"
+  - title: "Devices"
     url: /devices/index
   - title: "News"
     url: /news/index
@@ -28,6 +28,8 @@ machines:
         url: /machines/atilla/
       - title: "BC Roasters"
         url: /machines/bc/
+      - title: "BeanGo"
+        url: /machines/beango/
       - title: "BellaTW"
         url: /machines/bellatw/
       - title: "Berto"

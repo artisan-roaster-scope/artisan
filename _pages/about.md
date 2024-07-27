@@ -59,6 +59,10 @@ gallery:
     image_path: /assets/images/mugma-logo.png
     alt: "Mugma Roasters"
     title: "Mugma Roasters"
+  - url: https://www.beangocube.com/
+    image_path: /assets/images/beango-logo.png
+    alt: "BeanGo"
+    title: "BeanGo"
     
 ---
 
