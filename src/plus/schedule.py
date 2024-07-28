@@ -1416,12 +1416,11 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.remaining_splitter = Splitter(Qt.Orientation.Vertical)
         self.remaining_splitter.addWidget(self.stacked_remaining_widget)
         self.remaining_splitter.addWidget(remaining_filter_group2)
-        self.remaining_splitter.setSizes([100,0])
+        self.remaining_splitter.setSizes([100,0]) # the filter section is hidden by default and its position is not remembered
 
 
         if not self.aw.scheduler_completed_details_visible:
             self.remaining_filter_group.hide()
-        self.remaining_splitter.splitterMoved.connect(self.remainingSplitterMoved)
         self.filter_frame_hide = False
 
 #####
@@ -1611,7 +1610,6 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
         if not self.aw.scheduler_filters_visible:
             self.completed_details_scrollarea.hide()
-        self.completed_splitter.splitterMoved.connect(self.completedSplitterMoved)
         self.completed_details_scrollarea_hide = False
 
         completed_message = QLabel(f"{QApplication.translate('Plus', 'No completed roasts')}<br>")
@@ -1682,12 +1680,11 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.main_splitter = Splitter(Qt.Orientation.Vertical)
         self.main_splitter.addWidget(self.task2_frame)
         self.main_splitter.addWidget(self.TabWidget)
-        self.main_splitter.setSizes([0,100])
+#        self.main_splitter.setSizes([0,100])
         self.main_splitter.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
 
         if not self.aw.scheduler_tasks_visible:
             self.task_frame.hide()
-        self.main_splitter.splitterMoved.connect(self.mainSplitterMoved)
         self.task_frame_hide = False # flag used by mainSplitterMoved()/hide_task_frame() to hide task frame again after closing the drawer
 
 
@@ -1717,13 +1714,6 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
         self.setLayout(self.main_layout)
 
-        settings = QSettings()
-        if settings.contains('ScheduleRemainingSplitter'):
-            self.remaining_splitter.restoreState(settings.value('ScheduleRemainingSplitter'))
-        if settings.contains('ScheduleMainSplitter'):
-            self.main_splitter.restoreState(settings.value('ScheduleMainSplitter'))
-        if settings.contains('ScheduleCompletedSplitter'):
-            self.completed_splitter.restoreState(settings.value('ScheduleCompletedSplitter'))
 
         # we want minimize and close buttons, but no maximize buttons
         if not platform.system().startswith('Windows'):
@@ -1774,6 +1764,27 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             self.restoreGeometry(settings.value('ScheduleGeometry'))
         else:
             self.resize(250,300)
+
+
+        settings = QSettings()
+        if settings.contains('ScheduleMainSplitter'):
+            self.main_splitter.restoreState(settings.value('ScheduleMainSplitter'))
+        if settings.contains('ScheduleRemainingSplitter') and settings.contains('ScheduleRemainingSplitterOpen'):
+            if settings.value('ScheduleRemainingSplitterOpen'):
+                self.remaining_filter_group.show()
+            else:
+                self.remaining_filter_group.hide()
+            self.remaining_splitter.restoreState(settings.value('ScheduleRemainingSplitter'))
+        if settings.contains('ScheduleCompletedSplitter') and settings.contains('ScheduleCompletedSplitterOpen'):
+            if settings.value('ScheduleCompletedSplitterOpen'):
+                self.completed_details_scrollarea.show()
+            else:
+                self.completed_details_scrollarea.hide()
+            self.completed_splitter.restoreState(settings.value('ScheduleCompletedSplitter'))
+
+        self.main_splitter.splitterMoved.connect(self.mainSplitterMoved)
+        self.remaining_splitter.splitterMoved.connect(self.remainingSplitterMoved)
+        self.completed_splitter.splitterMoved.connect(self.completedSplitterMoved)
 
         self.aw.sendmessage(QApplication.translate('Message','Scheduler started'))
 
@@ -1986,6 +1997,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                 super().keyPressEvent(event)
 
 
+
     @pyqtSlot('QCloseEvent')
     def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
         self.aw.scheduled_items_uuids = self.get_scheduled_items_ids()
@@ -1994,9 +2006,13 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         #save window geometry
         settings.setValue('ScheduleGeometry', self.saveGeometry())
         #save splitter states
-        QSettings().setValue('ScheduleRemainingSplitter',self.remaining_splitter.saveState())
-        QSettings().setValue('ScheduleMainSplitter',self.main_splitter.saveState())
-        QSettings().setValue('ScheduleCompletedSplitter',self.completed_splitter.saveState())
+        QSettings().setValue('ScheduleMainSplitter',self.main_splitter.saveState()) # upper TODO/Completed splitter
+        remaining_splitter_sizes = self.remaining_splitter.sizes()
+        QSettings().setValue('ScheduleRemainingSplitterOpen', len(remaining_splitter_sizes)>0 and remaining_splitter_sizes[1]>0)
+        QSettings().setValue('ScheduleRemainingSplitter',self.remaining_splitter.saveState()) # lower TODO splitter
+        completed_splitter_sizes = self.completed_splitter.sizes()
+        QSettings().setValue('ScheduleCompletedSplitterOpen', len(completed_splitter_sizes)>0 and completed_splitter_sizes[1]>0)
+        QSettings().setValue('ScheduleCompletedSplitter',self.completed_splitter.saveState()) # lower Completed splitter
         self.aw.scheduler_tasks_visible = self.task_frame.isVisible()
         self.aw.scheduler_completed_details_visible = self.completed_details_scrollarea.isVisible()
         self.aw.scheduler_filters_visible = self.completed_details_scrollarea.isVisible()

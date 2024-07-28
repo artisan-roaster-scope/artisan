@@ -1662,6 +1662,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.drumspeed_setup = self.setup_ui.lineEditDrumSpeed.text()
             self.populateSetupDefaults()
             self.setupEdited()
+            self.aw.updateScheduleSignal.emit()
 
     @pyqtSlot(bool)
     def SetupDefaults(self, _:bool = False) -> None:
