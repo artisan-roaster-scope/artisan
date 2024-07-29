@@ -509,6 +509,10 @@ try: # BLE not available on some platforms
             # disconnect signals
             self.ble.deviceDisconnected.disconnect()
             self.ble.disconnectDevice()
+            try:
+                self.ble.stop_managing_thread()
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
 
         def ble_scan_failed(self) -> None:
             if self.ble is not None:

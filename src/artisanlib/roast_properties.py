@@ -2541,6 +2541,10 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.updateWeightLCD('')
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
+            try:
+                self.ble.stop_managing_thread()
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
         settings = QSettings()
         #save window geometry
         settings.setValue('RoastGeometry',self.saveGeometry())

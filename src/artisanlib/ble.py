@@ -18,7 +18,7 @@
 
 from enum import Enum
 import logging
-from typing import Final, Optional, Tuple, List, Callable
+from typing import Final, Optional, Tuple, List, Callable, Any, Type
 
 try:
     from PyQt6 import QtCore # @UnusedImport @Reimport  @UnresolvedImport
@@ -38,7 +38,7 @@ class BLE_CHAR_TYPE(Enum):
     BLE_CHAR_NOTIFY_WRITE = 'BLE_CHAR_NOTIFY_WRITE'
 
 
-class BleInterface(QtCore.QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class ()
+class BleSDK(QtCore.QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class ()
     weightChanged = QtCore.pyqtSignal(float)
     batteryChanged = QtCore.pyqtSignal(int)
     deviceDisconnected = QtCore.pyqtSignal()
@@ -60,6 +60,8 @@ class BleInterface(QtCore.QObject): # pyright: ignore [reportGeneralTypeIssues] 
                 connected : Optional[Callable[[], None]] = None,
                 device_names:Optional[List[str]] = None) -> None:
         super().__init__()
+
+        self.__managing_thread: Optional[QtCore.QThread] = None
 
         self.CHUNK_SIZE:Final[int] = 20
 
@@ -107,6 +109,15 @@ class BleInterface(QtCore.QObject): # pyright: ignore [reportGeneralTypeIssues] 
         self.m_connected:bool = False
 
         self.dataReceived.connect(self.dataReceivedProcessing)
+
+    def set_managing_thread(self, thread: QtCore.QThread) -> None:
+        self.__managing_thread = thread
+
+    def stop_managing_thread(self) -> None:
+        if self.__managing_thread:
+            self.__managing_thread.quit()
+            self.__managing_thread.wait()
+            self.__managing_thread = None
 
     def disconnectDiscovery(self) -> None:
         self.m_deviceDiscoveryAgent.deviceDiscovered.disconnect()
@@ -256,21 +267,6 @@ class BleInterface(QtCore.QObject): # pyright: ignore [reportGeneralTypeIssues] 
 #        print("Characteristic Read:  {values}".format(values=value))
         pass
 
-    @QtCore.pyqtSlot('QLowEnergyService::ServiceState')
-#    def onServiceStateChanged(self, s:QtBluetooth.QLowEnergyService.ServiceState) -> None:
-#        _log.debug('onServiceStateChanged(%s)',s)
-#        # pylint: disable=maybe-no-member
-#        if s == QtBluetooth.QLowEnergyService.ServiceState.InvalidService:
-#            pass
-#        elif s == QtBluetooth.QLowEnergyService.ServiceState.DiscoveryRequired and self.m_service is not None:
-#            self.m_service.discoverDetails()
-#        elif s == QtBluetooth.QLowEnergyService.ServiceState.RemoteServiceDiscovering:
-#            pass
-#        elif s == QtBluetooth.QLowEnergyService.ServiceState.ServiceDiscovered:
-#            self.searchCharacteristic()
-#        elif s == QtBluetooth.QLowEnergyService.ServiceState.LocalService:
-#            pass
-
     # a simplified version of the above
     @QtCore.pyqtSlot('QLowEnergyService::ServiceState')
     def onServiceStateChanged(self, s:QtBluetooth.QLowEnergyService.ServiceState) -> None:
@@ -280,6 +276,15 @@ class BleInterface(QtCore.QObject): # pyright: ignore [reportGeneralTypeIssues] 
             self.m_service.discoverDetails()
         elif s == QtBluetooth.QLowEnergyService.ServiceState.ServiceDiscovered:
             self.searchCharacteristic()
+#       elif s == QtBluetooth.QLowEnergyService.ServiceState.InvalidService:
+#            # A service can become invalid when it looses the connection to the underlying device.
+#            # Even though the connection may be lost it retains its last information.
+#            # An invalid service cannot become valid anymore even if the connection to the device is re-established
+#            pass
+#        elif s == QtBluetooth.QLowEnergyService.ServiceState.RemoteServiceDiscovering:
+#            pass
+#        elif s == QtBluetooth.QLowEnergyService.ServiceState.LocalService:
+#            pass
 
     @QtCore.pyqtSlot('QLowEnergyService::ServiceError')
     def serviceError(self, _error:QtBluetooth.QLowEnergyService.ServiceError) -> None:
@@ -411,17 +416,33 @@ class BleInterface(QtCore.QObject): # pyright: ignore [reportGeneralTypeIssues] 
         _log.debug('scanDevices()')
         self.m_device = None
         try:
-            # fails on PyQt5, works on PyQt6
+            # fails on PyQt5, works on PyQt6:
             # pylint: disable=maybe-no-member
             self.m_deviceDiscoveryAgent.start(QtBluetooth.QBluetoothDeviceDiscoveryAgent.DiscoveryMethod.LowEnergyMethod)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-            # works on PyQt5, fails on PyQt6
+            # works on PyQt5, fails on PyQt6:
             QBluetoothDeviceDiscoveryAgent_LowEnergyMethod = 2
             self.m_deviceDiscoveryAgent.start(
                 QtBluetooth.QBluetoothDeviceDiscoveryAgent.DiscoveryMethod(
                     QBluetoothDeviceDiscoveryAgent_LowEnergyMethod))
 
+class BleInterface(BleSDK):
+    """This class is just a singleton of BKE SDK class
+    """
+    __instance:Optional[BleSDK] = None
+
+    def __new__(cls:Type[Any], # type: ignore[misc]
+                uuid_service_char_tuples:List[Tuple[UUID, List[Tuple[UUID, BLE_CHAR_TYPE]]]],
+                processData : Callable[[Callable[[Optional[bytes]], None], bytes], Tuple[Optional[float], Optional[int]]],
+                *args:Any, **kwargs:Any) -> BleSDK:
+        if cls.__instance is None:
+            cls.__instance = BleSDK(uuid_service_char_tuples, processData, *args, **kwargs)
+            managing_thread_reference = QtCore.QThread()
+            cls.__instance.set_managing_thread(managing_thread_reference)
+            cls.__instance.moveToThread(managing_thread_reference)
+            managing_thread_reference.start()
+        return cls.__instance # type:ignore[no-any-return]
 
 def main() -> None:
     import sys
