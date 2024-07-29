@@ -1,8 +1,8 @@
 ---
 layout: single
 permalink: /machines/beango/
-title: "BeanGo"
-excerpt: "Cube X"
+title: "BeanGo Cube"
+excerpt: "X"
 header:
   overlay_image: /assets/images/beango2.png
   image: /assets/images/beango.jpg
