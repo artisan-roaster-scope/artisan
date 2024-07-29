@@ -10450,11 +10450,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 # we just fire the action
                 # split on an octothorpe '#' that is not inside parentheses '()'
                 cmd = re.split(r'\#(?![^\(]*\))',self.extraeventsactionstrings[ee])[0].strip()
-                try:
-                    # subst {TEMP} by given event value interpreted as temperature in Fahrenheit, potentially converted to C if self.qmc.mode='C'
-                    cmd = cmd.format(TEMP=(cmdvalue if self.qmc.mode == 'F' else int(round(fromFtoCstrict(cmdvalue)))))
-                except Exception:  # pylint: disable=broad-except
-                    pass
+#                try:
+#                    # subst {TEMP} by given event value interpreted as temperature in Fahrenheit, potentially converted to C if self.qmc.mode='C'
+#                    cmd = cmd.format(TEMP=(cmdvalue if self.qmc.mode == 'F' else int(round(fromFtoCstrict(cmdvalue)))))
+#                except Exception:  # pylint: disable=broad-except
+#                    pass
                 cmd = cmd.format(*(tuple([cmdvalue]*cmd.count('{}'))))
                 self.eventaction(self.extraeventsactions[ee],cmd,parallel=parallel)
                 # and record the event
@@ -10482,11 +10482,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 else:
                     # split on an octothorpe '#' that is not inside parentheses '()'
                     cmd = re.split(r'\#(?![^\(]*\))',self.extraeventsactionstrings[ee])[0].strip()
-                    try:
-                        # subst {TEMP} by given event value interpreted as temperature in Fahrenheit, potentially converted to C if self.qmc.mode='C'
-                        cmd = cmd.format(TEMP=(actionvalue if self.qmc.mode == 'F' else int(round(fromFtoCstrict(actionvalue)))))
-                    except Exception: # pylint: disable=broad-except
-                        pass
+#                    try:
+#                        # subst {TEMP} by given event value interpreted as temperature in Fahrenheit, potentially converted to C if self.qmc.mode='C'
+#                        cmd = cmd.format(TEMP=(actionvalue if self.qmc.mode == 'F' else int(round(fromFtoCstrict(actionvalue)))))
+#                    except Exception: # pylint: disable=broad-except
+#                        pass
                     try:
                         cmd = cmd.format(*(tuple([actionvalue]*cmd.count('{}'))))
                     except Exception: # pylint: disable=broad-except
@@ -10508,11 +10508,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             # just issue the eventaction (no cmd substitution here)
             # split on an octothorpe '#' that is not inside parentheses '()'
             cmd = re.split(r'\#(?![^\(]*\))',self.extraeventsactionstrings[ee])[0].strip()
-            try:
-                # subst {TEMP} by given event value interpreted as temperature in Fahrenheit, potentially converted to C if self.qmc.mode='C'
-                cmd = cmd.format(TEMP=(cmdvalue if self.qmc.mode == 'F' else int(round(fromFtoCstrict(cmdvalue)))))
-            except Exception:  # pylint: disable=broad-except
-                pass
+#            try:
+#                # subst {TEMP} by given event value interpreted as temperature in Fahrenheit, potentially converted to C if self.qmc.mode='C'
+#                cmd = cmd.format(TEMP=(cmdvalue if self.qmc.mode == 'F' else int(round(fromFtoCstrict(cmdvalue)))))
+#            except Exception:  # pylint: disable=broad-except
+#                pass
             cmd = cmd.format(*(tuple([cmdvalue]*cmd.count('{}'))))
             if cmdvalue == 0 and eventtype == 4:
                 # no event type and cmdvalue is 0 => cmd actions should await response and bind result to _
@@ -24671,7 +24671,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         et:int = eventtype
         res:str = label
         value = self.qmc.eventsInternal2ExternalValue(eventvalue)
-        tempvalue = (value if self.qmc.mode == 'F' else int(round(fromFtoCstrict(value))))
+        tempvalueF = (value if self.qmc.mode == 'F' else int(round(fromFtoCstrict(value))))
+        tempvalueC = (value if self.qmc.mode == 'C' else int(round(fromCtoFstrict(value))))
         sign = ''
         if 4 < et < 9 and value > 0:
             sign = '+'
@@ -24709,7 +24710,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 ('\\h', QApplication.translate('Label','HEATING')),
                 ('\\l', QApplication.translate('Label','COOLING')),
                 ('\\V', f'{sign}{value}'),
-                ('\\T', f'{tempvalue}{self.qmc.mode}')
+                ('\\F', f'{tempvalueF}{self.qmc.mode}'),
+                ('\\T', f'{tempvalueC}{self.qmc.mode}')
                 ]:
             res = res.replace(var,subst)
         return res

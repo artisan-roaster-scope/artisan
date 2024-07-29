@@ -781,19 +781,19 @@ class tgraphcanvas(FigureCanvas):
                        'Phidget TMP1101 4xTC 01',  #58
                        '+Phidget TMP1101 4xTC 23', #59
                        '+Phidget TMP1101 4xTC AT', #60
-                       'Phidget TMP1100 1xTC',  #61
-                       'Phidget 1011 IO 01',    #62
-                       'Phidget HUB IO 01', #63
-                       '+Phidget HUB IO 23',#64
-                       '+Phidget HUB IO 45',#65
-                       '-Omega HH806W',         #66 NOT WORKING
-                       'VOLTCRAFT PL-125-T2',   #67
-                       'Phidget TMP1200 1xRTD A', #68
-                       'Phidget IO Digital 01',         #69
-                       '+Phidget IO Digital 23',        #70
-                       '+Phidget IO Digital 45',        #71
-                       '+Phidget IO Digital 67',        #72
-                       'Phidget 1011 IO Digital 01',    #73
+                       'Phidget TMP1100 1xTC',     #61
+                       'Phidget 1011 IO 01',       #62
+                       'Phidget HUB IO 01',        #63
+                       '+Phidget HUB IO 23',       #64
+                       '+Phidget HUB IO 45',       #65
+                       '-Omega HH806W',            #66 NOT WORKING
+                       'VOLTCRAFT PL-125-T2',      #67
+                       'Phidget TMP1200 1xRTD A',  #68
+                       'Phidget IO Digital 01',    #69
+                       '+Phidget IO Digital 23',   #70
+                       '+Phidget IO Digital 45',   #71
+                       '+Phidget IO Digital 67',   #72
+                       'Phidget 1011 IO Digital 01', #73
                        'Phidget HUB IO Digital 01', #74
                        '+Phidget HUB IO Digital 23',#75
                        '+Phidget HUB IO Digital 45',#76
@@ -887,7 +887,9 @@ class tgraphcanvas(FigureCanvas):
                        'Mugma BT/ET',               #164
                        '+Mugma Heater/Fan',         #165
                        '+Mugma Heater/Catalyzer',   #166
-                       '+Mugma SV'                  #167
+                       '+Mugma SV',                 #167
+                       'Phidget TMP1202 1xRTD A',   #168
+                       '+Phidget TMP1202 1xRTD B'   #169
                        ]
 
         # ADD DEVICE:
@@ -923,7 +925,8 @@ class tgraphcanvas(FigureCanvas):
             146, # Phidget DAQ1000 01
             152, # Phidget DAQ1200 01
             154, # Phidget DAQ1300 01
-            156  # Phidget DAQ1301 01
+            156, # Phidget DAQ1301 01
+            168, # Phidget TMP1202
         ]
 
         # ADD DEVICE:
@@ -9137,26 +9140,34 @@ class tgraphcanvas(FigureCanvas):
                     self.smoothETBT(re_smooth_foreground,recomputeAllDeltas,decay_smoothing_p)
 
     ## Output Idle Noise StdDev of BT RoR
-    #                        try:
-    #                            start = self.timeindex[0]
-    #                            end = self.timeindex[6]
-    #                            if start == -1:
-    #                                start = 0
-    #                            start = start + 30 # avoiding the empty begin of heavy smoothed data
-    #                            if end == 0:
-    #                                end = min(len(self.delta2) -1,100)
-    #                            print("ET RoR mean:",numpy.mean([x for x in self.delta1[start:end] if x is not None]))
-    #                            print("ET RoR std:",numpy.std([x for x in self.delta1[start:end] if x is not None]))
-    #                            print("BT RoR mean:",numpy.mean([x for x in self.delta2[start:end] if x is not None]))
-    #                            print("BT RoR std:",numpy.std([x for x in self.delta2[start:end] if x is not None]))
-    #                            print("BT mean:",numpy.mean([x for x in self.temp2[start:end] if x is not None]))
-    #                            print("BT std:",numpy.std([x for x in self.temp2[start:end] if x is not None]))
-    #                            max_BT = numpy.max([x for x in self.temp2[start:end] if x is not None])
-    #                            min_BT = numpy.max([x for x in self.temp2[start:end] if x is not None])
-    #                            mean_BT = numpy.mean([x for x in self.temp2[start:end] if x is not None])
-    #                            print("BT max delta:", max(mean_BT - min_BT,max_BT - mean_BT))
-    #                        except Exception as e: # pylint: disable=broad-except
-    #                            _log.exception(e)
+#                    try:
+#                        print("*** IdleNoise ***")
+#                        start = self.timeindex[0]
+#                        end = self.timeindex[6]
+#                        if start == -1:
+#                            start = 0
+#                        else:
+#                            print("CHARGE set")
+#                        start = start + 20 # avoiding the empty begin of heavy smoothed data
+#                        if end == 0:
+#                            end = len(self.timex) - 1
+##                            end = min(len(self.delta2) -1,100)
+#                        print("start",start)
+#                        print("end",end)
+#                        print("total", end-start)
+#                        if end>start:
+#                            print("ET RoR mean:",numpy.mean([x for x in self.delta1[start:end] if x is not None]))
+#                            print("ET RoR std:",numpy.std([x for x in self.delta1[start:end] if x is not None]))
+#                            print("BT RoR mean:",numpy.mean([x for x in self.delta2[start:end] if x is not None]))
+#                            print("BT RoR std:",numpy.std([x for x in self.delta2[start:end] if x is not None]))
+#                            print("BT mean:",numpy.mean([x for x in self.temp2[start:end] if x is not None]))
+#                            print("BT std:",numpy.std([x for x in self.temp2[start:end] if x is not None]))
+#                            max_BT = numpy.max([x for x in self.temp2[start:end] if x is not None])
+#                            min_BT = numpy.max([x for x in self.temp2[start:end] if x is not None])
+#                            mean_BT = numpy.mean([x for x in self.temp2[start:end] if x is not None])
+#                            print("BT max delta:", max(mean_BT - min_BT,max_BT - mean_BT))
+#                    except Exception as e: # pylint: disable=broad-except
+#                        _log.exception(e)
 
                     # CHARGE-DROP curve index limits
                     charge_idx = 0

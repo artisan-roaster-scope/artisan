@@ -530,7 +530,9 @@ class serialport:
                                    self.Mugma_BTET,           #164
                                    self.Mugma_HeaterFan,      #165
                                    self.Mugma_HeaterCatalyzer, #166
-                                   self.Mugma_SV              #167
+                                   self.Mugma_SV,             #167
+                                   self.PHIDGET_TMP1202,      #168
+                                   self.PHIDGET_TMP1202_2     #169
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -1082,6 +1084,18 @@ class serialport:
     def PHIDGET_TMP1200_2(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
         t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1200,alternative_conf=True)
+        return tx,a,t
+
+    def PHIDGET_TMP1202(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1202)
+        return tx,a,t
+
+    def PHIDGET_TMP1202_2(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        t,a = self.PHIDGET1045temperature(
+            158, #DeviceID.PHIDID_TMP1202,
+            alternative_conf=True)
         return tx,a,t
 
     def PHIDGET_HUB0000(self) -> Tuple[float,float,float]:
@@ -3255,7 +3269,7 @@ class serialport:
         try:
             if self.aw.qmc.phidgetManager is not None:
                 self.aw.qmc.phidgetManager.reserveSerialPort(serial,port,0,'PhidgetTemperatureSensor',deviceType,remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
-                if deviceType != DeviceID.PHIDID_TMP1200:
+                if deviceType not in {DeviceID.PHIDID_TMP1200, DeviceID.PHIDID_TMP1202}:
                     self.aw.qmc.phidgetManager.reserveSerialPort(serial,port,1,'PhidgetTemperatureSensor',deviceType,remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
                 if deviceType == DeviceID.PHIDID_1045:
                     self.configure1045()
@@ -3266,7 +3280,7 @@ class serialport:
                 elif deviceType == DeviceID.PHIDID_TMP1100:
                     self.configureOneTC()
                     self.aw.sendmessage(QApplication.translate('Message','Phidget Isolated Thermocouple 1-input attached'))
-                elif deviceType == DeviceID.PHIDID_TMP1200:
+                elif deviceType in {DeviceID.PHIDID_TMP1200, DeviceID.PHIDID_TMP1202}:
                     if alternative_conf:
                         self.configureOneRTD_2()
                     else:
@@ -3280,7 +3294,7 @@ class serialport:
         try:
             if self.aw.qmc.phidgetManager is not None:
                 self.aw.qmc.phidgetManager.releaseSerialPort(serial,port,0,'PhidgetTemperatureSensor',deviceType,remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
-                if deviceType != DeviceID.PHIDID_TMP1200:
+                if deviceType not in {DeviceID.PHIDID_TMP1200, DeviceID.PHIDID_TMP1202}:
                     self.aw.qmc.phidgetManager.releaseSerialPort(serial,port,1,'PhidgetTemperatureSensor',deviceType,remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
                 if deviceType == DeviceID.PHIDID_1045:
                     self.aw.sendmessage(QApplication.translate('Message','Phidget Temperature Sensor IR detached'))
@@ -3288,13 +3302,13 @@ class serialport:
                     self.aw.sendmessage(QApplication.translate('Message','Phidget Temperature Sensor 1-input detached'))
                 elif deviceType == DeviceID.PHIDID_TMP1100:
                     self.aw.sendmessage(QApplication.translate('Message','Phidget Isolated Thermocouple 1-input detached'))
-                elif deviceType == DeviceID.PHIDID_TMP1200:
+                elif deviceType in {DeviceID.PHIDID_TMP1200, DeviceID.PHIDID_TMP1202}:
                     self.aw.sendmessage(QApplication.translate('Message','Phidget VINT RTD 1-input detached'))
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
-    # this one is reused for the 1045 (IR), the 1051 (1xTC), TMP1100 (1xTC), and TMP1200 (1xRTD)
-    # if alternative_conf is set, the second configuration for the TMP1200 module is used
+    # this one is reused for the 1045 (IR), the 1051 (1xTC), TMP1100 (1xTC), and TMP1200/TMP1202 (1xRTD)
+    # if alternative_conf is set, the second configuration for the TMP1200/TMP1202 module is used
     def PHIDGET1045temperature(self, deviceType:int=DeviceID.PHIDID_1045, retry:bool = True, alternative_conf:bool = False) -> Tuple[float, float]:
         try:
             if not self.PhidgetIRSensor and self.aw.qmc.phidgetManager is not None:
@@ -3302,8 +3316,8 @@ class serialport:
                             remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
                 if ser is not None:
                     self.PhidgetIRSensor = PhidgetTemperatureSensor()
-                    if deviceType == DeviceID.PHIDID_TMP1200:
-                        self.PhidgetIRSensorIC = None # the TMP1200 does not has an internal temperature sensor
+                    if deviceType in {DeviceID.PHIDID_TMP1200, DeviceID.PHIDID_TMP1202}:
+                        self.PhidgetIRSensorIC = None # the TMP1200/TMP1202 does not has an internal temperature sensor
                     else:
                         self.PhidgetIRSensorIC = PhidgetTemperatureSensor()
                     try:
@@ -3314,7 +3328,7 @@ class serialport:
                                 self.addPhidgetServer()
                             if port is not None:
                                 self.PhidgetIRSensor.setHubPort(port)
-                                if self.PhidgetIRSensorIC is not None and deviceType != DeviceID.PHIDID_TMP1200:
+                                if self.PhidgetIRSensorIC is not None and deviceType not in {DeviceID.PHIDID_TMP1200, DeviceID.PHIDID_TMP1202}:
                                     self.PhidgetIRSensorIC.setHubPort(port)
                             self.PhidgetIRSensor.setDeviceSerialNumber(ser)
                             self.PhidgetIRSensor.setChannel(0) # attached to the IR channel
@@ -3325,7 +3339,7 @@ class serialport:
                                 self.PhidgetIRSensor.open() #.openWaitForAttachment(timeout) # wait attach for the TMP1200 takes about 1sec on USB
                             except Exception: # pylint: disable=broad-except
                                 pass
-                            if self.PhidgetIRSensorIC is not None and deviceType != DeviceID.PHIDID_TMP1200:
+                            if self.PhidgetIRSensorIC is not None and deviceType not in {DeviceID.PHIDID_TMP1200, DeviceID.PHIDID_TMP1202}:
                                 self.PhidgetIRSensorIC.setDeviceSerialNumber(ser)
                                 self.PhidgetIRSensorIC.setChannel(1) # attached to the IC channel
                                 if self.aw.qmc.phidgetRemoteFlag and self.aw.qmc.phidgetRemoteOnlyFlag:
@@ -3363,7 +3377,7 @@ class serialport:
                 try:
                     if (deviceType == DeviceID.PHIDID_1045 and self.aw.qmc.phidget1045_async) or \
                         (deviceType in [DeviceID.PHIDID_1051,DeviceID.PHIDID_TMP1100] and self.aw.qmc.phidget1048_async[0]) or \
-                        (deviceType == DeviceID.PHIDID_TMP1200 and ((alternative_conf and self.aw.qmc.phidget1200_2_async) or self.aw.qmc.phidget1200_async)):
+                        (deviceType in {DeviceID.PHIDID_TMP1200, DeviceID.PHIDID_TMP1202} and ((alternative_conf and self.aw.qmc.phidget1200_2_async) or self.aw.qmc.phidget1200_async)):
                         async_res = None
                         try:
                             #### lock shared resources #####
@@ -3438,7 +3452,7 @@ class serialport:
                         pass # the value might be still unknown. This can happen right after attach.
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
-                    if deviceType == DeviceID.PHIDID_TMP1200:
+                    if deviceType in {DeviceID.PHIDID_TMP1200, DeviceID.PHIDID_TMP1202}:
                         ambient = res
                     if ambient == -1:
                         return -1,-1
