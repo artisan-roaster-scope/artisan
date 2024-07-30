@@ -327,7 +327,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.updateWeightLCD('----')
 
     def updateWeightLCD(self, txt_value:str, txt_unit:str = '') -> None:
-        self.scaleWeight.setText('' if txt_value == '' else txt_value+txt_unit)
+        self.scaleWeight.setText('' if txt_value == '' else txt_value+txt_unit.lower())
         self.aw.qmc.updateLargeScaleLCDs(txt_value)
 
     @pyqtSlot(float)
@@ -1361,7 +1361,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                          (acaia.SERVICE_UUID, [AcaiaBLE.CHAR_UUID, AcaiaBLE.CHAR_UUID_WRITE])],
                         acaia.processData,
                         acaia.sendHeartbeat,
-                        acaia.sendStop,
+                        None, #acaia.sendStop,
                         acaia.reset,
                         [
                             acaia.DEVICE_NAME_LUNAR,
@@ -1638,9 +1638,9 @@ class editGraphDlg(ArtisanResizeablDialog):
 ##
 
     def updateWeightLCD(self, txt_value:str, txt_unit:str = '', total:Optional[float] = None) -> None:
-        self.scaleWeight.setText(txt_value+txt_unit)
+        self.scaleWeight.setText(txt_value+txt_unit.lower())
         total_txt, unit = self.updateScaleWeightAccumulated(total)
-        self.scaleWeightAccumulated.setText(total_txt + unit)
+        self.scaleWeightAccumulated.setText(total_txt + unit.lower())
         if self.aw.largeScaleLCDs_dialog is not None:
             self.aw.largeScaleLCDs_dialog.updateWeightUnitTotal(unit)
         self.aw.qmc.updateLargeScaleLCDs(txt_value, total_txt)
@@ -1772,7 +1772,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.scale_weight = None
         self.scale_battery = None
         self.updateWeightLCD('----')
-        if self.ble is not None:
+        if self.ble is not None and not self.disconnecting:
             QTimer.singleShot(200, self.ble.scanDevices)
 
     @pyqtSlot(float)
@@ -2545,6 +2545,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.ble.stop_managing_thread()
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
+            self.ble = None
         settings = QSettings()
         #save window geometry
         settings.setValue('RoastGeometry',self.saveGeometry())
@@ -2571,6 +2572,11 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.updateWeightLCD('')
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
+            try:
+                self.ble.stop_managing_thread()
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+            self.ble = None
         settings = QSettings()
         #save window geometry
         settings.setValue('RoastGeometry',self.saveGeometry())
