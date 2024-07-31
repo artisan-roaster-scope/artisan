@@ -17138,6 +17138,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.scale.stopbits = toInt(settings.value('stopbits',self.scale.stopbits))
             self.scale.parity = s2a(toString(settings.value('parity',self.scale.parity)))
             self.scale.timeout = float2float(toFloat(settings.value('timeout',self.scale.timeout)))
+            #TODO removes acaia from Windows 11 (and 7/8) until BLE is fixed in Qt/PyQt # pylint: disable=fixme
+            if platform.system() == "Windows" and "Windows-10" not in platform.platform():
+                self.scale.device = None
             settings.endGroup()
 #--- END GROUP Scale
 

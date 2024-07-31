@@ -58,7 +58,8 @@ if NOT "%PYUPGRADE_WIN_V%" == "" (
 ::
 :: get pip up to date
 ::
-python -m pip install --upgrade pip # pip update to 24.1 breaks CI
+:: pip update to 24.1 breaks CI
+::python -m pip install --upgrade pip
 python -m pip install wheel
 
 ::
