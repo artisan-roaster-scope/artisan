@@ -61,7 +61,7 @@ class BleSDK(QtCore.QObject): # pyright: ignore [reportGeneralTypeIssues] # Argu
                 device_names:Optional[List[str]] = None) -> None:
         super().__init__()
 
-        self.__managing_thread: Optional[QtCore.QThread] = None
+#        self.__managing_thread: Optional[QtCore.QThread] = None
 
         self.CHUNK_SIZE:Final[int] = 20
 
@@ -110,15 +110,16 @@ class BleSDK(QtCore.QObject): # pyright: ignore [reportGeneralTypeIssues] # Argu
 
         self.dataReceived.connect(self.dataReceivedProcessing)
 
-    def set_managing_thread(self, thread: QtCore.QThread) -> None:
-        self.__managing_thread = thread
+#    def set_managing_thread(self, thread: QtCore.QThread) -> None:
+#        self.__managing_thread = thread
 
     def stop_managing_thread(self) -> None:
-        if self.__managing_thread:
-            self.__managing_thread.quit()
-            self.__managing_thread.wait()
-            self.__managing_thread = None
-        _log.debug('managing_thread stopped: %s', self.__managing_thread)
+        pass
+#        if self.__managing_thread:
+#            self.__managing_thread.quit()
+#            self.__managing_thread.wait()
+#            self.__managing_thread = None
+#        _log.debug('managing_thread stopped: %s', self.__managing_thread)
 
     def disconnectDiscovery(self) -> None:
         _log.debug('disconnectDiscovery()')
@@ -431,20 +432,21 @@ class BleSDK(QtCore.QObject): # pyright: ignore [reportGeneralTypeIssues] # Argu
                         QBluetoothDeviceDiscoveryAgent_LowEnergyMethod))
 
 class BleInterface(BleSDK):
-    """Creates a BKE SDK instance and runs it in its own QThread
+    """Creates a BKE SDK instance # disabled: and runs it in its own QThread
     """
 
     def __new__(cls:Type[Any], # type: ignore[misc]
                 uuid_service_char_tuples:List[Tuple[UUID, List[Tuple[UUID, BLE_CHAR_TYPE]]]],
                 processData : Callable[[Callable[[Optional[bytes]], None], bytes], Tuple[Optional[float], Optional[int]]],
                 *args:Any, **kwargs:Any) -> BleSDK:
-        __instance = BleSDK(uuid_service_char_tuples, processData, *args, **kwargs)
-        managing_thread_reference = QtCore.QThread()
-        managing_thread_reference.finished.connect(managing_thread_reference.deleteLater)
-        __instance.set_managing_thread(managing_thread_reference)
-        __instance.moveToThread(managing_thread_reference)
-        managing_thread_reference.start()
-        return __instance
+#        __instance = BleSDK(uuid_service_char_tuples, processData, *args, **kwargs)
+#        managing_thread_reference = QtCore.QThread()
+#        managing_thread_reference.finished.connect(managing_thread_reference.deleteLater)
+#        __instance.set_managing_thread(managing_thread_reference)
+#        __instance.moveToThread(managing_thread_reference)
+#        managing_thread_reference.start()
+#        return __instance
+        return BleSDK(uuid_service_char_tuples, processData, *args, **kwargs)
 
 
 def main() -> None:
