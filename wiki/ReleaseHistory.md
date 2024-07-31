@@ -8,18 +8,19 @@ v2.10.6 (XX, 2024)
 
 * ADDITIONS
   - adds support for the [execution of roast plans](https://doc.artisan.plus/docs/schedule/#plan-execution) scheduled on [artisan.plus](https://artisan.plus)
-  - advanced summary statistics
+  - adds advanced summary statistics
   - adds support for transparent colors
   - adds `{WEIGHTin}` placeholder substitute by the current batch size (g) in command actions
+  - adds additional button label substitutions, `\V`, `\F` and `\T` reporting the event value, the event value interpreted as temperature in Fahrenheit, and the event value interpreted as temperature in Celsius. The last two are automatically converted to the currently selected temperature unit.
   - adds "Load p-i-d from background" setting to configure the PID to the settings stored in background profile
   - capture and persist between-batch protocol (BBP) data as measured during a roasting session
 
 * NEW HARDWARE SUPPORT
-  - adds machine support for the [BeanGo Cube X](https://www.beangocube.com/en/products/beangocube-x/)
-  - adds machine support for [MUGMA Roasters](https://finecoffeeroaster.com/)
+  - adds machine support for the [BeanGo Cube X](https://artisan-scope.org/machines/beango/)
+  - adds machine support for [MUGMA Roasters](https://artisan-scope.org/machines/mugma/)
   - adds updated [Sivetz fluid bed roasting machines](https://artisan-scope.org/machines/sivetz/) support for the latest machines recording also fan changes
   - adds machine support for [iRm roasting machines](https://www.irm.coffee/) featuring Mitshubishi PLCs
-  - adds [Bühler RM20](https://www.buhlergroup.com/global/de/products/roastmaster_coffeeroaster.html) Simatic Legacy setup supporting older firmware versions not returning the machine state
+  - adds [Bühler RM20](https://www.buhlergroup.com/global/de/products/roastmaster_coffeeroaster.html) Simatic Legacy setup supporting older firmware versions not returning the machine state ([Issue #1529](../../../issues/1529))
   - adds support for the [Phidget RCC0004 server motor controller](https://phidgets.com/?prodid=1147) ([Discussion #1546](../../../discussions/1546))
   - adds support for the to-be-release Phidget TMP1202 module
   - adds Hottop Command `control` to activate and deactivate the control function of the machine via event buttons and alarms
@@ -30,13 +31,14 @@ v2.10.6 (XX, 2024)
   - disable input filtering on device channel of binary or special types like NONE, dummy, and slider values
 
 * FIXES
-  - fixes regression preventing Artisan v2.10.2 and v2.10.4 to connect successfully to Probat Series III machines via WebSockets incl. the Probat Sample Roaster
+  - fixes regression preventing Artisan v2.10.2 and v2.10.4 to connect successfully to Probat Series III machines via WebSockets incl. the Probat Sample Roaster ([Issue #1531](../../../issues/1531))
   - fixes regression in Roast Properties, unable to change/add ground color value ([Issue #1520](../../../issues/1520))
   - fixes regressions in table copy functions
   - fixes regression introduced in v2.8.4 that prevented the cupping chart being added properly to roast reports ([Discussion #1563](../../../discussions/1563))
   - fixes event playback by temperature being blocked by already past background events if playback is turned ON during a roast
   - avoids rendering timestamps as "xx:60" in mouse pointer time/temp/RoR widget
   - ensures that time-axis ticks extend over the full range of readings w.r.t. the loaded background and foreground profiles
+  - fixes a regression preventing the correct persistence of default SV values ([Issue #1631](../../../issues/1631))
 
 
 ----

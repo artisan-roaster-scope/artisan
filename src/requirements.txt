@@ -83,7 +83,7 @@ yoctopuce==2.0.61813; sys_platform!='darwin' or (sys_platform=='darwin' and plat
 ## Qt 6.4.x supports macOS 10.15 (Darwin 19.x) and higher as well as Windows 10/11
 ## Qt 6.6.x supports macOS 11 (Darwin 20.x) and higher as well as Windows 10/11
 ##
-## Qt5 on macOS <11 and Windows 7/8
+## Qt5 on macOS <11 and Windows 7/8 (PyQt5.15.10 is the last version supported on macOS 10.13!)
 PyQt5==5.15.10; (sys_platform=='darwin' and platform_release<'20.0') or (platform_system=='Windows' and python_version<'3.9')
 PyQtWebEngine==5.15.6; (sys_platform=='darwin' and platform_release<'20.0') or (platform_system=='Windows' and python_version<'3.9')
 # Qt6 on macOS 11+, Windows 10/11 and Linux
