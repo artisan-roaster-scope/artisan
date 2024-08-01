@@ -27,7 +27,7 @@ gallery:
     image_path: /assets/images/download-icon-windows-legacy.png
     alt: "Windows legacy"
     title: "Windows legacy"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.0.0/artisan-mac-3.0.3-legacy.dmg
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.0.0/artisan-mac-3.0.0-legacy.dmg
     image_path: /assets/images/download-icon-macos-legacy.png
     alt: "macOS legacy"
     title: "macOS legacy"
