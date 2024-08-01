@@ -31,10 +31,6 @@ gallery:
     image_path: /assets/images/kaleido-logo.jpg
     alt: "Kaleido"
     title: "Kalaido"
-  - url: https://www.paoloscimone.com/
-    image_path: /assets/images/paoloscimone-logo.jpg
-    alt: "Paolo Scimone Coffee Consulting"
-    title: "Paolo Scimone Coffee Consulting"
   - url: https://acaia.co/
     image_path: /assets/images/acaia-logo.jpeg
     alt: "acaia"
@@ -67,6 +63,10 @@ gallery:
 ---
 
 <!--
+  - url: https://www.paoloscimone.com/
+    image_path: /assets/images/paoloscimone-logo.jpg
+    alt: "Paolo Scimone Coffee Consulting"
+    title: "Paolo Scimone Coffee Consulting"
   - url: https://cmsale.com/
     image_path: /assets/images/cms-logo.jpg
     alt: "Coffee Maschines Sale"
@@ -151,6 +151,7 @@ There are also legacy builds for Windows 8 (x64) and macOS 10.13 as well as an e
 
 - we believe in [Open-Source](https://www.youtube.com/watch?v=SpeDK1TPbew){:target="_blank"}, check out [our code](https://github.com/artisan-roaster-scope/artisan){:target="_blank"} and contribute
 - seamless integration into the [artisan.plus](https://artisan.plus){:target="_blank"} inventory management service
+- execution of [artisan.plus roast schedules](https://doc.artisan.plus/docs/schedule/){:target="_blank"}
 - extensive [machine](/machines/) and [device](/devices/) support including control
 - unlimited number of curves
 - rate-of-rise (RoR), [area-under-the-curve (AUC)](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html){:target="_blank"}, [development-time-ratio (DTR)](https://artisan-roasterscope.blogspot.com/2020/05/displaying-development-time-ratio-in.html){:target="_blank"} calculations and projection lines
