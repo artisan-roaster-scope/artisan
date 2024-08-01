@@ -38,7 +38,7 @@ gallery:
 
 ---
 
-[Artisan v2.10.4](https://github.com/artisan-roaster-scope/artisan/releases/tag/v2.10.4)
+[Artisan v3.0.0](https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.0.0)
 {: target="_blank" style="text-align: center; font-weight:bold;"}
 
 
