@@ -11,11 +11,11 @@ author_profile: false
 
 
 gallery:
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v2.10.4/artisan-win-2.10.4.zip
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.0.0/artisan-win-3.0.0.zip
     image_path: /assets/images/download-icon-windows.png
     alt: "Windows"
     title: "Windows"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v2.10.4/artisan-mac-2.10.4.dmg
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.0.0/artisan-mac-3.0.0.dmg
     image_path: /assets/images/download-icon-macos.png
     alt: "macOS"
     title: "macOS"
@@ -23,15 +23,15 @@ gallery:
     image_path: /assets/images/download-icon-linux.png
     alt: "Linux"
     title: "Linux"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v2.10.4/artisan-win-2.10.4-legacy.zip
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.0.0/artisan-win-3.0.0-legacy.zip
     image_path: /assets/images/download-icon-windows-legacy.png
     alt: "Windows legacy"
     title: "Windows legacy"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v2.10.4/artisan-mac-2.10.4-legacy.dmg
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.0.0/artisan-mac-3.0.3-legacy.dmg
     image_path: /assets/images/download-icon-macos-legacy.png
     alt: "macOS legacy"
     title: "macOS legacy"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v2.10.4/artisan-linux-2.10.4_raspbian-bookworm.deb
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.0.0/artisan-linux-3.0.0_raspbian-bookworm.deb
     image_path: /assets/images/download-icon-rpi.png
     alt: "RPi"
     title: "RPi"
