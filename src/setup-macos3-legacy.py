@@ -161,7 +161,7 @@ OPTIONS = {
     'semi_standalone': False,
     'site_packages': True,
     'packages': ['yoctopuce','openpyxl','numpy','scipy','certifi', 'kiwisolver', 'psutil',
-        'matplotlib','PIL', 'lxml', 'snap7', 'google.protobuf', 'google._upb'], # MPL and PIL added for mpl v3.3.x
+        'matplotlib','PIL', 'lxml', 'snap7', 'google.protobuf', 'google._upb', 'keyring.backends'], # MPL and PIL added for mpl v3.3.x
     'optimize':  2,
     'compressed': True,
     'iconfile': 'artisan.icns',
