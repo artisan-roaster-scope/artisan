@@ -14,7 +14,7 @@ tags:
 link: https://worldofcoffee.org/
 ---
 
-Marko and Paul will introduce Roast Scheduling for Artisan and its inventory platform [artisan.plus](https://artisan.plus){:target="_blank"} at this years [World of Coffee](https://worldofcoffee.org/){:target="_blank"} fair in Copenhagen. Meet us in booth CJ-035, next to the Roasters Village South.
+Marko and Paul introduced [roast scheduling](https://doc.artisan.plus/docs/schedule/) for Artisan and its inventory platform [artisan.plus](https://artisan.plus){:target="_blank"} at this years [World of Coffee](https://worldofcoffee.org/){:target="_blank"} fair in Copenhagen. 
 
 > [World of Coffee](https://worldofcoffee.org/), booth **CJ-035**   
 Jun 27 – 29 2024, Copenhagen, Denmark
