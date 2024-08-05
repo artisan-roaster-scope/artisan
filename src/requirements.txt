@@ -53,7 +53,7 @@ scipy==1.13.1; python_version >= '3.9' # v1.14.0 fails to incl. numpy.f2py (see 
 wquantiles==0.6
 colorspacious==1.1.2
 openpyxl==3.1.5
-keyring==25.2.1
+keyring==25.3.0
 prettytable==3.10.2
 lxml==5.2.2
 matplotlib==3.7.3; python_version < '3.9' # last Python 3.8 release
