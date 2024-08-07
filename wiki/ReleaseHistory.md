@@ -2,6 +2,22 @@ Detailed Release History
 ========================
 
 ----
+v3.0.1
+------------------
+
+* ADDITIONS
+
+* NEW HARDWARE SUPPORT
+
+* CHANGES
+
+* FIXES
+
+* REMOVALS
+  - removes support for MOBDUS Serial Binary
+
+
+----
 v3.0.0 (August 1, 2024)
 ------------------
 

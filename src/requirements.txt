@@ -27,9 +27,10 @@
 # packages that are required on all platforms
 #
 setuptools==70.3.0 # py2app fails on 71.0.3 and 71.0.4; pyinstaller windows/linux fails on 71.0.0 <= < 71.0.3
-wheel==0.43.0
+wheel==0.44.0
 pyserial==3.5
-pymodbus==3.6.9
+pymodbus==3.6.9; python_version < '3.9' # last Python 3.8 release
+pymodbus==3.7.0; python_version >= '3.9'
 python-snap7==1.3; python_version < '3.10' # last Python 3.9 release
 python-snap7==2.0.0; python_version >= '3.10'
 Phidget22==1.19.20240513
@@ -42,7 +43,7 @@ persist-queue==1.0.0
 portalocker==2.10.1
 xlrd==2.0.1
 websockets==12.0
-PyYAML==6.0.1
+PyYAML==6.0.2
 psutil==6.0.0
 typing-extensions==4.10.0; python_version < '3.8' # required for supporting Final and TypeDict on Python <3.8
 protobuf==5.27.2
@@ -53,16 +54,16 @@ scipy==1.13.1; python_version >= '3.9' # v1.14.0 fails to incl. numpy.f2py (see 
 wquantiles==0.6
 colorspacious==1.1.2
 openpyxl==3.1.5
-keyring==25.2.1
+keyring==25.3.0
 prettytable==3.10.2
 lxml==5.2.2
 matplotlib==3.7.3; python_version < '3.9' # last Python 3.8 release
-matplotlib==3.9.1; python_version >= '3.9'
+matplotlib==3.9.1.post1; python_version >= '3.9'
 jinja2==3.1.4
 aiohttp==3.9.5
 aiohttp_jinja2==1.6
 python-bidi==0.4.2; python_version < '3.9' # last Python 3.8 release
-python-bidi==0.5.1; python_version >= '3.9'
+python-bidi==0.6.0; python_version >= '3.9'
 arabic-reshaper==3.0.0
 pillow>=10.4.0
 pydantic==2.8.2; (platform_system=='Windows' and python_version>'3.10') or sys_platform=='darwin' or platform_system=='Linux'

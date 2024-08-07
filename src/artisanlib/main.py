@@ -62,9 +62,10 @@ import io
 import functools
 import dateutil.parser
 import copy as copyd
-import arabic_reshaper # type:ignore
+import arabic_reshaper # type:ignore[import-untyped]
 from pathlib import Path
-from bidi.algorithm import get_display # type:ignore
+#from bidi.algorithm import get_display # type:ignore # pure Python implementation
+from bidi import get_display # type:ignore[import-untyped] # newer rust based implementation of the above Python implementation
 
 # links CTR-C signals to the system default (ignore)
 import signal
@@ -17139,7 +17140,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.scale.parity = s2a(toString(settings.value('parity',self.scale.parity)))
             self.scale.timeout = float2float(toFloat(settings.value('timeout',self.scale.timeout)))
             #TODO removes acaia from Windows 11 (and 7/8) until BLE is fixed in Qt/PyQt # pylint: disable=fixme
-            if platform.system() == "Windows" and "Windows-10" not in platform.platform():
+            if platform.system() == 'Windows' and 'Windows-10' not in platform.platform():
                 self.scale.device = None
             settings.endGroup()
 #--- END GROUP Scale

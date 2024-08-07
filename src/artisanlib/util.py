@@ -671,7 +671,7 @@ def convertVolume(v:float, i:int, o:int) -> float:
 
 # takes a weight, its weight unit index, and a weight unit target index (decides over metric vs imperial)
 # and returns a string rendering the weight with unit, potentially adjusted by its magnitude
-def render_weight(amount:float, weight_unit_index:int, target_unit_idx:int) -> str:
+def render_weight(amount:float, weight_unit_index:int, target_unit_idx:int, right_to_left_lang:bool = False) -> str:
     w = convertWeight(
         amount, weight_unit_index, target_unit_idx
     )  # @UndefinedVariable
@@ -720,7 +720,7 @@ def render_weight(amount:float, weight_unit_index:int, target_unit_idx:int) -> s
             # lb => lbs if |w|>1
             target_unit = f'{target_unit}s'
     w = int(round(w)) if w > 99 else float2float(w, 1) # @UndefinedVariable # we keep one decimal
-    return f'{w:g}{target_unit}'.lower()
+    return (f'{target_unit.lower()}{w:g}' if right_to_left_lang else f'{w:g}{target_unit.lower()}')
 
 
 # typing tools
@@ -733,6 +733,9 @@ def is_float_list(xs: List[Any]) -> TypeGuard[List[float]]:
 
 
 # locale tools
+
+def right_to_left(locale:str) -> bool:
+    return locale in {'ar', 'fa', 'he'}
 
 #def locale2full_local(locale:str) -> str:
 #    locale_map:Dict[str,str] = {

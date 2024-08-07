@@ -34,14 +34,14 @@ from artisanlib.comm import serialport
 
 try:
     from PyQt6.QtCore import (Qt, pyqtSlot, QSettings) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtGui import QIntValidator # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import QIntValidator, QStandardItemModel # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QTextEdit, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
                                  QHeaderView, QMessageBox, QScrollArea, QFrame)  # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import (Qt, pyqtSlot, QSettings) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QIntValidator # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QIntValidator, QStandardItemModel # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QTextEdit, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
@@ -552,6 +552,11 @@ class comportDlg(ArtisanResizeablDialog):
 #        modbus_typelabel.setBuddy(self.modbus_type)
         self.modbus_type.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.modbus_type.addItems(['Serial RTU', 'Serial ASCII', 'Serial Binary', 'TCP', 'UDP'])
+        modbus_type_model:Optional[QStandardItemModel] = cast(Optional[QStandardItemModel], self.modbus_type.model())
+        if modbus_type_model is not None:
+            serial_binary_item = modbus_type_model.item(2)
+            if serial_binary_item is not None:
+                serial_binary_item.setEnabled(False)
         self.modbus_type.setCurrentIndex(self.aw.modbus.type)
 
         # host (IP or hostname)
@@ -749,6 +754,7 @@ class comportDlg(ArtisanResizeablDialog):
         self.modbus_reset.setChecked(self.aw.modbus.reset_socket)
         self.modbus_reset.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.modbus_reset.setToolTip(QApplication.translate('Tooltip','Reset socket connection on error'))
+        self.modbus_reset.setEnabled(False)
 
         ##########################    TAB 4 WIDGETS   SCALE
         scale_devicelabel = QLabel(QApplication.translate('Label', 'Device'))

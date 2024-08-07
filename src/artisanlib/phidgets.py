@@ -84,7 +84,7 @@ class PhidgetManager:
                 hubport = channel.getHubPort()
                 hupportdevice = bool(channel.getIsHubPortDevice() == 0) # it is not a direct hubport channel
                 for k, _ in self.attachedPhidgetChannels.items():
-                    _log.info('PRINT debug: %s, %s',k, k.getDeviceID())
+#                    _log.debug('addChennel: %s, %s',k, k.getDeviceID())
                     try:
                         khub = k.getHub() # this might raise: "A Phidget channel object of the wrong channel class was passed into this API call."
                         khubport = k.getHubPort()
