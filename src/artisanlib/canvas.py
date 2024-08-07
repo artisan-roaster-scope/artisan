@@ -8193,9 +8193,10 @@ class tgraphcanvas(FigureCanvas):
                     if self.flagstart or self.xgrid == 0:
                         self.set_xlabel('')
                     elif right_to_left(self.locale_str):
-                        self.set_xlabel(f'{render_weight(self.roastersize_setup, 1, weight_units.index(self.weight[2]), right_to_left_lang=True)}  {self.__dijkstra_to_ascii(self.roastertype_setup)}')
+                        self.set_xlabel(f"{(render_weight(self.roastersize_setup, 1, weight_units.index(self.weight[2]), right_to_left_lang=True) if self.roastersize_setup>=0 else '')}  {self.__dijkstra_to_ascii(self.roastertype_setup)}")
                     else:
-                        self.set_xlabel(f'{self.__dijkstra_to_ascii(self.roastertype_setup)} {render_weight(self.roastersize_setup, 1, weight_units.index(self.weight[2]))}')
+                        self.set_xlabel(f"{self.__dijkstra_to_ascii(self.roastertype_setup)} {(render_weight(self.roastersize_setup, 1, weight_units.index(self.weight[2])) if self.roastersize_setup>0 else '')}")
+
 
                     try:
                         y_label.set_in_layout(False) # remove y-axis labels from tight_layout calculation
@@ -14632,9 +14633,9 @@ class tgraphcanvas(FigureCanvas):
             elif self.flagstart or self.xgrid == 0:
                 self.set_xlabel('')
             elif right_to_left(self.locale_str):
-                self.set_xlabel(f'{render_weight(self.roastersize_setup, 1, weight_units.index(self.weight[2]), right_to_left_lang=True)}  {self.__dijkstra_to_ascii(self.roastertype_setup)}')
+                self.set_xlabel(f'{(render_weight(self.roastersize_setup, 1, weight_units.index(self.weight[2]), right_to_left_lang=True) if self.roastersize_setup>=0 else "")}  {self.__dijkstra_to_ascii(self.roastertype_setup)}')
             else:
-                self.set_xlabel(f'{self.__dijkstra_to_ascii(self.roastertype_setup)} {render_weight(self.roastersize_setup, 1, weight_units.index(self.weight[2]))}')
+                self.set_xlabel(f'{self.__dijkstra_to_ascii(self.roastertype_setup)} {(render_weight(self.roastersize_setup, 1, weight_units.index(self.weight[2])) if self.roastersize_setup>0 else "")}')
 
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
