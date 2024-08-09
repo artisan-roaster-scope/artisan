@@ -22,7 +22,7 @@ gallery:
     image_path: /assets/images/download-icon-linux-rpm.png
     alt: "Linux rpm"
     title: "Linux rpm"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/latest/
+  - url: https://flathub.org/apps/org.artisan_scope.artisan
     image_path: /assets/images/download-icon-linux-Flatpack.png
     alt: "Linux Flatpack"
     title: "Linux Flatpack"
