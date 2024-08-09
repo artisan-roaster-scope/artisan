@@ -45,5 +45,5 @@ gallery:
 {% include gallery id="gallery" %}
 
 
-[Release History](https://github.com/artisan-roaster-scope/artisan/blob/v2.10.4/wiki/ReleaseHistory.md)
+[Release History](https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/ReleaseHistory.md)
 {: style="text-align: center;"}

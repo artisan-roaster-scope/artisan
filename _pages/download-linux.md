@@ -29,4 +29,13 @@ gallery:
 
 ---
 
+[Artisan v3.0.0](https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.0.0)
+{: target="_blank" style="text-align: center; font-weight:bold;"}
+
+
+
 {% include gallery id="gallery" %}
+
+
+[Release History](https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/ReleaseHistory.md)
+{: style="text-align: center;"}
