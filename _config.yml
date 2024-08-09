@@ -164,6 +164,7 @@ footer:
 include:
   - .htaccess
   - _pages
+  - .well-known
 exclude:
   - docker-compose.yml
   - "*.sublime-project"
