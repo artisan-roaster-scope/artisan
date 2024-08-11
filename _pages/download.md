@@ -23,7 +23,7 @@ gallery:
     image_path: /assets/images/download-icon-linux.png
     alt: "Linux"
     title: "Linux"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.0.0/artisan-win-3.0.0-legacy.zip
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.0.0/artisan-win-legacy-3.0.0.zip
     image_path: /assets/images/download-icon-windows-legacy.png
     alt: "Windows legacy"
     title: "Windows legacy"

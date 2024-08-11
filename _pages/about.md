@@ -143,7 +143,7 @@ Artisan supports the following 64bit operating systems:
 
 * macOS 12 Monterey and higher incl. Sonoma macOS 14 (Intel & AppleSilicon)
 * Windows 10 and 11 (x64)
-* Ubuntu 22.04+ (GCC11), Red Hat 8.4+ (GCC10)
+* Ubuntu 22.04+ (GCC11), Red Hat 8.4+ (GCC10) on x84 Intel and aarch64 ARM (via [Flatpack](https://flathub.org/apps/org.artisan_scope.artisan))
 
 There are also legacy builds for Windows 8 (x64) and macOS 10.13 as well as an experimental build for Raspberry Pi OS 12 bookworm 64bit.
 
