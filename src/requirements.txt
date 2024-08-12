@@ -55,7 +55,7 @@ wquantiles==0.6
 colorspacious==1.1.2
 openpyxl==3.1.5
 keyring==25.3.0
-prettytable==3.10.2
+prettytable==3.11.0
 lxml==5.2.2
 matplotlib==3.7.3; python_version < '3.9' # last Python 3.8 release
 matplotlib==3.9.1.post1; python_version >= '3.9'
