@@ -25,9 +25,9 @@ if /i "%APPVEYOR%" NEQ "True" (
     exit /b 1
 )
 if /i "%ARTISAN_LEGACY%" NEQ "True" (
-    set ARTISAN_SPEC=win
+    set ARTISAN_SPEC=Setup-Artisan
 ) else (
-    set ARTISAN_SPEC=win-legacy
+    set ARTISAN_SPEC=Setup-Artisan-legacy
 )
 :: ----------------------------------------------------------------------
 
@@ -71,22 +71,14 @@ echo **** Running NSIS makensis.exe file date %NSIS_DATE%
 
 ::
 :: run NSIS to build the install .exe file
-%NSIS_EXE% /DPRODUCT_VERSION=%ARTISAN_VERSION%.%ARTISAN_BUILD% /DLEGACY=%ARTISAN_LEGACY% setup-install3-pi.nsi
+%NSIS_EXE% /DPRODUCT_VERSION=%ARTISAN_VERSION% /DPRODUCT_BUILD=%ARTISAN_BUILD% /DLEGACY=%ARTISAN_LEGACY% setup-install3-pi.nsi
 if ERRORLEVEL 1 (echo ** Failed in NSIS & exit /b 1) else (echo ** Success)
 
-::
-:: package the installation zip file
-::
-if /i "%APPVEYOR%" == "True" (
-    copy "..\LICENSE" "LICENSE.txt"
-    7z a artisan-%ARTISAN_SPEC%-%ARTISAN_VERSION%.zip Setup*.exe LICENSE.txt README.txt
-    if ERRORLEVEL 1 (echo ** Failed in 7z zipping the setup files & exit /b 1)
-)
 
 ::
-:: check that the packaged files are above an expected size
+:: check that the install file is above an expected size
 ::
-set file=artisan-%ARTISAN_SPEC%-%ARTISAN_VERSION%.zip
+set file=%ARTISAN_SPEC%-%ARTISAN_VERSION%.exe
 set min_size=170000000
 for %%A in (%file%) do set size=%%~zA
 if %size% LSS %min_size% (

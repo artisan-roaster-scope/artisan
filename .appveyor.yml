@@ -113,10 +113,10 @@ for:
 
   artifacts:
 #    - path: 'generated-win-legacy.zip'
-    - path: 'src\%artifact_prefix%-*.zip'
+    - path: 'src\Setup-%artifact_prefix%-*.exe'
 
   deploy_script:
-    - cmd: bash ../.ci/upload.sh artisan-*.zip
+    - cmd: bash ../.ci/upload.sh Setup-Artisan-*.exe
 
 #  # uncomment this section for remote desktop connection to build image
 #  on_finish:
@@ -188,10 +188,10 @@ for:
 
   artifacts:
 #    - path: 'generated-win.zip'
-    - path: 'src\%artifact_prefix%-*.zip'
+    - path: 'src\Setup-%artifact_prefix%-*.exe'
 
   deploy_script:
-    - cmd: bash ../.ci/upload.sh artisan-*.zip
+    - cmd: bash ../.ci/upload.sh Setup-Artisan-*.exe
 
 #  # uncomment this section for remote desktop connection to build image
 #  on_finish:
