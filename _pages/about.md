@@ -59,6 +59,10 @@ gallery:
     image_path: /assets/images/beango-logo.png
     alt: "BeanGo"
     title: "BeanGo"
+  - url: http://www.santoker.com/
+    image_path: /assets/images/santoker-logo.png
+    alt: "Santoker"
+    title: "Santoker"
     
 ---
 
