@@ -10,6 +10,7 @@ header:
 sidebar:
   nav: "machines"
 ---
+<img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
 
 * __Producer:__ [Santoker](){:target="_blank"}, China
 
