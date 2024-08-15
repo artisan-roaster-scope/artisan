@@ -8055,6 +8055,14 @@ class tgraphcanvas(FigureCanvas):
             self.delta_ax.set_xlim(xlimit_min, xlimit)
             self.delta_ax.set_ylim(zlimit_min, zlimit)
 
+    def default_xlabel_text(self) -> str:
+        if self.flagstart or self.xgrid == 0:
+            return ''
+        if right_to_left(self.locale_str):
+            return f"{(render_weight(self.roastersize_setup, 1, weight_units.index(self.weight[2]), right_to_left_lang=True) if self.roastersize_setup>=0 else '')}  {self.__dijkstra_to_ascii(self.roastertype_setup)}"
+        return f"{self.__dijkstra_to_ascii(self.roastertype_setup)} {(render_weight(self.roastersize_setup, 1, weight_units.index(self.weight[2])) if self.roastersize_setup>0 else '')}"
+
+
     #Redraws data
     # if recomputeAllDeltas, the delta arrays and if smooth the smoothed line arrays are recomputed (incl. those of the background curves)
     # re_smooth_foreground: the foreground curves (incl. extras) will be re-smoothed if called while not recording. During recording foreground will never be smoothed here.
@@ -8190,13 +8198,7 @@ class tgraphcanvas(FigureCanvas):
                         y_label = self.ax.set_ylabel(self.mode,color=self.palette['ylabel'],rotation=0,labelpad=10,
                                 fontsize='medium',
                                 fontfamily=prop.get_family())
-                    if self.flagstart or self.xgrid == 0:
-                        self.set_xlabel('')
-                    elif right_to_left(self.locale_str):
-                        self.set_xlabel(f"{(render_weight(self.roastersize_setup, 1, weight_units.index(self.weight[2]), right_to_left_lang=True) if self.roastersize_setup>=0 else '')}  {self.__dijkstra_to_ascii(self.roastertype_setup)}")
-                    else:
-                        self.set_xlabel(f"{self.__dijkstra_to_ascii(self.roastertype_setup)} {(render_weight(self.roastersize_setup, 1, weight_units.index(self.weight[2])) if self.roastersize_setup>0 else '')}")
-
+                    self.set_xlabel(self.default_xlabel_text())
 
                     try:
                         y_label.set_in_layout(False) # remove y-axis labels from tight_layout calculation
@@ -14630,12 +14632,8 @@ class tgraphcanvas(FigureCanvas):
                     self.set_xlabel(msg)
                 else:
                     self.set_xlabel('')
-            elif self.flagstart or self.xgrid == 0:
-                self.set_xlabel('')
-            elif right_to_left(self.locale_str):
-                self.set_xlabel(f'{(render_weight(self.roastersize_setup, 1, weight_units.index(self.weight[2]), right_to_left_lang=True) if self.roastersize_setup>=0 else "")}  {self.__dijkstra_to_ascii(self.roastertype_setup)}')
             else:
-                self.set_xlabel(f'{self.__dijkstra_to_ascii(self.roastertype_setup)} {(render_weight(self.roastersize_setup, 1, weight_units.index(self.weight[2])) if self.roastersize_setup>0 else "")}')
+                self.set_xlabel(self.default_xlabel_text())
 
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
@@ -15547,7 +15545,7 @@ class tgraphcanvas(FigureCanvas):
                 idx = numpy.isfinite(c1) & numpy.isfinite(c2)
                 z:npt.NDArray[numpy.double] = numpy.polyfit(c1[idx],c2[idx],deg)
                 p = numpy.poly1d(z)
-                x = p(c1[startindex:endindex])
+                x = p(numpy.array(xarray[startindex:endindex], dtype='float64'))
                 pad = max(0,len(self.timex) - startindex - len(x))
                 xx = numpy.concatenate((numpy.full((max(0,startindex)), None),x, numpy.full((pad,), None)))
                 trans = None
@@ -15556,7 +15554,7 @@ class tgraphcanvas(FigureCanvas):
                 elif self.ax is not None:
                     trans = self.ax.transData
                 if trans is not None and self.ax is not None:
-                    self.ax.plot(self.timex, xx, linestyle = '--', linewidth=3,transform=trans)
+                    self.ax.plot(self.timex, xx, linestyle = '--', linewidth=3, transform=trans)
                     with warnings.catch_warnings():
                         warnings.simplefilter('ignore')
                         self.fig.canvas.draw()

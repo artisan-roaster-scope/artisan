@@ -6618,8 +6618,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         else:
                             a[nvi] = a[nvi + 1]
                     return a
-                nv = numpy.where(np_dbt is None)[0]
-                nvb = numpy.where(np_dbtb is None)[0]
+                nv = numpy.atleast_1d(numpy.asarray(np_dbt is None)).nonzero()[0] # fixes "Calling nonzero on 0d arrays is not allowed" numpy error of previous two lines
+                nvb = numpy.atleast_1d(numpy.asarray(np_dbtb is None)).nonzero()[0] # fixes "Calling nonzero on 0d arrays is not allowed" numpy error of previous two lines
+
                 np_dbt = replNone(np_dbt,nv)
                 np_dbtb = replNone(np_dbtb,nvb)
 
@@ -22626,26 +22627,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     def helpAbout(self, _:bool = False) -> None:
         # pylint: disable=consider-using-f-string
         coredevelopers = '<br>Rafael Cobo, Marko Luther &amp; Dave Baxter'
-        contribs = ['<br>' + uchr(199) + 'etin Barut, Marcio Carnerio, Bradley Collins, ',
-                    'Sebastien Delgrande, Kalle Deligeorgakis, Jim Gall, ',
-                    'Frans Goddijn, Rich Helms, Kyle Iseminger, Ingo, ',
-                    'Savvas Kiretsis, Lukas Kolbe, David Lahoz, ',
-                    'Runar Ostnes, Carlos Pascual, Claudia Raddatz, ',
-                    'Matthew Sewell, Bertrand Souville, Minoru Yoshida, ',
-                    "Wa'il, Alex Fan, Piet Dijk, Rubens Gardelli, ",
-                    'David Trebilcock, Zolt' + uchr(225) + 'n Kis, Miroslav Stankovic, ',
-                    'Barrie Fairley, Ziv Sade, Nicholas Seckar, ',
-                    'Morten M' + uchr(252) + 'nchow',
-                    ', Andrzej Kie' + uchr(322) + 'basi' + uchr(324) + 'ski, Marco Cremonese, Josef Gander',
-                    ', Paolo Scimone, Google, eightbit11, Phidgets, Hottop, Yoctopuce, Taras Prokopyuk',
-                    ', Reiss Gunson (Londinium), Ram Evgi (Coffee-Tech), Rob Gardner, Jaroslav Tu' + uchr(269) + 'ek (doubleshot)',
-                    ', Nick Watson, Azis Nawawi, Rit Multi, Joongbae Dave Cho (the Chambers), Probat, Andreas Bader, Dario Ernst',
-                    ', Nicolas (Marvell Street Coffee Roasters), Randy (Buckeye Coffee), Moshe Spinell',
-                    ', Morris Beume (Morris.Coffee), Michael Herbert, Bill (San Franciscan Roaster), Chistopher Feran',
-                    ', Coffed, Bono Gargolov, Rodrigo Ramos (King Caf' + uchr(233) + 's), Nico Bigler, Saeed Abdinasab, Lewis Li',
-                    ', Fotis Lefas (Coffee Lovers, Editors & Trainers), Leo Huang (Rainforest Coffee Institute)<br>'
-                    ]
-        contributors = ''.join(contribs)
         box = QMessageBox(self)
 
         #create a html QString
@@ -22674,14 +22655,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             _log.exception(e)
         box.about(self,
                 QApplication.translate('About', 'About'),
-                """<h2>{0} {1}{16} ({2})</h2>
+                """<h2>{0} {1}{14} ({2})</h2>
                 <p>
-                <small>Python {3}, Qt {4}, PyQt {5}, Matplotlib {6}, NumPy {7}, SciPy {8}, pymodbus {13}{17}</small>
+                <small>Python {3}, Qt {4}, PyQt {5}, Matplotlib {6}, NumPy {7}, SciPy {8}, pymodbus {11}{15}</small>
                 </p>
-                <p>{18}</p>
+                <p>{16}</p>
                 <p><b>{9}</b><small>{10}</small></p>
-                <p><b>{11}</b><small>{12}</small></p>
-                <p><b>{14}</b><br><small>{15}</small></p>
+                <p><b>{12}</b><br><small>{13}</small></p>
                 """.format( # noqa: UP030
                 name,
                 str(__version__),
@@ -22694,8 +22674,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 SCIPY_VERSION_STR,
                 QApplication.translate('About', 'Core Developers'),
                 coredevelopers,
-                QApplication.translate('About', 'Contributors'),
-                contributors,
                 PYMODBUS_VERSION_STR,
                 QApplication.translate('About', 'License'),
                 '<a href="http://www.gnu.org/copyleft/gpl.html">GNU Public Licence (GPLv3.0)</a>',
