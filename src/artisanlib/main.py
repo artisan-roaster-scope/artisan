@@ -6087,7 +6087,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     background = True
                 if background:
                     t_min,t_max = self.calcAutoAxisBackground()
-                    if self.qmc.timeindex[0] != -1 and len(self.qmc.timex) > self.qmc.timeindex[0]:
+                    if len(self.qmc.timex)<3 and self.qmc.timeindexB[0] != -1 and len(self.qmc.timeB) > self.qmc.timeindexB[0]:
+                        # no foregroundn loaded
+                        t_max = t_max - self.qmc.timeB[self.qmc.timeindexB[0]]
+                    elif self.qmc.timeindex[0] != -1 and len(self.qmc.timex) > self.qmc.timeindex[0]:
                         t_max = t_max - self.qmc.timex[self.qmc.timeindex[0]]
                 elif len(self.qmc.timex) > 3:
                     t_min,t_max = self.calcAutoAxisForeground()
@@ -6148,6 +6151,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             _, _, exc_tb = sys.exc_info()
             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' autoAdjustAxis() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
+
     @pyqtSlot()
     @pyqtSlot(bool)
     def toggleFullscreen(self, _:bool = False) -> None:
@@ -6190,7 +6194,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             t_start -= 1/16*time_period
             t_end += 1/10*time_period
             return t_start, t_end
-        return self.qmc.startofx, self.qmc.endofx
+        return self.qmc.startofx, self.qmc.endofx # BUG? here the second result does not includes the CHARGE offset while in the line above it does!
 
     def calcAutoDelta(self, d1:List[Optional[float]], d2:List[Optional[float]],
             timeindex:List[int], d1flag:bool, d2flag:bool) -> float:
@@ -6229,7 +6233,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         return 0
 
     def calcAutoAxisBackground(self) -> Tuple[float,float]:
-        return self.calcAutoAxis(self.qmc.timeB,self.qmc.timeindexB,self.qmc.backgroundShowFullflag or self.qmc.flagstart)
+        return self.calcAutoAxis(self.qmc.timeB,self.qmc.timeindexB, self.qmc.backgroundShowFullflag or self.qmc.flagstart)
 
     # returns the last event value of the given type, or None if no event was ever recorded
     def lastEventValue(self, tp:int) -> Optional[float]:
@@ -11297,15 +11301,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background'),ext_alt='.alog')
                             if len(filename) != 0:
                                 self.loadBackgroundSignal.emit(filename)
-#                                try:
-#                                    self.qmc.resetlinecountcaches()
-#                                    self.loadbackground(filename)
-#                                except Exception as e: # pylint: disable=broad-except
-#                                    _log.exception(e)
-#                                self.qmc.background = True
-#                                self.autoAdjustAxis()
-#                                self.qmc.timealign(redraw=False)
-#                                self.qmc.redraw()
                 elif k == 76:                       #L (load alarms)
                     if not self.qmc.designerflag and self.comparator is None:
                         filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Alarms'),ext='*.alrm')
@@ -12838,7 +12833,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.resetlinecountcaches()
                 self.loadbackground(filename)
                 self.qmc.background = not self.qmc.hideBgafterprofileload
-                self.autoAdjustAxis()
                 self.qmc.timealign(redraw=False)
                 self.qmc.redraw()
                 if self.qmc.backgroundPlaybackEvents:
@@ -17301,8 +17295,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.fujipid.PXG4[k][0] = toFloat(settings.value(k,self.fujipid.PXG4[k][0]))
                 elif isinstance(self.fujipid.PXG4[k][0], int):
                     self.fujipid.PXG4[k][0] = toInt(settings.value(k,self.fujipid.PXG4[k][0]))
-            if self.fujipid.PXG4['selectsv'][0] < 1:
-                self.fujipid.PXG4['selectsv'][0] = 1
+            self.fujipid.PXG4['selectsv'][0] = max(1,self.fujipid.PXG4['selectsv'][0])
             self.fujipid.followBackground = bool(toBool(settings.value('followBackground',self.fujipid.followBackground)))
             self.fujipid.lookahead = toInt(settings.value('lookahead',self.fujipid.lookahead))
             settings.endGroup()
@@ -20885,8 +20878,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             FCs_temp += convertTemp(rd['FCs_temp'],rd['temp_unit'],self.qmc.mode)
                             FCs_temp_count += 1
                         if 'DROP_time' in rd:
-                            if rd['DROP_time'] > max_drop_time:
-                                max_drop_time = rd['DROP_time']
+                            max_drop_time = max(max_drop_time, rd['DROP_time'])
                             DROP_time += rd['DROP_time']
                             DROP_time_count += 1
                         if 'DROP_temp' in rd:

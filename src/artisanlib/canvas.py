@@ -6886,6 +6886,8 @@ class tgraphcanvas(FigureCanvas):
         if self.endofx < 1:
             self.endofx = 60
 
+        self.aw.qmc.timealign(redraw=False)
+
         ### REDRAW  ##
         if redraw:
             self.aw.autoAdjustAxis(background=not keepProperties) # if reset() triggered by ON, we ignore background on adjusting the axis and adjust according to RESET min/max
