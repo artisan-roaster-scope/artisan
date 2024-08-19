@@ -977,7 +977,7 @@ class NoDragItem(StandardItem):
 
             return f'{weight}{task_date_str}'
         except Exception as e: # pylint: disable=broad-except
-            # if anything goes wrong here we log an execption and return the empty string
+            # if anything goes wrong here we log an exception and return the empty string
             _log.exception(e)
             return ''
 
@@ -1032,7 +1032,7 @@ class DragItem(StandardItem):
     #            task_date = format_date(date_local, format='long', locale=self.aw.locale_str).replace(format_date(date_local, 'Y', locale=self.aw.locale_str),'').strip().rstrip(',')
                 task_date = locale_format_date_no_year(self.aw.locale_str, date_local)
         except Exception as e: # pylint: disable=broad-except
-            # if anything goes wrong here we log an execption and use the empty string as task_date
+            # if anything goes wrong here we log an exception and use the empty string as task_date
             _log.exception(e)
 
         user_nickname:Optional[str] = plus.connection.getNickname()

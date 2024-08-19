@@ -64,8 +64,11 @@ import dateutil.parser
 import copy as copyd
 import arabic_reshaper # type:ignore[import-untyped]
 from pathlib import Path
-#from bidi.algorithm import get_display # type:ignore # pure Python implementation
-from bidi import get_display # type:ignore[import-untyped] # newer rust based implementation of the above Python implementation
+try:
+    from bidi import get_display # type:ignore[import-untyped] # newer rust based implementation of the above Python implementation
+except Exception: # pylint: disable=broad-except
+    # for Python <3.9 we need to import the pure Python implementation
+    from bidi.algorithm import get_display # type:ignore # pure Python implementation
 
 # links CTR-C signals to the system default (ignore)
 import signal
@@ -4629,7 +4632,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             sign = '+'
             fit = fit[::-1]
             try:
-                for i, fiti in enumerate(fit): # type:ignore[reportArgumentType, unused-ignore] # pyright falsly reports since numpy 2.1: Argument of type "Unknown | None" cannot be assigned to parameter "iterable" of type "Iterable
+                for i, fiti in enumerate(fit): # type:ignore[reportArgumentType, unused-ignore] # pyright falsely reports since numpy 2.1: Argument of type "Unknown | None" cannot be assigned to parameter "iterable" of type "Iterable
                     v = abs(fiti)
                     if round(v,3) != 0.0:
                         if i == 0:
