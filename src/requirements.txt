@@ -124,4 +124,4 @@ build==1.2.1; platform_system=='Windows'  # required to build pyinstaller bootlo
 pywin32==306; platform_system=='Windows'
 pyinstaller-versionfile==2.1.1; platform_system=='Windows'
 libusb-package==1.0.26.1; platform_system=='Windows'
-tzdata=2024.1; platform_system=='Windows' and python_version >= '3.9' # to prevent pyinstaller WARNING: Hidden import "tzdata" not found!
+tzdata==2024.1; platform_system=='Windows' and python_version >= '3.9' # to prevent pyinstaller WARNING: Hidden import "tzdata" not found!
