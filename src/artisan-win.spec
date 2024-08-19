@@ -120,21 +120,23 @@ hiddenimports_list=['charset_normalizer.md__mypyc', # part of requests 2.28.2 # 
                             'pywintypes',
                             'win32cred',
                             'win32timezone',
-                            'babel.numbers'
+                            'babel.numbers',
+                            'tzdata'
                             ]
 # Add the hidden imports not required by legacy Windows.
 if not ARTISAN_LEGACY=='True':
     logging.info(">>>>> Appending hidden imports")
     hiddenimports_list[len(hiddenimports_list):] = [
                             'PyQt6.QtWebChannel',
-                            'PyQt6.QtWebEngineCore'
+                            'PyQt6.QtWebEngineCore',
+                            'importlib_resources'
                             ]
 
 
 a = Analysis(['artisan.py'],
              pathex=[PYQT_QT_BIN, ARTISAN_SRC, SCIPY_BIN],
              binaries=[],
-             datas=[] + copy_metadata('keyring'), # + copy_metadata('scipy.special') + copy_metadata('tzdata'),
+             datas=[] + copy_metadata('scipy.special'), # + copy_metadata('tzdata')
              hookspath=[],
              runtime_hooks=[],
              excludes=[],
