@@ -4629,7 +4629,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             sign = '+'
             fit = fit[::-1]
             try:
-                for i, fiti in enumerate(fit):
+                for i, fiti in enumerate(fit): # type:ignore[reportArgumentType, unused-ignore] # pyright falsly reports since numpy 2.1: Argument of type "Unknown | None" cannot be assigned to parameter "iterable" of type "Iterable
                     v = abs(fiti)
                     if round(v,3) != 0.0:
                         if i == 0:
@@ -6555,8 +6555,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             factor = 10
         elif coarse == 2: # slider step size 5
             factor = 5
-        r = float(((numpy.digitize([v],ls)[0] - 1) * factor + self.eventslidermin[i]) / 10.)
-        return max(self.eventslidermin[i]/10., min(self.eventslidermax[i] / 10.,r))
+        r = float(((numpy.digitize([v],ls)[0] - 1) * factor + self.eventslidermin[i]) / 10.) # type:ignore[index] # mypy (on numpy 2.1): "signedinteger[_64Bit]" is not indexable  [index]
+        return max(self.eventslidermin[i]/10., min(self.eventslidermax[i] / 10., r))
 
     def curveSimilarity2(self,exp:int=-1,analysis_starttime:float=0,analysis_endtime:float=0) -> 'CurveSimilarity': # pylint: disable=no-self-use
         result:CurveSimilarity = {
@@ -6634,8 +6634,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     raise ValueError('Length of np_dbtb is zero')
 
                 #MSE
-                mse_BT = numpy.mean(numpy.square(np_bt - np_btb))
-                mse_deltaBT = numpy.mean(numpy.square(np_dbt - np_dbtb))
+                mse_BT = float(numpy.mean(numpy.square(np_bt - np_btb)))
+                mse_deltaBT = float(numpy.mean(numpy.square(np_dbt - np_dbtb)))
 
                 # RMSE
                 rmse_BT = numpy.sqrt(mse_BT)
@@ -6765,7 +6765,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     segment_mse_deltas = numpy.append(segment_mse_deltas, numpy.mean(numpy.square(segment_deltas)))
                     segment_times = times_all[ss:ss+lengths_seg[i]+1]
                     try:
-                        tra = numpy.trapezoid(segment_abs_deltas, x=segment_times) # type:ignore [attr-defined]
+                        tra = numpy.trapezoid(segment_abs_deltas, x=segment_times)
                     except Exception:  # pylint: disable=broad-except
                         tra = numpy.trapz(segment_abs_deltas, x=segment_times) # type:ignore [attr-defined, unused-ignore]
                     segment_abc_deltas = numpy.append(segment_abc_deltas, tra)
@@ -6778,11 +6778,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 ioi_abs_deltas = numpy.absolute(deltas_all)
                 ioi_maxdelta = deltas_all[numpy.asarray(ioi_abs_deltas == numpy.amax(ioi_abs_deltas)).nonzero()[0][0]]
                 try:
-                    tra = numpy.trapezoid(ioi_abs_deltas, x=times_all) # type:ignore [attr-defined]
+                    tra = numpy.trapezoid(ioi_abs_deltas, x=times_all)
                 except Exception:  # pylint: disable=broad-except
                     tra = numpy.trapz(ioi_abs_deltas, x=times_all) # type:ignore [attr-defined, unused-ignore]
-                ioi_abc_deltas = numpy.sum(tra)
-                ioi_abcprime = ioi_abc_deltas / ioi_seconds
+                ioi_abc_deltas = float(numpy.sum(tra))
+                ioi_abcprime = str(ioi_abc_deltas / ioi_seconds)
 
                 # fit RoR in C/min/min
                 if exp == 2:
@@ -15121,7 +15121,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     axis_to_data = self.qmc.ax.transAxes + self.qmc.ax.transData.inverted()
                     data_to_axis = axis_to_data.inverted()
                     pos = data_to_axis.transform(legendloc_pos_data)
-                    self.qmc.legendloc_pos = (pos[0],pos[1])
+                    self.qmc.legendloc_pos = (float(pos[0]),float(pos[1]))
                     self.qmc.legend = None
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
@@ -15269,7 +15269,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 # Calculate the average number of decimals in an array of floats
                 ndec_arr = numpy.array([ndec(x) for x in bt])
                 avgDecimal = numpy.average(ndec_arr)
-                maxDecimal = numpy.amax(ndec_arr)
+                maxDecimal = float(numpy.amax(ndec_arr))
 
                 # Calculate the resolution from the BT values
                 # Sort the numbers in ascending order
@@ -15277,7 +15277,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 # Find the smallest non-zero difference
                 # Exception if there are no non-zero differences
                 try:
-                    resolution = numpy.min(numpy.diff(numpy.sort(bt))[numpy.nonzero(numpy.diff(numpy.sort(bt)))])
+                    resolution = float(numpy.min(numpy.diff(numpy.sort(bt))[numpy.nonzero(numpy.diff(numpy.sort(bt)))]))
                 except Exception: # pylint: disable=broad-except
                     resolution = float('nan')
 
@@ -15293,8 +15293,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 # Count skipped samples (missing timex)
                 tx_diff = numpy.diff(tx)
                 avg_sample = float(numpy.average(tx_diff))
-                longest_sample = numpy.max(tx_diff)
-                shortest_sample = numpy.min(tx_diff)
+                longest_sample = float(numpy.max(tx_diff))
+                shortest_sample = float(numpy.min(tx_diff))
                 skipped_sample_time = 1.5*avg_sample
                 skipped = numpy.count_nonzero(tx_diff > skipped_sample_time)
                 bins = [0, 1*profile_sampling_interval, 1.5*profile_sampling_interval, 4*profile_sampling_interval, 9999]

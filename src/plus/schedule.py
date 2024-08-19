@@ -30,6 +30,8 @@ import html
 import textwrap
 import platform
 import logging
+from platform import python_version
+from packaging.version import Version
 from uuid import UUID
 try:
     from PyQt6.QtCore import (QRect, Qt, QMimeData, QSettings, pyqtSlot, pyqtSignal, QPoint, QPointF, QLocale, QDate, QDateTime, QSemaphore, QTimer) # @UnusedImport @Reimport  @UnresolvedImport
@@ -658,6 +660,53 @@ def completeditem_beans_description(weight_unit_idx:int, item:CompletedItem) -> 
     coffee_blend_label = (f' {html.escape(item.coffee_label)}' if item.coffee_label is not None else (f' {html.escape(item.blend_label)}' if item.blend_label is not None else ''))
     return f'{render_weight(item.batchsize, 1, weight_unit_idx)}{coffee_blend_label}'
 
+
+
+def remove_prefix(s:str, prefix:str) -> str:
+    if Version(python_version()) < Version('3.9.0'):
+        if s.startswith(prefix):
+            return s[len(prefix):]
+        return s
+    return s.removeprefix(prefix) # type:ignore[reportAttributeAccessIssue, unused-ignore] # not known under Python 3.8 which we use for pyright type checking
+
+def remove_suffix(s:str, suffix:str) -> str:
+    if Version(python_version()) < Version('3.9.0'):
+        if s.endswith(suffix):
+            return s[:-len(suffix)]
+        return s
+    return s.removesuffix(suffix) # type:ignore[reportAttributeAccessIssue, unused-ignore] # not known under Python 3.8 which we use for pyright type checking
+
+def locale_format_date_no_year(locale:str, date:datetime.date) -> str:
+    try:
+        # format nicely using babel
+        date_without_year = format_date(date, format='long', locale=locale).replace(format_date(date, 'Y', locale=locale),'').strip()
+        # strip some more characters for certain locales
+        if locale.startswith(('en', 'vi')):
+            date_without_year = date_without_year.rstrip(',')
+        elif locale.startswith(('es', 'pt')):
+            date_without_year = remove_suffix(date_without_year, ' de')
+        elif locale.startswith('zh'):
+            date_without_year = date_without_year.lstrip('\u5E74')
+        elif locale.startswith('ko'):
+            date_without_year = date_without_year.lstrip('\uB144')
+        elif locale.startswith('th'):
+            date_without_year = remove_suffix(date_without_year, '\u0e04.\u0e28.')
+        elif locale.startswith('lv'):
+            date_without_year = remove_prefix(date_without_year, '. gada')
+        elif locale.startswith('hu'):
+            date_without_year = remove_prefix(date_without_year, '. ')
+        elif locale.startswith('ru'):
+            date_without_year = remove_suffix(date_without_year, '\u202f\u0433.')
+        elif locale.startswith('uk'):
+            date_without_year = remove_suffix(date_without_year, '\u202f\u0440.')
+        return date_without_year.strip()
+    except Exception as e: # pylint: disable=broad-except
+        _log.error(e)
+        # format using datetime using system locale
+        date_without_year = date.strftime('%x').replace(date.strftime('%Y'),'')
+        return date_without_year.strip().strip(',').strip('.').strip('-').strip('/').strip()
+
+
 #--------
 
 class QLabelRight(QLabel): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
@@ -898,35 +947,39 @@ class NoDragItem(StandardItem):
     def getLeft(self) -> str:
         return f'{self.data.prefix}'
 
-
     def getMiddle(self) -> str:
         return f'{self.data.title}'
 
-
     def getRight(self) -> str:
-        # the datetimes now and roastdate are in UTC, we need to compare the dates w.r.t. the local timezone thus we have to convert both via astimezone()
-        roastdate = self.data.roastdate
-        roastdate_date_local = roastdate.astimezone().date()
-        days_diff = (self.now.astimezone().date() - roastdate_date_local).days
-        task_date_str = ''
-        if days_diff == 0:
-            # for time formatting we use the system locale
-            locale = QLocale()
-            dt = QDateTime.fromSecsSinceEpoch(int(datetime2epoch(roastdate)))
-            task_date_str = locale.toString(dt.time(), QLocale.FormatType.ShortFormat)
-        elif days_diff == 1:
-            task_date_str = QApplication.translate('Plus', 'Yesterday').capitalize()
-        elif days_diff < 7:
-            # for date formatting we use the artisan-language locale
-            locale = QLocale(self.locale_str)
-            task_date_str = locale.toString(QDate(roastdate_date_local.year, roastdate_date_local.month, roastdate_date_local.day), 'dddd').capitalize()
-        else:
-            # date formatted according to the locale without the year
-            task_date_str = format_date(roastdate_date_local, format='long', locale=self.locale_str).replace(format_date(roastdate_date_local, 'Y', locale=self.locale_str),'').strip().rstrip(',')
+        try:
+            # the datetimes now and roastdate are in UTC, we need to compare the dates w.r.t. the local timezone thus we have to convert both via astimezone()
+            roastdate = self.data.roastdate
+            roastdate_date_local = roastdate.astimezone().date()
+            days_diff = (self.now.astimezone().date() - roastdate_date_local).days
+            task_date_str = ''
+            if days_diff == 0:
+                # for time formatting we use the system locale
+                locale = QLocale()
+                dt = QDateTime.fromSecsSinceEpoch(int(datetime2epoch(roastdate)))
+                task_date_str = locale.toString(dt.time(), QLocale.FormatType.ShortFormat)
+            elif days_diff == 1:
+                task_date_str = QApplication.translate('Plus', 'Yesterday').capitalize()
+            elif days_diff < 7:
+                # for date formatting we use the artisan-language locale
+                locale = QLocale(self.locale_str)
+                task_date_str = locale.toString(QDate(roastdate_date_local.year, roastdate_date_local.month, roastdate_date_local.day), 'dddd').capitalize()
+            else:
+                # date formatted according to the locale without the year
+                task_date_str = locale_format_date_no_year(self.locale_str, roastdate_date_local)
+    #            task_date_str = format_date(roastdate_date_local, format='long', locale=self.locale_str).replace(format_date(roastdate_date_local, 'Y', locale=self.locale_str),'').strip().rstrip(',')
 
-        weight = (f'{render_weight(self.data.weight, 1, self.weight_unit_idx)}  ' if self.data.measured else '')
+            weight = (f'{render_weight(self.data.weight, 1, self.weight_unit_idx)}  ' if self.data.measured else '')
 
-        return f'{weight}{task_date_str}'
+            return f'{weight}{task_date_str}'
+        except Exception as e: # pylint: disable=broad-except
+            # if anything goes wrong here we log an execption and return the empty string
+            _log.exception(e)
+            return ''
 
     def select(self) -> None:
         self.setProperty('Selected', True)
@@ -965,17 +1018,22 @@ class DragItem(StandardItem):
     # need to be called if prepared information changes
     def update_widget(self) -> None:
         date_local = self.data.date
-        task_date:str
-        if self.days_diff == 0:
-            task_date = QApplication.translate('Plus', 'Today')
-        elif self.days_diff == 1:
-            task_date = QApplication.translate('Plus', 'Tomorrow')
-        elif self.days_diff < 7:
-            locale = QLocale(self.aw.locale_str)
-            task_date = locale.toString(QDate(date_local.year, date_local.month, date_local.day), 'dddd').capitalize()
-        else:
-            # date formatted according to the locale without the year
-            task_date = format_date(date_local, format='long', locale=self.aw.locale_str).replace(format_date(date_local, 'Y', locale=self.aw.locale_str),'').strip().rstrip(',')
+        task_date:str = ''
+        try:
+            if self.days_diff == 0:
+                task_date = QApplication.translate('Plus', 'Today')
+            elif self.days_diff == 1:
+                task_date = QApplication.translate('Plus', 'Tomorrow')
+            elif self.days_diff < 7:
+                locale = QLocale(self.aw.locale_str)
+                task_date = locale.toString(QDate(date_local.year, date_local.month, date_local.day), 'dddd').capitalize()
+            else:
+                # date formatted according to the locale without the year
+    #            task_date = format_date(date_local, format='long', locale=self.aw.locale_str).replace(format_date(date_local, 'Y', locale=self.aw.locale_str),'').strip().rstrip(',')
+                task_date = locale_format_date_no_year(self.aw.locale_str, date_local)
+        except Exception as e: # pylint: disable=broad-except
+            # if anything goes wrong here we log an execption and use the empty string as task_date
+            _log.exception(e)
 
         user_nickname:Optional[str] = plus.connection.getNickname()
         task_operator = (QApplication.translate('Plus', 'by anybody') if self.data.user is None else

@@ -2991,14 +2991,14 @@ class tgraphcanvas(FigureCanvas):
                 bboxpatch = self.aw.analysisresultsanno.get_bbox_patch()
                 if bboxpatch is not None:
                     corners = self.ax.transAxes.inverted().transform(bboxpatch.get_extents())
-                    self.analysisresultsloc = (corners[0][0], corners[0][1] + (corners[1][1] - corners[0][1])/2)
+                    self.analysisresultsloc = (float(corners[0][0]), float(corners[0][1] + (corners[1][1] - corners[0][1])/2))
             # save the location of segment results after dragging
             if self.segmentpickflag and self.aw.segmentresultsanno is not None:
                 self.segmentpickflag = False
                 bbox_patch = self.aw.segmentresultsanno.get_bbox_patch()
                 if bbox_patch is not None:
                     corners = self.ax.transAxes.inverted().transform(bbox_patch.get_extents())
-                    self.segmentresultsloc = (corners[0][0], corners[0][1] + (corners[1][1] - corners[0][1])/2)
+                    self.segmentresultsloc = (float(corners[0][0]), float(corners[0][1] + (corners[1][1] - corners[0][1])/2))
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
@@ -3884,7 +3884,7 @@ class tgraphcanvas(FigureCanvas):
                                         with warnings.catch_warnings():
                                             warnings.simplefilter('ignore')
                                             # using stable polyfit from numpy polyfit module
-                                            LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1) # type:ignore[no-untyped-call]
+                                            LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1)
                                             self.rateofchange1 = LS_fit[1]*60.
                                     except Exception: # pylint: disable=broad-except
                                         # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an exception "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
@@ -3917,7 +3917,7 @@ class tgraphcanvas(FigureCanvas):
                                         temp_samples = sample_tstemp2[-left_index:]
                                         with warnings.catch_warnings():
                                             warnings.simplefilter('ignore')
-                                            LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1) # type:ignore[no-untyped-call]
+                                            LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1)
                                             self.rateofchange2 = LS_fit[1]*60.
                                     except Exception: # pylint: disable=broad-except
                                         # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an exception "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
@@ -6392,7 +6392,7 @@ class tgraphcanvas(FigureCanvas):
             try:
                 # depending on the z-order of ax vs delta_ax the one or the other one is correct
                 #res = (self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,x))[1]))[1])
-                res = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,x))[1]))[1])
+                res = float(self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,x))[1]))[1])
             except Exception: # pylint: disable=broad-except
                 pass
         if self.LCDdecimalplaces:
@@ -7475,7 +7475,7 @@ class tgraphcanvas(FigureCanvas):
             with warnings.catch_warnings():
                 warnings.simplefilter('ignore')
                 left_index = max(0,i-wsize)
-                LS_fit = numpy.polynomial.polynomial.polyfit(tx[left_index:i+1],temp[left_index:i+1], 1) # type:ignore[no-untyped-call]
+                LS_fit = numpy.polynomial.polynomial.polyfit(tx[left_index:i+1],temp[left_index:i+1], 1)
                 return float(LS_fit[1]*60.)
         else:
             return 0
@@ -7707,12 +7707,12 @@ class tgraphcanvas(FigureCanvas):
                 pass
 
     def setProfileBackgroundTitle(self, backgroundtitle:str) -> None:
-        suptitleX = 1
+        suptitleX:float = 1
         try:
             if self.ax is not None:
                 ax_width = self.ax.get_window_extent(renderer=self.fig.canvas.get_renderer()).width # type: ignore # total width of axis in display coordinates
                 ax_begin = self.ax.transAxes.transform((0,0))[0] # left of axis in display coordinates
-                suptitleX = self.fig.transFigure.inverted().transform((ax_width + ax_begin,0))[0]
+                suptitleX = float(self.fig.transFigure.inverted().transform((ax_width + ax_begin,0))[0])
         except Exception: # pylint: disable=broad-except
             pass
 
@@ -16478,7 +16478,7 @@ class tgraphcanvas(FigureCanvas):
         if isinstance(line, Line2D):
             #identify which line is being edited
             ydata = line.get_ydata()
-            if len(ydata)>1 and ydata[1] == self.temp1[1]: # type: ignore
+            if len(ydata)>1 and ydata[1] == self.temp1[1]:
                 self.workingline = 1
             else:
                 self.workingline = 2

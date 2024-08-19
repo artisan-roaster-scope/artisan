@@ -1,4 +1,4 @@
-types-openpyxl>=3.1.5.20240806
+types-openpyxl>=3.1.5.20240819
 types-Pillow>=10.2.0.20240520
 types-protobuf>=5.27.0.20240626
 types-psutil>=6.0.0.20240621
@@ -7,12 +7,12 @@ types-python-dateutil==2.9.0.20240316
 types-pytz==2024.1.0.20240417
 types-pyyaml>=6.0.12.20240808
 types-requests>=2.32.0.20240712
-types-setuptools>=71.1.0.20240813
+types-setuptools>=71.1.0.20240818
 types-urllib3>=1.26.25.14
 lxml-stubs>=0.5.1
 mypy==1.11.1
 pyright==1.1.376
-ruff>=0.5.7
+ruff>=0.6.1
 pylint==3.2.6
 pre-commit>=3.8.0
 pytest>=8.3.2
@@ -24,7 +24,7 @@ pytest-cov==5.0.0
 #pytest-bdd==6.1.1
 #pytest-benchmark==4.0.0
 #pytest-mock==3.11.1
-hypothesis>=6.111.0
+hypothesis>=6.111.1
 coverage>=7.6.1
 coverage-badge==1.1.2
 codespell==2.3.0

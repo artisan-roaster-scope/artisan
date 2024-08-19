@@ -250,7 +250,7 @@ disallow_incomplete_defs = true
 disallow_untyped_calls = true
 disallow_untyped_defs = true
 disallow_untyped_decorators = true
-disallow_any_unimported = true
+disallow_any_unimported = false # raises about 100 errors with numpy >= 2.1
 
 # Restrict dynamic typing
 disallow_any_generics = true
@@ -337,6 +337,7 @@ pythonPlatform = "All"
 #reportUnknownArgumentType = false
 #reportGeneralTypeIssues = false
 useLibraryCodeForTypes = false
+reportInvalidTypeForm = false # since numpy 2.1 more than 150 errors are reported
 
 
 ## pytest conf

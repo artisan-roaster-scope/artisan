@@ -102,7 +102,7 @@ BINARIES.extend([(os.path.join(yocto_lib_path, fn),'yoctopuce/cdll') for fn in o
 a = Analysis(['artisan.py'],
              binaries=BINARIES,
              datas=DATA_FILES,
-             hiddenimports=[],
+             hiddenimports=['babel.numbers'],
              hookspath=[],
              runtime_hooks=[],
              excludes= [],
