@@ -15,7 +15,8 @@
 # AUTHOR
 # Dave Baxter, Marko Luther 2023
 
-set -ex
+#set -ex
+set -e  # reduced logging
 hash -r
 uname -srv
 which python3

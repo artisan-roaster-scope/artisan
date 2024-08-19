@@ -19,6 +19,8 @@
 import logging
 import sys
 
+from PyInstaller.utils.hooks import copy_metadata
+
 # Set up the logger
 logging.basicConfig(level=logging.INFO)
 
@@ -112,7 +114,8 @@ hiddenimports_list=['charset_normalizer.md__mypyc', # part of requests 2.28.2 # 
                             'matplotlib.backends.backend_pdf',
                             'matplotlib.backends.backend_svg',
                             'scipy.spatial.transform._rotation_groups',
-                            'scipy.special.cython_special',
+#                            'scipy.special.cython_special',
+                            'scipy.special',
                             'scipy._lib.messagestream',
                             'pywintypes',
                             'win32cred',
@@ -131,7 +134,7 @@ if not ARTISAN_LEGACY=='True':
 a = Analysis(['artisan.py'],
              pathex=[PYQT_QT_BIN, ARTISAN_SRC, SCIPY_BIN],
              binaries=[],
-             datas=[],
+             datas=[] + copy_metadata('keyring'), # + copy_metadata('scipy.special') + copy_metadata('tzdata'),
              hookspath=[],
              runtime_hooks=[],
              excludes=[],
