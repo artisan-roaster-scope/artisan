@@ -136,7 +136,7 @@ if not ARTISAN_LEGACY=='True':
 a = Analysis(['artisan.py'],
              pathex=[PYQT_QT_BIN, ARTISAN_SRC, SCIPY_BIN],
              binaries=[],
-             datas=[] + copy_metadata('scipy.special'), # + copy_metadata('tzdata')
+             datas=[], # + copy_metadata('tzdata')
              hookspath=[],
              runtime_hooks=[],
              excludes=[],
