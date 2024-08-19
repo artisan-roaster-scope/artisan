@@ -60,6 +60,7 @@ Version History
 
 | Version | Date  | Comment |
 |---------|------:|---------|
+| [v3.0.2](https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.0.2) | Aug&nbsp;20,&nbsp;2024 | Bug fixes |
 | [v3.0.0](https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.0.0) | Aug&nbsp;1,&nbsp;2024 | Adds [roast scheduling](https://doc.artisan.plus/docs/schedule/) support<br><b>Release Sponsor: [artisan.plus](https://artisan.plus/)</b><br/> |
 | [v2.10.4](https://github.com/artisan-roaster-scope/artisan/releases/tag/v2.10.4) | Mar&nbsp;21,&nbsp;2024 | Bug fixes |
 | [v2.10.2](https://github.com/artisan-roaster-scope/artisan/releases/tag/v2.10.2) | Feb&nbsp;29,&nbsp;2024 | Adds support for machines from [Mill City Roasters](https://millcityroasters.com/), the [IKAWA PRO X](https://www.ikawacoffee.com/), the standard WinUSB driver for the [Aillio R1](https://aillio.com/) on Windows, the [Digi-Sense 20250-07 IR](https://www.coleparmer.com/i/digi-sense-ir-thermometer-thermocouple-probe-input-and-nist-traceable-calibration-30-1/2025007), and the [Extech 42570 IR](https://www.extech-online.com/index.php?main_page=product_info&cPath=78_21_35&products_id=99).<br>|

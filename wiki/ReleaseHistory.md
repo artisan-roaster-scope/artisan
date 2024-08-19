@@ -2,16 +2,20 @@ Detailed Release History
 ========================
 
 ----
-v3.0.1
+v3.0.2 (August 20, 2024)
 ------------------
 
-* ADDITIONS
-
-* NEW HARDWARE SUPPORT
-
 * CHANGES
+  - shift Windows downloads from zip to exe
+  - switches to native ruff-based bidi algorithm
 
 * FIXES
+  - fixes a build issue on Windows and Linux that could prevent the scheduler to start under certain conditions
+  - fixes date rendering for some locales in scheduler and make it more robust
+  - fixes character issue in buttons definition of the Kalaido Legacy machine setup
+  - fixes an auto align axis issue on leaving the analyzer with RESET on profiles with long recording before CHARGE
+  - fixes phases bar and statistic line formatting issues in right-to-left languages
+  - corrects some translations
 
 * REMOVALS
   - removes support for MOBDUS Serial Binary

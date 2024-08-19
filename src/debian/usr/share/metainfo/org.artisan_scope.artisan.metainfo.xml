@@ -26,7 +26,7 @@
       <li>rate-of-rise (RoR), area-under-the-curve (AUC), development-time-ratio (DTR) calculations and projection lines</li>
       <li>statistics, roast profile evaluation, Profile Analyzerg, Roast Comparatorg, Profile Transposerg and Roast Simulatorg</li>
       <li>roast-, production- and ranking reportsg</li>
-      <li>automated reproduction of roasts via alarm programsg, replay of eventsg or PID controlg</li>
+      <li>automated reproduction of roasts via alarm programs, replay of eventsg or PID controlg</li>
       <li>batch counterg</li>
       <li>profile designerg, cupping editor, spider- and wheel graph</li>
       <li>user defined buttons and slidersg with programmable actions</li>
@@ -67,6 +67,27 @@
   </branding>
 
   <releases>
+    <release version="3.0.2" date="2024-08-20">
+      <url type="details">https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.0.2</url>
+      <description>
+        <p>CHANGES</p>
+        <ul>
+          <li>shift Windows downloads from zip to exe</li>
+          <li>switches to native ruff-based bidi algorithm</li>
+        </ul>
+
+        <p>FIXES</p>
+        <ul>
+          <li>fixes a build issue on Windows and Linux that could prevent the scheduler to start under certain conditions</li>
+          <li>fixes date rendering for some locales in scheduler and make it more robust</li>
+          <li>fixes character issue in buttons definition of the Kalaido Legacy machine setup</li>
+          <li>fixes an auto align axis issue on leaving the analyzer with RESET on profiles with long recording before CHARGE</li>
+          <li>fixes phases bar and statistic line formatting issues in right-to-left languages</li>
+          <li>corrects some translations</li>
+        </ul>
+      </description>
+    </release>
+
     <release version="3.0.0" date="2024-08-01">
       <url type="details">https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.0.0</url>
       <description>
