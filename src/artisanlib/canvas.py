@@ -8269,7 +8269,7 @@ class tgraphcanvas(FigureCanvas):
                         if self.flagstart or self.zgrid == 0:
                             y_label = self.delta_ax.set_ylabel('')
                         else:
-                            y_label = self.delta_ax.set_ylabel(f'{self.mode}{self.aw.arabicReshape('/min')}',
+                            y_label = self.delta_ax.set_ylabel(f"{self.mode}{self.aw.arabicReshape('/min')}",
                                 color = self.palette['ylabel'],
                                 fontsize='medium',
                                 fontfamily=prop.get_family()
