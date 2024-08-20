@@ -23,15 +23,15 @@ gallery:
     image_path: /assets/images/download-icon-linux.png
     alt: "Linux"
     title: "Linux"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.0.0/artisan-win-legacy-3.0.2-setup.exe
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.0.2/artisan-win-legacy-3.0.2-setup.exe
     image_path: /assets/images/download-icon-windows-legacy.png
     alt: "Windows legacy"
     title: "Windows legacy"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.0.0/artisan-mac-legacy-3.0.0-legacy.dmg
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.0.0/artisan-mac-3.0.0-legacy.dmg
     image_path: /assets/images/download-icon-macos-legacy.png
     alt: "macOS legacy"
     title: "macOS legacy"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.0.0/artisan-linux-3.0.2_raspbian-bookworm.deb
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.0.2/artisan-linux-3.0.2_raspbian-bookworm.deb
     image_path: /assets/images/download-icon-rpi.png
     alt: "RPi"
     title: "RPi"
