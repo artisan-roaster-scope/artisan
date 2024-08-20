@@ -24,10 +24,11 @@ if /i "%APPVEYOR%" NEQ "True" (
     echo This file is for use on Appveyor CI only.
     exit /b 1
 )
+:: used in build-derived-win-bat
 if /i "%ARTISAN_LEGACY%" NEQ "True" (
-    set ARTISAN_SPEC=Setup-Artisan
+    set ARTISAN_SPEC=win
 ) else (
-    set ARTISAN_SPEC=Setup-Artisan-legacy
+    set ARTISAN_SPEC=win-legacy
 )
 :: ----------------------------------------------------------------------
 
@@ -78,7 +79,7 @@ if ERRORLEVEL 1 (echo ** Failed in NSIS & exit /b 1) else (echo ** Success)
 ::
 :: check that the install file is above an expected size
 ::
-set file=%ARTISAN_SPEC%-%ARTISAN_VERSION%.exe
+set file=artisan-win*setup.exe
 set min_size=170000000
 for %%A in (%file%) do set size=%%~zA
 if %size% LSS %min_size% (

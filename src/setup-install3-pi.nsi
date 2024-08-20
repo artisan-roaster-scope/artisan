@@ -190,7 +190,7 @@ SetCompressor lzma
 ; MUI end ------
 
 Name "${PRODUCT_NAME}"
-OutFile "Setup-${PRODUCT_NAME}${LEGACY_STR}-${PRODUCT_VERSION}.exe"
+OutFile "artisan-win${LEGACY_STR}-${PRODUCT_VERSION}-setup.exe"
 InstallDir "C:\Program Files\Artisan"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
