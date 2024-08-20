@@ -2362,9 +2362,9 @@ class tgraphcanvas(FigureCanvas):
         elif self.fmt_data_curve == 2:
             s = self.aw.ETname
         elif self.fmt_data_curve == 3:
-            s = f'{QApplication.translate('Label','Background')} {self.aw.BTname}'
+            s = f"{QApplication.translate('Label','Background')} {self.aw.BTname}"
         elif self.fmt_data_curve == 4:
-            s = f'{QApplication.translate('Label','Background')} {self.aw.ETname}'
+            s = f"{QApplication.translate('Label','Background')} {self.aw.ETname}"
         self.aw.ntb.update_message()
         self.aw.sendmessage(QApplication.translate('Message', 'set y-coordinate to {}').format(s))
 
@@ -7890,7 +7890,7 @@ class tgraphcanvas(FigureCanvas):
                     linestyle=self.ETdeltalinestyle,
                     drawstyle=self.ETdeltadrawstyle,
                     color=self.palette['deltaet'],
-                    label=self.aw.arabicReshape(f'{deltaLabelUTF8}{QApplication.translate('Label', 'ET')}'))
+                    label=self.aw.arabicReshape(f"{deltaLabelUTF8}{QApplication.translate('Label', 'ET')}"))
 
     def drawDeltaBT(self, trans:Transform, start:int, end:int) -> None:
         if self.DeltaBTflag and self.ax is not None:
@@ -7917,7 +7917,7 @@ class tgraphcanvas(FigureCanvas):
                     linestyle=self.BTdeltalinestyle,
                     drawstyle=self.BTdeltadrawstyle,
                     color=self.palette['deltabt'],
-                    label=self.aw.arabicReshape(f'{deltaLabelUTF8}{QApplication.translate('Label', 'BT')}'))
+                    label=self.aw.arabicReshape(f"{deltaLabelUTF8}{QApplication.translate('Label', 'BT')}"))
 
     # if profileDataSemaphore lock cannot be fetched the redraw is not performed
     def lazyredraw(self, recomputeAllDeltas:bool = True, smooth:bool = True) -> None:
@@ -10556,7 +10556,7 @@ class tgraphcanvas(FigureCanvas):
             else:
                 prefix = '#'
                 suffix = ''
-            return f'{prefix}{roastbatchpos}{suffix} {QApplication.translate('AddlInfo', 'Roast of the Day')}'
+            return f"{prefix}{roastbatchpos}{suffix} {QApplication.translate('AddlInfo', 'Roast of the Day')}"
         return '' #return an empty string if roastbatchpos is None
 
     #add stats summary to graph, called from redraw()
@@ -14438,10 +14438,10 @@ class tgraphcanvas(FigureCanvas):
                         dbt_txt = f'{dbt:.1f}'
                     if right_to_left(self.locale_str):
                         strline = (
-                                    f'C*min{int(tsb)}={self.aw.arabicReshape(QApplication.translate('Label', 'AUC'))}   '
-                                    f'{self.aw.arabicReshape(self.mode + '/min')}'
-                                    f'{ror}={self.aw.arabicReshape(QApplication.translate('Label', 'RoR'))}   '
-                                    f'{ETmax}={self.aw.arabicReshape(QApplication.translate('Label', 'MET'))}'
+                                    f"C*min{int(tsb)}={self.aw.arabicReshape(QApplication.translate('Label', 'AUC'))}   "
+                                    f"{self.aw.arabicReshape(self.mode + '/min')}"
+                                    f"{ror}={self.aw.arabicReshape(QApplication.translate('Label', 'RoR'))}   "
+                                    f"{ETmax}={self.aw.arabicReshape(QApplication.translate('Label', 'MET'))}"
                                    )
                         if det is not None:
                             strline = f"{self.mode}{det_txt}/{dbt_txt}={QApplication.translate('Label', 'CM')}  {strline}"
