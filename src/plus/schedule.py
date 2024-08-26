@@ -971,7 +971,6 @@ class NoDragItem(StandardItem):
             else:
                 # date formatted according to the locale without the year
                 task_date_str = locale_format_date_no_year(self.locale_str, roastdate_date_local)
-    #            task_date_str = format_date(roastdate_date_local, format='long', locale=self.locale_str).replace(format_date(roastdate_date_local, 'Y', locale=self.locale_str),'').strip().rstrip(',')
 
             weight = (f'{render_weight(self.data.weight, 1, self.weight_unit_idx)}  ' if self.data.measured else '')
 
@@ -1029,7 +1028,6 @@ class DragItem(StandardItem):
                 task_date = locale.toString(QDate(date_local.year, date_local.month, date_local.day), 'dddd').capitalize()
             else:
                 # date formatted according to the locale without the year
-    #            task_date = format_date(date_local, format='long', locale=self.aw.locale_str).replace(format_date(date_local, 'Y', locale=self.aw.locale_str),'').strip().rstrip(',')
                 task_date = locale_format_date_no_year(self.aw.locale_str, date_local)
         except Exception as e: # pylint: disable=broad-except
             # if anything goes wrong here we log an exception and use the empty string as task_date

@@ -94,7 +94,7 @@ class AsyncComm:
         writer = asyncio.StreamWriter(transport, protocol, reader, loop)
         return reader, writer
 
-    # to be overwritten by the subclasse
+    # to be overwritten by the subclass
 
     def reset_readings(self) -> None:
         pass

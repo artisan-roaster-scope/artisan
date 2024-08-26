@@ -203,3 +203,4 @@ showEtypes=true, true, false, true, false
 showeventsonbt=true
 specialeventannotations=, , , 
 specialeventannovisibilities=0, 0, 0, 0
+autoDrop=false
