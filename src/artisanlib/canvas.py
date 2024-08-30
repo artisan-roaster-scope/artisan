@@ -889,7 +889,8 @@ class tgraphcanvas(FigureCanvas):
                        '+Mugma Heater/Catalyzer',   #166
                        '+Mugma SV',                 #167
                        'Phidget TMP1202 1xRTD A',   #168
-                       '+Phidget TMP1202 1xRTD B'   #169
+                       '+Phidget TMP1202 1xRTD B',  #169
+                       'ColorTrack'                 #170
                        ]
 
         # ADD DEVICE:
@@ -1024,7 +1025,8 @@ class tgraphcanvas(FigureCanvas):
             159, # +Phidget DAQ1301 67
             160, # IKAWA \Delta Humidity / \Delat Humidity direction
             165, # +Mugma Heater/Fan
-            166  # +Mugma Heater/Catalyzer
+            166, # +Mugma Heater/Catalyzer
+            170  # +ColorTrack
         ]
 
         # ADD DEVICE:
@@ -12370,6 +12372,11 @@ class tgraphcanvas(FigureCanvas):
     def disconnectProbesFromSerialDevice(self, ser:'serialport') -> None:
         try:
             self.samplingSemaphore.acquire(1)
+
+            if ser.colorTrack is not None:
+                ser.colorTrack.stop()
+                ser.colorTrack = None
+
             # close main serial port
             try:
                 ser.closeport()

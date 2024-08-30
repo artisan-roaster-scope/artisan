@@ -290,7 +290,9 @@ def extractProfileCropsterXLS(file:str, _:'ApplicationWindow') -> 'ProfileData':
     # standard curves
     curve_bt_trans = [
         'Curve - Bean temp.', # EN
+        'Curve - Bean temperature', # EN new
         'Kurve - Bohnentemp.', # DE
+        'Kurve - Bohnentemperatur', # DE new
         'Curva - Temp. del grano', # ES (potentially wrong)
         'Courbe Temp. grain', # FR
         'Curva - Temp. chicco', # IT
@@ -303,7 +305,9 @@ def extractProfileCropsterXLS(file:str, _:'ApplicationWindow') -> 'ProfileData':
     ]
     curve_et_trans = [ # not that we map Exhaust to ET and not Env. Temp. as it is available more often; Env. Temp. is mapped to an extra device curve if available
         'Curve - Exhaust temp.', # EN
+        'Curve - Exhaust temperature', # EN new
         'Kurve - Ablufttemp.', # DE
+        'Kurve - Ablufttemperatur', # DE new
         'Curva - Temp. de salida', # ES (potentially wrong)
         'Courbe Temp. \u00e9chappement', # FR
         'Curva - Temp. fumi', # IT
@@ -318,7 +322,9 @@ def extractProfileCropsterXLS(file:str, _:'ApplicationWindow') -> 'ProfileData':
 
     curve_env_temp_trans = [
         'Curve - Env. temp.', # EN
+        'Curve - Env. temperature', # EN new
         'Kurve - Umgebungstemp.', # DE
+        'Kurve - Umgebungstemperatur', # DE new
         'Curva - Temp. ambiente', # ES
         'Courbe Temp. env.', # FR
         'Curva - Temp. aria in tamburo', # IT
@@ -331,7 +337,9 @@ def extractProfileCropsterXLS(file:str, _:'ApplicationWindow') -> 'ProfileData':
     ]
     curve_burner_temp_trans = [
         'Curve - Burner temp.', # EN
+        'Curve - Burner temperature', # EN new
         'Kurve - Brennertemp.', # DE
+        'Kurve - Brennertemperatur', # DE new
         'Curva - Temp. del quemador', # ES
         'Courbe Temp. br\u00fbleur', # FR
         'Curva - Temp. bruciatore', # IT
@@ -344,7 +352,9 @@ def extractProfileCropsterXLS(file:str, _:'ApplicationWindow') -> 'ProfileData':
     ]
     curve_other_temp_trans = [
         'Curve - Other temp.', # EN
+        'Curve - Other temperature', # EN new
         'Kurve - Andere Temp.', # DE
+        'Kurve - Andere Temperatur', # DE new
         'Curva - Otras temperaturas', # ES
         'Courbe Temp. autre', # FR
         'Curva - Altra temp.', # IT
@@ -357,7 +367,9 @@ def extractProfileCropsterXLS(file:str, _:'ApplicationWindow') -> 'ProfileData':
     ]
     curve_stack_temp_trans = [
         'Curve - Stack temp.', # EN
+        'Curve - Stack temperatur', # EN new
         'Kurve - Schornsteintemp.', # DE
+        'Kurve - Schornsteintemperatur', # DE new
         'Curva - Temp. del tiro', # ES
         'Courbe Temp. broche', # FR
         'Curva - Temp. camino', # IT
@@ -370,7 +382,9 @@ def extractProfileCropsterXLS(file:str, _:'ApplicationWindow') -> 'ProfileData':
     ]
     curve_return_temp_trans = [
         'Curve - Return temp.', # EN
+        'Curve - Return temperature', # EN new
         'Kurve - R\u00fccklauftemp.', # DE
+        'Kurve - R\u00fccklauftemperatur', # DE new
         'Curva - Temp. de retorno', # ES
         'Courbe Temp. retour', # FR
         'Curva - Temp. di ritorno', # IT
@@ -383,7 +397,9 @@ def extractProfileCropsterXLS(file:str, _:'ApplicationWindow') -> 'ProfileData':
     ]
     curve_inlet_temp_trans = [
         'Curve - Inlet temp.', # EN
+        'Curve - Inlet temperature', # EN new
         'Kurve - Einlasstemp.', # DE
+        'Kurve - Einlasstemperatur', # DE new
         'Curva - Temp. de entrada', # ES
         'Courbe Temp. entr\u00e9e', # FR
         'Curva - Temp. in ingresso', # IT
@@ -396,7 +412,9 @@ def extractProfileCropsterXLS(file:str, _:'ApplicationWindow') -> 'ProfileData':
     ]
     curve_afterburner_temp_trans = [
         'Curve - Afterburner temp.', # EN
+        'Curve - Afterburner temperature', # EN new
         'Kurve - Nachbrennertemp.', # DE
+        'Kurve - Nachbrennertemperatur', # DE new
         'Curva - Temp. del posquemador', # ES
         'Courbe Temp. post-combustion', # FR
         'Curva - Temp. bruciafumi', # IT
@@ -409,7 +427,9 @@ def extractProfileCropsterXLS(file:str, _:'ApplicationWindow') -> 'ProfileData':
     ]
     curve_drum_temp_trans = [
         'Curve - Drum temp.', # EN
+        'Curve - Drum temperature', # EN new
         'Kurve - Trommeltemp.', # DE
+        'Kurve - Trommeltemperatur', # DE new
         'Curva - Temp. del Tambor', # EE
         'Courbe Temp. tambour', # FR
         'Curva - Temp. tamburo', # IT
@@ -575,6 +595,7 @@ def extractProfileCropsterXLS(file:str, _:'ApplicationWindow') -> 'ProfileData':
 
     curve_postfixa = [
         'temp.', # EN
+        'temperature', # EN new
         'temp.', # DE
         '\u0020\uc628\ub3c4', # KO
         '\u6e29\u5ea6\u3002', # JP

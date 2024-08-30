@@ -1,6 +1,20 @@
 Detailed Release History
 ========================
 
+
+----
+v3.0.3
+------------------
+
+* ADDITIONS
+  - adds ColorTrack support
+
+* FIXES
+  - updates Cropster XLS importer
+  - fixes regression which broke SV number switching for Fuji PIDs (see [Discussion #1683](../../../discussions/1546))
+
+
+
 ----
 v3.0.2 (August 20, 2024)
 ------------------

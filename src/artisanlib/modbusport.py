@@ -661,7 +661,10 @@ class modbusport:
             self.connect()
             if self.isConnected():
                 assert self.master is not None
-                self.master.write_registers(int(register),values,slave=int(slave))
+                if isinstance(values, int):
+                    self.master.write_registers(int(register),[values],slave=int(slave))
+                else:
+                    self.master.write_registers(int(register),values,slave=int(slave))
                 time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeRegisters(%d,%d,%s) failed', slave, register, values)

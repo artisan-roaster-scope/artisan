@@ -30,6 +30,7 @@ from typing import Final, Optional, List, Tuple, Dict, Callable, Union, Any, TYP
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from artisanlib.aillio import AillioR1 # pylint: disable=unused-import
+    from artisanlib.colortrack import ColorTrack # pylint: disable=unused-import
     import serial # noqa: F401 # pylint: disable=unused-import
     from Phidget22.Phidget import Phidget # type: ignore # pylint: disable=unused-import
     from yoctopuce.yocto_voltageoutput import YVoltageOutput # type: ignore # pylint: disable=unused-import
@@ -247,7 +248,7 @@ class serialport:
         'YOCTOthread','YOCTOvoltageOutputs','YOCTOcurrentOutputs','YOCTOrelays','YOCTOservos','YOCTOpwmOutputs','HH506RAid','MS6514PrevTemp1','MS6514PrevTemp2','DT301PrevTemp','EXTECH755PrevTemp',\
         'controlETpid','readBTpid','useModbusPort','showFujiLCDs','arduinoETChannel','arduinoBTChannel','arduinoATChannel',\
         'ArduinoIsInitialized','ArduinoFILT','HH806Winitflag','R1','devicefunctionlist','externalprogram',\
-        'externaloutprogram','externaloutprogramFlag','PhidgetHUMtemp','PhidgetHUMhum','PhidgetPREpre','TMP1000temp']
+        'externaloutprogram','externaloutprogramFlag','PhidgetHUMtemp','PhidgetHUMhum','PhidgetPREpre','TMP1000temp', 'colorTrack']
 
     def __init__(self, aw:'ApplicationWindow') -> None:
 
@@ -327,6 +328,8 @@ class serialport:
         self.YOCTOrelays:List[YRelay] = [] # type:ignore[no-any-unimported,unused-ignore]
         self.YOCTOservos:List[YServo] = [] # type:ignore[no-any-unimported,unused-ignore]
         self.YOCTOpwmOutputs:List[YPwmOutput] = [] # type:ignore[no-any-unimported,unused-ignore]
+
+        self.colorTrack:Optional[ColorTrack] = None
 
         #stores the _id of the meter HH506RA as a string
         self.HH506RAid:str = 'X'
@@ -532,7 +535,8 @@ class serialport:
                                    self.Mugma_HeaterCatalyzer, #166
                                    self.Mugma_SV,             #167
                                    self.PHIDGET_TMP1202,      #168
-                                   self.PHIDGET_TMP1202_2     #169
+                                   self.PHIDGET_TMP1202_2,    #169
+                                   self.ColorTrack            #170
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -596,7 +600,7 @@ class serialport:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 import binascii
-                settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial('Fuji: ' + settings + ' || Tx = ' + cmd2str(binascii.hexlify(binstring)) + ' || Rx = ' + cmd2str(binascii.hexlify(r)))
 
     #finds time, ET and BT when using Fuji PID. Updates sv (set value) LCD. Finds power duty cycle
@@ -1419,6 +1423,24 @@ class serialport:
         tx = self.aw.qmc.timeclock.elapsedMilli()
         t2,t1 = self.NONEtmp()
         return tx,t2,t1
+
+    def ColorTrack(self) -> Tuple[float,float,float]:
+        if self.colorTrack is None:
+            from artisanlib.colortrack import ColorTrack
+            from artisanlib.types import SerialSettings
+            colortrack_serial:SerialSettings = {
+                'port': self.comport,
+                'baudrate': self.baudrate,
+                'bytesize': self.bytesize,
+                'stopbits': self.stopbits,
+                'parity': self.parity,
+                'timeout': self.timeout}
+            self.colorTrack = ColorTrack(serial=colortrack_serial)
+            self.colorTrack.setLogging(self.aw.qmc.device_logging)
+            self.colorTrack.start()
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        color = (-1 if self.colorTrack is None else self.colorTrack.getColor())
+        return tx,color,color
 
     def ARDUINOTC4(self) -> Tuple[float,float,float]:
         self.aw.qmc.extraArduinoTX = self.aw.qmc.timeclock.elapsedMilli()
@@ -6817,7 +6839,7 @@ class scaleport(extraserialport):
         }
         #TODO removes acaia from Windows 11 (and 7/8) until BLE is fixed in Qt/PyQt # pylint: disable=fixme
         self.bluetooth_devices:List[str] = []
-        if platform.system() == "Windows" and "Windows-10" not in platform.platform():
+        if platform.system() == 'Windows' and 'Windows-10' not in platform.platform():
             del self.devicefunctionlist['acaia']
         else:
             self.bluetooth_devices = ['acaia']
