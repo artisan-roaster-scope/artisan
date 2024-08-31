@@ -21,16 +21,32 @@ These selections allow you to see the three roast phases in the classic Artisan 
 
 ![phases example](/assets/images/gsg/Three Phases.png)
 
-The latest release also shows the temperature change in each phase in addition to F/min.
+You can also see the temperature change in each phase in addition to F/min.
 
 The Characteristics, at the bottom of your graph post roast, show basic information on the roast, like date, time, beans, batch-size, roast-loss, on the x-axis label if you have entered some of this information in `Roast` >> `Properties`.  Time after First Crack is now shown as a Characteristic at the bottom of the chart.  You have to enter Charge and Drop in order to get statistics which can be either manually via an event button or automatically.   
-
-The Roast Summary shows roast information on the right, post roast: core information on the roast (batch number, title, date, ambient data, machine), information on the green beans (name in two lines, screen size, density, moisture and batch size), and information on the roasted beans (density, moisture, color, AUC, roasting & cupping notes). The transparency and line length can be configured and the content of the statistic summary box can now be exported for printing.  
 
 Sample post roast showing Characteristics at the bottom of the graph and Summary Box on the right:
 ![post roast Characteristics](/assets/images/gsg/post roast charateristics.png)
 
 ![post roast statistics](/assets/images/gsg/stats in 14.png)
+
+*Advanced Summary Statistics *
+
+You can choose which statistics to display. Managing the view of statistics is done on the new "Stats Summary" tab in the Config>> Statistics dialog. Notice that the "Show summary" checkbox was moved from its previous location to this tab.  Click that checkbox to display the summary statistics. 
+![stats summary](/assets/images/gsg/stats 1a.png)
+Click on one of the statistics in the table to choose from a list of available statistics.  The graph display will update as you make changes in the dialog.  You can change, add, insert, or delete statistics in the table to create your own custom summary statistics display.   
+![stats choice](/assets/images/gsg/stats 2a.png)
+The "Max characters per line" will set the width of the statistics box.  Most statistics will be truncated after that number of characters.  Double periods (..) are shown when a line has been truncated. When there are more lines information to display than the statistics box can hold an indicator will be placed as the last character.   
+![max char](/assets/images/gsg/stats 3a.png)
+Change the text size used for summary statistics.  The choice of font is still made in the Config>> Curves>> UI tab.  The choice of font affects all of Artisan whereas the "Text Size" setting only affects the statistics summary.  
+![text size](/assets/images/gsg/stats 4a.png)
+When displaying summary statistics it is recommended to enable "Auto Time Axis" (Config>> Axes).  Artisan will automatically adjust the time axis so the statistics box is to the right of DROP and not covering important profile information.  New in Artisan v3.0, the statistics box will shrink to keep the legend visible when the legend is set to either "upper right" or "lower right" (Config>> Axes). 
+![axes](/assets/images/gsg/stats 5a.png)
+Users asked for the ability to print out the statistics.  File>> Save Statistics>> PDF will generate a PDF file with the statistics as they are currently shown on the graph.  New in Artisan v3.0, File>> Save Statistics>> Text will generate a text file where all the configured statistics are included and not truncated by the "Max characters per line" setting.  Be aware "Notes" statistics are always truncated.  
+
+To change the background color of the statistics display go to Config>> Colors>> Graph tab.  Look for "Stats&Analysis Bkgnd" where the color and opaqueness can be adjusted.  This setting also affects the Tools>> Analyzer results. 
+![print out](/assets/images/gsg/stats 6a.png)
+
 
 *Statistics – Area Under Curve*
 
