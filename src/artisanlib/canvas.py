@@ -3706,13 +3706,13 @@ class tgraphcanvas(FigureCanvas):
                                     sample_extractemp2[i].append(None)
 
                                 # update extra lines
-
-                                if self.aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > xtra_dev_lines1 and self.extratemp1lines[xtra_dev_lines1] is not None:
-                                    self.extratemp1lines[xtra_dev_lines1].set_data(sample_extractimex1[i], numpy.array(sample_extractemp1[i]))
-                                    xtra_dev_lines1 = xtra_dev_lines1 + 1
-                                if self.aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > xtra_dev_lines2 and self.extratemp2lines[xtra_dev_lines2] is not None:
-                                    self.extratemp2lines[xtra_dev_lines2].set_data(sample_extractimex2[i], numpy.array(sample_extractemp2[i]))
-                                    xtra_dev_lines2 = xtra_dev_lines2 + 1
+                                if local_flagstart:
+                                    if self.aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > xtra_dev_lines1 and self.extratemp1lines[xtra_dev_lines1] is not None:
+                                        self.extratemp1lines[xtra_dev_lines1].set_data(sample_extractimex1[i], numpy.array(sample_extractemp1[i]))
+                                        xtra_dev_lines1 = xtra_dev_lines1 + 1
+                                    if self.aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > xtra_dev_lines2 and self.extratemp2lines[xtra_dev_lines2] is not None:
+                                        self.extratemp2lines[xtra_dev_lines2].set_data(sample_extractimex2[i], numpy.array(sample_extractemp2[i]))
+                                        xtra_dev_lines2 = xtra_dev_lines2 + 1
                         #ERROR FOUND
                         else:
                             lengths = [les,led,let]
