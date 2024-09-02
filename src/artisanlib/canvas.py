@@ -10763,11 +10763,14 @@ class tgraphcanvas(FigureCanvas):
                                      f"{stringfromseconds(cp['dryphasetime'])}, "
                                      f"{int(round(cp['dryphasetime']*100./cp['totaltime']))}%"
                                      )
+            elif n == 31:  #Whole Bean Color
+                if self.whole_color > 0:
+                    stattype_str += (f"{newline}{QApplication.translate('AddlInfo', 'Whole Bean Color')}: #"
+                        f'{self.whole_color} {self.color_systems[self.color_system_idx]}')
             else:
                 errmsg = (f"{QApplication.translate('Error Message','Exception:')} buildStat() "
                           f"{QApplication.translate('Error Message','Unexpected value for n, got')} {n}")
-                self.adderror(errmsg)
-                #raise ValueError(errmsg)
+                _log.debug(errmsg)
 
             #TODO add more stats  MET, CM, RoR, Profile quality, RoR at FCs, RMSE BT (Bckgd) # pylint: disable=fixme
 

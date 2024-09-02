@@ -109,11 +109,6 @@ echo curl vc_redist.x64.exe
 curl -L -O %VC_REDIST%
 if not exist vc_redist.x64.exe (exit /b 140)
 
-::
-:: copy the snap7 binary
-::
-copy "%PYTHON_PATH%\Lib\site-packages\snap7\lib\snap7.dll" "C:\Windows"
-if not exist "C:\Windows\snap7.dll" (exit /b 150)
 
 ::
 :: show set of libraries are installed

@@ -232,6 +232,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
                 self.aw.qmc.dijkstra_to_ascii(f"{QApplication.translate('Table','Phases')} - {QApplication.translate('Label','Finishing')}"), # 28
                 self.aw.qmc.dijkstra_to_ascii(f"{QApplication.translate('Table','Phases')} - {QApplication.translate('Label','Maillard')}"),  # 29
                 self.aw.qmc.dijkstra_to_ascii(f"{QApplication.translate('Table','Phases')} - {QApplication.translate('Label','Drying')}"),    # 30
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('AddlInfo','Whole Bean Color')),                # 31
                 ]
 
         # function to remove from a list any elements matching string_to_remove
@@ -613,8 +614,9 @@ class StatisticsDlg(ArtisanResizeablDialog):
             typeComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
             typeComboBox.setToolTip(QApplication.translate('Tooltip','Choose a statistic to display'))
             typeComboBox.addItems(self.summarystats_types_sorted)
-            # change table entries that point to a statistic type that is 'Unused' to point to 'Blank Line' instead
-            if self.summarystats_types[self.summarystatstypes[i]] == 'Unused':
+            # change table entries that point to a statistic type that is 'Unused' or to a statistic added in a later release
+            # to point to 'Blank Line' instead
+            if self.summarystatstypes[i] >= len(self.summarystats_types) or self.summarystats_types[self.summarystatstypes[i]] == 'Unused':
                 typeComboBox.setCurrentIndex(self.summarystats_types_sorted.index(self.summarystats_types[0]))
                 self.summarystatstypes[i] = 0  # updates to settings on
             else:
