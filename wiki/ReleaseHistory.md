@@ -6,8 +6,9 @@ Detailed Release History
 v3.0.3
 ------------------
 
-* ADDITIONS
+* NEW HARDWARE SUPPORT
   - adds ColorTrack support
+  - adds support for Primo roasting machines
 
 * FIXES
   - updates Cropster XLS importer

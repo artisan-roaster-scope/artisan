@@ -6,12 +6,12 @@ types-pyserial>=3.5.0.20240826
 types-python-dateutil==2.9.0.20240821
 types-pytz==2024.1.0.20240417
 types-pyyaml>=6.0.12.20240808
-types-requests>=2.32.0.20240712
+types-requests>=2.32.0.20240905
 types-setuptools>=74.0.0.20240831
 types-urllib3>=1.26.25.14
 lxml-stubs>=0.5.1
 mypy==1.11.2
-pyright==1.1.378
+pyright==1.1.379
 ruff>=0.6.3
 pylint==3.2.7
 pre-commit>=3.8.0
