@@ -124,6 +124,8 @@ machines:
         url: /machines/petroncini/
       - title: "Phoenix"
         url: /machines/phoenix/
+      - title: "Primo"
+        url: /machines/primo/
       - title: "Proaster"
         url: /machines/proaster/
       - title: "Prometheus"

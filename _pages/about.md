@@ -63,6 +63,10 @@ gallery:
     image_path: /assets/images/santoker-logo.png
     alt: "Santoker"
     title: "Santoker"
+  - url: https://www.primoroasting.com/
+    image_path: /assets/images/primo-logo.png
+    alt: "Primo"
+    title: "Primo"
     
 ---
 
