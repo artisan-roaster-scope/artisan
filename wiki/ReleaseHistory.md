@@ -7,11 +7,11 @@ v3.0.3
 ------------------
 
 * NEW HARDWARE SUPPORT
-  - adds ColorTrack support
-  - adds support for Primo roasting machines
+  - adds ColorTrack support ([Issue #1680](../../../issues/1680))
+  - adds support for [Primo roasting machines](https://artisan-scope.org/machines/primo/)
 
 * FIXES
-  - updates Cropster XLS importer
+  - updates Cropster XLS importer ([Issue #1685](../../../issues/1685))
   - fixes regression which broke SV number switching for Fuji PIDs (see [Discussion #1683](../../../discussions/1546))
 
 
