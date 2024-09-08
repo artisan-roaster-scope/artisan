@@ -1233,7 +1233,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                 else:
                     days = QApplication.translate('Plus','{} days left').format(remaining_days)
                 pu = self.aw.plus_paidUntil.date()
-                message = f'{QApplication.translate("Plus","Paid until")} {QDate(pu.year,pu.month,pu.day).toString(QLocale().dateFormat(QLocale.FormatType.ShortFormat))}'
+                message = f'{QApplication.translate('Plus','Paid until')} {QDate(pu.year,pu.month,pu.day).toString(QLocale().dateFormat(QLocale.FormatType.ShortFormat))}'
                 reminder_message = ''
                 percent_used_formatted = ''
                 if self.aw.plus_rlimit > 0:
@@ -1243,7 +1243,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                         unit = 2
                     rlimit = plus.stock.renderAmount(self.aw.plus_rlimit, target_unit_idx=unit)
                     used = plus.stock.renderAmount(self.aw.plus_used, target_unit_idx=unit)
-                    percent_used_formatted = f'{percent_used:.0f}% {QApplication.translate("Label","roasted")} ({used} / {rlimit})'
+                    percent_used_formatted = f'{percent_used:.0f}% {QApplication.translate('Label','roasted')} ({used} / {rlimit})'
                     # if 90% of quota is used, render usage in red
                     if percent_used >= 90:
                         style = 'background-color:#cc0f50;color:white;'
@@ -3406,7 +3406,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.buttonSVm5.setVisible(False)
 
         #### EVENT MINI EDITOR: View&Edits events without opening roast properties Dlg.
-        self.eventlabel: QLabel = QLabel(f'{QApplication.translate("Form Caption", "Event")} #<b>0 </b>')
+        self.eventlabel: QLabel = QLabel(f'{QApplication.translate('Form Caption', 'Event')} #<b>0 </b>')
 
         self.eventlabel.setIndent(5)
 
@@ -12103,7 +12103,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         currentevent = self.eNumberSpinBox.value()
         self.eNumberSpinBox.setDisabled(True)
         try:
-            self.eventlabel.setText(f'{QApplication.translate("Form Caption", "Event")} #<b>{currentevent} </b>')
+            self.eventlabel.setText(f'{QApplication.translate('Form Caption', 'Event')} #<b>{currentevent} </b>')
 
             if currentevent == 0:
                 self.lineEvent.setText('')
@@ -19833,7 +19833,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 if bool(plus.sync.getSync(roast_uuid)):
                     time_html = f'<a href="{plus.util.roastLink(roast_uuid)}" target="_blank">{time_html}</a>'
                 if 'plus_coffee' in data and data['plus_coffee'] is not None and data['plus_coffee'] != '':
-                    beans_html = f'<a href="{plus.util.coffeeLink(data["plus_coffee"])}" target="_blank">{beans_html}</a>'
+                    beans_html = f'<a href="{plus.util.coffeeLink(data['plus_coffee'])}" target="_blank">{beans_html}</a>'
         except Exception: # pylint: disable=broad-except
             pass
         return libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
@@ -22552,7 +22552,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             LP = self.qmc.greens_temp
             #avoid dividing by zero
             divisor = self.qmc.timex[dryEndIndex] - self.qmc.timex[self.qmc.timeindex[0]]
-        elif BTdrycross is not None and -1 < TP_index < min(1000, len(temp)) and dryEndIndex:
+        elif BTdrycross is not None and dryEndIndex and -1 < TP_index < dryEndIndex  < len(self.qmc.timex):
             LP = temp[TP_index]
             #avoid dividing by zero
             divisor = self.qmc.timex[dryEndIndex] - self.qmc.timex[TP_index]
@@ -25747,7 +25747,7 @@ def excepthook(excType:type, excValue:BaseException, tracebackobj:Optional['Trac
     traceback.print_tb(tracebackobj, None, tbinfofile)
     tbinfofile.seek(0)
     tbinfo = tbinfofile.read()
-    errmsg = f'{str(excType)}: \n{str(excValue)} (line: {getattr(tracebackobj, "tb_lineno", "?")})'
+    errmsg = f'{str(excType)}: \n{str(excValue)} (line: {getattr(tracebackobj, 'tb_lineno', '?')})'
     stack = []
     variables = ''
     tb:Optional[TracebackType] = tracebackobj

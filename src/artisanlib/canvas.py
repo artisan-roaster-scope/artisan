@@ -340,13 +340,14 @@ class tgraphcanvas(FigureCanvas):
         self.EvalueColor_default:Final[List[str]] = ['#43a7cf','#49b160','#800080','#ad0427']
         self.EvalueTextColor_default:Final[List[str]] = ['#ffffff','#ffffff','#ffffff','#ffffff']
 
+
         # standard math functions allowed in symbolic formulas
         self.mathdictionary_base = {
             'min':min,'max':max,'sin':math.sin,'cos':math.cos,'tan':math.tan,
             'pow':math.pow,'exp':math.exp,'pi':math.pi,'e':math.e,
             'abs':abs,'acos':math.acos,'asin':math.asin,'atan':math.atan,
             'log':math.log,'radians':math.radians,
-            'sqrt':math.sqrt,'degrees':math.degrees}
+            'sqrt':math.sqrt,'degrees':math.degrees,'bit':lambda n,x:min(1,(int(x) & (1<<int(n))))}
 
 
         self.artisanflavordefaultlabels: Final[List[str]] = [QApplication.translate('Textbox', 'Acidity'),
@@ -6288,7 +6289,6 @@ class tgraphcanvas(FigureCanvas):
                     self.adderror(f"{QApplication.translate('Error Message', 'Exception:')} eval_curve_expression(): {mathexpression} {e}",getattr(exc_tb, 'tb_lineno', '?'))
                 return -1
         return -1
-
 
     #format X axis labels
     def xaxistosm(self,redraw:bool = True, min_time:Optional[float] = None, max_time:Optional[float] = None) -> None:

@@ -153,7 +153,7 @@ class modbusport:
         # for optimized read of full register segments with single requests
         # this dict is re-computed on each connect() by a call to updateActiveRegisters()
         # NOTE: for registers of type float and BCD (32bit = 2x16bit) also the succeeding registers are registered
-        self.fetch_max_blocks:bool = False # if set, the optimizer fetches only one sequence per area from the minimum to the maximum register ignoring gaps
+        self.fetch_max_blocks:bool = False # if set, the optimizer fetches only one sequence per area from the minimum to the maximum of "optimized" registers ignoring gaps (note that function 1 and 2 registers are not counting as they are never optimized)
         self.fail_on_cache_miss:bool = True # if False and request cannot be resolved from optimizer cache while optimizer is active,
             # send individual reading request; if set to True, never send individual data requests while optimizer is on
             # NOTE: if TRUE read requests with force=False (default) will fail
@@ -389,15 +389,16 @@ class modbusport:
             if slave != 0:
                 register = self.inputRegisters[c]
                 code = self.inputCodes[c]
-                registers = [register]
-                if self.inputFloats[c] or self.inputBCDs[c] or self.inputFloatsAsInt[c]:
-                    registers.append(register+1)
-                if code not in self.activeRegisters:
-                    self.activeRegisters[code] = {}
-                if slave in self.activeRegisters[code]:
-                    self.activeRegisters[code][slave].extend(registers)
-                else:
-                    self.activeRegisters[code][slave] = registers
+                if code not in {1,2}: # MODBUS functions 1 and 2 are not optimized
+                    registers = [register]
+                    if self.inputFloats[c] or self.inputBCDs[c] or self.inputFloatsAsInt[c]:
+                        registers.append(register+1)
+                    if code not in self.activeRegisters:
+                        self.activeRegisters[code] = {}
+                    if slave in self.activeRegisters[code]:
+                        self.activeRegisters[code][slave].extend(registers)
+                    else:
+                        self.activeRegisters[code][slave] = registers
         _log.debug('active registers: %s',self.activeRegisters)
 
     def clearReadingsCache(self) -> None:
@@ -432,7 +433,8 @@ class modbusport:
         if res.registers is None:
             _log.info('invalidResult(%d) => res.registers is None', count)
             return True,False
-        if len(res.registers) != count:
+        # if count==0 no res.registers is expected as for MODBUS function 1 and 2
+        if count>0 and len(res.registers) != count:
             _log.info('invalidResult(%d) => len(res.registers)=%d', count, len(res.registers))
             return True, False
         return False, False
@@ -983,7 +985,7 @@ class modbusport:
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
-            if self.optimizer and not force:
+            if self.optimizer and not force and code not in {1,2}: # MODBUS function 1 and 2 are never optimized
                 if code in self.readingsCache and slave in self.readingsCache[code] and register in self.readingsCache[code][slave]:
                     # cache hit
                     res_int:int = self.readingsCache[code][slave][register]
@@ -1014,7 +1016,7 @@ class modbusport:
                     except Exception as ex: # pylint: disable=broad-except
                         _log.debug(ex)
                         res = None
-                    error, disconnect = self.invalidResult(res,1)
+                    error, disconnect = self.invalidResult(res, (0 if code in {1, 2} else 1)) # don't check for res.registers if function code is 1 or 2
                     if error:
                         error_disconnect = error_disconnect or disconnect
                         if retry > 0:
@@ -1027,7 +1029,9 @@ class modbusport:
                         break
                 if res is not None:
                     if code in {1, 2} and hasattr(res, 'bits'):
-                        r = 1 if len(res.bits)>0 and res.bits[0] else 0
+#                        r = 1 if len(res.bits)>0 and res.bits[0] else 0
+                        # let's interpret all bits and return the bits interpreted as integer
+                        r = sum(x[1] << x[0] for x in enumerate(res.bits)) if len(res.bits)>0 else 0
                         # we clear the previous error and send a message
                         self.clearCommError()
                         return r

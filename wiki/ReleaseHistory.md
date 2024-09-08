@@ -6,13 +6,18 @@ Detailed Release History
 v3.0.3
 ------------------
 
+* ADDITIONS
+  - adds symbolic expression `bit(n,x)` which returns the n-th bit of x interpreted as integer
+
 * NEW HARDWARE SUPPORT
   - adds ColorTrack support ([Issue #1680](../../../issues/1680))
   - adds support for [Primo roasting machines](https://artisan-scope.org/machines/primo/)
+  - adds Loring 'auto' setup which picks up CHARGE and DROP events set at the machine
 
 * FIXES
   - updates Cropster XLS importer ([Issue #1685](../../../issues/1685))
-  - fixes regression which broke SV number switching for Fuji PIDs (see [Discussion #1683](../../../discussions/1546))
+  - fixes regression which broke SV number switching for Fuji PIDs ([Discussion #1683](../../../discussions/1683))
+  - fixes missing statistic content ([Discussion #1689](../../../discussions/1689))
 
 
 
