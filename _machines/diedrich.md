@@ -13,7 +13,7 @@ sidebar:
 <img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge-grey.png" width="150px">
 
 * __Producer:__ [Diedrich](https://www.diedrichroasters.com/){:target="_blank"}, USA
-* __Machines:__ All IR- and CR-series machines equipped with the 4 or 6 Sensor Data Logging option as well as DR semi-auto / Diedrich CR with ZIII automation
+* __Machines:__ All IR- and CR-series machines equipped with the 4 or 6 Sensor Data Logging option as well as DR semi-auto & CR with ZIII automation machines
 * __Connection:__ USB
 * __Features 4 Sensor Data Logging Package:__
   - logging of bean temperature (BT)
