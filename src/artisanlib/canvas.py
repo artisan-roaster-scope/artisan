@@ -204,7 +204,7 @@ class tgraphcanvas(FigureCanvas):
     __slots__ = [ 'aw', 'alignnames', 'locale_str', 'alpha', 'palette', 'palette1', 'EvalueColor_default', 'EvalueTextColor_default', 'artisanflavordefaultlabels', 'customflavorlabels',
         'SCAAflavordefaultlabels', 'SCAflavordefaultlabels', 'CQIflavordefaultlabels', 'SweetMariasflavordefaultlabels', 'Cflavordefaultlabels', 'Eflavordefaultlabels', 'coffeegeekflavordefaultlabels',
         'Intelligentsiaflavordefaultlabels', 'IstitutoInternazionaleAssaggiatoriCaffe', 'WorldCoffeeRoastingChampionship', 'ax1', 'ax2', 'ambiWorker', 'ambiThread', 'afterTP',
-        'decay_weights', 'temp_decay_weights', 'flavorlabels', 'flavors', 'flavorstartangle', 'flavoraspect', 'flavorchart_plotf', 'flavorchart_angles', 'flavorchart_plot',
+        'decay_weights', 'temp_decay_weights', 'flavorlabels', 'flavors', 'flavors_total_correction', 'flavorstartangle', 'flavoraspect', 'flavorchart_plotf', 'flavorchart_angles', 'flavorchart_plot',
         'flavorchart_fill', 'flavorchart_labels', 'flavorchart_total', 'mode', 'mode_tempsliders', 'errorlog', 'default_delay', 'delay', 'min_delay', 'extra_event_sampling_delay',
         'phases_fahrenheit_defaults', 'phases_celsius_defaults', 'phases', 'phasesbuttonflag', 'phasesfromBackgroundflag', 'watermarksflag', 'step100temp', 'phasesLCDflag',
         'phasesLCDmode', 'phasesLCDmode_l', 'phasesLCDmode_all', 'statisticsflags', 'statisticsmode', 'AUCbegin', 'AUCbase', 'AUCbaseFlag', 'AUCtarget', 'AUCbackground',
@@ -493,6 +493,7 @@ class tgraphcanvas(FigureCanvas):
         #Initial flavor parameters.
         self.flavors_default_value:float = 5.
         self.flavors:List[float] = [5.]*len(self.flavorlabels)
+        self.flavors_total_correction:float = 0
         self.flavorstartangle:float = 90.
         self.flavoraspect:float = 1.0  #aspect ratio
         # flavor chart graph plots and annotations
@@ -6787,6 +6788,7 @@ class tgraphcanvas(FigureCanvas):
 
             #reset cupping flavor values
             self.flavors = [5.]*len(self.flavorlabels)
+            self.flavors_total_correction = 0
 
             try:
                 # reset color of last pressed button
@@ -10765,7 +10767,7 @@ class tgraphcanvas(FigureCanvas):
                                      )
             elif n == 31:  #Whole Bean Color
                 if self.whole_color > 0:
-                    stattype_str += (f"{newline}{QApplication.translate('AddlInfo', 'Whole Bean Color')}: #"
+                    stattype_str += (f"{newline}{QApplication.translate('HTML Report Template','Whole Color')}: #"
                         f'{self.whole_color} {self.color_systems[self.color_system_idx]}')
             else:
                 errmsg = (f"{QApplication.translate('Error Message','Exception:')} buildStat() "
@@ -11616,7 +11618,7 @@ class tgraphcanvas(FigureCanvas):
             self.flavorchart_plotf[i] /= 10.
 
     @staticmethod
-    def calcFlavorChartScoreFromFlavors(flavors:List[float]) -> float:
+    def calcFlavorChartScoreFromFlavors(flavors:List[float], flavors_total_correction:float) -> float:
         if len(flavors) < 1:
             return 50
         score:float = 0.
@@ -11625,10 +11627,11 @@ class tgraphcanvas(FigureCanvas):
             score += flavors[i]
         score /= (nflavors)
         score *= 10.
+        score += flavors_total_correction
         return score
 
     def calcFlavorChartScore(self) -> float:
-        return self.calcFlavorChartScoreFromFlavors(self.flavors)
+        return self.calcFlavorChartScoreFromFlavors(self.flavors, self.flavors_total_correction)
 
     # set the flavor chart scores such that the given overall score is reached
     def setFlavorChartScore(self, value:float) -> None:

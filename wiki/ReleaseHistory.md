@@ -8,11 +8,13 @@ v3.0.3
 
 * ADDITIONS
   - adds symbolic expression `bit(n,x)` which returns the n-th bit of x interpreted as integer
+  - adds (total) correction to cup profiles and enables column drag-and-drop([Discussion #1690](../../../discussions/1690))
 
 * NEW HARDWARE SUPPORT
   - adds ColorTrack support ([Issue #1680](../../../issues/1680))
   - adds support for [Primo roasting machines](https://artisan-scope.org/machines/primo/)
-  - adds Loring 'auto' setup which picks up CHARGE and DROP events set at the machine
+  - adds [Loring](https://artisan-scope.org/machines/loring/) 'auto' setup which picks up CHARGE and DROP events set at the machine
+  - adds control function to [Diedrich DR](https://artisan-scope.org/machines/diedrich/) machine setup and adds [Diedrich CR](https://artisan-scope.org/machines/diedrich/) machine setup
 
 * FIXES
   - updates Cropster XLS importer ([Issue #1685](../../../issues/1685))

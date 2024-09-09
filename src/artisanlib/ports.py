@@ -518,7 +518,8 @@ class comportDlg(ArtisanResizeablDialog):
             modbus_inputDecode:QComboBox = QComboBox()
             modbus_inputDecode.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             modbus_inputDecode.addItems(modbus_decode)
-            if self.aw.modbus.inputBCDsAsInt[i]:
+            if (self.aw.modbus.inputBCDsAsInt[i] and not self.aw.modbus.inputFloatsAsInt[i] and not self.aw.modbus.inputFloats[i] and
+                    not self.aw.modbus.inputBCDs[i]):
                 modbus_inputDecode.setCurrentIndex(4)
             elif self.aw.modbus.inputFloatsAsInt[i]:
                 if self.aw.modbus.inputSigned[i]:

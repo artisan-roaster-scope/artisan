@@ -1,6 +1,6 @@
 [General]
 Delay=2000
-roastertype_setup=Diedrich DR
+roastertype_setup=Diedrich CR
 
 [Device]
 id=29
@@ -18,7 +18,7 @@ SVmultiplier=1
 baudrate=115200
 bytesize=8
 comport=COM4
-host=192.168.251.202
+host=125.135.119.211
 input10BCDsAsInt=false
 input10FloatsAsInt=false
 input10Signed=false

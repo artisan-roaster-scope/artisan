@@ -163,7 +163,7 @@ def content() -> str:
     tbl_MathFormulas.add_row(['sin(x)',QApplication.translate('HelpDlg','Return the sine of x (measured in radians).')])
     tbl_MathFormulas.add_row(['sqrt(x)',QApplication.translate('HelpDlg','Return the square root of x.')])
     tbl_MathFormulas.add_row(['tan(x)',QApplication.translate('HelpDlg','Return the tangent of x (measured in radians).')])
-    tbl_MathFormulas.add_row(['bit(n,x)',QApplication.translate('HelpDlg','Return1 if the bit n of value x (interpreted as integer) is set.')])
+    tbl_MathFormulas.add_row(['bit(n,x)',QApplication.translate('HelpDlg','Return 1 if the bit n of value x (interpreted as integer) is set, otherwise 0.')])
     strlist.append(tbl_MathFormulas.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
     strlist.append('<br/><br/><b>')
     strlist.append(QApplication.translate('HelpDlg','MATHEMATICAL CONSTANTS'))

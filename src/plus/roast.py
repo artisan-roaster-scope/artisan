@@ -379,7 +379,8 @@ def getRoast() -> Dict[str, Any]:  #for Python >= 3.9 can replace 'Dict' with th
 
         try:
             if 'flavors' in p:
-                cupping_value:Optional[Union[float, int]] = aw.qmc.calcFlavorChartScoreFromFlavors(p['flavors'])
+                correction:float = p.get('flavors_total_correction', 0)
+                cupping_value:Optional[Union[float, int]] = aw.qmc.calcFlavorChartScoreFromFlavors(p['flavors'], correction)
                 cupping_value = util.float2floatMin(cupping_value, 2)
                 if cupping_value != 50:
                     # a cupping_value of 50 is dropped as this is the default

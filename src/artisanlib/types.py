@@ -139,6 +139,7 @@ class ProfileData(TypedDict, total=False):
     viewerMode: bool
     timeindex: List[int]
     flavors: List[float]
+    flavors_total_correction: float
     flavorlabels: List[str]
     flavorstartangle: float
     flavoraspect: float

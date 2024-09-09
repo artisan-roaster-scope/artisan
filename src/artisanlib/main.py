@@ -14769,6 +14769,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             elif len(self.qmc.flavorlabels) < len(self.qmc.flavors):
                 # remove superfluous values
                 self.qmc.flavors = self.qmc.flavors[:len(self.qmc.flavorlabels)]
+            if 'flavors_total_correction' in profile:
+                self.qmc.flavors_total_correction = max(-10,min(10,float(profile['flavors_total_correction'])))
+            else:
+                self.qmc.flavors_total_correction = 0
             if 'flavorstartangle' in profile:
                 self.qmc.flavorstartangle = int(profile['flavorstartangle'])
             if 'flavoraspect' in profile:
@@ -15776,6 +15780,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             profile['viewerMode'] = self.app.artisanviewerMode
             profile['timeindex'] = self.qmc.timeindex
             profile['flavors'] = self.qmc.flavors
+            profile['flavors_total_correction'] = self.qmc.flavors_total_correction
             profile['flavorlabels'] = [encodeLocalStrict(fl) for fl in self.qmc.flavorlabels]
             profile['flavorstartangle'] = self.qmc.flavorstartangle
             profile['flavoraspect'] = self.qmc.flavoraspect
@@ -22085,6 +22090,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 all_default = False
         score /= (nflavors)
         score *= 10.
+        score += self.qmc.flavors_total_correction
         return score, all_default
 
     @staticmethod
