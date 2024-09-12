@@ -16889,7 +16889,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if settings.contains('AnalysisResultsLoc'):
                 # on Windows11 some Artisan v3.0 writes this as
                 # AnalysisResultsLoc=@Variant(\0\0\0\x7f\0\0\0\xePyQt_PyObject\0\0\0\0\0), @Variant(\0\0\0\x7f\0\0\0\xePyQt_PyObject\0\0\0\0\0)
-                # due to a missing convertion from numpy numbers to Python floats, which cannot be re-loaded by Qt
+                # due to a missing conversion from numpy numbers to Python floats, which cannot be re-loaded by Qt
                 # => unable to convert a C++ 'QVariantList' instance to a Python object
                 try:
                     arl = toList(settings.value('AnalysisResultsLoc',self.qmc.analysisresultsloc))
@@ -16900,7 +16900,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if settings.contains('SegmentResultsLoc'):
                 # on Windows11 some Artisan v3.0 writes this as
                 # SegmentResultsLoc=@Variant(\0\0\0\x7f\0\0\0\xePyQt_PyObject\0\0\0\0\0), @Variant(\0\0\0\x7f\0\0\0\xePyQt_PyObject\0\0\0\0\0)
-                # due to a missing convertion from numpy numbers to Python floats, which cannot be re-loaded by Qt
+                # due to a missing conversion from numpy numbers to Python floats, which cannot be re-loaded by Qt
                 # => unable to convert a C++ 'QVariantList' instance to a Python object
                 try:
                     srl = toList(settings.value('SegmentResultsLoc',self.qmc.segmentresultsloc))
