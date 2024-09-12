@@ -16887,13 +16887,27 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 for _ in range(7 - len(self.qmc.statisticsflags)):
                     self.qmc.statisticsflags.append(0)
             if settings.contains('AnalysisResultsLoc'):
-                arl = toList(settings.value('AnalysisResultsLoc',self.qmc.analysisresultsloc))
-                if len(arl)>1:
-                    self.qmc.analysisresultsloc = (toFloat(arl[0]), toFloat(arl[1]))
+                # on Windows11 some Artisan v3.0 writes this as
+                # AnalysisResultsLoc=@Variant(\0\0\0\x7f\0\0\0\xePyQt_PyObject\0\0\0\0\0), @Variant(\0\0\0\x7f\0\0\0\xePyQt_PyObject\0\0\0\0\0)
+                # due to a missing convertion from numpy numbers to Python floats, which cannot be re-loaded by Qt
+                # => unable to convert a C++ 'QVariantList' instance to a Python object
+                try:
+                    arl = toList(settings.value('AnalysisResultsLoc',self.qmc.analysisresultsloc))
+                    if len(arl)>1:
+                        self.qmc.analysisresultsloc = (toFloat(arl[0]), toFloat(arl[1]))
+                except Exception: # pylint: disable=broad-except
+                    pass
             if settings.contains('SegmentResultsLoc'):
-                srl = toList(settings.value('SegmentResultsLoc',self.qmc.segmentresultsloc))
-                if len(srl)>1:
-                    self.qmc.segmentresultsloc = (toFloat(srl[0]), toFloat(srl[1]))
+                # on Windows11 some Artisan v3.0 writes this as
+                # SegmentResultsLoc=@Variant(\0\0\0\x7f\0\0\0\xePyQt_PyObject\0\0\0\0\0), @Variant(\0\0\0\x7f\0\0\0\xePyQt_PyObject\0\0\0\0\0)
+                # due to a missing convertion from numpy numbers to Python floats, which cannot be re-loaded by Qt
+                # => unable to convert a C++ 'QVariantList' instance to a Python object
+                try:
+                    srl = toList(settings.value('SegmentResultsLoc',self.qmc.segmentresultsloc))
+                    if len(srl)>1:
+                        self.qmc.segmentresultsloc = (toFloat(srl[0]), toFloat(srl[1]))
+                except Exception: # pylint: disable=broad-except
+                    pass
             self.qmc.analysisstartchoice = toInt(settings.value('analysisstartchoice',int(self.qmc.analysisstartchoice)))
             self.qmc.analysisoffset = toInt(settings.value('analysisoffset',int(self.qmc.analysisoffset)))
             self.qmc.curvefitstartchoice = toInt(settings.value('curvefitstartchoice',int(self.qmc.curvefitstartchoice)))
@@ -18626,8 +18640,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'autoFCs',self.qmc.autoFCsFlag, read_defaults)
             #save statistics
             self.settingsSetValue(settings, default_settings, 'Statistics',self.qmc.statisticsflags, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'AnalysisResultsLoc',list(self.qmc.analysisresultsloc), read_defaults)
-            self.settingsSetValue(settings, default_settings, 'SegmentResultsLoc',list(self.qmc.segmentresultsloc), read_defaults)
+            self.settingsSetValue(settings, default_settings, 'AnalysisResultsLoc',[toFloat(x) for x in list(self.qmc.analysisresultsloc)[:2]], read_defaults)
+            self.settingsSetValue(settings, default_settings, 'SegmentResultsLoc',[toFloat(x) for x in list(self.qmc.segmentresultsloc)[:2]], read_defaults)
             self.settingsSetValue(settings, default_settings, 'analysisstartchoice',self.qmc.analysisstartchoice, read_defaults)
             self.settingsSetValue(settings, default_settings, 'analysisoffset',self.qmc.analysisoffset, read_defaults)
             self.settingsSetValue(settings, default_settings, 'curvefitstartchoice',self.qmc.curvefitstartchoice, read_defaults)

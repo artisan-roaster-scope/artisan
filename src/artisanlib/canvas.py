@@ -2995,14 +2995,22 @@ class tgraphcanvas(FigureCanvas):
                 bboxpatch = self.aw.analysisresultsanno.get_bbox_patch()
                 if bboxpatch is not None:
                     corners = self.ax.transAxes.inverted().transform(bboxpatch.get_extents())
-                    self.analysisresultsloc = (float(corners[0][0]), float(corners[0][1] + (corners[1][1] - corners[0][1])/2))
+                    self.analysisresultsloc = (toFloat(corners[0][0]), toFloat(corners[0][1] + (corners[1][1] - corners[0][1])/2))
+                    #reset the annotation location if the origin is out of the screen
+                    for dim in self.analysisresultsloc:
+                        if dim >= 1 or dim <=0:
+                            self.analysisresultsloc = self.analysisresultsloc_default
             # save the location of segment results after dragging
             if self.segmentpickflag and self.aw.segmentresultsanno is not None:
                 self.segmentpickflag = False
                 bbox_patch = self.aw.segmentresultsanno.get_bbox_patch()
                 if bbox_patch is not None:
                     corners = self.ax.transAxes.inverted().transform(bbox_patch.get_extents())
-                    self.segmentresultsloc = (float(corners[0][0]), float(corners[0][1] + (corners[1][1] - corners[0][1])/2))
+                    self.segmentresultsloc = (toFloat(corners[0][0]), toFloat(corners[0][1] + (corners[1][1] - corners[0][1])/2))
+                    #reset the annotation location if the origin is out of the screen
+                    for dim in self.segmentresultsloc:
+                        if dim >= 1 or dim <=0:
+                            self.segmentresultsloc = self.segmentresultsloc_default
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()

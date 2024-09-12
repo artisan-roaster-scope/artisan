@@ -162,7 +162,7 @@ class flavorDlg(ArtisanResizeablDialog):
         mainLayout.addWidget(extraGroupLayout)
 #        mainLayout.addLayout(blayout)
         mainLayout.addLayout(mainButtonsLayout)
-        mainLayout.setContentsMargins(7,5,7,0) # left, top, right, bottom
+        mainLayout.setContentsMargins(7,5,7,5) # left, top, right, bottom
         mainLayout.setSpacing(3)
         self.setLayout(mainLayout)
         self.aw.qmc.updateFlavorchartValues() # fast incremental redraw

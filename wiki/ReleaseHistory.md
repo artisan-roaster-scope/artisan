@@ -20,6 +20,7 @@ v3.0.3
   - updates Cropster XLS importer ([Issue #1685](../../../issues/1685))
   - fixes regression which broke SV number switching for Fuji PIDs ([Discussion #1683](../../../discussions/1683))
   - fixes missing statistic content ([Discussion #1689](../../../discussions/1689))
+  - fixes a regression which prevented loading settings written (slightly broken) by Artisan v3.0 ([Discussion #1692](../../../discussions/1692))
 
 
 
