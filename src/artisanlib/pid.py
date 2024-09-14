@@ -19,7 +19,7 @@
 
 import time
 import numpy
-import scipy.signal # type:ignore[import-untyped]
+from scipy.signal import iirfilter # type:ignore[import-untyped]
 import logging
 from typing import Final, List, Optional, Callable
 
@@ -334,7 +334,7 @@ class PID:
     @staticmethod
     def derivativeFilter() -> LiveSosFilter:
         return LiveSosFilter(
-                scipy.signal.iirfilter(1, # order
+                iirfilter(1, # order
                 Wn=0.2, # 0 < Wn < fs/2 (fs=1 -> fs/2=0.5)
                 fs=1, # sampling rate, Hz
                 btype='low',

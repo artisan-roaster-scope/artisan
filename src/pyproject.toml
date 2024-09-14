@@ -304,7 +304,7 @@ line-length = 80
 lint.ignore = ["E402", "E501", "E741", "PLR0913", "PLR2004", "COM812", "PLR0912", "PLR0915", "PLW0603", "PLR0911", "SIM105", "SIM114", "PLR2044"]
 
 # Exclude a variety of commonly ignored directories.
-exclude = ["dist", "build", "proto", ".pytype", ".mypy_cache", ".git"]
+exclude = ["dist", "build", "proto", ".pytype", ".mypy_cache", ".git", ".venv", ".venv_universal", ".venv_arm"]
 
 # Assume Python 3.8.
 target-version = "py38"

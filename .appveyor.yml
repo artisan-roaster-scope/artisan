@@ -206,7 +206,7 @@ for:
 
   environment:
     ARTISAN_OS: macos
-    MACOSX_DEPLOYMENT_TARGET: 11.0
+    MACOSX_DEPLOYMENT_TARGET: 12.0
     PYTHONSITEPKGS: /Users/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages
     QT_PATH: ${PYTHONSITEPKGS}/PyQt6/Qt6
     QT_SRC_PATH: /Users/appveyor/Qt/6.6/macos

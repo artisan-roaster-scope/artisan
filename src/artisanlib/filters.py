@@ -165,10 +165,11 @@ if __name__ == '__main__':
     yraw = ys + yerr
 
     # define the filters
-    import scipy.signal # type: ignore
+    from scipy.signal import iirfilter, lfilter, sosfilt # type:ignore[import-untyped]
+    #
     # define lowpass filter with 2.5 Hz cutoff frequency of order 4
-    b, a = scipy.signal.iirfilter(4, Wn=2.5, fs=fs, btype='low', ftype='butter')
-    y_scipy_lfilter = scipy.signal.lfilter(b, a, yraw)
+    b, a = iirfilter(4, Wn=2.5, fs=fs, btype='low', ftype='butter')
+    y_scipy_lfilter = lfilter(b, a, yraw)
 
     live_lfilter = LiveLFilter(b, a)
     # simulate live filter - passing values one by one
@@ -176,9 +177,9 @@ if __name__ == '__main__':
 
 
     # define lowpass filter with 2.5 Hz cutoff frequency of order 2
-    sos = scipy.signal.iirfilter(2, Wn=2.5, fs=fs, btype='low',
+    sos = iirfilter(2, Wn=2.5, fs=fs, btype='low',
                                  ftype='butter', output='sos')
-    y_scipy_sosfilt = scipy.signal.sosfilt(sos, yraw)
+    y_scipy_sosfilt = sosfilt(sos, yraw)
 
     live_sosfilter = LiveSosFilter(sos)
     # simulate live filter - passing values one by one

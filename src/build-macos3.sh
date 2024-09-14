@@ -32,6 +32,9 @@ echo "************* build derived files **************"
 if [ $? -ne 0 ]; then echo "Failed in build-derived.sh"; exit $?; else (echo "** Finished build-derived.sh"); fi
 
 
+# remove useless .c file from Python site-packages from local build setups
+rm -f ${PYTHONPATH}/site-packages/fontTools/misc/bezierTools.c # 1.9MB
+
 # distribution
 rm -rf build dist
 sleep .3 # sometimes it takes a little for dist to get really empty

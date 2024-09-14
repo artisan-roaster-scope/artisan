@@ -16,13 +16,13 @@ extrastopbits=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x1)
 extratimeout=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x6?\xf0\0\0\0\0\0\0)
 
 [ExtraDev]
-extraCurveVisibility1=true, true, true, true, true, true, true, true, true, true
+extraCurveVisibility1=false, true, true, true, true, true, true, true, true, true
 extraCurveVisibility2=false, true, true, true, true, true, true, true, true, true
 extraDelta1=false, false, false, false, false, false, false, false, false, false
 extraDelta2=false, false, false, false, false, false, false, false, false, false
 extraFill1=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 extraFill2=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-extraLCDvisibility1=true, false, false, false, false, false, false, false, false, false
+extraLCDvisibility1=false, false, false, false, false, false, false, false, false, false
 extraLCDvisibility2=false, false, false, false, false, false, false, false, false, false
 extradevicecolor1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\xe\0#\0\x32\0\x30\0\x38\0\x36\0\x62\0\x62)
 extradevicecolor2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\n\0\x62\0l\0\x61\0\x63\0k)
@@ -69,7 +69,7 @@ input3div=1
 input3float=false
 input3mode=
 input3register=106
-input3slave=3
+input3slave=0
 input4FloatsAsInt=false
 input4bcd=false
 input4code=3

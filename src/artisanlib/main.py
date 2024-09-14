@@ -25853,7 +25853,7 @@ def initialize_locale(my_app:Artisan) -> str:
     qt_translation_modules:List[str] = [
         'qtbase',
         'qtconnectivity',
-        'qtwebengine'
+#        'qtwebengine'
     ]
 
     # NOTE: on updates, need to update util.py:locale2full_local() as well

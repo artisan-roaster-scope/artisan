@@ -1,6 +1,6 @@
 [General]
 Delay=2000
-roastertype_setup=TRINITAS T7
+roastertype_setup=TRINITAS T7 legacy
 dropDuplicates=true
 dropDuplicatesLimit=0.1
 
@@ -23,7 +23,7 @@ extraDelta2=false, false, false, false, false, false, false, false, false, false
 extraFill1=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 extraFill2=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 extraLCDvisibility1=true, false, false, false, false, false, false, false, false, false
-extraLCDvisibility2=false, false, false, false, false, false, false, false, false, false
+extraLCDvisibility2=true, false, false, false, false, false, false, false, false, false
 extradevicecolor1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\xe\0#\0\x32\0\x30\0\x38\0\x36\0\x62\0\x62)
 extradevicecolor2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\xe\0#\0\x61\0\x62\0\x30\0\x34\0\x32\0\x36)
 extradevices=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0!)
@@ -68,8 +68,8 @@ input3code=3
 input3div=1
 input3float=false
 input3mode=
-input3register=2
-input3slave=3
+input3register=106
+input3slave=10
 input4FloatsAsInt=false
 input4bcd=false
 input4code=3
