@@ -290,7 +290,7 @@ qt_plugin_dirs = [
 ]
 
 qt_plugin_files = [
-    'libqsvgicon.dylib', # needed to render MPL toolbar as SVG icons (fallback is PNG; build-in support)
+    'libqsvgicon.dylib', # needed to render MPL toolbar as SVG icons (fallback is PNG; built-in support)
 #    'libqgif.dylib',
 #    'libqicns.dylib',
 #    'libqico.dylib',

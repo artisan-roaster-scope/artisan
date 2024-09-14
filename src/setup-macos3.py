@@ -258,7 +258,7 @@ qt_plugin_dirs = [
     'styles'
 ]
 qt_plugin_files = [
-    'libqsvgicon.dylib', # needed to render MPL toolbar as SVG icons (fallback is PNG; build-in support)
+    'libqsvgicon.dylib', # needed to render MPL toolbar as SVG icons (fallback is PNG; built-in support)
 #    'libqgif.dylib',
 #    'libqicns.dylib',
 #    'libqico.dylib',
@@ -378,7 +378,7 @@ helpfile_prefix_unused_modules = {
     'qtwebsockets'
 }
 
-# remove unused tranlsations of unused Qt modules
+# remove unused translations of unused Qt modules
 for qt_dir in ['PyQt5/Qt5/translations', 'PyQt6/Qt6/translations']:
     qt = f'{rootdir}/{qt_dir}'
     for root, _, files in os.walk(qt):
