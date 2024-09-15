@@ -21,6 +21,9 @@ v3.0.3
   - fixes regression which broke SV number switching for Fuji PIDs ([Discussion #1683](../../../discussions/1683))
   - fixes missing statistic content ([Discussion #1689](../../../discussions/1689))
   - fixes a regression which prevented loading settings written (slightly broken) by Artisan v3.0 ([Discussion #1692](../../../discussions/1692))
+  - fixes a regression communicating with some serial MODBUS devices resulting from a more strict protocol interpretation by the underlying MODBUS pymodbus lib 3.7 introduced in Artisan v3.0.2, by adding a 'strict' flag (default off) to the serial MODBUS configuration ([Issue #1694](../../../issues/1694))
+
+
 
 
 
