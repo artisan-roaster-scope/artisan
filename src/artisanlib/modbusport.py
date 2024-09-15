@@ -18,6 +18,7 @@
 import sys
 import time
 import logging
+import serial
 from typing import Final, Optional, List, Dict, Tuple, Union, Any, Awaitable, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -100,7 +101,7 @@ def getBinaryPayloadDecoderFromRegisters(registers:List[int], byteorderLittle:bo
 class modbusport:
     """ this class handles the communications with all the modbus devices"""
 
-    __slots__ = [ 'aw', 'modbus_serial_read_delay', 'modbus_serial_extra_read_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'default_comport', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
+    __slots__ = [ 'aw', 'modbus_serial_read_delay', 'modbus_serial_extra_read_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'serial_strict_timing', 'default_comport', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
         'timeout', 'IP_timeout', 'IP_retries', 'serial_readRetries', 'PID_slave_ID', 'PID_SV_register', 'PID_p_register', 'PID_i_register', 'PID_d_register', 'PID_ON_action', 'PID_OFF_action',
         'channels', 'inputSlaves', 'inputRegisters', 'inputFloats', 'inputBCDs', 'inputFloatsAsInt', 'inputBCDsAsInt', 'inputSigned', 'inputCodes', 'inputDivs',
         'inputModes', 'optimizer', 'fetch_max_blocks', 'fail_on_cache_miss', 'disconnect_on_error', 'acceptable_errors', 'reset_socket', 'activeRegisters', 'readingsCache', 'SVmultiplier', 'PIDmultiplier',
@@ -124,6 +125,7 @@ class modbusport:
         self.stopbits:int = 1
         self.timeout:float = 0.3 # serial MODBUS timeout
         self.serial_readRetries:int = 0 # user configurable, defaults to 0
+        self.serial_strict_timing:bool = False
         self.IP_timeout:float = 0.2 # UDP/TCP MODBUS timeout in seconds
         self.IP_retries:int = 1 # UDP/TCP MODBUS retries (max 3)
         self.PID_slave_ID:int = 0
@@ -240,7 +242,7 @@ class modbusport:
 
 #    @staticmethod
 #    def reconnect() -> None:
-#        _log.info('reconnect()')
+#        _log.info('reonnect()')
 
     def connect(self) -> None:
         if not self.isConnected():
@@ -357,7 +359,7 @@ class modbusport:
 #                        retry_on_invalid=True,  # retry on invalid response; by default False  # retired
 #                        close_comm_on_error=self.reset_socket,
 #                        reset_socket=self.reset_socket,  # retired
-#                        strict=False, # settings this to False disables the inter char timeout restriction # retired
+#                        strict=False, # settings this to False disables the inter char timeout restriction # retired and replaced by self.serial_strict_timing
                         reconnect_delay=0, # avoid automatic reconnection
 #                        on_reconnect_callback=self.reconnect, # removed in pymodbus 3.7
                         timeout=min((self.aw.qmc.delay/2000), self.timeout)) # the timeout should not be larger than half of the sampling interval
@@ -366,6 +368,10 @@ class modbusport:
                 time.sleep(.2) # avoid possible hickups on startup
                 if self.master is not None:
                     self.master.connect() # type:ignore[no-untyped-call,unused-ignore]
+                    # on connect() of serial connections we reset the inter_byte_timeout of the serial socket if serial_strict_timing is False
+                    # by default pymodbus v3.7 sets a calculated inter_byte_timeout on connect()
+                    if not self.serial_strict_timing and self.type in {0,1} and self.master.socket is not None and isinstance(self.master.socket, serial.Serial):
+                        self.master.socket.inter_byte_timeout = None
                 if self.isConnected():
                     self.updateActiveRegisters()
                     self.clearReadingsCache()

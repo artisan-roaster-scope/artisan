@@ -4173,6 +4173,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     def setSamplingRate(self, rate:int) -> None:
         self.qmc.delay = max(self.qmc.min_delay, rate)
         self.sampling_ticks_to_block_quantifiction = self.blockTicks() # we update the quantification block ticks
+        _log.info('setSamplingRate(%s)', self.qmc.delay)
 
     @pyqtSlot()
     def updateMessageLog(self) -> None:
@@ -17110,6 +17111,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.modbus.stopbits = toInt(settings.value('stopbits',self.modbus.stopbits))
             self.modbus.parity = s2a(toString(settings.value('parity',self.modbus.parity)))
             self.modbus.timeout = max(0.3, float2float(toFloat(settings.value('timeout',self.modbus.timeout)))) # min serial MODBUS timeout is 300ms
+            self.modbus.serial_strict_timing = bool(toBool(settings.value('serial_strict_timing',self.modbus.serial_strict_timing)))
             self.modbus.modbus_serial_extra_read_delay = toFloat(settings.value('modbus_serial_extra_read_delay',self.modbus.modbus_serial_extra_read_delay))
             self.modbus.serial_readRetries = toInt(settings.value('serial_readRetries',self.modbus.serial_readRetries))
             self.modbus.IP_timeout = float2float(toFloat(settings.value('IP_timeout',self.modbus.IP_timeout)))
@@ -18835,6 +18837,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'stopbits',self.modbus.stopbits, read_defaults)
             self.settingsSetValue(settings, default_settings, 'parity',self.modbus.parity, read_defaults)
             self.settingsSetValue(settings, default_settings, 'timeout',self.modbus.timeout, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'serial_strict_timing',self.modbus.serial_strict_timing, read_defaults)
             self.settingsSetValue(settings, default_settings, 'modbus_serial_extra_read_delay',self.modbus.modbus_serial_extra_read_delay, read_defaults)
             self.settingsSetValue(settings, default_settings, 'serial_readRetries',self.modbus.serial_readRetries, read_defaults)
             self.settingsSetValue(settings, default_settings, 'IP_timeout',self.modbus.IP_timeout, read_defaults)
@@ -22816,6 +22819,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.modbus.IP_timeout = float2float(toFloat(str(dialog.modbus_IP_timeoutEdit.text())))
             except Exception: # pylint: disable=broad-except
                 pass
+            self.modbus.serial_strict_timing = bool(dialog.modbus_Serial_strict.isChecked())
             self.modbus.IP_retries = dialog.modbus_IP_retriesComboBox.currentIndex()
             self.modbus.PID_slave_ID = int(str(dialog.modbus_PIDslave_Edit.text()))
             self.modbus.PID_SV_register = int(str(dialog.modbus_SVregister_Edit.text()))
@@ -25853,7 +25857,7 @@ def initialize_locale(my_app:Artisan) -> str:
     qt_translation_modules:List[str] = [
         'qtbase',
         'qtconnectivity',
-#        'qtwebengine'
+#        'qtwebengine' # we do not use any UI
     ]
 
     # NOTE: on updates, need to update util.py:locale2full_local() as well
