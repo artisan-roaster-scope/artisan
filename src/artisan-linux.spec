@@ -24,13 +24,33 @@ hiddenimports_list=[
     'babel.numbers'
 ]
 
+EXCLUDES = [
+    'PyQt5',
+    'PyQt6.Multimedia',
+    'PyQt6.Network',
+    'PyQt6.OpenGL',
+    'PyQt6.PrintSupport',
+    'PyQt6.QtQml',
+    'PyQt6.QtQuick',
+    'PyQt6.QtWebChannel',
+    'PyQt6.QtPositioning',
+    'PyQt6.QtRemoteObjects',
+    'PyQt6.QtSensors',
+    'PyQt6.QtSerialPort',
+    'PyQt6.QtSpatialAudio',
+    'PyQt6.QtTest',
+    'PyQt6.QtTextToSpeech',
+    'PyQt6.QtWebEngineQuick',
+    'PyQt6.QtWebEngineWidgets'
+]
+
 a = Analysis(['artisan.py'],
     pathex=[path],
     binaries=BINARIES,
     datas=[],
     hookspath=[],
     runtime_hooks=[],
-    excludes=['PyQt5'],
+    excludes=EXCLUDES,
     hiddenimports=hiddenimports_list,
     win_no_prefer_redirects=False,
     win_private_assemblies=False,

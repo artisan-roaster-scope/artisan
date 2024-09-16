@@ -283,7 +283,7 @@ class tgraphcanvas(FigureCanvas):
         'l_eventtype3dots', 'l_eventtype4dots', 'l_eteventannos', 'l_bteventannos', 'l_eventtype1annos', 'l_eventtype2annos', 'l_eventtype3annos',
         'l_eventtype4annos', 'l_annotations', 'l_background_annotations', 'l_annotations_dict', 'l_annotations_pos_dict', 'l_event_flags_dict',
         'l_event_flags_pos_dict', 'ai', 'timeclock', 'threadserver', 'designerflag', 'designerconnections', 'mousepress', 'indexpoint',
-        'workingline', 'eventtimecopy', 'specialeventsStringscopy', 'specialeventsvaluecopy', 'specialeventstypecopy', 'currentx', 'currenty',
+        'workingline', 'eventtimecopy', 'etypescopy', 'specialeventsStringscopy', 'specialeventsvaluecopy', 'specialeventstypecopy', 'currentx', 'currenty',
         'designertimeinit', 'BTsplinedegree', 'ETsplinedegree', 'reproducedesigner', 'designertemp1init', 'designertemp2init', 'ax_background_designer', 'designer_timez', 'time_step_size',
         '_designer_orange_mark', '_designer_orange_mark_shown', '_designer_blue_mark', '_designer_blue_mark_shown', 'l_temp1_markers', 'l_temp2_markers',
         'l_stat1', 'l_stat2', 'l_stat3', 'l_div1', 'l_div2', 'l_div3', 'l_div4',
@@ -1960,6 +1960,7 @@ class tgraphcanvas(FigureCanvas):
         self.indexpoint:int = 0
         self.workingline:int = 2  #selects 1:ET or 2:BT
         self.eventtimecopy:List[float] = []
+        self.etypescopy:List[str] = []
         self.specialeventsStringscopy:List[str] = []
         self.specialeventsvaluecopy:List[float]   = []
         self.specialeventstypecopy:List[int]    = []
@@ -15952,6 +15953,7 @@ class tgraphcanvas(FigureCanvas):
             #
             # reset also the special event copy held for the designer
             self.eventtimecopy = []
+            self.eventtimecopy = []
             self.specialeventsStringscopy = []
             self.specialeventsvaluecopy = []
             self.specialeventstypecopy = []
@@ -16088,6 +16090,7 @@ class tgraphcanvas(FigureCanvas):
         for spe in self.specialevents:
             #save relative time of events
             self.eventtimecopy.append(self.timex[spe]-self.timex[self.timeindex[0]])
+        self.etypescopy = self.etypes[:]
 
         #find lowest point from profile to be converted
         lpindex = self.aw.findTP()
@@ -16932,10 +16935,14 @@ class tgraphcanvas(FigureCanvas):
             if self.eventtimecopy:
                 self.clearEvents() # first clear previous special event lists
                 for i, etc in enumerate(self.eventtimecopy):
-                    self.addEvent(self.time2index(etc + self.timex[self.timeindex[0]]),
-                        self.specialeventstypecopy[i],
-                        self.specialeventsStringscopy[i],
-                        self.specialeventsvaluecopy[i])
+                    tx_idx:int = self.time2index(etc + self.timex[self.timeindex[0]])
+                    if tx_idx > -1:
+                        # only if event time is between CHARGE and DROP we reconstruct the event
+                        self.addEvent(tx_idx,
+                            self.specialeventstypecopy[i],
+                            self.specialeventsStringscopy[i],
+                            self.specialeventsvaluecopy[i])
+            self.etypes = self.etypescopy[:]
 
             #check for extra devices
             num = len(self.timex)

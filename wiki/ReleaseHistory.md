@@ -17,7 +17,7 @@ v3.0.3
   - adds control function to [Diedrich DR](https://artisan-scope.org/machines/diedrich/) machine setup and adds [Diedrich CR](https://artisan-scope.org/machines/diedrich/) machine setup
 
 * CHANGES
-  - start the scheduler automatically on connected to artisan.plus if there are incompleted scheduled items
+  - start the scheduler automatically on connected to artisan.plus if there are incomplete scheduled items
 
 * FIXES
   - updates Cropster XLS importer ([Issue #1685](../../../issues/1685))
@@ -25,6 +25,7 @@ v3.0.3
   - fixes missing statistic content ([Discussion #1689](../../../discussions/1689))
   - fixes a regression which prevented loading settings written (slightly broken) by Artisan v3.0 ([Discussion #1692](../../../discussions/1692))
   - fixes a regression communicating with some serial MODBUS devices resulting from a more strict protocol interpretation by the underlying MODBUS pymodbus lib 3.7 introduced in Artisan v3.0.2, by adding a 'strict' flag (default off) to the serial MODBUS configuration ([Issue #1694](../../../issues/1694))
+  - removes incorrectly reconstructed custom events outside of the CHARGE to DROP period on quitting the designer ([Discussion #1696](../../../discussions/1696))
 
 
 

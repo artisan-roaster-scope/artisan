@@ -169,8 +169,13 @@ cp -R includes/Icons/* dist/Icons
 rm -rf dist/_internal/libQt5*
 rm -rf dist/_internal/PyQt5
 
-rm -rf dist/_internal/PyQt6/Qt6/translations
-rm -rf dist/_internal/PyQt6/Qt6/qml/QtQuick3D
+#rm -rf dist/_internal/PyQt6/Qt6/translations # some translations (qt, qtbase and qtconnectivity) are used!
+#rm -rf dist/_internal/PyQt6/Qt6/qml/QtQuick3D
+
+# remove matplotlib sample data
+rm -rf dist/_internal/matplotlib/mpl-data/sample_data
+# remove large unused fontTools source file
+rm -rf dist/_internal/fontTools/misc/bezierTools.c
 
 # remove automatically collected libs that might break things on some installations (eg. Ubuntu 16.04)
 # so it is better to rely on the system installed once
