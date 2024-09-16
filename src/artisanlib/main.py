@@ -4163,9 +4163,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     (self.qmc.roastertype_setup.strip() != '' and item.machine is not None and
                         item.machine.strip() == self.qmc.roastertype_setup.strip())))
 
-    def updateBadge(self) -> None:
+    def updateBadge(self, count:Optional[int] = None) -> None:
         if self.schedule_window is None:
-            plus.schedule.ScheduleWindow.updateAppBadge(self)
+            item_count = (plus.schedule.ScheduleWindow.openScheduleItemsCount(self) if count is None else count)
+            plus.schedule.ScheduleWindow.setAppBadge(item_count)
 
     def blockTicks(self) -> int:
         return max(1, int(round(self.sampling_seconds_to_block_quantifiction / (self.qmc.delay / 1000))) + 1)
@@ -4272,8 +4273,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     @pyqtSlot()
     def updateSchedule(self) -> None:
         if self.schedule_window is None:
-            self.updateBadge()
+            # schedule window is closed
+            item_count = plus.schedule.ScheduleWindow.openScheduleItemsCount(self)
+            if plus.controller.is_connected() and item_count > 0:
+                # if plus is connected and there are open schedule items, we open the scheduler window automatically
+                self.schedule()
+            # in any case we update the badge
+            self.updateBadge(item_count)
         else:
+            # if schedule window is already open we update its content as well as the app badge
             self.schedule_window.updateScheduleWindow()
 
     @pyqtSlot(str,str,NotificationType)

@@ -2441,9 +2441,9 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         except Exception: # pylint: disable=broad-except
             pass # setBadgeNumber only supported by Qt 6.5 and newer
 
-    # update app badge to be called from outside of the ScheduleWindow if ScheduleWindow is not open, recomputing all data
+    # returns number of open items
     @staticmethod
-    def updateAppBadge(aw:'ApplicationWindow') -> None:
+    def openScheduleItemsCount(aw:'ApplicationWindow') -> int:
         try:
             plus.stock.init()
             schedule:List[plus.stock.ScheduledItem] = plus.stock.getSchedule()
@@ -2455,10 +2455,10 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                 except Exception:  # pylint: disable=broad-except
                     pass # validation fails for outdated items
             today:datetime.date = datetime.datetime.now(datetime.timezone.utc).astimezone().date()
-            ScheduleWindow.setAppBadge(sum(max(0, x.count - len(x.roasts)) for x in scheduled_items if aw.scheduledItemsfilter(today, x)))
+            return sum(max(0, x.count - len(x.roasts)) for x in scheduled_items if aw.scheduledItemsfilter(today, x))
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
-
+            return 0
 
     @pyqtSlot()
     def updateFilters(self) -> None:

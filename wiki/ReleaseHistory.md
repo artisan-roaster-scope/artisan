@@ -16,6 +16,9 @@ v3.0.3
   - adds [Loring](https://artisan-scope.org/machines/loring/) 'auto' setup which picks up CHARGE and DROP events set at the machine
   - adds control function to [Diedrich DR](https://artisan-scope.org/machines/diedrich/) machine setup and adds [Diedrich CR](https://artisan-scope.org/machines/diedrich/) machine setup
 
+* CHANGES
+  - start the scheduler automatically on connected to artisan.plus if there are incompleted scheduled items
+
 * FIXES
   - updates Cropster XLS importer ([Issue #1685](../../../issues/1685))
   - fixes regression which broke SV number switching for Fuji PIDs ([Discussion #1683](../../../discussions/1683))
