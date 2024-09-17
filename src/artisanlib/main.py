@@ -1496,7 +1496,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'lastIOResult', 'lastArtisanResult', 'max_palettes', 'palette_entries', 'eventsliders', 'defaultSettings', 'zoomInShortcut', 'zoomOutShortcut',
         'summarystatstypes','summarystatsvisibility','summarystatsfontsize', 'bbp_drop_bt', 'bbp_drop_et', 'bbp_total_time','bbp_bottom_temp','bbp_begin_to_bottom_time','bbp_bottom_to_charge_time',
         'bbp_begin_to_bottom_ror', 'bbp_bottom_to_charge_ror', 'bbp_time_added_from_prev', 'bbp_begin', 'bbp_endroast_epoch_msec', 'bbp_endevents',
-        'bbp_dropevents', 'bbp_dropbt', 'bbp_dropet', 'bbp_drop_to_end', 'schedule_day_filter', 'schedule_user_filter', 'schedule_machine_filter']
+        'bbp_dropevents', 'bbp_dropbt', 'bbp_dropet', 'bbp_drop_to_end', 'schedule_day_filter', 'schedule_user_filter', 'schedule_machine_filter',
+        'scheduler_tasks_visible', 'scheduler_completed_details_visible', 'scheduler_filters_visible', 'scheduler_auto_open']
 
 
     def __init__(self, parent:Optional[QWidget] = None, *, locale:str, WebEngineSupport:bool, artisanviewerFirstStart:bool) -> None:
@@ -1590,6 +1591,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.scheduler_tasks_visible:bool = False # scheduler tasks pane visible?
         self.scheduler_completed_details_visible:bool = False # scheduler completed items details pane visible?
         self.scheduler_filters_visible:bool = False # scheduler filter pane visible?
+        self.scheduler_auto_open:bool = True # if set the scheduler is activated (window opened) automatically if there are scheduled items
 
         # initialize the BBP metrics
         self.resetBBPMetrics()
@@ -2158,10 +2160,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 fileConvertJPEGAction.triggered.connect(self.fileConvertJPEG)
                 self.convMenu.addAction(fileConvertJPEGAction)
 
-                fileConvertBMPAction = QAction(QApplication.translate('Menu', 'BMP...'), self)
-                fileConvertBMPAction.triggered.connect(self.fileConvertBMP)
-                self.convMenu.addAction(fileConvertBMPAction)
-
                 fileConvertSVGAction = QAction(QApplication.translate('Menu', 'SVG...'), self)
                 fileConvertSVGAction.triggered.connect(self.fileConvertSVG)
                 self.convMenu.addAction(fileConvertSVGAction)
@@ -2195,10 +2193,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 JPEGAction = QAction('JPEG...',self)
                 JPEGAction.triggered.connect(self.resizeImg_0_1_JPEG)
                 self.saveGraphMenu.addAction(JPEGAction)
-
-                BMPAction = QAction('BMP...',self)
-                BMPAction.triggered.connect(self.resizeImg_0_1_BMP)
-                self.saveGraphMenu.addAction(BMPAction)
 
                 self.saveGraphMenu.addSeparator()
 
@@ -4274,10 +4268,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     def updateSchedule(self) -> None:
         if self.schedule_window is None:
             # schedule window is closed
-            item_count = plus.schedule.ScheduleWindow.openScheduleItemsCount(self)
-            if plus.controller.is_connected() and item_count > 0:
-                # if plus is connected and there are open schedule items, we open the scheduler window automatically
-                self.schedule()
+            item_count:Optional[int] = plus.schedule.ScheduleWindow.openScheduleItemsCount(self)
+            if self.scheduler_auto_open:
+                if item_count > 0 and plus.controller.is_connected():
+                    # if plus is connected and there are open schedule items, we open the scheduler window automatically
+                    self.schedule()
+                elif item_count == 0:
+                    self.scheduler_auto_open = True # next time new schedule items arrive we again auto open
             # in any case we update the badge
             self.updateBadge(item_count)
         else:
@@ -16237,11 +16234,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     def fileConvertJPEG(self, _:bool = False) -> None:
         self.fileConvertBITMAP('JPEG')
 
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def fileConvertBMP(self, _:bool = False) -> None:
-        self.fileConvertBITMAP('BMP')
-
     def fileConvertBITMAP(self, filetype:str = 'PNG') -> None:
         files = self.ArtisanOpenFilesDialog(ext='*.alog')
         if files and len(files) > 0:
@@ -16252,8 +16244,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 fileext = '.png'
                 if filetype == 'JPEG':
                     fileext = '.jpg'
-                elif filetype == 'BMP':
-                    fileext = '.bmp'
                 outdir = self.ArtisanExistingDirectoryDialog()
                 progress:QProgressDialog = QProgressDialog(QApplication.translate('Message', 'Converting...'), '', 0, len(files), self)
                 progress.setCancelButton(None)
@@ -16274,7 +16264,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             self.setProfile(f,pd,quiet=False)
                             self.qmc.redraw()
                             image = self.qmc.grab()
-                            if filetype in {'JPEG', 'BMP', 'PNG'}:
+                            if filetype in {'JPEG', 'PNG'}:
                                 # transparences are not supported by those file types and are rendered in black by default.
                                 white_img = QPixmap(image.size())
                                 white_img.fill() # fills by default with Qt.GlobalColor.white
@@ -24386,11 +24376,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def resizeImg_0_1_BMP(self, _:bool = False) -> None:
-        self.resizeImgToSize(0,0,'BMP')
-
-    @pyqtSlot()
-    @pyqtSlot(bool)
     def resizeImg_1200_1(self, _:bool = False) -> None:
         self.resizeImgToSize(1200,0)
 
@@ -24447,8 +24432,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             fileext = '.png'
             if filetype == 'JPEG':
                 fileext = '.jpg'
-            elif filetype == 'BMP':
-                fileext = '.bmp'
             if fname == '' or fname is None:
                 filename = self.ArtisanSaveFileDialog(msg=QApplication.translate('Message','Save Graph as') + ' ' + filetype,ext='*'+fileext)
             else:

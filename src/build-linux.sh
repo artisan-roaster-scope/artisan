@@ -169,13 +169,50 @@ cp -R includes/Icons/* dist/Icons
 rm -rf dist/_internal/libQt5*
 rm -rf dist/_internal/PyQt5
 
-#rm -rf dist/_internal/PyQt6/Qt6/translations # some translations (qt, qtbase and qtconnectivity) are used!
-#rm -rf dist/_internal/PyQt6/Qt6/qml/QtQuick3D
+# remove unused Qt modules
+rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6Quick.so.6
+rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6Qml.so.6
+rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6QmlModels.so.6
+rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6Pdf.so.6
+rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6Positioning.so.6
+rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6WebChannel.so.6
+# rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6OpenGL.so.6 #(dont' remove! No window decorations without this one!)
+
+# remove unused Qt plugins
+rm -rf dist/_internal/PyQt6/Qt6/plugins/imageformats/libqwebp.so
+rm -rf dist/_internal/PyQt6/Qt6/plugins/imageformats/libqtiff.so
+rm -rf dist/_internal/PyQt6/Qt6/plugins/imageformats/libqgif.so
+rm -rf dist/_internal/PyQt6/Qt6/plugins/imageformats/libqwbmp.so
+rm -rf dist/_internal/PyQt6/Qt6/plugins/imageformats/libqtga.so
+
+SUPPORTED_LANGUAGES="ar da de el en es fa fi fr gd he hu id it ja ko lv nl no pl pt_BR pt sk sv th tr uk vi zh_CN zh_TW"
+
+# remove unused Qt translations
+rm -rf dist/_internal/PyQt6/Qt6/translations/qtwebengine_locales
+keep_qm=""
+for l in $SUPPORTED_LANGUAGES; do
+   keep_qm=${keep_qm}" qtbase_${l}.qm qt_${l}.qm qtconnectivity_${l}.qm"
+done
+for x in $(find dist/_internal/PyQt6/Qt6/translations -type f -name "*.qm"); do
+  filename="${x##*/}"
+  if [[ ! $keep_qm =~ $filename ]]; then
+    rm -f $x
+  fi
+
+# remove unused babel translations
+keep_dat=""
+for l in $SUPPORTED_LANGUAGES; do
+   keep_dat=${keep_dat}" ${l}.dat"
+done
+for x in $(find dist/_internal/babel/locale-data -type f -name "*.dat"); do
+  filename="${x##*/}"
+  if [[ ! $keep_dat =~ $filename ]]; then
+    rm -f $x
+  fi
+done
 
 # remove matplotlib sample data
 rm -rf dist/_internal/matplotlib/mpl-data/sample_data
-# remove large unused fontTools source file
-rm -rf dist/_internal/fontTools/misc/bezierTools.c
 
 # remove automatically collected libs that might break things on some installations (eg. Ubuntu 16.04)
 # so it is better to rely on the system installed once

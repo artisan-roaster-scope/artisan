@@ -36,13 +36,13 @@ from uuid import UUID
 try:
     from PyQt6.QtCore import (QRect, Qt, QMimeData, QSettings, pyqtSlot, pyqtSignal, QPoint, QPointF, QLocale, QDate, QDateTime, QSemaphore, QTimer) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import (QDrag, QPixmap, QPainter, QTextLayout, QTextLine, QColor, QFontMetrics, QCursor, QAction) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import (QStackedWidget, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QFrame, QTabWidget,  # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import (QMessageBox, QStackedWidget, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QFrame, QTabWidget,  # @UnusedImport @Reimport  @UnresolvedImport
             QCheckBox, QGroupBox, QScrollArea, QLabel, QSizePolicy,  # @UnusedImport @Reimport  @UnresolvedImport
             QGraphicsDropShadowEffect, QPlainTextEdit, QLineEdit, QMenu)  # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import (QRect, Qt, QMimeData, QSettings, pyqtSlot, pyqtSignal, QPoint, QPointF, QLocale, QDate, QDateTime, QSemaphore, QTimer) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import (QDrag, QPixmap, QPainter, QTextLayout, QTextLine, QColor, QFontMetrics, QCursor) # type: ignore # @UnusedImport @Reimport @UnresolvedImport
-    from PyQt5.QtWidgets import (QStackedWidget, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QFrame, QTabWidget, # type: ignore # @UnusedImport @Reimport @UnresolvedImport
+    from PyQt5.QtWidgets import (QMessageBox, QStackedWidget, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QFrame, QTabWidget, # type: ignore # @UnusedImport @Reimport @UnresolvedImport
             QCheckBox, QGroupBox, QScrollArea, QLabel, QSizePolicy, QAction,  # @UnusedImport @Reimport @UnresolvedImport
             QGraphicsDropShadowEffect, QPlainTextEdit, QLineEdit, QMenu)  # @UnusedImport @Reimport  @UnresolvedImport
 
@@ -2082,6 +2082,11 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             self.aw.qmc.scheduleID = None
             self.aw.qmc.scheduleDate = None
         self.aw.sendmessage(QApplication.translate('Message','Scheduler stopped'))
+        if self.aw.scheduler_auto_open and len(self.scheduled_items) > 0 and self.aw.plus_account is not None:
+            self.aw.scheduler_auto_open = False
+            QMessageBox.warning(None, #self.aw, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+                QApplication.translate('Message', 'Warning', None),
+                QApplication.translate('Message', 'Completed roasts will not adjust the schedule while the schedule window is closed'))
 
 
     # updates the current schedule items by joining its roast with those received as part of a stock update from the server

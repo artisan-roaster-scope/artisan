@@ -40,8 +40,7 @@ EXCLUDES = [
     'PyQt6.QtSpatialAudio',
     'PyQt6.QtTest',
     'PyQt6.QtTextToSpeech',
-    'PyQt6.QtWebEngineQuick',
-    'PyQt6.QtWebEngineWidgets'
+    'PyQt6.QtWebEngineQuick'
 ]
 
 a = Analysis(['artisan.py'],
