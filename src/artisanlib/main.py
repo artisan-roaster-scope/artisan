@@ -4268,7 +4268,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     def updateSchedule(self) -> None:
         if self.schedule_window is None:
             # schedule window is closed
-            item_count:Optional[int] = plus.schedule.ScheduleWindow.openScheduleItemsCount(self)
+            item_count:int = plus.schedule.ScheduleWindow.openScheduleItemsCount(self)
             if self.scheduler_auto_open:
                 if item_count > 0 and plus.controller.is_connected():
                     # if plus is connected and there are open schedule items, we open the scheduler window automatically

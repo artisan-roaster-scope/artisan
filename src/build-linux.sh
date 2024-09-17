@@ -176,7 +176,7 @@ rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6QmlModels.so.6
 rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6Pdf.so.6
 rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6Positioning.so.6
 rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6WebChannel.so.6
-# rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6OpenGL.so.6 #(dont' remove! No window decorations without this one!)
+# rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6OpenGL.so.6 # (don't remove! No window decorations without this one!)
 
 # remove unused Qt plugins
 rm -rf dist/_internal/PyQt6/Qt6/plugins/imageformats/libqwebp.so
