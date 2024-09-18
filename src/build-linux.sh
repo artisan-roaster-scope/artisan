@@ -190,26 +190,26 @@ SUPPORTED_LANGUAGES="ar da de el en es fa fi fr gd he hu id it ja ko lv nl no pl
 # remove unused Qt translations
 rm -rf dist/_internal/PyQt6/Qt6/translations/qtwebengine_locales
 keep_qm=""
-for l in $SUPPORTED_LANGUAGES; do \
-   keep_qm=${keep_qm}" qtbase_${l}.qm qt_${l}.qm qtconnectivity_${l}.qm" \
+for l in $SUPPORTED_LANGUAGES; do
+   keep_qm=${keep_qm}" qtbase_${l}.qm qt_${l}.qm qtconnectivity_${l}.qm"
 done
-for x in $(find dist/_internal/PyQt6/Qt6/translations -type f -name "*.qm"); do \
-  filename="${x##*/}" \
-  if [[ ! $keep_qm =~ $filename ]]; then \
-    rm -f $x \
-  fi \
+for x in $(find dist/_internal/PyQt6/Qt6/translations -type f -name "*.qm"); do
+  filename="${x##*/}";
+  if [[ ! $keep_qm =~ $filename ]]; then
+    rm -f $x
+  fi
 done
 
 # remove unused babel translations
 keep_dat=""
-for l in $SUPPORTED_LANGUAGES; do \
-   keep_dat=${keep_dat}" ${l}.dat" \
+for l in $SUPPORTED_LANGUAGES; do
+   keep_dat=${keep_dat}" ${l}.dat"
 done
-for x in $(find dist/_internal/babel/locale-data -type f -name "*.dat"); do \
-  filename="${x##*/}" \
-  if [[ ! $keep_dat =~ $filename ]]; then \
-    rm -f $x \
-  fi \
+for x in $(find dist/_internal/babel/locale-data -type f -name "*.dat"); do
+  filename="${x##*/}";
+  if [[ ! $keep_dat =~ $filename ]]; then
+    rm -f $x
+  fi
 done
 
 # remove matplotlib sample data
