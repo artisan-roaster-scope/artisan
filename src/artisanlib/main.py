@@ -135,7 +135,8 @@ try:
         from PyQt6.QtWebEngineWidgets import QWebEngineView # @Reimport @UnresolvedImport @UnusedImport  # pylint: disable=import-error,no-name-in-module
         from PyQt6.QtWebEngineCore import QWebEngineProfile
         QtWebEngineSupport = True
-    except ImportError:
+    except ImportError as e:
+        print(e)
         # on the RPi platform there is no native package PyQt-WebEngine nor PyQt6-WebEngine for Raspebarry 32bit
         pass
     from PyQt6 import sip # @Reimport @UnresolvedImport @UnusedImport
@@ -699,6 +700,11 @@ if multiprocessing.current_process().name == 'MainProcess':
     _log.info('exec: %s', sys.executable)
 else:
     _log.info('child process loaded')
+
+if QtWebEngineSupport:
+    _log.info('QtWebEngine found => PDF report rendering enabled')
+else:
+    _log.info('QtWebEngine not found => PDF report rendering disabled')
 
 if platform.system().startswith('Windows'):
     # on Windows we use the Fusion style per default which supports the dark mode

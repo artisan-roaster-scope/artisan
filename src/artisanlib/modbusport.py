@@ -209,7 +209,8 @@ class modbusport:
         return int(addr) - 30001
 
     def isConnected(self) -> bool:
-        return self.master is not None and bool(self.master.connected) # and bool(self.master.socket)
+#        return self.master is not None and bool(self.master.connected)
+        return self.master is not None and bool(self.master.socket) # self.master.connected connects if not connected on serial MODBUS
 
     def disconnect(self) -> None:
         try:

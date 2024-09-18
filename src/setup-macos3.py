@@ -236,17 +236,16 @@ Qt_modules = [
 #    'QtConcurrent', # not on PyQt6.2, but PyQt6.4 and PyQt5.x
 # needed for QtWebEngine HTML2PDF export:
     'QtWebEngineCore',
-    'QtWebEngine', # not on PyQt6
-    'QtWebEngineWidgets',
-
-# the following seems not to be required on PyQt/Qt 6.7.x
-#    'QtQuick',
-#    'QtQuickWidgets',
-#    'QtQml',
-#    'QtQmlModels',
-#    'QtWebChannel',
-#    'QtPositioning',
-#    'QtOpenGL' # required by QtWebEngineCore
+    'QtWebEngine', # only on PyQt5, does not exists for PyQt6
+    'QtWebEngineWidgets', # required by QtWebEngineCore
+# the following are required by QtWebEngineWidgets and thus by QtWebEngine for the HTML2PDF export
+    'QtQuick',
+    'QtQuickWidgets',
+    'QtQml',
+    'QtQmlModels',
+    'QtWebChannel',
+    'QtPositioning',
+    'QtOpenGL'
 ]
 Qt_frameworks = [module + '.framework' for module in Qt_modules]
 
@@ -380,7 +379,6 @@ for qt_dir in ['PyQt5/Qt5/translations', 'PyQt6/Qt6/translations']:
     qt = f'{rootdir}/{qt_dir}'
     for root, _, files in os.walk(qt):
         for file in files:
-            SUPPORTED_LANGUAGES
             if (any(file.startswith(f'{x}_') for x in qt_trans_prefix_delete) or
                     not (any(file.startswith(f'{x}_') for x in qt_trans_prefix_keep) and any(file.endswith(f'_{x}.qm') for x in SUPPORTED_LANGUAGES))):
                 file_path = os.path.join(root, file)

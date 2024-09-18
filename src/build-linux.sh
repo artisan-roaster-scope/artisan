@@ -15,8 +15,8 @@
 # AUTHOR
 # Dave Baxter, Marko Luther 2023
 
-#set -ex
-set -e  # reduced logging
+#set -ex # extended logging
+set -e  # exit as soon as any line in the script fails
 
 
 export LD_LIBRARY_PATH=$LD_LIBTRARY_PATH:/usr/local/lib

@@ -28,20 +28,30 @@ EXCLUDES = [
     'PyQt5',
     'PyQt6.Multimedia',
     'PyQt6.Network',
-    'PyQt6.OpenGL',
     'PyQt6.PrintSupport',
-    'PyQt6.QtQml',
-    'PyQt6.QtQuick',
-    'PyQt6.QtWebChannel',
-    'PyQt6.QtPositioning',
     'PyQt6.QtRemoteObjects',
     'PyQt6.QtSensors',
     'PyQt6.QtSerialPort',
     'PyQt6.QtSpatialAudio',
     'PyQt6.QtTest',
     'PyQt6.QtTextToSpeech',
-    'PyQt6.QtWebEngineQuick'
+# the following are required by QtWebEngineWidgets and thus by QtWebEngine for the HTML2PDF export
+#    'PyQt6.QtQuick',
+#    'PyQt6.QtQml',
+#    'PyQt6.OpenGL',
+#    'PyQt6.QtWebChannel',
+#    'PyQt6.QtPositioning',
+#    'PyQt6.QtWebEngineQuick'
 ]
+
+    'QtQuick',
+    'QtQuickWidgets',
+    'QtQml',
+    'QtQmlModels',
+    'QtWebChannel',
+    'QtPositioning',
+    'QtOpenGL'
+
 
 a = Analysis(['artisan.py'],
     pathex=[path],
