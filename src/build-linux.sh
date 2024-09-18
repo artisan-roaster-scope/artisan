@@ -197,7 +197,9 @@ echo $keep_qm
 for x in $(find dist/_internal/PyQt6/Qt6/translations -type f -name "*.qm"); do
   filename="${x##*/}"
   echo $filename
-  if [[ ! $keep_qm =~ $filename ]]; then
+  if [[ $keep_qm =~ $filename ]]; then
+    echo $x kept
+  else
     rm -f $x
     echo $x removed
   fi
@@ -210,7 +212,9 @@ for l in $SUPPORTED_LANGUAGES; do
 done
 for x in $(find dist/_internal/babel/locale-data -type f -name "*.dat"); do
   filename="${x##*/}"
-  if [[ ! $keep_dat =~ $filename ]]; then
+  if [[ $keep_dat =~ $filename ]]; then
+    echo $x kept
+  else
     rm -f $x
     echo $x removed
   fi
