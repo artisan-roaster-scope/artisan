@@ -36,12 +36,12 @@ EXCLUDES = [
     'PyQt6.QtTest',
     'PyQt6.QtTextToSpeech',
 # the following are required by QtWebEngineWidgets and thus by QtWebEngine for the HTML2PDF export
-    'PyQt6.QtQuick',
-    'PyQt6.QtQml',
-    'PyQt6.OpenGL',
-    'PyQt6.QtWebChannel',
-    'PyQt6.QtPositioning',
-    'PyQt6.QtWebEngineQuick'
+#    'PyQt6.QtQuick',
+#    'PyQt6.QtQml',
+#    'PyQt6.OpenGL',
+#    'PyQt6.QtWebChannel',
+#    'PyQt6.QtPositioning',
+#    'PyQt6.QtWebEngineQuick'
 ]
 
 
