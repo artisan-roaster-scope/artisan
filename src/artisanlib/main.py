@@ -135,8 +135,7 @@ try:
         from PyQt6.QtWebEngineWidgets import QWebEngineView # @Reimport @UnresolvedImport @UnusedImport  # pylint: disable=import-error,no-name-in-module
         from PyQt6.QtWebEngineCore import QWebEngineProfile
         QtWebEngineSupport = True
-    except ImportError as e:
-        print(e)
+    except ImportError:
         # on the RPi platform there is no native package PyQt-WebEngine nor PyQt6-WebEngine for Raspebarry 32bit
         pass
     from PyQt6 import sip # @Reimport @UnresolvedImport @UnusedImport
