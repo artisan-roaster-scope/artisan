@@ -193,10 +193,13 @@ keep_qm=""
 for l in $SUPPORTED_LANGUAGES; do
    keep_qm=${keep_qm}" qtbase_${l}.qm qt_${l}.qm qtconnectivity_${l}.qm"
 done
+echo $keep_qm
 for x in $(find dist/_internal/PyQt6/Qt6/translations -type f -name "*.qm"); do
-  filename="${x##*/}";
+  filename="${x##*/}"
+  echo $filename
   if [[ ! $keep_qm =~ $filename ]]; then
     rm -f $x
+    echo $x removed
   fi
 done
 
@@ -206,9 +209,10 @@ for l in $SUPPORTED_LANGUAGES; do
    keep_dat=${keep_dat}" ${l}.dat"
 done
 for x in $(find dist/_internal/babel/locale-data -type f -name "*.dat"); do
-  filename="${x##*/}";
+  filename="${x##*/}"
   if [[ ! $keep_dat =~ $filename ]]; then
     rm -f $x
+    echo $x removed
   fi
 done
 
