@@ -367,15 +367,12 @@ for qt_dir in ['PyQt5/Qt5/plugins', 'PyQt6/Qt6/plugins']:
 #    except Exception: # pylint: disable=broad-except
 #        pass
 
-helpfile_prefix_unused_modules = {
-    'qt_help',
-#    'qtconnectivity', # needed for BT communication/dialogs
-    'qtwebengine', # module used, but without any GUI
-    'qtdeclarative',
-    'qtlocation',
-    'qtmultimedia',
-    'qtserialport',
-    'qtwebsockets'
+qt_trans_prefix_keep = {
+    'qtbase',
+    'qt'
+}
+qt_trans_prefix_delete = {
+    'qt_help'
 }
 
 # remove unused translations of unused Qt modules
@@ -383,9 +380,10 @@ for qt_dir in ['PyQt5/Qt5/translations', 'PyQt6/Qt6/translations']:
     qt = f'{rootdir}/{qt_dir}'
     for root, _, files in os.walk(qt):
         for file in files:
-            if any(file.startswith(x) for x in helpfile_prefix_unused_modules):
+            SUPPORTED_LANGUAGES
+            if (any(file.startswith(f'{x}_') for x in qt_trans_prefix_delete) or
+                    not (any(file.startswith(f'{x}_') for x in qt_trans_prefix_keep) and any(file.endswith(f'_{x}.qm') for x in SUPPORTED_LANGUAGES))):
                 file_path = os.path.join(root, file)
-#                print('Deleting', file_path)
                 subprocess.check_call(f'rm -rf {file_path}',shell = True)
 
 print('*** Removing duplicate mpl_data folder and mpl_data/sample_data subfolder ***')

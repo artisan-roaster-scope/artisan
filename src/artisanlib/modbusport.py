@@ -18,7 +18,6 @@
 import sys
 import time
 import logging
-import serial
 from typing import Final, Optional, List, Dict, Tuple, Union, Any, Awaitable, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -250,7 +249,10 @@ class modbusport:
             try:
                 # as in the following the port is None, no port is opened on creation of the (py)serial object
                 if self.type == 1: # Serial ASCII
-                    from pymodbus.client import ModbusSerialClient
+                    if self.serial_strict_timing:
+                        from pymodbus.client import ModbusSerialClient # @Reimport
+                    else:
+                        from artisanlib.modbus_nonstrict_serial import ModbusSerialClientNonStrict as ModbusSerialClient # @Reimport
                     try:
                         from pymodbus.framer import FramerType # type:ignore[attr-defined,unused-ignore]
                     except Exception: # pylint: disable=broad-except
@@ -340,7 +342,10 @@ class modbusport:
                             port=self.port,
                             )
                 else: # Serial RTU
-                    from pymodbus.client import ModbusSerialClient # @Reimport
+                    if self.serial_strict_timing:
+                        from pymodbus.client import ModbusSerialClient # @Reimport
+                    else:
+                        from artisanlib.modbus_nonstrict_serial import ModbusSerialClientNonStrict as ModbusSerialClient # @Reimport
                     try:
                         from pymodbus.framer import FramerType  # type:ignore[attr-defined,unused-ignore]
                     except Exception: # pylint: disable=broad-except
@@ -368,10 +373,9 @@ class modbusport:
                 time.sleep(.2) # avoid possible hickups on startup
                 if self.master is not None:
                     self.master.connect() # type:ignore[no-untyped-call,unused-ignore]
-                    # on connect() of serial connections we reset the inter_byte_timeout of the serial socket if serial_strict_timing is False
-                    # by default pymodbus v3.7 sets a calculated inter_byte_timeout on connect()
-                    if not self.serial_strict_timing and self.type in {0,1} and self.master.socket is not None and isinstance(self.master.socket, serial.Serial):
-                        self.master.socket.inter_byte_timeout = None
+#                    # on connect() of serial connections we reset the inter_byte_timeout of the serial socket if serial_strict_timing is False
+#                    if not self.serial_strict_timing and self.type in {0,1} and self.master.socket is not None and isinstance(self.master.socket, serial.Serial):
+#                        self.master.socket.inter_byte_timeout = None
                 if self.isConnected():
                     self.updateActiveRegisters()
                     self.clearReadingsCache()

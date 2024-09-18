@@ -64,23 +64,6 @@ rm -rf dist/artisan.d
 
 # copy translations
 mkdir dist/translations
-
-
-for lan in ar, da, de, en, el, es, fa, fi, fr, gd, he, hu, id, it, ja, ko, lv, nl, no, pl, pt_BR, pt, sk, sv, th, tr, uk, vi, zh_CN, zh_TW; do
-     QTBASE_FILE=$QT_PATH/translations/qtbase_${lan}.qm
-     QT_FILE=$QT_PATH/translations/qt_${lan}.qm
-#     QTCONNECTIVITY_FILE=$QT_PATH/translations/qtconnectivity_${lan}.qm
-     if [ -e ${QTBASE_FILE} ]
-          then cp ${QTBASE_FILE} dist/translations
-     fi
-     if [ -e ${QT_FILE} ]
-          then cp ${QT_FILE} dist/translations
-     fi
-#     if [ -e ${QTCONNECTIVITY_FILE} ]
-#          then cp ${QTCONNECTIVITY_FILE} dist/translations
-#     fi
-done
-
 cp translations/*.qm dist/translations
 
 # copy data (mpl-data is now copied to matplotlib/mpl-data by pyinstaller)
@@ -187,37 +170,33 @@ rm -rf dist/_internal/PyQt6/Qt6/plugins/imageformats/libqtga.so
 
 SUPPORTED_LANGUAGES="ar da de el en es fa fi fr gd he hu id it ja ko lv nl no pl pt_BR pt sk sv th tr uk vi zh_CN zh_TW"
 
-# remove unused Qt translations
-rm -rf dist/_internal/PyQt6/Qt6/translations/qtwebengine_locales
-keep_qm=""
-for l in $SUPPORTED_LANGUAGES; do
-   keep_qm=${keep_qm}" qtbase_${l}.qm qt_${l}.qm qtconnectivity_${l}.qm"
-done
-echo $keep_qm
-for x in $(find dist/_internal/PyQt6/Qt6/translations -type f -name "*.qm"); do
-  filename="${x##*/}"
-  echo $filename
-  if [[ $keep_qm =~ $filename ]]; then
-    echo $x kept
-  else
-    rm -f $x
-    echo $x removed
-  fi
+for qttrans in $(find dist/_internal/PyQt6/Qt6/translations -type f -name "*.qm"); do
+    qttrans_filename="${qttrans##*/}"
+    match=0
+    for lang in ${SUPPORTED_LANGUAGES}; do
+        if [ ${qttrans_filename} = "qtbase_${lang}.qm" ] || [ ${qttrans_filename} = "qt_${lang}.qm" ] ; then
+            match=1
+            break
+        fi
+    done
+    if [ $match = 0 ]; then
+        rm -f ${qttrans}
+    fi
 done
 
 # remove unused babel translations
-keep_dat=""
-for l in $SUPPORTED_LANGUAGES; do
-   keep_dat=${keep_dat}" ${l}.dat"
-done
-for x in $(find dist/_internal/babel/locale-data -type f -name "*.dat"); do
-  filename="${x##*/}"
-  if [[ $keep_dat =~ $filename ]]; then
-    echo $x kept
-  else
-    rm -f $x
-    echo $x removed
-  fi
+for babeltrans in $(find dist/_internal/babel/locale-data -type f -name "*.dat"); do
+    babeltrans_filename="${babeltrans##*/}"
+    match=0
+    for lang in ${SUPPORTED_LANGUAGES}; do
+        if [ ${babeltrans_filename} = "${lang}.dat" ] ; then
+            match=1
+            break
+        fi
+    done
+    if [ $match = 0 ]; then
+        rm -f ${babeltrans}
+    fi
 done
 
 # remove matplotlib sample data
