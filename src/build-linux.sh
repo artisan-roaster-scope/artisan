@@ -135,17 +135,18 @@ keep_qt_modules="libQt6Bluetooth libQt6Concurrent libQt6Core libQt6DBus libQt6Gu
  libQt6Svg libQt6WaylandClient libQt6WaylandEglClientHwIntegration libQt6WebChannel libQt6WebEngineCore
  libQt6WebEngineWidgets libQt6Widgets libQt6WlShellIntegration libQt6XcbQpa"
 
-for qtlib in dist/_internal/PyQt6/Qt6/libQt6*.so.*; do
+for qtlib in $(find dist/_internal/PyQt6/Qt6/lib -type f -name "libQt6*.so.*"); do
+    qtlib_filename="${qtlib##*/}"
     match=0
     for item in ${keep_qt_modules}; do
-        if [ ${qtlib} = dist/_internal/${item}.so.* ]; then
+        if [ ${qtlib_filename} = "${item}.so.6" ]; then
             match=1
             break
         fi
     done
     if [ $match = 0 ]; then
         rm -f ${qtlib}
-        echo ${qtlib} removed
+        echo ${qtlib} Qt lib removed
     fi
 done
 
@@ -157,7 +158,7 @@ rm -rf dist/_internal/PyQt5
 # remove unused Qt plugins
 
 qt_imageformats="libqwebp libqtiff libqgif libqwbmp libqtga"
-for x in qt_imageformats; do
+for x in ${qt_imageformats}; do
     rm -rf "dist/_internal/PyQt6/Qt6/plugins/imageformats/${x}.so"
     echo "dist/_internal/PyQt6/Qt6/plugins/imageformats/${x}.so" removed
 done
@@ -181,9 +182,15 @@ for qttrans in $(find dist/_internal/PyQt6/Qt6/translations -type f -name "*.qm"
     done
     if [ $match = 0 ]; then
         rm -f ${qttrans}
+        echo ${qttrans} Qt translation removed
     fi
 done
 
+
+# remove unused QML files
+
+sudo rm -rf dist/_internal/PyQt6/Qt6/qml
+echo Qt QML files removed
 
 # remove unused babel translations
 
@@ -198,11 +205,13 @@ for babeltrans in $(find dist/_internal/babel/locale-data -type f -name "*.dat")
     done
     if [ $match = 0 ]; then
         rm -f ${babeltrans}
+        echo ${babeltrans} babel translation removed
     fi
 done
 
 # remove matplotlib sample data
 rm -rf dist/_internal/matplotlib/mpl-data/sample_data
+echo MPL sample_data removed
 
 # remove automatically collected libs that might break things on some installations (eg. Ubuntu 16.04)
 # so it is better to rely on the system installed once
