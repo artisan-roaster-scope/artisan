@@ -135,7 +135,7 @@ keep_qt_modules="libQt6Bluetooth libQt6Concurrent libQt6Core libQt6DBus libQt6Gu
  libQt6Svg libQt6WaylandClient libQt6WaylandEglClientHwIntegration libQt6WebChannel libQt6WebEngineCore
  libQt6WebEngineWidgets libQt6Widgets libQt6WlShellIntegration libQt6XcbQpa"
 
-for qtlib in dist/_internal/libQt6*.so.*; do
+for qtlib in dist/_internal/PyQt6/Qt6/libQt6*.so.*; do
     match=0
     for item in ${keep_qt_modules}; do
         if [ ${qtlib} = dist/_internal/${item}.so.* ]; then
@@ -144,8 +144,8 @@ for qtlib in dist/_internal/libQt6*.so.*; do
         fi
     done
     if [ $match = 0 ]; then
-#        rm -f ${qtlib}
-        echo ${qtlib}
+        rm -f ${qtlib}
+        echo ${qtlib} removed
     fi
 done
 
@@ -159,7 +159,8 @@ rm -rf dist/_internal/PyQt5
 qt_imageformats="libqwebp libqtiff libqgif libqwbmp libqtga"
 for x in qt_imageformats; do
     rm -rf "dist/_internal/PyQt6/Qt6/plugins/imageformats/${x}.so"
-
+    echo "dist/_internal/PyQt6/Qt6/plugins/imageformats/${x}.so" removed
+done
 
 
 SUPPORTED_LANGUAGES="ar da de el en es fa fi fr gd he hu id it ja ko lv nl no pl pt_BR pt sk sv th tr uk vi zh_CN zh_TW"
