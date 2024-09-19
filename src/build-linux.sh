@@ -153,13 +153,13 @@ rm -rf dist/_internal/libQt5*
 rm -rf dist/_internal/PyQt5
 
 # remove unused Qt modules
-rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6Quick.so.6
-rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6Qml.so.6
-rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6QmlModels.so.6
-rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6Pdf.so.6
-rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6Positioning.so.6
-rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6WebChannel.so.6
-# rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6OpenGL.so.6 # (don't remove! No window decorations without this one!)
+##rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6Quick.so.6
+##rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6Qml.so.6
+##rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6QmlModels.so.6
+#rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6Pdf.so.6
+##rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6Positioning.so.6
+##rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6WebChannel.so.6
+## rm -rf dist/_internal/PyQt6/Qt6/lib/libQt6OpenGL.so.6 # (don't remove! No window decorations without this one!)
 
 # remove unused Qt plugins
 rm -rf dist/_internal/PyQt6/Qt6/plugins/imageformats/libqwebp.so
@@ -168,7 +168,12 @@ rm -rf dist/_internal/PyQt6/Qt6/plugins/imageformats/libqgif.so
 rm -rf dist/_internal/PyQt6/Qt6/plugins/imageformats/libqwbmp.so
 rm -rf dist/_internal/PyQt6/Qt6/plugins/imageformats/libqtga.so
 
+
 SUPPORTED_LANGUAGES="ar da de el en es fa fi fr gd he hu id it ja ko lv nl no pl pt_BR pt sk sv th tr uk vi zh_CN zh_TW"
+
+# remove unused Qt translations
+
+rm -rf dist/_internal/PyQt6/Qt6/translations/qtwebengine_locales
 
 for qttrans in $(find dist/_internal/PyQt6/Qt6/translations -type f -name "*.qm"); do
     qttrans_filename="${qttrans##*/}"
@@ -184,7 +189,9 @@ for qttrans in $(find dist/_internal/PyQt6/Qt6/translations -type f -name "*.qm"
     fi
 done
 
+
 # remove unused babel translations
+
 for babeltrans in $(find dist/_internal/babel/locale-data -type f -name "*.dat"); do
     babeltrans_filename="${babeltrans##*/}"
     match=0
