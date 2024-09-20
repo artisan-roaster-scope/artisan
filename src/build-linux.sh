@@ -146,7 +146,6 @@ for qtlib in $(find dist/_internal/PyQt6/Qt6/lib -type f -name "libQt6*.so.*"); 
     done
     if [ $match = 0 ]; then
         rm -f ${qtlib}
-        echo ${qtlib} Qt lib removed
     fi
 done
 
@@ -160,7 +159,6 @@ rm -rf dist/_internal/PyQt5
 qt_imageformats="libqwebp libqtiff libqgif libqwbmp libqtga"
 for x in ${qt_imageformats}; do
     rm -rf "dist/_internal/PyQt6/Qt6/plugins/imageformats/${x}.so"
-    echo "dist/_internal/PyQt6/Qt6/plugins/imageformats/${x}.so" removed
 done
 
 
@@ -182,7 +180,6 @@ for qttrans in $(find dist/_internal/PyQt6/Qt6/translations -type f -name "*.qm"
     done
     if [ $match = 0 ]; then
         rm -f ${qttrans}
-        echo ${qttrans} Qt translation removed
     fi
 done
 
@@ -205,13 +202,11 @@ for babeltrans in $(find dist/_internal/babel/locale-data -type f -name "*.dat")
     done
     if [ $match = 0 ]; then
         rm -f ${babeltrans}
-        echo ${babeltrans} babel translation removed
     fi
 done
 
 # remove matplotlib sample data
 rm -rf dist/_internal/matplotlib/mpl-data/sample_data
-echo MPL sample_data removed
 
 # remove automatically collected libs that might break things on some installations (eg. Ubuntu 16.04)
 # so it is better to rely on the system installed once

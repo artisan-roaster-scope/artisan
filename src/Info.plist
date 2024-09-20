@@ -137,11 +137,12 @@
 	<key>LSArchitecturePriority</key>
 	<array>
 		<string>arm64</string>
+		<string>x86_64</string>
 	</array>
 	<key>LSHasLocalizedDisplayName</key>
 	<false/>
 	<key>LSMinimumSystemVersion</key>
-	<string>14.0</string>
+	<string>11.0</string>
 	<key>LSMultipleInstancesProhibited</key>
 	<string>false</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
