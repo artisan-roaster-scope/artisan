@@ -473,13 +473,17 @@ def getCoffeeLabel(coffee:Tuple[str, Tuple[Coffee, StockItem]]) -> str:
 def getCoffeeCoffeeDict(coffee:Tuple[str, Tuple[Coffee, StockItem]]) -> Coffee:
     return coffee[1][0]
 
+# return a list of all stocks with amounts of this coffee
+def getCoffeeCoffeeStocks(coffee:Tuple[str, Tuple[Coffee, StockItem]]) -> List[StockItem]:
+    return getCoffeeCoffeeDict(coffee).get('stock', [])
 
+
+# return the StockItem referred by this coffee
 def getCoffeeStockDict(coffee:Tuple[str, Tuple[Coffee, StockItem]]) -> StockItem:
     return coffee[1][1]
 
-# unused
-#def getCoffeeId(coffee:Tuple[str, Tuple[Coffee, StockItem]]) -> str:
-#    return getCoffeeCoffeeDict(coffee).get('hr_id','')
+def getCoffeeId(coffee:Tuple[str, Tuple[Coffee, StockItem]]) -> str:
+    return getCoffeeCoffeeDict(coffee).get('hr_id','')
 
 
 def getCoffeesLabels(coffees:List[Tuple[str, Tuple[Coffee, StockItem]]]) -> List[str]:
@@ -1567,7 +1571,7 @@ def getBlends(weight_unit_idx:int, store:Optional[str] = None, customBlend:Optio
                             if loc_amount_str == '':
                                 label = blend['label']
                             else:
-                                label = f'{blend["label"]} ({loc_amount_str})'
+                                label = f'{blend['label']} ({loc_amount_str})'
                             # we filter all items from replacementBlends with
                             # empty amount and the first original blend
                             replacementBlends = [

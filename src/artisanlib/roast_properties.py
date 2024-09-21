@@ -19,7 +19,7 @@ import sys
 import math
 import platform
 import logging
-from typing import Final, Optional, List, Tuple, Dict, Callable, cast, Any, TYPE_CHECKING
+from typing import Final, Optional, List, Set, Tuple, Dict, Callable, cast, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -1622,7 +1622,15 @@ class editGraphDlg(ArtisanResizeablDialog):
                     plus.blend.Component(coffee_tuples[0][1], 0.5),
                     plus.blend.Component(coffee_tuples[1][1], 0.5)
                 ])
-            res, total_weight = plus.blend.openCustomBlendDialog(self, self.aw, inWeight, self.aw.qmc.weight[2], coffees, blend)
+            # only entries of coffees with stock in the selected store or in all stores if no store is selected) should be enabled in blend component coffee popups
+            coffee_hr_ids_with_stock_in_store:Set[str] = set()
+            if self.plus_coffees is not None:
+                coffee_hr_ids_with_stock_in_store = {plus.stock.getCoffeeId(c) for c in self.plus_coffees if
+                    # if there are multiple stores defined and non is selected, only coffees with stock in all stores are enabled in the blend component coffee popups
+                    self.plus_stores is None or len(self.plus_stores) < 2 or self.plus_stores_combo.currentIndex() != 0 or len(plus.stock.getCoffeeCoffeeStocks(c)) == len(self.plus_stores)}
+
+            res, total_weight = plus.blend.openCustomBlendDialog(self, self.aw, inWeight, self.aw.qmc.weight[2],
+                    coffees, blend, coffee_hr_ids_with_stock_in_store)
             if res: # not canceled
                 self.aw.qmc.plus_custom_blend = res
                 self.populatePlusCoffeeBlendCombos() # we update the blend menu to reflect the current custom blend
@@ -1841,7 +1849,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 for i, ll in sorted(zip(self.plus_blend_selected_spec['ingredients'],self.plus_blend_selected_spec_labels), key=lambda tup:tup[0]['ratio'],reverse = True)[:4]:
                     if line:
                         line = line + ', '
-                    c = f'<a href="{plus.util.coffeeLink(i["coffee"])}"{dark_mode_link_color}>{abbrevString(ll, 18)}</a>'
+                    c = f'<a href="{plus.util.coffeeLink(i['coffee'])}"{dark_mode_link_color}>{abbrevString(ll, 18)}</a>'
                     line = line + str(int(round(i['ratio']*100))) + '% ' + c
             if line and len(line)>0 and self.plus_store_selected is not None and self.plus_store_selected_label is not None:
                 line = line + f'  (<a href="{plus.util.storeLink(self.plus_store_selected)}"{dark_mode_link_color}>{self.plus_store_selected_label}</a>)'

@@ -34,7 +34,7 @@ try:
         QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
     )
     from PyQt6.QtCore import Qt, pyqtSlot, QSize, QSettings # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtGui import QIcon # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import QIcon, QStandardItemModel # @UnusedImport @Reimport  @UnresolvedImport
 #    from PyQt6 import sip # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #pylint: disable = E, W, R, C
@@ -49,7 +49,7 @@ except Exception: # pylint: disable=broad-except
         QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
     )
     from PyQt5.QtCore import Qt, pyqtSlot, QSize, QSettings # type: ignore  # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QIcon # type: ignore  # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QIcon, QStandardItemModel # type: ignore  # @UnusedImport @Reimport  @UnresolvedImport
 #    try:
 #        from PyQt5 import sip # type: ignore  # @Reimport @UnresolvedImport @UnusedImport
 #    except Exception: # pylint: disable=broad-except
@@ -60,7 +60,7 @@ from artisanlib.util import comma2dot, float2floatWeightVolume
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
 from uic import BlendDialog # OFF type: ignore[attr-defined] # pylint: disable=no-name-in-module
-from typing import Final, Optional, List, Collection, Dict, Tuple, cast, TYPE_CHECKING
+from typing import Final, Optional, List, Set, Collection, Dict, Tuple, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -138,11 +138,13 @@ class CustomBlend:
 #####################  Custom CustomBlend Dialog  ######################################
 
 class CustomBlendDialog(ArtisanDialog):
-    def __init__(self, parent:'QWidget', aw:'ApplicationWindow', inWeight:float, weightUnit:str, coffees:Dict[str, str], blend:CustomBlend) -> None:
+    def __init__(self, parent:'QWidget', aw:'ApplicationWindow', inWeight:float, weightUnit:str,
+            coffees:Dict[str, str], blend:CustomBlend, coffee_hr_ids_with_stock_in_store:Set[str]) -> None:
         super().__init__(parent, aw)
         self.initialTotalWeight:float = inWeight
         self.inWeight:float = inWeight
         self.weightUnit:str = weightUnit
+        self.coffee_hr_ids_with_stock_in_store:Set[str] = coffee_hr_ids_with_stock_in_store
         self.coffees:Dict[str, str] = coffees # dict associating coffee names to their hr_id
         self.coffee_ids:Dict[str, str] = {v: k for k, v in self.coffees.items()} # dict associating coffee hr_ids to their names
         self.sorted_coffees:List[Tuple[str, str]] = sorted(coffees.items(), key=lambda x: x[0]) # list of coffee name and hr_id tuples sorted by coffee name
@@ -366,8 +368,20 @@ class CustomBlendDialog(ArtisanDialog):
                 beansComboBox = MyQComboBox()
                 beansComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
                 # the popup contains all available coffees but the ones used already in the blend, but always contains the components coffee
-                coffees = [n for (n, hr_id) in self.sorted_coffees if hr_id == c.coffee or hr_id not in blend_coffees]
+                coffees_tuples = [(n, hr_id) for (n, hr_id) in self.sorted_coffees if hr_id == c.coffee or hr_id not in blend_coffees]
+                coffees = [n for (n, hr_id) in coffees_tuples]
+
                 beansComboBox.addItems(coffees)
+
+                # disable items without stock in current selected store
+                model = cast(QStandardItemModel, beansComboBox.model())
+                if model is not None:
+                    for r, (_,hr_id) in enumerate(coffees_tuples):
+                        if hr_id not in self.coffee_hr_ids_with_stock_in_store:
+                            item = model.item(r)
+                            if item is not None:
+                                item.setEnabled(False)
+
                 beansComboBox.setCurrentIndex(coffees.index(self.coffee_ids[c.coffee]))
                 self.ui.tableWidget.setCellWidget(i,2,beansComboBox)
                 beansComboBox.currentIndexChanged.connect(self.componentCoffeeChanged)
@@ -396,8 +410,9 @@ class CustomBlendDialog(ArtisanDialog):
             _log.exception(e)
 
 
-def openCustomBlendDialog(window:'QWidget', aw:'ApplicationWindow', inWeight:float, weightUnit:str, coffees:Dict[str, str], blend:CustomBlend) -> Tuple[Optional[CustomBlend], float]:
-    dialog = CustomBlendDialog(window, aw, inWeight, weightUnit, coffees, blend)
+def openCustomBlendDialog(window:'QWidget', aw:'ApplicationWindow', inWeight:float, weightUnit:str,
+        coffees:Dict[str, str], blend:CustomBlend, coffee_hr_ids_with_stock_in_store:Set[str]) -> Tuple[Optional[CustomBlend], float]:
+    dialog = CustomBlendDialog(window, aw, inWeight, weightUnit, coffees, blend, coffee_hr_ids_with_stock_in_store)
     res = dialog.exec()
     blend_res:Optional[CustomBlend]
     if res:
