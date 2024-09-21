@@ -1849,7 +1849,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 for i, ll in sorted(zip(self.plus_blend_selected_spec['ingredients'],self.plus_blend_selected_spec_labels), key=lambda tup:tup[0]['ratio'],reverse = True)[:4]:
                     if line:
                         line = line + ', '
-                    c = f'<a href="{plus.util.coffeeLink(i['coffee'])}"{dark_mode_link_color}>{abbrevString(ll, 18)}</a>'
+                    c = f"<a href=\"{plus.util.coffeeLink(i['coffee'])}\"{dark_mode_link_color}>{abbrevString(ll, 18)}</a>"
                     line = line + str(int(round(i['ratio']*100))) + '% ' + c
             if line and len(line)>0 and self.plus_store_selected is not None and self.plus_store_selected_label is not None:
                 line = line + f'  (<a href="{plus.util.storeLink(self.plus_store_selected)}"{dark_mode_link_color}>{self.plus_store_selected_label}</a>)'

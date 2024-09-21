@@ -1571,7 +1571,7 @@ def getBlends(weight_unit_idx:int, store:Optional[str] = None, customBlend:Optio
                             if loc_amount_str == '':
                                 label = blend['label']
                             else:
-                                label = f'{blend['label']} ({loc_amount_str})'
+                                label = f"{blend['label']} ({loc_amount_str})"
                             # we filter all items from replacementBlends with
                             # empty amount and the first original blend
                             replacementBlends = [
