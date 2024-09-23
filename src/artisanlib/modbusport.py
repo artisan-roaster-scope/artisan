@@ -266,34 +266,13 @@ class modbusport:
                         bytesize=self.bytesize,
                         parity=self.parity,
                         stopbits=self.stopbits,
-                        retries=1,   # number of send retries
-#                        retry_on_empty=True,     # retry on empty response, by default False for faster speed # removed in pymodbus 3.7
-#                        retry_on_invalid=True,  # retry on invalid response, by default False for faster speed # retired
+                        retries=0,   # number of send retries
                         reconnect_delay=0, # avoid automatic reconnection
-#                        on_reconnect_callback=self.reconnect, # removed in pymodbus 3.7
                         # timeout is in seconds and defaults to 3
                         timeout=min((self.aw.qmc.delay/2000), self.timeout)) # the timeout should not be larger than half of the sampling interval
                     self.readRetries = self.serial_readRetries
                 elif self.type == 2: # Serial Binary
                     pass # serial binary is no longer supported by pymodbus 3.7
-#                    from pymodbus.client import ModbusSerialClient # @Reimport
-#                    from pymodbus.framer import Framer
-#                    self.master = ModbusSerialClient(
-#                        framer=Framer.BINARY,
-#                        #method='binary', # deprecated in pymodbus 3.x
-#                        port=self.comport,
-#                        baudrate=self.baudrate,
-#                        bytesize=self.bytesize,
-#                        parity=self.parity,
-#                        stopbits=self.stopbits,
-#                        retries=0,   # number of send retries
-##                        retry_on_empty=True,     # retry on empty response, by default False for faster speed # removed in pymodbus 3.7
-#                        retry_on_invalid=True,  # retry on invalid response, by default False for faster speed # retired
-#                        reconnect_delay=0, # avoid automatic reconnection
-##                        on_reconnect_callback=self.reconnect, # removed in pymodbus 3.7
-#                        # timeout is in seconds and defaults to 3
-#                        timeout=min((self.aw.qmc.delay/2000), self.timeout)) # the timeout should not be larger than half of the sampling interval
-#                    self.readRetries = self.serial_readRetries
                 elif self.type == 3: # TCP
                     from pymodbus.client import ModbusTcpClient
                     try:
@@ -301,10 +280,6 @@ class modbusport:
                                 host=self.host,
                                 port=self.port,
                                 retries=1,                # number of send retries
-#                                retry_on_empty=True,      # retry on empty response # removed in pymodbus 3.7
-#                                retry_on_invalid=True,    # retry on invalid response # retired
-#                                reconnect_delay=0, # not used by sync client
-#                                on_reconnect_callback=self.reconnect, # removed in pymodbus 3.7
                                 # timeout is in seconds (int) and defaults to 3
                                 timeout=min((self.aw.qmc.delay/2000), self.IP_timeout) # the timeout should not be larger than half of the sampling interval
                                 )
@@ -321,10 +296,6 @@ class modbusport:
                             host=self.host,
                             port=self.port,
                             retries=0,                # number of send retries (if set to n>0 each requests is sent n-types on MODBUS UDP!)
-#                            retry_on_empty=True,      # retry on empty response # removed in pymodbus 3.7
-#                            retry_on_invalid=True,    # retry on invalid response # retired
-#                            reconnect_delay=0,        # not used by sync client
-#                            on_reconnect_callback=self.reconnect, # removed in pymodbus 3.7
                             # timeout is in seconds (int) and defaults to 3
                             timeout=min((self.aw.qmc.delay/2000), self.IP_timeout) # the timeout should not be larger than half of the sampling interval
                             )
@@ -346,13 +317,13 @@ class modbusport:
                         from pymodbus.framer import Framer as FramerType # type:ignore[assignment]
                     self.master = ModbusSerialClient(
                         framer=FramerType.RTU, # type:ignore[unused-ignore]
-                        #method='rtu', # deprecated in pymodbus 3.x
                         port=self.comport,
                         baudrate=self.baudrate,
                         bytesize=self.bytesize,
                         parity=self.parity,
                         stopbits=self.stopbits,
-                        retries=1,              # number of send retries (ignored on sync client pymodbus 3.6.9, but not on 3.7.2); NOTE: disconnects between retries!
+                        retries=0,              # number of send retries (ignored on sync client pymodbus 3.6.9, but not on 3.7.2)
+                        #  NOTE: pymodbus sync client disconnects between retries, therefore we set this to 0; for the async client one might go with 1
                         timeout=min((self.aw.qmc.delay/2000), self.timeout)) # the timeout should not be larger than half of the sampling interval
                     self.readRetries = self.serial_readRetries
                 _log.debug('connect(): connecting')
