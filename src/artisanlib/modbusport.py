@@ -100,18 +100,19 @@ def getBinaryPayloadDecoderFromRegisters(registers:List[int], byteorderLittle:bo
 class modbusport:
     """ this class handles the communications with all the modbus devices"""
 
-    __slots__ = [ 'aw', 'modbus_serial_read_delay', 'modbus_serial_extra_read_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'serial_strict_timing', 'default_comport', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
+    __slots__ = [ 'aw', 'modbus_serial_read_delay', 'modbus_serial_connect_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'serial_strict_timing', 'default_comport', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
         'timeout', 'IP_timeout', 'IP_retries', 'serial_readRetries', 'PID_slave_ID', 'PID_SV_register', 'PID_p_register', 'PID_i_register', 'PID_d_register', 'PID_ON_action', 'PID_OFF_action',
         'channels', 'inputSlaves', 'inputRegisters', 'inputFloats', 'inputBCDs', 'inputFloatsAsInt', 'inputBCDsAsInt', 'inputSigned', 'inputCodes', 'inputDivs',
-        'inputModes', 'optimizer', 'fetch_max_blocks', 'fail_on_cache_miss', 'disconnect_on_error', 'acceptable_errors', 'reset_socket', 'activeRegisters', 'readingsCache', 'SVmultiplier', 'PIDmultiplier',
+        'inputModes', 'optimizer', 'fetch_max_blocks', 'fail_on_cache_miss', 'disconnect_on_error', 'acceptable_errors', 'activeRegisters', 'readingsCache', 'SVmultiplier', 'PIDmultiplier',
         'byteorderLittle', 'wordorderLittle', 'master', 'COMsemaphore', 'default_host', 'host', 'port', 'type', 'lastReadResult', 'commError' ]
 
     def __init__(self, aw:'ApplicationWindow') -> None:
         self.aw = aw
 
         self.modbus_serial_read_delay       :Final[float] = 0.035 # in seconds
-        self.modbus_serial_extra_read_delay :float = 0.0          # in seconds (user configurable)
+#        self.modbus_serial_extra_read_delay :float = 0.0          # in seconds (user configurable) # retired
         self.modbus_serial_write_delay      :Final[float] = 0.080 # in seconds
+        self.modbus_serial_connect_delay    :float = 0.0          # in seconds (user configurable delay after serial connect; important for Arduino based slaves that reboot on connect)
 
         self.maxCount:Final[int] = 125 # the maximum number of registers that can be fetched in one request according to the MODBUS spec
         self.readRetries:int = 0  # retries
@@ -161,8 +162,6 @@ class modbusport:
         self.disconnect_on_error:bool = True # if True we explicitly disconnect the MODBUS connection on IO errors (was: if on MODBUS serial and restart it on next request)
         self.acceptable_errors = 3 # the number of errors that are acceptable without a disconnect/reconnect. If set to 0 every error triggers a reconnect if disconnect_on_error is True
 
-        self.reset_socket:bool = False # reset socket connection on error (True by default in pymodbus>v2.5.2, False by default in pymodbus v2.3)
-
         self.activeRegisters:Dict[int, Dict[int, List[int]]] = {}
         # the readings cache that is filled by requesting sequences of values of activeRegisters in blocks
         self.readingsCache:Dict[int, Dict[int, Dict[int, int]]] = {}
@@ -197,10 +196,11 @@ class modbusport:
 #                pass
 #            else:
 #                time.sleep(self.modbus_serial_write_delay)
-        elif self.type in {3, 4}: # delay between writes only on serial connections
+        elif self.type in {3, 4}: # delay between reads only on serial connections
             pass
         else:
-            time.sleep(self.modbus_serial_read_delay + self.modbus_serial_extra_read_delay)
+#            time.sleep(self.modbus_serial_read_delay + self.modbus_serial_extra_read_delay)
+            time.sleep(self.modbus_serial_read_delay)
 
     @staticmethod
     def address2register(addr:Union[float, int], code:int = 3) -> int:
@@ -269,8 +269,6 @@ class modbusport:
                         retries=1,   # number of send retries
 #                        retry_on_empty=True,     # retry on empty response, by default False for faster speed # removed in pymodbus 3.7
 #                        retry_on_invalid=True,  # retry on invalid response, by default False for faster speed # retired
-#                        close_comm_on_error=self.reset_socket,
-#                        reset_socket=self.reset_socket,
                         reconnect_delay=0, # avoid automatic reconnection
 #                        on_reconnect_callback=self.reconnect, # removed in pymodbus 3.7
                         # timeout is in seconds and defaults to 3
@@ -291,7 +289,6 @@ class modbusport:
 #                        retries=0,   # number of send retries
 ##                        retry_on_empty=True,     # retry on empty response, by default False for faster speed # removed in pymodbus 3.7
 #                        retry_on_invalid=True,  # retry on invalid response, by default False for faster speed # retired
-#                        reset_socket=self.reset_socket,
 #                        reconnect_delay=0, # avoid automatic reconnection
 ##                        on_reconnect_callback=self.reconnect, # removed in pymodbus 3.7
 #                        # timeout is in seconds and defaults to 3
@@ -306,9 +303,7 @@ class modbusport:
                                 retries=1,                # number of send retries
 #                                retry_on_empty=True,      # retry on empty response # removed in pymodbus 3.7
 #                                retry_on_invalid=True,    # retry on invalid response # retired
-#                                close_comm_on_error=self.reset_socket,
-#                                reset_socket=self.reset_socket,
-                                reconnect_delay=0, # avoid automatic reconnection
+#                                reconnect_delay=0, # not used by sync client
 #                                on_reconnect_callback=self.reconnect, # removed in pymodbus 3.7
                                 # timeout is in seconds (int) and defaults to 3
                                 timeout=min((self.aw.qmc.delay/2000), self.IP_timeout) # the timeout should not be larger than half of the sampling interval
@@ -328,9 +323,7 @@ class modbusport:
                             retries=0,                # number of send retries (if set to n>0 each requests is sent n-types on MODBUS UDP!)
 #                            retry_on_empty=True,      # retry on empty response # removed in pymodbus 3.7
 #                            retry_on_invalid=True,    # retry on invalid response # retired
-#                            close_comm_on_error=self.reset_socket,
-#                            reset_socket=self.reset_socket, # retired
-                            reconnect_delay=0,        # avoid automatic reconnection
+#                            reconnect_delay=0,        # not used by sync client
 #                            on_reconnect_callback=self.reconnect, # removed in pymodbus 3.7
                             # timeout is in seconds (int) and defaults to 3
                             timeout=min((self.aw.qmc.delay/2000), self.IP_timeout) # the timeout should not be larger than half of the sampling interval
@@ -359,27 +352,21 @@ class modbusport:
                         bytesize=self.bytesize,
                         parity=self.parity,
                         stopbits=self.stopbits,
-                        retries=1,              # number of send retries
-#                        retry_on_empty=True,    # retry on empty response; by default False for faster speed # removed in pymodbus 3.7
-#                        retry_on_invalid=True,  # retry on invalid response; by default False  # retired
-#                        close_comm_on_error=self.reset_socket,
-#                        reset_socket=self.reset_socket,  # retired
-#                        strict=False, # settings this to False disables the inter char timeout restriction # retired and replaced by self.serial_strict_timing
-                        reconnect_delay=0, # avoid automatic reconnection
-#                        on_reconnect_callback=self.reconnect, # removed in pymodbus 3.7
+                        retries=1,              # number of send retries (ignored on sync client pymodbus 3.6.9, but not on 3.7.2); NOTE: disconnects between retries!
                         timeout=min((self.aw.qmc.delay/2000), self.timeout)) # the timeout should not be larger than half of the sampling interval
                     self.readRetries = self.serial_readRetries
                 _log.debug('connect(): connecting')
                 time.sleep(.2) # avoid possible hickups on startup
                 if self.master is not None:
                     self.master.connect() # type:ignore[no-untyped-call,unused-ignore]
-#                    # on connect() of serial connections we reset the inter_byte_timeout of the serial socket if serial_strict_timing is False
-#                    if not self.serial_strict_timing and self.type in {0,1} and self.master.socket is not None and isinstance(self.master.socket, serial.Serial):
-#                        self.master.socket.inter_byte_timeout = None
                 if self.isConnected():
                     self.updateActiveRegisters()
                     self.clearReadingsCache()
-                    time.sleep(.3) # avoid possible hickups on startup
+                    if self.type in {0,1}:
+                        # respect the user defined connect delay on serial connections
+                        time.sleep(self.modbus_serial_connect_delay)
+                    else:
+                        time.sleep(.3) # avoid possible hickups on startup
                     self.aw.sendmessage(QApplication.translate('Message', 'Connected via MODBUS'))
                 else:
                     self.aw.qmc.adderror(QApplication.translate('Error Message','Modbus Error: failed to connect'))

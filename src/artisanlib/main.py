@@ -17115,7 +17115,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.modbus.parity = s2a(toString(settings.value('parity',self.modbus.parity)))
             self.modbus.timeout = max(0.3, float2float(toFloat(settings.value('timeout',self.modbus.timeout)))) # min serial MODBUS timeout is 300ms
             self.modbus.serial_strict_timing = bool(toBool(settings.value('serial_strict_timing',self.modbus.serial_strict_timing)))
-            self.modbus.modbus_serial_extra_read_delay = toFloat(settings.value('modbus_serial_extra_read_delay',self.modbus.modbus_serial_extra_read_delay))
+            self.modbus.modbus_serial_connect_delay = toFloat(settings.value('modbus_serial_connect_delay',self.modbus.modbus_serial_connect_delay))
             self.modbus.serial_readRetries = toInt(settings.value('serial_readRetries',self.modbus.serial_readRetries))
             self.modbus.IP_timeout = float2float(toFloat(settings.value('IP_timeout',self.modbus.IP_timeout)))
             self.modbus.IP_retries = toInt(settings.value('IP_retries',self.modbus.IP_retries))
@@ -17147,7 +17147,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.modbus.type = toInt(settings.value('type',self.modbus.type))
             self.modbus.host = toString(settings.value('host',self.modbus.host))
             self.modbus.port = toInt(settings.value('port',self.modbus.port))
-            self.modbus.reset_socket = bool(toBool(settings.value('reset_socket',self.modbus.reset_socket)))
             settings.endGroup()
 #--- END GROUP Modbus
 
@@ -18841,7 +18840,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'parity',self.modbus.parity, read_defaults)
             self.settingsSetValue(settings, default_settings, 'timeout',self.modbus.timeout, read_defaults)
             self.settingsSetValue(settings, default_settings, 'serial_strict_timing',self.modbus.serial_strict_timing, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'modbus_serial_extra_read_delay',self.modbus.modbus_serial_extra_read_delay, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'modbus_serial_connect_delay',self.modbus.modbus_serial_connect_delay, read_defaults)
             self.settingsSetValue(settings, default_settings, 'serial_readRetries',self.modbus.serial_readRetries, read_defaults)
             self.settingsSetValue(settings, default_settings, 'IP_timeout',self.modbus.IP_timeout, read_defaults)
             self.settingsSetValue(settings, default_settings, 'IP_retries',self.modbus.IP_retries, read_defaults)
@@ -18872,7 +18871,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'type',self.modbus.type, read_defaults)
             self.settingsSetValue(settings, default_settings, 'host',self.modbus.host, read_defaults)
             self.settingsSetValue(settings, default_settings, 'port',self.modbus.port, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'reset_socket',self.modbus.reset_socket, read_defaults)
             settings.endGroup()
 #--- END GROUP Modbus
 
@@ -22814,7 +22812,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.modbus.parity = str(dialog.modbus_parityComboBox.currentText())
             self.modbus.timeout = max(0.3, float2float(toFloat(str(dialog.modbus_timeoutEdit.text()))))  # minimum serial timeout should be 300ms
             try:
-                self.modbus.modbus_serial_extra_read_delay = toInt(dialog.modbus_Serial_delayEdit.text()) / 1000
+                self.modbus.modbus_serial_connect_delay = float2float(toFloat(dialog.modbus_Serial_delayEdit.text()))
             except Exception: # pylint: disable=broad-except
                 pass
             self.modbus.serial_readRetries = dialog.modbus_Serial_retriesComboBox.currentIndex()
@@ -22914,7 +22912,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.modbus.wordorderLittle = bool(dialog.modbus_littleEndianWords.isChecked())
             self.modbus.optimizer = bool(dialog.modbus_optimize.isChecked())
             self.modbus.fetch_max_blocks = bool(dialog.modbus_full_block.isChecked())
-            self.modbus.reset_socket = bool(dialog.modbus_reset.isChecked())
             self.modbus.type = int(dialog.modbus_type.currentIndex())
             self.modbus.host = str(dialog.modbus_hostEdit.text())
             try:

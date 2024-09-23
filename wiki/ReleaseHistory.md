@@ -17,7 +17,11 @@ v3.0.3
   - adds control function to [Diedrich DR](https://artisan-scope.org/machines/diedrich/) machine setup and adds [Diedrich CR](https://artisan-scope.org/machines/diedrich/) machine setup
 
 * CHANGES
-  - start the scheduler automatically on connected to artisan.plus if there are incomplete scheduled items
+  - automatically start of the scheduler on connected to artisan.plus if there are incompleted scheduled items
+  - disable items in coffee popups of the Custom Blend dialog without stock in the selected store or, if no store is selected, without stock in every store
+  - reduce the size of builds by removing unnecessary files
+  - removes the optional delay on reads from serial MODBUS
+  - adds optional delay after connect before sending requests to serial MODBUS to allow to wait for Arduino slaves to complete reboot ([Issue #1694](../../../issues/1694))
 
 * FIXES
   - updates Cropster XLS importer ([Issue #1685](../../../issues/1685))

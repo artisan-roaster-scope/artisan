@@ -681,9 +681,9 @@ class comportDlg(ArtisanResizeablDialog):
 
 
         modbus_Serial_delaylabel = QLabel(QApplication.translate('Label', 'Delay'))
-        modbus_Serial_delaylabel.setToolTip(QApplication.translate('Tooltip', 'Extra delay in Milliseconds between MODBUS Serial commands'))
-        self.modbus_Serial_delayEdit = QLineEdit(str(int(self.aw.modbus.modbus_serial_extra_read_delay*1000)))
-        self.modbus_Serial_delayEdit.setValidator(self.aw.createCLocaleDoubleValidator(0,99,0,self.modbus_Serial_delayEdit))
+        modbus_Serial_delaylabel.setToolTip(QApplication.translate('Tooltip', 'Extra delay after connect in seconds before sending requests (needed by Arduino devices restarting on connect)'))
+        self.modbus_Serial_delayEdit = QLineEdit(str(self.aw.modbus.modbus_serial_connect_delay))
+        self.modbus_Serial_delayEdit.setValidator(self.aw.createCLocaleDoubleValidator(0,3,1,self.modbus_Serial_delayEdit))
         self.modbus_Serial_delayEdit.setFixedWidth(50)
         self.modbus_Serial_delayEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.modbus_Serial_delayEdit.setToolTip(QApplication.translate('Tooltip', 'Extra delay in Milliseconds between MODBUS Serial commands'))
@@ -759,12 +759,6 @@ class comportDlg(ArtisanResizeablDialog):
         self.modbus_full_block.setChecked(self.aw.modbus.fetch_max_blocks)
         self.modbus_full_block.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.modbus_full_block.setEnabled(bool(self.aw.modbus.optimizer))
-
-        self.modbus_reset = QCheckBox(QApplication.translate('ComboBox','reset'))
-        self.modbus_reset.setChecked(self.aw.modbus.reset_socket)
-        self.modbus_reset.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.modbus_reset.setToolTip(QApplication.translate('Tooltip','Reset socket connection on error'))
-        self.modbus_reset.setEnabled(False)
 
         ##########################    TAB 4 WIDGETS   SCALE
         scale_devicelabel = QLabel(QApplication.translate('Label', 'Device'))
@@ -990,8 +984,6 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_setup.addWidget(self.modbus_optimize)
         modbus_setup.addSpacing(5)
         modbus_setup.addWidget(self.modbus_full_block)
-        modbus_setup.addSpacing(5)
-        modbus_setup.addWidget(self.modbus_reset)
         modbus_setup.addSpacing(7)
         modbus_setup.addStretch()
         modbus_setup.addWidget(modbus_typelabel)
