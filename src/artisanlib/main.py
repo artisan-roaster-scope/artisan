@@ -117,7 +117,7 @@ try:
                              QInputDialog, QGroupBox, QLineEdit, # @Reimport @UnresolvedImport @UnusedImport
                              QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport @UnresolvedImport @UnusedImport
                              QLCDNumber, QSpinBox, QComboBox, # @Reimport @UnresolvedImport @UnusedImport
-                             QSlider, QProxyStyle, QStyle, QStyleOption, QStyleHintReturn, # @Reimport @UnresolvedImport @UnusedImport
+                             QSlider, # @Reimport @UnresolvedImport @UnusedImport
                              QColorDialog, QFrame, QScrollArea, QProgressDialog, # @Reimport @UnresolvedImport @UnusedImport
                              QStyleFactory, QMenu, QLayout) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt6.QtGui import (QScreen, QPageLayout, QAction, QImageReader, QWindow, # @Reimport @UnresolvedImport @UnusedImport
@@ -144,7 +144,7 @@ except ImportError:
                              QInputDialog, QGroupBox, QLineEdit, # @Reimport @UnresolvedImport @UnusedImport
                              QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport @UnresolvedImport @UnusedImport
                              QLCDNumber, QSpinBox, QComboBox, # @Reimport @UnresolvedImport @UnusedImport
-                             QSlider, QProxyStyle, QStyle, QStyleOption, QStyleHintReturn, # @Reimport @UnresolvedImport @UnusedImport
+                             QSlider, # @Reimport @UnresolvedImport @UnusedImport
                              QColorDialog, QFrame, QScrollArea, QProgressDialog, # @Reimport @UnresolvedImport @UnusedImport
                              QStyleFactory, QMenu, QLayout, QShortcut) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt5.QtGui import (QScreen, QPageLayout, QImageReader, QWindow,  # type: ignore # @Reimport @UnresolvedImport @UnusedImport
@@ -590,15 +590,6 @@ class Artisan(QtSingleApplication):
 #    except Exception: # pylint: disable=broad-except
 #        pass
 
-
-class MenuProxyStyle(QProxyStyle): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
-
-    def styleHint(self, hint:QStyle.StyleHint, option:Optional[QStyleOption] = None, widget:Optional[QWidget] = None, returnData:Optional[QStyleHintReturn] = None) -> int:
-        if hint == QStyle.StyleHint.SH_ComboBox_Popup and isinstance(widget, MyContentLimitedQComboBox):
-            return 0
-        return QProxyStyle.styleHint(self, hint, option, widget, returnData)
-
-
 app_args = sys.argv
 if sys.platform.startswith('linux'):
     # avoid a GTK bug in Ubuntu Unity
@@ -612,9 +603,6 @@ if sys.platform.startswith('linux'):
 #    except Exception as e: # pylint: disable=broad-except
 #        pass
 app = Artisan(app_args)
-# to limit the number of items displayed in a popup at once we fall back to non-native Qt QComboboxes in MyContentLimitedQComboBox
-# by resetting the style hint via a MenuProxy style object
-app.setStyle(MenuProxyStyle())
 
 
 # On the first run if there are legacy settings under "YourQuest" but no new settings under "artisan-scope" then the legacy settings
@@ -745,7 +733,6 @@ from artisanlib.widgets import (MyQLCDNumber, EventPushButton, MajorEventPushBut
 from artisanlib.notifications import Notification, NotificationManager, NotificationType
 from artisanlib.canvas import tgraphcanvas
 from artisanlib.phases_canvas import tphasescanvas
-from artisanlib.widgets import MyContentLimitedQComboBox
 
 
 # import artisan.plus module
@@ -994,22 +981,25 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
             self.qmc.ai.set_visible(False)
         # as since MPL 3.5 release_pan calls self.canvas.draw_idle() instead of _draw() we just invalidate the background here instead of
         # updating it
-        self.qmc.updateBackground()
-        #self.qmc.ax_background = None
+        #self.qmc.updateBackground()
+        self.qmc.ax_background = None
 
+    # monkey patch matplotlib navigationbar zoom rectangle to update background cache
     def release_zoom_new(self, event:'MplEvent') -> None:
         self.release_zoom_org(event)
         if self.qmc.ai is not None:
             self.qmc.ai.set_visible(False)
-        # as since MPL 3.5 release_pan calls self.canvas.draw_idle() instead of _draw() we just invalidate the background here instead of
+        # as since MPL 3.5 release_zoom calls self.canvas.draw_idle() instead of _draw() we just invalidate the background here instead of
         # updating it
-        self.qmc.updateBackground()
-        #self.qmc.ax_background = None
+        #self.qmc.updateBackground()
+        self.qmc.ax_background = None
 
-    # monkey patch matplotlib navigationbar zoom (release_zoom) and pan (release_pan) to update background cache
+    # monkey patch matplotlib navigationbar home/left/right history navigation to update background cache
     def update_view_new(self) -> None:
         self.update_view_org()
-        self.qmc.updateBackground()
+        # as since MPL 3.5 _update_view calls self.canvas.draw_idle() instead of _draw() we just invalidate the background here instead of
+        #self.qmc.updateBackground()
+        self.qmc.ax_background = None
 
     def getAxisRanges(self) -> List[float]:
         res = []
@@ -11224,18 +11214,21 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.minieventsflags[0] = 1
 
     def toggleForegroundShowfullFlag(self) -> None:
-        if not self.qmc.designerflag:
+        if not self.qmc.designerflag and not self.qmc.flagon:
+            # only if not recording
             self.qmc.foregroundShowFullflag = not self.qmc.foregroundShowFullflag
             self.autoAdjustAxis(background=self.qmc.background and (not len(self.qmc.timex) > 3), deltas=False)
             self.qmc.redraw(recomputeAllDeltas=False)
 
     def toggleBackroundShowfullFlag(self) -> None:
-        self.qmc.backgroundShowFullflag = not self.qmc.backgroundShowFullflag
-        if self.qmc.designerflag:
-            self.qmc.redrawdesigner(force=True)
-        else:
-            self.autoAdjustAxis(background=self.qmc.background and (not len(self.qmc.timex) > 3), deltas=False)
-            self.qmc.redraw(recomputeAllDeltas=False)
+        if self.qmc.background and self.qmc.backgroundprofile is not None:
+            # only while a background profile is loaded and not hidden
+            self.qmc.backgroundShowFullflag = not self.qmc.backgroundShowFullflag
+            if self.qmc.designerflag:
+                self.qmc.redrawdesigner(force=True)
+            else:
+                self.autoAdjustAxis(background=self.qmc.background and (not len(self.qmc.timex) > 3), deltas=False)
+                self.qmc.redraw(recomputeAllDeltas=False)
 
     @pyqtSlot()
     def updatePlaybackIndicator(self) -> None:

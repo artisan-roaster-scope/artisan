@@ -53,6 +53,9 @@ class MyContentLimitedQComboBox(MyQComboBox): # pylint: disable=too-few-public-m
         super().__init__(parent, **kwargs)
         # setting max number visible limit
         self.setMaxVisibleItems(20)
+        # ensure Qt style for this widget
+        self.setStyleSheet('combobox-popup: 0;')
+        # add scroll barspacer
         view = self.view()
         if view is not None:
             view.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
