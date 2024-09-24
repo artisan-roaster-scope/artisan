@@ -20,8 +20,7 @@ import platform
 from typing import Optional, List, Any, cast, TYPE_CHECKING, Final
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.util import deltaLabelUTF8
-from artisanlib.widgets import MyQComboBox
-
+from artisanlib.widgets import MyContentLimitedQComboBox
 import logging
 
 try:
@@ -609,7 +608,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
 
         for i in range(nstats):
             #0 Type
-            typeComboBox = MyQComboBox()
+            typeComboBox = MyContentLimitedQComboBox()
             # set the combox width to the full width of the table
             typeComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
             typeComboBox.setToolTip(QApplication.translate('Tooltip','Choose a statistic to display'))
@@ -663,7 +662,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
                 rows = []
                 rows.append(str(r+1))
                 # type
-                typeComboBox = cast(MyQComboBox, self.summarystatstable.cellWidget(r,1))
+                typeComboBox = cast(MyContentLimitedQComboBox, self.summarystatstable.cellWidget(r,1))
                 rows.append(typeComboBox.currentText())
                 tbl.add_row(rows)
             clipboard = tbl.get_string()
@@ -678,7 +677,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
             clipboard += '\n'
             for r in range(nrows):
                 clipboard += str(r+1) + '\t'
-                typeComboBox = cast(MyQComboBox, self.summarystatstable.cellWidget(r,1))
+                typeComboBox = cast(MyContentLimitedQComboBox, self.summarystatstable.cellWidget(r,1))
                 clipboard += typeComboBox.currentText() + '\t'
         # copy to the system clipboard
         sys_clip = QApplication.clipboard()
@@ -710,7 +709,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
     def setitemsummarystat(self, _:int) -> None:
         i = self.aw.findWidgetsRow(self.summarystatstable,self.sender(),1)
         if i is not None:
-            typecombobox = cast(MyQComboBox, self.summarystatstable.cellWidget(i,1))
+            typecombobox = cast(MyContentLimitedQComboBox, self.summarystatstable.cellWidget(i,1))
             if i < len(self.summarystatstypes):
                 self.summarystatstypes[i] = self.summarystats_types.index(self.summarystats_types_sorted[typecombobox.currentIndex()])
                 self.savetablesummarystats()
@@ -718,7 +717,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
     def disconnectTableItemActions(self) -> None:
         for x in range(self.summarystatstable.rowCount()):
             try:
-                typeComboBox = cast(MyQComboBox, self.summarystatstable.cellWidget(x,1))
+                typeComboBox = cast(MyContentLimitedQComboBox, self.summarystatstable.cellWidget(x,1))
                 typeComboBox.currentIndexChanged.disconnect() # type combo
             except Exception: # pylint: disable=broad-except
                 pass

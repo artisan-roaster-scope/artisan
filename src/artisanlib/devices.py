@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 
 from artisanlib.util import deltaLabelUTF8, setDeviceDebugLogLevel, argb_colorname2rgba_colorname, rgba_colorname2argb_colorname
 from artisanlib.dialogs import ArtisanResizeablDialog
-from artisanlib.widgets import MyQComboBox, MyQDoubleSpinBox
+from artisanlib.widgets import MyContentLimitedQComboBox, MyQComboBox, MyQDoubleSpinBox
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -39,14 +39,14 @@ try:
     from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,  # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QRadioButton, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QTableWidget, QMessageBox, QHeaderView, QTableWidgetItem) # @UnusedImport @Reimport  @UnresolvedImport
+                                 QTableWidget, QMessageBox, QHeaderView, QTableWidgetItem, QSizePolicy) # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QTimer, QRegularExpression) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import (QStandardItemModel, QStandardItem, QColor, QIntValidator, QRegularExpressionValidator) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QRadioButton, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QTableWidget, QMessageBox, QHeaderView, QTableWidgetItem) # @UnusedImport @Reimport  @UnresolvedImport
+                                 QTableWidget, QMessageBox, QHeaderView, QTableWidgetItem, QSizePolicy) # @UnusedImport @Reimport  @UnresolvedImport
 
 
 class DeviceAssignmentDlg(ArtisanResizeablDialog):
@@ -122,7 +122,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     dev.pop(i)              #note: pop() makes the list smaller that's why there are 2 FOR statements
                     break
         self.sorted_devices = sorted(dev)
-        self.devicetypeComboBox = MyQComboBox()
+        self.devicetypeComboBox = MyContentLimitedQComboBox()
 
 ##        self.devicetypeComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
 ##        self.devicetypeComboBox.view().setTextElideMode(Qt.TextElideMode.ElideNone)
@@ -1002,6 +1002,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.yoctoBoxRemoteFlag.stateChanged.connect(self.yoctoBoxRemoteFlagStateChanged)
         yoctoServerIdLabel = QLabel(QApplication.translate('Label','VirtualHub'))
         self.yoctoServerId = QLineEdit(self.aw.qmc.yoctoServerID)
+        self.yoctoServerId.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.yoctoServerId.setMinimumWidth(100)
+        self.yoctoServerId.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
         self.yoctoServerId.setEnabled(self.aw.qmc.yoctoRemoteFlag)
         YoctoEmissivityLabel = QLabel(QApplication.translate('Label','Emissivity'))
         self.yoctoEmissivitySpinBox = MyQDoubleSpinBox()
@@ -1013,6 +1016,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         yoctoServerBox.addWidget(yoctoServerIdLabel)
         yoctoServerBox.addSpacing(10)
         yoctoServerBox.addWidget(self.yoctoServerId)
+        yoctoServerBox.addStretch()
         yoctoServerBox.setContentsMargins(0,0,0,0)
         yoctoServerBox.setSpacing(10)
         yoctoNetworkGrid = QGridLayout()
@@ -1611,6 +1615,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             if vheader is not None:
                 vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
 
+            fixed_size_sections = [7,8,9,10,11,12,13,14]
             if nddevices:
                 dev = self.aw.qmc.devices[:]             #deep copy
                 limit = len(dev)
@@ -1623,7 +1628,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 for i in range(nddevices):
                     try:
                         # 0: device type
-                        typeComboBox =  MyQComboBox()
+                        typeComboBox =  MyContentLimitedQComboBox()
 #                        typeComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContentsOnFirstShow) # default
                         typeComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
 #                        typeComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
@@ -1742,7 +1747,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
-                fixed_size_sections = [7,8,9,10,11,12,13,14]
                 header = self.devicetable.horizontalHeader()
                 if header is not None:
                     header.setStretchLastSection(False)
@@ -1750,20 +1754,22 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     for i in fixed_size_sections:
                         header.setSectionResizeMode(i, QHeaderView.ResizeMode.Fixed)
                         header.resizeSection(i, header.sectionSize(i) + 5)
-                if not self.aw.qmc.devicetablecolumnwidths:
-                    self.devicetable.setColumnWidth(0, 100)
-                    self.devicetable.setColumnWidth(3, 100)
-                    self.devicetable.setColumnWidth(4, 100)
-                    self.devicetable.setColumnWidth(5, 40)
-                    self.devicetable.setColumnWidth(6, 40)
-                else:
-                    # remember the columnwidth
-                    for i, _ in enumerate(self.aw.qmc.devicetablecolumnwidths):
-                        if i not in fixed_size_sections:
-                            try:
-                                self.devicetable.setColumnWidth(i, self.aw.qmc.devicetablecolumnwidths[i])
-                            except Exception: # pylint: disable=broad-except
-                                pass
+            if not self.aw.qmc.devicetablecolumnwidths:
+                self.devicetable.setColumnWidth(0, 230)
+                self.devicetable.setColumnWidth(1, 80)
+                self.devicetable.setColumnWidth(2, 80)
+                self.devicetable.setColumnWidth(3, 80)
+                self.devicetable.setColumnWidth(4, 80)
+                self.devicetable.setColumnWidth(5, 40)
+                self.devicetable.setColumnWidth(6, 40)
+            else:
+                # remember the columnwidth
+                for i, _ in enumerate(self.aw.qmc.devicetablecolumnwidths):
+                    if i not in fixed_size_sections:
+                        try:
+                            self.devicetable.setColumnWidth(i, self.aw.qmc.devicetablecolumnwidths[i])
+                        except Exception: # pylint: disable=broad-except
+                            pass
         except Exception as e: # pylint: disable=broad-except
             _t, _e, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' createDeviceTable(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))

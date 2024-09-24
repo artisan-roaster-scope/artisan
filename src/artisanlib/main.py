@@ -117,7 +117,7 @@ try:
                              QInputDialog, QGroupBox, QLineEdit, # @Reimport @UnresolvedImport @UnusedImport
                              QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport @UnresolvedImport @UnusedImport
                              QLCDNumber, QSpinBox, QComboBox, # @Reimport @UnresolvedImport @UnusedImport
-                             QSlider, # @Reimport @UnresolvedImport @UnusedImport
+                             QSlider, QProxyStyle, QStyle, QStyleOption, QStyleHintReturn, # @Reimport @UnresolvedImport @UnusedImport
                              QColorDialog, QFrame, QScrollArea, QProgressDialog, # @Reimport @UnresolvedImport @UnusedImport
                              QStyleFactory, QMenu, QLayout) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt6.QtGui import (QScreen, QPageLayout, QAction, QImageReader, QWindow, # @Reimport @UnresolvedImport @UnusedImport
@@ -144,7 +144,7 @@ except ImportError:
                              QInputDialog, QGroupBox, QLineEdit, # @Reimport @UnresolvedImport @UnusedImport
                              QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton, # @Reimport @UnresolvedImport @UnusedImport
                              QLCDNumber, QSpinBox, QComboBox, # @Reimport @UnresolvedImport @UnusedImport
-                             QSlider, # @Reimport @UnresolvedImport @UnusedImport
+                             QSlider, QProxyStyle, QStyle, QStyleOption, QStyleHintReturn, # @Reimport @UnresolvedImport @UnusedImport
                              QColorDialog, QFrame, QScrollArea, QProgressDialog, # @Reimport @UnresolvedImport @UnusedImport
                              QStyleFactory, QMenu, QLayout, QShortcut) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt5.QtGui import (QScreen, QPageLayout, QImageReader, QWindow,  # type: ignore # @Reimport @UnresolvedImport @UnusedImport
@@ -591,6 +591,12 @@ class Artisan(QtSingleApplication):
 #        pass
 
 
+class MenuProxyStyle(QProxyStyle): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+
+    def styleHint(self, hint:QStyle.StyleHint, option:Optional[QStyleOption] = None, widget:Optional[QWidget] = None, returnData:Optional[QStyleHintReturn] = None) -> int:
+        if hint == QStyle.StyleHint.SH_ComboBox_Popup and isinstance(widget, MyContentLimitedQComboBox):
+            return 0
+        return QProxyStyle.styleHint(self, hint, option, widget, returnData)
 
 
 app_args = sys.argv
@@ -606,6 +612,9 @@ if sys.platform.startswith('linux'):
 #    except Exception as e: # pylint: disable=broad-except
 #        pass
 app = Artisan(app_args)
+# to limit the number of items displayed in a popup at once we fall back to non-native Qt QComboboxes in MyContentLimitedQComboBox
+# by resetting the style hint via a MenuProxy style object
+app.setStyle(MenuProxyStyle())
 
 
 # On the first run if there are legacy settings under "YourQuest" but no new settings under "artisan-scope" then the legacy settings
@@ -736,6 +745,7 @@ from artisanlib.widgets import (MyQLCDNumber, EventPushButton, MajorEventPushBut
 from artisanlib.notifications import Notification, NotificationManager, NotificationType
 from artisanlib.canvas import tgraphcanvas
 from artisanlib.phases_canvas import tphasescanvas
+from artisanlib.widgets import MyContentLimitedQComboBox
 
 
 # import artisan.plus module
