@@ -6301,7 +6301,7 @@ class tgraphcanvas(FigureCanvas):
         return -1
 
     #format X axis labels
-    def xaxistosm(self,redraw:bool = True, min_time:Optional[float] = None, max_time:Optional[float] = None) -> None:
+    def xaxistosm(self,redraw:bool = True, min_time:Optional[float] = None, max_time:Optional[float] = None, set_xlim:bool = True) -> None:
         if self.ax is None:
             return
         try:
@@ -6322,7 +6322,8 @@ class tgraphcanvas(FigureCanvas):
 
             endtime = endofx + starttime
 
-            self.ax.set_xlim(startofx,endtime)
+            if set_xlim:
+                self.ax.set_xlim(startofx,endtime)
 
             if self.xgrid != 0:
 
@@ -12829,9 +12830,10 @@ class tgraphcanvas(FigureCanvas):
     # if noaction is True, the button event action is not triggered
     @pyqtSlot(bool)
     def markCharge(self, noaction:bool = False) -> None:
+        zoomed_in: bool = False # True if zoomed in; in that case we prevent xaxistoxm to reset the x-axis limits (set_xlim)
         try:
-            if self.aw.ntb._nav_stack(): # pylint: disable=protected-access # if ZOOMED in we push state on stack
-                self.aw.ntb.push_current() # remember current canvas ZOOM/POSITION on stack
+            if self.aw.ntb._nav_stack(): # pylint: disable=protected-access
+                zoomed_in = True
         except Exception: # pylint: disable=broad-except
             pass
         removed = False
@@ -12864,7 +12866,7 @@ class tgraphcanvas(FigureCanvas):
                                 del self.l_annotations_dict[0]
                             self.timeindex[0] = -1
                             removed = True
-                            self.xaxistosm(redraw=False)
+                            self.xaxistosm(redraw=False, set_xlim=not zoomed_in)
                     elif not self.aw.buttonCHARGE.isFlat():
                         if self.device == 18 and self.aw.simulator is None: #manual mode
                             tx,et,bt = self.aw.ser.NONE()
@@ -12909,7 +12911,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.endofx = self.resetmaxtime
                         except Exception: # pylint: disable=broad-except
                             pass
-                        self.xaxistosm(redraw=False) # need to fix uneven x-axis labels like -0:13
+                        self.xaxistosm(redraw=False, set_xlim=not zoomed_in) # need to fix uneven x-axis labels like -0:13
 
                         if self.BTcurve or self.ETcurve:
                             temp = (self.temp2[self.timeindex[0]] if self.BTcurve else self.temp1[self.timeindex[0]])
@@ -12979,10 +12981,6 @@ class tgraphcanvas(FigureCanvas):
                 if self.roastpropertiesAutoOpenFlag:
                     self.aw.openPropertiesSignal.emit()
             self.aw.onMarkMoveToNext(self.aw.buttonCHARGE)
-        try:
-            self.aw.ntb._update_view() # type:ignore[has-type] # pylint: disable=protected-access # recallcanvas ZOOM/POSITION from stack
-        except Exception: # pylint: disable=broad-except
-            pass
 
     # called via markTPSignal (queued), triggered by external device
     # does directly call markTP()

@@ -22,6 +22,7 @@ v3.0.3
   - reduce the size of builds by removing unnecessary files
   - removes the optional delay on reads from serial MODBUS
   - adds optional delay after connect before sending requests to serial MODBUS to allow to wait for Arduino slaves to complete reboot ([Issue #1694](../../../issues/1694))
+  - limits the visible length of long popup lists in Devices and Statistics Dialog
 
 * FIXES
   - updates Cropster XLS importer ([Issue #1685](../../../issues/1685))
@@ -30,6 +31,8 @@ v3.0.3
   - fixes a regression which prevented loading settings written (slightly broken) by Artisan v3.0 ([Discussion #1692](../../../discussions/1692))
   - fixes a regression communicating with some serial MODBUS devices resulting from a more strict protocol interpretation by the underlying MODBUS pymodbus lib 3.7 introduced in Artisan v3.0.2, by adding a 'strict' flag (default off) to the serial MODBUS configuration ([Issue #1694](../../../issues/1694))
   - removes incorrectly reconstructed custom events outside of the CHARGE to DROP period on quitting the designer ([Discussion #1696](../../../discussions/1696))
+  - makes validation of numeric configuration input more robust ([Issue #1700](../../../issues/1700))
+  - ensures that splitter state in Comparator is properly reset on Factory Reset
 
 
 
