@@ -26,7 +26,7 @@ from typing import Final, Optional, List, Tuple, cast, TYPE_CHECKING
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
 
-from artisanlib.util import deltaLabelUTF8, setDeviceDebugLogLevel, argb_colorname2rgba_colorname, rgba_colorname2argb_colorname
+from artisanlib.util import deltaLabelUTF8, setDeviceDebugLogLevel, argb_colorname2rgba_colorname, rgba_colorname2argb_colorname, toInt
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import MyContentLimitedQComboBox, MyQComboBox, MyQDoubleSpinBox
 
@@ -2353,7 +2353,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 elif str(self.controlpidtypeComboBox.currentText()) == 'Fuji PXF':
                     self.aw.ser.controlETpid[0] = 4
                     str1 = 'Fuji PXF'
-                self.aw.ser.controlETpid[1] =  int(str(self.controlpidunitidComboBox.currentText()))
+                self.aw.ser.controlETpid[1] =  toInt(str(self.controlpidunitidComboBox.currentText()))
                 #if str(self.btpidtypeComboBox.currentText()) == 'Fuji PXG':
                 self.aw.ser.readBTpid[0] = 0
                 str2 = 'Fuji PXG'
@@ -2369,7 +2369,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 elif str(self.btpidtypeComboBox.currentText()) == 'Fuji PXF':
                     self.aw.ser.readBTpid[0] = 4
                     str2 = 'Fuji PXF'
-                self.aw.ser.readBTpid[1] =  int(str(self.btpidunitidComboBox.currentText()))
+                self.aw.ser.readBTpid[1] =  toInt(str(self.btpidunitidComboBox.currentText()))
                 if self.showFujiLCDs.isChecked():
                     self.aw.ser.showFujiLCDs = True
                 else:

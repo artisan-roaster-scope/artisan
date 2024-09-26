@@ -1833,12 +1833,15 @@ class DtaPID:
                   }
     #command  string = ID (ADR)+ FUNCTION (CMD) + ADDRESS + NDATA + LRC_CHK
     def writeDTE(self, value:str, DTAaddress:str) -> None:
-        newsv = hex(int(abs(float(str(value)))))[2:].upper()
-        slaveID = self.aw.ser.controlETpid[1]
-        if self.aw.ser.controlETpid[0] != 2: # control pid is not a DTA PID
-            slaveID = self.aw.ser.readBTpid[1]
-        command = self.aw.dtapid.message2send(slaveID,6,str(DTAaddress),newsv)
-        self.aw.ser.sendDTAcommand(command)
+        try:
+            newsv = hex(int(abs(float(str(value)))))[2:].upper() # can fail on value=''
+            slaveID = self.aw.ser.controlETpid[1]
+            if self.aw.ser.controlETpid[0] != 2: # control pid is not a DTA PID
+                slaveID = self.aw.ser.readBTpid[1]
+            command = self.aw.dtapid.message2send(slaveID,6,str(DTAaddress),newsv)
+            self.aw.ser.sendDTAcommand(command)
+        except Exception:  # pylint: disable=broad-except
+            pass
 
     def message2send(self, unitID:int, FUNCTION:int, ADDRESS:str, NDATA:Union[int,str]) -> str:
         #compose command

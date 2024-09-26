@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from PyQt6.QtWidgets import QWidget # pylint: disable=unused-import
     from PyQt6.QtGui import QCloseEvent, QKeyEvent # pylint: disable=unused-import
 
-from artisanlib.util import toFloat, uchr, comma2dot, float2float
+from artisanlib.util import toFloat, uchr, comma2dot, float2float, toInt
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog, PortComboBox
 from artisanlib.comm import serialport
 
@@ -1716,23 +1716,23 @@ class comportDlg(ArtisanResizeablDialog):
     def scanS7(self, _:bool = False) -> None:
         scan_S7_dlg = scanS7Dlg(self,self.aw)
         scan_S7_dlg.shost = str(self.s7_hostEdit.text())
-        scan_S7_dlg.sport = int(str(self.s7_portEdit.text()))
-        scan_S7_dlg.srack = int(str(self.s7_rackEdit.text()))
-        scan_S7_dlg.sslot = int(str(self.s7_slotEdit.text()))
+        scan_S7_dlg.sport = toInt(str(self.s7_portEdit.text()))
+        scan_S7_dlg.srack = toInt(str(self.s7_rackEdit.text()))
+        scan_S7_dlg.sslot = toInt(str(self.s7_slotEdit.text()))
         scan_S7_dlg.show()
 
     @pyqtSlot(bool)
     def scanModbus(self, _:bool = False) -> None:
         scan_modbuds_dlg = scanModbusDlg(self,self.aw)
         scan_modbuds_dlg.port = str(self.modbus_comportEdit.getSelection())
-        scan_modbuds_dlg.baudrate = int(str(self.modbus_baudrateComboBox.currentText()))
-        scan_modbuds_dlg.bytesize = int(str(self.modbus_bytesizeComboBox.currentText()))
-        scan_modbuds_dlg.stopbits = int(str(self.modbus_stopbitsComboBox.currentText()))
+        scan_modbuds_dlg.baudrate = toInt(str(self.modbus_baudrateComboBox.currentText()))
+        scan_modbuds_dlg.bytesize = toInt(str(self.modbus_bytesizeComboBox.currentText()))
+        scan_modbuds_dlg.stopbits = toInt(str(self.modbus_stopbitsComboBox.currentText()))
         scan_modbuds_dlg.parity = str(self.modbus_parityComboBox.currentText())
         scan_modbuds_dlg.timeout = float2float(toFloat(comma2dot(str(self.modbus_timeoutEdit.text()))))
         scan_modbuds_dlg.mtype = int(self.modbus_type.currentIndex())
         scan_modbuds_dlg.mhost = str(self.modbus_hostEdit.text())
-        scan_modbuds_dlg.mport = int(str(self.modbus_portEdit.text()))
+        scan_modbuds_dlg.mport = toInt(str(self.modbus_portEdit.text()))
         scan_modbuds_dlg.show()
 
     @pyqtSlot(int)
@@ -1821,13 +1821,13 @@ class comportDlg(ArtisanResizeablDialog):
                         comportComboBox = cast(PortComboBox, self.serialtable.cellWidget(i,1))
                         self.aw.extracomport[i] = str(comportComboBox.getSelection())
                         baudComboBox = cast(QComboBox, self.serialtable.cellWidget(i,2))
-                        self.aw.extrabaudrate[i] = int(str(baudComboBox.currentText()))
+                        self.aw.extrabaudrate[i] = toInt(str(baudComboBox.currentText()))
                         byteComboBox = cast(QComboBox, self.serialtable.cellWidget(i,3))
-                        self.aw.extrabytesize[i] = int(str(byteComboBox.currentText()))
+                        self.aw.extrabytesize[i] = toInt(str(byteComboBox.currentText()))
                         parityComboBox = cast(QComboBox, self.serialtable.cellWidget(i,4))
                         self.aw.extraparity[i] = str(parityComboBox.currentText())
                         stopbitsComboBox = cast(QComboBox, self.serialtable.cellWidget(i,5))
-                        self.aw.extrastopbits[i] = int(str(stopbitsComboBox.currentText()))
+                        self.aw.extrastopbits[i] = toInt(str(stopbitsComboBox.currentText()))
                         timeoutEdit = cast(QLineEdit, self.serialtable.cellWidget(i,6))
                         self.aw.extratimeout[i] = float(str(timeoutEdit.text()))
             #create serial ports for each extra device

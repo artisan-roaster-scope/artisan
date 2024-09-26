@@ -681,7 +681,10 @@ class WindowsDlg(ArtisanDialog):
             if self.aw.qmc.backgroundpath:
                 dmax_b = self.aw.calcAutoDeltaAxisBackground()
                 dmax = max(dmax,dmax_b)
-        zlimit_min = int(str(self.zlimitEdit_min.text()))
+        try:
+            zlimit_min = int(str(self.zlimitEdit_min.text()))
+        except Exception: # pylint: disable=broad-except
+            zlimit_min = self.aw.qmc.ylimit_min
         if dmax > zlimit_min and dmax+1 != self.aw.qmc.zlimit:
             self.zlimitEdit.setText(str(int(dmax) + 1))
             self.zlimitEdit.repaint()
@@ -690,7 +693,10 @@ class WindowsDlg(ArtisanDialog):
         self.aw.qmc.autodeltaxBT = autodeltaxBT_org
         # adjust zgrid
         if self.zgridSpinBox.value() != 0 and (self.autodeltaxETFlag.isChecked() or self.autodeltaxBTFlag.isChecked()):
-            zlimit_max = int(str(self.zlimitEdit.text()))
+            try:
+                zlimit_max = int(str(self.zlimitEdit.text()))
+            except Exception: # pylint: disable=broad-except
+                zlimit_max = self.aw.qmc.ylimit
             d = zlimit_max - zlimit_min
             steps = int(round(d/5))
             if steps > 50:

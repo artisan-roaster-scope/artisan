@@ -318,8 +318,14 @@ class designerconfigDlg(ArtisanDialog):
 
     @pyqtSlot(int)
     def redrawcurviness(self, _:int) -> None:
-        ETcurviness = int(str(self.ETsplineComboBox.currentText()))
-        BTcurviness = int(str(self.BTsplineComboBox.currentText()))
+        try:
+            ETcurviness = int(str(self.ETsplineComboBox.currentText()))
+        except Exception:  # pylint: disable=broad-except
+            ETcurviness = self.aw.qmc.ETsplinedegree
+        try:
+            BTcurviness = int(str(self.BTsplineComboBox.currentText()))
+        except Exception:  # pylint: disable=broad-except
+            BTcurviness = self.aw.qmc.BTsplinedegree
         timepoints = len(self.aw.qmc.timex)
         if (timepoints - ETcurviness) >= 1:
             self.aw.qmc.ETsplinedegree = ETcurviness

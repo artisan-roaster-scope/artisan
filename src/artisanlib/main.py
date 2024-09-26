@@ -80,20 +80,6 @@ from typing import Final, Optional, List, Dict, Tuple, Union, cast, Any, Callabl
 
 from functools import reduce as freduce
 
-# hack is not needed any longer and can lead to non-termination eg on importing the humanize lib
-### MONKEY PATCH BEGIN: importlib.metadata fix for macOS builds with py2app that fails to set proper metadata for prettytable >0.7.2 and thus fail
-### on import with importlib.metadata.PackageNotFoundError: prettytable on __version__ = importlib_metadata.version(__name__)
-#try:
-#    import importlib.metadata as importlib_metadata # @UnresolvedImport
-#    def md_version(distribution_name:str) -> str:
-#        if distribution_name == 'prettytable':
-#            return '2.1.0'
-#        return importlib_metadata.version(distribution_name)
-#    importlib_metadata.version = md_version
-#except Exception: # pylint: disable=broad-except
-#    pass
-### MONKEY PATCH END:
-
 try: # activate support for hiDPI screens on Windows
     if str(platform.system()).startswith('Windows'):
         os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = '1'
@@ -1011,26 +997,38 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         return res
 
     def press_pan(self, event:'MplEvent') -> None:
-        if self.qmc.ai is not None:
-            # we remember the axis ranges before the pan-zoom to detect if it was zoomed
-            self.axis_ranges = self.getAxisRanges()
+        try:
+            if self.qmc.ai is not None:
+                # we remember the axis ranges before the pan-zoom to detect if it was zoomed
+                self.axis_ranges = self.getAxisRanges()
+        except Exception as e:  # pylint: disable=broad-except
+            _log.error(e)
         super().press_pan(event)
 
     def forward(self, *args:Any) -> None:
-        if self.qmc.ai is not None:
-            self.qmc.ai.set_visible(False)  # whenever forward is pressed the image will be hidden
+        try:
+            if self.qmc.ai is not None:
+                self.qmc.ai.set_visible(False)  # whenever forward is pressed the image will be hidden
+        except Exception as e:  # pylint: disable=broad-except
+            _log.error(e)
         super().forward(*args)
 
     def back(self, *args:Any) -> None:
-        if self.qmc.ai is not None and self._nav_stack._pos == 1: # pylint: disable=protected-access
-            self.qmc.ai.set_visible(True)
+        try:
+            if self.qmc.ai is not None and self._nav_stack._pos == 1: # pylint: disable=protected-access
+                self.qmc.ai.set_visible(True)
+        except Exception as e:  # pylint: disable=broad-except
+            _log.error(e)
         super().back(*args)
 
     def home(self, *args:Any) -> None:
         """Restore the original view"""
         # show the background image again that was hidden on zoom-in
-        if self.qmc.ai is not None:
-            self.qmc.ai.set_visible(True)
+        try:
+            if self.qmc.ai is not None:
+                self.qmc.ai.set_visible(True)
+        except Exception as e:  # pylint: disable=broad-except
+            _log.error(e)
         super().home(*args)
 
         # toggle zoom_follow if recording
@@ -3802,9 +3800,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.splitter.setSizes([100,0])
         self.splitter.setFrameShape(QFrame.Shape.NoFrame)
         #self.splitter.handle(0).setVisible(False)
-        settings = QSettings()
-        if settings.contains('MainSplitter') and QApplication.queryKeyboardModifiers() != Qt.KeyboardModifier.AltModifier:
-            self.splitter.restoreState(settings.value('MainSplitter'))
 
         self.splitter.setHandleWidth(10)
         #self.splitter.setStyleSheet("QSplitter::handle:vertical {background: lightGray; border-bottom: 1px solid grey; border-top: 1px solid grey;}")
@@ -16722,6 +16717,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 # NOTE: only the main window Geometry is exported to a settings file
                 self.clearWindowGeometry(settings)
 
+            if settings.contains('MainSplitter') and QApplication.queryKeyboardModifiers() != Qt.KeyboardModifier.AltModifier:
+                self.splitter.restoreState(settings.value('MainSplitter'))
+
             #restore device
 
 #--- BEGIN GROUP Device
@@ -22801,43 +22799,52 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 # disconnect HOTTOP
                 self.hottop.stop()
             # set serial port
-            self.ser.comport = str(dialog.comportEdit.getSelection())
-            self.ser.baudrate = int(str(dialog.baudrateComboBox.currentText()))              #int changes QString to int
-            self.ser.bytesize = int(str(dialog.bytesizeComboBox.currentText()))
-            self.ser.stopbits = int(str(dialog.stopbitsComboBox.currentText()))
-            self.ser.parity = str(dialog.parityComboBox.currentText())
-            self.ser.timeout = float2float(toFloat(comma2dot(str(dialog.timeoutEdit.text()))))
+            try:
+                self.ser.comport = str(dialog.comportEdit.getSelection())
+                self.ser.baudrate = toInt(str(dialog.baudrateComboBox.currentText()))              #int changes QString to int
+                self.ser.bytesize = toInt(str(dialog.bytesizeComboBox.currentText()))
+                self.ser.stopbits = toInt(str(dialog.stopbitsComboBox.currentText()))
+                self.ser.parity = str(dialog.parityComboBox.currentText())
+                self.ser.timeout = float2float(toFloat(comma2dot(str(dialog.timeoutEdit.text()))))
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
             # set modbus port
-            self.modbus.comport = str(dialog.modbus_comportEdit.getSelection())
-            self.modbus.baudrate = int(str(dialog.modbus_baudrateComboBox.currentText()))              #int changes QString to int
-            self.modbus.bytesize = int(str(dialog.modbus_bytesizeComboBox.currentText()))
-            self.modbus.stopbits = int(str(dialog.modbus_stopbitsComboBox.currentText()))
-            self.modbus.parity = str(dialog.modbus_parityComboBox.currentText())
-            self.modbus.timeout = max(0.3, float2float(toFloat(str(dialog.modbus_timeoutEdit.text()))))  # minimum serial timeout should be 300ms
+            try:
+                self.modbus.comport = str(dialog.modbus_comportEdit.getSelection())
+                self.modbus.baudrate = toInt(str(dialog.modbus_baudrateComboBox.currentText()))              #int changes QString to int
+                self.modbus.bytesize = toInt(str(dialog.modbus_bytesizeComboBox.currentText()))
+                self.modbus.stopbits = toInt(str(dialog.modbus_stopbitsComboBox.currentText()))
+                self.modbus.parity = str(dialog.modbus_parityComboBox.currentText())
+                self.modbus.timeout = max(0.3, float2float(toFloat(str(dialog.modbus_timeoutEdit.text()))))  # minimum serial timeout should be 300ms
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
             try:
                 self.modbus.modbus_serial_connect_delay = float2float(toFloat(dialog.modbus_Serial_delayEdit.text()))
-            except Exception: # pylint: disable=broad-except
-                pass
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
             self.modbus.serial_readRetries = dialog.modbus_Serial_retriesComboBox.currentIndex()
             try:
                 self.modbus.IP_timeout = float2float(toFloat(str(dialog.modbus_IP_timeoutEdit.text())))
             except Exception: # pylint: disable=broad-except
                 pass
-            self.modbus.serial_strict_timing = bool(dialog.modbus_Serial_strict.isChecked())
-            self.modbus.IP_retries = dialog.modbus_IP_retriesComboBox.currentIndex()
-            self.modbus.PID_slave_ID = int(str(dialog.modbus_PIDslave_Edit.text()))
-            self.modbus.PID_SV_register = int(str(dialog.modbus_SVregister_Edit.text()))
-            self.modbus.PID_p_register = int(str(dialog.modbus_Pregister_Edit.text()))
-            self.modbus.PID_i_register = int(str(dialog.modbus_Iregister_Edit.text()))
-            self.modbus.PID_d_register = int(str(dialog.modbus_Dregister_Edit.text()))
-            self.modbus.PID_OFF_action = s2a(toString(dialog.modbus_pid_off.text()))
-            self.modbus.PID_ON_action = s2a(toString(dialog.modbus_pid_on.text()))
+            try:
+                self.modbus.serial_strict_timing = bool(dialog.modbus_Serial_strict.isChecked())
+                self.modbus.IP_retries = dialog.modbus_IP_retriesComboBox.currentIndex()
+                self.modbus.PID_slave_ID = toInt(str(dialog.modbus_PIDslave_Edit.text()))
+                self.modbus.PID_SV_register = toInt(str(dialog.modbus_SVregister_Edit.text()))
+                self.modbus.PID_p_register = toInt(str(dialog.modbus_Pregister_Edit.text()))
+                self.modbus.PID_i_register = toInt(str(dialog.modbus_Iregister_Edit.text()))
+                self.modbus.PID_d_register = toInt(str(dialog.modbus_Dregister_Edit.text()))
+                self.modbus.PID_OFF_action = s2a(toString(dialog.modbus_pid_off.text()))
+                self.modbus.PID_ON_action = s2a(toString(dialog.modbus_pid_on.text()))
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
 
             for i in range(self.modbus.channels):
                 try:
                     inputSlaveEdit = dialog.modbus_inputSlaveEdits[i]
                     if inputSlaveEdit is not None:
-                        self.modbus.inputSlaves[i] = int(inputSlaveEdit.text())
+                        self.modbus.inputSlaves[i] = toInt(inputSlaveEdit.text())
                 except Exception: # pylint: disable=broad-except
                     self.modbus.inputSlaves[i] = 0
                 try:
@@ -22918,88 +22925,103 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.modbus.type = int(dialog.modbus_type.currentIndex())
             self.modbus.host = str(dialog.modbus_hostEdit.text())
             try:
-                self.modbus.port = int(str(dialog.modbus_portEdit.text()))
-            except Exception: # pylint: disable=broad-except
-                pass
+                self.modbus.port = toInt(str(dialog.modbus_portEdit.text()))
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
 
             # WebSocket Setup
-            self.ws.compression = dialog.ws_compression.isChecked()
-            self.ws.host = str(dialog.ws_hostEdit.text()).strip()
-            self.ws.port = int(str(dialog.ws_portEdit.text()))
-            self.ws.path = str(dialog.ws_pathEdit.text()).strip()
-            self.ws.machineID = int(str(dialog.ws_machineIDEdit.text()))
-            self.ws.connect_timeout = float(dialog.ws_connect_timeout.value())
-            self.ws.reconnect_interval = float(dialog.ws_reconnect_timeout.value())
-            self.ws.request_timeout = float(dialog.ws_request_timeout.value())
-            self.ws.id_node = str(dialog.ws_messageID.text()).strip()
-            self.ws.machine_node = str(dialog.ws_machineID.text()).strip()
-            self.ws.command_node = str(dialog.ws_command.text()).strip()
-            self.ws.data_node = str(dialog.ws_data.text()).strip()
-            self.ws.pushMessage_node = str(dialog.ws_message.text())
-            self.ws.request_data_command = str(dialog.ws_data_request.text()).strip()
-            self.ws.charge_message = str(dialog.ws_charge.text()).strip()
-            self.ws.drop_message = str(dialog.ws_drop.text()).strip()
-            self.ws.STARTonCHARGE = bool(dialog.ws_STARTonCHARGE.isChecked())
-            self.ws.OFFonDROP = bool(dialog.ws_OFFonDROP.isChecked())
-            self.ws.addEvent_message = str(dialog.ws_event_message.text()).strip()
-            self.ws.event_node = str(dialog.ws_event.text()).strip()
-            self.ws.DRY_node = str(dialog.ws_DRY.text()).strip()
-            self.ws.FCs_node = str(dialog.ws_FCs.text()).strip()
-            self.ws.FCe_node = str(dialog.ws_FCe.text()).strip()
-            self.ws.SCs_node = str(dialog.ws_SCs.text()).strip()
-            self.ws.SCe_node = str(dialog.ws_SCe.text()).strip()
+            try:
+                self.ws.compression = dialog.ws_compression.isChecked()
+                self.ws.host = str(dialog.ws_hostEdit.text()).strip()
+                self.ws.port = toInt(str(dialog.ws_portEdit.text()))
+                self.ws.path = str(dialog.ws_pathEdit.text()).strip()
+                self.ws.machineID = toInt(str(dialog.ws_machineIDEdit.text()))
+                self.ws.connect_timeout = float(dialog.ws_connect_timeout.value())
+                self.ws.reconnect_interval = float(dialog.ws_reconnect_timeout.value())
+                self.ws.request_timeout = float(dialog.ws_request_timeout.value())
+                self.ws.id_node = str(dialog.ws_messageID.text()).strip()
+                self.ws.machine_node = str(dialog.ws_machineID.text()).strip()
+                self.ws.command_node = str(dialog.ws_command.text()).strip()
+                self.ws.data_node = str(dialog.ws_data.text()).strip()
+                self.ws.pushMessage_node = str(dialog.ws_message.text())
+                self.ws.request_data_command = str(dialog.ws_data_request.text()).strip()
+                self.ws.charge_message = str(dialog.ws_charge.text()).strip()
+                self.ws.drop_message = str(dialog.ws_drop.text()).strip()
+                self.ws.STARTonCHARGE = bool(dialog.ws_STARTonCHARGE.isChecked())
+                self.ws.OFFonDROP = bool(dialog.ws_OFFonDROP.isChecked())
+                self.ws.addEvent_message = str(dialog.ws_event_message.text()).strip()
+                self.ws.event_node = str(dialog.ws_event.text()).strip()
+                self.ws.DRY_node = str(dialog.ws_DRY.text()).strip()
+                self.ws.FCs_node = str(dialog.ws_FCs.text()).strip()
+                self.ws.FCe_node = str(dialog.ws_FCe.text()).strip()
+                self.ws.SCs_node = str(dialog.ws_SCs.text()).strip()
+                self.ws.SCe_node = str(dialog.ws_SCe.text()).strip()
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
 
             for i in range(self.ws.channels):
-                self.ws.channel_requests[i] = str(dialog.ws_requestEdits[i].text()).strip()
-                self.ws.channel_nodes[i] = str(dialog.ws_nodeEdits[i].text()).strip()
-                self.ws.channel_modes[i] = int(dialog.ws_modeCombos[i].currentIndex())
+                try:
+                    self.ws.channel_requests[i] = str(dialog.ws_requestEdits[i].text()).strip()
+                    self.ws.channel_nodes[i] = str(dialog.ws_nodeEdits[i].text()).strip()
+                    self.ws.channel_modes[i] = toInt(dialog.ws_modeCombos[i].currentIndex())
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
 
             # S7 Setup
-            self.s7.host = str(dialog.s7_hostEdit.text())
-            self.s7.port = int(str(dialog.s7_portEdit.text()))
-            self.s7.rack = int(str(dialog.s7_rackEdit.text()))
-            self.s7.slot = int(str(dialog.s7_slotEdit.text()))
-            for i in range(self.s7.channels):
-                self.s7.area[i] = dialog.s7_areaCombos[i].currentIndex()
-                self.s7.db_nr[i] = int(str(dialog.s7_dbEdits[i].text()))
-                self.s7.start[i] = int(str(dialog.s7_startEdits[i].text()))
-                self.s7.type[i] = dialog.s7_typeCombos[i].currentIndex()
-                self.s7.div[i] = dialog.s7_divCombos[i].currentIndex()
-                self.s7.mode[i] = dialog.s7_modeCombos[i].currentIndex()
-            self.s7.PID_area = dialog.s7_PIDarea.currentIndex()
-            self.s7.PID_db_nr = int(str(dialog.s7_PIDdb_nr_Edit.text()))
-            self.s7.PID_SV_register = int(str(dialog.s7_SVregister_Edit.text()))
-            self.s7.SVmultiplier = dialog.s7_SVmultiplier.currentIndex()
-            self.s7.SVtype = dialog.s7_SVtype.currentIndex()
-            self.s7.PIDmultiplier = dialog.s7_PIDmultiplier.currentIndex()
-            self.s7.PID_p_register = int(str(dialog.s7_Pregister_Edit.text()))
-            self.s7.PID_i_register = int(str(dialog.s7_Iregister_Edit.text()))
-            self.s7.PID_d_register = int(str(dialog.s7_Dregister_Edit.text()))
-            self.s7.PID_OFF_action = s2a(toString(dialog.s7_pid_off.text()))
-            self.s7.PID_ON_action = s2a(toString(dialog.s7_pid_on.text()))
-            self.s7.optimizer = bool(dialog.s7_optimize.isChecked())
-            self.s7.fetch_max_blocks = bool(dialog.s7_full_block.isChecked())
+            try:
+                self.s7.host = str(dialog.s7_hostEdit.text())
+                self.s7.port = toInt(str(dialog.s7_portEdit.text()))
+                self.s7.rack = toInt(str(dialog.s7_rackEdit.text()))
+                self.s7.slot = toInt(str(dialog.s7_slotEdit.text()))
+                for i in range(self.s7.channels):
+                    self.s7.area[i] = dialog.s7_areaCombos[i].currentIndex()
+                    self.s7.db_nr[i] = toInt(str(dialog.s7_dbEdits[i].text()))
+                    self.s7.start[i] = toInt(str(dialog.s7_startEdits[i].text()))
+                    self.s7.type[i] = dialog.s7_typeCombos[i].currentIndex()
+                    self.s7.div[i] = dialog.s7_divCombos[i].currentIndex()
+                    self.s7.mode[i] = dialog.s7_modeCombos[i].currentIndex()
+                self.s7.PID_area = dialog.s7_PIDarea.currentIndex()
+                self.s7.PID_db_nr = toInt(str(dialog.s7_PIDdb_nr_Edit.text()))
+                self.s7.PID_SV_register = toInt(str(dialog.s7_SVregister_Edit.text()))
+                self.s7.SVmultiplier = dialog.s7_SVmultiplier.currentIndex()
+                self.s7.SVtype = dialog.s7_SVtype.currentIndex()
+                self.s7.PIDmultiplier = dialog.s7_PIDmultiplier.currentIndex()
+                self.s7.PID_p_register = toInt(str(dialog.s7_Pregister_Edit.text()))
+                self.s7.PID_i_register = toInt(str(dialog.s7_Iregister_Edit.text()))
+                self.s7.PID_d_register = toInt(str(dialog.s7_Dregister_Edit.text()))
+                self.s7.PID_OFF_action = s2a(toString(dialog.s7_pid_off.text()))
+                self.s7.PID_ON_action = s2a(toString(dialog.s7_pid_on.text()))
+                self.s7.optimizer = bool(dialog.s7_optimize.isChecked())
+                self.s7.fetch_max_blocks = bool(dialog.s7_full_block.isChecked())
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
 
             # set scale port
-            self.scale.device = str(dialog.scale_deviceEdit.currentText())                #unicode() changes QString to a python string
-            if self.scale.device in self.scale.bluetooth_devices and not self.app.getBluetoothPermission():
-                self.scale.device = None
-                message:str = QApplication.translate('Message','Bluetooth scale cannot be connected while permission for Artisan to access Bluetooth is denied')
-                QMessageBox.information(self, QApplication.translate('Message','Bluetooth access denied'), message)
-            self.scale.comport = str(dialog.scale_comportEdit.getSelection())
-            self.scale.baudrate = int(str(dialog.scale_baudrateComboBox.currentText()))              #int changes QString to int
-            self.scale.bytesize = int(str(dialog.scale_bytesizeComboBox.currentText()))
-            self.scale.stopbits = int(str(dialog.scale_stopbitsComboBox.currentText()))
-            self.scale.parity = str(dialog.scale_parityComboBox.currentText())
-            self.scale.timeout = float2float(toFloat(comma2dot(str(dialog.scale_timeoutEdit.text()))))
+            try:
+                self.scale.device = str(dialog.scale_deviceEdit.currentText())                #unicode() changes QString to a python string
+                if self.scale.device in self.scale.bluetooth_devices and not self.app.getBluetoothPermission():
+                    self.scale.device = None
+                    message:str = QApplication.translate('Message','Bluetooth scale cannot be connected while permission for Artisan to access Bluetooth is denied')
+                    QMessageBox.information(self, QApplication.translate('Message','Bluetooth access denied'), message)
+                self.scale.comport = str(dialog.scale_comportEdit.getSelection())
+                self.scale.baudrate = toInt(str(dialog.scale_baudrateComboBox.currentText()))              #int changes QString to int
+                self.scale.bytesize = toInt(str(dialog.scale_bytesizeComboBox.currentText()))
+                self.scale.stopbits = toInt(str(dialog.scale_stopbitsComboBox.currentText()))
+                self.scale.parity = str(dialog.scale_parityComboBox.currentText())
+                self.scale.timeout = float2float(toFloat(comma2dot(str(dialog.scale_timeoutEdit.text()))))
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
             # set color port
-            self.color.device = str(dialog.color_deviceEdit.currentText())                #unicode() changes QString to a python string
-            self.color.comport = str(dialog.color_comportEdit.getSelection())
-            self.color.baudrate = int(str(dialog.color_baudrateComboBox.currentText()))              #int changes QString to int
-            self.color.bytesize = int(str(dialog.color_bytesizeComboBox.currentText()))
-            self.color.stopbits = int(str(dialog.color_stopbitsComboBox.currentText()))
-            self.color.parity = str(dialog.color_parityComboBox.currentText())
-            self.color.timeout = float2float(toFloat(comma2dot(str(dialog.color_timeoutEdit.text()))))
+            try:
+                self.color.device = str(dialog.color_deviceEdit.currentText())                #unicode() changes QString to a python string
+                self.color.comport = str(dialog.color_comportEdit.getSelection())
+                self.color.baudrate = toInt(str(dialog.color_baudrateComboBox.currentText()))              #int changes QString to int
+                self.color.bytesize = toInt(str(dialog.color_bytesizeComboBox.currentText()))
+                self.color.stopbits = toInt(str(dialog.color_stopbitsComboBox.currentText()))
+                self.color.parity = str(dialog.color_parityComboBox.currentText())
+                self.color.timeout = float2float(toFloat(comma2dot(str(dialog.color_timeoutEdit.text()))))
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
 #        # deleteLater() will not work here as the dialog is still bound via the parent
 #        dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
 #        # the following will immediately release the memory despite this parent link

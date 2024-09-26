@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from PyQt6.QtWidgets import QWidget # pylint: disable=unused-import
     from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
-from artisanlib.util import stringfromseconds, stringtoseconds, comma2dot
+from artisanlib.util import stringfromseconds, stringtoseconds, comma2dot, toInt, toFloat
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
 
@@ -303,7 +303,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidSV.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSV.setRange(0,999)
         self.pidSV.setSingleStep(10)
-        self.pidSV.setValue(int(self.aw.pidcontrol.svValue))
+        self.pidSV.setValue(toInt(self.aw.pidcontrol.svValue))
         self.pidSV.setToolTip(QApplication.translate('Tooltip', 'Manual set value (SV)'))
         pidSVLabel = QLabel(QApplication.translate('Label','SV'))
 
@@ -3401,49 +3401,49 @@ class PXG4pidDlgControl(PXpidDlgControl):
         if len(r) == 8:
             if i == 1:
                 self.sv1edit.setText(comma2dot(str(self.sv1edit.text())))
-                reg_dict[svkey][0] = float(str(self.sv1edit.text()))
+                reg_dict[svkey][0] = toFloat(self.sv1edit.text())
                 message = QApplication.translate('StatusBar','SV{0} successfully set to {1}',None).format(str(i),str(self.sv1edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(1)
                 self.aw.lcd6.display(self.sv1edit.text())
             elif i == 2:
                 self.sv2edit.setText(comma2dot(str(self.sv2edit.text())))
-                reg_dict[svkey][0] = float(str(self.sv2edit.text()))
+                reg_dict[svkey][0] = toFloat(str(self.sv2edit.text()))
                 message = QApplication.translate('StatusBar','SV{0} successfully set to {1}',None).format(str(i),str(self.sv2edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(2)
                 self.aw.lcd6.display(self.sv2edit.text())
             elif i == 3:
                 self.sv3edit.setText(comma2dot(str(self.sv3edit.text())))
-                reg_dict[svkey][0] = float(str(self.sv3edit.text()))
+                reg_dict[svkey][0] = toFloat(str(self.sv3edit.text()))
                 message = QApplication.translate('StatusBar','SV{0} successfully set to {1}',None).format(str(i),str(self.sv3edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(3)
                 self.aw.lcd6.display(self.sv3edit.text())
             elif i == 4:
                 self.sv4edit.setText(comma2dot(str(self.sv4edit.text())))
-                reg_dict[svkey][0] = float(str(self.sv4edit.text()))
+                reg_dict[svkey][0] = toFloat(str(self.sv4edit.text()))
                 message = QApplication.translate('StatusBar','SV{0} successfully set to {1}',None).format(str(i),str(self.sv4edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(4)
                 self.aw.lcd6.display(self.sv4edit.text())
             elif i == 5:
                 self.sv5edit.setText(comma2dot(str(self.sv5edit.text())))
-                reg_dict[svkey][0] = float(str(self.sv5edit.text()))
+                reg_dict[svkey][0] = toFloat(str(self.sv5edit.text()))
                 message = QApplication.translate('StatusBar','SV{0} successfully set to {1}',None).format(str(i),str(self.sv5edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(5)
                 self.aw.lcd6.display(self.sv5edit.text())
             elif i == 6:
                 self.sv6edit.setText(comma2dot(str(self.sv6edit.text())))
-                reg_dict[svkey][0] = float(str(self.sv6edit.text()))
+                reg_dict[svkey][0] = toFloat(str(self.sv6edit.text()))
                 message = QApplication.translate('StatusBar','SV{0} successfully set to {1}',None).format(str(i),str(self.sv6edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(6)
                 self.aw.lcd6.display(self.sv6edit.text())
             elif i == 7:
                 self.sv7edit.setText(comma2dot(str(self.sv7edit.text())))
-                reg_dict[svkey][0] = float(str(self.sv7edit.text()))
+                reg_dict[svkey][0] = toFloat(str(self.sv7edit.text()))
                 message = QApplication.translate('StatusBar','SV{0} successfully set to {1}',None).format(str(i),str(self.sv7edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(7)
@@ -3485,33 +3485,33 @@ class PXG4pidDlgControl(PXpidDlgControl):
             reg_dict = self.aw.fujipid.PXF
         #first get the new sv value from the corresponding edit ine
         if k == 1 and self.p1edit.text() != '' and self.i1edit.text() != '' and self.d1edit.text() != '':
-            newPvalue = int(float(str(self.p1edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
-            newIvalue = int(float(str(self.i1edit.text().replace(',','.')))*10.)
-            newDvalue = int(float(str(self.d1edit.text().replace(',','.')))*10.)
+            newPvalue = int(toFloat(str(self.p1edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
+            newIvalue = int(toFloat(str(self.i1edit.text().replace(',','.')))*10.)
+            newDvalue = int(toFloat(str(self.d1edit.text().replace(',','.')))*10.)
         elif k == 2 and self.p2edit.text() != '' and self.i2edit.text() != '' and self.d2edit.text() != '':
-            newPvalue = int(float(str(self.p2edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
-            newIvalue = int(float(str(self.i2edit.text().replace(',','.')))*10.)
-            newDvalue = int(float(str(self.d2edit.text().replace(',','.')))*10.)
+            newPvalue = int(toFloat(str(self.p2edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
+            newIvalue = int(toFloat(str(self.i2edit.text().replace(',','.')))*10.)
+            newDvalue = int(toFloat(str(self.d2edit.text().replace(',','.')))*10.)
         elif k == 3 and self.p3edit.text() != '' and self.i3edit.text() != '' and self.d3edit.text() != '':
-            newPvalue = int(float(str(self.p3edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
-            newIvalue = int(float(str(self.i3edit.text().replace(',','.')))*10.)
-            newDvalue = int(float(str(self.d3edit.text().replace(',','.')))*10.)
+            newPvalue = int(toFloat(str(self.p3edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
+            newIvalue = int(toFloat(str(self.i3edit.text().replace(',','.')))*10.)
+            newDvalue = int(toFloat(str(self.d3edit.text().replace(',','.')))*10.)
         elif k == 4 and self.p4edit.text() != '' and self.i4edit.text() != '' and self.d4edit.text() != '':
-            newPvalue = int(float(str(self.p4edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
-            newIvalue = int(float(str(self.i4edit.text().replace(',','.')))*10.)
-            newDvalue = int(float(str(self.d4edit.text().replace(',','.')))*10.)
+            newPvalue = int(toFloat(str(self.p4edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
+            newIvalue = int(toFloat(str(self.i4edit.text().replace(',','.')))*10.)
+            newDvalue = int(toFloat(str(self.d4edit.text().replace(',','.')))*10.)
         elif k == 5 and self.p5edit.text() != '' and self.i5edit.text() != '' and self.d5edit.text() != '':
-            newPvalue = int(float(str(self.p5edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
-            newIvalue = int(float(str(self.i5edit.text().replace(',','.')))*10.)
-            newDvalue = int(float(str(self.d5edit.text().replace(',','.')))*10.)
+            newPvalue = int(toFloat(str(self.p5edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
+            newIvalue = int(toFloat(str(self.i5edit.text().replace(',','.')))*10.)
+            newDvalue = int(toFloat(str(self.d5edit.text().replace(',','.')))*10.)
         elif k == 6 and self.p6edit.text() != '' and self.i6edit.text() != '' and self.d6edit.text() != '':
-            newPvalue = int(float(str(self.p6edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
-            newIvalue = int(float(str(self.i6edit.text().replace(',','.')))*10.)
-            newDvalue = int(float(str(self.d6edit.text().replace(',','.')))*10.)
+            newPvalue = int(toFloat(str(self.p6edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
+            newIvalue = int(toFloat(str(self.i6edit.text().replace(',','.')))*10.)
+            newDvalue = int(toFloat(str(self.d6edit.text().replace(',','.')))*10.)
         elif k == 7 and self.p7edit.text() != '' and self.i7edit.text() != '' and self.d7edit.text() != '':
-            newPvalue = int(float(str(self.p7edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
-            newIvalue = int(float(str(self.i7edit.text().replace(',','.')))*10.)
-            newDvalue = int(float(str(self.d7edit.text().replace(',','.')))*10.)
+            newPvalue = int(toFloat(str(self.p7edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
+            newIvalue = int(toFloat(str(self.i7edit.text().replace(',','.')))*10.)
+            newDvalue = int(toFloat(str(self.d7edit.text().replace(',','.')))*10.)
         else:
             return
         #send command to the right sv
@@ -3539,57 +3539,57 @@ class PXG4pidDlgControl(PXpidDlgControl):
         #verify it went ok
         if len(p) == 8 and len(i)==8 and len(d) == 8:
             if k == 1:
-                reg_dict[pkey][0] = float(str(self.p1edit.text().replace(',','.')))
-                reg_dict[ikey][0] = float(str(self.i1edit.text().replace(',','.')))
-                reg_dict[dkey][0] = float(str(self.d1edit.text().replace(',','.')))
+                reg_dict[pkey][0] = toFloat(str(self.p1edit.text().replace(',','.')))
+                reg_dict[ikey][0] = toFloat(str(self.i1edit.text().replace(',','.')))
+                reg_dict[dkey][0] = toFloat(str(self.d1edit.text().replace(',','.')))
                 message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})',None
                                                    )).format(str(k),str(self.p1edit.text()),str(self.i1edit.text()),str(self.d1edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(1)
             elif k == 2:
-                reg_dict[pkey][0] = float(str(self.p2edit.text().replace(',','.')))
-                reg_dict[ikey][0] = float(str(self.i2edit.text().replace(',','.')))
-                reg_dict[dkey][0] = float(str(self.d2edit.text().replace(',','.')))
+                reg_dict[pkey][0] = toFloat(str(self.p2edit.text().replace(',','.')))
+                reg_dict[ikey][0] = toFloat(str(self.i2edit.text().replace(',','.')))
+                reg_dict[dkey][0] = toFloat(str(self.d2edit.text().replace(',','.')))
                 message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})',None
                                                    )).format(str(k),str(self.p2edit.text()),str(self.i2edit.text()),str(self.d2edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(2)
             elif k == 3:
-                reg_dict[pkey][0] = float(str(self.p3edit.text().replace(',','.')))
-                reg_dict[ikey][0] = float(str(self.i3edit.text().replace(',','.')))
-                reg_dict[dkey][0] = float(str(self.d3edit.text().replace(',','.')))
+                reg_dict[pkey][0] = toFloat(str(self.p3edit.text().replace(',','.')))
+                reg_dict[ikey][0] = toFloat(str(self.i3edit.text().replace(',','.')))
+                reg_dict[dkey][0] = toFloat(str(self.d3edit.text().replace(',','.')))
                 message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})',None
                                                    )).format(str(k),str(self.p3edit.text()),str(self.i3edit.text()),str(self.d3edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(3)
             elif k == 4:
-                reg_dict[pkey][0] = float(str(self.p4edit.text().replace(',','.')))
-                reg_dict[ikey][0] = float(str(self.i4edit.text().replace(',','.')))
-                reg_dict[dkey][0] = float(str(self.d4edit.text().replace(',','.')))
+                reg_dict[pkey][0] = toFloat(str(self.p4edit.text().replace(',','.')))
+                reg_dict[ikey][0] = toFloat(str(self.i4edit.text().replace(',','.')))
+                reg_dict[dkey][0] = toFloat(str(self.d4edit.text().replace(',','.')))
                 message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})',None
                                                    )).format(str(k),str(self.p4edit.text()),str(self.i4edit.text()),str(self.d4edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(4)
             elif k == 5:
-                reg_dict[pkey][0] = float(str(self.p5edit.text().replace(',','.')))
-                reg_dict[ikey][0] = float(str(self.i5edit.text().replace(',','.')))
-                reg_dict[dkey][0] = float(str(self.d5edit.text().replace(',','.')))
+                reg_dict[pkey][0] = toFloat(str(self.p5edit.text().replace(',','.')))
+                reg_dict[ikey][0] = toFloat(str(self.i5edit.text().replace(',','.')))
+                reg_dict[dkey][0] = toFloat(str(self.d5edit.text().replace(',','.')))
                 message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})',None
                                                    )).format(str(k),str(self.p5edit.text()),str(self.i5edit.text()),str(self.d5edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(5)
             elif k == 6:
-                reg_dict[pkey][0] = float(str(self.p6edit.text().replace(',','.')))
-                reg_dict[ikey][0] = float(str(self.i6edit.text().replace(',','.')))
-                reg_dict[dkey][0] = float(str(self.d6edit.text().replace(',','.')))
+                reg_dict[pkey][0] = toFloat(str(self.p6edit.text().replace(',','.')))
+                reg_dict[ikey][0] = toFloat(str(self.i6edit.text().replace(',','.')))
+                reg_dict[dkey][0] = toFloat(str(self.d6edit.text().replace(',','.')))
                 message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})',None
                                                    )).format(str(k),str(self.p6edit.text()),str(self.i6edit.text()),str(self.d6edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(6)
             elif k == 7:
-                reg_dict[pkey][0] = float(str(self.p7edit.text().replace(',','.')))
-                reg_dict[ikey][0] = float(str(self.i7edit.text().replace(',','.')))
-                reg_dict[dkey][0] = float(str(self.d7edit.text().replace(',','.')))
+                reg_dict[pkey][0] = toFloat(str(self.p7edit.text().replace(',','.')))
+                reg_dict[ikey][0] = toFloat(str(self.i7edit.text().replace(',','.')))
+                reg_dict[dkey][0] = toFloat(str(self.d7edit.text().replace(',','.')))
                 message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})',None
                                                    )).format(str(k),str(self.p7edit.text()),str(self.i7edit.text()),str(self.d7edit.text()))
                 self.status.showMessage(message,5000)
@@ -4116,46 +4116,55 @@ class PXG4pidDlgControl(PXpidDlgControl):
     @pyqtSlot(bool)
     def accept(self, _:bool = False) -> None:
         # store set values
-        self.aw.fujipid.PXG4['sv1'][0] = float(comma2dot(self.sv1edit.text()))
-        self.aw.fujipid.PXG4['sv2'][0] = float(comma2dot(self.sv2edit.text()))
-        self.aw.fujipid.PXG4['sv3'][0] = float(comma2dot(self.sv3edit.text()))
-        self.aw.fujipid.PXG4['sv4'][0] = float(comma2dot(self.sv4edit.text()))
-        self.aw.fujipid.PXG4['sv5'][0] = float(comma2dot(self.sv5edit.text()))
-        self.aw.fujipid.PXG4['sv6'][0] = float(comma2dot(self.sv6edit.text()))
-        self.aw.fujipid.PXG4['sv7'][0] = float(comma2dot(self.sv7edit.text()))
+        self.aw.fujipid.PXG4['sv1'][0] = toFloat(comma2dot(self.sv1edit.text()))
+        self.aw.fujipid.PXG4['sv2'][0] = toFloat(comma2dot(self.sv2edit.text()))
+        self.aw.fujipid.PXG4['sv3'][0] = toFloat(comma2dot(self.sv3edit.text()))
+        self.aw.fujipid.PXG4['sv4'][0] = toFloat(comma2dot(self.sv4edit.text()))
+        self.aw.fujipid.PXG4['sv5'][0] = toFloat(comma2dot(self.sv5edit.text()))
+        self.aw.fujipid.PXG4['sv6'][0] = toFloat(comma2dot(self.sv6edit.text()))
+        self.aw.fujipid.PXG4['sv7'][0] = toFloat(comma2dot(self.sv7edit.text()))
         # store set values
-        self.aw.fujipid.PXG4['p1'][0] = float(self.p1edit.text())
-        self.aw.fujipid.PXG4['p2'][0] = float(self.p2edit.text())
-        self.aw.fujipid.PXG4['p3'][0] = float(self.p3edit.text())
-        self.aw.fujipid.PXG4['p4'][0] = float(self.p4edit.text())
-        self.aw.fujipid.PXG4['p5'][0] = float(self.p5edit.text())
-        self.aw.fujipid.PXG4['p6'][0] = float(self.p6edit.text())
-        self.aw.fujipid.PXG4['p7'][0] = float(self.p7edit.text())
-        self.aw.fujipid.PXG4['i1'][0] = float(self.i1edit.text())
-        self.aw.fujipid.PXG4['i2'][0] = float(self.i2edit.text())
-        self.aw.fujipid.PXG4['i3'][0] = float(self.i3edit.text())
-        self.aw.fujipid.PXG4['i4'][0] = float(self.i4edit.text())
-        self.aw.fujipid.PXG4['i5'][0] = float(self.i5edit.text())
-        self.aw.fujipid.PXG4['i6'][0] = float(self.i6edit.text())
-        self.aw.fujipid.PXG4['i7'][0] = float(self.i7edit.text())
-        self.aw.fujipid.PXG4['d1'][0] = float(self.d1edit.text())
-        self.aw.fujipid.PXG4['d2'][0] = float(self.d2edit.text())
-        self.aw.fujipid.PXG4['d3'][0] = float(self.d3edit.text())
-        self.aw.fujipid.PXG4['d4'][0] = float(self.d4edit.text())
-        self.aw.fujipid.PXG4['d5'][0] = float(self.d5edit.text())
-        self.aw.fujipid.PXG4['d6'][0] = float(self.d6edit.text())
-        self.aw.fujipid.PXG4['d7'][0] = float(self.d7edit.text())
+        self.aw.fujipid.PXG4['p1'][0] = toFloat(self.p1edit.text())
+        self.aw.fujipid.PXG4['p2'][0] = toFloat(self.p2edit.text())
+        self.aw.fujipid.PXG4['p3'][0] = toFloat(self.p3edit.text())
+        self.aw.fujipid.PXG4['p4'][0] = toFloat(self.p4edit.text())
+        self.aw.fujipid.PXG4['p5'][0] = toFloat(self.p5edit.text())
+        self.aw.fujipid.PXG4['p6'][0] = toFloat(self.p6edit.text())
+        self.aw.fujipid.PXG4['p7'][0] = toFloat(self.p7edit.text())
+        self.aw.fujipid.PXG4['i1'][0] = toFloat(self.i1edit.text())
+        self.aw.fujipid.PXG4['i2'][0] = toFloat(self.i2edit.text())
+        self.aw.fujipid.PXG4['i3'][0] = toFloat(self.i3edit.text())
+        self.aw.fujipid.PXG4['i4'][0] = toFloat(self.i4edit.text())
+        self.aw.fujipid.PXG4['i5'][0] = toFloat(self.i5edit.text())
+        self.aw.fujipid.PXG4['i6'][0] = toFloat(self.i6edit.text())
+        self.aw.fujipid.PXG4['i7'][0] = toFloat(self.i7edit.text())
+        self.aw.fujipid.PXG4['d1'][0] = toFloat(self.d1edit.text())
+        self.aw.fujipid.PXG4['d2'][0] = toFloat(self.d2edit.text())
+        self.aw.fujipid.PXG4['d3'][0] = toFloat(self.d3edit.text())
+        self.aw.fujipid.PXG4['d4'][0] = toFloat(self.d4edit.text())
+        self.aw.fujipid.PXG4['d5'][0] = toFloat(self.d5edit.text())
+        self.aw.fujipid.PXG4['d6'][0] = toFloat(self.d6edit.text())
+        self.aw.fujipid.PXG4['d7'][0] = toFloat(self.d7edit.text())
         # store segment table
         for i in range(16):
             svkey = 'segment' + str(i+1) + 'sv'
             rampkey = 'segment' + str(i+1) + 'ramp'
             soakkey = 'segment' + str(i+1) + 'soak'
             svedit = cast(QLineEdit, self.segmenttable.cellWidget(i,0))
-            self.aw.fujipid.PXG4[svkey][0] = float(svedit.text())
+            try:
+                self.aw.fujipid.PXG4[svkey][0] = float(svedit.text())
+            except Exception: # pylint: disable=broad-exception-caught
+                pass
             rampedit = cast(QLineEdit, self.segmenttable.cellWidget(i,1))
-            self.aw.fujipid.PXG4[rampkey][0] = stringtoseconds(rampedit.text())
+            try:
+                self.aw.fujipid.PXG4[rampkey][0] = stringtoseconds(rampedit.text())
+            except Exception: # pylint: disable=broad-exception-caught
+                pass
             soakedit = cast(QLineEdit, self.segmenttable.cellWidget(i,2))
-            self.aw.fujipid.PXG4[soakkey][0] = stringtoseconds(soakedit.text())
+            try:
+                self.aw.fujipid.PXG4[soakkey][0] = stringtoseconds(soakedit.text())
+            except Exception: # pylint: disable=broad-exception-caught
+                pass
         # SV slider
         self.aw.pidcontrol.svSliderMin = max(0, min(999, self.pidSVSliderMin.value(), self.pidSVSliderMax.value()))
         self.aw.pidcontrol.svSliderMax = min(999, max(0, self.pidSVSliderMin.value(), self.pidSVSliderMax.value()))
@@ -4304,7 +4313,7 @@ class DTApidDlgControl(ArtisanDialog):
     def writesv(self, _:bool = False) -> None:
         v = comma2dot(self.svedit.text())
         if v:
-            newsv = hex(int(abs(float(str(v)))*10.))[2:].upper()
+            newsv = hex(int(abs(toFloat(str(v)))*10.))[2:].upper()
             ### create command message2send(unitID,function,address,ndata)
             command = self.aw.dtapid.message2send(self.aw.ser.controlETpid[1],6,str(self.aw.dtapid.dtamem['sv'][1]),newsv)
                 #read sv

@@ -5047,7 +5047,7 @@ class tgraphcanvas(FigureCanvas):
                         elif action == 6:
                             slidernr = 3
                         if slidernr is not None:
-                            slidervalue = max(self.aw.eventslidermin[slidernr],min(self.aw.eventslidermax[slidernr],int(str(text))))
+                            slidervalue = max(self.aw.eventslidermin[slidernr],min(self.aw.eventslidermax[slidernr],toInt(str(text))))
                             self.aw.moveslider(slidernr,slidervalue)
                             # we set the last value to be used for relative +- button action as base
                             self.aw.extraeventsactionslastvalue[slidernr] = int(round(slidervalue))

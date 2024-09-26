@@ -1544,7 +1544,10 @@ class CurvesDlg(ArtisanDialog):
 
     @pyqtSlot()
     def changeWebLCDsPort(self) -> None:
-        self.aw.WebLCDsPort = int(str(self.WebLCDsPort.text()))
+        try:
+            self.aw.WebLCDsPort = int(str(self.WebLCDsPort.text()))
+        except Exception: # pylint: disable=broad-except
+            pass
 
     def setWebLCDsURL(self) -> None:
         url_str = self.getWebLCDsURL()
