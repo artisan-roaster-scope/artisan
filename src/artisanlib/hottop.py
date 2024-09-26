@@ -156,10 +156,10 @@ class Hottop(AsyncComm):
         return bytes(cmd)
 
     def send_control(self) -> None:
-        if self._loop is not None:
+        if self.async_loop_thread is not None:
             msg = self.create_msg()
             if self._write_queue is not None:
-                asyncio.run_coroutine_threadsafe(self._write_queue.put(msg), self._loop)
+                asyncio.run_coroutine_threadsafe(self._write_queue.put(msg), self.async_loop_thread.loop)
 
 
     # External Interface

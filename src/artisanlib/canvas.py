@@ -15955,6 +15955,7 @@ class tgraphcanvas(FigureCanvas):
             self.specialeventsStringscopy = []
             self.specialeventsvaluecopy = []
             self.specialeventstypecopy = []
+            self.etypescopy = self.etypes[:]
             #
             #pylint: disable=E0611
             #reset (clear) plot

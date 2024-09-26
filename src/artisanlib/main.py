@@ -11209,11 +11209,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.minieventsflags[0] = 1
 
     def toggleForegroundShowfullFlag(self) -> None:
-        if not self.qmc.designerflag and not self.qmc.flagon:
+        if not self.qmc.designerflag and not self.qmc.flagon and self.curFile is not None:
             # only if not recording
             self.qmc.foregroundShowFullflag = not self.qmc.foregroundShowFullflag
             self.autoAdjustAxis(background=self.qmc.background and (not len(self.qmc.timex) > 3), deltas=False)
-            self.qmc.redraw(recomputeAllDeltas=False)
+            self.qmc.redraw_keep_view(recomputeAllDeltas=False)
 
     def toggleBackroundShowfullFlag(self) -> None:
         if self.qmc.background and self.qmc.backgroundprofile is not None:
@@ -11223,7 +11223,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.redrawdesigner(force=True)
             else:
                 self.autoAdjustAxis(background=self.qmc.background and (not len(self.qmc.timex) > 3), deltas=False)
-                self.qmc.redraw(recomputeAllDeltas=False)
+                self.qmc.redraw_keep_view(recomputeAllDeltas=False)
 
     @pyqtSlot()
     def updatePlaybackIndicator(self) -> None:
@@ -14546,9 +14546,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         try:
             updateRender = False
             # if missing, current etypes are used. Empty entries are replaced by their defaults translated using the current locale
-            profile_etypes = ([decodeLocalStrict(x) for x in profile['etypes']] if 'etypes' in profile else self.qmc.etypes)
+            profile_etypes = ([decodeLocalStrict(x) for x in profile['etypes']] if 'etypes' in profile else self.qmc.etypes)[:5] # if too long we cut
+            profile_etypes = profile_etypes + self.qmc.etypes[len(profile_etypes):] # if to short we extend by current etypes
             if 'default_etypes' in profile:
-                default_etypes = profile['default_etypes']
+                default_etypes = profile['default_etypes'][:5]
+                default_etypes = default_etypes + [True, True, True, True, True][len(default_etypes):]
                 for i, _ in enumerate(profile_etypes):
                     if default_etypes[i]:
                         profile_etypes[i] = self.qmc.etypesdefault[i]
@@ -18678,10 +18680,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'minieventsflags',self.minieventsflags, read_defaults)
             self.settingsSetValue(settings, default_settings, 'eventsGraphflag',self.qmc.eventsGraphflag, read_defaults)
             # we only store etype names if they have been modified by the user to allow automatic translations otherwise
-            if (read_defaults or (self.qmc.etypes[0] != self.qmc.etypesdefault[0]) or
+            if (len(self.qmc.etypes) == 5 and # skip broken etypes
+                (read_defaults or (self.qmc.etypes[0] != self.qmc.etypesdefault[0]) or
                 (self.qmc.etypes[1] != self.qmc.etypesdefault[1]) or
                 (self.qmc.etypes[2] != self.qmc.etypesdefault[2]) or
-                (self.qmc.etypes[3] != self.qmc.etypesdefault[3])):
+                (self.qmc.etypes[3] != self.qmc.etypesdefault[3]))):
                 etypes = self.qmc.etypes[:]
                 if not read_defaults:
                     for i, _ in enumerate(self.qmc.etypes):
@@ -22675,7 +22678,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             _log.exception(e)
         box.about(self,
                 QApplication.translate('About', 'About'),
-                """<h2>{0} {1}{14} ({2})</h2>
+                """<h2>{0} {1}{14}{2}</h2>
                 <p>
                 <small>Python {3}, Qt {4}, PyQt {5}, Matplotlib {6}, NumPy {7}, SciPy {8}, pymodbus {11}{15}</small>
                 </p>
@@ -22685,7 +22688,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 """.format( # noqa: UP030
                 name,
                 str(__version__),
-                str(__revision__),
+                (f' ({str(__revision__)})' if str(__revision__) != '' else ''),
                 platform.python_version(),
                 qVersion(),
                 PYQT_VERSION_STR,

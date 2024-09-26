@@ -210,10 +210,10 @@ class Santoker(AsyncComm):
         return self.HEADER + target + data + crc + self.TAIL
 
     def send_msg(self, target:bytes, value: int) -> None:
-        if self._loop is not None:
+        if self.async_loop_thread is not None:
             msg = self.create_msg(target, value)
             if self._write_queue is not None:
-                asyncio.run_coroutine_threadsafe(self._write_queue.put(msg), self._loop)
+                asyncio.run_coroutine_threadsafe(self._write_queue.put(msg), self.async_loop_thread.loop)
 
 
 

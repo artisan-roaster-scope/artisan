@@ -28,17 +28,52 @@ if TYPE_CHECKING:
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
+
+# An AsyncLoopThread instance holds a thread and an asyncio loop running in that thread.
+# On object deletion the loop is terminated and the thread is ended.
+class AsyncLoopThread:
+
+    def __init__(self) -> None:
+
+        def start_background_loop(loop:asyncio.AbstractEventLoop) -> None:
+            asyncio.set_event_loop(loop)
+            try:
+                # run_forever() returns after calling loop.stop()
+                loop.run_forever()
+                # clean up tasks
+                for task in asyncio.all_tasks(loop):
+                    task.cancel()
+                for t in [t for t in asyncio.all_tasks(loop) if not (t.done() or t.cancelled())]:
+                    with suppress(asyncio.CancelledError):
+                        loop.run_until_complete(t)
+            except Exception:  # pylint: disable=broad-except
+                pass
+            finally:
+                loop.close()
+
+        self.__loop:asyncio.AbstractEventLoop = asyncio.new_event_loop()
+        self.__thread:Thread = Thread(target=start_background_loop, args=(self.__loop,), daemon=True)
+        self.__thread.start()
+
+    def __del__(self) -> None:
+        self.__loop.call_soon_threadsafe(self.__loop.stop)
+        self.__thread.join()
+
+    @property
+    def loop(self) -> asyncio.AbstractEventLoop:
+        return self.__loop
+
+
 class AsyncComm:
 
-    __slots__ = [ '_loop', '_thread', '_write_queue', '_host', '_port', '_serial', '_connected_handler', '_disconnected_handler',
+    __slots__ = [ '_asyncLoopThread', '_write_queue', '_host', '_port', '_serial', '_connected_handler', '_disconnected_handler',
                     '_verify_crc', '_logging' ]
 
     def __init__(self, host:str = '127.0.0.1', port:int = 8080, serial:Optional['SerialSettings'] = None,
                 connected_handler:Optional[Callable[[], None]] = None,
                 disconnected_handler:Optional[Callable[[], None]] = None) -> None:
         # internals
-        self._loop:        Optional[asyncio.AbstractEventLoop] = None # the asyncio loop
-        self._thread:      Optional[Thread]                    = None # the thread running the asyncio loop
+        self._asyncLoopThread: Optional[AsyncLoopThread]     = None # the asyncio AsyncLoopThread object
         self._write_queue: Optional[asyncio.Queue[bytes]]    = None # the write queue
 
         # connection
@@ -55,13 +90,17 @@ class AsyncComm:
         self._logging = False         # if True device communication is logged
 
 
-    # external configuration API
+    # external API
 
     def setVerifyCRC(self, b:bool) -> None:
         self._verify_crc = b
 
     def setLogging(self, b:bool) -> None:
         self._logging = b
+
+    @property
+    def async_loop_thread(self) -> Optional[AsyncLoopThread]:
+        return self._asyncLoopThread
 
 
     # asyncio loop
@@ -225,23 +264,14 @@ class AsyncComm:
     def start(self) -> None:
         try:
             _log.debug('start sampling')
-            self._loop = asyncio.new_event_loop()
-            self._thread = Thread(target=self.start_background_loop, args=(self._loop,), daemon=True)
-            self._thread.start()
+            self._asyncLoopThread = AsyncLoopThread()
             # run sample task in async loop
-            asyncio.run_coroutine_threadsafe(self.connect(), self._loop)
+            asyncio.run_coroutine_threadsafe(self.connect(), self._asyncLoopThread.loop)
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
 
     def stop(self) -> None:
         _log.debug('stop sampling')
-        # self._loop.stop() needs to be called as follows as the event loop class is not thread safe
-        if self._loop is not None:
-            self._loop.call_soon_threadsafe(self._loop.stop)
-            self._loop = None
-        # wait for the thread to finish
-        if self._thread is not None:
-            self._thread.join()
-            self._thread = None
+        self._asyncLoopThread = None
         self._write_queue = None
         self.reset_readings()
