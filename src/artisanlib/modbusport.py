@@ -767,7 +767,7 @@ class modbusport:
                 break
         return res, error_disconnect
 
-    # returns register data from optimzer cache or from slave
+    # returns register data from optimizer cache or from slave
     def read_registers(self, slave:int, register:int, count:int, code:int, force:bool=False) -> Tuple[Optional[List[int]],Optional[List[bool]],bool]:
         res_registers:Optional[List[int]] = None
         res_bits:Optional[List[bool]] = None
