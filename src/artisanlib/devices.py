@@ -172,7 +172,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.btpidtypeComboBox.setCurrentIndex([y[1] for y in supported_BT_pids].index(self.aw.ser.readBTpid[0])) #pid type is index 0
         label1 = QLabel(QApplication.translate('Label', 'Type'))
         label2 = QLabel(QApplication.translate('Label', 'RS485 Unit ID'))
-        #rs485 possible unit IDs (1-32); unit 0 is master (computer)
+        #rs485 possible unit IDs (1-32); unit 0 is client (computer)
         unitids = list(map(str,list(range(1,33))))
         self.controlpidunitidComboBox = QComboBox()
         self.controlpidunitidComboBox.addItems(unitids)

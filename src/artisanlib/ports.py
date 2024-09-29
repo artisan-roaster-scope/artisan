@@ -165,6 +165,8 @@ class scanModbusDlg(ArtisanDialog):
             # scan and report
             result = 'Register,Value<br>'
             result += '--------------<br>'
+            #### lock shared resources #####
+            self.aw.modbus.COMsemaphore.acquire(1)
             for register in range(min(self.min_register,self.max_register),max(self.min_register,self.max_register)+1):
                 QApplication.processEvents()
                 if self.stop:
@@ -185,8 +187,12 @@ class scanModbusDlg(ArtisanDialog):
                     if res is not None:
                         result += str(register) + '(3),' + str(res) + '<br>'
                         self.modbusEdit.setHtml(result)
+            self.aw.modbus.disconnect()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
+        finally:
+            if self.aw.modbus.COMsemaphore.available() < 1:
+                self.aw.modbus.COMsemaphore.release(1)
         # reconstruct MODBUS setup
         self.aw.modbus.comport = self.port_aw
         self.aw.modbus.baudrate = self.baudrate_aw
@@ -327,6 +333,8 @@ class scanS7Dlg(ArtisanDialog):
             # scan and report
             result = 'Start,Value<br>'
             result += '--------------<br>'
+            #### lock shared resources #####
+            self.aw.s7.COMsemaphore.acquire(1)
             for register in range(min(self.min_register,self.max_register),max(self.min_register,self.max_register)+1,(4 if self.typeFloat else 2)):
                 QApplication.processEvents()
                 if self.stop:
@@ -341,8 +349,12 @@ class scanS7Dlg(ArtisanDialog):
                     result += f'{str(register)}: {str(res)}<br>'
                     self.S7Edit.setHtml(result)
                 time.sleep(0.4)
+            self.aw.s7.disconnect()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
+        finally:
+            if self.aw.s7.COMsemaphore.available() < 1:
+                self.aw.s7.COMsemaphore.release(1)
         # reconstruct S7 setup
         self.aw.s7.host = self.shost_aw
         self.aw.s7.port = self.sport_aw
@@ -690,7 +702,7 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_Serial_retries = QLabel(QApplication.translate('Label', 'Retries'))
         self.modbus_Serial_retriesComboBox = QComboBox()
 #        modbus_Serial_retries.setBuddy(self.modbus_Serial_retriesComboBox)
-        self.modbus_Serial_retriesComboBox.addItems([str(n) for n in range(3)])
+        self.modbus_Serial_retriesComboBox.addItems([str(n) for n in range(4)])
         self.modbus_Serial_retriesComboBox.setCurrentIndex(self.aw.modbus.serial_readRetries)
 
         modbus_Serial_strict_label = QLabel(QApplication.translate('Label', 'Strict'))

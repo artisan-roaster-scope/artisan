@@ -237,34 +237,14 @@ class AsyncComm:
 
             await asyncio.sleep(1)
 
-    def start_background_loop(self, loop: asyncio.AbstractEventLoop) -> None:
-        asyncio.set_event_loop(loop)
-        try:
-            # run_forever() returns after calling loop.stop()
-            loop.run_forever()
-            # clean up tasks
-            for task in asyncio.all_tasks(loop):
-                task.cancel()
-            for t in [t for t in asyncio.all_tasks(loop) if not (t.done() or t.cancelled())]:
-                with suppress(asyncio.CancelledError):
-                    loop.run_until_complete(t)
-            if self._disconnected_handler is not None:
-                try:
-                    self._disconnected_handler()
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
-        except Exception as e:  # pylint: disable=broad-except
-            _log.exception(e)
-        finally:
-            loop.close()
-
 
     # start/stop sample thread
 
     def start(self) -> None:
         try:
             _log.debug('start sampling')
-            self._asyncLoopThread = AsyncLoopThread()
+            if self._asyncLoopThread is None:
+                self._asyncLoopThread = AsyncLoopThread()
             # run sample task in async loop
             asyncio.run_coroutine_threadsafe(self.connect(), self._asyncLoopThread.loop)
         except Exception as e:  # pylint: disable=broad-except
@@ -272,6 +252,7 @@ class AsyncComm:
 
     def stop(self) -> None:
         _log.debug('stop sampling')
+        del self._asyncLoopThread
         self._asyncLoopThread = None
         self._write_queue = None
         self.reset_readings()

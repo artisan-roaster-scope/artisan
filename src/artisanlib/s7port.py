@@ -572,7 +572,7 @@ class s7port:
                 self.COMsemaphore.release(1)
 
     # as readFloat, but does not retry nor raise and error and returns a None instead
-    # also does not reserve the port via a semaphore nor uses the cache!
+    # also does not reserve the port via a semaphore nor uses the cache! This has to be done by the caller!
     def peekFloat(self, area:int, dbnumber:int, start:int) -> Optional[float]:
         _log.debug('peekFloat(%d,%d,%d)',area,dbnumber,start)
         if area == 0:
@@ -665,7 +665,7 @@ class s7port:
 
 
     # as readInt, but does not retry nor raise and error and returns a None instead
-    # also does not reserve the port via a semaphore nor uses the cache!
+    # also does not reserve the port via a semaphore nor uses the cache! This has to be done by the caller!
     def peekInt(self, area:int, dbnumber:int, start:int) -> Optional[int]:
         _log.debug('peakInt(%d,%d,%d)',area,dbnumber,start)
         if area == 0:

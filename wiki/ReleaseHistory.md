@@ -22,6 +22,7 @@ v3.0.3
   - reduce the size of builds by removing unnecessary files
   - removes the optional delay on reads from serial MODBUS
   - adds optional delay after connect before sending requests to serial MODBUS to allow to wait for Arduino slaves to complete reboot ([Issue #1694](../../../issues/1694))
+  - upgrades MODBUS communication from sync to async IO
   - limits the visible length of long popup lists in Devices and Statistics Dialog
 
 * FIXES

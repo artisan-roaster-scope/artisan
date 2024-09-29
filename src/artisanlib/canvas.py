@@ -12560,6 +12560,7 @@ class tgraphcanvas(FigureCanvas):
 
     @pyqtSlot()
     def disconnectProbes(self) -> None:
+        _log.debug('disconnectProbes')
         # close ports of main device
         self.disconnectProbesFromSerialDevice(self.aw.ser)
         # close (serial) port of Modbus device
