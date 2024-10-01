@@ -440,7 +440,7 @@ class modbusport:
                         if 0 < count <= self.maxCount:
                             res:Optional[Union[ModbusResponse,Awaitable[ModbusResponse]]] = None
 #                            if just_send:
-#                                await self.sleepBetween() # we start with a sleep, as it could be that just a send command happened before the semaphore was caught
+#                                await self.sleepBetweenAsync() # we start with a sleep, as it could be that just a send command happened before the semaphore was caught
 #                            just_send = True
                             tx:float = time.time()
                             while True:
