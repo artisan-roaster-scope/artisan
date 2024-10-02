@@ -112,7 +112,7 @@ class flavorDlg(ArtisanResizeablDialog):
         aspectlabel = QLabel(QApplication.translate('Label','Aspect Ratio'))
         self.aspectSpinBox = QDoubleSpinBox()
         self.aspectSpinBox.setToolTip(QApplication.translate('Tooltip','Aspect Ratio'))
-        self.aspectSpinBox.setRange(0.,2.)
+        self.aspectSpinBox.setRange(0.5,2.)
         self.aspectSpinBox.setSingleStep(.1)
         self.aspectSpinBox.setValue(self.aw.qmc.flavoraspect)
         self.aspectSpinBox.valueChanged.connect(self.setaspect)

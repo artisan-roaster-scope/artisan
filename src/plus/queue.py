@@ -402,8 +402,8 @@ def addRoast(roast_record:Optional[Dict[str, Any]] = None) -> None:
                 config.app_window.sendmessage(
                     QApplication.translate(
                         'Plus',
-                        'Queuing roast for upload to artisan.plus'
-                    )
+                        'Queuing roast for upload to {}'
+                    ).format(config.app_name)
                 )  # @UndefinedVariable
                 rr: Dict[str, Any]
                 if roast_record is not None:
@@ -452,5 +452,6 @@ def sendLockSchedule() -> None:
                 # sql queue does not feature a timeout
             )
             _log.debug('-> lockSchedule queued up')
+            config.app_window.qmc.registerLockScheduleSent()
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)

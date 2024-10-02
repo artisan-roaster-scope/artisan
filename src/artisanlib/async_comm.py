@@ -180,7 +180,7 @@ class AsyncComm:
                 await writer.drain()
 
     # if serial settings are given, host/port are ignore and communication is handled by the given serial port
-    async def connect(self) -> None:
+    async def connect(self, connect_timeout:float=2) -> None:
         writer = None
         while True:
             try:
@@ -197,7 +197,7 @@ class AsyncComm:
                     _log.debug('connecting to %s:%s ...', self._host, self._port)
                     connect = asyncio.open_connection(self._host, self._port)
                 # Wait for 2 seconds, then raise TimeoutError
-                reader, writer = await asyncio.wait_for(connect, timeout=2)
+                reader, writer = await asyncio.wait_for(connect, timeout=connect_timeout)
                 _log.debug('connected')
                 if self._connected_handler is not None:
                     try:
@@ -235,18 +235,22 @@ class AsyncComm:
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
 
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.7)
+
+    def send(self, message:bytes) -> None:
+        if self.async_loop_thread is not None and self._write_queue is not None:
+            asyncio.run_coroutine_threadsafe(self._write_queue.put(message), self.async_loop_thread.loop)
 
 
     # start/stop sample thread
 
-    def start(self) -> None:
+    def start(self, connect_timeout:float=2) -> None:
         try:
             _log.debug('start sampling')
             if self._asyncLoopThread is None:
                 self._asyncLoopThread = AsyncLoopThread()
             # run sample task in async loop
-            asyncio.run_coroutine_threadsafe(self.connect(), self._asyncLoopThread.loop)
+            asyncio.run_coroutine_threadsafe(self.connect(connect_timeout), self._asyncLoopThread.loop)
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
 

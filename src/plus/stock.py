@@ -208,7 +208,7 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                         if stock is not None:
                             stock['retrieved'] = time.time()
                         _log.debug('-> retrieved')
-    #                    _log.debug("stock = %s", stock)
+#                        _log.debug("stock = %s", stock)
                     finally:
                         if stock_semaphore.available() < 1:
                             stock_semaphore.release(1)

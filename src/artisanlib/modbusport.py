@@ -102,7 +102,7 @@ def getBinaryPayloadDecoderFromRegisters(registers:List[int], byteorderLittle:bo
 class modbusport:
     """ this class handles the communications with all the modbus devices"""
 
-    __slots__ = [ 'aw', 'modbus_serial_read_delay', 'modbus_serial_connect_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'serial_strict_timing', 'default_comport', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
+    __slots__ = [ 'aw', 'modbus_serial_read_delay', 'modbus_serial_connect_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'default_comport', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
         'timeout', 'IP_timeout', 'IP_retries', 'serial_readRetries', 'PID_slave_ID', 'PID_SV_register', 'PID_p_register', 'PID_i_register', 'PID_d_register', 'PID_ON_action', 'PID_OFF_action',
         'channels', 'inputSlaves', 'inputRegisters', 'inputFloats', 'inputBCDs', 'inputFloatsAsInt', 'inputBCDsAsInt', 'inputSigned', 'inputCodes', 'inputDivs',
         'inputModes', 'optimizer', 'fetch_max_blocks', 'fail_on_cache_miss', 'disconnect_on_error', 'acceptable_errors', 'activeRegisters', 'readingsCache', 'SVmultiplier', 'PIDmultiplier',
@@ -126,7 +126,6 @@ class modbusport:
         self.stopbits:int = 1
         self.timeout:float = 0.4 # serial MODBUS timeout
         self.serial_readRetries:int = 1 # user configurable, defaults to 0
-        self.serial_strict_timing:bool = False
         self.IP_timeout:float = 0.2 # UDP/TCP MODBUS timeout in seconds
         self.IP_retries:int = 1 # UDP/TCP MODBUS retries (max 3)
         self.PID_slave_ID:int = 0
@@ -987,6 +986,7 @@ class modbusport:
             tx = time.time()
         error_disconnect:bool = False # set to True if a serious error requiring a disconnect was detected
         res:Optional[int] = None
+
         try:
             res_registers:Optional[List[int]]
             res_error_disconnect:bool

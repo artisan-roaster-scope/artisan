@@ -165,7 +165,7 @@ class Santoker(AsyncComm):
             _log.debug('unknown data target %s', target)
 
 
-    # asyncio loop
+    # asyncio read implementation
 
     # https://www.oreilly.com/library/view/using-asyncio-in/9781492075325/ch04.html
     async def read_msg(self, stream: asyncio.StreamReader) -> None:
@@ -210,11 +210,7 @@ class Santoker(AsyncComm):
         return self.HEADER + target + data + crc + self.TAIL
 
     def send_msg(self, target:bytes, value: int) -> None:
-        if self.async_loop_thread is not None:
-            msg = self.create_msg(target, value)
-            if self._write_queue is not None:
-                asyncio.run_coroutine_threadsafe(self._write_queue.put(msg), self.async_loop_thread.loop)
-
+        self.send(self.create_msg(target, value))
 
 
 def main() -> None:

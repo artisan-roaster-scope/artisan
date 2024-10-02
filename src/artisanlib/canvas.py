@@ -30,6 +30,7 @@ import ast
 import platform
 import math
 import warnings
+import datetime
 import numpy
 import logging
 import re
@@ -1475,6 +1476,10 @@ class tgraphcanvas(FigureCanvas):
         self.plus_file_last_modified:Optional[float] = None # holds the last_modified timestamp of the loaded profile as EPOCH (float incl. milliseconds as returned by time.time())
         # plus_file_last_modified is set on load, reset on RESET, and updated on save. It is also update, if not None and new data is received from the server (sync:applyServerUpdates)
         # this timestamp is used in sync:fetchServerUpdate to ask server for updated data
+
+        # remember the lockSchedule date/account sent to the server to prevent re-sending
+        self.plus_lockSchedule_sent_account:Optional[str] = None
+        self.plus_lockSchedule_sent_date:Optional[str] = None
 
         self.beans:str = ''
 
@@ -6610,6 +6615,10 @@ class tgraphcanvas(FigureCanvas):
             self.roastbatchnr = 0 # initialized to 0, set to increased batchcounter on DROP
             self.roastbatchpos = 1 # initialized to 1, set to increased batchsequence on DROP
             self.roastbatchprefix = self.batchprefix
+
+            # reset scheduleID/Date (prevents re-using a previous loaded profiles scheduleID to be 'reused')
+            self.scheduleID = None
+            self.scheduleDate = None
 
             self.aw.sendmessage(QApplication.translate('Message','Scope has been reset'))
             self.aw.AUClcd.setNumDigits(3)
@@ -12608,6 +12617,14 @@ class tgraphcanvas(FigureCanvas):
                 self.profileDataSemaphore.release(1)
         self.markChargeSignal.emit(False) # this queues an event which forces a realignment/redraw by resetting the cache ax_background and fires the CHARGE action
 
+    def registerLockScheduleSent(self) -> None:
+        self.plus_lockSchedule_sent_account = self.aw.plus_account
+        self.plus_lockSchedule_sent_date = str(datetime.datetime.now().astimezone().date())
+
+    # returns True if the lockSchedule was already sent for today and the current account
+    def lockScheduleSent(self) -> bool:
+        return (self.plus_lockSchedule_sent_account is not None and self.plus_lockSchedule_sent_account == self.aw.plus_account and
+            self.plus_lockSchedule_sent_date is not None and self.plus_lockSchedule_sent_date == str(datetime.datetime.now().astimezone().date()))
 
     def OnRecorder(self) -> None:
         try:
@@ -12702,7 +12719,7 @@ class tgraphcanvas(FigureCanvas):
             self.aw.update_minieventline_visibility()
 
             # lock todays schedule
-            if self.aw.plus_account is not None and self.aw.schedule_window is not None:
+            if self.aw.plus_account is not None and self.aw.schedule_window is not None and len(self.aw.schedule_window.scheduled_items)>0 and not self.lockScheduleSent():
                 try:
                     sendLockSchedule()
                 except Exception: # pylint: disable=broad-except

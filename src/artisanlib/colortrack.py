@@ -76,7 +76,7 @@ class ColorTrack(AsyncComm):
             _log.info('register_reading: %s',value)
 
 
-    # asyncio loop
+    # asyncio read implementation
 
     # https://www.oreilly.com/library/view/using-asyncio-in/9781492075325/ch04.html
     async def read_msg(self, stream: asyncio.StreamReader) -> None:

@@ -68,6 +68,8 @@ class Mugma(AsyncComm):
         self._sv = -1
 
 
+    # asyncio read implementation
+
     # https://www.oreilly.com/library/view/using-asyncio-in/9781492075325/ch04.html
     async def read_msg(self, stream: asyncio.StreamReader) -> None:
         # read line

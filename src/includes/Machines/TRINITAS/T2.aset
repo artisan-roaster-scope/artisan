@@ -119,7 +119,6 @@ type=0
 wordorderLittle=true
 optimizer=true
 fetch_max_blocks=false
-serial_strict_timing=false
 
 [MachineSetup]
 capacity=2

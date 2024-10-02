@@ -705,18 +705,11 @@ class comportDlg(ArtisanResizeablDialog):
         self.modbus_Serial_retriesComboBox.addItems([str(n) for n in range(4)])
         self.modbus_Serial_retriesComboBox.setCurrentIndex(self.aw.modbus.serial_readRetries)
 
-        modbus_Serial_strict_label = QLabel(QApplication.translate('Label', 'Strict'))
-        self.modbus_Serial_strict = QCheckBox()
-        self.modbus_Serial_strict.setChecked(self.aw.modbus.serial_strict_timing)
-        self.modbus_Serial_strict.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-
         modbus_Serial_grid = QGridLayout()
         modbus_Serial_grid.addWidget(modbus_Serial_delaylabel,0,0,Qt.AlignmentFlag.AlignRight)
         modbus_Serial_grid.addWidget(self.modbus_Serial_delayEdit,0,1,Qt.AlignmentFlag.AlignRight)
         modbus_Serial_grid.addWidget(modbus_Serial_retries,1,0,Qt.AlignmentFlag.AlignRight)
         modbus_Serial_grid.addWidget(self.modbus_Serial_retriesComboBox,1,1,Qt.AlignmentFlag.AlignRight)
-        modbus_Serial_grid.addWidget(modbus_Serial_strict_label,2,0,Qt.AlignmentFlag.AlignRight)
-        modbus_Serial_grid.addWidget(self.modbus_Serial_strict,2,1,Qt.AlignmentFlag.AlignLeft)
 
         modbus_Serial_layout = QVBoxLayout()
         modbus_Serial_layout.addLayout(modbus_Serial_grid)

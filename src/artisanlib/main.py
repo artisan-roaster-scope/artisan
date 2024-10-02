@@ -14787,7 +14787,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if 'flavorstartangle' in profile:
                 self.qmc.flavorstartangle = int(profile['flavorstartangle'])
             if 'flavoraspect' in profile:
-                self.qmc.flavoraspect = float(profile['flavoraspect'])
+                self.qmc.flavoraspect = min(2,max(0.5, float(profile['flavoraspect'])))
             else:
                 self.qmc.flavoraspect = 1.
             if 'title' in profile:
@@ -17117,7 +17117,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.modbus.stopbits = toInt(settings.value('stopbits',self.modbus.stopbits))
             self.modbus.parity = s2a(toString(settings.value('parity',self.modbus.parity)))
             self.modbus.timeout = max(0.3, float2float(toFloat(settings.value('timeout',self.modbus.timeout)))) # min serial MODBUS timeout is 300ms
-            self.modbus.serial_strict_timing = bool(toBool(settings.value('serial_strict_timing',self.modbus.serial_strict_timing)))
             self.modbus.modbus_serial_connect_delay = toFloat(settings.value('modbus_serial_connect_delay',self.modbus.modbus_serial_connect_delay))
             self.modbus.serial_readRetries = toInt(settings.value('serial_readRetries',self.modbus.serial_readRetries))
             self.modbus.IP_timeout = float2float(toFloat(settings.value('IP_timeout',self.modbus.IP_timeout)))
@@ -18843,7 +18842,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'stopbits',self.modbus.stopbits, read_defaults)
             self.settingsSetValue(settings, default_settings, 'parity',self.modbus.parity, read_defaults)
             self.settingsSetValue(settings, default_settings, 'timeout',self.modbus.timeout, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'serial_strict_timing',self.modbus.serial_strict_timing, read_defaults)
             self.settingsSetValue(settings, default_settings, 'modbus_serial_connect_delay',self.modbus.modbus_serial_connect_delay, read_defaults)
             self.settingsSetValue(settings, default_settings, 'serial_readRetries',self.modbus.serial_readRetries, read_defaults)
             self.settingsSetValue(settings, default_settings, 'IP_timeout',self.modbus.IP_timeout, read_defaults)
@@ -22831,7 +22829,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             except Exception: # pylint: disable=broad-except
                 pass
             try:
-                self.modbus.serial_strict_timing = bool(dialog.modbus_Serial_strict.isChecked())
                 self.modbus.IP_retries = dialog.modbus_IP_retriesComboBox.currentIndex()
                 self.modbus.PID_slave_ID = toInt(str(dialog.modbus_PIDslave_Edit.text()))
                 self.modbus.PID_SV_register = toInt(str(dialog.modbus_SVregister_Edit.text()))

@@ -2395,7 +2395,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             # reselect the previously selected item
             self.select_item(selected_item)
         else:
-            # otherwise select first item schedule is not empty
+            # otherwise select first item if schedule is not empty
             self.selected_remaining_item = None
             if self.drag_remaining.count() > 0:
                 first_item:Optional[DragItem] = self.drag_remaining.itemAt(0)
@@ -2436,6 +2436,12 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             self.TabWidget.setTabToolTip(0,'')
             # update app badge number
             self.setAppBadge(0)
+            # clear selection and reset scheduleID
+            self.selected_remaining_item = None
+            if self.aw.qmc.timeindex[6] == 0:
+                # if DROP is not set we clear the ScheduleItem UUID/Date
+                self.aw.qmc.scheduleID = None
+                self.aw.qmc.scheduleDate = None
         return len(scheduled_items)
 
     @staticmethod
@@ -3082,8 +3088,15 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             self.completed_items = self.getCompletedItems()             # updates completed items from cache
             self.updateFilters()                                        # update filter widget (user and machine)
 
-            # show empty message if there are no scheduled items or the schedule items scrolling widget if there are
+            # show empty message if there are no scheduled items or the schedule items scrolling widget if there are entries
             if self.scheduled_items == []:
+                # clear selection and reset scheduleID
+                self.selected_remaining_item = None
+                if self.aw.qmc.timeindex[6] == 0:
+                    # if DROP is not set we clear the ScheduleItem UUID/Date
+                    self.aw.qmc.scheduleID = None
+                    self.aw.qmc.scheduleDate = None
+                # show empty schedule message
                 self.remaining_message.setText(QApplication.translate('Plus', 'Schedule empty!{}Plan your schedule on {}').format('<BR><BR>', f'<a href="{schedulerLink()}">{plus.config.app_name}</a><br>'))
                 self.stacked_remaining_widget.setCurrentWidget(self.remaining_message_widget)
                 self.setAppBadge(0)
@@ -3096,7 +3109,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     self.stacked_remaining_widget.setCurrentWidget(self.remaining_message_widget)
 
 
-            # show empty message if there are no completed items or the completed splitter widget if there are
+            # show empty message if there are no completed items or the completed splitter widget if there are entries
             if not self.completed_items:
                 self.completed_stacked_widget.setCurrentWidget(self.completed_message_widget)
             else:

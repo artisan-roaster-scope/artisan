@@ -78,6 +78,9 @@ class Hottop(AsyncComm):
             self.HEADER[0:2] == message[0:2] and
             (not self._verify_crc or int(message[35]) == sum(int(c) for c in message[:35]) & 0xFF))
 
+
+    # asyncio read implementation
+
     # https://www.oreilly.com/library/view/using-asyncio-in/9781492075325/ch04.html
     async def read_msg(self, stream: asyncio.StreamReader) -> None:
         # look for the first header byte
@@ -156,11 +159,7 @@ class Hottop(AsyncComm):
         return bytes(cmd)
 
     def send_control(self) -> None:
-        if self.async_loop_thread is not None:
-            msg = self.create_msg()
-            if self._write_queue is not None:
-                asyncio.run_coroutine_threadsafe(self._write_queue.put(msg), self.async_loop_thread.loop)
-
+        self.send(self.create_msg())
 
     # External Interface
 
