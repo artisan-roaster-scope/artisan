@@ -180,7 +180,7 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                                     item['url'], item['data'], item['verb']
                                 )
                                 r.raise_for_status()
-# maybe to much noise, this message would be send on each START
+# maybe to much noise:
 #                                if config.app_window is not None:
 #                                    config.app_window.sendmessage(
 #                                        QApplication.translate(

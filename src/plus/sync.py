@@ -821,7 +821,8 @@ def fetchServerUpdate(uuid: str, file:Optional[str]=None, return_data:bool = Fal
                             '-> server last_modified date: %s',
                             r['modified_at'],
                         )
-            _log.error('received empty response on fetchServerUpdate')
+            else:
+                _log.error('received empty response on fetchServerUpdate')
     except requests.exceptions.ConnectionError as e:
         # more general: requests.exceptions.RequestException
         _log.exception(e)
