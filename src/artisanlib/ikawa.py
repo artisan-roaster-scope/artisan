@@ -9,7 +9,7 @@ import base64
 import csv
 import re
 import logging
-from typing import Final, Optional, List, Dict, Tuple, Callable, ClassVar, Any, Generator, TYPE_CHECKING
+from typing import Final, Optional, List, Dict, Callable, Any, Generator, TYPE_CHECKING
 
 
 if TYPE_CHECKING:
@@ -17,16 +17,14 @@ if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
 
 try:
-    from PyQt6.QtCore import QDateTime, Qt, QTimer, QMutex, QWaitCondition, QUrl # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import QDateTime, Qt, QMutex, QWaitCondition, QUrl # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
-    from PyQt5.QtCore import QDateTime, Qt, QTimer, QMutex, QWaitCondition, QUrl  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QDateTime, Qt, QMutex, QWaitCondition, QUrl  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import encodeLocal
-try:
-    from artisanlib.ble import BleInterface, BLE_CHAR_TYPE # noqa: F811
-except ImportError:
-    # BLE not available on older Windows/PyQt5 platforms
-    pass
+
+
+from artisanlib.ble_port import ClientBLE
 from proto import IkawaCmd_pb2 # type:ignore[unused-ignore]
 
 
@@ -358,30 +356,37 @@ def extractProfileIkawaCSV(file:str, aw:'ApplicationWindow') -> 'ProfileData':
 
 
 try: # BLE not available on some platforms
-    class IKAWA_BLE:
+    class IKAWA_BLE(ClientBLE):
 
         ###CmdType
-        BOOTLOADER_GET_VERSION:      ClassVar[int] = 0
-        MACH_PROP_GET_TYPE:          ClassVar[int] = 2
-        MACH_PROP_GET_ID:            ClassVar[int] = 3
-        MACH_STATUS_GET_ERROR_VALUE: ClassVar[int] = 10
-        MACH_STATUS_GET_ALL_VALUE:   ClassVar[int] = 11
-        HIST_GET_TOTAL_ROAST_COUNT:  ClassVar[int] = 13
-        PROFILE_GET:                 ClassVar[int] = 15
-        PROFILE_SET:                 ClassVar[int] = 16
-        SETTING_GET:                 ClassVar[int] = 17
-        MACH_PROP_GET_SUPPORT_INFO:  ClassVar[int] = 23
+        BOOTLOADER_GET_VERSION:      Final[int] = 0
+        MACH_PROP_GET_TYPE:          Final[int] = 2
+        MACH_PROP_GET_ID:            Final[int] = 3
+        MACH_STATUS_GET_ERROR_VALUE: Final[int] = 10
+        MACH_STATUS_GET_ALL_VALUE:   Final[int] = 11
+        HIST_GET_TOTAL_ROAST_COUNT:  Final[int] = 13
+        PROFILE_GET:                 Final[int] = 15
+        PROFILE_SET:                 Final[int] = 16
+        SETTING_GET:                 Final[int] = 17
+        MACH_PROP_GET_SUPPORT_INFO:  Final[int] = 23
 
 
-        DEVICE_NAME_IKAWA:   ClassVar[str] = 'IKAWA'
-        IKAWA_SERVICE_UUID:  ClassVar[str] = 'C92A6046-6C8D-4116-9D1D-D20A8F6A245F'
-        IKAWA_SEND_CHAR_UUID: ClassVar[Tuple[str,BLE_CHAR_TYPE]] = ('851A4582-19C1-4E6C-AB37-E7A03766BA16', BLE_CHAR_TYPE.BLE_CHAR_WRITE) # type:ignore[reportPossibleUnboundVariable,unused-ignore]
-        IKAWA_RECEIVE_CHAR_UUID: ClassVar[Tuple[str,BLE_CHAR_TYPE]] = ('948C5059-7F00-46D9-AC55-BF090AE066E3', BLE_CHAR_TYPE.BLE_CHAR_NOTIFY) # type:ignore[reportPossibleUnboundVariable,unused-ignore]
-
+        # IKAWA BLE name prefix
+        DEVICE_NAME_IKAWA:   Final[str] = 'IKAWA'
+        # IKAWA BLE service and characteristics UUIDs
+        IKAWA_SERVICE_UUID:  Final[str] = 'C92A6046-6C8D-4116-9D1D-D20A8F6A245F'
+        IKAWA_NOTIFY_UUID:   Final[str] = '948C5059-7F00-46D9-AC55-BF090AE066E3'
+        IKAWA_WRITE_UUID:    Final[str] = '851A4582-19C1-4E6C-AB37-E7A03766BA16'
 
         def __init__(self,
                     connected_handler:Optional[Callable[[], None]] = None,
                     disconnected_handler:Optional[Callable[[], None]] = None) -> None:
+            super().__init__()
+
+            # register IKAWA UUIDs
+            self.add_device_description(self.IKAWA_SERVICE_UUID, self.DEVICE_NAME_IKAWA)
+            self.add_notify(self.IKAWA_NOTIFY_UUID, self.notify_callback)
+            self.add_write(self.IKAWA_WRITE_UUID, self.IKAWA_WRITE_UUID)
 
             self.connected_handler:Optional[Callable[[], None]] = connected_handler
             self.disconnected_handler:Optional[Callable[[], None]] = disconnected_handler
@@ -423,13 +428,13 @@ try: # BLE not available on some platforms
 
             self.seq:Generator[int, None, None] = self.seqNum() # message sequence number generator
 
-            self.ble:BleInterface = BleInterface(  # type:ignore[unused-ignore]
-                [(IKAWA_BLE.IKAWA_SERVICE_UUID, [IKAWA_BLE.IKAWA_SEND_CHAR_UUID, IKAWA_BLE.IKAWA_RECEIVE_CHAR_UUID])],
-                self.processData,
-                sendStop = self.sendStop,
-                connected = self.connected,
-                #device_names = [ IKAWA_BLE.DEVICE_NAME_IKAWA ]
-                )
+#            self.ble:BleInterface = BleInterface(  # type:ignore[unused-ignore]
+#                [(IKAWA_BLE.IKAWA_SERVICE_UUID, [IKAWA_BLE.IKAWA_SEND_CHAR_UUID, IKAWA_BLE.IKAWA_RECEIVE_CHAR_UUID])],
+#                self.processData,
+#                sendStop = self.sendStop,
+#                connected = self.connected,
+#                #device_names = [ IKAWA_BLE.DEVICE_NAME_IKAWA ]
+#                )
 
             self.frame_char:Final[int]          = 126 # b'\x7e'
             self.escape_char:Final[int]         = 125 # b'\x7d'
@@ -498,27 +503,22 @@ try: # BLE not available on some platforms
         def reset(self) -> None:
             self.rcv_buffer = None
 
-        def start(self, log_data:bool = False) -> None:
+        def start_sampling(self, log_data:bool = False) -> None:
             self.log_data = log_data
             self.reset()
             # start BLE loop
-            self.ble.deviceDisconnected.connect(self.ble_scan_failed)
-            self.ble.scanDevices()
+            self.start()
 
-        def stop(self) -> None:
-            # disconnect signals
-            self.ble.deviceDisconnected.disconnect()
-            self.ble.disconnectDevice()
-            try:
-                self.ble.stop_managing_thread()
-            except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
+        def stop_sampling(self) -> None:
+            self.stop()
 
-        def ble_scan_failed(self) -> None:
-            if self.ble is not None:
-                QTimer.singleShot(200, self.ble.scanDevices)
+        def notify_callback(self, _characteristic:Any, data:bytearray) -> None:
+            _log.debug('notify: %s', data)
+            if self._logging:
+                _log.info('received: %s',data)
+            self.processData(bytes(data))
 
-        def processData(self, _write:Callable[[Optional[bytes]],None], data:bytes) -> Tuple[Optional[float], Optional[int]]:
+        def processData(self, data:bytes) -> None:
             if len(data) > 0:
                 try:
                     if self.rcv_buffer is None and data[0] == self.frame_char:
@@ -599,7 +599,6 @@ try: # BLE not available on some platforms
                                 _log.debug('processData() CRC check failed')
                 except Exception as e:  # pylint: disable=broad-except
                     _log.error(e)
-            return None, None
 
         def connected(self) -> None:
             self.connected_state = True
@@ -624,7 +623,7 @@ try: # BLE not available on some platforms
         def getData(self) -> None:
             if self.connected_state:
                 request_data = self.requestDataMessage()
-                self.ble.write(request_data)
+                self.send(request_data)
                 # wait for data to be delivered
                 self.receiveMutex.lock()
                 res = self.dataReceived.wait(self.receiveMutex, self.receiveTimeout)

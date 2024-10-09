@@ -1,7 +1,7 @@
 # -*- mode: python -*-
 
 import os
-from PyInstaller.utils.hooks import get_package_paths
+from PyInstaller.utils.hooks import get_package_paths, collect_submodules
 
 block_cipher = None
 
@@ -22,7 +22,7 @@ hiddenimports_list=[
     'matplotlib.backends.backend_pdf',
     'matplotlib.backends.backend_svg',
     'babel.numbers'
-]
+] + collect_submodules('dbus_fast')
 
 EXCLUDES = [
     'PyQt5',

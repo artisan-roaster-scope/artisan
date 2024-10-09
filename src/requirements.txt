@@ -30,12 +30,12 @@ setuptools==70.3.0 # py2app fails on 71.0.3 and 71.0.4; pyinstaller windows/linu
 wheel==0.44.0
 pyserial==3.5
 pymodbus==3.6.9; python_version < '3.9' # last Python 3.8 release
-pymodbus==3.7.2; python_version >= '3.9'
+pymodbus==3.7.3; python_version >= '3.9'
 python-snap7==1.3; python_version < '3.10' # last Python 3.9 release
 python-snap7==2.0.0; python_version >= '3.10'
 Phidget22==1.20.20240911
 Unidecode==1.3.8
-qrcode==7.4.2
+qrcode==8.0
 requests==2.32.3
 requests-file==2.1.0
 pyusb==1.2.1
@@ -48,7 +48,7 @@ psutil==6.0.0
 typing-extensions==4.10.0; python_version < '3.8' # required for supporting Final and TypeDict on Python <3.8
 protobuf==5.28.2
 numpy==1.24.3; python_version < '3.9' # last Python 3.8 release
-numpy==2.1.1; python_version >= '3.9'
+numpy==2.1.2; python_version >= '3.9'
 scipy==1.10.1; python_version < '3.9' # last Python 3.8 release
 scipy==1.14.1; python_version >= '3.9'
 wquantiles==0.6
@@ -60,7 +60,7 @@ lxml==5.3.0
 matplotlib==3.7.3; python_version < '3.9' # last Python 3.8 release
 matplotlib==3.9.2; python_version >= '3.9'
 jinja2==3.1.4
-aiohttp==3.10.8
+aiohttp==3.10.9
 aiohttp_jinja2==1.6
 python-bidi==0.4.2; python_version < '3.9' # last Python 3.8 release
 python-bidi==0.6.0; python_version >= '3.9'
@@ -69,6 +69,7 @@ pillow>=10.4.0
 pydantic==2.9.2; (platform_system=='Windows' and python_version>'3.10') or sys_platform=='darwin' or platform_system=='Linux'
 pydantic==2.7.1; (platform_system=='Windows' and python_version<'3.9')  # last version working with Windows 7/8 pending resolution of pydantic Issue #9920
 babel==2.16.0
+bleak==0.22.3
 #
 #
 ######

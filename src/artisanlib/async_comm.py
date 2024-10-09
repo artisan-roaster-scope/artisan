@@ -33,6 +33,8 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 # On object deletion the loop is terminated and the thread is ended.
 class AsyncLoopThread:
 
+    __slots__ = [ '__loop', '__thread' ]
+
     def __init__(self) -> None:
 
         def start_background_loop(loop:asyncio.AbstractEventLoop) -> None:

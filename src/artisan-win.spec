@@ -19,7 +19,7 @@
 import logging
 import sys
 
-from PyInstaller.utils.hooks import copy_metadata
+from PyInstaller.utils.hooks import copy_metadata, collect_data_files, collect_dynamic_libs
 
 # Set up the logger
 logging.basicConfig(level=logging.INFO)
@@ -127,14 +127,17 @@ if not ARTISAN_LEGACY=='True':
     hiddenimports_list[len(hiddenimports_list):] = [
                             'PyQt6.QtWebChannel',
                             'PyQt6.QtWebEngineCore',
-                            'importlib_resources'
+                            'importlib_resources',
+			    'winrt.windows.foundation.collections'
                             ]
 
+datas = collect_data_files('bleak', subdir=r'backends\winrt')
+binaries = collect_dynamic_libs('bleak')
 
 a = Analysis(['artisan.py'],
              pathex=[PYQT_QT_BIN, ARTISAN_SRC, SCIPY_BIN],
-             binaries=[],
-             datas=[], # + copy_metadata('tzdata')
+             binaries=binaries,
+             datas=datas, # + copy_metadata('tzdata')
              hookspath=[],
              runtime_hooks=[],
              excludes=[],

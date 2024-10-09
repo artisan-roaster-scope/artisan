@@ -262,7 +262,7 @@ class modbusport:
                         from pymodbus.framer import FramerType # type:ignore[attr-defined,unused-ignore]
                     except Exception: # pylint: disable=broad-except
                         # FramerType named Framer in pymodbus < 3.7
-                        from pymodbus.framer import Framer as FramerType # type:ignore[assignment]
+                        from pymodbus.framer import Framer as FramerType # type:ignore[attr-defined, no-redef]
                     self._client = AsyncModbusSerialClient(
                         framer=FramerType.ASCII, # type:ignore[unused-ignore]
                         port=self.comport,
@@ -309,7 +309,7 @@ class modbusport:
                         from pymodbus.framer import FramerType  # type:ignore[attr-defined,unused-ignore]
                     except Exception: # pylint: disable=broad-except
                         # FramerType named Framer in pymodbus < 3.7
-                        from pymodbus.framer import Framer as FramerType # type:ignore[assignment]
+                        from pymodbus.framer import Framer as FramerType # type:ignore[attr-defined, no-redef]
                     self._client = AsyncModbusSerialClient(
                         framer=FramerType.RTU, # type:ignore[unused-ignore]
                         port=self.comport,
@@ -566,7 +566,7 @@ class modbusport:
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
-                asyncio.run_coroutine_threadsafe(self._client.write_register(int(register),int(round(value)),slave=int(slave)), self._asyncLoopThread.loop).result()
+                asyncio.run_coroutine_threadsafe(self._client.write_register(int(register),int(round(value)).to_bytes(2, 'big'),slave=int(slave)), self._asyncLoopThread.loop).result()
 #                time.sleep(.03) # avoid possible hickups on startup
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeSingleRegister(%d,%d,%s) failed', slave, register, value)
@@ -628,10 +628,12 @@ class modbusport:
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
+                byte_values:List[bytes]
                 if isinstance(values, int):
-                    asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),[values],slave=int(slave)), self._asyncLoopThread.loop).result()
+                    byte_values = [values.to_bytes(2, 'big')]
                 else:
-                    asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),values,slave=int(slave)), self._asyncLoopThread.loop).result()
+                    byte_values = [v.to_bytes(2, 'big') for v in values]
+                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),byte_values,slave=int(slave)), self._asyncLoopThread.loop).result()
 #                time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeRegisters(%d,%d,%s) failed', slave, register, values)
@@ -661,7 +663,7 @@ class modbusport:
                 builder.add_32bit_float(float(value))
                 payload = builder.build()
                 #payload:List[int] = [int.from_bytes(b,("little" if self.byteorderLittle else "big")) for b in builder.build()]
-                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),payload,slave=int(slave),skip_encode=True), self._asyncLoopThread.loop).result() # type: ignore # pyright: ignore [reportGeneralTypeIssues] # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"
+                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),payload,slave=int(slave),skip_encode=True), self._asyncLoopThread.loop).result() # pyright: ignore [reportGeneralTypeIssues] # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"
 #                time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeWord(%d,%d,%s) failed', slave, register, value)
@@ -690,7 +692,7 @@ class modbusport:
                 builder.add_16bit_uint(r)
                 payload = builder.build()
                 #payload:List[int] = [int.from_bytes(b,("little" if self.byteorderLittle else "big")) for b in builder.build()]
-                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),payload,slave=int(slave),skip_encode=True), self._asyncLoopThread.loop).result() # type:ignore # pyright: ignore [reportGeneralTypeIssues] # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"
+                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),payload,slave=int(slave),skip_encode=True), self._asyncLoopThread.loop).result() # pyright: ignore [reportGeneralTypeIssues] # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"
 #                time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeBCD(%d,%d,%s) failed', slave, register, value)
@@ -720,7 +722,7 @@ class modbusport:
                 builder.add_32bit_int(int(value))
                 payload = builder.build()
                 #payload:List[int] = [int.from_bytes(b,("little" if self.byteorderLittle else "big")) for b in builder.build()]
-                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),payload,slave=int(slave),skip_encode=True), self._asyncLoopThread.loop).result() # type: ignore # pyright: ignore [reportGeneralTypeIssues] # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"
+                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),payload,slave=int(slave),skip_encode=True), self._asyncLoopThread.loop).result() # pyright: ignore [reportGeneralTypeIssues] # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"
 #                await asyncio.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeLong(%d,%d,%s) failed', slave, register, value)

@@ -381,26 +381,26 @@ class AillioR1:
         if self.parent_pipe is None or not self.parent_pipe.poll():
             return
         state = self.parent_pipe.recv()
-        valid = state[41]
+        valid = state[41]        # type:ignore[reportIndexIssue, unused-ignore]
         # Heuristic to find out if the data is valid
         # It looks like we get a different message every 15 seconds
         # when we're not roasting.  Ignore this message for now.
         if valid == 10:
-            self.bt = round(unpack('f', state[0:4])[0], 1)
-            self.bt_ror = round(unpack('f', state[4:8])[0], 1)
-            self.dt = round(unpack('f', state[8:12])[0], 1)
-            self.exitt = round(unpack('f', state[16:20])[0], 1)
-            self.minutes = state[24]
-            self.seconds = state[25]
-            self.fan = state[26]
-            self.heater = state[27]
-            self.drum = state[28]
-            self.r1state = state[29]
-            self.irt = round(unpack('f', state[32:36])[0], 1)
-            self.pcbt = round(unpack('f', state[36:40])[0], 1)
-            self.fan_rpm = unpack('h', state[44:46])[0]
-            self.voltage = unpack('h', state[48:50])[0]
-            self.coil_fan = round(unpack('i', state[52:56])[0], 1)
+            self.bt = round(unpack('f', state[0:4])[0], 1)      # type:ignore[reportIndexIssue, unused-ignore]
+            self.bt_ror = round(unpack('f', state[4:8])[0], 1)  # type:ignore[reportIndexIssue, unused-ignore]
+            self.dt = round(unpack('f', state[8:12])[0], 1)     # type:ignore[reportIndexIssue, unused-ignore]
+            self.exitt = round(unpack('f', state[16:20])[0], 1) # type:ignore[reportIndexIssue, unused-ignore]
+            self.minutes = state[24]   # type:ignore[reportIndexIssue, unused-ignore]
+            self.seconds = state[25]   # type:ignore[reportIndexIssue, unused-ignore]
+            self.fan = state[26]       # type:ignore[reportIndexIssue, unused-ignore]
+            self.heater = state[27]    # type:ignore[reportIndexIssue, unused-ignore]
+            self.drum = state[28]      # type:ignore[reportIndexIssue, unused-ignore]
+            self.r1state = state[29]   # type:ignore[reportIndexIssue, unused-ignore]
+            self.irt = round(unpack('f', state[32:36])[0], 1)  # type:ignore[reportIndexIssue, unused-ignore]
+            self.pcbt = round(unpack('f', state[36:40])[0], 1) # type:ignore[reportIndexIssue, unused-ignore]
+            self.fan_rpm = unpack('h', state[44:46])[0]        # type:ignore[reportIndexIssue, unused-ignore]
+            self.voltage = unpack('h', state[48:50])[0]        # type:ignore[reportIndexIssue, unused-ignore]
+            self.coil_fan = round(unpack('i', state[52:56])[0], 1) # type:ignore[reportIndexIssue, unused-ignore]
             self.__dbg('BT: ' + str(self.bt))
             self.__dbg('BT RoR: ' + str(self.bt_ror))
             self.__dbg('DT: ' + str(self.dt))
@@ -414,9 +414,9 @@ class AillioR1:
             self.__dbg('drum speed: ' + str(self.drum))
             self.__dbg('time: ' + str(self.minutes) + ':' + str(self.seconds))
 
-        state = state[64:]
-        self.coil_fan2 = round(unpack('i', state[32:36])[0], 1)
-        self.pht = unpack('H', state[40:42])[0]
+        state = state[64:]         # type:ignore[reportIndexIssue, unused-ignore]
+        self.coil_fan2 = round(unpack('i', state[32:36])[0], 1) # type:ignore[reportIndexIssue, unused-ignore]
+        self.pht = unpack('H', state[40:42])[0] # type:ignore[reportIndexIssue, unused-ignore]
         self.__dbg('pre-heat temperature: ' + str(self.pht))
         if self.r1state == self.AILLIO_STATE_OFF:
             self.state_str = 'off'

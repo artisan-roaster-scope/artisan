@@ -19636,6 +19636,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.flagKeepON = flagKeepON
                 if QApplication.queryKeyboardModifiers() != (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ShiftModifier):
                     self.closeEventSettings() # it takes quite some time to write the >1000 setting items
+                # if BLE was used we need to terminate its singular thread/asyncloop running the bleak scan and connect:
+                if 'artisanlib.ble_port' in sys.modules:
+                    from artisanlib import ble_port
+                    ble_port.ble.close()
 #                gc.collect() # this takes quite some time
                 QApplication.exit()
                 return True
@@ -25874,7 +25878,7 @@ def initialize_locale(my_app:Artisan) -> str:
 
     qt_translation_modules:List[str] = [
         'qtbase',
-        'qtconnectivity',
+#        'qtconnectivity', # QtBluetooth replaced by bleak
 #        'qtwebengine' # we do not use any UI
     ]
 

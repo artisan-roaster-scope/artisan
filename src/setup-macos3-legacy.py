@@ -265,7 +265,7 @@ Qt_modules = [
     'QtPrintSupport',
     'QtNetwork',
     'QtDBus',
-    'QtBluetooth',
+#    'QtBluetooth', # replaced by bleak
     'QtConcurrent', # not on PyQt6
 # needed for QtWebEngine HTML2PDF export:
     'QtWebEngineWidgets',

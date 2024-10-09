@@ -24,7 +24,7 @@ from typing import Final, Optional, List, Set, Tuple, Dict, Callable, cast, Any,
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from artisanlib.types import RecentRoast, BTU
-    from artisanlib.ble import BleInterface # noqa: F401 # pylint: disable=unused-import
+    from artisanlib.acaia import Acaia # noqa: F401 # pylint: disable=unused-import
     from plus.stock import Blend # noqa: F401  # pylint: disable=unused-import
     from PyQt6.QtWidgets import QLayout, QAbstractItemView, QCompleter # pylint: disable=unused-import
     from PyQt6.QtGui import QClipboard, QCloseEvent, QKeyEvent, QMouseEvent # pylint: disable=unused-import
@@ -115,10 +115,11 @@ class volumeCalculatorDlg(ArtisanDialog):
         # Scale Weight
         self.scale_weight = self.parent_dialog.scale_weight
         self.scaleWeight = QLabel() # displays the current reading - tare of the connected scale
-        if self.parent_dialog.ble is not None:
+        if self.parent_dialog.acaia is not None:
             self.update_scale_weight()
-            self.parent_dialog.ble.weightChanged.connect(self.ble_weight_changed)
-            self.parent_dialog.ble.deviceDisconnected.connect(self.ble_scan_failed)
+            self.parent_dialog.acaia.weight_changed_signal.connect(self.acaia_weight_changed)
+            self.parent_dialog.acaia.battery_changed_signal.connect(self.acaia_battery_changed)
+            self.parent_dialog.acaia.disconnected_signal.connect(self.acaia_disconnected)
         # Scale Battery
         self.scale_battery = self.parent_dialog.scale_battery
 
@@ -321,7 +322,7 @@ class volumeCalculatorDlg(ArtisanDialog):
             self.aw.largeScaleLCDs_dialog.updateWeightUnit('g')
 
     @pyqtSlot()
-    def ble_scan_failed(self) -> None:
+    def acaia_disconnected(self) -> None:
         self.scale_weight = None
         self.scale_battery = None
         self.updateWeightLCD('----')
@@ -330,11 +331,14 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.scaleWeight.setText('' if txt_value == '' else txt_value+txt_unit.lower())
         self.aw.qmc.updateLargeScaleLCDs(txt_value)
 
-    @pyqtSlot(float)
-    def ble_weight_changed(self, w:float) -> None:
-        if w is not None:
-            self.scale_weight = w
-            self.update_scale_weight()
+    @pyqtSlot(int)
+    def acaia_battery_changed(self, b:int) -> None:
+        self.scale_battery = b
+
+    @pyqtSlot(int)
+    def acaia_weight_changed(self, w:int) -> None:
+        self.scale_weight = w
+        self.update_scale_weight()
 
     @pyqtSlot(float)
     def update_scale_weight(self, weight:Optional[float] = None) -> None:
@@ -342,7 +346,7 @@ class volumeCalculatorDlg(ArtisanDialog):
             if weight is not None:
                 self.scale_weight = weight
             if self.scale_weight is not None and self.tare is not None:
-                self.updateWeightLCD(f'{self.scale_weight - self.tare:.1f}','g')
+                self.updateWeightLCD(f'{self.scale_weight - self.tare:.0f}','g')
             else:
                 self.updateWeightLCD('----')
         except Exception as e: # pylint: disable=broad-except # the dialog might have been closed already and thus the qlabel might not exist anymore
@@ -411,11 +415,16 @@ class volumeCalculatorDlg(ArtisanDialog):
                 self.coffeeinvolume.setText('')
                 self.inVolume = None
             else:
-                self.inVolume = convertVolume(
-                    convertWeight(self.weightIn,self.weightunit,0) * float(comma2dot(self.unitvolumeEdit.text())) / float(comma2dot(self.coffeeinweightEdit.text())),
-                    5,
-                    self.volumeunit)
-                self.coffeeinvolume.setText(f'{float2floatWeightVolume(self.inVolume):g}')
+                inWeight:float = float(comma2dot(self.coffeeinweightEdit.text()))
+                if inWeight == 0:
+                    self.coffeeinvolume.setText('')
+                    self.inVolume = None
+                else:
+                    self.inVolume = convertVolume(
+                        convertWeight(self.weightIn,self.weightunit,0) * float(comma2dot(self.unitvolumeEdit.text())) / inWeight,
+                        5,
+                        self.volumeunit)
+                    self.coffeeinvolume.setText(f'{float2floatWeightVolume(self.inVolume):g}')
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             self.inVolume = None
@@ -429,8 +438,16 @@ class volumeCalculatorDlg(ArtisanDialog):
                 self.coffeeoutvolume.setText('')
                 self.outVolume = None
             else:
-                self.outVolume = convertVolume(convertWeight(self.weightOut,self.weightunit,0) * float(comma2dot(str(self.unitvolumeEdit.text()))) / float(comma2dot(str(self.coffeeoutweightEdit.text()))),5,self.volumeunit)
-                self.coffeeoutvolume.setText(f'{float2floatWeightVolume(self.outVolume):g}')
+                outWeight:float = float(comma2dot(str(self.coffeeoutweightEdit.text())))
+                if outWeight == 0:
+                    self.coffeeoutvolume.setText('')
+                    self.outVolume = None
+                else:
+                    self.outVolume = convertVolume(
+                        convertWeight(self.weightOut,self.weightunit,0) * float(comma2dot(str(self.unitvolumeEdit.text()))) / outWeight,
+                        5,
+                        self.volumeunit)
+                    self.coffeeoutvolume.setText(f'{float2floatWeightVolume(self.outVolume):g}')
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             self.outVolume = None
@@ -580,7 +597,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         self.perKgRoastMode = False # if true only the amount during the roast and not the full batch (incl. preheat and BBP) are displayed), toggled by click on the result widget
 
-        self.ble:'Optional[BleInterface]' = None # the BLE interface # noqa: UP037
+        self.acaia:'Optional[Acaia]' = None # the BLE interface # noqa: UP037
         self.scale_weight:Optional[float] = None # weight received from a connected scale
         self.scale_battery:Optional[int] = None # battery level of the connected scale in %
         self.scale_set:Optional[float] = None # set weight for accumulation in g
@@ -1348,36 +1365,17 @@ class editGraphDlg(ArtisanResizeablDialog):
 
 
             if self.aw.scale.device == 'acaia' and not (platform.system() == 'Windows' and math.floor(toFloat(platform.release())) < 10):
-                # QtBluetooth is not well supported under Windows versions before Windows 10
+                # BLE is not well supported under Windows versions before Windows 10
                 try:
-#                    with suppress_stdout_stderr():
-                    # if selected scale is the Acaia, start the BLE interface
-                    from artisanlib.ble import BleInterface # noqa: F811
-                    from artisanlib.acaia import AcaiaBLE
-                    acaia = AcaiaBLE()
-
-                    self.ble = BleInterface(
-                        [(acaia.SERVICE_UUID_LEGACY, [AcaiaBLE.CHAR_UUID_LEGACY]),
-                         (acaia.SERVICE_UUID, [AcaiaBLE.CHAR_UUID, AcaiaBLE.CHAR_UUID_WRITE])],
-                        acaia.processData,
-                        acaia.sendHeartbeat,
-                        None, #acaia.sendStop,
-                        acaia.reset,
-                        [
-                            acaia.DEVICE_NAME_LUNAR,
-                            acaia.DEVICE_NAME_PEARL,
-                            acaia.DEVICE_NAME_PEARL2021,
-                            acaia.DEVICE_NAME_PEARLS,
-                            acaia.DEVICE_NAME_LUNAR2021,
-                            acaia.DEVICE_NAME_PYXIS
-                        ]
-                        )
+                    from artisanlib.acaia import Acaia
+                    self.acaia = Acaia()
+                    self.acaia.weight_changed_signal.connect(self.ble_weight_changed)
+                    self.acaia.battery_changed_signal.connect(self.ble_battery_changed)
+                    self.acaia.disconnected_signal.connect(self.ble_disconnected)
                     # start BLE loop
-                    self.ble.deviceDisconnected.connect(self.ble_scan_failed)
-                    self.ble.weightChanged.connect(self.ble_weight_changed)
-                    self.ble.batteryChanged.connect(self.ble_battery_changed)
+                    self.acaia.start()
+
                     self.updateWeightLCD('----')
-                    self.ble.scanDevices()
                 except Exception as e:  # pylint: disable=broad-except
                     _log.exception(e)
             elif self.aw.scale.device in {'KERN NDE','Shore 930'}:
@@ -1772,19 +1770,13 @@ class editGraphDlg(ArtisanResizeablDialog):
         return v_formatted, unit
 
     @pyqtSlot()
-    def ble_scan_failed(self) -> None:
-#        import datetime
-#        ts = libtime.time()
-#        st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-#        _log.debug("ble_scan_failed: %s", st)
+    def ble_disconnected(self) -> None:
         self.scale_weight = None
         self.scale_battery = None
         self.updateWeightLCD('----')
-        if self.ble is not None and not self.disconnecting:
-            QTimer.singleShot(200, self.ble.scanDevices)
 
-    @pyqtSlot(float)
-    def ble_weight_changed(self, w:float) -> None:
+    @pyqtSlot(int)
+    def ble_weight_changed(self, w:int) -> None:
         if w is not None:
             self.scale_weight = w
             self.update_scale_weight()
@@ -1808,7 +1800,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             unit = weight_units.index(self.aw.qmc.weight[2])
             if unit == 0: # g selected
                 # metric
-                v_formatted = f'{v:.0f}' if v > 1000 else f'{v:.1f}'
+                #v_formatted = f'{v:.0f}' if v > 1000 else f'{v:.1f}'
+                v_formatted = f'{v:.0f}' # never show decimals for g
             elif unit == 1: # kg selected
                 # metric (always keep the accuracy to the g
                 v_formatted = f'{v/1000:.3f}'
@@ -2537,23 +2530,19 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot('QCloseEvent')
     def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
         self.disconnecting = True
-        if self.ble is not None:
+        if self.acaia is not None:
             try:
-                self.ble.batteryChanged.disconnect()
-                self.ble.weightChanged.disconnect()
-                self.ble.deviceDisconnected.disconnect()
+                self.acaia.battery_changed_signal.disconnect()
+                self.acaia.weight_changed_signal.disconnect()
+                self.acaia.disconnected_signal.disconnect()
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
             try:
-                self.ble.disconnectDevice()
+                self.acaia.stop()
                 self.updateWeightLCD('')
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
-            try:
-                self.ble.stop_managing_thread()
-            except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
-            self.ble = None
+            self.acaia = None
         settings = QSettings()
         #save window geometry
         settings.setValue('RoastGeometry',self.saveGeometry())
@@ -2568,23 +2557,19 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def cancel_dialog(self) -> None:
         self.disconnecting = True
-        if self.ble is not None:
+        if self.acaia is not None:
             try:
-                self.ble.batteryChanged.disconnect()
-                self.ble.weightChanged.disconnect()
-                self.ble.deviceDisconnected.disconnect()
+                self.acaia.battery_changed_signal.disconnect()
+                self.acaia.weight_changed_signal.disconnect()
+                self.acaia.disconnected_signal.disconnect()
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
             try:
-                self.ble.disconnectDevice()
+                self.acaia.stop()
                 self.updateWeightLCD('')
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
-            try:
-                self.ble.stop_managing_thread()
-            except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
-            self.ble = None
+            self.acaia = None
         settings = QSettings()
         #save window geometry
         settings.setValue('RoastGeometry',self.saveGeometry())

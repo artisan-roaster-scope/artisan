@@ -6580,6 +6580,11 @@ class tgraphcanvas(FigureCanvas):
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
+
+        import threading
+        for thread in threading.enumerate():
+            _log.info('PRINT running thread: %s', thread.name)
+
         if not self.checkSaved():
             return False
 
@@ -12040,7 +12045,7 @@ class tgraphcanvas(FigureCanvas):
                             connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('IKAWA'),True,None),
                             disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('IKAWA'),True,None))
                         if self.aw.ikawa is not None:
-                            self.aw.ikawa.start(self.device_logging)
+                            self.aw.ikawa.start_sampling(self.device_logging)
                             self.aw.sendmessageSignal.emit(QApplication.translate('Message', 'scanning for device'),True,None)
                     except Exception as ex:  # pylint: disable=broad-except
                         _log.error(ex)
@@ -12168,7 +12173,7 @@ class tgraphcanvas(FigureCanvas):
 
                 # disconnect IKAWA
                 if not bool(self.aw.simulator) and self.device == 142 and self.aw.ikawa is not None:
-                    self.aw.ikawa.stop()
+                    self.aw.ikawa.stop_sampling()
                     try:
                         if self.aw.ikawa.ambient_pressure != -1:
                             self.ambient_pressure = self.aw.ikawa.ambient_pressure
