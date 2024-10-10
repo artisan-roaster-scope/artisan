@@ -566,11 +566,12 @@ class modbusport:
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
-                asyncio.run_coroutine_threadsafe(self._client.write_register(int(register),int(round(value)).to_bytes(2, 'big'),slave=int(slave)), self._asyncLoopThread.loop).result()
+                asyncio.run_coroutine_threadsafe(self._client.write_register(int(register),int(round(value)),slave=int(slave)), self._asyncLoopThread.loop).result() # type:ignore[arg-type] # type annotation wrong in pymodbus 3.7.3
 #                time.sleep(.03) # avoid possible hickups on startup
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeSingleRegister(%d,%d,%s) failed', slave, register, value)
             _log.debug(ex)
+            _log.exception(ex)
             self.disconnectOnError()
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:
@@ -628,12 +629,10 @@ class modbusport:
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
-                byte_values:List[bytes]
-                if isinstance(values, int):
-                    byte_values = [values.to_bytes(2, 'big')]
-                else:
-                    byte_values = [v.to_bytes(2, 'big') for v in values]
-                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),byte_values,slave=int(slave)), self._asyncLoopThread.loop).result()
+#                byte_values:List[bytes] = ([values.to_bytes(2, 'big')] if isinstance(values, int) else [v.to_bytes(2, 'big') for v in values])
+                int_values:List[int] = ([values] if isinstance(values, int) else values)
+#                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),byte_values,slave=int(slave)), self._asyncLoopThread.loop).result()
+                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),int_values,slave=int(slave)), self._asyncLoopThread.loop).result() # type:ignore[arg-type] # type annotation wrong in pymodbus 3.7.3
 #                time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeRegisters(%d,%d,%s) failed', slave, register, values)

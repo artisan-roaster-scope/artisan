@@ -6580,11 +6580,6 @@ class tgraphcanvas(FigureCanvas):
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
-
-        import threading
-        for thread in threading.enumerate():
-            _log.info('PRINT running thread: %s', thread.name)
-
         if not self.checkSaved():
             return False
 

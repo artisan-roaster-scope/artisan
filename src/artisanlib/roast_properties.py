@@ -2538,7 +2538,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
             try:
-                self.acaia.stop()
+                #self.acaia.stop()
+                QTimer.singleShot(2,self.acaia.stop) # no delay on RoastProperties window close on Windows
                 self.updateWeightLCD('')
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)

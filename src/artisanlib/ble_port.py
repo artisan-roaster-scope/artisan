@@ -130,8 +130,8 @@ class BLE:
             blacklist:Set[str], # list of client addresses to ignore as they don't offer the required service
             case_sensitive:bool=True,
             disconnected_callback:Optional[Callable[[BleakClient], None]] = None,
-            scan_timeout:float=3,
-            connect_timeout:float=2) -> Tuple[Optional[BleakClient], Optional[str]]:
+            scan_timeout:float=5,
+            connect_timeout:float=4) -> Tuple[Optional[BleakClient], Optional[str]]:
         if self._asyncLoopThread is None:
             self._asyncLoopThread = AsyncLoopThread()
         fut = asyncio.run_coroutine_threadsafe(
@@ -145,16 +145,19 @@ class BLE:
                 self._asyncLoopThread.loop)
         try:
             return fut.result()
-        except Exception as e: # pylint: disable=broad-except
-            raise fut.exception() from e # type: ignore[misc]
+        except Exception: # pylint: disable=broad-except
+            #raise fut.exception() from e # type: ignore[misc]
+             _log.error('exception in scan_and_connect: %s', fut.exception())
+             return None, None
 
     def disconnect(self, client:'BleakClient') -> bool:
         if self._asyncLoopThread is not None:
             fut = asyncio.run_coroutine_threadsafe(client.disconnect(), self._asyncLoopThread.loop)
             try:
                 return fut.result()
-            except Exception as e: # pylint: disable=broad-except
-                raise fut.exception() from e # type: ignore[misc]
+            except Exception: # pylint: disable=broad-except
+                #raise fut.exception() from e # type: ignore[misc]
+                _log.error('exception in disconnect: %s', fut.exception())
         return False
 
     def start_notify(self, client:BleakClient, uuid:str, callback: 'Callable[[BleakGATTCharacteristic, bytearray], Union[None, Awaitable[None]]]') -> None:
@@ -256,7 +259,7 @@ class ClientBLE:
 
 
     # connect and re-connect while self._running to BLE
-    async def _connect(self, case_sensitive:bool=True, scan_timeout:float=3, connect_timeout:float=2) -> None:
+    async def _connect(self, case_sensitive:bool=True, scan_timeout:float=5, connect_timeout:float=4) -> None:
         blacklist:Set[str] = set()
         while self._running:
             # scan and connect
@@ -308,8 +311,8 @@ class ClientBLE:
             asyncio.run_coroutine_threadsafe(self.set_event(), self._async_loop_thread.loop)
 
     def send(self, message:bytes) -> None:
-        _log.debug('send: %s', message)
         if self._ble_client is not None and self._connected_service_uuid is not None and self._connected_service_uuid in self._writers:
+            _log.debug('send: %s', message)
             ble.write(self._ble_client, self._writers[self._connected_service_uuid], message)
 
     async def _keep_alive(self) -> None:
@@ -317,13 +320,13 @@ class ClientBLE:
             await asyncio.sleep(self._heartbeat_frequency)
             self.heartbeat()
 
-    async def _connect_and_keep_alive(self,case_sensitive:bool,scan_timeout:float=3, connect_timeout:float=2) -> None:
+    async def _connect_and_keep_alive(self,case_sensitive:bool,scan_timeout:float, connect_timeout:float) -> None:
         await asyncio.gather(
             self._connect(case_sensitive,scan_timeout,connect_timeout),
             self._keep_alive())
 
 
-    def start(self, case_sensitive:bool=True, scan_timeout:float=3, connect_timeout:float=2) -> None:
+    def start(self, case_sensitive:bool=True, scan_timeout:float=5, connect_timeout:float=4) -> None:
         _log.debug('start')
         if self._running:
             _log.error('BLE client already running')
