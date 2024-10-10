@@ -6837,12 +6837,7 @@ class scaleport(extraserialport):
             'acaia' : self.readAcaia,
             #"Shore 930" : self.readShore930,
         }
-        #TODO removes acaia from Windows 11 (and 7/8) until BLE is fixed in Qt/PyQt # pylint: disable=fixme
-        self.bluetooth_devices:List[str] = []
-        if platform.system() == 'Windows' and 'Windows-10' not in platform.platform():
-            del self.devicefunctionlist['acaia']
-        else:
-            self.bluetooth_devices = ['acaia']
+        self.bluetooth_devices:List[str] = ['acaia']
 
     def closeport(self) -> None:
         if self.device == 'acaia':
