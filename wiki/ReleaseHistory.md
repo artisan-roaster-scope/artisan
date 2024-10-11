@@ -24,7 +24,7 @@ v3.0.3
   - adds optional delay after connect before sending requests to serial MODBUS to allow to wait for Arduino slaves to complete reboot ([Issue #1694](../../../issues/1694))
   - upgrades MODBUS communication from sync to async IO
   - limits the visible length of long popup lists in Devices and Statistics Dialog
-  - keep Hottop connected after OFF in control mode to avoid the shutdown on disconnect ([Issue #1714](../../../issues/1714))
+  - keep Hottop connected after OFF in control mode to prevent the shutdown on disconnect ([Issue #1714](../../../issues/1714))
 
 
 * FIXES

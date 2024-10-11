@@ -21,7 +21,7 @@ import asyncio
 from contextlib import suppress
 from threading import Thread
 from pymodbus.transport.serialtransport import create_serial_connection # patched pyserial-asyncio
-from typing import Final, Optional, Union, Tuple, Callable, TYPE_CHECKING
+from typing import Final, Optional, Union, Tuple, Callable, AsyncIterator, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.types import SerialSettings # pylint: disable=unused-import
@@ -64,6 +64,76 @@ class AsyncLoopThread:
     @property
     def loop(self) -> asyncio.AbstractEventLoop:
         return self.__loop
+
+
+class AsyncIterable:
+
+    _queue: asyncio.Queue[bytes]
+
+    def __init__(self, queue:asyncio.Queue[bytes]) -> None:
+        self._queue = queue
+
+    def __aiter__(self) -> 'AsyncIterable':
+        return self
+
+    async def __anext__(self) -> bytes:
+        return await self._queue.get()
+
+
+class IteratorReader:
+
+    _chunks: AsyncIterator[bytes]
+    _backlog: bytes
+
+    def __init__(self, chunks: AsyncIterator[bytes]):
+        self._chunks = chunks
+        self._backlog = b''
+
+    async def _read_until_end(self) -> bytes:
+
+        content = self._backlog
+        self._backlog = b''
+
+        while True:
+            try:
+                content += await self._chunks.__anext__()
+            except StopAsyncIteration:
+                break
+
+        return content
+
+    async def _read_chunk(self, size: int) -> bytes:
+
+        content = self._backlog
+        bytes_read = len(self._backlog)
+
+        while bytes_read < size:
+
+            try:
+                chunk = await self._chunks.__anext__()
+            except StopAsyncIteration:
+                break
+
+            content += chunk
+            bytes_read += len(chunk)
+
+        self._backlog = content[size:]
+        return content[:size]
+
+    async def readexactly(self, size: int = -1) -> bytes:
+        if size > 0:
+            return await self._read_chunk(size)
+        if size == -1:
+            return await self._read_until_end()
+        return b''
+
+    async def readuntil(self, separator:bytes = b'\n') -> bytes:
+        if len(separator) != 0:
+            while True:
+                next_char = await self.readexactly(len(separator))
+                if next_char == separator:
+                    break
+        return separator
 
 
 class AsyncComm:
@@ -182,7 +252,7 @@ class AsyncComm:
                 await writer.drain()
 
     # if serial settings are given, host/port are ignore and communication is handled by the given serial port
-    async def connect(self, connect_timeout:float=2) -> None:
+    async def connect(self, connect_timeout:float=5) -> None:
         writer = None
         while True:
             try:
@@ -246,7 +316,7 @@ class AsyncComm:
 
     # start/stop sample thread
 
-    def start(self, connect_timeout:float=2) -> None:
+    def start(self, connect_timeout:float=5) -> None:
         try:
             _log.debug('start sampling')
             if self._asyncLoopThread is None:
