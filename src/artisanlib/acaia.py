@@ -478,7 +478,7 @@ class AcaiaBLE(ClientBLE):
 #                    255, #2,  # battery argument (if 0 : fast, 1 : slow)
 #                    2,  # timer id
 #                    255, #5,  # timer argument
-#                    3,  # key (not used)
+#                    3,  # key id (not used)
 #                    255, #4   # setting (not used)
                 ])
                 )
@@ -495,7 +495,7 @@ class AcaiaBLE(ClientBLE):
 #                    255, #2,  # battery argument (if 0 : fast, 1 : slow)
 #                    2,  # timer id
 #                    255, #5,  # timer argument
-#                    3,  # key (not used)
+#                    3,  # key id (not used)
 #                    255, #4   # setting (not used)
                 ])
                 )

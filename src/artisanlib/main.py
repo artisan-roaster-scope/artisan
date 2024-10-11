@@ -19537,6 +19537,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
 
     def stopActivities(self) -> None:
+        # if BLE was used we need to terminate its singular thread/asyncloop running the bleak scan and connect:
+        try:
+            if 'artisanlib.ble_port' in sys.modules:
+                from artisanlib import ble_port
+                ble_port.ble.close()
+        except Exception: # pylint: disable=broad-except
+            pass
         if self.full_screen_mode_active:
             if not (platform.system() == 'Darwin' and self.qmc.locale_str == 'en'):
                 self.fullscreenAction.setChecked(False)
@@ -19633,10 +19640,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.flagKeepON = flagKeepON
                 if QApplication.queryKeyboardModifiers() != (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ShiftModifier):
                     self.closeEventSettings() # it takes quite some time to write the >1000 setting items
-                # if BLE was used we need to terminate its singular thread/asyncloop running the bleak scan and connect:
-                if 'artisanlib.ble_port' in sys.modules:
-                    from artisanlib import ble_port
-                    ble_port.ble.close()
 #                gc.collect() # this takes quite some time
                 QApplication.exit()
                 return True
@@ -23047,6 +23050,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 if self.HottopControlActive:
                     self.sendmessage(QApplication.translate('Message','Hottop control turned off'))
                 self.HottopControlActive = False
+                if self.qmc.flagon:
+                    # if not sampling we also stop the communication loop with the Hottop here completely
+                    self.hottop.stop()
                 self.buttonCONTROL.setStyleSheet(self.pushbuttonstyles['PID'])
 
     def HottopControlOn(self, autosuper:bool=True) -> None:

@@ -147,8 +147,8 @@ class BLE:
             return fut.result()
         except Exception: # pylint: disable=broad-except
             #raise fut.exception() from e # type: ignore[misc]
-             _log.error('exception in scan_and_connect: %s', fut.exception())
-             return None, None
+            _log.error('exception in scan_and_connect: %s', fut.exception())
+            return None, None
 
     def disconnect(self, client:'BleakClient') -> bool:
         if self._asyncLoopThread is not None:

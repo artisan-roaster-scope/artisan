@@ -175,6 +175,9 @@ class Hottop(AsyncComm):
             return True
         return False
 
+    def hasHottopControl(self) -> bool:
+        return self._control_active
+
     def getState(self) -> Tuple[float, float, int, int]:
         return self._bt, self._et, self._heater, self._main_fan
 

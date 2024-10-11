@@ -251,8 +251,8 @@ class AsyncComm:
             _log.debug('start sampling')
             if self._asyncLoopThread is None:
                 self._asyncLoopThread = AsyncLoopThread()
-            # run sample task in async loop
-            asyncio.run_coroutine_threadsafe(self.connect(connect_timeout), self._asyncLoopThread.loop)
+                # run sample task in async loop
+                asyncio.run_coroutine_threadsafe(self.connect(connect_timeout), self._asyncLoopThread.loop)
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
 
