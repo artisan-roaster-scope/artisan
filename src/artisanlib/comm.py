@@ -5240,9 +5240,6 @@ class serialport:
         except Exception: # pylint: disable=broad-except
             pass
 
-    def phidgetPrinter(self, channel:int, value:int, serial:Optional[str]=None) -> None:
-        print(f'channel:{channel}, value:{value}, serial:{serial}\n')
-
     # sets rescalefactor
     def phidgetStepperRescale(self, channel:int, value:int, serial:Optional[str]=None) -> None:
 
