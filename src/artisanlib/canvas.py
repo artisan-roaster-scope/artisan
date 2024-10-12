@@ -12528,6 +12528,8 @@ class tgraphcanvas(FigureCanvas):
         self.aw.ser.phidgetDCMotorClose()
         # close Phidget RC Servos
         self.aw.ser.phidgetRCclose()
+        # close Phidget Stepper Motors
+        self.aw.ser.phidgetStepperClose()
         # close Yocto Voltage Outputs
         self.aw.ser.yoctoVOUTclose()
         # close Yocto Current Outputs
