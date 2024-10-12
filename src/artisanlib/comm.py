@@ -5242,7 +5242,6 @@ class serialport:
 
     # sets rescalefactor
     def phidgetStepperRescale(self, channel:int, value:int, serial:Optional[str]=None) -> None:
-
         _log.debug('phidgetStepperRescale(%s,%s,%s,%s)',channel,value,serial)
         self.phidgetStepperAttach(channel,serial)
         if serial in self.aw.ser.PhidgetStepperMotor and len(self.aw.ser.PhidgetStepperMotor[serial])>channel:
@@ -5250,7 +5249,6 @@ class serialport:
 
     # sets position
     def phidgetStepperSet(self, channel:int, value:int, serial:Optional[str]=None) -> None:
-        
         _log.debug('phidgetStepperSet(%s,%s,%s,%s)',channel,value,serial)
         self.phidgetStepperAttach(channel,serial)
         if serial in self.aw.ser.PhidgetStepperMotor and len(self.aw.ser.PhidgetStepperMotor[serial])>channel:
@@ -5258,14 +5256,12 @@ class serialport:
 
     # engages channel
     def phidgetStepperEngaged(self, channel:int, state:bool, serial:Optional[str]=None) -> None:
-        #print('engage\n')
         _log.debug('phidgetStepperEngaged(%s,%s,%s,%s)',channel,state,serial)
         self.phidgetStepperAttach(channel,serial)
         if serial in self.aw.ser.PhidgetStepperMotor and len(self.aw.ser.PhidgetStepperMotor[serial])>channel:
             self.aw.ser.PhidgetStepperMotor[serial][channel].setEngaged(state)
 
     def phidgetStepperClose(self) -> None:
-        print('closing stepper\n')
         _log.debug('phidgetStepperClose')
         for c in self.aw.ser.PhidgetStepperMotor:
             st = self.aw.ser.PhidgetStepperMotor[c]
