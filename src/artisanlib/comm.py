@@ -76,6 +76,7 @@ from Phidget22.Devices.DigitalInput import DigitalInput # type: ignore # @Unused
 from Phidget22.Devices.DigitalOutput import DigitalOutput # type: ignore # @UnusedWildImport
 from Phidget22.Devices.VoltageOutput import VoltageOutput, VoltageOutputRange # type: ignore # @UnusedWildImport
 from Phidget22.Devices.RCServo import RCServo # type: ignore # @UnusedWildImport
+from Phidget22.Devices.Stepper import Stepper # type: ignore # @UnusedWildImport
 from Phidget22.Devices.CurrentInput import CurrentInput # type: ignore # @UnusedWildImport
 from Phidget22.Devices.FrequencyCounter import FrequencyCounter # type: ignore # @UnusedWildImport
 from Phidget22.Devices.DCMotor import DCMotor # type: ignore # @UnusedWildImport
@@ -243,7 +244,7 @@ class serialport:
         'Phidget1045semaphore','PhidgetBridgeSensor','Phidget1046values','Phidget1046lastvalues','Phidget1046semaphores',\
         'PhidgetIO','PhidgetIOvalues','PhidgetIOlastvalues','PhidgetIOsemaphores','PhidgetDigitalOut',\
         'PhidgetDigitalOutLastPWM','PhidgetDigitalOutLastToggle','PhidgetDigitalOutHub','PhidgetDigitalOutLastPWMhub',\
-        'PhidgetDigitalOutLastToggleHub','PhidgetAnalogOut','PhidgetDCMotor','PhidgetRCServo',\
+        'PhidgetDigitalOutLastToggleHub','PhidgetAnalogOut','PhidgetDCMotor','PhidgetRCServo','PhidgetStepperMotor',\
         'YOCTOlibImported','YOCTOsensor','YOCTOchan1','YOCTOchan2','YOCTOtempIRavg','YOCTOvalues','YOCTOlastvalues','YOCTOsemaphores',\
         'YOCTOthread','YOCTOvoltageOutputs','YOCTOcurrentOutputs','YOCTOrelays','YOCTOservos','YOCTOpwmOutputs','HH506RAid','MS6514PrevTemp1','MS6514PrevTemp2','DT301PrevTemp','EXTECH755PrevTemp',\
         'controlETpid','readBTpid','useModbusPort','showFujiLCDs','arduinoETChannel','arduinoBTChannel','arduinoATChannel',\
@@ -304,6 +305,8 @@ class serialport:
         self.PhidgetAnalogOut:Dict[Optional[str], List[Phidget]] = {} # type:ignore[no-any-unimported,unused-ignore] # a dict associating serials with lists of channels
         #store the servo objects
         self.PhidgetRCServo:Dict[Optional[str], List[Phidget]] = {} # type:ignore[no-any-unimported,unused-ignore] # a dict associating serials with lists of channels
+        #store the Phidget StepperMotor objects
+        self.PhidgetStepperMotor:Dict[Optional[str], List[Phidget]] = {} # type:ignore[no-any-unimported,unused-ignore] # a dict associating serials with lists of channels
         #store the Phidget DCMotor objects
         self.PhidgetDCMotor:Dict[Optional[str], List[Phidget]] = {} # type:ignore[no-any-unimported,unused-ignore] # a dict associating serials with lists of channels
         # Phidget Ambient Sensor Channels
@@ -5187,6 +5190,97 @@ class serialport:
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
+#-- Phidget Stepper Motor (only one supported for now)
+    #  - Phidget STC1005: 1 channels (control of one bipolar stepper motor)
+# commands:
+#       engaged(ch,state[,sn])    # engage channel
+#       set(ch,pos[,sn])          # sets position
+#       rescale(ch,rf,[,sn])      # sets rescalefactor
+    
+    def phidgetStepperAttach(self, channel:int, serial:Optional[str]=None) -> None:
+        if serial not in self.aw.ser.PhidgetStepperMotor:
+            if self.aw.qmc.phidgetManager is None:
+                self.aw.qmc.startPhidgetManager()
+            if self.aw.qmc.phidgetManager is not None:
+                s,p = self.serialString2serialPort(serial)
+                # try to attach a Phidget STC1005 module
+                ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetStepper',DeviceID.PHIDID_STC1005,
+                            remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
+                ports = 1
+
+                if ser is not None:
+                    self.aw.ser.PhidgetStepperMotor[serial] = []
+                    for i in range(ports):
+                        stepper = Stepper()
+                        if port is not None:
+                            stepper.setHubPort(port)
+                        stepper.setDeviceSerialNumber(ser)
+                        stepper.setChannel(i)
+                        if self.aw.qmc.phidgetRemoteOnlyFlag and self.aw.qmc.phidgetRemoteFlag:
+                            stepper.setIsRemote(True)
+                            stepper.setIsLocal(False)
+                        self.aw.ser.PhidgetStepperMotor[serial].append(stepper)
+                    if serial is None:
+                        # we make this also accessible via its serial number
+                        self.aw.ser.PhidgetStepperMotor[str(ser)] = self.aw.ser.PhidgetStepperMotor[None]
+
+        try:
+            ch = self.aw.ser.PhidgetStepperMotor[serial][channel]
+            ch.setOnAttachHandler(self.phidgetOUTattached)
+            ch.setOnDetachHandler(self.phidgetOUTdetached)
+            if not ch.getAttached():
+                if self.aw.qmc.phidgetRemoteFlag:
+                    ch.openWaitForAttachment(3000)
+                else:
+                    ch.openWaitForAttachment(1500)
+                if serial is None and ch.getAttached():
+                    # we make this also accessible via its serial number + port
+                    si = self.serialPort2serialString(ch.getDeviceSerialNumber(),ch.getHubPort())
+                    self.aw.ser.PhidgetStepperMotor[str(si)] = self.aw.ser.PhidgetStepperMotor[None]
+        except Exception: # pylint: disable=broad-except
+            pass
+
+    def phidgetPrinter(self, channel:int, value:int, serial:Optional[str]=None) -> None:
+        print(f'channel:{channel}, value:{value}, serial:{serial}\n')
+
+    # sets rescalefactor
+    def phidgetStepperRescale(self, channel:int, value:int, serial:Optional[str]=None) -> None:
+
+        _log.debug('phidgetStepperRescale(%s,%s,%s,%s)',channel,value,serial)
+        self.phidgetStepperAttach(channel,serial)
+        if serial in self.aw.ser.PhidgetStepperMotor and len(self.aw.ser.PhidgetStepperMotor[serial])>channel:
+            self.aw.ser.PhidgetStepperMotor[serial][channel].setRescaleFactor(value)
+
+    # sets position
+    def phidgetStepperSet(self, channel:int, value:int, serial:Optional[str]=None) -> None:
+        
+        _log.debug('phidgetStepperSet(%s,%s,%s,%s)',channel,value,serial)
+        self.phidgetStepperAttach(channel,serial)
+        if serial in self.aw.ser.PhidgetStepperMotor and len(self.aw.ser.PhidgetStepperMotor[serial])>channel:
+            self.aw.ser.PhidgetStepperMotor[serial][channel].setTargetPosition(value)
+
+    # engages channel
+    def phidgetStepperEngaged(self, channel:int, state:bool, serial:Optional[str]=None) -> None:
+        #print('engage\n')
+        _log.debug('phidgetStepperEngaged(%s,%s,%s,%s)',channel,state,serial)
+        self.phidgetStepperAttach(channel,serial)
+        if serial in self.aw.ser.PhidgetStepperMotor and len(self.aw.ser.PhidgetStepperMotor[serial])>channel:
+            self.aw.ser.PhidgetStepperMotor[serial][channel].setEngaged(state)
+
+    def phidgetStepperClose(self) -> None:
+        print('closing stepper\n')
+        _log.debug('phidgetStepperClose')
+        for c in self.aw.ser.PhidgetStepperMotor:
+            st = self.aw.ser.PhidgetStepperMotor[c]
+            for i, _ in enumerate(st):
+                try:
+                    if st[i].getAttached():
+                        st[i].setEngaged(False)
+                        self.phidgetOUTdetached(st[i])
+                    st[i].close()
+                except Exception: # pylint: disable=broad-except
+                    pass
+        self.aw.ser.PhidgetStepperMotor = {}
 
 #--- Phidget RC (only one supported for now)
 #  supporting up to 16 channels for the following RC Phidgets
