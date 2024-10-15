@@ -30,7 +30,7 @@ from typing import Final, Optional, List, Tuple, Dict, Callable, Union, Any, TYP
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from artisanlib.aillio import AillioR1 # pylint: disable=unused-import
-    from artisanlib.colortrack import ColorTrack # pylint: disable=unused-import
+    from artisanlib.colortrack import ColorTrackBLE # pylint: disable=unused-import
     import serial # noqa: F401 # pylint: disable=unused-import
     from Phidget22.Phidget import Phidget # type: ignore # pylint: disable=unused-import
     from yoctopuce.yocto_voltageoutput import YVoltageOutput # type: ignore # pylint: disable=unused-import
@@ -329,7 +329,7 @@ class serialport:
         self.YOCTOservos:List[YServo] = [] # type:ignore[no-any-unimported,unused-ignore]
         self.YOCTOpwmOutputs:List[YPwmOutput] = [] # type:ignore[no-any-unimported,unused-ignore]
 
-        self.colorTrack:Optional[ColorTrack] = None
+        self.colorTrack:Optional[ColorTrackBLE] = None
 
         #stores the _id of the meter HH506RA as a string
         self.HH506RAid:str = 'X'
@@ -536,7 +536,10 @@ class serialport:
                                    self.Mugma_SV,             #167
                                    self.PHIDGET_TMP1202,      #168
                                    self.PHIDGET_TMP1202_2,    #169
-                                   self.ColorTrack            #170
+                                   self.ColorTrack,           #170
+                                   self.SantokerR_BTET,       #171
+                                   self.Santoker_IB,          #172
+                                   self.Santoker_RR           #173
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -1425,22 +1428,31 @@ class serialport:
         return tx,t2,t1
 
     def ColorTrack(self) -> Tuple[float,float,float]:
+# serial:
+#        if self.colorTrack is None:
+#            from artisanlib.colortrack import ColorTrack
+#            from artisanlib.types import SerialSettings
+#            colortrack_serial:SerialSettings = {
+#                'port': self.comport,
+#                'baudrate': self.baudrate,
+#                'bytesize': self.bytesize,
+#                'stopbits': self.stopbits,
+#                'parity': self.parity,
+#                'timeout': self.timeout}
+#            self.colorTrack = ColorTrack(serial=colortrack_serial)
+#            self.colorTrack.setLogging(self.aw.qmc.device_logging)
+#            self.colorTrack.start()
+#        tx = self.aw.qmc.timeclock.elapsedMilli()
+#        color = (-1 if self.colorTrack is None else self.colorTrack.getColor())
+#        return tx,color,color
+# BLE test
         if self.colorTrack is None:
-            from artisanlib.colortrack import ColorTrack
-            from artisanlib.types import SerialSettings
-            colortrack_serial:SerialSettings = {
-                'port': self.comport,
-                'baudrate': self.baudrate,
-                'bytesize': self.bytesize,
-                'stopbits': self.stopbits,
-                'parity': self.parity,
-                'timeout': self.timeout}
-            self.colorTrack = ColorTrack(serial=colortrack_serial)
-            self.colorTrack.setLogging(self.aw.qmc.device_logging)
-            self.colorTrack.start()
+            from artisanlib.colortrack import ColorTrackBLE
+            self.colorTrack = ColorTrackBLE()
+            if self.colorTrack is not None:
+                self.colorTrack.start()
         tx = self.aw.qmc.timeclock.elapsedMilli()
-        color = (-1 if self.colorTrack is None else self.colorTrack.getColor())
-        return tx,color,color
+        return tx,-1,-1
 
     def ARDUINOTC4(self) -> Tuple[float,float,float]:
         self.aw.qmc.extraArduinoTX = self.aw.qmc.timeclock.elapsedMilli()
@@ -1627,6 +1639,18 @@ class serialport:
         v2,v1 = self.YOCTOtemperatures(2)
         return tx,v2,v1
 
+    def SantokerR_BTET(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        if self.aw.santokerR is not None:
+            t1 = self.aw.santokerR.getET()
+            t2 = self.aw.santokerR.getBT()
+            if self.aw.qmc.mode == 'F':
+                t1 = fromCtoFstrict(t1)
+                t2 = fromCtoFstrict(t2)
+        else:
+            t1 = t2 = -1
+        return tx,t1,t2 # time, ET (chan2), BT (chan1)
+
     def Santoker_BTET(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
         if self.aw.santoker is not None:
@@ -1642,8 +1666,8 @@ class serialport:
     def Santoker_PF(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
         if self.aw.santoker is not None:
-            t1 = self.aw.santoker.getPower()
-            t2 = self.aw.santoker.getAir()
+            t1 = self.aw.santoker.getAir()
+            t2 = self.aw.santoker.getPower()
         else:
             t1 = t2 = -1
         return tx,t1,t2 # time, Air (chan2), Power (chan1)
@@ -1655,7 +1679,25 @@ class serialport:
             t2 = self.aw.santoker.getDrum()
         else:
             t1 = t2 = -1
-        return tx,t1,t2 # time, -1 (chan2), Drum (chan1)
+        return tx,t1,t2 # time, -- (chan2), Drum (chan1)
+
+    def Santoker_IB(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        if self.aw.santoker is not None:
+            t1 = self.aw.santoker.getBoard()
+            t2 = self.aw.santoker.getIR()
+        else:
+            t1 = t2 = -1
+        return tx,t1,t2 # time, Board (chan2), IR (chan1)
+
+    def Santoker_RR(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        if self.aw.santoker is not None:
+            t1 = self.aw.santoker.getET_RoR()
+            t2 = self.aw.santoker.getBT_RoR()
+        else:
+            t1 = t2 = -1
+        return tx,t1,t2 # time, ET RoR (chan2), BT RoR (chan1)
 
     def Mugma_BTET(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()

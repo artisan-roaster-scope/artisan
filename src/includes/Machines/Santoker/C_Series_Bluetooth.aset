@@ -1,41 +1,43 @@
 [General]
 Delay=1000
-roastertype_setup=Santoker Q Series
+roastertype_setup=Santoker C Series BLE
+roasterheating_setup=3
 
 [Device]
 id=134
 santokerHost=10.10.100.254
 santokerPort=20001
-santokerSerial=true
+santokerSerial=false
+santokerBLE=true
+Controlbuttonflag=true
 
 [events]
 markTP=false
 
 [ExtraComm]
-extrabaudrate=19200, 19200
-extrabytesize=8, 8
-extracomport=COM1, COM1
-extraparity=E, E
-extrastopbits=1, 1
-extratimeout=0.5, 0.5
+extrabaudrate=19200, 19200, 19200, 19200
+extrabytesize=8, 8, 8, 8
+extracomport=COM1, COM1, COM1, COM1
+extraparity=E, E, E, E
+extrastopbits=1, 1, 1, 1
+extratimeout=0.5, 0.5, 0.5, 0.5
 
 [ExtraDev]
-devicetablecolumnwidths=167, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100
-extraCurveVisibility1=false, false, true, true, true, true, true, true, true, true
-extraCurveVisibility2=false, false, true, true, true, true, true, true, true, true
-extraDelta1=false, false, false, false, false, false, false, false, false, false
-extraDelta2=false, false, false, false, false, false, false, false, false, false
+extraCurveVisibility1=false, true, false, false, true, true, true, true, true, true
+extraCurveVisibility2=false, false, false, false, true, true, true, true, true, true
+extraDelta1=false, false, false, true, false, false, false, false, false, false
+extraDelta2=false, false, false, true, false, false, false, false, false, false
 extraFill1=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 extraFill2=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-extraLCDvisibility1=false, false, false, false, false, false, false, false, false, false
-extraLCDvisibility2=false, false, false, false, false, false, false, false, false, false
-extradevicecolor1=#910113, #49b160
-extradevicecolor2=#4895ce, #800080
-extradevices=135, 136
-extramathexpression1=, 
-extramathexpression2=, 
-extraname1=Power, Drum
-extraname2=Fan, Extra 2
+extraLCDvisibility1=false, false, false, false, false, false, false, false, false, true
+extraLCDvisibility2=false, false, false, false, false, false, false, false, false, true
+extradevicecolor1=#910113, #49b160, #000000, #000000
+extradevicecolor2=#4895ce, #800080, #000000, #000000
+extradevices=135, 136, 172, 173
+extramathexpression1=, , , 
+extramathexpression2=, , , 
+extraname1=Power, Drum, IR, BT RoR
+extraname2=Fan, Extra 2, Board, ET RoR
 
 
 [DefaultButtons]
@@ -64,6 +66,18 @@ buttonpalette_label=
 buttonpalette_shortcuts=true
 buttonpalettemaxlen=14, 14, 14, 14, 14, 14, 14, 14, 14, 14
 button size=1
+extraeventbuttoncolor=#ad0427, #ad0427, #808080, #45a6cf, #45a6cf, #808080, #49b260, #49b260
+extraeventbuttontextcolor=white, white, white, white, white, white, white, white
+extraeventsactions=6, 6, 0, 6, 6, 0, 6, 6
+extraeventsactionstrings="santoker(fa,{})", "santoker(fa,{})", , "santoker(ca,{})", "santoker(ca,{})", , "santoker(c0,{})", "santoker(c0,{})"
+extraeventsbuttonsflags=0, 1, 1
+extraeventsdescriptions=, , , , , , , 
+extraeventslabels=-10%\n\\t, +10%\n\\t, , -10%\n\\t, +10%\n\\t, , -10%\n\\t, +10%\n\\t
+extraeventstypes=8, 8, 4, 5, 5, 4, 6, 6
+extraeventsvalues=-2, 2, 0, -2, 2, 0, -2, 2
+extraeventsvisibility=1, 1, 0, 1, 1, 0, 0, 0
+marklastbuttonpressed=true
+showextrabuttontooltips=false
 
 [Sliders]
 ModeTempSliders=C
@@ -80,3 +94,7 @@ slidermax=100, 100, 100, 100
 slidermin=0, 0, 0, 0
 slideroffsets=0, 0, 0, 0
 slidervisibilities=1, 0, 0, 1
+
+[ArduinoPID]
+pidPositiveTarget=4
+pidSource=2

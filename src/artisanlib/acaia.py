@@ -183,13 +183,9 @@ class AcaiaBLE(ClientBLE):
             _log.debug('connected to Acaia Legacy Scale')
         elif connected_service_UUID == self.ACAIA_SERVICE_UUID:
             _log.debug('connected to Acaia Scale')
-        if self._connected_handler is not None:
-            self._connected_handler()
 
     def on_disconnect(self) -> None:
         _log.debug('disconnected')
-        if self._disconnected_handler is not None:
-            self._disconnected_handler()
 
 
     ##
@@ -311,7 +307,6 @@ class AcaiaBLE(ClientBLE):
         if payload and len(payload) > 0:
             pos = self.parse_scale_event(payload)
             if pos > -1:
-                _log.debug('EVENT')
                 self.parse_scale_events(payload[pos+1:])
 
     ##
@@ -374,7 +369,6 @@ class AcaiaBLE(ClientBLE):
 
     # constructs message bytearray of the given type (int) and payload (bytearray) by adding headers and CRCs
     def message(self, tp:int, payload:bytes) -> bytes:
-#        return bytes([self.HEADER1,self.HEADER2,tp]) + payload + self.crc(payload)
         return self.HEADER1 + self.HEADER2 + tp.to_bytes(1, 'big') + payload + self.crc(payload)
 
     def send_message(self, tp:int, payload:bytes) -> None:
@@ -458,6 +452,8 @@ class AcaiaBLE(ClientBLE):
             asyncio.run_coroutine_threadsafe(
                     self._read_queue.put(bytes(data)),
                     self._async_loop_thread.loop)
+            if self._logging:
+                _log.info('received: %s',data)
 
 
     # EX: d = b'\xef\xdd\x07\x07\x02\x14\x02<\x14\x00W\x18\xef\xdd\x07' (len: 12)
@@ -467,26 +463,28 @@ class AcaiaBLE(ClientBLE):
     # 6 data:       d[4:10]  = b'\x02\x14\x02<\x14\x00'
     # 2 crc:        d[10:12] = b'\x00W\x18'  # calculated over "data_len+data"
 
-    async def reader(self) -> None:
+    async def reader(self, stream:IteratorReader) -> None:
         while True:
-            await self._input_stream.readuntil(self.HEADER1)
-            if await self._input_stream.readexactly(1) == self.HEADER2:
-                cmd = int.from_bytes(await self._input_stream.readexactly(1), 'big')
+            await stream.readuntil(self.HEADER1)
+            if await stream.readexactly(1) == self.HEADER2:
+                cmd = int.from_bytes(await stream.readexactly(1), 'big')
                 if cmd in {CMD.SYSTEM_SA, CMD.INFO_A, CMD.STATUS_A, CMD.EVENT_SA}:
-                    dl = await self._input_stream.readexactly(1)
+                    dl = await stream.readexactly(1)
                     data_len:int = min(20, int.from_bytes(dl, 'big'))
-                    data = await self._input_stream.readexactly(data_len - 1)
-                    crc = await self._input_stream.readexactly(2)
+                    data = await stream.readexactly(data_len - 1)
+                    crc = await stream.readexactly(2)
                     data = dl+data
                     if crc == self.crc(data):
                         self.parse_data(cmd, data)
+                    else:
+                        _log.debug('CRC error')
 
 
     def on_start(self) -> None:
         if self._async_loop_thread is not None:
             # start the reader
             asyncio.run_coroutine_threadsafe(
-                    self.reader(),
+                    self.reader(self._input_stream),
                     self._async_loop_thread.loop)
 
 

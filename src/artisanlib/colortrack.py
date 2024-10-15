@@ -20,6 +20,7 @@ import logging
 import numpy as np
 
 from artisanlib.async_comm import AsyncComm
+from artisanlib.ble_port import ClientBLE
 
 try:
     from PyQt6.QtCore import QRegularExpression # @UnusedImport @Reimport  @UnresolvedImport
@@ -32,9 +33,10 @@ if TYPE_CHECKING:
     from PyQt6.QtCore import QRegularExpressionMatch # pylint: disable=unused-import
     from artisanlib.types import SerialSettings # pylint: disable=unused-import
     import numpy.typing as npt # pylint: disable=unused-import
-
+    from bleak.backends.characteristic import BleakGATTCharacteristic  # pylint: disable=unused-import
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
+
 
 class ColorTrack(AsyncComm):
 
@@ -91,6 +93,39 @@ class ColorTrack(AsyncComm):
                 self.register_reading(value)
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)
+
+
+class ColorTrackBLE(ClientBLE):
+
+    # ColorTrack RT service and characteristics UUIDs
+    COLORTRACK_NAME:Final[str] = 'ColorTrack'
+    COLORTRACK_CUBE_SERVICE_UUID:Final[str] = '713D0000-503E-4C75-BA94-3148F18D941E'
+    COLORTRACK_CUBE_NOTIFY_UUID:Final[str] = '713D0002-503E-4C75-BA94-3148F18D9410' # Laser Measurements
+
+
+    def __init__(self, connected_handler:Optional[Callable[[], None]] = None,
+                    disconnected_handler:Optional[Callable[[], None]] = None):
+        super().__init__()
+
+        # handlers
+        self._connected_handler = connected_handler
+        self._disconnected_handler = disconnected_handler
+
+        self.add_device_description(self.COLORTRACK_CUBE_SERVICE_UUID, self.COLORTRACK_NAME)
+        self.add_notify(self.COLORTRACK_CUBE_NOTIFY_UUID, self.notify_callback)
+
+    @staticmethod
+    def notify_callback(_sender:'BleakGATTCharacteristic', data:bytearray) -> None:
+        _log.info('notify: %s', data)
+
+    def on_connect(self) -> None: # pylint: disable=no-self-use
+        if self._connected_handler is not None:
+            self._connected_handler()
+
+    def on_disconnect(self) -> None: # pylint: disable=no-self-use
+        if self._disconnected_handler is not None:
+            self._disconnected_handler()
+
 
 
 def main() -> None:

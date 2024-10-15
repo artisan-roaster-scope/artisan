@@ -38,14 +38,14 @@ try:
     from PyQt6.QtGui import (QStandardItemModel, QStandardItem, QColor, QIntValidator, QRegularExpressionValidator) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,  # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QGroupBox, QRadioButton, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGroupBox, QRadioButton, QButtonGroup, # @UnusedImport @Reimport  @UnresolvedImport
                                  QTableWidget, QMessageBox, QHeaderView, QTableWidgetItem, QSizePolicy) # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QTimer, QRegularExpression) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import (QStandardItemModel, QStandardItem, QColor, QIntValidator, QRegularExpressionValidator) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QGroupBox, QRadioButton, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGroupBox, QRadioButton, QButtonGroup, # @UnusedImport @Reimport  @UnresolvedImport
                                  QTableWidget, QMessageBox, QHeaderView, QTableWidgetItem, QSizePolicy) # @UnusedImport @Reimport  @UnresolvedImport
 
 
@@ -61,6 +61,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.org_phidgetRemoteFlag = self.aw.qmc.phidgetRemoteFlag
         self.org_yoctoRemoteFlag = self.aw.qmc.yoctoRemoteFlag
         self.org_santokerSerial = self.aw.santokerSerial
+        self.org_santokerBLE = self.aw.santokerBLE
         self.org_kaleidoSerial = self.aw.kaleidoSerial
 
         ################ TAB 1   WIDGETS
@@ -1139,9 +1140,25 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.santokerPort.setFixedWidth(150)
         self.santokerPort.setValidator(QIntValidator(1, 65535,self.santokerPort))
         self.santokerPort.setEnabled(not self.aw.santokerSerial)
-        self.santokerSerialFlag = QCheckBox()
-        self.santokerSerialFlag.setChecked(not self.aw.santokerSerial)
+
+        self.santokerSerialFlag = QCheckBox(QApplication.translate('Label','Serial'))
+        self.santokerSerialFlag.setChecked(self.aw.santokerSerial and not self.aw.santokerBLE)
         self.santokerSerialFlag.stateChanged.connect(self.santokerSerialStateChanged)
+
+        self.santokerNetworkFlag = QCheckBox(QApplication.translate('Label','WiFi'))
+        self.santokerNetworkFlag.setChecked(not self.aw.santokerSerial and not self.aw.santokerBLE)
+        self.santokerNetworkFlag.stateChanged.connect(self.santokerNetworkStateChanged)
+
+        self.santokerBLEFlag = QCheckBox(QApplication.translate('Label','Bluetooth'))
+        self.santokerBLEFlag.setChecked(self.aw.santokerBLE and not self.aw.santokerSerial)
+        self.santokerBLEFlag.stateChanged.connect(self.santokerBLEStateChanged)
+
+        # make those flags exclusive
+        self.button_group = QButtonGroup()
+        self.button_group.addButton(self.santokerSerialFlag)
+        self.button_group.addButton(self.santokerNetworkFlag)
+        self.button_group.addButton(self.santokerBLEFlag)
+
         kaleidoHostLabel = QLabel(QApplication.translate('Label','Host'))
         self.kaleidoHost = QLineEdit(self.aw.kaleidoHost)
         self.kaleidoHost.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -1154,7 +1171,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.kaleidoPort.setFixedWidth(150)
         self.kaleidoPort.setValidator(QIntValidator(1, 65535,self.kaleidoPort))
         self.kaleidoPort.setEnabled(not self.aw.kaleidoSerial)
-        self.kaleidoSerialFlag = QCheckBox()
+        self.kaleidoSerialFlag = QCheckBox(QApplication.translate('Label','WiFi'))
         self.kaleidoSerialFlag.setChecked(not self.aw.kaleidoSerial)
         self.kaleidoSerialFlag.stateChanged.connect(self.kaleidoSerialStateChanged)
 #        kaleidoPIDLabel = QLabel('PID')
@@ -1173,23 +1190,31 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.mugmaPort.setFixedWidth(150)
 
         santokerNetworkGrid = QGridLayout()
-        santokerNetworkGrid.addWidget(self.santokerSerialFlag,0,0)
+        santokerNetworkGrid.addWidget(self.santokerNetworkFlag,0,0)
         santokerNetworkGrid.addWidget(santokerHostLabel,0,1)
         santokerNetworkGrid.addWidget(self.santokerHost,0,2)
         santokerNetworkGrid.addWidget(santokerPortLabel,1,1)
         santokerNetworkGrid.addWidget(self.santokerPort,1,2)
         santokerNetworkGrid.setSpacing(20)
-        santokerNetworkGroupBox = QGroupBox('Santoker')
-        santokerNetworkGroupBox.setLayout(santokerNetworkGrid)
+        santokerSerialHBox = QHBoxLayout()
+        santokerSerialHBox.addSpacing(20)
+        santokerSerialHBox.addWidget(self.santokerBLEFlag)
+        santokerSerialHBox.addSpacing(20)
+        santokerSerialHBox.addWidget(self.santokerSerialFlag)
+        santokerSerialHBox.addStretch()
         santokerHBox = QHBoxLayout()
         santokerHBox.addStretch()
-        santokerHBox.addWidget(santokerNetworkGroupBox)
+        santokerHBox.addLayout(santokerNetworkGrid)
         santokerHBox.addStretch()
         santokerVBox = QVBoxLayout()
+        santokerVBox.addLayout(santokerSerialHBox)
         santokerVBox.addLayout(santokerHBox)
         santokerVBox.addStretch()
         santokerVBox.setSpacing(5)
         santokerVBox.setContentsMargins(0,0,0,0)
+
+        santokerNetworkGroupBox = QGroupBox('Santoker')
+        santokerNetworkGroupBox.setLayout(santokerVBox)
 
         kaleidoNetworkGrid = QGridLayout()
         kaleidoNetworkGrid.addWidget(self.kaleidoSerialFlag,0,0)
@@ -1378,7 +1403,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         tab6Layout.setContentsMargins(2,10,2,5)
         #LAYOUT TAB 7 (Santoker)
         tab7VLayout = QVBoxLayout()
-        tab7VLayout.addLayout(santokerVBox)
+        tab7VLayout.addWidget(santokerNetworkGroupBox)
         tab7VLayout.addLayout(kaleidoVBox)
         tab7VLayout.addStretch()
         tab7Layout = QHBoxLayout()
@@ -1451,10 +1476,24 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.phidgetBoxRemoteOnlyFlag.setEnabled(self.aw.qmc.phidgetRemoteFlag)
 
     @pyqtSlot(int)
-    def santokerSerialStateChanged(self, _:int) -> None:
-        self.aw.santokerSerial = not self.aw.santokerSerial
+    def santokerSerialStateChanged(self, i:int) -> None:
+        self.aw.santokerSerial = bool(i)
+        if self.aw.santokerSerial:
+            self.aw.santokerBLE = False
+
+    @pyqtSlot(int)
+    def santokerNetworkStateChanged(self, i:int) -> None:
+        self.aw.santokerSerial = not bool(i)
+        if not self.aw.santokerSerial:
+            self.aw.santokerBLE = False
         self.santokerHost.setEnabled(not self.aw.santokerSerial)
         self.santokerPort.setEnabled(not self.aw.santokerSerial)
+
+    @pyqtSlot(int)
+    def santokerBLEStateChanged(self, i:int) -> None:
+        self.aw.santokerBLE = bool(i)
+        if self.aw.santokerBLE:
+            self.aw.santokerSerial = False
 
     @pyqtSlot(int)
     def kaleidoSerialStateChanged(self, _:int) -> None:
@@ -2308,6 +2347,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.aw.qmc.phidgetRemoteFlag = self.org_phidgetRemoteFlag
         self.aw.qmc.yoctoRemoteFlag = self.org_yoctoRemoteFlag
         self.aw.santokerSerial = self.org_santokerSerial
+        self.aw.santokerBLE = self.org_santokerBLE
         self.aw.kaleidoSerial = self.org_kaleidoSerial
         self.reject()
 
@@ -3095,7 +3135,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ####  DEVICE 135 is +Santoker Power/Fan but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
-                ####  DEVICE 136 is +Santoker Drum but +DEVICE cannot be set as main device
+                ####  DEVICE 136 is +Santoker Drum  but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
                 ####  DEVICE 137 is Phidget DAQ1500
@@ -3233,6 +3273,18 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ##########################
                 ####  DEVICE 170 is +ColorTrack
+                ##########################
+                ##########################
+                ####  DEVICE 171 is Santoker BT/ET
+                elif meter == 'Santoker R BT/ET':
+                    self.aw.qmc.device = 171
+                    message = QApplication.translate('Message','Device set to {0}').format(meter)
+                ##########################
+                ##########################
+                ####  DEVICE 172 is +Santoker IR/Board  but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                ####  DEVICE 173 is +Santoker DelatBT/DeltaET  but +DEVICE cannot be set as main device
                 ##########################
 
 
@@ -3424,7 +3476,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 167
                 1, # 168
                 1, # 169
-                3  # 170
+                3, # 170
+                1, # 171
+                1, # 172
+                1  # 173
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):

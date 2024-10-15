@@ -194,12 +194,11 @@ class ClientBLE:
 
 # NOTE: __slots__ are incompatible with multiple inheritance mixings in subclasses (e.g. with QObject)
 #    __slots__ = [ '_running', '_async_loop_thread', '_ble_client', '_connected_service_uuid', '_disconnected_event',
-#                    '_active_notification_uuids', '_connected_handler', '_disconnected_handler',
+#                    '_active_notification_uuids',
 #                    '_device_descriptions', '_notifications', '_writers', '_heartbeat_frequency',
 #                    '_logging'  ]
 
-    def __init__(self, connected_handler:Optional[Callable[[], None]] = None,
-                       disconnected_handler:Optional[Callable[[], None]] = None) -> None:
+    def __init__(self) -> None:
         # internals
         self._running:bool                                   = False           # if True we keep reconnecting
         self._async_loop_thread: Optional[AsyncLoopThread]   = None            # the asyncio AsyncLoopThread object
@@ -207,10 +206,6 @@ class ClientBLE:
         self._connected_service_uuid:Optional[str]           = None            # set to the service UUID we are connected to
         self._disconnected_event:asyncio.Event               = asyncio.Event() # event set on disconnect
         self._active_notification_uuids:Set[str]             = set() # uuids of characteristics were notification are active
-
-        # handlers
-        self._connected_handler:Optional[Callable[[], None]] = connected_handler
-        self._disconnected_handler:Optional[Callable[[], None]] = disconnected_handler
 
         # configuration
         self._device_descriptions:Dict[Optional[str],Optional[Set[str]]] = {}
@@ -332,14 +327,14 @@ class ClientBLE:
             _log.error('BLE client already running')
         else:
             try:
-                self._running = True # enable automatic reconnects
                 if self._async_loop_thread is None:
+                    self._running = True # enable automatic reconnects
                     self._async_loop_thread = AsyncLoopThread()
-                # run _connect in async loop
-                asyncio.run_coroutine_threadsafe(
-                    self._connect_and_keep_alive(case_sensitive, scan_timeout, connect_timeout),
-                    self._async_loop_thread.loop)
-                self.on_start()
+                    # run _connect in async loop
+                    asyncio.run_coroutine_threadsafe(
+                        self._connect_and_keep_alive(case_sensitive, scan_timeout, connect_timeout),
+                        self._async_loop_thread.loop)
+                    self.on_start()
             except Exception as e:  # pylint: disable=broad-except
                 _log.exception(e)
 

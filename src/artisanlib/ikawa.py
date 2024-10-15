@@ -388,6 +388,7 @@ try: # BLE not available on some platforms
             self.add_notify(self.IKAWA_NOTIFY_UUID, self.notify_callback)
             self.add_write(self.IKAWA_WRITE_UUID, self.IKAWA_WRITE_UUID)
 
+            # handlers
             self.connected_handler:Optional[Callable[[], None]] = connected_handler
             self.disconnected_handler:Optional[Callable[[], None]] = disconnected_handler
 
@@ -427,15 +428,6 @@ try: # BLE not available on some platforms
             # 11: development
 
             self.seq:Generator[int, None, None] = self.seqNum() # message sequence number generator
-
-#            self.ble:BleInterface = BleInterface(  # type:ignore[unused-ignore]
-#                [(IKAWA_BLE.IKAWA_SERVICE_UUID, [IKAWA_BLE.IKAWA_SEND_CHAR_UUID, IKAWA_BLE.IKAWA_RECEIVE_CHAR_UUID])],
-#                self.processData,
-#                sendStop = self.sendStop,
-#                connected = self.connected,
-#                #device_names = [ IKAWA_BLE.DEVICE_NAME_IKAWA ]
-#                )
-
             self.frame_char:Final[int]          = 126 # b'\x7e'
             self.escape_char:Final[int]         = 125 # b'\x7d'
             self.escape_offset:Final[int]       = 32

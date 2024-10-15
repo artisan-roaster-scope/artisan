@@ -893,7 +893,10 @@ class tgraphcanvas(FigureCanvas):
                        '+Mugma SV',                 #167
                        'Phidget TMP1202 1xRTD A',   #168
                        '+Phidget TMP1202 1xRTD B',  #169
-                       'ColorTrack'                 #170
+                       '+ColorTrack',               #170
+                       'Santoker R BT/ET',          #171
+                       '+Santoker IR/Board',        #172
+                       '+Santoker DelatBT/DeltaET'  #173
                        ]
 
         # ADD DEVICE:
@@ -957,7 +960,8 @@ class tgraphcanvas(FigureCanvas):
             134, # Santoker BT/ET
             138, # Kaleido BT/ET
             142, # IKAWA,
-            164  # Mugma BT/ET
+            164, # Mugma BT/ET
+            171  # Santoker R BT/ET
         ]
 
         # ADD DEVICE:
@@ -1029,7 +1033,8 @@ class tgraphcanvas(FigureCanvas):
             160, # IKAWA \Delta Humidity / \Delat Humidity direction
             165, # +Mugma Heater/Fan
             166, # +Mugma Heater/Catalyzer
-            170  # +ColorTrack
+            170, # +ColorTrack
+            173  # +Santoker BT RoR / ET RoR
         ]
 
         # ADD DEVICE:
@@ -3599,7 +3604,7 @@ class tgraphcanvas(FigureCanvas):
                     sample_extractimex2 = self.extractimex2
                     sample_extractemp2 = self.extractemp2
                 else:
-                    m_len = self.curvefilter #*2
+                    m_len = self.curvefilter
                     sample_timex = self.on_timex = self.on_timex[-m_len:]
                     sample_temp1 = self.on_temp1 = self.on_temp1[-m_len:]
                     sample_temp2 = self.on_temp2 = self.on_temp2[-m_len:]
@@ -11975,6 +11980,7 @@ class tgraphcanvas(FigureCanvas):
             # warm up software PID (write current p-i-d settings,..)
             self.aw.pidcontrol.confSoftwarePID()
 
+            # ADD DEVICE:
             if not bool(self.aw.simulator):
                 if self.device == 53:
                     # connect HOTTOP
@@ -11996,7 +12002,7 @@ class tgraphcanvas(FigureCanvas):
                     # connect Santoker
                     from artisanlib.santoker import Santoker
                     santoker_serial:Optional[SerialSettings] = None
-                    if self.aw.santokerSerial:
+                    if self.aw.santokerSerial and not self.aw.santokerBLE:
                         santoker_serial = {
                                 'port': self.aw.ser.comport,
                                 'baudrate': self.aw.ser.baudrate,
@@ -12005,7 +12011,7 @@ class tgraphcanvas(FigureCanvas):
                                 'parity': self.aw.ser.parity,
                                 'timeout': self.aw.ser.timeout}
                     self.aw.santoker = Santoker(self.aw.santokerHost, self.aw.santokerPort,
-                        santoker_serial,
+                        santoker_serial, self.aw.santokerBLE,
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Santoker'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Santoker'),True,None),
                         charge_handler=lambda : (self.markChargeDelaySignal.emit(0) if (self.timeindex[0] == -1) else None),
@@ -12015,6 +12021,14 @@ class tgraphcanvas(FigureCanvas):
                         drop_handler=lambda : (self.markDropSignal.emit(False) if (self.timeindex[6] == 0) else None))
                     self.aw.santoker.setLogging(self.device_logging)
                     self.aw.santoker.start()
+                elif self.device == 171:
+                    # connect Santoker R
+                    from artisanlib.santoker_r import SantokerR
+                    self.aw.santokerR = SantokerR(
+                        connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Santoker R'),True,None),
+                        disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Santoker R'),True,None))
+                    self.aw.santokerR.setLogging(self.device_logging)
+                    self.aw.santokerR.start()
                 elif self.device == 138:
                     # connect Kaleido
                     from artisanlib.kaleido import KaleidoPort
@@ -12160,6 +12174,11 @@ class tgraphcanvas(FigureCanvas):
                 if not bool(self.aw.simulator) and self.device == 134 and self.aw.santoker is not None:
                     self.aw.santoker.stop()
                     self.aw.santoker = None
+
+                # disconnect Santoker R
+                if not bool(self.aw.simulator) and self.device == 171 and self.aw.santokerR is not None:
+                    self.aw.santokerR.stop()
+                    self.aw.santokerR = None
 
                 # disconnect Kaleido
                 if not bool(self.aw.simulator) and self.device == 138 and self.aw.kaleido is not None:
