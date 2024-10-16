@@ -1,12 +1,14 @@
 [General]
 Delay=1000
-roastertype_setup=Santoker Q Series
+roastertype_setup=Santoker R Master Series WiFi
 
 [Device]
 id=134
 santokerHost=10.10.100.254
 santokerPort=20001
 santokerSerial=false
+santokerBLE=false
+Controlbuttonflag=true
 
 [events]
 markTP=false

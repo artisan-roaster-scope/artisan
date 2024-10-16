@@ -99,8 +99,8 @@ class ColorTrackBLE(ClientBLE):
 
     # ColorTrack RT service and characteristics UUIDs
     COLORTRACK_NAME:Final[str] = 'ColorTrack'
-    COLORTRACK_CUBE_SERVICE_UUID:Final[str] = '713D0000-503E-4C75-BA94-3148F18D941E'
-    COLORTRACK_CUBE_NOTIFY_UUID:Final[str] = '713D0002-503E-4C75-BA94-3148F18D9410' # Laser Measurements
+    COLORTRACK_SERVICE_UUID:Final[str] = '713D0000-503E-4C75-BA94-3148F18D941E'
+    COLORTRACK_NOTIFY_UUID:Final[str] = '713D0002-503E-4C75-BA94-3148F18D9410' # Laser Measurements
 
 
     def __init__(self, connected_handler:Optional[Callable[[], None]] = None,
@@ -111,8 +111,8 @@ class ColorTrackBLE(ClientBLE):
         self._connected_handler = connected_handler
         self._disconnected_handler = disconnected_handler
 
-        self.add_device_description(self.COLORTRACK_CUBE_SERVICE_UUID, self.COLORTRACK_NAME)
-        self.add_notify(self.COLORTRACK_CUBE_NOTIFY_UUID, self.notify_callback)
+        self.add_device_description(self.COLORTRACK_SERVICE_UUID, self.COLORTRACK_NAME)
+        self.add_notify(self.COLORTRACK_NOTIFY_UUID, self.notify_callback)
 
     @staticmethod
     def notify_callback(_sender:'BleakGATTCharacteristic', data:bytearray) -> None:

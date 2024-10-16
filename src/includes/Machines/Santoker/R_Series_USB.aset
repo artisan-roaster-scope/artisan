@@ -1,10 +1,17 @@
 [General]
-Delay=1000
-roastertype_setup=Santoker R Series BT
+Delay=2000
+roastertype_setup=Santoker R Series USB
 
 [Device]
-id=171
+id=9
 
+[SerialPort]
+baudrate=9600
+bytesize=8
+comport=COM3
+parity=N
+stopbits=1
+timeout=0.4
 
 [ExtraComm]
 extrabaudrate=@Invalid()
