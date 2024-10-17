@@ -2,7 +2,7 @@
 title: "Setup"
 permalink: /docs/setup/
 excerpt: "Setup Artisan for a first roast"
-last_modified_at: 2024-16-10T15:59:00-04:00
+last_modified_at: 2024-10-16T15:59:00-04:00
 author: Michael Herbert
 author_profile: true
 ---
