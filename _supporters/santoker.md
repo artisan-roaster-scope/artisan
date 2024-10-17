@@ -15,20 +15,20 @@ sidebar:
 * __Producer:__ [Santoker](){:target="_blank"}, China
 
 * __Machines:__ 
-  - `1xPXR`, `2xPXF`, `2xPXR` : machines with one or two Fuji PXR/PXG PIDs
-  - `R Series USB` : R Series with USB
-  - `R Series Bluetooth` : R Series with Bluetooth
-  - `R Master Series WiFi` : R Master Series with WiFi (before 10/2023)
-  - `R Master Series Bluetooth` : R Master Series with Bluetooth (after 10/2023)
-  - `Q + X Series WiFi` : Q and X Series with WiFi (before 10/2023)
-  - `Q + X Series Bluetooth` : Q and X Series with Bluetooth (after 10/2023)
+  - `1xPXR`, `2xPXF`, `2xPXR`: machines with one or two Fuji PXR/PXG PIDs
+  - `R Series USB`: R Series with USB
+  - `R Series Bluetooth`: R Series with Bluetooth
+  - `R Master Series WiFi`: R Master Series with WiFi (before 10/2023)
+  - `R Master Series Bluetooth`: R Master Series with Bluetooth (after 10/2023)
+  - `Q + X Series WiFi`: Q and X Series with WiFi (before 10/2023)
+  - `Q + X Series Bluetooth`: Q and X Series with Bluetooth (after 10/2023)
   - `Cube Bluetooth` : Cube10
 
 * __Connection:__ 
   - Fuji based machines use MODBUS RTU via USB; requires the installation of a [serial driver](/modbus_serial/)
   - R Series connect via USB; requires the installation of a [serial driver](/modbus_serial/)
-  - Q and X Series as well as the R Master Series connect via WiFi or Bluetooth
+  - Q and X Series as well as the R Master Series machines connect via WiFi or Bluetooth
   - the Cube connects via Bluetooth
 * __Features:__ 
   - logging of bean temperature (BT), environmental temperature (ET) and in some cases a third temperature
-  - logging of control of fan, power and drum speed for the Q and X Series, the Cube as well as the R Master Series models
+  - logging and control of fan and power for the Q and X Series, the Cube as well as the R Master Series models. The later allows also to log the drum speed.
