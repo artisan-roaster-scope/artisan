@@ -127,7 +127,8 @@ class EventsDlg(ArtisanResizeablDialog):
                                      QApplication.translate('ComboBox','Aillio R1 Command'),
                                      QApplication.translate('ComboBox','Artisan Command'),
                                      QApplication.translate('ComboBox','RC Command'),
-                                     QApplication.translate('ComboBox','WebSocket Command')]
+                                     QApplication.translate('ComboBox','WebSocket Command'),
+                                     QApplication.translate('ComboBox','Stepper Command')]
         self.custom_button_actions_sorted:List[str] = sorted(self.custom_button_actions)
 
         titlefont = QFont()
@@ -774,7 +775,8 @@ class EventsDlg(ArtisanResizeablDialog):
                        QApplication.translate('ComboBox', 'Aillio R1 Drum'),
                        QApplication.translate('ComboBox', 'Artisan Command'),
                        QApplication.translate('ComboBox', 'RC Command'),
-                       QApplication.translate('ComboBox', 'WebSocket Command')]
+                       QApplication.translate('ComboBox', 'WebSocket Command'),
+                       QApplication.translate('ComboBox', 'Stepper Command')]
         self.sliderActionTypesSorted = sorted(self.sliderActionTypes)
         self.E1action = QComboBox()
         self.E1action.setToolTip(QApplication.translate('Tooltip', 'Action Type'))
