@@ -102,7 +102,7 @@ BINARIES.extend([(os.path.join(yocto_lib_path, fn),'yoctopuce/cdll') for fn in o
 a = Analysis(['artisan.py'],
              binaries=BINARIES,
              datas=DATA_FILES,
-             hiddenimports=['babel.numbers'],
+             hiddenimports=['babel.numbers'], # should not be needed as it got fixed in pyinstaller 6.11
              hookspath=[],
              runtime_hooks=[],
              excludes= [],

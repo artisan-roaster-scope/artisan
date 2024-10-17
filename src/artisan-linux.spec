@@ -21,7 +21,7 @@ if not os.path.isdir(path):
 hiddenimports_list=[
     'matplotlib.backends.backend_pdf',
     'matplotlib.backends.backend_svg',
-    'babel.numbers'
+    'babel.numbers'  # should not be needed as it got fixed in pyinstaller 6.11
 ] + collect_submodules('dbus_fast')
 
 EXCLUDES = [

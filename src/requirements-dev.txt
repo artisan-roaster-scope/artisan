@@ -1,18 +1,18 @@
 types-openpyxl>=3.1.5.20240918
 types-Pillow>=10.2.0.20240822
 types-protobuf>=5.28.0.20240924
-types-psutil>=6.0.0.20240901
+types-psutil>=6.0.0.20241011
 types-pyserial>=3.5.0.20240826
 types-python-dateutil==2.9.0.20241003
 types-pytz>=2024.2.0.20241003
 types-pyyaml>=6.0.12.20240917
-types-requests>=2.32.0.20240907
-types-setuptools>=75.1.0.20240917
+types-requests>=2.32.0.20241016
+types-setuptools>=75.1.0.20241014
 types-urllib3>=1.26.25.14
 types-docutils>=0.21.0.20241005
 lxml-stubs>=0.5.1
-mypy==1.11.2
-pyright==1.1.384
+mypy==1.12.0
+pyright==1.1.385
 ruff>=0.6.9
 pylint==3.3.1
 pre-commit>=4.0.1
@@ -25,8 +25,8 @@ pytest-cov==5.0.0
 #pytest-bdd==6.1.1
 #pytest-benchmark==4.0.0
 #pytest-mock==3.11.1
-hypothesis>=6.114.1
-coverage>=7.6.2
+hypothesis>=6.115.3
+coverage>=7.6.3
 coverage-badge==1.1.2
 codespell==2.3.0
 # the following 2 packages are not installed along aiohttp on Python3.12 and make mypy complain

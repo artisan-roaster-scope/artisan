@@ -8,16 +8,17 @@ v3.0.3
 
 * ADDITIONS
   - adds symbolic expression `bit(n,x)` which returns the n-th bit of x interpreted as integer
-  - adds (total) correction to cup profiles and enables column drag-and-drop([Discussion #1690](../../../discussions/1690))
+  - adds (total) correction to cup profiles and enables column drag-and-drop ([Discussion #1690](../../../discussions/1690))
 
 * NEW HARDWARE SUPPORT
+  - adds support for various new [Santoker machines](https://artisan-scope.org/machines/santoker/) communicating via Bluetooth like the new Cube10, the Bluetooth enabled X, Q and R Master Series as well as the R Series machines
   - adds ColorTrack support ([Issue #1680](../../../issues/1680))
   - adds support for [Primo roasting machines](https://artisan-scope.org/machines/primo/)
   - adds [Loring](https://artisan-scope.org/machines/loring/) 'auto' setup which picks up CHARGE and DROP events set at the machine
   - adds control function to [Diedrich DR](https://artisan-scope.org/machines/diedrich/) machine setup and adds [Diedrich CR](https://artisan-scope.org/machines/diedrich/) machine setup
 
 * CHANGES
-  - automatically start of the scheduler on connected to artisan.plus if there are incompleted scheduled items
+  - automatically start of the scheduler on connected to [artisan.plus](https://artisan.plus) if there are incompleted scheduled items
   - disable items in coffee popups of the Custom Blend dialog without stock in the selected store or, if no store is selected, without stock in every store
   - reduce the size of builds by removing unnecessary files
   - removes the optional delay on reads from serial MODBUS

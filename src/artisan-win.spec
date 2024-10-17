@@ -119,7 +119,7 @@ hiddenimports_list=['charset_normalizer.md__mypyc', # part of requests 2.28.2 # 
                             'pywintypes',
                             'win32cred',
                             'win32timezone',
-                            'babel.numbers'
+                            'babel.numbers'  # should not be needed as it got fixed in pyinstaller 6.11
                             ]
 # Add the hidden imports not required by legacy Windows.
 if not ARTISAN_LEGACY=='True':

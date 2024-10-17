@@ -386,7 +386,7 @@ try: # BLE not available on some platforms
             # register IKAWA UUIDs
             self.add_device_description(self.IKAWA_SERVICE_UUID, self.DEVICE_NAME_IKAWA)
             self.add_notify(self.IKAWA_NOTIFY_UUID, self.notify_callback)
-            self.add_write(self.IKAWA_WRITE_UUID, self.IKAWA_WRITE_UUID)
+            self.add_write(self.IKAWA_SERVICE_UUID, self.IKAWA_WRITE_UUID)
 
             # handlers
             self.connected_handler:Optional[Callable[[], None]] = connected_handler
@@ -395,8 +395,6 @@ try: # BLE not available on some platforms
             self.receiveMutex:QMutex = QMutex()
             self.dataReceived:QWaitCondition = QWaitCondition()
             self.receiveTimeout:int = 400
-
-            self.log_data = False
 
             self.connected_state:bool = False
 
@@ -495,8 +493,7 @@ try: # BLE not available on some platforms
         def reset(self) -> None:
             self.rcv_buffer = None
 
-        def start_sampling(self, log_data:bool = False) -> None:
-            self.log_data = log_data
+        def start_sampling(self) -> None:
             self.reset()
             # start BLE loop
             self.start()
@@ -527,7 +524,7 @@ try: # BLE not available on some platforms
                             # clear the buffer
                             self.rcv_buffer = None
                             # log payload
-                            if self.log_data:
+                            if self._logging:
                                 _log.info('ikawa payload: %s',payload)
                             # verify CRC
                             if crc == self.crc16(payload, 65535):
@@ -592,12 +589,12 @@ try: # BLE not available on some platforms
                 except Exception as e:  # pylint: disable=broad-except
                     _log.error(e)
 
-        def connected(self) -> None:
+        def on_connect(self) -> None:
             self.connected_state = True
             if self.connected_handler is not None:
                 self.connected_handler()
 
-        def sendStop(self, _write:Callable[[Optional[bytes]],None]) -> None:
+        def on_disconnect(self) -> None:
             self.connected_state = False
             if self.disconnected_handler is not None:
                 self.disconnected_handler()
@@ -615,11 +612,12 @@ try: # BLE not available on some platforms
         def getData(self) -> None:
             if self.connected_state:
                 request_data = self.requestDataMessage()
-                self.send(request_data)
+                self.send(request_data, response=True)
                 # wait for data to be delivered
                 self.receiveMutex.lock()
                 res = self.dataReceived.wait(self.receiveMutex, self.receiveTimeout)
                 if not res:
+                    _log.debug('receive timeout')
                     # timeout, no data received
                     self.clearData()
                 self.receiveMutex.unlock()

@@ -39,6 +39,7 @@ _log = logging.getLogger(__name__)
 class BLE:
 
     _scan_and_connect_lock: asyncio.Lock = asyncio.Lock()
+    _terminate_scan_event = asyncio.Event()
     _asyncLoopThread:Optional[AsyncLoopThread] = None
 
     def __del__(self) -> None:
@@ -49,6 +50,9 @@ class BLE:
         if self._asyncLoopThread is not None:
             del self._asyncLoopThread
             self._asyncLoopThread = None
+
+    def terminate_scan(self) -> None:
+        self._terminate_scan_event.set()
 
     # returns True if the given device name matches with the devices name or the local_name of the advertisement
     @staticmethod
@@ -83,7 +87,10 @@ class BLE:
             try:
                 async with asyncio.timeout(scan_timeout): # type:ignore[attr-defined]
                     async with BleakScanner() as scanner:
+                        self._terminate_scan_event.clear()
                         async for bd, ad in scanner.advertisement_data():
+                            if self._terminate_scan_event.is_set():
+                                break
 #                            _log.debug("device %s, (%s): %s", bd.name, ad.local_name, ad.service_uuids)
                             if bd.address not in blacklist:
                                 res:bool
@@ -114,15 +121,14 @@ class BLE:
             return client, service_uuid
 
 ##
-
-    def write(self, client:BleakClient, write_uuid:str, message:bytes) -> None:
+    def write(self, client:BleakClient, write_uuid:str, message:bytes, response:bool = False) -> None:
         if self._asyncLoopThread is not None and client.is_connected:
             # NOTE: we don't wait for a result not to block the bleak write loop
             junk_size = 20
             for i in range(0, len(message), junk_size):
                 # send message in junks of just 20 bytes (minimum BLE mtu size)
                 asyncio.run_coroutine_threadsafe(
-                    client.write_gatt_char(write_uuid, message[i:i+junk_size], response=False),
+                    client.write_gatt_char(write_uuid, message[i:i+junk_size], response=response),
                     self._asyncLoopThread.loop)
 
     def scan_and_connect(self,
@@ -305,10 +311,11 @@ class ClientBLE:
         if self._async_loop_thread is not None:
             asyncio.run_coroutine_threadsafe(self.set_event(), self._async_loop_thread.loop)
 
-    def send(self, message:bytes) -> None:
+    def send(self, message:bytes, response:bool = False) -> None:
         if self._ble_client is not None and self._connected_service_uuid is not None and self._connected_service_uuid in self._writers:
-            _log.debug('send: %s', message)
-            ble.write(self._ble_client, self._writers[self._connected_service_uuid], message)
+            if self._logging:
+                _log.debug('send to %s: %s', self._writers[self._connected_service_uuid], message)
+            ble.write(self._ble_client, self._writers[self._connected_service_uuid], message, response)
 
     async def _keep_alive(self) -> None:
         while self._heartbeat_frequency > 0:
@@ -343,6 +350,8 @@ class ClientBLE:
         _log.debug('stop')
         if self._running:
             self._running = False # disable automatic reconnects
+            if self._ble_client is None:
+                ble.terminate_scan() # we stop ongoing scanning
             self._disconnect()
             del self._async_loop_thread
             self._async_loop_thread = None
