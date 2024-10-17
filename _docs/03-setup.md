@@ -59,7 +59,7 @@ What BT and ET temperatures do you want as reference points?
 
 Some roasters are just fine with the readings their machines put out from their thermocouples.  Each machine is different and each machine’s thermocouples are placed differently and read differently.  Learn your machine is something you will hear over and over.  That said are you happy with first crack being at 365° or do you want it to be at 390°?  In order to adjust your machine thermocouples to give you dry end or first crack at temps that people think they should be at, you can enter an adjustment under `Config` >> `Device` on the tab – `Symb ET/BT`.  
 
-![symbolic bt](/assets/images/gsg/symbolic btY2.png)
+![symbolic bt](/assets/images/gsg/symbolic bty2.png)
 
 Also don’t expect these to match the PID in the roaster if the probes are in different places.
 
