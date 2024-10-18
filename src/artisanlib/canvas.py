@@ -1858,8 +1858,8 @@ class tgraphcanvas(FigureCanvas):
 
         self.autosaveimage:bool = False # if true save an image along alog files
 
-        self.autoasaveimageformat_types:List[str] = ['PDF', 'PDF Report', 'SVG', 'PNG', 'JPEG', 'BMP', 'CSV', 'JSON']
-        self.autosaveimageformat:str = 'PDF' # one of the supported image file formats PDF, SVG, PNG, JPEG, BMP, CSV, JSON
+        self.autoasaveimageformat_types:List[str] = ['PDF', 'PDF Report', 'SVG', 'PNG', 'JPEG', 'CSV', 'JSON']
+        self.autosaveimageformat:str = 'PDF' # one of the supported image file formats PDF, SVG, PNG, JPEG, CSV, JSON
 
         #used to place correct height of text to avoid placing text over text (annotations)
         self.ystep_down:int = 0

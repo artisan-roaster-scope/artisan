@@ -40,7 +40,8 @@ v3.0.3
   - makes validation of numeric configuration input more robust ([Issue #1700](../../../issues/1700))
   - ensures that splitter state in Comparator is properly reset on Factory Reset
 
-
+* REMOVALS
+  - support for the image format BMP has been removed
 
 
 
