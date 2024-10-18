@@ -60,6 +60,8 @@ if NOT "%PYUPGRADE_WIN_V%" == "" (
 ::
 :: pip update to 24.1 breaks CI
 ::python -m pip install --upgrade pip
+
+:: install wheel
 python -m pip install wheel
 
 ::
@@ -67,6 +69,11 @@ python -m pip install wheel
 ::
 python -m pip install -r src\requirements.txt | findstr /v /b "Ignoring"
 
+:: Check that libusb-1.0.dll was installed.  Was missing once on CI with Win11.
+if not exist %PYTHON_PATH%\Lib\site-packages\libusb_package\libusb-1.0.dll (
+    echo *** ERROR - libusb-1.0.dll is missing from the libusb-package installation
+    exit /b 95
+)
 ::
 :: custom build the pyinstaller bootloader or install a prebuilt
 ::

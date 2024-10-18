@@ -269,6 +269,7 @@ SectionEnd
 
 Section "Microsoft Visual C++ Redistributable Package (x64)" SEC02
   ExecWait '$INSTDIR\vc_redist.x64.exe /install /passive /norestart'
+  Delete '$INSTDIR\vc_redist.x64.exe'
 SectionEnd
 
 Section -AdditionalIcons
