@@ -10249,6 +10249,57 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         else:
                             # command not recognized
                             _log.info('WebSocket Command <%s> not recognized', cs)
+                elif action == 23:
+                    # PHIDGETS   sn : has the form <hub_serial>[:<hub_port>], an optional serial number of the hub, optionally specifying the port number the module is connected to
+                    ##  rescale(ch,rs,[,sn]) : sets the rescaleFactor
+                    ##  engaged(ch,b[,sn])   : engage (b=1) or disengage (b = 0)
+                    ##  set(ch,pos[,sn])     : set the target position
+                    if cmd_str:
+                        cmds = filter(None, cmd_str.split(';')) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
+                        for c in cmds:
+                            cs = c.strip()
+                            # rescale(ch,val[,sn]) # sets rescaleFactor
+                            if cs.startswith('rescale(') and len(cs) > 11:
+                                try:
+                                    n = 2
+                                    cs_split = cs[len('rescale('):-1].split(',')
+                                    channel_str,value = cs_split[0:n]
+                                    if len(cs_split)>n:
+                                        sn = cs_split[n]
+                                    else:
+                                        sn = None
+                                    self.ser.phidgetStepperRescale(int(channel_str),toFloat(eval(value)),sn) # pylint: disable=eval-used
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            # engaged(ch,state[,sn]) # engage channel
+                            elif cs.startswith('engaged(') and len(cs) > 11:
+                                try:
+                                    n = 2
+                                    cs_split = cs[len('engaged('):-1].split(',')
+                                    channel_str, state_str = cs_split[0:n]
+                                    if len(cs_split)>n:
+                                        sn = cs_split[n]
+                                    else:
+                                        sn = None
+                                    state_engaged:bool = bool(state_str.lower() in {'yes', 'true', 't', '1'})
+                                    self.ser.phidgetStepperEngaged(int(channel_str), state_engaged, sn)
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            # set(ch,pos[,sn]) # set position
+                            elif cs.startswith('set(') and len(cs) > 7:
+                                try:
+                                    n = 2
+                                    cs_split = cs[len('set('):-1].split(',')
+                                    channel_str,pos = cs_split[0:n]
+                                    if len(cs_split)>n:
+                                        sn = cs_split[n]
+                                    else:
+                                        sn = None
+                                    self.ser.phidgetStepperSet(int(channel_str),toFloat(eval(pos)),sn) # pylint: disable=eval-used
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            else:
+                                _log.info('Stepper Command <%s> not recognized', cs)
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
 
