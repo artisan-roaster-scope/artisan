@@ -37,7 +37,7 @@ If you think Artisan is useful to you, contribute financially to its further dev
 
 ![](https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/screenshots/artisan-cover.png?raw=true)
 
-[Download](https://github.com/artisan-roaster-scope/artisan/releases/latest) (macOS/Windows/Linux)
+[Download](https://artisan-scope.org/download/) (macOS/Windows/Linux/RPi)
 
 [Installation Instructions](https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/Installation.md)
 
