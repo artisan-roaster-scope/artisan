@@ -137,7 +137,7 @@ class BLE:
             case_sensitive:bool=True,
             disconnected_callback:Optional[Callable[[BleakClient], None]] = None,
             scan_timeout:float=5,
-            connect_timeout:float=4) -> Tuple[Optional[BleakClient], Optional[str]]:
+            connect_timeout:float=2) -> Tuple[Optional[BleakClient], Optional[str]]:
         if self._asyncLoopThread is None:
             self._asyncLoopThread = AsyncLoopThread()
         fut = asyncio.run_coroutine_threadsafe(
@@ -260,7 +260,7 @@ class ClientBLE:
 
 
     # connect and re-connect while self._running to BLE
-    async def _connect(self, case_sensitive:bool=True, scan_timeout:float=5, connect_timeout:float=4) -> None:
+    async def _connect(self, case_sensitive:bool=True, scan_timeout:float=5, connect_timeout:float=2) -> None:
         blacklist:Set[str] = set()
         while self._running:
             # scan and connect

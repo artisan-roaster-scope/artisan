@@ -310,9 +310,9 @@ class Santoker(AsyncComm):
 
     # send message interface
 
-    # message encoder
+    # message encoder for values as unsigned integers
     def create_msg(self, target:bytes, value: int) -> bytes:
-        data_len = 3
+        data_len = 3 #(value.bit_length() + 7) // 8
         data = self.CODE_HEADER + data_len.to_bytes(1, 'big') + value.to_bytes(data_len, 'big')
         crc: bytes = FramerRTU.compute_CRC(data).to_bytes(2, 'big')
         return self.HEADER + target + data + crc + self.TAIL

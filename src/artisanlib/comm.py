@@ -5233,12 +5233,12 @@ class serialport:
             _log.exception(e)
 
 #-- Phidget Stepper Motor (only one supported for now)
-    #  - Phidget STC1005: 1 channels (control of one bipolar stepper motor)
+    #  - Phidget STC1002 and STC1005 : 1 channels (control of one bipolar stepper motor)
 # commands:
 #       engaged(ch,state[,sn])    # engage channel
 #       set(ch,pos[,sn])          # sets position
 #       rescale(ch,rf,[,sn])      # sets rescalefactor
-    
+
     def phidgetStepperAttach(self, channel:int, serial:Optional[str]=None) -> None:
         if serial not in self.aw.ser.PhidgetStepperMotor:
             if self.aw.qmc.phidgetManager is None:
@@ -5249,6 +5249,11 @@ class serialport:
                 ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetStepper',DeviceID.PHIDID_STC1005,
                             remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
                 ports = 1
+                # try to attach an Phidget STC1002 module
+                if ser is None:
+                    ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetRCServo',DeviceID.PHIDID_STC1002,
+                                    remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
+                    ports = 1
 
                 if ser is not None:
                     self.aw.ser.PhidgetStepperMotor[serial] = []
@@ -5283,22 +5288,22 @@ class serialport:
             pass
 
     # sets rescalefactor
-    def phidgetStepperRescale(self, channel:int, value:int, serial:Optional[str]=None) -> None:
-        _log.debug('phidgetStepperRescale(%s,%s,%s,%s)',channel,value,serial)
+    def phidgetStepperRescale(self, channel:int, value:float, serial:Optional[str]=None) -> None:
+        _log.debug('phidgetStepperRescale(%s,%s,%s)',channel,value,serial)
         self.phidgetStepperAttach(channel,serial)
         if serial in self.aw.ser.PhidgetStepperMotor and len(self.aw.ser.PhidgetStepperMotor[serial])>channel:
             self.aw.ser.PhidgetStepperMotor[serial][channel].setRescaleFactor(value)
 
     # sets position
-    def phidgetStepperSet(self, channel:int, value:int, serial:Optional[str]=None) -> None:
-        _log.debug('phidgetStepperSet(%s,%s,%s,%s)',channel,value,serial)
+    def phidgetStepperSet(self, channel:int, value:float, serial:Optional[str]=None) -> None:
+        _log.debug('phidgetStepperSet(%s,%s,%s)',channel,value,serial)
         self.phidgetStepperAttach(channel,serial)
         if serial in self.aw.ser.PhidgetStepperMotor and len(self.aw.ser.PhidgetStepperMotor[serial])>channel:
             self.aw.ser.PhidgetStepperMotor[serial][channel].setTargetPosition(value)
 
     # engages channel
     def phidgetStepperEngaged(self, channel:int, state:bool, serial:Optional[str]=None) -> None:
-        _log.debug('phidgetStepperEngaged(%s,%s,%s,%s)',channel,state,serial)
+        _log.debug('phidgetStepperEngaged(%s,%s,%s)',channel,state,serial)
         self.phidgetStepperAttach(channel,serial)
         if serial in self.aw.ser.PhidgetStepperMotor and len(self.aw.ser.PhidgetStepperMotor[serial])>channel:
             self.aw.ser.PhidgetStepperMotor[serial][channel].setEngaged(state)

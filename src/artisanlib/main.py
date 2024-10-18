@@ -10263,12 +10263,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 try:
                                     n = 2
                                     cs_split = cs[len('rescale('):-1].split(',')
-                                    channel_str,value = cs_split[0:n]
+                                    channel_str, value_str = cs_split[0:n]
                                     if len(cs_split)>n:
                                         sn = cs_split[n]
                                     else:
                                         sn = None
-                                    self.ser.phidgetStepperRescale(int(channel_str),toFloat(eval(value)),sn) # pylint: disable=eval-used
+                                    self.ser.phidgetStepperRescale(int(channel_str),toFloat(eval(value_str)),sn) # pylint: disable=eval-used
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             # engaged(ch,state[,sn]) # engage channel
@@ -10281,7 +10281,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                         sn = cs_split[n]
                                     else:
                                         sn = None
-                                    state_engaged:bool = bool(state_str.lower() in {'yes', 'true', 't', '1'})
+                                    state_engaged = bool(state_str.lower() in {'yes', 'true', 't', '1'})
                                     self.ser.phidgetStepperEngaged(int(channel_str), state_engaged, sn)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
