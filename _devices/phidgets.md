@@ -362,6 +362,30 @@ with
 See [Artisan v1.6.1](https://artisan-roasterscope.blogspot.com/2019/03/artisan-v161.html){:target="_blank"} under "RC Servos" for details.
 
 
+
+### 4.7 Stepper Motor Control
+
+Artisan v3.2 adds support for stepper motor control.
+
+* [Phidget STC1002](https://www.phidgets.com/?prodid=1121){:target="_blank"} (8A Stepper Phidget)
+* [Phidget STC1005](https://phidgets.com/?prodid=1278){:target="_blank"} (4A Stepper Phidget) 
+
+Phidget Stepper Motor modules can be controlled via `Stepper Command` actions triggered by buttons or sliders configured in the Events tab (menu `Config >> Events`). The following commands are supported:
+
+* `rescale(ch,val[,sn])` : used to set the rescale factor
+* `engaged(ch,state[,sn])` : engage (b=1) or disengage (b = 0)
+* `set(ch,pos[,sn])` : set the target position
+
+
+with
+
+* `ch` : the channel to be addressed (integer)
+* `val, pos` : values (float)
+* `state` : bool value given as 0 (false) or 1 (true)
+* `sn` : optional hub serial number or hub serial number and hub port specifier separated by a colon like in `set(0,6,560282)` or `set(0,6,560282:2)`. Using a command actions, like in `set(0,6)`, without specifying a hub serial number, will attach to the first yet unattached module connected to the hub with the lowest serial number instead. If just a port number is given as in `set(0,6,:2)`, the yet unattached module connected to the given port (here 2) of the first hub with the lowest serial number is addressed.
+
+
+
 ## <a name="remote-access"></a>5. Remote Access
 
 All Phidgets can be accessed either directly via USB or remotely via network connection. The device making its connected Phidgets accessible via remote access can be either a wireless VINT hub like the [Phidget HUB5000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=1143){:target="_blank"}, a [Phidget SBC](https://www.phidgets.com/?tier=1&catid=1&pcid=0) or another computer running the Phidget driver. In the last case, one needs to activate the Network Server in the Phidget Control Panel running on the computer with the Phidgets physically connected to make those available for remote access. 

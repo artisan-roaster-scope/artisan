@@ -67,6 +67,10 @@ gallery:
     image_path: /assets/images/primo-logo.png
     alt: "Primo"
     title: "Primo"
+  - url: https://www.sweetcoffeeitalia.com/
+    image_path: /assets/images/sci-logo.png
+    alt: "Sweet Coffee Italia"
+    title: "Sweet Coffee Italia"
     
 ---
 
