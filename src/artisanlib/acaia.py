@@ -113,6 +113,7 @@ class AcaiaBLE(ClientBLE):
     ACAIA_PEARL_NAME:Final[str] = 'PEARL-'   # Acaia Pearl (2021)
     ACAIA_PEARLS_NAME:Final[str] = 'PEARLS'  # Acaia Pearl S
     ACAIA_LUNAR_NAME:Final[str] = 'LUNAR-'   # Acaia Lunar (2021)
+    ACAIA_CINCO_NAME:Final[str] = 'CINCO'    # Acaia Cinco
     ACAIA_PYXIS_NAME:Final[str] = 'PYXIS'    # Acaia Pyxis
 
     # Acaia message constants
@@ -156,7 +157,7 @@ class AcaiaBLE(ClientBLE):
         self.add_write(self.ACAIA_LEGACY_SERVICE_UUID, self.ACAIA_LEGACY_WRITE_UUID)
 
         # register Acaia Current UUIDs
-        for acaia_name in (self.ACAIA_PEARL_NAME, self.ACAIA_PEARLS_NAME, self.ACAIA_LUNAR_NAME, self.ACAIA_PYXIS_NAME):
+        for acaia_name in (self.ACAIA_PEARL_NAME, self.ACAIA_PEARLS_NAME, self.ACAIA_LUNAR_NAME, self.ACAIA_PYXIS_NAME, self.ACAIA_CINCO_NAME):
             self.add_device_description(self.ACAIA_SERVICE_UUID, acaia_name)
         self.add_notify(self.ACAIA_NOTIFY_UUID, self.notify_callback)
         self.add_write(self.ACAIA_SERVICE_UUID, self.ACAIA_WRITE_UUID)

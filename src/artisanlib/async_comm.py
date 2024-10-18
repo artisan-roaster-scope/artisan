@@ -68,7 +68,7 @@ class AsyncLoopThread:
 
 class AsyncIterable:
 
-    _queue: asyncio.Queue[bytes]
+    _queue: 'asyncio.Queue[bytes]' # type Queue is not subscriptable in Python <3.9 thus it is quoted
 
     def __init__(self, queue:asyncio.Queue[bytes]) -> None:
         self._queue = queue
