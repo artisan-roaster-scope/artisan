@@ -17,7 +17,7 @@ v3.0.3
   - adds support for [Primo roasting machines](https://artisan-scope.org/machines/primo/)
   - adds [Loring](https://artisan-scope.org/machines/loring/) 'auto' setup which picks up CHARGE and DROP events set at the machine
   - adds control function to [Diedrich DR](https://artisan-scope.org/machines/diedrich/) machine setup and adds [Diedrich CR](https://artisan-scope.org/machines/diedrich/) machine setup
-  - adds support for [Phidget Steppers](https://artisan-scope.org/devices/phidgets/#47-stepper-motor-control) ([Discussion #891](../../../discussions/891) and ([PR #1715](../../../pull/1715)))
+  - adds support for [Phidget Stepper Motor Controllers](https://artisan-scope.org/devices/phidgets/#47-stepper-motor-control) ([Discussion #891](../../../discussions/891) and [PR #1715](../../../pull/1715))
 
 * CHANGES
   - automatically start of the scheduler on connected to [artisan.plus](https://artisan.plus) if there are incompleted scheduled items
