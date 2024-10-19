@@ -2804,7 +2804,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
         border_modern = 'border-style:solid; border-radius:4;border-color:grey; border-width:0;' # modernize
 
-        self.pushbuttonstyles_simulator: dict[str, str] = {
+        self.pushbuttonstyles_simulator: Dict[str, str] = {
             'OFF':    """
                 QPushButton {
                     min-width: """ + self.main_button_min_width_str + """;
@@ -2896,7 +2896,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             """,
         }
 
-        self.pushbuttonstyles: dict[str, str] = {
+        self.pushbuttonstyles: Dict[str, str] = {
             'RESET':     """
                 QPushButton {
                     min-width: """ + self.main_button_min_width_str + """;

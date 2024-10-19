@@ -242,7 +242,7 @@ enable='''c-extension-no-member,'''
 [tool.mypy]
 files = ["artisanlib/*.py", "plus/*.py"]
 exclude = ['build', 'dist', 'uic', 'misc']
-python_version = "3.9"
+python_version = "3.8"
 # "3.8" throws "matplotlib/backends/backend_agg.py:393: error: Parenthesized context managers are only supported in Python 3.9 and greater"
 
 # Ensure full coverage

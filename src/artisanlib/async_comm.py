@@ -23,6 +23,7 @@ from threading import Thread
 from pymodbus.transport.serialtransport import create_serial_connection # patched pyserial-asyncio
 from typing import Final, Optional, Union, Tuple, Callable, AsyncIterator, TYPE_CHECKING
 
+
 if TYPE_CHECKING:
     from artisanlib.types import SerialSettings # pylint: disable=unused-import
 
@@ -70,7 +71,7 @@ class AsyncIterable:
 
     _queue: 'asyncio.Queue[bytes]' # type Queue is not subscriptable in Python <3.9 thus it is quoted
 
-    def __init__(self, queue:asyncio.Queue[bytes]) -> None:
+    def __init__(self, queue:'asyncio.Queue[bytes]') -> None:
         self._queue = queue
 
     def __aiter__(self) -> 'AsyncIterable':
@@ -145,8 +146,8 @@ class AsyncComm:
                 connected_handler:Optional[Callable[[], None]] = None,
                 disconnected_handler:Optional[Callable[[], None]] = None) -> None:
         # internals
-        self._asyncLoopThread: Optional[AsyncLoopThread]     = None # the asyncio AsyncLoopThread object
-        self._write_queue: Optional[asyncio.Queue[bytes]]    = None # the write queue
+        self._asyncLoopThread: Optional[AsyncLoopThread]       = None # the asyncio AsyncLoopThread object
+        self._write_queue: 'Optional[asyncio.Queue[bytes]]'    = None # noqa: UP037 # quotes for Python3.8 # the write queue
 
         # connection
         self._host:str = host

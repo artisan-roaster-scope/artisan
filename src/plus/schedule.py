@@ -667,14 +667,14 @@ def remove_prefix(s:str, prefix:str) -> str:
         if s.startswith(prefix):
             return s[len(prefix):]
         return s
-    return s.removeprefix(prefix) # type:ignore[reportAttributeAccessIssue, unused-ignore] # not known under Python 3.8 which we use for pyright type checking
+    return s.removeprefix(prefix) # type:ignore[attr-defined, no-any-return, reportAttributeAccessIssue, unused-ignore] # not known under Python 3.8 which we use for pyright type checking
 
 def remove_suffix(s:str, suffix:str) -> str:
     if Version(python_version()) < Version('3.9.0'):
         if s.endswith(suffix):
             return s[:-len(suffix)]
         return s
-    return s.removesuffix(suffix) # type:ignore[reportAttributeAccessIssue, unused-ignore] # not known under Python 3.8 which we use for pyright type checking
+    return s.removesuffix(suffix) # type:ignore[attr-defined, no-any-return, reportAttributeAccessIssue, unused-ignore] # not known under Python 3.8 which we use for pyright type checking
 
 def locale_format_date_no_year(locale:str, date:datetime.date) -> str:
     try:
