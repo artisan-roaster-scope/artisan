@@ -344,7 +344,6 @@ for qt_dir in ['PyQt5/Qt5/lib', 'PyQt6/Qt6/lib']:
                 subprocess.check_call(f'rm -rf {file_path}',shell = True)
     # remove all WebEngine locales, but keep en-US.pak
     file_path = os.path.join(qt, 'QtWebEngineCore.framework/Resources/qtwebengine_locales')
-#    subprocess.check_call(f'rm -rf {file_path}/*',shell = True)
     try:
         subprocess.check_call(f"find {file_path} ! -name 'en-US.pak' -type f -exec rm -f {{}} + 2>/dev/null",shell = True)
     except Exception: # pylint: disable=broad-except

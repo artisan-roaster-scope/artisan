@@ -95,3 +95,24 @@ slidermax=100, 100, 100, 100
 slidermin=0, 0, 0, 0
 slideroffsets=0, 0, 0, 0
 slidervisibilities=1, 0, 0, 1
+
+[ArduinoPID]
+derivative_filter=1
+dutyMax=100
+dutyMin=-100
+dutySteps=1
+invertControl=false
+pOnE=true
+pidKd=40
+pidKi=0.01
+pidKp=2
+pidNegativeTarget=0
+pidPositiveTarget=4
+pidSource=1
+positiveTargetMax=100
+positiveTargetMin=0
+positiveTargetRangeLimit=false
+svLookahead=5
+svSlider=false
+svSliderMax=230
+svSliderMin=0

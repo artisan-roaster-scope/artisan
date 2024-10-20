@@ -571,7 +571,6 @@ class modbusport:
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeSingleRegister(%d,%d,%s) failed', slave, register, value)
             _log.debug(ex)
-            _log.exception(ex)
             self.disconnectOnError()
             _, _, exc_tb = sys.exc_info()
             if self.aw.qmc.flagon:
