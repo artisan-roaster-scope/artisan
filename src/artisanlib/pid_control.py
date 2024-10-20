@@ -471,6 +471,7 @@ class FujiPID:
             self.aw.qmc.adderror(message)
 
     def calcSV(self, tx:float) -> Optional[float]:
+        # tx is the timestamp recorded, NOT the time displayed to the user after CHARGE
         if self.aw.qmc.background:
             # Follow Background mode
             if self.aw.qmc.swapETBT: # we observe the BT
@@ -1134,11 +1135,11 @@ class FujiPID:
 ###################################################################################
 
 class PIDcontrol:
-    __slots__ = [ 'aw', 'pidActive', 'sv', 'pidOnCHARGE', 'loadpidfrombackground', 'createEvents', 'loadRampSoakFromProfile', 'loadRampSoakFromBackground', 'svLen', 'svLabel',
+    __slots__ = [ 'aw', 'pidActive', 'sv', 'pidOnCHARGE', 'RStimeAfterCHARGE', 'loadpidfrombackground', 'createEvents', 'loadRampSoakFromProfile', 'loadRampSoakFromBackground', 'svLen', 'svLabel',
             'svValues', 'svRamps', 'svSoaks', 'svActions', 'svBeeps', 'svDescriptions','svTriggeredAlarms', 'RSLen', 'RS_svLabels', 'RS_svValues', 'RS_svRamps', 'RS_svSoaks',
             'RS_svActions', 'RS_svBeeps', 'RS_svDescriptions', 'svSlider', 'svButtons', 'svMode', 'svLookahead', 'dutySteps', 'svSliderMin', 'svSliderMax', 'svValue',
             'dutyMin', 'dutyMax', 'pidKp', 'pidKi', 'pidKd', 'pOnE', 'pidSource', 'pidCycle', 'pidPositiveTarget', 'pidNegativeTarget', 'invertControl',
-            'sv_smoothing_factor', 'sv_decay_weights', 'previous_svs', 'time_pidON', 'current_ramp_segment',  'current_soak_segment', 'ramp_soak_engaged',
+            'sv_smoothing_factor', 'sv_decay_weights', 'previous_svs', 'time_pidON', 'source_reading_pidON', 'current_ramp_segment',  'current_soak_segment', 'ramp_soak_engaged',
             'RS_total_time', 'slider_force_move', 'positiveTargetRangeLimit', 'positiveTargetMin', 'positiveTargetMax', 'negativeTargetRangeLimit',
             'negativeTargetMin', 'negativeTargetMax', 'derivative_filter']
 
@@ -1148,6 +1149,7 @@ class PIDcontrol:
         self.sv:Optional[float] = None # the last sv send to the Arduino
         #
         self.pidOnCHARGE:bool = False
+        self.RStimeAfterCHARGE = True # if True RS time is taken from CHARGE if FALSE it is the time after the PID was last started
         self.loadpidfrombackground = False # if True, p-i-d parameters pidKp, pidKi, pidKd, pidSource, pOnE and svLookahead are set from the background profile
         self.createEvents:bool = False
         self.loadRampSoakFromProfile:bool = False
@@ -1211,6 +1213,7 @@ class PIDcontrol:
         self.previous_svs:List[float] = []
         # time @ PID ON
         self.time_pidON:float = 0 # in monitoring mode, ramp-soak times are interpreted w.r.t. the time after the PID was turned on and not the time after CHARGE as during recording
+        self.source_reading_pidON:float = 0 # the reading of the selected source on PID ON (to be used as start point for the first RAMP/SOAK pattern)
         self.current_ramp_segment:int = 0 # the RS segment currently active. Note that this is 1 based, 0 indicates that no segment has started yet
         self.current_soak_segment:int = 0 # the RS segment currently active. Note that this is 1 based, 0 indicates that no segment has started yet
         self.ramp_soak_engaged:int = 1 # set to 0, disengaged, after the RS pattern was processed fully
@@ -1343,13 +1346,32 @@ class PIDcontrol:
             self.RS_total_time = self.RStotalTime(self.svRamps,self.svSoaks)
             self.svTriggeredAlarms = [False]*self.svLen
 
-            if self.aw.qmc.flagstart or len(self.aw.qmc.on_timex)<1:
+            if self.aw.qmc.flagstart:
+                self.time_pidON = self.aw.qmc.timex[-1]
+            elif len(self.aw.qmc.on_timex)<1:
                 self.time_pidON = 0
             else:
                 self.time_pidON = self.aw.qmc.on_timex[-1]
                 if self.svMode == 1:
                     # turn the timer LCD color blue if in RS mode and not recording
                     self.aw.setTimerColor('rstimer')
+
+            # remember current pidSource reading
+            self.source_reading_pidON = 0
+            if self.pidSource == 1: # we observe the BT
+                self.source_reading_pidON = self.aw.qmc.temp2[-1]
+            elif self.pidSource == 2: # we observe the ET
+                self.source_reading_pidON = self.aw.qmc.temp1[-1]
+            elif self.pidSource>2: # we observe an extra curve
+                n = self.pidSource-3
+                c = n // 2
+                if n % 2 == 0:
+                    tempX = self.aw.qmc.extratemp1 if self.aw.qmc.flagstart else self.aw.qmc.on_extratemp1
+                else:
+                    tempX = self.aw.qmc.extratemp2 if self.aw.qmc.flagstart else self.aw.qmc.on_extratemp2
+                if len(tempX)>c:
+                    self.source_reading_pidON = tempX[c][-1]
+
 
     # the internal software PID should be configured on ON, but not be activated yet to warm it up
     def confSoftwarePID(self) -> None:
@@ -1498,7 +1520,7 @@ class PIDcontrol:
             segment_end_time = 0 # the (end) time of the segments
             prev_segment_end_time = 0 # the (end) time of the previous segment
             segment_start_sv = 0. # the (target) sv of the segment
-            prev_segment_start_sv = 0. # the (target) sv of the previous segment
+            prev_segment_start_sv = self.source_reading_pidON # the (target) sv of the previous segment; initialized to the reading of the pid source on PID ON
             for i, v in enumerate(self.svValues):
                 # Ramp
                 if self.svRamps[i] != 0:
@@ -1554,10 +1576,17 @@ class PIDcontrol:
 
     # returns None if in manual mode or no other sv (via ramp/soak or follow mode) defined
     def calcSV(self, tx:float) -> Optional[float]:
+        # tx is the timestamp recorded, NOT the time displayed to the user after CHARGE
         if self.svMode == 1:
             # Ramp/Soak mode
-            # actual time (after CHARGE) on recording and time after PID ON on monitoring:
-            return self.svRampSoak(tx - self.time_pidON)
+            # actual time (after CHARGE) on recording (if CHARGE and RStimeAfterCHARGE) and time after PID ON (on monitoring or if RStimeAfterCHARGE):
+            time = tx
+            if not self.aw.qmc.flagstart or not self.RStimeAfterCHARGE:
+                time = time - self.time_pidON
+            elif self.RStimeAfterCHARGE and self.aw.qmc.timeindex[0] > -1:
+                # after CHARGE
+                time = time - self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
+            return self.svRampSoak(time)
         if self.svMode == 2 and self.aw.qmc.background:
             # Follow Background mode
             if self.aw.qmc.device == 19 and self.externalPIDControl(): # in case we run TC4 with the PIDfirmware

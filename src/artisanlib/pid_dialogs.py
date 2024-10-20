@@ -779,7 +779,19 @@ class PID_DlgControl(ArtisanDialog):
         flagsLayout.addWidget(self.loadRampSoakFromBackground)
         flagsLayout.addStretch()
 
-
+        time_label = QLabel(QApplication.translate('Label', 'Time starts at'))
+        self.radioTimeAfterCHARGE = QRadioButton(QApplication.translate('Label','CHARGE'))
+        self.radioTimeAfterPIDON = QRadioButton(QApplication.translate('Button','PID ON'))
+        if self.aw.pidcontrol.RStimeAfterCHARGE:
+            self.radioTimeAfterCHARGE.setChecked(True)
+        else:
+            self.radioTimeAfterPIDON.setChecked(True)
+        radioButtonsLayout = QHBoxLayout()
+        radioButtonsLayout.addStretch()
+        radioButtonsLayout.addWidget(time_label)
+        radioButtonsLayout.addWidget(self.radioTimeAfterCHARGE)
+        radioButtonsLayout.addWidget(self.radioTimeAfterPIDON)
+        radioButtonsLayout.addStretch()
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
@@ -792,6 +804,7 @@ class PID_DlgControl(ArtisanDialog):
 
         tab2Layout.addLayout(buttonLayout)
         tab2Layout.addStretch()
+        tab2Layout.addLayout(radioButtonsLayout)
         tab2Layout.addLayout(flagsLayout)
 
 
@@ -1180,6 +1193,7 @@ class PID_DlgControl(ArtisanDialog):
         self.aw.pidcontrol.setPID(kp,ki,kd,source,cycle,pOnE)
         #
         self.aw.pidcontrol.pidOnCHARGE = self.startPIDonCHARGE.isChecked()
+        self.aw.pidcontrol.RStimeAfterCHARGE = self.radioTimeAfterCHARGE.isChecked()
         self.aw.pidcontrol.loadpidfrombackground = self.loadPIDfromBackground.isChecked()
         self.aw.pidcontrol.createEvents = self.createEvents.isChecked()
         self.aw.pidcontrol.loadRampSoakFromProfile = self.loadRampSoakFromProfile.isChecked()

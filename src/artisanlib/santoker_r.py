@@ -78,8 +78,11 @@ class SantokerR(ClientBLE):
         if self._logging:
             _log.debug('notify: %s', data)
         if len(data) > 3:
-            self._BT = int.from_bytes(data[0:2], 'big') / 10
-            self._ET = int.from_bytes(data[2:4], 'big') / 10
+            BT = int.from_bytes(data[0:2], 'big') / 10
+            ET = int.from_bytes(data[2:4], 'big') / 10
+            # BLE delivers a new reading about every 0.5sec which we average
+            self._BT = (BT if self._BT == -1 else (2*BT + self._BT)/3)
+            self._ET = (ET if self._ET == -1 else (2*ET + self._ET)/3)
 
     def getBT(self) -> float:
         return self._BT

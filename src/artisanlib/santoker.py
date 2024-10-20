@@ -215,9 +215,11 @@ class Santoker(AsyncComm):
         if target == self.BOARD:
             self._board = value / 10.0
         elif target == self.BT:
-            self._bt = value / 10.0
+            BT = value / 10.0
+            self._bt = (BT if self._bt == -1 else (2*BT + self._bt)/3)
         elif target == self.ET:
-            self._et = value / 10.0
+            ET = value / 10.0
+            self._et = (ET if self._et == -1 else (2*ET + self._et)/3)
         elif target == self.BT_ROR:
             self._bt_ror = value / 10.0
         elif target == self.ET_ROR:

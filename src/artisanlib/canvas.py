@@ -531,7 +531,7 @@ class tgraphcanvas(FigureCanvas):
         # default delay between readings in milliseconds
         self.default_delay: Final[int] = 2000 # default 2s
         self.delay:int = self.default_delay
-        self.min_delay: Final[int] = 250 #500 # 1000 # Note that a 0.25s min delay puts a lot of performance pressure on the app
+        self.min_delay: Final[int] = 100 #250 # 1000 # Note that already a 0.25s min delay puts a lot of performance pressure on the app
 
         # extra event sampling interval in milliseconds. If 0, then extra sampling commands are sent "in sync" with the standard sampling commands
         self.extra_event_sampling_delay:int = 0 # sync, 0.5s, 1.0s, 1.5s,.., 5s => 0, 500, 1000, 1500, .. # 0, 500, 1000, 1500, ...
@@ -15853,11 +15853,9 @@ class tgraphcanvas(FigureCanvas):
         if n % 2 == 0:
             # even
             tempBX = self.stemp1BX if smoothed else self.temp1BX
-        # odd
-        elif smoothed:
-            tempBX = self.stemp2BX
         else:
-            tempBX = self.temp2BX
+            # odd
+            tempBX = self.stemp2BX if smoothed else self.temp2BX
         c = n // 2
         if len(tempBX)>c:
             temp = tempBX[c]
