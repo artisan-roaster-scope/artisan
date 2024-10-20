@@ -18,6 +18,8 @@
 
 import logging
 import sys
+import subprocess
+import os
 
 from PyInstaller.utils.hooks import copy_metadata, collect_data_files, collect_dynamic_libs
 
@@ -28,7 +30,7 @@ logging.basicConfig(level=logging.INFO)
 def copy_file(source_file, destination_file, fatal=True):
     #logging.info("Copying %s",source_file)
     copy_command = f'copy "{source_file}" "{destination_file}"'
-    exit_code = os.system(copy_command)
+    exit_code = subprocess.call(copy_command, stdout=subprocess.DEVNULL, shell=True)
     if exit_code != 0:
         msg = f'Copy operation failed {source_file} {destination_file}'
         logging.error(msg)
@@ -39,7 +41,7 @@ def copy_file(source_file, destination_file, fatal=True):
 def xcopy_files(source_dir, destination_dir, fatal=True):
     #logging.info("Copying %s",source_file)
     xcopy_command = f'xcopy "{source_dir}" "{destination_dir}"  /y /S'
-    exit_code = os.system(xcopy_command)
+    exit_code = subprocess.call(xcopy_command, stdout=subprocess.DEVNULL, shell=True)
     if exit_code != 0:
         msg =f'Xcopy operation failed {source_dir} {destination_dir}'
         logging.error(msg)
@@ -49,7 +51,7 @@ def xcopy_files(source_dir, destination_dir, fatal=True):
 # Function to make dir
 def make_dir(source_dir, fatal=True):
     mkdir_command = f'mkdir "{source_dir}"'
-    exit_code = os.system(mkdir_command)
+    exit_code = subprocess.call(mkdir_command, shell=True)
     if exit_code != 0:
         msg =f'mkdir operation failed {source_dir}'
         logging.error(msg)
@@ -59,7 +61,7 @@ def make_dir(source_dir, fatal=True):
 # Function to remove dir
 def remove_dir(source_dir, fatal=True):
     rmdir_command = f'rmdir /q /s {source_dir}'
-    exit_code = os.system(rmdir_command)
+    exit_code = subprocess.call(rmdir_command, shell=True)
     if exit_code != 0:
         msg =f'rmdir operation failed {source_dir}'
         logging.error(msg)
@@ -77,16 +79,17 @@ def check_file_exists(file_path, fatal=True):
 # Function to delete file
 def del_file(file_path, fatal=True):
     del_command = f'del /q {file_path}'
-    exit_code = os.system(del_command)
+    exit_code = subprocess.call(del_command, shell=True)
     if exit_code != 0:
         msg =f'del operation failed {file_path}'
         logging.error(msg)
         if fatal:
             sys.exit('Fatal Error')
 
-block_cipher = None
 
-import os
+###################################
+# Setup the environment
+###################################
 if os.environ.get('APPVEYOR'):
     ARTISAN_SRC = r'C:\projects\artisan\src'
     PYTHON = os.environ.get('PYTHON_PATH')
@@ -99,11 +102,6 @@ else:
     sys.exit('Fatal Error')
 
 NAME = 'artisan'
-
-logging.info("** ARTISAN_LEGACY: %s", ARTISAN_LEGACY)
-logging.info("** QT_TRANSL: %s",QT_TRANSL)
-
-##
 TARGET = 'dist\\' + NAME + '\\'
 PYTHON_PACKAGES = PYTHON + r'\Lib\site-packages'
 PYQT_QT = PYTHON_PACKAGES + r'\PyQt' + PYQT + r'\Qt'
@@ -118,8 +116,12 @@ if is_module_satisfies('scipy >= 1.3.2'):
 else:
     SCIPY_BIN = PYTHON_PACKAGES + r'\scipy\extra-dll'
 
-#os.system(PYTHON + r'\Scripts\pylupdate5 artisan.pro')
+logging.info("** ARTISAN_LEGACY: %s", ARTISAN_LEGACY)
+logging.info("** QT_TRANSL: %s",QT_TRANSL)
 
+###################################
+# Pyinstaller core
+###################################
 hiddenimports_list=['charset_normalizer.md__mypyc', # part of requests 2.28.2 # see https://github.com/pyinstaller/pyinstaller-hooks-contrib/issues/534
                             'matplotlib.backends.backend_pdf',
                             'matplotlib.backends.backend_svg',
@@ -134,13 +136,15 @@ hiddenimports_list=['charset_normalizer.md__mypyc', # part of requests 2.28.2 # 
 # Add the hidden imports not required by legacy Windows.
 if not ARTISAN_LEGACY=='True':
     hiddenimports_list[len(hiddenimports_list):] = [
+                            'PyQt6.QtWebChannel',
+                            'PyQt6.QtWebEngineCore',
                             'importlib_resources',
                             'winrt.windows.foundation.collections'
                             ]
 
 datas = collect_data_files('bleak', subdir=r'backends\winrt')
 binaries = collect_dynamic_libs('bleak')
-logging.info(">>>>> Appending hidden imports")
+block_cipher = None
 
 a = Analysis(['artisan.py'],
              pathex=[PYQT_QT_BIN, ARTISAN_SRC, SCIPY_BIN],
@@ -176,12 +180,16 @@ coll = COLLECT(exe,
                name=NAME)
 
 
-# assumes the Microsoft Visual C++ 2015 Redistributable Package (x64), vc_redist.x64.exe, is located above the source directory
+###################################
+# copy additional needed files
+###################################
+logging.info(">>>>> Copying additional needed files")
+
+# requires the Microsoft Visual C++ 2015 Redistributable Package (x64), vc_redist.x64.exe, to be located above the source directory
 copy_file(r'..\vc_redist.x64.exe', TARGET)
 
 copy_file('README.txt',TARGET)
 copy_file(r'..\LICENSE', TARGET + r'\LICENSE.txt')
-#os.system('copy qt-win.conf ' + TARGET + 'qt.conf')
 make_dir(TARGET + 'Wheels')
 make_dir(TARGET + r'Wheels\Cupping')
 make_dir(TARGET + r'Wheels\Other')
@@ -234,9 +242,6 @@ if not ARTISAN_LEGACY=='True':
         ]:
         copy_file(QT_TRANSL + '\\' + tr, TARGET + 'translations',False)
 
-
-# this directory no longer exists
-#remove_dir(TARGET + 'mpl-data\sample_data',False)
 
 # YOCTO HACK BEGIN: manually copy over the dlls
 make_dir(TARGET + r'_internal\yoctopuce\cdll')
@@ -300,138 +305,156 @@ make_dir(TARGET + 'Icons')
 xcopy_files(r'includes\Icons', TARGET + 'Icons')
 
 
+###################################
+# Remove unneeded files and folders
+###################################
+# remove unused translations of unused Qt modules
+rootdir = f'{TARGET}_internal'
+SUPPORTED_LANGUAGES = ['ar', 'da', 'de','el','en','es','fa','fi','fr','gd', 'he','hu','id','it','ja','ko','lv', 'nl','no','pl','pt_BR','pt','sk', 'sv','th','tr','uk','vi','zh_CN','zh_TW']
 
+qt_trans_prefix_keep = {
+    'qtbase',
+    'qt'
+}
+qt_trans_file_keep = {
+    'en-US.pak'
+}
+qt_trans_prefix_delete = {
+    'qt_help'
+}
+
+logging.info(">>>>> Removing unneeded Qt translation files")
+for qt_dir in [r'PyQt5\Qt5\translations', r'PyQt6\Qt6\translations']:
+    qt = rootdir + '\\' + qt_dir
+    for root, _, files in os.walk(qt):
+        for file in files:
+            if (any(file.startswith(f'{x}_') for x in qt_trans_prefix_delete) or
+                    not ( (any(file.startswith(f'{x}_') for x in qt_trans_prefix_keep) and any(file.endswith(f'_{x}.qm') for x in SUPPORTED_LANGUAGES)) or
+                         any(file == f'{x}' for x in qt_trans_file_keep))):
+                file_path = os.path.join(root, file)
+                del_file(file_path, True)
+                #logging.info(file_path)
+
+logging.info(">>>>> Removing unneeded language support from babel")
+for root, _, files in os.walk(rootdir + r'\babel\locale-data'):
+    for file in files:
+        if file.endswith('.dat') and (('_' not in file and file.split('.')[0] not in SUPPORTED_LANGUAGES) or
+                ('_' in file and file.split('.')[0] not in SUPPORTED_LANGUAGES)):
+            file_path = os.path.join(root, file)
+            del_file(file_path, True)
+            #logging.info(file_path)
+
+# remove unneeded files and folders from Windows (not implemented for legacy)
 if not ARTISAN_LEGACY=='True':
-    logging.info(">>>>> Deleting unneeded files")
+    logging.info(">>>>> Removing unneeded files")
     for fn in [
-        TARGET + r'\_internal\Artisan\_internal\api-ms-win-*',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6Multimedia.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6MultimediaQuick.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6PdfQuick.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6PositioningQuick.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6QmlWorkerScript.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6Quick3D.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6Quick3DAssetImport.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6Quick3DAssetUtils.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6Quick3DEffects.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6Quick3DHelpers.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6Quick3DHelpersImpl.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6Quick3DParticles.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6Quick3DPhysics.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6Quick3DPhysicsHelpers.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6Quick3DRuntimeRender.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6Quick3DSpatialAudio.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6Quick3DUtils.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6QuickControls2.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6QuickControls2Basic.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6QuickControls2BasicStyleImpl.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6QuickControls2Fusion.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6QuickControls2FusionStyleImpl.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6QuickControls2Imagine.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6QuickControls2ImagineStyleImpl.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6QuickControls2Impl.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6QuickControls2Material.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6QuickControls2MaterialStyleImpl.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6QuickControls2Universal.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6QuickControls2UniversalStyleImpl.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6QuickDialogs2.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6QuickDialogs2QuickImpl.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6QuickDialogs2Utils.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6QuickLayouts.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6QuickParticles.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6QuickShapes.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6QuickTemplates2.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6QuickTest.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6QuickTimeline.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6QuickTimelineBlendTrees.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6RemoteObjects.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6RemoteObjectsQml.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6Sensors.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6SensorsQuick.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6SerialPort.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6ShaderTools.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6SpatialAudio.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6Test.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6TextToSpeech.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6WebChannelQuick.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6WebEngineQuick.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6WebEngineQuickDelegatesQml.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\bin\Qt6WebSockets.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\plugins\generic\qtuiotouchplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\plugins\networkinformation\qnetworklistmanager.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\plugins\platforms\qminimal.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\plugins\platforms\qoffscreen.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\plugins\position\qtposition_nmea.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\plugins\position\qtposition_positionpoll.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\plugins\position\qtposition_winrt.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\plugins\tls\qcertonlybackend.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\plugins\tls\qopensslbackend.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\plugins\tls\qschannelbackend.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtMultimedia\quickmultimediaplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtPositioning\positioningquickplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQml\Base\qmlplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQml\Models\modelsplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQml\WorkerScript\workerscriptplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQml\qmlmetaplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick3D\AssetUtils\qtquick3dassetutilsplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick3D\Effects\qtquick3deffectplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick3D\Helpers\impl\qtquick3dhelpersimplplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick3D\Helpers\qtquick3dhelpersplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick3D\Particles3D\qtquick3dparticles3dplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick3D\Physics\Helpers\qtquick3dphysicshelpersplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick3D\Physics\qquick3dphysicsplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick3D\SpatialAudio\quick3dspatialaudioplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick3D\qquick3dplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\Controls\Basic\impl\qtquickcontrols2basicstyleimplplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\Controls\Basic\qtquickcontrols2basicstyleplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\Controls\Fusion\impl\qtquickcontrols2fusionstyleimplplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\Controls\Fusion\qtquickcontrols2fusionstyleplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\Controls\Imagine\impl\qtquickcontrols2imaginestyleimplplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\Controls\Imagine\qtquickcontrols2imaginestyleplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\Controls\Material\impl\qtquickcontrols2materialstyleimplplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\Controls\Material\qtquickcontrols2materialstyleplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\Controls\Universal\impl\qtquickcontrols2universalstyleimplplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\Controls\Universal\qtquickcontrols2universalstyleplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\Controls\Windows\qtquickcontrols2windowsstyleplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\Controls\impl\qtquickcontrols2implplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\Controls\qtquickcontrols2plugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\Dialogs\qtquickdialogsplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\Dialogs\quickimpl\qtquickdialogs2quickimplplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\Layouts\qquicklayoutsplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\NativeStyle\qtquickcontrols2nativestyleplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\Particles\particlesplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\Pdf\pdfquickplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\Shapes\qmlshapesplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\Templates\qtquicktemplates2plugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\Timeline\BlendTrees\qtquicktimelineblendtreesplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\Timeline\qtquicktimelineplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\Window\quickwindowplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\qtquick2plugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtQuick\tooling\quicktoolingplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtRemoteObjects\declarative_remoteobjectsplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtSensors\sensorsquickplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtTest\quicktestplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtTextToSpeech\texttospeechqmlplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtWebChannel\webchannelquickplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtWebEngine\ControlsDelegates\qtwebenginequickdelegatesplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtWebEngine\qtwebenginequickplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\qml\QtWebSockets\qmlwebsocketsplugin.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\plugins\imageformats\qicns.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\plugins\imageformats\qtga.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\plugins\imageformats\qtiff.dll',
-        TARGET + r'\_internal\PyQt6\Qt6\plugins\imageformats\qwebp.dll',
-        TARGET + r'\_internal\yoctopuce\cdll\yapi.dll',      # could simply not copy this one above
+        r'_internal\PyQt6\Qt6\bin\Qt6Multimedia.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6MultimediaQuick.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6PdfQuick.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6PositioningQuick.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6QmlWorkerScript.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6Quick3D.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6Quick3DAssetImport.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6Quick3DAssetUtils.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6Quick3DEffects.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6Quick3DHelpers.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6Quick3DHelpersImpl.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6Quick3DParticles.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6Quick3DPhysics.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6Quick3DPhysicsHelpers.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6Quick3DRuntimeRender.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6Quick3DSpatialAudio.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6Quick3DUtils.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Basic.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2BasicStyleImpl.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Fusion.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2FusionStyleImpl.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Imagine.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2ImagineStyleImpl.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Impl.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Material.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2MaterialStyleImpl.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Universal.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2UniversalStyleImpl.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6QuickDialogs2.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6QuickDialogs2QuickImpl.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6QuickDialogs2Utils.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6QuickLayouts.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6QuickParticles.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6QuickShapes.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6QuickTemplates2.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6QuickTest.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6QuickTimeline.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6QuickTimelineBlendTrees.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6RemoteObjects.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6RemoteObjectsQml.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6Sensors.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6SensorsQuick.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6SerialPort.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6ShaderTools.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6SpatialAudio.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6Test.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6TextToSpeech.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6WebChannelQuick.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6WebEngineQuick.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6WebEngineQuickDelegatesQml.dll',
+        r'_internal\PyQt6\Qt6\bin\Qt6WebSockets.dll',
+        r'_internal\PyQt6\Qt6\plugins\platforms\qminimal.dll',
+        r'_internal\PyQt6\Qt6\plugins\platforms\qoffscreen.dll',
+        r'_internal\PyQt6\Qt6\plugins\imageformats\qicns.dll',
+        r'_internal\PyQt6\Qt6\plugins\imageformats\qtga.dll',
+        r'_internal\PyQt6\Qt6\plugins\imageformats\qtiff.dll',
+        r'_internal\PyQt6\Qt6\plugins\imageformats\qwebp.dll',
         ]:
-        del_file(fn, False)
+        del_file(f'{TARGET}{fn}', True)
+
+    # The api-ms-win*.dll files are generated on Appveyer CI and are not required
+    for root, _, files in os.walk(TARGET):
+        for file in files:
+            if (file.startswith('api-ms-win')):
+                file_path = os.path.join(root, file)
+                del_file(file_path, True)
 
     logging.info(">>>>> Removing unneeded folders")
     for dp in [
-        TARGET + r'\_internal\PyQt6\Qt6\plugins\generic',
-        TARGET + r'\_internal\PyQt6\Qt6\plugins\networkinformation',
-        TARGET + r'\_internal\PyQt6\Qt6\plugins\position',
-        TARGET + r'\_internal\PyQt6\Qt6\plugins\tls',
-        TARGET + r'\_internal\PyQt6\Qt6\qml',
-        TARGET + r'\_internal\matplotlib\mpl-data\sample_data',
+        r'_internal\PyQt6\Qt6\plugins\generic',
+        r'_internal\PyQt6\Qt6\plugins\networkinformation',
+        r'_internal\PyQt6\Qt6\plugins\position',
+        r'_internal\PyQt6\Qt6\plugins\tls',
+        r'_internal\PyQt6\Qt6\qml',
+        r'_internal\matplotlib\mpl-data\sample_data',
         ]:
-        remove_dir(dp,False)
+        remove_dir(f'{TARGET}{dp}', True)
+
+
+
+###################################
+# log the size of install folder
+###################################
+def get_size(path):
+    size = 0
+    # If the path is a file, get its size directly
+    if os.path.isfile(path):
+        size += os.path.getsize(path)
+    # If the path is a directory, walk through all files and sum their sizes
+    elif os.path.isdir(path):
+        for dirpath, dirnames, filenames in os.walk(path):
+            for filename in filenames:
+                file_path = os.path.join(dirpath, filename)
+                size += os.path.getsize(file_path)
+    return size
+
+def readable_bytes(size_in_bytes):
+    # Converts bytes to readable format
+    for unit in ['Bytes', 'KB', 'MB', 'GB', 'TB']:
+        if size_in_bytes < 1024.0:
+            return f"{size_in_bytes:.2f} {unit}"
+        size_in_bytes /= 1024.0
+
+# Get total size in bytes minus the vc_redist.x64.exe file
+size_bytes = get_size(TARGET) - get_size(TARGET + 'vc_redist.x64.exe')
+logging.info(f'>>>>> Net size of install folder: {readable_bytes(size_bytes)}')
+
+###################################
 
