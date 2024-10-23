@@ -12,13 +12,12 @@ v3.0.3
 
 * NEW HARDWARE SUPPORT
   - adds support for various newer [Santoker machines](https://artisan-scope.org/machines/santoker/) communicating via Bluetooth like the Cube10, the Bluetooth enabled X, Q and R Master Series as well as the R Series machines ([Issue #1088](../../../issues/1088) and [Issue #1702](../../../issues/1702))
-  - adds ColorTrack support ([Issue #1680](../../../issues/1680))
-  - adds support for Acaia scales on Windows 11
+  - adds ColorTrack serial and bluetooth support ([Issue #1680](../../../issues/1680))
+  - adds support for [Acaia](https://acaia.co/) scales on Windows 11
   - adds support for [Primo roasting machines](https://artisan-scope.org/machines/primo/)
   - adds [Loring](https://artisan-scope.org/machines/loring/) 'auto' setup which picks up CHARGE and DROP events set at the machine
   - adds control function to [Diedrich DR](https://artisan-scope.org/machines/diedrich/) machine setup and adds [Diedrich CR](https://artisan-scope.org/machines/diedrich/) machine setup
   - adds support for [Phidget Stepper Motor Controllers](https://artisan-scope.org/devices/phidgets/#47-stepper-motor-control) ([Discussion #891](../../../discussions/891) and [PR #1715](../../../pull/1715))
-  - adds option to start the RampSoak timer on PID ON instead on CHARGE ([Discussion #1720](../../../discussions/1720))
 
 * CHANGES
   - automatically start of the scheduler on connected to [artisan.plus](https://artisan.plus) if there are incompleted scheduled items
@@ -29,6 +28,7 @@ v3.0.3
   - upgrades MODBUS communication from sync to async IO
   - limits the visible length of long popup lists in Devices and Statistics Dialog
   - keep Hottop connected after OFF in control mode to prevent the shutdown on disconnect ([Issue #1714](../../../issues/1714))
+  - PID RS time is reset on PID ON not on CHARGE as in previous releases
 
 
 * FIXES
@@ -40,6 +40,8 @@ v3.0.3
   - removes incorrectly reconstructed custom events outside of the CHARGE to DROP period on quitting the designer ([Discussion #1696](../../../discussions/1696))
   - makes validation of numeric configuration input more robust ([Issue #1700](../../../issues/1700))
   - ensures that splitter state in Comparator is properly reset on Factory Reset
+  - fixes issue where on save file a PNG was created instead of an PDF Report if "PDF Report" was selected as type under "Save also" in the autosave dialog ([Issue #1718](../../../issues/1718))
+  - fixes a rare redraw issues on using the zoom function
 
 * REMOVALS
   - support for the image format BMP has been removed

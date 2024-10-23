@@ -23,7 +23,7 @@ from bleak.exc import BleakCharacteristicNotFoundError
 
 from artisanlib.async_comm import AsyncLoopThread
 
-from typing import Optional, Callable, Union, Dict, Set, Tuple, Awaitable, TYPE_CHECKING
+from typing import Optional, Callable, Union, Dict, List, Set, Tuple, Awaitable, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from bleak.backends.device import BLEDevice # pylint: disable=unused-import
@@ -47,7 +47,7 @@ class BLE:
 
     # close() needs to be called on terminating the app to get rid of the singular thread/asyncloop running the bleak scan and connect
     def close(self) -> None:
-        if self._asyncLoopThread is not None:
+        if hasattr(self, '_asyncLoopThread') and self._asyncLoopThread is not None:
             del self._asyncLoopThread
             self._asyncLoopThread = None
 
@@ -122,7 +122,7 @@ class BLE:
 
 ##
     def write(self, client:BleakClient, write_uuid:str, message:bytes, response:bool = False) -> None:
-        if self._asyncLoopThread is not None and client.is_connected:
+        if hasattr(self, '_asyncLoopThread') and self._asyncLoopThread is not None and client.is_connected:
             # NOTE: we don't wait for a result not to block the bleak write loop
             junk_size = 20
             for i in range(0, len(message), junk_size):
@@ -131,15 +131,28 @@ class BLE:
                     client.write_gatt_char(write_uuid, message[i:i+junk_size], response=response),
                     self._asyncLoopThread.loop)
 
+    def read(self, client:BleakClient, read_uuid:str) -> Optional[bytes]:
+        if hasattr(self, '_asyncLoopThread') and self._asyncLoopThread is not None and client.is_connected:
+            fut = asyncio.run_coroutine_threadsafe(
+                    client.read_gatt_char(read_uuid),
+                    self._asyncLoopThread.loop)
+            try:
+                return bytes(fut.result())
+            except Exception: # pylint: disable=broad-except
+                #raise fut.exception() from e # type: ignore[misc]
+                _log.error('exception in read: %s', fut.exception())
+        return None
+
     def scan_and_connect(self,
             device_descriptions: Dict[Optional[str],Optional[Set[str]]],
             blacklist:Set[str], # list of client addresses to ignore as they don't offer the required service
             case_sensitive:bool=True,
             disconnected_callback:Optional[Callable[[BleakClient], None]] = None,
             scan_timeout:float=5,
-            connect_timeout:float=2) -> Tuple[Optional[BleakClient], Optional[str]]:
-        if self._asyncLoopThread is None:
+            connect_timeout:float=3) -> Tuple[Optional[BleakClient], Optional[str]]:
+        if hasattr(self, '_asyncLoopThread') and self._asyncLoopThread is None:
             self._asyncLoopThread = AsyncLoopThread()
+        assert self._asyncLoopThread is not None
         fut = asyncio.run_coroutine_threadsafe(
                 self._scan_and_connect(
                     device_descriptions,
@@ -157,7 +170,7 @@ class BLE:
             return None, None
 
     def disconnect(self, client:'BleakClient') -> bool:
-        if self._asyncLoopThread is not None:
+        if hasattr(self, '_asyncLoopThread') and self._asyncLoopThread is not None:
             fut = asyncio.run_coroutine_threadsafe(client.disconnect(), self._asyncLoopThread.loop)
             try:
                 return fut.result()
@@ -167,7 +180,7 @@ class BLE:
         return False
 
     def start_notify(self, client:BleakClient, uuid:str, callback: 'Callable[[BleakGATTCharacteristic, bytearray], Union[None, Awaitable[None]]]') -> None:
-        if self._asyncLoopThread is not None and client.is_connected:
+        if hasattr(self, '_asyncLoopThread') and self._asyncLoopThread is not None and client.is_connected:
             fut = asyncio.run_coroutine_threadsafe(
                     client.start_notify(uuid, callback),
                     self._asyncLoopThread.loop)
@@ -178,7 +191,7 @@ class BLE:
                 _log.error('exception in start_notify: %s', fut.exception())
 
     def stop_notify(self, client:'BleakClient', uuid:str) -> None:
-        if self._asyncLoopThread is not None and client.is_connected:
+        if hasattr(self, '_asyncLoopThread') and self._asyncLoopThread is not None and client.is_connected:
             fut = asyncio.run_coroutine_threadsafe(
                 client.stop_notify(uuid),
                 self._asyncLoopThread.loop)
@@ -201,7 +214,7 @@ class ClientBLE:
 # NOTE: __slots__ are incompatible with multiple inheritance mixings in subclasses (e.g. with QObject)
 #    __slots__ = [ '_running', '_async_loop_thread', '_ble_client', '_connected_service_uuid', '_disconnected_event',
 #                    '_active_notification_uuids',
-#                    '_device_descriptions', '_notifications', '_writers', '_heartbeat_frequency',
+#                    '_device_descriptions', '_notifications', '_writers', '_readers', '_heartbeat_frequency',
 #                    '_logging'  ]
 
     def __init__(self) -> None:
@@ -216,7 +229,8 @@ class ClientBLE:
         # configuration
         self._device_descriptions:Dict[Optional[str],Optional[Set[str]]] = {}
         self._notifications:Dict[str, Callable[[BleakGATTCharacteristic, bytearray], None]] = {}
-        self._writers:Dict[str, str] = {}
+        self._writers:Dict[str, List[str]] = {} # associates a service UUID with a list of write characteristics
+        self._readers:Dict[str, List[str]] = {} # associates a service UUID with a list of read characteristics
         self._heartbeat_frequency : float = 0 # heartbeat frequency in seconds; heartbeat ends if not positive and >0
         self._logging = False  # if True device communication is logged
 
@@ -260,7 +274,7 @@ class ClientBLE:
 
 
     # connect and re-connect while self._running to BLE
-    async def _connect(self, case_sensitive:bool=True, scan_timeout:float=5, connect_timeout:float=2) -> None:
+    async def _connect(self, case_sensitive:bool=True, scan_timeout:float=5, connect_timeout:float=3) -> None:
         blacklist:Set[str] = set()
         while self._running:
             # scan and connect
@@ -288,7 +302,7 @@ class ClientBLE:
                     # the client does not offer our service thus we put its
                     # address on the blacklist to be ignore on next discover
                     # and disconnect
-                    blacklist.add(self._ble_client.address)
+                    ##blacklist.add(self._ble_client.address) # we don't blacklist as the searched for service might just not yet be discovered
                     self._disconnect()
                     self._ble_client = None
                 else:
@@ -308,14 +322,49 @@ class ClientBLE:
     def disconnected_callback(self, _client:BleakClient) -> None:
         self.stop_notifications()
         self.on_disconnect()
-        if self._async_loop_thread is not None:
+        if hasattr(self, '_async_loop_thread') and self._async_loop_thread is not None:
             asyncio.run_coroutine_threadsafe(self.set_event(), self._async_loop_thread.loop)
 
-    def send(self, message:bytes, response:bool = False) -> None:
+    def send(self, message:bytes, response:bool = False, write_characteristic:Optional[str] = None) -> None:
         if self._ble_client is not None and self._connected_service_uuid is not None and self._connected_service_uuid in self._writers:
             if self._logging:
                 _log.debug('send to %s: %s', self._writers[self._connected_service_uuid], message)
-            ble.write(self._ble_client, self._writers[self._connected_service_uuid], message, response)
+            write_chars = self._writers[self._connected_service_uuid]
+            wc:Optional[str] = None
+            if write_characteristic is None:
+                # if there is no explicit write_characteristic specified thus we write to the only registered as writer
+                if len(write_chars) == 1:
+                    wc = write_chars[0]
+            elif write_characteristic in write_chars:
+                wc = write_characteristic
+            if wc is None:
+                if write_characteristic is None:
+                    _log.debug('send failed. No unique write characteristic registered for service %s', self._connected_service_uuid)
+                else:
+                    _log.debug('send failed. Characteristic %s not registered for write for service %s', write_characteristic, self._connected_service_uuid)
+            else:
+                ble.write(self._ble_client, wc, message, response)
+
+    def read(self, read_characteristic:Optional[str] = None) -> Optional[bytes]:
+        if self._ble_client is not None and self._connected_service_uuid is not None and self._connected_service_uuid in self._readers:
+            if self._logging:
+                _log.debug('receive from %s', self._readers[self._connected_service_uuid])
+            read_chars = self._readers[self._connected_service_uuid]
+            rc:Optional[str] = None
+            if read_characteristic is None:
+                # if there is no explicit read_characteristic specified thus we read from the only registered as reader
+                if len(read_chars) == 1:
+                    rc = read_chars[0]
+            elif read_characteristic in read_chars:
+                rc = read_characteristic
+            if rc is None:
+                if read_characteristic is None:
+                    _log.debug('read failed. No unique read characteristic registered for service %s', self._connected_service_uuid)
+                else:
+                    _log.debug('read failed. Characteristic %s not registered for read for service %s', read_characteristic, self._connected_service_uuid)
+            else:
+                return ble.read(self._ble_client, rc)
+        return None
 
     async def _keep_alive(self) -> None:
         while self._heartbeat_frequency > 0:
@@ -328,13 +377,13 @@ class ClientBLE:
             self._keep_alive())
 
 
-    def start(self, case_sensitive:bool=True, scan_timeout:float=5, connect_timeout:float=4) -> None:
+    def start(self, case_sensitive:bool=True, scan_timeout:float=5, connect_timeout:float=3) -> None:
         _log.debug('start')
         if self._running:
             _log.error('BLE client already running')
         else:
             try:
-                if self._async_loop_thread is None:
+                if not hasattr(self, '_async_loop_thread') or self._async_loop_thread is None:
                     self._running = True # enable automatic reconnects
                     self._async_loop_thread = AsyncLoopThread()
                     # run _connect in async loop
@@ -353,7 +402,7 @@ class ClientBLE:
             if self._ble_client is None:
                 ble.terminate_scan() # we stop ongoing scanning
             self._disconnect()
-            del self._async_loop_thread
+            #del self._async_loop_thread # on this level the released object should be automatically collected by the GC
             self._async_loop_thread = None
             self._ble_client = None
             self._connected_service_uuid = None
@@ -394,7 +443,16 @@ class ClientBLE:
         self._notifications[notify_uuid] = callback
 
     def add_write(self, service_uuid:str, write_uuid:str) -> None:
-        self._writers[service_uuid] = write_uuid
+        if service_uuid in self._writers:
+            self._writers[service_uuid].append(write_uuid)
+        else:
+            self._writers[service_uuid] = [write_uuid]
+
+    def add_read(self, service_uuid:str, read_uuid:str) -> None:
+        if service_uuid in self._readers:
+            self._readers[service_uuid].append(read_uuid)
+        else:
+            self._readers[service_uuid] = [read_uuid]
 
     def set_heartbeat(self, frequency:float) -> None:
         self._heartbeat_frequency = frequency

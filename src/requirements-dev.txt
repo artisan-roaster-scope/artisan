@@ -11,8 +11,8 @@ types-setuptools>=75.1.0.20241014
 types-urllib3>=1.26.25.14
 types-docutils>=0.21.0.20241005
 lxml-stubs>=0.5.1
-mypy==1.12.0
-pyright==1.1.385
+mypy==1.13.0
+pyright==1.1.386
 ruff>=0.7.0
 pylint==3.3.1
 pre-commit>=4.0.1

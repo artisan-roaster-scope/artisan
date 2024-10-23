@@ -30,7 +30,7 @@ from typing import Final, Optional, List, Tuple, Dict, Callable, Union, Any, TYP
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from artisanlib.aillio import AillioR1 # pylint: disable=unused-import
-    from artisanlib.colortrack import ColorTrackBLE # pylint: disable=unused-import
+    from artisanlib.colortrack import ColorTrack, ColorTrackBLE # pylint: disable=unused-import
     import serial # noqa: F401 # pylint: disable=unused-import
     from Phidget22.Phidget import Phidget # type: ignore # pylint: disable=unused-import
     from yoctopuce.yocto_voltageoutput import YVoltageOutput # type: ignore # pylint: disable=unused-import
@@ -249,7 +249,7 @@ class serialport:
         'YOCTOthread','YOCTOvoltageOutputs','YOCTOcurrentOutputs','YOCTOrelays','YOCTOservos','YOCTOpwmOutputs','HH506RAid','MS6514PrevTemp1','MS6514PrevTemp2','DT301PrevTemp','EXTECH755PrevTemp',\
         'controlETpid','readBTpid','useModbusPort','showFujiLCDs','arduinoETChannel','arduinoBTChannel','arduinoATChannel',\
         'ArduinoIsInitialized','ArduinoFILT','HH806Winitflag','R1','devicefunctionlist','externalprogram',\
-        'externaloutprogram','externaloutprogramFlag','PhidgetHUMtemp','PhidgetHUMhum','PhidgetPREpre','TMP1000temp', 'colorTrack']
+        'externaloutprogram','externaloutprogramFlag','PhidgetHUMtemp','PhidgetHUMhum','PhidgetPREpre','TMP1000temp', 'colorTrackSerial', 'colorTrackBT']
 
     def __init__(self, aw:'ApplicationWindow') -> None:
 
@@ -332,7 +332,8 @@ class serialport:
         self.YOCTOservos:List[YServo] = [] # type:ignore[no-any-unimported,unused-ignore]
         self.YOCTOpwmOutputs:List[YPwmOutput] = [] # type:ignore[no-any-unimported,unused-ignore]
 
-        self.colorTrack:Optional[ColorTrackBLE] = None
+        self.colorTrackSerial:Optional[ColorTrack] = None
+        self.colorTrackBT:Optional[ColorTrackBLE] = None
 
         #stores the _id of the meter HH506RA as a string
         self.HH506RAid:str = 'X'
@@ -539,10 +540,11 @@ class serialport:
                                    self.Mugma_SV,             #167
                                    self.PHIDGET_TMP1202,      #168
                                    self.PHIDGET_TMP1202_2,    #169
-                                   self.ColorTrack,           #170
+                                   self.ColorTrackSerial,     #170
                                    self.SantokerR_BTET,       #171
                                    self.Santoker_IB,          #172
-                                   self.Santoker_RR           #173
+                                   self.Santoker_RR,          #173
+                                   self.ColorTrackBT          #174
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -1430,32 +1432,33 @@ class serialport:
         t2,t1 = self.NONEtmp()
         return tx,t2,t1
 
-    def ColorTrack(self) -> Tuple[float,float,float]:
-# serial:
-#        if self.colorTrack is None:
-#            from artisanlib.colortrack import ColorTrack
-#            from artisanlib.types import SerialSettings
-#            colortrack_serial:SerialSettings = {
-#                'port': self.comport,
-#                'baudrate': self.baudrate,
-#                'bytesize': self.bytesize,
-#                'stopbits': self.stopbits,
-#                'parity': self.parity,
-#                'timeout': self.timeout}
-#            self.colorTrack = ColorTrack(serial=colortrack_serial)
-#            self.colorTrack.setLogging(self.aw.qmc.device_logging)
-#            self.colorTrack.start()
-#        tx = self.aw.qmc.timeclock.elapsedMilli()
-#        color = (-1 if self.colorTrack is None else self.colorTrack.getColor())
-#        return tx,color,color
-# BLE test
-        if self.colorTrack is None:
-            from artisanlib.colortrack import ColorTrackBLE
-            self.colorTrack = ColorTrackBLE()
-            if self.colorTrack is not None:
-                self.colorTrack.start()
+    def ColorTrackSerial(self) -> Tuple[float,float,float]:
+        if self.colorTrackSerial is None:
+            from artisanlib.colortrack import ColorTrack
+            from artisanlib.types import SerialSettings
+            colortrack_serial:SerialSettings = {
+                'port': self.comport,
+                'baudrate': self.baudrate,
+                'bytesize': self.bytesize,
+                'stopbits': self.stopbits,
+                'parity': self.parity,
+                'timeout': self.timeout}
+            self.colorTrackSerial = ColorTrack(serial=colortrack_serial)
+            self.colorTrackSerial.setLogging(self.aw.qmc.device_logging)
+            self.colorTrackSerial.start()
         tx = self.aw.qmc.timeclock.elapsedMilli()
-        return tx,-1,-1
+        color = (-1 if self.colorTrackSerial is None else self.colorTrackSerial.getColor())
+        return tx,color,color
+
+    def ColorTrackBT(self) -> Tuple[float,float,float]:
+        if self.colorTrackBT is None:
+            from artisanlib.colortrack import ColorTrackBLE
+            self.colorTrackBT = ColorTrackBLE()
+            if self.colorTrackBT is not None:
+                self.colorTrackBT.start()
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        color = (-1 if self.colorTrackBT is None else self.colorTrackBT.getColor())
+        return tx,color,color
 
     def ARDUINOTC4(self) -> Tuple[float,float,float]:
         self.aw.qmc.extraArduinoTX = self.aw.qmc.timeclock.elapsedMilli()

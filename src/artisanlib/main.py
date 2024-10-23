@@ -12070,6 +12070,20 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.adderror((QApplication.translate('Error Message', 'Error:') + ' parseAutosaveprefix() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         return fn
 
+    def autosave(self, filename:str) -> None:
+        if self.qmc.autosaveimageformat == 'PDF':
+            self.saveVectorGraph(extension='.pdf',fname=filename)
+        elif self.qmc.autosaveimageformat == 'PDF Report' and self.QtWebEngineSupport:
+            self.roastReport(pdf_filename=filename + '.pdf')
+        elif self.qmc.autosaveimageformat == 'SVG':
+            self.saveVectorGraph(extension='.svg',fname=filename)
+        elif self.qmc.autosaveimageformat == 'CSV':
+            self.exportCSV(filename + '.csv')
+        elif self.qmc.autosaveimageformat == 'JSON':
+            self.exportJSON(filename + '.json')
+        else:
+            self.resizeImgToSize(0,0,self.qmc.autosaveimageformat,fname=filename)
+
     #automatation of filename when saving a file through keyboard shortcut. Speeds things up for batch roasting.
     # returns filename on success, None otherwise
     def automaticsave(self, interactive:bool = True) -> Optional[str]:
@@ -12100,27 +12114,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.setCurrentFile(filename_path,self.qmc.autosaveaddtorecentfilesflag)
                     self.qmc.fileCleanSignal.emit()
 
-                    if self.qmc.autosavealsopath != '':
-                        other_filename_path = os.path.join(self.qmc.autosavealsopath,filename)
-                    else:
-                        other_filename_path = os.path.join(self.qmc.autosavepath,filename)
-
                     if self.qmc.autosaveimage and not self.qmc.flagon:
+                        if self.qmc.autosavealsopath != '':
+                            other_filename_path = os.path.join(self.qmc.autosavealsopath,filename)
+                        else:
+                            other_filename_path = os.path.join(self.qmc.autosavepath,filename)
                         if other_filename_path.endswith('.alog'):
                             other_filename_path = other_filename_path[0:-5]
-                        if self.qmc.autosaveimageformat == 'PDF':
-                            self.saveVectorGraph(extension='.pdf',fname=other_filename_path)
-                        elif self.qmc.autosaveimageformat == 'PDF Report' and self.QtWebEngineSupport:
-                            self.roastReport(pdf_filename=other_filename_path + '.pdf')
-                        elif self.qmc.autosaveimageformat == 'SVG':
-                            self.saveVectorGraph(extension='.svg',fname=other_filename_path)
-                        elif self.qmc.autosaveimageformat == 'CSV':
-                            self.exportCSV(other_filename_path + '.csv')
-                        elif self.qmc.autosaveimageformat == 'JSON':
-                            self.exportJSON(other_filename_path + '.json')
-                        else:
-#                            self.resizeImg(0,1,self.qmc.autosaveimageformat,fname=other_filename_path)
-                            self.resizeImgToSize(0,0,self.qmc.autosaveimageformat,fname=other_filename_path)
+                        self.autosave(other_filename_path)
                     #restore dirs
                     QDir.setCurrent(oldDir)
                     # file might be autosaved but not uploaded to plus yet (no DROP registered). This needs to be indicated by a red plus icon
@@ -16150,7 +16151,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     # update plus data set modification date
                     self.qmc.plus_file_last_modified = plus.util.getModificationDate(filename)
 
-                    if self.qmc.autosaveimage:
+                    if self.qmc.autosaveimage and not self.qmc.flagon:
                         #
                         if QFileInfo(filename).suffix() == 'alog':
                             name_also = QFileInfo(filename).completeBaseName()
@@ -16162,16 +16163,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         else:
                             path_also.setPath(QFileInfo(filename).path())
                         filename_also = path_also.absoluteFilePath(name_also)
-                        if self.qmc.autosaveimageformat == 'PDF':
-                            self.saveVectorGraph(extension='.pdf',fname=filename_also)
-                        elif self.qmc.autosaveimageformat == 'SVG':
-                            self.saveVectorGraph(extension='.svg',fname=filename_also)
-                        elif self.qmc.autosaveimageformat == 'CSV':
-                            self.exportCSV(filename_also + '.csv')
-                        elif self.qmc.autosaveimageformat == 'JSON':
-                            self.exportJSON(filename_also + '.json')
-                        else:
-                            self.resizeImgToSize(0,0,self.qmc.autosaveimageformat,fname=filename_also)
+
+                        self.autosave(filename_also)
+
                     return True
                 self.sendmessage(QApplication.translate('Message','Cancelled'))
                 return False
@@ -17304,7 +17298,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             #restore TC4/Arduino PID settings
             settings.beginGroup('ArduinoPID')
             self.pidcontrol.pidOnCHARGE = bool(toBool(settings.value('pidOnCHARGE',self.pidcontrol.pidOnCHARGE)))
-            self.pidcontrol.RStimeAfterCHARGE = bool(toBool(settings.value('RStimeAfterCHARGE',self.pidcontrol.RStimeAfterCHARGE)))
+#            self.pidcontrol.RStimeAfterCHARGE = bool(toBool(settings.value('RStimeAfterCHARGE',self.pidcontrol.RStimeAfterCHARGE)))
             self.pidcontrol.loadpidfrombackground = bool(toBool(settings.value('loadpidfrombackground',self.pidcontrol.loadpidfrombackground)))
             self.pidcontrol.createEvents = bool(toBool(settings.value('createEvents',self.pidcontrol.createEvents)))
             self.pidcontrol.loadRampSoakFromProfile = bool(toBool(settings.value('loadRampSoakFromProfile',self.pidcontrol.loadRampSoakFromProfile)))
@@ -18964,7 +18958,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             #save pid settings (only key and value[0])
             settings.beginGroup('ArduinoPID')
             self.settingsSetValue(settings, default_settings, 'pidOnCHARGE',self.pidcontrol.pidOnCHARGE, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'RStimeAfterCHARGE',self.pidcontrol.RStimeAfterCHARGE, read_defaults)
+#            self.settingsSetValue(settings, default_settings, 'RStimeAfterCHARGE',self.pidcontrol.RStimeAfterCHARGE, read_defaults)
             self.settingsSetValue(settings, default_settings, 'loadpidfrombackground',self.pidcontrol.loadpidfrombackground, read_defaults)
             self.settingsSetValue(settings, default_settings, 'createEvents',self.pidcontrol.createEvents, read_defaults)
             self.settingsSetValue(settings, default_settings, 'loadRampSoakFromProfile',self.pidcontrol.loadRampSoakFromProfile, read_defaults)

@@ -46,6 +46,8 @@ class LiveFilter:
 class LiveLFilter(LiveFilter):
     """Live implementation of digital filter using difference equations.
 
+    (infinite impulse response IIR filter; digitial version can have instabilites)
+
     The following is almost equivalent to calling scipy.lfilter(b, a, xs):
     >>> lfilter = LiveLFilter(b, a)
     >>> [lfilter(x) for x in xs]
@@ -77,6 +79,8 @@ class LiveLFilter(LiveFilter):
 
 class LiveSosFilter(LiveFilter):
     """Live implementation of digital filter with second-order sections.
+
+    (usually to be preferred over lfilter as more stable)
 
     The following is equivalent to calling scipy.sosfilt(sos, xs):
     >>> sosfilter = LiveSosFilter(sos)
@@ -167,7 +171,7 @@ if __name__ == '__main__':
     # define the filters
     from scipy.signal import iirfilter, lfilter, sosfilt # type:ignore[import-untyped]
     #
-    # define lowpass filter with 2.5 Hz cutoff frequency of order 4
+    # define lowpass filter with 2.5 Hz cutoff frequency of order 4 (note: delay increases with order)
     b, a = iirfilter(4, Wn=2.5, fs=fs, btype='low', ftype='butter')
     y_scipy_lfilter = lfilter(b, a, yraw)
 

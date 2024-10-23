@@ -1149,7 +1149,7 @@ class PIDcontrol:
         self.sv:Optional[float] = None # the last sv send to the Arduino
         #
         self.pidOnCHARGE:bool = False
-        self.RStimeAfterCHARGE = True # if True RS time is taken from CHARGE if FALSE it is the time after the PID was last started
+        self.RStimeAfterCHARGE = False # if True RS time is taken from CHARGE if FALSE it is the time after the PID was last started
         self.loadpidfrombackground = False # if True, p-i-d parameters pidKp, pidKi, pidKd, pidSource, pOnE and svLookahead are set from the background profile
         self.createEvents:bool = False
         self.loadRampSoakFromProfile:bool = False
@@ -1359,9 +1359,9 @@ class PIDcontrol:
             # remember current pidSource reading
             self.source_reading_pidON = 0
             if self.pidSource == 1: # we observe the BT
-                self.source_reading_pidON = self.aw.qmc.temp2[-1]
+                self.source_reading_pidON = (self.aw.qmc.temp2[-1] if len(self.aw.qmc.temp2)>0 else 0)
             elif self.pidSource == 2: # we observe the ET
-                self.source_reading_pidON = self.aw.qmc.temp1[-1]
+                self.source_reading_pidON = (self.aw.qmc.temp1[-1] if len(self.aw.qmc.temp1)>0 else 0)
             elif self.pidSource>2: # we observe an extra curve
                 n = self.pidSource-3
                 c = n // 2
@@ -1370,7 +1370,7 @@ class PIDcontrol:
                 else:
                     tempX = self.aw.qmc.extratemp2 if self.aw.qmc.flagstart else self.aw.qmc.on_extratemp2
                 if len(tempX)>c:
-                    self.source_reading_pidON = tempX[c][-1]
+                    self.source_reading_pidON = (tempX[c][-1] if len(tempX[c])>0 else 0)
 
 
     # the internal software PID should be configured on ON, but not be activated yet to warm it up

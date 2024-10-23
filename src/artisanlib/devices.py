@@ -3272,7 +3272,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ####  DEVICE 169 is +TMP1202_2 (a second TMP1202 configuration)
                 ##########################
                 ##########################
-                ####  DEVICE 170 is +ColorTrack
+                ####  DEVICE 170 is ColorTrack Serial
+                elif meter == 'ColorTrack Serial':
+                    self.aw.qmc.device = 170
+                    message = QApplication.translate('Message','Device set to {0}').format(meter)
                 ##########################
                 ##########################
                 ####  DEVICE 171 is Santoker BT/ET
@@ -3285,6 +3288,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ##########################
                 ####  DEVICE 173 is +Santoker DelatBT/DeltaET  but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                ####  DEVICE 174 is ColorTrack BT
+                elif meter == 'ColorTrack BT':
+                    self.aw.qmc.device = 174
+                    message = QApplication.translate('Message','Device set to {0}').format(meter)
                 ##########################
 
 
@@ -3479,7 +3488,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 3, # 170
                 1, # 171
                 1, # 172
-                1  # 173
+                1, # 173
+                1  # 174
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):

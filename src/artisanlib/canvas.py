@@ -893,10 +893,11 @@ class tgraphcanvas(FigureCanvas):
                        '+Mugma SV',                 #167
                        'Phidget TMP1202 1xRTD A',   #168
                        '+Phidget TMP1202 1xRTD B',  #169
-                       '+ColorTrack',               #170
+                       'ColorTrack Serial',         #170
                        'Santoker R BT/ET',          #171
                        '+Santoker IR/Board',        #172
-                       '+Santoker DelatBT/DeltaET'  #173
+                       '+Santoker DelatBT/DeltaET', #173
+                       'ColorTrack BT'              #174
                        ]
 
         # ADD DEVICE:
@@ -961,7 +962,8 @@ class tgraphcanvas(FigureCanvas):
             138, # Kaleido BT/ET
             142, # IKAWA,
             164, # Mugma BT/ET
-            171  # Santoker R BT/ET
+            171, # Santoker R BT/ET
+            174  # ColorTrack BT
         ]
 
         # ADD DEVICE:
@@ -1033,8 +1035,9 @@ class tgraphcanvas(FigureCanvas):
             160, # IKAWA \Delta Humidity / \Delat Humidity direction
             165, # +Mugma Heater/Fan
             166, # +Mugma Heater/Catalyzer
-            170, # +ColorTrack
-            173  # +Santoker BT RoR / ET RoR
+            170, # ColorTrack Serial
+            173, # +Santoker BT RoR / ET RoR
+            174  # ColorTrack BT
         ]
 
         # ADD DEVICE:
@@ -1859,7 +1862,7 @@ class tgraphcanvas(FigureCanvas):
         self.autosaveimage:bool = False # if true save an image along alog files
 
         self.autoasaveimageformat_types:List[str] = ['PDF', 'PDF Report', 'SVG', 'PNG', 'JPEG', 'CSV', 'JSON']
-        self.autosaveimageformat:str = 'PDF' # one of the supported image file formats PDF, SVG, PNG, JPEG, CSV, JSON
+        self.autosaveimageformat:str = 'PDF' # one of the supported image file formats PDF, PDF Report, SVG, PNG, JPEG, CSV, JSON
 
         #used to place correct height of text to avoid placing text over text (annotations)
         self.ystep_down:int = 0
@@ -12418,9 +12421,15 @@ class tgraphcanvas(FigureCanvas):
         try:
             self.samplingSemaphore.acquire(1)
 
-            if ser.colorTrack is not None:
-                ser.colorTrack.stop()
-                ser.colorTrack = None
+            if ser.colorTrackBT is not None:
+                ser.colorTrackBT.stop()
+                libtime.sleep(0.05)
+                ser.colorTrackBT = None
+
+            if ser.colorTrackSerial is not None:
+                ser.colorTrackSerial.stop()
+                libtime.sleep(0.05)
+                ser.colorTrackSerial = None
 
             # close main serial port
             try:
