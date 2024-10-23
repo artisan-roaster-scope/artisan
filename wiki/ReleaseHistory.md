@@ -12,7 +12,7 @@ v3.0.3
 
 * NEW HARDWARE SUPPORT
   - adds support for various newer [Santoker machines](https://artisan-scope.org/machines/santoker/) communicating via Bluetooth like the Cube10, the Bluetooth enabled X, Q and R Master Series as well as the R Series machines ([Issue #1088](../../../issues/1088) and [Issue #1702](../../../issues/1702))
-  - adds ColorTrack serial and bluetooth support ([Issue #1680](../../../issues/1680))
+  - adds [ColorTrack](https://www.color-track.com/) serial and bluetooth support ([Issue #1680](../../../issues/1680))
   - adds support for [Acaia](https://acaia.co/) scales on Windows 11
   - adds support for [Primo roasting machines](https://artisan-scope.org/machines/primo/)
   - adds [Loring](https://artisan-scope.org/machines/loring/) 'auto' setup which picks up CHARGE and DROP events set at the machine
@@ -20,7 +20,7 @@ v3.0.3
   - adds support for [Phidget Stepper Motor Controllers](https://artisan-scope.org/devices/phidgets/#47-stepper-motor-control) ([Discussion #891](../../../discussions/891) and [PR #1715](../../../pull/1715))
 
 * CHANGES
-  - automatically start of the scheduler on connected to [artisan.plus](https://artisan.plus) if there are incompleted scheduled items
+  - automatically start of the scheduler while connected to [artisan.plus](https://artisan.plus) if there are incompleted scheduled items
   - disable items in coffee popups of the Custom Blend dialog without stock in the selected store or, if no store is selected, without stock in every store
   - reduces the size of builds by removing unnecessary files
   - removes the optional delay on reads from serial MODBUS
