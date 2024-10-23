@@ -46,7 +46,7 @@ class LiveFilter:
 class LiveLFilter(LiveFilter):
     """Live implementation of digital filter using difference equations.
 
-    (infinite impulse response IIR filter; digitial version can have instabilites)
+    (infinite impulse response IIR filter; digital version can have instabilites)
 
     The following is almost equivalent to calling scipy.lfilter(b, a, xs):
     >>> lfilter = LiveLFilter(b, a)
