@@ -1347,11 +1347,11 @@ class PIDcontrol:
             self.svTriggeredAlarms = [False]*self.svLen
 
             if self.aw.qmc.flagstart:
-                self.time_pidON = (self.aw.qmc.timex[-1] if len(self.aw.qmc.timex[-1])>0 else 0)
+                self.time_pidON = (self.aw.qmc.timex[-1] if len(self.aw.qmc.timex)>0 else 0)
             elif len(self.aw.qmc.on_timex)<1:
                 self.time_pidON = 0
             else:
-                self.time_pidON = (self.aw.qmc.on_timex[-1] if len(self.aw.qmc.on_timex[-1])>0 else 0)
+                self.time_pidON = (self.aw.qmc.on_timex[-1] if len(self.aw.qmc.on_timex)>0 else 0)
                 if self.svMode == 1:
                     # turn the timer LCD color blue if in RS mode and not recording
                     self.aw.setTimerColor('rstimer')
