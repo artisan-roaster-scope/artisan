@@ -9,6 +9,7 @@ v3.0.3
 * ADDITIONS
   - adds symbolic expression `bit(n,x)` which returns the n-th bit of x interpreted as integer
   - adds (total) correction to cup profiles and enables column drag-and-drop ([Discussion #1690](../../../discussions/1690))
+  - adds option to manually add a roast to an open schedule item assigned by [artisan.plus](https://artisan.plus)
 
 * NEW HARDWARE SUPPORT
   - adds support for various newer [Santoker machines](https://artisan-scope.org/machines/santoker/) communicating via Bluetooth like the Cube10, the Bluetooth enabled X, Q and R Master Series as well as the R Series machines ([Issue #1088](../../../issues/1088) and [Issue #1702](../../../issues/1702))
@@ -36,7 +37,7 @@ v3.0.3
   - fixes regression which broke SV number switching for Fuji PIDs ([Discussion #1683](../../../discussions/1683))
   - fixes missing statistic content ([Discussion #1689](../../../discussions/1689))
   - fixes a regression which prevented loading settings written (slightly broken) by Artisan v3.0 ([Discussion #1692](../../../discussions/1692))
-  - fixes a regression communicating with some serial MODBUS devices resulting from a more strict protocol interpretation by the underlying MODBUS pymodbus lib 3.7 introduced in Artisan v3.0.2, by adding a 'strict' flag (default off) to the serial MODBUS configuration ([Issue #1694](../../../issues/1694))
+  - fixes a regression communicating with some serial MODBUS devices resulting from a more strict protocol interpretation by the underlying MODBUS pymodbus lib 3.7 introduced in Artisan v3.0.2 ([Issue #1694](../../../issues/1694))
   - removes incorrectly reconstructed custom events outside of the CHARGE to DROP period on quitting the designer ([Discussion #1696](../../../discussions/1696))
   - makes validation of numeric configuration input more robust ([Issue #1700](../../../issues/1700))
   - ensures that splitter state in Comparator is properly reset on Factory Reset

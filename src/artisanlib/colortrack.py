@@ -27,7 +27,7 @@ try:
 except ImportError:
     from PyQt5.QtCore import QRegularExpression # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
-from typing import Final, Optional, Callable, TYPE_CHECKING
+from typing import Final, Optional, Callable, Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from PyQt6.QtCore import QRegularExpressionMatch # pylint: disable=unused-import
@@ -142,8 +142,9 @@ class ColorTrackBLE(ClientBLE):
 
         # weights for averaging (length 40) # ColorTrack sends about 65 laser readings per second
         self._weights:Final[npt.NDArray[np.float64]] = np.array(range(1, 40))
-        # received but not yet consumed readings
+        # received but not yet consumed readings (mapped)
         self._received_readings:npt.NDArray[np.float64] = np.array([])
+        self._received_raw_readings:npt.NDArray[np.float64] = np.array([])
 
 
     def map_reading(self, r:int) -> float:
@@ -156,22 +157,31 @@ class ColorTrackBLE(ClientBLE):
         if self._logging:
             _log.info('register_reading: %s',value)
 
-    def getColor(self) -> float:
+    def register_raw_reading(self, value:float) -> None:
+        self._received_raw_readings = np.append(self._received_raw_readings, value)
+
+    # second result is the raw average
+    def getColor(self) -> Tuple[float, float]:
         read_res = self.read(self.COLORTRACK_READ_NOTIFY_LASER_UUID)
         _log.info('PRINT getLaser: %s',read_res)
         try:
             number_of_readings = len(self._received_readings)
+            number_of_raw_readings = len(self._received_raw_readings)
             if number_of_readings == 1:
-                return float(self._received_readings[0])
+                return float(self._received_readings[0]), (float(self._received_raw_readings[0]) if number_of_raw_readings==1 else -1)
             if number_of_readings > 1:
                 # consume and average the readings
                 l = min(len(self._weights), number_of_readings)
                 res:float = float(np.average(self._received_readings[-l:], weights=self._weights[-l:]))
                 self._received_readings = np.array([])
-                return res
+                # raw
+                l_raw = min(len(self._weights), number_of_raw_readings)
+                res_raw:float = float(np.average(self._received_raw_readings[-l_raw:], weights=self._weights[-l_raw:]))
+                self._received_raw_readings = np.array([])
+                return res, res_raw
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-        return -1
+        return -1, -1
 
     # every second reading is the sync character 36
     # returns readings as bytes extracted from the given payload. If the payload is not valid the result is empty.
@@ -189,6 +199,7 @@ class ColorTrackBLE(ClientBLE):
     def notify_laser_callback(self, _sender:'BleakGATTCharacteristic', payload:bytearray) -> None:
         for r in self.validate_data(payload):
             self.register_reading(self.map_reading(r))
+            self.register_raw_reading(r)
 
     @staticmethod
     def notify_temp_hum_callback(_sender:'BleakGATTCharacteristic', payload:bytearray) -> None:

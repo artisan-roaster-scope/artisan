@@ -329,8 +329,8 @@ def addRoRTemp2dict(dict_source:Union['ProfileData', 'ComputedProfileInformation
 
 # returns extends dict_target by item with key_target holding the
 # dict_source[key_source] value if key_source in dict_source and not empty
-def add2dict(dict_source:'ProfileData', key_source:str, dict_target:Dict[str, Any], key_target:str) -> None:
-    if key_source in dict_source and dict_source[key_source]:  # type:ignore # TypedDict key must be a string literal; expected one of
+def add2dict(dict_source:'ProfileData', key_source:str, dict_target:Dict[str, Any], key_target:str, if_non_empty:bool = True) -> None:
+    if key_source in dict_source and (not if_non_empty or dict_source[key_source]):  # type:ignore # TypedDict key must be a string literal; expected one of
         dict_target[key_target] = dict_source[key_source]  # type:ignore # TypedDict key must be a string literal; expected one of
 
 

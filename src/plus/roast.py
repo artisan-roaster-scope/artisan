@@ -118,8 +118,8 @@ def getTemplate(bp: 'ProfileData', background:bool=False) -> Dict[str, Any]:  #f
                 _log.exception(e)
 
         util.add2dict(bp, config.uuid_tag, d, 'id')                   # roast UUID
-        util.add2dict(bp, config.schedule_uuid_tag, d, 's_item_id')   # ScheduleItem UUID
-        util.add2dict(bp, config.schedule_date_tag, d, 's_item_date') # ScheduleItem date
+        util.add2dict(bp, config.schedule_uuid_tag, d, 's_item_id', if_non_empty=False)   # ScheduleItem UUID (add also also if None!)
+        util.add2dict(bp, config.schedule_date_tag, d, 's_item_date', if_non_empty=False) # ScheduleItem date (added to speed up search on server side; also if None)
 
         try:
             util.addNum2dict(bp, 'moisture_roasted', d, 'moisture', 0, 100, 1)
@@ -479,13 +479,15 @@ sync_record_empty_string_supressed_attributes: List[str] = [  #for Python >= 3.9
     'cupping_notes',
 ]
 
+# those will always be send by Artisan also if None or 0:
 sync_record_non_supressed_attributes: List[str] = [  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
     'roast_id',
-    'location',
-    'coffee',
-    'blend',
-    'amount',
-    'end_weight',
+    'location',   # default None
+    'coffee',     # default None
+    'blend',      # default None
+    'amount',     # default 0
+    'end_weight', # default 0
+    's_item_id',  # default None
 ]
 
 # all roast record attributes that participate in the sync process

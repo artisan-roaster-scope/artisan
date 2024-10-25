@@ -437,6 +437,7 @@ def getApplidedServerUpdatesModifiedAt() -> Optional[float]:
 
 # the values of "syncable" properties in data are applied to the apps
 # variables directly
+# NOTE: server returns always all values of the SyncRecord, but suppresses NULL values
 def applyServerUpdates(data:Dict[str, Any]) -> None:
     dirty = False
     title_changed = False
@@ -530,58 +531,71 @@ def applyServerUpdates(data:Dict[str, Any]) -> None:
                 ):
                     aw.qmc.plus_store_label = data['location']['label']
                     dirty = True
-            if 'coffee' in data and data['coffee'] is not None:
-                if (
-                    'hr_id' in data['coffee']
-                    and data['coffee']['hr_id'] != aw.qmc.plus_coffee
-                ):
-                    aw.qmc.plus_coffee = data['coffee']['hr_id']
-                    dirty = True
-                if (
-                    'label' in data['coffee']
-                    and data['coffee']['label'] != aw.qmc.plus_coffee_label
-                ):
-                    aw.qmc.plus_coffee_label = data['coffee']['label']
+            if 'coffee' in data:
+                if data['coffee'] is not None:
+                    if (
+                        'hr_id' in data['coffee']
+                        and data['coffee']['hr_id'] != aw.qmc.plus_coffee
+                    ):
+                        aw.qmc.plus_coffee = data['coffee']['hr_id']
+                        dirty = True
+                    if (
+                        'label' in data['coffee']
+                        and data['coffee']['label'] != aw.qmc.plus_coffee_label
+                    ):
+                        aw.qmc.plus_coffee_label = data['coffee']['label']
+                        dirty = True
+                elif aw.qmc.plus_coffee is not None: # and we know here that data['coffee'] is None
+                    aw.qmc.plus_coffee = None
                     dirty = True
                 if aw.qmc.plus_coffee is not None:
                     aw.qmc.plus_blend_label = None
                     aw.qmc.plus_blend_spec = None
                     aw.qmc.plus_blend_spec_labels = None
-            if (
-                'blend' in data
-                and data['blend'] is not None
-                and 'label' in data['blend']
-                and 'ingredients' in data['blend']
-                and data['blend']['ingredients']
-            ):
-                try:
-                    ingredients:List[stock.BlendIngredient] = []
-                    for i in data['blend']['ingredients']:
-                        entry:stock.BlendIngredient = {
-                            'ratio': i['ratio'],
-                            'coffee': i['coffee']['hr_id']}
-                        # just the hr_id as a string and not the full object
-                        if 'ratio_num' in i and i['ratio_num'] is not None:
-                            entry['ratio_num'] = i['ratio_num']
-                        if 'ratio_denom' in i and i['ratio_denom'] is not None:
-                            entry['ratio_denom'] = i['ratio_denom']
-                        ingredients.append(entry)
-                    blend_spec:stock.Blend = {
-                        'label': data['blend']['label'],
-                        'ingredients': ingredients,
-                    }
-                    blend_spec_labels = [
-                        i['coffee']['label'] for i in data['blend']['ingredients']
-                    ]
-                    aw.qmc.plus_blend_spec = blend_spec
-                    aw.qmc.plus_blend_spec_labels = blend_spec_labels
+            elif aw.qmc.plus_coffee is not None: # data['coffee'] is implicit None
+                aw.qmc.plus_coffee = None
+                dirty = True
+            if 'blend' in data:
+                if (data['blend'] is not None
+                    and 'label' in data['blend']
+                    and 'ingredients' in data['blend']
+                    and data['blend']['ingredients']
+                ):
+                    try:
+                        ingredients:List[stock.BlendIngredient] = []
+                        for i in data['blend']['ingredients']:
+                            entry:stock.BlendIngredient = {
+                                'ratio': i['ratio'],
+                                'coffee': i['coffee']['hr_id']}
+                            # just the hr_id as a string and not the full object
+                            if 'ratio_num' in i and i['ratio_num'] is not None:
+                                entry['ratio_num'] = i['ratio_num']
+                            if 'ratio_denom' in i and i['ratio_denom'] is not None:
+                                entry['ratio_denom'] = i['ratio_denom']
+                            ingredients.append(entry)
+                        blend_spec:stock.Blend = {
+                            'label': data['blend']['label'],
+                            'ingredients': ingredients,
+                        }
+                        blend_spec_labels = [
+                            i['coffee']['label'] for i in data['blend']['ingredients']
+                        ]
+                        aw.qmc.plus_blend_spec = blend_spec
+                        aw.qmc.plus_blend_spec_labels = blend_spec_labels
+                        dirty = True
+                    except Exception as e:  # pylint: disable=broad-except
+                        _log.exception(e)
+                    if aw.qmc.plus_blend_spec is not None:
+                        aw.qmc.plus_coffee = None
+                        aw.qmc.plus_coffee_label = None
+                elif data['blend'] is None and aw.qmc.plus_coffee is not None:
+                    aw.qmc.plus_blend_spec = None
+                    aw.qmc.plus_blend_spec_labels = None
                     dirty = True
-                except Exception as e:  # pylint: disable=broad-except
-                    _log.exception(e)
-                if aw.qmc.plus_blend_spec is not None:
-                    aw.qmc.plus_coffee = None
-                    aw.qmc.plus_coffee_label = None
-
+            elif aw.qmc.plus_blend_spec is not None: # data['blend'] is implicit None
+                aw.qmc.plus_blend_spec = None
+                aw.qmc.plus_blend_spec_labels = None
+                dirty = True
             # ensure that location is None if neither coffee nor blend is set
             if (
                 aw.qmc.plus_coffee is None
@@ -589,6 +603,30 @@ def applyServerUpdates(data:Dict[str, Any]) -> None:
                 and aw.qmc.plus_store is not None
             ):
                 aw.qmc.plus_store = None
+
+            if 's_item_id' in data:
+                if data['s_item_id'] is not None:
+                    if data['s_item_id'] != aw.qmc.scheduleID:
+                        aw.qmc.scheduleID = data['s_item_id']
+                        dirty = True
+                elif aw.qmc.scheduleID is not None:
+                    aw.qmc.scheduleID = None
+                    aw.qmc.scheduleDate = None
+                    dirty = True
+            elif aw.qmc.scheduleID is not None: # data['s_item_id'] is implicit None
+                aw.qmc.scheduleID = None
+                aw.qmc.scheduleDate = None
+                dirty = True
+# s_item_date is not stored by the server and thus never returned
+#            if 's_item_date' in data:
+#                if data['s_item_date'] is not None:
+#                    if data['s_item_date'] != aw.qmc.scheduleDate:
+#                        aw.qmc.scheduleDate = data['s_item_date']
+#                        dirty = True
+#                elif aw.qmc.scheduleDate is not None:
+#                    aw.qmc.scheduleDate = None
+#                    dirty = True
+
             if 'color_system' in data:
                 if data['color_system'] != aw.qmc.color_systems[aw.qmc.color_system_idx]:
                     try:

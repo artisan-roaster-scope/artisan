@@ -227,7 +227,7 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                     if success:
                         config.connected = success
                         config.app_window.sendmessageSignal.emit(
-                            f'{config.app_window.plus_account} {QApplication.translate("Plus", "authentified")}',
+                            f'{config.app_window.plus_account} {QApplication.translate('Plus', 'authentified')}',
                             True,
                             None,
                         )  # @UndefinedVariable
@@ -400,7 +400,7 @@ def reconnected() -> None:
             queue.start()  # restart the outbox queue
 
 
-# if on and synced, computes the sync record hash, updates the
+# if plus is ON and synced, computes the sync record hash, updates the
 # sync record cache and returns the sync record hash
 # otherwise return None
 # this function is called by filesave() and returns the sync_record hash

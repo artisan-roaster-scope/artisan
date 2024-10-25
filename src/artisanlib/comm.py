@@ -1457,8 +1457,10 @@ class serialport:
             if self.colorTrackBT is not None:
                 self.colorTrackBT.start()
         tx = self.aw.qmc.timeclock.elapsedMilli()
-        color = (-1 if self.colorTrackBT is None else self.colorTrackBT.getColor())
-        return tx,color,color
+        ct_color, ct_raw_color = self.colorTrackBT.getColor()
+        color = (-1 if self.colorTrackBT is None else ct_color)
+        raw_color = (-1 if self.colorTrackBT is None else ct_raw_color)
+        return tx,color,raw_color
 
     def ARDUINOTC4(self) -> Tuple[float,float,float]:
         self.aw.qmc.extraArduinoTX = self.aw.qmc.timeclock.elapsedMilli()

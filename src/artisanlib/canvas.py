@@ -1466,7 +1466,7 @@ class tgraphcanvas(FigureCanvas):
         # profile UUID
         self.roastUUID:Optional[str] = None
         self.scheduleID:Optional[str] = None
-        self.scheduleDate:Optional[str] = None
+        self.scheduleDate:Optional[str] = None # not stored on server and thus might be None while scheduleID is not None (in case scheduleID got set on server side)
 
 #PLUS
         # the default store selected by the user (save in the  app settings)
