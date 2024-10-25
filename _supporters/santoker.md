@@ -15,21 +15,21 @@ sidebar:
 * __Producer:__ [Santoker](){:target="_blank"}, China
 
 * __Machine Setups:__ 
-  - __`1xPXR`, `2xPXF`, `2xPXR`__
+  - __1xPXR, 2xPXF, 2xPXR__  
   machines with one or two Fuji PXR/PXG PIDs
-  - __`R Series USB`__  
+  - __R Series USB__  
   R Series machines with USB connection
-  - __`R Series Bluetooth`__  
+  - __R Series Bluetooth__  
   R Series machines with Bluetooth
-  - __`R Master Series WiFi`__  
+  - __R Master Series WiFi__  
   R Master Series machines with WiFi (before 10/2023)
-  - __`R Master Series Bluetooth`__  
+  - __R Master Series Bluetooth__  
   R Master Series machines with Bluetooth (after 10/2023)
-  - __`Q + X Series WiFi`__  
+  - __Q + X Series WiFi__  
   Q and X Series machines with WiFi (before 10/2023)
-  - __`Q + X Series Bluetooth`__  
+  - __Q + X Series Bluetooth__  
   Q and X Series machines with Bluetooth (after 10/2023)
-  - __`Cube Bluetooth`__  
+  - __Cube Bluetooth__  
   Cube10 machines
 
 * __Connection:__ 
