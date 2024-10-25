@@ -20,17 +20,17 @@ sidebar:
   - `R Series USB`  
   R Series machines with USB connection
   - `R Series Bluetooth`  
-  R Series with Bluetooth
+  R Series machines with Bluetooth
   - `R Master Series WiFi`  
-  R Master Series with WiFi (before 10/2023)
+  R Master Series machines with WiFi (before 10/2023)
   - `R Master Series Bluetooth`  
-  R Master Series with Bluetooth (after 10/2023)
+  R Master Series machines with Bluetooth (after 10/2023)
   - `Q + X Series WiFi`  
-  Q and X Series with WiFi (before 10/2023)
+  Q and X Series machines with WiFi (before 10/2023)
   - `Q + X Series Bluetooth`  
-  Q and X Series with Bluetooth (after 10/2023)
+  Q and X Series machines with Bluetooth (after 10/2023)
   - `Cube Bluetooth`  
-  Cube10
+  Cube10 machines
 
 * __Connection:__ 
   - Fuji based machines use MODBUS RTU via USB; requires the installation of a [serial driver](/modbus_serial/)
