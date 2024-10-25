@@ -12,9 +12,10 @@ sidebar:
 ---
 <img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
 
-* __Producer:__ [Santoker](){:target="_blank"}, China
+* __Producer__  
+  [Santoker](){:target="_blank"}, China
 
-* __Machine Setups:__ 
+* __Machine Setups__ 
   - __1xPXR, 2xPXF, 2xPXR__  
   machines with one or two Fuji PXR/PXG PIDs
   - __R Series USB__  
@@ -32,11 +33,11 @@ sidebar:
   - __Cube Bluetooth__  
   Cube10 machines
 
-* __Connection:__ 
+* __Connection__ 
   - Fuji based machines use MODBUS RTU via USB; requires the installation of a [serial driver](/modbus_serial/)
   - R Series connect via USB; requires the installation of a [serial driver](/modbus_serial/)
   - Q and X Series as well as the R Master Series machines connect via WiFi or Bluetooth
   - the Cube connects via Bluetooth
-* __Features:__ 
+* __Features__ 
   - logging of bean temperature (BT), environmental temperature (ET) and in some cases a third temperature
   - logging and control of fan and power for the Q and X Series, the Cube as well as the R Master Series models. The later allows to log the drum speed as well.
