@@ -227,7 +227,7 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                     if success:
                         config.connected = success
                         config.app_window.sendmessageSignal.emit(
-                            f'{config.app_window.plus_account} {QApplication.translate('Plus', 'authentified')}',
+                            f"{config.app_window.plus_account} {QApplication.translate('Plus', 'authentified')}",
                             True,
                             None,
                         )  # @UndefinedVariable
