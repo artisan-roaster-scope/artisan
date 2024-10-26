@@ -6,6 +6,10 @@ dropDuplicates=true
 [Units]
 weight=g
 
+[events]
+eventsGraphflag=4
+default_etypes_set=1, 0, 0, 1, 0
+
 [ArduinoPID]
 dutyMax=100
 dutyMin=-100
@@ -93,7 +97,7 @@ extraeventsactions=10, 10, 0, 10, 10, 0, 10, 10, 0, 9, 9, 0, 8, 8
 extraeventsactionstrings=motor(1), motor(0), , solenoid(1), solenoid(0), , stirrer(1), stirrer(0), , , , , , 
 extraeventsbuttonsflags=1, 1, 1
 extraeventsdescriptions=Motor On, Motor Off, , Door Open, Door Close, , Stirrer On, Stirrer Off, , , , , , 
-extraeventslabels=MOTOR\n\\1, MOTOR\n\\0, E, DOOR\n\\o, DOOR\n\\c, E, STIRRER\n\\1, STIRRER\n\\0, E, \\t\n+10, \\t\n-10, E, \\t\n+10, \\t\n-10
+extraeventslabels=MOTOR\n\\1, MOTOR\n\\0, E, \\b\n\\o, \\b\n\\c, E, \\i\n\\1, \\i\n\\0, E, \\t\n+10, \\t\n-10, E, \\t\n+10, \\t\n-10
 extraeventstypes=4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 4, 8, 8
 extraeventsvalues=1, 1, 0, 1, 1, 0, 1, 1, 0, 2, -2, 0, 2, -2
 extraeventsvisibility=1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1

@@ -12934,6 +12934,24 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             _,_,auc,_ = self.ts(tp=None,background=True)
         return auc
 
+    # returns a list of strings of length 5 containing the etype names with the default etype names translated
+    # to the current selected language
+    # If missing, current etypes are used. Empty entries are replaced by their defaults translated using the current locale
+    def get_profile_etypes(self, profile:'ProfileData') -> List[str]:
+        res:List[str] = ([decodeLocalStrict(et) for et in profile['etypes']] if 'etypes' in profile else self.qmc.etypes)[:5]
+        # if to short we extend by current etypes
+        res = res + self.qmc.etypes[len(res):]
+        # apply etypes default to get their translations right
+        if len(res) == 5 and 'default_etypes' in profile:
+            default_etypes = profile['default_etypes'][:5]
+            default_etypes = default_etypes + [True, True, True, True, True][len(default_etypes):]
+            default_etypes_set = profile.get('default_etypes_set', [0,0,0,0,0])[:5]
+            default_etypes_set = default_etypes_set + [0, 0, 0, 0, 0][len(default_etypes_set):]
+            for i, _ in enumerate(res):
+                if default_etypes[i]:
+                    res[i] = self.qmc.get_etype_default(i, default_etypes_set)
+        return res
+
     # Loads background profile
     # NOTE: this does NOT set the self.qmc.background flag to make the loaded background visible.
     def loadbackground(self, filename:str) -> None:
@@ -13084,12 +13102,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         self.qmc.backgroundFlavors[i] *= 10.
                     self.qmc.backgroundFlavors = self.qmc.backgroundFlavors[:(l-1)]
                 if 'etypes' in profile:
-                    self.qmc.Betypes = [decodeLocalStrict(x) for x in profile['etypes']]
-                    if 'default_etypes' in profile:
-                        default_etypes = profile['default_etypes']
-                        for i, _ in enumerate(self.qmc.Betypes):
-                            if default_etypes[i]:
-                                self.qmc.Betypes[i] = self.qmc.etypesdefault[i]
+                    self.qmc.Betypes = self.get_profile_etypes(self.qmc.backgroundprofile)
                 if 'timeindex' in profile:
                     self.qmc.timeindexB = [max(0,v) if i>0 else max(-1,v) for i,v in enumerate(profile['timeindex'])]          #if new profile found with variable timeindex
                     if self.qmc.phasesfromBackgroundflag:
@@ -14295,6 +14308,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 'extramarkers2'          : self.qmc.extramarkers2,
                 'extramarkersizes1'      : self.qmc.extramarkersizes1,
                 'extramarkersizes2'      : self.qmc.extramarkersizes2,
+                'default_etypes_set'     : self.qmc.default_etypes_set,
                 'etypes'                 : self.qmc.etypes
                 }
 
@@ -14325,6 +14339,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.extramarkers2        = self.org_extradevicesettings['extramarkers2']
             self.qmc.extramarkersizes1    = self.org_extradevicesettings['extramarkersizes1']
             self.qmc.extramarkersizes2    = self.org_extradevicesettings['extramarkersizes2']
+            self.qmc.default_etypes_set   = self.org_extradevicesettings['default_etypes_set']
             self.qmc.etypes               = self.org_extradevicesettings['etypes']
             self.updateExtradeviceSettings()
 
@@ -14469,6 +14484,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
                     #save custom event names
                     settings.beginGroup('events')
+                    settings.setValue('default_etypes_set',self.qmc.default_etypes_set)
                     settings.setValue('etypes',self.qmc.etypes)
                     settings.endGroup()
             except Exception as e: # pylint: disable=broad-except
@@ -14568,6 +14584,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     settings.endGroup()
 
                     settings.beginGroup('events')
+                    self.qmc.default_etypes_set = [toInt(x) for x in toList(settings.value('default_etypes_set',self.qmc.default_etypes_set))]
                     self.qmc.etypes = toStringList(settings.value('etypes',self.qmc.etypes))
                     settings.endGroup()
                     # now remove the settings file
@@ -14604,15 +14621,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     def setProfile(self, filename:Optional[str], profile:'ProfileData', quiet:bool = False, reset:bool = True) -> bool: # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths
         try:
             updateRender = False
-            # if missing, current etypes are used. Empty entries are replaced by their defaults translated using the current locale
-            profile_etypes = ([decodeLocalStrict(x) for x in profile['etypes']] if 'etypes' in profile else self.qmc.etypes)[:5] # if too long we cut
-            profile_etypes = profile_etypes + self.qmc.etypes[len(profile_etypes):] # if to short we extend by current etypes
-            if 'default_etypes' in profile:
-                default_etypes = profile['default_etypes'][:5]
-                default_etypes = default_etypes + [True, True, True, True, True][len(default_etypes):]
-                for i, _ in enumerate(profile_etypes):
-                    if default_etypes[i]:
-                        profile_etypes[i] = self.qmc.etypesdefault[i]
+            profile_etypes = self.get_profile_etypes(profile)
             #extra devices load and check
             if profile and 'extratimex' in profile:
                 if 'extradevices' in profile:
@@ -15057,6 +15066,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.specialeventsStrings = []
             self.consolidateSpecialEvents() # we ensure that all 4 lists holding the special events are of equal length
 
+            if 'default_etypes_set' in profile:
+                self.qmc.default_etypes_set = profile['default_etypes_set']
             if 'etypes' in profile:
                 self.qmc.etypes = profile_etypes
 
@@ -15939,6 +15950,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             profile['specialeventsvalue'] = self.qmc.specialeventsvalue
             profile['specialeventsStrings'] = [encodeLocalStrict(ses) for ses in self.qmc.specialeventsStrings]
             profile['default_etypes'] = [item == self.qmc.etypesdefault[i] for i, item in enumerate(self.qmc.etypes)]
+            profile['default_etypes_set'] = self.qmc.default_types_set
             profile['etypes'] = [encodeLocalStrict(et) for et in self.qmc.etypes[:]]
             profile['roastingnotes'] = encodeLocalStrict(self.qmc.roastingnotes)
             profile['cuppingnotes'] = encodeLocalStrict(self.qmc.cuppingnotes)
@@ -16895,18 +16907,20 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.eventsbuttonflag = toInt(settings.value('eventsbuttonflag',int(self.eventsbuttonflag)))
             self.minieventsflags = [toInt(x) for x in toList(settings.value('minieventsflags',self.minieventsflags))]
             self.qmc.eventsGraphflag = toInt(settings.value('eventsGraphflag',int(self.qmc.eventsGraphflag)))
+            if settings.contains('default_etypes_set'):
+                self.qmc.default_etypes_set = [toInt(x) for x in toList(settings.value('default_etypes_set',self.qmc.default_etypes_set))]
             if settings.contains('etypes'):
                 self.qmc.etypes = toStringList(settings.value('etypes',self.qmc.etypes))
                 # etype specified as empty strings are replaced by their defaults to enable translations in partially customized etypes
                 for i, name in enumerate(self.qmc.etypes):
                     if name == '':
-                        self.qmc.etypes[i] = self.qmc.etypesdefault[i]
+                        self.qmc.etypes[i] = self.qmc.get_etype_default(i)
                 # update minieditor event type ComboBox
                 self.etypeComboBox.clear()
                 self.etypeComboBox.addItems(self.qmc.etypes)
             else:
                 # etypes have not been saved in the setting to presever the translations, we have to reset those to their default
-                self.qmc.etypes = self.qmc.etypesdefault[:]
+                self.qmc.etypes = self.qmc.get_etypes_defaults()
             self.qmc.eventsshowflag = toInt(settings.value('eventsshowflag',int(self.qmc.eventsshowflag)))
             self.qmc.clampEvents = bool(toBool(settings.value('clampEvents',self.qmc.clampEvents)))
             self.qmc.renderEventsDescr = bool(toBool(settings.value('renderEventsDescr',self.qmc.renderEventsDescr)))
@@ -18730,16 +18744,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'eventsbuttonflag',self.eventsbuttonflag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'minieventsflags',self.minieventsflags, read_defaults)
             self.settingsSetValue(settings, default_settings, 'eventsGraphflag',self.qmc.eventsGraphflag, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'default_etypes_set', self.qmc.default_etypes_set, read_defaults)
             # we only store etype names if they have been modified by the user to allow automatic translations otherwise
+
             if (len(self.qmc.etypes) == 5 and # skip broken etypes
-                (read_defaults or (self.qmc.etypes[0] != self.qmc.etypesdefault[0]) or
-                (self.qmc.etypes[1] != self.qmc.etypesdefault[1]) or
-                (self.qmc.etypes[2] != self.qmc.etypesdefault[2]) or
-                (self.qmc.etypes[3] != self.qmc.etypesdefault[3]))):
+                (read_defaults or
+                    any(self.qmc.etypes[i] != self.qmc.get_etype_default(i) for i in range(4)))):
                 etypes = self.qmc.etypes[:]
                 if not read_defaults:
                     for i, _ in enumerate(self.qmc.etypes):
-                        if self.qmc.etypes[i] == self.qmc.etypesdefault[i]:
+                        if self.qmc.etypes[i] == self.qmc.get_etype_default(i):
                             etypes[i] = '' # we save empty strings for default event type names to ensure correct translation on re-loading those settings
                 self.settingsSetValue(settings, default_settings, 'etypes',etypes, read_defaults)
             else:
@@ -24796,6 +24810,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 ('\\R', QApplication.translate('Label','RELEASE')),
                 ('\\h', QApplication.translate('Label','HEATING')),
                 ('\\l', QApplication.translate('Label','COOLING')),
+                ('\\b', QApplication.translate('Label','FLAP')),
+                ('\\d', QApplication.translate('Label','CONTROL')),
                 ('\\V', f'{sign}{value}'),
                 ('\\F', f'{tempvalueF}{self.qmc.mode}'),
                 ('\\T', f'{tempvalueC}{self.qmc.mode}')

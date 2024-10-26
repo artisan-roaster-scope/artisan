@@ -79,6 +79,8 @@ def content() -> str:
     tbl_Labels.add_row(['\\R',QApplication.translate('HelpDlg','RELEASE')])
     tbl_Labels.add_row(['\\h',QApplication.translate('HelpDlg','HEATING')])
     tbl_Labels.add_row(['\\l',QApplication.translate('HelpDlg','COOLING')])
+    tbl_Labels.add_row(['\\b',QApplication.translate('HelpDlg','FLAP')])
+    tbl_Labels.add_row(['\\d',QApplication.translate('HelpDlg','CONTROL')])
     tbl_Labels.add_row(['\\V',QApplication.translate('HelpDlg','event value')])
     tbl_Labels.add_row(['\\F',QApplication.translate('HelpDlg','event value interpreted as temperature in Fahrenheit converted to the current temperature mode')])
     tbl_Labels.add_row(['\\T',QApplication.translate('HelpDlg','event value interpreted as temperature in Celsius converted to the current temperature mode')])

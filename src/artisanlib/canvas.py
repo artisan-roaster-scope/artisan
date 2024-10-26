@@ -257,7 +257,8 @@ class tgraphcanvas(FigureCanvas):
         'xextrabuttonactions', 'xextrabuttonactionstrings', 'chargeTimerFlag', 'autoChargeFlag', 'autoDropFlag', 'autoChargeMode', 'autoDropMode', 'autoChargeIdx', 'autoDropIdx', 'markTPflag',
         'autoDRYflag', 'autoFCsFlag', 'autoCHARGEenabled', 'autoDRYenabled', 'autoFCsenabled', 'autoDROPenabled', 'autoDryIdx', 'projectionconstant',
         'projectionmode', 'transMappingMode', 'weight', 'volume', 'density', 'density_roasted', 'volumeCalcUnit', 'volumeCalcWeightInStr',
-        'volumeCalcWeightOutStr', 'container_names', 'container_weights', 'container_idx', 'specialevents', 'etypes', 'etypesdefault', 'specialeventstype',
+        'volumeCalcWeightOutStr', 'container_names', 'container_weights', 'container_idx', 'specialevents', 'etypes', 'etypesdefault',
+        'alt_etypesdefault', 'default_etypes_set', 'specialeventstype',
         'specialeventsStrings', 'specialeventsvalue', 'eventsGraphflag', 'clampEvents', 'renderEventsDescr', 'eventslabelschars', 'eventsshowflag',
         'annotationsflag', 'showeventsonbt', 'showEtypes', 'E1timex', 'E2timex', 'E3timex', 'E4timex', 'E1values', 'E2values', 'E3values', 'E4values',
         'EvalueColor', 'EvalueTextColor', 'EvalueMarker', 'EvalueMarkerSize', 'Evaluelinethickness', 'Evaluealpha', 'eventpositionbars', 'specialeventannotations',
@@ -1621,11 +1622,20 @@ class tgraphcanvas(FigureCanvas):
                        QApplication.translate('ComboBox', 'Burner'),
                        '--']
         #default etype settings to restore
-        self.etypesdefault: Final[List[str]] = [QApplication.translate('ComboBox', 'Air'),
-                              QApplication.translate('ComboBox', 'Drum'),
-                              QApplication.translate('ComboBox', 'Damper'),
-                              QApplication.translate('ComboBox', 'Burner'),
-                              '--']
+        self.etypesdefault: Final[List[str]] = [
+                                QApplication.translate('ComboBox', 'Air'),
+                                QApplication.translate('ComboBox', 'Drum'),
+                                QApplication.translate('ComboBox', 'Damper'),
+                                QApplication.translate('ComboBox', 'Burner'),
+                                '--']
+        #alternative default etype settings to restore
+        self.alt_etypesdefault: Final[List[str]] = [
+                                QApplication.translate('ComboBox', 'Fan'),
+                                QApplication.translate('ComboBox', 'Drum'), # still free to choose another name (currently unused)
+                                QApplication.translate('ComboBox', 'Cooling'),
+                                QApplication.translate('ComboBox', 'Heater'),
+                                '--']
+        self.default_etypes_set: List[int] = [0,0,0,0,0] # if 1 the default is taken from alt_etypesdefault if 0 from etypesdefault
         #stores the type of each event as index of self.etypes. None = 0, Power = 1, etc.
         self.specialeventstype:List[int] = []
         #stores text string descriptions for each event.
@@ -2579,6 +2589,13 @@ class tgraphcanvas(FigureCanvas):
                     self.fig.canvas.blit(axfig.bbox)
 
         self.block_update = False
+
+    def get_etype_default(self, i:int, default_etypes_set:Optional[List[int]] = None) -> str:
+        etypes_set = (self.default_etypes_set if default_etypes_set is None else default_etypes_set)
+        return (self.alt_etypesdefault[i] if etypes_set[i] else self.etypesdefault[i])
+
+    def get_etypes_defaults(self) -> List[str]:
+        return [self.get_etype_default(i) for i,_ in enumerate(self.etypesdefault)]
 
     def getetypes(self) -> List[str]:
         if len(self.etypes) == 4:

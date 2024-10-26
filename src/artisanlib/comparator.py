@@ -162,14 +162,15 @@ class RoastProfile:
         self.specialeventstype:Optional[List[int]] = None
         self.specialeventsvalue:Optional[List[float]] = None
         #
-        self.etypes:List[str] = self.aw.qmc.etypes[:-1]
-        if 'etypes' in profile:
-            self.etypes = [decodeLocalStrict(et) for et in profile['etypes'][:4]]
-            if 'default_etypes' in profile:
-                default_etypes = profile['default_etypes']
-                for i, _ in enumerate(self.etypes):
-                    if default_etypes[i]:
-                        self.etypes[i] = self.aw.qmc.etypesdefault[i]
+        self.etypes:List[str] = self.aw.get_profile_etypes(profile)[:-1]
+#        self.etypes:List[str] = self.aw.qmc.etypes[:-1]
+#        if 'etypes' in profile:
+#            self.etypes = [decodeLocalStrict(et) for et in profile['etypes'][:4]]
+#            if 'default_etypes' in profile:
+#                default_etypes = profile['default_etypes']
+#                for i, _ in enumerate(self.etypes):
+#                    if default_etypes[i]:
+#                        self.etypes[i] = self.aw.qmc.etypesdefault[i]
         #
         # fill profile data:
         if 'timex' in profile:
@@ -321,7 +322,7 @@ class RoastProfile:
             except Exception: # pylint: disable=broad-except
                 pass
         if 'roastbatchpos' in profile:
-            self.metadata['roastoftheday'] = f'{self.aw.qmc.roastOfTheDay(profile["roastbatchpos"])}'
+            self.metadata['roastoftheday'] = f'{self.aw.qmc.roastOfTheDay(profile['roastbatchpos'])}'
         if 'beans' in profile:
             beans_str = decodeLocal(profile['beans'])
             if beans_str is not None:

@@ -2,6 +2,7 @@
 Delay=1000
 roastertype_setup=Santoker Cube BT
 roasterheating_setup=3
+roastersize_setup=0.1
 
 [Device]
 id=134
@@ -115,3 +116,6 @@ svLookahead=5
 svSlider=false
 svSliderMax=230
 svSliderMin=0
+
+[EnergyDefaults]
+ratings=@Variant(\0\0\0\x7f\0\0\0\xePyQt_PyObject\0\0\0\x1\x10\x80\x4\x95\x5\x1\0\0\0\0\0\0}\x94K\x3}\x94G?\xb9\x99\x99\x99\x99\x99\x9a}\x94(\x8c\nloadlabels\x94]\x94(\x8c\x6Heater\x94\x8c\0\x94h\x6h\x6\x65\x8c\vloadratings\x94]\x94(G?\xf4\xcc\xcc\xcc\xcc\xcc\xcdK\0K\0K\0\x65\x8c\vratingunits\x94]\x94(K\x3K\0K\0K\0\x65\x8c\vsourcetypes\x94]\x94(K\x2K\0K\0K\0\x65\x8c\vload_etypes\x94]\x94(K\x4K\0K\0K\0\x65\x8c\x12presssure_percents\x94]\x94(\x89\x89\x89\x89\x65\x8c\x12loadevent_zeropcts\x94]\x94(K\0K\0K\0K\0\x65\x8c\x12loadevent_hundpcts\x94]\x94(KdKdKdKdeuss.)

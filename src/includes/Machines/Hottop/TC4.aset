@@ -6,6 +6,10 @@ roastertype_setup=Hottop TC4
 [Units]
 weight=g
 
+[events]
+eventsGraphflag=4
+default_etypes_set=1, 0, 0, 1, 0
+
 [ArduinoPID]
 dutyMax=100
 dutyMin=-100

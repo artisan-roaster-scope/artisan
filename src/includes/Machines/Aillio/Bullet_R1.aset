@@ -36,7 +36,7 @@ extraname1={3}, BT RoR, Voltage, State
 extraname2={0}, {1}, Exhaust, Fan RPM
 
 [events]
-etypes=Fan, Drum, Damper, Heater, --
+default_etypes_set=1, 0, 0, 1, 0
 
 [ExtraEventButtons]
 buttonlistmaxlen=11

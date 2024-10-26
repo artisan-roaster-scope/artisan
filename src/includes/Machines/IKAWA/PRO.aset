@@ -13,6 +13,9 @@ curvefilter=1
 [Units]
 weight=g
 
+[events]
+default_etypes_set=1, 0, 0, 1, 0
+
 [Alarms]
 alarm_popup_timout=10
 alarmaction=7, -1, 16, -1, 13, 15
