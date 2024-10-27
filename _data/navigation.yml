@@ -148,6 +148,8 @@ machines:
         url: /machines/sedona/
       - title: "Sivetz"
         url: /machines/sivetz/
+      - title: "Sweet Coffee Italia"
+        url: /machines/sci/
       - title: "Tesla"
         url: /machines/tesla/
       - title: "Titanium"
