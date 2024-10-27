@@ -575,7 +575,7 @@ class comportDlg(ArtisanResizeablDialog):
         # host (IP or hostname)
         modbus_hostlabel = QLabel(QApplication.translate('Label', 'Host'))
         self.modbus_hostEdit = QLineEdit(str(self.aw.modbus.host))
-        self.modbus_hostEdit.setFixedWidth(100)
+        self.modbus_hostEdit.setFixedWidth(110)
         self.modbus_hostEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         # port (default 502)
         modbus_portlabel = QLabel(QApplication.translate('Label', 'Port'))
@@ -597,6 +597,11 @@ class comportDlg(ArtisanResizeablDialog):
         self.modbus_SVregister_Edit.setAlignment(Qt.AlignmentFlag.AlignRight)
 
         modbus_multis = ['', '10','100']
+
+        self.modbus_SVwriteLong = QCheckBox('32bit')
+        self.modbus_SVwriteLong.setChecked(self.aw.modbus.SVwriteLong)
+        self.modbus_SVwriteLong.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.modbus_SVwriteLong.setToolTip(QApplication.translate('Tooltip', 'Write SV as 32bit DINT'))
 
         modbus_SVmultiplier_label = QLabel(QApplication.translate('Label', 'SV Factor'))
         self.modbus_SVmultiplier = QComboBox()
@@ -647,6 +652,8 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_pid_registers.addWidget(self.modbus_Dregister_Edit)
 
         modbus_pid_multipliers = QHBoxLayout()
+        modbus_pid_multipliers.addWidget(self.modbus_SVwriteLong)
+        modbus_pid_multipliers.addStretch()
         modbus_pid_multipliers.addWidget(modbus_SVmultiplier_label)
         modbus_pid_multipliers.addWidget(self.modbus_SVmultiplier)
         modbus_pid_multipliers.addStretch()

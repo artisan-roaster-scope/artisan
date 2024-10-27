@@ -322,7 +322,7 @@ class RoastProfile:
             except Exception: # pylint: disable=broad-except
                 pass
         if 'roastbatchpos' in profile:
-            self.metadata['roastoftheday'] = f'{self.aw.qmc.roastOfTheDay(profile['roastbatchpos'])}'
+            self.metadata['roastoftheday'] = f"{self.aw.qmc.roastOfTheDay(profile['roastbatchpos'])}"
         if 'beans' in profile:
             beans_str = decodeLocal(profile['beans'])
             if beans_str is not None:

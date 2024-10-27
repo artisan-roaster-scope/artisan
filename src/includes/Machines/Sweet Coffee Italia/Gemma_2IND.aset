@@ -9,7 +9,7 @@ id=29
 Controlbuttonflag=true
 
 [events]
-default_etypes_set=1, 0, 0, 1, 0
+default_etypes_set=0, 0, 0, 1, 0
 eventsGraphflag=4
 
 [ExtraComm]
@@ -55,6 +55,7 @@ PID_p_register=0
 PID_slave_ID=255
 PIDmultiplier=0
 SVmultiplier=1
+SVwriteLong=true
 baudrate=115200
 bytesize=8
 comport=COM5

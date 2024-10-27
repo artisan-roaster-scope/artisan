@@ -105,7 +105,8 @@ class modbusport:
     __slots__ = [ 'aw', 'modbus_serial_read_delay', 'modbus_serial_connect_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'default_comport', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
         'timeout', 'IP_timeout', 'IP_retries', 'serial_readRetries', 'PID_slave_ID', 'PID_SV_register', 'PID_p_register', 'PID_i_register', 'PID_d_register', 'PID_ON_action', 'PID_OFF_action',
         'channels', 'inputSlaves', 'inputRegisters', 'inputFloats', 'inputBCDs', 'inputFloatsAsInt', 'inputBCDsAsInt', 'inputSigned', 'inputCodes', 'inputDivs',
-        'inputModes', 'optimizer', 'fetch_max_blocks', 'fail_on_cache_miss', 'disconnect_on_error', 'acceptable_errors', 'activeRegisters', 'readingsCache', 'SVmultiplier', 'PIDmultiplier',
+        'inputModes', 'optimizer', 'fetch_max_blocks', 'fail_on_cache_miss', 'disconnect_on_error', 'acceptable_errors', 'activeRegisters',
+        'readingsCache', 'SVmultiplier', 'PIDmultiplier', 'SVwriteLong',
         'byteorderLittle', 'wordorderLittle', '_asyncLoopThread', '_client', 'COMsemaphore', 'default_host', 'host', 'port', 'type', 'lastReadResult', 'commError' ]
 
     def __init__(self, aw:'ApplicationWindow') -> None:
@@ -167,6 +168,7 @@ class modbusport:
         self.readingsCache:Dict[int, Dict[int, Dict[int, int]]] = {}
 
         self.SVmultiplier:int = 0  # 0:no, 1:10x, 2:100x # Literal[0,1,2]
+        self.SVwriteLong:bool = False # if True use self.writeLong() to update the SV, otherwise self.writeRegister()
         self.PIDmultiplier:int = 0  # 0:no, 1:10x, 2:100x # :Literal[0,1,2]
         self.byteorderLittle:bool = False
         self.wordorderLittle:bool = True
@@ -1079,7 +1081,10 @@ class modbusport:
                 multiplier = 10.
             elif self.SVmultiplier == 2:
                 multiplier = 100.
-            self.writeSingleRegister(self.PID_slave_ID,self.PID_SV_register,int(round(sv*multiplier)))
+            if self.SVwriteLong:
+                self.writeLong(self.PID_slave_ID,self.PID_SV_register,int(round(sv*multiplier)))
+            else:
+                self.writeSingleRegister(self.PID_slave_ID,self.PID_SV_register,int(round(sv*multiplier)))
 
     def setPID(self, p:float, i:float, d:float) -> None:
         _log.debug('setPID(%s,%s,%s)', p, i, d)
