@@ -21482,39 +21482,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     @pyqtSlot()
     @pyqtSlot(bool)
     def rankingCSVReport(self, _:bool = False) -> None: # get profile filenames
-        import csv
         profiles = self.reportFiles()
         if profiles and len(profiles) > 0:
             # select file
             filename = self.ArtisanSaveFileDialog(msg='Export CSV',ext='*.csv')
             if filename:
-                try:
-                    # open file
-                    with open(filename, 'w',newline='', encoding='utf-8') as outfile:
-                        writer = csv.writer(outfile,delimiter='\t',quotechar='"')
-
-                        # write header
-                        extendedRankingHdr = self.extendedRankingData2List(header=True)
-                        writer.writerow(extendedRankingHdr)
-
-                        # write data
-    #                    c = 1
-                        for p in profiles:
-                            try:
-    #                            c += 1
-                                dsd = self.deserialize(p)
-                                pd = self.productionData2string(self.profileProductionData(dsd),units=False)
-                                rd = self.rankingData2string(self.profileRankingData(dsd),units=False)
-                                extendedRankingData = self.extendedRankingData2List(dsd,rd,pd)
-                                writer.writerow(extendedRankingData)
-                            except Exception as e: # pylint: disable=broad-except
-                                _a, _b, exc_tb = sys.exc_info()
-                                self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' rankingCSVReport() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
-                    self.sendmessage(QApplication.translate('Message','CSV Ranking Report exported to {0}').format(filename))
-                except OSError as x:
-                    self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' Err [{0}] Can not write to file, perhaps it is open in an application or is write protected?').format(x.errno))
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
+                self.rankingSpreadsheetCreate(filename, profiles, "csv")
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -21525,222 +21498,244 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             # select file
             filename = self.ArtisanSaveFileDialog(msg='Export Excel',ext='*.xlsx')
             if filename:
-                try:
-                    # open file
-                    from openpyxl import Workbook
-                    from openpyxl.utils.cell import get_column_letter,column_index_from_string  # @UnusedImport # pylint: disable=unused-import # noqa: F401
-                    from openpyxl.styles import Font, Fill, Alignment # @UnusedImport # pylint: disable=unused-import # noqa: F401
-                    wb = Workbook()
-                    ws:Optional[Worksheet] = wb.active # type: ignore[assignment,unused-ignore] # Incompatible types in assignment (expression has type "Optional[_WorkbookChild]", variable has type "Optional[Worksheet]")
-                    if ws is not None:
-                        ws.title = QApplication.translate('HTML Report Template', 'Ranking Report')
-                        bf = Font(name='Calibri',size='11',bold=True)
+                self.rankingSpreadsheetCreate(filename, profiles, "excel")
+
+    def rankingSpreadsheetCreate(self,filename:str, profiles:List[str], reporttype:str) -> None:
+        try:
+            # open file
+            from openpyxl import Workbook
+            from openpyxl.utils.cell import get_column_letter,column_index_from_string  # @UnusedImport # pylint: disable=unused-import # noqa: F401
+            from openpyxl.styles import Font, Fill, Alignment # @UnusedImport # pylint: disable=unused-import # noqa: F401
+            wb = Workbook()
+            ws:Optional[Worksheet] = wb.active # type: ignore[assignment,unused-ignore] # Incompatible types in assignment (expression has type "Optional[_WorkbookChild]", variable has type "Optional[Worksheet]")
+            if ws is not None:
+                ws.title = QApplication.translate('HTML Report Template', 'Ranking Report')
+                bf = Font(name='Calibri',size='11',bold=True)
 #                        ws.font = Font(name='Calibri',size='11') # type: ignore # has no attribute .font
 
+                #get the field definitions
+                ranking_data_fields, field_index = self.rankingdataDef()
 
-                        #get the field definitions
-                        ranking_data_fields, field_index = self.rankingdataDef()
+                # write header
+                widths:List[float] = [10]*len(ranking_data_fields)
+                weight_unit = self.qmc.weight[2]
+                volume_unit = self.qmc.volume[2]
+                temperature_unit = self.qmc.mode
+                col_ = 0
+                for i, rdf in enumerate(ranking_data_fields):
+                    name:str = rdf[field_index.index('name')]
+                    units:str = rdf[field_index.index('units')]
+                    if units == 'temp':
+                        suffix = f' ({temperature_unit})'
+                    elif units == 'volume':
+                        suffix = f' ({volume_unit})'
+                    elif units == 'weight':
+                        suffix = f' ({weight_unit})'
+                    elif units == 'ror':
+                        suffix = f' ({temperature_unit}/min)'
+                    elif units.startswith('('):
+                        suffix = f' {units}'
+                    else:
+                        suffix = ''
+                    cell = ws.cell(column=i+1, row=1, value=f'{name}{suffix}')
+                    cell.font = bf
+                    cell.alignment = Alignment(horizontal='center')
+                    width = len(name + suffix) + 2.
+                    if width > widths[i]:
+                        widths[i] = width
+                        ws.column_dimensions[get_column_letter(i+1)].width = width
 
-                        # write header
-                        widths:List[float] = [10]*len(ranking_data_fields)
-                        weight_unit = self.qmc.weight[2]
-                        volume_unit = self.qmc.volume[2]
-                        temperature_unit = self.qmc.mode
-                        col_ = 0
+                # write data
+                c = 1
+                for p in profiles:
+                    try:
+                        c += 1
+                        dsd:Dict[str,Any] = self.deserialize(p)
+                        rd = self.profileRankingData(dsd)
+                        pd:ProductionDataStr = self.productionData2string(self.profileProductionData(dsd),units=False)
+                        cnum = col_
                         for i, rdf in enumerate(ranking_data_fields):
-                            name:str = rdf[field_index.index('name')]
-                            units:str = rdf[field_index.index('units')]
-                            if units == 'temp':
-                                suffix = f' ({temperature_unit})'
-                            elif units == 'volume':
-                                suffix = f' ({volume_unit})'
-                            elif units == 'weight':
-                                suffix = f' ({weight_unit})'
-                            elif units == 'ror':
-                                suffix = f' ({temperature_unit}/min)'
-                            elif units.startswith('('):
-                                suffix = f' {units}'
+                            cnum += 1
+                            cr = f'{get_column_letter(cnum)}{c}'
+
+                            name = rdf[field_index.index('name')]
+                            fld:str = rdf[field_index.index('fld')]
+                            src:str = rdf[field_index.index('src')]
+                            typ:str = rdf[field_index.index('typ')]
+                            test0:str = rdf[field_index.index('test0')]
+                            units = rdf[field_index.index('units')]
+                            if src == 'comp' and fld in dsd['computed']:
+                                res_fld = dsd['computed'][fld]
+                            elif src == 'prof' and fld in dsd:
+                                res_fld = dsd[fld]
+                            elif src == 'rank' and fld in rd:
+                                res_fld = rd[fld]
+                            elif src == 'prod' and fld in pd:
+                                res_fld = pd[fld] # type:ignore[literal-required]
+                            elif src == 'eval':
+                                try:
+                                    res_fld = eval(fld) # pylint: disable=eval-used
+                                except Exception:
+                                    res_fld = -1
+                            elif src == 'self':
+                                res_fld = getattr(self,f'{fld}')
                             else:
-                                suffix = ''
-                            cell = ws.cell(column=i+1, row=1, value=f'{name}{suffix}')
-                            cell.font = bf
-                            cell.alignment = Alignment(horizontal='center')
-                            width = len(name + suffix) + 2.
-                            if width > widths[i]:
-                                widths[i] = width
-                                ws.column_dimensions[get_column_letter(i+1)].width = width
+                                continue
 
-                        # write data
-                        c = 1
-                        for p in profiles:
-                            try:
-                                c += 1
-                                dsd:Dict[str,Any] = self.deserialize(p)
-                                rd = self.profileRankingData(dsd)
-                                pd:ProductionDataStr = self.productionData2string(self.profileProductionData(dsd),units=False)
-                                cnum = col_
-                                for i, rdf in enumerate(ranking_data_fields):
-                                    cnum += 1
-                                    cr = f'{get_column_letter(cnum)}{c}'
-
-                                    name = rdf[field_index.index('name')]
-                                    fld:str = rdf[field_index.index('fld')]
-                                    src:str = rdf[field_index.index('src')]
-                                    typ:str = rdf[field_index.index('typ')]
-                                    test0:str = rdf[field_index.index('test0')]
-                                    units = rdf[field_index.index('units')]
-                                    if src == 'comp' and fld in dsd['computed']:
-                                        res_fld = dsd['computed'][fld]
-                                    elif src == 'prof' and fld in dsd:
-                                        res_fld = dsd[fld]
-                                    elif src == 'rank' and fld in rd:
-                                        res_fld = rd[fld]
-                                    elif src == 'prod' and fld in pd:
-                                        res_fld = pd[fld] # type:ignore[literal-required]
-                                    elif src == 'eval':
-                                        try:
-                                            res_fld = eval(fld) # pylint: disable=eval-used
-                                        except Exception:
-                                            res_fld = -1
-                                    elif src == 'self':
-                                        res_fld = getattr(self,f'{fld}')
-                                    else:
-                                        continue
-
-                                    if (test0 == 'true' and float2float(toFloat(res_fld)) > 0) or test0 == 'false':
-                                        if units == 'temp':
-                                            conv_fld = convertTemp(res_fld,dsd['mode'],temperature_unit)
-                                        elif units == 'ror':
-                                            conv_fld = convertRoRstrict(res_fld,dsd['mode'],temperature_unit)
-                                        elif units == 'volume':
-                                            conv_fld = convertVolume(res_fld,0,volume_units.index(volume_unit))
-                                        elif units == 'weight':
-                                            conv_fld = convertWeight(res_fld,0,weight_units.index(weight_unit))
-                                        else:
-                                            conv_fld = res_fld
-
-                                        if typ == 'text':
-                                            ws[cr] = conv_fld # type: ignore[assignment, unused-ignore]
-                                            width = len(str(conv_fld)) + 2.
-                                            if re.match(r'[0-9]+',units) and width > float(units):
-                                                width = float(units)
-                                            if width > widths[i]:
-                                                widths[i] = width
-                                                ws.column_dimensions[get_column_letter(cnum)].width = width
-                                            ws[cr].alignment = Alignment(wrap_text=True)
-                                        elif typ == 'int':
-                                            ws[cr] = conv_fld  # type: ignore[assignment, unused-ignore]
-                                        elif typ == 'float1':
-                                            ws[cr] = conv_fld  # type: ignore[assignment, unused-ignore]
-                                            ws[cr].number_format = '0.0'
-                                        elif typ == 'float2':
-                                            ws[cr] = conv_fld  # type: ignore[assignment, unused-ignore]
-                                            ws[cr].number_format = '0.00'
-                                        elif typ == 'float4':
-                                            ws[cr] = conv_fld  # type: ignore[assignment, unused-ignore]
-                                            ws[cr].number_format = '0.0000'
-                                        elif typ == 'text2float1':
-                                            ws[cr] = float2float(toFloat(conv_fld)) # type: ignore[assignment, unused-ignore] #  Incompatible types in assignment (expression has type "float", target has type "str")
-                                            ws[cr].number_format = '0.0'
-                                        elif typ == 'text2float2':
-                                            ws[cr] = float2float(toFloat(conv_fld)) # type: ignore[assignment, unused-ignore] # Incompatible types in assignment (expression has type "float", target has type "str")
-                                            ws[cr].number_format = '0.00'
-                                        elif typ == 'text2int':
-                                            ws[cr] = toInt(conv_fld) # type: ignore[assignment, unused-ignore]
-                                            ws[cr].number_format = '0'
-                                        elif typ == 'percent':
-                                            ws[cr] = conv_fld/100. # type: ignore[assignment, unused-ignore]
-                                            ws[cr].number_format = '0.0%'
-                                        elif typ == 'time':
-                                            h,m = divmod(conv_fld,60)
-                                            dt = datetime.time(int(h),int(m),0) # note that rounding h and m might lead to failure of .time() as round(59.99) = 60 which is >59 thus not accepted by .time()
-                                            ws[cr] = dt # type: ignore[assignment, unused-ignore] # Incompatible types in assignment (expression has type "time", target has type "str")
-                                            ws[cr].number_format = 'H:MM'
-                                        elif typ == 'date':
-                                            ws[cr] = QDateTime(conv_fld).toPyDateTime() # type: ignore # Incompatible types in assignment (expression has type "datetime", target has type "str")
-                                            fmt = 'YYYY-MM-DD HH:MM'
-                                            ws[cr].number_format = fmt
-                                            width = len(fmt) + 2.
-                                            if width > widths[i]:
-                                                widths[i] = width
-                                                ws.column_dimensions[get_column_letter(cnum)].width = width
-                                        elif typ == 'bool':
-                                            ws[cr] = str(conv_fld)
-
-                            except Exception as e: # pylint: disable=broad-except
-                                _log.exception(e)
-                                _a, _b, exc_tb = sys.exc_info()
-                                self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' rankingExcelReport() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
-
-                        # write trailer
-                        if c > 1:
-                            def avgFormat(c:str,s:int,e:int) -> str:
-                                rng = f'{c}{s}:{c}{e}'
-                                return f'=IF(SUMPRODUCT(--({rng}<>""))=0,"",AVERAGE({rng}))'
-
-                            ws[f'A{c+1}'] = QApplication.translate('HTML Report Template', 'AVG')
-                            ws[f'A{c+1}'].font = bf
-                            cnum = col_
-                            for rdf in ranking_data_fields:
-                                cnum += 1
-                                fld = rdf[field_index.index('fld')]
-                                typ = rdf[field_index.index('typ')]
-                                test0 = rdf[field_index.index('test0')]
-                                cr = f'{get_column_letter(cnum)}{c+1}'
-                                cltr = get_column_letter(cnum)
+                            if (test0 == 'true' and float2float(toFloat(res_fld)) > 0) or test0 == 'false':
+                                if units == 'temp':
+                                    conv_fld = convertTemp(res_fld,dsd['mode'],temperature_unit)
+                                elif units == 'ror':
+                                    conv_fld = convertRoRstrict(res_fld,dsd['mode'],temperature_unit)
+                                elif units == 'volume':
+                                    conv_fld = convertVolume(res_fld,0,volume_units.index(volume_unit))
+                                elif units == 'weight':
+                                    conv_fld = convertWeight(res_fld,0,weight_units.index(weight_unit))
+                                else:
+                                    conv_fld = res_fld
 
                                 if typ == 'text':
-                                    pass
+                                    ws[cr] = conv_fld # type: ignore[assignment, unused-ignore]
+                                    width = len(str(conv_fld)) + 2.
+                                    if re.match(r'[0-9]+',units) and width > float(units):
+                                        width = float(units)
+                                    if width > widths[i]:
+                                        widths[i] = width
+                                        ws.column_dimensions[get_column_letter(cnum)].width = width
+                                    ws[cr].alignment = Alignment(wrap_text=True)
                                 elif typ == 'int':
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
-                                    ws[cr].number_format = '0'
+                                    ws[cr] = conv_fld  # type: ignore[assignment, unused-ignore]
                                 elif typ == 'float1':
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
+                                    ws[cr] = conv_fld  # type: ignore[assignment, unused-ignore]
                                     ws[cr].number_format = '0.0'
                                 elif typ == 'float2':
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
-                                    ws[cr].number_format = '0.0'
+                                    ws[cr] = conv_fld  # type: ignore[assignment, unused-ignore]
+                                    ws[cr].number_format = '0.00'
                                 elif typ == 'float4':
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
+                                    ws[cr] = conv_fld  # type: ignore[assignment, unused-ignore]
                                     ws[cr].number_format = '0.0000'
                                 elif typ == 'text2float1':
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
+                                    ws[cr] = float2float(toFloat(conv_fld)) # type: ignore[assignment, unused-ignore] #  Incompatible types in assignment (expression has type "float", target has type "str")
                                     ws[cr].number_format = '0.0'
                                 elif typ == 'text2float2':
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
+                                    ws[cr] = float2float(toFloat(conv_fld)) # type: ignore[assignment, unused-ignore] # Incompatible types in assignment (expression has type "float", target has type "str")
                                     ws[cr].number_format = '0.00'
                                 elif typ == 'text2int':
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
+                                    ws[cr] = toInt(conv_fld) # type: ignore[assignment, unused-ignore]
                                     ws[cr].number_format = '0'
                                 elif typ == 'percent':
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
+                                    ws[cr] = conv_fld/100. # type: ignore[assignment, unused-ignore]
                                     ws[cr].number_format = '0.0%'
                                 elif typ == 'time':
-                                    ws[cr] = avgFormat(cltr,2,c)
-                                    ws[cr].font = bf
+                                    h,m = divmod(conv_fld,60)
+                                    dt = datetime.time(int(h),int(m),0) # note that rounding h and m might lead to failure of .time() as round(59.99) = 60 which is >59 thus not accepted by .time()
+                                    ws[cr] = dt # type: ignore[assignment, unused-ignore] # Incompatible types in assignment (expression has type "time", target has type "str")
                                     ws[cr].number_format = 'H:MM'
+                                elif typ == 'date':
+                                    ws[cr] = QDateTime(conv_fld).toPyDateTime() # type: ignore # Incompatible types in assignment (expression has type "datetime", target has type "str")
+                                    fmt = 'YYYY-MM-DD HH:MM'
+                                    ws[cr].number_format = fmt
+                                    width = len(fmt) + 2.
+                                    if width > widths[i]:
+                                        widths[i] = width
+                                        ws.column_dimensions[get_column_letter(cnum)].width = width
                                 elif typ == 'bool':
-                                    pass
+                                    ws[cr] = str(conv_fld)
 
-                    # close file
-                    wb.save(filename)
-                    self.sendmessage(QApplication.translate('Message','Excel Ranking Report exported to {0}').format(filename))
-                except OSError as x:
-                    _log.exception(x)
-                    self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' Err [{0}] Can not write to file, perhaps it is open in an application or is write protected?').format(x.errno))
-                    QApplication.beep()
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
-                    _a, _b, exc_tb = sys.exc_info()
-                    self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' rankingExcelReport() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
+                        _a, _b, exc_tb = sys.exc_info()
+                        self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' rankingExcelReport() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+
+                if reporttype == "csv":
+                    try:
+                        import csv
+                        # open file
+                        with open(filename, 'w',newline='', encoding='utf-8') as outfile:
+                            writer = csv.writer(outfile,delimiter='\t',quotechar='"')
+                            
+                            for r in ws.rows: 
+                                # row by row write  
+                                # operation is perform 
+                                writer.writerow([cell.value for cell in r]) 
+
+                        self.sendmessage(QApplication.translate('Message','CSV Ranking Report exported to {0}').format(filename))
+                    except OSError as x:
+                        self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' Err [{0}] Can not write to file, perhaps it is open in an application or is write protected?').format(x.errno))
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
+                    return
+                
+                #reporttype=="excel"
+                # write trailer
+                if c > 1:
+                    def avgFormat(c:str,s:int,e:int) -> str:
+                        rng = f'{c}{s}:{c}{e}'
+                        return f'=IF(SUMPRODUCT(--({rng}<>""))=0,"",AVERAGE({rng}))'
+
+                    ws[f'A{c+1}'] = QApplication.translate('HTML Report Template', 'AVG')
+                    ws[f'A{c+1}'].font = bf
+                    cnum = col_
+                    for rdf in ranking_data_fields:
+                        cnum += 1
+                        fld = rdf[field_index.index('fld')]
+                        typ = rdf[field_index.index('typ')]
+                        test0 = rdf[field_index.index('test0')]
+                        cr = f'{get_column_letter(cnum)}{c+1}'
+                        cltr = get_column_letter(cnum)
+
+                        if typ == 'text':
+                            pass
+                        elif typ == 'int':
+                            ws[cr] = avgFormat(cltr,2,c)
+                            ws[cr].font = bf
+                            ws[cr].number_format = '0'
+                        elif typ == 'float1':
+                            ws[cr] = avgFormat(cltr,2,c)
+                            ws[cr].font = bf
+                            ws[cr].number_format = '0.0'
+                        elif typ == 'float2':
+                            ws[cr] = avgFormat(cltr,2,c)
+                            ws[cr].font = bf
+                            ws[cr].number_format = '0.0'
+                        elif typ == 'float4':
+                            ws[cr] = avgFormat(cltr,2,c)
+                            ws[cr].font = bf
+                            ws[cr].number_format = '0.0000'
+                        elif typ == 'text2float1':
+                            ws[cr] = avgFormat(cltr,2,c)
+                            ws[cr].font = bf
+                            ws[cr].number_format = '0.0'
+                        elif typ == 'text2float2':
+                            ws[cr] = avgFormat(cltr,2,c)
+                            ws[cr].font = bf
+                            ws[cr].number_format = '0.00'
+                        elif typ == 'text2int':
+                            ws[cr] = avgFormat(cltr,2,c)
+                            ws[cr].font = bf
+                            ws[cr].number_format = '0'
+                        elif typ == 'percent':
+                            ws[cr] = avgFormat(cltr,2,c)
+                            ws[cr].font = bf
+                            ws[cr].number_format = '0.0%'
+                        elif typ == 'time':
+                            ws[cr] = avgFormat(cltr,2,c)
+                            ws[cr].font = bf
+                            ws[cr].number_format = 'H:MM'
+                        elif typ == 'bool':
+                            pass
+
+            # close file
+            wb.save(filename)
+            self.sendmessage(QApplication.translate('Message','Excel Ranking Report exported to {0}').format(filename))
+        except OSError as x:
+            _log.exception(x)
+            self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' Err [{0}] Can not write to file, perhaps it is open in an application or is write protected?').format(x.errno))
+            QApplication.beep()
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+            _a, _b, exc_tb = sys.exc_info()
+            self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' rankingExcelReport() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot()
     @pyqtSlot(bool)
