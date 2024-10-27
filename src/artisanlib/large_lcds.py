@@ -39,8 +39,8 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 class LargeLCDs(ArtisanDialog):
 
-    __slots__ = ['lcds1', 'lcds2', 'lcds1styles', 'lcds2styles', 'lcds1labelsUpper', 'lcds2labelsUpper', 'lcds1labelsLower', 'lcds2labelsLower',
-        'lcds1frames', 'lcds2frames', 'visibleFrames', 'tight', 'layoutNr', 'swaplcds']
+#    __slots__ = ['lcds1', 'lcds2', 'lcds1styles', 'lcds2styles', 'lcds1labelsUpper', 'lcds2labelsUpper', 'lcds1labelsLower', 'lcds2labelsLower',
+#        'lcds1frames', 'lcds2frames', 'visibleFrames', 'tight', 'layoutNr', 'swaplcds']
 
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         if aw.get_os()[0] == 'RPi':

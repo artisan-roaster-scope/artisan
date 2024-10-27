@@ -170,7 +170,9 @@ class YoctoThread(threading.Thread):
 
 #inputs temperature
 class nonedevDlg(QDialog): # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+
     __slots__ = ['etEdit','btEdit','ETbox','okButton','cancelButton'] # save some memory by using slots
+
     def __init__(self, parent:QWidget, aw:'ApplicationWindow') -> None:
         super().__init__(parent)
 
@@ -2026,7 +2028,7 @@ class serialport:
             # Temperature
             if self.aw.ser.TMP1000temp is None:
                 self.aw.ser.TMP1000temp = PhidgetTemperatureSensor()
-            if not self.aw.ser.TMP1000temp.getAttached() and self.aw.qmc.phidgetManager is not None:
+            if self.aw.ser.TMP1000temp is not None and not self.aw.ser.TMP1000temp.getAttached() and self.aw.qmc.phidgetManager is not None:
                 ser, port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget(
                     'PhidgetTemperatureSensor',
                     DeviceID.PHIDID_TMP1000,
@@ -2071,7 +2073,7 @@ class serialport:
             # HUM Temperature
             if self.aw.ser.PhidgetHUMtemp is None:
                 self.aw.ser.PhidgetHUMtemp = PhidgetTemperatureSensor()
-            if not self.aw.ser.PhidgetHUMtemp.getAttached() and self.aw.qmc.phidgetManager is not None:
+            if self.aw.ser.PhidgetHUMtemp is not None and not self.aw.ser.PhidgetHUMtemp.getAttached() and self.aw.qmc.phidgetManager is not None:
                 ser, port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget(
                     'PhidgetTemperatureSensor',
                     DeviceID.PHIDID_HUM1000,
@@ -2123,7 +2125,7 @@ class serialport:
             # HUM Humidity
             if self.aw.ser.PhidgetHUMhum is None:
                 self.aw.ser.PhidgetHUMhum = PhidgetHumiditySensor()
-            if not self.aw.ser.PhidgetHUMhum.getAttached() and self.aw.qmc.phidgetManager is not None:
+            if self.aw.ser.PhidgetHUMhum is not None and not self.aw.ser.PhidgetHUMhum.getAttached() and self.aw.qmc.phidgetManager is not None:
                 ser, port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget(
                     'PhidgetTemperatureSensor',
                     DeviceID.PHIDID_HUM1000,
@@ -2175,7 +2177,7 @@ class serialport:
             # PRE Pressure
             if self.aw.ser.PhidgetPREpre is None:
                 self.aw.ser.PhidgetPREpre = PhidgetPressureSensor()
-            if not self.aw.ser.PhidgetPREpre.getAttached() and self.aw.qmc.phidgetManager is not None:
+            if self.aw.ser.PhidgetPREpre is not None and not self.aw.ser.PhidgetPREpre.getAttached() and self.aw.qmc.phidgetManager is not None:
                 ser, port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget(
                     'PhidgetPressureSensor',
                     DeviceID.PHIDID_PRE1000,

@@ -6631,9 +6631,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 # Replace None values in the Delta curves with the closest numeric value on the right
                 def replNone(a:'npt.NDArray[numpy.double]', nv:'npt.NDArray[numpy.int64]') -> 'npt.NDArray[numpy.double]':
                     for i, nvi in enumerate(nv):
-                        if i == len(nv) -1:
-                            a[nvi] = 0
-                        elif a[nvi + 1] is None:
+                        if i == len(nv) -1 or a[nvi + 1] is None:
                             a[nvi] = 0
                         else:
                             a[nvi] = a[nvi + 1]
@@ -7089,9 +7087,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         mpl.rcParams['font.family'] = ['DejaVu Sans','DejaVu Sans Mono','Times New Roman']
                     elif self.locale_str == 'ja':
                         mpl.rcParams['font.family'] = ['TakaoPGothic']
-                    elif self.locale_str == 'zh_CN':
-                        mpl.rcParams['font.family'] = ['NanumGothic','DejaVu Sans Mono']
-                    elif self.locale_str == 'zh_TW':
+                    elif self.locale_str in {'zh_CN', 'zh_TW'}:
                         mpl.rcParams['font.family'] = ['NanumGothic','DejaVu Sans Mono']
                     self.mpl_fontproperties = FontProperties()
                 else: # Windows:
@@ -9775,11 +9771,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 try:
                                     rs = int(eval(cs[len('pidRS('):-1])) # pylint: disable=eval-used
                                     if self.qmc.device in {0, 26}:
-                                        if self.ser.controlETpid[0] == 0: # PXG
-                                            pass
-                                        elif self.ser.controlETpid[0] == 1: # PRG
-                                            pass
-                                        elif self.ser.controlETpid[0] == 4: # PXF
+                                        if self.ser.controlETpid[0] in {0,1,4}: # PXG, PRG, PXF
                                             pass
                                     elif rs>0:
                                         self.pidcontrol.setRSpattern(rs-1)
@@ -20735,9 +20727,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             res.append(f'{conv_fld}')
                         elif typ == 'int':
                             res.append(f'{conv_fld:.0f}')
-                        elif typ == 'temp':
-                            res.append(f'{conv_fld:.1f}')
-                        elif typ == 'float1':
+                        elif typ in {'temp', 'float1'}:
                             res.append(f'{conv_fld:.1f}')
                         elif typ == 'float2':
                             res.append(f'{conv_fld:.2f}')
@@ -21487,7 +21477,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             # select file
             filename = self.ArtisanSaveFileDialog(msg='Export CSV',ext='*.csv')
             if filename:
-                self.rankingSpreadsheetCreate(filename, profiles, "csv")
+                self.rankingSpreadsheetCreate(filename, profiles, 'csv')
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -21498,7 +21488,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             # select file
             filename = self.ArtisanSaveFileDialog(msg='Export Excel',ext='*.xlsx')
             if filename:
-                self.rankingSpreadsheetCreate(filename, profiles, "excel")
+                self.rankingSpreadsheetCreate(filename, profiles, 'excel')
 
     def rankingSpreadsheetCreate(self,filename:str, profiles:List[str], reporttype:str) -> None:
         try:
@@ -21647,17 +21637,17 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         _a, _b, exc_tb = sys.exc_info()
                         self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' rankingExcelReport() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
-                if reporttype == "csv":
+                if reporttype == 'csv':
                     try:
                         import csv
                         # open file
                         with open(filename, 'w',newline='', encoding='utf-8') as outfile:
                             writer = csv.writer(outfile,delimiter='\t',quotechar='"')
-                            
-                            for r in ws.rows: 
-                                # row by row write  
-                                # operation is perform 
-                                writer.writerow([cell.value for cell in r]) 
+
+                            for r in ws.rows:
+                                # row by row write
+                                # operation is perform
+                                writer.writerow([cell.value for cell in r])
 
                         self.sendmessage(QApplication.translate('Message','CSV Ranking Report exported to {0}').format(filename))
                     except OSError as x:
@@ -21665,7 +21655,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
                     return
-                
+
                 #reporttype=="excel"
                 # write trailer
                 if c > 1:
@@ -21690,14 +21680,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             ws[cr] = avgFormat(cltr,2,c)
                             ws[cr].font = bf
                             ws[cr].number_format = '0'
-                        elif typ == 'float1':
+                        elif typ in 'float1':
                             ws[cr] = avgFormat(cltr,2,c)
                             ws[cr].font = bf
                             ws[cr].number_format = '0.0'
                         elif typ == 'float2':
                             ws[cr] = avgFormat(cltr,2,c)
                             ws[cr].font = bf
-                            ws[cr].number_format = '0.0'
+                            ws[cr].number_format = '0.00'
                         elif typ == 'float4':
                             ws[cr] = avgFormat(cltr,2,c)
                             ws[cr].font = bf

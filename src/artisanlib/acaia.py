@@ -416,7 +416,7 @@ class AcaiaBLE(ClientBLE):
             bytes([ # pairs of key/setting
                     0,  # weight id
                     7,  # 0, 1, 3, 5, 7, 15, 31, 63, 127  # weight argument (speed of notifications in 1/10 sec)
-                       # 5 or 7 seems to be good values for this app in Artisan
+                        # 5 or 7 seems to be good values for this app in Artisan
 #                    1,   # battery id
 #                    255, #2,  # battery argument (if 0 : fast, 1 : slow)
 #                    2,  # timer id
@@ -433,7 +433,7 @@ class AcaiaBLE(ClientBLE):
             bytes([ # pairs of key/setting
                     0,  # weight id
                     1,  # 0, 1, 3, 5, 7, 15, 31, 63, 127  # weight argument (speed of notifications in 1/10 sec)
-                       # 5 or 7 seems to be good values for this app in Artisan
+                        # 5 or 7 seems to be good values for this app in Artisan
 #                    1,   # battery id
 #                    255, #2,  # battery argument (if 0 : fast, 1 : slow)
 #                    2,  # timer id

@@ -3230,7 +3230,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 161 is +Omega HH309 34 but +DEVICE cannot be set as main device
                 ##########################
-                elif meter == 'Digi-Sense 20250-07' and self.aw.qmc.device != 161:
+                elif meter == 'Digi-Sense 20250-07' and self.aw.qmc.device != 161: # noqa: SIM114
                     self.aw.qmc.device = 17
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 9600

@@ -10731,7 +10731,7 @@ class tgraphcanvas(FigureCanvas):
                     if 'CO2_batch_per_green_kg' in cp and cp['CO2_batch_per_green_kg']:
                         stattype_str += f" ({float2float(cp['CO2_batch_per_green_kg'],0)}g/kg)"
             elif n == 16:  #AUC
-                if cp['AUC']:
+                if 'AUC' in cp and 'AUCbase' in cp and cp['AUC']:
                     stattype_str += (f"{newline}{QApplication.translate('AddlInfo', 'AUC')}: "
                         f"{cp['AUC']}{degree}C*min [{cp['AUCbase']}{degree}{self.mode}]")
             elif n == 17:  #Notes (Roast)

@@ -30,6 +30,7 @@ v3.0.3
   - limits the visible length of long popup lists in Devices and Statistics Dialog
   - keep Hottop connected after OFF in control mode to prevent the shutdown on disconnect ([Issue #1714](../../../issues/1714))
   - PID RS time is reset on PID ON not on CHARGE as in previous releases
+  - makes columns in CSV ranking report consistent with Excel variant
 
 
 * FIXES

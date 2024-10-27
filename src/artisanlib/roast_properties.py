@@ -2688,9 +2688,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(int)
     def tabSwitched(self, i:int) -> None:
-        if i == 0: # Roast (always initialized in __init__())
-            self.saveEventTable()
-        elif i == 1: # Notes (always initialized in __init__())
+        if i in {0,1}: # Roast (always initialized in __init__()) # Notes (always initialized in __init__())
             self.saveEventTable()
         elif i == 2: # Events (only initialized on first opening that tab)
             self.createEventTable()

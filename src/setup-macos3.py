@@ -406,8 +406,10 @@ except Exception: # pylint: disable=broad-except
     pass
 
 print('*** Removing debug and test files and folders  ***')
+
 for root, dirs, files in os.walk('.'):
     for file in files:
+        # ruff: noqa: SIM114
         if 'debug' in file:
 #            print('Deleting', file)
             os.remove(os.path.join(root,file))
