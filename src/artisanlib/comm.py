@@ -4195,9 +4195,10 @@ class serialport:
                             do.setIsRemote(False)
                             do.setIsLocal(True)
                         self.aw.ser.PhidgetDigitalOut[serial].append(do)
-                    if serial is None:
-                        # we make this also accessible via its serial number
-                        self.aw.ser.PhidgetDigitalOut[str(ser)] = self.aw.ser.PhidgetDigitalOut[None]
+# this is not needed here as we add those a bit below on successful attach
+#                    if serial is None:
+#                        # we make this also accessible via its serial number
+#                        self.aw.ser.PhidgetDigitalOut[str(ser)] = self.aw.ser.PhidgetDigitalOut[None]
         try:
             ch = self.aw.ser.PhidgetDigitalOut[serial][channel]
             ch.setOnAttachHandler(self.phidgetOUTattached)
@@ -4210,7 +4211,8 @@ class serialport:
                 if serial is None and ch.getAttached():
                     # we make this also accessible via its serial number + port
                     si = self.serialPort2serialString(ch.getDeviceSerialNumber(),ch.getHubPort()) # NOTE: ch.getHubPort() returns -1 if not yet attached
-                    self.aw.ser.PhidgetDigitalOut[str(si)] = self.aw.ser.PhidgetDigitalOut[None]
+                    if si is not None:
+                        self.aw.ser.PhidgetDigitalOut[si] = self.aw.ser.PhidgetDigitalOut[None]
         except Exception: # pylint: disable=broad-except
             pass
 
@@ -4329,9 +4331,14 @@ class serialport:
                             do.setIsRemote(False)
                             do.setIsLocal(True)
                         self.aw.ser.PhidgetDigitalOut[serial].append(do)
-                    if serial is None:
-                        # we make this also accessible via its serial number
-                        self.aw.ser.PhidgetDigitalOut[str(ser)] = self.aw.ser.PhidgetDigitalOut[None]
+# this is not needed here as we add those a bit below on successful attach
+#                    if serial is None:
+#                        # we make this also accessible via its serial number and serial:port number
+#                        for sn in (str(ser) if port is None else [str(ser),f'{str(ser)}:{str(port)}']):
+#                            self.aw.ser.PhidgetDigitalOut[sn] = self.aw.ser.PhidgetDigitalOut[None]
+#                            self.aw.ser.PhidgetDigitalOutLastPWM[sn] = self.aw.ser.PhidgetDigitalOutLastPWM[None]
+#                            self.aw.ser.PhidgetDigitalOutLastToggle[sn] = self.aw.ser.PhidgetDigitalOutLastToggle[None]
+
         try:
             ch = self.aw.ser.PhidgetDigitalOut[serial][channel]
             if not ch.getAttached():
@@ -4344,7 +4351,10 @@ class serialport:
                 if serial is None and ch.getAttached():
                     # we make this also accessible via its serial number + port
                     si = self.serialPort2serialString(ch.getDeviceSerialNumber(),ch.getHubPort())
-                    self.aw.ser.PhidgetDigitalOut[str(si)] = self.aw.ser.PhidgetDigitalOut[None]
+                    if si is not None:
+                        self.aw.ser.PhidgetDigitalOut[si] = self.aw.ser.PhidgetDigitalOut[None]
+                        self.aw.ser.PhidgetDigitalOutLastPWM[si] = self.aw.ser.PhidgetDigitalOutLastPWM[None]
+                        self.aw.ser.PhidgetDigitalOutLastToggle[si] = self.aw.ser.PhidgetDigitalOutLastToggle[None]
         except Exception: # pylint: disable=broad-except
             pass
 
@@ -4618,9 +4628,10 @@ class serialport:
                             vo.setIsRemote(False)
                             vo.setIsLocal(True)
                         self.aw.ser.PhidgetAnalogOut[serial].append(vo)
-                    if serial is None:
-                        # we make this also accessible via its serial number
-                        self.aw.ser.PhidgetAnalogOut[str(ser)] = self.aw.ser.PhidgetAnalogOut[None]
+# this is not needed here as we add those a bit below on successful attach
+#                    if serial is None:
+#                        # we make this also accessible via its serial number
+#                        self.aw.ser.PhidgetAnalogOut[str(ser)] = self.aw.ser.PhidgetAnalogOut[None]
         try:
             ch = self.aw.ser.PhidgetAnalogOut[serial][channel]
             ch.setOnAttachHandler(self.phidgetOUTattached)
@@ -4633,7 +4644,8 @@ class serialport:
                 if serial is None and ch.getAttached():
                     # we make this also accessible via its serial number + port
                     si = self.serialPort2serialString(ch.getDeviceSerialNumber(),ch.getHubPort())
-                    self.aw.ser.PhidgetAnalogOut[str(si)] = self.aw.ser.PhidgetAnalogOut[None]
+                    if si is not None:
+                        self.aw.ser.PhidgetAnalogOut[si] = self.aw.ser.PhidgetAnalogOut[None]
             try:
                 self.aw.ser.PhidgetAnalogOut[str(s)][channel].setEnabled(True) # the output on this device is always enabled
             except Exception: # pylint: disable=broad-except
@@ -4741,9 +4753,10 @@ class serialport:
                             dcm.setIsRemote(False)
                             dcm.setIsLocal(True)
                         self.aw.ser.PhidgetDCMotor[serial].append(dcm)
-                    if serial is None:
-                        # we make this also accessible via its serial number
-                        self.aw.ser.PhidgetDCMotor[str(ser)] = self.aw.ser.PhidgetDCMotor[None]
+# this is not needed here as we add those a bit below on successful attach
+#                    if serial is None:
+#                        # we make this also accessible via its serial number
+#                        self.aw.ser.PhidgetDCMotor[str(ser)] = self.aw.ser.PhidgetDCMotor[None]
         try:
             ch = self.aw.ser.PhidgetDCMotor[serial][channel]
             ch.setOnAttachHandler(self.phidgetOUTattached)
@@ -4756,7 +4769,8 @@ class serialport:
                 if serial is None and ch.getAttached():
                     # we make this also accessible via its serial number + port
                     si = self.serialPort2serialString(ch.getDeviceSerialNumber(),ch.getHubPort())
-                    self.aw.ser.PhidgetDCMotor[str(si)] = self.aw.ser.PhidgetDCMotor[None]
+                    if si is not None:
+                        self.aw.ser.PhidgetDCMotor[si] = self.aw.ser.PhidgetDCMotor[None]
         except Exception: # pylint: disable=broad-except
             pass
 
@@ -5274,9 +5288,10 @@ class serialport:
                             stepper.setIsRemote(True)
                             stepper.setIsLocal(False)
                         self.aw.ser.PhidgetStepperMotor[serial].append(stepper)
-                    if serial is None:
-                        # we make this also accessible via its serial number
-                        self.aw.ser.PhidgetStepperMotor[str(ser)] = self.aw.ser.PhidgetStepperMotor[None]
+# this is not needed here as we add those a bit below on successful attach
+#                    if serial is None:
+#                        # we make this also accessible via its serial number
+#                        self.aw.ser.PhidgetStepperMotor[str(ser)] = self.aw.ser.PhidgetStepperMotor[None]
 
         try:
             ch = self.aw.ser.PhidgetStepperMotor[serial][channel]
@@ -5290,7 +5305,8 @@ class serialport:
                 if serial is None and ch.getAttached():
                     # we make this also accessible via its serial number + port
                     si = self.serialPort2serialString(ch.getDeviceSerialNumber(),ch.getHubPort())
-                    self.aw.ser.PhidgetStepperMotor[str(si)] = self.aw.ser.PhidgetStepperMotor[None]
+                    if si is not None:
+                        self.aw.ser.PhidgetStepperMotor[si] = self.aw.ser.PhidgetStepperMotor[None]
         except Exception: # pylint: disable=broad-except
             pass
 
@@ -5385,9 +5401,10 @@ class serialport:
                             rcservo.setIsRemote(True)
                             rcservo.setIsLocal(False)
                         self.aw.ser.PhidgetRCServo[serial].append(rcservo)
-                    if serial is None:
-                        # we make this also accessible via its serial number
-                        self.aw.ser.PhidgetRCServo[str(ser)] = self.aw.ser.PhidgetRCServo[None]
+# this is not needed here as we add those a bit below on successful attach
+#                    if serial is None:
+#                        # we make this also accessible via its serial number
+#                        self.aw.ser.PhidgetRCServo[str(ser)] = self.aw.ser.PhidgetRCServo[None]
         try:
             ch = self.aw.ser.PhidgetRCServo[serial][channel]
             ch.setOnAttachHandler(self.phidgetOUTattached)
@@ -5400,7 +5417,8 @@ class serialport:
                 if serial is None and ch.getAttached():
                     # we make this also accessible via its serial number + port
                     si = self.serialPort2serialString(ch.getDeviceSerialNumber(),ch.getHubPort())
-                    self.aw.ser.PhidgetRCServo[str(si)] = self.aw.ser.PhidgetRCServo[None]
+                    if si is not None:
+                        self.aw.ser.PhidgetRCServo[si] = self.aw.ser.PhidgetRCServo[None]
         except Exception: # pylint: disable=broad-except
             pass
 
