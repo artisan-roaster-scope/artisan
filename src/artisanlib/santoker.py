@@ -63,7 +63,7 @@ class SantokerCube_BLE(ClientBLE):
 
     def notify_callback(self, _sender:'BleakGATTCharacteristic', data:bytearray) -> None:
 #        _log.debug("notify: %s => %s", self._read_queue.qsize(), data)
-        if self._async_loop_thread is not None:
+        if hasattr(self, '_async_loop_thread') and self._async_loop_thread is not None:
             asyncio.run_coroutine_threadsafe(
                     self._read_queue.put(bytes(data)),
                     self._async_loop_thread.loop)
@@ -81,7 +81,7 @@ class SantokerCube_BLE(ClientBLE):
             await self._read_msg(stream)
 
     def on_start(self) -> None:
-        if self._async_loop_thread is not None:
+        if hasattr(self, '_async_loop_thread') and self._async_loop_thread is not None:
             # start the reader
             asyncio.run_coroutine_threadsafe(
                     self.reader(self._input_stream),

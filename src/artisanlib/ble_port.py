@@ -71,6 +71,33 @@ class BLE:
                 return True, service_uuid
         return False, None
 
+
+    # returns discovered_bd and service_uuid on success, or None
+    async def _scan(self,
+            device_descriptions:Dict[Optional[str],Optional[Set[str]]],
+            blacklist:Set[str],
+            case_sensitive:bool,
+            scan_timeout:float) -> 'Tuple[Optional[BLEDevice], Optional[str]]':
+        try:
+            async with asyncio.timeout(scan_timeout): # type:ignore[attr-defined]
+                async with BleakScanner() as scanner:
+                    self._terminate_scan_event.clear()
+                    async for bd, ad in scanner.advertisement_data():
+                        if self._terminate_scan_event.is_set():
+                            return None, None
+                        #_log.debug("device %s, (%s): %s", bd.name, ad.local_name, ad.service_uuids)
+                        if bd.address not in blacklist:
+                            res:bool
+                            res_service_uuid:Optional[str]
+                            res, res_service_uuid = self.description_match(bd,ad,device_descriptions,case_sensitive)
+                            if res:
+                                _log.debug('BLE device match')
+                                # we return the first discovered device that matches the given device descriptions
+                                return bd, res_service_uuid
+        except asyncio.TimeoutError:
+            _log.debug('timeout on BLE scanning')
+        return None, None
+
     # pylint: disable=too-many-positional-arguments
     async def _scan_and_connect(self,
                 device_descriptions:Dict[Optional[str],Optional[Set[str]]],
@@ -84,26 +111,7 @@ class BLE:
             # can cause errors
             discovered_bd:Optional[BLEDevice] = None
             service_uuid:Optional[str] = None
-            try:
-                async with asyncio.timeout(scan_timeout): # type:ignore[attr-defined]
-                    async with BleakScanner() as scanner:
-                        self._terminate_scan_event.clear()
-                        async for bd, ad in scanner.advertisement_data():
-                            if self._terminate_scan_event.is_set():
-                                break
-#                            _log.debug("device %s, (%s): %s", bd.name, ad.local_name, ad.service_uuids)
-                            if bd.address not in blacklist:
-                                res:bool
-                                res_service_uuid:Optional[str]
-                                res, res_service_uuid = self.description_match(bd,ad,device_descriptions,case_sensitive)
-                                if res:
-                                    _log.debug('BLE device match')
-                                    # we return the first discovered device that matches the given device descriptions
-                                    discovered_bd = bd
-                                    service_uuid = res_service_uuid
-                                    break
-            except asyncio.TimeoutError:
-                _log.debug('timeout on BLE scanning')
+            discovered_bd, service_uuid = await self._scan(device_descriptions, blacklist, case_sensitive, scan_timeout)
             if discovered_bd is None:
                 return None, None
             client = BleakClient(
@@ -402,11 +410,12 @@ class ClientBLE:
             if self._ble_client is None:
                 ble.terminate_scan() # we stop ongoing scanning
             self._disconnect()
-            #del self._async_loop_thread # on this level the released object should be automatically collected by the GC
+            del self._async_loop_thread # on this level the released object should be automatically collected by the GC
             self._async_loop_thread = None
             self._ble_client = None
             self._connected_service_uuid = None
             self.on_stop()
+            _log.error('BLE client stopped')
         else:
             _log.error('BLE client not running')
 
