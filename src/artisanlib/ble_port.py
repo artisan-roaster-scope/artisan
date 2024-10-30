@@ -410,7 +410,7 @@ class ClientBLE:
             if self._ble_client is None:
                 ble.terminate_scan() # we stop ongoing scanning
             self._disconnect()
-            del self._async_loop_thread # on this level the released object should be automatically collected by the GC
+            #del self._async_loop_thread # on this level the released object should be automatically collected by the GC
             self._async_loop_thread = None
             self._ble_client = None
             self._connected_service_uuid = None

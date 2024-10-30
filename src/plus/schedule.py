@@ -2086,9 +2086,10 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                         self.selected_completed_item.clicked.emit()
                     else:
                         self.selected_completed_item.selected.emit()
+            elif k == 46 and QApplication.keyboardModifiers() == Qt.KeyboardModifier.ControlModifier: # CMD-.
+                self.closeEvent()
             else:
                 super().keyPressEvent(event)
-
 
 
     @pyqtSlot('QCloseEvent')
@@ -2119,6 +2120,11 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         else:
             self.closeScheduler()
 
+    @pyqtSlot()
+    def close(self) -> bool:
+        self.closeEvent(None)
+        return True
+
     def closeScheduler(self) -> None:
         self.aw.scheduled_items_uuids = self.get_scheduled_items_ids()
         # remember Dialog geometry
@@ -2146,6 +2152,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             self.aw.qmc.scheduleID = None
             self.aw.qmc.scheduleDate = None
         self.aw.sendmessage(QApplication.translate('Message','Scheduler stopped'))
+        self.accept()
 
     # updates the current schedule items by joining its roast with those received as part of a stock update from the server
     # adding new items at the end

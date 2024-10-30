@@ -34,7 +34,7 @@ try:
         QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
     )
     from PyQt6.QtCore import Qt, pyqtSlot, QSize, QSettings # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtGui import QIcon, QStandardItemModel # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import QKeySequence, QAction, QIcon, QStandardItemModel # @UnusedImport @Reimport  @UnresolvedImport
 #    from PyQt6 import sip # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #pylint: disable = E, W, R, C
@@ -49,7 +49,7 @@ except Exception: # pylint: disable=broad-except
         QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
     )
     from PyQt5.QtCore import Qt, pyqtSlot, QSize, QSettings # type: ignore  # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QIcon, QStandardItemModel # type: ignore  # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QKeySequence, QAction, QIcon, QStandardItemModel # type: ignore  # @UnusedImport @Reimport  @UnresolvedImport
 #    try:
 #        from PyQt5 import sip # type: ignore  # @Reimport @UnresolvedImport @UnusedImport
 #    except Exception: # pylint: disable=broad-except
@@ -65,7 +65,7 @@ from typing import Final, Optional, List, Set, Collection, Dict, Tuple, cast, TY
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtWidgets import QWidget # noqa: F401 # pylint: disable=unused-import
-    from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
+    from PyQt6.QtGui import QCloseEvent, QKeyEvent # pylint: disable=unused-import
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -163,6 +163,23 @@ class CustomBlendDialog(ArtisanDialog):
             self.ui.buttonBox.removeButton(applyButton)
             self.applyButton = self.ui.buttonBox.addButton(applyButton.text(), QDialogButtonBox.ButtonRole.AcceptRole)
 
+        cancelButton = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Cancel)
+        if cancelButton is not None:
+            cancelButton.setDefault(False)
+            cancelButton.setAutoDefault(False)
+            # add additional CMD-. shortcut to close the dialog
+            cancelButton.setShortcut(QKeySequence('Ctrl+.'))
+            # add additional CMD-W shortcut to close this dialog (ESC on Mac OS X)
+    #        cancelAction = QAction(self, triggered=lambda _:self.dialogbuttons.rejected.emit())
+            cancelAction = QAction(self)
+            cancelAction.triggered.connect(self.cancelDialog)
+            try:
+                cancelAction.setShortcut(QKeySequence.StandardKey.Cancel)
+            except Exception: # pylint: disable=broad-except
+                pass
+            cancelButton.addActions([cancelAction])
+
+
         # populate widgets
         self.ui.lineEdit_name.setText(self.blend.name)
         self.ui.label_weight.setText(QApplication.translate('Label','Weight'))
@@ -182,6 +199,22 @@ class CustomBlendDialog(ArtisanDialog):
         settings = QSettings()
         if settings.contains('BlendGeometry'):
             self.restoreGeometry(settings.value('BlendGeometry'))
+
+    @pyqtSlot()
+    def cancelDialog(self) -> None: # ESC key
+        self.reject()
+
+    def keyPressEvent(self, event: Optional['QKeyEvent']) -> None:
+        if event is not None:
+            key = int(event.key())
+            #uncomment next line to find the integer value of a key
+            #print(key)
+            #modifiers = QApplication.keyboardModifiers()
+            modifiers = event.modifiers()
+            if key == 16777216 or (key == 87 and modifiers == Qt.KeyboardModifier.ControlModifier): #ESCAPE or CMD-W
+                self.reject()
+            else:
+                super().keyPressEvent(event)
 
     @pyqtSlot(str)
     def textChanged(self,s:str) -> None:
@@ -291,7 +324,7 @@ class CustomBlendDialog(ArtisanDialog):
 
     @pyqtSlot('QCloseEvent')
     def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
-        self.saveSettings()
+        self.reject()
 
     @pyqtSlot()
     def accept(self) -> None:

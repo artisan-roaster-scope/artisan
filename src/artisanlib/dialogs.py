@@ -93,11 +93,6 @@ class ArtisanDialog(QDialog): # pyright: ignore [reportGeneralTypeIssues] # Argu
                 (cancelButton,'Cancel',QApplication.translate('Button','Cancel'))]:
             self.setButtonTranslations(btn,txt,trans)
 
-    @pyqtSlot()
-    def cancelDialog(self) -> None:
-#        self.dialogbuttons.rejected.emit()
-        self.reject()
-
     @staticmethod
     def setButtonTranslations(btn: Optional['QPushButton'], txt:str, trans:str) -> None:
         if btn is not None:
@@ -107,6 +102,11 @@ class ArtisanDialog(QDialog): # pyright: ignore [reportGeneralTypeIssues] # Argu
                 current_trans = trans
             if txt != current_trans:
                 btn.setText(current_trans)
+
+    @pyqtSlot()
+    def cancelDialog(self) -> None:  # ESC key
+#        self.reject() # this does not call any closeEvent in subclasses!
+        self.dialogbuttons.rejected.emit()
 
     @pyqtSlot('QCloseEvent')
     def closeEvent(self,_:Optional['QCloseEvent'] = None) -> None:

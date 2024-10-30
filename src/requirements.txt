@@ -45,9 +45,9 @@ portalocker==2.10.1
 xlrd==2.0.1
 websockets==13.1
 PyYAML==6.0.2
-psutil==6.0.0
+psutil==6.1.0
 typing-extensions==4.10.0; python_version < '3.8' # required for supporting Final and TypeDict on Python <3.8
-protobuf==5.28.2
+protobuf==5.28.3
 numpy==1.24.3; python_version < '3.9' # last Python 3.8 release
 numpy==2.1.2; python_version >= '3.9'
 scipy==1.10.1; python_version < '3.9' # last Python 3.8 release
@@ -55,8 +55,9 @@ scipy==1.14.1; python_version >= '3.9'
 wquantiles==0.6
 colorspacious==1.1.2
 openpyxl==3.1.5
-keyring==25.4.1
-prettytable==3.11.0
+keyring==25.5.0
+prettytable==3.11.0; python_version < '3.9' # last Python 3.8 release
+prettytable==3.12.0; python_version >= '3.9'
 lxml==5.3.0
 matplotlib==3.7.3; python_version < '3.9' # last Python 3.8 release
 matplotlib==3.9.2; python_version >= '3.9'
