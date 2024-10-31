@@ -41,12 +41,13 @@ extraname2=CT, Extra 2, SP, {1}
 svSlider=true
 svSliderMax=250
 svSliderMin=0
+svSync=8
 
 [Modbus]
 IP_retries=1
 IP_timeout=0.2
-PID_OFF_action="write(255,3085,0)"
-PID_ON_action="write(255,3085,1)"
+PID_OFF_action=
+PID_ON_action=
 PID_SV_register=3002
 PID_d_register=0
 PID_i_register=0
@@ -184,7 +185,7 @@ eventbuttontablecolumnwidths=70, 80, 100, 50, 150, 290, 73, 75, 75
 extraeventbuttoncolor=#49b160, #85ba91, #808080, #ad0427, #a35968, #808080, #43a7cf, #a0c9d8, #808080, #5a5a5a, #9c9c9c
 extraeventbuttontextcolor=white, white, white, white, white, white, white, white, white, white, white
 extraeventsactions=4, 4, 0, 4, 4, 0, 4, 4, 0, 4, 4
-extraeventsactionstrings="write(255,3014,1)", "write(255,3014,0)", , "write(255,3008,1)", "write(255,3008,0)", , "write(255,3013,1)", "write(255,3013,0)", , "write(255,3085,1)", "write(255,3085,0)"
+extraeventsactionstrings="write(255,3014,1)", "write(255,3014,0)", , "write(255,3008,1)", "write(255,3008,0)", , "write(255,3013,1)", "write(255,3013,0)", , "write(255,3085,0)", "write(255,3085,1)"
 extraeventsbuttonsflags=0, 1, 1
 extraeventsdescriptions=, , , , , , , , , , 
 extraeventslabels=\\w\n\\1, \\w\n\\0, E, \\d\n\\1, \\d\n\\0, E, \\l\n\\1, \\l\n\\0, E, \\a, \\m

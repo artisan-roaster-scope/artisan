@@ -10,6 +10,7 @@ v3.0.3
   - adds symbolic expression `bit(n,x)` which returns the n-th bit of x interpreted as integer
   - adds (total) correction to cup profiles and enables column drag-and-drop ([Discussion #1690](../../../discussions/1690))
   - adds option to manually add a roast to an open schedule item assigned by [artisan.plus](https://artisan.plus)
+  - adds option to synchronization of the Artisan PID SV slider with external MODBUS/S7 PIDs
 
 * NEW HARDWARE SUPPORT
   - adds support for various newer [Santoker machines](https://artisan-scope.org/machines/santoker/) communicating via Bluetooth like the Cube10, the Bluetooth enabled X, Q and R Master Series as well as the R Series machines ([Issue #1088](../../../issues/1088) and [Issue #1702](../../../issues/1702))

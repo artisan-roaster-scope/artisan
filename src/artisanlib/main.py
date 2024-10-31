@@ -6054,6 +6054,27 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     # we set the last value to be used for relative +- button action as base
                                     self.extraeventsactionslastvalue[i] = int(round(v))
                                     self.establishQuantifiedEventSignal.emit(i,v)
+        # process SV sync for external MODBUS/S7 PID if PID SV slider is visible, PID in Manual Mode and svSync set
+        if self.pidcontrol.svSlider and self.pidcontrol.svSync and \
+            self.pidcontrol.svMode == 0 and self.pidcontrol.externalPIDControl() in {1,2}:
+            value:Optional[float] = None
+            if self.pidcontrol.svSync == 1: # we sync SV to the BT
+                value = self.qmc.temp2[-1] if self.qmc.flagstart else self.qmc.on_temp2[-1]
+            elif self.pidcontrol.svSync == 2: # we sync SV to the ET
+                value = self.qmc.temp1[-1] if self.qmc.flagstart else self.qmc.on_temp1[-1]
+            elif self.pidcontrol.svSync>2: # we sync SV to an extra device channel
+                n = self.pidcontrol.svSync - 3
+                c = n // 2
+                if n % 2 == 0:
+                    tempX = self.qmc.extratemp1 if self.qmc.flagstart else self.qmc.on_extratemp1
+                else:
+                    tempX = self.qmc.extratemp2 if self.qmc.flagstart else self.qmc.on_extratemp2
+                if len(tempX)>c:
+                    value = (tempX[c][-1] if len(tempX[c])>0 else 0)
+            if value is not None:
+                self.moveSVslider(max(0,value),setValue=True)
+
+
 
     # signalled from the sampling thread via process_active_quantifiers, but runs in the GUI thread (required for this moveslider call!)
     @pyqtSlot(int,float)
@@ -17323,6 +17344,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.pidcontrol.svSliderMin = max(0, min(999, toInt(settings.value('svSliderMin',self.pidcontrol.svSliderMin))))
             self.pidcontrol.svSliderMax = max(0, min(999, toInt(settings.value('svSliderMax',self.pidcontrol.svSliderMax))))
             self.pidcontrol.svValue = toInt(settings.value('svValue',self.pidcontrol.svValue))
+            self.pidcontrol.svSync = toInt(settings.value('svSync',self.pidcontrol.svSync))
             self.pidcontrol.loadRampSoakFromBackground = toBool(settings.value('loadRampSoakFromBackground',self.pidcontrol.loadRampSoakFromBackground))
             self.pidcontrol.svLabel = toString(settings.value('svLabel',self.pidcontrol.svLabel))
             self.pidcontrol.dutyMin = toInt(settings.value('dutyMin',self.pidcontrol.dutyMin))
@@ -18987,6 +19009,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'svSliderMax',self.pidcontrol.svSliderMax, read_defaults)
             sv = max(min(self.pidcontrol.svValue, self.pidcontrol.svSliderMax), self.pidcontrol.svSliderMin)
             self.settingsSetValue(settings, default_settings, 'svValue',sv, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'svSync',self.pidcontrol.svSync, read_defaults)
             self.settingsSetValue(settings, default_settings, 'dutyMin',self.pidcontrol.dutyMin, read_defaults)
             self.settingsSetValue(settings, default_settings, 'dutyMax',self.pidcontrol.dutyMax, read_defaults)
             self.settingsSetValue(settings, default_settings, 'positiveTargetRangeLimit',self.pidcontrol.positiveTargetRangeLimit, read_defaults)

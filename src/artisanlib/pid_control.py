@@ -1136,7 +1136,8 @@ class FujiPID:
 
 class PIDcontrol:
     __slots__ = [ 'aw', 'pidActive', 'sv', 'pidOnCHARGE', 'RStimeAfterCHARGE', 'loadpidfrombackground', 'createEvents', 'loadRampSoakFromProfile', 'loadRampSoakFromBackground', 'svLen', 'svLabel',
-            'svValues', 'svRamps', 'svSoaks', 'svActions', 'svBeeps', 'svDescriptions','svTriggeredAlarms', 'RSLen', 'RS_svLabels', 'RS_svValues', 'RS_svRamps', 'RS_svSoaks',
+            'svValues', 'svSync', 'svRamps', 'svSoaks', 'svActions', 'svBeeps', 'svDescriptions','svTriggeredAlarms',
+            'RSLen', 'RS_svLabels', 'RS_svValues', 'RS_svRamps', 'RS_svSoaks',
             'RS_svActions', 'RS_svBeeps', 'RS_svDescriptions', 'svSlider', 'svButtons', 'svMode', 'svLookahead', 'dutySteps', 'svSliderMin', 'svSliderMax', 'svValue',
             'dutyMin', 'dutyMax', 'pidKp', 'pidKi', 'pidKd', 'pOnE', 'pidSource', 'pidCycle', 'pidPositiveTarget', 'pidNegativeTarget', 'invertControl',
             'sv_smoothing_factor', 'sv_decay_weights', 'previous_svs', 'time_pidON', 'source_reading_pidON', 'current_ramp_segment',  'current_soak_segment', 'ramp_soak_engaged',
@@ -1181,6 +1182,7 @@ class PIDcontrol:
         self.svSliderMin:int = 0
         self.svSliderMax:int = (230 if self.aw.qmc.mode == 'C' else 446) # 446F / 230C
         self.svValue:float = (180 if self.aw.qmc.mode == 'C' else 356) # 356F / 180C # the value in the setSV textinput box of the PID dialog
+        self.svSync:int = 0 # 0: off, 1:BT, 2:ET, >2: extra devices index of temperature curve to be used to move SV slider in manual mode in external MODBUS/SV PID mode
         self.dutySteps:int = 1
         self.dutyMin:int = -100
         self.dutyMax:int = 100
@@ -1647,14 +1649,14 @@ class PIDcontrol:
 #            self.aw.sendmessage(QApplication.translate("Message","SV set to %s"%sv))
         if self.externalPIDControl() == 1:
             # MODBUS PID and Control ticked
-            self.sv = max(0,sv)
+            sv = max(0,sv)
             if move:
                 self.aw.moveSVslider(sv,setValue=True)
             self.aw.modbus.setTarget(sv)
             self.sv = sv # remember last sv
         elif self.externalPIDControl() == 2:
             # S7 PID and Control ticked
-            self.sv = max(0,sv)
+            sv = max(0,sv)
             if move:
                 self.aw.moveSVslider(sv,setValue=True)
             self.aw.s7.setTarget(sv,self.aw.s7.SVmultiplier)
