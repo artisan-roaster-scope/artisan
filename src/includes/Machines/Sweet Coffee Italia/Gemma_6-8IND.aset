@@ -33,7 +33,7 @@ extradevicecolor1=#ff5d00ff, #000000, #000000, #43a7cfff
 extradevicecolor2=#2298c7ff, #000000, #0c6aa6ff, #49b160ff
 extradevices=33, 55, 109, 150
 extramathexpression1=, , , 
-extramathexpression2=, , , 
+extramathexpression2=, , , -1*x
 extraname1=IT, kWh, {3}, {0}
 extraname2=CT, Extra 2, SP, {1}
 
