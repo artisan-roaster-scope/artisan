@@ -18,7 +18,7 @@
 import asyncio
 import logging
 from enum import IntEnum
-from typing import Optional, Union, List, Tuple, Final, TYPE_CHECKING
+from typing import Optional, Union, List, Tuple, Final, Callable, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from bleak.backends.characteristic import BleakGATTCharacteristic  # pylint: disable=unused-import
@@ -125,10 +125,16 @@ class AcaiaBLE(ClientBLE):
 
 # NOTE: __slots__ are incompatible with multiple inheritance mixings in subclasses (as done below in class Acaia with QObject)
 #    __slots__ = [ '_read_queue', '_input_stream',
-#            'id_sent', 'fast_notifications_sent', 'slow_notifications_sent', 'weight', 'battery', 'firmware', 'unit', 'max_weight' ]
+#            'id_sent', 'fast_notifications_sent', 'slow_notifications_sent', 'weight', 'battery', 'firmware', 'unit', 'max_weight'
+#            '_connected_handler', '_disconnected_handler' ]
 
-    def __init__(self) -> None:
+    def __init__(self, connected_handler:Optional[Callable[[], None]] = None,
+                       disconnected_handler:Optional[Callable[[], None]] = None):
         super().__init__()
+
+        # handlers
+        self._connected_handler = connected_handler
+        self._disconnected_handler = disconnected_handler
 
         # Protocol parser variables
         self._read_queue : asyncio.Queue[bytes] = asyncio.Queue(maxsize=200)
@@ -184,9 +190,13 @@ class AcaiaBLE(ClientBLE):
             _log.debug('connected to Acaia Legacy Scale')
         elif connected_service_UUID == self.ACAIA_SERVICE_UUID:
             _log.debug('connected to Acaia Scale')
+        if self._connected_handler is not None:
+            self._connected_handler()
 
     def on_disconnect(self) -> None:
         _log.debug('disconnected')
+        if self._disconnected_handler is not None:
+            self._disconnected_handler()
 
 
     ##
@@ -505,6 +515,11 @@ class Acaia(QObject, AcaiaBLE): # pyright: ignore [reportGeneralTypeIssues] # Ar
     battery_changed_signal = pyqtSignal(int)  # delivers new batter level in %
     disconnected_signal = pyqtSignal()        # issued on disconnect
 
+    def __init__(self, connected_handler:Optional[Callable[[], None]] = None,
+                       disconnected_handler:Optional[Callable[[], None]] = None):
+        QObject.__init__(self)
+        AcaiaBLE.__init__(self, connected_handler = connected_handler, disconnected_handler=disconnected_handler)
+
 
     def weight_changed(self, new_value:int) -> None:
         self.weight_changed_signal.emit(new_value)
@@ -514,3 +529,4 @@ class Acaia(QObject, AcaiaBLE): # pyright: ignore [reportGeneralTypeIssues] # Ar
 
     def on_disconnect(self) -> None:
         self.disconnected_signal.emit()
+        AcaiaBLE.on_disconnect(self)

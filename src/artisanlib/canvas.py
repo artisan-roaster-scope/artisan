@@ -12048,7 +12048,7 @@ class tgraphcanvas(FigureCanvas):
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Santoker R'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Santoker R'),True,None))
                     self.aw.santokerR.setLogging(self.device_logging)
-                    self.aw.santokerR.start()
+                    self.aw.santokerR.start(case_sensitive=False)
                 elif self.device == 138:
                     # connect Kaleido
                     from artisanlib.kaleido import KaleidoPort

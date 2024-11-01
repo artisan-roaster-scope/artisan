@@ -1455,7 +1455,9 @@ class serialport:
     def ColorTrackBT(self) -> Tuple[float,float,float]:
         if self.colorTrackBT is None:
             from artisanlib.colortrack import ColorTrackBLE
-            self.colorTrackBT = ColorTrackBLE()
+            self.colorTrackBT = ColorTrackBLE(
+                connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('ColorTrack'),True,None),
+                disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('ColorTrack'),True,None))
             if self.colorTrackBT is not None:
                 self.colorTrackBT.start()
         tx = self.aw.qmc.timeclock.elapsedMilli()

@@ -1370,7 +1370,9 @@ class editGraphDlg(ArtisanResizeablDialog):
                 # BLE is not well supported under Windows versions before Windows 10
                 try:
                     from artisanlib.acaia import Acaia
-                    self.acaia = Acaia()
+                    self.acaia = Acaia(
+                        connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Acaia'),True,None),
+                        disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Acaia'),True,None))
                     self.acaia.weight_changed_signal.connect(self.ble_weight_changed)
                     self.acaia.battery_changed_signal.connect(self.ble_battery_changed)
                     self.acaia.disconnected_signal.connect(self.ble_disconnected)

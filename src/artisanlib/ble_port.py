@@ -15,7 +15,6 @@
 # AUTHOR
 # Marko Luther, 2024
 
-import time
 import asyncio
 import logging
 from bleak import BleakScanner, BleakClient
@@ -179,12 +178,8 @@ class BLE:
 
     def disconnect(self, client:'BleakClient') -> bool:
         if hasattr(self, '_asyncLoopThread') and self._asyncLoopThread is not None:
-            fut = asyncio.run_coroutine_threadsafe(client.disconnect(), self._asyncLoopThread.loop)
-            try:
-                return fut.result()
-            except Exception: # pylint: disable=broad-except
-                #raise fut.exception() from e # type: ignore[misc]
-                _log.error('exception in disconnect: %s', fut.exception())
+            # don't wait for completion not to block caller (note: ble device will not be discovered until fully disconnected)
+            asyncio.run_coroutine_threadsafe(client.disconnect(), self._asyncLoopThread.loop)
         return False
 
     def start_notify(self, client:BleakClient, uuid:str, callback: 'Callable[[BleakGATTCharacteristic, bytearray], Union[None, Awaitable[None]]]') -> None:
@@ -270,9 +265,6 @@ class ClientBLE:
     def _disconnect(self) -> None:
         if self._ble_client is not None and self._ble_client.is_connected:
             ble.disconnect(self._ble_client)
-            # wait somewhat until disconnected
-            while self._ble_client is not None and self._ble_client.is_connected:
-                time.sleep(0.05)
 
     # returns the service UUID connected to or None
     def connected(self) -> Optional[str]:
@@ -398,6 +390,7 @@ class ClientBLE:
                     asyncio.run_coroutine_threadsafe(
                         self._connect_and_keep_alive(case_sensitive, scan_timeout, connect_timeout),
                         self._async_loop_thread.loop)
+                    _log.debug('BLE client started')
                     self.on_start()
             except Exception as e:  # pylint: disable=broad-except
                 _log.exception(e)
@@ -414,8 +407,8 @@ class ClientBLE:
             self._async_loop_thread = None
             self._ble_client = None
             self._connected_service_uuid = None
+            _log.debug('BLE client stopped')
             self.on_stop()
-            _log.error('BLE client stopped')
         else:
             _log.error('BLE client not running')
 

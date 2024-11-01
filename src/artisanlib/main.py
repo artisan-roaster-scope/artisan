@@ -17679,7 +17679,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 _log.info('machine: %s (%s, %skg, %s)', self.qmc.machinesetup, self.qmc.roastertype_setup, self.qmc.roastersize_setup, ([''] + self.qmc.sourcenames)[self.qmc.roasterheating_setup])
                 _log.info('device: %s (%s extra devices)', (['Fuji PID']+self.qmc.devices)[self.qmc.device], len(self.qmc.extradevices))
                 _log.info('serial: %s @%s', self.ser.comport, self.ser.baudrate)
-                _log.info('MODBUS %s: %s, %s @%s', ['Serial RTU','Serial ASCII','Serial Binary','TCP','UDP'][self.modbus.type], self.modbus.host, self.modbus.comport, self.modbus.baudrate)
+                _log.info('MODBUS %s: %s, %s %s%s%s@%s', ['Serial RTU','Serial ASCII','Serial Binary','TCP','UDP'][self.modbus.type],
+                        self.modbus.host, self.modbus.comport, self.modbus.bytesize, self.modbus.parity, self.modbus.stopbits, self.modbus.baudrate)
                 _log.info('S7: %s', self.s7.host)
                 _log.info('WebSocket: %s', self.ws.host)
             except Exception as e: # pylint: disable=broad-except
