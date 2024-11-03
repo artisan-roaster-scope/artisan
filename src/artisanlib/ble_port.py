@@ -54,19 +54,22 @@ class BLE:
         self._terminate_scan_event.set()
 
     # returns True if the given device name matches with the devices name or the local_name of the advertisement
+    # returns True also in case the local_name is None, but the given service_uuid is within ad.service_uuids
     @staticmethod
-    def name_match(bd:'BLEDevice', ad:'AdvertisementData', device_name:str, case_sensitive:bool) -> bool:
+    def name_match(bd:'BLEDevice', ad:'AdvertisementData', device_name:str, case_sensitive:bool, service_uuid:Optional[str]) -> bool:
         return ((bd.name is not None and (bd.name.startswith(device_name) if
                     case_sensitive else bd.name.casefold().startswith(device_name.casefold()))) or
                 (ad.local_name is not None and (ad.local_name.startswith(device_name) if
-                    case_sensitive else ad.local_name.casefold().startswith(device_name.casefold()))))
+                    case_sensitive else ad.local_name.casefold().startswith(device_name.casefold()))) or
+                (ad.local_name is None and service_uuid is not None and
+                    service_uuid.casefold() in (uuid.casefold() for uuid in ad.service_uuids)))
 
     # matches the discovered BLEDevice and AdvertisementData
     # returns True on success and False otherwise, as well as the service_uuid str of the matching device_description
     def description_match(self, bd:'BLEDevice', ad:'AdvertisementData',
             device_descriptions:Dict[Optional[str],Optional[Set[str]]], case_sensitive:bool) -> Tuple[bool, Optional[str]]:
         for service_uuid, device_names in device_descriptions.items():
-            if device_names is None or any(self.name_match(bd,ad,device_name,case_sensitive) for device_name in device_names):
+            if device_names is None or any(self.name_match(bd,ad,device_name,case_sensitive, service_uuid) for device_name in device_names):
                 return True, service_uuid
         return False, None
 
@@ -84,7 +87,7 @@ class BLE:
                     async for bd, ad in scanner.advertisement_data():
                         if self._terminate_scan_event.is_set():
                             return None, None
-                        #_log.debug("device %s, (%s): %s", bd.name, ad.local_name, ad.service_uuids)
+#                        _log.debug("device %s, (%s): %s", bd.name, ad.local_name, ad.service_uuids)
                         if bd.address not in blacklist:
                             res:bool
                             res_service_uuid:Optional[str]
