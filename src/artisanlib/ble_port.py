@@ -277,7 +277,7 @@ class ClientBLE:
 
 
     # connect and re-connect while self._running to BLE
-    async def _connect(self, case_sensitive:bool=True, scan_timeout:float=10, connect_timeout:float=3) -> None:
+    async def _connect(self, case_sensitive:bool=True, scan_timeout:float=10, connect_timeout:float=4) -> None:
         blacklist:Set[str] = set()
         while self._running:
             # scan and connect
@@ -380,7 +380,7 @@ class ClientBLE:
             self._keep_alive())
 
 
-    def start(self, case_sensitive:bool=True, scan_timeout:float=10, connect_timeout:float=3) -> None:
+    def start(self, case_sensitive:bool=True, scan_timeout:float=10, connect_timeout:float=4) -> None:
         _log.debug('start')
         if self._running:
             _log.error('BLE client already running')
