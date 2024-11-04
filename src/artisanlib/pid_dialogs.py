@@ -3245,7 +3245,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
             command = self.aw.fujipid.message2send(self.aw.ser.controlETpid[1],3,reg_dict['selectsv'][1],1)
             N = self.aw.fujipid.readoneword(command)
         # if current svN is different than requested svN
-        if N != -1:
+        if N is not None and N != -1:
             if svn != N:
                 string = QApplication.translate('Message','Current sv = {0}. Change now to sv = {1}?',None).format(str(N),str(svn))
                 reply = QMessageBox.question(self.aw,QApplication.translate('Message','Change svN',None),string,

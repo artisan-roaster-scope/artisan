@@ -350,9 +350,6 @@ class AcaiaBLE(ClientBLE):
     def parse_data(self, msg_type:int, data:bytes) -> None:
         if msg_type == MSG.INFO:
             self.parse_info(data)
-            if not self.id_sent:
-                # send ID only once per connect
-                self.send_ID()
         elif msg_type == MSG.STATUS:
             self.parse_status(data)
         elif msg_type == MSG.EVENT:
@@ -362,6 +359,9 @@ class AcaiaBLE(ClientBLE):
             # we configure the scale to receive the initial
             # weight notification as fast as possible
             self.fast_notifications()
+        if not self.id_sent:
+            # send ID only once per connect
+            self.send_ID()
 
     ##
 
