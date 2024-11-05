@@ -317,11 +317,17 @@ class ClientBLE:
                 # await disconnect
                 self._disconnected_event.clear()
                 await self._disconnected_event.wait()
+                _log.debug('BLE reconnect')
             await asyncio.sleep(0.1)
 
+    # release the async lock _disconnected_event after disconnect triggered to enable the automatic reconnect
     async def set_event(self) -> None:
+        # if still connected, wait somewhat until really disconnected
+        while self._ble_client is not None and self._ble_client.is_connected:
+            await asyncio.sleep(0.05)
         self._disconnected_event.set()
 
+    # this seems only to be called if disconnect from device received and not if disconnecting via API calls
     def disconnected_callback(self, _client:BleakClient) -> None:
         self.stop_notifications()
         self.on_disconnect()
