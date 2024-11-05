@@ -13,12 +13,13 @@ v3.0.3
   - adds option to synchronization of the Artisan PID SV slider with external MODBUS/S7 PIDs
 
 * NEW HARDWARE SUPPORT
+  - adds support for the [induction-based roasting machines Gemma_2IND, Gemma_6-8IND and Gemma_26-30IND](https://artisan-scope.org/machines/sci/) from Sweet Coffee Italia
   - adds support for various newer [Santoker machines](https://artisan-scope.org/machines/santoker/) communicating via Bluetooth like the Cube10, the Bluetooth enabled X, Q and R Master Series as well as the R Series machines ([Issue #1088](../../../issues/1088) and [Issue #1702](../../../issues/1702))
   - adds [ColorTrack](https://artisan-scope.org/devices/colortrack/) serial and bluetooth support ([Issue #1680](../../../issues/1680))
-  - adds support for [Acaia](https://acaia.co/) scales on Windows 11
   - adds support for [Primo roasting machines](https://artisan-scope.org/machines/primo/)
   - adds [Loring](https://artisan-scope.org/machines/loring/) 'auto' setup which picks up CHARGE and DROP events set at the machine
   - adds control function to [Diedrich DR](https://artisan-scope.org/machines/diedrich/) machine setup and adds [Diedrich CR](https://artisan-scope.org/machines/diedrich/) machine setup
+  - adds support for [Acaia](https://acaia.co/) scales on Windows 11
   - adds support for [Phidget Stepper Motor Controllers](https://artisan-scope.org/devices/phidgets/#47-stepper-motor-control) ([Discussion #891](../../../discussions/891) and [PR #1715](../../../pull/1715))
 
 * CHANGES
