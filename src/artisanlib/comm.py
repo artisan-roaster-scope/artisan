@@ -1554,6 +1554,7 @@ class serialport:
             except Exception: # pylint: disable=broad-except
                 self.aw.ws.readings = [-1]*self.aw.ws.channels
         else:
+            self.aw.ws.tx = self.aw.qmc.timeclock.elapsedMilli()
             for i in [0,1]:
                 c = mode*2+i
                 if self.aw.ws.channel_requests[c] != '':
