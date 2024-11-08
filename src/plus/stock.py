@@ -286,7 +286,7 @@ def load() -> None:
         with open(stock_cache_path, encoding='utf-8') as f:
             stock = json.load(f)
     except Exception as e:  # pylint: disable=broad-except
-        _log.error(e)
+        _log.info(e)
     finally:
         if stock_semaphore.available() < 1:
             stock_semaphore.release(1)

@@ -12,7 +12,7 @@ from typing import Final, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
-    from artisanlib.types import ProfileData # pylint: disable=unused-import
+    from artisanlib.atypes import ProfileData # pylint: disable=unused-import
 from artisanlib.util import replace_duplicates, encodeLocal
 
 try:

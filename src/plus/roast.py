@@ -30,7 +30,7 @@ from typing import Final, Any, Optional, Dict, List, Tuple, Union, TYPE_CHECKING
 
 
 if TYPE_CHECKING:
-    from artisanlib.types import ProfileData # pylint: disable=unused-import
+    from artisanlib.atypes import ProfileData # pylint: disable=unused-import
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)

@@ -44,7 +44,7 @@ import numpy
 from typing import Final, Optional, Union, Any, Dict, List, Tuple, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
 
 if TYPE_CHECKING:
-    from artisanlib.types import ProfileData, ComputedProfileInformation # pylint: disable=unused-import
+    from artisanlib.atypes import ProfileData, ComputedProfileInformation # pylint: disable=unused-import
     from PyQt6.QtWidgets import QMessageBox # pylint: disable=unused-import
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)

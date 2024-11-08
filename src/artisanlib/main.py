@@ -193,7 +193,7 @@ import matplotlib.backends.qt_editor._formlayout as formlayout
 
 if TYPE_CHECKING:
     from types import TracebackType
-    from artisanlib.types import ProfileData, ComputedProfileInformation, RecentRoast, ExtraDeviceSettings, Palette, CurveSimilarity, ProductionData, ProductionDataStr, Wheel # pylint: disable=unused-import
+    from artisanlib.atypes import ProfileData, ComputedProfileInformation, RecentRoast, ExtraDeviceSettings, Palette, CurveSimilarity, ProductionData, ProductionDataStr, Wheel # pylint: disable=unused-import
     from artisanlib.roast_properties import editGraphDlg # pylint: disable=unused-import
     from artisanlib.comparator import roastCompareDlg # pylint: disable=unused-import
     from artisanlib.wheels import WheelDlg # pylint: disable=unused-import
@@ -1453,7 +1453,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'seriallog', 'ser', 'modbus', 'extraMODBUStemps', 'extraMODBUStx', 's7', 'extraS7tx', 'ws', 'scale', 'color', 'extraser', 'extracomport', 'extrabaudrate',
         'extrabytesize', 'extraparity', 'extrastopbits', 'extratimeout', 'hottop', 'santokerHost', 'santokerPort', 'santokerSerial', 'santokerBLE', 'santoker', 'santokerr', 'fujipid', 'dtapid', 'pidcontrol', 'soundflag', 'recentRoasts', 'maxRecentRoasts',
         'mugmaHost','mugmaPort', 'mugma', 'mugma_default_host',
-        'kaleido_default_host', 'kaleidoHost', 'kaleidoPort', 'kaleidoSerial', 'kaleidoPID', 'kaleido', 'ikawa',
+        'kaleido_default_host', 'kaleidoHost', 'kaleidoPort', 'kaleidoSerial', 'kaleidoPID', 'kaleido', 'colorTrack_mean_window_size', 'colorTrack_median_window_size', 'ikawa',
         'lcdpaletteB', 'lcdpaletteF', 'extraeventsbuttonsflags', 'extraeventslabels', 'extraeventbuttoncolor', 'extraeventsactionstrings',
         'extraeventbuttonround', 'block_quantification_sampling_ticks', 'sampling_seconds_to_block_quantifiction', 'sampling_ticks_to_block_quantifiction', 'extraeventsactionslastvalue',
         'org_extradevicesettings', 'eventslidervalues', 'eventslidervisibilities', 'eventsliderKeyboardControl', 'eventsliderAlternativeLayout', 'eventslideractions', 'eventslidercommands', 'eventslideroffsets',
@@ -1769,6 +1769,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.mugmaPort:int = 1504
         self.mugma:Optional[Mugma] = None # holds the Mugma instance created on connect; reset to None on disconnect
 
+        # ColorTrack
+        self.colorTrack_mean_window_size:int = 50    # window size of the mean filter (10-200)
+        self.colorTrack_median_window_size:int = 50  # window size of the median filter (10-200)
+
         # Kaleido Network
         self.kaleido_default_host:Final[str] = '127.0.0.1'
         self.kaleidoHost:str = self.kaleido_default_host
@@ -2077,6 +2081,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 importRoastPathAction = QAction('RoastPATH URL...',self)
                 importRoastPathAction.triggered.connect(self.importRoastPATH)
                 self.importMenu.addAction(importRoastPathAction)
+
+                importStrongholdAction = QAction('Stronghold XLSX...', self)
+                importStrongholdAction.triggered.connect(self.importStronghold)
+                self.importMenu.addAction(importStrongholdAction)
 
 
             self.fileMenu.addSeparator()
@@ -14943,10 +14951,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             else:
                 self.qmc.roastertype = ''
             self.qmc.roastersize = profile.get('roastersize', 0)
-            if 'roasterheating' in profile:
-                self.qmc.roasterheating = profile['roasterheating']
-            else:
-                self.qmc.roastersize = 0
+            self.qmc.roasterheating = profile.get('roasterheating', 0)
             if 'operator' in profile:
                 self.qmc.operator = decodeLocalStrict(profile['operator'])
             else:
@@ -16866,6 +16871,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.kaleidoPID = toBool(settings.value('kaleidoPID',self.kaleidoPID))
             self.mugmaHost = toString(settings.value('mugmaHost',self.mugmaHost))
             self.mugmaPort = toInt(settings.value('mugmaPort',self.mugmaPort))
+            self.colorTrack_mean_window_size = toInt(settings.value('ctMean',self.colorTrack_mean_window_size))
+            self.colorTrack_median_window_size = toInt(settings.value('ctMedian',self.colorTrack_median_window_size))
             # activate CONTROL BUTTON
             self.showControlButton()
             self.ser.controlETpid = [toInt(x) for x in toList(settings.value('controlETpid',self.ser.controlETpid))]
@@ -18697,6 +18704,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'kaleidoPID',self.kaleidoPID, read_defaults)
             self.settingsSetValue(settings, default_settings, 'mugmaHost',self.mugmaHost, read_defaults)
             self.settingsSetValue(settings, default_settings, 'mugmaPort',self.mugmaPort, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ctMean',self.colorTrack_mean_window_size, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ctMedian',self.colorTrack_median_window_size, read_defaults)
             settings.endGroup()
 #--- END GROUP System
 
@@ -24374,6 +24383,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     @pyqtSlot()
     @pyqtSlot(bool)
+    def importStronghold(self, _:bool = False) -> None:
+        from artisanlib.stronghold import extractProfileStrongholdXLSX
+        self.importExternal(extractProfileStrongholdXLSX, QApplication.translate('Message','Import Stronghold XLSX'), '*.xlsx')
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
     def importRoastLog(self, _:bool = False) -> None:
         from artisanlib.roastlog import extractProfileRoastLog
         self.importExternalURL(extractProfileRoastLog,QApplication.translate('Message','Import RoastLog URL'))
@@ -25603,14 +25618,32 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if 'segmentresultstr' in cfr:
                 segmentresultstr = cfr['segmentresultstr']
 
-                self.segmentresultsanno = self.qmc.ax.annotate(segmentresultstr, xy=self.qmc.segmentresultsloc, xycoords='axes fraction',
-                           ha='left', va='center',
-                           fontfamily=fontfamily,
-                           fontsize='x-small',
-                           color=tc,
-                           zorder=30,
-                           picker=False,
-                           bbox={'boxstyle': 'round', 'fc': fc, 'alpha': a})
+                try:
+                    self.segmentresultsanno = self.qmc.ax.annotate(segmentresultstr, xy=self.qmc.segmentresultsloc, xycoords='axes fraction',
+                               ha='left', va='center',
+                               fontfamily=fontfamily,
+                               fontsize='x-small',
+                               color=tc,
+                               zorder=30,
+                               picker=False,
+                               bbox={'boxstyle': 'round', 'fc': fc, 'alpha': a})
+                except Exception as e: # pylint: disable=broad-except
+                    _log.error(e)
+                    _log.info('reseting segmentresultsloc')
+                    self.qmc.segmentresultsloc = self.qmc.segmentresultsloc_default
+                    # retry to draw
+                    try:
+                        self.segmentresultsanno = self.qmc.ax.annotate(segmentresultstr, xy=self.qmc.segmentresultsloc, xycoords='axes fraction',
+                                   ha='left', va='center',
+                                   fontfamily=fontfamily,
+                                   fontsize='x-small',
+                                   color=tc,
+                                   zorder=30,
+                                   picker=False,
+                                   bbox={'boxstyle': 'round', 'fc': fc, 'alpha': a})
+                    except Exception: # pylint: disable=broad-except
+                        _log.error(e)
+
                 if self.segmentresultsanno is not None:
                     try:
                         self.segmentresultsanno.set_in_layout(False) # remove from tight_layout calculation
@@ -25623,14 +25656,32 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             a = self.qmc.alpha['statsanalysisbkgnd']
             fc = self.qmc.palette['statsanalysisbkgnd']
             tc = self.labelBorW(fc)
-            self.analysisresultsanno = self.qmc.ax.annotate(resultstr, xy=self.qmc.analysisresultsloc, xycoords='axes fraction',
-                       ha='left', va='center',
-                       fontfamily=fontfamily,
-                       fontsize='x-small',
-                       color=tc,
-                       zorder=31,
-                       picker=False,
-                       bbox={'boxstyle':'round', 'fc':fc, 'alpha':a})
+            try:
+                self.analysisresultsanno = self.qmc.ax.annotate(resultstr, xy=self.qmc.analysisresultsloc, xycoords='axes fraction',
+                           ha='left', va='center',
+                           fontfamily=fontfamily,
+                           fontsize='x-small',
+                           color=tc,
+                           zorder=31,
+                           picker=False,
+                           bbox={'boxstyle':'round', 'fc':fc, 'alpha':a})
+            except Exception as e: # pylint: disable=broad-except
+                _log.error(e)
+                _log.info('reseting analysisresultsloc')
+                self.qmc.analysisresultsloc = self.qmc.analysisresultsloc_default
+                # retry to draw
+                try:
+                    self.analysisresultsanno = self.qmc.ax.annotate(resultstr, xy=self.qmc.analysisresultsloc, xycoords='axes fraction',
+                               ha='left', va='center',
+                               fontfamily=fontfamily,
+                               fontsize='x-small',
+                               color=tc,
+                               zorder=31,
+                               picker=False,
+                               bbox={'boxstyle':'round', 'fc':fc, 'alpha':a})
+                except Exception as ex: # pylint: disable=broad-except
+                    _log.error(ex)
+
             if self.analysisresultsanno is not None:
                 try:
                     self.analysisresultsanno.set_in_layout(False) # remove from tight_layout calculation

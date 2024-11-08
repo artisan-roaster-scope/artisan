@@ -44,7 +44,7 @@ from typing import Final, Optional, List, Dict, Callable, Tuple, Union, Any, Seq
 
 if TYPE_CHECKING:
     from artisanlib.comm import serialport # pylint: disable=unused-import
-    from artisanlib.types import ProfileData, EnergyMetrics, BTU, AlarmSet # pylint: disable=unused-import
+    from artisanlib.atypes import ProfileData, EnergyMetrics, BTU, AlarmSet # pylint: disable=unused-import
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from plus.stock import Blend # pylint: disable=unused-import
     from plus.blend import CustomBlend # pylint: disable=unused-import
@@ -66,9 +66,7 @@ from artisanlib import pid
 from artisanlib.time import ArtisanTime
 from artisanlib.filters import LiveMedian
 from artisanlib.dialogs import ArtisanMessageBox
-from artisanlib.types import SerialSettings
-from artisanlib.types import BTBreakParams
-from artisanlib.types import BbpCache
+from artisanlib.atypes import SerialSettings, BTBreakParams, BbpCache
 
 # import artisan.plus module
 from plus.util import roastLink
@@ -1430,7 +1428,7 @@ class tgraphcanvas(FigureCanvas):
         self.operator: str = ''
         self.organization: str = ''
         self.roastertype: str = ''
-        self.roastersize: float = 0
+        self.roastersize: float = 0 # in kg
         self.roasterheating:int = 0 # 0: ??, 1: LPG, 2: NG, 3: Elec
         self.drumspeed: str = ''
         # kept in app settings

@@ -1436,35 +1436,42 @@ class serialport:
 
     def ColorTrackSerial(self) -> Tuple[float,float,float]:
         if self.colorTrackSerial is None:
-            from artisanlib.colortrack import ColorTrack
-            from artisanlib.types import SerialSettings
-            colortrack_serial:SerialSettings = {
-                'port': self.comport,
-                'baudrate': self.baudrate,
-                'bytesize': self.bytesize,
-                'stopbits': self.stopbits,
-                'parity': self.parity,
-                'timeout': self.timeout}
-            self.colorTrackSerial = ColorTrack(serial=colortrack_serial)
-            self.colorTrackSerial.setLogging(self.aw.qmc.device_logging)
-            self.colorTrackSerial.start()
+            try:
+                from artisanlib.colortrack import ColorTrack
+                from artisanlib.atypes import SerialSettings
+                colortrack_serial:SerialSettings = {
+                    'port': self.comport,
+                    'baudrate': self.baudrate,
+                    'bytesize': self.bytesize,
+                    'stopbits': self.stopbits,
+                    'parity': self.parity,
+                    'timeout': self.timeout}
+                self.colorTrackSerial = ColorTrack(serial=colortrack_serial)
+                self.colorTrackSerial.setLogging(self.aw.qmc.device_logging)
+                self.colorTrackSerial.start()
+            except Exception as e: # pylint: disable=broad-except
+                _log.error(e)
         tx = self.aw.qmc.timeclock.elapsedMilli()
         color = (-1 if self.colorTrackSerial is None else self.colorTrackSerial.getColor())
         return tx,color,color
 
     def ColorTrackBT(self) -> Tuple[float,float,float]:
-        if self.colorTrackBT is None:
-            from artisanlib.colortrack import ColorTrackBLE
-            self.colorTrackBT = ColorTrackBLE(
-                connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('ColorTrack'),True,None),
-                disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('ColorTrack'),True,None))
-            if self.colorTrackBT is not None:
-                self.colorTrackBT.start()
         tx = self.aw.qmc.timeclock.elapsedMilli()
-        ct_color, ct_raw_color = self.colorTrackBT.getColor()
-        color = (-1 if self.colorTrackBT is None else ct_color)
-        raw_color = (-1 if self.colorTrackBT is None else ct_raw_color)
-        return tx,color,raw_color
+        if self.colorTrackBT is None:
+            try:
+                from artisanlib.colortrack import ColorTrackBLE
+                self.colorTrackBT = ColorTrackBLE(
+                    self.aw.colorTrack_mean_window_size,
+                    self.aw.colorTrack_median_window_size,
+                    connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('ColorTrack'),True,None),
+                    disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('ColorTrack'),True,None))
+                if self.colorTrackBT is not None:
+                    self.colorTrackBT.start()
+            except Exception as e: # pylint: disable=broad-except
+                _log.error(e)
+            return tx, -1, -1
+        color_mean, color_median = self.colorTrackBT.getColor()
+        return tx, color_median, color_mean # ch1: mean, ch2: median
 
     def ARDUINOTC4(self) -> Tuple[float,float,float]:
         self.aw.qmc.extraArduinoTX = self.aw.qmc.timeclock.elapsedMilli()

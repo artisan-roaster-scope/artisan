@@ -25,7 +25,7 @@ from typing import Final, Optional, Union, Tuple, Callable, AsyncIterator, TYPE_
 
 
 if TYPE_CHECKING:
-    from artisanlib.types import SerialSettings # pylint: disable=unused-import
+    from artisanlib.atypes import SerialSettings # pylint: disable=unused-import
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 

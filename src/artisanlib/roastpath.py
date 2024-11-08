@@ -15,7 +15,7 @@ from typing import Final, TypedDict, Optional, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
-    from artisanlib.types import ProfileData # pylint: disable=unused-import
+    from artisanlib.atypes import ProfileData # pylint: disable=unused-import
     from PyQt6.QtCore import QUrl # pylint: disable=unused-import
 
 try:

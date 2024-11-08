@@ -125,6 +125,7 @@ class LiveMedian(LiveFilter):
         assert k % 2 == 1, 'Median filter length must be odd.'
         self.k:int = k
         self.init_list:List[float] = [] # collects first k readings until initialized
+        self.total:float = 0 # the sum of the last n<k readings
         self.initialized:bool = False
         self.q:Optional[Deque[float]] = None
         self.l:Optional[List[float]] = None
@@ -138,6 +139,7 @@ class LiveMedian(LiveFilter):
             self.mididx = (len(self.q) - 1) // 2
             self.initialized = True
             del self.init_list
+            del self.total
 
     def _process(self, x:float) -> float:
         """Filter incoming data with median low-pass filter.
@@ -145,7 +147,10 @@ class LiveMedian(LiveFilter):
         if not self.initialized:
             if len(self.init_list) < self.k:
                 self.init_list.append(x)
-                return x
+                self.total += x
+#                return x
+                # for a smoother start we return the mean until the window is filled
+                return self.total / len(self.init_list)
             self.init_queue()
         if self.q is not None and self.l is not None:
             old_elem = self.q.popleft()
@@ -155,6 +160,42 @@ class LiveMedian(LiveFilter):
             return self.l[self.mididx]
         return x
 
+
+class LiveMean(LiveFilter):
+    def __init__(self, k:int) -> None:
+        """Initialize live mean low-pass filter.
+
+        Args:
+            k: window size
+        """
+        self.k:int = k
+        self.init_list:List[float] = [] # collects first k readings until initialized
+        self.total:float = 0 # the sum of the last n<=k readings
+        self.initialized:bool = False
+        self.window:Optional[Deque[float]] = None
+
+    def init_queue(self) -> None:
+        self.window = deque(self.init_list)
+        if self.window is not None:
+            self.initialized = True
+            del self.init_list
+
+    def _process(self, x:float) -> float:
+        """Filter incoming data with mean low-pass filter.
+        """
+        if not self.initialized:
+            if len(self.init_list) < self.k:
+                self.init_list.append(x)
+                self.total += x
+                return self.total / len(self.init_list)
+            self.init_queue()
+        if self.window is not None:
+
+            self.total -= self.window.popleft()
+            self.total += x
+            self.window.append(x)
+            return self.total / self.k
+        return x
 
 if __name__ == '__main__':
 
@@ -198,6 +239,10 @@ if __name__ == '__main__':
     # simulate median filter - passing values one by one
     y_live_med9filt = [med9filter(y) for y in yraw]
 
+    avg9filter = LiveMean(9)
+    # simulate mean filter - passing values one by one
+    y_live_avg9filt = [avg9filter(y) for y in yraw]
+
     y_live_med5sosfilt = [live_sosfilter(med5filter(y)) for y in yraw]
 
 
@@ -209,8 +254,9 @@ if __name__ == '__main__':
 #    plt.plot(ts, y_live_lfilter, lw=1, ls="dashed", label="LiveLFilter")
 #    plt.plot(ts, y_scipy_sosfilt, lw=1, label="SciPy SoS filter")
     plt.plot(ts, y_live_sosfilt, lw=1, label='LiveSoSFilter')
-    plt.plot(ts, y_live_med5filt, lw=1, label='LiveMed5Filter')
-#    plt.plot(ts, y_live_med9filt, lw=1, label="LiveMed9Filter")
+#    plt.plot(ts, y_live_med5filt, lw=1, label='LiveMed5Filter')
+    plt.plot(ts, y_live_med9filt, lw=1, label='LiveMed9Filter')
+    plt.plot(ts, y_live_avg9filt, lw=1, label='LiveAvg9Filter')
     plt.plot(ts, y_live_med5sosfilt, lw=1, label='LiveMed5SosFilter')
 
     plt.legend(loc='lower center', bbox_to_anchor=[0.5, 1], ncol=3,

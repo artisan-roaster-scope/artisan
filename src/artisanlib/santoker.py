@@ -26,7 +26,7 @@ except Exception: # pylint: disable=broad-except
 from typing import Final, Optional, Union, Callable, Awaitable, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from artisanlib.types import SerialSettings # pylint: disable=unused-import
+    from artisanlib.atypes import SerialSettings # pylint: disable=unused-import
     from bleak.backends.characteristic import BleakGATTCharacteristic  # pylint: disable=unused-import
 
 from artisanlib.async_comm import AsyncComm, AsyncIterable, IteratorReader

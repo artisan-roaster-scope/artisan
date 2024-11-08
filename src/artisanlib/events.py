@@ -21,7 +21,7 @@ import logging
 from typing import Final, List, Optional, Any, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from artisanlib.types import Palette
+    from artisanlib.atypes import Palette
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 

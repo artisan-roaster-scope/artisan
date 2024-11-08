@@ -21,6 +21,7 @@ v3.0.3
   - adds control function to [Diedrich DR](https://artisan-scope.org/machines/diedrich/) machine setup and adds [Diedrich CR](https://artisan-scope.org/machines/diedrich/) machine setup
   - adds support for [Acaia](https://acaia.co/) scales on Windows 11
   - adds support for [Phidget Stepper Motor Controllers](https://artisan-scope.org/devices/phidgets/#47-stepper-motor-control) ([Discussion #891](../../../discussions/891) and [PR #1715](../../../pull/1715))
+  - adds importer for [Stronghold](https://stronghold.coffee/) profiles exported as XLSX
 
 * CHANGES
   - automatically start of the scheduler while connected to [artisan.plus](https://artisan.plus) if there are incompleted scheduled items
@@ -46,6 +47,7 @@ v3.0.3
   - ensures that splitter state in Comparator is properly reset on Factory Reset
   - fixes issue where on save file a PNG was created instead of an PDF Report if "PDF Report" was selected as type under "Save also" in the autosave dialog ([Issue #1718](../../../issues/1718))
   - fixes a rare redraw issues on using the zoom function
+  - fixes an issue in WebSocket communication where time did not progress with empty `Data Request` ([Issue #1737](../../../issues/1737))
 
 * REMOVALS
   - support for the image format BMP has been removed

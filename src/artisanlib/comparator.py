@@ -25,7 +25,7 @@ from typing import Final, TypedDict, Sequence, List, Union, Tuple, Optional, Lit
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
-    from artisanlib.types import ProfileData # pylint: disable=unused-import
+    from artisanlib.atypes import ProfileData # pylint: disable=unused-import
     from matplotlib.lines import Line2D # pylint: disable=unused-import
     from matplotlib.backend_bases import PickEvent # pylint: disable=unused-import
     from matplotlib.legend import Legend # pylint: disable=unused-import

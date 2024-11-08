@@ -13,7 +13,7 @@ from typing import Final, Optional, List, Dict, Callable, Any, Generator, TYPE_C
 
 
 if TYPE_CHECKING:
-    from artisanlib.types import ProfileData # pylint: disable=unused-import
+    from artisanlib.atypes import ProfileData # pylint: disable=unused-import
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
 
 try:

@@ -23,7 +23,7 @@ from typing import Final, Dict, Union, List, Optional, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
-    from artisanlib.types import ProfileData, AlarmSet # pylint: disable=unused-import
+    from artisanlib.atypes import ProfileData, AlarmSet # pylint: disable=unused-import
     from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
     from PyQt6.QtWidgets import QStyleOptionViewItem  # pylint: disable=unused-import
     from PyQt6.QtCore import QModelIndex # pylint: disable=unused-import

@@ -23,7 +23,7 @@ from typing import Final, Optional, List, Set, Tuple, Dict, Callable, cast, Any,
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
-    from artisanlib.types import RecentRoast, BTU
+    from artisanlib.atypes import RecentRoast, BTU
     from artisanlib.acaia import Acaia # noqa: F401 # pylint: disable=unused-import
     from plus.stock import Blend # noqa: F401  # pylint: disable=unused-import
     from PyQt6.QtWidgets import QLayout, QAbstractItemView, QCompleter # pylint: disable=unused-import

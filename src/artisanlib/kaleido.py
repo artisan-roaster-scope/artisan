@@ -23,7 +23,7 @@ from pymodbus.transport.serialtransport import create_serial_connection # patche
 import logging
 from typing import Final, Optional, TypedDict, Union, Callable, Dict, Tuple  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
 
-from artisanlib.types import SerialSettings
+from artisanlib.atypes import SerialSettings
 from artisanlib.async_comm import AsyncLoopThread
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)

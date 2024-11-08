@@ -22,7 +22,7 @@ import asyncio
 from typing import Final, Optional, Tuple, Callable, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from artisanlib.types import SerialSettings # pylint: disable=unused-import
+    from artisanlib.atypes import SerialSettings # pylint: disable=unused-import
 
 from artisanlib.async_comm import AsyncComm
 
