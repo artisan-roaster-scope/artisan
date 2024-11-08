@@ -4,6 +4,8 @@ roastertype_setup=Santoker R Series BT
 
 [Device]
 id=171
+santokerSerial=false
+santokerBLE=true
 
 
 [ExtraComm]
