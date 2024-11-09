@@ -625,7 +625,8 @@ class EventsDlg(ArtisanResizeablDialog):
         size_items = [
                     QApplication.translate('ComboBox', 'tiny'),
                     QApplication.translate('ComboBox', 'small'),
-                    QApplication.translate('ComboBox', 'large')
+                    QApplication.translate('ComboBox', 'large'),
+                    QApplication.translate('ComboBox', 'xlarge')
                 ]
         self.nbuttonsSizeBox.addItems(size_items)
         self.nbuttonsSizeBox.setCurrentIndex(self.aw.buttonsize)

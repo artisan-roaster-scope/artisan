@@ -3105,10 +3105,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.standard_button_tiny_height = int(round(default_button_height * 1.1))
             self.standard_button_small_height = int(round(default_button_height * 1.5))
             self.standard_button_height = int(round(default_button_height * 2))
+            self.standard_button_large_height = int(round(default_button_height * 2.8))
         else:
             self.standard_button_small_height = QPushButton('Test').sizeHint().height()
             self.standard_button_tiny_height = int(round(self.standard_button_small_height * 0.8))
             self.standard_button_height = int(round(self.standard_button_small_height * 1.3))
+            self.standard_button_large_height = int(round(self.standard_button_small_height * 1.9))
 
         #create ON/OFF buttons
 
@@ -3476,7 +3478,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.buttonpalette.append(self.makePalette())
         self.buttonpalettemaxlen:List[int] = [14]*10  #keeps max number of buttons per row per palette
         self.buttonpalette_shortcuts:bool = True # if True palettes can be changed via the number keys
-        self.buttonsize:int = 1 # 0: tiny, 1: small (default), 2: large
+        self.buttonsize:int = 1 # 0: tiny, 1: small (default), 2: large, 3: xlarge
         self.mark_last_button_pressed:bool = True
         self.show_extrabutton_tooltips:bool = False
 
@@ -10469,6 +10471,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             # large
             button_min_width = str(self.standard_button_min_width_px)
             button_font_size = self.button_font_size_small
+        elif self.buttonsize == 3:
+            # xlarge
+            button_min_width = str(self.standard_button_min_width_px + 20)
+            button_font_size = self.button_font_size
         else:
             # small (default)
             button_min_width = self.small_button_min_width_str
@@ -24912,7 +24918,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             p = QPushButton()
             p.setAutoDefault(False)
             p.setStyleSheet(self.extraEventButtonStyle(i))
-            p.setMinimumHeight([self.standard_button_tiny_height,self.standard_button_small_height,self.standard_button_height][self.buttonsize])
+            p.setMinimumHeight([self.standard_button_tiny_height,self.standard_button_small_height,self.standard_button_height,self.standard_button_large_height][self.buttonsize])
 
             p.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
