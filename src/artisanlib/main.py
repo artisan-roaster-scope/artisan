@@ -25306,6 +25306,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.fig.canvas.mpl_disconnect(self.qmc.analyzer_connect_id)
         self.segmentresultsanno = None
         self.analysisresultsanno = None
+        self.redrawOnResize = True
         self.autoAdjustAxis()
         self.qmc.redraw(recomputeAllDeltas=True)
 
@@ -25331,6 +25332,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         #Save the background annotations setting and then disable
         orig_backgroundDetails = self.qmc.backgroundDetails
         self.qmc.backgroundDetails = False
+
+        # Prevent removal of results boxes when a logo image is present
+        self.redrawOnResize = False
 
         #prevent accidental overwrite of the original file
         self.qmc.fileDirtySignal.emit()
@@ -25414,9 +25418,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 #check for finished background roast
                 if not self.qmc.background:
                     self.sendmessage(QApplication.translate('Error Message', 'Analyze: no background profile data available'))
+                    self.qmc.backgroundDetails = orig_backgroundDetails
+                    self.redrawOnResize = True
                     return
                 if not (self.qmc.timeindexB[0] > -1 and self.qmc.timeindexB[6]):
                     self.sendmessage(QApplication.translate('Error Message', 'Analyze: background profile requires CHARGE and DROP events'))
+                    self.qmc.backgroundDetails = orig_backgroundDetails
+                    self.redrawOnResize = True
                     return
 
                 # set curvefit_starttime to match analysis_starttime
