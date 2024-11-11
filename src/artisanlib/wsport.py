@@ -30,7 +30,7 @@ from typing import Final, Optional, Union, Any, Dict, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
-    from websockets.client import WebSocketClientProtocol # pylint: disable=unused-import
+    from websockets.asyncio.client import ClientConnection # pylint: disable=unused-import
 
 try:
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
@@ -243,7 +243,7 @@ class wsport:
             if single_message != '':
                 await self.consumer(single_message)
 
-    async def consumer_handler(self, websocket:'WebSocketClientProtocol') -> None:
+    async def consumer_handler(self, websocket:'ClientConnection') -> None:
         async for message in websocket:
             if isinstance(message, str):
                 await self.split_and_consume_message(message)
@@ -251,7 +251,7 @@ class wsport:
                 await self.split_and_consume_message(message.decode('utf-8'))
 
 
-    async def producer_handler(self, websocket:'WebSocketClientProtocol') -> None:
+    async def producer_handler(self, websocket:'ClientConnection') -> None:
         while True:
             message = await self.producer()
             if message is not None:
