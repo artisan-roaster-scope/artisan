@@ -48,6 +48,8 @@ v3.0.3
   - fixes issue where on save file a PNG was created instead of an PDF Report if "PDF Report" was selected as type under "Save also" in the autosave dialog ([Issue #1718](../../../issues/1718))
   - fixes a rare redraw issues on using the zoom function
   - fixes an issue in WebSocket communication where time did not progress with empty `Data Request` ([Issue #1737](../../../issues/1737))
+  - fixes an issue with the Analyzer result panes disappearing under some conditions ([Discussion #1736](../../../discussions/1736))
+  - fixes saving of designer point which could result in failure on loading ([Discussion #1721](../../../discussions/1721))
 
 * REMOVALS
   - support for the image format BMP has been removed

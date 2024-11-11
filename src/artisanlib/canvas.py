@@ -16038,9 +16038,9 @@ class tgraphcanvas(FigureCanvas):
             filename = self.aw.ArtisanSaveFileDialog(msg=QApplication.translate('Message', 'Save Points'),ext='*.adsg')
             if filename:
                 obj:Dict[str, Union[List[float],List[int]]] = {}
-                obj['timex'] = self.timex # List[float]
-                obj['temp1'] = self.temp1 # List[float]
-                obj['temp2'] = self.temp2 # List[float]
+                obj['timex'] = [float2float(float(tx), 10) for tx in self.timex] # List[float]
+                obj['temp1'] = [float2float(float(t1), 8) for t1 in self.temp1] # List[float]
+                obj['temp2'] = [float2float(float(t2), 8) for t2 in self.temp2] # List[float]
                 obj['timeindex'] = self.timeindex # List[int]
                 import codecs # @Reimport
                 with codecs.open(filename, 'w+', encoding='utf-8') as f:
