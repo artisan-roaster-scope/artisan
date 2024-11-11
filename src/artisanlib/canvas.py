@@ -11558,7 +11558,11 @@ class tgraphcanvas(FigureCanvas):
                 self.ax1.set_autoscale_on(False)
                 self.ax1.grid(True,linewidth=1.,color='#212121', linestyle = '-',alpha=.3)
                 # hack to make flavor labels visible also on top and bottom
-                xlabel_artist = self.ax1.set_xlabel(' -\n ', alpha=0.0)
+                if self.flavors_total_correction != 0:
+                    xlabel_artist = self.ax1.set_xlabel(f"\n\n\n{QApplication.translate('Label','Correction')}: {self.flavors_total_correction}".rstrip('0').rstrip('.'), fontsize='small', alpha=0.6)
+                else:
+                    xlabel_artist = self.ax1.set_xlabel(' -\n ', alpha=0.0)
+
                 title_artist = self.ax1.set_title(' -\n ', alpha=0.0)
                 try:
                     xlabel_artist.set_in_layout(False) # remove x-axis labels from tight_layout calculation
@@ -11609,7 +11613,7 @@ class tgraphcanvas(FigureCanvas):
 
                 # total score
                 score = self.calcFlavorChartScore()
-                txt = f'{score:.2f}'
+                txt = f'{score:.2f}'.rstrip('0').rstrip('.')
                 self.flavorchart_total = self.ax1.text(0.,0.,txt,fontsize='x-large',fontproperties=self.aw.mpl_fontproperties,color='#FFFFFF',horizontalalignment='center',bbox={'facecolor':'#212121', 'alpha':0.5, 'pad':10})
 
                 #add background to plot if found
@@ -11640,7 +11644,7 @@ class tgraphcanvas(FigureCanvas):
             _log.exception(e)
 
     def flavorChartLabelText(self, i:int) -> str:
-        return f'{self.aw.arabicReshape(self.flavorlabels[i])}\n{self.flavors[i]:.2f}'
+        return f'{self.aw.arabicReshape(self.flavorlabels[i])}\n{self.flavors[i]:.2f}'.rstrip('0').rstrip('.')
 
     #To close circle we need one more element. angle and values need same dimension in order to plot.
     def updateFlavorChartData(self) -> None:
@@ -11705,8 +11709,14 @@ class tgraphcanvas(FigureCanvas):
         # total score
         score = self.calcFlavorChartScore()
         if self.flavorchart_total is not None:
-            txt = f'{score:.2f}'
+            txt = f'{score:.2f}'.rstrip('0').rstrip('.')
             self.flavorchart_total.set_text(txt)
+
+        if self.aw.qmc.ax1 is not None:
+            if self.aw.qmc.flavors_total_correction != 0:
+                self.aw.qmc.ax1.set_xlabel(f"\n\n\n{QApplication.translate('Label','Correction')}: {self.aw.qmc.flavors_total_correction}".rstrip('0').rstrip('.'), fontsize='small', alpha=0.6)
+            else:
+                self.aw.qmc.ax1.set_xlabel(' -\n ', alpha=0.0)
 
         # update canvas
         with warnings.catch_warnings():
