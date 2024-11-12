@@ -10811,6 +10811,9 @@ class tgraphcanvas(FigureCanvas):
                 if self.whole_color > 0:
                     stattype_str += (f"{newline}{QApplication.translate('HTML Report Template','Whole Color')}: #"
                         f'{self.whole_color} {self.color_systems[self.color_system_idx]}')
+            elif n == 32:  #Cupper correction
+                if self.aw.qmc.flavors_total_correction != 0:
+                    stattype_str += (f"{newline}{QApplication.translate('Label','Correction')} {self.aw.qmc.flavors_total_correction}")
             else:
                 errmsg = (f"{QApplication.translate('Error Message','Exception:')} buildStat() "
                           f"{QApplication.translate('Error Message','Unexpected value for n, got')} {n}")

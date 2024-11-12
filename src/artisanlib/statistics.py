@@ -232,6 +232,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
                 self.aw.qmc.dijkstra_to_ascii(f"{QApplication.translate('Table','Phases')} - {QApplication.translate('Label','Maillard')}"),  # 29
                 self.aw.qmc.dijkstra_to_ascii(f"{QApplication.translate('Table','Phases')} - {QApplication.translate('Label','Drying')}"),    # 30
                 self.aw.qmc.dijkstra_to_ascii(QApplication.translate('HTML Report Template','Whole Color')),         # 31
+                self.aw.qmc.dijkstra_to_ascii(QApplication.translate('Label','Cupper Correction')),                  # 32
                 ]
 
         # function to remove from a list any elements matching string_to_remove
