@@ -1,4 +1,3 @@
-#
 # ABOUT
 # Script to take an Excel input file and generate Artisan help dialog code.
 
@@ -15,8 +14,7 @@
 # AUTHOR
 # Dave Baxter, 2023
 
-'''
-Command line:  xlsx_to_artisan_help.py <filename>|all
+'''Command line:  xlsx_to_artisan_help.py <filename>|all
 **Note that filename should have no suffix, file name only.
 
 The input file is drawn from ../input_files/<filename>.xlsx
@@ -29,14 +27,14 @@ Note: This program has no error checking or trapping!  TBA.
 
 Excel file format:
     One Excel file for each help dialog.
-    One or more tabs, each tab is a seperate table within the same help dialog.
+    One or more tabs, each tab is a separate table within the same help dialog.
     The tab name is not important but it will be used to generate the associated PrettyTable table name.
 
     Each tab must have the following cells, starting in the upper left cell A1
     Title of the table               [First row, required]
     Top Note                         [Multiple contiguous rows, optional]
-    Table headers, aka column titles [One row, optional but if provided must include table rows]
-    Table data rows                  [Multiple coniguous rows, optional but must follow the table headers]
+    Table headers, aka column titles [One row, optional but if provided must include table data rows]
+    Table data rows                  [Multiple contiguous rows, optional but must follow the table headers]
     Bottom Note                      [Multiple contiguous rows, optional]
 
     QApplication.translate() is not applied to cells formatted as Italic, formatted with any font color
@@ -47,7 +45,7 @@ Excel file format:
 
     A single quote at the start of a cell string acts as a flag to Excel that the cell contains text. If the
     single quote at the start of a string is to be displayed and passed along to the help code it should
-    be escaped (proceeded) with another single quote.  Example, to display the string 'Hello' put ''Hello'
+    be escaped (preceded) with another single quote.  Example, to display the string 'Hello' put ''Hello'
     into the cell. Single quotes in the middle or end of a string do not need to be escaped.
 
     Single blank rows are legal. Consecutive blank rows are interpreted as the end of a table. All cells in
@@ -70,7 +68,7 @@ A hack was added to correct for openpyxl reporting too many rows. There is not a
 
 Recent changes:
 - Single quotes now tolerated
-- hacked around the problem: The unicode elipsis \x85 "…" is not properly handled.  These seem to get into the Excel file when cut and paste from the blog.
+- hacked around the problem: The Unicode ellipsis \x85 "…" is not properly handled.  These seem to get into the Excel file when cut and paste from the blog.
 Must be replaced with three periods "..." in the Excel file.
 - Alt-Enter in Excel to create newlines now tolerated
 - adds support for PyQt6
@@ -85,32 +83,33 @@ from time import sleep
 import sys
 sys.dont_write_bytecode = True  #prevents __pycache__ folder written to help/
 
+from typing import List, Tuple
+from openpyxl.worksheet.worksheet import Worksheet # pylint: disable=unused-import
+
 try:
-    from PyQt6.QtWidgets import QApplication
+    from PyQt6.QtWidgets import QApplication  # pylint: disable=unused-import
 except ImportError:
-    from PyQt5.QtWidgets import QApplication # type: ignore # noqa: F401
+    from PyQt5.QtWidgets import QApplication # type: ignore # noqa: F401  # pylint: disable=unused-import
 from openpyxl import load_workbook
 
-def u(x):
-    return str(x)
 
 ind = '    '         #indent
 nlind = '\n' + ind   #new line plus indent
 
-def translateStr(in_str, group='HelpDlg'):
-    return "QApplication.translate('" + group + "','" + u(in_str) + "')"
+def translateStr(in_str:str, group:str='HelpDlg') -> str:
+    return "QApplication.translate('" + group + "','" + str(in_str) + "')"
 
-def generateRows(ws):
+def generateRows(ws:Worksheet) -> List[List[str]]:
     all_rows = []
     for row in ws.iter_rows():
         this_row = []
         for cell in row:
             # insert a nonbreaking space into blank cells to keep the row height homgenous
-            if cell.value in (None, ''):
+            if cell.value in {None, ''}:
                 cell_str = "'&#160;'"
             else:
                 if cell.data_type == 's':
-                    cell_value = re.subn(r"'",r'&#39;',cell.value)  #protect downstream by changing single quotes to double
+                    cell_value = re.subn(r"'",r'&#39;',str(cell.value))  #protect downstream by changing single quotes to double
                     cell_value = re.subn(r'\n',r'\\n',cell_value[0])
                     # do not translate if the cell has italic format or any font color
                     if cell.font.italic or \
@@ -132,26 +131,26 @@ def generateRows(ws):
         all_rows.append(this_row)
     return all_rows
 
-def getTitle(all_rows,_,nsheet):
+def getTitle(all_rows:List[List[str]],_:Worksheet,nsheet:int) -> str:
     del _
     if nsheet == 0:
-        title = nlind + 'strlist.append("<b>")'
+        title = nlind + "strlist.append('<b>')"
     else:
-        title = nlind + 'strlist.append("<br/><br/><b>")'
+        title = nlind + "strlist.append('<br/><br/><b>')"
     title +=  nlind + 'strlist.append(' + str(all_rows[0][0]) + ')'
-    title +=  nlind + 'strlist.append("</b>")'
+    title +=  nlind + "strlist.append('</b>')"
     return title
 
-def getNotes(all_rows,nrows,tbl_name,notetype='top'):
+def getNotes(all_rows:List[List[str]],nrows:int,tbl_name:str,notetype:str='top') -> Tuple[str,int]:
     tbl_name = tbl_name + notetype
     tbl_notes = ''
     notes = []
     notes_len = 0
     for idx in range(1, nrows):
         if notetype == 'top':
-            gotnote = re.subn(r'topnote:|tn:','',str(all_rows[idx][0]),0,re.IGNORECASE)
+            gotnote = re.subn(r'topnote:|tn:','',str(all_rows[idx][0]),count=0,flags=re.IGNORECASE)
         else:
-            gotnote = re.subn(r'botnote:|bn:|bottomnote:','',str(all_rows[idx][0]),0,re.IGNORECASE)
+            gotnote = re.subn(r'botnote:|bn:|bottomnote:','',str(all_rows[idx][0]),count=0,flags=re.IGNORECASE)
         if gotnote[1]:
             notes.append(gotnote[0])
             notes_len += 1
@@ -161,27 +160,31 @@ def getNotes(all_rows,nrows,tbl_name,notetype='top'):
 
     return tbl_notes, notes_len
 
-def getFieldnames(rows,tbl_name):
+def getFieldnames(rows:List[str],tbl_name:str) -> str:
     this_row = ','.join(rows)
-    return u(tbl_name) + '.field_names = [' + str(this_row) + ']'
+    return str(tbl_name) + '.field_names = [' + str(this_row) + ']'
 
-def getAddrows(all_rows,tbl_name):
+def getAddrows(all_rows:List[List[str]],tbl_name:str) -> str:
     addrows = ''
     for idx, row in enumerate(all_rows):
         this_row = ','.join(row)
         if idx > 0:
             addrows += nlind
-        addrows += u(tbl_name) + '.add_row([' + this_row + '])'
+        addrows += str(tbl_name) + '.add_row([' + this_row + '])'
     return addrows
 
-def buildpyCode(filename_in):
-    data_table_attributes = '"width":"100%","border":"1","padding":"1","border-collapse":"collapse"'
-    note_table_attributes = '"width":"100%","border":"1","padding":"1","border-collapse":"collapse"'
+def buildpyCode(filename_in:str) -> str:
+    data_table_attributes = "'width':'100%','border':'1','padding':'1','border-collapse':'collapse'"
+    note_table_attributes = "'width':'100%','border':'1','padding':'1','border-collapse':'collapse'"
 
     outstr = ''
+    
+    outstr += '# This is an autogenerated file -- Do not edit'
+    outstr += '\n' + '# Edit the source file in artisan/doc/help_dialogs/Input_files'
+    outstr += '\n' + '# then execute artisan/doc/help_dialogs/Script/xlsx_to_artisan_help.py'
 
     # wrap the output with python code to allow it to execute
-    outstr += 'import prettytable'
+    outstr += '\n' + 'import prettytable'
     outstr += '\n' + 'import re'
     outstr += '\n' + 'try:'
     outstr += '\n' + '    from PyQt6.QtWidgets import QApplication # @Reimport @UnresolvedImport @UnusedImport # pylint: disable=import-error'
@@ -256,16 +259,16 @@ def buildpyCode(filename_in):
             outstr += nlind + 'strlist.append(' + tbl_name + 'bottom' + '.get_html_string(attributes={' + note_table_attributes + '}))'
 
     # finalize outstr - py code
-    outstr += nlind + 'strlist.append("</body>")'
+    outstr += nlind + "strlist.append('</body>')"
 
-    outstr += nlind + 'helpstr = "".join(strlist)'
+    outstr += nlind + "helpstr = ''.join(strlist)"
 
     # clean any html entities that get escaped by PrettyTable in its html output
-    outstr += nlind + 'return re.sub(r"&amp;", r"&",helpstr)'
+    outstr += nlind + "return re.sub(r'&amp;', r'&',helpstr)" + "\n"
 
     return outstr
 
-def writepyFile(filename_in, filename_out):
+def writepyFile(filename_in:str, filename_out:str) -> None:
     outstr = buildpyCode(filename_in)
 
     # write outstr (py code) to the specified filename
@@ -273,14 +276,14 @@ def writepyFile(filename_in, filename_out):
         file_object.write(outstr)
     sleep(0.01)  #allow the previous write to settle, resolves appveyor file read fail
 
-def writehtmlFile(_fname_in, filename_out, filename_htm):
+def writehtmlFile(_fname_in:str, filename_out:str, filename_htm:str) -> None:
     del _fname_in
     importfile = splitext(split(filename_out)[1])[0]
     importpath = abspath(split(filename_out)[0])
     sys.path.append(importpath)
     var = importlib.import_module(importfile)
 
-    htmstr = var.content()
+    htmstr = var.content() + '\n'
 
     # write htmlstr (html) to the specified filename
     with open(filename_htm,'w', encoding='utf-8') as file_object:

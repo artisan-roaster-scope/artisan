@@ -1,0 +1,368 @@
+# Copied from artisan/src/pyporject.toml
+# Modified 
+#  [tool.mypy] 
+#  files = ["xlsx_to_artisan_help.py"]
+# and
+#  [tool.pyright]
+#  include = []
+#  exclude = []
+
+[project]
+name = 'Artisan'
+dynamic = ['version']
+description = "Artisan is a software that helps coffee roasters record, analyze, and control roast profiles."
+readme = {file = 'README.txt', content-type='text/markdown'}
+authors = [
+    {name = 'Rafael Cobo'},
+    {name = 'Marko Luther'},
+    {name = 'Dave Baxter'}
+]
+maintainers = [
+    {name = 'Marko Luther'},
+    {name = 'Dave Baxter'}
+]
+license = {file = 'LICENSE'}
+requires-python = '>=3.8'
+keywords = ['roasting', 'roast logging', 'speciality coffee']
+classifiers = [
+    'Development Status :: 5 - Production/Stable',
+    'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+    "Operating System :: Windows",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3 :: Only',
+    'Programming Language :: Python :: Implementation :: CPython',
+    'Topic :: Other/Nonlisted Topic'
+]
+
+[project.urls]
+'Homepage' = 'https://artisan-scope.org/'
+'Documentation' = 'https://artisan-scope.org/docs/quick-start-guide/'
+'Repository' = 'https://github.com/artisan-roaster-scope/artisan'
+'Issue Tracker' = 'https://github.com/artisan-roaster-scope/artisan/issues'
+'Changelog' = 'https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/ReleaseHistory.md'
+
+
+## black
+
+[tool.black]
+line-length = 100
+target-version = ['py38']
+include = '\.pyi?$'
+extend-exclude = '''
+# A regex preceded with ^/ will apply only to files and directories
+# in the root of the project.
+^/foo.py  # exclude a file named foo.py in the root of the project (in addition to the defaults)
+'''
+
+## pylint conf
+
+[tool.pylint.MASTER]
+load-plugins = [
+#    'pylint.extensions.bad_builtin', # suggest comprehension over filter/join/map
+    'pylint.extensions.check_elif',
+#    'pylint.extensions.code_style', # suggests the := operator; NOT YET
+    'pylint.extensions.comparison_placement',
+#    'pylint.extensions.confusing_elif', # nested if => functions; NOT YET
+    'pylint.extensions.docparams',
+    'pylint.extensions.docstyle',
+    'pylint.extensions.eq_without_hash',
+    'pylint.extensions.for_any_all',
+    'pylint.extensions.overlapping_exceptions',
+#    'pylint.extensions.private_import',
+    'pylint.extensions.set_membership',
+    'pylint.extensions.typing',
+#    'pylint.extensions.redefined_variable_type', # NOT YET
+#    'pylint.extensions.mccabe', # complexity rating for functions; NOT YET
+    'pylint.extensions.no_self_use'
+]
+ignore-paths = [ "^uic/.*$",
+                 "^build/.*$",
+                 "^dist/.*$",
+                 "^proto/.*$",
+                 "^test/.*$" ]
+
+# Use multiple processes to speed up Pylint. Specifying 0 will auto-detect the
+# number of processors available to use.
+jobs = "0"
+
+# Minimum supported python version
+py-version = "3.8"
+
+# Pickle collected data for later comparisons.
+persistent = "no"
+
+# A comma-separated list of package or module names from where C extensions may
+# be loaded. Extensions are loading into the active Python interpreter and may
+# run arbitrary code.
+extension-pkg-allow-list='''PyQt6'''
+
+[tool.pylint.'MESSAGES CONTROL']
+
+# Disable the message, report, category or checker with the given id(s). You
+# can either give multiple identifiers separated by comma (,) or put this
+# option multiple times (only on the command line, not in the configuration
+# file where it should appear only once). You can also use "--disable=all" to
+# disable everything first and then re-enable specific checks. For example, if
+# you want to run only the similarities checker, you can use "--disable=all
+# --enable=similarities". If you want to run only the classes checker, but have
+# no Warning level messages displayed, use "--disable=all --enable=classes
+# --disable=W".
+disable='''
+        line-too-long,
+        too-many-lines,
+        trailing-whitespace,
+        missing-final-newline,
+        trailing-newlines,
+        multiple-statements,
+        multiple-imports,
+        wrong-import-order,
+        ungrouped-imports,
+        wrong-import-position,
+        useless-import-alias,
+        import-outside-toplevel,
+        empty-docstring,
+        missing-module-docstring,
+        missing-class-docstring,
+        missing-function-docstring,
+        invalid-name,
+        too-many-statements,
+        too-many-branches,
+        too-many-ancestors,
+        too-many-instance-attributes,
+        too-few-public-methods,
+        too-many-public-methods,
+        too-many-return-statements,
+        too-many-branches,
+        too-many-arguments,
+        too-many-locals,
+        too-many-boolean-expressions,
+        too-many-nested-blocks,
+        too-many-positional-arguments,
+        cyclic-import,
+        duplicate-code,
+'''
+
+#        raw-checker-failed,
+#        bad-inline-option,
+#        locally-disabled,
+#        file-ignored,
+#        suppressed-message,
+#        useless-suppression,
+#        deprecated-pragma,
+#        use-symbolic-message-instead,
+#        wrong-spelling-in-comment,
+#        wrong-spelling-in-docstring,
+#        invalid-characters-in-docstring,
+#        unnecessary-dunder-call,
+#        bad-file-encoding,
+#        bad-classmethod-argument,
+#        bad-mcs-method-argument,
+#        bad-mcs-classmethod-argument,
+#        single-string-used-for-slots,
+#        unnecessary-lambda-assignment,
+#        unnecessary-direct-lambda-call,
+#        non-ascii-name,
+#        non-ascii-module-import,
+
+#        superfluous-parens,
+#        mixed-line-endings,
+#        unexpected-line-ending-format,
+
+#        unneeded-not,
+#        consider-using-enumerate,
+#        consider-iterating-dictionary,
+#        consider-using-dict-items,
+#        use-maxsplit-arg,
+#        use-sequence-for-iteration,
+#        consider-using-f-string,
+#        use-implicit-booleaness-not-len,
+#        use-implicit-booleaness-not-comparison,
+
+
+#        disallowed-name,
+#        typevar-name-incorrect-variance,
+#        typevar-double-variance,
+#        typevar-name-mismatch,
+
+#        singleton-comparison,
+#        unidiomatic-typecheck,
+#        useless-option-value,
+#        no-classmethod-decorator,
+#        no-staticmethod-decorator,
+#        useless-object-inheritance,
+#        property-with-parameters,
+#        consider-using-from-import,
+#        consider-merging-isinstance,
+#        simplifiable-if-statement,
+#        redefined-argument-from-local,
+#        no-else-return,
+#        consider-using-ternary,
+#        trailing-comma-tuple,
+#        stop-iteration-return,
+#        simplify-boolean-expression,
+#        inconsistent-return-statements,
+#        useless-return,
+#        consider-swap-variables,
+#        consider-using-join,
+#        consider-using-in,
+#        consider-using-get,
+#        chained-comparison,
+#        consider-using-dict-comprehension,
+#        consider-using-set-comprehension,
+#        simplifiable-if-expression,
+#        no-else-raise,
+#        unnecessary-comprehension,
+#        consider-using-sys-exit,
+#        no-else-break,
+#        no-else-continue,
+#        super-with-arguments,
+#        simplifiable-condition,
+#        condition-evals-to-constant,
+#        consider-using-generator,
+#        use-a-generator,
+#        consider-using-min-builtin,
+#        consider-using-max-builtin,
+#        consider-using-with,
+#        unnecessary-dict-index-lookup,
+#        use-list-literal,
+#        use-dict-literal,
+#        unnecessary-list-index-lookup,
+#        literal-comparison,
+#        comparison-with-itself,
+#        comparison-of-constants,
+#        no-self-use,
+
+# Enable the message, report, category or checker with the given id(s). You can
+# either give multiple identifier separated by comma (,) or put this option
+# multiple time (only on the command line, not in the configuration file where
+# it should appear only once). See also the "--disable" option for examples.
+enable='''c-extension-no-member,'''
+
+
+## mypy conf
+
+[tool.mypy]
+files = ["xlsx_to_artisan_help.py"]
+exclude = ['build', 'dist', 'uic', 'misc']
+python_version = "3.8"
+
+# Ensure full coverage
+check_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_untyped_decorators = true
+disallow_any_unimported = false # raises about 100 errors with numpy >= 2.1
+
+# Restrict dynamic typing
+disallow_any_generics = true
+disallow_subclassing_any = true
+warn_return_any = true
+
+# Some more checks
+local_partial_types = true
+strict_equality = true
+
+# Know exactly what we're doing
+warn_redundant_casts = true
+warn_unused_configs = true
+warn_unused_ignores = true
+warn_unreachable = true
+#show_error_codes = true
+
+# Explicit is better than implicit
+no_implicit_optional = true
+
+
+plugins = ["numpy.typing.mypy_plugin"]
+
+[[tool.mypy.overrides]]
+module = ["matplotlib.*", "aiohttp.*", "aiohttp.web.*", "aiohttp_jinja2.*", "libusb_package.*"]
+ignore_missing_imports = true
+
+
+[[tool.mypy.overrides]]
+module = "uic.*"
+follow_imports = 'skip'
+
+
+## ruff conf
+
+[tool.ruff]
+# Enable pycodestyle (`E`), Pyflakes (`F`), Updates ('UP'), flake8-bugbear (`B`) codes by default.
+# also flake8-2020 (YTT), flake8-commas (COM), flake8-comprehensions (C4),
+# flake8-datetimez (DTZ), flake8-pie (PIE), flake8-raise (RSE), flake8-return (RET),
+# flake8-simplify (SIM), flake8-gettext (INT), flake8-unused-arguments (ARG),
+# Error (PLE), Refactor (PLR), Warning (PLW)
+## next: flake8-use-pathlib (PTH), flake8-print (T20)
+lint.select = ["E", "F", "UP", "B", "A", "YTT", "COM", "C4", "DTZ", "PIE", "RSE", "RET", "SIM", "ARG", "PLE", "PLR", "PLW", "INT", "RUF013"]
+
+output-format = "pylint" # one of: text, json, junit, grouped, github, gitlab, pylint, azure
+
+# Same as Black.
+line-length = 80
+
+# Never enforce `E501` (line length violations).
+lint.ignore = ["E501", "E741", "E402", "PLR0912", "PLR0913", "PLR0915", "SIM105", "PLR2044", "PLR2004", "PLW0603", "PLR0911", "COM812"]
+
+# Exclude a variety of commonly ignored directories.
+exclude = ["dist", "build", "proto", ".pytype", ".mypy_cache", ".git", ".venv", ".venv_universal", ".venv_arm"]
+
+# Assume Python 3.8.
+target-version = "py38"
+
+[tool.ruff.lint.per-file-ignores]
+"uic/*.py" = ["UP004", "F401", "ARG002"]
+
+
+
+## pyright conf
+
+[tool.pyright]
+include = []
+exclude = []
+# ignore = []
+
+reportMissingImports = true
+reportMissingTypeStubs = false
+
+pythonVersion = "3.8"
+pythonPlatform = "All"
+
+#typeCheckingMode = "strict" # "off", "basic", "strict"
+
+# strict disabled checks # "error", "warning", false, true
+#reportUnboundVariable = "error"
+#reportUnknownParameterType = false
+#reportMissingParameterType = false
+#reportUnknownMemberType = false
+#reportUnknownArgumentType = false
+#reportGeneralTypeIssues = false
+useLibraryCodeForTypes = false
+reportInvalidTypeForm = false # since numpy 2.1 more than 150 errors are reported
+
+
+## pytest conf
+
+[tool.pytest.ini_options]
+minversion = "7.4"
+addopts = "-ra -v"
+testpaths = [
+    "test",
+]
+pythonpath = [
+  "."
+]
+
+[tool.codespell]
+skip = '*.ts,./coverage,./build,./dist*,./htmlcov,./*.spec'
+count = ''
+quiet-level = 3
+ignore-words-list = 'ser,alog,nd,iterm,dout,te,commandi,dout,exitt,currenty,exaust,controle,coment,controle,outweight,everytime,sade,weightIn,weightin'
