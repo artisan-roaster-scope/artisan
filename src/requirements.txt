@@ -44,7 +44,7 @@ persist-queue==1.0.0
 portalocker==2.10.1
 xlrd==2.0.1
 websockets==13.1;  python_version < '3.9' # last Python 3.8 release
-websockets==14.0; python_version >= '3.9'
+websockets==14.1; python_version >= '3.9'
 PyYAML==6.0.2
 psutil==6.1.0
 typing-extensions==4.10.0; python_version < '3.8' # required for supporting Final and TypeDict on Python <3.8
