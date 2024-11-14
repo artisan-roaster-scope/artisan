@@ -71,6 +71,10 @@ gallery:
     image_path: /assets/images/sci-logo.png
     alt: "Sweet Coffee Italia"
     title: "Sweet Coffee Italia"
+  - url: https://algrano.com/
+    image_path: /assets/images/algrano-logo.png
+    alt: "Algrano"
+    title: "Algrano"
     
 ---
 
@@ -173,7 +177,7 @@ There are also legacy builds for Windows 8 (x64) and macOS 10.13 as well as an e
 - [batch counter](https://artisan-roasterscope.blogspot.de/2015/07/batch-counter.html){:target="_blank"}
 - [profile designer](https://artisan-roasterscope.blogspot.com/2019/05/using-artisan-designer.html){:target="_blank"}, cupping editor, spider- and wheel graph
 - [user defined buttons and sliders](http://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html){:target="_blank"} with programmable actions
-- many import and export formats like Aillio Roastime, Cropster XLS, Giesen CSV, IKAWA CSV, Probat Pilot, RoastLogger, RoastLog, RoastPath,..
+- many import and export formats like Aillio Roastime, Cropster XLS, Giesen CSV, IKAWA CSV, Probat Pilot, RoastLogger, RoastLog, RoastPath, Stronghold, ..
 
 [Request a Feature](https://github.com/artisan-roaster-scope/artisan/issues){: .btn .btn--success .btn--large}{:target="_blank"}
 

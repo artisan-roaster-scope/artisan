@@ -27,15 +27,23 @@ gallery:
     alt: "Linux Flatpack"
     title: "Linux Flatpack"
 
+release_sponsor:
+  - url: https://algrano.com/
+    image_path: /assets/images/algrano-logo.png
+    alt: "Algrano"
+    title: "Algrano"
+
 ---
 
 [Artisan v3.0.2](https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.0.2)
 {: target="_blank" style="text-align: center; font-weight:bold;"}
 
-
-
 {% include gallery id="gallery" %}
 
+[Release Sponsor](https://algrano.com/)
+{: target="_blank" style="text-align: center;"}
+
+{% include gallery id="release_sponsor" %}
 
 [Release History](https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/ReleaseHistory.md)
-{: style="text-align: center;"}
+{: target="_blank" style="text-align: center;"}

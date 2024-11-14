@@ -185,6 +185,8 @@ devices:
     children:
       - title: "Arduino"
         url: /devices/arduino/
+      - title: "ColorTrack"
+        url: /devices/colortrack/
       - title: "Modbus"
         url: /devices/modbus/
       - title: "Meters"
