@@ -2431,7 +2431,7 @@ class tgraphcanvas(FigureCanvas):
     @pyqtSlot(int, bool)
     def showEvents(self, event_type: int, state: bool) -> None:
         event_type -= 1
-        if len(self.showEtypes) > event_type > 0 and self.showEtypes[event_type] != state:
+        if len(self.showEtypes) > event_type >= 0 and self.showEtypes[event_type] != state:
             self.showEtypes[event_type] = state
             self.redraw(recomputeAllDeltas=False,re_smooth_foreground=False)
 

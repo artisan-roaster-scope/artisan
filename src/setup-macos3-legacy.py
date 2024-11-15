@@ -236,20 +236,18 @@ for lang in ['ar', 'da', 'de','el','en','es','fa','fi','fr','gd', 'he','hu','id'
 #  # brew install libusb
 #
 # to get libusb installed
+# lib usb v1.0.27 is not compatible with this platform
 try:
-    subprocess.check_call(r'cp /usr/local/Cellar/libusb/1.0.27/lib/libusb-1.0.0.dylib Artisan.app/Contents/Frameworks/libusb-1.0.dylib',shell = True)
+    subprocess.check_call(r'cp /usr/local/Cellar/libusb/1.0.26/lib/libusb-1.0.0.dylib Artisan.app/Contents/Frameworks/libusb-1.0.dylib',shell = True)
 except Exception: # pylint: disable=broad-except
     try:
-        subprocess.check_call(r'cp /usr/local/Cellar/libusb/1.0.26/lib/libusb-1.0.0.dylib Artisan.app/Contents/Frameworks/libusb-1.0.dylib',shell = True)
+        subprocess.check_call(r'cp /usr/local/Cellar/libusb/1.0.25/lib/libusb-1.0.0.dylib Artisan.app/Contents/Frameworks/libusb-1.0.dylib',shell = True)
     except Exception: # pylint: disable=broad-except
         try:
-            subprocess.check_call(r'cp /usr/local/Cellar/libusb/1.0.25/lib/libusb-1.0.0.dylib Artisan.app/Contents/Frameworks/libusb-1.0.dylib',shell = True)
+            subprocess.check_call(r'cp /usr/local/Cellar/libusb/1.0.24/lib/libusb-1.0.0.dylib Artisan.app/Contents/Frameworks/libusb-1.0.dylib',shell = True)
         except Exception: # pylint: disable=broad-except
-            try:
-                subprocess.check_call(r'cp /usr/local/Cellar/libusb/1.0.24/lib/libusb-1.0.0.dylib Artisan.app/Contents/Frameworks/libusb-1.0.dylib',shell = True)
-            except Exception: # pylint: disable=broad-except
-                print('ERROR: failed to locate libusb')
-                sys.exit(1)
+            print('ERROR: failed to locate libusb')
+            sys.exit(1)
 
 
 

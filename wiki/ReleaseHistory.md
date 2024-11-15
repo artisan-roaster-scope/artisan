@@ -3,7 +3,7 @@ Detailed Release History
 
 
 ----
-v3.1.0 (November XX, 2024)
+v3.1.0 (November 22, 2024)
 ------------------
 
 * ADDITIONS
@@ -50,6 +50,7 @@ v3.1.0 (November XX, 2024)
   - fixes an issue in WebSocket communication where time did not progress with empty `Data Request` ([Issue #1737](../../../issues/1737))
   - fixes an issue with the Analyzer result panes disappearing under some conditions ([Discussion #1736](../../../discussions/1736))
   - fixes saving of designer point which could result in failure on loading ([Discussion #1721](../../../discussions/1721))
+  - fixes Artisan Command `showEvents(1,x)` ([Discussion #1741](../../../discussions/1741))
 
 * REMOVALS
   - support for the image format BMP has been removed

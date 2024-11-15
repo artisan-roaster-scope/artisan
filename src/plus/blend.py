@@ -50,6 +50,7 @@ except Exception: # pylint: disable=broad-except
     )
     from PyQt5.QtCore import Qt, pyqtSlot, QSize, QSettings # type: ignore  # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QKeySequence, QAction, QIcon, QStandardItemModel # type: ignore  # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtWidgets import QAction # type: ignore  # @UnusedImport @Reimport  @UnresolvedImport
 #    try:
 #        from PyQt5 import sip # type: ignore  # @Reimport @UnresolvedImport @UnusedImport
 #    except Exception: # pylint: disable=broad-except
