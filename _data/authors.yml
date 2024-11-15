@@ -13,6 +13,9 @@ Marko Luther:
     - label: "Mastodon"
       icon: "fab fa-fw fa-mastodon"
       url: "https://masto.ai/@marko"
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/MAKOMO"
 
 Michael Herbert:
   name     : "Michael Herbert"
@@ -26,6 +29,9 @@ Michael Herbert:
     - label: "Instagram"
       icon: "fab fa-fw fa-instagram"
       url: "https://instagram.com/carefreebuzzbuzz/"
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/carefreebuzzbuzz"
 
 
 Dave Baxter:
@@ -33,3 +39,18 @@ Dave Baxter:
   avatar   : "/assets/images/DaveBaxter.png"
   bio      : "genius"
   location : "SF, USA"
+  links:
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/roasterdave"
+
+
+wvengen:
+  name     : "wvengen"
+  avatar   : "/assets/images/wvengen.jpeg"
+  bio      : "build master"
+  location : "Norway"
+  links:
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/wvengen"

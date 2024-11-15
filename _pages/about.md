@@ -190,6 +190,8 @@ __[Dave Baxter](/authors/baxter/)__ –– design wizard, genius & CI
 
 __[Michael Herbert](/authors/herbert/)__ –– documentation & fundraising
 
+__[wvengen](/authors/wvengen/)__ –– flatpack installer
+
 __Brett Pound__ –– support
 
 __Frans Goddijn__ –– support
