@@ -15,7 +15,7 @@ This software is open-source and absolutely free, also for commercial use.
 
 If you think Artisan is useful to you and your business, contribute financially to its further development. Send any amount via 
 - my [PayPal.Me page](https://www.paypal.me/MarkoLuther){:target="_blank"} 
-- or [GitHub Sponsors](https://github.com/sponsors/artisan-roaster-scope){:target="_blank"} (by Credit Card)
+- or [GitHub Sponsors](https://github.com/sponsors/artisan-roaster-scope){:target="_blank"} (one-time and montly)
 
 Thanks!
 

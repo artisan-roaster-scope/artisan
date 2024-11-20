@@ -13,7 +13,7 @@ sidebar:
 <img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
 
 * __Producer__  
-  [Santoker](){:target="_blank"}, China
+  [Santoker](http://www.santoker.com/){:target="_blank"}, China
 
 * __Machine Setups__ 
   - __1xPXR, 2xPXF, 2xPXR__  
