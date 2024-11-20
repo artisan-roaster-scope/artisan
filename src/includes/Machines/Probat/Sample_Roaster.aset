@@ -61,7 +61,7 @@ extraeventsactions=22, 0, 22, 22, 0, 22, 22, 0, 22
 extraeventsactionstrings="send({{ \"command\": \"setControlParams\", \"params\": {{ \"burnerState\": True }}}})", , "send({{ \"command\": \"setControlParams\", \"params\": {{ \"burner\": {} }}}})", "send({{ \"command\": \"setControlParams\", \"params\": {{ \"burner\": {} }}}})", , "send({{ \"command\": \"setControlParams\", \"params\": {{ \"burner\": {} }}}})", "send({{ \"command\": \"setControlParams\", \"params\": {{ \"burner\": {} }}}})", , "send({{ \"command\": \"setControlParams\", \"params\": {{ \"burnerState\": False }}}})"
 extraeventsbuttonsflags=0, 1, 1
 extraeventsdescriptions=, , , , , , , , 
-extraeventslabels=ON\nBurner, , +10%\n\\t, +5%\n\\t, , -5%\n\\t, -10%\n\\t, , OFF\nBurner
+extraeventslabels=ON\n\\r, , +10%\n\\t, +5%\n\\t, , -5%\n\\t, -10%\n\\t, , OFF\n\\r
 extraeventstypes=4, 4, 8, 8, 4, 8, 8, 4, 4
 extraeventsvalues=0, 0, 2, 1.5, 0, -1.5, -2, 0, 0
 extraeventsvisibility=0, 0, 1, 1, 0, 1, 1, 0, 0
@@ -121,4 +121,4 @@ request_data_command=getCurrentRoastingStep
 request_timeout=0.5
 
 [events]
-etypes=Air, Drum, Dumper, Burner, --
+default_etypes_set=0, 0, 0, 1, 0

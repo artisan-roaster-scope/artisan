@@ -138,13 +138,13 @@ extraFill1=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 extraFill2=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 extraLCDvisibility1=true, false, false, false, false, false, false, false, false, false
 extraLCDvisibility2=false, false, false, false, false, false, false, false, false, false
-extradevicecolor1=#188a02, #ad0427
-extradevicecolor2=#45a6cf, black
+extradevicecolor1=#188a02, #45a6cf
+extradevicecolor2=#ad0427, black
 extradevices=33, 55
 extramathexpression1=, 
 extramathexpression2=, 
-extraname1=Inlet, Air
-extraname2=Burner, Extra 2
+extraname1=Inlet, {0}
+extraname2={3}, Extra 2
 
 [ExtraEventButtons]
 buttonlistmaxlen=11

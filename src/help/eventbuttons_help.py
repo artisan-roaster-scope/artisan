@@ -79,7 +79,7 @@ def content() -> str:
     tbl_Labels.add_row(['\\M',QApplication.translate('HelpDlg','MANUAL (translated, respecting button state)')])
     tbl_Labels.add_row(['\\i',QApplication.translate('HelpDlg','STIRRER')])
     tbl_Labels.add_row(['\\f',QApplication.translate('HelpDlg','FILL')])
-    tbl_Labels.add_row(['\\f',QApplication.translate('HelpDlg','DISCHARGE')])
+    tbl_Labels.add_row(['\\D',QApplication.translate('HelpDlg','DISCHARGE')])
     tbl_Labels.add_row(['\\R',QApplication.translate('HelpDlg','RELEASE')])
     tbl_Labels.add_row(['\\h',QApplication.translate('HelpDlg','HEATING')])
     tbl_Labels.add_row(['\\l',QApplication.translate('HelpDlg','COOLING')])

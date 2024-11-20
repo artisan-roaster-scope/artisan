@@ -125,7 +125,7 @@ class s7port:
             self.areas = [
                     Area.PE, # 129, 0x81
                     Area.PA, # 130, 0x82
-                    Area.MK, # 131, 0x83
+                    Area.MK, # 131, 0x83 # area Q
                     Area.CT, #  28, 0x1C
                     Area.TM, #  29, 0x1D
                     Area.DB  # 132, 0x84

@@ -11,6 +11,7 @@ Controlbuttonflag=true
 [events]
 default_etypes_set=0, 0, 0, 1, 0
 eventsGraphflag=4
+showEtypes=true, true, true, false, true
 
 [ExtraComm]
 extrabaudrate=38400, 38400, 9600, 38400
@@ -133,14 +134,14 @@ input6mode=C
 input6register=4550
 input6slave=0
 input7BCDsAsInt=false
-input7FloatsAsInt=false
-input7Signed=false
+input7FloatsAsInt=true
+input7Signed=true
 input7bcd=false
 input7code=3
 input7div=1
 input7float=false
 input7mode=
-input7register=4400
+input7register=4650
 input7slave=255
 input8BCDsAsInt=false
 input8FloatsAsInt=true
