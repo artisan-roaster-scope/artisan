@@ -27,9 +27,7 @@ v3.1.0 (November 22, 2024)
   - automatically start of the scheduler while connected to [artisan.plus](https://artisan.plus) if there are incompleted scheduled items
   - disable items in coffee popups of the Custom Blend dialog without stock in the selected store or, if no store is selected, without stock in every store
   - reduces the size of builds by removing unnecessary files
-  - removes the optional delay on reads from serial MODBUS
-  - adds optional delay after connect before sending requests to serial MODBUS to allow to wait for Arduino slaves to complete reboot ([Issue #1694](../../../issues/1694))
-  - upgrades MODBUS communication from sync to async IO
+  - upgrades MODBUS communication from sync to async IO ([Issue #1694](../../../issues/1694))
   - limits the visible length of long popup lists in Devices and Statistics Dialog
   - keep Hottop connected after OFF in control mode to prevent the shutdown on disconnect ([Issue #1714](../../../issues/1714))
   - PID RS time is reset on PID ON not on CHARGE as in previous releases
