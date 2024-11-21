@@ -71,7 +71,7 @@ gallery:
     image_path: /assets/images/sci-logo.png
     alt: "Sweet Coffee Italia"
     title: "Sweet Coffee Italia"
-  - url: https://algrano.com/
+  - url: https://algrano.com/artisan?utm_source=artisan_blog&utm_medium=referral&utm_campaign=algrano_x_artisan&utm_content=blog
     image_path: /assets/images/algrano-logo.png
     alt: "Algrano"
     title: "Algrano"
