@@ -1,6 +1,13 @@
 Detailed Release History
 ========================
 
+----
+v3.1.1
+------------------
+
+* CHANGES
+  - the Phidget driver is now bundled with the Artisan app and does no longer need to be installed separately
+
 
 ----
 v3.1.0 (November 22, 2024)

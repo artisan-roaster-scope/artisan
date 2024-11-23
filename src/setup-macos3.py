@@ -480,6 +480,13 @@ try:
 except Exception: # pylint: disable=broad-except
     pass
 
+print('*** Removing Phidget driver libs not for this platforms ***')
+try:
+    subprocess.check_call(f'rm -f ./Artisan.app/Contents/Resources/lib/{python_version}/Phidget22/.libs/*.so',shell = True)
+    subprocess.check_call(f'rm -f ./Artisan.app/Contents/Resources/lib/{python_version}/Phidget22/.libs/*.dll',shell = True)
+except Exception: # pylint: disable=broad-except
+    pass
+
 ####
 
 os.chdir('..')

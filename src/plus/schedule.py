@@ -2253,7 +2253,12 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             self.aw.qmc.plus_store_label = plus.stock.getStoreLabel(store_item)
             if item.coffee is not None:
                 coffee = plus.stock.getCoffee(item.coffee)
-                if coffee is not None:
+                if coffee is None:
+                    # coffee not in stock, we keep at least the coffee hr_id
+                    self.aw.qmc.plus_coffee = item.coffee
+                    self.aw.qmc.plus_coffee_label = ''
+                    self.aw.qmc.beans = ''
+                else:
                     self.aw.qmc.plus_coffee = item.coffee
                     self.aw.qmc.plus_coffee_label = plus.stock.coffeeLabel(coffee)
                     self.aw.qmc.beans = plus.stock.coffee2beans(coffee)
