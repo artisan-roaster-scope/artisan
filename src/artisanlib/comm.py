@@ -80,6 +80,7 @@ from Phidget22.Devices.Stepper import Stepper # type: ignore # @UnusedWildImport
 from Phidget22.Devices.CurrentInput import CurrentInput # type: ignore # @UnusedWildImport
 from Phidget22.Devices.FrequencyCounter import FrequencyCounter # type: ignore # @UnusedWildImport
 from Phidget22.Devices.DCMotor import DCMotor # type: ignore # @UnusedWildImport
+from Phidget22.Devices.BLDCMotor import BLDCMotor # type: ignore # @UnusedWildImport
 from Phidget22.PhidgetException import PhidgetException # type: ignore
 
 from yoctopuce.yocto_api import YAPI, YRefParam
@@ -4724,6 +4725,7 @@ class serialport:
 #  only supporting
 #     1 channel VINT DCC1000 and DCC1002
 #     2 channel VINT DCC1003
+#     1 channel VINT DCC1100 (brushless DC motor controller)
 #  commands:
 #     accel(c,v[,sn]) with c channel number and v acceleration as a float, and sn serial the optional serial/port number of the addressed module
 #     vel(c,v[,sn])   with c channel number and v target velocity as a float, and sn serial the optional serial/port number of the addressed module
@@ -4739,7 +4741,8 @@ class serialport:
                 s,p = self.serialString2serialPort(serial)
                 ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDCMotor',DeviceID.PHIDID_DCC1000,
                             remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
-                ports = 1
+                ports:int = 1
+                brushless:bool = False
                 if ser is None:
                     ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDCMotor',DeviceID.PHIDID_DCC1002,
                                     remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
@@ -4748,10 +4751,15 @@ class serialport:
                     ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDCMotor',DeviceID.PHIDID_DCC1003,
                                     remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
                     ports = 2
+                if ser is None:
+                    ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetBLDCMotor',DeviceID.PHIDID_DCC1100,
+                                    remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
+                    ports = 1
+                    brushless = True
                 if ser is not None:
                     self.aw.ser.PhidgetDCMotor[serial] = []
                     for i in range(ports):
-                        dcm = DCMotor()
+                        dcm:Union[BLDCMotor, DCMotor] = (BLDCMotor() if brushless else DCMotor())
                         if port is not None:
                             dcm.setHubPort(port)
                         dcm.setDeviceSerialNumber(ser)

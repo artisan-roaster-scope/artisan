@@ -1141,7 +1141,7 @@ class DragItem(StandardItem):
                 not self.aw.schedule_window.in_completed(self.aw.qmc.roastUUID) and \
                 self.aw.qmc.roastdate.date().toPyDate() >= self.aw.schedule_window.prev_roast_session_data():
             # if not sampling and a profile without scheduleID loaded which is not yet registered as completed roast,
-            # and roast date is not before the last roast sessiong
+            # and roast date is not before the last roast session
             # we allow to assign the current profile to the selected schedule item
             addToItemAction:QAction = QAction(QApplication.translate('Contextual Menu', 'Register roast'),self)
             addToItemAction.triggered.connect(self.addLoadedProfileToSelectedScheduleItem)

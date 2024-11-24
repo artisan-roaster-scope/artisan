@@ -5,6 +5,9 @@ Detailed Release History
 v3.1.1
 ------------------
 
+* NEW HARDWARE SUPPORT
+  - adds support for the [DCC1100 Brushless DC Motor controller](https://artisan-scope.org/devices/phidgets/#47-stepper-motor-control) ([Discussion #1750](../../../discussions/1750))
+
 * CHANGES
   - the Phidget driver is now bundled with the Artisan app and does no longer need to be installed separately
 
