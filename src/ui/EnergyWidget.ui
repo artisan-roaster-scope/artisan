@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>621</width>
-    <height>414</height>
+    <width>900</width>
+    <height>470</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,16 +21,16 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_6">
    <property name="spacing">
-    <number>10</number>
+    <number>5</number>
    </property>
    <property name="leftMargin">
     <number>2</number>
    </property>
    <property name="topMargin">
-    <number>5</number>
+    <number>4</number>
    </property>
    <property name="rightMargin">
-    <number>5</number>
+    <number>2</number>
    </property>
    <property name="bottomMargin">
     <number>0</number>
@@ -591,7 +591,7 @@
        <string notr="true"/>
       </property>
       <attribute name="title">
-       <string notr="true">Burners</string>
+       <string notr="true">Loads</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <property name="spacing">
@@ -622,19 +622,22 @@
            <number>2</number>
           </property>
           <property name="topMargin">
-           <number>2</number>
+           <number>1</number>
           </property>
           <property name="rightMargin">
            <number>2</number>
           </property>
           <property name="bottomMargin">
-           <number>2</number>
+           <number>0</number>
           </property>
-          <property name="spacing">
-           <number>8</number>
+          <property name="horizontalSpacing">
+           <number>5</number>
           </property>
-          <item row="4" column="3">
-           <widget class="QComboBox" name="ratingunit3">
+          <property name="verticalSpacing">
+           <number>3</number>
+          </property>
+          <item row="2" column="5">
+           <widget class="QComboBox" name="events1">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
@@ -649,79 +652,21 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="7">
-           <widget class="QSpinBox" name="zeropcts2">
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="accessibleDescription">
-             <string notr="true"/>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-            <property name="suffix">
-             <string notr="true"/>
-            </property>
-            <property name="prefix">
-             <string notr="true"/>
-            </property>
-            <property name="maximum">
-             <number>998</number>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="5">
-           <widget class="QComboBox" name="events2">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
+          <item row="2" column="0">
+           <widget class="QLabel" name="bLabel">
+            <property name="font">
+             <font>
+              <bold>true</bold>
+             </font>
             </property>
             <property name="toolTip">
              <string notr="true"/>
             </property>
             <property name="accessibleDescription">
-             <string notr="true"/>
-            </property>
-            <property name="currentText">
-             <string notr="true"/>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="QLineEdit" name="loadlabel3">
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="accessibleDescription">
-             <string notr="true"/>
-            </property>
-            <property name="inputMask">
              <string notr="true"/>
             </property>
             <property name="text">
-             <string notr="true"/>
-            </property>
-            <property name="maxLength">
-             <number>12</number>
-            </property>
-            <property name="placeholderText">
-             <string notr="true"/>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="4">
-           <widget class="QComboBox" name="sourcetype1">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="accessibleDescription">
-             <string notr="true"/>
-            </property>
-            <property name="currentText">
-             <string notr="true"/>
+             <string notr="true">B</string>
             </property>
            </widget>
           </item>
@@ -743,30 +688,24 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="2">
-           <widget class="QLineEdit" name="loadrating2">
+          <item row="3" column="3">
+           <widget class="QComboBox" name="ratingunit2">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
             <property name="toolTip">
              <string notr="true"/>
             </property>
             <property name="accessibleDescription">
              <string notr="true"/>
             </property>
-            <property name="inputMask">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string notr="true"/>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-            <property name="placeholderText">
+            <property name="currentText">
              <string notr="true"/>
             </property>
            </widget>
           </item>
-          <item row="4" column="4">
-           <widget class="QComboBox" name="sourcetype3">
+          <item row="2" column="4">
+           <widget class="QComboBox" name="sourcetype1">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
@@ -797,8 +736,8 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QLabel" name="loadlabelsLabel">
+          <item row="0" column="3">
+           <widget class="QLabel" name="ratingunitsLabel">
             <property name="font">
              <font>
               <bold>true</bold>
@@ -811,7 +750,28 @@
              <string notr="true"/>
             </property>
             <property name="text">
-             <string notr="true">Label</string>
+             <string notr="true">Unit</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="6">
+           <widget class="QLabel" name="pressureLabel">
+            <property name="font">
+             <font>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true">Pressure %</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -843,8 +803,8 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="8">
-           <widget class="QSpinBox" name="hundredpct0">
+          <item row="4" column="8">
+           <widget class="QSpinBox" name="hundredpct3">
             <property name="toolTip">
              <string notr="true"/>
             </property>
@@ -868,8 +828,33 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="3">
-           <widget class="QLabel" name="ratingunitsLabel">
+          <item row="3" column="8">
+           <widget class="QSpinBox" name="hundredpct2">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="suffix">
+             <string notr="true"/>
+            </property>
+            <property name="prefix">
+             <string notr="true"/>
+            </property>
+            <property name="maximum">
+             <number>999</number>
+            </property>
+            <property name="value">
+             <number>100</number>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="5">
+           <widget class="QLabel" name="eventsLabel">
             <property name="font">
              <font>
               <bold>true</bold>
@@ -882,15 +867,36 @@
              <string notr="true"/>
             </property>
             <property name="text">
-             <string notr="true">Unit</string>
+             <string notr="true">Event</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
-          <item row="2" column="7">
-           <widget class="QSpinBox" name="zeropcts1">
+          <item row="1" column="0">
+           <widget class="QLabel" name="aLabel">
+            <property name="font">
+             <font>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true">A</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="7">
+           <widget class="QSpinBox" name="zeropcts2">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
             <property name="accessibleDescription">
              <string notr="true"/>
             </property>
@@ -929,47 +935,8 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="aLabel">
-            <property name="font">
-             <font>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="accessibleDescription">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string notr="true">A</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="6">
-           <widget class="QLabel" name="pressureLabel">
-            <property name="font">
-             <font>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="accessibleDescription">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string notr="true">Pressure %</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="loadlabel2">
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="loadlabel1">
             <property name="toolTip">
              <string notr="true"/>
             </property>
@@ -987,109 +954,6 @@
             </property>
             <property name="placeholderText">
              <string notr="true"/>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="8">
-           <widget class="QSpinBox" name="hundredpct3">
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="accessibleDescription">
-             <string notr="true"/>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-            <property name="suffix">
-             <string notr="true"/>
-            </property>
-            <property name="prefix">
-             <string notr="true"/>
-            </property>
-            <property name="maximum">
-             <number>999</number>
-            </property>
-            <property name="value">
-             <number>100</number>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="4">
-           <widget class="QComboBox" name="sourcetype0">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="accessibleDescription">
-             <string notr="true"/>
-            </property>
-            <property name="currentText">
-             <string notr="true"/>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="7">
-           <widget class="QSpinBox" name="zeropcts0">
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="accessibleDescription">
-             <string notr="true"/>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-            <property name="suffix">
-             <string notr="true"/>
-            </property>
-            <property name="prefix">
-             <string notr="true"/>
-            </property>
-            <property name="maximum">
-             <number>998</number>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="dLabel">
-            <property name="font">
-             <font>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="accessibleDescription">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string notr="true">D</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="7">
-           <widget class="QSpinBox" name="zeropcts3">
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="accessibleDescription">
-             <string notr="true"/>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-            <property name="suffix">
-             <string notr="true"/>
-            </property>
-            <property name="prefix">
-             <string notr="true"/>
-            </property>
-            <property name="maximum">
-             <number>998</number>
             </property>
            </widget>
           </item>
@@ -1115,55 +979,8 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="8">
-           <widget class="QSpinBox" name="hundredpct2">
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="accessibleDescription">
-             <string notr="true"/>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-            <property name="suffix">
-             <string notr="true"/>
-            </property>
-            <property name="prefix">
-             <string notr="true"/>
-            </property>
-            <property name="maximum">
-             <number>999</number>
-            </property>
-            <property name="value">
-             <number>100</number>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="2">
-           <widget class="QLineEdit" name="loadrating3">
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="accessibleDescription">
-             <string notr="true"/>
-            </property>
-            <property name="inputMask">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string notr="true"/>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-            <property name="placeholderText">
-             <string notr="true"/>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="5">
-           <widget class="QComboBox" name="events0">
+          <item row="3" column="5">
+           <widget class="QComboBox" name="events2">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
@@ -1178,40 +995,8 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="5">
-           <widget class="QComboBox" name="events1">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="accessibleDescription">
-             <string notr="true"/>
-            </property>
-            <property name="currentText">
-             <string notr="true"/>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="3">
-           <widget class="QComboBox" name="ratingunit1">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="accessibleDescription">
-             <string notr="true"/>
-            </property>
-            <property name="currentText">
-             <string notr="true"/>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="loadlabel1">
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="loadlabel2">
             <property name="toolTip">
              <string notr="true"/>
             </property>
@@ -1232,62 +1017,8 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="2">
-           <widget class="QLineEdit" name="loadrating1">
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="accessibleDescription">
-             <string notr="true"/>
-            </property>
-            <property name="inputMask">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string notr="true"/>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-            <property name="placeholderText">
-             <string notr="true"/>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="5">
-           <widget class="QComboBox" name="events3">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="accessibleDescription">
-             <string notr="true"/>
-            </property>
-            <property name="currentText">
-             <string notr="true"/>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="3">
-           <widget class="QComboBox" name="ratingunit0">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="accessibleDescription">
-             <string notr="true"/>
-            </property>
-            <property name="currentText">
-             <string notr="true"/>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QLabel" name="loadratingsLabel">
+          <item row="0" column="8">
+           <widget class="QLabel" name="hundredpctsLabel">
             <property name="font">
              <font>
               <bold>true</bold>
@@ -1300,10 +1031,32 @@
              <string notr="true"/>
             </property>
             <property name="text">
-             <string notr="true">Rating</string>
+             <string notr="true">100%</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="loadlabel3">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
+            <property name="maxLength">
+             <number>12</number>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
@@ -1329,63 +1082,30 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="bLabel">
-            <property name="font">
-             <font>
-              <bold>true</bold>
-             </font>
-            </property>
+          <item row="4" column="2">
+           <widget class="QLineEdit" name="loadrating3">
             <property name="toolTip">
              <string notr="true"/>
             </property>
             <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
              <string notr="true"/>
             </property>
             <property name="text">
-             <string notr="true">B</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="3">
-           <widget class="QComboBox" name="ratingunit2">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
              <string notr="true"/>
-            </property>
-            <property name="accessibleDescription">
-             <string notr="true"/>
-            </property>
-            <property name="currentText">
-             <string notr="true"/>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="5">
-           <widget class="QLabel" name="eventsLabel">
-            <property name="font">
-             <font>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="toolTip">
-             <string notr="true"/>
-            </property>
-            <property name="accessibleDescription">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string notr="true">Event</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignCenter</set>
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
-          <item row="0" column="4">
-           <widget class="QLabel" name="sourcetypesLabel">
+          <item row="4" column="0">
+           <widget class="QLabel" name="dLabel">
             <property name="font">
              <font>
               <bold>true</bold>
@@ -1398,31 +1118,72 @@
              <string notr="true"/>
             </property>
             <property name="text">
-             <string notr="true">Fuel</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
+             <string notr="true">D</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="8">
-           <widget class="QLabel" name="hundredpctsLabel">
-            <property name="font">
-             <font>
-              <bold>true</bold>
-             </font>
-            </property>
+          <item row="3" column="6">
+           <layout class="QHBoxLayout" name="horizontalLayout_9">
+            <item>
+             <spacer name="horizontalSpacer_14">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="pressureCheckBox2">
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
+              <property name="text">
+               <string notr="true"/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_13">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item row="2" column="2">
+           <widget class="QLineEdit" name="loadrating1">
             <property name="toolTip">
              <string notr="true"/>
             </property>
             <property name="accessibleDescription">
              <string notr="true"/>
             </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
             <property name="text">
-             <string notr="true">100%</string>
+             <string notr="true"/>
             </property>
             <property name="alignment">
-             <set>Qt::AlignCenter</set>
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
@@ -1478,91 +1239,233 @@
             </item>
            </layout>
           </item>
-          <item row="2" column="6">
-           <layout class="QHBoxLayout" name="horizontalLayout_8">
-            <item>
-             <spacer name="horizontalSpacer_12">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="pressureCheckBox1">
-              <property name="toolTip">
-               <string notr="true"/>
-              </property>
-              <property name="accessibleDescription">
-               <string notr="true"/>
-              </property>
-              <property name="text">
-               <string notr="true"/>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_11">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
+          <item row="4" column="3">
+           <widget class="QComboBox" name="ratingunit3">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="currentText">
+             <string notr="true"/>
+            </property>
+           </widget>
           </item>
-          <item row="3" column="6">
-           <layout class="QHBoxLayout" name="horizontalLayout_9">
-            <item>
-             <spacer name="horizontalSpacer_14">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="pressureCheckBox2">
-              <property name="toolTip">
-               <string notr="true"/>
-              </property>
-              <property name="accessibleDescription">
-               <string notr="true"/>
-              </property>
-              <property name="text">
-               <string notr="true"/>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_13">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
+          <item row="1" column="3">
+           <widget class="QComboBox" name="ratingunit0">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="currentText">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="4">
+           <widget class="QComboBox" name="sourcetype0">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="currentText">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="8">
+           <widget class="QSpinBox" name="hundredpct0">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="suffix">
+             <string notr="true"/>
+            </property>
+            <property name="prefix">
+             <string notr="true"/>
+            </property>
+            <property name="maximum">
+             <number>999</number>
+            </property>
+            <property name="value">
+             <number>100</number>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QLineEdit" name="loadrating2">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="inputMask">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="placeholderText">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QComboBox" name="ratingunit1">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="currentText">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="4">
+           <widget class="QComboBox" name="sourcetype3">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="currentText">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="loadlabelsLabel">
+            <property name="font">
+             <font>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true">Label</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="7">
+           <widget class="QSpinBox" name="zeropcts0">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="suffix">
+             <string notr="true"/>
+            </property>
+            <property name="prefix">
+             <string notr="true"/>
+            </property>
+            <property name="maximum">
+             <number>998</number>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="loadratingsLabel">
+            <property name="font">
+             <font>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true">Rating</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="4">
+           <widget class="QLabel" name="sourcetypesLabel">
+            <property name="font">
+             <font>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string notr="true">Fuel</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="5">
+           <widget class="QComboBox" name="events3">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="currentText">
+             <string notr="true"/>
+            </property>
+           </widget>
           </item>
           <item row="4" column="6">
            <layout class="QHBoxLayout" name="horizontalLayout_10">
@@ -1607,8 +1510,271 @@
             </item>
            </layout>
           </item>
+          <item row="2" column="7">
+           <widget class="QSpinBox" name="zeropcts1">
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="suffix">
+             <string notr="true"/>
+            </property>
+            <property name="prefix">
+             <string notr="true"/>
+            </property>
+            <property name="maximum">
+             <number>998</number>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="7">
+           <widget class="QSpinBox" name="zeropcts3">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="suffix">
+             <string notr="true"/>
+            </property>
+            <property name="prefix">
+             <string notr="true"/>
+            </property>
+            <property name="maximum">
+             <number>998</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="5">
+           <widget class="QComboBox" name="events0">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
+            <property name="currentText">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="6">
+           <layout class="QHBoxLayout" name="horizontalLayout_8">
+            <item>
+             <spacer name="horizontalSpacer_12">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="pressureCheckBox1">
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
+              <property name="text">
+               <string notr="true"/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_11">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
          </layout>
         </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_12">
+         <property name="spacing">
+          <number>4</number>
+         </property>
+         <item>
+          <spacer name="horizontalSpacer_18">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="meter1GroupBox">
+           <property name="title">
+            <string>Meter 1</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_2">
+            <property name="leftMargin">
+             <number>2</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>2</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <property name="horizontalSpacing">
+             <number>5</number>
+            </property>
+            <property name="verticalSpacing">
+             <number>1</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QLabel" name="meter1Label">
+              <property name="text">
+               <string>Label</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLineEdit" name="meter1LabelLineEdit"/>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="meter1UnitLabel">
+              <property name="text">
+               <string>Unit</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QComboBox" name="meter1UnitComboBox"/>
+            </item>
+            <item row="1" column="2">
+             <widget class="QComboBox" name="meter1SourceComboBox"/>
+            </item>
+            <item row="0" column="2">
+             <widget class="QLabel" name="meter1SourceLabel">
+              <property name="text">
+               <string>Source</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_19">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="meter2GroubBox">
+           <property name="title">
+            <string>Meter 2</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_4">
+            <property name="leftMargin">
+             <number>2</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>2</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <property name="horizontalSpacing">
+             <number>5</number>
+            </property>
+            <property name="verticalSpacing">
+             <number>1</number>
+            </property>
+            <item row="1" column="1">
+             <widget class="QComboBox" name="meter2UnitComboBox"/>
+            </item>
+            <item row="1" column="2">
+             <widget class="QComboBox" name="meter2SourceComboBox"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLineEdit" name="meter2LabelLineEdit"/>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="meter2Label">
+              <property name="text">
+               <string>Label</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="meter2UnitLabel">
+              <property name="text">
+               <string>Unit</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QLabel" name="meter2SourceLabel">
+              <property name="text">
+               <string>Source</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_20">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -1616,10 +1782,10 @@
           <number>5</number>
          </property>
          <property name="topMargin">
-          <number>10</number>
+          <number>4</number>
          </property>
          <property name="bottomMargin">
-          <number>10</number>
+          <number>4</number>
          </property>
          <item>
           <spacer name="horizontalSpacer_7">
@@ -1690,6 +1856,70 @@
           </widget>
          </item>
          <item>
+          <spacer name="horizontalSpacer_17">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="gasMixLabel">
+           <property name="toolTip">
+            <string notr="true"/>
+           </property>
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
+           <property name="text">
+            <string notr="true">Gas Mix:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="gasMixSpinBox">
+           <property name="toolTip">
+            <string notr="true"/>
+           </property>
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="suffix">
+            <string notr="true">%</string>
+           </property>
+           <property name="prefix">
+            <string notr="true"/>
+           </property>
+           <property name="maximum">
+            <number>100</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="renewableLabel2">
+           <property name="toolTip">
+            <string notr="true"/>
+           </property>
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
+           <property name="text">
+            <string notr="true">Renewable</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <spacer name="horizontalSpacer_8">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -1712,7 +1942,7 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>40</height>
+           <height>0</height>
           </size>
          </property>
         </spacer>
@@ -1726,17 +1956,20 @@
           <string notr="true"/>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <property name="spacing">
+           <number>4</number>
+          </property>
           <property name="leftMargin">
            <number>0</number>
           </property>
           <property name="topMargin">
-           <number>5</number>
+           <number>3</number>
           </property>
           <property name="rightMargin">
            <number>0</number>
           </property>
           <property name="bottomMargin">
-           <number>5</number>
+           <number>3</number>
           </property>
           <item>
            <widget class="QPushButton" name="loadsSetDefaultsButton">
@@ -2658,6 +2891,9 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="helpButtonLine">
+     <property name="spacing">
+      <number>4</number>
+     </property>
      <item>
       <widget class="QLabel" name="resultunitLabel">
        <property name="toolTip">
