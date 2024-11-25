@@ -311,8 +311,9 @@ with
 
 Artisan v2.4 adds support for DC motor control.
 
-* [DCC1000](https://www.phidgets.com/?tier=3&catid=18&pcid=15&prodid=965){:target="_blank"} and [DCC1002](https://www.phidgets.com/?tier=3&catid=18&pcid=15&prodid=1117){:target="_blank"} (1x VINT)
-* [DCC1003](https://www.phidgets.com/?tier=3&catid=18&pcid=15&prodid=1118){:target="_blank"} (2x VINT)
+* [DCC1000](https://www.phidgets.com/?prodid=965){:target="_blank"} and [DCC1002](https://www.phidgets.com/?prodid=1117){:target="_blank"} (1x VINT)
+* [DCC1003](https://www.phidgets.com/?prodid=1118){:target="_blank"} (2x VINT)
+* [DCC1100](https://www.phidgets.com/?prodid=1013){:target="_blank"} (1x VINT; Brushless DC Motor Control; added in v3.1.2)
 
 Phidget DC Motor Control modules can be controlled via `IO Command` actions triggered by buttons or sliders configured in the Events tab (menu `Config >> Events`). The following commands are supported:
 
@@ -328,6 +329,11 @@ with
 * `v` : velocity (float)
 * `s` : sleep time in seconds (float)
 * `sn` : optional hub serial number or hub serial number and hub port specifier separated by a colon like in `accel(0,0.5,560282)` or `accel(0,0.5,560282:2)`. Using a command actions, like in `accel(0,0.5)`, without specifying a hub serial number, will attach to the first yet unattached module connected to the hub with the lowest serial number instead. If just a port number is given as in `accel(0,0.5,:2)`, the yet unattached module connected to the given port (here 2) of the first hub with the lowest serial number is addressed.
+
+
+**Watch out!** It has been observed that those controllers produce a cleaner output if the limit is set at a minimum of 50% above motor nominal rating.
+{: .notice--primary}
+
 
 
 ### 4.6 RC Servo Control

@@ -31,7 +31,7 @@ You need to install the corresponding serial driver for the chipset of this conv
 
 ## Serial Driver Cheat Sheet
 
-.. table to be extended and corrected as we receive new information form you ..
+.. table to be extended and corrected as we receive new information from you ..
 
 Machine                         | Driver | Remarks
 ------------------------------- | ------ | -----
@@ -56,7 +56,7 @@ Machine                         | Driver | Remarks
 [KapoK](/machines/kapok/) | CH34x
 [NOR](/machines/nor/) | FTDI | CH34x (on N Series V.4 old machines)
 [Nordic](/machines/nordic/) | PL2303
-[Plugin Roast](/machines/pluginroast/) | CH34x
+[Plugin Roast](https://www.pluginroast.com.br/) | CH34x
 [Phoenix](/machines/phoenix/) | CH34x
 [Proaster](/machines/proaster/) | FTDI
 [Roastmax](/machines/roastmax/) | FTDI
