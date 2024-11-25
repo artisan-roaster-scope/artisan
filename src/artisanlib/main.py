@@ -21855,7 +21855,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.html_loader = QWebEngineView(profile) # pyright:ignore[reportPossiblyUnboundVariable]
                 except Exception: # pylint: disable=broad-except
                     self.html_loader = QWebEngineView() # pyright:ignore[reportPossiblyUnboundVariable]
-                self.html_loader.setZoomFactor(1)
+                if self.html_loader is not None:
+                    self.html_loader.setZoomFactor(1)
             if self.pdf_page_layout is None:
                 # lazy imports
                 try:
