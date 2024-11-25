@@ -109,6 +109,7 @@ PYQT_QT_BIN = PYQT_QT + r'\bin'
 PYQT_QT_TRANSLATIONS = QT_TRANSL
 YOCTO_BIN = PYTHON_PACKAGES + r'\yoctopuce\cdll'
 SNAP7_BIN = PYTHON_PACKAGES + r'\snap7\lib'
+PHIDGET22_BIN = PYTHON_PACKAGES + r'\Phidget22\.libs'
 
 from PyInstaller.utils.hooks import is_module_satisfies
 if is_module_satisfies('scipy >= 1.3.2'):
@@ -147,7 +148,7 @@ binaries = collect_dynamic_libs('bleak')
 block_cipher = None
 
 a = Analysis(['artisan.py'],
-             pathex=[PYQT_QT_BIN, ARTISAN_SRC, SCIPY_BIN],
+             pathex=[PYQT_QT_BIN, ARTISAN_SRC, SCIPY_BIN, PHIDGET22_BIN],
              binaries=binaries,
              datas=datas, # + copy_metadata('tzdata')
              hookspath=[],
