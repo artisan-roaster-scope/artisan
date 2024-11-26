@@ -24,4 +24,4 @@ sidebar:
 * __Connection:__ Phidgets, MODBUS TCP
 * __Features:__
   - logging of bean temperature and exhaust temperature
-  - PLC equiped machines: burner power (%), drum pressure (pa), drum speed (Hz), and airflow (%). Control of burner power, drum speed and fan speed.
+  - PLC equiped machines: logging of burner power (%), drum pressure (pa), drum speed (Hz), and airflow (%) as well as control of burner power, drum speed and fan speed.
