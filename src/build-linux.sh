@@ -186,7 +186,7 @@ done
 
 # remove unused QML files
 
-sudo rm -rf dist/_internal/PyQt6/Qt6/qml
+rm -rf dist/_internal/PyQt6/Qt6/qml
 echo Qt QML files removed
 
 # remove unused babel translations
