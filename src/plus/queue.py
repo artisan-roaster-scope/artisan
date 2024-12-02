@@ -124,7 +124,7 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                         r:Any = None
                         try:
                             # we upload only full roast records, or partial updates
-                            # in case the are under sync
+                            # in case they are under sync
                             # (registered in the sync cache)
                             if is_full_roast_record(item['data']) or (
                                 'roast_id' in item['data']
@@ -193,6 +193,7 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                             # for syncing are ignored
                             iters = 0
                         except RequestsConnectionError as e:
+                            # DNS failure, refused connection
                             try:
                                 if controller.is_connected():
                                     _log.debug(
@@ -207,9 +208,11 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                             except Exception as ex:  # pylint: disable=broad-except
                                 _log.exception(ex)
                             # we don't change the iter, but retry to connect after
-                            # a delay in the next iteration
+                            # a delay in the next iteration once the queue got restarted
                             time.sleep(config.queue_retry_delay)
                         except Exception as e:  # pylint: disable=broad-except
+                            # could be a requests.exceptions.Timeout or requests.exceptions.TooManyRedirects
+                            # or any HTTP error like 401
                             _log.debug('-> task failed: %s', e)
                             if r is not None:
                                 _log.debug(
@@ -218,7 +221,7 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                             else:
                                 _log.debug('-> no status code')
                             if (
-                                r is not None and r.status_code == 401
+                                r is not None and r.status_code == 401 # 401: Unauthorized
                             ):  # authentication failed
                                 try:
                                     if controller.is_connected():

@@ -6894,9 +6894,6 @@ class tgraphcanvas(FigureCanvas):
             if self.crossmarker:
                 self.togglecrosslines()
 
-            if self.aw is not None:
-                self.aw.updatePlusStatus()
-
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
@@ -6933,6 +6930,9 @@ class tgraphcanvas(FigureCanvas):
             self.endofx = 60
 
         self.aw.qmc.timealign(redraw=False)
+
+        if self.aw is not None:
+            self.aw.updatePlusStatus()
 
         ### REDRAW  ##
         if redraw:
@@ -11937,15 +11937,17 @@ class tgraphcanvas(FigureCanvas):
             if self.phidgetRemoteFlag:
                 try:
                     self.addPhidgetServer()
-                    _log.info('phidgetServer started')
-                except Exception: # pylint: disable=broad-except
+                    _log.info('phidgetServer added')
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
                     if self.device in self.phidgetDevices:
-                        self.adderror(QApplication.translate('Error Message',"Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!"))
+                        self.adderror(QApplication.translate('Error Message',"Exception: phidgetServer couldn't be added. Verify that the Phidget driver is correctly installed!"))
             if self.phidgetManager is None:
                 try:
                     self.phidgetManager = PhidgetManager()
                     _log.info('phidgetManager started')
-                except Exception: # pylint: disable=broad-except
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
                     if self.device in self.phidgetDevices:
                         self.adderror(QApplication.translate('Error Message',"Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!"))
 
@@ -12324,6 +12326,8 @@ class tgraphcanvas(FigureCanvas):
 
             if self.flagKeepON and len(self.timex) > 10:
                 QTimer.singleShot(300, self.onMonitorSignal.emit)
+
+            self.aw.updatePlusStatusSignal.emit() # update plus icon (roast might not have been uploaded yet)
 
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
@@ -12799,11 +12803,15 @@ class tgraphcanvas(FigureCanvas):
     def OffRecorder(self, autosave:bool = True, enableButton:bool = True) -> None:
         _log.info('MODE: STOP RECORDING')
         try:
-            # mark DROP if not yet set, at least 7min roast time and CHARGE is set and either autoDROP is active or DROP button is hidden
-            if self.timeindex[6] == 0 and self.timeindex[0] != -1 and (self.autoDropFlag or not self.buttonvisibility[6]):
+            # mark DROP if not yet set (and DROP not undone), at least 7min roast time and CHARGE is set and either autoDROP is active or DROP button is hidden
+            if self.timeindex[6] == 0 and self.timeindex[0] != -1 and self.autoDROPenabled and (self.autoDropFlag or not self.buttonvisibility[6]):
                 start = self.timex[self.timeindex[0]]
                 if (len(self.timex)>0 and self.timex[-1] - start) > 7*60: # only after 7min into the roast
                     self.markDrop()
+            if self.timeindex[6] == 0 and self.autoDROPenabled:
+                # if DROP is still not set (and was never set before, eg. autoDROP is still enabled), we reset the scheduleID not
+                # to have this still incomplete roast be associated with any scheduleItem (rule: a roast without a DROP is never automatically registered as scheduleItem)
+                self.scheduleID = None
             self.cacheforBbp()  # save items for bbp
             self.aw.enableSaveActions()
             self.aw.resetCurveVisibilities()

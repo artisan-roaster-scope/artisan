@@ -241,7 +241,7 @@ def getTemplate(bp: 'ProfileData', background:bool=False) -> Dict[str, Any]:  #f
 def trimBlendSpec(blend_spec:stock.Blend) -> Optional[stock.Blend]:
     try:
         res:stock.Blend = {} # type: ignore # missing required fields (added later)
-        if 'label' in blend_spec:
+        if 'label' in blend_spec and blend_spec['label']:
             res['label'] = blend_spec['label']
             if 'ingredients' in blend_spec and blend_spec['ingredients']:
                 res_ingredients:List[stock.BlendIngredient] = []
@@ -250,9 +250,11 @@ def trimBlendSpec(blend_spec:stock.Blend) -> Optional[stock.Blend]:
                     for tag in ['coffee', 'ratio', 'ratio_num', 'ratio_denom']:
                         if tag in ingredient:
                             res_ingredient[tag] = ingredient[tag] # type: ignore # field vars like 'tag' are not supported by mypy for TypedDicts
-                    if res_ingredient:
+                    if res_ingredient and 'coffee' in res_ingredient and res_ingredient['coffee'] and 'ratio' in res_ingredient and res_ingredient['ratio'] > 0:
                         res_ingredients.append(res_ingredient)
-                if res_ingredients:
+                    else:
+                        return None
+                if res_ingredients and 0 < sum(ingr['ratio'] for ingr in res_ingredients) <= 1.0001:
                     res['ingredients'] = res_ingredients
                     return res
         return None

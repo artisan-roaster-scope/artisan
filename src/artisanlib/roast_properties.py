@@ -2823,7 +2823,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.ratingunit3.addItems(self.aw.qmc.powerunits)
 
             # input validators
-            regextime = QRegularExpression(r'^[0-9]?[0-9]?[0-9]:[0-5][0-9]$')
+            regextime = QRegularExpression(r'^$|^[0-9]?[0-9]?[0-9]:[0-5][0-9]$') # includes the empty string to trigger editingFinished
             self.energy_ui.preheatDuration.setValidator(QRegularExpressionValidator(regextime,self))
             self.energy_ui.betweenBatchesDuration.setValidator(QRegularExpressionValidator(regextime,self))
             self.energy_ui.coolingDuration.setValidator(QRegularExpressionValidator(regextime,self))
@@ -3134,6 +3134,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     def updatePreheatDuration(self, updateMetrics:bool = True) -> None:
         self.aw.qmc.preheatDuration = self.validateText2Seconds(self.energy_ui.preheatDuration.text())
+        self.energy_ui.preheatDuration.setText(self.validateSeconds2Text(self.aw.qmc.preheatDuration))
         if updateMetrics:
             self.updateMetricsLabel()
 
@@ -3339,10 +3340,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             (self.energy_ui.events2,self.energy_ui.zeropcts2),
             (self.energy_ui.events3,self.energy_ui.zeropcts3),
             ]:
-            if ew.currentIndex() == 0:
-                zw.setEnabled(False)
-            else:
-                zw.setEnabled(True)
+            zw.setEnabled(ew.currentIndex() != 0)
         self.updateMetricsLabel()
 
     ##
@@ -3448,84 +3446,115 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot()
     def loadlabels_editingfinished(self) -> None:
-        for w in [self.energy_ui.loadlabel0,self.energy_ui.loadlabel1,self.energy_ui.loadlabel2,self.energy_ui.loadlabel3]:
-            if w.isModified():
-                w.setText(w.text().strip())
-        self.updateLoadLabels()
-        self.loadsEdited()
+        w = self.sender()
+        if w and isinstance(w, QLineEdit) and w.isModified():
+            w.setText(w.text().strip())
+            self.updateLoadLabels()
+            self.loadsEdited()
 
     @pyqtSlot()
     def loadratings_editingfinished(self) -> None:
-        for w in [self.energy_ui.loadrating0,self.energy_ui.loadrating1,self.energy_ui.loadrating2,self.energy_ui.loadrating3]:
-            if w.isModified():
-                w.setText(self.validateNumText(w.text()))
-        self.updateLoadRatings()
-        self.updateEnergyLabels()
-        self.loadsEdited()
+        w = self.sender()
+        if w and isinstance(w, QLineEdit) and w.isModified():
+            w.setText(self.validateNumText(w.text()))
+            self.updateLoadRatings()
+            self.updateEnergyLabels()
+            self.loadsEdited()
 
     @pyqtSlot()
     def ratingunits_currentindexchanged(self) -> None:
-        self.updateLoadUnits()
-        self.updateEnergyUnitLabels()
-        self.loadsEdited()
+        sender = self.sender()
+        if isinstance(sender, QComboBox):
+            try:
+                i = [self.energy_ui.ratingunit0,self.energy_ui.ratingunit1,self.energy_ui.ratingunit2,self.energy_ui.ratingunit3].index(sender)
+                self.aw.qmc.ratingunits[i] = sender.currentIndex()
+                self.updateMetricsLabel()
+                self.updateEnergyUnitLabels()
+                self.loadsEdited()
+            except Exception: # pylint: disable=broad-except
+                pass
 
     @pyqtSlot()
     def sourcetypes_currentindexchanged(self) -> None:
-        self.updateSourceTypes()
-        self.loadsEdited()
+        sender = self.sender()
+        if isinstance(sender, QComboBox):
+            try:
+                i = [self.energy_ui.sourcetype0, self.energy_ui.sourcetype1, self.energy_ui.sourcetype2, self.energy_ui.sourcetype3].index(sender)
+                self.aw.qmc.sourcetypes[i] = sender.currentIndex()
+                self.updateMetricsLabel()
+                self.loadsEdited()
+            except Exception: # pylint: disable=broad-except
+                pass
 
     @pyqtSlot()
     def load_etypes_currentindexchanged(self) -> None:
-        self.updateEnableZHpct()
-        self.updateLoadEvents()
-        self.loadsEdited()
+        sender = self.sender()
+        if isinstance(sender, QComboBox):
+            try:
+                i = [self.energy_ui.events0, self.energy_ui.events1, self.energy_ui.events2, self.energy_ui.events3].index(sender)
+                self.aw.qmc.load_etypes[i] = sender.currentIndex()
+                zw = [self.energy_ui.zeropcts0, self.energy_ui.zeropcts1, self.energy_ui.zeropcts2, self.energy_ui.zeropcts3][i]
+                zw.setEnabled(sender.currentIndex() != 0)
+                self.updateMetricsLabel()
+                self.loadsEdited()
+            except Exception: # pylint: disable=broad-except
+                pass
 
     @pyqtSlot(int)
     def pressureCheckBox_statechanged(self, _:int) -> None:
-        self.updatePressurePercent()
-        self.loadsEdited()
+        sender = self.sender()
+        if isinstance(sender, QCheckBox):
+            try:
+                i = [self.energy_ui.pressureCheckBox0, self.energy_ui.pressureCheckBox1, self.energy_ui.pressureCheckBox2, self.energy_ui.pressureCheckBox3].index(sender)
+                self.aw.qmc.presssure_percents[i] = sender.isChecked()
+                self.updateMetricsLabel()
+                self.loadsEdited()
+            except Exception: # pylint: disable=broad-except
+                pass
 
     @pyqtSlot()
     def loadevent_zeropcts0_valuechanged(self) -> None:
-        self.loadevent_pcts_valuechanged('zero',self.energy_ui.zeropcts0,self.energy_ui.hundredpct0)
+        self.loadevent_pcts_valuechanged(0, 'zero',self.energy_ui.zeropcts0,self.energy_ui.hundredpct0)
 
     @pyqtSlot()
     def loadevent_zeropcts1_valuechanged(self) -> None:
-        self.loadevent_pcts_valuechanged('zero',self.energy_ui.zeropcts1,self.energy_ui.hundredpct1)
+        self.loadevent_pcts_valuechanged(1, 'zero',self.energy_ui.zeropcts1,self.energy_ui.hundredpct1)
 
     @pyqtSlot()
     def loadevent_zeropcts2_valuechanged(self) -> None:
-        self.loadevent_pcts_valuechanged('zero',self.energy_ui.zeropcts2,self.energy_ui.hundredpct2)
+        self.loadevent_pcts_valuechanged(2, 'zero',self.energy_ui.zeropcts2,self.energy_ui.hundredpct2)
 
     @pyqtSlot()
     def loadevent_zeropcts3_valuechanged(self) -> None:
-        self.loadevent_pcts_valuechanged('zero',self.energy_ui.zeropcts3,self.energy_ui.hundredpct3)
+        self.loadevent_pcts_valuechanged(3, 'zero',self.energy_ui.zeropcts3,self.energy_ui.hundredpct3)
 
     @pyqtSlot()
     def loadevent_hundpcts0_valuechanged(self) -> None:
-        self.loadevent_pcts_valuechanged('hund',self.energy_ui.zeropcts0,self.energy_ui.hundredpct0)
+        self.loadevent_pcts_valuechanged(0, 'hund',self.energy_ui.zeropcts0,self.energy_ui.hundredpct0)
 
     @pyqtSlot()
     def loadevent_hundpcts1_valuechanged(self) -> None:
-        self.loadevent_pcts_valuechanged('hund',self.energy_ui.zeropcts1,self.energy_ui.hundredpct1)
+        self.loadevent_pcts_valuechanged(1, 'hund',self.energy_ui.zeropcts1,self.energy_ui.hundredpct1)
 
     @pyqtSlot()
     def loadevent_hundpcts2_valuechanged(self) -> None:
-        self.loadevent_pcts_valuechanged('hund',self.energy_ui.zeropcts2,self.energy_ui.hundredpct2)
+        self.loadevent_pcts_valuechanged(2, 'hund',self.energy_ui.zeropcts2,self.energy_ui.hundredpct2)
 
     @pyqtSlot()
     def loadevent_hundpcts3_valuechanged(self) -> None:
-        self.loadevent_pcts_valuechanged('hund',self.energy_ui.zeropcts3,self.energy_ui.hundredpct3)
+        self.loadevent_pcts_valuechanged(3, 'hund',self.energy_ui.zeropcts3,self.energy_ui.hundredpct3)
 
-    def loadevent_pcts_valuechanged(self, field:str, zeropcts:QSpinBox, hundpcts:QSpinBox) -> None:
+    def loadevent_pcts_valuechanged(self, pos:int, field:str, zeropcts:QSpinBox, hundpcts:QSpinBox) -> None:
         if zeropcts.value() >= hundpcts.value():
             self.aw.sendmessage(QApplication.translate('Message','The 0% value must be less than the 100% value.'))
             QApplication.beep()
             if field == 'zero':
                 zeropcts.setValue(hundpcts.value()-1)
+                self.aw.qmc.loadevent_zeropcts[pos] = zeropcts.value()
             else:
                 hundpcts.setValue(zeropcts.value()+1)
-        self.updateLoadPcts()
+                self.aw.qmc.loadevent_hundpcts[pos] = hundpcts.value()
+        self.updateMetricsLabel()
         self.loadsEdited()
 
     @pyqtSlot()
@@ -3954,7 +3983,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     def createDataTable(self) -> None:
         self.datatable.clear()
-        ndata = len(self.aw.qmc.timex)
+        ndata = min(len(self.aw.qmc.timex), len(self.aw.qmc.temp1), len(self.aw.qmc.temp2))
         self.datatable.setRowCount(ndata)
         columns = [QApplication.translate('Table', 'Time'),
                                                   QApplication.translate('Table', 'ET'),

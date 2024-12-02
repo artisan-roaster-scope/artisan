@@ -949,6 +949,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.phidgetPassword.setEnabled(self.aw.qmc.phidgetServerID != '')
         self.phidgetPassword.setMinimumWidth(100)
         self.phidgetPassword.setEnabled(self.aw.qmc.phidgetRemoteFlag)
+        self.phidgetPassword.setToolTip(QApplication.translate('Tooltip','Phidget server password'))
         phidgetPortLabel = QLabel(QApplication.translate('Label','Port'))
         self.phidgetPort = QLineEdit(str(self.aw.qmc.phidgetPort))
         self.phidgetPort.setMaximumWidth(70)

@@ -13000,8 +13000,32 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 tb = profile['timex']
                 t1 = profile['temp1']
                 t2 = profile['temp2']
+                # ensure that timex, temp1 and temp2 are all of the same (minimal-)length
+                data_len:int = min(len(tb), len(t1), len(t2))
+                tb = tb[:data_len]
+                t1 = t1[:data_len]
+                t2 = t2[:data_len]
+
+                timex = profile['extratimex']
                 t1x = profile['extratemp1']
                 t2x = profile['extratemp2']
+                # ensure that number of extra device data is consistent
+                number_extra_devices = min(len(timex), len(t1x), len(t2x))
+                timex = timex[:number_extra_devices]
+                t1x = t1x[:number_extra_devices]
+                t2x = t2x[:number_extra_devices]
+                # ensure that the extra device data is of length data_len
+                for c in range(number_extra_devices):
+                    timex[c] = timex[c][:data_len]
+                    t1x[c] = t1x[c][:data_len]
+                    t2x[c] = t2x[c][:data_len]
+                    if len(timex[c]) != data_len:
+                        timex[c] = tb[:]
+                    if len(t1x[c]) != data_len:
+                        t1x[c] = [-1]*data_len
+                    if len(t2x[c]) != data_len:
+                        t2x[c] = [-1]*data_len
+
 
                 # reset the movebackground cache:
                 self.qmc.backgroundprofile_moved_x = 0
@@ -13033,7 +13057,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
                 names1x = [decodeLocalStrict(x) for x in profile['extraname1']]
                 names2x = [decodeLocalStrict(x) for x in profile['extraname2']]
-                timex = profile['extratimex']
                 self.qmc.temp1B,self.qmc.temp2B,self.qmc.timeB, self.qmc.temp1BX, self.qmc.temp2BX = t1,t2,tb,t1x,t2x
                 self.qmc.abs_timeB = tb.copy()  #invariant copy of timeB
                 self.qmc.extratimexB = timex
@@ -13135,7 +13158,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 if 'etypes' in profile:
                     self.qmc.Betypes = self.get_profile_etypes(self.qmc.backgroundprofile)
                 if 'timeindex' in profile:
-                    self.qmc.timeindexB = [max(0,v) if i>0 else max(-1,v) for i,v in enumerate(profile['timeindex'])]          #if new profile found with variable timeindex
+                    self.qmc.timeindexB = [max(0,min(v,data_len-1)) if i>0 else max(-1,min(v,data_len-1)) for i,v in enumerate(profile['timeindex'])]          #if new profile found with variable timeindex
                     if self.qmc.phasesfromBackgroundflag:
                         # adjust phases by DryEnd and FCs events from background profile
                         if self.qmc.timeindexB[1] and len(self.qmc.timeindexB) > 1 and len(self.qmc.temp2B) > self.qmc.timeindexB[1]:
@@ -15118,16 +15141,27 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.cuppingnotes = decodeLocalStrict(profile['cuppingnotes'])
             else:
                 self.qmc.cuppingnotes = ''
+
             if 'timex' in profile:
                 self.qmc.timex = profile['timex']
+            if 'temp1' in profile:
+                self.qmc.temp1 = profile['temp1']
+            if 'temp2' in profile:
+                self.qmc.temp2 = profile['temp2']
+
+            # ensure that timex, temp1 and temp2 are all of the same (minimal-)length
+            data_len:int = min(len(self.qmc.timex), len(self.qmc.temp1), len(self.qmc.temp2))
+            self.qmc.timex = self.qmc.timex[:data_len]
+            self.qmc.temp1 = self.qmc.temp1[:data_len]
+            self.qmc.temp2 = self.qmc.temp2[:data_len]
 
             # ensure that extra timex and temp lists are as long as the main timex
             for i, _ in enumerate(self.qmc.extratimex):
-                if not isinstance(self.qmc.extratimex[i], list) or len(self.qmc.extratimex[i]) != len(self.qmc.timex):
-                    self.qmc.extratimex[i] = self.qmc.timex
-                if not isinstance(self.qmc.extratemp1[i], list) or len(self.qmc.extratemp1[i]) != len(self.qmc.timex):
+                if not isinstance(self.qmc.extratimex[i], list) or len(self.qmc.extratimex[i]) != data_len:
+                    self.qmc.extratimex[i] = self.qmc.timex[:]
+                if not isinstance(self.qmc.extratemp1[i], list) or len(self.qmc.extratemp1[i]) != data_len:
                     self.qmc.extratemp1[i] = [-1]*len(self.qmc.timex)
-                if not isinstance(self.qmc.extratemp2[i], list) or len(self.qmc.extratemp2[i]) != len(self.qmc.timex):
+                if not isinstance(self.qmc.extratemp2[i], list) or len(self.qmc.extratemp2[i]) != data_len:
                     self.qmc.extratemp2[i] = [-1]*len(self.qmc.timex)
 
             # alarms
@@ -15138,10 +15172,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.extraNoneTempHint2 = profile.get('extraNoneTempHint2', [])
 
             m = str(profile['mode']) if 'mode' in profile else self.qmc.mode
-            if 'temp1' in profile:
-                self.qmc.temp1 = profile['temp1']
-            if 'temp2' in profile:
-                self.qmc.temp2 = profile['temp2']
             if 'ambientTemp' in profile:
                 self.qmc.ambientTemp = profile['ambientTemp']
             self.qmc.greens_temp = profile.get('greens_temp', 0.0)
@@ -15264,7 +15294,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.loadBbpFromProfile(profile)
 
             if 'timeindex' in profile:
-                self.qmc.timeindex = [max(0,v) if i>0 else max(-1,v) for i,v in enumerate(profile['timeindex'])]
+                # ensure that no timeindex points outside of timex
+                self.qmc.timeindex = [max(0,min(v,data_len-1)) if i>0 else max(-1,min(v,data_len-1)) for i,v in enumerate(profile['timeindex'])]
+
                 if self.qmc.locktimex:
                     if self.qmc.timeindex[0] != -1:
                         self.qmc.startofx = self.qmc.timex[self.qmc.timeindex[0]] + self.qmc.locktimex_start

@@ -66,9 +66,11 @@ def is_synced() -> bool:
     aw = config.app_window
     if aw is not None:
         if aw.qmc.roastUUID is None:
-            return not bool(aw.curFile)
-        res = sync.getSync(aw.qmc.roastUUID)
-        return bool(res)
+            # not in sync if no roastUUID and saved to file or (OFF and not saved yet but at least 5min in length)
+            return not (bool(aw.curFile) or
+                (not aw.qmc.flagon and
+                    (len(aw.qmc.timex)>0 and ((aw.qmc.timex[-1] - (aw.qmc.timex[aw.qmc.timeindex[0]] if aw.qmc.timeindex[0] != -1 else 0)) > 5*60))))
+        return bool(sync.getSync(aw.qmc.roastUUID))
     return False
 
 
@@ -86,7 +88,7 @@ def toggle(app_window:'ApplicationWindow') -> None:
         connect()
         if (
             is_connected()
-            and is_synced()
+            and is_synced() # current profile under sync
             and config.app_window.curFile is not None
         ):  # @UndefinedVariable
             sync.sync()

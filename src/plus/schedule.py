@@ -1143,6 +1143,9 @@ class DragItem(StandardItem):
             # if not sampling and a profile without scheduleID loaded which is not yet registered as completed roast,
             # and roast date is not before the last roast session
             # we allow to assign the current profile to the selected schedule item
+            # NOTE: that in contrast to the automatic assignment which does not allow incomplete roasts without a DROP to be registered
+            #   to prevent recorded snippet to confuse the roast session,
+            #   a roast without DROP can still be registered manually
             addToItemAction:QAction = QAction(QApplication.translate('Contextual Menu', 'Register roast'),self)
             addToItemAction.triggered.connect(self.addLoadedProfileToSelectedScheduleItem)
             self.menu.addAction(addToItemAction)

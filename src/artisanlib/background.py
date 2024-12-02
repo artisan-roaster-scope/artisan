@@ -831,7 +831,7 @@ class backgroundDlg(ArtisanResizeablDialog):
             #### lock shared resources #####
             self.aw.qmc.profileDataSemaphore.acquire(1)
 
-            ndata = len(self.aw.qmc.timeB)
+            ndata = min(len(self.aw.qmc.timeB), len(self.aw.qmc.temp1B), len(self.aw.qmc.temp2B))
 
             self.datatable.clear() # this crashes Ubuntu 16.04
     #        if ndata != 0:
