@@ -4054,8 +4054,10 @@ class editGraphDlg(ArtisanResizeablDialog):
             text:str = ''
             if i in self.aw.qmc.specialevents:
                 index = self.aw.qmc.specialevents.index(i)
-                text = QApplication.translate('Table', '#{0} {1}{2}').format(str(index+1),self.aw.qmc.etypesf(self.aw.qmc.specialeventstype[index])[0],self.aw.qmc.eventsvalues(self.aw.qmc.specialeventsvalue[index]))
-                Rtime.setText(text + ' ' + Rtime.text())
+                text = QApplication.translate('Table', '#{0} {1}{2}').format(
+                    str(index+1),
+                    self.aw.qmc.etypeAbbrev(self.aw.qmc.etypesf(self.aw.qmc.specialeventstype[index])),
+                    self.aw.qmc.eventsvalues(self.aw.qmc.specialeventsvalue[index]))
             self.datatable.setItem(i,0,Rtime)
             tableitem: Optional[QTableWidgetItem]
             if i in self.aw.qmc.specialevents:

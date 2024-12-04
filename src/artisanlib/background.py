@@ -938,7 +938,9 @@ class backgroundDlg(ArtisanResizeablDialog):
                         elif i in self.aw.qmc.backgroundEvents:
                             item0.setBackground(QColor('yellow'))
                             index = self.aw.qmc.backgroundEvents.index(i)
-                            text = QApplication.translate('Table', '#{0} {1}{2}').format(str(index+1),self.aw.qmc.Betypesf(self.aw.qmc.backgroundEtypes[index])[0],self.aw.qmc.eventsvalues(self.aw.qmc.backgroundEvalues[index]))
+                            text = QApplication.translate('Table', '#{0} {1}{2}').format(str(index+1),
+                                self.aw.qmc.etypeAbbrev(self.aw.qmc.Betypesf(self.aw.qmc.backgroundEtypes[index])),
+                                self.aw.qmc.eventsvalues(self.aw.qmc.backgroundEvalues[index]))
                         else:
                             text = ''
                     else:

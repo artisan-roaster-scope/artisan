@@ -2614,6 +2614,12 @@ class tgraphcanvas(FigureCanvas):
             return 'Background'+self.Betypes[i]
         return self.Betypes[i]
 
+    # returns the first letter as abbrev of the etype name if any
+    # NOTE: that event type names should never be the empty string, but older Artisan versions allowed for this!
+    @staticmethod
+    def etypeAbbrev(etype_name:str) -> str:
+        return etype_name[:1]
+
     def ambientTempSourceAvg(self) -> Optional[float]:
         res:Optional[float] = None
         if self.ambientTempSource:
@@ -9068,7 +9074,7 @@ class tgraphcanvas(FigureCanvas):
                                     if self.backgroundEtypes[i] == 4 or self.eventsGraphflag in {0, 3, 4}:
                                         if self.backgroundEtypes[i] < 4 and (not self.renderEventsDescr or len(self.backgroundEStrings[i].strip()) == 0):
                                             Betype = self.Betypesf(self.backgroundEtypes[i])
-                                            firstletter = str(Betype[0])
+                                            firstletter = self.etypeAbbrev(Betype)
                                             secondletter = self.eventsvaluesShort(self.backgroundEvalues[i])
                                             if self.aw.eventslidertemp[self.backgroundEtypes[i]]:
                                                 thirdletter = self.mode # postfix
@@ -9240,10 +9246,10 @@ class tgraphcanvas(FigureCanvas):
 
                         if self.eventsGraphflag == 1 and Nevents:
 
-                            char1 = self.etypes[0][0]
-                            char2 = self.etypes[1][0]
-                            char3 = self.etypes[2][0]
-                            char4 = self.etypes[3][0]
+                            char1 = self.etypeAbbrev(self.etypes[0])
+                            char2 = self.etypeAbbrev(self.etypes[1])
+                            char3 = self.etypeAbbrev(self.etypes[2])
+                            char4 = self.etypeAbbrev(self.etypes[3])
 
                             if self.mode == 'F':
                                 row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
@@ -9296,7 +9302,7 @@ class tgraphcanvas(FigureCanvas):
                                         if not(self.flagstart or self.foregroundShowFullflag or (charge_idx <= event_idx <= drop_idx) or (self.autotimex and self.autotimexMode != 0 and event_idx < charge_idx)):
                                             continue
 
-                                        firstletter = self.etypes[self.specialeventstype[i]][0]
+                                        firstletter = self.etypeAbbrev(self.etypes[self.specialeventstype[i]])
                                         secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
 
                                         #some times ET is not drawn (ET = 0) when using device NONE
@@ -9670,7 +9676,7 @@ class tgraphcanvas(FigureCanvas):
                                     if self.specialeventstype[i] == 4 or self.eventsGraphflag in {0, 3, 4}:
                                         if self.specialeventstype[i] < 4 and (not self.renderEventsDescr or len(self.specialeventsStrings[i].strip()) == 0):
                                             etype = self.etypesf(self.specialeventstype[i])
-                                            firstletter = str(etype[0])
+                                            firstletter = self.etypeAbbrev(etype)
                                             secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
                                             if self.aw.eventslidertemp[self.specialeventstype[i]]:
                                                 thirdletter = self.mode # postfix
@@ -14181,7 +14187,7 @@ class tgraphcanvas(FigureCanvas):
                         if self.eventsshowflag != 0 and self.showEtypes[etype] and self.ax is not None:
                             index = self.specialevents[-1]
                             if etype < 4  and (not self.renderEventsDescr or len(self.specialeventsStrings[-1].strip()) == 0):
-                                firstletter = self.etypesf(etype)[0]
+                                firstletter = self.etypeAbbrev(self.etypesf(etype))
                                 secondletter = self.eventsvaluesShort(sevalue)
                                 if self.aw.eventslidertemp[etype]:
                                     thirdletter = self.mode # postfix
@@ -14383,7 +14389,7 @@ class tgraphcanvas(FigureCanvas):
                         fontprop_small = self.aw.mpl_fontproperties.copy()
                         fontsize = 'xx-small'
                         fontprop_small.set_size(fontsize)
-                        firstletter = self.etypesf(self.specialeventstype[-1])[0]
+                        firstletter = self.etypeAbbrev(self.etypesf(self.specialeventstype[-1]))
                         secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])
 
                         if self.eventsGraphflag == 0:

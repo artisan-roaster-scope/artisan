@@ -10,6 +10,12 @@ v3.1.1
 
 * CHANGES
   - the Phidget driver is now bundled with the Artisan app and does no longer need to be installed separately (but for some legacy USB HID devices, like the original 1046 and 1048, which still need the kernel extension of the driver package installed in the system)
+  - indicates artisan.plus connection loss more reliable
+
+* FIXES
+  - ensure complete reset to defaults in energy tab loads tab
+  - makes loading of (broken) profiles with inconsistent data length more robust
+  - prevents exceptions caused by empty event type names ([Discussion #1690](../../../discussions/1745))
 
 
 ----
