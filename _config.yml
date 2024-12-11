@@ -73,7 +73,7 @@ algolia:
   powered_by             : # true (default), false
 
 # SEO Related
-google_site_verification :
+google_site_verification : "Qbb-sSZ3DH71jheaT0ks6RI2kcmRIJcNfERMgaWFG4s"
 bing_site_verification   :
 yandex_site_verification :
 naver_site_verification  :
@@ -84,21 +84,28 @@ twitter:
 facebook:
   username               : &facebook "ArtisanScope"
   app_id                 :
-  publisher              :
-og_image                 : # Open Graph/Twitter default site image
+  publisher              : "1779354492130921"
+og_image                 : "/assets/images/artisan-logo.png" # Open Graph/Twitter default site image
 # For specifying social profiles
 # - https://developers.google.com/structured-data/customize/social-profiles
 social:
-  type                   : # Person or Organization (defaults to Person)
-  name                   : # If the user or organization name differs from the site's name
+  type                   : "Organization" # Person or Organization (defaults to Person)
+  name                   : "Artisan Scope" # If the user or organization name differs from the site's name
   links: # An array of links to social media profiles
-    - "https://facebook.com/marko.luther"
+    - "https://www.facebook.com/ArtisanScope"
+    - "https://www.instagram.com/artisanscope"
+    - "https://www.linkedin.com/company/artisan-plus"
+    - "https://www.linkedin.com/company/artisan-plus"
+    - "https://www.youtube.com/channel/UCEp-DH_Y7sBR3-X3FWomgog"
+    - "https://masto.ai/@artisan"
+    - "https://github.com/artisan-roaster-scope/artisan"
 
 # Analytics
 analytics:
   provider               : false # false (default), "google", "google-universal", "custom"
   google:
     tracking_id          :
+    anonymize_ip         : # true, false (default)
 
 
 # Site Author
@@ -143,21 +150,12 @@ footer:
     - label: "Linked.in"
       icon: "fab fa-fw fa-linkedin"
       url: "https://www.linkedin.com/company/artisan-plus"
-#    - label: "Twitter"
-#      icon: "fab fa-fw fa-twitter-square"
-#      url: https://twitter.com/artisanscope
     - label: "Mastodon"
       icon: "fab fa-fw fa-mastodon"
       url: https://masto.ai/@artisan
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/artisan-roaster-scope/artisan"
-    - label: "GitLab"
-      icon: "fab fa-fw fa-gitlab"
-      # url:
-    - label: "Bitbucket"
-      icon: "fab fa-fw fa-bitbucket"
-      # url:
 
 
 # Reading Files
