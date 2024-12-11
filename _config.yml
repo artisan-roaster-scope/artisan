@@ -11,14 +11,14 @@
 # https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/#installing-the-theme
 
 # theme                  : "minimal-mistakes-jekyll"
-remote_theme             : "mmistakes/minimal-mistakes@4.26.2"
+remote_theme             : "mmistakes/minimal-mistakes" # "mmistakes/minimal-mistakes@4.26.2"
 minimal_mistakes_skin    : "default" # "default" "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
 
 # Site Settings
 future                   : true # show future posts
 locale                   : "en-US"
-title                    : "Coffee roasting software - artisan"
-title_separator          : "-"
+title                    : "coffee roasting software"
+title_separator          : "|"
 #subtitle                 : "visual scope" # site tagline that appears below site title in masthead
 name                     : &name "Marko Luther"
 description              : &description "visual scope for coffee roasters"
@@ -27,7 +27,7 @@ baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : "artisan-roaster-scope/artisan" # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
 teaser                   : "/assets/images/500x300.png" # path of fallback teaser image, e.g. "/assets/images/500x300.png"
 logo                     : "/assets/images/artisan-logo.png" # path of logo image to 
-masthead_title           : "artisan" #"artisan.plus" # overrides the website title displayed in the masthead, use " " for no title
+masthead_title           : "artisan" # overrides the website title displayed in the masthead, use " " for no title
 #breadcrumbs            : false # true, false (default)
 words_per_minute         : 200
 comments:
@@ -187,6 +187,7 @@ exclude:
   - log
   - node_modules
   - package.json
+  - package-lock.json
   - Rakefile
   - README
   - tmp
@@ -315,6 +316,7 @@ plugins:
   - jekyll-sitemap
   - jekyll-gist
   - jekyll-feed
+  - jemoji
   - jekyll-include-cache
 
 # mimic GitHub Pages with --safe
@@ -323,6 +325,7 @@ whitelist:
   - jekyll-sitemap
   - jekyll-gist
   - jekyll-feed
+  - jemoji
   - jekyll-include-cache
 
 # Archives
