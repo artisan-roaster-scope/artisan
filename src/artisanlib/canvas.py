@@ -4577,7 +4577,7 @@ class tgraphcanvas(FigureCanvas):
                                                 # keep the RoR axis constant
                                                 zlim = self.delta_ax.get_ylim()
                                                 zlim_offset = (zlim[1] - zlim[0]) / 2.
-                                                tempd = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,temp))[1]))[1])
+                                                tempd = float(self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,temp))[1]))[1])
                                                 zlim_new = (tempd - zlim_offset, tempd + zlim_offset)
                                                 self.delta_ax.set_ylim(zlim_new)
                                             self.ax_background = None
@@ -4606,7 +4606,6 @@ class tgraphcanvas(FigureCanvas):
                                             zlim = self.delta_ax.get_ylim()
                                             zlim_offset = (zlim[1] - zlim[0]) / 2.
                                             zlim_new = (ror - zlim_offset, ror + zlim_offset)
-                                            self.delta_ax.set_ylim(zlim_new)
                                             self.ax_background = None
 
                         ##### updated canvas
@@ -10524,21 +10523,23 @@ class tgraphcanvas(FigureCanvas):
             coord_axes_middle_Display = self.ax.transAxes.transform((.5,.5))
             coord_axes_upperright_Display = self.ax.transAxes.transform((1.,1.))
             coord_axes_lowerleft_Display = self.ax.transAxes.transform((0.,0.))
-            coord_axes_height_pixels = coord_axes_upperright_Display[1] - coord_axes_lowerleft_Display[1]
-            coord_axes_width_pixels = coord_axes_upperright_Display[0] - coord_axes_lowerleft_Display[0]
+            coord_axes_height_pixels = float(coord_axes_upperright_Display[1]) - float(coord_axes_lowerleft_Display[1])
+            coord_axes_width_pixels = float(coord_axes_upperright_Display[0]) - float(coord_axes_lowerleft_Display[0])
             coord_axes_aspect = coord_axes_height_pixels / coord_axes_width_pixels
             if img_aspect >= coord_axes_aspect:
                 scale = min(1., coord_axes_height_pixels / img_height_pixels)
             else:
                 scale = min(1., coord_axes_width_pixels / img_width_pixels)
 
-            corner_pixels = [0.,0.,0.,0.]
+            corner_pixels:List[float] = [0.,0.,0.,0.]
             corner_pixels[0] = coord_axes_middle_Display[0] - (scale * img_width_pixels / 2)
             corner_pixels[1] = coord_axes_middle_Display[1] - (scale * img_height_pixels / 2)
             corner_pixels[2] = corner_pixels[0] + scale * img_width_pixels
             corner_pixels[3] = corner_pixels[1] + scale * img_height_pixels
-            ll_corner_axes:List[float] = self.ax.transData.inverted().transform_point((corner_pixels[0],corner_pixels[1])).tolist()
-            ur_corner_axes:List[float] = self.ax.transData.inverted().transform_point((corner_pixels[2],corner_pixels[3])).tolist()
+            transformed_point1 = self.ax.transData.inverted().transform_point((corner_pixels[0],corner_pixels[1]))
+            transformed_point2 = self.ax.transData.inverted().transform_point((corner_pixels[2],corner_pixels[3]))
+            ll_corner_axes:List[float] = [float(transformed_point1[0]), float(transformed_point1[1])]
+            ur_corner_axes:List[float] = [float(transformed_point2[0]), float(transformed_point2[1])]
             extent = (ll_corner_axes[0], ur_corner_axes[0], ll_corner_axes[1], ur_corner_axes[1])
             if self.ai is not None:
                 try:
@@ -11546,7 +11547,7 @@ class tgraphcanvas(FigureCanvas):
             self.updateFlavorChartData()
             if self.ax1 is not None and self.flavorchart_angles is not None:
                 try:
-                    ticks_loc = self.ax1.get_yticks().tolist()
+                    ticks_loc = [float(tick) for tick in self.ax1.get_yticks()]
                     self.ax1.yaxis.set_major_locator(ticker.FixedLocator(ticks_loc))
                 except Exception: # pylint: disable=broad-except
                     pass
@@ -17381,7 +17382,7 @@ class tgraphcanvas(FigureCanvas):
 
                 # fixing yticks with matplotlib.ticker "FixedLocator"
                 try:
-                    ticks_loc = self.ax2.get_yticks().tolist()
+                    ticks_loc = [float(tick) for tick in self.ax2.get_yticks()]
                     self.ax2.yaxis.set_major_locator(ticker.FixedLocator(ticks_loc))
                 except Exception: # pylint: disable=broad-except
                     pass
@@ -17599,8 +17600,8 @@ class tgraphcanvas(FigureCanvas):
                         deltaX = stringfromseconds(x - self.baseX)
                         deltaY = str(float2float(y - self.baseY,1))
                         RoR = str(float2float(60 * (y - self.baseY) / (x - self.baseX),1))
-                        deltaRoR = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,y))[1]))[1]
-                                    - self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,self.baseY))[1]))[1])
+                        deltaRoR:float = (float(self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,y))[1]))[1])
+                                    - float(self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,self.baseY))[1]))[1]))
                         #RoRoR is always in C/min/min
                         if self.mode == 'F':
                             deltaRoR = RoRfromFtoCstrict(deltaRoR)

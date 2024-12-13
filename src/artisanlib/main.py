@@ -12247,7 +12247,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     @pyqtSlot(bool)
     def miniEventRecord(self, _:bool) -> None:
         lenevents = self.eNumberSpinBox.value()
-        if lenevents:
+        if lenevents and len(self.qmc.specialevents) < lenevents-1:
             if self.qmc.timeindex[0] > -1:
                 newtime = self.qmc.time2index(self.qmc.timex[self.qmc.timeindex[0]]+ stringtoseconds(str(self.etimeline.text())))
             else:

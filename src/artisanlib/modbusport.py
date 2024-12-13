@@ -449,9 +449,9 @@ class modbusport:
                                 try:
                                     # we cache only MODBUS function 3 and 4 (not 1 and 2!)
                                     if code == 3:
-                                        res = await self._client.read_holding_registers(register,count,slave=slave)
+                                        res = await self._client.read_holding_registers(address=register,count=count,slave=slave)
                                     elif code == 4:
-                                        res = await self._client.read_input_registers(register,count,slave=slave)
+                                        res = await self._client.read_input_registers(address=register,count=count,slave=slave)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.info('readActive(%d,%d,%d,%d)', slave, code, register, count)
                                     _log.debug(e)
@@ -594,7 +594,11 @@ class modbusport:
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
-                asyncio.run_coroutine_threadsafe(self._client.mask_write_register(int(register),int(and_mask),int(or_mask),slave=int(slave)), self._asyncLoopThread.loop).result()
+                asyncio.run_coroutine_threadsafe(self._client.mask_write_register(
+                    address=int(register),
+                    and_mask=int(and_mask),
+                    or_mask=int(or_mask),
+                    slave=int(slave)), self._asyncLoopThread.loop).result()
 #                time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('maskWriteRegister(%d,%d,%s,%s) failed', slave, register, and_mask, or_mask)
@@ -633,7 +637,7 @@ class modbusport:
 #                byte_values:List[bytes] = ([values.to_bytes(2, 'big')] if isinstance(values, int) else [v.to_bytes(2, 'big') for v in values])
                 int_values:List[int] = ([values] if isinstance(values, int) else values)
 #                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),byte_values,slave=int(slave)), self._asyncLoopThread.loop).result()
-                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),int_values,slave=int(slave)), self._asyncLoopThread.loop).result() # type:ignore[arg-type] # type annotation wrong in pymodbus 3.7.3
+                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),int_values,slave=int(slave)), self._asyncLoopThread.loop).result()
 #                time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeRegisters(%d,%d,%s) failed', slave, register, values)
@@ -663,7 +667,7 @@ class modbusport:
                 builder.add_32bit_float(float(value))
                 payload = builder.build()
                 #payload:List[int] = [int.from_bytes(b,("little" if self.byteorderLittle else "big")) for b in builder.build()]
-                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),payload,slave=int(slave),skip_encode=True), self._asyncLoopThread.loop).result() # type: ignore [reportGeneralTypeIssues, arg-type, unused-ignore] # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"; in pymodbus 3.7.4 the error is now "List[bytes]"; expected "List[Union[bytes, int]
+                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),payload,slave=int(slave)), self._asyncLoopThread.loop).result() # type: ignore [reportGeneralTypeIssues, arg-type, unused-ignore] # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"; in pymodbus 3.7.4 the error is now "List[bytes]"; expected "List[Union[bytes, int]
 #                time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeWord(%d,%d,%s) failed', slave, register, value)
@@ -692,7 +696,7 @@ class modbusport:
                 builder.add_16bit_uint(r)
                 payload = builder.build()
                 #payload:List[int] = [int.from_bytes(b,("little" if self.byteorderLittle else "big")) for b in builder.build()]
-                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),payload,slave=int(slave),skip_encode=True), self._asyncLoopThread.loop).result() # type: ignore [reportGeneralTypeIssues, arg-type, unused-ignore] # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"; in pymodbus 3.7.4 the error is now "List[bytes]"; expected "List[Union[bytes, int]
+                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),payload,slave=int(slave)), self._asyncLoopThread.loop).result() # type: ignore [reportGeneralTypeIssues, arg-type, unused-ignore] # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"; in pymodbus 3.7.4 the error is now "List[bytes]"; expected "List[Union[bytes, int]
 #                time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeBCD(%d,%d,%s) failed', slave, register, value)
@@ -722,7 +726,7 @@ class modbusport:
                 builder.add_32bit_int(int(value))
                 payload = builder.build()
                 #payload:List[int] = [int.from_bytes(b,("little" if self.byteorderLittle else "big")) for b in builder.build()]
-                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),payload,slave=int(slave),skip_encode=True), self._asyncLoopThread.loop).result() # type: ignore [reportGeneralTypeIssues, arg-type, unused-ignore] # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"; in pymodbus 3.7.4 the error is now "List[bytes]"; expected "List[Union[bytes, int]
+                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),payload,slave=int(slave)), self._asyncLoopThread.loop).result() # type: ignore [reportGeneralTypeIssues, arg-type, unused-ignore] # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"; in pymodbus 3.7.4 the error is now "List[bytes]"; expected "List[Union[bytes, int]
 #                await asyncio.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeLong(%d,%d,%s) failed', slave, register, value)
@@ -746,13 +750,13 @@ class modbusport:
         while True:
             try:
                 if code==1:
-                    res = await self._client.read_coils(int(register),count,slave=int(slave))
+                    res = await self._client.read_coils(address=int(register),count=count,slave=int(slave))
                 elif code==2:
-                    res = await self._client.read_discrete_inputs(int(register),count,slave=int(slave))
+                    res = await self._client.read_discrete_inputs(address=int(register),count=count,slave=int(slave))
                 elif code==4:
-                    res = await self._client.read_input_registers(int(register),count,slave=int(slave))
+                    res = await self._client.read_input_registers(address=int(register),count=count,slave=int(slave))
                 else: # code==3
-                    res = await self._client.read_holding_registers(int(register),count,slave=int(slave))
+                    res = await self._client.read_holding_registers(address=int(register),count=count,slave=int(slave))
             except Exception as ex: # pylint: disable=broad-except
                 _log.debug(ex)
                 res = None

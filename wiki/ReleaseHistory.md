@@ -15,7 +15,7 @@ v3.1.1
 * FIXES
   - ensure complete reset to defaults in energy tab loads tab
   - makes loading of (broken) profiles with inconsistent data length more robust
-  - prevents exceptions caused by empty event type names ([Discussion #1690](../../../discussions/1745))
+  - prevents exceptions caused by empty event type names ([Discussion #1745](../../../discussions/1745))
 
 
 ----
