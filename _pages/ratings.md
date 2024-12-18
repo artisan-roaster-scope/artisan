@@ -11,7 +11,7 @@ toc: false
 # Burner and Motor Ratings
 
 
-For selected manufactors ([Aillio](/machines/aillio/#EnergyRatings), [Hottop](/machines/hottop/#EnergyRatings), [Probat](/machines/probat/#EnergyRatings), [Kirsch & Mausser](/machines/kirsch/#EnergyRatings), [Coffed](/machines/coffed/#EnergyRatings), [San Franciscan](/machines/sf/#EnergyRatings), [IP-CC](/machines/ip-cc/#EnergyRatings)) machine specific ratings are listed on the corresponding pages.
+For selected manufactors ([Aillio](/machines/aillio/#EnergyRatings), [Hottop](/machines/hottop/#EnergyRatings), [Probat](/machines/probat/#EnergyRatings), [Kirsch & Mausser](/machines/kirsch/#EnergyRatings), [Coffed](/machines/coffed/#EnergyRatings), [San Franciscan](/machines/sf/#EnergyRatings), [IP-CC](/machines/iRm/#EnergyRatings)) machine specific ratings are listed on the corresponding pages.
 
 For other machines, the table below estimate the roaster burner and motor rating based on the roaster capacity.
  
