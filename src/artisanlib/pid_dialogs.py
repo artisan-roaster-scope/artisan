@@ -858,11 +858,11 @@ class PID_DlgControl(ArtisanDialog):
     # NOTE: ET/BT inverted as pidSource=1 => BT and pidSource=2 => ET !!
     def getCurveNames(self) -> List[str]:
         curveNames = []
-        curveNames.append(self.aw.ETname.format(self.aw.qmc.etypesf(0),self.aw.qmc.etypesf(1),self.aw.qmc.etypesf(2),self.aw.qmc.etypesf(3)))
-        curveNames.append(self.aw.BTname.format(self.aw.qmc.etypesf(0),self.aw.qmc.etypesf(1),self.aw.qmc.etypesf(2),self.aw.qmc.etypesf(3)))
+        curveNames.append(self.aw.qmc.device_name_subst(self.aw.ETname))
+        curveNames.append(self.aw.qmc.device_name_subst(self.aw.BTname))
         for i in range(len(self.aw.qmc.extradevices)):
-            curveNames.append(self.aw.qmc.extraname1[i].format(self.aw.qmc.etypesf(0),self.aw.qmc.etypesf(1),self.aw.qmc.etypesf(2),self.aw.qmc.etypesf(3)))
-            curveNames.append(self.aw.qmc.extraname2[i].format(self.aw.qmc.etypesf(0),self.aw.qmc.etypesf(1),self.aw.qmc.etypesf(2),self.aw.qmc.etypesf(3)))
+            curveNames.append(self.aw.qmc.device_name_subst(self.aw.qmc.extraname1[i]))
+            curveNames.append(self.aw.qmc.device_name_subst(self.aw.qmc.extraname2[i]))
         return curveNames
 
     @pyqtSlot()

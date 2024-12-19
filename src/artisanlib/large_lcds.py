@@ -383,7 +383,7 @@ class LargeMainLCDs(LargeLCDs):
         self.lcd0.clicked.connect(self.aw.superusermodeLeftClicked)
         # ET
         ETlcd = self.makeLCD('et') # Environmental Temperature ET
-        ETlabelUpper = self.makeLabel(f'<b>{self.aw.ETname.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3])}</b> ')
+        ETlabelUpper = self.makeLabel(f'<b>{self.aw.qmc.device_name_subst(self.aw.ETname)}</b> ')
         ETlabelLower = self.makeLabel(' ')
         #
         self.lcds1 = [ETlcd]
@@ -396,7 +396,7 @@ class LargeMainLCDs(LargeLCDs):
         self.lcds1frames[0].customContextMenuRequested.connect(self.aw.setTareET)
         # BT
         BTlcd = self.makeLCD('bt') # Bean Temperature BT
-        BTlabelUpper = self.makeLabel(f'<b>{self.aw.BTname.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3])}</b> ')
+        BTlabelUpper = self.makeLabel(f'<b>{self.aw.qmc.device_name_subst(self.aw.BTname)}</b> ')
         BTlabelLower = self.makeLabel(' ')
         #
         self.lcds2 = [BTlcd]
@@ -519,7 +519,7 @@ class LargeDeltaLCDs(LargeLCDs):
     def makeLCDs(self) -> None:
         self.lcds1styles = ['deltaet']
         self.lcds1 = [self.makeLCD(self.lcds1styles[0])] # DeltaET
-        label1Upper = self.makeLabel(f'<b>&Delta;{self.aw.ETname.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3])}</b> ')
+        label1Upper = self.makeLabel(f'<b>&Delta;{self.aw.qmc.device_name_subst(self.aw.ETname)}</b> ')
         label1Lower = self.makeLabel(' ')
         self.lcds1labelsUpper = [label1Upper]
         self.lcds1labelsLower = [label1Lower]
@@ -528,7 +528,7 @@ class LargeDeltaLCDs(LargeLCDs):
         #
         self.lcds2styles = ['deltabt']
         self.lcds2 = [self.makeLCD(self.lcds2styles[0])] # DeltaBT
-        label2Upper = self.makeLabel(f'<b>&Delta;{self.aw.BTname.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3])}</b> ')
+        label2Upper = self.makeLabel(f'<b>&Delta;{self.aw.qmc.device_name_subst(self.aw.BTname)}</b> ')
         label2Lower = self.makeLabel(' ')
         self.lcds2labelsUpper = [label2Upper]
         self.lcds2labelsLower = [label2Lower]
@@ -668,12 +668,7 @@ class LargeExtraLCDs(LargeLCDs):
             lcd1 = self.makeLCD(lcdstyle)
             self.lcds1.append(lcd1)
             self.lcds1styles.append(lcdstyle)
-            l1 = '<b>' + self.aw.qmc.extraname1[i] + '</b>'
-            try:
-                l1 = l1.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3])
-            except Exception: # pylint: disable=broad-except
-                pass
-            label1Upper = self.makeLabel(l1)
+            label1Upper = self.makeLabel('<b>' + self.aw.qmc.device_name_subst(self.aw.qmc.extraname1[i]) + '</b>')
             self.lcds1labelsUpper.append(label1Upper)
             label1Lower = self.makeLabel(' ')
             self.lcds1labelsLower.append(label1Lower)
@@ -685,12 +680,7 @@ class LargeExtraLCDs(LargeLCDs):
             lcd2 = self.makeLCD(lcdstyle)
             self.lcds2.append(lcd2)
             self.lcds2styles.append(lcdstyle)
-            l2 = '<b>' + self.aw.qmc.extraname2[i] + '</b>'
-            try:
-                l2 = l2.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3])
-            except Exception: # pylint: disable=broad-except
-                pass
-            label2Upper = self.makeLabel(l2)
+            label2Upper = self.makeLabel('<b>' + self.aw.qmc.device_name_subst(self.aw.qmc.extraname2[i]) + '</b>')
             self.lcds2labelsUpper.append(label2Upper)
             label2Lower = self.makeLabel(' ')
             self.lcds2labelsLower.append(label2Lower)

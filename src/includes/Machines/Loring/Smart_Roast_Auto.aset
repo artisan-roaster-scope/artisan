@@ -2,6 +2,7 @@
 Delay=1000
 roastertype_setup=Loring Auto
 roastersize_setup_default=7
+roasterheating_setup_default=2
 
 [CurveStyles]
 extradrawstyles1=default, default

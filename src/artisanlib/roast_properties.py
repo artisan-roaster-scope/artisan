@@ -556,6 +556,9 @@ class editGraphDlg(ArtisanResizeablDialog):
     def __init__(self, parent:QWidget, aw:'ApplicationWindow', activeTab:int = 0) -> None:
         super().__init__(parent, aw)
 
+        self.ETname = self.aw.qmc.device_name_subst(self.aw.ETname)
+        self.BTname = self.aw.qmc.device_name_subst(self.aw.BTname)
+
         self.activeTab:int = activeTab
 
         self.setModal(True)
@@ -3986,20 +3989,13 @@ class editGraphDlg(ArtisanResizeablDialog):
         ndata = min(len(self.aw.qmc.timex), len(self.aw.qmc.temp1), len(self.aw.qmc.temp2))
         self.datatable.setRowCount(ndata)
         columns = [QApplication.translate('Table', 'Time'),
-                                                  QApplication.translate('Table', 'ET'),
-                                                  QApplication.translate('Table', 'BT'),
-                                                  deltaLabelUTF8 + QApplication.translate('Label', 'ET'),
-                                                  deltaLabelUTF8 + QApplication.translate('Label', 'BT')]
+                                                  self.ETname,
+                                                  self.BTname,
+                                                  deltaLabelUTF8 + self.ETname,
+                                                  deltaLabelUTF8 + self.BTname]
         for i in range(len(self.aw.qmc.extratimex)):
-            en1 = self.aw.qmc.extraname1[i]
-            en2 = self.aw.qmc.extraname2[i]
-            try:
-                en1 = en1.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3])
-                en2 = en2.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3])
-            except Exception: # pylint: disable=broad-except
-                pass
-            columns.append(en1)
-            columns.append(en2)
+            columns.append(self.aw.qmc.device_name_subst(self.aw.qmc.extraname1[i]))
+            columns.append(self.aw.qmc.device_name_subst(self.aw.qmc.extraname2[i]))
         self.datatable.setColumnCount(len(columns))
         self.datatable.setHorizontalHeaderLabels(columns)
         self.datatable.setAlternatingRowColors(True)
@@ -4142,8 +4138,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.eventtable.setRowCount(nevents)
                 self.eventtable.setColumnCount(6)
                 self.eventtable.setHorizontalHeaderLabels([QApplication.translate('Table', 'Time'),
-                                                           QApplication.translate('Table', 'ET'),
-                                                           QApplication.translate('Table', 'BT'),
+                                                           self.ETname,
+                                                           self.BTname,
                                                            QApplication.translate('Table', 'Description'),
                                                            QApplication.translate('Table', 'Type'),
                                                            QApplication.translate('Table', 'Value')])

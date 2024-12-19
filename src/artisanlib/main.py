@@ -5241,25 +5241,19 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     def establish_etypes(self) -> None:
         # update ET/BT LCD label substitutions
-        self.label2.setText(f'<big><b>{self.ETname}</b></big>'.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
-        self.label3.setText(f'<big><b>{self.BTname}</b></big>'.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
+        ETname = self.qmc.device_name_subst(self.ETname)
+        BTname = self.qmc.device_name_subst(self.BTname)
+        self.label2.setText(f'<big><b>{ETname}</b></big>')
+        self.label3.setText(f'<big><b>{BTname}</b></big>')
         # update ET/BT Delta LCD label substitutions
-        self.label4.setText(f'{deltaLabelBigPrefix}{self.ETname}</b></big>'.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
-        self.label5.setText(f'{deltaLabelBigPrefix}{self.BTname}</b></big>'.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
+        self.label4.setText(f'{deltaLabelBigPrefix}{ETname}</b></big>')
+        self.label5.setText(f'{deltaLabelBigPrefix}{BTname}</b></big>')
         # update extra LCD label substitutions
         for i in range(len(self.qmc.extradevices)):
             if i < len(self.qmc.extraname1):
-                l1 = '<b>' + self.qmc.extraname1[i] + '</b>'
-                try:
-                    self.extraLCDlabel1[i].setText(l1.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
-                except Exception: # pylint: disable=broad-except
-                    self.extraLCDlabel1[i].setText(l1)
+                self.extraLCDlabel1[i].setText('<b>' + self.qmc.device_name_subst(self.qmc.extraname1[i]) + '</b>')
             if i < len(self.qmc.extraname2):
-                l2 = '<b>' + self.qmc.extraname2[i] + '</b>'
-                try:
-                    self.extraLCDlabel2[i].setText(l2.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
-                except Exception: # pylint: disable=broad-except
-                    self.extraLCDlabel2[i].setText(l2)
+                self.extraLCDlabel2[i].setText('<b>' + self.qmc.device_name_subst(self.qmc.extraname2[i]) + '</b>')
         self.settooltip()
 
     def populateListMenu(self, resourceName:str, ext:str, triggered:Callable[[bool], None], menu:QMenu, addMenu:bool = True,
@@ -10981,23 +10975,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if i < self.nLCDS:
                 self.extraLCDframe1[i].setVisible(bool(self.extraLCDvisibility1[i]))
                 if i < len(self.qmc.extraname1):
-                    l1 = '<b>' + self.qmc.extraname1[i] + '</b>'
-                    try:
-                        l1 = l1.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3])
-                    except Exception: # pylint: disable=broad-except
-                        # substitution might fail if the label contains brackets like in "t{FCS}"
-                        pass
+                    l1 = '<b>' + self.qmc.device_name_subst(self.qmc.extraname1[i]) + '</b>'
                     self.extraLCDlabel1[i].setText(l1)
                     self.setLabelColor(self.extraLCDlabel1[i],self.qmc.extradevicecolor1[i])
                 self.extraLCD1[i].setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
                 self.extraLCDframe2[i].setVisible(bool(self.extraLCDvisibility2[i]))
                 if i < len(self.qmc.extraname2):
-                    l2 = '<b>' + self.qmc.extraname2[i] + '</b>'
-                    try:
-                        l2 = l2.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3])
-                    except Exception: # pylint: disable=broad-except
-                        # substitution might fail if the label contains brackets like in "t{FCS}"
-                        pass
+                    l2 = '<b>' + self.qmc.device_name_subst(self.qmc.extraname2[i]) + '</b>'
                     self.extraLCDlabel2[i].setText(l2)
                     self.setLabelColor(self.extraLCDlabel2[i],self.qmc.extradevicecolor2[i])
                 self.extraLCD2[i].setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
@@ -16710,6 +16694,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     #loads the settings at the start of application. See the oppposite closeEventSettings()
     def settingsLoad(self, filename:Optional[str] = None, theme:bool = False, machine:bool = False, redraw:bool = True) -> bool: # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing
         res = False
+
         try:
             updateBatchCounter = True
             if filename is not None:
@@ -17530,14 +17515,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.graphfont = toInt(settings.value('graphfont',self.qmc.graphfont))
             if settings.contains('ETname'):
                 self.ETname = settings.value('ETname')
-                self.label2.setText(f'<big><b>{self.ETname}</b></big>'.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
-                self.label4.setText(f'{deltaLabelBigPrefix}{self.ETname}</b></big>'.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
+                ETname_subst = self.qmc.device_name_subst(self.ETname)
+                self.label2.setText(f'<big><b>{ETname_subst}</b></big>')
+                self.label4.setText(f'{deltaLabelBigPrefix}{ETname_subst}</b></big>')
             else:
                 self.ETname = QApplication.translate('Label', 'ET')
             if settings.contains('BTname'):
                 self.BTname = settings.value('BTname')
-                self.label3.setText(f'<big><b>{self.BTname}</b></big>'.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
-                self.label5.setText(f'{deltaLabelBigPrefix}{self.BTname}</b></big>'.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
+                BTname_subst = self.qmc.device_name_subst(self.BTname)
+                self.label3.setText(f'<big><b>{BTname_subst}</b></big>')
+                self.label5.setText(f'{deltaLabelBigPrefix}{BTname_subst}</b></big>')
             else:
                 self.BTname = QApplication.translate('Label', 'BT')
             settings.endGroup()
@@ -23165,6 +23152,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.color.timeout = float2float(toFloat(comma2dot(str(dialog.color_timeoutEdit.text()))))
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
+
+        self.qmc.intChannel.cache_clear() # device type and thus int channels might have been changed
+        self.qmc.clearLCDs()
+
 #        # deleteLater() will not work here as the dialog is still bound via the parent
 #        dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
 #        # the following will immediately release the memory despite this parent link

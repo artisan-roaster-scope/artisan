@@ -2174,16 +2174,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 else:
                     self.aw.qmc.extraname2[i] = ''
 
-                l1 = '<b>' + self.aw.qmc.extraname1[i] + '</b>'
-                try:
-                    self.aw.extraLCDlabel1[i].setText(l1.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3]))
-                except Exception: # pylint: disable=broad-except
-                    self.aw.extraLCDlabel1[i].setText(l1)
-                l2 = '<b>' + self.aw.qmc.extraname2[i] + '</b>'
-                try:
-                    self.aw.extraLCDlabel2[i].setText(l2.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3]))
-                except Exception: # pylint: disable=broad-except
-                    self.aw.extraLCDlabel2[i].setText(l2)
+                self.aw.extraLCDlabel1[i].setText('<b>' + self.aw.qmc.device_name_subst(self.aw.qmc.extraname1[i]) + '</b>')
+                self.aw.extraLCDlabel2[i].setText('<b>' + self.aw.qmc.device_name_subst(self.aw.qmc.extraname2[i]) + '</b>')
                 if mexpr2edit:
                     self.aw.qmc.extramathexpression1[i] = mexpr1edit.text()
                 else:

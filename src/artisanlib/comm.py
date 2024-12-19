@@ -4725,7 +4725,9 @@ class serialport:
 #  only supporting
 #     1 channel VINT DCC1000 and DCC1002
 #     2 channel VINT DCC1003
+#     1 channel VINT DCC1020
 #     1 channel VINT DCC1100 (brushless DC motor controller)
+#     1 channel VINT DCC1120 (brushless DC motor controller)
 #  commands:
 #     accel(c,v[,sn]) with c channel number and v acceleration as a float, and sn serial the optional serial/port number of the addressed module
 #     vel(c,v[,sn])   with c channel number and v target velocity as a float, and sn serial the optional serial/port number of the addressed module
@@ -4752,7 +4754,16 @@ class serialport:
                                     remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
                     ports = 2
                 if ser is None:
+                    ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDCMotor',DeviceID.PHIDID_DCC1020,
+                                    remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
+                    ports = 1
+                if ser is None:
                     ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetBLDCMotor',DeviceID.PHIDID_DCC1100,
+                                    remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
+                    ports = 1
+                    brushless = True
+                if ser is None:
+                    ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetBLDCMotor',DeviceID.PHIDID_DCC1120,
                                     remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
                     ports = 1
                     brushless = True

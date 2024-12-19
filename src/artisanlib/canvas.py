@@ -2588,6 +2588,13 @@ class tgraphcanvas(FigureCanvas):
 
         self.block_update = False
 
+    def device_name_subst(self, device_name:str) -> str:
+        try:
+            return device_name.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3],self.mode)
+        except Exception: # pylint: disable=broad-except
+            # substitution might fail if the label contains brackets like in "t{FCS}"
+            return device_name
+
     def get_etype_default(self, i:int, default_etypes_set:Optional[List[int]] = None) -> str:
         etypes_set = (self.default_etypes_set if default_etypes_set is None else default_etypes_set)
         return (self.alt_etypesdefault[i] if etypes_set[i] else self.etypesdefault[i])
@@ -3399,56 +3406,22 @@ class tgraphcanvas(FigureCanvas):
                 no_math_formula_defined = bool(self.extramathexpression1[n] == '')
             if c == 1:
                 no_math_formula_defined = bool(self.extramathexpression2[n] == '')
-            if self.extradevices[n] == 29: # MODBUS
-                if c == 0:
-                    return ((self.aw.modbus.inputFloatsAsInt[0] or self.aw.modbus.inputBCDsAsInt[0] or not self.aw.modbus.inputFloats[0]) and
-                        self.aw.modbus.inputDivs[0] == 0 and
-                        self.aw.modbus.inputModes[0] == '' and
+            # MODBUS channels
+            for idx, dev_type in enumerate([29,33,55,109,150]): # MODBUS, MODBUS_34, MODBUS_56, MODBUS_78, MODBUS_910
+                if self.extradevices[n] == dev_type:
+                    return ((self.aw.modbus.inputFloatsAsInt[idx*2 + c] or self.aw.modbus.inputBCDsAsInt[idx*2 + c] or not self.aw.modbus.inputFloats[idx*2 + c]) and
+                        self.aw.modbus.inputDivs[idx*2 + c] == 0 and
+                        (self.aw.modbus.inputModes[idx*2 + c] == '' or self.aw.modbus.inputModes[idx*2 + c] == self.aw.qmc.mode) and
                         no_math_formula_defined)
-                return ((self.aw.modbus.inputFloatsAsInt[1] or self.aw.modbus.inputBCDsAsInt[1] or not self.aw.modbus.inputFloats[1]) and
-                    self.aw.modbus.inputDivs[1] == 0 and
-                    self.aw.modbus.inputModes[1] == '' and
-                    no_math_formula_defined)
-            if self.extradevices[n] == 33: # MODBUS_34
-                if c == 0:
-                    return ((self.aw.modbus.inputFloatsAsInt[2] or self.aw.modbus.inputBCDsAsInt[2] or not self.aw.modbus.inputFloats[2]) and
-                        self.aw.modbus.inputDivs[2] == 0 and
-                        self.aw.modbus.inputModes[2] == '' and
-                        no_math_formula_defined)
-                return ((self.aw.modbus.inputFloatsAsInt[3] or self.aw.modbus.inputBCDsAsInt[3] or not self.aw.modbus.inputFloats[3]) and
-                    self.aw.modbus.inputDivs[3] == 0 and
-                    self.aw.modbus.inputModes[3] == '' and
-                    no_math_formula_defined)
-            if self.extradevices[n] == 55: # MODBUS_56
-                if c == 0:
-                    return ((self.aw.modbus.inputFloatsAsInt[4] or self.aw.modbus.inputBCDsAsInt[4] or not self.aw.modbus.inputFloats[4]) and
-                        self.aw.modbus.inputDivs[4] == 0 and
-                        self.aw.modbus.inputModes[4] == '' and
-                        no_math_formula_defined)
-                return ((self.aw.modbus.inputFloatsAsInt[5] or self.aw.modbus.inputBCDsAsInt[5] or not self.aw.modbus.inputFloats[5]) and
-                    self.aw.modbus.inputDivs[5] == 0 and
-                    self.aw.modbus.inputModes[5] == '' and
-                    no_math_formula_defined)
-            if self.extradevices[n] == 109: # MODBUS_78
-                if c == 0:
-                    return ((self.aw.modbus.inputFloatsAsInt[6] or self.aw.modbus.inputBCDsAsInt[6] or not self.aw.modbus.inputFloats[6]) and
-                        self.aw.modbus.inputDivs[6] == 0 and
-                        self.aw.modbus.inputModes[6] == '' and
-                        no_math_formula_defined)
-                return ((self.aw.modbus.inputFloatsAsInt[7] or self.aw.modbus.inputBCDsAsInt[7] or not self.aw.modbus.inputFloats[7]) and
-                    self.aw.modbus.inputDivs[7] == 0 and
-                    self.aw.modbus.inputModes[7] == '' and
-                    no_math_formula_defined)
-            if self.extradevices[n] == 70: # S7
-                return self.aw.s7.type[0+c] != 1 and self.aw.s7.mode[0+c] == 0 and (self.aw.s7.div[0+c] == 0 or self.aw.s7.type[0+c] == 2) and no_math_formula_defined
-            if self.extradevices[n] == 80: # S7_34
-                return self.aw.s7.type[2+c] != 1 and self.aw.s7.mode[2+c] == 0 and (self.aw.s7.div[2+c] == 0 or self.aw.s7.type[2+c] == 2) and no_math_formula_defined
-            if self.extradevices[n] == 81: # S7_56
-                return self.aw.s7.type[4+c] != 1 and self.aw.s7.mode[4+c] == 0 and (self.aw.s7.div[4+c] == 0 or self.aw.s7.type[4+c] == 2) and no_math_formula_defined
-            if self.extradevices[n] == 82: # S7_78
-                return self.aw.s7.type[6+c] != 1 and self.aw.s7.mode[6+c] == 0 and (self.aw.s7.div[6+c] == 0 or self.aw.s7.type[6+c] == 2) and no_math_formula_defined
-            if self.extradevices[n] == 110: # S7_910
-                return self.aw.s7.type[8+c] != 1 and self.aw.s7.mode[8+c] == 0 and (self.aw.s7.div[8+c] == 0 or self.aw.s7.type[8+c] == 2) and no_math_formula_defined
+            # S7 channels
+            for idx, dev_type in enumerate([70,80,81,82,110,151]): # S7, S7_34, S7_56, S7_78, S7_910, S7_1112
+                if self.extradevices[n] == dev_type:
+                    return (self.aw.s7.type[idx*2 + c] != 1 and
+                            (self.aw.s7.mode[idx*2 + c] == 0 or (self.aw.s7.mode[idx*2 + c] == 1 and
+                                self.aw.qmc.mode == 'C') or (self.aw.s7.mode[idx*2 + c] == 2 and self.aw.qmc.mode == 'F')) and
+                            (self.aw.s7.div[idx*2 + c] == 0 or self.aw.s7.type[idx*2 + c] == 2) and
+                            no_math_formula_defined)
+            # others
             if self.extradevices[n] in {54, 90, 91, 135, 136, 140, 141, 165}: # Hottop Heater/Fan, Slider 12, Slider 34, Santoker Power / Fan, Kaleido Fan/Drum, Kaleido Heater/AH, Mugma Heater/Fan
                 return True
             if self.extradevices[n] == 136 and c == 0: # Santoker Drum
@@ -8236,14 +8209,8 @@ class tgraphcanvas(FigureCanvas):
                     extraname1_subst = self.extraname1[:]
                     extraname2_subst = self.extraname2[:]
                     for i in range(len(self.extratimex)):
-                        try:
-                            extraname1_subst[i] = extraname1_subst[i].format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])
-                        except Exception: # pylint: disable=broad-except
-                            pass
-                        try:
-                            extraname2_subst[i] = extraname2_subst[i].format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])
-                        except Exception: # pylint: disable=broad-except
-                            pass
+                        extraname1_subst[i] = self.device_name_subst(extraname1_subst[i])
+                        extraname2_subst[i] = self.device_name_subst(extraname2_subst[i])
 
                     if self.flagstart or self.ygrid == 0:
                         y_label = self.ax.set_ylabel('')
@@ -10000,7 +9967,7 @@ class tgraphcanvas(FigureCanvas):
                                 if not l1.startswith('_'):
                                     self.handles.append(self.extratemp1lines[idx1])
                                     try:
-                                        self.labels.append(self.aw.arabicReshape(l1.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])))
+                                        self.labels.append(self.aw.arabicReshape(l1.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3],self.mode)))
                                     except Exception: # pylint: disable=broad-except
                                         # a key error can occur triggered by the format if curley braces are used without reference
                                         self.labels.append(self.aw.arabicReshape(l1))
@@ -10011,7 +9978,7 @@ class tgraphcanvas(FigureCanvas):
                                 if not l2.startswith('_'):
                                     self.handles.append(self.extratemp2lines[idx2])
                                     try:
-                                        self.labels.append(self.aw.arabicReshape(l2.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])))
+                                        self.labels.append(self.aw.arabicReshape(l2.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3],self.mode)))
                                     except Exception: # pylint: disable=broad-except
                                         # a key error can occur triggered by the format if curley braces are used without reference
                                         self.labels.append(self.aw.arabicReshape(l2))

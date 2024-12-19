@@ -799,10 +799,10 @@ class AlarmDlg(ArtisanResizeablDialog):
     def buildAlarmSourceList(self) -> List[str]:
         extra_names = []
         for i in range(len(self.aw.qmc.extradevices)):
-            extra_names.append(self.aw.qmc.extraname1[i].format(self.aw.qmc.etypesf(0),self.aw.qmc.etypesf(1),self.aw.qmc.etypesf(2),self.aw.qmc.etypesf(3)))
-            extra_names.append(self.aw.qmc.extraname2[i].format(self.aw.qmc.etypesf(0),self.aw.qmc.etypesf(1),self.aw.qmc.etypesf(2),self.aw.qmc.etypesf(3)))
-        et_name = self.aw.ETname.format(self.aw.qmc.etypesf(0),self.aw.qmc.etypesf(1),self.aw.qmc.etypesf(2),self.aw.qmc.etypesf(3))
-        bt_name = self.aw.BTname.format(self.aw.qmc.etypesf(0),self.aw.qmc.etypesf(1),self.aw.qmc.etypesf(2),self.aw.qmc.etypesf(3))
+            extra_names.append(self.aw.qmc.device_name_subst(self.aw.qmc.extraname1[i]))
+            extra_names.append(self.aw.qmc.device_name_subst(self.aw.qmc.extraname2[i]))
+        et_name = self.aw.qmc.device_name_subst(self.aw.ETname)
+        bt_name = self.aw.qmc.device_name_subst(self.aw.BTname)
         return ['',
              deltaLabelUTF8 + et_name,
              deltaLabelUTF8 + bt_name,

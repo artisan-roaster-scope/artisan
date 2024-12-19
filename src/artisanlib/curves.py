@@ -1527,16 +1527,18 @@ class CurvesDlg(ArtisanDialog):
         self.aw.BTname = str(self.renameBTLine.text()).strip()
         if self.aw.BTname == '':
             self.aw.BTname = QApplication.translate('Label', 'BT')
-        self.aw.label3.setText(f'<big><b>{self.aw.BTname}</b></big>'.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3]))
-        self.aw.label5.setText(f'{deltaLabelBigPrefix}{self.aw.BTname}</b></big>'.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3]))
+        BTname_subst = self.aw.qmc.device_name_subst(self.aw.BTname)
+        self.aw.label3.setText(f'<big><b>{BTname_subst}</b></big>')
+        self.aw.label5.setText(f'{deltaLabelBigPrefix}{BTname_subst}</b></big>')
 
     @pyqtSlot()
     def renameET(self) -> None:
         self.aw.ETname = str(self.renameETLine.text()).strip()
         if self.aw.ETname == '':
             self.aw.ETname = QApplication.translate('Label', 'ET')
-        self.aw.label2.setText(f'<big><b>{self.aw.ETname}</b></big>'.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3]))
-        self.aw.label4.setText(f'{deltaLabelBigPrefix}{self.aw.ETname}</b></big>'.format(self.aw.qmc.etypes[0],self.aw.qmc.etypes[1],self.aw.qmc.etypes[2],self.aw.qmc.etypes[3]))
+        ETname_subst = self.aw.qmc.device_name_subst(self.aw.ETname)
+        self.aw.label2.setText(f'<big><b>{ETname_subst}</b></big>')
+        self.aw.label4.setText(f'{deltaLabelBigPrefix}{ETname_subst}</b></big>')
 
     @pyqtSlot(int)
     def toggleWebLCDsAlerts(self, _:int) -> None:

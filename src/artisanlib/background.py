@@ -48,6 +48,9 @@ class backgroundDlg(ArtisanResizeablDialog):
         super().__init__(parent, aw)
         self.activeTab = activeTab
 
+        self.ETname = self.aw.qmc.device_name_subst(self.aw.ETname)
+        self.BTname = self.aw.qmc.device_name_subst(self.aw.BTname)
+
         self.setWindowTitle(QApplication.translate('Form Caption','Profile Background'))
         self.setModal(True)
 
@@ -65,11 +68,11 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.backgroundDetails = QCheckBox(QApplication.translate('CheckBox','Annotations'))
         self.backgroundeventsflag = QCheckBox(QApplication.translate('CheckBox','Events'))
         self.backgroundDeltaETflag = QCheckBox()
-        backgroundDeltaETflagLabel = QLabel(deltaLabelPrefix + QApplication.translate('Label','ET'))
+        backgroundDeltaETflagLabel = QLabel(deltaLabelPrefix + self.ETname)
         self.backgroundDeltaBTflag = QCheckBox()
-        backgroundDeltaBTflagLabel = QLabel(deltaLabelPrefix + QApplication.translate('Label','BT'))
-        self.backgroundETflag = QCheckBox(QApplication.translate('CheckBox','ET'))
-        self.backgroundBTflag = QCheckBox(QApplication.translate('CheckBox','BT'))
+        backgroundDeltaBTflagLabel = QLabel(deltaLabelPrefix + self.BTname)
+        self.backgroundETflag = QCheckBox(self.ETname)
+        self.backgroundBTflag = QCheckBox(self.BTname)
         self.backgroundFullflag = QCheckBox(QApplication.translate('CheckBox','Show Full'))
         self.keyboardControlflag = QCheckBox(QApplication.translate('CheckBox','Keyboard Control'))
         self.keyboardControlflag.setToolTip(QApplication.translate('Tooltip', 'Move the background profile using the cursor keys'))
@@ -118,8 +121,10 @@ class backgroundDlg(ArtisanResizeablDialog):
 
         curvenames = [''] # first entry is the empty one, no extra curve displayed
         for i in range(min(len(self.aw.qmc.extraname1B),len(self.aw.qmc.extraname2B),len(self.aw.qmc.extratimexB))):
-            curvenames.append('B' + str(2*i+3) + ': ' + self.aw.qmc.extraname1B[i].format(self.aw.qmc.Betypesf(0),self.aw.qmc.Betypesf(1),self.aw.qmc.Betypesf(2),self.aw.qmc.Betypesf(3)))
-            curvenames.append('B' + str(2*i+4) + ': ' + self.aw.qmc.extraname2B[i].format(self.aw.qmc.Betypesf(0),self.aw.qmc.Betypesf(1),self.aw.qmc.Betypesf(2),self.aw.qmc.Betypesf(3)))
+            curvenames.append('B' + str(2*i+3) + ': ' + self.aw.qmc.extraname1B[i].format(
+                self.aw.qmc.Betypesf(0),self.aw.qmc.Betypesf(1),self.aw.qmc.Betypesf(2),self.aw.qmc.Betypesf(3),self.aw.qmc.mode))
+            curvenames.append('B' + str(2*i+4) + ': ' + self.aw.qmc.extraname2B[i].format(
+                self.aw.qmc.Betypesf(0),self.aw.qmc.Betypesf(1),self.aw.qmc.Betypesf(2),self.aw.qmc.Betypesf(3),self.aw.qmc.mode))
 
         self.xtcurvelabel = QLabel(QApplication.translate('Label', 'Extra 1'))
         self.xtcurveComboBox = QComboBox()
@@ -770,8 +775,8 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.eventtable.setRowCount(ndata)
         self.eventtable.setColumnCount(6)
         self.eventtable.setHorizontalHeaderLabels([QApplication.translate('Table','Time'),
-                                                   QApplication.translate('Table', 'ET'),
-                                                   QApplication.translate('Table', 'BT'),
+                                                   self.ETname,
+                                                   self.BTname,
                                                    QApplication.translate('Table','Description'),
                                                    QApplication.translate('Table','Type'),
                                                    QApplication.translate('Table','Value')])
@@ -844,10 +849,10 @@ class backgroundDlg(ArtisanResizeablDialog):
                 start = 0
             self.datatable.setRowCount(ndata)
             headers = [QApplication.translate('Table','Time'),
-                                                      QApplication.translate('Table','ET'),
-                                                      QApplication.translate('Table','BT'),
-                                                      deltaLabelUTF8 + QApplication.translate('Table','ET'),
-                                                      deltaLabelUTF8 + QApplication.translate('Table','BT')]
+                                                      self.ETname,
+                                                      self.BTname,
+                                                      deltaLabelUTF8 + self.ETname,
+                                                      deltaLabelUTF8 + self.BTname]
             xtcurve = False # no XT curve
             n3:int = 0
             n4:int = 0
