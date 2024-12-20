@@ -340,7 +340,7 @@ class KaleidoPort:
 
     @staticmethod
     async def open_serial_connection(*, loop:Optional[asyncio.AbstractEventLoop] = None,
-            limit:Optional[int] = None, **kwargs:Union[int,float,str]) -> Tuple[asyncio.StreamReader, asyncio.StreamWriter]:
+            limit:Optional[int] = None, **kwargs:Union[int,float,str]) -> Tuple[asyncio.Transport, asyncio.StreamReader, asyncio.StreamWriter]:
         """A wrapper for create_serial_connection() returning a (reader,
         writer) pair.
 
@@ -364,7 +364,7 @@ class KaleidoPort:
             loop=loop, protocol_factory=lambda: protocol, **kwargs
         )
         writer = asyncio.StreamWriter(transport, protocol, reader, loop)
-        return reader, writer
+        return transport, reader, writer
 
 
     async def serial_handle_reads(self, reader: asyncio.StreamReader) -> None:
@@ -427,6 +427,7 @@ class KaleidoPort:
                 connected_handler:Optional[Callable[[], None]] = None,
                 disconnected_handler:Optional[Callable[[], None]] = None) -> None:
 
+        transport = None
         writer = None
         while True:
             try:
@@ -440,7 +441,7 @@ class KaleidoPort:
                         parity=serial['parity'],
                         timeout=serial['timeout'])
                 # Wait for 2 seconds, then raise TimeoutError
-                reader, writer = await asyncio.wait_for(connect, timeout=self._open_timeout)
+                transport, reader, writer = await asyncio.wait_for(connect, timeout=self._open_timeout)
 
                 self._write_queue = asyncio.Queue()
                 await asyncio.wait_for(self.serial_initialize(reader, writer, mode), timeout=self._init_timeout)
@@ -472,6 +473,12 @@ class KaleidoPort:
                 if writer is not None:
                     try:
                         writer.close()
+                        await writer.wait_closed()
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.error(e)
+                if transport is not None:
+                    try:
+                        transport.close()
                     except Exception as e: # pylint: disable=broad-except
                         _log.error(e)
 

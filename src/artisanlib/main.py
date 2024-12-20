@@ -5517,22 +5517,36 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 if self.qmc.roastersize_setup in heating_ratings:
                                     ratings = heating_ratings[self.qmc.roastersize_setup]
                                     if 'loadlabels' in ratings and len(ratings['loadlabels']) == 4:
-                                        self.qmc.loadlabels_setup = ratings['loadlabels']
+                                        self.qmc.loadlabels_setup = [str(lb) for lb in ratings['loadlabels']]
                                     if 'loadratings' in ratings and len(ratings['loadratings']) == 4:
-                                        self.qmc.loadratings_setup = ratings['loadratings']
+                                        self.qmc.loadratings_setup = [float(lr) for lr in ratings['loadratings']]
                                     if 'ratingunits' in ratings and len(ratings['ratingunits']) == 4:
-                                        self.qmc.ratingunits_setup = ratings['ratingunits']
+                                        self.qmc.ratingunits_setup = [int(lu) for lu in ratings['ratingunits']]
                                     if 'sourcetypes' in ratings and len(ratings['sourcetypes']) == 4:
-                                        self.qmc.sourcetypes_setup = ratings['sourcetypes']
+                                        self.qmc.sourcetypes_setup = [int(st) for st in ratings['sourcetypes']]
                                     if 'load_etypes' in ratings and len(ratings['load_etypes']) == 4:
-                                        self.qmc.load_etypes_setup = ratings['load_etypes']
+                                        self.qmc.load_etypes_setup = [int(let) for let in ratings['load_etypes']]
                                     if 'presssure_percents' in ratings and len(ratings['presssure_percents']) == 4:
-                                        self.qmc.presssure_percents_setup = ratings['presssure_percents']
+                                        self.qmc.presssure_percents_setup = [bool(pp) for pp in ratings['presssure_percents']]
                                     if 'loadevent_zeropcts' in ratings and len(ratings['loadevent_zeropcts']) == 4:
-                                        self.qmc.loadevent_zeropcts_setup = ratings['loadevent_zeropcts']
+                                        self.qmc.loadevent_zeropcts_setup = [int(lzp) for lzp in ratings['loadevent_zeropcts']]
                                     if 'loadevent_hundpcts' in ratings and len(ratings['loadevent_hundpcts']) == 4:
-                                        self.qmc.loadevent_hundpcts_setup = ratings['loadevent_hundpcts']
+                                        self.qmc.loadevent_hundpcts_setup = [int(lhp) for lhp in ratings['loadevent_hundpcts']]
+                                    if 'preheatDuration' in ratings and len(ratings['preheatenergies']) == 1:
+                                        self.qmc.preheatDuration_setup = int(ratings['preheatDuration'][0])
+                                    if 'preheatenergies' in ratings and len(ratings['preheatenergies']) == 4:
+                                        self.qmc.preheatenergies_setup = [float(phe) for phe in ratings['preheatenergies']]
+                                    if 'betweenbatchDuration' in ratings and len(ratings['betweenbatchDuration']) == 1:
+                                        self.qmc.betweenbatchDuration_setup = int(ratings['betweenbatchDuration'][0])
+                                    if 'betweenbatchenergies' in ratings and len(ratings['betweenbatchenergies']) == 4:
+                                        self.qmc.betweenbatchenergies_setup = [float(bbe) for bbe in ratings['betweenbatchenergies']]
+                                    if 'coolingDuration' in ratings and len(ratings['coolingDuration']) == 1:
+                                        self.qmc.coolingDuration_setup = int(ratings['coolingDuration'][0])
+                                    if 'coolingenergies' in ratings and len(ratings['coolingenergies']) == 4:
+                                        self.qmc.coolingenergies_setup = [float(ce) for ce in ratings['coolingenergies']]
+
                                     self.qmc.restoreEnergyLoadDefaults()
+                                    self.qmc.restoreEnergyProtocolDefaults()
                                     self.sendmessage(QApplication.translate('Message','Energy loads configured for {0} {1}kg').format(label,self.qmc.roastersize_setup))
                             self.sendmessage(QApplication.translate('Message','Artisan configured for {0}').format(label))
                             _log.info('Artisan configured for %s',label)
