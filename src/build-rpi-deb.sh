@@ -9,7 +9,7 @@ NAME=artisan-linux-${VERSION}
 
 # fix debian/DEBIAN/control _VERSION_ and arch
 sed -i'' -e "s/_VERSION_/${VERSION}/g" debian/DEBIAN/control
-sed -i'' -e "s/x86_64/armhf/g" debian/DEBIAN/control
+sed -i'' -e "s/x86_64/arm64/g" debian/DEBIAN/control
 
 
 # prepare debian directory
