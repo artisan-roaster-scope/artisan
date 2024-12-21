@@ -169,7 +169,7 @@ class KaleidoPort:
 
     # asyncio
 
-    # returns the current state of the given var or None (for sid/TU) and -1 (otherwise) if the state is unknown
+    # returns the current state of the given var or None (for sid/TU/SC/CL/SN) and -1 (otherwise) if the state is unknown
     async def get_state_async(self, var:str) -> Optional[Union[str,int,float]]:
         return self.get_state(var)
 
@@ -340,7 +340,7 @@ class KaleidoPort:
 
     @staticmethod
     async def open_serial_connection(*, loop:Optional[asyncio.AbstractEventLoop] = None,
-            limit:Optional[int] = None, **kwargs:Union[int,float,str]) -> Tuple[asyncio.Transport, asyncio.StreamReader, asyncio.StreamWriter]:
+            limit:Optional[int] = None, **kwargs:Union[int,float,str]) -> Tuple[asyncio.StreamReader, asyncio.StreamWriter]:
         """A wrapper for create_serial_connection() returning a (reader,
         writer) pair.
 
@@ -364,7 +364,7 @@ class KaleidoPort:
             loop=loop, protocol_factory=lambda: protocol, **kwargs
         )
         writer = asyncio.StreamWriter(transport, protocol, reader, loop)
-        return transport, reader, writer
+        return reader, writer
 
 
     async def serial_handle_reads(self, reader: asyncio.StreamReader) -> None:
@@ -427,7 +427,6 @@ class KaleidoPort:
                 connected_handler:Optional[Callable[[], None]] = None,
                 disconnected_handler:Optional[Callable[[], None]] = None) -> None:
 
-        transport = None
         writer = None
         while True:
             try:
@@ -441,7 +440,7 @@ class KaleidoPort:
                         parity=serial['parity'],
                         timeout=serial['timeout'])
                 # Wait for 2 seconds, then raise TimeoutError
-                transport, reader, writer = await asyncio.wait_for(connect, timeout=self._open_timeout)
+                reader, writer = await asyncio.wait_for(connect, timeout=self._open_timeout)
 
                 self._write_queue = asyncio.Queue()
                 await asyncio.wait_for(self.serial_initialize(reader, writer, mode), timeout=self._init_timeout)
@@ -470,18 +469,26 @@ class KaleidoPort:
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)
             finally:
+                if self._write_queue is not None:
+                    try:
+                        while not self._write_queue.empty():
+                            self._write_queue.get_nowait()
+                            self._write_queue.task_done()
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.error(e)
                 if writer is not None:
                     try:
                         writer.close()
-                        await writer.wait_closed()
+                        await asyncio.wait_for(writer.wait_closed(), timeout=0.3)
                     except Exception as e: # pylint: disable=broad-except
                         _log.error(e)
-                if transport is not None:
+                if writer is not None and writer.transport is not None:
                     try:
-                        transport.close()
+                        writer.transport.close()
                     except Exception as e: # pylint: disable=broad-except
                         _log.error(e)
 
+            # the following is not reached on stop()
             self.resetReadings()
             if disconnected_handler is not None:
                 try:

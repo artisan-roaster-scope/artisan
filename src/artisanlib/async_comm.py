@@ -299,7 +299,7 @@ class AsyncComm:
                 if writer is not None:
                     try:
                         writer.close()
-                        await writer.wait_closed()
+                        await asyncio.wait_for(writer.wait_closed(), timeout=0.3)
                     except Exception as e: # pylint: disable=broad-except
                         _log.error(e)
 
