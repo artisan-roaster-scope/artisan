@@ -31,7 +31,7 @@ gallery:
     image_path: /assets/images/download-icon-macos-legacy.png
     alt: "macOS legacy"
     title: "macOS legacy"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.1.0/artisan-linux-3.1.0_raspbian-bookworm.deb
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.1.0/artisan-linux-3.1.0_PiOS64-bookworm.deb
     image_path: /assets/images/download-icon-rpi.png
     alt: "RPi"
     title: "RPi"
