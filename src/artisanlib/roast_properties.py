@@ -3557,6 +3557,9 @@ class editGraphDlg(ArtisanResizeablDialog):
             else:
                 hundpcts.setValue(zeropcts.value()+1)
                 self.aw.qmc.loadevent_hundpcts[pos] = hundpcts.value()
+        else:
+            self.aw.qmc.loadevent_zeropcts[pos] = zeropcts.value()
+            self.aw.qmc.loadevent_hundpcts[pos] = hundpcts.value()
         self.updateMetricsLabel()
         self.loadsEdited()
 
