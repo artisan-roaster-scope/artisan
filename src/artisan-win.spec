@@ -353,7 +353,7 @@ if not ARTISAN_LEGACY=='True':
         r'_internal\PyQt6\Qt6\bin\Qt6MultimediaQuick.dll',
         r'_internal\PyQt6\Qt6\bin\Qt6PdfQuick.dll',
         r'_internal\PyQt6\Qt6\bin\Qt6PositioningQuick.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6QmlWorkerScript.dll',
+#        r'_internal\PyQt6\Qt6\bin\Qt6QmlWorkerScript.dll',  # required for pyqt6 v6.8
         r'_internal\PyQt6\Qt6\bin\Qt6Quick3D.dll',
         r'_internal\PyQt6\Qt6\bin\Qt6Quick3DAssetImport.dll',
         r'_internal\PyQt6\Qt6\bin\Qt6Quick3DAssetUtils.dll',
