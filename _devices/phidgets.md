@@ -313,7 +313,9 @@ Artisan v2.4 adds support for DC motor control.
 
 * [DCC1000](https://www.phidgets.com/?prodid=965){:target="_blank"} and [DCC1002](https://www.phidgets.com/?prodid=1117){:target="_blank"} (1x VINT)
 * [DCC1003](https://www.phidgets.com/?prodid=1118){:target="_blank"} (2x VINT)
+* [DCC1020](https://www.phidgets.com/?prodid=1333){:target="_blank"} (1x VINT)
 * [DCC1100](https://www.phidgets.com/?prodid=1013){:target="_blank"} (1x VINT; Brushless DC Motor Control; added in v3.1.2)
+* [DCC1120](https://www.phidgets.com/?prodid=1334){:target="_blank"} (1x VINT; Brushless DC Motor Control; added in v3.1.2)
 
 Phidget DC Motor Control modules can be controlled via `IO Command` actions triggered by buttons or sliders configured in the Events tab (menu `Config >> Events`). The following commands are supported:
 

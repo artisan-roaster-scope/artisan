@@ -27,7 +27,7 @@ gallery:
     image_path: /assets/images/bc-logo.jpg
     alt: "Buckeye Coffee"
     title: "Buckeye Coffee"
-  - url: https://sniper-kaleido.com/
+  - url: https://www.kaleidosniper.com/
     image_path: /assets/images/kaleido-logo.jpg
     alt: "Kaleido"
     title: "Kalaido"
@@ -157,7 +157,7 @@ Artisan is an open-source software that helps coffee roasters record, analyze, a
 
 Artisan supports the following 64bit operating systems:
 
-* macOS 12 Monterey and higher incl. macOS Sequoia 15 (Intel & AppleSilicon)
+* macOS 12.3 Monterey and higher incl. the latest macOS Sequoia 15 (Intel & AppleSilicon)
 * Windows 10 and 11 (x64)
 * Ubuntu 22.04+ (GCC11), Red Hat 8.4+ (GCC10) on x86 Intel and aarch64 ARM (via [Flatpack](https://flathub.org/apps/org.artisan_scope.artisan))
 
@@ -200,9 +200,25 @@ __Frans Goddijn__ –– support
 
 <span style="color:grey">__Rafael Cobo__ –– initiator</span>
 
-We are always looking for people that support us here and there. Especially, people that help us to localize the UI of Artisan to more languages and to complete the existing translations are very welcome!
+Especially, people that help us to localize the UI of Artisan to more languages and to complete the existing translations are very welcome!
 
 Contact us via the [Contact Form](https://artisan-roasterscope.blogspot.com/p/contact-me.html){:target="_blank"} on the [Artisan blog](https://artisan-roasterscope.blogspot.com){:target="_blank"}.
+
+
+## Translators
+
+Language  | Translators
+------------- | -------------
+CN  | Leo Huang, Lewis Li
+FA  | Saeed Abdinasab
+FR  | Nico Bigler
+IT  | FraBriz
+PT-BR | Rodrigo Menezes Ramos
+TR  | Kemal Akdas
+VN  | Trinh Thu
+
+We are always looking for people that support us here and there. 
+
 
 ## Supporters
 

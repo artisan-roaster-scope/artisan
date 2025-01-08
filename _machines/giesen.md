@@ -12,14 +12,32 @@ sidebar:
 ---
 
 * __Producer:__ [GIESEN coffee-roasters](https://www.giesen.com/){:target="_blank"}, The Netherlands
-* __Machines:__ WPG/WPE/W1/W6/W15/W30/W45/W60 with networked PLC (6/2014 and later)
+* __Machines:__ WPG/WPE/W1/W6/W15/W30/W45/W60/W140 with networked PLC, including the PRO machines (6/2014 and later)
 * __Connection:__ Siemens S7 network
 * __Features:__
   - logging of exhaust temperature (ET), bean temperature (BT) and related rate-of-rise curves
   - logging and control of burner level, air flow, air temperature setpoint, drum speed
   - logging of the optional infrared (IR) and/or environmental temperature sensor (Env)
-  - operation of actors (intake, flavouring, discharge, cooling, stirrer) on W30 and larger machines via custom buttons (press CMD-2 to switch to this extended button set; CMD-1 switches back to the standard button set)
+  - operation of actors (intake, flavouring, discharge, cooling, stirrer, LED, ...)
 
+Artisan provides a custom machine setup for each Giesen model as well as a [few generic setups](#generic-machine-setups).
+
+
+
+
+#### Generic Machine Setups
+
+There are also the following 3 generic setups for older firmware version:
+
+- `WxA`: this one should work with all machines, but delivers temperature data without decimals
+- `WxA coarse`: the WxA coarse setup is for older machines, which allow burner changes only in 10% steps, but is otherwise the same as the `WxA` setup
+- `WxA+` : this setups requires an unlock code from Giesen, but delivers data in higher resolution with decimals
+
+There are also variants of those generic Giesen machine setups which includes support for the optional infrared sensor (`IR`) and additional environmental temperature sensor (`Env`).
+
+All of theses generic setups provide some extended custom buttons (press CMD-2 to switch to this extended button set; CMD-1 switches back to the standard button set) to operate the actors installed in some machines, like the stirrer.
+ 
+ 
 <figure>
 <center>
 <a href="{{ site.baseurl }}/assets/images/buttons-giesen.png">
@@ -28,11 +46,8 @@ sidebar:
 </center>
 </figure>
 
-**Watch out!** The WxA coarse setup is for older machines, which allow burner changes only in 10% steps.
-{: .notice--primary}
 
-**Watch out!** The WxA+ setups require an unlock code from Giesen and deliver data in higher resolution with decimals.
-{: .notice--primary}
+
 
 ### Setup
 
