@@ -3097,7 +3097,7 @@ class tgraphcanvas(FigureCanvas):
                 fig = self.ax.get_figure()
                 if fig is None:
                     return
-                s = fig.get_size_inches()*fig.dpi
+                s = fig.get_size_inches()*fig.dpi # type:ignore[union-attr] # MPL 3.10.0 reports `Item "SubFigure" of "Union[Figure, SubFigure]" has no attribute "get_size_inches"`
                 if event.x > s[0]*2/3 and event.y > s[1]*2/3:
                     if not self.flagstart and not self.flagon and self.backgroundprofile is None and __release_sponsor_domain__ and __release_sponsor_url__:
                         QDesktopServices.openUrl(QUrl(__release_sponsor_url__, QUrl.ParsingMode.TolerantMode))

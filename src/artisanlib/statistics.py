@@ -20,18 +20,18 @@ import platform
 from typing import Optional, List, Any, cast, TYPE_CHECKING, Final
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.util import deltaLabelUTF8
-from artisanlib.widgets import MyContentLimitedQComboBox
+from artisanlib.widgets import MyContentLimitedQComboBox, MyQTableWidget
 import logging
 
 try:
-    from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QTimer # @XUnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout, # @XUnusedImport @Reimport  @UnresolvedImport
-        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGroupBox, QTableWidgetItem, # @XUnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QTimer # @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout, # @Reimport  @UnresolvedImport
+        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGroupBox, # @Reimport  @UnresolvedImport
         QSpinBox, QWidget, QTabWidget, QTableWidget, QPushButton, QHeaderView, QLineEdit) # @XUnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import Qt, pyqtSlot, QSettings, QTimer # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGroupBox, QTableWidgetItem, # @UnusedImport @Reimport  @UnresolvedImport
+        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGroupBox, # @UnusedImport @Reimport  @UnresolvedImport
         QSpinBox, QWidget, QTabWidget, QTableWidget, QPushButton, QHeaderView, QLineEdit) # @UnusedImport @Reimport  @UnresolvedImport
 
 if TYPE_CHECKING:
@@ -251,6 +251,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
         self.ShowStatsSummary.setToolTip(QApplication.translate('Tooltip','Show Summary Statistics'))
         self.ShowStatsSummary.setChecked(self.aw.qmc.statssummary)
         self.ShowStatsSummary.stateChanged.connect(self.changeStatsSummary)         #toggle
+        self.ShowStatsSummary.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         # max chars per line
         self.statsmaxchrperlinelabel = QLabel(QApplication.translate('Label', 'Max characters per line'))
         self.statsmaxchrperlineSpinBox = QSpinBox()
@@ -260,6 +261,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
         self.statsmaxchrperlineSpinBox.setValue(int(round(self.aw.qmc.statsmaxchrperline)))
         self.statsmaxchrperlineSpinBox.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.statsmaxchrperlineSpinBox.valueChanged.connect(self.setstatsmaxchrperline)
+        self.statsmaxchrperlineSpinBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         # Font size
         self.fontsizeLabel = QLabel(QApplication.translate('Table', 'Text Size'))
         self.fontsizeSpinBox = QSpinBox()
@@ -270,8 +272,9 @@ class StatisticsDlg(ArtisanResizeablDialog):
         self.fontsizeSpinBox.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.fontsizeSpinBox.setPrefix('  ')
         self.fontsizeSpinBox.valueChanged.connect(self.setstatsfontsize)
+        self.fontsizeSpinBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         #table for showing events
-        self.summarystatstable = QTableWidget()
+        self.summarystatstable = MyQTableWidget() #QTableWidget()
         self.summarystatstable.setTabKeyNavigation(True)
         self.summarystatstable.itemSelectionChanged.connect(self.selectionChanged)
         vheader: Optional[QHeaderView] = self.summarystatstable.verticalHeader()
@@ -528,7 +531,6 @@ class StatisticsDlg(ArtisanResizeablDialog):
         self.summarystatstable.setRowCount(0)  # resets the data model
         self.createSummarystatsTable()
 
-
     @pyqtSlot()
     def selectionChanged(self) -> None:
         selected = self.summarystatstable.selectedRanges()
@@ -537,10 +539,12 @@ class StatisticsDlg(ArtisanResizeablDialog):
                 self.insertButton.setEnabled(True)
             else:
                 self.insertButton.setEnabled(False)
+        vheader = self.summarystatstable.verticalHeader()
+        if self.summarystatstable.cursor_navigation and vheader is not None:
+            QTimer.singleShot(0, vheader.setFocus)
 
     @pyqtSlot(int)
     def tabSwitched(self, i:int) -> None:
-#        self.closeHelp()
         if i == 0:
             pass
         elif i == 1: # switched to Config Summary tab
@@ -561,7 +565,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
         # one column that is a ComboBox, the row selector also selects the ComboBox and the down arrow opens the combo.  No
         # solution was found, tus this alternate implementaition.
 
-        columns = 2  # With one column we don't need lists, but the plumbing is here if more columns are needed in the future
+        columns = 1  # With one column we don't need lists, but the plumbing is here if more columns are needed in the future
 
 #        if self.summarystatstable is not None and self.summarystatstable.columnCount() == columns:
 #            # rows have been already established
@@ -590,12 +594,11 @@ class StatisticsDlg(ArtisanResizeablDialog):
         self.summarystatstable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.summarystatstable.setShowGrid(True)
 
-        # Turn off row header
-        self.summarystatstable.verticalHeader().setVisible(False)  # type: ignore[union-attr]  # pyright: ignore[reportOptionalMemberAccess] #TODO figure out why this fails mypy and pyright  # pylint: disable=fixme
-
 
         vheader = self.summarystatstable.verticalHeader()
         if vheader is not None:
+            # Turn off row header
+#            vheader.setVisible(False)
             vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
 
         #Enable Drag Sorting
@@ -622,11 +625,15 @@ class StatisticsDlg(ArtisanResizeablDialog):
             else:
                 typeComboBox.setCurrentIndex(self.summarystats_types_sorted.index(self.summarystats_types[self.summarystatstypes[i]]))
             typeComboBox.currentIndexChanged.connect(self.setitemsummarystat)
+#            QWidget.setTabOrder(typeComboBox, vheader)
             #add widgets to the table
-            rowlabel = QTableWidgetItem(str(i+1))  #pyright: ignore[reportPossiblyUnboundVariable]  #TODO why does pyright error?  # pylint: disable=fixme
-            rowlabel.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-            self.summarystatstable.setItem(i,0,rowlabel)
-            self.summarystatstable.setCellWidget(i,1,typeComboBox)
+#            rowlabel = QTableWidgetItem(str(i+1))
+#            rowlabel.setFlags(rowlabel.flags() ^ Qt.ItemFlag.ItemIsEditable) # disallow editing of row labels
+#            rowlabel.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+#            self.summarystatstable.setItem(i,0,rowlabel)
+#            self.summarystatstable.setCellWidget(i,1,typeComboBox)
+            self.summarystatstable.setCellWidget(i,0,typeComboBox)
+
 
         hheader = self.summarystatstable.horizontalHeader()
         if hheader is not None:
@@ -801,6 +808,11 @@ class StatisticsDlg(ArtisanResizeablDialog):
         self.summarystatstypes = self.aw.summarystatstypes_default.copy()
         self.createSummarystatsTable()
         #self.savetablesummarystats(True)
+        self.summarystatstable.cursor_navigation = True
+        vheader = self.summarystatstable.verticalHeader()
+        if vheader is not None:
+            vheader.setFocus()
+
 
     @pyqtSlot('QCloseEvent')
     def closeEvent(self,_:Optional['QCloseEvent'] = None) -> None:

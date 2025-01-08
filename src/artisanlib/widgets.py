@@ -20,23 +20,22 @@ from artisanlib.util import stringtoseconds, createGradient
 from typing import Optional, Dict, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from PyQt6.QtCore import QCoreApplication # pylint: disable=unused-import
-    from PyQt6.QtGui import QWheelEvent, QMouseEvent, QFocusEvent, QResizeEvent # pylint: disable=unused-import
+    from PyQt6.QtCore import QCoreApplication, QObject # pylint: disable=unused-import
+    from PyQt6.QtGui import QWheelEvent, QMouseEvent, QFocusEvent, QResizeEvent, QKeyEvent # pylint: disable=unused-import
     from PyQt6.QtWidgets import QWidget, QTimeEdit, QCheckBox, QComboBox # pylint: disable=unused-import
 
 try:
     from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, QLine, QEvent, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QByteArray, QPropertyAnimation, QEasingCurve, QLocale) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QSplitter, QSplitterHandle, QLabel, QComboBox, QLineEdit, QTextEdit, QDoubleSpinBox, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
-        QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
+        QTableWidget, QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QPen, QPainter, QFontMetrics, QColor, QCursor, QEnterEvent, QPaintEvent # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, QLine, QEvent, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QByteArray, QPropertyAnimation, QEasingCurve, QLocale) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QSplitter, QSplitterHandle, QLabel, QComboBox, QLineEdit, QTextEdit, QDoubleSpinBox, QPushButton, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
+        QTableWidget, QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QPen, QPainter, QFontMetrics, QColor, QCursor, QEnterEvent, QPaintEvent # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-
 
 class MyQComboBox(QComboBox): # pylint: disable=too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues]# Argument to class must be a base class
     def __init__(self, parent:Optional['QWidget'] = None, **kwargs:Dict[Any,Any]) -> None:
@@ -79,6 +78,41 @@ class MyQDoubleSpinBox(QDoubleSpinBox):  # pyright: ignore [reportGeneralTypeIss
         super().mouseReleaseEvent(event)
         super().mouseDoubleClickEvent(event)
         super().mouseReleaseEvent(event)
+
+class MyQTableWidget(QTableWidget):  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+    def __init__(self, parent:Optional['QWidget'] = None, **kwargs:Dict[Any,Any]) -> None:
+        super().__init__(parent, **kwargs)
+        self.installEventFilter(self)
+        self.cursor_navigation:bool = True
+
+    #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work
+    def keyPressEvent(self, event: 'Optional[QKeyEvent]') -> None:
+        if event is not None and event.key() == Qt.Key.Key_Tab and self.cursor_navigation:
+            self.cursor_navigation = False
+            self.setCurrentCell(max(-1,self.currentRow()-1), 0)
+        super().keyPressEvent(event)
+
+    def eventFilter(self, obj:'Optional[QObject]', event:'Optional[QEvent]') -> bool:
+        # pylint: disable=c-extension-no-member
+        try:
+            if event is not None and event.type() == QEvent.Type.KeyPress:
+                key = event.key()  # type:ignore[attr-defined] # "QEvent" has no attribute "key"
+                if key == Qt.Key.Key_Left:
+                    self.cursor_navigation = True
+                    vheader = self.verticalHeader()
+                    if vheader is not None:
+                        vheader.setFocus()
+                elif key == Qt.Key.Key_Right:
+                    self.cursor_navigation = False
+                    current_row = self.currentRow()
+                    cellWidget = self.cellWidget(current_row,0)
+                    if cellWidget is not None:
+                        cellWidget.setFocus()
+        except Exception: # pylint: disable=broad-except
+            pass
+        return super().eventFilter(obj, event)
+
+
 
 class MyTableWidgetItemQLineEdit(QTableWidgetItem): # pylint: disable= too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     __slots__ = ['sortKey'] # save some memory by using slots

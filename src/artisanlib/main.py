@@ -122,7 +122,7 @@ try:
         from PyQt6.QtWebEngineCore import QWebEngineProfile
         QtWebEngineSupport = True
     except ImportError:
-        # on the RPi platform there is no native package PyQt-WebEngine nor PyQt6-WebEngine for Raspebarry 32bit
+        # on the RPi platform there is no native package PyQt-WebEngine nor PyQt6-WebEngine
         pass
     from PyQt6 import sip # @Reimport @UnresolvedImport @UnusedImport
 except ImportError:
@@ -422,11 +422,13 @@ class Artisan(QtSingleApplication):
                 file_suffix = qfile.suffix()
 
                 if file_suffix == 'alog':
+                    modifiers = QApplication.keyboardModifiers()
                     if aw.comparator is not None:
                         # add Artisan profile to the comparator selection
                         aw.comparatorAddProfileSignal.emit(filename)
-                    # load Artisan profile on double-click on *.alog file
-                    elif url_query is not None and url_query == 'template':
+                    # load Artisan profile on double-click on *.alog file or as result of a drag-and-drop action to the canvas
+                    # in case OPTION/ALT key is hold, load into background, else foreground
+                    elif (url_query is not None and url_query == 'template') or modifiers == Qt.KeyboardModifier.AltModifier:
                         aw.loadBackgroundSignal.emit(filename)
                     else:
                         aw.loadFileSignal.emit(filename)
@@ -11340,7 +11342,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work
     @pyqtSlot('QKeyEvent')
-    def keyPressEvent(self, event: Optional['QKeyEvent']) -> None:
+    def keyPressEvent(self, event: 'Optional[QKeyEvent]') -> None:
         if not self.processingKeyEvent and event is not None:
             try:
                 self.processingKeyEvent = True
@@ -11543,9 +11545,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         # force redraw crosslines if active
                         if self.qmc.crossmarker:
                             try:
-                                self.ntb.mouse_move(mplLocationevent.lastevent)
-                            except Exception as e: # pylint: disable=broad-except
-                                _log.exception(e)
+                                self.ntb.mouse_move(mplLocationevent.lastevent) # type:ignore[attr-defined] # lastevent removed from MPL 3.10
+                            except Exception: # pylint: disable=broad-except
+                                pass
                 elif k == 90:                     #Z (toggle xy coordinates between 0: cursor, 1: BT, 2: ET, 3: BTB, 4: ETB)
                     if not self.qmc.designerflag and not self.qmc.wheelflag and self.comparator is None:
                         self.qmc.nextFmtDataCurve()

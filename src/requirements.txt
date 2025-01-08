@@ -33,46 +33,47 @@ pymodbus==3.6.9; python_version < '3.9' # last Python 3.8 release
 pymodbus==3.8.2; python_version >= '3.9'
 python-snap7==1.3; python_version < '3.10' # last Python 3.9 release
 python-snap7==2.0.2; python_version >= '3.10'
-Phidget22==1.22.20241209
+Phidget22==1.22.20250106
 Unidecode==1.3.8
 qrcode==7.4.2;  python_version < '3.9' # last Python 3.8 release
 qrcode==8.0; python_version >= '3.9'
 requests==2.32.3
 requests-file==2.1.0
-pyusb==1.2.1
+pyusb==1.2.1;  python_version < '3.9' # last Python 3.8 release
+pyusb==1.3.0;  python_version >= '3.9'
 persist-queue==1.0.0
 portalocker==2.10.1;  python_version < '3.9' # last Python 3.8 release
-portalocker==3.0.0; python_version >= '3.9'
+portalocker==3.1.1; python_version >= '3.9'
 xlrd==2.0.1
 websockets==13.1;  python_version < '3.9' # last Python 3.8 release
 websockets==14.1; python_version >= '3.9'
 PyYAML==6.0.2
-psutil==6.1.0
+psutil==6.1.1
 typing-extensions==4.10.0; python_version < '3.8' # required for supporting Final and TypeDict on Python <3.8
-protobuf==5.29.1
+protobuf==5.29.2
 numpy==1.24.3; python_version < '3.9' # last Python 3.8 release
-numpy==2.2.0; python_version >= '3.9'
+numpy==2.2.1; python_version >= '3.9'
 scipy==1.10.1; python_version < '3.9' # last Python 3.8 release
-scipy==1.14.1; python_version >= '3.9'
+scipy==1.15.0; python_version >= '3.9'
 wquantiles==0.6
 colorspacious==1.1.2
 openpyxl==3.1.5
-keyring==25.5.0
+keyring==25.6.0
 prettytable==3.11.0; python_version < '3.9' # last Python 3.8 release
 prettytable==3.12.0; python_version >= '3.9'
 lxml==5.3.0
 matplotlib==3.7.3; python_version < '3.9' # last Python 3.8 release
-matplotlib==3.9.4; python_version >= '3.9'
+matplotlib==3.10.0; python_version >= '3.9'
 jinja2==3.1.4
 aiohttp==3.10.11; python_version < '3.9' # last Python 3.8 release
-aiohttp==3.11.10; python_version >= '3.9'
+aiohttp==3.11.11; python_version >= '3.9'
 aiohttp_jinja2==1.6
 python-bidi==0.4.2; python_version < '3.9' # last Python 3.8 release
 python-bidi==0.6.3; python_version >= '3.9'
 arabic-reshaper==3.0.0
 pillow==10.4.0; python_version < '3.9' # last Python 3.8 release
-pillow>=11.0.0; python_version >= '3.9'
-pydantic==2.10.3; (platform_system=='Windows' and python_version>'3.10') or sys_platform=='darwin' or platform_system=='Linux'
+pillow>=11.1.0; python_version >= '3.9'
+pydantic==2.10.4; (platform_system=='Windows' and python_version>'3.10') or sys_platform=='darwin' or platform_system=='Linux'
 pydantic==2.7.1; (platform_system=='Windows' and python_version<'3.9')  # last version working with Windows 7/8 pending resolution of pydantic Issue #9920
 babel==2.16.0
 bleak==0.22.3
@@ -129,8 +130,9 @@ SecretStorage==3.3.3; platform_system=='Linux'
 ########
 ### Windows specific packages
 ###
-build==1.2.1; platform_system=='Windows'  # required to build pyinstaller bootloader
+build==1.2.2.post1; platform_system=='Windows'  # required to build pyinstaller bootloader
 pywin32==308; platform_system=='Windows'
-pyinstaller-versionfile==2.1.1; platform_system=='Windows'
+pyinstaller-versionfile==2.1.1; platform_system=='Windows' and python_version < '3.9'
+pyinstaller-versionfile==3.0.0; platform_system=='Windows' and python_version >= '3.9'
 libusb-package==1.0.26.1; platform_system=='Windows'
-tzdata==2024.1; platform_system=='Windows' and python_version >= '3.9' # to prevent pyinstaller WARNING: Hidden import "tzdata" not found!
+tzdata==2024.2; platform_system=='Windows' and python_version >= '3.9' # to prevent pyinstaller WARNING: Hidden import "tzdata" not found!

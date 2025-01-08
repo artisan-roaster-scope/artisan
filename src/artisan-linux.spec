@@ -38,6 +38,9 @@ EXCLUDES = [
 # the following are required by QtWebEngineWidgets and thus by QtWebEngine for the HTML2PDF export
 #    'PyQt6.QtQuick',
 #    'PyQt6.QtQml',
+#    'PyQt6.QtQmlMeta',
+#    'PyQt6.QtQmlModels',
+#    'PyQt6.QtQmlWorkerScript',
 #    'PyQt6.OpenGL',
 #    'PyQt6.QtWebChannel',
 #    'PyQt6.QtPositioning',

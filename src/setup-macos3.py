@@ -102,7 +102,7 @@ with open('Info.plist', 'r+b') as fp:
     try:
         plist['LSMinimumSystemVersion'] = os.environ['MACOSX_DEPLOYMENT_TARGET']
     except Exception: # pylint: disable=broad-except
-        plist['LSMinimumSystemVersion'] = '12.0'
+        plist['LSMinimumSystemVersion'] = '12.3'
     plist['LSMultipleInstancesProhibited'] = 'false'
     plist['LSArchitecturePriority'] = ['arm64', 'x86_64']
     plist['NSHumanReadableCopyright'] = LICENSE
@@ -243,6 +243,8 @@ Qt_modules = [
     'QtQuickWidgets',
     'QtQml',
     'QtQmlModels',
+    'QtQmlMeta',
+    'QtQmlWorkerScript',
     'QtWebChannel',
     'QtPositioning',
     'QtOpenGL'
