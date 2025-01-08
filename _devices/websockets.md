@@ -121,7 +121,7 @@ send(
 )
 ```{% endraw %}
 
-The placeholders `{BT}`, `{ET}`, `{time}` substituted in WebSocket Command actions by the current bean temperature (BT), environmental temperature (ET) or the time in seconds (float). Again, if such a placeholder is used in a WebSocket Command, all JSON elements have to be wrapped in an extra set of brackets as well as this placeholder substitution like in the following example.
+The placeholders `{BT}`, `{ET}`, `{BTB}`, `{ETB}`, `{WEIGHTin}` and`{t}` substituted in WebSocket Command actions by the current bean temperature (BT), environmental temperature (ET), the background profile bean temperature (BTB), the background profile environmental temperature (ETB), the batch size in g (WEIGHTin) and the time in seconds (float), respectively. Again, if such a placeholder is used in a WebSocket Command, all JSON elements have to be wrapped in an extra set of brackets as well as this placeholder substitution like in the following example.
 
 ```
 {% raw %}
