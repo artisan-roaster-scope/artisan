@@ -44,7 +44,7 @@ release_sponsor:
     title: "Algrano"
 
 ---
-![Github Latest Releases](https://img.shields.io/github/downloads/artisan-roaster-scope/artisan/latest/total?logo=github&label=downloads&color=6996C0&style=flat)    
+![Github Latest Releases](https://img.shields.io/github/downloads/artisan-roaster-scope/artisan/latest/total?logo=github&label=downloads&color=f5f5f5&labelColor=9C9C9C&style=flat)    
 
 [Artisan v3.1.0](https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.1.0)
 {: target="_blank" style="text-align: center; font-weight:bold;"}
