@@ -8226,7 +8226,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
                 cmd_str = str(cmd)
 
-                # we add {BT}, {ET}, {time} substitutions for Serial/CallProgram/MODBUS/S7/Artisan/WebSocket command actions
+                # we add {BT}, {ET}, {t}ime substitutions for Serial/CallProgram/MODBUS/S7/Artisan/WebSocket command actions
                 if action in {1, 2, 4, 7, 15, 20, 22}:
                     BT_subst = -1.
                     ET_subst = -1.
