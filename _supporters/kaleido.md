@@ -12,7 +12,7 @@ sidebar:
 ---
 <img class="tab-image" src="{{ site.baseurl }}/assets/images/supporter-badge.png" width="150px">
 
-* __Producer:__ [Wuhan Kaleido Technology Co.,Ltd](https://www.kaleidosniper.com/){:target="_blank"}, CN
+* __Producer:__ [Wuhan Kaleido Technology Co.,Ltd](https://kaleidostorm.com/){:target="_blank"}, CN
 * __Machines:__ New 2023 machine generation (Serial/Network) and legacy dual-system models (Legacy)
 * __Connection:__ Serial via USB or Bluetooth; requires the installation of a [serial driver](/modbus_serial/) and WiFi
 * __Features:__ reads beans temperature (BT), environmental temperature (ET), ambient air temperature (AT), set value (SV), and heater/fan/drum settings. The setting allows to control the fan and heater levels as well as the drum speed via sliders and buttons.

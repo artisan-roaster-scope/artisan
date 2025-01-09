@@ -27,7 +27,7 @@ gallery:
     image_path: /assets/images/bc-logo.jpg
     alt: "Buckeye Coffee"
     title: "Buckeye Coffee"
-  - url: https://www.kaleidosniper.com/
+  - url: https://kaleidostorm.com/
     image_path: /assets/images/kaleido-logo.jpg
     alt: "Kaleido"
     title: "Kalaido"
