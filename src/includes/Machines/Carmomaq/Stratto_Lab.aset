@@ -1,7 +1,10 @@
 [General]
-Delay=3000
-Oversampling=true
+Delay=2000
 roastertype_setup=Carmomaq Stratto Lab
+roastersize_setup_default=0.25
+roastersize_setup=0.25
+roasterheating_setup=3
+roasterheating_setup_default=3
 
 [DefaultButtons]
 buttonactions=3, 0, 0, 0, 0, 0, 3, 0

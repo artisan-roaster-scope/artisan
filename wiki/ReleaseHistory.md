@@ -7,6 +7,7 @@ v3.1.1
 
 * NEW HARDWARE SUPPORT
   - adds support for the [DCC1100 and DCC1120 Brushless DC Motor controllers and the DCC1020 DC Motor controller](https://artisan-scope.org/devices/phidgets/#45-dc-motor-control) ([Discussion #1750](../../../discussions/1750))
+  - adds support for [Carmomaq's Stratto Lab sample roaster](https://carmomaq.com.br/en/produtos/stratto-roaster-lab/)
   - updated Giesen support (now incl. sample roasters and PRO machines)
 
 * ADDITIONS
