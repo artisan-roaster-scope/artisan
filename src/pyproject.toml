@@ -301,7 +301,7 @@ output-format = "pylint" # one of: text, json, junit, grouped, github, gitlab, p
 line-length = 80
 
 # Never enforce `E501` (line length violations).
-lint.ignore = ["E501", "E741", "E402", "PLR0912", "PLR0913", "PLR0915", "SIM105", "PLR2044", "PLR2004", "PLW0603", "PLR0911", "COM812"]
+lint.ignore = ["E501", "E741", "E402", "PLR0912", "PLR0913", "PLR0915", "SIM105", "PLR2044", "PLR2004", "PLW0603", "PLR0911", "COM812", "A005"]
 
 # Exclude a variety of commonly ignored directories.
 exclude = ["dist", "build", "proto", ".pytype", ".mypy_cache", ".git", ".venv", ".venv_universal", ".venv_arm"]
