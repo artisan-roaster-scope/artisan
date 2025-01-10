@@ -25,7 +25,7 @@ Artisan provides a custom machine setup for each Giesen model as well as a [few 
 
 
 
-#### Generic Machine Setups
+#### Generic Machine Setups (recommended for machines made before 2/2018)
 
 There are also the following 3 generic setups for older firmware version:
 
