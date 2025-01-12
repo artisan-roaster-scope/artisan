@@ -1503,7 +1503,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'summarystatstypes','summarystatsvisibility','summarystatsfontsize', 'bbp_drop_bt', 'bbp_drop_et', 'bbp_total_time','bbp_bottom_temp','bbp_begin_to_bottom_time','bbp_bottom_to_charge_time',
         'bbp_begin_to_bottom_ror', 'bbp_bottom_to_charge_ror', 'bbp_time_added_from_prev', 'bbp_begin', 'bbp_endroast_epoch_msec', 'bbp_endevents',
         'bbp_dropevents', 'bbp_dropbt', 'bbp_dropet', 'bbp_drop_to_end', 'schedule_day_filter', 'schedule_user_filter', 'schedule_machine_filter',
-        'scheduler_tasks_visible', 'scheduler_completed_details_visible', 'scheduler_filters_visible', 'scheduler_auto_open']
+        'schedule_visible_filter', 'scheduler_tasks_visible', 'scheduler_completed_details_visible', 'scheduler_filters_visible', 'scheduler_auto_open']
 
 
     def __init__(self, parent:Optional[QWidget] = None, *, locale:str, WebEngineSupport:bool, artisanviewerFirstStart:bool) -> None:
@@ -1594,6 +1594,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.schedule_day_filter:bool = True
         self.schedule_user_filter:bool = True
         self.schedule_machine_filter:bool = True
+        self.schedule_visible_filter:bool = True
         self.scheduler_tasks_visible:bool = False # scheduler tasks pane visible?
         self.scheduler_completed_details_visible:bool = False # scheduler completed items details pane visible?
         self.scheduler_filters_visible:bool = False # scheduler filter pane visible?
@@ -4165,10 +4166,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
 
     # today is expected to be w.r.t. local timezone
-    def scheduledItemsfilter(self, today:datetime.date, item:plus.schedule.ScheduledItem) -> bool:
+    def scheduledItemsfilter(self, today:datetime.date, item:plus.schedule.ScheduledItem, hidden:bool = False) -> bool:
         # if user filter is active only items not for a specific user or for the current user (if available) are listed
         # if machine filter is active only items not for a specific machine or for the current machine setup are listed in case a current machine is set
-        return ((not self.schedule_day_filter or item.date == today) and
+        return ((not self.schedule_visible_filter or not hidden) and
+                (not self.schedule_day_filter or item.date == today) and
                 (not self.schedule_user_filter or not bool(plus.connection.getNickname()) or item.user is None or item.user == self.plus_user_id) and
                 (self.qmc.roastertype_setup.strip() == '' or not self.schedule_machine_filter or item.machine is None or
                     (self.qmc.roastertype_setup.strip() != '' and item.machine is not None and
@@ -17998,6 +18000,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.schedule_day_filter =toBool(settings.value('ScheduleDayFilter',self.schedule_day_filter))
             self.schedule_user_filter = toBool(settings.value('ScheduleUserFilter',self.schedule_user_filter))
             self.schedule_machine_filter = toBool(settings.value('ScheduleMachineFilter',self.schedule_machine_filter))
+            self.schedule_visible_filter =toBool(settings.value('ScheduleVisibleFilter',self.schedule_visible_filter))
             self.scheduled_items_uuids = list(toStringList(settings.value('scheduled_items',self.scheduled_items_uuids)))
             self.scheduleFlag = toBool(settings.value('Schedule',self.scheduleFlag))
             self.scheduler_tasks_visible = toBool(settings.value('SchedulerTasks',self.scheduler_tasks_visible))
@@ -19478,6 +19481,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'ScheduleDayFilter',self.schedule_day_filter, read_defaults)
             self.settingsSetValue(settings, default_settings, 'ScheduleUserFilter',self.schedule_user_filter, read_defaults)
             self.settingsSetValue(settings, default_settings, 'ScheduleMachineFilter',self.schedule_machine_filter, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ScheduleVisibleFilter',self.schedule_visible_filter, read_defaults)
             self.settingsSetValue(settings, default_settings, 'Schedule',self.scheduleFlag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'scheduled_items',self.scheduled_items_uuids, read_defaults)
             self.settingsSetValue(settings, default_settings, 'SchedulerTasks',self.scheduler_tasks_visible, read_defaults)

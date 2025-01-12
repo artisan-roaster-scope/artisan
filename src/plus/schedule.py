@@ -15,7 +15,7 @@
 # version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. Seef
 # the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -92,6 +92,12 @@ completed_roasts_semaphore = QSemaphore(
 )  # protects access to the completed_roasts_cache file and the completed_roasts dict
 
 completed_roasts_cache_path = getDirectory(plus.config.completed_roasts_cache)
+
+hidden_items_semaphore = QSemaphore(
+    1
+)  # protects access to the hidden_items_cache_path file and the hidden_items list cache
+
+hidden_items_cache_path = getDirectory(plus.config.hidden_items_cache)
 
 
 ## Configuration
@@ -179,6 +185,9 @@ completed_roasts_cache:List[CompletedItemDict] = []
 
 # dict associating ScheduledItem IDs to a list of prepared green weights interpreted in order. Weights beyond item.count will be ignored.
 prepared_items_cache:Dict[str, List[float]] = {}
+
+# list containing ScheduledItem IDs that are hidden
+hidden_items_cache:List[str] = []
 
 
 class ScheduledItem(BaseModel):
@@ -498,10 +507,10 @@ def save_prepared(plus_account_id:Optional[str]) -> None:
             if prepared_items_semaphore.available() < 1:
                 prepared_items_semaphore.release(1)
 
-# load completed roasts data from local file cache
+# load prepared schedule items information from local file cache
 def load_prepared(plus_account_id:Optional[str], scheduled_items:List[ScheduledItem]) -> None:
     global prepared_items_cache  # pylint: disable=global-statement
-    _log.debug('load_completed(%s)', plus_account_id)
+    _log.debug('load_prepared(%s)', plus_account_id)
     try:
         prepared_items_semaphore.acquire(1)
         prepared_items_cache = {}
@@ -634,6 +643,107 @@ def set_unprepared(plus_account_id:Optional[str], item:ScheduledItem) -> None:
     if modified:
         save_prepared(plus_account_id)
 
+
+###################
+# hidden schedule items cache
+#
+# NOTE: hidden scheduled items data file access is not protected by portalocker for parallel access via a second Artisan instance
+#   as the ArtisanViewer disables the scheduler, thus only one Artisan instance is handling this file
+#
+# NOTE: changes applied to the hidden schedule item cache via set_hidden() and set_visible()
+#   are automatically persisted by a call to save_hidden()
+
+
+# save hidden schedule items information to local file cache
+def save_hidden(plus_account_id:Optional[str]) -> None:
+    _log.debug('save_hidden(%s): %s', plus_account_id, len(hidden_items_cache))
+    if plus_account_id is not None:
+        try:
+            hidden_items_semaphore.acquire(1)
+            f:TextIO
+            with open(hidden_items_cache_path, 'w+', encoding='utf-8') as f:
+                try:
+                    hidden_items_cache_data = json.load(f)
+                except Exception:   # pylint: disable=broad-except
+                    hidden_items_cache_data = {}
+                hidden_items_cache_data[plus_account_id] = hidden_items_cache
+                json.dump(hidden_items_cache_data, f, indent=None, separators=(',', ':'), ensure_ascii=False)
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
+        finally:
+            if hidden_items_semaphore.available() < 1:
+                hidden_items_semaphore.release(1)
+
+# load hidden schedule items information from local file cache
+def load_hidden(plus_account_id:Optional[str], scheduled_items:List[ScheduledItem]) -> None:
+    global hidden_items_cache  # pylint: disable=global-statement
+    _log.debug('load_hidden(%s)', plus_account_id)
+    try:
+        hidden_items_semaphore.acquire(1)
+        hidden_items_cache = []
+        if plus_account_id is not None:
+            f:TextIO
+            with open(hidden_items_cache_path, encoding='utf-8') as f:
+                hidden_items_cache_data = json.load(f)
+                if plus_account_id in hidden_items_cache_data:
+                    hidden_items:List[str] = []
+                    for item_id in hidden_items_cache_data[plus_account_id]:
+                        # remove schedule items from hidden_items_cache that are not in the given list of schedule_items
+                        si = next((x for x in scheduled_items if x.id == item_id), None)
+                        if si is not None:
+                            hidden_items.append(item_id)
+                    hidden_items_cache = hidden_items
+    except FileNotFoundError:
+        _log.debug('no hidden items cache file found')
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
+    finally:
+        if hidden_items_semaphore.available() < 1:
+            hidden_items_semaphore.release(1)
+
+def is_hidden(item:ScheduledItem) -> bool:
+    try:
+        hidden_items_semaphore.acquire(1)
+        return item.id in hidden_items_cache
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
+    finally:
+        if hidden_items_semaphore.available() < 1:
+            hidden_items_semaphore.release(1)
+    return False
+
+# set all remaining batches as prepared
+def set_hidden(plus_account_id:Optional[str], item:ScheduledItem) -> None:
+    modified: bool = False
+    try:
+        hidden_items_semaphore.acquire(1)
+        if item.id not in hidden_items_cache:
+            hidden_items_cache.append(item.id)
+            modified = True
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
+    finally:
+        if hidden_items_semaphore.available() < 1:
+            hidden_items_semaphore.release(1)
+    if modified:
+        save_hidden(plus_account_id)
+
+
+# set all remaining batches as prepared
+def set_visible(plus_account_id:Optional[str], item:ScheduledItem) -> None:
+    modified: bool = False
+    try:
+        hidden_items_semaphore.acquire(1)
+        if item.id in hidden_items_cache:
+            hidden_items_cache.remove(item.id)
+            modified = True
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
+    finally:
+        if hidden_items_semaphore.available() < 1:
+            hidden_items_semaphore.release(1)
+    if modified:
+        save_hidden(plus_account_id)
 
 #--------
 
@@ -864,9 +974,9 @@ class StandardItem(QFrame): # pyright: ignore[reportGeneralTypeIssues] # Argumen
 
     def makeShadow(self) -> QGraphicsDropShadowEffect:
         shadow = QGraphicsDropShadowEffect(self)
-        shadow.setBlurRadius(15)
+        shadow.setBlurRadius(20) # (15)
         shadow.setColor(QColor(shadow_color))
-        shadow.setOffset(0,0.7)
+        shadow.setOffset(0,1.5) # (0,0.7)
         return shadow
 
 
@@ -1011,12 +1121,22 @@ class DragItem(StandardItem):
         self.menu:Optional[QMenu] = None
 
         super().__init__()
-        self.setGraphicsEffect(self.makeShadow())
+        if not self.is_hidden():
+            self.setGraphicsEffect(self.makeShadow())
 
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self.itemMenu)
 
         self.update_widget()
+
+    def is_hidden(self) -> bool:
+        return is_hidden(self.data)
+
+    def set_hidden(self) -> None:
+        set_hidden(self.aw.plus_account_id, self.data)
+
+    def visible_filter_on(self) -> bool:
+        return self.aw.schedule_visible_filter
 
     # need to be called if prepared information changes
     def update_widget(self) -> None:
@@ -1094,15 +1214,27 @@ class DragItem(StandardItem):
         self.third_label.setText(self.getRight())
 
 
+    @pyqtSlot()
     def allPrepared(self) -> None:
         set_prepared(self.aw.plus_account_id, self.data)
         self.update_widget()
         self.prepared.emit()
 
+    @pyqtSlot()
     def nonePrepared(self) -> None:
         set_unprepared(self.aw.plus_account_id, self.data)
         self.update_widget()
         self.prepared.emit()
+
+    @pyqtSlot()
+    def hideItem(self) -> None:
+        set_hidden(self.aw.plus_account_id, self.data)
+        self.aw.updateScheduleSignal.emit()
+
+    @pyqtSlot()
+    def showItem(self) -> None:
+        set_visible(self.aw.plus_account_id, self.data)
+        self.aw.updateScheduleSignal.emit()
 
     def addLoadedProfileToSelectedScheduleItem(self) -> None:
         string = QApplication.translate('Message','Register the currently loaded roast profile<br>in the selected entry.<br>This will overwrite some roast properties.')
@@ -1149,6 +1281,14 @@ class DragItem(StandardItem):
             addToItemAction:QAction = QAction(QApplication.translate('Contextual Menu', 'Register roast'),self)
             addToItemAction.triggered.connect(self.addLoadedProfileToSelectedScheduleItem)
             self.menu.addAction(addToItemAction)
+        if is_hidden(self.data):
+            showaction:QAction = QAction(QApplication.translate('Contextual Menu', 'Show'),self)
+            showaction.triggered.connect(self.showItem)
+            self.menu.addAction(showaction)
+        else:
+            hideAction:QAction = QAction(QApplication.translate('Contextual Menu', 'Hide'),self)
+            hideAction.triggered.connect(self.hideItem)
+            self.menu.addAction(hideAction)
         self.menu.popup(QCursor.pos())
 
 
@@ -1178,7 +1318,8 @@ class DragItem(StandardItem):
             pixmap.setDevicePixelRatio(2)
             self.render(pixmap)
             drag.setPixmap(pixmap)
-            self.setGraphicsEffect(self.makeShadow())
+            if not is_hidden(self.data):
+                self.setGraphicsEffect(self.makeShadow())
             drag.exec(Qt.DropAction.MoveAction)
 
 
@@ -1298,10 +1439,54 @@ class DragWidget(BaseWidget):
 
     def dragLeaveEvent(self, e:'Optional[QDragLeaveEvent]') -> None:
         if e is not None:
-            self._drag_target_indicator.hide()
+            try:
+                if self.drag_source is not None:
+                    widget:Optional[QObject] = self.drag_source
+                    if widget is not None and isinstance(widget, DragItem):
+                        # Use drop target location for destination, then remove it.
+                        self._drag_target_indicator.hide()
+                        if not widget.is_hidden():
+                            # we mark the underlying ScheduleItem as hidden
+                            widget.set_hidden()
+                        if not widget.visible_filter_on():
+                            # as hidden items are not filtered out we have to put that item back
+                            index = self.blayout.indexOf(self._drag_target_indicator)
+                            if index is not None:
+                                self.blayout.insertWidget(index, widget) # pyright:ignore[reportArgumentType]
+                                self.orderChanged.emit(self.get_item_data())
+                                widget.show() # pyright:ignore[reportAttributeAccessIssue]
+                                self.blayout.activate()
 
-            if self.drag_source is not None:
-                widget:Optional[QObject] = self.drag_source
+            except Exception:   # pylint: disable=broad-except
+                # wrapped C/C++ objects might have been deleted due to a complete redraw of the widget via updateScheduleWindow()
+                pass
+            e.accept()
+
+
+    def dragMoveEvent(self, e:'Optional[QDragMoveEvent]') -> None:
+        if e is not None:
+            try:
+                # Find the correct location of the drop target, so we can move it there.
+                index = self._find_drop_location(e)
+                if index is not None:
+                    # Inserting moves the item if its alreaady in the layout.
+                    self.blayout.insertWidget(index, self._drag_target_indicator)
+                    # Hide the item being dragged.
+                    source:Optional[QObject] = e.source()
+                    if source is not None and isinstance(source, QWidget):
+                        source.hide() # pyright:ignore[reportAttributeAccessIssue]
+                    # Show the target.
+                    self._drag_target_indicator.show()
+            except Exception:   # pylint: disable=broad-except
+                # wrapped C/C++ objects might have been deleted due to a complete redraw of the widget via updateScheduleWindow()
+                pass
+            e.accept()
+
+
+    def dropEvent(self, e:'Optional[QDropEvent]') -> None:
+        if e is not None and e.source() is not None:
+            try:
+                widget:Optional[QObject] = e.source()
                 if widget is not None and isinstance(widget, QWidget):
                     # Use drop target location for destination, then remove it.
                     self._drag_target_indicator.hide()
@@ -1311,38 +1496,9 @@ class DragWidget(BaseWidget):
                         self.orderChanged.emit(self.get_item_data())
                         widget.show() # pyright:ignore[reportAttributeAccessIssue]
                         self.blayout.activate()
-
-            e.accept()
-
-
-    def dragMoveEvent(self, e:'Optional[QDragMoveEvent]') -> None:
-        if e is not None:
-            # Find the correct location of the drop target, so we can move it there.
-            index = self._find_drop_location(e)
-            if index is not None:
-                # Inserting moves the item if its alreaady in the layout.
-                self.blayout.insertWidget(index, self._drag_target_indicator)
-                # Hide the item being dragged.
-                source:Optional[QObject] = e.source()
-                if source is not None and isinstance(source, QWidget):
-                    source.hide() # pyright:ignore[reportAttributeAccessIssue]
-                # Show the target.
-                self._drag_target_indicator.show()
-            e.accept()
-
-
-    def dropEvent(self, e:'Optional[QDropEvent]') -> None:
-        if e is not None and e.source() is not None:
-            widget:Optional[QObject] = e.source()
-            if widget is not None and isinstance(widget, QWidget):
-                # Use drop target location for destination, then remove it.
-                self._drag_target_indicator.hide()
-                index = self.blayout.indexOf(self._drag_target_indicator)
-                if index is not None:
-                    self.blayout.insertWidget(index, widget) # pyright:ignore[reportArgumentType]
-                    self.orderChanged.emit(self.get_item_data())
-                    widget.show() # pyright:ignore[reportAttributeAccessIssue]
-                    self.blayout.activate()
+            except Exception:   # pylint: disable=broad-except
+                # wrapped C/C++ objects might have been deleted due to a complete redraw of the widget via updateScheduleWindow()
+                pass
             e.accept()
 
 
@@ -1457,9 +1613,15 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         remaining_widget.setLayout(layout_remaining)
         remaining_widget.setContentsMargins(0, 0, 0, 0)
 
+
+        self.visible_filter = QCheckBox(QApplication.translate('Plus','Visible'))
+        self.visible_filter.setChecked(self.aw.schedule_visible_filter)
+        self.visible_filter.setToolTip(QApplication.translate('Plus','List only visible items'))
+        self.visible_filter.stateChanged.connect(self.remainingFilterChanged)
         self.day_filter = QCheckBox(QApplication.translate('Plus','Today'))
         self.day_filter.setChecked(self.aw.schedule_day_filter)
         self.day_filter.stateChanged.connect(self.remainingFilterChanged)
+        self.day_filter.setToolTip(QApplication.translate('Plus','List only items scheduled for today'))
         self.user_filter = QCheckBox()
         self.user_filter.setChecked(self.aw.schedule_user_filter)
         self.user_filter.stateChanged.connect(self.remainingFilterChanged)
@@ -1468,6 +1630,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.machine_filter.stateChanged.connect(self.remainingFilterChanged)
 
         remaining_filter_layout = QVBoxLayout()
+        remaining_filter_layout.addWidget(self.visible_filter)
         remaining_filter_layout.addWidget(self.day_filter)
         remaining_filter_layout.addWidget(self.user_filter)
         remaining_filter_layout.addWidget(self.machine_filter)
@@ -2027,6 +2190,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
     @pyqtSlot(int)
     def remainingFilterChanged(self, _:int = 0) -> None:
+        self.aw.schedule_visible_filter = self.visible_filter.isChecked()
         self.aw.schedule_day_filter = self.day_filter.isChecked()
         self.aw.schedule_user_filter = self.user_filter.isChecked()
         self.aw.schedule_machine_filter = self.machine_filter.isChecked()
@@ -2425,7 +2589,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
     def next_not_prepared_item(self) -> Optional[GreenWeightItem]:
         today:datetime.date = datetime.datetime.now(datetime.timezone.utc).astimezone().date()
-        for item in filter(lambda x: self.aw.scheduledItemsfilter(today, x), self.scheduled_items):
+        for item in filter(lambda x: self.aw.scheduledItemsfilter(today, x, is_hidden(x)), self.scheduled_items):
             prepared:int = len(get_prepared(item))
             roasted:int = len(item.roasts)
             remaining = item.count - roasted
@@ -2464,7 +2628,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         drag_items_first_label_max_width = 0
         drag_first_labels = []
         selected_item:Optional[DragItem] = None
-        for item in filter(lambda x: self.aw.scheduledItemsfilter(today, x), self.scheduled_items):
+        for item in filter(lambda x: self.aw.scheduledItemsfilter(today, x, is_hidden(x)), self.scheduled_items):
             drag_item = DragItem(item,
                 self.aw,
                 today,
@@ -2558,7 +2722,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                 except Exception:  # pylint: disable=broad-except
                     pass # validation fails for outdated items
             today:datetime.date = datetime.datetime.now(datetime.timezone.utc).astimezone().date()
-            return sum(max(0, x.count - len(x.roasts)) for x in scheduled_items if aw.scheduledItemsfilter(today, x))
+            return sum(max(0, x.count - len(x.roasts)) for x in scheduled_items if aw.scheduledItemsfilter(today, x, is_hidden(x)))
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
             return 0
@@ -2568,6 +2732,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         nickname:Optional[str] = plus.connection.getNickname()
         if nickname is not None and nickname != '':
             self.user_filter.setText(nickname)
+            self.user_filter.setToolTip(QApplication.translate('Plus','List only items scheduled for the current user {}').format(nickname))
             self.user_filter.show()
         else:
             self.user_filter.hide()
@@ -2575,6 +2740,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         if machine_name != '':
             self.machine_filter.setText(machine_name)
             self.machine_filter.show()
+            self.user_filter.setToolTip(QApplication.translate('Plus','List only items scheduled for the current machine {}').format(machine_name))
         else:
             self.machine_filter.hide()
 
@@ -3188,6 +3354,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             # update scheduled and completed items
             self.updateScheduledItems()                                 # updates the current schedule items from received stock data
             load_prepared(self.aw.plus_account_id, self.scheduled_items)# load the prepared items cache and update according to the valid schedule items
+            load_hidden(self.aw.plus_account_id, self.scheduled_items)  # load the hidden items cache and update according to the valid schedule items
             self.completed_items = self.getCompletedItems()             # updates completed items from cache
             self.updateFilters()                                        # update filter widget (user and machine)
 

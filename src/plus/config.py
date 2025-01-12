@@ -101,6 +101,9 @@ completed_roasts_cache: Final[str] = 'completed'
 # the prepared items cache reflects the prepared scheduled items
 prepared_items_cache: Final[str] = 'prepared'
 
+# the hidden items cache reflects the hidden scheduled items
+hidden_items_cache: Final[str] = 'hidden'
+
 # the uuid register that associates UUIDs with local filepaths where to
 # locate the corresponding Artisan profiles
 uuid_cache: Final[str] = 'uuids'
