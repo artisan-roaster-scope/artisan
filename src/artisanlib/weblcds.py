@@ -27,7 +27,7 @@ from threading import Thread
 from typing import Final, Optional, Dict, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from aiohttp.web import Request #, Response  # pylint: disable=unused-import
+    from aiohttp.web import Request  # pylint: disable=unused-import
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 

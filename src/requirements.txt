@@ -40,7 +40,7 @@ qrcode==8.0; python_version >= '3.9'
 requests==2.32.3
 requests-file==2.1.0
 pyusb==1.2.1;  python_version < '3.9' # last Python 3.8 release
-pyusb==1.3.0;  python_version >= '3.9'
+pyusb==1.3.1;  python_version >= '3.9'
 persist-queue==1.0.0
 portalocker==2.10.1;  python_version < '3.9' # last Python 3.8 release
 portalocker==3.1.1; python_version >= '3.9'
@@ -54,7 +54,7 @@ protobuf==5.29.3
 numpy==1.24.3; python_version < '3.9' # last Python 3.8 release
 numpy==2.2.1; python_version >= '3.9'
 scipy==1.10.1; python_version < '3.9' # last Python 3.8 release
-scipy==1.15.0; python_version >= '3.9'
+scipy==1.15.1; python_version >= '3.9'
 wquantiles==0.6
 colorspacious==1.1.2
 openpyxl==3.1.5
