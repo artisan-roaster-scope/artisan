@@ -223,3 +223,7 @@ If you need support please check the [documentation](#documentation) or ask the 
 <a name="FAQ-Viewing-5	"></a>
 **5) Can I change which curve is drawn on top?** 
 : The drawing order of curves is fixed and follows the order of the LCDs. However, the order of the ET/BT LCDs can be swapped in the Device Assignment dialog (menu `Config` >> `Device`) and the order of the RoR LCDs can be swapped in the Curves dialog (menu `Config` >> `Curves`, first tab). Besides this you can hide curves temporarily by a click to their legend entry (activate the legend in the Axis dialog accessible via menu `Config` >> `Axis`) to see what is behind.
+
+<a name="FAQ-Viewing-6	"></a>
+**6) Some of my lines disappeared from the graph, but everything else works, and the LCDs show the temperatures.** 
+: Clicking the temperature LCDs on the right toggles the visibility of the corresponding temperature curves. By clicking the corresponding LCDs, the missing temperature curves will be restored.
