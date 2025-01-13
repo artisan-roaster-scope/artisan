@@ -220,10 +220,10 @@ If you need support please check the [documentation](#documentation) or ask the 
 **4) What are those `CM` readings shown in the time axis label about?**  
 : [This is a pair of values indicating how good your profiles ET and BT curves match the ones of the background template.](https://artisan-roasterscope.blogspot.com/2019/05/how-close.html){:target="_blank"} Better matches get lower `CM` values. The measure is named by the initials of the roasting operation, [Casino Mocca](https://casinomocca.com/){:target="_blank"}, that first suggested it.
 
-<a name="FAQ-Viewing-5	"></a>
+<a name="FAQ-Viewing-5"></a>
 **5) Can I change which curve is drawn on top?** 
 : The drawing order of curves is fixed and follows the order of the LCDs. However, the order of the ET/BT LCDs can be swapped in the Device Assignment dialog (menu `Config` >> `Device`) and the order of the RoR LCDs can be swapped in the Curves dialog (menu `Config` >> `Curves`, first tab). Besides this you can hide curves temporarily by a click to their legend entry (activate the legend in the Axis dialog accessible via menu `Config` >> `Axis`) to see what is behind.
 
-<a name="FAQ-Viewing-6	"></a>
+<a name="FAQ-Viewing-6"></a>
 **6) Some of my lines disappeared from the graph, but everything else works, and the LCDs show the temperatures.** 
 : Clicking the temperature LCDs on the right toggles the visibility of the corresponding temperature curves. By clicking the corresponding LCDs, the missing temperature curves will be restored.
