@@ -50,6 +50,8 @@ machines:
         url: /machines/carmomaq/
       - title: "Coffed"
         url: /machines/coffed/
+      - title: "Coffee Crafters"
+        url: /machines/coffeecrafters/
       - title: "Coffee Machines Sale"
         url: /machines/cms/
       - title: "Coffee Tech"
