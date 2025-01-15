@@ -138,6 +138,8 @@ type=3
 wordorderLittle=true
 optimizer=true
 fetch_max_blocks=true
+IP_retries=1
+IP_timeout=0.3
 
 [Quantifiers]
 clusterEventsFlag=false
