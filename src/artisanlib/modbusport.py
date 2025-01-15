@@ -250,7 +250,7 @@ class modbusport:
     def connect(self) -> None:
         if self._asyncLoopThread is None:
             self._asyncLoopThread = AsyncLoopThread()
-            asyncio.run_coroutine_threadsafe(self.connect_async(), self._asyncLoopThread.loop).result()
+        asyncio.run_coroutine_threadsafe(self.connect_async(), self._asyncLoopThread.loop).result()
 
 
     async def connect_async(self) -> None:

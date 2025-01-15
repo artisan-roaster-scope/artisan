@@ -1565,11 +1565,14 @@ class CurvesDlg(ArtisanDialog):
 
     def getWebLCDsURL(self) -> str:
         import socket
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(('8.8.8.8', 80))
-        localIP = s.getsockname()[0]
-        s.close()
-        return f'http://{str(localIP)}:{str(self.aw.WebLCDsPort)}/artisan'
+        # use Artisan's host IP address
+#        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#        s.connect(('8.8.8.8', 80))
+#        localIP = s.getsockname()[0]
+#        s.close()
+#        return f'http://{str(localIP)}:{str(self.aw.WebLCDsPort)}/artisan'
+        # use Artisan's host name (more stable over DHCP updates)
+        return f'http://{socket.gethostname().casefold()}:{str(self.aw.WebLCDsPort)}/artisan'
 
     @pyqtSlot(bool)
     def toggleWebLCDs(self, b:bool = False) -> None:

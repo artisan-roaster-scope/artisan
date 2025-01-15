@@ -74,9 +74,10 @@ except Exception: # pylint: disable=broad-except
 import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
+import zlib
 import logging.config
 from yaml import safe_load as yaml_load
-from typing import Final, Optional, List, Dict, Tuple, Union, cast, Any, Callable, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
+from typing import Final, Optional, Mapping, List, Dict, Tuple, Union, cast, Any, Callable, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
 
 from functools import reduce as freduce
 
@@ -653,6 +654,7 @@ if not appFrozen() and __revision__ in {'', '0'}:
         pass
 
 # configure logging
+
 try:
     with open(os.path.join(getResourcePath(),'logging.yaml'), encoding='utf-8') as logging_conf:
         conf = yaml_load(logging_conf)
@@ -669,6 +671,29 @@ try:
         logging.config.dictConfig(conf)
 except Exception: # pylint: disable=broad-except
     pass
+class FilteredLogger(logging.Logger):
+
+    def __init__(self, name:str, level:Any=logging.NOTSET) -> None:
+        super().__init__(name, level)
+        self._message_lockup: Dict[int,int] = {}
+
+    def _log(self, level:int, msg:Any, args:Any, exc_info:Any=None, extra:Optional[Mapping[str, object]]=None,
+            stack_info:bool=False, stacklevel: int = 1) -> None:
+# don't change signature for typing, but fix to log_interval=10
+#            log_interval:Optional[int]=None) -> None:
+#        if log_interval is None or log_interval == 1:
+#            super()._log(level, msg, args, exc_info, extra, stack_info, stacklevel)
+#        else:
+        log_interval = 10
+        message_Id = zlib.crc32(msg.encode('utf-8'))
+        if message_Id not in self._message_lockup:
+            self._message_lockup[message_Id] = 0
+            super()._log(level, msg, args, exc_info, extra, stack_info, stacklevel)
+        elif self._message_lockup[message_Id] % log_interval == 0:
+            msg += f' -- Suppressed {log_interval} equal messages'
+            super()._log(level, msg, args, exc_info, extra, stack_info, stacklevel)
+        self._message_lockup[message_Id] += 1
+logging.setLoggerClass(FilteredLogger)
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -4187,7 +4212,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     def setSamplingRate(self, rate:int) -> None:
         self.qmc.delay = max(self.qmc.min_delay, rate)
         self.sampling_ticks_to_block_quantifiction = self.blockTicks() # we update the quantification block ticks
-        _log.info('setSamplingRate(%s)', self.qmc.delay)
 
     @pyqtSlot()
     def updateMessageLog(self) -> None:

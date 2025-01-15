@@ -3290,29 +3290,29 @@ class tgraphcanvas(FigureCanvas):
                 pass
 
     def updateWebLCDs(self, bt:Optional[str] = None, et:Optional[str] = None, time:Optional[str] = None, alertTitle:Optional[str] = None, alertText:Optional[str] = None, alertTimeout:Optional[int] = None) -> None:
-        try:
-            payload:Dict[str,Dict[str,Union[str,int]]] = {'data': {}}
-            if not (bt is None and et is None) and self.flagon and not self.flagstart:
-                # in monitoring only mode, timer might be set by PID RS
-                time = None
-            if bt is not None:
-                payload['data']['bt'] = bt
-            if et is not None:
-                payload['data']['et'] = et
-            if time is not None:
-                payload['data']['time'] = time
-            if alertText is not None:
-                payload['alert'] = {}
-                payload['alert']['text'] = alertText
-                if alertTitle:
-                    payload['alert']['title'] = alertTitle
-                if alertTimeout:
-                    payload['alert']['timeout'] = alertTimeout
-            if self.aw.weblcds_server is not None:
+        if self.aw.weblcds_server is not None:
+            try:
+                payload:Dict[str,Dict[str,Union[str,int]]] = {'data': {}}
+                if not (bt is None and et is None) and self.flagon and not self.flagstart:
+                    # in monitoring only mode, timer might be set by PID RS
+                    time = None
+                if bt is not None:
+                    payload['data']['bt'] = bt
+                if et is not None:
+                    payload['data']['et'] = et
+                if time is not None:
+                    payload['data']['time'] = time
+                if alertText is not None:
+                    payload['alert'] = {}
+                    payload['alert']['text'] = alertText
+                    if alertTitle:
+                        payload['alert']['title'] = alertTitle
+                    if alertTimeout:
+                        payload['alert']['timeout'] = alertTimeout
                 from json import dumps as json_dumps
                 self.aw.weblcds_server.send_msg(json_dumps(payload, indent=None, separators=(',', ':')))
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
 
     # note that partial values might be given here (time might update, but not the values)
     @pyqtSlot(str,str,str)

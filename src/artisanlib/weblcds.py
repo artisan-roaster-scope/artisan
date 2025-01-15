@@ -31,14 +31,11 @@ if TYPE_CHECKING:
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
-class WebLCDs:
+class WebView:
 
-    __slots__ = [ '_loop', '_thread', '_app', '_port', '_last_send', '_min_send_interval', '_resource_path', '_nonesymbol', '_timecolor',
-                    '_timebackground', '_btcolor', '_btbackground', '_etcolor', '_etbackground',
-                    '_showetflag', '_showbtflag' ]
+    __slots__ = [ '_loop', '_thread', '_app', '_port', '_last_send', '_min_send_interval', '_resource_path', '_index_path', '_websocket_path'  ]
 
-    def __init__(self, port:int, resource_path:str, nonesymbol:str, timecolor:str, timebackground:str, btcolor:str,
-            btbackground:str, etcolor:str, etbackground:str, showetflag:bool, showbtflag:bool) -> None:
+    def __init__(self, port:int, resource_path:str, index_path:str, websocket_path:str) -> None:
 
         self._loop:        Optional[asyncio.AbstractEventLoop] = None # the asyncio loop
         self._thread:      Optional[Thread]                    = None # the thread running the asyncio loop
@@ -49,45 +46,25 @@ class WebLCDs:
         self._last_send:float = time.time() # timestamp of the last message send to the clients
         self._min_send_interval:float = 0.03
 
+        self._port: int = port
+        self._resource_path:str = resource_path
+        self._index_path:str = index_path
+        self._websocket_path:str = websocket_path
+
         aiohttp_jinja2.setup(self._app,
             loader=jinja2.FileSystemLoader(resource_path))
 
         self._app.add_routes([
-            web.get('/artisan', self.index),
-            web.get('/websocket', self.websocket_handler),
+            web.get(f'/{self._index_path}', self.index),
+            web.get(f'/{self._websocket_path}', self.websocket_handler),
             web.static('/', resource_path, append_version=True)
         ])
 
-        self._port: int = port
-        self._resource_path:str = resource_path
-        self._nonesymbol:str = nonesymbol
-        self._timecolor:str = timecolor
-        self._timebackground:str = timebackground
-        self._btcolor:str = btcolor
-        self._btbackground:str = btbackground
-        self._etcolor:str = etcolor
-        self._etbackground:str = etbackground
-        self._showetflag:bool = showetflag
-        self._showbtflag:bool = showbtflag
 
-    @aiohttp_jinja2.template('artisan.tpl')
-    async def index(self, _request: 'Request') -> Dict[str,str]:
-        showspace_str = 'inline' if not (self._showbtflag and self._showetflag) else 'none'
-        showbt_str = 'inline' if self._showbtflag else 'none'
-        showet_str = 'inline' if self._showetflag else 'none'
-        return {
-            'port': str(self._port),
-            'nonesymbol': self._nonesymbol,
-            'timecolor': self._timecolor,
-            'timebackground': self._timebackground,
-            'btcolor': self._btcolor,
-            'btbackground': self._btbackground,
-            'etcolor': self._etcolor,
-            'etbackground': self._etbackground,
-            'showbt': showbt_str,
-            'showet': showet_str,
-            'showspace': showspace_str
-        }
+# needs to be defined in subclass
+    @aiohttp_jinja2.template('empty.tpl')
+    async def index(self, _request: 'Request') -> Dict[str,str]: # pylint:disable=no-self-use
+        return {}
 
     async def send_msg_to_all(self, message:str) -> None:
         if 'websockets' in self._app and self._app['websockets'] is not None:
@@ -160,7 +137,6 @@ class WebLCDs:
             loop.close()
 
     def startWeb(self) -> bool:
-        _log.info('start WebLCDs on port %s', self._port)
         try:
             self._loop = asyncio.new_event_loop()
             self._thread = Thread(target=self.start_background_loop, args=(self._loop,), daemon=True)
@@ -173,7 +149,6 @@ class WebLCDs:
             return False
 
     def stopWeb(self) -> None:
-        _log.info('stop WebLCDs')
         # _loop.stop() needs to be called as follows as the event loop class is not thread safe
         if self._loop is not None:
             self._loop.call_soon_threadsafe(self._loop.stop)
@@ -182,3 +157,50 @@ class WebLCDs:
         if self._thread is not None:
             self._thread.join()
             self._thread = None
+
+
+class WebLCDs(WebView):
+
+    __slots__ = [ '_nonesymbol', '_timecolor', '_timebackground', '_btcolor', '_btbackground', '_etcolor', '_etbackground',
+                    '_showetflag', '_showbtflag' ]
+
+    def __init__(self, port:int, resource_path:str, nonesymbol:str, timecolor:str, timebackground:str, btcolor:str,
+            btbackground:str, etcolor:str, etbackground:str, showetflag:bool, showbtflag:bool) -> None:
+        super().__init__(port, resource_path, 'artisan', 'websocket')
+
+        self._nonesymbol:str = nonesymbol
+        self._timecolor:str = timecolor
+        self._timebackground:str = timebackground
+        self._btcolor:str = btcolor
+        self._btbackground:str = btbackground
+        self._etcolor:str = etcolor
+        self._etbackground:str = etbackground
+        self._showetflag:bool = showetflag
+        self._showbtflag:bool = showbtflag
+
+    @aiohttp_jinja2.template('artisan.tpl')
+    async def index(self, _request: 'Request') -> Dict[str,str]:
+        showspace_str = 'inline' if not (self._showbtflag and self._showetflag) else 'none'
+        showbt_str = 'inline' if self._showbtflag else 'none'
+        showet_str = 'inline' if self._showetflag else 'none'
+        return {
+            'port': str(self._port),
+            'nonesymbol': self._nonesymbol,
+            'timecolor': self._timecolor,
+            'timebackground': self._timebackground,
+            'btcolor': self._btcolor,
+            'btbackground': self._btbackground,
+            'etcolor': self._etcolor,
+            'etbackground': self._etbackground,
+            'showbt': showbt_str,
+            'showet': showet_str,
+            'showspace': showspace_str
+        }
+
+    def startWeb(self) -> bool:
+        _log.info('start WebLCDs on port %s', self._port)
+        return super().startWeb()
+
+    def stopWeb(self) -> None:
+        _log.info('stop WebLCDs')
+        super().stopWeb()
