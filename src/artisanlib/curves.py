@@ -1565,14 +1565,20 @@ class CurvesDlg(ArtisanDialog):
 
     def getWebLCDsURL(self) -> str:
         import socket
-        # use Artisan's host IP address
+#        # use Artisan's host IP address
 #        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 #        s.connect(('8.8.8.8', 80))
 #        localIP = s.getsockname()[0]
 #        s.close()
 #        return f'http://{str(localIP)}:{str(self.aw.WebLCDsPort)}/artisan'
-        # use Artisan's host name (more stable over DHCP updates)
-        return f'http://{socket.gethostname().casefold()}:{str(self.aw.WebLCDsPort)}/artisan'
+        # use Artisan's host name (more stable over DHCP/zeroconf updates), but cannot be accessed on Windows from iPhone
+        if sys.platform.startswith('darwin'):
+            import subprocess
+            host = subprocess.check_output(['scutil', '--get', 'LocalHostName']).decode('utf-8')
+        else:
+            # on Linux/Windows the mdns name is created by appending ".local" to the hostname
+            host = socket.gethostname()
+        return f'http://{host.strip().replace(' ', '_').casefold()}.local:{str(self.aw.WebLCDsPort)}/artisan'
 
     @pyqtSlot(bool)
     def toggleWebLCDs(self, b:bool = False) -> None:
