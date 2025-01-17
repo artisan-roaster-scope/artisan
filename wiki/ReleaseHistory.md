@@ -23,6 +23,9 @@ v3.1.1
   - ensure complete reset to defaults in energy tab loads tab
   - makes loading of (broken) profiles with inconsistent data length more robust
   - prevents exceptions caused by empty event type names ([Discussion #1745](../../../discussions/1745))
+  - fixes processing of MODBUS function 2 request which broke the just introduced autoCHARGE/autoDROP triggered by Loring machines
+  - fixes a typo which allowed to open multiple Roast Properties dialogs ([Issue #1781](../../../issues/1781))
+
 
 
 ----

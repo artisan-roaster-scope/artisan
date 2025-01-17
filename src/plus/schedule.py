@@ -1282,7 +1282,7 @@ class DragItem(StandardItem):
             addToItemAction.triggered.connect(self.addLoadedProfileToSelectedScheduleItem)
             self.menu.addAction(addToItemAction)
         if is_hidden(self.data):
-            showaction:QAction = QAction(QApplication.translate('Contextual Menu', 'Show'),self)
+            showaction:QAction = QAction(QApplication.translate('CheckBox', 'Show'),self)
             showaction.triggered.connect(self.showItem)
             self.menu.addAction(showaction)
         else:
@@ -2723,8 +2723,8 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     pass # validation fails for outdated items
             today:datetime.date = datetime.datetime.now(datetime.timezone.utc).astimezone().date()
             return sum(max(0, x.count - len(x.roasts)) for x in scheduled_items if aw.scheduledItemsfilter(today, x, is_hidden(x)))
-        except Exception as e:  # pylint: disable=broad-except
-            _log.exception(e)
+        except Exception:  # pylint: disable=broad-except
+#            _log.exception(e) # this can raise an exception on macOS if Artisan is started using sudo as the logging framework might not fully initialized
             return 0
 
     @pyqtSlot()

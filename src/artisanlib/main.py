@@ -4182,7 +4182,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         QTimer.singleShot(2000,self.donate)
 
         QTimer.singleShot(0, self.logStartupTime)
-        QTimer.singleShot(200, self.updateBadge)
+        QTimer.singleShot(500, self.updateBadge)
 
         self.zoomInShortcut = QShortcut(QKeySequence.StandardKey.ZoomIn, self)
         self.zoomInShortcut.activated.connect(self.zoomIn)
@@ -23908,7 +23908,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     @pyqtSlot()
     @pyqtSlot(bool)
     def editgraph(self, _:bool = False) -> None:
-        if self.editgraphdialog is not False: # Roast Properties dialog is not blocked!
+        if self.editgraphdialog is not False and self.editgraphdialog is None: # Roast Properties dialog is not blocked!
             from artisanlib.roast_properties import editGraphDlg
             self.editgraphdialog = editGraphDlg(self,self,self.editGraphDlg_activeTab)
             self.editgraphdialog.show()
