@@ -1022,7 +1022,7 @@ def blend2beans(blend:BlendStructure, weight_unit_idx:int, weightIn:float=0) -> 
             c = getBlendCoffeeLabelDict(blend)[i['coffee']]
             w = ''
             if weightIn:
-                w = f"{render_weight(i['ratio'] * weightIn,weight_unit_idx,weight_unit_idx)} " # @UndefinedVariable
+                w = f"{render_weight(i['ratio'] * weightIn,weight_unit_idx,weight_unit_idx,smart_unit_upgrade=False)} " # @UndefinedVariable
             ratio = f"{int(round(i['ratio'] * 100))}% "
             res.append(f'{ratio}{w}{c}')
     except Exception as e:  # pylint: disable=broad-except

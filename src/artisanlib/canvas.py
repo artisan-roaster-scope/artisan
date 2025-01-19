@@ -10670,12 +10670,10 @@ class tgraphcanvas(FigureCanvas):
                     stattype_str += f"{newline}{QApplication.translate('Label', 'Moisture')} {QApplication.translate('Label', 'Green')}: {dropZeroDecimal(self.moisture_greens,1)}%"
             elif n == 10:  #Batch Size
                 if self.weight[0] != 0:
-                    if self.weight[2] == 'g':
-                        w = f'{float2float(self.weight[0],0)}'
-                    else:
-                        w = f'{dropZeroDecimal(self.weight[0],2)}'
+                    weight_unit_index = weight_units.index(self.weight[2])
                     stattype_str += (f"{newline}{QApplication.translate('AddlInfo', 'Batch Size')}: "
-                        f'{w}{self.weight[2]} ')
+                        f'{render_weight(self.weight[0],weight_unit_index,weight_unit_index)} ')
+
                     if self.weight[1]:
                         stattype_str += f'(-{dropZeroDecimal(self.aw.weight_loss(self.weight[0],self.weight[1]),1)}%)'
             elif n == 11:  #Density Roasted
@@ -10719,12 +10717,9 @@ class tgraphcanvas(FigureCanvas):
                     stattype_str = wrapNotes(self.cuppingnotes)
             elif n == 20:  #Weight Green
                 if self.weight[0] != 0:
-                    if self.weight[2] == 'g':
-                        w = f'{float2float(self.weight[0],0)}'
-                    else:
-                        w = f'{dropZeroDecimal(self.weight[0],2)}'
+                    weight_unit_index = weight_units.index(self.weight[2])
                     stattype_str += (f"{newline}{QApplication.translate('Label', 'Weight')} {QApplication.translate('Label', 'Green')}: "
-                        f'{w}{self.weight[2]} ')
+                        f'{render_weight(self.weight[0],weight_unit_index,weight_unit_index)}')
             elif n == 21:  #Weight Roasted
                 if self.weight[1] != 0:
                     if self.weight[2] == 'g':

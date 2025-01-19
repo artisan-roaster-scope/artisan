@@ -81,7 +81,7 @@ def getTemplate(bp: 'ProfileData', background:bool=False) -> Dict[str, Any]:  #f
                     ),
                 )
                 if w is not None:
-                    d['start_weight'] = util.float2floatMin(w, 3)  # in kg
+                    d['start_weight'] = util.float2floatMin(w, 4)  # in kg (send one decimal more than presented to prevent rounding effects)
                 else:
                     d['start_weight'] = 0
             except Exception as e:  # pylint: disable=broad-except
@@ -101,7 +101,7 @@ def getTemplate(bp: 'ProfileData', background:bool=False) -> Dict[str, Any]:  #f
                     ),
                 )
                 if w is not None:
-                    d['end_weight'] = util.float2floatMin(w, 3)  # in kg
+                    d['end_weight'] = util.float2floatMin(w, 4)  # in kg (send one decimal more than presented to prevent rounding effects)
                 else:
                     d['end_weight'] = 0
             except Exception as e:  # pylint: disable=broad-except

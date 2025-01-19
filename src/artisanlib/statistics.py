@@ -391,12 +391,6 @@ class StatisticsDlg(ArtisanResizeablDialog):
         # some tabs are not rendered at all on Windows using Qt v6.5.1 (https://bugreports.qt.io/projects/QTBUG/issues/QTBUG-114204?filter=allissues)
         QTimer.singleShot(50, self.setActiveTab)
 
-# removed when making the dialog resizeable
-#        settings = QSettings()
-#        if settings.contains('StatisticsPosition'):
-#            self.move(settings.value('StatisticsPosition'))
-
-#        mainLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
 
     @pyqtSlot(int)
     def AUCLCDflagChanged(self, _:int) -> None:
@@ -567,21 +561,11 @@ class StatisticsDlg(ArtisanResizeablDialog):
 
         columns = 1  # With one column we don't need lists, but the plumbing is here if more columns are needed in the future
 
-#        if self.summarystatstable is not None and self.summarystatstable.columnCount() == columns:
-#            # rows have been already established
-#            # save the current columnWidth to reset them after table creation
-#            self.aw.summarystatstablecolumnwidths = [self.summarystatstable.columnWidth(self.summarystatstable.width())]
-
         # deleting all rows is not allowed, create a first row if that happens
         if len(self.summarystatstypes) < 1:
             self.summarystatstypes.append(1)        #Title
 
         nstats = len(self.summarystatstypes)
-
-        # self.summarystatstable.clear() # this crashes Ubuntu 16.04
-#        if ndata != 0:
-#            self.summarystatstable.clearContents() # this crashes Ubuntu 16.04 if device table is empty and also sometimes else
-#        self.summarystatstable.clearSelection() # this seems to work also for Ubuntu 16.04
 
         self.summarystatstable.setRowCount(nstats)
         self.summarystatstable.setColumnCount(columns)
@@ -597,8 +581,6 @@ class StatisticsDlg(ArtisanResizeablDialog):
 
         vheader = self.summarystatstable.verticalHeader()
         if vheader is not None:
-            # Turn off row header
-#            vheader.setVisible(False)
             vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
 
         #Enable Drag Sorting
@@ -625,13 +607,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
             else:
                 typeComboBox.setCurrentIndex(self.summarystats_types_sorted.index(self.summarystats_types[self.summarystatstypes[i]]))
             typeComboBox.currentIndexChanged.connect(self.setitemsummarystat)
-#            QWidget.setTabOrder(typeComboBox, vheader)
             #add widgets to the table
-#            rowlabel = QTableWidgetItem(str(i+1))
-#            rowlabel.setFlags(rowlabel.flags() ^ Qt.ItemFlag.ItemIsEditable) # disallow editing of row labels
-#            rowlabel.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-#            self.summarystatstable.setItem(i,0,rowlabel)
-#            self.summarystatstable.setCellWidget(i,1,typeComboBox)
             self.summarystatstable.setCellWidget(i,0,typeComboBox)
 
 
@@ -640,13 +616,6 @@ class StatisticsDlg(ArtisanResizeablDialog):
             hheader.setStretchLastSection(False)
             self.summarystatstable.resizeColumnsToContents()
             hheader.setStretchLastSection(True)
-
-#        # remember the columnwidth
-#        for i, _ in enumerate(self.aw.summarystatstablecolumnwidths):
-#            try:
-#                self.summarystatstable.setColumnWidth(i,self.aw.summarystatstablecolumnwidths[i])
-#            except Exception: # pylint: disable=broad-except
-#                pass
 
         self.savetablesummarystats()
 
@@ -670,7 +639,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
                 rows = []
                 rows.append(str(r+1))
                 # type
-                typeComboBox = cast(MyContentLimitedQComboBox, self.summarystatstable.cellWidget(r,1))
+                typeComboBox = cast(MyContentLimitedQComboBox, self.summarystatstable.cellWidget(r,0))
                 rows.append(typeComboBox.currentText())
                 tbl.add_row(rows)
             clipboard = tbl.get_string()
@@ -685,7 +654,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
             clipboard += '\n'
             for r in range(nrows):
                 clipboard += str(r+1) + '\t'
-                typeComboBox = cast(MyContentLimitedQComboBox, self.summarystatstable.cellWidget(r,1))
+                typeComboBox = cast(MyContentLimitedQComboBox, self.summarystatstable.cellWidget(r,0))
                 clipboard += typeComboBox.currentText() + '\t'
         # copy to the system clipboard
         sys_clip = QApplication.clipboard()
@@ -715,9 +684,9 @@ class StatisticsDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(int)
     def setitemsummarystat(self, _:int) -> None:
-        i = self.aw.findWidgetsRow(self.summarystatstable,self.sender(),1)
+        i = self.aw.findWidgetsRow(self.summarystatstable,self.sender(),0)
         if i is not None:
-            typecombobox = cast(MyContentLimitedQComboBox, self.summarystatstable.cellWidget(i,1))
+            typecombobox = cast(MyContentLimitedQComboBox, self.summarystatstable.cellWidget(i,0))
             if i < len(self.summarystatstypes):
                 self.summarystatstypes[i] = self.summarystats_types.index(self.summarystats_types_sorted[typecombobox.currentIndex()])
                 self.savetablesummarystats()
@@ -725,7 +694,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
     def disconnectTableItemActions(self) -> None:
         for x in range(self.summarystatstable.rowCount()):
             try:
-                typeComboBox = cast(MyContentLimitedQComboBox, self.summarystatstable.cellWidget(x,1))
+                typeComboBox = cast(MyContentLimitedQComboBox, self.summarystatstable.cellWidget(x,0))
                 typeComboBox.currentIndexChanged.disconnect() # type combo
             except Exception: # pylint: disable=broad-except
                 pass
@@ -769,7 +738,6 @@ class StatisticsDlg(ArtisanResizeablDialog):
 
         # defaults for new entries
         stat_type:int = 0
-#        stat_visibility:int = 1
 
         if len(selected) > 0:
             selected_idx = selected[0].topRow()

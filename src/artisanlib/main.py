@@ -12016,7 +12016,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 ('volumegain',drop_trailing_zero(f"{cp['volume_gain']}") if 'volume_gain' in cp else '0'),
                 ('densityloss',drop_trailing_zero(density_loss)),
                 ('moistureloss',drop_trailing_zero(f"{cp['moisture_loss']}") if 'moisture_loss' in cp else '0'),
-                ('weightunits',self.qmc.weight[2]),
+                ('weightunits',self.qmc.weight[2].lower()),
                 ('weight',drop_trailing_zero(f'{self.qmc.weight[0]}')),
                 ('volumeunits',self.qmc.volume[2]),
                 ('volume',drop_trailing_zero(f'{self.qmc.volume[0]}')),

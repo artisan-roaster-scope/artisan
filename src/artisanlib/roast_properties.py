@@ -4948,6 +4948,9 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.aw.qmc.plus_blend_label = None
                 self.aw.qmc.plus_blend_spec =  None
                 self.aw.qmc.plus_blend_spec_labels = None
+            # if weight unit changed we update the scheduler window if open
+            if self.aw.schedule_window is not None and self.org_weight[2] != self.aw.qmc.weight[2]:
+                self.aw.updateScheduleSignal.emit()
 
         # Update beans
         self.aw.qmc.beans = self.beansedit.toPlainText()

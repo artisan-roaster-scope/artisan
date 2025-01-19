@@ -613,7 +613,6 @@ weight_units:Final[Tuple[str,str,str,str]] = ('g','Kg','lb','oz')
 weight_units_lower:Final[Tuple[str,str,str,str]] = ('g','kg','lb','oz') # just for display use
 volume_units:Final[Tuple[str,str,str,str,str,str]] = ('l','gal','qt','pt','cup','ml')
 
-
 def weightVolumeDigits(v:float) -> int:
     if v >= 1000:
         return 1
@@ -672,23 +671,31 @@ def convertVolume(v:float, i:int, o:int) -> float:
 
 # takes a weight, its weight unit index, and a weight unit target index (decides over metric vs imperial)
 # and returns a string rendering the weight with unit, potentially adjusted by its magnitude
-def render_weight(amount:float, weight_unit_index:int, target_unit_idx:int, right_to_left_lang:bool = False) -> str:
+# with weight_unit_index:
+#         0 => g
+#         1 => kg
+#         2 => lb
+#         3 => oz
+# if brief defaults to 0 and 3 decimals are returned for lb/kg and 2 for oz/g, if brief > 0 the number of decimals is reduced by that value
+# with smart_unit_upgrade, a weight like 1600g is rendered more readable as 1.6kg (but leaves 1610g and 1601g as is)
+def render_weight(amount:float, weight_unit_index:int, target_unit_idx:int,
+        right_to_left_lang:bool = False, brief:int=0, smart_unit_upgrade:bool=True) -> str:
     w = convertWeight(
         amount, weight_unit_index, target_unit_idx
     )  # @UndefinedVariable
-    if w < 1 and target_unit_idx == 1:
-        # we convert Kg to the smaller unit g for readability
+    if w < 1 and target_unit_idx == 1: # requested target unit: kg (unit downgrade: kg -> g)
+        # we convert kg to the smaller unit g for readability despite requested target is kg as weight < 1kg
         w = convertWeight(
             amount, weight_unit_index, 0
         )  # @UndefinedVariable
         target_unit = weight_units[
             0
         ]  # @UndefinedVariable
-    elif w >= 1000000 and target_unit_idx == 0:
+    elif w >= 1000000 and target_unit_idx == 0: # requested target unit: g (unit upgrade: g -> t)
         # we convert kg to tonnes
         w = w / 1000000.0
         target_unit = 't'
-    elif w > 999 and target_unit_idx == 0:
+    elif w >= 10000 and target_unit_idx == 0: # requested target unit: g (unit upgrade: g -> kg)
         # we convert g to the larger unit kg for readability
         w = convertWeight(
             amount, weight_unit_index, 1
@@ -696,31 +703,79 @@ def render_weight(amount:float, weight_unit_index:int, target_unit_idx:int, righ
         target_unit = weight_units[
             1
         ]  # @UndefinedVariable
-    elif w >= 1000 and target_unit_idx == 1:
+    elif smart_unit_upgrade and w >= 1000 and target_unit_idx == 0: # requested target unit: g (unit smart upgrade: g -> kg)
+        # if w is between 1000 and 10000 and has no decimals and at least two 0 we render more readable as kg (eg. 1600g => 1.6kg)
+        # but 1601g => 1601g (not 1.601kg) and 1610g => 1610g (not 1.61kg as this is not shorter or easier to read)
+        ws = str(float2float(w,1)).split('.')
+        if len(ws[0].rstrip('0')) < 3 and (len(ws)<2 or ws[1] == '0'):
+            w = convertWeight(
+                amount, weight_unit_index, 1
+            )  # @UndefinedVariable
+            target_unit = weight_units[
+                1
+            ]  # @UndefinedVariable
+        else:
+            target_unit = weight_units[
+                target_unit_idx
+            ]  # @UndefinedVariable
+    elif w >= 10000 and target_unit_idx == 1: # requested target unit: kg (unit upgrade: kg -> t)
         # we convert kg to tonnes
         w = w / 1000.0
         target_unit = 't'
-    elif w >= 2000 and target_unit_idx == 2:
+    elif smart_unit_upgrade and w >= 1000 and target_unit_idx == 1: # requested target unit: kg (unit smart upgrade: kg -> t)
+        # if w is between 1000 and 10000 and has no decimals and at least two 0 we render more readable as t (eg. 1600kg => 1.6t)
+        # but 1601kg => 1601kg (not 1.601t) and 1610kg => 1610kg (not 1.61t as this is not shorter or easier to read)
+        ws = str(float2float(w,1)).split('.')
+        if len(ws[0].rstrip('0')) < 3 and (len(ws)<2 or ws[1] == '0'):
+            w = w / 1000.0
+            target_unit = 't'
+        else:
+            target_unit = weight_units[
+                target_unit_idx
+            ]  # @UndefinedVariable
+    elif w >= 20000 and target_unit_idx == 2: # requested target unit: lb (unit upgrade: lb -> t)
         # we convert lbs to tonnes
         w = w / 2000.0
         target_unit = 't'  # US tons
-    elif w >= 16 and target_unit_idx == 3:
-        if w >= 3200:
+    elif smart_unit_upgrade and w >= 2000 and target_unit_idx == 2: # requested target unit: lb (unit smart upgrade: lb -> t)
+        # if w is between 2000 and 20000 and has no decimals and at least two 0 we render more readable as t (eg. 2600lb => 1.3t)
+        # but 2601lb => 2601lb (not 1.3005t) and 2610lb => 2610lb (not 1.305t as this is not shorter or easier to read and more precise)
+        ws = str(float2float(w,1)).split('.')
+        if len(ws[0].rstrip('0')) < 3 and (len(ws)<2 or ws[1] == '0'):
+            w = w / 2000.0
+            target_unit = 't'
+        else:
+            target_unit = weight_units[
+                target_unit_idx
+            ]  # @UndefinedVariable
+    elif smart_unit_upgrade and w < 1 and target_unit_idx == 2: # requested target unit: lb (unit downgrade: lb -> oz)
+        # we convert lb to the smaller unit oz, only if smart_unit_upgrade is set, for readability despite requested target is lb as weight < 1lb
+        w = convertWeight(
+            amount, weight_unit_index, 3
+        )  # @UndefinedVariable
+        target_unit = weight_units[
+            3
+        ]  # @UndefinedVariable
+    elif w >= 1600 and target_unit_idx == 3: # requested target unit: oz
+        if w >= 32000:
             # we convert oz to US tonnes
             w = w / 32000.0
             target_unit = 't'  # US tons
-        else:  # 3200 > w >= 16
+        else:  # 32000 > w >= 1600 # 16oz == 1lb
             # we convert oz to lb
             w = w / 16.0
-            target_unit = 'lb' if abs(abs(w) - 1.0) < 0.01 else 'lbs'
+            target_unit = 'lb'
     else:
         target_unit = weight_units[
             target_unit_idx
         ]  # @UndefinedVariable
-        if target_unit_idx == 2 and abs(abs(w) - 1.00) >= 0.01:
-            # lb => lbs if |w|>1
-            target_unit = f'{target_unit}s'
-    w = int(round(w)) if w > 99 else float2float(w, 1) # @UndefinedVariable # we keep one decimal
+
+    decimals = 0 if w>=100 else 1
+    if target_unit not in ['g', 'oz']:
+        decimals += 2
+    if brief > 0:
+        decimals = max(0, decimals-brief)
+    w = float2float(w,decimals)
     return (f'{target_unit.lower()}{w:g}' if right_to_left_lang else f'{w:g}{target_unit.lower()}')
 
 

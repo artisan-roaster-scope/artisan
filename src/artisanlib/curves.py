@@ -1578,7 +1578,7 @@ class CurvesDlg(ArtisanDialog):
         else:
             # on Linux/Windows the mdns name is created by appending ".local" to the hostname
             host = socket.gethostname()
-        return f'http://{host.strip().replace(' ', '_').casefold()}.local:{str(self.aw.WebLCDsPort)}/artisan'
+        return f"http://{host.strip().replace(' ', '_').casefold()}.local:{str(self.aw.WebLCDsPort)}/artisan"
 
     @pyqtSlot(bool)
     def toggleWebLCDs(self, b:bool = False) -> None:
