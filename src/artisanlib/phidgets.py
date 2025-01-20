@@ -52,7 +52,7 @@ class PhidgetManager:
         self.manager.setOnAttachHandler(self.attachHandler)
         self.manager.setOnDetachHandler(self.detachHandler)
         self.manager.open()
-        _log.debug('PhidgetManager opened')
+        _log.debug('phidgetManager opened')
 
     def close(self) -> None:
         self.manager.close()

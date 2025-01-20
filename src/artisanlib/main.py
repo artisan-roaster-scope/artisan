@@ -77,7 +77,7 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 import zlib
 import logging.config
 from yaml import safe_load as yaml_load
-from typing import Final, Optional, Mapping, List, Dict, Tuple, Union, cast, Any, Callable, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
+from typing import Final, Optional, List, Dict, Tuple, Union, cast, Any, Callable, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
 
 from functools import reduce as freduce
 
@@ -672,31 +672,33 @@ try:
 except Exception: # pylint: disable=broad-except
     pass
 
-class FilteredLogger(logging.Logger):
-
-    def __init__(self, name:str, level:Any=logging.NOTSET) -> None:
-        super().__init__(name, level)
+# returns False if message is duplicate and should be suppressed from log output
+class DuplicateFilter(logging.Filter):
+    def __init__(self) -> None:
+        super().__init__()
         self._message_lockup: Dict[int,int] = {}
 
-    def _log(self, level:int, msg:Any, args:Any, exc_info:Any=None, extra:Optional[Mapping[str, object]]=None,
-            stack_info:bool=False, stacklevel: int = 1) -> None:
+    def filter(self, record:logging.LogRecord) -> bool:
         try:
-            log_interval = 10
-            message_Id = zlib.crc32(str(msg).encode('utf-8'))
+            log_interval:int = 10
+            message_Id = zlib.crc32(str(record.getMessage()).encode('utf-8'))
             if message_Id not in self._message_lockup:
                 self._message_lockup[message_Id] = 0
-                super()._log(level, msg, args, exc_info, extra, stack_info, stacklevel)
-            elif self._message_lockup[message_Id] % log_interval == 0:
-                self._message_lockup[message_Id] = 0
-                msg += f' -- Suppressed {log_interval} equal messages'
-                super()._log(level, msg, args, exc_info, extra, stack_info, stacklevel)
+                return True
             self._message_lockup[message_Id] += 1
+            if self._message_lockup[message_Id] % log_interval == 0:
+                self._message_lockup[message_Id] = 0
+                return True
+            return False
         except Exception: # pylint: disable=broad-except
-            super()._log(level, msg, args, exc_info, extra, stack_info, stacklevel)
-logging.setLoggerClass(FilteredLogger)
+            return True
+for handler in logging.root.handlers:
+    handler.addFilter(DuplicateFilter())
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
+
+
 
 if multiprocessing.current_process().name == 'MainProcess':
     _log.info(
