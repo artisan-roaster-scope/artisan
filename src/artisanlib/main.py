@@ -671,6 +671,7 @@ try:
         logging.config.dictConfig(conf)
 except Exception: # pylint: disable=broad-except
     pass
+
 class FilteredLogger(logging.Logger):
 
     def __init__(self, name:str, level:Any=logging.NOTSET) -> None:
@@ -679,21 +680,21 @@ class FilteredLogger(logging.Logger):
 
     def _log(self, level:int, msg:Any, args:Any, exc_info:Any=None, extra:Optional[Mapping[str, object]]=None,
             stack_info:bool=False, stacklevel: int = 1) -> None:
-# don't change signature for typing, but fix to log_interval=10
-#            log_interval:Optional[int]=None) -> None:
-#        if log_interval is None or log_interval == 1:
-#            super()._log(level, msg, args, exc_info, extra, stack_info, stacklevel)
-#        else:
-        log_interval = 10
-        message_Id = zlib.crc32(msg.encode('utf-8'))
-        if message_Id not in self._message_lockup:
-            self._message_lockup[message_Id] = 0
+        try:
+            log_interval = 10
+            message_Id = zlib.crc32(str(msg).encode('utf-8'))
+            if message_Id not in self._message_lockup:
+                self._message_lockup[message_Id] = 0
+                super()._log(level, msg, args, exc_info, extra, stack_info, stacklevel)
+            elif self._message_lockup[message_Id] % log_interval == 0:
+                self._message_lockup[message_Id] = 0
+                msg += f' -- Suppressed {log_interval} equal messages'
+                super()._log(level, msg, args, exc_info, extra, stack_info, stacklevel)
+            self._message_lockup[message_Id] += 1
+        except Exception: # pylint: disable=broad-except
             super()._log(level, msg, args, exc_info, extra, stack_info, stacklevel)
-        elif self._message_lockup[message_Id] % log_interval == 0:
-            msg += f' -- Suppressed {log_interval} equal messages'
-            super()._log(level, msg, args, exc_info, extra, stack_info, stacklevel)
-        self._message_lockup[message_Id] += 1
 logging.setLoggerClass(FilteredLogger)
+
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
