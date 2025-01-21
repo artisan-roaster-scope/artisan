@@ -50,7 +50,7 @@ def test_fromFtoC(temp:Optional[float]) -> None:
     (123.4, 0, 0, 0, True, '123g'),     # 0 decimal as >=100 and result unit g
     (123.4, 0, 0, 1, True, '123g'),     # 0 decimal as >=100 and result unit g
     (1234.2, 0, 0, 0, True, '1234g'),   # 0 decimal as >=100 and result unit g
-    (1234.2, 0, 0, 1, True, '1234g'),   # 0 decimal as >=100 and result unit g
+    (1234.2, 0, 0, 1, True, '1.23kg'),  # upgraded to kg as brief!=0 and amount>1000, rendered with 2 decimals (1 downgraded from the default 3)
     (12346, 0, 0, 0, True, '12.346kg'), # unit upgrade
     (1600, 0, 0, 0, True, '1.6kg'),     # smart unit upgrade
     (1600, 0, 0, 0, False, '1600g'),    # no smart unit upgrade (disabled)

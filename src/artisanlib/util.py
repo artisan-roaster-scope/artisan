@@ -676,7 +676,8 @@ def convertVolume(v:float, i:int, o:int) -> float:
 #         1 => kg
 #         2 => lb
 #         3 => oz
-# if brief defaults to 0 and 3 decimals are returned for lb/kg and 2 for oz/g, if brief > 0 the number of decimals is reduced by that value
+# if brief is set to 0 (default 0), 3 decimals are returned for lb/kg and 2 for oz/g, if brief > 0 the number of decimals is reduced by that value and
+# the rendering might loose precision
 # with smart_unit_upgrade, a weight like 1600g is rendered more readable as 1.6kg (but leaves 1610g and 1601g as is)
 def render_weight(amount:float, weight_unit_index:int, target_unit_idx:int,
         right_to_left_lang:bool = False, brief:int=0, smart_unit_upgrade:bool=True) -> str:
@@ -695,7 +696,7 @@ def render_weight(amount:float, weight_unit_index:int, target_unit_idx:int,
         # we convert kg to tonnes
         w = w / 1000000.0
         target_unit = 't'
-    elif w >= 10000 and target_unit_idx == 0: # requested target unit: g (unit upgrade: g -> kg)
+    elif (w >= 10000 or (w >= 1000 and brief > 0)) and target_unit_idx == 0: # requested target unit: g (unit upgrade: g -> kg)
         # we convert g to the larger unit kg for readability
         w = convertWeight(
             amount, weight_unit_index, 1
@@ -718,7 +719,7 @@ def render_weight(amount:float, weight_unit_index:int, target_unit_idx:int,
             target_unit = weight_units[
                 target_unit_idx
             ]  # @UndefinedVariable
-    elif w >= 10000 and target_unit_idx == 1: # requested target unit: kg (unit upgrade: kg -> t)
+    elif (w >= 10000 or (w >= 1000 and brief > 0)) and target_unit_idx == 1: # requested target unit: kg (unit upgrade: kg -> t)
         # we convert kg to tonnes
         w = w / 1000.0
         target_unit = 't'
