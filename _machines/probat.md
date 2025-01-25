@@ -62,10 +62,13 @@ sidebar:
 | Probatone 12 | LPG/NG | 28 | 1.5 |
 | Probatone 25 | LPG/NG | 55 | 2.8 |
 |||
+| P01 III | Elec | 11 | 0.8 |
 | P05 III | LPG/NG | 13.86 | 1.2 |
 | P05 III | Elec | 17 | 1.2 |
 | P12 III | LPG/NG | 28 | 1.5 |
+| P12 III | Elec | 30 | 1.5 |
 | P25 III | LPG/NG | 55 | 2.8 |
+| P25 III | Elec | 65 | 2.8 |
 |||
 | UG 15 | LPG/NG | 55 | 4 |
 | UG 25 | LPG/NG | 80 | 4 |

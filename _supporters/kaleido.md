@@ -36,3 +36,16 @@ Press CMD-2 to switch to the reduced button set; CMD-1 switches back to the full
 
 **Watch out!** The legacy settings of Artisan use a serial speed of 9600. Some of the newer legacy machines instead communicate at 57600 baud. Change the baudrate using menu `Config >> Port` to 57600 if needed.
 {: .notice--primary}
+
+
+<a name="EnergyRatings"></a>
+## Energy Ratings
+
+
+|Model|Source|Size (kg)|Burner (kW)|Motor (kW)|
+|:-----|:-----:|:-----:|:-----:|:-----:|
+|||
+| M1 | Elec | 0.2 | 1 | 0
+| M2 | Elec | 0.4 | 1.6 | 0
+| M6 | Elec | 0.7 | 2.3 | 0
+| M10 | Elec | 1.2 | 2.6 | 0

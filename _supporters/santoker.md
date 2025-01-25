@@ -41,3 +41,13 @@ sidebar:
 * __Features__ 
   - logging of bean temperature (BT), environmental temperature (ET) and in some cases a third temperature
   - logging and control of fan and power for the Q and X Series, the Cube as well as the R Master Series models. The later allows to log the drum speed as well.
+
+  
+<a name="EnergyRatings"></a>
+## Energy Ratings
+
+
+|Model|Source|Size (kg)|Burner (kW)|Motor (kW)|
+|:-----|:-----:|:-----:|:-----:|:-----:|
+|||
+| Cube 10 | Elec | 0.1 | 1.3 | 0

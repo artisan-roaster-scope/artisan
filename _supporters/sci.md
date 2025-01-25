@@ -28,3 +28,15 @@ sidebar:
     <figcaption>custom event buttons</figcaption>
 </center>
 </figure>
+
+
+<a name="EnergyRatings"></a>
+## Energy Ratings
+
+
+|Model|Source|Size (kg)|Burner (kW)|Motor (kW)|
+|:-----|:-----:|:-----:|:-----:|:-----:|
+|||
+| 2IND | Elec | 2 | 2.5 | 0.3
+| 6-8IND | LPG/NG | 8 | 12 | 1.75
+| 26-30IND | LPG/NG | 30 | 30 | 5

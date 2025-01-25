@@ -28,3 +28,12 @@ sidebar:
     <figcaption>custom event buttons</figcaption>
 </center>
 </figure>
+
+<a name="EnergyRatings"></a>
+## Energy Ratings
+
+
+|Model|Source|Size (kg)|Burner (kW)|Motor (kW)|
+|:-----|:-----:|:-----:|:-----:|:-----:|
+|||
+| BeanGo Cube X | Elec | 0.3 | 1.25 | 0
