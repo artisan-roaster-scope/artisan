@@ -46,4 +46,4 @@ jobs:
           check_filenames: false
           check_hidden: false
           skip: ./.git,src/*.ts,src/coverage,src/build,src/dist*,src/htmlcov,src/*.spec,src/*.toml
-          ignore_words_list: ser,alog,nd,iterm,dout,te,commandi,dout,exitt,currenty,exaust,controle,coment,controle,outweight,everytime,sade,weightIn,weightin
+          ignore_words_list: Abd,ser,alog,nd,iterm,dout,te,commandi,dout,exitt,currenty,exaust,controle,coment,controle,outweight,everytime,sade,weightIn,weightin
