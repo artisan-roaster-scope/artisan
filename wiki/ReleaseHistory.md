@@ -6,10 +6,10 @@ v3.1.1
 ------------------
 
 * NEW HARDWARE SUPPORT
-  - adds support for the [DCC1100 and DCC1120 Brushless DC Motor controllers and the DCC1020 DC Motor controller](https://artisan-scope.org/devices/phidgets/#45-dc-motor-control) ([Discussion #1750](../../../discussions/1750))
   - adds support for [Carmomaq's Stratto Lab sample roaster](https://carmomaq.com.br/en/produtos/stratto-roaster-lab/)
-  - adds a new [IMF](https://artisan-scope.org/machines/imf/) machine setup that adds machine control
-  - updated [Giesen](https://artisan-scope.org/machines/giesen/) machine support (now incl. sample roasters and PRO machines)
+  - adds a new [IMF](https://artisan-scope.org/machines/imf/) machine setup that supports machine control
+  - updated [Giesen](https://artisan-scope.org/machines/giesen/) machine support (now incl. sample roasters and PRO machines) supporting additional actor control
+  - adds support for the [DCC1100 and DCC1120 Brushless DC Motor controllers and the DCC1020 DC Motor controller](https://artisan-scope.org/devices/phidgets/#45-dc-motor-control) ([Discussion #1750](../../../discussions/1750))
 
 * ADDITIONS
   - adds drag-and-drop to Stats Summary table configuration

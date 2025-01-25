@@ -136,6 +136,7 @@ class PID:
 
     # update control value (the pid loop is running even if PID is inactive, just the control function is only called if active)
     def update(self, i:Optional[float]) -> None:
+        _log.debug('update(%s)',i)
         try:
             if i == -1 or i is None:
                 # reject error values
@@ -197,6 +198,8 @@ class PID:
                 elif output < self.outMin:
                     output = self.outMin
 
+                _log.debug('P: %s, I: %s, D: %s => output: %s', self.Pterm, self.Iterm, D, output)
+
                 int_output = int(round(min(self.dutyMax,max(self.dutyMin,output))))
                 if self.lastOutput is None or self.iterations_since_duty >= self.force_duty or int_output >= self.lastOutput + self.dutySteps or int_output <= self.lastOutput - self.dutySteps:
                     if self.active:
@@ -212,18 +215,14 @@ class PID:
 
     # bring the PID to its initial state (to be called externally)
     def reset(self) -> None:
-        try:
-            self.pidSemaphore.acquire(1)
-            self.init()
-            self.Iterm = 0.0
-        finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+        self.init()
 
     # re-initalize the PID on restarting it after a temporary off state
     def init(self) -> None:
         try:
             self.pidSemaphore.acquire(1)
+            # reset the derivative filter on each filter level change (also on PID ON)
+            self.derivative_filter = self.derivativeFilter()
             self.errSum = 0.0
             self.lastError = 0.0
             self.lastInput = 0.0
@@ -274,6 +273,7 @@ class PID:
         finally:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)
+        self.reset()
 
     def setLimits(self, outMin:int, outMax:int) -> None:
         try:
