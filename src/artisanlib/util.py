@@ -562,7 +562,6 @@ def setFileLogLevels(level:int, logger_names:List[str]) -> None:
 
 # returns True if new log level of loggers is DEBUG, False otherwise
 def debugLogLevelToggle() -> bool:
-    # first get all module loggers
     newDebugLevel = not debugLogLevelActive()
     setDebugLogLevel(newDebugLevel)
     return newDebugLevel

@@ -19,15 +19,24 @@ import sys
 import time
 import asyncio
 import logging
-from typing import Final, Optional, List, Dict, Tuple, Union, Any, TYPE_CHECKING
+
+import pymodbus
+from pymodbus.pdu import ExceptionResponse
+from pymodbus.client import AsyncModbusSerialClient, AsyncModbusUdpClient, AsyncModbusTcpClient
+from pymodbus.client.mixin import ModbusClientMixin
+try:
+    from pymodbus.framer import FramerType # type:ignore[attr-defined,unused-ignore]
+except Exception: # pylint: disable=broad-except
+    # FramerType named Framer in pymodbus < 3.7
+    from pymodbus.framer import Framer as FramerType # type:ignore[attr-defined, no-redef, unused-ignore]
+
+from packaging.version import Version
+from typing import Final, Optional, List, Dict, Tuple, Union, Literal, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from pymodbus.client import ModbusBaseClient # pylint: disable=unused-import
-    from pymodbus.payload import BinaryPayloadBuilder # pylint: disable=unused-import
-    from pymodbus.payload import BinaryPayloadDecoder # pylint: disable=unused-import
     from pymodbus.pdu.pdu import ModbusPDU # pylint: disable=unused-import
-
 
 try:
     from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
@@ -78,19 +87,6 @@ def convert_from_bcd(value: int) -> int:
         place *= 10
     return decimal
 
-def getBinaryPayloadBuilder(byteorderLittle:bool = True, wordorderLittle:bool = False) -> 'BinaryPayloadBuilder':
-    from pymodbus.constants import Endian
-    from pymodbus.payload import BinaryPayloadBuilder
-    byteorder = Endian.LITTLE if byteorderLittle else Endian.BIG
-    wordorder = Endian.LITTLE if wordorderLittle else Endian.BIG
-    return BinaryPayloadBuilder(byteorder=byteorder, wordorder=wordorder) # type:ignore[no-untyped-call]
-
-def getBinaryPayloadDecoderFromRegisters(registers:List[int], byteorderLittle:bool = True, wordorderLittle:bool = False) -> 'BinaryPayloadDecoder':
-    from pymodbus.constants import Endian
-    from pymodbus.payload import BinaryPayloadDecoder
-    byteorder = Endian.LITTLE if byteorderLittle else Endian.BIG
-    wordorder = Endian.LITTLE if wordorderLittle else Endian.BIG
-    return BinaryPayloadDecoder.fromRegisters(registers, byteorder=byteorder, wordorder=wordorder) # type:ignore[no-untyped-call, no-any-return]
 
 
 ###########################################################################################
@@ -98,19 +94,23 @@ def getBinaryPayloadDecoderFromRegisters(registers:List[int], byteorderLittle:bo
 ###########################################################################################
 
 
-# pymodbus version
 class modbusport:
     """ this class handles the communications with all the modbus devices"""
 
-    __slots__ = [ 'aw', 'modbus_serial_read_delay', 'modbus_serial_connect_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'default_comport', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
+    __slots__ = [ 'aw', 'legacy_pymodbus', 'modbus_serial_read_delay', 'modbus_serial_connect_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'default_comport', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
         'timeout', 'IP_timeout', 'IP_retries', 'serial_readRetries', 'PID_slave_ID', 'PID_SV_register', 'PID_p_register', 'PID_i_register', 'PID_d_register', 'PID_ON_action', 'PID_OFF_action',
         'channels', 'inputSlaves', 'inputRegisters', 'inputFloats', 'inputBCDs', 'inputFloatsAsInt', 'inputBCDsAsInt', 'inputSigned', 'inputCodes', 'inputDivs',
         'inputModes', 'optimizer', 'fetch_max_blocks', 'fail_on_cache_miss', 'disconnect_on_error', 'acceptable_errors', 'activeRegisters',
         'readingsCache', 'SVmultiplier', 'PIDmultiplier', 'SVwriteLong',
-        'byteorderLittle', 'wordorderLittle', '_asyncLoopThread', '_client', 'COMsemaphore', 'default_host', 'host', 'port', 'type', 'lastReadResult', 'commError' ]
+        'wordorderLittle', '_asyncLoopThread', '_client', 'COMsemaphore', 'default_host', 'host', 'port', 'type', 'lastReadResult', 'commError' ]
 
     def __init__(self, aw:'ApplicationWindow') -> None:
         self.aw = aw
+
+        self.legacy_pymodbus:bool = False
+        if Version(pymodbus.__version__) < Version('3.8.2'):
+            # pymodbus before 3.8.2 did not had the option to specify the word order in datatype conversions
+            self.legacy_pymodbus = True
 
         self.modbus_serial_read_delay       :Final[float] = 0.035 # in seconds
         self.modbus_serial_write_delay      :Final[float] = 0.080 # in seconds
@@ -170,7 +170,6 @@ class modbusport:
         self.SVmultiplier:int = 0  # 0:no, 1:10x, 2:100x # Literal[0,1,2]
         self.SVwriteLong:bool = False # if True use self.writeLong() to update the SV, otherwise self.writeRegister()
         self.PIDmultiplier:int = 0  # 0:no, 1:10x, 2:100x # :Literal[0,1,2]
-        self.byteorderLittle:bool = False
         self.wordorderLittle:bool = True
 
         self._asyncLoopThread: Optional[AsyncLoopThread]     = None # the asyncio AsyncLoopThread object
@@ -191,6 +190,83 @@ class modbusport:
         self.lastReadResult:Optional[int] = None # this is set by eventaction following some custom button/slider Modbus actions with "read" command
 
         self.commError:int = 0 # number of errors that occurred after the last connect; cleared by receiving proper data
+
+
+
+    # data conversions
+
+    def word_order(self) -> Literal['big', 'little']:
+        return 'little' if self.wordorderLittle else 'big'
+
+#
+
+    def convert_16bit_uint_to_registers(self, value:int) -> List [int]:
+        return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.UINT16, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+
+    #- unused:
+
+#    def convert_16bit_int_to_registers(self, value:int) -> List [int]:
+#        return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.INT16, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+#
+#    def convert_32bit_uint_to_registers(self, value:int) -> List [int]:
+#        return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.UINT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+
+    #-
+
+    def convert_32bit_int_to_registers(self, value:int) -> List [int]:
+        if self.legacy_pymodbus:
+            return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.INT32)[::-1]
+        return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.INT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+
+    def convert_float_to_registers(self, value:float) -> List[int]:
+        if self.legacy_pymodbus:
+            return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.FLOAT32)[::-1]
+        return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.FLOAT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+
+
+##############################
+
+
+    def convert_16bit_uint_from_registers(self, registers:List[int]) -> int:
+        res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.UINT16, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+        if isinstance(res, int):
+            return res
+        return -1
+
+
+    def convert_16bit_int_from_registers(self, registers:List[int]) -> int:
+        res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.INT16, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+        if isinstance(res, int):
+            return res
+        return -1
+
+
+    def convert_32bit_uint_from_registers(self, registers:List[int]) -> int:
+        res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.UINT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+        if isinstance(res, int):
+            return res
+        return -1
+
+
+    def convert_32bit_int_from_registers(self, registers:List[int]) -> int:
+        if self.legacy_pymodbus:
+            res = ModbusClientMixin.convert_from_registers(registers[::-1], ModbusClientMixin.DATATYPE.INT32)
+        else:
+            res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.INT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+        if isinstance(res, int):
+            return res
+        return -1
+
+
+    def convert_float_from_registers(self, registers:List[int]) -> float:
+        if self.legacy_pymodbus:
+            res = ModbusClientMixin.convert_from_registers(registers[::-1], ModbusClientMixin.DATATYPE.FLOAT32)
+        else:
+            res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.FLOAT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+        if isinstance(res, float):
+            return res
+        return -1
+
 
     # this guarantees a minimum of 30 milliseconds between readings and 80ms between writes (according to the Modbus spec) on serial connections
     # this sleep delays between requests seems to be beneficial on slow RTU serial connections like those of the FZ-94
@@ -259,12 +335,6 @@ class modbusport:
             try:
                 # as in the following the port is None, no port is opened on creation of the (py)serial object
                 if self.type == 1: # Serial ASCII
-                    from pymodbus.client import AsyncModbusSerialClient
-                    try:
-                        from pymodbus.framer import FramerType # type:ignore[attr-defined,unused-ignore]
-                    except Exception: # pylint: disable=broad-except
-                        # FramerType named Framer in pymodbus < 3.7
-                        from pymodbus.framer import Framer as FramerType # type:ignore[attr-defined, no-redef]
                     self._client = AsyncModbusSerialClient(
                         framer=FramerType.ASCII, # type:ignore[unused-ignore]
                         port=self.comport,
@@ -280,7 +350,6 @@ class modbusport:
                 elif self.type == 2: # Serial Binary
                     pass # serial binary is no longer supported by pymodbus 3.7
                 elif self.type == 3: # TCP
-                    from pymodbus.client import AsyncModbusTcpClient
                     self._client = AsyncModbusTcpClient(
                             host=self.host,
                             port=self.port,
@@ -293,7 +362,6 @@ class modbusport:
                             )
 #                    self.readRetries = self.IP_retries # retire Artisan-level retries
                 elif self.type == 4: # UDP
-                    from pymodbus.client import AsyncModbusUdpClient
                     self._client = AsyncModbusUdpClient(
                         host=self.host,
                         port=self.port,
@@ -306,12 +374,6 @@ class modbusport:
                         )
 #                    self.readRetries = self.IP_retries # retire Artisan-level retries
                 else: # Serial RTU
-                    from pymodbus.client import AsyncModbusSerialClient
-                    try:
-                        from pymodbus.framer import FramerType  # type:ignore[attr-defined,unused-ignore]
-                    except Exception: # pylint: disable=broad-except
-                        # FramerType named Framer in pymodbus < 3.7
-                        from pymodbus.framer import Framer as FramerType # type:ignore[attr-defined, no-redef]
                     self._client = AsyncModbusSerialClient(
                         framer=FramerType.RTU, # type:ignore[unused-ignore]
                         port=self.comport,
@@ -384,7 +446,6 @@ class modbusport:
     # second result signals a server error which requires a disconnect/reconnect
     @staticmethod
     def invalidResult(res:Any, count:int) -> Tuple[bool, bool]:
-        from pymodbus.pdu import ExceptionResponse
         if res is None:
             _log.info('invalidResult(%d) => None', count)
             return True, False
@@ -634,11 +695,8 @@ class modbusport:
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
-#                byte_values:List[bytes] = ([values.to_bytes(2, 'big')] if isinstance(values, int) else [v.to_bytes(2, 'big') for v in values])
                 int_values:List[int] = ([values] if isinstance(values, int) else values)
-#                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),byte_values,slave=int(slave)), self._asyncLoopThread.loop).result()
                 asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),int_values,slave=int(slave)), self._asyncLoopThread.loop).result()
-#                time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeRegisters(%d,%d,%s) failed', slave, register, values)
             _log.debug(ex)
@@ -663,14 +721,12 @@ class modbusport:
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
-                builder = getBinaryPayloadBuilder(self.byteorderLittle,self.wordorderLittle)
-                builder.add_32bit_float(float(value))
-                payload = builder.build()
-                #payload:List[int] = [int.from_bytes(b,("little" if self.byteorderLittle else "big")) for b in builder.build()]
-                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),payload,slave=int(slave)), self._asyncLoopThread.loop).result() # type: ignore [reportGeneralTypeIssues, arg-type, unused-ignore] # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"; in pymodbus 3.7.4 the error is now "List[bytes]"; expected "List[Union[bytes, int]
+                payload:List[int] = self.convert_float_to_registers(float(value))
+                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),payload,slave=int(slave)), self._asyncLoopThread.loop).result()
 #                time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeWord(%d,%d,%s) failed', slave, register, value)
+            _log.exception(ex)
             _log.debug(ex)
             self.disconnectOnError()
             _, _, exc_tb = sys.exc_info()
@@ -691,11 +747,8 @@ class modbusport:
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
                 self.connect()
-                builder = getBinaryPayloadBuilder(self.byteorderLittle,self.wordorderLittle)
                 r = convert_to_bcd(int(value))
-                builder.add_16bit_uint(r)
-                payload = builder.build()
-                #payload:List[int] = [int.from_bytes(b,("little" if self.byteorderLittle else "big")) for b in builder.build()]
+                payload: List[int] = self.convert_16bit_uint_to_registers(r)
                 asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),payload,slave=int(slave)), self._asyncLoopThread.loop).result() # type: ignore [reportGeneralTypeIssues, arg-type, unused-ignore] # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"; in pymodbus 3.7.4 the error is now "List[bytes]"; expected "List[Union[bytes, int]
 #                time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
@@ -722,10 +775,7 @@ class modbusport:
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
-                builder = getBinaryPayloadBuilder(self.byteorderLittle,self.wordorderLittle)
-                builder.add_32bit_int(int(value))
-                payload = builder.build()
-                #payload:List[int] = [int.from_bytes(b,("little" if self.byteorderLittle else "big")) for b in builder.build()]
+                payload:List[int] = self.convert_32bit_int_to_registers(int(value))
                 asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),payload,slave=int(slave)), self._asyncLoopThread.loop).result() # type: ignore [reportGeneralTypeIssues, arg-type, unused-ignore] # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"; in pymodbus 3.7.4 the error is now "List[bytes]"; expected "List[Union[bytes, int]
 #                await asyncio.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
@@ -826,8 +876,7 @@ class modbusport:
             res_registers, _, res_error_disconnect = self.read_registers(slave, register, 2, code, force)
             error_disconnect = res_error_disconnect
             if res_registers is not None:
-                decoder = getBinaryPayloadDecoderFromRegisters(res_registers, self.byteorderLittle, self.wordorderLittle)
-                res = decoder.decode_32bit_float() # type:ignore[no-untyped-call]
+                res = self.convert_float_from_registers(res_registers)
                 # we clear the previous error and send a message
                 self.clearCommError()
 #             await asyncio.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
@@ -868,8 +917,7 @@ class modbusport:
             res_registers, _, res_error_disconnect = self.read_registers(slave, register, 2, code, force)
             error_disconnect = res_error_disconnect
             if res_registers is not None:
-                decoder = getBinaryPayloadDecoderFromRegisters(res_registers, self.byteorderLittle, self.wordorderLittle)
-                res = convert_from_bcd(decoder.decode_32bit_uint()) # type:ignore[no-untyped-call]
+                res = self.convert_32bit_uint_from_registers(res_registers)
                 # we clear the previous error and send a message
                 self.clearCommError()
 #             await asyncio.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
@@ -915,10 +963,9 @@ class modbusport:
                     return 1
                 return 0
             if hasattr(res, 'registers'):
-                decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
-                r = int(decoder.decode_16bit_uint()) # type:ignore[no-untyped-call]
+                r = self.convert_16bit_uint_from_registers(res.registers)
 #                _log.debug('  res.registers => %s', res.registers)
-                _log.debug('  decoder.decode_16bit_uint() => %s', r)
+                _log.debug('  convert_16bit_uint_from_registers() => %s', r)
                 return r
         return None
 
@@ -953,11 +1000,10 @@ class modbusport:
                 self.clearCommError()
 #             await asyncio.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
             elif res_registers is not None:
-                decoder = getBinaryPayloadDecoderFromRegisters(res_registers, self.byteorderLittle, self.wordorderLittle)
                 if signed:
-                    res = decoder.decode_16bit_int() # type:ignore[no-untyped-call]
+                    res = self.convert_16bit_int_from_registers(res_registers)
                 else:
-                    res = decoder.decode_16bit_uint() # type:ignore[no-untyped-call]
+                    res = self.convert_16bit_uint_from_registers(res_registers)
                 # we clear the previous error and send a message
                 self.clearCommError()
 #             await asyncio.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
@@ -999,11 +1045,11 @@ class modbusport:
             res_registers, _, res_error_disconnect = self.read_registers(slave, register, 2, code, force)
             error_disconnect = res_error_disconnect
             if res_registers is not None:
-                decoder = getBinaryPayloadDecoderFromRegisters(res_registers, self.byteorderLittle, self.wordorderLittle)
                 if signed:
-                    res = decoder.decode_32bit_int() # type:ignore[no-untyped-call]
+                    res = self.convert_32bit_int_from_registers(res_registers)
                 else:
-                    res = decoder.decode_32bit_uint() # type:ignore[no-untyped-call]
+                    res = self.convert_32bit_uint_from_registers(res_registers)
+
                 # we clear the previous error and send a message
                 self.clearCommError()
 #             await asyncio.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
@@ -1047,8 +1093,7 @@ class modbusport:
             res_registers, _, res_error_disconnect = self.read_registers(slave, register, 1, code, force)
             error_disconnect = res_error_disconnect
             if res_registers is not None:
-                decoder = getBinaryPayloadDecoderFromRegisters(res_registers, self.byteorderLittle, self.wordorderLittle)
-                res = convert_from_bcd(decoder.decode_16bit_uint()) # type:ignore[no-untyped-call]
+                res = self.convert_16bit_uint_from_registers(res_registers)
                 # we clear the previous error and send a message
                 self.clearCommError()
 #             await asyncio.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic

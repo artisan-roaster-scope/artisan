@@ -673,6 +673,8 @@ except Exception: # pylint: disable=broad-except
     pass
 
 # returns False if message is duplicate and should be suppressed from log output
+# only directly repeated messages will be filtered (maximal 10 times)
+# DEBUG messages will never be filtered
 class DuplicateFilter(logging.Filter):
     def __init__(self) -> None:
         super().__init__()
@@ -680,9 +682,12 @@ class DuplicateFilter(logging.Filter):
 
     def filter(self, record:logging.LogRecord) -> bool:
         try:
+            if logging.getLogger(record.name).isEnabledFor(logging.DEBUG): # don't filter anything in DEBUG mode
+                return True
             log_interval:int = 10
             message_Id = zlib.crc32(str(record.getMessage()).encode('utf-8'))
             if message_Id not in self._message_lockup:
+                self._message_lockup = {} # clear all other "remembered" messages thus remove only directly repeated messages
                 self._message_lockup[message_Id] = 0
                 return True
             self._message_lockup[message_Id] += 1
@@ -9084,7 +9089,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                         # 2. call setpid(self,k) with k that active pid
                                         self.fujipid.setpidPXF(N,kp,ki,kd)
                             else:
-                                self.pidcontrol.confPID(kp,ki,kd,pOnE=self.pidcontrol.pOnE)
+                                self.pidcontrol.confPID(kp,ki,kd)
                                 #self.pidcontrol.setPID(kp,ki,kd) # we don't set the new values in the dialog
                 elif action == 12: # Fuji Command (currently only "write(<unitId>,<register>,<value>)" is supported
                     if cmd_str:
@@ -9816,7 +9821,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                                     self.fujipid.setpidPXF(N,kp,ki,kd)
                                                     self.sendmessage(f'Artisan Command: {cs}')
                                         else:
-                                            self.pidcontrol.confPID(kp,ki,kd,pOnE=self.pidcontrol.pOnE)
+                                            self.pidcontrol.confPID(kp,ki,kd)
                                             self.sendmessage(f'Artisan Command: {cs}')
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
@@ -9872,7 +9877,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                         kp = self.pidcontrol.pidKp
                                         ki = self.pidcontrol.pidKi
                                         kd = self.pidcontrol.pidKd
-                                        self.pidcontrol.confPID(kp,ki,kd,pOnE=self.pidcontrol.pOnE,source=source)
+                                        self.pidcontrol.confPID(kp,ki,kd,source=source)
                                         self.sendmessage(f'Artisan Command: {cs}')
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
@@ -12727,8 +12732,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.pidcontrol.pidKd = float(profile['pidKd'])
             if 'pidSource' in profile:
                 self.pidcontrol.pidSource = int(profile['pidSource'])
-            if 'pOnE' in profile:
-                self.pidcontrol.pOnE = bool(profile['pOnE'])
             if 'svLookahead' in profile:
                 self.pidcontrol.svLookahead = int(profile['svLookahead'])
         except Exception as e: # pylint: disable=broad-except
@@ -16124,7 +16127,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             profile['pidKi'] = self.pidcontrol.pidKi
             profile['pidKd'] = self.pidcontrol.pidKd
             profile['pidSource'] = self.pidcontrol.pidSource
-            profile['pOnE'] = self.pidcontrol.pOnE
             profile['svLookahead'] = self.pidcontrol.svLookahead
             try:
                 ds = list(self.qmc.extradevices)
@@ -17291,7 +17293,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.modbus.inputFloatsAsInt[i] = toBool(settings.value(f'input{i+1}FloatsAsInt',self.modbus.inputFloatsAsInt[i]))
                 self.modbus.inputBCDsAsInt[i] = toBool(settings.value(f'input{i+1}BCDsAsInt',self.modbus.inputBCDsAsInt[i]))
                 self.modbus.inputSigned[i] = toBool(settings.value(f'input{i+1}Signed',self.modbus.inputSigned[i]))
-            self.modbus.byteorderLittle = toBool(settings.value('littleEndianFloats',self.modbus.byteorderLittle))
             self.modbus.wordorderLittle = toBool(settings.value('wordorderLittle',self.modbus.wordorderLittle))
             self.modbus.optimizer = toBool(settings.value('optimizer',self.modbus.optimizer))
             self.modbus.fetch_max_blocks = toBool(settings.value('fetch_max_blocks',self.modbus.fetch_max_blocks))
@@ -17444,7 +17445,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.pidcontrol.pidPositiveTarget = toInt(settings.value('pidPositiveTarget',self.pidcontrol.pidPositiveTarget))
             self.pidcontrol.pidNegativeTarget = toInt(settings.value('pidNegativeTarget',self.pidcontrol.pidNegativeTarget))
             self.pidcontrol.invertControl = toBool(settings.value('invertControl',self.pidcontrol.invertControl))
-            self.pidcontrol.pOnE = toBool(settings.value('pOnE',self.pidcontrol.pOnE))
 
             for n in range(self.pidcontrol.RSLen):
                 svLabelLabel = 'RS_svLabel'+str(n)
@@ -19033,7 +19033,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'PIDmultiplier',self.modbus.PIDmultiplier, read_defaults)
             self.settingsSetValue(settings, default_settings, 'SVmultiplier',self.modbus.SVmultiplier, read_defaults)
             self.settingsSetValue(settings, default_settings, 'SVwriteLong',self.modbus.SVwriteLong, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'littleEndianFloats',self.modbus.byteorderLittle, read_defaults)
             self.settingsSetValue(settings, default_settings, 'wordorderLittle',self.modbus.wordorderLittle, read_defaults)
             self.settingsSetValue(settings, default_settings, 'optimizer',self.modbus.optimizer, read_defaults)
             self.settingsSetValue(settings, default_settings, 'fetch_max_blocks',self.modbus.fetch_max_blocks, read_defaults)
@@ -19112,7 +19111,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'pidPositiveTarget',self.pidcontrol.pidPositiveTarget, read_defaults)
             self.settingsSetValue(settings, default_settings, 'pidNegativeTarget',self.pidcontrol.pidNegativeTarget, read_defaults)
             self.settingsSetValue(settings, default_settings, 'invertControl',self.pidcontrol.invertControl, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'pOnE',self.pidcontrol.pOnE, read_defaults)
             for n in range(self.pidcontrol.RSLen):
                 self.settingsSetValue(settings, default_settings, 'RS_svLabel'+str(n),self.pidcontrol.RS_svLabels[n], read_defaults)
                 self.settingsSetValue(settings, default_settings, 'RS_svValues'+str(n),self.pidcontrol.RS_svValues[n], read_defaults)
@@ -23095,7 +23093,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.modbus.SVmultiplier = dialog.modbus_SVmultiplier.currentIndex()
             self.modbus.SVwriteLong = bool(dialog.modbus_SVwriteLong.isChecked())
             self.modbus.PIDmultiplier = dialog.modbus_PIDmultiplier.currentIndex()
-            self.modbus.byteorderLittle = bool(dialog.modbus_littleEndianBytes.isChecked())
             self.modbus.wordorderLittle = bool(dialog.modbus_littleEndianWords.isChecked())
             self.modbus.optimizer = bool(dialog.modbus_optimize.isChecked())
             self.modbus.fetch_max_blocks = bool(dialog.modbus_full_block.isChecked())

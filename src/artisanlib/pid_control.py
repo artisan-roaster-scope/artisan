@@ -1139,7 +1139,7 @@ class PIDcontrol:
             'svValues', 'svSync', 'svRamps', 'svSoaks', 'svActions', 'svBeeps', 'svDescriptions','svTriggeredAlarms',
             'RSLen', 'RS_svLabels', 'RS_svValues', 'RS_svRamps', 'RS_svSoaks',
             'RS_svActions', 'RS_svBeeps', 'RS_svDescriptions', 'svSlider', 'svButtons', 'svMode', 'svLookahead', 'dutySteps', 'svSliderMin', 'svSliderMax', 'svValue',
-            'dutyMin', 'dutyMax', 'pidKp', 'pidKi', 'pidKd', 'pOnE', 'pidSource', 'pidCycle', 'pidPositiveTarget', 'pidNegativeTarget', 'invertControl',
+            'dutyMin', 'dutyMax', 'pidKp', 'pidKi', 'pidKd', 'pidSource', 'pidCycle', 'pidPositiveTarget', 'pidNegativeTarget', 'invertControl',
             'sv_smoothing_factor', 'sv_decay_weights', 'previous_svs', 'time_pidON', 'source_reading_pidON', 'current_ramp_segment',  'current_soak_segment', 'ramp_soak_engaged',
             'RS_total_time', 'slider_force_move', 'positiveTargetRangeLimit', 'positiveTargetMin', 'positiveTargetMax', 'negativeTargetRangeLimit',
             'negativeTargetMin', 'negativeTargetMax', 'derivative_filter']
@@ -1151,7 +1151,7 @@ class PIDcontrol:
         #
         self.pidOnCHARGE:bool = False
         self.RStimeAfterCHARGE = False # if True RS time is taken from CHARGE if FALSE it is the time after the PID was last started
-        self.loadpidfrombackground = False # if True, p-i-d parameters pidKp, pidKi, pidKd, pidSource, pOnE and svLookahead are set from the background profile
+        self.loadpidfrombackground = False # if True, p-i-d parameters pidKp, pidKi, pidKd, pidSource, and svLookahead are set from the background profile
         self.createEvents:bool = False
         self.loadRampSoakFromProfile:bool = False
         self.loadRampSoakFromBackground:bool = False
@@ -1197,7 +1197,6 @@ class PIDcontrol:
         self.pidKi:float = (0.01 if self.aw.qmc.mode == 'C' else 0.00556) # 0.01 in C
         self.pidKd:float = (20.0 if self.aw.qmc.mode == 'C' else 11.1111) # 20.0 in C
         # Proposional on Measurement mode see: http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/
-        self.pOnE:bool = True # True for Proposional on Error mode, False for Proposional on Measurement Mode
         # pidSource
         #   either the TC4 input channel from [1,..,4] if self.qmc.device == 19 (Arduino/TC4)
         #   in all other cases (HOTTOP, MODBUS,..), 1 is interpreted as BT and 2 as ET, 3 as 0xT1, 4 as 0xT2, 5 as 1xT1, ...
@@ -1379,7 +1378,7 @@ class PIDcontrol:
     def confSoftwarePID(self) -> None:
         if self.externalPIDControl() not in [1, 2, 4] and not(self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag) and self.aw.qmc.Controlbuttonflag:
             # software PID
-            self.aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd,self.pOnE)
+            self.aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd)
             self.aw.qmc.pid.setLimits((-100 if self.pidNegativeTarget else 0),(100 if self.pidPositiveTarget else 0))
             self.aw.qmc.pid.setDutySteps(self.dutySteps)
             self.aw.qmc.pid.setDutyMin(self.dutyMin)
@@ -1410,7 +1409,7 @@ class PIDcontrol:
             self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PIDactive'])
         elif self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag: # ArduinoTC4 firmware PID
             if send_command and self.aw.ser.ArduinoIsInitialized:
-                self.confPID(self.pidKp,self.pidKi,self.pidKd,self.pidSource,self.pidCycle,self.pOnE) # first configure PID according to the actual settings
+                self.confPID(self.pidKp,self.pidKi,self.pidKd,self.pidSource,self.pidCycle) # first configure PID according to the actual settings
                 try:
                     #### lock shared resources #####
                     self.aw.ser.COMsemaphore.acquire(1)
@@ -1434,7 +1433,7 @@ class PIDcontrol:
             self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PIDactive'])
         elif self.aw.qmc.Controlbuttonflag:
             # software PID
-            self.aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd,self.pOnE)
+            self.aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd)
             self.aw.qmc.pid.setLimits((-100 if self.pidNegativeTarget else 0),(100 if self.pidPositiveTarget else 0))
             self.aw.qmc.pid.setDutySteps(self.dutySteps)
             self.aw.qmc.pid.setDutyMin(self.dutyMin)
@@ -1768,18 +1767,17 @@ class PIDcontrol:
             self.aw.buttonSVm5.setVisible(False)
 
     # just store the p-i-d configuration
-    def setPID(self, kp:float, ki:float, kd:float, source:Optional[int] = None, cycle:Optional[int] = None, pOnE:bool = True) -> None:
+    def setPID(self, kp:float, ki:float, kd:float, source:Optional[int] = None, cycle:Optional[int] = None) -> None:
         self.pidKp = kp
         self.pidKi = ki
         self.pidKd = kd
-        self.pOnE = pOnE
         if source is not None:
             self.pidSource = source
         if cycle is not None:
             self.pidCycle = cycle
 
     # send conf to connected PID
-    def confPID(self, kp:float, ki:float, kd:float, source:Optional[int] = None, cycle:Optional[int] = None, pOnE:bool = True) -> None:
+    def confPID(self, kp:float, ki:float, kd:float, source:Optional[int] = None, cycle:Optional[int] = None) -> None:
         if self.externalPIDControl() == 1: # MODBUS (external) Control active
             self.aw.modbus.setPID(kp,ki,kd)
             self.pidKp = kp
@@ -1796,7 +1794,6 @@ class PIDcontrol:
             self.pidKp = kp
             self.pidKi = ki
             self.pidKd = kd
-            self.pOnE = pOnE
             if source is not None and source in {1, 2, 3, 4}:
                 self.pidSource = source
             if self.aw.ser.ArduinoIsInitialized:
@@ -1806,10 +1803,7 @@ class PIDcontrol:
                     if self.aw.ser.SP.is_open:
                         self.aw.ser.SP.reset_input_buffer() # self.aw.ser.SP.flushInput() # deprecated in v3
                         self.aw.ser.SP.reset_output_buffer() # self.aw.ser.SP.flushOutput() # deprecated in v3
-                        if pOnE:
-                            self.aw.ser.SP.write(str2cmd('PID;T;' + str(kp) + ';' + str(ki) + ';' + str(kd) + '\n'))
-                        else:
-                            self.aw.ser.SP.write(str2cmd('PID;T_POM;' + str(kp) + ';' + str(ki) + ';' + str(kd) + '\n'))
+                        self.aw.ser.SP.write(str2cmd('PID;T;' + str(kp) + ';' + str(ki) + ';' + str(kd) + '\n'))
                         if source is not None and source in {1, 2, 3, 4}:
                             libtime.sleep(.03)
                             self.aw.ser.SP.write(str2cmd('PID;CHAN;' + str(source) + '\n'))
@@ -1821,11 +1815,10 @@ class PIDcontrol:
                     if self.aw.ser.COMsemaphore.available() < 1:
                         self.aw.ser.COMsemaphore.release(1)
         elif self.aw.qmc.Controlbuttonflag: # in all other cases if the "Control" flag is ticked
-            self.aw.qmc.pid.setPID(kp,ki,kd,pOnE)
+            self.aw.qmc.pid.setPID(kp,ki,kd)
             self.pidKp = kp
             self.pidKi = ki
             self.pidKd = kd
-            self.pOnE = pOnE
             self.aw.qmc.pid.setLimits((-100 if self.pidNegativeTarget else 0),(100 if self.pidPositiveTarget else 0))
             if source is not None and source>0:
                 self.pidSource = source

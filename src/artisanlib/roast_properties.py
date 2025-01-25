@@ -4499,7 +4499,10 @@ class editGraphDlg(ArtisanResizeablDialog):
     def weightouteditChanged(self) -> None:
         self.weightoutedit.setText(comma2dot(self.weightoutedit.text()))
         self.percent()
-        self.calculated_density()
+        if ((self.bean_density_out_edit.text() in {'0',''} and self.volumeoutedit.text() not in {'0',''} and self.weightoutedit.text().strip() not in {'0',''}) or
+                (self.volumeoutedit.text() in {'0',''} and self.weightoutedit.text().strip() not in {'0',''})):
+            self.calculated_density()
+        self.density_out_editing_finished() # recalc volume_out
         if self.weightoutedit.text() != '' and float(self.weightoutedit.text()) != 0:
             self.density_out_editing_finished() # recalc volume_out
         # mark weightoutedit if higher than weightinedit
@@ -4551,10 +4554,14 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.weightinedit.setText(comma2dot(str(self.weightinedit.text())))
         self.weightinedit.repaint()
         self.percent()
-        self.calculated_density()
-        keep_modified_density = self.modified_density_in_text
+        keep_modified_density:Optional[str] = self.modified_density_in_text
+        if ((self.bean_density_in_edit.text() in {'0',''} and self.volumeinedit.text() not in {'0',''} and self.weightinedit.text().strip() not in {'0',''}) or
+                (self.volumeinedit.text() in {'0',''} and self.weightinedit.text().strip() not in {'0',''})):
+            self.calculated_density()
+            keep_modified_density = self.modified_density_in_text
         self.density_in_editing_finished() # recalc volume_in
-        self.modified_density_in_text = keep_modified_density
+        if keep_modified_density is not None:
+            self.modified_density_in_text = keep_modified_density
         self.recentRoastEnabled()
         if self.aw.plus_account is not None:
             blend_idx = self.plus_blends_combo.currentIndex()
@@ -4713,7 +4720,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if self.bean_density_in_edit.text() != '':
             density_in = float(comma2dot(self.bean_density_in_edit.text()))
             if density_in != 0:
-                if self.weightinedit.text() != '' and self.volumeinedit.text().strip() in {'0',''}:
+                if self.weightinedit.text() != '': # and self.volumeinedit.text().strip() in {'0',''}: # prefer to recompute volume which is seldom measured
                     # if density-in and weight-in is given, we re-calc volume-in:
                     weight_in = float(comma2dot(self.weightinedit.text()))
                     if weight_in != 0:
@@ -4741,7 +4748,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if self.bean_density_out_edit.text() != '':
             density_out = float(self.bean_density_out_edit.text())
             if density_out != 0:
-                if self.weightoutedit.text() != '' and self.volumeoutedit.text().strip() in {'0',''}:
+                if self.weightoutedit.text() != '': # and self.volumeoutedit.text().strip() in {'0',''}:
                     # if density-out and weight-out is given, we re-calc volume-out:
                     weight_out = float(comma2dot(self.weightoutedit.text()))
                     if weight_out != 0:

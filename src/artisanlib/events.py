@@ -2497,7 +2497,7 @@ class EventsDlg(ArtisanResizeablDialog):
         columns = 9
         if self.eventbuttontable is not None and self.eventbuttontable.columnCount() == columns:
             # rows have been already established
-            # save the current columnWidth to reset them afte table creation
+            # save the current columnWidth to reset them after table creation
             self.aw.eventbuttontablecolumnwidths = [self.eventbuttontable.columnWidth(c) for c in range(self.eventbuttontable.columnCount())]
 
         self.nbuttonsSpinBox.setValue(int(self.aw.buttonlistmaxlen))

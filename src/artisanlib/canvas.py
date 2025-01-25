@@ -3218,7 +3218,7 @@ class tgraphcanvas(FigureCanvas):
                         self.aw.onMarkMoveToNext(self.aw.buttonCHARGE)
 
                     self.xaxistosm(redraw=False) # need to fix uneven x-axis labels like -0:13
-                    self.updateProjection() # we update the data here to have the projections drawn by the redraw() triggered by belows timealign
+                    self.updateProjection() # we update the data here to have the projections drawn by the redraw() triggered by the call to timealign below
                 else:
                     # we keep xaxis limit the same but adjust to updated timeindex[0] mark
                     if timeindex_before > -1:
@@ -3557,7 +3557,7 @@ class tgraphcanvas(FigureCanvas):
         # if v[-1] is the current temperature then check if
         #   we are 20sec after CHARGE
         #   len(BT) > 4
-        # BT[-5] <= BT[-4] abd BT[-5] <= BT[-3] and BT[-5] <= BT[-2] and BT[-5] <= BT[-1] and BT[-5] < BT[-1]
+        # BT[-5] <= BT[-4] and BT[-5] <= BT[-3] and BT[-5] <= BT[-2] and BT[-5] <= BT[-1] and BT[-5] < BT[-1]
         if seconds_since_CHARGE > 20 and not self.afterTP and len(self.temp2) > 3 and (self.temp2[-5] <= self.temp2[-4]) and (self.temp2[-5] <= self.temp2[-3]) and (self.temp2[-5] <= self.temp2[-2]) and (self.temp2[-5] <= self.temp2[-1]) and (self.temp2[-5] < self.temp2[-1]):
             self.afterTP = True
         return self.afterTP
@@ -6617,7 +6617,7 @@ class tgraphcanvas(FigureCanvas):
             self.roastbatchpos = 1 # initialized to 1, set to increased batchsequence on DROP
             self.roastbatchprefix = self.batchprefix
 
-            # reset scheduleID/Date (prevents re-using a previous loaded profiles scheduleID to be 'reused')
+            # reset scheduleID/Date (prevents reusing a previous loaded profiles scheduleID to be 'reused')
             self.scheduleID = None
             self.scheduleDate = None
 
@@ -12979,7 +12979,7 @@ class tgraphcanvas(FigureCanvas):
                                 if time_temp_annos is not None:
                                     self.l_annotations += time_temp_annos
 
-                        self.updateProjection() # we update the data here to have the projections drawn by the redraw() triggered by belows timealign
+                        self.updateProjection() # we update the data here to have the projections drawn by the redraw() triggered by the call to timealign below
 
                         # mark active slider values that are not zero
                         for slidernr in range(4):

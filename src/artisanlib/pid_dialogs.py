@@ -34,14 +34,14 @@ try:
     from PyQt6.QtGui import QIntValidator, QRegularExpressionValidator # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
         QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
-        QMessageBox, QRadioButton, QSpinBox, QStatusBar, QTabWidget, QButtonGroup, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
+        QMessageBox, QRadioButton, QSpinBox, QStatusBar, QTabWidget, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
         QTimeEdit, QLayout, QSizePolicy, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import Qt, pyqtSlot, QRegularExpression, QSettings, QTimer # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QIntValidator, QRegularExpressionValidator # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton, # type:ignore # @UnusedImport @Reimport  @UnresolvedImport
         QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
-        QMessageBox, QRadioButton, QSpinBox, QStatusBar, QTabWidget, QButtonGroup, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
+        QMessageBox, QRadioButton, QSpinBox, QStatusBar, QTabWidget, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
         QTimeEdit, QLayout, QSizePolicy, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
 
 
@@ -126,22 +126,6 @@ class PID_DlgControl(ArtisanDialog):
         pidSetBox.addStretch()
         pidSetBox.addWidget(pidSetPID)
 
-        self.pOnGroup = QButtonGroup()
-        self.pOnGroup.setExclusive(True)
-        self.pOnE = QRadioButton('P on Error')
-        self.pOnGroup.addButton(self.pOnE)
-        self.pOnM = QRadioButton('P on Input')
-        self.pOnGroup.addButton(self.pOnM)
-        self.pOnE.setChecked(self.aw.pidcontrol.pOnE)
-        self.pOnM.setChecked(not self.aw.pidcontrol.pOnE)
-        if pid_controller in {1,2}:
-            self.pOnE.setEnabled(False)
-            self.pOnM.setEnabled(False)
-
-        pOnLayout = QVBoxLayout()
-        pOnLayout.addWidget(self.pOnE)
-        pOnLayout.addWidget(self.pOnM)
-
         self.SVsyncSource = QComboBox()
         self.SVsyncSource.setToolTip(QApplication.translate('Tooltip', 'Source for SV slider synchronization in manual mode'))
         SVsyncSourceLabel = QLabel(QApplication.translate('Label','Sync'))
@@ -159,6 +143,7 @@ class PID_DlgControl(ArtisanDialog):
             else:
                 self.SVsyncSource.setCurrentIndex(0)
 
+        pidGridVBox = QVBoxLayout()
         pidVBox = QVBoxLayout()
         if pid_controller in {0, 1, 2, 3, 4}: # only for internal PID, MODBUS/S7 PID and TC4/Kaleido; NOTE: for MODBUS/S7 the input is used only to decide on the source for the background follow mode SV
             self.pidSource = QComboBox()
@@ -191,16 +176,17 @@ class PID_DlgControl(ArtisanDialog):
             pidSourceBox.addWidget(self.pidSource)
             #pidSourceBox.addSpacing(80)
             pidSourceBox.addStretch()
-            pidVBox.addLayout(pidSourceBox)
+#            pidVBox.addLayout(pidSourceBox)
+            pidGridVBox.addLayout(pidSourceBox)
             if pid_controller in {3, 4}: # TC4/Kaleido
                 pidVBox.addLayout(pidCycleBox)
-        pidVBox.addLayout(pOnLayout)
-        pidVBox.setAlignment(pOnLayout,Qt.AlignmentFlag.AlignRight)
+        pidVBox.addStretch()
         pidVBox.addLayout(pidSetBox)
         pidVBox.setAlignment(pidSetBox,Qt.AlignmentFlag.AlignRight)
 
+        pidGridVBox.addLayout(pidGrid)
         pidGridBox = QHBoxLayout()
-        pidGridBox.addLayout(pidGrid)
+        pidGridBox.addLayout(pidGridVBox)
         pidGridBox.addLayout(pidVBox)
         if pid_controller == 0: # Output configuration only for internal PID
             #PID target (only shown if internal PID for hottop/modbus/TC4 is active
@@ -1189,8 +1175,7 @@ class PID_DlgControl(ArtisanDialog):
                 source = self.pidSource.currentIndex() + 1 # 3, 4, ... (extra device curves)
             if self.aw.pidcontrol.externalPIDControl() in {3, 4}: # only TC4/Kaleido
                 cycle = self.pidCycle.value() # def 1000 in ms
-        pOnE = bool(self.pOnE.isChecked())
-        self.aw.pidcontrol.confPID(kp,ki,kd,source,cycle,pOnE)
+        self.aw.pidcontrol.confPID(kp,ki,kd,source,cycle)
         if self.aw.pidcontrol.externalPIDControl() == 0: # Targets only for internal PID
             self.aw.pidcontrol.pidPositiveTarget = self.positiveControlCombo.currentIndex()
             self.aw.pidcontrol.pidNegativeTarget = self.negativeControlCombo.currentIndex()
@@ -1232,8 +1217,7 @@ class PID_DlgControl(ArtisanDialog):
                 self.aw.pidcontrol.svSync = 1 # BT
             else:
                 self.aw.pidcontrol.svSync = svSyncIdx # 0: off, 3, 4, ... (extra device curves)
-        pOnE = bool(self.pOnE.isChecked())
-        self.aw.pidcontrol.setPID(kp,ki,kd,source,cycle,pOnE)
+        self.aw.pidcontrol.setPID(kp,ki,kd,source,cycle)
         #
         self.aw.pidcontrol.pidOnCHARGE = self.startPIDonCHARGE.isChecked()
 #        self.aw.pidcontrol.RStimeAfterCHARGE = self.radioTimeAfterCHARGE.isChecked()
@@ -3540,7 +3524,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
             reg_dict = self.aw.fujipid.PXG4
         else:
             reg_dict = self.aw.fujipid.PXF
-        #first get the new sv value from the corresponding edit ine
+        #first get the new sv value from the corresponding edit line
         if k == 1 and self.p1edit.text() != '' and self.i1edit.text() != '' and self.d1edit.text() != '':
             newPvalue = int(toFloat(str(self.p1edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
             newIvalue = int(toFloat(str(self.i1edit.text().replace(',','.')))*10.)

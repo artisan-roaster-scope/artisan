@@ -8,7 +8,8 @@ v3.1.1
 * NEW HARDWARE SUPPORT
   - adds support for the [DCC1100 and DCC1120 Brushless DC Motor controllers and the DCC1020 DC Motor controller](https://artisan-scope.org/devices/phidgets/#45-dc-motor-control) ([Discussion #1750](../../../discussions/1750))
   - adds support for [Carmomaq's Stratto Lab sample roaster](https://carmomaq.com.br/en/produtos/stratto-roaster-lab/)
-  - updated Giesen support (now incl. sample roasters and PRO machines)
+  - adds a new [IMF](https://artisan-scope.org/machines/imf/) machine setup that adds machine control
+  - updated [Giesen](https://artisan-scope.org/machines/giesen/) machine support (now incl. sample roasters and PRO machines)
 
 * ADDITIONS
   - adds drag-and-drop to Stats Summary table configuration
@@ -17,6 +18,8 @@ v3.1.1
 * CHANGES
   - the Phidget driver is now bundled with the Artisan app and does no longer need to be installed separately (but for some legacy USB HID devices, like the original 1046 and 1048, which still need the kernel extension of the driver package installed in the system)
   - indicates [artisan.plus](https://artisan.plus) connection loss more reliable
+  - update volume not density if weight changes and volume is set in Roast Properties ([Discussion #1786](../../../discussions/1786))
+  - generated WebLCD URL are using more stable host names instead of potentially DHCP assigned IP addresses
   - updated Turkish translations (thanks to Kemal Akdas)
 
 * FIXES
@@ -26,6 +29,10 @@ v3.1.1
   - fixes processing of MODBUS function 2 request which broke the just introduced autoCHARGE/autoDROP triggered by Loring machines
   - fixes a typo which allowed to open multiple Roast Properties dialogs ([Issue #1781](../../../issues/1781))
 
+
+* REMOVALS
+  - support for the non-standard MODBUS little-endian byte order has been removed
+  - removes the experimental PID P-on-Measurement/Input mode ([Issue #1744](../../../issues/1744))
 
 
 ----
