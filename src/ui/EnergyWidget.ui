@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
-    <height>470</height>
+    <width>686</width>
+    <height>397</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -414,7 +414,7 @@
       <string notr="true"/>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="detailsTab">
       <property name="toolTip">
@@ -638,9 +638,6 @@
           </property>
           <item row="2" column="5">
            <widget class="QComboBox" name="events1">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
             <property name="toolTip">
              <string notr="true"/>
             </property>
@@ -690,6 +687,18 @@
           </item>
           <item row="3" column="3">
            <widget class="QComboBox" name="ratingunit2">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="toolTip">
              <string notr="true"/>
             </property>
@@ -699,10 +708,25 @@
             <property name="currentText">
              <string notr="true"/>
             </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::AdjustToContents</enum>
+            </property>
            </widget>
           </item>
           <item row="2" column="4">
            <widget class="QComboBox" name="sourcetype1">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="toolTip">
              <string notr="true"/>
             </property>
@@ -716,6 +740,18 @@
           </item>
           <item row="3" column="4">
            <widget class="QComboBox" name="sourcetype2">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="toolTip">
              <string notr="true"/>
             </property>
@@ -972,9 +1008,6 @@
           </item>
           <item row="3" column="5">
            <widget class="QComboBox" name="events2">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
             <property name="toolTip">
              <string notr="true"/>
             </property>
@@ -1122,7 +1155,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>40</width>
+                <width>0</width>
                 <height>20</height>
                </size>
               </property>
@@ -1148,7 +1181,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>40</width>
+                <width>0</width>
                 <height>20</height>
                </size>
               </property>
@@ -1190,7 +1223,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>40</width>
+                <width>0</width>
                 <height>20</height>
                </size>
               </property>
@@ -1219,7 +1252,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>40</width>
+                <width>0</width>
                 <height>20</height>
                </size>
               </property>
@@ -1229,6 +1262,18 @@
           </item>
           <item row="4" column="3">
            <widget class="QComboBox" name="ratingunit3">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="toolTip">
              <string notr="true"/>
             </property>
@@ -1237,11 +1282,26 @@
             </property>
             <property name="currentText">
              <string notr="true"/>
+            </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::AdjustToContents</enum>
             </property>
            </widget>
           </item>
           <item row="1" column="3">
            <widget class="QComboBox" name="ratingunit0">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="toolTip">
              <string notr="true"/>
             </property>
@@ -1251,10 +1311,25 @@
             <property name="currentText">
              <string notr="true"/>
             </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::AdjustToContents</enum>
+            </property>
            </widget>
           </item>
           <item row="1" column="4">
            <widget class="QComboBox" name="sourcetype0">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="toolTip">
              <string notr="true"/>
             </property>
@@ -1315,6 +1390,18 @@
           </item>
           <item row="2" column="3">
            <widget class="QComboBox" name="ratingunit1">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="toolTip">
              <string notr="true"/>
             </property>
@@ -1324,10 +1411,25 @@
             <property name="currentText">
              <string notr="true"/>
             </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::AdjustToContents</enum>
+            </property>
            </widget>
           </item>
           <item row="4" column="4">
            <widget class="QComboBox" name="sourcetype3">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="toolTip">
              <string notr="true"/>
             </property>
@@ -1426,9 +1528,6 @@
           </item>
           <item row="4" column="5">
            <widget class="QComboBox" name="events3">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
             <property name="toolTip">
              <string notr="true"/>
             </property>
@@ -1449,7 +1548,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>40</width>
+                <width>0</width>
                 <height>20</height>
                </size>
               </property>
@@ -1475,7 +1574,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>40</width>
+                <width>0</width>
                 <height>20</height>
                </size>
               </property>
@@ -1546,7 +1645,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>40</width>
+                <width>0</width>
                 <height>20</height>
                </size>
               </property>
@@ -1572,7 +1671,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>40</width>
+                <width>0</width>
                 <height>20</height>
                </size>
               </property>
@@ -1595,7 +1694,7 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>40</width>
+             <width>10</width>
              <height>20</height>
             </size>
            </property>
@@ -1632,9 +1731,6 @@
               </property>
              </widget>
             </item>
-            <item row="1" column="0">
-             <widget class="QLineEdit" name="meter1LabelLineEdit"/>
-            </item>
             <item row="0" column="1">
              <widget class="QLabel" name="meter1UnitLabel">
               <property name="text">
@@ -1642,18 +1738,67 @@
               </property>
              </widget>
             </item>
-            <item row="1" column="1">
-             <widget class="QComboBox" name="meter1UnitComboBox"/>
-            </item>
-            <item row="1" column="2">
-             <widget class="QComboBox" name="meter1SourceComboBox"/>
-            </item>
             <item row="0" column="2">
+             <widget class="QLabel" name="meter1FuelLabel">
+              <property name="text">
+               <string>Fuel</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3">
              <widget class="QLabel" name="meter1SourceLabel">
               <property name="text">
                <string>Source</string>
               </property>
              </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLineEdit" name="meter1LabelLineEdit">
+              <property name="minimumSize">
+               <size>
+                <width>60</width>
+                <height>0</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QComboBox" name="meter1UnitComboBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>80</width>
+                <height>0</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2">
+             <widget class="QComboBox" name="meter1FuelComboBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>80</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="sizeAdjustPolicy">
+               <enum>QComboBox::AdjustToContents</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="3">
+             <widget class="QComboBox" name="meter1SourceComboBox"/>
             </item>
            </layout>
           </widget>
@@ -1668,7 +1813,7 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>40</width>
+             <width>10</width>
              <height>20</height>
             </size>
            </property>
@@ -1698,14 +1843,53 @@
             <property name="verticalSpacing">
              <number>1</number>
             </property>
+            <item row="1" column="0">
+             <widget class="QLineEdit" name="meter2LabelLineEdit">
+              <property name="minimumSize">
+               <size>
+                <width>60</width>
+                <height>0</height>
+               </size>
+              </property>
+             </widget>
+            </item>
             <item row="1" column="1">
-             <widget class="QComboBox" name="meter2UnitComboBox"/>
+             <widget class="QComboBox" name="meter2UnitComboBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>80</width>
+                <height>0</height>
+               </size>
+              </property>
+             </widget>
             </item>
             <item row="1" column="2">
-             <widget class="QComboBox" name="meter2SourceComboBox"/>
+             <widget class="QComboBox" name="meter2FuelComboBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>80</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="sizeAdjustPolicy">
+               <enum>QComboBox::AdjustToContents</enum>
+              </property>
+             </widget>
             </item>
-            <item row="1" column="0">
-             <widget class="QLineEdit" name="meter2LabelLineEdit"/>
+            <item row="1" column="3">
+             <widget class="QComboBox" name="meter2SourceComboBox"/>
             </item>
             <item row="0" column="0">
              <widget class="QLabel" name="meter2Label">
@@ -1722,6 +1906,13 @@
              </widget>
             </item>
             <item row="0" column="2">
+             <widget class="QLabel" name="meter2FuelLabel">
+              <property name="text">
+               <string>Fuel</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3">
              <widget class="QLabel" name="meter2SourceLabel">
               <property name="text">
                <string>Source</string>
@@ -1738,7 +1929,7 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>40</width>
+             <width>10</width>
              <height>20</height>
             </size>
            </property>
@@ -2952,24 +3143,35 @@
   <tabstop>hundredpct0</tabstop>
   <tabstop>loadlabel1</tabstop>
   <tabstop>loadrating1</tabstop>
+  <tabstop>ratingunit1</tabstop>
+  <tabstop>sourcetype1</tabstop>
+  <tabstop>events1</tabstop>
   <tabstop>pressureCheckBox1</tabstop>
   <tabstop>zeropcts1</tabstop>
   <tabstop>hundredpct1</tabstop>
   <tabstop>loadlabel2</tabstop>
   <tabstop>loadrating2</tabstop>
+  <tabstop>ratingunit2</tabstop>
+  <tabstop>sourcetype2</tabstop>
+  <tabstop>events2</tabstop>
   <tabstop>pressureCheckBox2</tabstop>
   <tabstop>zeropcts2</tabstop>
   <tabstop>hundredpct2</tabstop>
   <tabstop>loadlabel3</tabstop>
   <tabstop>loadrating3</tabstop>
+  <tabstop>ratingunit3</tabstop>
+  <tabstop>sourcetype3</tabstop>
+  <tabstop>events3</tabstop>
   <tabstop>pressureCheckBox3</tabstop>
   <tabstop>zeropcts3</tabstop>
   <tabstop>hundredpct3</tabstop>
   <tabstop>meter1LabelLineEdit</tabstop>
   <tabstop>meter1UnitComboBox</tabstop>
+  <tabstop>meter1FuelComboBox</tabstop>
   <tabstop>meter1SourceComboBox</tabstop>
   <tabstop>meter2LabelLineEdit</tabstop>
   <tabstop>meter2UnitComboBox</tabstop>
+  <tabstop>meter2FuelComboBox</tabstop>
   <tabstop>meter2SourceComboBox</tabstop>
   <tabstop>electricEnergyMixSpinBox</tabstop>
   <tabstop>gasMixSpinBox</tabstop>

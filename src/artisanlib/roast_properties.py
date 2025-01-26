@@ -1531,7 +1531,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         tab4Layout = QVBoxLayout()
         tab4Layout.addWidget(self.datatable)
         tab4Layout.addLayout(databuttonLayout)
-        tab4Layout.setContentsMargins(5, 5, 5, 5) # left, top, right, bottom
+        tab4Layout.setContentsMargins(2, 5, 2, 5) # left, top, right, bottom
         #tabwidget
         self.TabWidget = QTabWidget()
         self.TabWidget.setContentsMargins(0,0,0,0)
@@ -2782,11 +2782,23 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.loadlabelsLabel.setText(QApplication.translate('Label','Label'))
             self.energy_ui.loadratingsLabel.setText(QApplication.translate('Label','Rating'))
             self.energy_ui.ratingunitsLabel.setText(QApplication.translate('Label','Unit'))
-            self.energy_ui.sourcetypesLabel.setText(QApplication.translate('Label','Source'))
+            self.energy_ui.sourcetypesLabel.setText(QApplication.translate('Label','Type'))
             self.energy_ui.eventsLabel.setText(QApplication.translate('Label','Event'))
             self.energy_ui.pressureLabel.setText(QApplication.translate('Label','Pressure %'))
             self.energy_ui.electricEnergyMixLabel.setText(QApplication.translate('Label','Electric Energy Mix:'))
             self.energy_ui.renewableLabel.setText(QApplication.translate('Label','Renewable'))
+            self.energy_ui.renewableLabel2.setText(QApplication.translate('Label','Renewable'))
+            self.energy_ui.gasMixLabel.setText(QApplication.translate('Label','Gas Energy Mix:'))
+            self.energy_ui.meter1GroupBox.setTitle(QApplication.translate('Label','Meter 1'))
+            self.energy_ui.meter2GroupBox.setTitle(QApplication.translate('Label','Meter 2'))
+            self.energy_ui.meter1Label.setText(QApplication.translate('Label','Label'))
+            self.energy_ui.meter2Label.setText(QApplication.translate('Label','Label'))
+            self.energy_ui.meter1UnitLabel.setText(QApplication.translate('Label','Unit'))
+            self.energy_ui.meter2UnitLabel.setText(QApplication.translate('Label','Unit'))
+            self.energy_ui.meter1FuelLabel.setText(QApplication.translate('Label','Type'))
+            self.energy_ui.meter2FuelLabel.setText(QApplication.translate('Label','Type'))
+            self.energy_ui.meter1SourceLabel.setText(QApplication.translate('Label','Source'))
+            self.energy_ui.meter2SourceLabel.setText(QApplication.translate('Label','Source'))
             # Protocol tab
             self.energy_ui.protocolSetDefaultsButton.setText(QApplication.translate('Button','Save Defaults'))
             self.energy_ui.protocolDefaultsButton.setText(QApplication.translate('Button','Restore Defaults'))
@@ -2832,6 +2844,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             #
             self.energy_ui.meter1UnitComboBox.addItems(self.aw.qmc.meterunitnames)
             self.energy_ui.meter2UnitComboBox.addItems(self.aw.qmc.meterunitnames)
+            self.energy_ui.meter1FuelComboBox.addItems(self.aw.qmc.sourcenames)
+            self.energy_ui.meter2FuelComboBox.addItems(self.aw.qmc.sourcenames)
             #
             self.curvenames = []
             self.curvenames.append('')  # 'blank' top choice

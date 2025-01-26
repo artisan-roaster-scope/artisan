@@ -4373,7 +4373,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.toggleETCurve()
 
     def toggleBTCurve(self) -> None:
-        if len(self.qmc.temp2) > 20:
+        if len(self.qmc.temp2) > 5:
             # only if some data is given to have a visible clue
             self.qmc.BTcurve = not self.qmc.BTcurve
             # we reset the cached main event annotation positions as those annotations are now rendered on the other curve
@@ -4382,7 +4382,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.redraw_keep_view(recomputeAllDeltas=False)
 
     def toggleETCurve(self) -> None:
-        if len(self.qmc.temp1) > 20:
+        if len(self.qmc.temp1) > 5:
             # only if some data is given to have a visible clue
             self.qmc.ETcurve = not self.qmc.ETcurve
             # we reset the cached main event annotation positions as those annotations are now rendered on the other curve
@@ -4404,7 +4404,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.toggleDeltaBTCurve()
 
     def toggleDeltaETCurve(self) -> None:
-        if len(self.qmc.delta1) > 20:
+        if len(self.qmc.delta1) > 5:
             # only if some data is given to have a visible clue
             twoAxis_before = self.qmc.twoAxisMode()
             self.qmc.DeltaETflag = not self.qmc.DeltaETflag
@@ -4412,7 +4412,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.redraw_keep_view(recomputeAllDeltas=False, forceRenewAxis=twoAxis_before != twoAxis_after)
 
     def toggleDeltaBTCurve(self) -> None:
-        if len(self.qmc.delta2) > 20:
+        if len(self.qmc.delta2) > 5:
             # only if some data is given to have a visible clue
             twoAxis_before = self.qmc.twoAxisMode()
             self.qmc.DeltaBTflag = not self.qmc.DeltaBTflag
@@ -4425,7 +4425,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             sender = self.sender()
             assert isinstance(sender, ClickableLCDFrame)
             i = self.extraLCDframe1.index(sender)
-            if len(self.qmc.extratemp1[i])>20:
+            if len(self.qmc.extratemp1[i])>5:
                 # only if some data is given to have a visible clue
                 self.extraCurveVisibility1[i] = not self.extraCurveVisibility1[i]
         except Exception as e: # pylint: disable=broad-except
@@ -4438,7 +4438,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             sender = self.sender()
             assert isinstance(sender, ClickableLCDFrame)
             i = self.extraLCDframe2.index(sender)
-            if len(self.qmc.extratemp2[i])>20:
+            if len(self.qmc.extratemp2[i])>5:
                 # only if some data is given to have a visible clue
                 self.extraCurveVisibility2[i] = not self.extraCurveVisibility2[i]
         except Exception as e: # pylint: disable=broad-except

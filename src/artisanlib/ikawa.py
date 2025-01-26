@@ -69,7 +69,7 @@ def extractProfileIkawaURL(url:QUrl, aw:'ApplicationWindow') -> 'ProfileData':
                     timex.append(fp.time/10+30)
                     temp1.append(-1.0)
                     temp2.append(-1.0)
-                    extra1.append(-1)
+                    extra1.append(-1.0)
                     extra2.append(-1.0)
                     extra3.append(-1.0)
                     fan = round(fp.power / 2.55)
@@ -135,6 +135,11 @@ def extractProfileIkawaURL(url:QUrl, aw:'ApplicationWindow') -> 'ProfileData':
     res['extraname2'] = ['RPM', '{0}', 'Extra 2']
     res['extratemp2'] = [extra2, extra4, extra6]
     res['extramathexpression2'] = ['x/100', '', '']
+
+    res['extraLCDvisibility1'] = [True, True, True, True, True, True, True, True, True, True]
+    res['extraLCDvisibility2'] = [True, True, False, True, True, True, True, True, True, True]
+    res['extraCurveVisibility1'] = [True, True, True, True, True, True, True, True, True, True]
+    res['extraCurveVisibility2'] = [True, True, False, True, True, True, True, True, True, True]
 
     if len(specialevents) > 0:
         res['specialevents'] = specialevents
