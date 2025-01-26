@@ -12402,9 +12402,10 @@ class tgraphcanvas(FigureCanvas):
                                             ), begin, end 
                                          ]
                 except Exception as ex: # pylint: disable=broad-except
-                    _log.exception(ex)
-                    _, _, exc_tb = sys.exc_info()
-                    self.adderror((QApplication.translate('Error Message', 'Exception:') + ' getMeterReads() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+#                    _log.exception(ex)
+#                    _, _, exc_tb = sys.exc_info()
+#                    self.adderror((QApplication.translate('Error Message', 'Exception:') + ' getMeterReads() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+                    pass
                 
     def getAmbientData(self) -> None:
         _log.debug('getAmbientData()')
