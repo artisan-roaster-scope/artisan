@@ -14,6 +14,7 @@ v3.1.1
 * ADDITIONS
   - adds drag-and-drop to Stats Summary table configuration
   - allows to hide scheduled items
+  - adds support for feeding data from energy meters into Artisans roast energy calculator
 
 * CHANGES
   - the Phidget driver is now bundled with the Artisan app and does no longer need to be installed separately (but for some legacy USB HID devices, like the original 1046 and 1048, which still need the kernel extension of the driver package installed in the system)

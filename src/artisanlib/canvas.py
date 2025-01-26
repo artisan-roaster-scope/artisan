@@ -2240,7 +2240,7 @@ class tgraphcanvas(FigureCanvas):
         self.coolingenergies_setup:List[float] = [0]*4             # rating of the cooling burner
         self.betweenbatch_after_preheat_setup:bool = True          # True adds BBP to pre-heating (and cooling) for the first batch.
         self.electricEnergyMix_setup:int = 0                       # the amount of renewable electric energy in the energy mix in %
-            
+
         # Others
         self.energyresultunit_setup:int = 0                        # index in list self.powerunits
         self.kind_list: Final[List[str]] = [QApplication.translate('Label','Preheat Measured'),
@@ -2486,7 +2486,7 @@ class tgraphcanvas(FigureCanvas):
         self.presssure_percents_setup = self.presssure_percents[:]
         self.loadevent_zeropcts_setup = self.loadevent_zeropcts[:]
         self.loadevent_hundpcts_setup = self.loadevent_hundpcts[:]
-        self.meterlabels_setup = self.meterlabels[:] 
+        self.meterlabels_setup = self.meterlabels[:]
         self.meterunits_setup = self.meterunits[:]
         self.metersources_setup = self.metersources[:]
         self.electricEnergyMix_setup = self.electricEnergyMix
@@ -2501,7 +2501,7 @@ class tgraphcanvas(FigureCanvas):
         self.presssure_percents = self.presssure_percents_setup[:]
         self.loadevent_zeropcts = self.loadevent_zeropcts_setup[:]
         self.loadevent_hundpcts = self.loadevent_hundpcts_setup[:]
-        self.meterlabels = self.meterlabels_setup[:] 
+        self.meterlabels = self.meterlabels_setup[:]
         self.meterunits = self.meterunits_setup[:]
         self.metersources = self.metersources_setup[:]
         self.electricEnergyMix = self.electricEnergyMix_setup
@@ -12356,7 +12356,7 @@ class tgraphcanvas(FigureCanvas):
 
                 self.threadserver.terminatingSignal.connect(self.OffMonitorCloseDown)
                 self.flagon = False
-                
+
                 self.getMeterReads()
 
             except Exception as ex: # pylint: disable=broad-except
@@ -12395,18 +12395,18 @@ class tgraphcanvas(FigureCanvas):
                     elif len(self.extratemp2) > (x/2):
                         begin = self.extratemp2[x // 2][0]
                         end = self.extratemp2[x // 2][-1]
-                    
+
                     self.meterreads[i] = [calc_meter_read (
                                             self.convertHeat(begin, self.powerunits[self.meterunits[i]], 'BTU'),
                                             self.convertHeat(end, self.powerunits[self.meterunits[i]], 'BTU')
-                                            ), begin, end 
+                                            ), begin, end
                                          ]
-                except Exception as ex: # pylint: disable=broad-except
+                except Exception: # pylint: disable=broad-except
 #                    _log.exception(ex)
 #                    _, _, exc_tb = sys.exc_info()
 #                    self.adderror((QApplication.translate('Error Message', 'Exception:') + ' getMeterReads() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                     pass
-                
+
     def getAmbientData(self) -> None:
         _log.debug('getAmbientData()')
         # this is needed to suppress the message on the ignored Exception
@@ -15304,7 +15304,7 @@ class tgraphcanvas(FigureCanvas):
                     if BTUs > 0:
                         btu_list.append({'load_pct':load_pct,'duration':duration,'BTUs':BTUs,'CO2g':CO2g,'LoadLabel':loadlabel,'Kind':kind,'SourceType':self.sourcetypes[i],'SortOrder':sortorder})
             #### end of loop: for i in range(0,4)
-            
+
             # Meter reads
             for j in range(2):
                 if self.meterreads[j][0] > 0:
@@ -15317,7 +15317,7 @@ class tgraphcanvas(FigureCanvas):
                     CO2g = 0
                     kind = 8 # Meter
                     btu_list.append({'load_pct':0,'duration':0,'BTUs':BTUs,'CO2g':CO2g,'LoadLabel':loadlabel,'Kind':kind,'SourceType':sourcetype,'SortOrder':sortorder})
-            
+
             btu_list.sort(key=lambda k : k['SortOrder'] )
 
             # summarize the batch metrics
