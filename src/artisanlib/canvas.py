@@ -2214,16 +2214,23 @@ class tgraphcanvas(FigureCanvas):
         self.energyunits: Final[List[str]] = ['BTU', 'kJ', 'kCal', 'kWh', 'hph']
         self.powerunits: Final[List[str]] = ['BTU/h', 'kJ/h', 'kCal/h', 'kW', 'hp']
         self.sourcenames: Final[List[str]] = ['LPG', 'NG', QApplication.translate('ComboBox','Elec')]
-        ## setup defaults (stored in app :
+        self.meterunitnames: Final[List[str]] = ['BTU', 'kJ', 'kCal', 'kWh', 'hph']
+        self.meterreads_default: List[List[float]] = [[0]*3,[0]*3]  # [diff scaled to btu, raw begin, raw end]
+        self.meterreads = self.meterreads_default.copy()
+        ## setup defaults (stored in app):
         # Burners
         self.loadlabels_setup:List[str] = ['']*4                   # burner labels
-        self.loadratings_setup:List[float] = [0]*4                   # in ratingunits
+        self.loadratings_setup:List[float] = [0]*4                 # in ratingunits
         self.ratingunits_setup:List[int] = [0]*4                   # index in list self.powerunits
         self.sourcetypes_setup:List[int] = [0]*4                   # index in list self.sourcenames
         self.load_etypes_setup:List[int] = [0]*4                   # index of the etype that is the gas/burner setting
         self.presssure_percents_setup:List[bool] = [False]*4       # event value in pressure percent
         self.loadevent_zeropcts_setup:List[int] = [0]*4            # event value corresponding to 0 percent
         self.loadevent_hundpcts_setup:List[int] = [100]*4          # event value corresponding to 100 percent
+        # Meters
+        self.meterlabels_setup:List[str] = ['']*2                  # meter labels
+        self.meterunits_setup:List[int] = [0]*2                    # index in list meterunitnames
+        self.metersources_setup:List[int] = [0]*2                  # index in locally generated list curvenames
         # Protocol
         self.preheatDuration_setup:int = 0                         # length of preheat in seconds
         self.preheatenergies_setup:List[float] = [0]*4             # rating of the preheat burner
@@ -2233,6 +2240,7 @@ class tgraphcanvas(FigureCanvas):
         self.coolingenergies_setup:List[float] = [0]*4             # rating of the cooling burner
         self.betweenbatch_after_preheat_setup:bool = True          # True adds BBP to pre-heating (and cooling) for the first batch.
         self.electricEnergyMix_setup:int = 0                       # the amount of renewable electric energy in the energy mix in %
+            
         # Others
         self.energyresultunit_setup:int = 0                        # index in list self.powerunits
         self.kind_list: Final[List[str]] = [QApplication.translate('Label','Preheat Measured'),
@@ -2242,7 +2250,8 @@ class tgraphcanvas(FigureCanvas):
                           QApplication.translate('Label','Cooling Measured'),
                           QApplication.translate('Label','Cooling %'),
                           QApplication.translate('Label','Continuous'),
-                          QApplication.translate('Label','Roast Event')]
+                          QApplication.translate('Label','Roast Event'),
+                          QApplication.translate('Label','Meter')]
 
         ## working variables (stored in .alog profiles):
         # Burners
@@ -2254,6 +2263,10 @@ class tgraphcanvas(FigureCanvas):
         self.presssure_percents = self.presssure_percents_setup[:]  # event value in pressure percent
         self.loadevent_zeropcts = self.loadevent_zeropcts_setup[:]  # event value corresponding to 0 percent
         self.loadevent_hundpcts = self.loadevent_hundpcts_setup[:]  # event value corresponding to 100 percent
+        # Meters
+        self.meterlabels = self.meterlabels_setup[:]            # meter labels
+        self.meterunits = self.meterunits_setup[:]              # index in list meterunitnames
+        self.metersources = self.metersources_setup[:]          # index in locally generated list curvenames
         # Protocol
         self.preheatDuration = self.preheatDuration_setup               # length of preheat in seconds
         self.preheatenergies = self.preheatenergies_setup[:]            # rating of the preheat burner
@@ -2473,6 +2486,9 @@ class tgraphcanvas(FigureCanvas):
         self.presssure_percents_setup = self.presssure_percents[:]
         self.loadevent_zeropcts_setup = self.loadevent_zeropcts[:]
         self.loadevent_hundpcts_setup = self.loadevent_hundpcts[:]
+        self.meterlabels_setup = self.meterlabels[:] 
+        self.meterunits_setup = self.meterunits[:]
+        self.metersources_setup = self.metersources[:]
         self.electricEnergyMix_setup = self.electricEnergyMix
 
     # restore burner settings to their defaults
@@ -2485,6 +2501,9 @@ class tgraphcanvas(FigureCanvas):
         self.presssure_percents = self.presssure_percents_setup[:]
         self.loadevent_zeropcts = self.loadevent_zeropcts_setup[:]
         self.loadevent_hundpcts = self.loadevent_hundpcts_setup[:]
+        self.meterlabels = self.meterlabels_setup[:] 
+        self.meterunits = self.meterunits_setup[:]
+        self.metersources = self.metersources_setup[:]
         self.electricEnergyMix = self.electricEnergyMix_setup
 
     # set current protocol settings as defaults
@@ -6728,6 +6747,7 @@ class tgraphcanvas(FigureCanvas):
                 self.aw.seriallog = []
 
             self.aw.resetBBPMetrics()
+            self.meterreads = self.meterreads_default.copy()
 
             self.zoom_follow = False # reset the zoom follow feature
 
@@ -10692,9 +10712,9 @@ class tgraphcanvas(FigureCanvas):
             elif n == 14:  #Energy
                 if 'BTU_batch' in cp and cp['BTU_batch']:
                     stattype_str += (f"{newline}{QApplication.translate('AddlInfo', 'Energy')}: "
-                        f"{dropZeroDecimal(self.convertHeat(cp['BTU_batch'],0,3),2)}kWh")
+                        f"{dropZeroDecimal(self.convertHeat(cp['BTU_batch'],'BTU','kWh'),2)}kWh")
                     if 'BTU_batch_per_green_kg' in cp and cp['BTU_batch_per_green_kg']:
-                        stattype_str += f" ({dropZeroDecimal(self.convertHeat(cp['BTU_batch_per_green_kg'], 0,3), 2)}kWh/kg)"
+                        stattype_str += f" ({dropZeroDecimal(self.convertHeat(cp['BTU_batch_per_green_kg'],'BTU','kWh'), 2)}kWh/kg)"
             elif n == 15:  #CO2
                 if 'CO2_batch' in cp and cp['CO2_batch']:
                     stattype_str += f"{newline}{QApplication.translate('AddlInfo', 'CO2')}: {float2float(cp['CO2_batch'],0)}g"
@@ -10857,7 +10877,6 @@ class tgraphcanvas(FigureCanvas):
             fc = self.palette['statsanalysisbkgnd']  #fill color
             tc = self.aw.labelBorW(fc)               #text color
             a = self.alpha['statsanalysisbkgnd']     #background alpha
-            #TODO review all the linespacing values and see how they look on mac as well as windows # pylint: disable=fixme
             ls = 1.7                                 #linespacing
             ls = 1.5                                 #linespacing
 
@@ -10929,7 +10948,6 @@ class tgraphcanvas(FigureCanvas):
                     marginX = stats_textbox_width * marginX_factor
 
                     # position the stats summary relative to the right edge of the drop text
-                    #TODO works pretty well, needs more test, on CHARGE there is more gap from event anno to textbox 0519 and 0529 # pylint: disable=fixme
                     if self.ax.get_xlim()[0] < 0 and time0 > self.timex[self.timeindex[0]]:
                         adjust = time0 - self.timex[self.timeindex[0]]
                     else:
@@ -12338,12 +12356,56 @@ class tgraphcanvas(FigureCanvas):
 
                 self.threadserver.terminatingSignal.connect(self.OffMonitorCloseDown)
                 self.flagon = False
+                
+                self.getMeterReads()
 
             except Exception as ex: # pylint: disable=broad-except
                 _log.exception(ex)
                 _, _, exc_tb = sys.exc_info()
                 self.adderror((QApplication.translate('Error Message', 'Exception:') + ' OffMonitor() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
+    def getMeterReads(self) -> None:
+        # Helper function to calculate the meter difference then detect and correct for rollover
+        def calc_meter_read(_start:float, _end:float) -> float:
+            # Determine the rollover threshold, assumes rolling past only one power of 10
+            if (_start < 0 or _end < 0):   # catches invalid reads (-1), negative reads not allowed either
+                return 0
+            if _start == 10. ** math.floor(math.log10(_start)): # start is a power of 10
+                rollover_threshold = 10. ** (math.floor(math.log10(_start)) + 1)
+            else:
+                rollover_threshold = 10. ** math.ceil(math.log10(_start)) # find the next greater power of 10
+            if _end >= _start:  # No rollover
+                return _end - _start
+            # Rollover occurred
+            return (rollover_threshold - _start + _end)
+
+        # Read meters
+        self.meterreads = self.meterreads_default.copy()  # init to zero in case of an exception
+        for i in range(2):
+            if self.metersources[i] > 0:
+                begin = end = 0.
+                x = self.metersources[i]-1
+                try:
+                    if x % 2 == 0:
+                        # even
+                        if len(self.extratemp1) > (x/2):
+                            begin = self.extratemp1[x // 2][0]
+                            end = self.extratemp1[x // 2][-1]
+                    # odd
+                    elif len(self.extratemp2) > (x/2):
+                        begin = self.extratemp2[x // 2][0]
+                        end = self.extratemp2[x // 2][-1]
+                    
+                    self.meterreads[i] = [calc_meter_read (
+                                            self.convertHeat(begin, self.powerunits[self.meterunits[i]], 'BTU'),
+                                            self.convertHeat(end, self.powerunits[self.meterunits[i]], 'BTU')
+                                            ), begin, end 
+                                         ]
+                except Exception as ex: # pylint: disable=broad-except
+                    _log.exception(ex)
+                    _, _, exc_tb = sys.exc_info()
+                    self.adderror((QApplication.translate('Error Message', 'Exception:') + ' getMeterReads() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+                
     def getAmbientData(self) -> None:
         _log.debug('getAmbientData()')
         # this is needed to suppress the message on the ignored Exception
@@ -14628,7 +14690,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         CO2perKgCoffeeLabel = ''
 
-                    total_energy = scaleFloat2String(self.convertHeat(energymetrics.get('BTU_batch', 0), 0, self.energyresultunit_setup))
+                    total_energy = scaleFloat2String(self.convertHeat(energymetrics.get('BTU_batch', 0), 'BTU', self.energyunits[self.energyresultunit_setup]))
                     CO2_batch = energymetrics.get('CO2_batch', 0)
                     if right_to_left(self.locale_str):
                         scaled_co2_batch = f'g{scaleFloat2String(CO2_batch)}' if CO2_batch<1000 else f'kg{scaleFloat2String(CO2_batch/1000.)}'
@@ -14691,7 +14753,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         CO2perKgCoffeeLabel = ''
 
-                    total_energy = (scaleFloat2String(self.convertHeat(energymetrics['BTU_roast'],0,self.energyresultunit_setup)) if 'BTU_roast' in energymetrics else '0')
+                    total_energy = (scaleFloat2String(self.convertHeat(energymetrics['BTU_roast'],'BTU',self.energyunits[self.energyresultunit_setup])) if 'BTU_roast' in energymetrics else '0')
                     if right_to_left(self.locale_str):
                         scaled_co2_batch = (f"g{scaleFloat2String(energymetrics['CO2_roast'])}" if energymetrics['CO2_roast']<1000 else f"kg{scaleFloat2String(energymetrics['CO2_roast']/1000.)}") if 'CO2_roast' in energymetrics else '0'
                     else:
@@ -15038,17 +15100,22 @@ class tgraphcanvas(FigureCanvas):
         return values_at_timeindex
 
     @staticmethod
-    def convertHeat(value:float, fromUnit:int, toUnit:int=0) -> float:
+    def convertHeat(value:float, fromUnit:str, toUnit:str='BTU') -> float:
         if value in [-1,None]:
             return value
-        conversion = {#     BTU            kJ             kCal           kWh            hph
-                       0:{0:1.,          1:1.0551E+00,  2:2.5200E-01,  3:2.9307E-04,  4:3.9301E-04 }, # = 1 btu
-                       1:{0:9.4782E-01,  1:1.,          2:2.3885E-01,  3:2.7778E-04,  4:3.7251E-04 }, # = 1 kj
-                       2:{0:3.9683E+00,  1:4.1868E+00,  2:1.,          3:1.1630E-03,  4:1.5596E-03 }, # = 1 kcal
-                       3:{0:3.4121E+03,  1:3.6000E+03,  2:8.5985E+02,  3:1.,          4:1.3410E+00 }, # = 1 kwh
-                       4:{0:2.5444E+03,  1:2.6845E+03,  2:6.4119E+02,  3:7.4570E-01,  4:1.         }} # = 1 hph
+        conversion = { #        BTU                kJ                kCal                kWh                hph               thm
+                       'bt': {'bt':1.,          'kj':1.0551E+00,  'kc':2.5200E-01,  'kw':2.9307E-04,  'hp':3.9301E-04, 'th':1.0000E-05 }, # = 1 btu
+                       'kj': {'bt':9.4782E-01,  'kj':1.,          'kc':2.3885E-01,  'kw':2.7778E-04,  'hp':3.7251E-04, 'th':9.4782E-06 }, # = 1 kj
+                       'kc': {'bt':3.9683E+00,  'kj':4.1868E+00,  'kc':1.,          'kw':1.1630E-03,  'hp':1.5596E-03, 'th':3.9683E-05 }, # = 1 kcal
+                       'kw': {'bt':3.4121E+03,  'kj':3.6000E+03,  'kc':8.5985E+02,  'kw':1.,          'hp':1.3410E+00, 'th':3.4121E-02 }, # = 1 kwh
+                       'hp': {'bt':2.5444E+03,  'kj':2.6845E+03,  'kc':6.4119E+02,  'kw':7.4570E-01,  'hp':1.        , 'th':2.5444E-02 }, # = 1 hph
+                       'th': {'bt':1.0000E+05,  'kj':1.0551E+05,  'kc':2.5200E+04,  'kw':2.9307E+01,  'hp':3.9301E+01, 'th':1.         }} # = 1 thm
 
-        return value * conversion[fromUnit][toUnit]
+        try:
+            return value * conversion[fromUnit.lower()[0:2]][toUnit.lower()[0:2]]
+        except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
+            return 0
 
     def calcEnergyuse(self, beanweightstr:str = '') -> Tuple['EnergyMetrics', List['BTU']]:
         energymetrics:EnergyMetrics = {}
@@ -15116,7 +15183,7 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             factor = load_pct / 100
 
-                        BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
+                        BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.powerunits[self.ratingunits[i]],'BTU')
                         if BTUs > 0:
                             loadlabel = f'{formatLoadLabel(i)}-{eTypes[self.load_etypes[i]]}'
                             kind = 7  #Roast Event
@@ -15145,7 +15212,7 @@ class tgraphcanvas(FigureCanvas):
                     kind = 6  #Roast Continuous
                     fueltype = self.sourcetypes[i]
                     sortorder = 2000 - i
-                    BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
+                    BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.powerunits[self.ratingunits[i]],'BTU')
                     CO2g = BTUs * CO2kg_per_BTU[fueltype] * 1000
                     if self.sourcetypes[i] == 2:  #electicity
                         CO2g = CO2g * (1 - self.electricEnergyMix/100)
@@ -15163,13 +15230,13 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             factor = load_pct / 100
                         duration = self.preheatDuration
-                        BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
+                        BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.powerunits[self.ratingunits[i]],'BTU')
                         kind = 1  #Preheat Percent
                     else:
                         # measured value
                         load_pct = 0
                         duration = 0
-                        BTUs = self.preheatenergies[i] * self.convertHeat(1,self.ratingunits[i],0)
+                        BTUs = self.preheatenergies[i] * self.convertHeat(1,self.powerunits[self.ratingunits[i]],'BTU')
                         kind = 0  #Preheat Measured
 
                     loadlabel = formatLoadLabel(i)
@@ -15191,13 +15258,13 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             factor = load_pct / 100
                         duration = self.betweenbatchDuration
-                        BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
+                        BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.powerunits[self.ratingunits[i]],'BTU')
                         kind = 3  #BBP Percent
                     else:
                         # measured value
                         load_pct = 0
                         duration = 0
-                        BTUs = self.betweenbatchenergies[i] * self.convertHeat(1,self.ratingunits[i],0)
+                        BTUs = self.betweenbatchenergies[i] * self.convertHeat(1,self.powerunits[self.ratingunits[i]],'BTU')
                         kind = 2  #BBP Measured
 
                     loadlabel = formatLoadLabel(i)
@@ -15219,13 +15286,13 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             factor = load_pct / 100
                         duration = self.coolingDuration
-                        BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.ratingunits[i],0)
+                        BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.powerunits[self.ratingunits[i]],'BTU')
                         kind = 5  #Cooling Percent
                     else:
                         # measured value
                         load_pct = 0
                         duration = 0
-                        BTUs = self.coolingenergies[i] * self.convertHeat(1,self.ratingunits[i],0)
+                        BTUs = self.coolingenergies[i] * self.convertHeat(1,self.powerunits[self.ratingunits[i]],'BTU')
                         kind = 4  #Cooling Measured
 
                     loadlabel = formatLoadLabel(i)
@@ -15236,7 +15303,20 @@ class tgraphcanvas(FigureCanvas):
                     if BTUs > 0:
                         btu_list.append({'load_pct':load_pct,'duration':duration,'BTUs':BTUs,'CO2g':CO2g,'LoadLabel':loadlabel,'Kind':kind,'SourceType':self.sourcetypes[i],'SortOrder':sortorder})
             #### end of loop: for i in range(0,4)
-
+            
+            # Meter reads
+            for j in range(2):
+                if self.meterreads[j][0] > 0:
+                    BTUs = self.meterreads[j][0]
+                    loadlabel = self.meterlabels[j]
+                    sortorder = j
+                    #TODO CO2 and sourcetype placeholders until we know the energy source for the meter  # pylint: disable=fixme
+                    sourcetype = 2
+                    #CO2g = self.meterreads[j][0] * CO2kg_per_BTU[self.sourcetypes[i]] * 1000
+                    CO2g = 0
+                    kind = 8 # Meter
+                    btu_list.append({'load_pct':0,'duration':0,'BTUs':BTUs,'CO2g':CO2g,'LoadLabel':loadlabel,'Kind':kind,'SourceType':sourcetype,'SortOrder':sortorder})
+            
             btu_list.sort(key=lambda k : k['SortOrder'] )
 
             # summarize the batch metrics
@@ -15270,6 +15350,8 @@ class tgraphcanvas(FigureCanvas):
             btu_lpg = float2float(btu_lpg,3)
             btu_ng = float2float(btu_ng,3)
             btu_elec = float2float(btu_elec,3)
+            btu_meter1 = float2float(self.meterreads[0][0],3)
+            btu_meter2 = float2float(self.meterreads[1][0],3)
             if bean_weight > 0:
                 co2_batch_per_green_kg = co2_batch / bean_weight
                 co2_roast_per_green_kg = co2_roast / bean_weight
@@ -15284,8 +15366,8 @@ class tgraphcanvas(FigureCanvas):
             co2_roast_per_green_kg = float2float(co2_roast_per_green_kg,3)
             btu_batch_per_green_kg = float2float(btu_batch_per_green_kg,3)
             btu_roast_per_green_kg = float2float(btu_roast_per_green_kg,3)
-            kwh_batch_per_green_kg = float2float(self.convertHeat(btu_batch_per_green_kg,0,3),3)
-            kwh_roast_per_green_kg = float2float(self.convertHeat(btu_roast_per_green_kg,0,3),3)
+            kwh_batch_per_green_kg = float2float(self.convertHeat(btu_batch_per_green_kg,'BTU','kWh'),3)
+            kwh_roast_per_green_kg = float2float(self.convertHeat(btu_roast_per_green_kg,'BTU','kWh'),3)
 
 
             # energymetrics
@@ -15306,6 +15388,8 @@ class tgraphcanvas(FigureCanvas):
             energymetrics['BTU_LPG'] = btu_lpg
             energymetrics['BTU_NG'] = btu_ng
             energymetrics['BTU_ELEC'] = btu_elec
+            energymetrics['BTU_METER1'] = btu_meter1
+            energymetrics['BTU_METER2'] = btu_meter2
             energymetrics['KWH_batch_per_green_kg'] = kwh_batch_per_green_kg
             energymetrics['KWH_roast_per_green_kg'] = kwh_roast_per_green_kg
 
@@ -15338,7 +15422,7 @@ class tgraphcanvas(FigureCanvas):
                         factor = math.sqrt(load_pct / 100)
                     else:
                         factor = load_pct / 100
-                    return self.loadratings[i] * factor * (duration / 3600) #* self.convertHeat(1,self.ratingunits[i],0)
+                    return self.loadratings[i] * factor * (duration / 3600) #* self.convertHeat(1,self.powerunits[self.ratingunits[i]],'BTU')
                 except Exception as ex: # pylint: disable=broad-except
                     _log.exception(ex)
                     _, _, exc_tb = sys.exc_info()

@@ -5568,6 +5568,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                         self.qmc.loadevent_zeropcts_setup = [int(lzp) for lzp in ratings['loadevent_zeropcts']]
                                     if 'loadevent_hundpcts' in ratings and len(ratings['loadevent_hundpcts']) == 4:
                                         self.qmc.loadevent_hundpcts_setup = [int(lhp) for lhp in ratings['loadevent_hundpcts']]
+                                    if 'meterlabels' in ratings and len(ratings['meterlabels']) == 2:
+                                        self.qmc.meterlabels_setup = [str(ml) for ml in ratings['meterlabels']]
+                                    if 'meterunits' in ratings and len(ratings['meterunits']) == 2:
+                                        self.qmc.meterunits_setup = [int(mu) for mu in ratings['meterunits']]
+                                    if 'metersources' in ratings and len(ratings['metersources']) == 4:
+                                        self.qmc.metersources_setup = [int(ms) for ms in ratings['metersources']]
                                     if 'preheatDuration' in ratings and len(ratings['preheatenergies']) == 1:
                                         self.qmc.preheatDuration_setup = int(ratings['preheatDuration'][0])
                                     if 'preheatenergies' in ratings and len(ratings['preheatenergies']) == 4:
@@ -12771,6 +12777,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.loadevent_zeropcts = [int(x) for x in profile['loadevent_zeropcts']]
         if 'loadevent_hundpcts' in profile:
             self.qmc.loadevent_hundpcts = [int(x) for x in profile['loadevent_hundpcts']]
+        if 'meterlabels' in profile:
+            self.qmc.meterlabels = [str(x) for x in profile['meterlabels']]
+        if 'meterunits' in profile:
+            self.qmc.meterunits = [int(x) for x in profile['meterunits']]
+        if 'metersources' in profile:
+            self.qmc.metersources = [int(x) for x in profile['metersources']]
+        if 'meterreads' in profile:
+            self.qmc.meterreads = profile['meterreads']
         if 'preheatDuration' in profile:
             self.qmc.preheatDuration = profile['preheatDuration']
         if 'preheatenergies' in profile:
@@ -16158,6 +16172,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 profile['presssure_percents'] = self.qmc.presssure_percents
                 profile['loadevent_zeropcts'] = self.qmc.loadevent_zeropcts
                 profile['loadevent_hundpcts'] = self.qmc.loadevent_hundpcts
+                profile['meterlabels'] = self.qmc.meterlabels
+                profile['meterunits'] = self.qmc.meterunits
+                profile['metersources'] = self.qmc.metersources
+                profile['meterreads'] = self.qmc.meterreads
                 profile['preheatDuration'] = self.qmc.preheatDuration
                 profile['preheatenergies'] = self.qmc.preheatenergies
                 profile['betweenbatchDuration'] = self.qmc.betweenbatchDuration
@@ -17667,6 +17685,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.presssure_percents_setup = [toBool(x) for x in toList(settings.value('presssure_percents_setup', self.qmc.presssure_percents_setup))]
             self.qmc.loadevent_zeropcts_setup = [toInt(x) for x in toList(settings.value('loadevent_zeropcts_setup', self.qmc.loadevent_zeropcts_setup))]
             self.qmc.loadevent_hundpcts_setup = [toInt(x) for x in toList(settings.value('loadevent_hundpcts_setup', self.qmc.loadevent_hundpcts_setup))]
+            self.qmc.meterlabels_setup = [toString(x) for x in toList(settings.value('meterlabels_setup', self.qmc.meterlabels_setup))]
+            self.qmc.meterunits_setup = [toInt(x) for x in toList(settings.value('meterunits_setup', self.qmc.meterunits_setup))]
+            self.qmc.metersources_setup = [toInt(x) for x in toList(settings.value('metersources_setup', self.qmc.metersources_setup))]
             self.qmc.preheatDuration_setup = toInt(settings.value('preheatDuration_setup',self.qmc.preheatDuration_setup))
             self.qmc.preheatenergies_setup = [toFloat(x) for x in toList(settings.value('preheatenergies_setup', self.qmc.preheatenergies_setup))]
             self.qmc.betweenbatchDuration_setup = toInt(settings.value('betweenbatchDuration_setup',self.qmc.betweenbatchDuration_setup))
@@ -19282,6 +19303,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'presssure_percents_setup',self.qmc.presssure_percents_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'loadevent_zeropcts_setup',self.qmc.loadevent_zeropcts_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'loadevent_hundpcts_setup',self.qmc.loadevent_hundpcts_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'meterlabels_setup',self.qmc.meterlabels_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'meterunits_setup',self.qmc.meterunits_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'metersources_setup',self.qmc.metersources_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'preheatDuration_setup',self.qmc.preheatDuration_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'preheatenergies_setup',self.qmc.preheatenergies_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'betweenbatchDuration_setup',self.qmc.betweenbatchDuration_setup, read_defaults)
@@ -20557,7 +20581,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if 'AUC' in comp:
                 res['AUC'] = comp['AUC']
             if 'BTU_batch' in comp:
-                res['energy'] = self.qmc.convertHeat(comp['BTU_batch'],0,3)
+                res['energy'] = self.qmc.convertHeat(comp['BTU_batch'],'BTU','kWh')
             if 'CO2_batch' in comp:
                 res['co2'] = comp['CO2_batch']
             if 'CO2_batch_per_green_kg' in comp:
@@ -22077,7 +22101,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             else:
                 color = '--'
             if 'BTU_batch' in cp and cp['BTU_batch']:
-                energy = f"{self.qmc.convertHeat(cp['BTU_batch'],0,3):.1f}kWh"
+                energy = f"{self.qmc.convertHeat(cp['BTU_batch'],'BTU','kWh'):.1f}kWh"
             else:
                 energy = '--'
             if 'CO2_batch' in cp and cp['CO2_batch']:

@@ -414,7 +414,7 @@
       <string notr="true"/>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="detailsTab">
       <property name="toolTip">
@@ -690,9 +690,6 @@
           </item>
           <item row="3" column="3">
            <widget class="QComboBox" name="ratingunit2">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
             <property name="toolTip">
              <string notr="true"/>
             </property>
@@ -706,9 +703,6 @@
           </item>
           <item row="2" column="4">
            <widget class="QComboBox" name="sourcetype1">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
             <property name="toolTip">
              <string notr="true"/>
             </property>
@@ -722,9 +716,6 @@
           </item>
           <item row="3" column="4">
            <widget class="QComboBox" name="sourcetype2">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
             <property name="toolTip">
              <string notr="true"/>
             </property>
@@ -1207,9 +1198,6 @@
             </item>
             <item>
              <widget class="QCheckBox" name="pressureCheckBox0">
-              <property name="focusPolicy">
-               <enum>Qt::NoFocus</enum>
-              </property>
               <property name="toolTip">
                <string notr="true"/>
               </property>
@@ -1241,9 +1229,6 @@
           </item>
           <item row="4" column="3">
            <widget class="QComboBox" name="ratingunit3">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
             <property name="toolTip">
              <string notr="true"/>
             </property>
@@ -1257,9 +1242,6 @@
           </item>
           <item row="1" column="3">
            <widget class="QComboBox" name="ratingunit0">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
             <property name="toolTip">
              <string notr="true"/>
             </property>
@@ -1273,9 +1255,6 @@
           </item>
           <item row="1" column="4">
            <widget class="QComboBox" name="sourcetype0">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
             <property name="toolTip">
              <string notr="true"/>
             </property>
@@ -1336,9 +1315,6 @@
           </item>
           <item row="2" column="3">
            <widget class="QComboBox" name="ratingunit1">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
             <property name="toolTip">
              <string notr="true"/>
             </property>
@@ -1352,9 +1328,6 @@
           </item>
           <item row="4" column="4">
            <widget class="QComboBox" name="sourcetype3">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
             <property name="toolTip">
              <string notr="true"/>
             </property>
@@ -1553,9 +1526,6 @@
           </item>
           <item row="1" column="5">
            <widget class="QComboBox" name="events0">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
             <property name="toolTip">
              <string notr="true"/>
             </property>
@@ -1705,7 +1675,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="QGroupBox" name="meter2GroubBox">
+          <widget class="QGroupBox" name="meter2GroupBox">
            <property name="title">
             <string>Meter 2</string>
            </property>
@@ -2974,36 +2944,53 @@
   <tabstop>datatable</tabstop>
   <tabstop>loadlabel0</tabstop>
   <tabstop>loadrating0</tabstop>
+  <tabstop>ratingunit0</tabstop>
+  <tabstop>sourcetype0</tabstop>
+  <tabstop>events0</tabstop>
+  <tabstop>pressureCheckBox0</tabstop>
   <tabstop>zeropcts0</tabstop>
   <tabstop>hundredpct0</tabstop>
   <tabstop>loadlabel1</tabstop>
   <tabstop>loadrating1</tabstop>
+  <tabstop>pressureCheckBox1</tabstop>
   <tabstop>zeropcts1</tabstop>
   <tabstop>hundredpct1</tabstop>
   <tabstop>loadlabel2</tabstop>
   <tabstop>loadrating2</tabstop>
+  <tabstop>pressureCheckBox2</tabstop>
   <tabstop>zeropcts2</tabstop>
   <tabstop>hundredpct2</tabstop>
   <tabstop>loadlabel3</tabstop>
   <tabstop>loadrating3</tabstop>
+  <tabstop>pressureCheckBox3</tabstop>
   <tabstop>zeropcts3</tabstop>
   <tabstop>hundredpct3</tabstop>
+  <tabstop>meter1LabelLineEdit</tabstop>
+  <tabstop>meter1UnitComboBox</tabstop>
+  <tabstop>meter1SourceComboBox</tabstop>
+  <tabstop>meter2LabelLineEdit</tabstop>
+  <tabstop>meter2UnitComboBox</tabstop>
+  <tabstop>meter2SourceComboBox</tabstop>
   <tabstop>electricEnergyMixSpinBox</tabstop>
+  <tabstop>gasMixSpinBox</tabstop>
   <tabstop>preheatDuration</tabstop>
   <tabstop>preheatenergies0</tabstop>
   <tabstop>preheatenergies1</tabstop>
   <tabstop>preheatenergies2</tabstop>
   <tabstop>preheatenergies3</tabstop>
+  <tabstop>PreHeatToolButton</tabstop>
   <tabstop>betweenBatchesDuration</tabstop>
   <tabstop>betweenbatchesenergy0</tabstop>
   <tabstop>betweenbatchesenergy1</tabstop>
   <tabstop>betweenbatchesenergy2</tabstop>
   <tabstop>betweenbatchesenergy3</tabstop>
+  <tabstop>BetweenBatchesToolButton</tabstop>
   <tabstop>coolingDuration</tabstop>
   <tabstop>coolingenergies0</tabstop>
   <tabstop>coolingenergies1</tabstop>
   <tabstop>coolingenergies2</tabstop>
   <tabstop>coolingenergies3</tabstop>
+  <tabstop>CoolingToolButton</tabstop>
   <tabstop>BBPafterPreHeatcheckBox</tabstop>
  </tabstops>
  <resources/>

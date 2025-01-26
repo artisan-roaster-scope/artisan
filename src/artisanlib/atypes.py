@@ -292,6 +292,9 @@ class ProfileData(TypedDict, total=False):
     presssure_percents: List[bool]
     loadevent_zeropcts: List[int]
     loadevent_hundpcts: List[int]
+    meterlabels: List[str]
+    meterunits: List[int]
+    metersources: List[int]
     preheatDuration: int
     preheatenergies:List[float]
     betweenbatchDuration: int
@@ -300,6 +303,7 @@ class ProfileData(TypedDict, total=False):
     coolingenergies: List[float]
     betweenbatch_after_preheat: bool
     electricEnergyMix: int
+    meterreads: List[List[float]]
     plus_sync_record_hash: str
     bbp_begin: str
     bbp_time_added_from_prev: float
@@ -398,6 +402,8 @@ class EnergyMetrics(TypedDict, total=False):
     BTU_LPG                 : float
     BTU_NG                  : float
     BTU_ELEC                : float
+    BTU_METER1              : float
+    BTU_METER2              : float
     KWH_batch_per_green_kg  : float
     KWH_roast_per_green_kg  : float
 

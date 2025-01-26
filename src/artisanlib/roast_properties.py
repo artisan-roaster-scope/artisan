@@ -2715,6 +2715,9 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.org_presssure_percents = self.aw.qmc.presssure_percents.copy()
             self.org_loadevent_zeropcts = self.aw.qmc.loadevent_zeropcts.copy()
             self.org_loadevent_hundpcts = self.aw.qmc.loadevent_hundpcts.copy()
+            self.org_meterlabels = self.aw.qmc.meterlabels.copy()
+            self.org_meterunits = self.aw.qmc.meterunits.copy()
+            self.org_metersources = self.aw.qmc.metersources.copy()
             self.org_preheatDuration = self.aw.qmc.preheatDuration
             self.org_preheatenergies = self.aw.qmc.preheatenergies.copy()
             self.org_betweenbatchDuration = self.aw.qmc.betweenbatchDuration
@@ -2825,6 +2828,25 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.ratingunit2.addItems(self.aw.qmc.powerunits)
             self.energy_ui.ratingunit3.addItems(self.aw.qmc.powerunits)
 
+            # meter1LabelLineEdit
+            #
+            self.energy_ui.meter1UnitComboBox.addItems(self.aw.qmc.meterunitnames)
+            self.energy_ui.meter2UnitComboBox.addItems(self.aw.qmc.meterunitnames)
+            #
+            self.curvenames = []
+            self.curvenames.append('')  # 'blank' top choice
+            for i in range(len(self.aw.qmc.extradevices)):
+                self.curvenames.append(self.aw.qmc.device_name_subst(self.aw.qmc.extraname1[i]))
+                self.curvenames.append(self.aw.qmc.device_name_subst(self.aw.qmc.extraname2[i]))
+            self.energy_ui.meter1SourceComboBox.clear()
+            self.energy_ui.meter1SourceComboBox.addItems(self.curvenames)
+            if self.aw.qmc.metersources[0] < len(self.curvenames):
+                self.energy_ui.meter1SourceComboBox.setCurrentIndex(self.aw.qmc.metersources[0])
+            self.energy_ui.meter2SourceComboBox.clear()
+            self.energy_ui.meter2SourceComboBox.addItems(self.curvenames)
+            if self.aw.qmc.metersources[1] < len(self.curvenames):
+                self.energy_ui.meter2SourceComboBox.setCurrentIndex(self.aw.qmc.metersources[1])
+
             # input validators
             regextime = QRegularExpression(r'^$|^[0-9]?[0-9]?[0-9]:[0-5][0-9]$') # includes the empty string to trigger editingFinished
             self.energy_ui.preheatDuration.setValidator(QRegularExpressionValidator(regextime,self))
@@ -2865,6 +2887,15 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.events1.currentIndexChanged.connect(self.load_etypes_currentindexchanged)
             self.energy_ui.events2.currentIndexChanged.connect(self.load_etypes_currentindexchanged)
             self.energy_ui.events3.currentIndexChanged.connect(self.load_etypes_currentindexchanged)
+
+            self.energy_ui.meter1LabelLineEdit.editingFinished.connect(self.meterlabels_editingfinished)
+            self.energy_ui.meter2LabelLineEdit.editingFinished.connect(self.meterlabels_editingfinished)
+
+            self.energy_ui.meter1UnitComboBox.currentIndexChanged.connect(self.meterunits_currentindexchanged)
+            self.energy_ui.meter2UnitComboBox.currentIndexChanged.connect(self.meterunits_currentindexchanged)
+
+            self.energy_ui.meter1SourceComboBox.currentIndexChanged.connect(self.metersources_currentindexchanged)
+            self.energy_ui.meter2SourceComboBox.currentIndexChanged.connect(self.metersources_currentindexchanged)
 
             self.energy_ui.pressureCheckBox0.stateChanged.connect(self.pressureCheckBox_statechanged)
             self.energy_ui.pressureCheckBox1.stateChanged.connect(self.pressureCheckBox_statechanged)
@@ -2959,7 +2990,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 duration_mmss_widget = MyTableWidgetItemNumber(stringfromseconds(self.btu_list[i]['duration']),self.btu_list[i]['duration'])
                 duration_mmss_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
 
-            BTUs = self.aw.qmc.convertHeat(self.btu_list[i]['BTUs'],0,self.aw.qmc.energyresultunit_setup)
+            BTUs = self.aw.qmc.convertHeat(self.btu_list[i]['BTUs'],'BTU',self.aw.qmc.energyunits[self.aw.qmc.energyresultunit_setup])
             BTUs_widget = MyTableWidgetItemNumber(scaleFloat2String(BTUs),BTUs)
             BTUs_widget.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
 
@@ -3048,6 +3079,13 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.energy_ui.hundredpct1.setValue(self.aw.qmc.loadevent_hundpcts[1])
         self.energy_ui.hundredpct2.setValue(self.aw.qmc.loadevent_hundpcts[2])
         self.energy_ui.hundredpct3.setValue(self.aw.qmc.loadevent_hundpcts[3])
+        # meters
+        self.energy_ui.meter1LabelLineEdit.setText(self.aw.qmc.meterlabels[0])
+        self.energy_ui.meter2LabelLineEdit.setText(self.aw.qmc.meterlabels[1])
+        self.energy_ui.meter1UnitComboBox.setCurrentIndex(self.aw.qmc.meterunits[0])
+        self.energy_ui.meter2UnitComboBox.setCurrentIndex(self.aw.qmc.meterunits[1])
+        self.energy_ui.meter1SourceComboBox.setCurrentIndex(self.aw.qmc.metersources[0])
+        self.energy_ui.meter2SourceComboBox.setCurrentIndex(self.aw.qmc.metersources[1])
         ## Protocol tab
         self.energy_ui.preheatDuration.setText(self.validateSeconds2Text(self.aw.qmc.preheatDuration))
         self.energy_ui.betweenBatchesDuration.setText(self.validateSeconds2Text(self.aw.qmc.betweenbatchDuration))
@@ -3118,6 +3156,25 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.presssure_percents[1] = self.energy_ui.pressureCheckBox1.isChecked()
         self.aw.qmc.presssure_percents[2] = self.energy_ui.pressureCheckBox2.isChecked()
         self.aw.qmc.presssure_percents[3] = self.energy_ui.pressureCheckBox3.isChecked()
+        if updateMetrics:
+            self.updateMetricsLabel()
+
+    def updateMeterLabels(self, updateMetrics:bool = True) -> None:
+        self.aw.qmc.meterlabels[0] = self.energy_ui.meter1LabelLineEdit.text()
+        self.aw.qmc.meterlabels[1] = self.energy_ui.meter2LabelLineEdit.text()
+        if updateMetrics:
+            self.updateMetricsLabel()
+        self.updateEnergyLabels()
+
+    def updateMeterUnits(self, updateMetrics:bool = True) -> None:
+        self.aw.qmc.meterunits[0] = self.energy_ui.meter1UnitComboBox.currentIndex()
+        self.aw.qmc.meterunits[1] = self.energy_ui.meter2UnitComboBox.currentIndex()
+        if updateMetrics:
+            self.updateMetricsLabel()
+
+    def updateMeterSources(self, updateMetrics:bool = True) -> None:
+        self.aw.qmc.metersources[0] = self.energy_ui.meter1SourceComboBox.currentIndex()
+        self.aw.qmc.metersources[1] = self.energy_ui.meter2SourceComboBox.currentIndex()
         if updateMetrics:
             self.updateMetricsLabel()
 
@@ -3222,6 +3279,9 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.presssure_percents = self.org_presssure_percents.copy()
             self.aw.qmc.loadevent_zeropcts = self.org_loadevent_zeropcts.copy()
             self.aw.qmc.loadevent_hundpcts = self.org_loadevent_hundpcts.copy()
+            self.aw.qmc.meterlables = self.org_meterlabels.copy()
+            self.aw.qmc.meterunits = self.org_meterunits.copy()
+            self.aw.qmc.metersources = self.org_metersources.copy()
             self.aw.qmc.preheatDuration = self.org_preheatDuration
             self.aw.qmc.preheatenergies = self.org_preheatenergies.copy()
             self.aw.qmc.betweenbatchDuration = self.org_betweenbatchDuration
@@ -3233,18 +3293,21 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     def updateMetricsLabel(self) -> None:
         try:
+            # update meter reads in case the meter units changed
+            self.aw.qmc.getMeterReads()
+            # Recaclulate the energy metrics
             metrics,self.btu_list = self.aw.qmc.calcEnergyuse(self.weightinedit.text()) # pylint: disable=attribute-defined-outside-init
             if len(metrics) > 0 and metrics['BTU_batch'] > 0:
                 energy_unit = self.aw.qmc.energyunits[self.aw.qmc.energyresultunit_setup]
                 #
-                total_energy = scaleFloat2String(self.aw.qmc.convertHeat(metrics['BTU_batch'],0,self.aw.qmc.energyresultunit_setup))
+                total_energy = scaleFloat2String(self.aw.qmc.convertHeat(metrics['BTU_batch'],'BTU',self.aw.qmc.energyunits[self.aw.qmc.energyresultunit_setup]))
                 self.energy_ui.totalEnergyLabel.setText(f'{total_energy} {energy_unit}')
                 #
-                preheat_energy = scaleFloat2String(self.aw.qmc.convertHeat(metrics['BTU_preheat'],0,self.aw.qmc.energyresultunit_setup))
+                preheat_energy = scaleFloat2String(self.aw.qmc.convertHeat(metrics['BTU_preheat'],'BTU',self.aw.qmc.energyunits[self.aw.qmc.energyresultunit_setup]))
                 self.energy_ui.preheatEnergyLabel.setText(f"{preheat_energy} {energy_unit} ({QApplication.translate('Label','Preheat')})")
-                BBP_energy = scaleFloat2String(self.aw.qmc.convertHeat(metrics['BTU_bbp'],0,self.aw.qmc.energyresultunit_setup))
+                BBP_energy = scaleFloat2String(self.aw.qmc.convertHeat(metrics['BTU_bbp'],'BTU',self.aw.qmc.energyunits[self.aw.qmc.energyresultunit_setup]))
                 self.energy_ui.BBPEnergyLabel.setText(f"{BBP_energy} {energy_unit} ({QApplication.translate('Label','BBP')})")
-                roast_energy = scaleFloat2String(self.aw.qmc.convertHeat(metrics['BTU_roast'],0,self.aw.qmc.energyresultunit_setup))
+                roast_energy = scaleFloat2String(self.aw.qmc.convertHeat(metrics['BTU_roast'],'BTU',self.aw.qmc.energyunits[self.aw.qmc.energyresultunit_setup]))
                 self.energy_ui.roastEnergyLabel.setText(f"{roast_energy} {energy_unit} ({QApplication.translate('Label','Roast')})")
 
                 # a green weight is available
@@ -3437,6 +3500,9 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.presssure_percents != self.aw.qmc.presssure_percents_setup or
             self.aw.qmc.loadevent_zeropcts != self.aw.qmc.loadevent_zeropcts_setup or
             self.aw.qmc.loadevent_hundpcts != self.aw.qmc.loadevent_hundpcts_setup or
+            self.aw.qmc.meterlabels != self.aw.qmc.meterlabels_setup or
+            self.aw.qmc.meterunits != self.aw.qmc.meterunits_setup or
+            self.aw.qmc.metersources != self.aw.qmc.metersources_setup or
             self.aw.qmc.electricEnergyMix != self.aw.qmc.electricEnergyMix_setup)
 
     # enables/disables the Defaults/SetDefaults buttons if loads values differ from their set defaults
@@ -3562,6 +3628,41 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.loadevent_hundpcts[pos] = hundpcts.value()
         self.updateMetricsLabel()
         self.loadsEdited()
+
+    @pyqtSlot()
+    def meterlabels_editingfinished(self) -> None:
+        w = self.sender()
+        if w and isinstance(w, QLineEdit) and w.isModified():
+            w.setText(w.text().strip())
+            self.updateMeterLabels()
+            self.loadsEdited()
+
+    @pyqtSlot()
+    def meterunits_currentindexchanged(self) -> None:
+        sender = self.sender()
+        if isinstance(sender, QComboBox):
+            try:
+                i = [self.energy_ui.meter1UnitComboBox,self.energy_ui.meter2UnitComboBox].index(sender)
+                self.aw.qmc.meterunits[i] = sender.currentIndex()
+                self.updateMetricsLabel()
+                self.updateMeterLabels()
+                self.updateMeterUnits()
+                self.loadsEdited()
+            except Exception: # pylint: disable=broad-except
+                pass
+
+    @pyqtSlot()
+    def metersources_currentindexchanged(self) -> None:
+        sender = self.sender()
+        if isinstance(sender, QComboBox):
+            try:
+                i = [self.energy_ui.meter1SourceComboBox,self.energy_ui.meter2SourceComboBox].index(sender)
+                self.aw.qmc.metersources[i] = sender.currentIndex()
+                self.updateMetricsLabel()
+                self.updateMeterSources()
+                self.loadsEdited()
+            except Exception: # pylint: disable=broad-except
+                pass
 
     @pyqtSlot()
     def electric_energy_mix_valuechanged(self) -> None:
