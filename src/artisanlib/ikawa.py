@@ -116,7 +116,7 @@ def extractProfileIkawaURL(url:QUrl, aw:'ApplicationWindow') -> 'ProfileData':
 
 
     res['title'] = ikawa_profile.name
-    res['beans'] = ikawa_profile.coffee_name
+#    res['beans'] = ikawa_profile.coffee_name # NOTE: as this is often not set and if set the received data is garbage, we deactivate this for now
     res['mode'] = 'C'
 
     timeindex = [0,0,0,0,0,0,len(timex)-1,0]
@@ -148,7 +148,6 @@ def extractProfileIkawaURL(url:QUrl, aw:'ApplicationWindow') -> 'ProfileData':
         res['specialeventsStrings'] = specialeventsStrings
 
     res['etypes'] = aw.qmc.etypesdefault
-
     return res
 
 

@@ -273,7 +273,6 @@ class PID:
         finally:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)
-        self.reset()
 
     def setLimits(self, outMin:int, outMax:int) -> None:
         try:

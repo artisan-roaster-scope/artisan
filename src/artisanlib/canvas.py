@@ -2740,6 +2740,7 @@ class tgraphcanvas(FigureCanvas):
     #   10.0 => 90
     #   1.1 => 1
     #   1.0 => 0
+    #   0.5 => 0
     #     0 => 0
     #  -1.0 => 0
     #  -1.1 => -1
@@ -12377,7 +12378,7 @@ class tgraphcanvas(FigureCanvas):
             if _end >= _start:  # No rollover
                 return _end - _start
             # Rollover occurred
-            return (rollover_threshold - _start + _end)
+            return rollover_threshold - _start + _end
 
         # Read meters
         self.meterreads = self.meterreads_default.copy()  # init to zero in case of an exception

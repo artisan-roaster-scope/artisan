@@ -97,7 +97,6 @@ class PID_DlgControl(ArtisanDialog):
         pidSetPID.clicked.connect(self.pidConf)
         pidSetPID.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
-
         pidGrid = QGridLayout()
         pidGrid.addWidget(pidKpLabel,0,0)
         pidGrid.addWidget(self.pidKp,0,1)
@@ -118,8 +117,9 @@ class PID_DlgControl(ArtisanDialog):
 
         pidCycleBox = QHBoxLayout()
         pidCycleBox.addStretch()
-        pidCycleBox.addWidget(pidCycleLabel)
-        pidCycleBox.addWidget(self.pidCycle)
+        if pid_controller != 4:
+            pidCycleBox.addWidget(pidCycleLabel)
+            pidCycleBox.addWidget(self.pidCycle)
         pidCycleBox.addStretch()
 
         pidSetBox = QHBoxLayout()
@@ -184,7 +184,8 @@ class PID_DlgControl(ArtisanDialog):
         pidVBox.addLayout(pidSetBox)
         pidVBox.setAlignment(pidSetBox,Qt.AlignmentFlag.AlignRight)
 
-        pidGridVBox.addLayout(pidGrid)
+        if pid_controller != 4:
+            pidGridVBox.addLayout(pidGrid)
         pidGridBox = QHBoxLayout()
         pidGridBox.addLayout(pidGridVBox)
         pidGridBox.addLayout(pidVBox)
