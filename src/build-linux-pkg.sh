@@ -42,6 +42,8 @@ mv debian/usr/share/dist debian/usr/share/artisan
 find debian -name .svn -exec rm -rf {} \; > /dev/null 2>&1
 fakeroot chown -R root:root debian
 fakeroot chmod -R go-w debian
+# Find and delete dangling symbolic links
+find "debian/usr/share/artisan/_internal/" -type l -name "*.so*" ! -exec test -e {} \; -delete
 fakeroot chmod 0644 debian/usr/share/artisan/_internal/*.so* || true
 fakeroot chmod +x debian/usr/bin/artisan
 rm -f ${NAME}*.rpm
@@ -89,6 +91,12 @@ flavor." \
 cd ..
 mv *.rpm ${NAME}.rpm
 mv *.deb ${NAME}.deb
+
+# imagemagick missing from pkg2appimage continuous as of bd9684f (27-Jan-25)
+# reference https://github.com/AppImageCommunity/pkg2appimage/issues/445
+# TODO - watch for this to be resolved
+echo "*** Installing imagemagick"
+sudo apt-get install -y imagemagick
 
 export ARCH=x86_64
 # Create AppImage by using the pkg2appimage tool
