@@ -1618,7 +1618,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.segmentresultsanno:Optional[Annotation] = None
 
         # Schedule
-        self.schedule_window:Optional[plus.schedule.ScheduleWindow] = None
+        self.schedule_window:Optional[plus.schedule.ScheduleWindow] = None # None if scheduler is not active
         # the uuids of the scheduled items in local custom order on last closing the scheduler
         # persistet along the app settings
         self.scheduled_items_uuids:List[str] = []
@@ -5232,13 +5232,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     background_UUID = rr.get('roastUUID', None)
                     self.qmc.resetlinecountcaches()
                     self.loadAndRedrawBackgroundUUID(rr['background'],background_UUID)
-#                    if self.loadbackgroundUUID(rr['background'],background_UUID):
-#                        try:
-#                            self.qmc.background = not self.qmc.hideBgafterprofileload
-#                            self.qmc.timealign(redraw=False)
-#                            self.qmc.redraw()
-#                        except Exception as e: # pylint: disable=broad-except
-#                            _log.exception(e)
                 if alt_modifier:
                     if self.qmc.flagon:
                         self.setRecentRoast(rr)
@@ -6353,12 +6346,38 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             pass
         return res_last
 
+    def orderBackgroundEvents(self) -> None:
+        nevents = len(self.qmc.backgroundEvents)
+        packed_events = []
+        # pack
+        for i in range(nevents):
+            packed_events.append(
+                (self.qmc.backgroundEvents[i],
+                 self.qmc.backgroundEtypes[i],
+                 self.qmc.backgroundEStrings[i],
+                 self.qmc.backgroundEvalues[i]))
+        # sort
+        packed_events.sort(key=lambda tup: tup[0])
+        # unpack
+        for i in range(nevents):
+            self.qmc.backgroundEvents[i] = packed_events[i][0]
+            self.qmc.backgroundEtypes[i] = packed_events[i][1]
+            self.qmc.backgroundEStrings[i] = packed_events[i][2]
+            self.qmc.backgroundEvalues[i] = packed_events[i][3]
+
+
     # order event table by time
-    def orderEvents(self, lock:bool = True) -> None:
+    # if force_update is not set, the data structures are only update and the minieditor is only cleared if the order changed
+    # returns True if order changed or force_update=True, False otherwise
+    def orderEvents(self, lock:bool = True, force_update:bool = True) -> bool:
         try:
             #### lock shared resources #####
             if lock:
                 self.qmc.profileDataSemaphore.acquire(1)
+
+            # we remember the current event number selected in the minieditor to re-estabish it after a potentiall reordering
+            currentevent = self.eNumberSpinBox.value()
+
             nevents = len(self.qmc.specialevents)
             packed_events = []
             # pack
@@ -6368,20 +6387,43 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                      self.qmc.specialeventstype[i],
                      self.qmc.specialeventsStrings[i],
                      self.qmc.specialeventsvalue[i]))
+
+            currentevent_tuple:Optional[Tuple[int,int,str,float]] = (packed_events[currentevent-1] if currentevent != 0 and len(packed_events)>currentevent-1 else None)
+
             # sort
-            packed_events.sort(key=lambda tup: tup[0])
-            # unpack
-            for i in range(nevents):
-                self.qmc.setEvent(i,
-                    packed_events[i][0],
-                    packed_events[i][1],
-                    packed_events[i][2],
-                    packed_events[i][3])
-            # we have to clear the event flag positions as those are now out of order
-            self.qmc.l_event_flags_dict = {}
-            self.qmc.l_event_flags_pos_dict = {}
-            # update minievent editor
-            self.changeEventNumber(0)
+            packed_events_sorted = sorted(packed_events, key=lambda tup: tup[0])
+
+            # check if order changed
+            same_order = [(e[0] if len(e)>0 else 0) for e in packed_events] == [(e[0] if len(e)>0 else 0) for e in packed_events_sorted]
+
+            if force_update or not same_order:
+                # in case the order did not change and we are not forced to update, everything can stay the same,
+                # otherwise we update the custom events and clear the minievent editor
+
+                # unpack
+                for i in range(nevents):
+                    self.qmc.setEvent(i,
+                        packed_events_sorted[i][0],
+                        packed_events_sorted[i][1],
+                        packed_events_sorted[i][2],
+                        packed_events_sorted[i][3])
+                # we have to clear the event flag positions as those are now out of order
+                self.qmc.l_event_flags_dict = {}
+                self.qmc.l_event_flags_pos_dict = {}
+                # update minievent editor
+                if currentevent_tuple is not None:
+                    try:
+                        new_pos = packed_events_sorted.index(currentevent_tuple)
+                        self.eNumberSpinBox.setValue(new_pos + 1)
+                    except Exception:
+                        # if tuple is not found we also reset the minieditor
+                        self.eNumberSpinBox.setValue(0)
+                else:
+                    # we reset the minievent editor to 0, the empty event
+                    self.eNumberSpinBox.setValue(0)
+                self.changeEventNumber(0)
+                return True
+            return False
         finally:
             if lock and self.qmc.profileDataSemaphore.available() < 1:
                 self.qmc.profileDataSemaphore.release(1)
@@ -9694,6 +9736,31 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     self.sendmessage(f'Artisan Command: {cs}')
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
+                            # quantifier(<int>, <bool>) with <int> from {1,2,3,4} selecting one of the four event types
+                            elif cs.startswith('quantifier(') and cs.endswith(')'):
+                                try:
+                                    args = cs[len('quantifier('):-1].split(',')
+                                    if len(args) == 2:
+                                        event_type = int(args[0])
+                                        state = toBool(eval(args[1])) # pylint: disable=eval-used
+                                        if 0 < event_type < 5:
+                                            self.eventquantifieractive[event_type - 1] = int(state)
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            # setBatchSize(<float>) : if <float> is negative, the batchsize of the background profile is used if any
+                            elif cs.startswith('setBatchSize') and cs.endswith(')'): # in seconds
+                                try:
+                                    cmds = eval(cs[len('setBatchSize'):]) # pylint: disable=eval-used
+                                    if isinstance(cmds,(float,int)):
+                                        # cmd has format "setBatchSize(xx.yy)"
+                                        if cmds < 0:
+                                            # set batch size from background profile if any is loaded
+                                            if self.qmc.backgroundprofile is not None and 'weight' in self.qmc.backgroundprofile:
+                                                self.qmc.weight = (float(self.qmc.backgroundprofile['weight'][0]),self.qmc.weight[1],str(self.qmc.backgroundprofile['weight'][2]))
+                                        else:
+                                            self.qmc.weight = (cmds,self.qmc.weight[1],self.qmc.weight[2])
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
 
                             ##  visible(<i>,<b>) : sets the visibility of <button> visible
                             #        (visibility=ON) if value b is yes, true, t, or 1, otherwise to hidden (visibility=OFF)
@@ -12232,6 +12299,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     def incrEventNumber(self, _:bool = False) -> None:
         self.eNumberSpinBox.stepBy(1)
 
+    def plotEventSelection(self, event_nr:int) -> None:
+        if self.qmc.ax is not None and len(self.qmc.specialevents)>event_nr:
+            etimeindex = self.qmc.specialevents[event_nr]
+            x = [self.qmc.timex[etimeindex],self.qmc.timex[etimeindex],self.qmc.timex[etimeindex],self.qmc.timex[etimeindex]]
+            y = [(self.qmc.ylimit_min-100),self.qmc.temp2[etimeindex],self.qmc.temp1[etimeindex],(self.qmc.ylimit+100)]
+            self.qmc.ax.plot(x,y,marker ='o',markersize=12,color ='yellow',linestyle='-',linewidth = 7,alpha=.4)
+
     #moves events in minieditor
     @pyqtSlot(int)
     def changeEventNumber(self, _:int = 0) -> None:
@@ -12266,11 +12340,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.etypeComboBox.setCurrentIndex(self.qmc.specialeventstype[currentevent-1])
             #plot little dot lines
             self.qmc.resetlines() #clear old
-            etimeindex = self.qmc.specialevents[currentevent-1]
-            if currentevent and self.qmc.ax is not None:
-                x = [self.qmc.timex[etimeindex],self.qmc.timex[etimeindex],self.qmc.timex[etimeindex],self.qmc.timex[etimeindex]]
-                y = [(self.qmc.ylimit_min-100),self.qmc.temp2[etimeindex],self.qmc.temp1[etimeindex],(self.qmc.ylimit+100)]
-                self.qmc.ax.plot(x,y,marker ='o',markersize=12,color ='yellow',linestyle='-',linewidth = 7,alpha=.4)
+            if currentevent:
+                self.plotEventSelection(currentevent-1)
                 if not self.qmc.flagstart:
                     self.qmc.fig.canvas.draw()
         except Exception as e: # pylint: disable=broad-except
@@ -12287,7 +12358,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     @pyqtSlot(bool)
     def miniEventRecord(self, _:bool) -> None:
         lenevents = self.eNumberSpinBox.value()
-        if lenevents and len(self.qmc.specialevents) < lenevents-1:
+        if lenevents and  lenevents-1 < len(self.qmc.specialevents):
             if self.qmc.timeindex[0] > -1:
                 newtime = self.qmc.time2index(self.qmc.timex[self.qmc.timeindex[0]]+ stringtoseconds(str(self.etimeline.text())))
             else:
@@ -12297,15 +12368,27 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.etypeComboBox.currentIndex(),
                 self.lineEvent.text(),
                 self.qmc.str2eventsvalue(self.valueEdit.text()))
+
+            # remember etimeindex before reorder
+            etimeindex = self.qmc.specialevents[lenevents-1]
+
             self.lineEvent.clearFocus()
             self.eNumberSpinBox.clearFocus()
             self.etimeline.clearFocus()
 
+            self.orderEvents(force_update=False)
+
             self.qmc.redraw(recomputeAllDeltas=False)
+
+            # redraw minieditor event selection line
+            currentevent = self.eNumberSpinBox.value()
+            if currentevent:
+                self.plotEventSelection(currentevent-1)
+                if not self.qmc.flagstart:
+                    self.qmc.fig.canvas.draw()
 
             if self.qmc.ax is not None:
                 #plot highest ET or BT (sometimes only BT is plot (et is zero))
-                etimeindex = self.qmc.specialevents[lenevents-1]
                 if self.qmc.temp1[etimeindex] > self.qmc.temp2[etimeindex]:
                     self.qmc.ax.plot(self.qmc.timex[etimeindex], self.qmc.temp1[etimeindex], 'o', color = self.qmc.palette['et'])
                 else:
@@ -12564,6 +12647,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 # we avoid the reset within setProfile as we just did a reset and do not want to confuse the ExtraDeviceSettingsBackup
                 res = self.setProfile(filename,obj,quiet=quiet,reset=False)
             if res:
+                #order custom events
+                self.orderEvents()
                 #update etypes combo box
                 self.etypeComboBox.clear()
                 self.etypeComboBox.addItems(self.qmc.etypes)
@@ -13164,6 +13249,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.backgroundEtypes = profile['specialeventstype']
                 self.qmc.backgroundEvalues = profile['specialeventsvalue']
                 self.qmc.backgroundEStrings = [decodeLocalStrict(x) for x in profile['specialeventsStrings']]
+                # order background events
+                self.orderBackgroundEvents()
+                #
                 self.qmc.backgroundFlavors = profile['flavors']
                 self.qmc.titleB = decodeLocalStrict(profile['title'])
 
@@ -13247,6 +13335,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
                 if not self.curFile and len(self.qmc.timex) < 10: # if no foreground is loaded, autoadjustAxis
                     self.autoAdjustAxis(True)
+
+                # set current batch size from this background profile if
+                #  - setBatchSizeFromBackground is ticked
+                #  - no foreground profile is loaded
+                #  - scheduler is not active
+                if self.qmc.setBatchSizeFromBackground and (self.qmc.flagon or not self.curFile) and self.schedule_window is None:
+                    self.qmc.weight = (profile['weight'][0],self.qmc.weight[1],profile['weight'][2])
+
 
                 message = QApplication.translate('Message', 'Background {0} loaded successfully {1}').format(filename, '')
                 self.sendmessage(message)
@@ -18015,6 +18111,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.backgroundShowFullflag = toBool(settings.value('backgroundShowFullflag',self.qmc.backgroundShowFullflag))
             self.qmc.backgroundKeyboardControlFlag = toBool(settings.value('backgroundKeyboardControlFlag',self.qmc.backgroundKeyboardControlFlag))
             self.qmc.clearBgbeforeprofileload = toBool(settings.value('clearBgbeforeprofileload',self.qmc.clearBgbeforeprofileload))
+            self.qmc.setBatchSizeFromBackground = toBool(settings.value('setBatchSizeFromBackground',self.qmc.setBatchSizeFromBackground))
             self.qmc.hideBgafterprofileload = toBool(settings.value('hideBgafterprofileload',self.qmc.hideBgafterprofileload))
             settings.endGroup()
 #--- END GROUP background
@@ -19498,6 +19595,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'backgroundShowFullflag',self.qmc.backgroundShowFullflag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'backgroundKeyboardControlFlag',self.qmc.backgroundKeyboardControlFlag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'clearBgbeforeprofileload',self.qmc.clearBgbeforeprofileload, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'setBatchSizeFromBackground',self.qmc.setBatchSizeFromBackground, read_defaults)
             self.settingsSetValue(settings, default_settings, 'hideBgafterprofileload',self.qmc.hideBgafterprofileload, read_defaults)
             settings.endGroup()
 #--- END GROUP background

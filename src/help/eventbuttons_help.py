@@ -213,6 +213,8 @@ def content() -> str:
     tbl_Commands.add_row(['&#160;','visible(i,b)',QApplication.translate('HelpDlg','sets button i to visible if value of b is yes, true, t, or 1, otherwise to hidden')])
     tbl_Commands.add_row(['&#160;','palette(<p>)',QApplication.translate('HelpDlg','activates palette <p> with <p> either a number 0-9 or a palette label')])
     tbl_Commands.add_row(['&#160;','playbackmode(<int>)',QApplication.translate('HelpDlg','sets playback mode to 0: off, 1: time, 2: BT, 3: ET')])
+    tbl_Commands.add_row(['&#160;','quantifier(n,<bool>)',QApplication.translate('HelpDlg','activate/deactivate quantification per event type n from {1,2,3,4}')])
+    tbl_Commands.add_row(['&#160;','setBatchSize(<float>)',QApplication.translate('HelpDlg','set the batch size to the given value. If the value is negative, the batch size is taken from the background profile, if any is loaded')])
     tbl_Commands.add_row(['&#160;','openProperties',QApplication.translate('HelpDlg','opens the Roast Properties dialog')])
     tbl_Commands.add_row(['&#160;','loadBackground(<filepath>)',QApplication.translate('HelpDlg','loads the .alog profile at the given filepath as background profile')])
     tbl_Commands.add_row(['&#160;','clearBackground',QApplication.translate('HelpDlg','clears the current background profile')])

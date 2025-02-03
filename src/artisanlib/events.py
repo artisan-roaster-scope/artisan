@@ -617,7 +617,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.nbuttonsSpinBox = QSpinBox()
         self.nbuttonsSpinBox.setMaximumWidth(100)
         self.nbuttonsSpinBox.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.nbuttonsSpinBox.setRange(2,30)
+        self.nbuttonsSpinBox.setRange(2,50)
         self.nbuttonsSpinBox.setValue(int(self.aw.buttonlistmaxlen))
         self.nbuttonsSpinBox.valueChanged.connect(self.setbuttonlistmaxlen)
         nbuttonsSizeLabel = QLabel(QApplication.translate('Label','Button Size'))
@@ -2978,7 +2978,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.insertextraeventbutton(True)
 
     def insertextraeventbutton(self, insert:bool = False) -> None:
-        if len(self.extraeventstypes) >= self.aw.buttonlistmaxlen * 4: # max 4 rows of buttons of buttonlistmaxlen
+        if len(self.extraeventstypes) >= self.aw.buttonlistmaxlen * 10: # max 10 rows of buttons of buttonlistmaxlen
             return
         try:
             focusWidget = QApplication.focusWidget()

@@ -91,11 +91,11 @@ class DialogDisplay(Display):
     def show_item(self, item:WeightItem) -> None:
         pass
 
-
 class WebDisplay(Display):
     __slots__ = [ 'url', 'qr_code' ]
 #    def __init__(self) -> None:
 #        super().__init__()
+
 
 
 class Scale:

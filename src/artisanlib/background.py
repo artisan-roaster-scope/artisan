@@ -222,11 +222,18 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.etimeSpinBox.setValue(int(self.aw.qmc.detectBackgroundEventTime))
         self.etimeSpinBox.valueChanged.connect(self.setreproduce)
         self.etimeSpinBox.setEnabled(self.aw.qmc.backgroundReproduce)
-        self.clearBgbeforeprofileload = QCheckBox(QApplication.translate('CheckBox','Clear the background before loading a new profile'))
+        self.clearBgbeforeprofileload = QCheckBox(QApplication.translate('CheckBox','Clear background before loading'))
+        self.clearBgbeforeprofileload.setToolTip(QApplication.translate('Tooltip', 'Clear background before loading a profile'))
         self.clearBgbeforeprofileload.setChecked(self.aw.qmc.clearBgbeforeprofileload)
         self.clearBgbeforeprofileload.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.clearBgbeforeprofileload.stateChanged.connect(self.optclearbgbeforeprofileload)
-        self.hideBgafterprofileload = QCheckBox(QApplication.translate('CheckBox','Always hide background when loading a profile'))
+        self.setBatchSizeFromBackground = QCheckBox(QApplication.translate('CheckBox','Set batch size'))
+        self.setBatchSizeFromBackground.setToolTip(QApplication.translate('Tooltip', 'Set batch size from background profile on load'))
+        self.setBatchSizeFromBackground.setChecked(self.aw.qmc.setBatchSizeFromBackground)
+        self.setBatchSizeFromBackground.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.setBatchSizeFromBackground.stateChanged.connect(self.optsetBatchSizeFromBackground)
+        self.hideBgafterprofileload = QCheckBox(QApplication.translate('CheckBox','Always hide background on loading'))
+        self.hideBgafterprofileload.setToolTip(QApplication.translate('Tooltip', 'Always hide background on loading a profile'))
         self.hideBgafterprofileload.setChecked(self.aw.qmc.hideBgafterprofileload)
         self.hideBgafterprofileload.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.hideBgafterprofileload.stateChanged.connect(self.opthideBgafterprofileload)
@@ -284,37 +291,37 @@ class backgroundDlg(ArtisanResizeablDialog):
         alignButtonBoxed.addWidget(alignButton)
         alignButtonBoxed.addWidget(self.alignComboBox)
 
-        self.backgroundPlaybackAid0Label = QLabel('1')
-        self.backgroundPlaybackAid0Label.setEnabled(self.aw.qmc.backgroundReproduce)
+#        self.backgroundPlaybackAid0Label = QLabel('1')
+#        self.backgroundPlaybackAid0Label.setEnabled(self.aw.qmc.backgroundReproduce)
         self.backgroundPlaybackAid0 = QCheckBox(self.aw.qmc.etypesf(0))
         self.backgroundPlaybackAid0.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.backgroundPlaybackAid0.setChecked(self.aw.qmc.specialeventplaybackaid[0])
         self.backgroundPlaybackAid0.stateChanged.connect(self.setplaybackaideventtypeenabled)
         self.backgroundPlaybackAid0.setEnabled(self.aw.qmc.backgroundReproduce)
 
+#        self.backgroundPlaybackAid1Label = QLabel('2')
+#        self.backgroundPlaybackAid1Label.setEnabled(self.aw.qmc.backgroundReproduce)
         self.backgroundPlaybackAid1 = QCheckBox(self.aw.qmc.etypesf(1))
         self.backgroundPlaybackAid1.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.backgroundPlaybackAid1.setChecked(self.aw.qmc.specialeventplaybackaid[1])
         self.backgroundPlaybackAid1.stateChanged.connect(self.setplaybackaideventtypeenabled)
         self.backgroundPlaybackAid1.setEnabled(self.aw.qmc.backgroundReproduce)
-        self.backgroundPlaybackAid1Label = QLabel('2')
-        self.backgroundPlaybackAid1Label.setEnabled(self.aw.qmc.backgroundReproduce)
 
+#        self.backgroundPlaybackAid2Label = QLabel('3')
+#        self.backgroundPlaybackAid2Label.setEnabled(self.aw.qmc.backgroundReproduce)
         self.backgroundPlaybackAid2 = QCheckBox(self.aw.qmc.etypesf(2))
         self.backgroundPlaybackAid2.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.backgroundPlaybackAid2.setChecked(self.aw.qmc.specialeventplaybackaid[2])
         self.backgroundPlaybackAid2.stateChanged.connect(self.setplaybackaideventtypeenabled)
         self.backgroundPlaybackAid2.setEnabled(self.aw.qmc.backgroundReproduce)
-        self.backgroundPlaybackAid2Label = QLabel('3')
-        self.backgroundPlaybackAid2Label.setEnabled(self.aw.qmc.backgroundReproduce)
 
+#        self.backgroundPlaybackAid3Label = QLabel('4')
+#        self.backgroundPlaybackAid3Label.setEnabled(self.aw.qmc.backgroundReproduce)
         self.backgroundPlaybackAid3 = QCheckBox(self.aw.qmc.etypesf(3))
         self.backgroundPlaybackAid3.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.backgroundPlaybackAid3.setChecked(self.aw.qmc.specialeventplaybackaid[3])
         self.backgroundPlaybackAid3.stateChanged.connect(self.setplaybackaideventtypeenabled)
         self.backgroundPlaybackAid3.setEnabled(self.aw.qmc.backgroundReproduce)
-        self.backgroundPlaybackAid3Label = QLabel('4')
-        self.backgroundPlaybackAid3Label.setEnabled(self.aw.qmc.backgroundReproduce)
 
         tab4content1 = QHBoxLayout()
         tab4content1.addWidget(self.backgroundReproduce)
@@ -326,44 +333,44 @@ class backgroundDlg(ArtisanResizeablDialog):
         tab4content1.addWidget(self.etimeunit)
         tab4content1.addSpacing(20)
         tab4content1.addStretch()
-        tab4content1.addWidget(self.backgroundPlaybackAid0Label)
+#        tab4content1.addWidget(self.backgroundPlaybackAid0Label)
         tab4content1.addWidget(self.backgroundPlaybackAid0)
         tab4content1.addSpacing(10)
-        tab4content1.addWidget(self.backgroundPlaybackAid1Label)
+#        tab4content1.addWidget(self.backgroundPlaybackAid1Label)
         tab4content1.addWidget(self.backgroundPlaybackAid1)
         tab4content1.addSpacing(10)
-        tab4content1.addWidget(self.backgroundPlaybackAid2Label)
+#        tab4content1.addWidget(self.backgroundPlaybackAid2Label)
         tab4content1.addWidget(self.backgroundPlaybackAid2)
         tab4content1.addSpacing(10)
-        tab4content1.addWidget(self.backgroundPlaybackAid3Label)
+#        tab4content1.addWidget(self.backgroundPlaybackAid3Label)
         tab4content1.addWidget(self.backgroundPlaybackAid3)
 
-        self.backgroundPlaybackEvent0Label = QLabel('1')
-        self.backgroundPlaybackEvent0Label.setEnabled(self.aw.qmc.backgroundPlaybackEvents)
+#        self.backgroundPlaybackEvent0Label = QLabel('1')
+#        self.backgroundPlaybackEvent0Label.setEnabled(self.aw.qmc.backgroundPlaybackEvents)
         self.backgroundPlaybackEvent0 = QCheckBox(self.aw.qmc.etypesf(0))
         self.backgroundPlaybackEvent0.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.backgroundPlaybackEvent0.setChecked(self.aw.qmc.specialeventplayback[0])
         self.backgroundPlaybackEvent0.stateChanged.connect(self.setplaybackeventtypeenabled)
         self.backgroundPlaybackEvent0.setEnabled(self.aw.qmc.backgroundPlaybackEvents)
 
-        self.backgroundPlaybackEvent1Label = QLabel('2')
-        self.backgroundPlaybackEvent1Label.setEnabled(self.aw.qmc.backgroundPlaybackEvents)
+#        self.backgroundPlaybackEvent1Label = QLabel('2')
+#        self.backgroundPlaybackEvent1Label.setEnabled(self.aw.qmc.backgroundPlaybackEvents)
         self.backgroundPlaybackEvent1 = QCheckBox(self.aw.qmc.etypesf(1))
         self.backgroundPlaybackEvent1.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.backgroundPlaybackEvent1.setChecked(self.aw.qmc.specialeventplayback[1])
         self.backgroundPlaybackEvent1.stateChanged.connect(self.setplaybackeventtypeenabled)
         self.backgroundPlaybackEvent1.setEnabled(self.aw.qmc.backgroundPlaybackEvents)
 
-        self.backgroundPlaybackEvent2Label = QLabel('3')
-        self.backgroundPlaybackEvent2Label.setEnabled(self.aw.qmc.backgroundPlaybackEvents)
+#        self.backgroundPlaybackEvent2Label = QLabel('3')
+#        self.backgroundPlaybackEvent2Label.setEnabled(self.aw.qmc.backgroundPlaybackEvents)
         self.backgroundPlaybackEvent2 = QCheckBox(self.aw.qmc.etypesf(2))
         self.backgroundPlaybackEvent2.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.backgroundPlaybackEvent2.setChecked(self.aw.qmc.specialeventplayback[2])
         self.backgroundPlaybackEvent2.stateChanged.connect(self.setplaybackeventtypeenabled)
         self.backgroundPlaybackEvent2.setEnabled(self.aw.qmc.backgroundPlaybackEvents)
 
-        self.backgroundPlaybackEvent3Label = QLabel('4')
-        self.backgroundPlaybackEvent3Label.setEnabled(self.aw.qmc.backgroundPlaybackEvents)
+#        self.backgroundPlaybackEvent3Label = QLabel('4')
+#        self.backgroundPlaybackEvent3Label.setEnabled(self.aw.qmc.backgroundPlaybackEvents)
         self.backgroundPlaybackEvent3 = QCheckBox(self.aw.qmc.etypesf(3))
         self.backgroundPlaybackEvent3.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.backgroundPlaybackEvent3.setChecked(self.aw.qmc.specialeventplayback[3])
@@ -372,34 +379,39 @@ class backgroundDlg(ArtisanResizeablDialog):
 
         tab4content2 = QHBoxLayout()
         tab4content2.addWidget(self.backgroundPlaybackDROP)
-        tab4content2.addSpacing(25)
+        tab4content2.addSpacing(10)
         tab4content2.addStretch()
         tab4content2.addWidget(self.backgroundPlaybackEvents)
         tab4content2.addSpacing(10)
         tab4content2.addWidget(self.replayComboBox)
         tab4content2.addSpacing(10)
         tab4content2.addStretch()
-        tab4content2.addWidget(self.backgroundPlaybackEvent0Label)
+#        tab4content2.addWidget(self.backgroundPlaybackEvent0Label)
         tab4content2.addWidget(self.backgroundPlaybackEvent0)
         tab4content2.addSpacing(10)
-        tab4content2.addWidget(self.backgroundPlaybackEvent1Label)
+#        tab4content2.addWidget(self.backgroundPlaybackEvent1Label)
         tab4content2.addWidget(self.backgroundPlaybackEvent1)
         tab4content2.addSpacing(10)
-        tab4content2.addWidget(self.backgroundPlaybackEvent2Label)
+#        tab4content2.addWidget(self.backgroundPlaybackEvent2Label)
         tab4content2.addWidget(self.backgroundPlaybackEvent2)
         tab4content2.addSpacing(10)
-        tab4content2.addWidget(self.backgroundPlaybackEvent3Label)
+#        tab4content2.addWidget(self.backgroundPlaybackEvent3Label)
         tab4content2.addWidget(self.backgroundPlaybackEvent3)
 
         tab4content = QVBoxLayout()
         tab4content.addLayout(tab4content1)
         tab4content.addLayout(tab4content2)
+        tab4content.setSpacing(7)
 
         playbackGroupLayout = QGroupBox(QApplication.translate('GroupBox','Playback'))
         playbackGroupLayout.setLayout(tab4content)
 
         optcontent = QHBoxLayout()
         optcontent.addWidget(self.clearBgbeforeprofileload)
+        optcontent.addSpacing(5)
+        optcontent.addStretch()
+        optcontent.addWidget(self.setBatchSizeFromBackground)
+        optcontent.addSpacing(5)
         optcontent.addStretch()
         optcontent.addWidget(self.hideBgafterprofileload)
         tab1layout = QVBoxLayout()
@@ -531,10 +543,11 @@ class backgroundDlg(ArtisanResizeablDialog):
                 self.backgroundPlaybackEvent1,
                 self.backgroundPlaybackEvent2,
                 self.backgroundPlaybackEvent3,
-                self.backgroundPlaybackEvent0Label,
-                self.backgroundPlaybackEvent1Label,
-                self.backgroundPlaybackEvent2Label,
-                self.backgroundPlaybackEvent3Label]:
+#                self.backgroundPlaybackEvent0Label,
+#                self.backgroundPlaybackEvent1Label,
+#                self.backgroundPlaybackEvent2Label,
+#                self.backgroundPlaybackEvent3Label
+                ]:
             widget.setEnabled(self.aw.qmc.backgroundPlaybackEvents)
 
     @pyqtSlot(int)
@@ -591,15 +604,23 @@ class backgroundDlg(ArtisanResizeablDialog):
                 self.backgroundPlaybackAid1,
                 self.backgroundPlaybackAid2,
                 self.backgroundPlaybackAid3,
-                self.backgroundPlaybackAid0Label,
-                self.backgroundPlaybackAid1Label,
-                self.backgroundPlaybackAid2Label,
-                self.backgroundPlaybackAid3Label]:
+#                self.backgroundPlaybackAid0Label,
+#                self.backgroundPlaybackAid1Label,
+#                self.backgroundPlaybackAid2Label,
+#                self.backgroundPlaybackAid3Label
+                ]:
             widget.setEnabled(self.aw.qmc.backgroundReproduce)
         self.backgroundReproduceBeep.setEnabled(self.aw.qmc.backgroundReproduce)
         self.etimeSpinBox.setEnabled(self.aw.qmc.backgroundReproduce)
         self.etimelabel.setEnabled(self.aw.qmc.backgroundReproduce)
         self.etimeunit.setEnabled(self.aw.qmc.backgroundReproduce)
+
+    @pyqtSlot(int)
+    def optsetBatchSizeFromBackground(self, _:int) -> None:
+        if self.setBatchSizeFromBackground.isChecked():
+            self.aw.qmc.setBatchSizeFromBackground = True
+        else:
+            self.aw.qmc.setBatchSizeFromBackground = False
 
     @pyqtSlot(int)
     def optclearbgbeforeprofileload(self, _:int) -> None:

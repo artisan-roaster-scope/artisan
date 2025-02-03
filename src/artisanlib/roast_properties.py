@@ -2566,6 +2566,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.roastpropertiesAutoOpenFlag = self.org_roastpropertiesAutoOpenFlag
         self.aw.qmc.roastpropertiesAutoOpenDropFlag = self.org_roastpropertiesAutoOpenDropFlag
 
+        self.aw.qmc.redraw(recomputeAllDeltas=False)
+
         self.clean_up()
         super().reject()
 
@@ -4519,9 +4521,10 @@ class editGraphDlg(ArtisanResizeablDialog):
     def orderEventTableLoop(self) -> None:
         nevents = len(self.aw.qmc.specialevents)
         if nevents:
-            self.aw.orderEvents()
-            self.createEventTable(force=True)
-            self.aw.qmc.redraw(recomputeAllDeltas=False)
+            event_order_changed = self.aw.orderEvents()
+            if event_order_changed:
+                self.createEventTable(force=True)
+                self.aw.qmc.redraw(recomputeAllDeltas=False)
 
     @pyqtSlot(bool)
     def addEventTable(self, _:bool = False) -> None:
@@ -5048,6 +5051,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.aw.qmc.timealign(redraw=False)
 
             self.saveEventTable()
+            self.aw.orderEvents()
+            self.aw.qmc.redraw(recomputeAllDeltas=False)
         # Update Title
         self.aw.qmc.title = ' '.join(self.titleedit.currentText().split())
         self.aw.qmc.title_show_always = self.titleShowAlwaysFlag.isChecked()

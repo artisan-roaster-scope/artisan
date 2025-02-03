@@ -243,7 +243,7 @@ class tgraphcanvas(FigureCanvas):
         'backgroundReproduce', 'backgroundReproduceBeep', 'backgroundPlaybackEvents', 'backgroundPlaybackDROP', 'Betypes', 'backgroundFlavors', 'flavorbackgroundflag',
         'E1backgroundtimex', 'E2backgroundtimex', 'E3backgroundtimex', 'E4backgroundtimex', 'E1backgroundvalues', 'E2backgroundvalues', 'E3backgroundvalues',
         'E4backgroundvalues', 'l_backgroundeventtype1dots', 'l_backgroundeventtype2dots', 'l_backgroundeventtype3dots', 'l_backgroundeventtype4dots',
-        'DeltaETBflag', 'DeltaBTBflag', 'clearBgbeforeprofileload', 'hideBgafterprofileload', 'heating_types', 'operator', 'organization', 'roastertype', 'roastersize', 'roasterheating', 'drumspeed',
+        'DeltaETBflag', 'DeltaBTBflag', 'clearBgbeforeprofileload', 'setBatchSizeFromBackground', 'hideBgafterprofileload', 'heating_types', 'operator', 'organization', 'roastertype', 'roastersize', 'roasterheating', 'drumspeed',
         'organization_setup', 'operator_setup', 'roastertype_setup', 'roastersize_setup', 'roastersize_setup_default', 'roasterheating_setup', 'roasterheating_setup_default', 'drumspeed_setup', 'last_batchsize', 'machinesetup_energy_ratings',
         'machinesetup', 'roastingnotes', 'cuppingnotes', 'roastdate', 'roastepoch', 'roastepoch_timeout', 'lastroastepoch', 'batchcounter', 'batchsequence', 'batchprefix', 'neverUpdateBatchCounter',
         'roastbatchnr', 'roastbatchprefix', 'roastbatchpos', 'roasttzoffset', 'roastUUID', 'scheduleID', 'scheduleDate', 'plus_default_store', 'plus_store', 'plus_store_label', 'plus_coffee',
@@ -1414,6 +1414,7 @@ class tgraphcanvas(FigureCanvas):
         self.DeltaETBflag:bool = False
         self.DeltaBTBflag:bool = True
         self.clearBgbeforeprofileload:bool = False
+        self.setBatchSizeFromBackground:bool = False
         self.hideBgafterprofileload:bool = False
 
         self.heating_types: Final[List[str]] = [
@@ -3297,6 +3298,13 @@ class tgraphcanvas(FigureCanvas):
                 self.aw.orderEvents()
                 self.fileDirtySignal.emit()
                 self.redraw_keep_view(recomputeAllDeltas=(action.key[0] in {0, 6}))  # type: ignore[attr-defined] # "QAction" has no attribute "key" # on moving CHARGE or DROP, we have to recompute the Deltas
+                # redraw minieditor event selection line
+                currentevent = self.aw.eNumberSpinBox.value()
+                if currentevent:
+                    self.aw.plotEventSelection(currentevent-1)
+                    if not self.flagstart:
+                        self.fig.canvas.draw()
+
             try:
                 dlg.dialogbuttons.accepted.disconnect()
                 dlg.dialogbuttons.rejected.disconnect()
@@ -5207,7 +5215,7 @@ class tgraphcanvas(FigureCanvas):
             self.adderror((QApplication.translate('Error Message','Exception:') + ' playbackdrop() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
 
-    # turns playback event on and fills self.replayedBackgroundEvents with already passed events if any
+    # turns playback event on and fills self.replayedBackgroundEvents with already passed events (w.r.t. time) if any
     def turn_playback_event_ON(self) -> None:
         if not self.backgroundPlaybackEvents:
             # only if playback is freshly turned ON we consider to enable (potentially) already fired background events to be replayed
@@ -5223,10 +5231,13 @@ class tgraphcanvas(FigureCanvas):
             additional_samples = (3 if self.autoChargeFlag else 2)
             # to catch also background events scheduled for around 00:00 we relax the condition to mark
             # events before now where time has already passed by 2 (or 3 with autoCHARGE) samples
+            short_after_CHARGE:bool = False
             if self.timeindex[0] != -1 and now - start <  additional_samples*sample_interval:
                 now -= additional_samples*sample_interval
+                short_after_CHARGE = True
             for i, bge in enumerate(self.backgroundEvents):
-                if (self.timeB[bge] - now) <= 0:
+                if (self.timeB[bge] - now) <= 0 and not (short_after_CHARGE and self.timeB[bge] < 0):
+                    # switching on short after CHARGE, does not disable background events before CHARGE
                     self.replayedBackgroundEvents.append(i)
 
     def turn_playback_event_OFF(self) -> None:
@@ -6705,7 +6716,11 @@ class tgraphcanvas(FigureCanvas):
                 self.restoreEnergyLoadDefaults()
                 self.restoreEnergyProtocolDefaults()
                 #
-                self.weight = (self.last_batchsize,0,self.weight[2])
+                if (self.backgroundprofile is not None and 'weight' in self.backgroundprofile and
+                    self.setBatchSizeFromBackground and self.aw.schedule_window is None):
+                    self.weight = (float(self.backgroundprofile['weight'][0]),0,str(self.backgroundprofile['weight'][2]))
+                else:
+                    self.weight = (self.last_batchsize,0,self.weight[2])
                 self.volume = (0,0,self.volume[2])
                 self.density = (0,self.density[1],1,self.density[3])
                 # we reset ambient values to the last sampled readings in this session

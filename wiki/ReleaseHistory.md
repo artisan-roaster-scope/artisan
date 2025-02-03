@@ -15,6 +15,10 @@ v3.1.1
   - adds drag-and-drop to Stats Summary table configuration
   - allows to hide scheduled items
   - adds support for feeding data from energy meters into Artisans roast energy calculator
+  - adds new flag "Set batch size" to background dialog. If ticked the batch size is taken from the background profile on load while scheduler is off
+  - adds new Artisan Command `setBatchSize(<float>)` to set the batch size. if the given number is negative the batch size is taken from the background profile, if available
+  - adds new Artisan Command `quantifier(n,<bool>)` to toggle quantification per event type
+
 
 * CHANGES
   - the Phidget driver is now bundled with the Artisan app and does no longer need to be installed separately (but for some legacy USB HID devices, like the original 1046 and 1048, which still need the kernel extension of the driver package installed in the system)
@@ -22,6 +26,8 @@ v3.1.1
   - update volume not density if weight changes and volume is set in Roast Properties ([Discussion #1786](../../../discussions/1786))
   - generated WebLCD URL are using more stable host names instead of potentially DHCP assigned IP addresses
   - updated Turkish translations (thanks to Kemal Akdas)
+  - raises max event button limits from 4 rows a 30 buttons to 10 rows a 50 buttons
+  - keeps custom events ordered by time
 
 * FIXES
   - ensure complete reset to defaults in energy tab loads tab
@@ -29,6 +35,7 @@ v3.1.1
   - prevents exceptions caused by empty event type names ([Discussion #1745](../../../discussions/1745))
   - fixes processing of MODBUS function 2 request which broke the just introduced autoCHARGE/autoDROP triggered by Loring machines
   - fixes a typo which allowed to open multiple Roast Properties dialogs ([Issue #1781](../../../issues/1781))
+- fixes regression introduced in v3.0 which prevented to replay events before CHARGE
 
 
 * REMOVALS
