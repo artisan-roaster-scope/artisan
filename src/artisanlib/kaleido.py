@@ -412,13 +412,13 @@ class KaleidoPort:
             # otherwise repeat in one second
             await asyncio.sleep(self._ping_retry_delay)
         try:
-            # ping was successful, now we send the temperature mode via the queue
+            # ping was successful, now we send the temperature mode
             await self.serial_write_process(reader, writer, self.create_msg('TU', mode))
         except asyncio.TimeoutError:
             _log.debug('TU response timeout')
         # send SC (start guard)
         try:
-            # ping was successful, now we send the temperature mode via the queue
+            # ping was successful, now we send the safe guard
             await self.serial_write_process(reader, writer, self.create_msg('SC', 'AR'))
         except asyncio.TimeoutError:
             _log.debug('SC AR timeout')
@@ -476,17 +476,18 @@ class KaleidoPort:
                             self._write_queue.task_done()
                     except Exception as e: # pylint: disable=broad-except
                         _log.error(e)
-                if writer is not None:
-                    try:
-                        writer.close()
-                        await asyncio.wait_for(writer.wait_closed(), timeout=0.3)
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.error(e)
                 if writer is not None and writer.transport is not None:
                     try:
                         writer.transport.close()
                     except Exception as e: # pylint: disable=broad-except
                         _log.error(e)
+                if writer is not None:
+                    try:
+                        writer.close()
+                        await asyncio.wait_for(writer.wait_closed(), timeout=0.3) # this seems to always timeout!?
+                    except Exception: # pylint: disable=broad-except
+                        #_log.error("exception in writer close")
+                        pass
 
             # the following is not reached on stop()
             self.resetReadings()
@@ -540,36 +541,46 @@ class KaleidoPort:
                     _log.error(ex)
 
     # adds message to write queue and awaits new data for var
-    async def write_await(self, message:str, var:str, await_var:str) -> Optional[str]:
+    async def write_await(self, message:str, var:str, await_var:str, timeout:Optional[float] = None) -> Optional[str]:
+        send_timeout:float = self._send_timeout
+        if timeout is not None:
+            send_timeout = timeout
         if self._write_queue is None:
             return None
         task = await self.add_request(await_var)
         await self._write_queue.put(message)
-        await task.wait() # await a response containing a new value for var
-        res = await self.get_state_async(var)
-        return str(res)
+        # await a response containing a new value for var with timeout
+        try:
+            await asyncio.wait_for(task.wait(), send_timeout)
+            return str(await self.get_state_async(var))
+        except asyncio.TimeoutError:
+            if self._logging:
+                _log.info('write_await timeout (msg=%s, timeout:%s, send_timeout:%s)',message.strip(),timeout,send_timeout)
+        return None
+
 
     # <target> is the tag indicating the receiver of the <value>
     # will await new data assigned to given <var>, if <var> is not given, a response with a single <target>/value pair is awaited
     # using the target prefixed by _single_await_var_prefix as async.Event lock variable
-    def send_request(self, target:str, value:Optional[str] = None, var:Optional[str] = None, timeout:Optional[float] = None) -> Optional[str]:
+    def send_request(self, target:str, value:Optional[str] = None, var:Optional[str] = None,
+                timeout:Optional[float] = None, single_request:bool = False) -> Optional[str]:
         send_timeout:float = self._send_timeout
         if timeout is not None:
             send_timeout = timeout
         # await_var is prefixed by _single_await_var_prefix to ensure that a response with a single <target>/value pair is awaited
         variable:str = (target if var is None else var)
-        await_var:str = (self._single_await_var_prefix + target if var is None else var)
+        await_var:str = (self._single_await_var_prefix + variable if var is None or single_request else var)
         if self._asyncLoopThread is not None:
             msg = self.create_msg(target, value)
             if self._write_queue is not None:
-                task = self.write_await(msg, variable, await_var)
+                task = self.write_await(msg, variable, await_var, send_timeout)
                 future = asyncio.run_coroutine_threadsafe(task, self._asyncLoopThread.loop)
                 try:
-                    return future.result(send_timeout)
+                    return future.result()
                 except TimeoutError:
                     # the coroutine took too long, cancelling the task...
                     if self._logging:
-                        _log.info('send_request timeout (msg=%s, timeout:%s)',msg.strip(),timeout)
+                        _log.info('send_request timeout (msg=%s, timeout:%s, send_timeout:%s)',msg.strip(),timeout,send_timeout)
                     future.cancel()
                 except Exception as ex: # pylint: disable=broad-except
                     _log.error(ex)
@@ -604,8 +615,8 @@ class KaleidoPort:
 
     def stop(self) -> None:
         _log.debug('stop sampling')
-        # send end guard
-        self.send_request('CL','AR','SN')
+        # send "end safety guard"
+        self.send_request('CL','AR','SN', 2*self._send_timeout, True)
         del self._asyncLoopThread
         self._asyncLoopThread = None
         self._write_queue = None
