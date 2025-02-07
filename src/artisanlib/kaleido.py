@@ -442,28 +442,29 @@ class KaleidoPort:
                 # Wait for 2 seconds, then raise TimeoutError
                 reader, writer = await asyncio.wait_for(connect, timeout=self._open_timeout)
 
-                self._write_queue = asyncio.Queue()
-                await asyncio.wait_for(self.serial_initialize(reader, writer, mode), timeout=self._init_timeout)
+                if reader is not None and writer is not None:
+                    self._write_queue = asyncio.Queue()
+                    await asyncio.wait_for(self.serial_initialize(reader, writer, mode), timeout=self._init_timeout)
 
-                _log.debug('connected')
-                if connected_handler is not None:
-                    try:
-                        connected_handler()
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.error(e)
+                    _log.debug('connected')
+                    if connected_handler is not None:
+                        try:
+                            connected_handler()
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.error(e)
 
-                read_handler = asyncio.create_task(self.serial_handle_reads(reader))
-                write_handler = asyncio.create_task(self.serial_handle_writes(writer, self._write_queue))
-                done, pending = await asyncio.wait([read_handler, write_handler], return_when=asyncio.FIRST_COMPLETED)
+                    read_handler = asyncio.create_task(self.serial_handle_reads(reader))
+                    write_handler = asyncio.create_task(self.serial_handle_writes(writer, self._write_queue))
+                    done, pending = await asyncio.wait([read_handler, write_handler], return_when=asyncio.FIRST_COMPLETED)
 
-                _log.debug('disconnected')
+                    _log.debug('disconnected')
 
-                for task in pending:
-                    task.cancel()
-                for task in done:
-                    exception = task.exception()
-                    if isinstance(exception, Exception):
-                        raise exception
+                    for task in pending:
+                        task.cancel()
+                    for task in done:
+                        exception = task.exception()
+                        if isinstance(exception, Exception):
+                            raise exception
             except asyncio.TimeoutError:
                 _log.debug('connection timeout')
             except Exception as e: # pylint: disable=broad-except
@@ -598,6 +599,10 @@ class KaleidoPort:
                 connected_handler:Optional[Callable[[], None]] = None,
                 disconnected_handler:Optional[Callable[[], None]] = None) -> None:
         try:
+            # initialize data structures
+            self._state = {}
+            self._pending_requests = {}
+
             _log.debug('start sampling')
             if self._asyncLoopThread is None:
                 self._asyncLoopThread = AsyncLoopThread()

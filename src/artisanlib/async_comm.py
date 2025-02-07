@@ -272,24 +272,25 @@ class AsyncComm:
                     connect = asyncio.open_connection(self._host, self._port)
                 # Wait for 2 seconds, then raise TimeoutError
                 reader, writer = await asyncio.wait_for(connect, timeout=connect_timeout)
-                _log.debug('connected')
-                if self._connected_handler is not None:
-                    try:
-                        self._connected_handler()
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.exception(e)
-                self._write_queue = asyncio.Queue()
-                read_handler = asyncio.create_task(self.handle_reads(reader))
-                write_handler = asyncio.create_task(self.handle_writes(writer, self._write_queue))
-                done, pending = await asyncio.wait([read_handler, write_handler], return_when=asyncio.FIRST_COMPLETED)
-                _log.debug('disconnected')
+                if reader is not None and writer is not None:
+                    _log.debug('connected')
+                    if self._connected_handler is not None:
+                        try:
+                            self._connected_handler()
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.exception(e)
+                    self._write_queue = asyncio.Queue()
+                    read_handler = asyncio.create_task(self.handle_reads(reader))
+                    write_handler = asyncio.create_task(self.handle_writes(writer, self._write_queue))
+                    done, pending = await asyncio.wait([read_handler, write_handler], return_when=asyncio.FIRST_COMPLETED)
+                    _log.debug('disconnected')
 
-                for task in pending:
-                    task.cancel()
-                for task in done:
-                    exception = task.exception()
-                    if isinstance(exception, Exception):
-                        raise exception
+                    for task in pending:
+                        task.cancel()
+                    for task in done:
+                        exception = task.exception()
+                        if isinstance(exception, Exception):
+                            raise exception
 
             except asyncio.TimeoutError:
                 _log.debug('connection timeout')

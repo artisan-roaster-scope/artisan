@@ -29,6 +29,9 @@ def extractProfileRubasseCSV(file:str, aw:'ApplicationWindow') -> 'ProfileData':
     filename:str = os.path.basename(file)
     res['title'] = filename
 
+    res['roastertype'] = 'Rubase'
+    res['roasterheating'] = 3 # electric
+
     with open(file, newline='',encoding='utf-8') as csvFile:
         data = csv.reader(csvFile,delimiter=',')
         #read file header

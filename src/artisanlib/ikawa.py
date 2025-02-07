@@ -44,6 +44,9 @@ def extractProfileIkawaURL(url:QUrl, aw:'ApplicationWindow') -> 'ProfileData':
     res:ProfileData = {} # the interpreted data set
     res['samplinginterval'] = 1.0
 
+    res['roastertype'] = 'IKAWA Sample Roaster'
+    res['roasterheating'] = 3 # electric
+
     specialevents:List[int] = []
     specialeventstype:List[int] = []
     specialeventsvalue:List[float] = []

@@ -40,7 +40,7 @@ from bisect import bisect_right
 import psutil
 from psutil._common import bytes2human
 
-from typing import Final, Optional, List, Dict, Callable, Tuple, Union, Any, Sequence, cast, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
+from typing import Final, Optional, List, Set, Dict, Callable, Tuple, Union, Any, Sequence, cast, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
 
 if TYPE_CHECKING:
     from artisanlib.comm import serialport # pylint: disable=unused-import
@@ -226,7 +226,7 @@ class tgraphcanvas(FigureCanvas):
         'extraNoneTempHint2', 'plotcurves', 'plotcurvecolor', 'overlapList', 'tight_layout_params', 'fig', 'ax', 'delta_ax', 'legendloc', 'legendloc_pos', 'onclick_cid',
         'oncpick_cid', 'ondraw_cid', 'rateofchange1', 'rateofchange2', 'flagon', 'flagstart', 'flagKeepON', 'flagOpenCompleted', 'flagsampling', 'flagsamplingthreadrunning',
         'manuallogETflag', 'zoom_follow', 'alignEvent', 'compareAlignEvent', 'compareEvents', 'compareET', 'compareBT', 'compareDeltaET', 'compareDeltaBT', 'compareMainEvents', 'compareBBP', 'compareRoast', 'compareExtraCurves1', 'compareExtraCurves2',
-        'replayType', 'replayedBackgroundEvents', 'beepedBackgroundEvents', 'roastpropertiesflag', 'roastpropertiesAutoOpenFlag', 'roastpropertiesAutoOpenDropFlag',
+        'replayType', 'replayedBackgroundEvents', 'last_replayed_events', 'beepedBackgroundEvents', 'roastpropertiesflag', 'roastpropertiesAutoOpenFlag', 'roastpropertiesAutoOpenDropFlag',
         'title', 'title_show_always', 'ambientTemp', 'ambientTempSource', 'ambient_temperature_device', 'ambient_pressure', 'ambient_pressure_device', 'ambient_humidity',
         'ambient_humidity_device', 'elevation', 'temperaturedevicefunctionlist', 'humiditydevicefunctionlist', 'pressuredevicefunctionlist', 'moisture_greens', 'moisture_roasted',
         'greens_temp', 'beansize', 'beansize_min', 'beansize_max', 'whole_color', 'ground_color', 'color_systems', 'color_system_idx', 'heavyFC_flag', 'lowFC_flag', 'lightCut_flag',
@@ -1194,8 +1194,8 @@ class tgraphcanvas(FigureCanvas):
         self.compareRoast:bool = True # if False roast should not be compared (self.compareBBP should be True in this case!)
 
         self.replayType:int = 0 # 0: by time, 1: by BT, 2: by ET
-        self.replayedBackgroundEvents:List[int] = [] # set of BackgroundEvent indices that have already been replayed (cleared in ClearMeasurements)
-        self.beepedBackgroundEvents:List[int] = []   # set of BackgroundEvent indices that have already been beeped for (cleared in ClearMeasurements)
+        self.replayedBackgroundEvents:Set[int] = set()  # set of BackgroundEvent indices that have already been replayed (cleared in ClearMeasurements)
+        self.beepedBackgroundEvents:Set[int] = set()   # set of BackgroundEvent indices that have already been beeped for (cleared in ClearMeasurements)
 
         self.roastpropertiesflag:int = 1  #resets roast properties if not zero
         self.roastpropertiesAutoOpenFlag:int = 0  #open roast properties dialog on CHARGE if not zero
@@ -1675,8 +1675,9 @@ class tgraphcanvas(FigureCanvas):
         self.eventpositionbars:List[float] = [0.]*120
         self.specialeventannotations:List[str] = ['','','','']
         self.specialeventannovisibilities:List[int] = [0,0,0,0]
-        self.specialeventplaybackaid:List[bool] = [True, True, True, True] # per event type decides if playback aid is active
-        self.specialeventplayback:List[bool] = [True, True, True, True] # per event type decides if background events are playbacked or not
+        self.specialeventplaybackaid:List[bool] = [True, True, True, True]      # per event type decides if playback aid is active
+        self.specialeventplayback:List[bool] = [True, True, True, True]         # per event type decides if background events are play-backed or not
+        self.specialeventplaybackramp:List[bool] = [False, False, False, False] # per event type decides if playback ramping is applied or not
         self.overlappct:int = 100
 
         #curve styles
@@ -1783,7 +1784,7 @@ class tgraphcanvas(FigureCanvas):
         self.loadalarmsfromprofile:bool = False # if set, alarms are loaded from profile
         self.loadalarmsfrombackground:bool = False # if set, alarms are loaded from background profiles
         self.alarmsfile:str = '' # filename alarms were loaded from
-        self.TPalarmtimeindex:Optional[int] = None # is set to the current  self.timeindex by sample(), if alarms are defined and once the TP is detected
+        self.TPalarmtimeindex:Optional[int] = None # is set to the current  self.time index by sample(), if alarms are defined and once the TP is detected
 
         self.rsfile:str = '' # filename Ramp/Soak patterns were loaded from
 
@@ -5220,7 +5221,7 @@ class tgraphcanvas(FigureCanvas):
         if not self.backgroundPlaybackEvents:
             # only if playback is freshly turned ON we consider to enable (potentially) already fired background events to be replayed
             self.backgroundPlaybackEvents = True
-            self.replayedBackgroundEvents = []
+            self.replayedBackgroundEvents = set()
         if self.flagstart:
             sample_interval = self.delay/1000. # in sec
             if self.timeindex[0] != -1:
@@ -5238,56 +5239,81 @@ class tgraphcanvas(FigureCanvas):
             for i, bge in enumerate(self.backgroundEvents):
                 if (self.timeB[bge] - now) <= 0 and not (short_after_CHARGE and self.timeB[bge] < 0):
                     # switching on short after CHARGE, does not disable background events before CHARGE
-                    self.replayedBackgroundEvents.append(i)
+                    self.replayedBackgroundEvents.add(i)
 
     def turn_playback_event_OFF(self) -> None:
         self.backgroundPlaybackEvents = False
-        self.replayedBackgroundEvents = []
+        self.replayedBackgroundEvents = set()
 
 
     # called only after CHARGE
     def playbackevent(self) -> None:
         try:
-            reproducing = None # index of the event that is currently replaying (suppress other replays in this round)
+
             #needed when using device NONE
             if self.timex:
                 #find time or temp distances
+
+
+                reproducing:Optional[int] = None # index of the event that is currently replaying as text (suppress other replays in this round)
+
+                # if all event types reached their end, we can stop checking further events (optimization)
+
+                # register per event type that we do not have to check further events of that type, if all are checked we can stop the processing
+                end_reached:List[bool] = [not flag for flag in self.specialeventplayback] # those event types not activated for event replay are considered done already
+
+                # the next variables is used to realize ramping event replay
+                ramps:List[Optional[int]] = [None,None,None,None]  # holds the time or temp ramp value to be applied per event type, calculated from last_replayed_events and the succeeding event
+
                 slider_events = {} # keep event type value pairs to move sliders (but only once per slider and per interval!)
-                next_byTemp_checked:bool = False # we take care to reply events by temperature in order!
-                now = self.timeclock.elapsedMilli()
+                next_byTemp_checked:List[bool] = [False,False,False,False] # we take care to reply events by temperature in order
+
+                # after an replay by-temp event is checked we set the flag corresponding to its event type in next_byTemp_checked to prevent further checking of this type for by-temp
+                # preventing later events to trigger by-temp to keep events triggered in-order (we assume temps increase and without this all further event will trigger immediately!)
                 for i, bge in enumerate(self.backgroundEvents):
+                    if all(end_reached):
+                        # for each type an event was found that did not fire, we can stop looking further for monotonicity
+                        break
+
+                    event_type = self.backgroundEtypes[i]
+
+                    now = self.timeclock.elapsedMilli()
+
                     if (i not in self.replayedBackgroundEvents and # never replay one event twice
-                        (self.timeindexB[6]==0 or bge < self.timeindexB[6])): # don't replay events that happened after DROP in the backgroundprofile
+                        not end_reached[event_type] and # we already reached the next event of this type after the first enabled one
+                        (self.timeindexB[6]==0 or bge < self.timeindexB[6]) and
+                        event_type < 4 and len(self.timeB)>bge): # don't replay events that happened after DROP in the backgroundprofile
+
                         timed = self.timeB[bge] - now
                         delta:float = 1 # by default don't trigger this one
                         if self.replayType == 0: # replay by time
                             delta = timed
-                        elif not next_byTemp_checked and self.replayType == 1: # replay by BT (after TP)
-                            if self.TPalarmtimeindex:
-                                if self.ctemp2[-1] is not None:
+                        elif not next_byTemp_checked[event_type] and self.replayType == 1: # replay by BT (after TP)
+                            if self.TPalarmtimeindex is not None:
+                                if len(self.ctemp2)>0 and self.ctemp2[-1] is not None and len(self.stemp2B)>bge:
                                     delta = self.stemp2B[bge] - self.ctemp2[-1]
-                                    next_byTemp_checked = True
+                                    next_byTemp_checked[event_type] = True
                             else: # before TP we switch back to time-based
                                 delta = timed
-                                next_byTemp_checked = True
-                        elif not next_byTemp_checked and self.replayType == 2: # replay by ET (after TP)
-                            if self.TPalarmtimeindex:
-                                if self.ctemp1[-1] is not None:
+                                next_byTemp_checked[event_type] = True
+                        elif not next_byTemp_checked[event_type] and self.replayType == 2: # replay by ET (after TP)
+                            if self.TPalarmtimeindex is not None:
+                                if len(self.ctemp1)> 0 and self.ctemp1[-1] is not None and len(self.stemp1)>bge:
                                     delta = self.stemp1B[bge] - self.ctemp1[-1]
-                                    next_byTemp_checked = True
+                                    next_byTemp_checked[event_type] = True
                             else: # before TP we switch back to time-based
                                 delta = timed
-                                next_byTemp_checked = True
+                                next_byTemp_checked[event_type] = True
                         else:
-                            delta = 1 # don't trigger this one
-                        if (reproducing is None and
-                                self.backgroundEtypes[i] < 4 and self.specialeventplaybackaid[self.backgroundEtypes[i]] and  # only show playback aid for event types with activated playback aid
+                            delta = 99999 # don't trigger this one
+
+                        if (reproducing is None and self.specialeventplaybackaid[event_type] and  # only show playback aid for event types with activated playback aid
                                 self.backgroundReproduce and 0 < timed < self.detectBackgroundEventTime):
                             if i not in self.beepedBackgroundEvents and self.backgroundReproduceBeep:
-                                self.beepedBackgroundEvents.append(i)
+                                self.beepedBackgroundEvents.add(i)
                                 QApplication.beep()
                             #write text message
-                            message = f'> [{self.Betypesf(self.backgroundEtypes[i])}] [{self.eventsvalues(self.backgroundEvalues[i])}] : <b>{stringfromseconds(timed)}</b> : {self.backgroundEStrings[i]}'
+                            message = f'> [{self.Betypesf(event_type)}] [{self.eventsvalues(self.backgroundEvalues[i])}] : <b>{stringfromseconds(timed)}</b> : {self.backgroundEStrings[i]}'
                             #rotate colors to get attention
                             if int(round(timed))%2:
                                 style = "background-color:'transparent';"
@@ -5296,6 +5322,7 @@ class tgraphcanvas(FigureCanvas):
 
                             self.aw.sendmessage(message,style=style)
                             reproducing = i
+
 
                         if delta <= 0:
                             #for devices that support automatic roaster control
@@ -5333,21 +5360,95 @@ class tgraphcanvas(FigureCanvas):
                             # if playbackevents is active, we fire the event by moving the slider, but only if
                             # a event type is given (type!=4), the background event type is named exactly as the one of the foreground
                             # the event slider is active/visible and has an action defined
-                            if (self.backgroundPlaybackEvents and self.backgroundEtypes[i] < 4 and
-                                    self.specialeventplayback[self.backgroundEtypes[i]] and # only replay event types activated for replay
-                                    (str(self.etypesf(self.backgroundEtypes[i]) == str(self.Betypesf(self.backgroundEtypes[i])))) and
-                                    self.aw.eventslidervisibilities[self.backgroundEtypes[i]]): #  and self.aw.eventslideractions[self.backgroundEtypes[i]]
-                                slider_events[self.backgroundEtypes[i]] = self.eventsInternal2ExternalValue(self.backgroundEvalues[i]) # add to dict (later overwrite earlier slider moves!)
-                                # we move sliders only after processing all pending events (from the collected dict)
-                                #self.aw.moveslider(self.backgroundEtypes[i],self.eventsInternal2ExternalValue(self.backgroundEvalues[i])) # move slider and update slider LCD
-                                #self.aw.sliderReleased(self.backgroundEtypes[i],force=True) # record event
+                            if (self.backgroundPlaybackEvents and event_type < 4 and
+                                    self.specialeventplayback[event_type] and # only replay event types activated for replay
+                                    (str(self.etypesf(event_type) == str(self.Betypesf(event_type)))) and
+                                    self.aw.eventslidervisibilities[event_type] and
+                                    len(self.backgroundEvalues)>i):
+                                slider_events[event_type] = self.eventsInternal2ExternalValue(self.backgroundEvalues[i]) # add to dict (later overwrite earlier slider moves!)
 
-                            self.replayedBackgroundEvents.append(i) # in any case we mark this event as processed
+                            self.replayedBackgroundEvents.add(i) # in any case we mark this event as processed
+
+                        elif self.backgroundPlaybackEvents and event_type < 4:
+
+                            # we reached a background event (in order) which is not yet ready for (direct) replay
+                            # as we assume all further events of this type will as well not fire as they are ordered by time and
+                            # temperatures which are assumed to increase
+                            end_reached[event_type] = True
+
+                            if (event_type not in slider_events and # only if the is no slider event of the corresponding type
+                                    self.specialeventplayback[event_type] and # only replay event types activated for replay
+                                    (str(self.etypesf(event_type) == str(self.Betypesf(event_type)))) and
+                                    self.aw.eventslidervisibilities[event_type] and
+                                    self.specialeventplaybackramp[event_type]):   # only calculate ramp for ramping events
+
+                                try:
+                                    # get the index of the last event of current event type
+                                    # NOTE: this last event was not necessarily replayed before and might have been manually entered instead
+                                    last_registered_event_idx:Optional[int] = None
+                                    last_event_temp:Optional[float] = None
+                                    next_event_temp:Optional[float] = None
+                                    current_temp:Optional[float] = None
+
+                                    last_registered_event_idx = len(self.specialeventstype) - 1 - self.specialeventstype[::-1].index(event_type)
+
+                                    if last_registered_event_idx is not None and len(self.specialeventsvalue)>last_registered_event_idx:
+                                        last_value = self.eventsInternal2ExternalValue(self.specialeventsvalue[last_registered_event_idx]) # from foreground
+                                        next_value = self.eventsInternal2ExternalValue(self.backgroundEvalues[i])                          # from background
+
+                                        # for ramp by BT only after TP and if BT increased
+                                        if (self.TPalarmtimeindex is not None and self.replayType == 1 and len(self.temp2)>1 and self.temp2[-1] != -1 and
+                                                self.temp2[-2] != -1 and self.temp2[-1] > self.temp2[-2] and len(self.specialevents) > last_registered_event_idx and
+                                                len(self.temp2)> self.specialevents[last_registered_event_idx] and
+                                                len(self.temp2B) > bge):
+                                            # we ramp by BT only after TP and if BT increased, however, last event could be before TP
+                                            # we take as last event then one of the foreground profile and not the one of the background assuming it was replayed at the same temp
+                                            # we do not take any last_temp before TP as before TP BT is not monotone increasing, but decreasing
+                                            last_event_temp = (self.temp2[self.TPalarmtimeindex] if self.specialevents[last_registered_event_idx] < self.TPalarmtimeindex
+                                                    else self.temp2[self.specialevents[last_registered_event_idx]])
+                                            next_event_temp = self.temp2B[bge]
+                                            current_temp = self.temp2[-1]
+                                        elif (self.TPalarmtimeindex is not None and self.replayType == 2 and len(self.temp1)>1 and self.temp1[-1] != -1 and
+                                                self.temp1[-2] != -1 and self.temp1[-1] > self.temp1[-2] and len(self.specialevents) > last_registered_event_idx and
+                                                len(self.temp1)> self.specialevents[last_registered_event_idx] and
+                                                len(self.temp1B) > bge):
+                                            # we ramp by ET only after TP and if ET increased
+                                            # NOTE: ET ramp replay might not work well as ET is often not monotonic increasing
+                                            # we do not take any last_temp before TP as before TP BT is not monotone increasing, but decreasing
+                                            last_event_temp = (self.temp1[self.TPalarmtimeindex] if self.specialevents[last_registered_event_idx] < self.TPalarmtimeindex
+                                                    else self.temp1[self.specialevents[last_registered_event_idx]])
+                                            next_event_temp = self.temp1B[bge]
+                                            current_temp = self.temp1[-1]
+
+                                        # compute ramp value if possible
+                                        if (self.replayType in {1,2} and last_event_temp is not None and next_event_temp is not None and
+                                                current_temp is not None and next_event_temp > last_event_temp):
+                                            # if background event target temperature did increase we ramp by temperature
+                                            coefficients = numpy.polyfit([last_event_temp, next_event_temp] , [last_value, next_value], 1)
+                                            ramps[event_type] = numpy.poly1d(coefficients)(current_temp)
+                                        elif len(self.timex)> self.specialevents[last_registered_event_idx] and len(self.timeB)>bge:
+                                            # otherwise we ramp by time
+                                            last_time = self.timex[self.specialevents[last_registered_event_idx]]
+                                            next_time = self.timeB[bge]
+                                            coefficients = numpy.polyfit([last_time, next_time], [last_value, next_value], 1)
+                                            ramps[event_type] = numpy.poly1d(coefficients)(now)
+
+                                except ValueError:
+                                    # no previous event found to compute the ramp
+                                    pass
 
                 # now move the sliders to the new values (if any)
                 for k,v in slider_events.items():
                     self.aw.moveslider(k,v)
                     self.aw.sliderReleased(k,force=True)
+
+                for k,ramp_value in enumerate(ramps):
+                    if ramp_value is not None:
+                        slider_value = self.aw.eventslidervalues[k]
+                        self.aw.moveslider(k, ramp_value)
+                        if slider_value != self.aw.eventslidervalues[k]:
+                            # slider moved to new value thus we fire its action, if any
+                            self.aw.fireslideraction(k)
 
                 #delete existing message
                 if reproducing is None:
@@ -6565,8 +6666,8 @@ class tgraphcanvas(FigureCanvas):
             for i in range(min(len(self.extradevices),len(self.extratimex),len(self.extratemp1),len(self.extratemp2),len(self.extrastemp1),len(self.extrastemp2))):
                 self.extratimex[i],self.extratemp1[i],self.extratemp2[i],self.extrastemp1[i],self.extrastemp2[i] = [],[],[],[],[]            #reset all variables that need to be reset (but for the actually measurements that will be treated separately at the end of this function)
                 self.extractimex1[i],self.extractimex2[i],self.extractemp1[i],self.extractemp2[i] = [],[],[],[]
-            self.replayedBackgroundEvents=[]
-            self.beepedBackgroundEvents=[]
+            self.replayedBackgroundEvents=set()
+            self.beepedBackgroundEvents=set()
             self.clearEvents() # clear special events
             self.aw.lcd1.display('00:00')
             if self.aw.WebLCDs:
@@ -8997,7 +9098,9 @@ class tgraphcanvas(FigureCanvas):
                                                                                 picker=True,
                                                                                 pickradius=2,
                                                                                 #markevery=every,
-                                                                                linestyle='-',drawstyle='steps-post',linewidth = self.Evaluelinethickness[0],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(0,True))
+                                                                                linestyle='-',
+                                                                                drawstyle=(self.drawstyle_default if self.specialeventplaybackramp[0] else 'steps-post'),
+                                                                                linewidth = self.Evaluelinethickness[0],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(0,True))
                                 if len(self.E2backgroundtimex)>0 and len(self.E2backgroundtimex)==len(self.E2backgroundvalues):
                                     if (self.timeindexB[6] > 0 and self.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E2b_last]]):   #if drop exists and last event was earlier
                                         # repeat last value at time of DROP
@@ -9019,7 +9122,9 @@ class tgraphcanvas(FigureCanvas):
                                                                                 picker=True,
                                                                                 pickradius=2,
                                                                                 #markevery=every,
-                                                                                linestyle='-',drawstyle='steps-post',linewidth = self.Evaluelinethickness[1],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(1,True))
+                                                                                linestyle='-',
+                                                                                drawstyle=(self.drawstyle_default if self.specialeventplaybackramp[1] else 'steps-post'),
+                                                                                linewidth = self.Evaluelinethickness[1],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(1,True))
                                 if len(self.E3backgroundtimex)>0 and len(self.E3backgroundtimex)==len(self.E3backgroundvalues):
                                     if (self.timeindexB[6] > 0 and self.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E3b_last]]):   #if drop exists and last event was earlier
                                         # repeat last value at time of DROP
@@ -9041,7 +9146,9 @@ class tgraphcanvas(FigureCanvas):
                                                                                 picker=True,
                                                                                 pickradius=2,
                                                                                 #markevery=every,
-                                                                                linestyle='-',drawstyle='steps-post',linewidth = self.Evaluelinethickness[2],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(2,True))
+                                                                                linestyle='-',
+                                                                                drawstyle=(self.drawstyle_default if self.specialeventplaybackramp[2] else 'steps-post'),
+                                                                                linewidth = self.Evaluelinethickness[2],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(2,True))
                                 if len(self.E4backgroundtimex)>0 and len(self.E4backgroundtimex)==len(self.E4backgroundvalues):
                                     if (self.timeindexB[6] > 0 and self.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E4b_last]]):   #if drop exists and last event was earlier
                                         # repeat last value at time of DROP
@@ -9063,7 +9170,9 @@ class tgraphcanvas(FigureCanvas):
                                                                                 picker=True,
                                                                                 pickradius=2,
                                                                                 #markevery=every,
-                                                                                linestyle='-',drawstyle='steps-post',linewidth = self.Evaluelinethickness[3],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(3,True))
+                                                                                linestyle='-',
+                                                                                drawstyle=(self.drawstyle_default if self.specialeventplaybackramp[3] else 'steps-post'),
+                                                                                linewidth = self.Evaluelinethickness[3],alpha = min(self.backgroundalpha + 0.1, 1.0), label=self.Betypesf(3,True))
 
                             if len(self.backgroundEvents) > 0:
                                 Bevalues:List[List[float]] = [[],[],[],[]]

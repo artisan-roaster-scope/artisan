@@ -4324,7 +4324,7 @@ class serialport:
                             ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',phidget_id,channel,
                                     remote=self.aw.qmc.phidgetRemoteFlag,remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag,serial=s,hubport=p)
                         else:
-                            break # type: ignore # mypy: Statement is unreachable  [unreachable]
+                            break
                 if ser is not None:
                     self.aw.ser.PhidgetDigitalOut[serial] = []
                     self.aw.ser.PhidgetDigitalOutLastPWM[serial] = [0]*ports # 0-100

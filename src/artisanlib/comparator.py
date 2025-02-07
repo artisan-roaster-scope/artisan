@@ -505,8 +505,8 @@ class RoastProfile:
                                 self.E4.append((self.timex[self.timeindex[0]],last_E4))
                                 last_E4 = None
                             self.E4.append((etime,evalue))
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
+                except Exception as ex: # pylint: disable=broad-except
+                    _log.exception(ex)
             # add a last event at DROP/END to extend the lines to the end of roast
             if not self.aw.qmc.compareRoast and self.aw.qmc.compareBBP:
                 # BBP-only mode

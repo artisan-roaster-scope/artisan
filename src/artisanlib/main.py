@@ -2094,6 +2094,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 importLoringAction.triggered.connect(self.importLoring)
                 self.importMenu.addAction(importLoringAction)
 
+                importROESTAction = QAction('ROEST CSV...', self)
+                importROESTAction.triggered.connect(self.importRoest)
+                self.importMenu.addAction(importROESTAction)
+
                 importRubasseAction = QAction('Rubasse CSV...', self)
                 importRubasseAction.triggered.connect(self.importRubasse)
                 self.importMenu.addAction(importRubasseAction)
@@ -6378,6 +6382,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             # we remember the current event number selected in the minieditor to re-estabish it after a potentiall reordering
             currentevent = self.eNumberSpinBox.value()
 
+            # first ensure that all self.qmc.specialevents indices are positive
+            self.qmc.specialevents = [max(0,i) for i in self.qmc.specialevents]
+
             nevents = len(self.qmc.specialevents)
             packed_events = []
             # pack
@@ -6461,7 +6468,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     # group those with minimally 2x min_span time delta by keeping the first with the value of the last
                     for i, se in enumerate(self.qmc.specialevents):
                         if self.qmc.specialeventstype[i] == tp and last_event_idx is not None:
-                            if self.qmc.specialeventsvalue[last_event_idx] == self.qmc.specialeventsvalue[i]: # type: ignore # mypy: Statement is unreachable  [unreachable]
+                            if self.qmc.specialeventsvalue[last_event_idx] == self.qmc.specialeventsvalue[i]:
                                 # if the value of the event is the same as the previous, we remove it
                                 indexes_to_be_removed.append(i)
                             else:
@@ -14904,6 +14911,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             profile['extraFill1'] = self.extraFill1
                             profile['extraFill2'] = self.extraFill2
 
+
                 # adjust extra serial device table
                 # a) remove superfluous extra serial settings
                 self.extraser = self.extraser[:len(self.qmc.extradevices)]
@@ -17078,7 +17086,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.fmt_data_RoR = toBool(settings.value('fmt_data_RoR',self.qmc.fmt_data_RoR))
             self.qmc.fmt_data_ON = toBool(settings.value('fmt_data_ON',self.qmc.fmt_data_ON))
             self.qmc.fmt_data_curve = toInt(settings.value('fmt_data_curve',self.qmc.fmt_data_curve))
-            #restore playback aid
+            #restore playback aid and replay
             self.qmc.detectBackgroundEventTime = toInt(settings.value('detectBackgroundEventTime',self.qmc.detectBackgroundEventTime))
             self.qmc.backgroundReproduce = toBool(settings.value('backgroundReproduce',self.qmc.backgroundReproduce))
             self.qmc.backgroundReproduceBeep = toBool(settings.value('backgroundReproduceBeep',self.qmc.backgroundReproduceBeep))
@@ -17087,6 +17095,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.replayType = toInt(settings.value('replayType',self.qmc.replayType))
             self.qmc.specialeventplaybackaid = [toBool(x) for x in toList(settings.value('specialeventplaybackaid',self.qmc.specialeventplaybackaid))]
             self.qmc.specialeventplayback = [toBool(x) for x in toList(settings.value('specialeventplayback',self.qmc.specialeventplayback))]
+            self.qmc.specialeventplaybackramp = [toBool(x) for x in toList(settings.value('specialeventplaybackramp',self.qmc.specialeventplaybackramp))]
+
             #restore phases
             self.qmc.phases = [toInt(x) for x in toList(settings.value('Phases',self.qmc.phases))]
             self.qmc.phasesbuttonflag = toBool(settings.value('phasesbuttonflag',self.qmc.phasesbuttonflag))
@@ -18913,6 +18923,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'replayType',self.qmc.replayType, read_defaults)
             self.settingsSetValue(settings, default_settings, 'specialeventplaybackaid',self.qmc.specialeventplaybackaid, read_defaults)
             self.settingsSetValue(settings, default_settings, 'specialeventplayback',self.qmc.specialeventplayback, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'specialeventplaybackramp',self.qmc.specialeventplaybackramp, read_defaults)
             self.settingsSetValue(settings, default_settings, 'Phases',self.qmc.phases, read_defaults)
             #save phasesbuttonflag
             self.settingsSetValue(settings, default_settings, 'phasesbuttonflag',self.qmc.phasesbuttonflag, read_defaults)
@@ -24561,6 +24572,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 # clear annotation cache
                 self.qmc.l_annotations_dict = {}
                 self.qmc.l_event_flags_dict = {}
+                self.orderEvents()
                 #Plot everything
                 self.qmc.redraw()
                 message = QApplication.translate('Message','{0} imported').format(filename)
@@ -24628,6 +24640,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     def importLoring(self, _:bool = False) -> None:
         from artisanlib.loring import extractProfileLoringCSV
         self.importExternal(extractProfileLoringCSV,QApplication.translate('Message','Import Loring CSV'),'*.csv')
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def importRoest(self, _:bool = False) -> None:
+        from artisanlib.roest import extractProfileRoestCSV
+        self.importExternal(extractProfileRoestCSV,QApplication.translate('Message','Import ROEST CSV'),'*.csv')
 
     @pyqtSlot()
     @pyqtSlot(bool)

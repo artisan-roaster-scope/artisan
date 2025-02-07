@@ -26,6 +26,9 @@ def extractProfileStrongholdXLSX(file:str, aw:'ApplicationWindow') -> 'ProfileDa
 
     res:ProfileData = {} # the interpreted data set
 
+    res['roastertype'] = 'Stronghold'
+    res['roasterheating'] = 3 # electric
+
     book = openpyxl.load_workbook(file)
     sheet = book.worksheets[0] # first sheet
     first_row = sheet[1]

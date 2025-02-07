@@ -31,6 +31,8 @@ def extractProfilePetronciniCSV(file:str, aw:'ApplicationWindow') -> 'ProfileDat
 
     res['samplinginterval'] = 1.0
 
+    res['roastertype'] = 'Petroncini'
+
     roastdate:Optional[str]
     roastisodate:Optional[str]
     roasttime:Optional[str]

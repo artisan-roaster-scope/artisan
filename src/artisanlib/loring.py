@@ -32,6 +32,9 @@ def extractProfileLoringCSV(file:str, aw:'ApplicationWindow') -> 'ProfileData':
         #read file header
         header = next(data)
 
+        res['roastertype'] = 'Loring'
+        res['roasterheating'] = 2 # NG
+
         power = None # holds last processed heater event value
         power_last = None # holds the heater event value before the last one
         specialevents:List[int] = []
