@@ -4,7 +4,7 @@ permalink: /machines/ikawa/
 title: "IKAWA"
 excerpt: "HOME/PRO"
 header:
-  overlay_image: /assets/images/ikawa.jpg
+  overlay_image: /assets/images/ikawa2.jpg
   image: /assets/images/ikawa.jpg
   teaser: assets/images/ikawa.jpg
 sidebar:

@@ -140,6 +140,8 @@ machines:
         url: /machines/roasterandroaster/
       - title: "Roastmax"
         url: /machines/roastmax/
+      - title: "ROEST"
+        url: /machines/roest/
       - title: "Rolltech"
         url: /machines/rolltech/
       - title: "Santoker"
@@ -150,6 +152,8 @@ machines:
         url: /machines/sedona/
       - title: "Sivetz"
         url: /machines/sivetz/
+      - title: "Stronghold"
+        url: /machines/stronghold/
       - title: "Sweet Coffee Italia"
         url: /machines/sci/
       - title: "Tesla"
