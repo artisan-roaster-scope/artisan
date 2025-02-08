@@ -17423,6 +17423,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.modbus.PIDmultiplier = toInt(settings.value('PIDmultiplier',self.modbus.PIDmultiplier))
             self.modbus.SVmultiplier = toInt(settings.value('SVmultiplier',self.modbus.SVmultiplier))
             self.modbus.SVwriteLong = toBool(settings.value('SVwriteLong',self.modbus.SVwriteLong))
+            self.modbus.SVwriteFloat = toBool(settings.value('SVwriteFloat',self.modbus.SVwriteFloat))
             self.modbus.PID_slave_ID = toInt(settings.value('PID_slave_ID',self.modbus.PID_slave_ID))
             self.modbus.PID_SV_register = toInt(settings.value('PID_SV_register',self.modbus.PID_SV_register))
             self.modbus.PID_p_register = toInt(settings.value('PID_p_register',self.modbus.PID_p_register))
@@ -19162,6 +19163,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'PIDmultiplier',self.modbus.PIDmultiplier, read_defaults)
             self.settingsSetValue(settings, default_settings, 'SVmultiplier',self.modbus.SVmultiplier, read_defaults)
             self.settingsSetValue(settings, default_settings, 'SVwriteLong',self.modbus.SVwriteLong, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'SVwriteFloat',self.modbus.SVwriteFloat, read_defaults)
             self.settingsSetValue(settings, default_settings, 'wordorderLittle',self.modbus.wordorderLittle, read_defaults)
             self.settingsSetValue(settings, default_settings, 'optimizer',self.modbus.optimizer, read_defaults)
             self.settingsSetValue(settings, default_settings, 'fetch_max_blocks',self.modbus.fetch_max_blocks, read_defaults)
@@ -23222,9 +23224,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         self.modbus.inputFloats[i] = False
                         self.modbus.inputBCDs[i] = False
                         self.modbus.inputSigned[i] = False
-
             self.modbus.SVmultiplier = dialog.modbus_SVmultiplier.currentIndex()
-            self.modbus.SVwriteLong = bool(dialog.modbus_SVwriteLong.isChecked())
+            if dialog.SVComboBox.currentIndex() == 2:
+                self.modbus.SVwriteFloat = True
+                self.modbus.SVwriteLong = False
+            elif dialog.SVComboBox.currentIndex() == 1:
+                self.modbus.SVwriteFloat = False
+                self.modbus.SVwriteLong = True
+            else:
+                self.modbus.SVwriteFloat = False
+                self.modbus.SVwriteLong = False
             self.modbus.PIDmultiplier = dialog.modbus_PIDmultiplier.currentIndex()
             self.modbus.wordorderLittle = bool(dialog.modbus_littleEndianWords.isChecked())
             self.modbus.optimizer = bool(dialog.modbus_optimize.isChecked())

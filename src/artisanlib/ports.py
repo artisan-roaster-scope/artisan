@@ -594,10 +594,14 @@ class comportDlg(ArtisanResizeablDialog):
 
         modbus_multis = ['', '10','100']
 
-        self.modbus_SVwriteLong = QCheckBox('32bit')
-        self.modbus_SVwriteLong.setChecked(self.aw.modbus.SVwriteLong)
-        self.modbus_SVwriteLong.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.modbus_SVwriteLong.setToolTip(QApplication.translate('Tooltip', 'Write SV as 32bit DINT'))
+        self.SVComboBox = QComboBox()
+        svVariants = [
+            'Int16',
+            'Int32',
+            'Float32',
+            ]
+        self.SVComboBox.addItems(svVariants)
+        self.SVComboBox.setCurrentIndex(2 if self.aw.modbus.SVwriteFloat else (1 if self.aw.modbus.SVwriteLong else 0))
 
         modbus_SVmultiplier_label = QLabel(QApplication.translate('Label', 'SV Factor'))
         self.modbus_SVmultiplier = QComboBox()
@@ -648,7 +652,7 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_pid_registers.addWidget(self.modbus_Dregister_Edit)
 
         modbus_pid_multipliers = QHBoxLayout()
-        modbus_pid_multipliers.addWidget(self.modbus_SVwriteLong)
+        modbus_pid_multipliers.addWidget(self.SVComboBox)
         modbus_pid_multipliers.addStretch()
         modbus_pid_multipliers.addWidget(modbus_SVmultiplier_label)
         modbus_pid_multipliers.addWidget(self.modbus_SVmultiplier)

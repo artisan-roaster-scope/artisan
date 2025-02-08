@@ -190,8 +190,8 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.replayComboBox = QComboBox()
         replayVariants = [
             QApplication.translate('Label','by time'),
-            QApplication.translate('Label','by BT'),
-            QApplication.translate('Label','by ET'),
+            QApplication.translate('Label','by BT').replace('BT', self.aw.BTname),
+            QApplication.translate('Label','by ET').replace('ET', self.aw.ETname),
             ]
         self.replayComboBox.addItems(replayVariants)
         self.replayComboBox.setCurrentIndex(self.aw.qmc.replayType)
@@ -931,9 +931,9 @@ class backgroundDlg(ArtisanResizeablDialog):
                 if len(self.aw.qmc.temp1BX) > n3 and len(self.aw.qmc.extratimexB) > n3:
                     xtcurve = True
                     if self.aw.qmc.xtcurveidx % 2:
-                        headers.append(self.aw.qmc.extraname1B[n3])
+                        headers.append(self.aw.qmc.device_name_subst(self.aw.qmc.extraname1B[n3]))
                     else:
-                        headers.append(self.aw.qmc.extraname2B[n3])
+                        headers.append(self.aw.qmc.device_name_subst(self.aw.qmc.extraname2B[n3]))
 
             ytcurve = False # no YT curve
             if self.aw.qmc.ytcurveidx > 0: # 4th background curve set?
@@ -942,9 +942,9 @@ class backgroundDlg(ArtisanResizeablDialog):
                 if len(self.aw.qmc.temp1BX) > n4 and len(self.aw.qmc.extratimexB) > n4:
                     ytcurve = True
                     if self.aw.qmc.ytcurveidx % 2:
-                        headers.append(self.aw.qmc.extraname1B[n4])
+                        headers.append(self.aw.qmc.device_name_subst(self.aw.qmc.extraname1B[n4]))
                     else:
-                        headers.append(self.aw.qmc.extraname2B[n4])
+                        headers.append(self.aw.qmc.device_name_subst(self.aw.qmc.extraname2B[n4]))
 
             self.datatable.setColumnCount(len(headers))
             self.datatable.setHorizontalHeaderLabels(headers)

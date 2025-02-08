@@ -5358,12 +5358,12 @@ class tgraphcanvas(FigureCanvas):
 
 
                             # if playbackevents is active, we fire the event by moving the slider, but only if
-                            # a event type is given (type!=4), the background event type is named exactly as the one of the foreground
-                            # the event slider is active/visible and has an action defined
+                            # an event type is given (type<4), the background event type is named exactly as the one of the foreground
+                            # (NOTE: the event slider does not need to be visible any longer)
                             if (self.backgroundPlaybackEvents and event_type < 4 and
                                     self.specialeventplayback[event_type] and # only replay event types activated for replay
                                     (str(self.etypesf(event_type) == str(self.Betypesf(event_type)))) and
-                                    self.aw.eventslidervisibilities[event_type] and
+                                    #self.aw.eventslidervisibilities[event_type] and
                                     len(self.backgroundEvalues)>i):
                                 slider_events[event_type] = self.eventsInternal2ExternalValue(self.backgroundEvalues[i]) # add to dict (later overwrite earlier slider moves!)
 
@@ -5379,7 +5379,7 @@ class tgraphcanvas(FigureCanvas):
                             if (event_type not in slider_events and # only if the is no slider event of the corresponding type
                                     self.specialeventplayback[event_type] and # only replay event types activated for replay
                                     (str(self.etypesf(event_type) == str(self.Betypesf(event_type)))) and
-                                    self.aw.eventslidervisibilities[event_type] and
+                                    #self.aw.eventslidervisibilities[event_type] and
                                     self.specialeventplaybackramp[event_type]):   # only calculate ramp for ramping events
 
                                 try:

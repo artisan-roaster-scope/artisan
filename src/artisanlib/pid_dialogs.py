@@ -160,6 +160,7 @@ class PID_DlgControl(ArtisanDialog):
                 pidSourceItems = self.getCurveNames()
                 self.pidSource.addItems(pidSourceItems)
 
+                # pidSource = 1 is interpreted as BT and 2 as ET, 3 as 0xT1, 4 as 0xT2, 5 as 1xT1, ...
                 if self.aw.pidcontrol.pidSource in {0,1}:
                     self.pidSource.setCurrentIndex(1)
                 elif self.aw.pidcontrol.pidSource == 2:
@@ -1211,6 +1212,13 @@ class PID_DlgControl(ArtisanDialog):
                 self.aw.pidcontrol.invertControl = self.invertControlFlag.isChecked()
             cycle = self.pidCycle.value() # def 1000 in ms
         if pid_controller in {1, 2}: # external MODBUS/S7 PID control
+            svSource = self.pidSource.currentIndex()
+            if svSource == 0: # ET
+                self.aw.pidcontrol.pidSource = 2
+            elif svSource == 1: # BT
+                self.aw.pidcontrol.pidSource = 1
+            else:
+                self.aw.pidcontrol.pidSource = svSource+1
             svSyncIdx = self.SVsyncSource.currentIndex()
             if svSyncIdx == 1:
                 self.aw.pidcontrol.svSync = 2 # ET
