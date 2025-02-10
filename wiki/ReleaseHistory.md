@@ -11,11 +11,14 @@ v3.1.1
   - allows to hide scheduled items
   - adds support for feeding data from energy meters into Artisans roast energy calculator
   - adds new flag "Set batch size" to background dialog. If ticked the batch size is taken from the background profile on load while scheduler is off
-  - adds new Artisan Command `setBatchSize(<float>)` to set the batch size. if the given number is negative the batch size is taken from the background profile, if available
-  - adds new Artisan Command `quantifier(n,<bool>)` to toggle quantification per event type
   - adds sorting to the background events table
-  - adds event replay ramping by time and temperature
   - adds configuration to allow to send MODBUS PID SV as 32bit float
+  - adds event replay ramping by time and temperature
+  - adds new Artisan Commands (with `n` from `{1,2,3,4}`)
+      - `quantifier(n,<bool>)` to toggle quantification per event type
+      - `playback(n,<bool>)` to toggle event playback per event type
+      - `ramp(n,<bool>)` to toggle event playback ramping per event type
+      - `setBatchSize(<float>)` to set the batch size. if the given number is negative the batch size is taken from the background profile, if available
 
 
 * NEW HARDWARE SUPPORT
@@ -35,6 +38,7 @@ v3.1.1
   - raises max event button limits from 4 rows a 30 buttons to 10 rows a 50 buttons
   - keeps custom events ordered by time
   - events were replayed only if the corresponding event slider was visible in previous versions. Now events selected for replay are always replayed, independent of the visibility of the corresponding event slider.
+  - the parameters "max. number of custom buttons per row", "button size", "alternative slider layout", "mark last pressed" and "show tooltips" are now persisted per palette
 
 * FIXES
   - ensure complete reset to defaults in energy tab loads tab

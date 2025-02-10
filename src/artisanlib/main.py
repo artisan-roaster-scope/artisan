@@ -1491,7 +1491,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'kaleido_default_host', 'kaleidoHost', 'kaleidoPort', 'kaleidoSerial', 'kaleidoPID', 'kaleido', 'colorTrack_mean_window_size', 'colorTrack_median_window_size', 'ikawa',
         'lcdpaletteB', 'lcdpaletteF', 'extraeventsbuttonsflags', 'extraeventslabels', 'extraeventbuttoncolor', 'extraeventsactionstrings',
         'extraeventbuttonround', 'block_quantification_sampling_ticks', 'sampling_seconds_to_block_quantifiction', 'sampling_ticks_to_block_quantifiction', 'extraeventsactionslastvalue',
-        'org_extradevicesettings', 'eventslidervalues', 'eventslidervisibilities', 'eventsliderKeyboardControl', 'eventsliderAlternativeLayout', 'eventslideractions', 'eventslidercommands', 'eventslideroffsets',
+        'org_extradevicesettings', 'eventslidervalues', 'eventslidervisibilities', 'eventsliderKeyboardControl', 'eventsliderAlternativeLayout_default',
+        'eventsliderAlternativeLayout', 'eventslideractions', 'eventslidercommands', 'eventslideroffsets',
         'eventsliderfactors', 'eventslidermin', 'eventsMaxValue', 'eventslidermax', 'eventslidersflags', 'eventsliderBernoulli', 'eventslidercoarse',
         'eventslidertemp', 'eventsliderunits', 'eventslidermoved', 'SVslidermoved', 'eventquantifieractive', 'eventquantifiersource', 'eventquantifierSV',
         'eventquantifiermin', 'eventquantifiermax', 'eventquantifiercoarse', 'eventquantifieraction', 'clusterEventsFlag', 'eventquantifierlinspaces',
@@ -1518,7 +1519,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'extraLCDframe1', 'extraLCDframe2', 'extraLCDvisibility1', 'extraLCDvisibility2', 'extraCurveVisibility1', 'extraCurveVisibility2',
         'extraDelta1', 'extraDelta2', 'extraFill1', 'extraFill2', 'channel_tare_values', 'messagehist', 'eventlabel', 'eNumberSpinBox',
         'lineEvent', 'etypeComboBox', 'valueEdit', 'etimeline', 'buttonminiEvent', 'buttonlist', 'buttonStates', 'lastbuttonpressed', 'buttonlistmaxlen',
-        'buttonpalette_default_label', 'buttonpalette_label', 'buttonpalettemaxlen', 'buttonpalette_shortcuts', 'buttonsize', 'mark_last_button_pressed', 'show_extrabutton_tooltips', 'eventbuttontablecolumnwidths',
+        'buttonpalette_default_label', 'buttonpalette_label', 'buttonpalettemaxlen_min', 'buttonpalettemaxlen_max',
+        'buttonpalettemaxlen_default', 'buttonpalettemaxlen', 'buttonpalette_shortcuts', 'buttonsize_default', 'buttonsize',
+        'mark_last_button_pressed_default', 'mark_last_button_pressed', 'show_extrabutton_tooltips_default', 'show_extrabutton_tooltips',
+        'buttonpalette_buttonsize', 'buttonpalette_mark_last_button_pressed', 'buttonpalette_tooltips', 'buttonpalette_slider_alternative_layout', 'eventbuttontablecolumnwidths',
         'lowerbuttondialogLayout', 'lowerbuttondialog', 'lowerbuttondialogLayout', 'e1buttonbarLayout', 'e1buttondialog', 'e2buttonbarLayout', 'e2buttondialog',
         'e3buttonbarLayout', 'e3buttondialog', 'e4buttonbarLayout', 'e4buttondialog', 'keyboardmove', 'keyboardButtonList', 'keyboardmoveindex',
         'keyboardmoveflag', 'lastkeyboardcmd', 'error_dlg', 'serial_dlg', 'message_dlg', 'ETname', 'BTname', 'level1frame', 'level1layout', 'qpc', 'splitter', 'scroller', 'EventsGroupLayout',
@@ -1895,7 +1899,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.eventslidervalues:List[int] = [0]*self.eventsliders
         self.eventslidervisibilities:List[int] = [0]*self.eventsliders
         self.eventsliderKeyboardControl:bool = True # if false sliders cannot be moved using up/down keys
-        self.eventsliderAlternativeLayout:bool = False # if True group slider 1+4 and 2+3 instead of slider 1+2 and 3+4
+        self.eventsliderAlternativeLayout_default:Final[bool] = False # if True group slider 1+4 and 2+3 instead of slider 1+2 and 3+4
+        self.eventsliderAlternativeLayout:bool = self.eventsliderAlternativeLayout_default
         self.eventslideractions:List[int] = [0]*self.eventsliders # 0: None, 1: Serial Command, 2: Modbus Command, 3: DTA Command, 4: Call Program, 5: Hottop Heater, 6: Hottop Fan
         self.eventslidercommands:List[str] = ['']*self.eventsliders
         self.eventslideroffsets:List[float] = [0]*self.eventsliders
@@ -3505,20 +3510,32 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.buttonlist:List[QPushButton] = []
         self.buttonStates:List[int] = [] # per custom event button it holds a 0 or 1 if indicating its state as managed by button actions
         self.lastbuttonpressed:int = -1
-        self.buttonlistmaxlen:int = 11
         self.buttonpalette_default_label:Final[str] = ''
         self.buttonpalette_label:str = self.buttonpalette_default_label
         #10 palettes of buttons
-        self.max_palettes:Final[int] = 10
+        self.max_palettes:Final[int] = 10                # number of supported palettes
         self.palette_entries:Final[int] = 28
         self.buttonpalette:List[Palette] = [] # a list of Palettes, either valid, paletteValid(p), or empty, generated by makePalette(empty=True)
         for _ in range(self.max_palettes):
             self.buttonpalette.append(self.makePalette())
-        self.buttonpalettemaxlen:List[int] = [14]*10  #keeps max number of buttons per row per palette
+        self.buttonpalettemaxlen_min: Final[int] = 2      # minimal numbers of buttons per row
+        self.buttonpalettemaxlen_max: Final[int] = 50     # maximal numbers of buttons per row
+        self.buttonpalettemaxlen_default: Final[int] = 14 # default number of buttons per row
+        self.buttonlistmaxlen:int = self.buttonpalettemaxlen_default
+        self.buttonpalettemaxlen:List[int] = [self.buttonpalettemaxlen_default]*self.max_palettes  #keeps max number of buttons per row per palette
         self.buttonpalette_shortcuts:bool = True # if True palettes can be changed via the number keys
-        self.buttonsize:int = 1 # 0: tiny, 1: small (default), 2: large
-        self.mark_last_button_pressed:bool = True
-        self.show_extrabutton_tooltips:bool = False
+        self.buttonsize_default: Final[int] = 1 # default button size; 0: tiny, 1: small (default), 2: large
+        self.buttonsize:int = self.buttonsize_default
+        self.mark_last_button_pressed_default: Final[bool] = True
+        self.mark_last_button_pressed:bool = self.mark_last_button_pressed_default
+        self.show_extrabutton_tooltips_default:Final[bool] = False
+        self.show_extrabutton_tooltips:bool = self.show_extrabutton_tooltips_default
+        #- settings per palette
+        self.buttonpalette_buttonsize:List[int] =                 [self.buttonsize_default]*self.max_palettes                    # button sizes per pallet
+        self.buttonpalette_mark_last_button_pressed:List[bool] =  [self.mark_last_button_pressed_default]*self.max_palettes      # mark last flag per pallet
+        self.buttonpalette_tooltips:List[bool] =                  [self.show_extrabutton_tooltips_default]*self.max_palettes     # show tooltips flag per pallet
+        self.buttonpalette_slider_alternative_layout:List[bool] = [self.eventsliderAlternativeLayout_default]*self.max_palettes  # alternative layout flag per pallet
+        #-
 
         self.eventbuttontablecolumnwidths:List[int] = [] # custom event button table column widths
 
@@ -9523,7 +9540,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             # alarms(<bool>) enable/disable alarms
                             if cs.startswith('alarms(') and cs.endswith(')'):
                                 try:
-                                    value_str = cs[len('alarms('):-1]
+                                    value_str = cs[len('alarms('):-1].strip()
                                     if value_str.lower() in {'yes', 'true', 't', '1'}:
                                         self.qmc.silent_alarms = False
                                         self.sendmessage(QApplication.translate('Message','Alarms on'))
@@ -9535,7 +9552,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             # autoCHARGE(<bool>) enable/disable autoCHARGE
                             elif cs.startswith('autoCHARGE(') and cs.endswith(')'):
                                 try:
-                                    value_str = cs[len('autoCHARGE('):-1]
+                                    value_str = cs[len('autoCHARGE('):-1].strip()
                                     if value_str.lower() in {'yes', 'true', 't', '1'}:
                                         self.qmc.autoChargeFlag = True
                                         self.sendmessage(QApplication.translate('Message','autoCHARGE on'))
@@ -9547,7 +9564,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             # autoDROP(<bool>) enable/disable autoDROP
                             elif cs.startswith('autoDROP(') and cs.endswith(')'):
                                 try:
-                                    value_str = cs[len('autoDROP('):-1]
+                                    value_str = cs[len('autoDROP('):-1].strip()
                                     if value_str.lower() in {'yes', 'true', 't', '1'}:
                                         self.qmc.autoDropFlag = True
                                         self.sendmessage(QApplication.translate('Message','autoDROP on'))
@@ -9714,7 +9731,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             elif cs.startswith('notifications(') and cs.endswith(')'):
                                 try:
                                     if self.notificationManager:
-                                        value_str = cs[len('notifications('):-1]
+                                        value_str = cs[len('notifications('):-1].strip()
                                         if value_str.lower() in {'yes', 'true', 't', '1'}:
                                             self.notificationsSetEnabledSignal.emit(True)
                                             self.sendmessage(QApplication.translate('Message','Notifications on'))
@@ -9743,15 +9760,58 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     self.sendmessage(f'Artisan Command: {cs}')
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
+                            # ramp(<int>, <bool>) with <int> from {1,2,3,4} selecting one of the four event types
+                            elif cs.startswith('ramp(') and cs.endswith(')'):
+                                try:
+                                    args = cs[len('ramp('):-1].split(',')
+                                    if len(args) == 2:
+                                        event_type = int(args[0])
+                                        if 0 < event_type < 5:
+                                            try:
+                                                state = toBool(eval(args[1])) # pylint: disable=eval-used
+                                                self.qmc.specialeventplaybackramp[event_type - 1] = state
+                                            except Exception: # pylint: disable=broad-except
+                                                value_str = args[1].strip()
+                                                if value_str.lower() in {'yes', 'true', 't', '1'}:
+                                                    self.qmc.specialeventplaybackramp[event_type - 1] = True
+                                                else:
+                                                    self.qmc.specialeventplaybackramp[event_type - 1] = False
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            # playback(<int>, <bool>) with <int> from {1,2,3,4} selecting one of the four event types
+                            elif cs.startswith('playback(') and cs.endswith(')'):
+                                try:
+                                    args = cs[len('playback('):-1].split(',')
+                                    if len(args) == 2:
+                                        event_type = int(args[0])
+                                        if 0 < event_type < 5:
+                                            try:
+                                                state = toBool(eval(args[1])) # pylint: disable=eval-used
+                                                self.qmc.specialeventplayback[event_type - 1] = state
+                                            except Exception: # pylint: disable=broad-except
+                                                value_str = args[1].strip()
+                                                if value_str.lower() in {'yes', 'true', 't', '1'}:
+                                                    self.qmc.specialeventplayback[event_type - 1] = True
+                                                else:
+                                                    self.qmc.specialeventplayback[event_type - 1] = False
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
                             # quantifier(<int>, <bool>) with <int> from {1,2,3,4} selecting one of the four event types
                             elif cs.startswith('quantifier(') and cs.endswith(')'):
                                 try:
                                     args = cs[len('quantifier('):-1].split(',')
                                     if len(args) == 2:
                                         event_type = int(args[0])
-                                        state = toBool(eval(args[1])) # pylint: disable=eval-used
                                         if 0 < event_type < 5:
-                                            self.eventquantifieractive[event_type - 1] = int(state)
+                                            try:
+                                                state = toBool(eval(args[1])) # pylint: disable=eval-used
+                                                self.eventquantifieractive[event_type - 1] = int(state)
+                                            except Exception: # pylint: disable=broad-except
+                                                value_str = args[1].strip()
+                                                if value_str.lower() in {'yes', 'true', 't', '1'}:
+                                                    self.eventquantifieractive[event_type - 1] = True
+                                                else:
+                                                    self.eventquantifieractive[event_type - 1] = False
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             # setBatchSize(<float>) : if <float> is negative, the batchsize of the background profile is used if any
@@ -18223,7 +18283,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.extraeventsdescriptions = extraeventsdescriptions
                     self.extraeventbuttoncolor = extraeventbuttoncolor
                     self.extraeventbuttontextcolor = extraeventbuttontextcolor
-                self.buttonpalettemaxlen = [min(30,max(6,toInt(x))) for x in toList(settings.value('buttonpalettemaxlen',self.buttonpalettemaxlen))]
+                self.buttonpalettemaxlen = [min(self.buttonpalettemaxlen_max,max(self.buttonpalettemaxlen_min,toInt(x))) for x in toList(settings.value('buttonpalettemaxlen',self.buttonpalettemaxlen))]
+                self.buttonpalette_buttonsize = [min(2,max(0,toInt(x))) for x in toList(settings.value('buttonpalette_buttonsize',self.buttonpalette_buttonsize))]
+                self.buttonpalette_mark_last_button_pressed = [toBool(x) for x in toList(settings.value('buttonpalette_mark_last_button_pressed',self.buttonpalette_mark_last_button_pressed))]
+                self.buttonpalette_tooltips = [toBool(x) for x in toList(settings.value('buttonpalette_tooltips',self.buttonpalette_tooltips))]
+                self.buttonpalette_slider_alternative_layout = [toBool(x) for x in toList(settings.value('buttonpalette_slider_alternative_layout',self.buttonpalette_slider_alternative_layout))]
                 bp = toList(settings.value('buttonpalette',self.buttonpalette))
                 self.buttonpalette = []
                 if not bp:
@@ -19670,6 +19734,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'extraeventsbuttonsflags',self.extraeventsbuttonsflags, read_defaults)
             self.settingsSetValue(settings, default_settings, 'buttonpalette',[list(bp) for bp in self.buttonpalette], read_defaults) # externally we store lists of lists, internally we hold a list of tuples of lists (Palettes)
             self.settingsSetValue(settings, default_settings, 'buttonpalettemaxlen',self.buttonpalettemaxlen, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'buttonpalette_buttonsize',self.buttonpalette_buttonsize, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'buttonpalette_mark_last_button_pressed',self.buttonpalette_mark_last_button_pressed, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'buttonpalette_tooltips',self.buttonpalette_tooltips, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'buttonpalette_slider_alternative_layout',self.buttonpalette_slider_alternative_layout, read_defaults)
             self.settingsSetValue(settings, default_settings, 'buttonpalette_shortcuts',self.buttonpalette_shortcuts, read_defaults)
             self.settingsSetValue(settings, default_settings, 'eventbuttontablecolumnwidths',self.eventbuttontablecolumnwidths, read_defaults)
             self.settingsSetValue(settings, default_settings, 'buttonsize',self.buttonsize, read_defaults)
@@ -25230,9 +25298,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     #transfers current buttons to a palette number
     def transferbuttonsto(self, pindex:int) -> None:
-        self.buttonpalette[pindex] = self.makePalette()
-        self.buttonpalettemaxlen[pindex] = self.buttonlistmaxlen
-        self.sendmessage(f"{QApplication.translate('Message','Buttons copied to Palette #')}{pindex}")
+        if 0 <= pindex < self.max_palettes:
+            self.buttonpalette[pindex] = self.makePalette()
+            self.buttonpalettemaxlen[pindex] = self.buttonlistmaxlen
+            self.buttonpalette_buttonsize[pindex] = self.buttonsize
+            self.buttonpalette_mark_last_button_pressed[pindex] = self.mark_last_button_pressed
+            self.buttonpalette_tooltips[pindex] = self.show_extrabutton_tooltips
+            self.buttonpalette_slider_alternative_layout[pindex] = self.eventsliderAlternativeLayout
+            self.sendmessage(f"{QApplication.translate('Message','Buttons copied to Palette #')}{pindex}")
 
     # action not returning anything
     @pyqtSlot(int)
@@ -25252,44 +25325,51 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     #restores a palette number to current buttons
     # returns 1 on success and 0 on failure
     def setbuttonsfrom(self,pindex:int) -> int:
-        copy:Palette = self.buttonpalette[pindex]
-        if self.paletteValid(copy):
-            self.extraeventstypes = copy[0][:]
-            self.extraeventsvalues = copy[1][:]
-            self.extraeventsactions = copy[2][:]
-            self.extraeventsvisibility = copy[3][:]
-            self.extraeventsactionstrings = copy[4][:]
-            self.extraeventslabels = copy[5][:]
-            self.extraeventsdescriptions = copy[6][:]
-            self.extraeventbuttoncolor = copy[7][:]
-            self.extraeventbuttontextcolor = copy[8][:]
-            self.eventslidervisibilities = copy[9][:]
-            self.eventslideractions = copy[10][:]
-            self.eventslidercommands = copy[11][:]
-            self.eventslideroffsets = copy[12][:]
-            self.eventsliderfactors = copy[13][:]
-            self.eventquantifieractive = copy[14][:]
-            self.eventquantifiersource = copy[15][:]
-            self.eventquantifiermin = copy[16][:]
-            self.eventquantifiermax = copy[17][:]
-            self.eventquantifiercoarse = copy[18][:]
-            self.eventslidermin = copy[19][:]
-            self.eventslidermax = copy[20][:]
-            self.eventslidercoarse = copy[21][:]
-            self.eventslidertemp = copy[22][:]
-            self.eventsliderunits = copy[23][:]
-            self.eventsliderBernoulli = copy[24][:]
-            self.buttonpalette_label = copy[25]
-            self.eventquantifieraction = copy[26][:]
-            self.eventquantifierSV = copy[27][:]
-            #
-            self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
-            self.realignbuttons()
-            self.updateSlidersProperties()
-            self.lastbuttonpressed = -1
-            self.sendmessage(QApplication.translate('Message','Palette #%i restored')%pindex) # pylint: disable=consider-using-f-string
-            return 1  #success
-        self.sendmessage(QApplication.translate('Message','Palette #%i empty')%pindex) # pylint: disable=consider-using-f-string
+        if 0 <= pindex < self.max_palettes:
+            copy:Palette = self.buttonpalette[pindex]
+            if self.paletteValid(copy):
+                self.extraeventstypes = copy[0][:]
+                self.extraeventsvalues = copy[1][:]
+                self.extraeventsactions = copy[2][:]
+                self.extraeventsvisibility = copy[3][:]
+                self.extraeventsactionstrings = copy[4][:]
+                self.extraeventslabels = copy[5][:]
+                self.extraeventsdescriptions = copy[6][:]
+                self.extraeventbuttoncolor = copy[7][:]
+                self.extraeventbuttontextcolor = copy[8][:]
+                self.eventslidervisibilities = copy[9][:]
+                self.eventslideractions = copy[10][:]
+                self.eventslidercommands = copy[11][:]
+                self.eventslideroffsets = copy[12][:]
+                self.eventsliderfactors = copy[13][:]
+                self.eventquantifieractive = copy[14][:]
+                self.eventquantifiersource = copy[15][:]
+                self.eventquantifiermin = copy[16][:]
+                self.eventquantifiermax = copy[17][:]
+                self.eventquantifiercoarse = copy[18][:]
+                self.eventslidermin = copy[19][:]
+                self.eventslidermax = copy[20][:]
+                self.eventslidercoarse = copy[21][:]
+                self.eventslidertemp = copy[22][:]
+                self.eventsliderunits = copy[23][:]
+                self.eventsliderBernoulli = copy[24][:]
+                self.buttonpalette_label = copy[25]
+                self.eventquantifieraction = copy[26][:]
+                self.eventquantifierSV = copy[27][:]
+                #
+                self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
+                self.buttonsize = self.buttonpalette_buttonsize[pindex]
+                self.mark_last_button_pressed = self.buttonpalette_mark_last_button_pressed[pindex]
+                self.show_extrabutton_tooltips = self.buttonpalette_tooltips[pindex]
+                if self.eventsliderAlternativeLayout != self.buttonpalette_slider_alternative_layout[pindex]:
+                    self.updateSliderLayout(self.buttonpalette_slider_alternative_layout[pindex])
+                #
+                self.realignbuttons()
+                self.updateSlidersProperties()
+                self.lastbuttonpressed = -1
+                self.sendmessage(QApplication.translate('Message','Palette #%i restored')%pindex) # pylint: disable=consider-using-f-string
+                return 1  #success
+            self.sendmessage(QApplication.translate('Message','Palette #%i empty')%pindex) # pylint: disable=consider-using-f-string
         return 0  #failed
 
     def encodeTreeStrings(self, tree:Any) -> Any:

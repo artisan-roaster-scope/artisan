@@ -348,7 +348,7 @@ Palette = Tuple[
     List[float],  # 1: event button values (same length as event button types)
     List[int],    # 2: event button actions (same length as event button actions)
     List[int],    # 3: event button visibility (same length as event button actions)
-    List[str],    # 4: event button actions (same length as event button actions)
+    List[str],    # 4: event button action strings (same length as event button actions)
     List[str],    # 5: event button labels (same length as event button actions)
     List[str],    # 6: event button descriptions (same length as event button actions)
     List[str],    # 7: event button colors (same length as event button actions)
@@ -370,8 +370,8 @@ Palette = Tuple[
     List[str],    # 23: slider units; len=self.eventsliders
     List[int],    # 24: slider bernoulli flags; len=self.eventsliders
     str,          # 25: label
-    List[int],    # 26 quantifier action flags; len=self.eventsliders
-    List[int]     # 27 quantifier SV flags; len=self.eventsliders
+    List[int],    # 26: quantifier action flags; len=self.eventsliders
+    List[int]    # 27: quantifier SV flags; len=self.eventsliders
     ]
 
 class BTU(TypedDict):
