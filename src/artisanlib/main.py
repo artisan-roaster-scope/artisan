@@ -5586,7 +5586,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                         self.qmc.meterlabels_setup = [str(ml) for ml in ratings['meterlabels']]
                                     if 'meterunits' in ratings and len(ratings['meterunits']) == 2:
                                         self.qmc.meterunits_setup = [int(mu) for mu in ratings['meterunits']]
-                                    if 'metersources' in ratings and len(ratings['metersources']) == 4:
+                                    if 'meterfuels' in ratings and len(ratings['meterfuels']) == 2:
+                                        self.qmc.meterfuels_setup = [int(mf) for mf in ratings['meterfuels']]
+                                    if 'metersources' in ratings and len(ratings['metersources']) == 2:
                                         self.qmc.metersources_setup = [int(ms) for ms in ratings['metersources']]
                                     if 'preheatDuration' in ratings and len(ratings['preheatenergies']) == 1:
                                         self.qmc.preheatDuration_setup = int(ratings['preheatDuration'][0])
@@ -12933,10 +12935,24 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.meterlabels = [str(x) for x in profile['meterlabels']]
         if 'meterunits' in profile:
             self.qmc.meterunits = [int(x) for x in profile['meterunits']]
+        if 'meterfuels' in profile:
+            self.qmc.meterfuels = [int(x) for x in profile['meterfuels']]
         if 'metersources' in profile:
             self.qmc.metersources = [int(x) for x in profile['metersources']]
         if 'meterreads' in profile:
             self.qmc.meterreads = profile['meterreads']
+        if 'co2kg_per_btu' in profile:
+            self.qmc.CO2kg_per_BTU = [float(x) for x in profile['co2kg_per_btu']]
+        else: 
+            self.qmc.CO2kg_per_BTU = self.qmc.CO2kg_per_BTU_default.copy()
+        if 'biogas_co2_reduction' in profile:
+            self.qmc.Biogas_CO2_Reduction = profile['biogas_co2_reduction']
+        else:
+            self.qmc.Biogas_CO2_Reduction = self.qmc.Biogas_CO2_Reduction_default
+        # for compatibility with profiles created with d76a41d or earlier
+        if (self.qmc.meterreads[0] is not None and len(self.qmc.meterreads[0]) == 3):
+            self.qmc.CO2kg_per_BTU = [6.288e-05,5.291e-05,2.964e-04]
+            self.qmc.Biogas_CO2_Reduction = 0.7562
         if 'preheatDuration' in profile:
             self.qmc.preheatDuration = profile['preheatDuration']
         if 'preheatenergies' in profile:
@@ -12953,8 +12969,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.betweenbatch_after_preheat = profile['betweenbatch_after_preheat']
         if 'electricEnergyMix' in profile:
             self.qmc.electricEnergyMix = profile['electricEnergyMix']
+        if 'gasMix' in profile:
+            self.qmc.gasMix = profile['gasMix']
 
-    #TODO remove try/except??  # pylint: disable=fixme
     def loadBbpFromProfile(self, profile:'ProfileData') -> None:
         try:
             if 'bbp_begin' in profile:
@@ -16338,8 +16355,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 profile['loadevent_hundpcts'] = self.qmc.loadevent_hundpcts
                 profile['meterlabels'] = self.qmc.meterlabels
                 profile['meterunits'] = self.qmc.meterunits
+                profile['meterfuels'] = self.qmc.meterfuels
                 profile['metersources'] = self.qmc.metersources
                 profile['meterreads'] = self.qmc.meterreads
+                profile['co2kg_per_btu'] = self.qmc.CO2kg_per_BTU
+                profile['biogas_co2_reduction'] = self.qmc.Biogas_CO2_Reduction
                 profile['preheatDuration'] = self.qmc.preheatDuration
                 profile['preheatenergies'] = self.qmc.preheatenergies
                 profile['betweenbatchDuration'] = self.qmc.betweenbatchDuration
@@ -16348,6 +16368,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 profile['coolingenergies'] = self.qmc.coolingenergies
                 profile['betweenbatch_after_preheat'] = self.qmc.betweenbatch_after_preheat
                 profile['electricEnergyMix'] = self.qmc.electricEnergyMix
+                profile['gasMix'] = self.qmc.gasMix
             except Exception as ex: # pylint: disable=broad-except
                 _log.exception(ex)
                 _, _, exc_tb = sys.exc_info()
@@ -17854,6 +17875,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.loadevent_hundpcts_setup = [toInt(x) for x in toList(settings.value('loadevent_hundpcts_setup', self.qmc.loadevent_hundpcts_setup))]
             self.qmc.meterlabels_setup = [toString(x) for x in toList(settings.value('meterlabels_setup', self.qmc.meterlabels_setup))]
             self.qmc.meterunits_setup = [toInt(x) for x in toList(settings.value('meterunits_setup', self.qmc.meterunits_setup))]
+            self.qmc.meterfuels_setup = [toInt(x) for x in toList(settings.value('meterfuels_setup', self.qmc.meterfuels_setup))]
             self.qmc.metersources_setup = [toInt(x) for x in toList(settings.value('metersources_setup', self.qmc.metersources_setup))]
             self.qmc.preheatDuration_setup = toInt(settings.value('preheatDuration_setup',self.qmc.preheatDuration_setup))
             self.qmc.preheatenergies_setup = [toFloat(x) for x in toList(settings.value('preheatenergies_setup', self.qmc.preheatenergies_setup))]
@@ -17863,6 +17885,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.coolingenergies_setup = [toFloat(x) for x in toList(settings.value('coolingenergies_setup', self.qmc.coolingenergies_setup))]
             self.qmc.betweenbatch_after_preheat_setup = toBool(settings.value('betweenbatch_after_preheat_setup',self.qmc.betweenbatch_after_preheat_setup))
             self.qmc.electricEnergyMix_setup = toInt(settings.value('electricEnergyMix_setup',self.qmc.electricEnergyMix_setup))
+            self.qmc.gasMix_setup = toInt(settings.value('gasMix_setup',self.qmc.gasMix_setup))
             self.qmc.energyresultunit_setup = toInt(settings.value('energyresultunit_setup',self.qmc.energyresultunit_setup))
 #            self.qmc.energytablecolumnwidths = [toInt(x) for x in toList(settings.value("energytablecolumnwidths",self.qmc.energytablecolumnwidths))]
             settings.endGroup()
@@ -19479,6 +19502,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'loadevent_hundpcts_setup',self.qmc.loadevent_hundpcts_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'meterlabels_setup',self.qmc.meterlabels_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'meterunits_setup',self.qmc.meterunits_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'meterfuels_setup',self.qmc.meterfuels_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'metersources_setup',self.qmc.metersources_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'preheatDuration_setup',self.qmc.preheatDuration_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'preheatenergies_setup',self.qmc.preheatenergies_setup, read_defaults)
@@ -19488,6 +19512,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'coolingenergies_setup',self.qmc.coolingenergies_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'betweenbatch_after_preheat_setup',self.qmc.betweenbatch_after_preheat_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'electricEnergyMix_setup',self.qmc.electricEnergyMix_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'gasMix_setup',self.qmc.gasMix_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'energyresultunit_setup',self.qmc.energyresultunit_setup, read_defaults)
             settings.endGroup()
 #--- END GROUP EnergyUse

@@ -305,10 +305,10 @@ class tgraphcanvas(FigureCanvas):
         'extendevents', 'statssummary', 'showtimeguide', 'statsmaxchrperline', 'energyunits', 'powerunits', 'sourcenames', 'loadlabels_setup',
         'loadratings_setup', 'ratingunits_setup', 'sourcetypes_setup', 'load_etypes_setup', 'presssure_percents_setup', 'loadevent_zeropcts_setup',
         'loadevent_hundpcts_setup', 'preheatDuration_setup', 'preheatenergies_setup', 'betweenbatchDuration_setup', 'betweenbatchenergies_setup',
-        'coolingDuration_setup', 'coolingenergies_setup', 'betweenbatch_after_preheat_setup', 'electricEnergyMix_setup', 'energyresultunit_setup',
+        'coolingDuration_setup', 'coolingenergies_setup', 'betweenbatch_after_preheat_setup', 'electricEnergyMix_setup', 'gasMix_setup', 'energyresultunit_setup',
         'kind_list', 'loadlabels', 'loadratings', 'ratingunits', 'sourcetypes', 'load_etypes', 'presssure_percents', 'loadevent_zeropcts',
         'loadevent_hundpcts', 'preheatDuration', 'preheatenergies', 'betweenbatchDuration', 'betweenbatchenergies', 'coolingDuration', 'coolingenergies',
-        'betweenbatch_after_preheat', 'electricEnergyMix', 'baseX', 'baseY', 'base_horizontalcrossline', 'base_verticalcrossline',
+        'betweenbatch_after_preheat', 'electricEnergyMix', 'gasMix', 'baseX', 'baseY', 'base_horizontalcrossline', 'base_verticalcrossline',
         'base_messagevisible', 'colorDifferenceThreshold', 'handles', 'labels', 'legend_lines', 'eventmessage', 'backgroundeventmessage',
         'eventmessagetimer', 'resizeredrawing', 'logoimg', 'analysisresultsloc_default', 'analysisresultsloc', 'analysispickflag', 'analysisresultsstr',
         'analysisstartchoice', 'analysisoffset', 'curvefitstartchoice', 'curvefitoffset', 'segmentresultsloc_default', 'segmentresultsloc',
@@ -2213,11 +2213,24 @@ class tgraphcanvas(FigureCanvas):
         self.bbpCache: BbpCache = {}
 
         #EnergyUse
+        # Energy conversion canstants
+        #reference: https://www.eia.gov/environment/emissions/co2_vol_mass.php (dated Nov-18-2021, accessed Jan-02-2022)
+        #           https://www.eia.gov/tools/faqs/faq.php?id=74&t=11 (referencing data from 2020, accessed Jan-02-2022)
+        # entries in this list correlate with those in self.sourcenames
+        self.CO2kg_per_BTU_default: Final[List[float]] = [6.288e-05,  # LPG
+                                                          5.291e-05,  # NG
+                                                          2.964e-04]  # Elec
+        #reference: https://www.bafa.de/SharedDocs/Downloads/DE/Energie/eew_infoblatt_co2_faktoren_2024.pdf?__blob=publicationFile&v=2 (dated Aug-08-2024, accessed Jan-28-2025)
+        self.Biogas_CO2_Reduction_default: Final[float] = 0.7562
+
+        self.CO2kg_per_BTU:List[float] = self.CO2kg_per_BTU_default.copy()
+        self.Biogas_CO2_Reduction:float = self.Biogas_CO2_Reduction_default
+
         self.energyunits: Final[List[str]] = ['BTU', 'kJ', 'kCal', 'kWh', 'hph']
         self.powerunits: Final[List[str]] = ['BTU/h', 'kJ/h', 'kCal/h', 'kW', 'hp']
         self.sourcenames: Final[List[str]] = ['LPG', 'NG', QApplication.translate('ComboBox','Elec')]
-        self.meterunitnames: Final[List[str]] = ['BTU', 'kJ', 'kCal', 'kWh', 'hph']
-        self.meterreads_default: List[List[float]] = [[0]*3,[0]*3]  # [diff scaled to btu, raw begin, raw end]
+        self.meterunitnames: Final[List[str]] = ['BTU', 'kJ', 'kCal', 'kWh', 'thm']
+        self.meterreads_default: List[List[float]] = [[0.]*9,[0.]*9] # scaled to btu, [0]:ON to OFF, [1:8] ON to extratemp[timeindex[0:7]]
         self.meterreads = self.meterreads_default.copy()
         ## setup defaults (stored in app):
         # Burners
@@ -2231,7 +2244,8 @@ class tgraphcanvas(FigureCanvas):
         self.loadevent_hundpcts_setup:List[int] = [100]*4          # event value corresponding to 100 percent
         # Meters
         self.meterlabels_setup:List[str] = ['']*2                  # meter labels
-        self.meterunits_setup:List[int] = [0]*2                    # index in list meterunitnames
+        self.meterunits_setup:List[int] = [3]*2                    # index in list meterunitnames, default to Elec
+        self.meterfuels_setup:List[int] = [2]*2                    # index in list sourcetypes, default to kWh
         self.metersources_setup:List[int] = [0]*2                  # index in locally generated list curvenames
         # Protocol
         self.preheatDuration_setup:int = 0                         # length of preheat in seconds
@@ -2242,6 +2256,7 @@ class tgraphcanvas(FigureCanvas):
         self.coolingenergies_setup:List[float] = [0]*4             # rating of the cooling burner
         self.betweenbatch_after_preheat_setup:bool = True          # True adds BBP to pre-heating (and cooling) for the first batch.
         self.electricEnergyMix_setup:int = 0                       # the amount of renewable electric energy in the energy mix in %
+        self.gasMix_setup:int = 0                                  # the amount of renewable gas in the energy mix in %
 
         # Others
         self.energyresultunit_setup:int = 0                        # index in list self.powerunits
@@ -2268,6 +2283,7 @@ class tgraphcanvas(FigureCanvas):
         # Meters
         self.meterlabels = self.meterlabels_setup[:]            # meter labels
         self.meterunits = self.meterunits_setup[:]              # index in list meterunitnames
+        self.meterfuels = self.meterfuels_setup[:]              # index in list sourcetypes
         self.metersources = self.metersources_setup[:]          # index in locally generated list curvenames
         # Protocol
         self.preheatDuration = self.preheatDuration_setup               # length of preheat in seconds
@@ -2277,7 +2293,8 @@ class tgraphcanvas(FigureCanvas):
         self.coolingDuration = self.coolingDuration_setup               # length of cooling in seconds
         self.coolingenergies = self.coolingenergies_setup[:]            # rating of the cooling burner
         self.betweenbatch_after_preheat = self.betweenbatch_after_preheat_setup # True if after preheat a BBP is done
-        self.electricEnergyMix = self.electricEnergyMix_setup        # the amount of renewable electric energy in the energy mix in %
+        self.electricEnergyMix = self.electricEnergyMix_setup           # the amount of renewable electric energy in the energy mix in %
+        self.gasMix = self.gasMix_setup                                 # the amount of renewable gas in the energy mix in %
 
         #mouse cross lines measurement
         self.baseX:Optional[float] = None
@@ -2490,8 +2507,10 @@ class tgraphcanvas(FigureCanvas):
         self.loadevent_hundpcts_setup = self.loadevent_hundpcts[:]
         self.meterlabels_setup = self.meterlabels[:]
         self.meterunits_setup = self.meterunits[:]
+        self.meterfuels_setup = self.meterfuels[:]
         self.metersources_setup = self.metersources[:]
         self.electricEnergyMix_setup = self.electricEnergyMix
+        self.gasMix_setup = self.gasMix
 
     # restore burner settings to their defaults
     def restoreEnergyLoadDefaults(self) -> None:
@@ -2505,8 +2524,10 @@ class tgraphcanvas(FigureCanvas):
         self.loadevent_hundpcts = self.loadevent_hundpcts_setup[:]
         self.meterlabels = self.meterlabels_setup[:]
         self.meterunits = self.meterunits_setup[:]
+        self.meterfuels = self.meterfuels_setup[:]
         self.metersources = self.metersources_setup[:]
         self.electricEnergyMix = self.electricEnergyMix_setup
+        self.gasMix = self.gasMix_setup
 
     # set current protocol settings as defaults
     def setEnergyProtocolDefaults(self) -> None:
@@ -12489,48 +12510,139 @@ class tgraphcanvas(FigureCanvas):
                 _, _, exc_tb = sys.exc_info()
                 self.adderror((QApplication.translate('Error Message', 'Exception:') + ' OffMonitor() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
-    def getMeterReads(self) -> None:
-        # Helper function to calculate the meter difference then detect and correct for rollover
-        def calc_meter_read(_start:float, _end:float) -> float:
-            # Determine the rollover threshold, assumes rolling past only one power of 10
-            if (_start < 0 or _end < 0):   # catches invalid reads (-1), negative reads not allowed either
-                return 0
-            if _start == 10. ** math.floor(math.log10(_start)): # start is a power of 10
-                rollover_threshold = 10. ** (math.floor(math.log10(_start)) + 1)
-            else:
-                rollover_threshold = 10. ** math.ceil(math.log10(_start)) # find the next greater power of 10
-            if _end >= _start:  # No rollover
-                return _end - _start
-            # Rollover occurred
-            return rollover_threshold - _start + _end
+    # input: extratemp, outputs: modified extratemp, rollover_index, error_flag
+    def conditionMeterData(self,extratemp:List[float]) -> Tuple[List[float], int, bool]:
+        try:
+            # Don't accept a zero length list
+            if len(extratemp) == 0:
+                return extratemp, -1, True
 
+            # Look for invalid (-1) meter values in the begin and end samples
+            max_begin_invalid_samples = 10  # allows for some invalid meter samples after startup
+            max_end_invalid_samples = 3     # allows for some invalid meter samples before ending
+            pct_invalid_samples = .1        # percent invalid samples
+
+            # Convert the list to a numpy array
+            arr = numpy.array(extratemp)
+
+            # Find the indexes of non-negative elements
+            positive_value_indexes = numpy.where(arr >= 0)[0]
+
+            # Check for too many invalid readings at begin and end
+            if (positive_value_indexes[0] > max_begin_invalid_samples or
+                positive_value_indexes[-1] < (len(extratemp) - max_end_invalid_samples -1)):
+                return extratemp, -1, True  # invalid meter read
+
+            # Reject if there are less than 90% valid samples
+            if len(positive_value_indexes) / len(extratemp) < (1 - pct_invalid_samples):
+                self.adderror(QApplication.translate('Error Message', 'Unstable meter data'))
+                return extratemp, -1, True
+
+            # Interpolate any -1 values from extratemp, set interpolate_max based on pct_invalid_samples
+            arr = numpy.array(fill_gaps(arr, int(math.ceil(len(arr)*(pct_invalid_samples)))))
+
+            # Replace rightmost -1's, if any, with last valid value from the left
+            last_valid = -1
+            for i in range(1, len(arr), 1):
+                if arr[i] != -1:
+                    last_valid = arr[i]
+                else:
+                    arr[i] = last_valid
+
+            # Create a boolean array to find decreases in succeeding values
+            decreases = arr[1:] < arr[:-1]
+
+            # Count the number of decreases
+            count_decreases:numpy.double = numpy.sum(decreases)
+
+            # Check for any decreases
+            rollover_index:int = -1
+            if count_decreases == 1:
+                # Rollover detected, get the index of the first occurrence of the decrease
+                rollover_index = int(numpy.argmax(decreases))
+            if count_decreases > 1:
+                self.adderror(QApplication.translate('Error Message', 'Unstable meter data'))
+                return extratemp, -1, True
+
+            # All good
+            return arr.tolist(), rollover_index, False
+
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
+            return extratemp, -1, True
+
+
+    @staticmethod
+    # Helper function to calculate the meter difference and correct for rollover
+    def calc_meter_read(extratemp:List[float], event_index:int=-1, rollover_index:int=-1) -> float:
+        try:
+            # Calculate the meter read
+            begin = extratemp[0]
+            if event_index == -1:
+                end = extratemp[-1]
+            elif event_index > 0:
+                end = extratemp[event_index]
+            else:
+                return 0 # invalid meter read
+            # Test for rollover in the range of the meter read
+            if (event_index == -1 and rollover_index > 0) or (0 < rollover_index < event_index) :
+                # rollover detected
+                rollover_value = extratemp[rollover_index]
+                return  float2float(end + rollover_value - begin,5)
+            # no rollover
+            return  float2float(end - begin,5)
+
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
+            return 0
+
+    def getMeterReads(self) -> None:
         # Read meters
         self.meterreads = self.meterreads_default.copy()  # init to zero in case of an exception
+        event_meterread = [-1]*8
         for i in range(2):
             if self.metersources[i] > 0:
-                begin = end = 0.
                 x = self.metersources[i]-1
                 try:
-                    if x % 2 == 0:
-                        # even
+                    if x % 2 == 0:  #even
                         if len(self.extratemp1) > (x/2):
-                            begin = self.extratemp1[x // 2][0]
-                            end = self.extratemp1[x // 2][-1]
-                    # odd
-                    elif len(self.extratemp2) > (x/2):
-                        begin = self.extratemp2[x // 2][0]
-                        end = self.extratemp2[x // 2][-1]
+                            meterarray,rolloveridx,failed = self.conditionMeterData(self.extratemp1[x // 2])
+                        else:
+                            break
+                    elif len(self.extratemp2) > (x/2):  # odd
+                        meterarray,rolloveridx,failed = self.conditionMeterData(self.extratemp2[x // 2])
+                    else:
+                        break
+                    if failed:
+                        break
 
-                    self.meterreads[i] = [calc_meter_read (
-                                            self.convertHeat(begin, self.powerunits[self.meterunits[i]], 'BTU'),
-                                            self.convertHeat(end, self.powerunits[self.meterunits[i]], 'BTU')
-                                            ), begin, end
-                                         ]
-                except Exception: # pylint: disable=broad-except
-#                    _log.exception(ex)
-#                    _, _, exc_tb = sys.exc_info()
-#                    self.adderror((QApplication.translate('Error Message', 'Exception:') + ' getMeterReads() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
-                    pass
+                    for event in range(8):
+                        # if no timeindex then leave at initialized -1 value
+                        if self.timeindex[event] > 0:
+                            event_meterread[event] = self.timeindex[event]
+
+                    self.meterreads[i] = [
+                        float2float(
+                            self.convertHeat(
+                                self.calc_meter_read(meterarray, -1, rolloveridx),
+                                self.meterunitnames[self.meterunits[i]],
+                                'BTU'
+                            ),
+                            5
+                        )
+                    ] + [
+                        float2float(
+                            self.convertHeat(
+                                self.calc_meter_read(meterarray, self.timeindex[j], rolloveridx),
+                                self.powerunits[self.meterunits[i]],
+                                'BTU'
+                            ),
+                            5
+                        ) for j in range(len(self.timeindex))
+                    ]
+
+                except Exception as e:  # pylint: disable=broad-except
+                    _log.exception(e)
 
     def getAmbientData(self) -> None:
         _log.debug('getAmbientData()')
@@ -15243,6 +15355,16 @@ class tgraphcanvas(FigureCanvas):
             _log.exception(ex)
             return 0
 
+    # Calculate CO2 mass from energy consumption
+    def calcCO2g(self, btus:float, energysource:int) -> float:
+        co2g = btus * self.CO2kg_per_BTU[energysource] * 1000
+        if energysource == 1:  # NG
+            co2g = co2g - (co2g * (1 - self.Biogas_CO2_Reduction) * self.gasMix/100)
+        elif energysource == 2:  # Electric
+            co2g = co2g * (1 - self.electricEnergyMix/100)
+        return co2g
+
+    # Sum up the energy use from a variety of inputs
     def calcEnergyuse(self, beanweightstr:str = '') -> Tuple['EnergyMetrics', List['BTU']]:
         energymetrics:EnergyMetrics = {}
         btu_list:List[BTU] = []
@@ -15263,11 +15385,6 @@ class tgraphcanvas(FigureCanvas):
             else:
                 w = self.weight[0]
             bean_weight = convertWeight(w, weight_units.index(self.weight[2]),1) # to kg
-
-            #reference: https://www.eia.gov/environment/emissions/co2_vol_mass.php (dated Nov-18-2021, accessed Jan-02-2022)
-            #           https://www.eia.gov/tools/faqs/faq.php?id=74&t=11 (referencing data from 2020, accessed Jan-02-2022)
-            # entries must match those in self.sourcenames
-            CO2kg_per_BTU = {0:6.288e-05, 1:5.291e-05, 2:2.964e-04}  # "LPG", "NG", "Elec"
 
             eTypes = [''] + self.etypes[:][:4]
 
@@ -15314,9 +15431,7 @@ class tgraphcanvas(FigureCanvas):
                             loadlabel = f'{formatLoadLabel(i)}-{eTypes[self.load_etypes[i]]}'
                             kind = 7  #Roast Event
                             sortorder = (2000 * (i + 1)) + j
-                            CO2g = BTUs * CO2kg_per_BTU[self.sourcetypes[i]] * 1000
-                            if self.sourcetypes[i] == 2:  #electicity
-                                CO2g = CO2g * (1 - self.electricEnergyMix/100)
+                            CO2g = self.calcCO2g(BTUs, self.sourcetypes[i])
                             btu_list.append({'load_pct':load_pct,'duration':duration,'BTUs':BTUs,'CO2g':CO2g,'LoadLabel':loadlabel,'Kind':kind,'SourceType':self.sourcetypes[i],'SortOrder':sortorder})
                 ### end of loop: for j in range(len(self.specialevents) - 1, -1, -1)
 
@@ -15339,9 +15454,7 @@ class tgraphcanvas(FigureCanvas):
                     fueltype = self.sourcetypes[i]
                     sortorder = 2000 - i
                     BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.powerunits[self.ratingunits[i]],'BTU')
-                    CO2g = BTUs * CO2kg_per_BTU[fueltype] * 1000
-                    if self.sourcetypes[i] == 2:  #electicity
-                        CO2g = CO2g * (1 - self.electricEnergyMix/100)
+                    CO2g = self.calcCO2g(BTUs, self.sourcetypes[i])
                     if BTUs > 0:
                         btu_list.append({'load_pct':load_pct,'duration':duration,'BTUs':BTUs,'CO2g':CO2g,'LoadLabel':loadlabel,'Kind':kind,'SourceType':self.sourcetypes[i],'SortOrder':sortorder})
 
@@ -15367,9 +15480,7 @@ class tgraphcanvas(FigureCanvas):
 
                     loadlabel = formatLoadLabel(i)
                     sortorder = 100 + i
-                    CO2g = BTUs * CO2kg_per_BTU[self.sourcetypes[i]] * 1000
-                    if self.sourcetypes[i] == 2:  #electicity
-                        CO2g = CO2g * (1 - self.electricEnergyMix/100)
+                    CO2g = self.calcCO2g(BTUs, self.sourcetypes[i])
                     if BTUs > 0:
                         btu_list.append({'load_pct':load_pct,'duration':duration,'BTUs':BTUs,'CO2g':CO2g,'LoadLabel':loadlabel,'Kind':kind,'SourceType':self.sourcetypes[i],'SortOrder':sortorder})
 
@@ -15395,9 +15506,7 @@ class tgraphcanvas(FigureCanvas):
 
                     loadlabel = formatLoadLabel(i)
                     sortorder = 400 + i
-                    CO2g = BTUs * CO2kg_per_BTU[self.sourcetypes[i]] * 1000
-                    if self.sourcetypes[i] == 2:  #electicity
-                        CO2g = CO2g * (1 - self.electricEnergyMix/100)
+                    CO2g = self.calcCO2g(BTUs, self.sourcetypes[i])
                     if BTUs > 0:
                         btu_list.append({'load_pct':load_pct,'duration':duration,'BTUs':BTUs,'CO2g':CO2g,'LoadLabel':loadlabel,'Kind':kind,'SourceType':self.sourcetypes[i],'SortOrder':sortorder})
 
@@ -15420,29 +15529,35 @@ class tgraphcanvas(FigureCanvas):
                         duration = 0
                         BTUs = self.coolingenergies[i] * self.convertHeat(1,self.powerunits[self.ratingunits[i]],'BTU')
                         kind = 4  #Cooling Measured
-
                     loadlabel = formatLoadLabel(i)
                     sortorder = 800 + i
-                    CO2g = BTUs * CO2kg_per_BTU[self.sourcetypes[i]] * 1000
-                    if self.sourcetypes[i] == 2:  #electicity
-                        CO2g = CO2g * (1 - self.electricEnergyMix/100)
+                    CO2g = self.calcCO2g(BTUs, self.sourcetypes[i])
                     if BTUs > 0:
                         btu_list.append({'load_pct':load_pct,'duration':duration,'BTUs':BTUs,'CO2g':CO2g,'LoadLabel':loadlabel,'Kind':kind,'SourceType':self.sourcetypes[i],'SortOrder':sortorder})
             #### end of loop: for i in range(0,4)
 
             # Meter reads
+            btu_meter_bbp:float = 0
+            btu_meter_roast:float = 0
+            co2_meter_bbp:float = 0
+            co2_meter_roast:float = 0
             for j in range(2):
+                # Get the batch, roast and bbp meter reads
                 if self.meterreads[j][0] > 0:
                     BTUs = self.meterreads[j][0]
                     loadlabel = self.meterlabels[j]
-                    sortorder = j
-                    #TODO CO2 and sourcetype placeholders until we know the energy source for the meter  # pylint: disable=fixme
-                    sourcetype = 2
-                    #CO2g = self.meterreads[j][0] * CO2kg_per_BTU[self.sourcetypes[i]] * 1000
-                    CO2g = 0
+                    sortorder = j  # meter reads at the top of the details table
+                    fueltype = self.meterfuels[j]
+                    CO2g = self.calcCO2g(BTUs, fueltype)
                     kind = 8 # Meter
-                    btu_list.append({'load_pct':0,'duration':0,'BTUs':BTUs,'CO2g':CO2g,'LoadLabel':loadlabel,'Kind':kind,'SourceType':sourcetype,'SortOrder':sortorder})
+                    btu_list.append({'load_pct':0,'duration':0,'BTUs':BTUs,'CO2g':CO2g,'LoadLabel':loadlabel,'Kind':kind,'SourceType':fueltype,'SortOrder':sortorder})
+                    # Get the BBP and Roastreads
+                    btu_meter_bbp += self.meterreads[j][1] # Charge
+                    btu_meter_roast += self.meterreads[j][7] - self.meterreads[j][1] # Drop minus Charge
+                    co2_meter_bbp += self.calcCO2g(btu_meter_bbp, fueltype)
+                    co2_meter_roast += self.calcCO2g(btu_meter_roast, fueltype)
 
+            # sort the entries in btu list per the sort order defined for each entry
             btu_list.sort(key=lambda k : k['SortOrder'] )
 
             # summarize the batch metrics
@@ -15463,6 +15578,10 @@ class tgraphcanvas(FigureCanvas):
                 btu_lpg += item['BTUs'] if item['SourceType'] == 0 else 0
                 btu_ng += item['BTUs'] if item['SourceType'] == 1 else 0
                 btu_elec += item['BTUs'] if item['SourceType'] == 2 else 0
+            btu_bbp += btu_meter_bbp
+            btu_roast += btu_meter_roast
+            co2_bbp += co2_meter_bbp
+            co2_roast += co2_meter_roast
             btu_batch = float2float(btu_batch,3)
             btu_preheat = float2float(btu_preheat,3)
             btu_bbp = float2float(btu_bbp,3)
@@ -15494,7 +15613,6 @@ class tgraphcanvas(FigureCanvas):
             btu_roast_per_green_kg = float2float(btu_roast_per_green_kg,3)
             kwh_batch_per_green_kg = float2float(self.convertHeat(btu_batch_per_green_kg,'BTU','kWh'),3)
             kwh_roast_per_green_kg = float2float(self.convertHeat(btu_roast_per_green_kg,'BTU','kWh'),3)
-
 
             # energymetrics
             energymetrics['BTU_batch'] = btu_batch

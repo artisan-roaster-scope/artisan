@@ -295,6 +295,9 @@ class ProfileData(TypedDict, total=False):
     meterlabels: List[str]
     meterunits: List[int]
     metersources: List[int]
+    meterfuels: List[int]
+    co2kg_per_btu: List[float]
+    biogas_co2_reduction: float
     preheatDuration: int
     preheatenergies:List[float]
     betweenbatchDuration: int
@@ -303,6 +306,7 @@ class ProfileData(TypedDict, total=False):
     coolingenergies: List[float]
     betweenbatch_after_preheat: bool
     electricEnergyMix: int
+    gasMix: int
     meterreads: List[List[float]]
     plus_sync_record_hash: str
     bbp_begin: str

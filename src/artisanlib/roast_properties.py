@@ -2719,6 +2719,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.org_loadevent_hundpcts = self.aw.qmc.loadevent_hundpcts.copy()
             self.org_meterlabels = self.aw.qmc.meterlabels.copy()
             self.org_meterunits = self.aw.qmc.meterunits.copy()
+            self.org_meterfuels = self.aw.qmc.meterfuels.copy()
             self.org_metersources = self.aw.qmc.metersources.copy()
             self.org_preheatDuration = self.aw.qmc.preheatDuration
             self.org_preheatenergies = self.aw.qmc.preheatenergies.copy()
@@ -2728,6 +2729,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.org_coolingenergies = self.aw.qmc.coolingenergies.copy()
             self.org_betweenbatch_after_preheat = self.aw.qmc.betweenbatch_after_preheat
             self.org_electricEnergyMix = self.aw.qmc.electricEnergyMix
+            self.org_gasMix = self.aw.qmc.gasMix
 
             ### reset UI text labels and tooltips for proper translation
             # hack to access the Qt automatic translation of the Help button
@@ -2788,6 +2790,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.eventsLabel.setText(QApplication.translate('Label','Event'))
             self.energy_ui.pressureLabel.setText(QApplication.translate('Label','Pressure %'))
             self.energy_ui.electricEnergyMixLabel.setText(QApplication.translate('Label','Electric Energy Mix:'))
+            self.energy_ui.gasMixLabel.setText(QApplication.translate('Label','Gas Energy Mix:'))
             self.energy_ui.renewableLabel.setText(QApplication.translate('Label','Renewable'))
             self.energy_ui.renewableLabel2.setText(QApplication.translate('Label','Renewable'))
             self.energy_ui.gasMixLabel.setText(QApplication.translate('Label','Gas Energy Mix:'))
@@ -2910,6 +2913,9 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.meter1UnitComboBox.currentIndexChanged.connect(self.meterunits_currentindexchanged)
             self.energy_ui.meter2UnitComboBox.currentIndexChanged.connect(self.meterunits_currentindexchanged)
 
+            self.energy_ui.meter1FuelComboBox.currentIndexChanged.connect(self.meterfuels_currentindexchanged)
+            self.energy_ui.meter2FuelComboBox.currentIndexChanged.connect(self.meterfuels_currentindexchanged)
+
             self.energy_ui.meter1SourceComboBox.currentIndexChanged.connect(self.metersources_currentindexchanged)
             self.energy_ui.meter2SourceComboBox.currentIndexChanged.connect(self.metersources_currentindexchanged)
 
@@ -2961,6 +2967,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.BBPafterPreHeatcheckBox.stateChanged.connect(self.betweenbatch_after_preheat_statechanged)
 
             self.energy_ui.electricEnergyMixSpinBox.valueChanged.connect(self.electric_energy_mix_valuechanged)
+            self.energy_ui.gasMixSpinBox.valueChanged.connect(self.gas_energy_mix_valuechanged)
 
             self.energy_ui.resultunitComboBox.currentIndexChanged.connect(self.energyresultunitComboBox_indexchanged)
 
@@ -3100,6 +3107,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.energy_ui.meter2LabelLineEdit.setText(self.aw.qmc.meterlabels[1])
         self.energy_ui.meter1UnitComboBox.setCurrentIndex(self.aw.qmc.meterunits[0])
         self.energy_ui.meter2UnitComboBox.setCurrentIndex(self.aw.qmc.meterunits[1])
+        self.energy_ui.meter1FuelComboBox.setCurrentIndex(self.aw.qmc.meterfuels[0])
+        self.energy_ui.meter2FuelComboBox.setCurrentIndex(self.aw.qmc.meterfuels[1])
         self.energy_ui.meter1SourceComboBox.setCurrentIndex(self.aw.qmc.metersources[0])
         self.energy_ui.meter2SourceComboBox.setCurrentIndex(self.aw.qmc.metersources[1])
         ## Protocol tab
@@ -3120,6 +3129,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.energy_ui.coolingenergies3.setText(self.validatePctText(str(self.aw.qmc.coolingenergies[3])))
         self.energy_ui.BBPafterPreHeatcheckBox.setChecked(self.aw.qmc.betweenbatch_after_preheat)
         self.energy_ui.electricEnergyMixSpinBox.setValue(self.aw.qmc.electricEnergyMix)
+        self.energy_ui.gasMixSpinBox.setValue(self.aw.qmc.gasMix)
         #
         self.updateEnergyLabels()
         self.updateEnergyUnitLabels()
@@ -3185,6 +3195,12 @@ class editGraphDlg(ArtisanResizeablDialog):
     def updateMeterUnits(self, updateMetrics:bool = True) -> None:
         self.aw.qmc.meterunits[0] = self.energy_ui.meter1UnitComboBox.currentIndex()
         self.aw.qmc.meterunits[1] = self.energy_ui.meter2UnitComboBox.currentIndex()
+        if updateMetrics:
+            self.updateMetricsLabel()
+
+    def updateMeterFuels(self, updateMetrics:bool = True) -> None:
+        self.aw.qmc.meterfuels[0] = self.energy_ui.meter1FuelComboBox.currentIndex()
+        self.aw.qmc.meterfuels[1] = self.energy_ui.meter2FuelComboBox.currentIndex()
         if updateMetrics:
             self.updateMetricsLabel()
 
@@ -3256,6 +3272,10 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.electricEnergyMix = self.energy_ui.electricEnergyMixSpinBox.value()
         self.updateMetricsLabel()
 
+    def updateGasMix(self) -> None:
+        self.aw.qmc.gasMix = self.energy_ui.gasMixSpinBox.value()
+        self.updateMetricsLabel()
+
     # fills the energy config data from the current energy tab widget values
     def updateEnergyConfig(self) -> None:
         if self.tabInitialized[4]:
@@ -3297,6 +3317,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.loadevent_hundpcts = self.org_loadevent_hundpcts.copy()
             self.aw.qmc.meterlables = self.org_meterlabels.copy()
             self.aw.qmc.meterunits = self.org_meterunits.copy()
+            self.aw.qmc.meterfuels = self.org_meterfuels.copy()
             self.aw.qmc.metersources = self.org_metersources.copy()
             self.aw.qmc.preheatDuration = self.org_preheatDuration
             self.aw.qmc.preheatenergies = self.org_preheatenergies.copy()
@@ -3306,6 +3327,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.coolingenergies = self.org_coolingenergies.copy()
             self.aw.qmc.betweenbatch_after_preheat = self.org_betweenbatch_after_preheat
             self.aw.qmc.electricEnergyMix = self.org_electricEnergyMix
+            self.aw.qmc.gasMix = self.org_gasMix
 
     def updateMetricsLabel(self) -> None:
         try:
@@ -3518,8 +3540,10 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.loadevent_hundpcts != self.aw.qmc.loadevent_hundpcts_setup or
             self.aw.qmc.meterlabels != self.aw.qmc.meterlabels_setup or
             self.aw.qmc.meterunits != self.aw.qmc.meterunits_setup or
+            self.aw.qmc.meterfuels != self.aw.qmc.meterfuels_setup or
             self.aw.qmc.metersources != self.aw.qmc.metersources_setup or
-            self.aw.qmc.electricEnergyMix != self.aw.qmc.electricEnergyMix_setup)
+            self.aw.qmc.electricEnergyMix != self.aw.qmc.electricEnergyMix_setup or
+            self.aw.qmc.gasMix != self.aw.qmc.gasMix_setup)
 
     # enables/disables the Defaults/SetDefaults buttons if loads values differ from their set defaults
     def loadsEdited(self) -> None:
@@ -3668,6 +3692,19 @@ class editGraphDlg(ArtisanResizeablDialog):
                 pass
 
     @pyqtSlot()
+    def meterfuels_currentindexchanged(self) -> None:
+        sender = self.sender()
+        if isinstance(sender, QComboBox):
+            try:
+                i = [self.energy_ui.meter1FuelComboBox,self.energy_ui.meter2FuelComboBox].index(sender)
+                self.aw.qmc.meterfuels[i] = sender.currentIndex()
+                self.updateMetricsLabel()
+                self.updateMeterFuels()
+                self.loadsEdited()
+            except Exception: # pylint: disable=broad-except
+                pass
+
+    @pyqtSlot()
     def metersources_currentindexchanged(self) -> None:
         sender = self.sender()
         if isinstance(sender, QComboBox):
@@ -3685,6 +3722,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.updateElectricEnergyMix()
         self.loadsEdited()
 
+    @pyqtSlot()
+    def gas_energy_mix_valuechanged(self) -> None:
+        self.updateGasMix()
+        self.loadsEdited()
+
     #
 
     # returns True if the energy loads in the dialog are different to the set defaults
@@ -3697,7 +3739,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.coolingDuration != self.aw.qmc.coolingDuration_setup or
             self.aw.qmc.coolingenergies != self.aw.qmc.coolingenergies_setup or
             self.aw.qmc.betweenbatch_after_preheat != self.aw.qmc.betweenbatch_after_preheat_setup or
-            self.aw.qmc.electricEnergyMix != self.aw.qmc.electricEnergyMix_setup)
+            self.aw.qmc.electricEnergyMix != self.aw.qmc.electricEnergyMix_setup or
+            self.aw.qmc.gasMix != self.aw.qmc.gasMix_setup)
 
     # enables/disables the Defaults/SetDefaults buttons if loads values differ from their set defaults
     def protocolEdited(self) -> None:
