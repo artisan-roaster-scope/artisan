@@ -8,7 +8,7 @@ v3.1.1
 
 * ADDITIONS
   - adds drag-and-drop to Stats Summary table configuration
-  - allows to hide scheduled items
+  - allows to hide scheduled items via a right-click or drag-out
   - adds support for feeding data from energy meters into Artisans roast energy calculator
   - adds new flag "Set batch size" to background dialog. If ticked the batch size is taken from the background profile on load while scheduler is off
   - adds sorting to the background events table
@@ -18,16 +18,16 @@ v3.1.1
       - `quantifier(n,<bool>)` to toggle quantification per event type
       - `playback(n,<bool>)` to toggle event playback per event type
       - `ramp(n,<bool>)` to toggle event playback ramping per event type
+      - `alarm(m,<bool>)` enable/disable alarm number `m`
       - `setBatchSize(<float>)` to set the batch size. if the given number is negative the batch size is taken from the background profile, if available
-
+  - events displayed as Step, Step+ or Combo can be updated by moving them to a new position. Pressing SHIFT restricts the movement in either the x or the y direction.
 
 * NEW HARDWARE SUPPORT
   - adds support for [Carmomaq's Stratto Lab sample roaster](https://carmomaq.com.br/en/produtos/stratto-roaster-lab/)
   - adds a new [IMF](https://artisan-scope.org/machines/imf/) machine setup that supports machine control
-  - updated [Giesen](https://artisan-scope.org/machines/giesen/) machine support (now incl. sample roasters and PRO machines) supporting additional actor control
+  - updated [Giesen](https://artisan-scope.org/machines/giesen/) machine support (now incl. sample roasters and PRO machines) supporting the control of additional actors
   - adds support for the [DCC1100 and DCC1120 Brushless DC Motor controllers and the DCC1020 DC Motor controller](https://artisan-scope.org/devices/phidgets/#45-dc-motor-control) ([Discussion #1750](../../../discussions/1750))
   - adds [ROEST](https://artisan-scope.org/machines/roest/) CSV import
-
 
 * CHANGES
   - the Phidget driver is now bundled with the Artisan app and does no longer need to be installed separately (but for some legacy USB HID devices, like the original 1046 and 1048, which still need the kernel extension of the driver package installed in the system)
@@ -39,6 +39,9 @@ v3.1.1
   - keeps custom events ordered by time
   - events were replayed only if the corresponding event slider was visible in previous versions. Now events selected for replay are always replayed, independent of the visibility of the corresponding event slider.
   - the parameters "max. number of custom buttons per row", "button size", "alternative slider layout", "mark last pressed" and "show tooltips" are now persisted per palette
+  - a click in a sliders pane does no longer move the slider, but just gives that slier the input focus (a click in a sliders bar still moves the slider to this position)
+  - a click on a sliders LCD give the slider the input focus
+  - a double-click on a sliders LCD opens a widget to set a new slider value by number
 
 * FIXES
   - ensure complete reset to defaults in energy tab loads tab
@@ -46,10 +49,9 @@ v3.1.1
   - prevents exceptions caused by empty event type names ([Discussion #1745](../../../discussions/1745))
   - fixes processing of MODBUS function 2 request which broke the just introduced autoCHARGE/autoDROP triggered by Loring machines
   - fixes a typo which allowed to open multiple Roast Properties dialogs ([Issue #1781](../../../issues/1781))
-  - fixes regression introduced in v3.0 which prevented to replay events before CHARGE
+  - fixes regression introduced in v3.0 which prevented the replay of events before CHARGE
   - fixed an issue in event replay where certain events failed to be replayed by temperature
   - fixes an issue where the PID Input for external MODBUS/SV PIDs was not correctly persisted
-
 
 * REMOVALS
   - support for the non-standard MODBUS little-endian byte order has been removed

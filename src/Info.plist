@@ -142,7 +142,7 @@
 	<key>LSHasLocalizedDisplayName</key>
 	<false/>
 	<key>LSMinimumSystemVersion</key>
-	<string>12.0</string>
+	<string>12.3</string>
 	<key>LSMultipleInstancesProhibited</key>
 	<string>false</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>

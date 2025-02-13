@@ -28,14 +28,15 @@ try:
     from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, QLine, QEvent, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QByteArray, QPropertyAnimation, QEasingCurve, QLocale) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QSplitter, QSplitterHandle, QLabel, QComboBox, QLineEdit, QTextEdit, QDoubleSpinBox, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
-        QTableWidget, QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
+        QTableWidget, QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame, QSlider, QStyle, QStyleOptionSlider) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QPen, QPainter, QFontMetrics, QColor, QCursor, QEnterEvent, QPaintEvent # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import (Qt, pyqtSignal, pyqtSlot, pyqtProperty, QLine, QEvent, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
         QByteArray, QPropertyAnimation, QEasingCurve, QLocale) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QSplitter, QSplitterHandle, QLabel, QComboBox, QLineEdit, QTextEdit, QDoubleSpinBox, QPushButton, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QTableWidget, QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
+        QTableWidget, QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame, QSlider, QStyle, QStyleOptionSlider) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QPen, QPainter, QFontMetrics, QColor, QCursor, QEnterEvent, QPaintEvent # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+
 
 class MyQComboBox(QComboBox): # pylint: disable=too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues]# Argument to class must be a base class
     def __init__(self, parent:Optional['QWidget'] = None, **kwargs:Dict[Any,Any]) -> None:
@@ -180,6 +181,19 @@ class MyTableWidgetItemQComboBox(QTableWidgetItem): # pylint: disable= too-few-p
     def __lt__(self, other:'MyTableWidgetItemQComboBox') -> bool: # type: ignore[override]
         return str(self.sortKey.currentText()) < str(other.sortKey.currentText())
 
+# Slider which does not move if slider widget is clicked, only if slider bar is clicked
+class SliderUnclickable(QSlider): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+    def mousePressEvent(self, event:'Optional[QMouseEvent]') -> None:
+        opt = QStyleOptionSlider()
+        self.initStyleOption(opt)
+        slider_style:Optional[QStyle] = self.style()
+        if event is not None and slider_style is not None:
+            pressedControl = slider_style.hitTestComplexControl(QStyle.ComplexControl.CC_Slider, opt, event.pos(), self)
+            #if pressedControl in {QStyle.SubControl.SC_SliderGroove, QStyle.SubControl.SC_SliderHandle, QStyle.SubControl.SC_ScrollBarSubLine}:
+            if pressedControl is not QStyle.SubControl.SC_None:
+                super().mousePressEvent(event)
+
+
 # QLabel that automatically resizes its text font
 class MyQLabel(QLabel):  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     def __init__(self, text: Optional[str] = None, parent: Optional['QWidget'] = None, flags: Qt.WindowType = Qt.WindowType.Widget) -> None:
@@ -257,6 +271,7 @@ class MyQLCDNumber(QLCDNumber): # pylint: disable=too-few-public-methods # pyrig
     clicked = pyqtSignal()
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
+    double_clicked = pyqtSignal()
 
     def mousePressEvent(self, event:'Optional[QMouseEvent]') -> None:
         super().mousePressEvent(event)
@@ -266,6 +281,11 @@ class MyQLCDNumber(QLCDNumber): # pylint: disable=too-few-public-methods # pyrig
                 self.left_clicked.emit()
             elif event.button() == Qt.MouseButton.RightButton:
                 self.right_clicked.emit()
+
+    def mouseDoubleClickEvent(self, event:'Optional[QMouseEvent]') -> None:
+        super().mousePressEvent(event)
+        if event is not None:
+            self.double_clicked.emit()
 
 class ClickableLCDFrame(QFrame): # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     clicked = pyqtSignal()

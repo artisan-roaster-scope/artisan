@@ -185,6 +185,7 @@ def content() -> str:
     tbl_Commands.add_row([QApplication.translate('HelpDlg','Aillio R1 Drum'),'&#160;',QApplication.translate('HelpDlg','sets drum speed to value')])
     tbl_Commands.add_row([QApplication.translate('HelpDlg','Aillio R1 Command'),'PRS',QApplication.translate('HelpDlg','Sends PRS command')])
     tbl_Commands.add_row([QApplication.translate('HelpDlg','Artisan Command'),'$',QApplication.translate('HelpDlg','variable holding the last state of the button pressed (1 or 0)')])
+    tbl_Commands.add_row(['&#160;','alarm(n,<bool>)',QApplication.translate('HelpDlg','enables/disables alarm number n')])
     tbl_Commands.add_row(['&#160;','alarms(<bool>)',QApplication.translate('HelpDlg','enables/disables alarms')])
     tbl_Commands.add_row(['&#160;','autoCHARGE(<bool>)',QApplication.translate('HelpDlg','enables/disables autoCHARGE')])
     tbl_Commands.add_row(['&#160;','autoDROP(<bool>)',QApplication.translate('HelpDlg','enables/disables autoDROP')])

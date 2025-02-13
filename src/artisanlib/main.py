@@ -742,7 +742,7 @@ from artisanlib.modbusport import modbusport
 from artisanlib.slider_style import artisan_slider_style
 from artisanlib.event_button_style import artisan_event_button_style
 from artisanlib.simulator import Simulator
-from artisanlib.dialogs import HelpDlg, ArtisanInputDialog, ArtisanComboBoxDialog, ArtisanPortsDialog
+from artisanlib.dialogs import HelpDlg, ArtisanInputDialog, ArtisanComboBoxDialog, ArtisanPortsDialog, ArtisanSliderLCDinputDlg
 from artisanlib.large_lcds import (LargeMainLCDs, LargeDeltaLCDs, LargePIDLCDs, LargeExtraLCDs, LargePhasesLCDs, LargeScaleLCDs)
 from artisanlib.logs import (serialLogDlg, errorDlg, messageDlg)
 from artisanlib.comm import serialport, colorport, scaleport
@@ -750,7 +750,7 @@ from artisanlib.pid_dialogs import (PXRpidDlgControl, PXG4pidDlgControl,
     PID_DlgControl, DTApidDlgControl)
 from artisanlib.pid_control import FujiPID, PIDcontrol, DtaPID
 from artisanlib.widgets import (MyQLCDNumber, EventPushButton, MajorEventPushButton,
-    AnimatedMajorEventPushButton, MinorEventPushButton, AuxEventPushButton, ClickableLCDFrame, Splitter)
+    AnimatedMajorEventPushButton, MinorEventPushButton, AuxEventPushButton, ClickableLCDFrame, Splitter, SliderUnclickable)
 
 from artisanlib.notifications import Notification, NotificationManager, NotificationType
 from artisanlib.canvas import tgraphcanvas
@@ -3914,7 +3914,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         midleftlayout.addWidget(self.EventsGroupLayout)
 
         self.slider1:QSlider = self.slider()
-        self.sliderLCD1:QLCDNumber = self.sliderLCD()
+        self.sliderLCD1:MyQLCDNumber = self.sliderLCD()
         self.sliderLCD1.setStyleSheet(f'font-weight: bold; color: {self.qmc.EvalueColor[0]};')
         self.sliderLCD1.display(self.slider1.value())
         sliderGrp1 = QVBoxLayout()
@@ -3943,9 +3943,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         # needed for both tracking variants:
         self.slider1.actionTriggered.connect(self.slider1actionTriggered)
         self.slider1.setFocusPolicy(Qt.FocusPolicy.StrongFocus) # ClickFocus TabFocus StrongFocus NoFocus
+        self.sliderLCD1.clicked.connect(self.slider1lcdClicked)
+        self.sliderLCD1.double_clicked.connect(self.slider1lcdDoubleClicked)
 
         self.slider2:QSlider = self.slider()
-        self.sliderLCD2:QLCDNumber = self.sliderLCD()
+        self.sliderLCD2:MyQLCDNumber = self.sliderLCD()
         self.sliderLCD2.setStyleSheet(f'font-weight: bold; color: {self.qmc.EvalueColor[1]};')
         self.sliderLCD2.display(self.slider2.value())
         sliderGrp2 = QVBoxLayout()
@@ -3974,9 +3976,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         # needed for both tracking variants:
         self.slider2.actionTriggered.connect(self.slider2actionTriggered)
         self.slider2.setFocusPolicy(Qt.FocusPolicy.StrongFocus) # ClickFocus TabFocus StrongFocus
+        self.sliderLCD2.clicked.connect(self.slider2lcdClicked)
+        self.sliderLCD2.double_clicked.connect(self.slider2lcdDoubleClicked)
 
         self.slider3:QSlider = self.slider()
-        self.sliderLCD3:QLCDNumber = self.sliderLCD()
+        self.sliderLCD3:MyQLCDNumber = self.sliderLCD()
         self.sliderLCD3.setStyleSheet(f'font-weight: bold; color: {self.qmc.EvalueColor[2]};')
         self.sliderLCD3.display(self.slider3.value())
         sliderGrp3 = QVBoxLayout()
@@ -4005,9 +4009,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         # needed for both tracking variants:
         self.slider3.actionTriggered.connect(self.slider3actionTriggered)
         self.slider3.setFocusPolicy(Qt.FocusPolicy.StrongFocus) # ClickFocus TabFocus StrongFocus
+        self.sliderLCD3.clicked.connect(self.slider3lcdClicked)
+        self.sliderLCD3.double_clicked.connect(self.slider3lcdDoubleClicked)
 
         self.slider4:QSlider = self.slider()
-        self.sliderLCD4:QLCDNumber = self.sliderLCD()
+        self.sliderLCD4:MyQLCDNumber = self.sliderLCD()
         self.sliderLCD4.setStyleSheet(f'font-weight: bold; color: {self.qmc.EvalueColor[3]};')
         self.sliderLCD4.display(self.slider4.value())
         sliderGrp4 = QVBoxLayout()
@@ -4036,9 +4042,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         # needed for both tracking variants:
         self.slider4.actionTriggered.connect(self.slider4actionTriggered)
         self.slider4.setFocusPolicy(Qt.FocusPolicy.StrongFocus) # ClickFocus TabFocus StrongFocus
+        self.sliderLCD4.clicked.connect(self.slider4lcdClicked)
+        self.sliderLCD4.double_clicked.connect(self.slider4lcdDoubleClicked)
 
         self.sliderSV:QSlider = self.slider()
-        self.sliderLCDSV:QLCDNumber = self.sliderLCD()
+        self.sliderLCDSV:MyQLCDNumber = self.sliderLCD()
 #        self.sliderLCDSV.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.palette["text"])
         self.sliderLCDSV.setNumDigits(3)
         self.sliderLCDSV.setStyleSheet('font-weight: bold;')
@@ -4062,6 +4070,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.sliderSV.sliderReleased.connect(self.sliderSVreleased)
         self.sliderSV.actionTriggered.connect(self.sliderSVactionTriggered)
         self.sliderSV.setFocusPolicy(Qt.FocusPolicy.StrongFocus) # ClickFocus TabFocus StrongFocus
+        self.sliderLCDSV.clicked.connect(self.sliderSVlcdClicked)
+        self.sliderLCDSV.double_clicked.connect(self.sliderSVlcdDoubleClicked)
 
         self.sliderGrp12 = QVBoxLayout()
         self.sliderGrp12.setSpacing(0)
@@ -7946,6 +7956,58 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #        self.eventslidermoved[3]=1
 #        self.updateSliderLCD(3,v)
 
+    pyqtSlot()
+    def slider1lcdClicked(self) -> None:
+        QTimer.singleShot(0, self.slider1.setFocus)
+    pyqtSlot()
+    def slider2lcdClicked(self) -> None:
+        QTimer.singleShot(0, self.slider2.setFocus)
+    pyqtSlot()
+    def slider3lcdClicked(self) -> None:
+        QTimer.singleShot(0, self.slider3.setFocus)
+    pyqtSlot()
+    def slider4lcdClicked(self) -> None:
+        QTimer.singleShot(0, self.slider4.setFocus)
+    pyqtSlot()
+    def sliderSVlcdClicked(self) -> None:
+        QTimer.singleShot(0, self.sliderSV.setFocus)
+
+    pyqtSlot()
+    def slider1lcdDoubleClicked(self) -> None:
+        dlg = ArtisanSliderLCDinputDlg(self,self, self.slider1.value(), self.eventslidermin[0], self.eventslidermax[0], self.qmc.etypesf(0))
+        if dlg.exec() and dlg.value is not None:
+            self.slider1.setValue(dlg.value)
+            self.sliderReleased(0,force=True,updateLCD=False)
+        QTimer.singleShot(0, self.slider1.setFocus)
+    pyqtSlot()
+    def slider2lcdDoubleClicked(self) -> None:
+        dlg = ArtisanSliderLCDinputDlg(self,self, self.slider2.value(), self.eventslidermin[1], self.eventslidermax[1], self.qmc.etypesf(1))
+        if dlg.exec() and dlg.value is not None:
+            self.slider2.setValue(dlg.value)
+            self.sliderReleased(1,force=True,updateLCD=False)
+        QTimer.singleShot(0, self.slider2.setFocus)
+    pyqtSlot()
+    def slider3lcdDoubleClicked(self) -> None:
+        dlg = ArtisanSliderLCDinputDlg(self,self, self.slider3.value(), self.eventslidermin[2], self.eventslidermax[2], self.qmc.etypesf(2))
+        if dlg.exec() and dlg.value is not None:
+            self.slider3.setValue(dlg.value)
+            self.sliderReleased(2,force=True,updateLCD=False)
+        QTimer.singleShot(0, self.slider3.setFocus)
+    pyqtSlot()
+    def slider4lcdDoubleClicked(self) -> None:
+        dlg = ArtisanSliderLCDinputDlg(self,self, self.slider4.value(), self.eventslidermin[3], self.eventslidermax[3], self.qmc.etypesf(3))
+        if dlg.exec() and dlg.value is not None:
+            self.slider4.setValue(dlg.value)
+            self.sliderReleased(3,force=True,updateLCD=False)
+        QTimer.singleShot(0, self.slider4.setFocus)
+    pyqtSlot()
+    def sliderSVlcdDoubleClicked(self) -> None:
+        dlg = ArtisanSliderLCDinputDlg(self,self, self.sliderSV.value(), self.pidcontrol.svSliderMin, self.pidcontrol.svSliderMax, QApplication.translate('Label','SV'))
+        if dlg.exec() and dlg.value is not None:
+            self.sliderSV.setValue(dlg.value)
+            self.sliderSVreleased()
+        QTimer.singleShot(0, self.sliderSV.setFocus)
+
 # required for the default tracking sliders
     @pyqtSlot()
     def slider1released(self) -> None:
@@ -8146,8 +8208,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.fireslideraction(n)
 
     @staticmethod
-    def sliderLCD() -> QLCDNumber:
-        slcd = QLCDNumber()
+    def sliderLCD() -> MyQLCDNumber:
+        slcd = MyQLCDNumber()
         slcd.setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
         slcd.setNumDigits(1)
         slcd.setMinimumHeight(35)
@@ -8159,8 +8221,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         return slcd
 
     @staticmethod
-    def slider() -> QSlider:
-        s = QSlider()
+    def slider() -> SliderUnclickable:
+        s = SliderUnclickable()
         s.setTickPosition(QSlider.TickPosition.TicksBothSides)
         s.setTickInterval(10)
         s.setSingleStep(1)
@@ -9539,8 +9601,25 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 last = self.buttonStates[lastbuttonpressed]
                             cs = cs.replace('$', str(last))
 
-                            # alarms(<bool>) enable/disable alarms
-                            if cs.startswith('alarms(') and cs.endswith(')'):
+                            # alarm(n,<bool>) : enable/disable alarm rule
+                            if cs.startswith('alarm(') and cs.endswith(')'):
+                                try:
+                                    args = cs[len('alarm('):-1].split(',')
+                                    if len(args) == 2:
+                                        alarm_nr = int(args[0])
+                                        if alarm_nr>0 and len(self.qmc.alarmflag) > alarm_nr-1:
+                                            try:
+                                                self.qmc.alarmflag[alarm_nr-1] = toBool(eval(args[1])) # pylint: disable=eval-used
+                                            except Exception: # pylint: disable=broad-except
+                                                value_str = args[1].strip()
+                                                if value_str.lower() in {'yes', 'true', 't', '1'}:
+                                                    self.qmc.alarmflag[alarm_nr-1] = True
+                                                else:
+                                                    self.qmc.alarmflag[alarm_nr-1] = False
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            # alarms(<bool>) enable/disable alarms actions (alarms are still fired, just the actions are not executed)
+                            elif cs.startswith('alarms(') and cs.endswith(')'):
                                 try:
                                     value_str = cs[len('alarms('):-1].strip()
                                     if value_str.lower() in {'yes', 'true', 't', '1'}:
@@ -12943,7 +13022,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.meterreads = profile['meterreads']
         if 'co2kg_per_btu' in profile:
             self.qmc.CO2kg_per_BTU = [float(x) for x in profile['co2kg_per_btu']]
-        else: 
+        else:
             self.qmc.CO2kg_per_BTU = self.qmc.CO2kg_per_BTU_default.copy()
         if 'biogas_co2_reduction' in profile:
             self.qmc.Biogas_CO2_Reduction = profile['biogas_co2_reduction']
@@ -18835,7 +18914,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             _log.exception(e)
             return '','',''
 
-    # settingsSetValue() avoids writing settings unmodified w.r.t. their defaults and is to be used on saving settings on appQuit
+    # settingsSetValue() avoids writing settings unmodified w.r.t. their defaults and is to be used on saving settings on closeApp()
     # if read_defaults=False the name/value pair is added in case the name is not in defaults or the value for name in defaults is different
     # else the defaultSettings dictionary is filled if given
     @staticmethod
@@ -20040,7 +20119,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 if unsaved_changes:
                     self.qmc.safesaveflag = False
                     # in case we have unsaved changes and the user decided to discard those, we first reset to have the correct settings (like axis limits) saved
+                    lastLoadedProfile = self.curFile # however, we remember the lastLoadedProfile to reload it on restart, even if changes were not saved
+                    lastLoadedBackground = self.qmc.backgroundpath
                     self.qmc.reset(redraw=False,soundOn=False,keepProperties=False,fireResetAction=False)
+                    if lastLoadedProfile != '':
+                        self.curFile = lastLoadedProfile
+                    if lastLoadedBackground != '':
+                        self.qmc.backgroundpath = lastLoadedBackground
                 self.qmc.flagKeepON = flagKeepON
                 if QApplication.queryKeyboardModifiers() != (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ShiftModifier):
                     self.closeEventSettings() # it takes quite some time to write the >1000 setting items
@@ -26595,6 +26680,7 @@ def main() -> None:
                             appWindow.qmc.timealign(redraw=True,recompute=True)
                     else:
                         appWindow.lastLoadedProfile = ''
+                        appWindow.lastLoadedBackground = ''
                         appWindow.qmc.background = False
                         appWindow.qmc.backgroundprofile = None
                         appWindow.qmc.backgroundprofile_moved_x = 0
@@ -26602,6 +26688,7 @@ def main() -> None:
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
                     appWindow.lastLoadedProfile = ''
+                    appWindow.lastLoadedBackground = ''
                     appWindow.qmc.background = False
                     appWindow.qmc.backgroundprofile = None
                     appWindow.qmc.backgroundprofile_moved_x = 0
