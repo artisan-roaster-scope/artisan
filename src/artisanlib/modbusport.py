@@ -918,7 +918,7 @@ class modbusport:
             res_registers, _, res_error_disconnect = self.read_registers(slave, register, 2, code, force)
             error_disconnect = res_error_disconnect
             if res_registers is not None:
-                res = self.convert_32bit_uint_from_registers(res_registers)
+                res = convert_from_bcd(self.convert_32bit_uint_from_registers(res_registers))
                 # we clear the previous error and send a message
                 self.clearCommError()
 #             await asyncio.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
@@ -1094,7 +1094,7 @@ class modbusport:
             res_registers, _, res_error_disconnect = self.read_registers(slave, register, 1, code, force)
             error_disconnect = res_error_disconnect
             if res_registers is not None:
-                res = self.convert_16bit_uint_from_registers(res_registers)
+                res = convert_from_bcd(self.convert_16bit_uint_from_registers(res_registers))
                 # we clear the previous error and send a message
                 self.clearCommError()
 #             await asyncio.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic

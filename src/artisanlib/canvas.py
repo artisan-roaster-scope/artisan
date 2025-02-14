@@ -3035,39 +3035,41 @@ class tgraphcanvas(FigureCanvas):
                             self.starteventmessagetimer()
                             break
                 elif event.artist in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
-                    timex = self.time2index(numpy.array(event.artist.get_xdata())[ind])
-                    event_type: int = 4
-                    if event.artist == self.l_eventtype1dots:
-                        event_type = 0
-                    elif event.artist == self.l_eventtype2dots:
-                        event_type = 1
-                    elif event.artist == self.l_eventtype3dots:
-                        event_type = 2
-                    elif event.artist == self.l_eventtype4dots:
-                        event_type = 3
-                    for i, spe in enumerate(self.specialevents):
-                        if (event_type == self.specialeventstype[i]
-#                            re.search(
-#                                    f'({self.etypesf(self.specialeventstype[i])})',
-#                                    str(event.artist))
-                                and (timex in [spe, spe + 1, spe -1])):
-                            if self.timeindex[0] != -1:
-                                start = self.timex[self.timeindex[0]]
-                            else:
-                                start = 0
-                            if len(self.eventmessage) != 0:
-                                self.eventmessage = f'{self.eventmessage} | '
-                            self.eventmessage = f'{self.eventmessage}{self.etypesf(self.specialeventstype[i])} = {self.eventsvalues(self.specialeventsvalue[i])}'
-                            if self.renderEventsDescr and self.specialeventsStrings[i] and self.specialeventsStrings[i]!='':
-                                self.eventmessage = f'{self.eventmessage} ({self.specialeventsStrings[i].strip()[:self.eventslabelschars]})'
-                            self.eventmessage = f'{self.eventmessage} @ {stringfromseconds(self.timex[spe] - start)} {float2float(self.temp2[spe],digits)}{self.mode}'
-                            self.starteventmessagetimer()
-                            if self.eventsGraphflag in {2,4}:
-                                # we support custom event pick-and-drag only for events rendered as step lines, step+ and as combo.
-                                self.foreground_event_ind = i
-                                self.foreground_event_pos = ind
-                                self.foreground_event_pick_position = (event.artist.get_xdata()[ind],event.artist.get_ydata()[ind])
-                            break
+                    tx = numpy.array(event.artist.get_xdata())[ind]
+                    timex = self.time2index(tx)
+                    if abs(tx - event.mouseevent.xdata)<2:
+                        event_type: int = 4
+                        if event.artist == self.l_eventtype1dots:
+                            event_type = 0
+                        elif event.artist == self.l_eventtype2dots:
+                            event_type = 1
+                        elif event.artist == self.l_eventtype3dots:
+                            event_type = 2
+                        elif event.artist == self.l_eventtype4dots:
+                            event_type = 3
+                        for i, spe in enumerate(self.specialevents):
+                            if (event_type == self.specialeventstype[i]
+    #                            re.search(
+    #                                    f'({self.etypesf(self.specialeventstype[i])})',
+    #                                    str(event.artist))
+                                    and (timex in [spe, spe + 1, spe -1])):
+                                if self.timeindex[0] != -1:
+                                    start = self.timex[self.timeindex[0]]
+                                else:
+                                    start = 0
+                                if len(self.eventmessage) != 0:
+                                    self.eventmessage = f'{self.eventmessage} | '
+                                self.eventmessage = f'{self.eventmessage}{self.etypesf(self.specialeventstype[i])} = {self.eventsvalues(self.specialeventsvalue[i])}'
+                                if self.renderEventsDescr and self.specialeventsStrings[i] and self.specialeventsStrings[i]!='':
+                                    self.eventmessage = f'{self.eventmessage} ({self.specialeventsStrings[i].strip()[:self.eventslabelschars]})'
+                                self.eventmessage = f'{self.eventmessage} @ {stringfromseconds(self.timex[spe] - start)} {float2float(self.temp2[spe],digits)}{self.mode}'
+                                self.starteventmessagetimer()
+                                if self.eventsGraphflag in {2,4}:
+                                    # we support custom event pick-and-drag only for events rendered as step lines, step+ and as combo.
+                                    self.foreground_event_ind = i
+                                    self.foreground_event_pos = ind
+                                    self.foreground_event_pick_position = (event.artist.get_xdata()[ind],event.artist.get_ydata()[ind])
+                                break
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
