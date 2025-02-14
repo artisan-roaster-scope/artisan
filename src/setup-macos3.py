@@ -447,7 +447,7 @@ for root, dirs, files in os.walk('.'):
             for r,_d,f in os.walk(os.path.join(root,di)):
                 for fl in f:
 #                    print('Deleting', os.path.join(r,fl))
-                    if not (fl.endswith('.py') or fl.endswith('.pyc')):
+                    if not fl.endswith(('.py', '.pyc')):
                         os.remove(os.path.join(r,fl))
 
 print('*** Removing parts of scipy ***')
