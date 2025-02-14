@@ -20,7 +20,7 @@ v3.1.1
       - `ramp(n,<bool>)` to toggle event playback ramping per event type
       - `alarm(m,<bool>)` enable/disable alarm number `m`
       - `setBatchSize(<float>)` to set the batch size. if the given number is negative the batch size is taken from the background profile, if available
-  - events displayed as Step, Step+ or Combo can be updated by moving them to a new position. Pressing SHIFT restricts the movement in either the x or the y direction.
+  - events displayed in Step and Combo mode can be updated by moving them to a new position. Pressing SHIFT restricts the movement in either the x or the y direction.
 
 * NEW HARDWARE SUPPORT
   - adds support for [Carmomaq's Stratto Lab sample roaster](https://carmomaq.com.br/en/produtos/stratto-roaster-lab/)

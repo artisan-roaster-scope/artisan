@@ -3062,7 +3062,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.eventmessage = f'{self.eventmessage} ({self.specialeventsStrings[i].strip()[:self.eventslabelschars]})'
                             self.eventmessage = f'{self.eventmessage} @ {stringfromseconds(self.timex[spe] - start)} {float2float(self.temp2[spe],digits)}{self.mode}'
                             self.starteventmessagetimer()
-                            if self.eventsGraphflag in {2,3,4}:
+                            if self.eventsGraphflag in {2,4}:
                                 # we support custom event pick-and-drag only for events rendered as step lines, step+ and as combo.
                                 self.foreground_event_ind = i
                                 self.foreground_event_pos = ind
