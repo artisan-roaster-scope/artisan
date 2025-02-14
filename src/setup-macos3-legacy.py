@@ -441,7 +441,8 @@ for root, dirs, files in os.walk('.'):
             for r,_d,f in os.walk(os.path.join(root,di)):
                 for fl in f:
 #                    print('Deleting', os.path.join(r,fl))
-                    os.remove(os.path.join(r,fl))
+                    if not (fl.endswith('.py') or fl.endswith('.pyc')):
+                        os.remove(os.path.join(r,fl))
 
 os.chdir('..')
 subprocess.check_call(r'rm -f artisan-mac-' + VERSION + r'.dmg',shell = True)
