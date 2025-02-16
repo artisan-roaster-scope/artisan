@@ -315,7 +315,13 @@ class tgraphcanvas(FigureCanvas):
         'segmentpickflag', 'segmentdeltathreshold', 'segmentsamplesthreshold', 'stats_summary_rect', 'title_text', 'title_artist', 'title_width',
         'background_title_width', 'xlabel_text', 'xlabel_artist', 'xlabel_width', 'lazyredraw_on_resize_timer', 'mathdictionary_base',
         'ambient_pressure_sampled', 'ambient_humidity_sampled', 'ambientTemp_sampled', 'backgroundmovespeed', 'chargeTimerPeriod', 'flavors_default_value',
-        'fmt_data_ON', 'l_subtitle', 'projectDeltaFlag', 'btbreak_params','bbpCache', 'glow']
+        'fmt_data_ON', 'l_subtitle', 'projectDeltaFlag', 'btbreak_params','bbpCache', 'glow',
+        'custom_event_dlg_default_type', 'custom_event_dlg_default_type', 'foreground_event_ind' , 'foreground_event_pos', 'foreground_event_pick_position',
+        'plus_lockSchedule_sent_account', 'plus_lockSchedule_sent_date', 'specialeventplaybackramp',
+        'CO2kg_per_BTU_default', 'CO2kg_per_BTU', 'Biogas_CO2_Reduction', 'Biogas_CO2_Reduction_default',
+        'meterunitnames', 'meterreads_default', 'meterreads', 'meterlabels_setup', 'meterlabels', 'meterunits_setup', 'meterunits',
+        'meterfuels_setup', 'meterfuels', 'metersources_setup', 'metersources'
+        ]
 
 
     def __init__(self, parent:QWidget, dpi:int, locale:str, aw:'ApplicationWindow') -> None:
@@ -1143,6 +1149,7 @@ class tgraphcanvas(FigureCanvas):
         self.oncpick_cid = self.fig.canvas.mpl_connect('pick_event', cast('Callable[[Event],None]', self.onpick)) # incompatible type "Callable[[PickEvent], None]"; expected "Callable[[Event], Any] # type: ignore[arg-type]
         self.ondraw_cid = self.fig.canvas.mpl_connect('draw_event', self._draw_event)
 
+        self.custom_event_dlg_default_type:int = 4 # the default type remembered by the customEventDlg on adding events via a right click on the graph
         self.foreground_event_ind:Optional[int] = None # index of the currently moved event marker in self.specialevents
         self.foreground_event_pos:Optional[int] = None # position of the currently moved event marker in its 2DLine.xdata() value array
         self.foreground_event_pick_position:Optional[Tuple[float,float]] = None # pick position, as (x-time,y-value) tuple, of the currently moved event
@@ -3132,15 +3139,22 @@ class tgraphcanvas(FigureCanvas):
                         event_annos[self.foreground_event_pos].set_text(f'{firstletter}{secondletter}{thirdletter}')
                     # redraw
                     self.fileDirty()
-                    self.fig.canvas.draw_idle()
+                    if self.flagon:
+                        self.redraw_keep_view(recomputeAllDeltas=False)
+                    else:
+                        self.fig.canvas.draw_idle()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-        # reset the moved marker
+        if self.foreground_event_ind is not None:
+            # reset the picked marker after 2sec
+            QTimer.singleShot(2000,self.release_picked_event)
+        if self.legend is not None:
+            QTimer.singleShot(1,self.updateBackground)
+
+    def release_picked_event(self) -> None:
         self.foreground_event_ind = None
         self.foreground_event_pos = None
         self.foreground_event_pick_position = None
-        if self.legend is not None:
-            QTimer.singleShot(1,self.updateBackground)
 
     def onrelease(self, event:'Event') -> None:     # NOTE: onrelease() is connected/disconnected in togglecrosslines()
         event = cast('MouseEvent', event)
@@ -3480,12 +3494,13 @@ class tgraphcanvas(FigureCanvas):
         else:
             # add a special event at the current timepoint
             from artisanlib.events import customEventDlg
-            dlg = customEventDlg(self.aw, self.aw, action.key[1], value=action.key[2]) # type: ignore[attr-defined] # "QAction" has no attribute "key"
+            dlg = customEventDlg(self.aw, self.aw, action.key[1], value=action.key[2], event_type=self.custom_event_dlg_default_type) # type: ignore[attr-defined] # "QAction" has no attribute "key"
             if dlg.exec():
                 self.addEvent(action.key[1], # type: ignore[attr-defined] # "QAction" has no attribute "key" # absolute time index
                     dlg.type, # default: "--"
                     dlg.description,
                     dlg.value)
+                self.custom_event_dlg_default_type = dlg.type
                 self.aw.orderEvents()
                 self.fileDirtySignal.emit()
                 self.redraw_keep_view(recomputeAllDeltas=(action.key[0] in {0, 6}))  # type: ignore[attr-defined] # "QAction" has no attribute "key" # on moving CHARGE or DROP, we have to recompute the Deltas
@@ -17608,6 +17623,12 @@ class tgraphcanvas(FigureCanvas):
         self.specialeventstype.append(event_type)
         self.specialeventsStrings.append(event_description)
         self.specialeventsvalue.append(event_value)
+
+    def deleteEvent(self, event_time_idx:int) -> None:
+        del self.specialevents[event_time_idx]
+        del self.specialeventstype[event_time_idx]
+        del self.specialeventsStrings[event_time_idx]
+        del self.specialeventsvalue[event_time_idx]
 
     def setEvent(self, idx:int, event_time_idx:int, event_type:int, event_description:str, event_value:float) -> None:
         if -1 < idx < len(self.specialevents):

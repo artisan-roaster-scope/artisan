@@ -1482,11 +1482,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'analysisresultsanno', 'segmentresultsanno', 'schedule_window', 'scheduleFlag', 'scheduled_items_uuids', 'largeLCDs_dialog', 'LargeLCDsFlag', 'largeDeltaLCDs_dialog', 'LargeDeltaLCDsFlag', 'largePIDLCDs_dialog',
         'LargePIDLCDsFlag', 'largeExtraLCDs_dialog', 'LargeExtraLCDsFlag', 'largePhasesLCDs_dialog', 'LargePhasesLCDsFlag', 'WebLCDs', 'WebLCDsPort', 'weblcds_server',
         'WebLCDsAlerts', 'EventsDlg_activeTab', 'graphColorDlg_activeTab', 'PID_DlgControl_activeTab', 'CurveDlg_activeTab', 'editGraphDlg_activeTab',
-        'backgroundDlg_activeTab', 'DeviceAssignmentDlg_activeTab', 'AlarmDlg_activeTab', 'schedule_activeTab', 'resetqsettings', 'settingspath', 'wheelpath', 'profilepath',
+        'backgroundDlg_activeTab', 'DeviceAssignmentDlg_activeTab', 'AlarmDlg_activeTab', 'schedule_activeTab', 'StatisticsDlg_activeTab', 'resetqsettings', 'settingspath', 'wheelpath', 'profilepath',
         'userprofilepath', 'printer', 'main_widget', 'defaultdpi', 'dpi', 'qmc', 'HottopControlActive', 'AsyncSamplingTimer', 'wheeldialog',
         'simulator', 'simulatorpath', 'comparator', 'stack', 'eventsbuttonflag', 'minieventsflags', 'seriallogflag',
         'seriallog', 'ser', 'modbus', 'extraMODBUStemps', 'extraMODBUStx', 's7', 'extraS7tx', 'ws', 'scale', 'color', 'extraser', 'extracomport', 'extrabaudrate',
-        'extrabytesize', 'extraparity', 'extrastopbits', 'extratimeout', 'hottop', 'santokerHost', 'santokerPort', 'santokerSerial', 'santokerBLE', 'santoker', 'santokerr', 'fujipid', 'dtapid', 'pidcontrol', 'soundflag', 'recentRoasts', 'maxRecentRoasts',
+        'extrabytesize', 'extraparity', 'extrastopbits', 'extratimeout', 'hottop', 'santokerHost', 'santokerPort', 'santokerSerial', 'santokerBLE', 'santoker', 'santokerR', 'fujipid', 'dtapid', 'pidcontrol', 'soundflag', 'recentRoasts', 'maxRecentRoasts',
         'mugmaHost','mugmaPort', 'mugma', 'mugma_default_host',
         'kaleido_default_host', 'kaleidoHost', 'kaleidoPort', 'kaleidoSerial', 'kaleidoPID', 'kaleido', 'colorTrack_mean_window_size', 'colorTrack_median_window_size', 'ikawa',
         'lcdpaletteB', 'lcdpaletteF', 'extraeventsbuttonsflags', 'extraeventslabels', 'extraeventbuttoncolor', 'extraeventsactionstrings',
@@ -1507,7 +1507,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'batchAction', 'temperatureConfMenu', 'FahrenheitAction', 'CelsiusAction', 'languageMenu', 'analyzeMenu', 'fitIdealautoAction',
         'analyzeMenu', 'fitIdealx2Action', 'fitIdealx3Action', 'fitIdealx0Action', 'fitBkgndAction', 'clearresultsAction', 'roastCompareAction',
         'designerAction', 'simulatorAction', 'wheeleditorAction', 'transformAction', 'temperatureMenu', 'ConvertToFahrenheitAction',
-        'ConvertToCelsiusAction', 'controlsAction', 'readingsAction', 'eventsEditorAction', 'buttonsAction', 'slidersAction', 'lcdsAction', 'deltalcdsAction',
+        'ConvertToCelsiusAction', 'controlsAction', 'readingsAction', 'eventsEditorAction', 'buttonsAction', 'slidersAction', 'scheduleAction', 'lcdsAction', 'deltalcdsAction',
         'pidlcdsAction', 'scalelcdsAction', 'extralcdsAction', 'phaseslcdsAction', 'fullscreenAction', 'loadSettingsAction', 'openRecentSettingMenu',
         'saveAsSettingsAction', 'resetAction', 'messagelabel', 'button_font_size_pt', 'button_font_size', 'button_font_size_small', 'button_font_size_small_selected',
         'button_font_size_tiny', 'button_font_size_micro', 'main_button_min_width', 'standard_button_min_width', 'small_button_min_width', 'tiny_button_min_width',
@@ -1537,7 +1537,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'rankingPDFAction', 'roastReportMenu', 'roastReportPDFAction', 'saveAsThemeAction', 'sliderGrp12', 'sliderGrp34', 'sliderGrpBox1x', 'sliderGrpBox2x', 'sliderGrpBox3x', 'sliderGrpBox4x',
         'small_button_min_width_str', 'standard_button_min_width_px', 'tiny_button_min_width_str', 'recording_version', 'recording_revision', 'recording_build',
         'lastIOResult', 'lastArtisanResult', 'max_palettes', 'palette_entries', 'eventsliders', 'defaultSettings', 'zoomInShortcut', 'zoomOutShortcut',
-        'summarystatstypes','summarystatsvisibility','summarystatsfontsize', 'bbp_drop_bt', 'bbp_drop_et', 'bbp_total_time','bbp_bottom_temp','bbp_begin_to_bottom_time','bbp_bottom_to_charge_time',
+        'summarystatstypes_default', 'summarystatstypes','summarystats_startup', 'summarystatsfontsize', 'bbp_drop_bt', 'bbp_drop_et', 'bbp_total_time','bbp_bottom_temp','bbp_begin_to_bottom_time','bbp_bottom_to_charge_time',
         'bbp_begin_to_bottom_ror', 'bbp_bottom_to_charge_ror', 'bbp_time_added_from_prev', 'bbp_begin', 'bbp_endroast_epoch_msec', 'bbp_endevents',
         'bbp_dropevents', 'bbp_dropbt', 'bbp_dropet', 'bbp_drop_to_end', 'schedule_day_filter', 'schedule_user_filter', 'schedule_machine_filter',
         'schedule_visible_filter', 'scheduler_tasks_visible', 'scheduler_completed_details_visible', 'scheduler_filters_visible', 'scheduler_auto_open']
@@ -2629,12 +2629,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
         if self.viewMenu is not None:
             self.controlsAction = QAction(QApplication.translate('Menu', 'Controls'), self)
+            self.controlsAction.setShortcut('C')
             self.controlsAction.triggered.connect(self.toggleControls)
             self.controlsAction.setCheckable(True)
             self.controlsAction.setChecked(True)
             self.viewMenu.addAction(self.controlsAction)
 
             self.readingsAction = QAction(QApplication.translate('Menu', 'Readings'), self)
+            self.readingsAction.setShortcut('X')
             self.readingsAction.triggered.connect(self.toggleReadings)
             self.readingsAction.setCheckable(True)
             self.readingsAction.setChecked(False)
@@ -2647,12 +2649,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.viewMenu.addAction(self.eventsEditorAction)
 
             self.buttonsAction = QAction(QApplication.translate('Menu', 'Buttons'), self)
+            self.buttonsAction.setShortcut('B')
             self.buttonsAction.triggered.connect(self.toggleExtraButtons)
             self.buttonsAction.setCheckable(True)
             self.buttonsAction.setChecked(False)
             self.viewMenu.addAction(self.buttonsAction)
 
             self.slidersAction: QAction = QAction(QApplication.translate('Menu', 'Sliders'), self)
+            self.slidersAction.setShortcut('S')
             self.slidersAction.triggered.connect(self.toggleSliders)
             self.slidersAction.setCheckable(True)
             self.slidersAction.setChecked(False)
@@ -3915,7 +3919,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
         self.slider1:QSlider = self.slider()
         self.sliderLCD1:MyQLCDNumber = self.sliderLCD()
-        self.sliderLCD1.setStyleSheet(f'font-weight: bold; color: {self.qmc.EvalueColor[0]};')
+        self.sliderLCD1.setStyleSheet(self.sliderLCDstyle(0))
         self.sliderLCD1.display(self.slider1.value())
         sliderGrp1 = QVBoxLayout()
         sliderGrp1.addWidget(self.sliderLCD1)
@@ -3942,13 +3946,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.slider1.sliderReleased.connect(self.slider1released)
         # needed for both tracking variants:
         self.slider1.actionTriggered.connect(self.slider1actionTriggered)
+        self.slider1.focus_in.connect(self.sliderfocusIn)
+        self.slider1.focus_out.connect(self.sliderfocusOut)
         self.slider1.setFocusPolicy(Qt.FocusPolicy.StrongFocus) # ClickFocus TabFocus StrongFocus NoFocus
         self.sliderLCD1.clicked.connect(self.slider1lcdClicked)
         self.sliderLCD1.double_clicked.connect(self.slider1lcdDoubleClicked)
 
         self.slider2:QSlider = self.slider()
         self.sliderLCD2:MyQLCDNumber = self.sliderLCD()
-        self.sliderLCD2.setStyleSheet(f'font-weight: bold; color: {self.qmc.EvalueColor[1]};')
+        self.sliderLCD2.setStyleSheet(self.sliderLCDstyle(1))
         self.sliderLCD2.display(self.slider2.value())
         sliderGrp2 = QVBoxLayout()
         sliderGrp2.addWidget(self.sliderLCD2)
@@ -3975,13 +3981,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.slider2.sliderReleased.connect(self.slider2released)
         # needed for both tracking variants:
         self.slider2.actionTriggered.connect(self.slider2actionTriggered)
+        self.slider2.focus_in.connect(self.sliderfocusIn)
+        self.slider2.focus_out.connect(self.sliderfocusOut)
         self.slider2.setFocusPolicy(Qt.FocusPolicy.StrongFocus) # ClickFocus TabFocus StrongFocus
         self.sliderLCD2.clicked.connect(self.slider2lcdClicked)
         self.sliderLCD2.double_clicked.connect(self.slider2lcdDoubleClicked)
 
         self.slider3:QSlider = self.slider()
         self.sliderLCD3:MyQLCDNumber = self.sliderLCD()
-        self.sliderLCD3.setStyleSheet(f'font-weight: bold; color: {self.qmc.EvalueColor[2]};')
+        self.sliderLCD3.setStyleSheet(self.sliderLCDstyle(2))
         self.sliderLCD3.display(self.slider3.value())
         sliderGrp3 = QVBoxLayout()
         sliderGrp3.addWidget(self.sliderLCD3)
@@ -4008,13 +4016,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.slider3.sliderReleased.connect(self.slider3released)
         # needed for both tracking variants:
         self.slider3.actionTriggered.connect(self.slider3actionTriggered)
+        self.slider3.focus_in.connect(self.sliderfocusIn)
+        self.slider3.focus_out.connect(self.sliderfocusOut)
         self.slider3.setFocusPolicy(Qt.FocusPolicy.StrongFocus) # ClickFocus TabFocus StrongFocus
         self.sliderLCD3.clicked.connect(self.slider3lcdClicked)
         self.sliderLCD3.double_clicked.connect(self.slider3lcdDoubleClicked)
 
         self.slider4:QSlider = self.slider()
         self.sliderLCD4:MyQLCDNumber = self.sliderLCD()
-        self.sliderLCD4.setStyleSheet(f'font-weight: bold; color: {self.qmc.EvalueColor[3]};')
+        self.sliderLCD4.setStyleSheet(self.sliderLCDstyle(3))
         self.sliderLCD4.display(self.slider4.value())
         sliderGrp4 = QVBoxLayout()
         sliderGrp4.addWidget(self.sliderLCD4)
@@ -4041,13 +4051,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.slider4.sliderReleased.connect(self.slider4released)
         # needed for both tracking variants:
         self.slider4.actionTriggered.connect(self.slider4actionTriggered)
+        self.slider4.focus_in.connect(self.sliderfocusIn)
+        self.slider4.focus_out.connect(self.sliderfocusOut)
         self.slider4.setFocusPolicy(Qt.FocusPolicy.StrongFocus) # ClickFocus TabFocus StrongFocus
         self.sliderLCD4.clicked.connect(self.slider4lcdClicked)
         self.sliderLCD4.double_clicked.connect(self.slider4lcdDoubleClicked)
 
         self.sliderSV:QSlider = self.slider()
         self.sliderLCDSV:MyQLCDNumber = self.sliderLCD()
-#        self.sliderLCDSV.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.palette["text"])
+        self.sliderLCDSV.setStyleSheet(self.sliderLCDstyle(4))
         self.sliderLCDSV.setNumDigits(3)
         self.sliderLCDSV.setStyleSheet('font-weight: bold;')
         sv = max(min(self.pidcontrol.svValue, self.pidcontrol.svSliderMax), self.pidcontrol.svSliderMin)
@@ -4069,6 +4081,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.sliderSV.valueChanged.connect(self.updateSVSliderLCD)
         self.sliderSV.sliderReleased.connect(self.sliderSVreleased)
         self.sliderSV.actionTriggered.connect(self.sliderSVactionTriggered)
+        self.sliderSV.focus_in.connect(self.sliderfocusIn)
+        self.sliderSV.focus_out.connect(self.sliderfocusOut)
         self.sliderSV.setFocusPolicy(Qt.FocusPolicy.StrongFocus) # ClickFocus TabFocus StrongFocus
         self.sliderLCDSV.clicked.connect(self.sliderSVlcdClicked)
         self.sliderLCDSV.double_clicked.connect(self.sliderSVlcdDoubleClicked)
@@ -6184,16 +6198,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             _log.exception(e)
 
     def updateSliderColors(self) -> None:
-        self.sliderLCD1.setStyleSheet(f'font-weight: bold; color: {self.qmc.EvalueColor[0]};')
-        self.sliderLCD2.setStyleSheet(f'font-weight: bold; color: {self.qmc.EvalueColor[1]};')
-        self.sliderLCD3.setStyleSheet(f'font-weight: bold; color: {self.qmc.EvalueColor[2]};')
-        self.sliderLCD4.setStyleSheet(f'font-weight: bold; color: {self.qmc.EvalueColor[3]};')
-        self.sliderLCDSV.setStyleSheet(f"font-weight: bold; color: {self.qmc.palette['title']};")
-        self.slider1.setStyleSheet(artisan_slider_style.format(color=self.qmc.EvalueColor[0]))
-        self.slider2.setStyleSheet(artisan_slider_style.format(color=self.qmc.EvalueColor[1]))
-        self.slider3.setStyleSheet(artisan_slider_style.format(color=self.qmc.EvalueColor[2]))
-        self.slider4.setStyleSheet(artisan_slider_style.format(color=self.qmc.EvalueColor[3]))
-        self.sliderSV.setStyleSheet(artisan_slider_style.format(color=self.qmc.palette['title']))
+        self.sliderLCD1.setStyleSheet(self.sliderLCDstyle(0))
+        self.sliderLCD2.setStyleSheet(self.sliderLCDstyle(1))
+        self.sliderLCD3.setStyleSheet(self.sliderLCDstyle(2))
+        self.sliderLCD4.setStyleSheet(self.sliderLCDstyle(3))
+        self.sliderLCDSV.setStyleSheet(self.sliderLCDstyle(4))
+        self.slider1.setStyleSheet(self.slideStyle(0))
+        self.slider2.setStyleSheet(self.slideStyle(1))
+        self.slider3.setStyleSheet(self.slideStyle(2))
+        self.slider4.setStyleSheet(self.slideStyle(3))
+        self.sliderSV.setStyleSheet(self.slideStyle(4))
 
     def updatePhasesLCDsColors(self) -> None:
         label_style = 'QLabel { color : ' + self.qmc.palette['messages']  + '; }'
@@ -7886,6 +7900,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.setSliderNumber(self.sliderLCD3,v)
         elif n == 3:
             self.setSliderNumber(self.sliderLCD4,v)
+        elif n == 4:
+            self.setSliderNumber(self.sliderLCDSV,v)
 
     @pyqtSlot(int)
     def updateSVSliderLCD(self, v:int) -> None:
@@ -8084,6 +8100,35 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.slider4.setValue(self.sliderLCD4.intValue())
             self.slider4released()
             self.eventslidermoved[3] = 0
+
+    # sets sliderLCD to slider.value
+    def resetSliderLCD(self, n:int) -> None:
+        if 0 <= n <= 4:
+            v = [self.slider1,self.slider2,self.slider3,self.slider4,self.sliderSV][n].value()
+            self.updateSliderLCD(n, v)
+
+    pyqtSlot()
+    def sliderfocusIn(self) -> None:
+        sender = self.sender()
+        if not self.qmc.designerflag and self.comparator is None and sender is not None and isinstance(sender,QSlider):
+            try:
+                n:int = [self.slider1,self.slider2,self.slider3,self.slider4,self.sliderSV].index(sender)
+                self.quickEventShortCut = (n,'')
+            except Exception: # pylint: disable=broad-except
+                pass
+
+    pyqtSlot()
+    def sliderfocusOut(self) -> None:
+        if self.quickEventShortCut is not None:
+            eventNr = self.quickEventShortCut[0]
+            try:
+                # reset silder style
+                [self.sliderLCD1,self.sliderLCD2,self.sliderLCD3,self.sliderLCD4,self.sliderLCDSV][eventNr].setStyleSheet(self.sliderLCDstyle(eventNr))
+            except Exception:  # pylint: disable=broad-except
+                pass
+            self.resetSliderLCD(eventNr)
+            self.clearMessageLine()
+            self.quickEventShortCut = None
 
     @pyqtSlot(int)
     def slider1actionTriggered(self, n:int) -> None:
@@ -11595,6 +11640,60 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.sendmessage(QApplication.translate('ComboBox','Playback OFF'))
         self.updatePlaybackIndicatorSignal.emit()
 
+    def slideStyle(self, n:int) -> str:
+        if n == 4:
+            return artisan_slider_style.format(color=self.qmc.palette['title'])
+        if 0 <= n < 4:
+            return artisan_slider_style.format(color=self.qmc.EvalueColor[n])
+        return ''
+
+    def sliderLCDstyle(self, n:int) -> str:
+        if n == 4:
+            return f"font-weight: bold; color: {self.qmc.palette['title']};"
+        if 0 <= n < 4:
+            return f'font-weight: bold; color: {self.qmc.EvalueColor[n]};'
+        return ''
+
+    @staticmethod
+    def sliderLCDeditStyle() -> str:
+        return 'font-weight: bold; color: grey;'
+
+    def outputQuickEventShortCutState(self) -> None:
+        if self.quickEventShortCut is not None:
+            eventNr = self.quickEventShortCut[0]
+            eventValueStr = self.quickEventShortCut[1]
+            if eventNr == -1:
+                self.sendmessage(f"{QApplication.translate('Label','Event button')} {eventValueStr}")
+            elif eventNr == 4:
+                self.sendmessage(f'SV {eventValueStr}', append=False)
+                try:
+                    if QApplication.focusWidget() == self.sliderSV:
+                        if eventValueStr:
+                            # set silder editing style
+                            self.sliderLCDSV.setStyleSheet(self.sliderLCDeditStyle())
+                            self.updateSliderLCD(eventNr,int(eventValueStr))
+                        else:
+                            # reset slider style and value
+                            self.sliderLCDSV.setStyleSheet(self.sliderLCDstyle(eventNr))
+                            self.resetSliderLCD(eventNr)
+                except Exception:  # pylint: disable=broad-except
+                    pass
+            elif 0 <= eventNr < 4:
+                self.sendmessage(f'{self.qmc.etypes[eventNr]} {eventValueStr}', append=False)
+                try:
+                    slider_widget = [self.slider1,self.slider2,self.slider3,self.slider4][eventNr]
+                    if QApplication.focusWidget() == slider_widget:
+                        if eventValueStr:
+                            # set silder editing style
+                            [self.sliderLCD1,self.sliderLCD2,self.sliderLCD3,self.sliderLCD4][eventNr].setStyleSheet(self.sliderLCDeditStyle())
+                            self.updateSliderLCD(eventNr,int(eventValueStr))
+                        else:
+                            # reset slider style and value
+                            [self.sliderLCD1,self.sliderLCD2,self.sliderLCD3,self.sliderLCD4][eventNr].setStyleSheet(self.sliderLCDstyle(eventNr))
+                            self.resetSliderLCD(eventNr)
+                except Exception:  # pylint: disable=broad-except
+                    pass
+
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work
     @pyqtSlot('QKeyEvent')
     def keyPressEvent(self, event: 'Optional[QKeyEvent]') -> None:
@@ -11733,16 +11832,92 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     elif self.qmc.flagon:
                         self.qmc.toggleRecorderSignal.emit()
                 elif k == 16777220:                 #ENTER (turns ON/OFF keyboard moves; COMMAND+ENTER starts record, SHIFT+ENTER turns Artisan OFF)
-                    if shift_modifier and self.qmc.flagon:
+                    if self.quickEventShortCut and len(self.quickEventShortCut[1])>0:
+                        # event entry active
+                        eventNr = self.quickEventShortCut[0]
+                        eventValueStr = self.quickEventShortCut[1]
+                        if eventNr == -1: # Custom Event Button
+                            buttonnumber = int(eventValueStr)-1
+                            self.clearMessageLine()
+                            if buttonnumber < len(self.extraeventstypes):
+                                self.recordextraevent(buttonnumber,parallel=False,updateButtons=False)
+                            else:
+                                try:
+                                    self.sendmessage(QApplication.translate('Message',f'Button {int(eventValueStr)} not defined'))
+                                except Exception: # pylint: disable=broad-except
+                                    pass
+                            self.quickEventShortCut = None
+                        elif eventNr == 4: # SV slider
+                            value = int(eventValueStr)
+                            self.clearMessageLine()
+                            self.SVslidermoved = 1
+                            self.updateSVSliderLCD(value)
+                            self.sliderLCDSV.setStyleSheet(self.sliderLCDstyle(eventNr))
+                            if QApplication.focusWidget() == self.sliderSV:
+                                self.quickEventShortCut = (4,'') # restart with the focused slider event type
+                            else:
+                                self.quickEventShortCut = None
+                        elif 0 <= eventNr < 4:
+                            # all decimals, create the new event
+                            value = max(self.eventslidermin[eventNr],min(self.eventslidermax[eventNr],int(eventValueStr)))
+                            self.clearMessageLine()
+                            try:
+                                # reset silder style
+                                [self.sliderLCD1,self.sliderLCD2,self.sliderLCD3,self.sliderLCD4][eventNr].setStyleSheet(self.sliderLCDstyle(eventNr))
+                            except Exception:  # pylint: disable=broad-except
+                                pass
+                            self.moveslider(eventNr,value)
+                            self.recordsliderevent(eventNr)
+                            focus_widget = QApplication.focusWidget()
+                            if focus_widget is not None and isinstance(focus_widget,QSlider):
+                                try:
+                                    n:int = [self.slider1,self.slider2,self.slider3,self.slider4].index(focus_widget)
+                                    self.quickEventShortCut = (n,'') # restart with the focused slider event type
+                                except Exception:   # pylint: disable=broad-except
+                                    self.quickEventShortCut = None
+                    elif shift_modifier and self.qmc.flagon:
                         self.qmc.OffMonitor()
                     elif control_modifier and not self.qmc.flagstart:
                         self.qmc.OnRecorder()
                     else:
                         self.releaseminieditor()
                         self.moveKbutton('enter')
+                elif k == 16777219:                #BACKSPACE (deletes last picked event)
+                    if self.quickEventShortCut and len(self.quickEventShortCut[1])>0:
+                        eventNr = self.quickEventShortCut[0]
+                        self.quickEventShortCut = (eventNr, self.quickEventShortCut[1][:-1])
+                        self.outputQuickEventShortCutState()
+                    if self.qmc.foreground_event_ind is not None:
+                        self.qmc.deleteEvent(self.qmc.foreground_event_ind)
+                        #Reset MiniEventEditor
+                        self.eNumberSpinBox.setValue(0)
+                        self.lineEvent.setText('')
+                        self.valueEdit.setText('')
+                        self.etypeComboBox.setCurrentIndex(0)
+                        self.etimeline.setText('')
+                        self.qmc.resetlines()
+                        self.qmc.fileDirtySignal.emit()
+                        self.qmc.redraw_keep_view(recomputeAllDeltas=False)
                 elif k == 16777216:                 #ESCAPE (exists full screen mode / clears message line / resets event short cut / exits designer/wheel graph / releases minieditor)
-                    self.quickEventShortCut = None
+                    if self.quickEventShortCut is not None:
+                        eventNr = self.quickEventShortCut[0]
+                        # if corresponding slider has focus we reset LCD color and value
+                        try:
+                            if 0 <= eventNr <= 4 and QApplication.focusWidget() == [self.slider1,self.slider2,self.slider3,self.slider4,self.sliderSV][eventNr]:
+                                # reset silder style
+                                [self.sliderLCD1,self.sliderLCD2,self.sliderLCD3,self.sliderLCD4,self.sliderLCDSV][eventNr].setStyleSheet(self.sliderLCDstyle(eventNr))
+                                # reset slider value
+                                self.resetSliderLCD(eventNr)
+                        except Exception:  # pylint: disable=broad-except
+                            pass
+                        self.quickEventShortCut = (eventNr, '')
                     self.clearMessageLine()
+
+                    # release focus
+                    focus_widget = QApplication.focusWidget()
+                    if focus_widget is not None:
+                        focus_widget.clearFocus()
+
                     macfullscreen = False
                     try:
                         if platform.system() == 'Darwin' and self.app.allWindows()[0].visibility() == QWindow.Visibility.FullScreen:
@@ -11846,28 +12021,28 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 elif k == 81:                          #Q (quick entry of custom event 1)
                     if not self.qmc.designerflag and self.comparator is None:
                         self.quickEventShortCut = (0,'')
-                        self.sendmessage(self.qmc.etypes[0])
+                        self.sendmessage(self.qmc.etypes[0], append=False)
                 elif k == 87:                          #W (quick entry of custom event 2)
                     if not self.qmc.designerflag and self.comparator is None:
                         self.quickEventShortCut = (1,'')
-                        self.sendmessage(self.qmc.etypes[1])
+                        self.sendmessage(self.qmc.etypes[1], append=False)
                 elif k == 69:                          #E (quick entry of custom event 3)
                     if not self.qmc.designerflag and self.comparator is None:
                         self.quickEventShortCut = (2,'')
-                        self.sendmessage(self.qmc.etypes[2])
+                        self.sendmessage(self.qmc.etypes[2], append=False)
                 elif k == 82:                          #R (quick entry of custom event 4)
                     if not self.qmc.designerflag and self.comparator is None:
                         self.quickEventShortCut = (3,'')
-                        self.sendmessage(self.qmc.etypes[3])
+                        self.sendmessage(self.qmc.etypes[3], append=False)
                 elif k == 86:                          #V (set SV)
                     if not self.qmc.designerflag and self.comparator is None:
                         self.quickEventShortCut = (4,'')
-                        self.sendmessage('SV')
-                elif k == 66:                          #B (hides/shows extra rows of event buttons / actives custom event button <nr>)
+                        self.sendmessage('SV', append=False)
+                elif k == 66:                          #B (hides/shows extra rows of event buttons / actives custom event button <nr> with ALT/CTRL+SHIFT modifier)
                     if (alt_modifier and platform.system() != 'Windows') or (control_shift_modifier and platform.system() == 'Windows'):
                         # activate custom event button
                         self.quickEventShortCut = (-1,'')
-                        self.sendmessage(f"{QApplication.translate('Label','Event button')}")
+                        self.sendmessage(f"{QApplication.translate('Label','Event button')}", append=False)
                     elif not self.app.artisanviewerMode and not self.qmc.designerflag and not self.qmc.wheelflag:
                         self.toggleextraeventrows()
                 elif k == 77:                          #M (hides/shows standard buttons row)
@@ -11881,49 +12056,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             # quick custom event entry
                             eventNr = self.quickEventShortCut[0]
                             eventValueStr = self.quickEventShortCut[1] + str(button.index(k))
-                            if eventNr == -1:
-                                self.sendmessage(f"{QApplication.translate('Label','Event button')} {eventValueStr}")
-                            elif eventNr == 4:
-                                self.sendmessage(f'SV {eventValueStr}')
-                            else:
-                                self.sendmessage(f'{self.qmc.etypes[eventNr]} {eventValueStr}')
-                            if eventNr == -1: # Custom Event Button
-                                if len(eventValueStr) == 2:
-                                    buttonnumber = int(eventValueStr)-1
-                                    if buttonnumber < len(self.extraeventstypes):
-                                        self.recordextraevent(buttonnumber,parallel=False,updateButtons=False)
-                                    else:
-                                        try:
-                                            self.sendmessage(QApplication.translate('Message',f'Button {int(eventValueStr)} not defined'))
-                                        except Exception: # pylint: disable=broad-except
-                                            pass
-                                else:
-                                    # keep on looking for digits
-                                    self.quickEventShortCut = (eventNr,eventValueStr)
-                            elif eventNr == 4: # SV
-                                if len(eventValueStr) == 3:
-                                    # three digits entered, set the SV
-                                    self.quickEventShortCut = None
-                                    value = int(eventValueStr)
-                                    self.clearMessageLine()
-                                    self.SVslidermoved = 1
-                                    self.updateSVSliderLCD(value)
-                                else:
-                                    # keep on looking for digits
-                                    self.quickEventShortCut = (eventNr,eventValueStr)
-                            elif (len(eventValueStr) == 2 and self.eventslidermax[eventNr]<=100) or (len(eventValueStr) == 3 and self.eventslidermax[eventNr]>100):
-                                # both digits entered, create the event
-                                self.quickEventShortCut = None
-                                value = max(self.eventslidermin[eventNr],min(self.eventslidermax[eventNr],int(eventValueStr)))
-                                self.moveslider(eventNr,value)
-                                self.recordsliderevent(eventNr)
-                            else:
-                                # keep on looking for digits
-                                self.quickEventShortCut = (eventNr,eventValueStr)
-# now shift modifier is required to switch palettes via number keys
-#                       else:
-#                            if self.buttonpalette_shortcuts:
-#                               self.setbuttonsfrom(button.index(k))
+                            if ((eventNr == -1 and len(eventValueStr) > 2) or # Custom Event Button
+                                (eventNr == 4 and len(eventValueStr) > 3) or # SV
+                                (0 < eventNr < 4 and (len(eventValueStr) > 2 and self.eventslidermax[eventNr]<100) or (len(eventValueStr) > 3 and self.eventslidermax[eventNr]>=100))):
+                                # do not accept this additional digit
+                                return
+                            # establish this digit
+                            self.quickEventShortCut = (eventNr,eventValueStr)
+                            self.outputQuickEventShortCutState()
                 # note Qt/PyQt maps the ';' and ',' keys reversed from the ASCII mapping
                 elif k_txt == ';' and not self.qmc.flagon: #k == 58    # ";" (application screenshots only if not sampling)
                     self.applicationscreenshot()
@@ -12526,7 +12666,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
             self.orderEvents(force_update=False)
 
-            self.qmc.redraw(recomputeAllDeltas=False)
+            self.qmc.redraw_keep_view(recomputeAllDeltas=False)
 
             # redraw minieditor event selection line
             currentevent = self.eNumberSpinBox.value()

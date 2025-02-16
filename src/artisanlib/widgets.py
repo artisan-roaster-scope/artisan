@@ -181,8 +181,12 @@ class MyTableWidgetItemQComboBox(QTableWidgetItem): # pylint: disable= too-few-p
     def __lt__(self, other:'MyTableWidgetItemQComboBox') -> bool: # type: ignore[override]
         return str(self.sortKey.currentText()) < str(other.sortKey.currentText())
 
+
 # Slider which does not move if slider widget is clicked, only if slider bar is clicked
 class SliderUnclickable(QSlider): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+    focus_in = pyqtSignal()
+    focus_out = pyqtSignal()
+
     def mousePressEvent(self, event:'Optional[QMouseEvent]') -> None:
         opt = QStyleOptionSlider()
         self.initStyleOption(opt)
@@ -192,6 +196,16 @@ class SliderUnclickable(QSlider): # pyright: ignore [reportGeneralTypeIssues] # 
             #if pressedControl in {QStyle.SubControl.SC_SliderGroove, QStyle.SubControl.SC_SliderHandle, QStyle.SubControl.SC_ScrollBarSubLine}:
             if pressedControl is not QStyle.SubControl.SC_None:
                 super().mousePressEvent(event)
+
+    def focusInEvent(self, event:'Optional[QFocusEvent]') -> None:
+        super().focusInEvent(event)
+        if event is not None:
+            self.focus_in.emit()
+
+    def focusOutEvent(self, event:'Optional[QFocusEvent]') -> None:
+        super().focusOutEvent(event)
+        if event is not None:
+            self.focus_out.emit()
 
 
 # QLabel that automatically resizes its text font

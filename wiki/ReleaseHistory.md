@@ -8,7 +8,7 @@ v3.1.1
 
 * ADDITIONS
   - adds drag-and-drop to Stats Summary table configuration
-  - allows to hide scheduled items via a right-click or drag-out
+  - adds hiding of scheduled items via a right-click or drag-out
   - adds support for feeding data from energy meters into Artisans roast energy calculator
   - adds new flag "Set batch size" to background dialog. If ticked the batch size is taken from the background profile on load while scheduler is off
   - adds sorting to the background events table
@@ -20,7 +20,11 @@ v3.1.1
       - `ramp(n,<bool>)` to toggle event playback ramping per event type
       - `alarm(m,<bool>)` enable/disable alarm number `m`
       - `setBatchSize(<float>)` to set the batch size. if the given number is negative the batch size is taken from the background profile, if available
-  - events displayed in Step and Combo mode can be updated by moving them to a new position. Pressing SHIFT restricts the movement in either the x or the y direction.
+  - adds event slider input dialog via a double-click on a sliders LCD
+  - adds slider focus on slider LCD click
+  - adds quick keyboard focused event slider input using numeric keys followed by the ENTER/RETURN key. The last digit can be removed by using the backspace key. ESC cancels the action.
+  - events displayed in step and combo mode can be updated by moving them to a new position. Pressing SHIFT restricts the movement in either the x or the y direction.
+  - a picked custom event can be removed using the backspace key
 
 * NEW HARDWARE SUPPORT
   - adds support for [Carmomaq's Stratto Lab sample roaster](https://carmomaq.com.br/en/produtos/stratto-roaster-lab/)
@@ -40,8 +44,7 @@ v3.1.1
   - events were replayed only if the corresponding event slider was visible in previous versions. Now events selected for replay are always replayed, independent of the visibility of the corresponding event slider.
   - the parameters "max. number of custom buttons per row", "button size", "alternative slider layout", "mark last pressed" and "show tooltips" are now persisted per palette
   - a click in a sliders pane does no longer move the slider, but just gives that slier the input focus (a click in a sliders bar still moves the slider to this position)
-  - a click on a sliders LCD give the slider the input focus
-  - a double-click on a sliders LCD opens a widget to set a new slider value by number
+  - the quick custom event entry using the q, w, e and e key followed by number keys now requires the ENTER/RETURN key to establish the new value.  The last entered digit can be removed by using the backspace key. ESC cancels the action.
 
 * FIXES
   - ensure complete reset to defaults in energy tab loads tab
