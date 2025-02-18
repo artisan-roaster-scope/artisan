@@ -3474,9 +3474,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.eNumberSpinBox: QSpinBox = QSpinBox()
         self.eNumberSpinBox.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.eNumberSpinBox.setToolTip(QApplication.translate('Tooltip', 'Number of events found'))
-        self.eNumberSpinBox.setRange(0,99)
+        self.eNumberSpinBox.setRange(0,999)
         self.eNumberSpinBox.valueChanged.connect(self.changeEventNumber)
-        self.eNumberSpinBox.setMaximumWidth(40)
+        self.eNumberSpinBox.setMaximumWidth(60)
 
         self.minieventleft: QPushButton = QPushButton('<')
         self.minieventleft.clicked.connect(self.decrEventNumber)
@@ -11887,15 +11887,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         eventNr = self.quickEventShortCut[0]
                         self.quickEventShortCut = (eventNr, self.quickEventShortCut[1][:-1])
                         self.outputQuickEventShortCutState()
-                    if self.qmc.foreground_event_ind is not None:
-                        self.qmc.deleteEvent(self.qmc.foreground_event_ind)
-                        #Reset MiniEventEditor
-                        self.eNumberSpinBox.setValue(0)
-                        self.lineEvent.setText('')
-                        self.valueEdit.setText('')
-                        self.etypeComboBox.setCurrentIndex(0)
-                        self.etimeline.setText('')
-                        self.qmc.resetlines()
+                    if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
+                        self.qmc.deleteEvent(self.qmc.foreground_event_last_picked_ind)
+                        self.qmc.clear_last_picked_event_selection()
                         self.qmc.fileDirtySignal.emit()
                         self.qmc.redraw_keep_view(recomputeAllDeltas=False)
                 elif k == 16777216:                 #ESCAPE (exists full screen mode / clears message line / resets event short cut / exits designer/wheel graph / releases minieditor)
@@ -11948,17 +11942,29 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         self.moveKbutton('left')
                     elif self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
                         self.qmc.moveBackgroundSignal.emit('left',self.qmc.backgroundmovespeed)
+                    elif self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
+                        # a foreground event is selected; move it up
+                        self.qmc.move_custom_event(self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, xstep=-1)
                 elif k == 16777236:               #RIGHT (moves background right / moves button selection right)
                     if self.keyboardmoveflag and self.qmc.flagstart:
                         self.moveKbutton('right')
                     elif self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
                         self.qmc.moveBackgroundSignal.emit('right',self.qmc.backgroundmovespeed)
+                    elif self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
+                        # a foreground event is selected; move it up
+                        self.qmc.move_custom_event(self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, xstep=1)
                 elif k == 16777235:               #UP (moves background up)
                     if self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
                         self.qmc.moveBackgroundSignal.emit('up',self.qmc.backgroundmovespeed)
+                    elif self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
+                        # a foreground event is selected; move it up
+                        self.qmc.move_custom_event(self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, ystep=1)
                 elif k == 16777237:               #DOWN (moves background down)
                     if self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
                         self.qmc.moveBackgroundSignal.emit('down',self.qmc.backgroundmovespeed)
+                    elif self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
+                        # a foreground event is selected; move it up
+                        self.qmc.move_custom_event(self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, ystep=-1)
                 elif k == 65:                     #A (automatic save)
                     if not self.app.artisanviewerMode and self.qmc.flagon and not self.qmc.designerflag and self.comparator is None:
                         self.automaticsave()
@@ -12597,6 +12603,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     #moves events in minieditor
     @pyqtSlot(int)
     def changeEventNumber(self, _:int = 0) -> None:
+        _log.debug('PRINT changeEventNumber')
         if self.qmc.designerflag:
             return
         #check
@@ -12606,6 +12613,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         try:
             self.eventlabel.setText(f"{QApplication.translate('Form Caption', 'Event')} #<b>{currentevent} </b>")
 
+            _log.debug('PRINT currentevent: %s',currentevent)
+
             if currentevent == 0:
                 self.lineEvent.setText('')
                 self.valueEdit.setText('')
@@ -12614,9 +12623,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.resetlines()
                 if not self.qmc.flagstart:
                     self.qmc.fig.canvas.draw()
+                _log.debug('PRINT return1')
                 return
             if currentevent > lenevents:
                 self.eNumberSpinBox.setValue(int(lenevents))
+                _log.debug('PRINT return2')
                 return
             self.lineEvent.setText(self.qmc.specialeventsStrings[currentevent-1])
             if self.qmc.timeindex[0] > -1 and len(self.qmc.timex) > self.qmc.timeindex[0]:
@@ -12642,7 +12653,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.eNumberSpinBox.setFocus()
 
 
-    #updates events from mini edtitor
+    #updates events from mini editor
     @pyqtSlot(bool)
     def miniEventRecord(self, _:bool) -> None:
         lenevents = self.eNumberSpinBox.value()
@@ -12657,9 +12668,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.lineEvent.text(),
                 self.qmc.str2eventsvalue(self.valueEdit.text()))
 
-            # remember etimeindex before reorder
-            etimeindex = self.qmc.specialevents[lenevents-1]
-
             self.lineEvent.clearFocus()
             self.eNumberSpinBox.clearFocus()
             self.etimeline.clearFocus()
@@ -12672,15 +12680,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             currentevent = self.eNumberSpinBox.value()
             if currentevent:
                 self.plotEventSelection(currentevent-1)
-                if not self.qmc.flagstart:
-                    self.qmc.fig.canvas.draw()
-
-            if self.qmc.ax is not None:
-                #plot highest ET or BT (sometimes only BT is plot (et is zero))
-                if self.qmc.temp1[etimeindex] > self.qmc.temp2[etimeindex]:
-                    self.qmc.ax.plot(self.qmc.timex[etimeindex], self.qmc.temp1[etimeindex], 'o', color = self.qmc.palette['et'])
-                else:
-                    self.qmc.ax.plot(self.qmc.timex[etimeindex], self.qmc.temp2[etimeindex], 'o', color = self.qmc.palette['bt'])
 
             if not self.qmc.flagstart:
                 self.qmc.fig.canvas.draw()

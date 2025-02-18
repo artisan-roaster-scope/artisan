@@ -178,6 +178,7 @@ svMode=0
 svSliderMax=550
 svSliderMin=0
 svValue=180
+pidOnCHARGE=true
 
 [ExtraEventButtons]
 buttonlistmaxlen=17

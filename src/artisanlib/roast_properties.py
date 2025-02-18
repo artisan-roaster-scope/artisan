@@ -2566,6 +2566,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.roastpropertiesAutoOpenFlag = self.org_roastpropertiesAutoOpenFlag
         self.aw.qmc.roastpropertiesAutoOpenDropFlag = self.org_roastpropertiesAutoOpenDropFlag
 
+        self.aw.qmc.clear_last_picked_event_selection()
+
         self.aw.qmc.redraw(recomputeAllDeltas=False)
 
         self.clean_up()
