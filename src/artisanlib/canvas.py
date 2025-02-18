@@ -3027,7 +3027,7 @@ class tgraphcanvas(FigureCanvas):
                 if event.artist in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots]:
                     tx = event.artist.get_xdata()[ind]
                     timex = self.backgroundtime2index(tx)
-                    if abs(tx - event.mouseevent.xdata)<3: # allow a slightly different mouse possition, but close enough to the point on the line
+                    if abs(tx - event.mouseevent.xdata)<3: # allow a slightly different mouse position, but close enough to the point on the line
                         if event.artist == self.l_backgroundeventtype1dots:
                             event_type = 0
                         elif event.artist == self.l_backgroundeventtype2dots:
@@ -3066,7 +3066,7 @@ class tgraphcanvas(FigureCanvas):
                 elif event.artist in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
                     tx = event.artist.get_xdata()[ind]
                     timex = self.time2index(tx)
-                    if abs(tx - event.mouseevent.xdata)<3: # allow a slightly different mouse possition, but close enough to the point on the line
+                    if abs(tx - event.mouseevent.xdata)<3: # allow a slightly different mouse position, but close enough to the point on the line
                         if event.artist == self.l_eventtype1dots:
                             event_type = 0
                         elif event.artist == self.l_eventtype2dots:
