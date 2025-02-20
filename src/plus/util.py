@@ -399,30 +399,33 @@ def updateLimitsFromResponse(response: Dict[str,Any]) -> None:
 
 
 def plusLink() -> str:
-    return f'{config.web_base_url}/{getLanguage()}/'
-
+#    return f'{config.web_base_url}/{getLanguage()}/'
+    return f'{config.web_base_url}/'
 
 def storeLink(plus_store:str) -> str:
-    return f'{config.web_base_url}/{getLanguage()}/stores;id={plus_store}'
-
+#    return f'{config.web_base_url}/{getLanguage()}/stores;id={plus_store}'
+    return f'{config.web_base_url}/stores;id={plus_store}'
 
 def coffeeLink(plus_coffee:str) -> str:
-    return f'{config.web_base_url}/{getLanguage()}/coffees;id={plus_coffee}'
-
+#    return f'{config.web_base_url}/{getLanguage()}/coffees;id={plus_coffee}'
+    return f'{config.web_base_url}/coffees;id={plus_coffee}'
 
 def blendLink(plus_blend:str) -> str:
-    return f'{config.web_base_url}/{getLanguage()}/blends;id={plus_blend}'
-
+#    return f'{config.web_base_url}/{getLanguage()}/blends;id={plus_blend}'
+    return f'{config.web_base_url}/blends;id={plus_blend}'
 
 def roastLink(plus_roast:str) -> str:
-    return f'{config.web_base_url}/{getLanguage()}/roasts;id={plus_roast}'
-
+#    return f'{config.web_base_url}/{getLanguage()}/roasts;id={plus_roast}'
+    return f'{config.web_base_url}/roasts;id={plus_roast}'
 
 def remindersLink() -> str:
-    return f'{config.web_base_url}/{getLanguage()}/reminders'
+#    return f'{config.web_base_url}/{getLanguage()}/reminders'
+    return f'{config.web_base_url}/reminders'
 
 def schedulerLink() -> str:
-    return f'{config.web_base_url}/{getLanguage()}/schedule'
+#    return f'{config.web_base_url}/{getLanguage()}/schedule'
+    return f'{config.web_base_url}/schedule'
+
 
 # HiRes plus QMessageBox icon
 

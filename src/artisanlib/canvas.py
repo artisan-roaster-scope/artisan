@@ -282,6 +282,7 @@ class tgraphcanvas(FigureCanvas):
         'l_ETprojection', 'l_AUCguide', 'l_horizontalcrossline', 'l_verticalcrossline', 'l_timeline', 'legend', 'l_eventtype1dots', 'l_eventtype2dots',
         'l_eventtype3dots', 'l_eventtype4dots', 'l_eteventannos', 'l_bteventannos', 'l_eventtype1annos', 'l_eventtype2annos', 'l_eventtype3annos',
         'l_eventtype4annos', 'l_annotations', 'l_background_annotations', 'l_annotations_dict', 'l_annotations_pos_dict', 'l_event_flags_dict',
+        'l_eventtype1backannos', 'l_eventtype2backannos', 'l_eventtype3backannos', 'l_eventtype4backannos',
         'l_event_flags_pos_dict', 'ai', 'timeclock', 'threadserver', 'designerflag', 'designerconnections', 'mousepress', 'indexpoint',
         'workingline', 'eventtimecopy', 'etypescopy', 'specialeventsStringscopy', 'specialeventsvaluecopy', 'specialeventstypecopy', 'currentx', 'currenty',
         'designertimeinit', 'BTsplinedegree', 'ETsplinedegree', 'reproducedesigner', 'designertemp1init', 'designertemp2init', 'ax_background_designer', 'designer_timez', 'time_step_size',
@@ -316,7 +317,8 @@ class tgraphcanvas(FigureCanvas):
         'background_title_width', 'xlabel_text', 'xlabel_artist', 'xlabel_width', 'lazyredraw_on_resize_timer', 'mathdictionary_base',
         'ambient_pressure_sampled', 'ambient_humidity_sampled', 'ambientTemp_sampled', 'backgroundmovespeed', 'chargeTimerPeriod', 'flavors_default_value',
         'fmt_data_ON', 'l_subtitle', 'projectDeltaFlag', 'btbreak_params','bbpCache', 'glow',
-        'custom_event_dlg_default_type', 'custom_event_dlg_default_type', 'foreground_event_ind', 'foreground_event_last_picked_ind', 'foreground_event_last_picked_pos',
+        'custom_event_dlg_default_type', 'custom_event_dlg_default_type', 'foreground_event_ind', 'foreground_event_last_picked_ind',
+        'foreground_event_last_picked_pos', 'background_event_ind', 'background_event_pos', 'background_event_pick_position',
         'foreground_event_pos', 'plus_lockSchedule_sent_account', 'plus_lockSchedule_sent_date', 'specialeventplaybackramp',
         'CO2kg_per_BTU_default', 'CO2kg_per_BTU', 'Biogas_CO2_Reduction', 'Biogas_CO2_Reduction_default',
         'meterunitnames', 'meterreads_default', 'meterreads', 'meterlabels_setup', 'meterlabels', 'meterunits_setup', 'meterunits',
@@ -1152,9 +1154,14 @@ class tgraphcanvas(FigureCanvas):
         self.custom_event_dlg_default_type:int = 4 # the default type remembered by the customEventDlg on adding events via a right click on the graph
         self.foreground_event_ind:Optional[int] = None # index of the currently moved event marker in self.specialevents
         self.foreground_event_pos:Optional[int] = None # position of the currently moved event marker in its 2DLine.xdata() value array
+        self.foreground_event_pick_position:Optional[Tuple[float,float]] = None # pick position, as (x-time,y-value) tuple, of the currently moved event
         self.foreground_event_last_picked_ind:Optional[int] = None # index of the last picked event marker in self.specialevents to be deleted via backspace or moved by cursor keys
         self.foreground_event_last_picked_pos:Optional[int] = None # position of the last picked event marker in its 2DLine.xdata() value array to be deleted via backspace or moved by cursor keys
-        self.foreground_event_pick_position:Optional[Tuple[float,float]] = None # pick position, as (x-time,y-value) tuple, of the currently moved event
+        #
+        self.background_event_ind:Optional[int] = None
+        self.background_event_pos:Optional[int] = None
+        self.background_event_pick_position:Optional[Tuple[float,float]] = None
+
         self.onmove_cid = self.fig.canvas.mpl_connect('motion_notify_event', cast('Callable[[Event],None]', self.onmove))
 
         self.fig.canvas.mpl_connect('button_release_event', self.onrelease_after_pick)
@@ -1962,12 +1969,18 @@ class tgraphcanvas(FigureCanvas):
         self.l_eventtype3dots:Optional[Line2D] = None
         self.l_eventtype4dots:Optional[Line2D] = None
 
-        self.l_eteventannos:List[Annotation] = []
-        self.l_bteventannos:List[Annotation] = []
         self.l_eventtype1annos:List[Annotation] = []
         self.l_eventtype2annos:List[Annotation] = []
         self.l_eventtype3annos:List[Annotation] = []
         self.l_eventtype4annos:List[Annotation] = []
+
+        self.l_eteventannos:List[Annotation] = []
+        self.l_bteventannos:List[Annotation] = []
+
+        self.l_eventtype1backannos:List[Annotation] = []
+        self.l_eventtype2backannos:List[Annotation] = []
+        self.l_eventtype3backannos:List[Annotation] = []
+        self.l_eventtype4backannos:List[Annotation] = []
 
         self.l_annotations:List[Annotation] = []
         self.l_background_annotations:List[Annotation] = []
@@ -2925,12 +2938,16 @@ class tgraphcanvas(FigureCanvas):
 
     def onpick(self, event:'PickEvent') -> None:
         try:
-            # reset forground_event_ind
+            # reset picked foreground event
             self.foreground_event_ind = None
-            self.foreground_event_last_picked_ind = None
-            self.foreground_event_last_picked_pos = None
             self.foreground_event_pos = None
             self.foreground_event_pick_position = None
+            self.foreground_event_last_picked_ind = None # for delete and cursor move action
+            self.foreground_event_last_picked_pos = None # for delete and cursor move action
+            # reset picked background event
+            self.background_event_ind = None
+            self.background_event_pos = None
+            self.background_event_pick_position = None
             # display MET information by clicking on the MET marker
             if (isinstance(event.artist, Annotation) and self.showmet and event.artist in [self.met_annotate] and
                     self.met_timex_temp1_delta is not None and self.met_timex_temp1_delta[2] is not None):
@@ -3027,7 +3044,7 @@ class tgraphcanvas(FigureCanvas):
                 if event.artist in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots]:
                     tx = event.artist.get_xdata()[ind]
                     timex = self.backgroundtime2index(tx)
-                    if abs(tx - event.mouseevent.xdata)<3: # allow a slightly different mouse position, but close enough to the point on the line
+                    if event.artist is not None and abs(tx - event.mouseevent.xdata)<3: # allow a slightly different mouse position, but close enough to the point on the line
                         if event.artist == self.l_backgroundeventtype1dots:
                             event_type = 0
                         elif event.artist == self.l_backgroundeventtype2dots:
@@ -3062,11 +3079,16 @@ class tgraphcanvas(FigureCanvas):
                                         self.backgroundeventmessage = f'{self.backgroundeventmessage} ({self.backgroundEStrings[i].strip()[:self.eventslabelschars]})'
                                     self.backgroundeventmessage = f'{self.backgroundeventmessage} @ {(stringfromseconds(self.timeB[bge] - start))} {float2float(self.temp2B[bge],digits)}{self.mode}'
                                     self.starteventmessagetimer()
+                                    if self.eventsGraphflag in {2,4}:
+                                        # we support custom event pick-and-drag only for events rendered as step lines, step+ and as combo.
+                                        self.background_event_ind = i
+                                        self.background_event_pos = ind
+                                        self.background_event_pick_position = (event.artist.get_xdata()[ind],event.artist.get_ydata()[ind])
                                     break
                 elif event.artist in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
                     tx = event.artist.get_xdata()[ind]
                     timex = self.time2index(tx)
-                    if abs(tx - event.mouseevent.xdata)<3: # allow a slightly different mouse position, but close enough to the point on the line
+                    if event.artist is not None and abs(tx - event.mouseevent.xdata)<3: # allow a slightly different mouse position, but close enough to the point on the line
                         if event.artist == self.l_eventtype1dots:
                             event_type = 0
                         elif event.artist == self.l_eventtype2dots:
@@ -3103,10 +3125,10 @@ class tgraphcanvas(FigureCanvas):
                                     if self.eventsGraphflag in {2,4}:
                                         # we support custom event pick-and-drag only for events rendered as step lines, step+ and as combo.
                                         self.foreground_event_ind = i
-                                        self.foreground_event_last_picked_ind = i
                                         self.foreground_event_pos = ind
-                                        self.foreground_event_last_picked_pos = ind
                                         self.foreground_event_pick_position = (event.artist.get_xdata()[ind],event.artist.get_ydata()[ind])
+                                        self.foreground_event_last_picked_ind = i
+                                        self.foreground_event_last_picked_pos = ind
                                     break
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -3135,6 +3157,28 @@ class tgraphcanvas(FigureCanvas):
                 event_annos = self.l_eventtype4annos
         return ldots, event_annos
 
+    # returns background event line artist, if any, and, if events are displayed as Combo also the list event annotations
+    def event_type_to_background_artist(self, event_type:int) -> Tuple[Optional[Line2D],Optional[List[Annotation]]]:
+        ldots:Optional[Line2D] = None
+        event_annos:Optional[List[Annotation]] = None
+        if event_type == 0:
+            ldots = self.l_backgroundeventtype1dots
+            if self.eventsGraphflag == 4:
+                event_annos = self.l_eventtype1backannos
+        elif event_type == 1:
+            ldots = self.l_backgroundeventtype2dots
+            if self.eventsGraphflag == 4:
+                event_annos = self.l_eventtype2backannos
+        elif event_type == 2:
+            ldots = self.l_backgroundeventtype3dots
+            if self.eventsGraphflag == 4:
+                event_annos = self.l_eventtype3backannos
+        elif event_type == 3:
+            ldots = self.l_backgroundeventtype4dots
+            if self.eventsGraphflag == 4:
+                event_annos = self.l_eventtype4backannos
+        return ldots, event_annos
+
     # ind: the event index in self.specialevents; pos: the index in the corresponding 2DLine artist
     def move_custom_event(self, ind:int, pos:int, xstep:int = 0, ystep:int = 0) -> None:
         if len(self.specialeventstype)>ind:
@@ -3155,7 +3199,7 @@ class tgraphcanvas(FigureCanvas):
                     event_pos_factor = self.eventpositionbars[1] - self.eventpositionbars[0]
                     event_ydata = int(round(new_value * event_pos_factor + event_pos_offset))
                 ydata[pos] = event_ydata
-                if len(ydata) == pos + 2: # we also move the last dot up and down with the butlast
+                if not self.flagon and len(ydata) == pos + 2: # we also move the last dot up and down with the butlast
                     ydata[-1] = ydata[-2]
                 ldots.set_ydata(ydata)
                 # update the xdata
@@ -3188,10 +3232,12 @@ class tgraphcanvas(FigureCanvas):
 
     def onrelease_after_pick(self, _event:'Optional[Event]') -> None:
         try:
+            ldots:Optional[Line2D]
+            event_annos:Optional[List[Annotation]]
             if (self.foreground_event_ind is not None and self.foreground_event_pos is not None and self.foreground_event_pick_position is not None and
                     len(self.specialeventstype)>self.foreground_event_ind):
                 event_type = self.specialeventstype[self.foreground_event_ind]
-                ldots:Optional[Line2D] = None
+                ldots = None
                 event_annos = None
                 ldots, event_annos = self.event_type_to_artist(event_type)
                 if ldots is not None:
@@ -3236,6 +3282,50 @@ class tgraphcanvas(FigureCanvas):
                         self.fig.canvas.draw_idle()
                 elif self.legend is not None:
                     QTimer.singleShot(1,self.updateBackground)
+
+
+            elif (self.background_event_ind is not None and self.background_event_pos is not None and self.background_event_pick_position is not None and
+                    len(self.backgroundEtypes)>self.background_event_ind):
+                event_type = self.backgroundEtypes[self.background_event_ind]
+                ldots = None
+                event_annos = None
+                ldots, event_annos = self.event_type_to_background_artist(event_type)
+                if ldots is not None:
+                    # update the xdata
+                    xdata = ldots.get_xdata()
+                    time_idx = max(0,min(len(self.timeB)-1,self.backgroundtime2index(xdata[self.background_event_pos])))
+                    self.backgroundEvents[self.background_event_ind] = time_idx
+                    # update also the Artist to the final time
+                    xdata[self.background_event_pos] = self.timeB[time_idx]
+                    ldots.set_xdata(xdata)
+                    # update the ydata
+                    ydata = ldots.get_ydata()
+                    event_ydata = ydata[self.background_event_pos]
+                    event_pos_offset = self.eventpositionbars[0]
+                    event_pos_factor = self.eventpositionbars[1] - self.eventpositionbars[0]
+                    if self.clampEvents:
+                        evalue = max(0,int(round(event_ydata)))
+                    else:
+                        evalue = max(0,int(round((event_ydata - event_pos_offset) / event_pos_factor)))
+                    evalue_internal = self.eventsExternal2InternalValue(evalue)
+                    self.backgroundEvalues[self.background_event_ind] = evalue_internal
+                    # put back after rounding and converting back to position
+                    ydata[self.background_event_pos] = (evalue if self.clampEvents else (evalue*event_pos_factor)+event_pos_offset)
+                    if event_annos is not None and len(event_annos)>self.background_event_pos:
+                        event_anno = event_annos[self.background_event_pos]
+                        self.updateEventAnno(
+                            event_type,
+                            event_anno,
+                            self.timeB[time_idx],
+                            event_ydata)
+                    # redraw
+                    if self.flagon:
+                        self.redraw_keep_view(recomputeAllDeltas=False)
+                    else:
+                        self.fig.canvas.draw_idle()
+                elif self.legend is not None:
+                    QTimer.singleShot(1,self.updateBackground)
+
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         self.release_picked_event()
@@ -3244,6 +3334,9 @@ class tgraphcanvas(FigureCanvas):
         self.foreground_event_ind = None
         self.foreground_event_pos = None
         self.foreground_event_pick_position = None
+        self.background_event_ind = None
+        self.background_event_pos = None
+        self.background_event_pick_position = None
 
     def onrelease(self, event:'Event') -> None:     # NOTE: onrelease() is connected/disconnected in togglecrosslines()
         event = cast('MouseEvent', event)
@@ -3336,9 +3429,11 @@ class tgraphcanvas(FigureCanvas):
         event_anno.set_text(f'{firstletter}{secondletter}{thirdletter}')
 
     def onmove(self, event:'MouseEvent') -> None:
-        if self.foreground_event_ind is None or self.foreground_event_pos is None or self.foreground_event_pick_position is None:
+        if all(x is None for x in [self.foreground_event_ind, self.foreground_event_pos, self.foreground_event_pick_position,
+            self.background_event_ind, self.background_event_pos, self.background_event_pick_position]):
             return
-        self.clear_last_picked_event_selection() # clear the last picked event index, if any, remembered for the delete event by backspace action
+        if self.foreground_event_ind is not None:
+            self.clear_last_picked_event_selection() # clear the last picked event index, if any, remembered for the delete event by backspace action
         if event.inaxes is None:
             return
         if event.button != 1:
@@ -3347,34 +3442,78 @@ class tgraphcanvas(FigureCanvas):
             return
         if event.ydata is None:
             return
-        event_type = self.specialeventstype[self.foreground_event_ind]
-        ldots = None
-        event_annos = None
-        ldots, event_annos = self.event_type_to_artist(event_type)
-        set_x = True
-        set_y = True
-        if ldots is not None:
-            if QApplication.keyboardModifiers() == Qt.KeyboardModifier.ShiftModifier:
-                if abs(event.xdata - self.foreground_event_pick_position[0]) < abs(event.ydata - self.foreground_event_pick_position[1]):
-                    set_x = False
-                else:
-                    set_y = False
-            xdata = ldots.get_xdata()
-            xdata[self.foreground_event_pos] = (event.xdata if set_x else self.foreground_event_pick_position[0])
-            ldots.set_xdata(xdata)
-            ydata = ldots.get_ydata()
-            ydata[self.foreground_event_pos] = max(0,(event.ydata if set_y else self.foreground_event_pick_position[1]))
-            if len(ydata) == self.foreground_event_pos + 2: # we also move the last dot up and down with the butlast
-                ydata[-1] = ydata[-2]
-            ldots.set_ydata(ydata)
-            if event_annos is not None and len(event_annos)>self.foreground_event_pos:
-                event_anno = event_annos[self.foreground_event_pos]
-                self.updateEventAnno(
-                    event_type,
-                    event_anno,
-                    (event.xdata if set_x else self.foreground_event_pick_position[0]),
-                    max(0,(event.ydata if set_y else self.foreground_event_pick_position[1])))
-            self.fig.canvas.draw_idle()
+        if  (self.foreground_event_ind is not None and self.foreground_event_pos is not None and self.foreground_event_pick_position is not None and
+                    len(self.specialeventstype)>self.foreground_event_ind):
+            event_type = self.specialeventstype[self.foreground_event_ind]
+            ldots = None
+            event_annos = None
+            ldots, event_annos = self.event_type_to_artist(event_type)
+            set_x = True
+            set_y = True
+            if ldots is not None:
+                if QApplication.keyboardModifiers() == Qt.KeyboardModifier.ShiftModifier:
+                    if abs(event.xdata - self.foreground_event_pick_position[0]) < abs(event.ydata - self.foreground_event_pick_position[1]):
+                        set_x = False
+                    else:
+                        set_y = False
+                xdata = ldots.get_xdata()
+                if set_x:
+                    xdata[self.foreground_event_pos] = int(round(event.xdata))
+                    ldots.set_xdata(xdata)
+                ydata = ldots.get_ydata()
+                if set_y:
+                    ydata[self.foreground_event_pos] = max(0,event.ydata)
+                    if not self.flagon and len(ydata) == self.foreground_event_pos + 2: # we also move the last dot up and down with the butlast
+                        ydata[-1] = ydata[-2]
+                    ldots.set_ydata(ydata)
+                if event_annos is not None and len(event_annos)>self.foreground_event_pos:
+                    event_anno = event_annos[self.foreground_event_pos]
+                    self.updateEventAnno(
+                        event_type,
+                        event_anno,
+                        xdata[self.foreground_event_pos],
+                        ydata[self.foreground_event_pos])
+                self.fig.canvas.draw_idle()
+        elif (self.background_event_ind is not None and self.background_event_pos is not None and self.background_event_pick_position is not None and
+                    len(self.backgroundEtypes)>self.background_event_ind):
+            event_type = self.backgroundEtypes[self.background_event_ind]
+            ldots = None
+            event_annos = None
+            ldots, event_annos = self.event_type_to_background_artist(event_type)
+            set_x = True
+            set_y = True
+            if ldots is not None:
+                if QApplication.keyboardModifiers() == Qt.KeyboardModifier.ShiftModifier:
+                    if abs(event.xdata - self.background_event_pick_position[0]) < abs(event.ydata - self.background_event_pick_position[1]):
+                        set_x = False
+                    else:
+                        set_y = False
+                xdata = ldots.get_xdata()
+                if set_x:
+                    # allow to move events only between the previous and the next of that type on the time axis to keep the temporal order
+                    new_x = event.xdata
+                    if self.background_event_pos != 0:
+                        # there is a point left to ours
+                        new_x = max(xdata[self.background_event_pos-1]+1,new_x)
+                    if self.background_event_pos != len(xdata)-1:
+                        # there is a point right to ours
+                        new_x = min(xdata[self.background_event_pos+1]-1,new_x)
+                    xdata[self.background_event_pos] = int(round(new_x))
+                    ldots.set_xdata(xdata)
+                ydata = ldots.get_ydata()
+                if set_y:
+                    ydata[self.background_event_pos] = max(0,event.ydata)
+                    if not self.flagon and len(ydata) == self.background_event_pos + 2: # we also move the last dot up and down with the butlast
+                        ydata[-1] = ydata[-2]
+                    ldots.set_ydata(ydata)
+                if event_annos is not None and len(event_annos)>self.background_event_pos:
+                    event_anno = event_annos[self.background_event_pos]
+                    self.updateEventAnno(
+                        event_type,
+                        event_anno,
+                        xdata[self.background_event_pos],
+                        ydata[self.background_event_pos])
+                self.fig.canvas.draw_idle()
 
     def clear_last_picked_event_selection(self) -> None:
         if self.foreground_event_last_picked_ind is not None or self.foreground_event_last_picked_pos is not None:
@@ -5737,11 +5876,14 @@ class tgraphcanvas(FigureCanvas):
 
                 for k,ramp_value in enumerate(ramps):
                     if ramp_value is not None:
-                        slider_value = self.aw.eventslidervalues[k]
+#                        slider_value = self.aw.eventslidervalues[k]
                         self.aw.moveslider(k, ramp_value)
-                        if slider_value != self.aw.eventslidervalues[k]:
-                            # slider moved to new value thus we fire its action, if any
-                            self.aw.fireslideraction(k)
+# Ramping quantified to integers (only sends a slider action request if quantification leads to a different integer as previously)
+#                        if slider_value != self.aw.eventslidervalues[k]:
+#                            # slider moved to new value thus we fire its action, if any
+#                            self.aw.fireslideraction(k)
+# Ramping using full floats (more slider action requests!)
+                        self.aw.fireslideraction_internal(k, ramp_value) # higher precision ramp value send in extern slider actions
 
                 #delete existing message
                 if reproducing is None:
@@ -8761,27 +8903,13 @@ class tgraphcanvas(FigureCanvas):
                         for m in self.ax.yaxis.get_minorticklines():
                             m.set_markersize(5)
 
-
-                    try:
-                        if self.l_eventtype1dots is not None:
-                            self.l_eventtype1dots.remove()
-                    except Exception: # pylint: disable=broad-except
-                        pass
-                    try:
-                        if self.l_eventtype2dots is not None:
-                            self.l_eventtype2dots.remove()
-                    except Exception: # pylint: disable=broad-except
-                        pass
-                    try:
-                        if self.l_eventtype3dots is not None:
-                            self.l_eventtype3dots.remove()
-                    except Exception: # pylint: disable=broad-except
-                        pass
-                    try:
-                        if self.l_eventtype4dots is not None:
-                            self.l_eventtype4dots.remove()
-                    except Exception: # pylint: disable=broad-except
-                        pass
+                    for ldots in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots,
+                            self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots]:
+                        try:
+                            if ldots is not None:
+                                self.ldots.remove()
+                        except Exception: # pylint: disable=broad-except
+                            pass
 
                     self.l_eventtype1dots = None
                     self.l_eventtype2dots = None
@@ -8797,6 +8925,10 @@ class tgraphcanvas(FigureCanvas):
                     self.l_backgroundeventtype2dots = None
                     self.l_backgroundeventtype3dots = None
                     self.l_backgroundeventtype4dots = None
+                    self.l_eventtype1backannos = []
+                    self.l_eventtype2backannos = []
+                    self.l_eventtype3backannos = []
+                    self.l_eventtype4backannos = []
 
                     #update X ticks, labels, and rotating_colors
                     self.xaxistosm(redraw=False)
@@ -9549,6 +9681,14 @@ class tgraphcanvas(FigureCanvas):
                                                              fontproperties=fontprop_small,
                                                              path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette['background'])],
                                                              )
+                                                if self.backgroundEtypes[i] == 0:
+                                                    self.l_eventtype1backannos.append(anno)
+                                                elif self.backgroundEtypes[i] == 1:
+                                                    self.l_eventtype2backannos.append(anno)
+                                                elif self.backgroundEtypes[i] == 2:
+                                                    self.l_eventtype3backannos.append(anno)
+                                                elif self.backgroundEtypes[i] == 3:
+                                                    self.l_eventtype4backannos.append(anno)
                                                 try:
                                                     anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                                 except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function

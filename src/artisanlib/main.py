@@ -8196,6 +8196,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     # n=0 : slider1; n=1 : slider2; n=2 : slider3; n=3 : slider4
     @pyqtSlot(int)
     def fireslideraction(self, n:int) -> None:
+        self.fireslideraction_internal(n)
+
+    # if optional value is given it is applied to the action instead of the integer slider value
+    def fireslideraction_internal(self, n:int, v:Optional[float] = None) -> None:
         action = self.eventslideractions[n]
         if action:
             try:
@@ -8205,6 +8209,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 #  =11 (IO Command), =12 (S7 Command), =13 (Aillio R1 Heater Command), =14 (Aillio R1 Fan Command), =15 (Aillio R1 Drum Command)
                 #  =16 (Artisan Command), 17= (RC Command)
                 action = (action+2 if action > 1 else action) # skipping (2 Call Program and 3 Multiple Event)
+            # after adaption (before skipping):
+                # action =0 (None), =1 (Serial), =4 (Modbus), =5 (DTA Command), =6 (Call Program [with argument])
+                #  =7 (Hottop Heater), =8 (Hottop Fan), =9 (Hottop Command), =10 (Fuji Command), =11 (PWM Command), =12 (VOUT Command)
+                #  =13 (IO Command), =14 (S7 Command), =15 (Aillio R1 Heater Command), =16 (Aillio R1 Fan Command), =17 (Aillio R1 Drum Command)
+                #  =18 (Artisan Command), 19= (RC Command)
                 if action > 5:
                     action = action + 1 # skip the 6:IO Command
                     if 15 > action > 10:
@@ -8214,8 +8223,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     if action > 18:
                         action = action + 1 # skip the 19: Aillio PRS
             # after adaption: (see eventaction)
-                value = self.calcSliderSendValue(n)
-                if action not in [6, 14, 15, 21]: # only for IO, VOUT, S7 and RC Commands we keep the floats
+                value = (self.calcSliderSendValue(n) if v is None else v) # preference for the more precise float value if given over the slider value
+                if action not in [4, 6, 14, 15, 21]: # only for MODBUS, IO, VOUT, S7 and RC Commands we keep the floats
                     value = int(round(value))
                 if action in {8, 9, 16, 17, 18}: # for Hottop/R1 Heater or Fan, we just forward the value
                     cmd = str(int(round(value)))
@@ -11938,33 +11947,33 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             self.showControls()
                         self.releaseminieditor()
                 elif k == 16777234:               #LEFT (moves background left / moves button selection left)
-                    if self.keyboardmoveflag and self.qmc.flagstart:
+                    if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
+                        # a foreground event is selected; move it up
+                        self.qmc.move_custom_event(self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, xstep=-1)
+                    elif self.keyboardmoveflag and self.qmc.flagstart:
                         self.moveKbutton('left')
                     elif self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
                         self.qmc.moveBackgroundSignal.emit('left',self.qmc.backgroundmovespeed)
-                    elif self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
-                        # a foreground event is selected; move it up
-                        self.qmc.move_custom_event(self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, xstep=-1)
                 elif k == 16777236:               #RIGHT (moves background right / moves button selection right)
-                    if self.keyboardmoveflag and self.qmc.flagstart:
+                    if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
+                        # a foreground event is selected; move it up
+                        self.qmc.move_custom_event(self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, xstep=1)
+                    elif self.keyboardmoveflag and self.qmc.flagstart:
                         self.moveKbutton('right')
                     elif self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
                         self.qmc.moveBackgroundSignal.emit('right',self.qmc.backgroundmovespeed)
-                    elif self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
-                        # a foreground event is selected; move it up
-                        self.qmc.move_custom_event(self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, xstep=1)
                 elif k == 16777235:               #UP (moves background up)
-                    if self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
-                        self.qmc.moveBackgroundSignal.emit('up',self.qmc.backgroundmovespeed)
-                    elif self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
+                    if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
                         # a foreground event is selected; move it up
                         self.qmc.move_custom_event(self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, ystep=1)
+                    elif self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
+                        self.qmc.moveBackgroundSignal.emit('up',self.qmc.backgroundmovespeed)
                 elif k == 16777237:               #DOWN (moves background down)
-                    if self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
-                        self.qmc.moveBackgroundSignal.emit('down',self.qmc.backgroundmovespeed)
-                    elif self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
+                    if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
                         # a foreground event is selected; move it up
                         self.qmc.move_custom_event(self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, ystep=-1)
+                    elif self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
+                        self.qmc.moveBackgroundSignal.emit('down',self.qmc.backgroundmovespeed)
                 elif k == 65:                     #A (automatic save)
                     if not self.app.artisanviewerMode and self.qmc.flagon and not self.qmc.designerflag and self.comparator is None:
                         self.automaticsave()
