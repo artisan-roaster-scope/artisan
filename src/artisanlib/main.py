@@ -11722,13 +11722,17 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 #meta_modifier = modifiers == Qt.KeyboardModifier.MetaModifier # Control on macOS, Meta on Windows
                 #uncomment next line to find the integer value of a k
                 #print(k,event.text())
-                #_log.info("PRINT key: %s",k)
+                #_log.debug("PRINT key: %s",k)
 
-                numberkeys = [48,49,50,51,52,53,54,55,56,57] # keycodes for number keys 0,1,...,9
+#                numberkeys = [48,49,50,51,52,53,54,55,56,57] # keycodes for number keys 0,1,...,9
+                numberkeys = [
+                    Qt.Key.Key_0, Qt.Key.Key_1, Qt.Key.Key_2, Qt.Key.Key_3, Qt.Key.Key_4,
+                    Qt.Key.Key_5, Qt.Key.Key_6, Qt.Key.Key_7, Qt.Key.Key_8, Qt.Key.Key_9
+                    ] # keycodes for number keys 0,1,...,9
 
-                if k == 70:                         #F (enters full screen mode)
+                if k == Qt.Key.Key_F: # 70:                         #F (enters full screen mode)
                     self.toggleFullscreen()
-                elif k == 71:                       #G (toggle time auto axis mode)
+                elif k == Qt.Key.Key_G: # 71:                       #G (toggle time auto axis mode)
                     if not self.qmc.designerflag and not self.qmc.wheelflag:
                         if self.comparator is not None:
                             self.comparator.modeComboBox.setCurrentIndex((self.comparator.modeComboBox.currentIndex()+1) % 3)
@@ -11744,15 +11748,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 # adjust foreground or if no foreground but background is loaded the background
                                 self.autoAdjustAxis(background=self.qmc.background and (not len(self.qmc.timex) > 3), deltas=False)
                                 self.qmc.redraw()
-                elif self.buttonpalette_shortcuts and control_modifier and k in numberkeys: # palette switch via SHIFT-NUM-Keys
-                    self.setbuttonsfrom(numberkeys.index(k))
-                elif k == 74:                       #J (toggle Playback Events)
+                elif self.buttonpalette_shortcuts and control_modifier and k in numberkeys: # palette switch via COMMAND-NUM-Keys
+                    self.setbuttonsfrom(numberkeys.index(Qt.Key(k)))
+                elif k == Qt.Key.Key_J: # 74:                       #J (toggle Playback Events)
                     self.togglePlaybackEvents()
-                elif k == 73:                       #I (toggle foreground showfull flag)
+                elif k == Qt.Key.Key_I: # 73:                       #I (toggle foreground showfull flag)
                     self.toggleForegroundShowfullFlag()
-                elif k == 79:                       #O (toggle background showfull flag)
+                elif k == Qt.Key.Key_O: # 79:                       #O (toggle background showfull flag)
                     self.toggleBackroundShowfullFlag()
-                elif k == 72:                       #H  (load / delete background profile)
+                elif k == Qt.Key.Key_H: # 72:                       #H  (load / delete background profile)
                     if self.comparator is None:
                         # delete background when there are platform specific modifiers
                         if ((alt_modifier or shift_modifier) and platform.system() != 'Windows') or (control_shift_modifier or control_alt_modifier and platform.system() == 'Windows'): #control_alt_modifier here for backward compatibility only, see note above
@@ -11765,7 +11769,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background'),ext_alt='.alog')
                             if len(filename) != 0:
                                 self.loadBackgroundSignal.emit(filename)
-                elif k == 76:                       #L (load alarms)
+                elif k == Qt.Key.Key_L: # 76:                       #L (load alarms)
                     if not self.qmc.designerflag and self.comparator is None:
                         filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Alarms'),ext='*.alrm')
                         if len(filename) == 0:
@@ -11774,7 +11778,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             self.loadAlarms(filename)
                         except Exception as e: # pylint: disable=broad-except
                             _log.exception(e)
-                elif k == 80:                       #P
+                elif k == Qt.Key.Key_P: # 80:                       #P
                     # switch PID mode
                     if self.qmc.device == 0 and self.fujipid and self.qmc.Controlbuttonflag: # FUJI PID
                         # toggle mode: manual => RS => background
@@ -11801,31 +11805,37 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             self.sendmessage(QApplication.translate('Message','PID Mode: Ramp/Soak'))
                         elif  self.pidcontrol.svMode == 2:
                             self.sendmessage(QApplication.translate('Message','PID Mode: Background'))
-                elif k_txt == '-': #k == 45:          #- (decrease dpi, zoom out / decrease PID lookahead)
+                elif k_txt == '-': #k == Qt.Key.Key_Minus: k == 45:          #- (decrease dpi, zoom out / decrease PID lookahead)
 #                    # the following does not work on US keyboards, we use shortcuts instead, see above self.zoomInShortcut()/self.zoomOutShortcut()
 #                    if control_modifier or control_shift_modifier:
 #                        self.setdpi(self.dpi-10)
 #                    else:
-                    if not(control_modifier or control_shift_modifier):
+                    if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
+                        # a foreground event is selected; move it up
+                        self.qmc.move_custom_event(self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, ystep=-1)
+                    elif not(control_modifier or control_shift_modifier):
                         if self.qmc.device == 0 and self.fujipid and self.qmc.Controlbuttonflag: # FUJI PID
                             self.fujipid.lookahead = max(0,self.fujipid.lookahead-1)
                             self.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(self.fujipid.lookahead))
                         elif (self.pidcontrol and self.qmc.Controlbuttonflag): # MODBUS hardware PID
                             self.pidcontrol.svLookahead = max(0,self.pidcontrol.svLookahead-1)
                             self.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(self.pidcontrol.svLookahead))
-                elif k_txt == '+': #k == 43:         #+ (increase dpi, zoom in / increase PID lookahead)
+                elif k_txt == '+': #k == Qt.Key.Key_Plus: k == 43:         #+ (increase dpi, zoom in / increase PID lookahead)
 #                    # the following does not work on US keyboards, we use shortcuts instead, see above self.zoomInShortcut()/self.zoomOutShortcut()
 #                    if control_modifier or control_shift_modifier:
 #                        self.setdpi(self.dpi+10)
 #                    else:
-                    if not(control_modifier or control_shift_modifier):
+                    if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
+                        # a foreground event is selected; move it up
+                        self.qmc.move_custom_event(self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, ystep=1)
+                    elif not(control_modifier or control_shift_modifier):
                         if self.qmc.device == 0 and self.fujipid and self.qmc.Controlbuttonflag: # FUJI PID
                             self.fujipid.lookahead = self.fujipid.lookahead+1
                             self.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(self.fujipid.lookahead))
                         elif (self.pidcontrol and self.qmc.Controlbuttonflag): # MODBUS hardware PID
                             self.pidcontrol.svLookahead = self.pidcontrol.svLookahead+1
                             self.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(self.pidcontrol.svLookahead))
-                elif k == 32:                       #SPACE (selects active button)
+                elif k == Qt.Key.Key_Space: # 32:                       #SPACE (selects active button)
                     if self.qmc.flagstart:
                         if self.keyboardmoveflag:
                             # if recording and manual keyboard move mode is on and
@@ -11840,7 +11850,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             self.qmc.EventRecord()
                     elif self.qmc.flagon:
                         self.qmc.toggleRecorderSignal.emit()
-                elif k == 16777220:                 #ENTER (turns ON/OFF keyboard moves; COMMAND+ENTER starts record, SHIFT+ENTER turns Artisan OFF)
+                elif k in {Qt.Key.Key_Return,Qt.Key.Key_Enter}: # k in {16777220, 16777221}: #ENTER (turns ON/OFF keyboard moves; COMMAND+ENTER starts record, SHIFT+ENTER turns Artisan OFF)
                     if self.quickEventShortCut and len(self.quickEventShortCut[1])>0:
                         # event entry active
                         eventNr = self.quickEventShortCut[0]
@@ -11891,7 +11901,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     else:
                         self.releaseminieditor()
                         self.moveKbutton('enter')
-                elif k == 16777219:                #BACKSPACE (deletes last picked event)
+                elif k == Qt.Key.Key_Backspace: # 16777219:                #BACKSPACE (deletes last picked event)
                     if self.quickEventShortCut and len(self.quickEventShortCut[1])>0:
                         eventNr = self.quickEventShortCut[0]
                         self.quickEventShortCut = (eventNr, self.quickEventShortCut[1][:-1])
@@ -11901,7 +11911,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         self.qmc.clear_last_picked_event_selection()
                         self.qmc.fileDirtySignal.emit()
                         self.qmc.redraw_keep_view(recomputeAllDeltas=False)
-                elif k == 16777216:                 #ESCAPE (exists full screen mode / clears message line / resets event short cut / exits designer/wheel graph / releases minieditor)
+                elif k == Qt.Key.Key_Escape: # 16777216:                 #ESCAPE (exists full screen mode / clears message line / resets event short cut / exits designer/wheel graph / releases minieditor)
                     if self.quickEventShortCut is not None:
                         eventNr = self.quickEventShortCut[0]
                         # if corresponding slider has focus we reset LCD color and value
@@ -11946,7 +11956,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             self.enableEditMenus()
                             self.showControls()
                         self.releaseminieditor()
-                elif k == 16777234:               #LEFT (moves background left / moves button selection left)
+                elif k == Qt.Key.Key_Left: # 16777234:               #LEFT (moves background left / moves button selection left)
                     if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
                         # a foreground event is selected; move it up
                         self.qmc.move_custom_event(self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, xstep=-1)
@@ -11954,7 +11964,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         self.moveKbutton('left')
                     elif self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
                         self.qmc.moveBackgroundSignal.emit('left',self.qmc.backgroundmovespeed)
-                elif k == 16777236:               #RIGHT (moves background right / moves button selection right)
+                elif k == Qt.Key.Key_Right: # 16777236:               #RIGHT (moves background right / moves button selection right)
                     if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
                         # a foreground event is selected; move it up
                         self.qmc.move_custom_event(self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, xstep=1)
@@ -11962,22 +11972,22 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         self.moveKbutton('right')
                     elif self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
                         self.qmc.moveBackgroundSignal.emit('right',self.qmc.backgroundmovespeed)
-                elif k == 16777235:               #UP (moves background up)
+                elif k == Qt.Key.Key_Up: # 16777235:               #UP (moves background up)
                     if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
                         # a foreground event is selected; move it up
                         self.qmc.move_custom_event(self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, ystep=1)
                     elif self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
                         self.qmc.moveBackgroundSignal.emit('up',self.qmc.backgroundmovespeed)
-                elif k == 16777237:               #DOWN (moves background down)
+                elif k == Qt.Key.Key_Down: # 16777237:               #DOWN (moves background down)
                     if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
                         # a foreground event is selected; move it up
                         self.qmc.move_custom_event(self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, ystep=-1)
                     elif self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
                         self.qmc.moveBackgroundSignal.emit('down',self.qmc.backgroundmovespeed)
-                elif k == 65:                     #A (automatic save)
+                elif k == Qt.Key.Key_A: # 65:                     #A (automatic save)
                     if not self.app.artisanviewerMode and self.qmc.flagon and not self.qmc.designerflag and self.comparator is None:
                         self.automaticsave()
-                elif k == 68:                     #D (toggle xy coordinates between temp and RoR scale)
+                elif k == Qt.Key.Key_D: # 68:                     #D (toggle xy coordinates between temp and RoR scale)
                     if not self.qmc.wheelflag:
                         if not self.qmc.fmt_data_ON:
                             self.qmc.fmt_data_ON = True
@@ -11993,10 +12003,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 self.ntb.mouse_move(mplLocationevent.lastevent) # type:ignore[attr-defined] # lastevent removed from MPL 3.10
                             except Exception: # pylint: disable=broad-except
                                 pass
-                elif k == 90:                     #Z (toggle xy coordinates between 0: cursor, 1: BT, 2: ET, 3: BTB, 4: ETB)
+                elif k == Qt.Key.Key_Z: # 90:                     #Z (toggle xy coordinates between 0: cursor, 1: BT, 2: ET, 3: BTB, 4: ETB)
                     if not self.qmc.designerflag and not self.qmc.wheelflag and self.comparator is None:
                         self.qmc.nextFmtDataCurve()
-                elif k == 85:                     #U (toggle running LCDs on/off)
+                elif k == Qt.Key.Key_U: # 85:                     #U (toggle running LCDs on/off)
                     if not self.qmc.flagon:
                         if self.qmc.running_LCDs == 0 and self.curFile:
                             self.qmc.running_LCDs = 1
@@ -12019,52 +12029,52 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 idx=None) # show default OFF placeholders in LCDs
                         else:
                             self.ntb.update_message()
-                elif k == 67:                          #C (toggle controls)
+                elif k == Qt.Key.Key_C: # 67:                          #C (toggle controls)
                     if not self.qmc.wheelflag:
                         self.toggleControls()
-                elif k == 88:                          #X (toggle readings)
+                elif k == Qt.Key.Key_X: # 88:                          #X (toggle readings)
                     if not self.app.artisanviewerMode and not self.qmc.designerflag and not self.qmc.wheelflag:
                         self.toggleReadings()
-                elif k == 89:                          #Y (toggle minieditor)
+                elif k == Qt.Key.Key_Y: # 89:                          #Y (toggle minieditor)
                     if not self.qmc.designerflag and not self.qmc.wheelflag:
                         self.toggle_minieventline()
-                elif k == 83:                          #S (toggle sliders)
+                elif k == Qt.Key.Key_S: # 83:                          #S (toggle sliders)
                     if not self.app.artisanviewerMode and not self.qmc.designerflag and not self.qmc.wheelflag:
                         self.toggleSliders()
-                elif k == 84 and not self.qmc.flagon:  #T (toggle mouse cross)
+                elif k == Qt.Key.Key_T: # 84 and not self.qmc.flagon:  #T (toggle mouse cross)
                     self.qmc.togglecrosslines()
-                elif k == 81:                          #Q (quick entry of custom event 1)
+                elif k == Qt.Key.Key_Q: # 81:                          #Q (quick entry of custom event 1)
                     if not self.qmc.designerflag and self.comparator is None:
                         self.quickEventShortCut = (0,'')
                         self.sendmessage(self.qmc.etypes[0], append=False)
-                elif k == 87:                          #W (quick entry of custom event 2)
+                elif k == Qt.Key.Key_W: # 87:                          #W (quick entry of custom event 2)
                     if not self.qmc.designerflag and self.comparator is None:
                         self.quickEventShortCut = (1,'')
                         self.sendmessage(self.qmc.etypes[1], append=False)
-                elif k == 69:                          #E (quick entry of custom event 3)
+                elif k == Qt.Key.Key_E: # 69:                          #E (quick entry of custom event 3)
                     if not self.qmc.designerflag and self.comparator is None:
                         self.quickEventShortCut = (2,'')
                         self.sendmessage(self.qmc.etypes[2], append=False)
-                elif k == 82:                          #R (quick entry of custom event 4)
+                elif k == Qt.Key.Key_R: # 82:                          #R (quick entry of custom event 4)
                     if not self.qmc.designerflag and self.comparator is None:
                         self.quickEventShortCut = (3,'')
                         self.sendmessage(self.qmc.etypes[3], append=False)
-                elif k == 86:                          #V (set SV)
+                elif k == Qt.Key.Key_V: # 86:                          #V (set SV)
                     if not self.qmc.designerflag and self.comparator is None:
                         self.quickEventShortCut = (4,'')
                         self.sendmessage('SV', append=False)
-                elif k == 66:                          #B (hides/shows extra rows of event buttons / actives custom event button <nr> with ALT/CTRL+SHIFT modifier)
+                elif k == Qt.Key.Key_B: # 66:                          #B (hides/shows extra rows of event buttons / actives custom event button <nr> with ALT/CTRL+SHIFT modifier)
                     if (alt_modifier and platform.system() != 'Windows') or (control_shift_modifier and platform.system() == 'Windows'):
                         # activate custom event button
                         self.quickEventShortCut = (-1,'')
                         self.sendmessage(f"{QApplication.translate('Label','Event button')}", append=False)
                     elif not self.app.artisanviewerMode and not self.qmc.designerflag and not self.qmc.wheelflag:
                         self.toggleextraeventrows()
-                elif k == 77:                          #M (hides/shows standard buttons row)
+                elif k == Qt.Key.Key_M: # 77:                          #M (hides/shows standard buttons row)
                     if self.qmc.flagstart:
                         self.standardButtonsVisibility()
                 #Extra event buttons palette. Numerical keys [0,1,2,3,4,5,6,7,8,9]
-                elif 47 < k < 58:
+                elif k in numberkeys: # 47 < k < 58:
                     if not self.app.artisanviewerMode:
                         button = [48,49,50,51,52,53,54,55,56,57]
                         if self.quickEventShortCut:
@@ -12080,9 +12090,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             self.quickEventShortCut = (eventNr,eventValueStr)
                             self.outputQuickEventShortCutState()
                 # note Qt/PyQt maps the ';' and ',' keys reversed from the ASCII mapping
-                elif k_txt == ';' and not self.qmc.flagon: #k == 58    # ";" (application screenshots only if not sampling)
+                elif k_txt == ';' and not self.qmc.flagon: #k == Qt.Key.Key_Semicolon: k == 58    # ";" (application screenshots only if not sampling)
                     self.applicationscreenshot()
-                elif k_txt == ':' and not self.qmc.flagon:  #k == 59    # ":" (desktop screenshots only if not sampling)
+                elif k_txt == ':' and not self.qmc.flagon:  #k == Qt.Key.Key_Colon:    k == 59    # ":" (desktop screenshots only if not sampling)
                     self.desktopscreenshot()
                 else:
                     QWidget.keyPressEvent(self, event)
