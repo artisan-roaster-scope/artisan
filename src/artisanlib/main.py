@@ -8198,7 +8198,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     def fireslideraction(self, n:int) -> None:
         self.fireslideraction_internal(n)
 
-    # if optional value is given it is applied to the action instead of the integer slider value
+    # if optional float value is given it is applied to the action instead of the less accurate integer slider value
+    # (used by ramping event replay)
     def fireslideraction_internal(self, n:int, v:Optional[float] = None) -> None:
         action = self.eventslideractions[n]
         if action:
@@ -8224,7 +8225,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         action = action + 1 # skip the 19: Aillio PRS
             # after adaption: (see eventaction)
                 value = (self.calcSliderSendValue(n) if v is None else v) # preference for the more precise float value if given over the slider value
-                if action not in [4, 6, 14, 15, 21]: # only for MODBUS, IO, VOUT, S7 and RC Commands we keep the floats
+                if action not in [6, 14, 15, 21] or (action == 4 and v is None): # only for IO, VOUT, S7 and RC Commands we keep the floats
+                        # and for MODBUS if the optional float value v is not given (only for ramping event replay on MOBDUS; don't use 'write' then to write integers, but 'writeSingle')
                     value = int(round(value))
                 if action in {8, 9, 16, 17, 18}: # for Hottop/R1 Heater or Fan, we just forward the value
                     cmd = str(int(round(value)))
