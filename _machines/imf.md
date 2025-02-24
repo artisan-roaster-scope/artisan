@@ -17,6 +17,13 @@ sidebar:
    - logging of bean temperature, inlet temperature and related rate-of-rise curves, as well as the burner temperature. 
    - control of drum speed, airflow and vortex valve on machines with the latest firmware installed
 
+<figure>
+<center>
+<a href="{{ site.baseurl }}/assets/images/buttons-imf.png">
+<img src="{{ site.baseurl }}/assets/images/buttons-imf.png" style="width: 80%;"></a>
+    <figcaption>custom event buttons</figcaption>
+</center>
+</figure>
 
 ### Setup
 
