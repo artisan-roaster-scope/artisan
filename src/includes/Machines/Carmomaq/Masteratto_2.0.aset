@@ -1,11 +1,11 @@
-[General]
+writeSingle([General]
 Delay=3000
 Oversampling=true
 roastertype_setup=Carmomaq Masteratto
 
 [DefaultButtons]
 buttonactions=3, 0, 0, 0, 0, 0, 3, 0
-buttonactionstrings="write(1,50,1)", , , , , , "write(1,50,2)", 
+buttonactionstrings="writeSingle(1,50,1)", , , , , , "writeSingle(1,50,2)", 
 buttonvisibility=true, true, true, true, true, false, true, true
 extrabuttonactions=0, 0, 0
 extrabuttonactionstrings=, , 
@@ -54,7 +54,7 @@ eventbuttontablecolumnwidths=234, 80, 100, 50, 150, 100, 80, 80, 80, 102
 extraeventbuttoncolor=#ad0427, #ad5a6b, #bfbfbf, #45a6cf, #99becf, #bfbfbf, #49b260, #91b398, #404040, #808080, #bfbfbf, #f0842b, #f0b98b, #bfbfbf, #7f0080, #995c99
 extraeventbuttontextcolor=#ffffff, #ffffff, #000000, #ffffff, #ffffff, #000000, #ffffff, #ffffff, #ffffff, #ffffff, #000000, #ffffff, #ffffff, #000000, #ffffff, #ffffff
 extraeventsactions=4, 4, 0, 4, 4, 0, 4, 4, 4, 4, 0, 4, 4, 0, 4, 4
-extraeventsactionstrings="write(1,55,1)", "write(1,55,2)", , "write(1,56,1)", "write(1,56,2)", , "write(1,57,1)", "write(1,57,2)", "write(1,52,1)", "write(1,52,2)", , "write(1,58,1)", "write(1,58,2)", , "write(1,60,1)", "write(1,60,2)"
+extraeventsactionstrings="writeSingle(1,55,1)", "writeSingle(1,55,2)", , "writeSingle(1,56,1)", "writeSingle(1,56,2)", , "writeSingle(1,57,1)", "writeSingle(1,57,2)", "writeSingle(1,52,1)", "writeSingle(1,52,2)", , "writeSingle(1,58,1)", "writeSingle(1,58,2)", , "writeSingle(1,60,1)", "writeSingle(1,60,2)"
 extraeventsbuttonsflags=0, 1, 1
 extraeventsdescriptions=, , , , , , , , , , , , , , , 
 extraeventslabels=\\1\n\\t, \\0\n\\t, , \\1\n\\t, \\0\n\\t, , \\1\n\\t, \\0\n\\t, \\1\n\\i, \\0\n\\i, , \\1\n \\l , \\0\n \\l , , "\\1\n Vent. Pressão ", "\\0\n Vent. Pressão "
@@ -193,7 +193,7 @@ eventslidersflags=0, 1, 1
 eventslidertemp=0, 0, 0, 0
 eventsliderunits=, , %, %
 slideractions=2, 2, 2, 2
-slidercommands="write(1,47,{})", "write(1,46,{})", "write(1,59,{})", "write(1,45,{})"
+slidercommands="writeSingle(1,47,{})", "writeSingle(1,46,{})", "writeSingle(1,59,{})", "writeSingle(1,45,{})"
 sliderfactors=1, 1, 1, 1
 slidermax=120, 120, 100, 100
 slidermin=0, 0, 0, 0

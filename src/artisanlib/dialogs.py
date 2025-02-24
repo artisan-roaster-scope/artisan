@@ -347,8 +347,10 @@ class PortComboBox(MyQComboBox):  # pyright: ignore [reportGeneralTypeIssues] # 
             # on older versions of pyserial list_ports.comports() returned a list of tuples (port, desc, hwid), current versions return a list of ListPortInfo objects
             comports = [(cp.device, cp.product, 'n/a') for cp in serial.tools.list_ports.comports()]
             if platform.system() == 'Darwin':
-                self.ports = [p for p in comports if (p[0] not in ['/dev/cu.Bluetooth-PDA-Sync',
-                    '/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem','/dev/cu.Bluetooth-Incoming-Port','/dev/tty.Bluetooth-Incoming-Port'])]
+                self.ports = [p for p in comports if (p[0] not in ['/dev/cu.Bluetooth-PDA-Sync', '/dev/cu.debug-console', '/dev/cu.wlan-debug',
+                    '/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem',
+                    '/dev/cu.Bluetooth-Incoming-Port', '/dev/tty.Bluetooth-Incoming-Port'
+                    ])]
             else:
                 self.ports = list(comports)
             if self.selection is not None and self.selection not in [p[0] for p in self.ports]:

@@ -4,7 +4,7 @@ roastertype_setup=Berto R
 
 [DefaultButtons]
 buttonactions=3, 0, 0, 0, 0, 0, 3, 0
-buttonactionstrings="write(1,71,20)", , , , , , "write(1,71,4)", 
+buttonactionstrings="writeSingle(1,71,20)", , , , , , "writeSingle(1,71,4)", 
 buttonvisibility=true, true, true, true, true, false, true, true
 extrabuttonactions=0, 0, 0
 extrabuttonactionstrings=, , 

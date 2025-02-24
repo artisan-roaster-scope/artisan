@@ -1,4 +1,4 @@
-[General]
+writeSingle([General]
 Delay=3000
 Oversampling=false
 roastertype_setup=Coffed SR5 manual delta
@@ -100,7 +100,7 @@ eventslidercoarse=0, 0, 0, 0
 eventslidersflags=1, 1, 1
 eventslidertemp=0, 0, 0, 0
 slideractions=2, 0, 0, 2
-slidercommands="write([1,1,{}])", , , "write([2,53,{}])"
+slidercommands="writeSingle([1,1,{}])", , , "writeSingle([2,53,{}])"
 sliderfactors=21, 1, 1, 100
 slidermax=100, 100, 100, 100
 slidermin=0, 0, 0, 0

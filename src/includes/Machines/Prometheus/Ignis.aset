@@ -1,4 +1,4 @@
-[General]
+writeSingle([General]
 Delay=2000
 Oversampling=true
 roastertype_setup=Prometheus Ignis
@@ -134,7 +134,7 @@ eventslidersflags=1, 1, 1
 eventslidertemp=0, 0, 0, 0
 eventsliderunits="%", "RPM", , "%"
 slideractions=2, 2, 0, 2
-slidercommands="write(1,12,{})", "write(1,11,{})", , "write(1,9,{})"
+slidercommands="writeSingle(1,12,{})", "writeSingle(1,11,{})", , "writeSingle(1,9,{})"
 sliderfactors=1, 1, 1, 1
 slidermax=100, 70, 100, 100
 slidermin=5, 10, 0, 5

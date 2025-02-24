@@ -1,4 +1,4 @@
-[General]
+writeSingle([General]
 Delay=1000
 ExtraEventSamplingDelay=0
 Oversampling=false
@@ -32,12 +32,12 @@ svValues=110, 161, 179, 193, 198, 202, 204, 205
 
 [DefaultButtons]
 buttonactions=3, 0, 0, 0, 0, 0, 3, 0
-buttonactionstrings="write(1,11,1)", , , , , , "write(1,514,1);write(1,514,0)", 
+buttonactionstrings="writeSingle(1,11,1)", , , , , , "writeSingle(1,514,1);writeSingle(1,514,0)", 
 buttonvisibility=true, true, true, true, true, false, true, false
 extrabuttonactions=3, 3, 0
-extrabuttonactionstrings="write(1,11,0);write(1,12,0)", "write(1,11,0)", 
+extrabuttonactionstrings="writeSingle(1,11,0);writeSingle(1,12,0)", "writeSingle(1,11,0)", 
 xextrabuttonactions=3, 3
-xextrabuttonactionstrings="write(1,11,0);write(1,12,0)", "write(1,11,0);write(1,12,0)"
+xextrabuttonactionstrings="writeSingle(1,11,0);writeSingle(1,12,0)", "writeSingle(1,11,0);writeSingle(1,12,0)"
 
 [Device]
 Controlbuttonflag=false
@@ -79,7 +79,7 @@ eventbuttontablecolumnwidths=70, 80, 100, 90, 150, 100, 80, 80, 80, 320
 extraeventbuttoncolor=#b64c4e, #b6181a, #5ba1d2, #1e83c9, #4bb676, #00aa44, #ffff00, #ffff00, #ffff92, #ffaaff
 extraeventbuttontextcolor=#ffffff, #ffffff, black, black, black, black, black, black, black, black
 extraeventsactions=4, 4, 4, 4, 4, 4, 0, 4, 4, 4
-extraeventsactionstrings="write(1,50,{})", "write(1,50,{})", "write(1,30,{})", "write(1,30,{})", "write(1,40,{})", "write(1,40,{})", , "write(1,10,{})", "write(1,10,{})", "write(1,12,{})"
+extraeventsactionstrings="writeSingle(1,50,{})", "writeSingle(1,50,{})", "writeSingle(1,30,{})", "writeSingle(1,30,{})", "writeSingle(1,40,{})", "writeSingle(1,40,{})", , "writeSingle(1,10,{})", "writeSingle(1,10,{})", "writeSingle(1,12,{})"
 extraeventsbuttonsflags=0, 1, 1
 extraeventsdescriptions=, , , , , , , , , 
 extraeventslabels=\\t\n-5%, \\t\n+5%, \\t\n-5%, \\t\n+5%, \\t\n-5%, \\t\n+5%, , Transfer\nON, Transfer\nOFF, Door\nCLOSE
@@ -88,8 +88,8 @@ extraeventsvalues=-1.5, 1.5, -1.5, 1.5, -1.5, 1.5, 1.1, 1.1, 1, 1
 extraeventsvisibility=1, 1, 1, 1, 1, 1, 0, 0, 0, 0
 
 [Modbus]
-PID_OFF_action="write(1,502,0)"
-PID_ON_action="write(1,502,1)"
+PID_OFF_action="writeSingle(1,502,0)"
+PID_ON_action="writeSingle(1,502,1)"
 PID_SV_register=500
 PID_d_register=57
 PID_i_register=381
@@ -191,7 +191,7 @@ eventslidersflags=0, 1, 1
 eventslidertemp=0, 0, 0, 0
 eventsliderunits=%, %, , %
 slideractions=2, 2, 0, 2
-slidercommands="write(1,30,{});", "write(1,40,{});", , "write(1,50,{});"
+slidercommands="writeSingle(1,30,{});", "writeSingle(1,40,{});", , "writeSingle(1,50,{});"
 sliderfactors=1, 1, 1, 1
 slidermax=100, 100, 100, 100
 slidermin=0, 0, 0, 0

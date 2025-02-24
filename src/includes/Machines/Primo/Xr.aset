@@ -1,4 +1,4 @@
-[General]
+writeSingle([General]
 roastertype_setup=Primo Xr
 ETcurve=false
 ETlcd=false
@@ -14,8 +14,8 @@ svSlider=true
 
 
 [Modbus]
-PID_OFF_action="write(1,4101,0)"
-PID_ON_action="write(1,4101,1)"
+PID_OFF_action="writeSingle(1,4101,0)"
+PID_ON_action="writeSingle(1,4101,1)"
 PID_SV_register=4097
 PID_d_register=0
 PID_i_register=0
@@ -112,7 +112,7 @@ eventbuttontablecolumnwidths=70, 80, 100, 50, 150, 296, 73, 75, 75
 extraeventbuttoncolor=#808080, #808080, #808080
 extraeventbuttontextcolor=white, white, white
 extraeventsactions=4, 4, 4
-extraeventsactionstrings="write(1,4101,2)", "write(1,4101,0)", "write(1,4101,1)"
+extraeventsactionstrings="writeSingle(1,4101,2)", "writeSingle(1,4101,0)", "writeSingle(1,4101,1)"
 extraeventsbuttonsflags=0, 1, 1
 extraeventsdescriptions=, , 
 extraeventslabels=\\m, PID \\0, PID \\1
@@ -132,7 +132,7 @@ eventslidersflags=0, 1, 1
 eventslidertemp=0, 0, 0, 0
 eventsliderunits=, , , %
 slideractions=0, 0, 0, 2
-slidercommands=, , , "write(1,4114,{})"
+slidercommands=, , , "writeSingle(1,4114,{})"
 sliderfactors=1, 1, 1, 10
 slidermax=100, 100, 100, 100
 slidermin=0, 0, 0, 0

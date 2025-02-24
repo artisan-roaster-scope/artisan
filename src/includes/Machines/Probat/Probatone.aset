@@ -1,7 +1,7 @@
 [General]
 BTcurve=true
 BTlcd=true
-Delay=2000
+Delay=1000
 ETcurve=false
 ETlcd=false
 ExtraEventSamplingDelay=5000
@@ -11,10 +11,10 @@ roastersize_setup_default=5
 
 [DefaultButtons]
 buttonactions=0, 0, 0, 0, 0, 0, 0, 0
-buttonactionstrings="mwrite(1,12318,65534,1)write(1,12290,3000);mwrite(1,12318,65530,4)", , , , , , "write(1,12290,3000);mwrite(1,12318,65530,4)", 
+buttonactionstrings="mwrite(1,12318,65534,1);writeSingle(1,12290,3000);mwrite(1,12318,65530,4)", , , , , , "writeSingle(1,12290,3000);mwrite(1,12318,65530,4)", 
 buttonvisibility=true, true, true, true, true, false, true, true
 extrabuttonactions=3, 3, 3
-extrabuttonactionstrings="mwrite(1,12288,65532,2)", "mwrite(1,12288,65532,3)", "read(1,12390);write(1,12289,_)"
+extrabuttonactionstrings="mwrite(1,12288,65532,2)", "mwrite(1,12288,65532,3)", "read(1,12390);writeSingle(1,12289,_)"
 xextrabuttonactions=0, 0
 xextrabuttonactionstrings=, 
 
@@ -50,7 +50,7 @@ buttonpalettemaxlen=11, 11, 14, 14, 14, 14, 14, 14, 14, 14
 extraeventbuttoncolor=#b64c4e, #b6181a
 extraeventbuttontextcolor=#ffffff, #ffffff
 extraeventsactions=4, 4
-extraeventsactionstrings="write(1,12290,{});mwrite(1,12318,65531,4)", "write(1,12290,{});mwrite(1,12318,65531,4)"
+extraeventsactionstrings="writeSingle(1,12290,{});mwrite(1,12318,65531,4)", "writeSingle(1,12290,{});mwrite(1,12318,65531,4)"
 extraeventsbuttonsflag=1
 extraeventsdescriptions=, 
 extraeventslabels=-10%\n\\t, 10%\n\\t
@@ -154,7 +154,7 @@ DeltaETlcd=false
 [Sliders]
 eventslidersflag=1
 slideractions=0, 0, 0, 2
-slidercommands=, , , "write(1,12290,{});mwrite(1,12318,65531,4)"
+slidercommands=, , , "writeSingle(1,12290,{});mwrite(1,12318,65531,4)"
 sliderfactors=1, 1, 1, 100
 slidermax=100, 100, 100, 100
 slidermin=0, 0, 0, 0

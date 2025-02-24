@@ -904,12 +904,19 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
             figure = self.aw.qmc.fig
             orig_xlim = axes.get_xlim()
             orig_ylim = axes.get_ylim()
+
             linedict = {}
             for line in axes.get_lines():
                 label:str = str(line.get_label())
-                if label == '_nolegend_':
+                if label.startswith('_'):
                     continue
                 linedict[label] = line
+
+            # filter out all temporary lines with names starting with an underscore character
+            if (isinstance(data, list) and len(data)>1 and isinstance(data[1],tuple) and len(data[1]) == 3 and
+                    isinstance(data[1][0], list)):
+                data[1] = ([elem for elem in data[1][0] if not (isinstance(elem,list) and len(elem)>1 and elem[1].startswith('_'))],
+                            data[1][1], data[1][2])
 
             if len(data) > 1:
                 # just take the Curve Styles and drop the Axis settings
@@ -1444,8 +1451,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     loadBackgroundSignal = pyqtSignal(str)
     clearBackgroundSignal = pyqtSignal()
     setTareSignal = pyqtSignal(int)
-    adjustSVSignal = pyqtSignal(int)
-    setSVSignal = pyqtSignal(int)
+    adjustSVSignal = pyqtSignal(float)
+    setSVSignal = pyqtSignal(float)
     fireslideractionSignal = pyqtSignal(int)
     moveButtonSignal = pyqtSignal(str)
     sendnotificationMessageSignal = pyqtSignal(str,str,NotificationType)
@@ -6646,16 +6653,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             (QColorDialog.ColorDialogOption.ShowAlphaChannel if alphasupport else
                 QColorDialog.ColorDialogOption(0)))
 
-    @pyqtSlot(int)
-    def adjustPIDsv(self, x:int) -> None:
+    @pyqtSlot(float)
+    def adjustPIDsv(self, x:float) -> None:
         if self.qmc.device == 0: # Fuji PID
             self.fujipid.adjustsv(x)
 #        elif self.qmc.device == 19: # Arduino TC4
         else: # Arduino TC4, internal Software PID or MODBUS/S7 external PID
             self.pidcontrol.adjustsv(x)
 
-    @pyqtSlot(int)
-    def setPIDsv(self, sv:int) -> None:
+    @pyqtSlot(float)
+    def setPIDsv(self, sv:float) -> None:
         if self.qmc.device == 0 and sv != self.fujipid.sv: # Fuji PID
             self.fujipid.setsv(sv,silent=True)
         elif sv != self.pidcontrol.sv:
@@ -8208,13 +8215,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 # action =0 (None), =1 (Serial), =2 (Modbus), =3 (DTA Command), =4 (Call Program [with argument])
                 #  =5 (Hottop Heater), =6 (Hottop Fan), =7 (Hottop Command), =8 (Fuji Command), =9 (PWM Command), =10 (VOUT Command)
                 #  =11 (IO Command), =12 (S7 Command), =13 (Aillio R1 Heater Command), =14 (Aillio R1 Fan Command), =15 (Aillio R1 Drum Command)
-                #  =16 (Artisan Command), 17= (RC Command)
+                #  =16 (Artisan Command), 17= (RC Command), 18= (WebSocket Command)
                 action = (action+2 if action > 1 else action) # skipping (2 Call Program and 3 Multiple Event)
             # after adaption (before skipping):
                 # action =0 (None), =1 (Serial), =4 (Modbus), =5 (DTA Command), =6 (Call Program [with argument])
                 #  =7 (Hottop Heater), =8 (Hottop Fan), =9 (Hottop Command), =10 (Fuji Command), =11 (PWM Command), =12 (VOUT Command)
                 #  =13 (IO Command), =14 (S7 Command), =15 (Aillio R1 Heater Command), =16 (Aillio R1 Fan Command), =17 (Aillio R1 Drum Command)
-                #  =18 (Artisan Command), 19= (RC Command)
+                #  =18 (Artisan Command), 19= (RC Command), 20= (WebSocket Command)
                 if action > 5:
                     action = action + 1 # skip the 6:IO Command
                     if 15 > action > 10:
@@ -9723,8 +9730,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             elif cs.startswith('tare') and cs.endswith(')'): # in seconds
                                 try:
                                     cmds = eval(cs[len('tare'):]) # pylint: disable=eval-used
-                                    if isinstance(cmds,int):
-                                        self.setTareSignal.emit(cmds-1)
+                                    if isinstance(cmds,(int, float)):
+                                        self.setTareSignal.emit(int(cmds)-1)
                                         self.sendmessage(f'Artisan Command: {cs}')
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
@@ -9824,7 +9831,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     message = str(eval(values[0])) # pylint: disable=eval-used
                                     timeout = 0
                                     if len(values)>1:
-                                        timeout = int(eval(values[1])) # pylint: disable=eval-used
+                                        timeout = int(round(float(eval(values[1])))) # pylint: disable=eval-used
                                     self.qmc.showAlarmPopupSignal.emit(message,timeout)
                                 except Exception: # pylint: disable=broad-except
                                     # sequence of character message
@@ -9974,10 +9981,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 except Exception: # pylint: disable=broad-except
                                     arg = cs[len('visible('):-1]
                                     if ',' in arg and '(' not in arg:
-                                        # no function definition in arg, and exactly on comma, we split into the two args (could be just "button(1,false)" which does not eval above)
+                                        # no function definition in arg, and exactly on comma, we split into the two args (could be just "visible(1,false)" which does not eval above)
                                         cs_aac = [a.strip() for a in arg.split(',')]
                                     else:
-                                        cs_aac = [c[len('button('):-1].strip()]
+                                        cs_aac = [c[len('visible('):-1].strip()]
                                 if isinstance(cs_aac, (list, tuple)):
                                     cs_len = len(cs_aac)
                                     if cs_len == 2:
@@ -10105,7 +10112,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             # pidSVC(<n>) with <n> a number in C to be used as PID SV (if temperature mode is F, n will be first converted to F
                             elif cs.startswith('pidSVC(') and cs.endswith(')'):
                                 try:
-                                    sv = max(0,int(round(convertTemp(float(eval(cs[len('pidSVC('):-1])), 'C', self.qmc.mode)))) # we don't send SV < 0 # pylint: disable=eval-used
+                                    sv = max(0,convertTemp(float(eval(cs[len('pidSVC('):-1])), 'C', self.qmc.mode)) # we don't send SV < 0 # pylint: disable=eval-used
                                     if self.qmc.device == 0 and sv != self.fujipid.sv:
                                         self.fujipid.setsv(sv,silent=True)
                                         self.sendmessage(f'Artisan Command: {cs}')
@@ -10117,7 +10124,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             # pidSV(<n>) with <n> a number to be used as PID SV
                             elif cs.startswith('pidSV(') and cs.endswith(')'):
                                 try:
-                                    sv = max(0,int(eval(cs[len('pidSV('):-1]))) # we don't send SV < 0 # pylint: disable=eval-used
+                                    sv = max(0,float(eval(cs[len('pidSV('):-1]))) # we don't send SV < 0 # pylint: disable=eval-used
                                     if self.qmc.device == 0 and sv != self.fujipid.sv:
                                         self.fujipid.setsv(sv,silent=True)
                                         self.sendmessage(f'Artisan Command: {cs}')
@@ -10226,7 +10233,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                         direction = args[0].lower()
                                         if len(direction)>3 and direction[0] in {'"', "'"} and direction[-1] in {'"', "'"}:
                                             direction = eval(direction) # pylint: disable=eval-used
-                                        step = int(args[1])
+                                        step = int(round(float(args[1])))
                                         self.qmc.moveBackgroundSignal.emit(direction,step)
                                         self.sendmessage(f'Artisan Command: {cs}')
                                 except Exception as e: # pylint: disable=broad-except
@@ -11707,7 +11714,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work
     @pyqtSlot('QKeyEvent')
-    def keyPressEvent(self, event: 'Optional[QKeyEvent]') -> None:
+    def keyPressEvent(self, event: 'Optional[QKeyEvent]') -> None: # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths
         if not self.processingKeyEvent and event is not None:
             try:
                 self.processingKeyEvent = True
@@ -11751,7 +11758,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 self.autoAdjustAxis(background=self.qmc.background and (not len(self.qmc.timex) > 3), deltas=False)
                                 self.qmc.redraw()
                 elif self.buttonpalette_shortcuts and control_modifier and k in numberkeys: # palette switch via COMMAND-NUM-Keys
-                    self.setbuttonsfrom(numberkeys.index(Qt.Key(k)))
+                    self.setbuttonsfrom(numberkeys.index(Qt.Key(k)), only_non_empty=True)
                 elif k == Qt.Key.Key_J: # 74:                       #J (toggle Playback Events)
                     self.togglePlaybackEvents()
                 elif k == Qt.Key.Key_I: # 73:                       #I (toggle foreground showfull flag)
@@ -11814,7 +11821,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #                    else:
                     if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
                         # a foreground event is selected; move it up
-                        self.qmc.move_custom_event(self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, ystep=-1)
+                        self.qmc.move_custom_event(True, self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, ystep=-1)
+                    elif self.qmc.background_event_last_picked_ind is not None and self.qmc.background_event_last_picked_pos is not None:
+                        # a background event is selected; move it up
+                        self.qmc.move_custom_event(False, self.qmc.background_event_last_picked_ind, self.qmc.background_event_last_picked_pos, ystep=-1)
                     elif not(control_modifier or control_shift_modifier):
                         if self.qmc.device == 0 and self.fujipid and self.qmc.Controlbuttonflag: # FUJI PID
                             self.fujipid.lookahead = max(0,self.fujipid.lookahead-1)
@@ -11829,7 +11839,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #                    else:
                     if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
                         # a foreground event is selected; move it up
-                        self.qmc.move_custom_event(self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, ystep=1)
+                        self.qmc.move_custom_event(True, self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, ystep=1)
+                    elif self.qmc.background_event_last_picked_ind is not None and self.qmc.background_event_last_picked_pos is not None:
+                        # a background event is selected; move it up
+                        self.qmc.move_custom_event(False, self.qmc.background_event_last_picked_ind, self.qmc.background_event_last_picked_pos, ystep=1)
                     elif not(control_modifier or control_shift_modifier):
                         if self.qmc.device == 0 and self.fujipid and self.qmc.Controlbuttonflag: # FUJI PID
                             self.fujipid.lookahead = self.fujipid.lookahead+1
@@ -11961,7 +11974,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 elif k == Qt.Key.Key_Left: # 16777234:               #LEFT (moves background left / moves button selection left)
                     if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
                         # a foreground event is selected; move it up
-                        self.qmc.move_custom_event(self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, xstep=-1)
+                        self.qmc.move_custom_event(True, self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, xstep=-1)
+                    elif self.qmc.background_event_last_picked_ind is not None and self.qmc.background_event_last_picked_pos is not None:
+                        # a background event is selected; move it up
+                        self.qmc.move_custom_event(False, self.qmc.background_event_last_picked_ind, self.qmc.background_event_last_picked_pos, xstep=-1)
                     elif self.keyboardmoveflag and self.qmc.flagstart:
                         self.moveKbutton('left')
                     elif self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
@@ -11969,7 +11985,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 elif k == Qt.Key.Key_Right: # 16777236:               #RIGHT (moves background right / moves button selection right)
                     if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
                         # a foreground event is selected; move it up
-                        self.qmc.move_custom_event(self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, xstep=1)
+                        self.qmc.move_custom_event(True, self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, xstep=1)
+                    elif self.qmc.background_event_last_picked_ind is not None and self.qmc.background_event_last_picked_pos is not None:
+                        # a background event is selected; move it up
+                        self.qmc.move_custom_event(False, self.qmc.background_event_last_picked_ind, self.qmc.background_event_last_picked_pos, xstep=1)
                     elif self.keyboardmoveflag and self.qmc.flagstart:
                         self.moveKbutton('right')
                     elif self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
@@ -11977,13 +11996,19 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 elif k == Qt.Key.Key_Up: # 16777235:               #UP (moves background up)
                     if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
                         # a foreground event is selected; move it up
-                        self.qmc.move_custom_event(self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, ystep=1)
+                        self.qmc.move_custom_event(True, self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, ystep=1)
+                    elif self.qmc.background_event_last_picked_ind is not None and self.qmc.background_event_last_picked_pos is not None:
+                        # a background event is selected; move it up
+                        self.qmc.move_custom_event(False, self.qmc.background_event_last_picked_ind, self.qmc.background_event_last_picked_pos, ystep=1)
                     elif self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
                         self.qmc.moveBackgroundSignal.emit('up',self.qmc.backgroundmovespeed)
                 elif k == Qt.Key.Key_Down: # 16777237:               #DOWN (moves background down)
                     if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
                         # a foreground event is selected; move it up
-                        self.qmc.move_custom_event(self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, ystep=-1)
+                        self.qmc.move_custom_event(True, self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, ystep=-1)
+                    elif self.qmc.background_event_last_picked_ind is not None and self.qmc.background_event_last_picked_pos is not None:
+                        # a background event is selected; move it up
+                        self.qmc.move_custom_event(False, self.qmc.background_event_last_picked_ind, self.qmc.background_event_last_picked_pos, ystep=-1)
                     elif self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
                         self.qmc.moveBackgroundSignal.emit('down',self.qmc.backgroundmovespeed)
                 elif k == Qt.Key.Key_A: # 65:                     #A (automatic save)
@@ -12624,7 +12649,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     #moves events in minieditor
     @pyqtSlot(int)
     def changeEventNumber(self, _:int = 0) -> None:
-        _log.debug('PRINT changeEventNumber')
         if self.qmc.designerflag:
             return
         #check
@@ -12634,8 +12658,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         try:
             self.eventlabel.setText(f"{QApplication.translate('Form Caption', 'Event')} #<b>{currentevent} </b>")
 
-            _log.debug('PRINT currentevent: %s',currentevent)
-
             if currentevent == 0:
                 self.lineEvent.setText('')
                 self.valueEdit.setText('')
@@ -12644,11 +12666,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.resetlines()
                 if not self.qmc.flagstart:
                     self.qmc.fig.canvas.draw()
-                _log.debug('PRINT return1')
                 return
             if currentevent > lenevents:
                 self.eNumberSpinBox.setValue(int(lenevents))
-                _log.debug('PRINT return2')
                 return
             self.lineEvent.setText(self.qmc.specialeventsStrings[currentevent-1])
             if self.qmc.timeindex[0] > -1 and len(self.qmc.timex) > self.qmc.timeindex[0]:
@@ -17177,7 +17197,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 'BackgroundGeometry','ScheduleGeometry','ScheduleRemainingSplitter', 'ScheduleMainSplitter', 'ScheduleCompletedSplitter', 'LCDGeometry','DeltaLCDGeometry','ExtraLCDGeometry','PhasesLCDGeometry','AlarmsGeometry',
                 'DeviceAssignmentGeometry','PortsGeometry','TransformatorPosition', 'CurvesPosition', 'StatisticsPosition',
                 'AxisPosition','PhasesPosition', 'BatchPosition', 'SamplingPosition', 'autosaveGeometry', 'PIDPosition',
-                'DesignerPosition','PIDLCDGeometry','ScaleLCDGeometry', 'MainSplitter']:
+                'DesignerPosition','PIDLCDGeometry','ScaleLCDGeometry', 'MainSplitter', 'StatisticsGeometry']:
             settings.remove(s)
 
     #loads the settings at the start of application. See the oppposite closeEventSettings()
@@ -25594,10 +25614,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     #restores a palette number to current buttons
     # returns 1 on success and 0 on failure
-    def setbuttonsfrom(self,pindex:int) -> int:
+    # if only_non_empty is set (like for CMD-<n> key palette swaps, we never active an empty palette
+    def setbuttonsfrom(self,pindex:int, only_non_empty:bool=False) -> int:
         if 0 <= pindex < self.max_palettes:
             copy:Palette = self.buttonpalette[pindex]
-            if self.paletteValid(copy):
+            if self.paletteValid(copy) and (not only_non_empty or copy != self.makePalette(empty=True)):
                 self.extraeventstypes = copy[0][:]
                 self.extraeventsvalues = copy[1][:]
                 self.extraeventsactions = copy[2][:]
@@ -25684,7 +25705,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         # by default an empty (non paletteValid() palette is returned
         # if empty is set to False, a valid palette from the current event settings is generated
         if empty:
-            return cast('Palette', tuple([[]]*25 + [''] + [[]]*2))
+#            return cast('Palette', tuple([[]]*25 + [''] + [[]]*2))
+            return cast('Palette', ([], [], [], [], [], [], [], [], [], [0, 0, 0, 0], [0, 0, 0, 0],
+                ['', '', '', ''], [0, 0, 0, 0], [1.0, 1.0, 1.0, 1.0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [100, 100, 100, 100],
+                [0, 0, 0, 0], [0, 0, 0, 0], [100, 100, 100, 100], [0, 0, 0, 0], [0, 0, 0, 0], ['', '', '', ''], [0, 0, 0, 0], '',
+                [0, 0, 0, 0], [0, 0, 0, 0]))
         return (
             self.extraeventstypes[:],
             self.extraeventsvalues[:],

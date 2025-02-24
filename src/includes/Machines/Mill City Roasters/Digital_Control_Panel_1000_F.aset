@@ -1,4 +1,4 @@
-[General]
+writeSingle([General]
 Delay=2000
 roastertype_setup=MCR Digital Control Panel 1000
 dropDuplicates=true
@@ -176,7 +176,7 @@ eventbuttontablecolumnwidths=70, 80, 100, 50, 150, 100, 80, 80, 80, 138
 extraeventbuttoncolor=#ad0427, #ad5a6b, #808080, #45a6cf, #97becf, #808080, #49b360, #91b398
 extraeventbuttontextcolor=white, white, white, white, white, white, white, white
 extraeventsactions=4, 4, 0, 4, 4, 0, 4, 4
-extraeventsactionstrings="write([1,4608,{}])", "write([1,4608,{}])", , "write([1,4638,{}])", "write([1,4638,{}])", , "write([1,4636,{}])", "write([1,4636,{}])"
+extraeventsactionstrings="writeSingle([1,4608,{}])", "writeSingle([1,4608,{}])", , "writeSingle([1,4638,{}])", "writeSingle([1,4638,{}])", , "writeSingle([1,4636,{}])", "writeSingle([1,4636,{}])"
 extraeventsbuttonsflags=0, 1, 1
 extraeventsdescriptions=, , , , , , , 
 extraeventslabels=+10\n\\t, -10\n\\t, , +5\n\\t, -5\n\\t, , +5\n\\t, -5\n\\t
@@ -196,7 +196,7 @@ eventslidersflags=0, 1, 1
 eventslidertemp=0, 0, 0, 0
 eventsliderunits=Hz, Hz, , daPa
 slideractions=2, 2, 0, 2
-slidercommands="write([1,4638,{}])", "write([1,4636,{}])", , "write([1,4608,{}])"
+slidercommands="writeSingle([1,4638,{}])", "writeSingle([1,4636,{}])", , "writeSingle([1,4608,{}])"
 sliderfactors=100, 100, 1, 10
 slidermax=60, 60, 100, 350
 slidermin=0, 0, 0, 0

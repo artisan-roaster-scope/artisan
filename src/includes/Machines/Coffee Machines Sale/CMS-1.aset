@@ -1,4 +1,4 @@
-[General]
+writeSingle([General]
 roastersize_setup=1
 roastertype_setup=CMS-1
 roastersize_setup=1
@@ -42,7 +42,7 @@ eventbuttontablecolumnwidths=70, 80, 100, 50, 150, 100, 80, 80, 80, 138
 extraeventbuttoncolor=#b64c4e, #b6181a, #808080, #7fb4cb, #45a6cf, #808080, #70b780, #49b260
 extraeventbuttontextcolor=white, white, white, white, white, white, white, white
 extraeventsactions=4, 4, 0, 4, 4, 0, 4, 4
-extraeventsactionstrings="write([3,53,{}])", "write([3,53,{}])", , "write([5,8193,{}])", "write([5,8193,{}])", , "write([4,8193,{}])", "write([4,8193,{}])"
+extraeventsactionstrings="writeSingle([3,53,{}])", "writeSingle([3,53,{}])", , "writeSingle([5,8193,{}])", "writeSingle([5,8193,{}])", , "writeSingle([4,8193,{}])", "writeSingle([4,8193,{}])"
 extraeventsbuttonsflags=0, 1, 1
 extraeventsdescriptions=, , , , , , , 
 extraeventslabels=-5%\n\\t, +5%\n\\t, E, -5%\n\\t, +5%\n\\t, E, -5%\n\\t, +5%\n\\t
@@ -175,7 +175,7 @@ eventslidersflags=0, 1, 1
 eventslidertemp=0, 0, 0, 0
 eventsliderunits=Hz, Hz, , %
 slideractions=2, 2, 0, 2
-slidercommands="write([5,8193,{}])", "write([4,8193,{}])", , "write([3,53,{}])"
+slidercommands="writeSingle([5,8193,{}])", "writeSingle([4,8193,{}])", , "writeSingle([3,53,{}])"
 sliderfactors=100, 100, 1, 50
 slidermax=50, 50, 100, 100
 slidermin=20, 20, 0, 0

@@ -281,6 +281,7 @@ class tgraphcanvas(FigureCanvas):
         'l_temp1', 'l_temp2', 'l_delta1', 'l_delta2', 'l_back1', 'l_back2', 'l_back3', 'l_back4', 'l_delta1B', 'l_delta2B', 'l_BTprojection', 'l_DeltaETprojection', 'l_DeltaBTprojection',
         'l_ETprojection', 'l_AUCguide', 'l_horizontalcrossline', 'l_verticalcrossline', 'l_timeline', 'legend', 'l_eventtype1dots', 'l_eventtype2dots',
         'l_eventtype3dots', 'l_eventtype4dots', 'l_eteventannos', 'l_bteventannos', 'l_eventtype1annos', 'l_eventtype2annos', 'l_eventtype3annos',
+        'l_eventflagannos', 'l_eventflagbackannos',
         'l_eventtype4annos', 'l_annotations', 'l_background_annotations', 'l_annotations_dict', 'l_annotations_pos_dict', 'l_event_flags_dict',
         'l_eventtype1backannos', 'l_eventtype2backannos', 'l_eventtype3backannos', 'l_eventtype4backannos',
         'l_event_flags_pos_dict', 'ai', 'timeclock', 'threadserver', 'designerflag', 'designerconnections', 'mousepress', 'indexpoint',
@@ -319,6 +320,7 @@ class tgraphcanvas(FigureCanvas):
         'fmt_data_ON', 'l_subtitle', 'projectDeltaFlag', 'btbreak_params','bbpCache', 'glow',
         'custom_event_dlg_default_type', 'custom_event_dlg_default_type', 'foreground_event_ind', 'foreground_event_last_picked_ind',
         'foreground_event_last_picked_pos', 'background_event_ind', 'background_event_pos', 'background_event_pick_position',
+        'background_event_last_picked_ind', 'background_event_last_picked_pos',
         'foreground_event_pos', 'plus_lockSchedule_sent_account', 'plus_lockSchedule_sent_date', 'specialeventplaybackramp',
         'CO2kg_per_BTU_default', 'CO2kg_per_BTU', 'Biogas_CO2_Reduction', 'Biogas_CO2_Reduction_default',
         'meterunitnames', 'meterreads_default', 'meterreads', 'meterlabels_setup', 'meterlabels', 'meterunits_setup', 'meterunits',
@@ -1161,6 +1163,8 @@ class tgraphcanvas(FigureCanvas):
         self.background_event_ind:Optional[int] = None
         self.background_event_pos:Optional[int] = None
         self.background_event_pick_position:Optional[Tuple[float,float]] = None
+        self.background_event_last_picked_ind:Optional[int] = None # index of the last picked event marker in self.specialevents to be deleted via backspace or moved by cursor keys
+        self.background_event_last_picked_pos:Optional[int] = None # position of the last picked event marker in its 2DLine.xdata() value array to be deleted via backspace or moved by cursor keys
 
         self.onmove_cid = self.fig.canvas.mpl_connect('motion_notify_event', cast('Callable[[Event],None]', self.onmove))
 
@@ -1974,6 +1978,8 @@ class tgraphcanvas(FigureCanvas):
         self.l_eventtype3annos:List[Annotation] = []
         self.l_eventtype4annos:List[Annotation] = []
 
+        self.l_eventflagannos:List[Annotation] = [] # collects all the foreground profile flag annotations in Step+ mode (self.eventsGraphflag == 3)
+
         self.l_eteventannos:List[Annotation] = []
         self.l_bteventannos:List[Annotation] = []
 
@@ -1981,6 +1987,8 @@ class tgraphcanvas(FigureCanvas):
         self.l_eventtype2backannos:List[Annotation] = []
         self.l_eventtype3backannos:List[Annotation] = []
         self.l_eventtype4backannos:List[Annotation] = []
+
+        self.l_eventflagbackannos:List[Annotation] = [] # collects all the background profile flag annotations in Step+ mode (self.eventsGraphflag == 3)
 
         self.l_annotations:List[Annotation] = []
         self.l_background_annotations:List[Annotation] = []
@@ -2942,12 +2950,12 @@ class tgraphcanvas(FigureCanvas):
             self.foreground_event_ind = None
             self.foreground_event_pos = None
             self.foreground_event_pick_position = None
-            self.foreground_event_last_picked_ind = None # for delete and cursor move action
-            self.foreground_event_last_picked_pos = None # for delete and cursor move action
+            self.clear_last_picked_event_selection()
             # reset picked background event
             self.background_event_ind = None
             self.background_event_pos = None
             self.background_event_pick_position = None
+            self.clear_last_background_picked_event_selection()
             # display MET information by clicking on the MET marker
             if (isinstance(event.artist, Annotation) and self.showmet and event.artist in [self.met_annotate] and
                     self.met_timex_temp1_delta is not None and self.met_timex_temp1_delta[2] is not None):
@@ -3079,11 +3087,13 @@ class tgraphcanvas(FigureCanvas):
                                         self.backgroundeventmessage = f'{self.backgroundeventmessage} ({self.backgroundEStrings[i].strip()[:self.eventslabelschars]})'
                                     self.backgroundeventmessage = f'{self.backgroundeventmessage} @ {(stringfromseconds(self.timeB[bge] - start))} {float2float(self.temp2B[bge],digits)}{self.mode}'
                                     self.starteventmessagetimer()
-                                    if self.eventsGraphflag in {2,4}:
+                                    if self.eventsGraphflag in {2,3,4}:
                                         # we support custom event pick-and-drag only for events rendered as step lines, step+ and as combo.
                                         self.background_event_ind = i
                                         self.background_event_pos = ind
                                         self.background_event_pick_position = (event.artist.get_xdata()[ind],event.artist.get_ydata()[ind])
+                                        self.background_event_last_picked_ind = i
+                                        self.background_event_last_picked_pos = ind
                                     break
                 elif event.artist in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
                     tx = event.artist.get_xdata()[ind]
@@ -3122,7 +3132,7 @@ class tgraphcanvas(FigureCanvas):
                                         self.eventmessage = f'{self.eventmessage} ({self.specialeventsStrings[i].strip()[:self.eventslabelschars]})'
                                     self.eventmessage = f'{self.eventmessage} @ {stringfromseconds(self.timex[spe] - start)} {float2float(self.temp2[spe],digits)}{self.mode}'
                                     self.starteventmessagetimer()
-                                    if self.eventsGraphflag in {2,4}:
+                                    if self.eventsGraphflag in {2,3,4}:
                                         # we support custom event pick-and-drag only for events rendered as step lines, step+ and as combo.
                                         self.foreground_event_ind = i
                                         self.foreground_event_pos = ind
@@ -3135,7 +3145,7 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             self.adderror((QApplication.translate('Error Message','Exception:') + ' onpick() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
-    # returns event line artist, if any, and, if events are displayed as Combo also the list event annotations
+    # returns event line artist, if any, and, if events are displayed as Combo also the list event annotations or in Step+ mode also the flag annos
     def event_type_to_artist(self, event_type:int) -> Tuple[Optional[Line2D],Optional[List[Annotation]]]:
         ldots:Optional[Line2D] = None
         event_annos:Optional[List[Annotation]] = None
@@ -3155,9 +3165,11 @@ class tgraphcanvas(FigureCanvas):
             ldots = self.l_eventtype4dots
             if self.eventsGraphflag == 4:
                 event_annos = self.l_eventtype4annos
+        if self.eventsGraphflag == 3:
+            event_annos = self.l_eventflagannos
         return ldots, event_annos
 
-    # returns background event line artist, if any, and, if events are displayed as Combo also the list event annotations
+    # returns background event line artist, if any, and, if events are displayed as Combo also the list event annotations or in Step+ mode also the flag annos
     def event_type_to_background_artist(self, event_type:int) -> Tuple[Optional[Line2D],Optional[List[Annotation]]]:
         ldots:Optional[Line2D] = None
         event_annos:Optional[List[Annotation]] = None
@@ -3177,19 +3189,25 @@ class tgraphcanvas(FigureCanvas):
             ldots = self.l_backgroundeventtype4dots
             if self.eventsGraphflag == 4:
                 event_annos = self.l_eventtype4backannos
+        if self.eventsGraphflag == 3:
+            event_annos = self.l_eventflagbackannos
         return ldots, event_annos
 
     # ind: the event index in self.specialevents; pos: the index in the corresponding 2DLine artist
-    def move_custom_event(self, ind:int, pos:int, xstep:int = 0, ystep:int = 0) -> None:
-        if len(self.specialeventstype)>ind:
+    # if foreground, we ind and pos are interpreted against the foreground profile otherwise against the background profile
+    def move_custom_event(self, foreground:bool, ind:int, pos:int, xstep:int = 0, ystep:int = 0) -> None:
+        specialevents = (self.specialevents if foreground else self.backgroundEvents)
+        specialeventstype = (self.specialeventstype if foreground else self.backgroundEtypes)
+        specialeventsvalue = (self.specialeventsvalue if foreground else self.backgroundEvalues)
+        if len(specialeventstype)>ind:
             # update event value
-            new_value:int = self.eventsInternal2ExternalValue(self.specialeventsvalue[ind]) + ystep
-            self.specialeventsvalue[ind] = self.eventsExternal2InternalValue(new_value)
+            new_value:int = self.eventsInternal2ExternalValue(specialeventsvalue[ind]) + ystep
+            specialeventsvalue[ind] = self.eventsExternal2InternalValue(new_value)
             # establish new artist value
-            event_type = self.specialeventstype[ind]
+            event_type = specialeventstype[ind]
             ldots:Optional[Line2D] = None
             event_annos = None
-            ldots, event_annos = self.event_type_to_artist(event_type)
+            ldots, event_annos = (self.event_type_to_artist(event_type) if foreground else self.event_type_to_background_artist(event_type))
             if ldots is not None:
                 ydata = ldots.get_ydata()
                 if self.clampEvents:
@@ -3204,25 +3222,61 @@ class tgraphcanvas(FigureCanvas):
                 ldots.set_ydata(ydata)
                 # update the xdata
                 xdata = ldots.get_xdata()
-                time_idx = max(0,min(len(self.timex)-1,self.time2index(xdata[pos])))
+                time_idx = (max(0,min(len(self.timex)-1,self.time2index(xdata[pos]))) if foreground else
+                        max(0,min(len(self.timeB)-1,self.backgroundtime2index(xdata[pos]))))
                 if xstep:
                     time_idx += xstep
-                    self.specialevents[ind] = time_idx
+                    if not foreground:
+                        # don't move events beyond previous and next events positions
+                        if pos != 0:
+                            # there is a point left to ours
+                            time_idx = max(self.backgroundtime2index(xdata[pos-1])+1,time_idx)
+                        if pos != len(xdata)-1:
+                            # there is a point right to ours
+                            time_idx = min(time_idx,self.backgroundtime2index(xdata[pos+1])-1)
+                    # limit to length of timex/timeB
+                    time_idx = (max(0,min(len(self.timex)-1,time_idx)) if foreground else max(0,min(len(self.timeB)-1,time_idx)))
+                    specialevents[ind] = time_idx
                     # update also the Artist to the final time
-                    xdata[pos] = self.timex[time_idx]
+                    xdata[pos] = (self.timex[time_idx] if foreground else self.timeB[time_idx])
                     ldots.set_xdata(xdata)
-
-                if xstep != 0:
+                if foreground and xstep != 0:
+                    # we redraw the selection mark only for foreground selections
                     self.resetlines()
                     self.aw.plotEventSelection(ind)
-
-                if event_annos is not None and len(event_annos)>pos:
-                    event_anno = event_annos[pos]
-                    self.updateEventAnno(
-                        event_type,
-                        event_anno,
-                        self.timex[time_idx],
-                        event_ydata)
+                if event_annos is not None:
+                    if self.eventsGraphflag == 4 and len(event_annos)>pos:
+                        event_anno = event_annos[pos]
+                        self.updateEventAnno(
+                            event_type,
+                            event_anno,
+                            (self.timex[time_idx] if foreground else self.timeB[time_idx]),
+                            event_ydata)
+                    elif self.eventsGraphflag == 3 and len(event_annos)>ind:
+                        event_anno = event_annos[ind]
+                        tempo:Optional[float] = None
+                        if foreground:
+                            if not self.showeventsonbt and self.temp1[ind] > self.temp2[ind] and self.ETcurve:
+                                if self.flagon:
+                                    tempo = self.temp1[time_idx]
+                                else:
+                                    tempo = self.stemp1[time_idx]
+                            elif self.BTcurve:
+                                if self.flagon:
+                                    tempo = self.temp2[time_idx]
+                                else:
+                                    tempo = self.stemp2[time_idx]
+                        elif not self.showeventsonbt and self.temp1B[ind] > self.temp2B[ind] and self.ETcurve:
+                            tempo = self.temp1B[time_idx]
+                        elif self.BTcurve:
+                            tempo = self.temp2B[time_idx]
+                        if tempo is not None:
+                            self.updateFlagAnno(
+                                event_type,
+                                event_anno,
+                                (self.timex[time_idx] if foreground else self.timeB[time_idx]),
+                                event_ydata,
+                                tempo)
                 # redraw
                 if self.flagon:
                     self.redraw_keep_view(recomputeAllDeltas=False)
@@ -3234,6 +3288,7 @@ class tgraphcanvas(FigureCanvas):
         try:
             ldots:Optional[Line2D]
             event_annos:Optional[List[Annotation]]
+            tempo:Optional[float] = None
             if (self.foreground_event_ind is not None and self.foreground_event_pos is not None and self.foreground_event_pick_position is not None and
                     len(self.specialeventstype)>self.foreground_event_ind):
                 event_type = self.specialeventstype[self.foreground_event_ind]
@@ -3261,13 +3316,33 @@ class tgraphcanvas(FigureCanvas):
                     self.specialeventsvalue[self.foreground_event_ind] = evalue_internal
                     # put back after rounding and converting back to position
                     ydata[self.foreground_event_pos] = (evalue if self.clampEvents else (evalue*event_pos_factor)+event_pos_offset)
-                    if event_annos is not None and len(event_annos)>self.foreground_event_pos:
-                        event_anno = event_annos[self.foreground_event_pos]
-                        self.updateEventAnno(
-                            event_type,
-                            event_anno,
-                            self.timex[time_idx],
-                            event_ydata)
+                    if event_annos is not None:
+                        if self.eventsGraphflag == 4 and len(event_annos)>self.foreground_event_pos:
+                            event_anno = event_annos[self.foreground_event_pos]
+                            self.updateEventAnno(
+                                event_type,
+                                event_anno,
+                                self.timex[time_idx],
+                                event_ydata)
+                        elif self.eventsGraphflag == 3 and len(event_annos)>self.foreground_event_ind:
+                            event_anno = event_annos[self.foreground_event_ind]
+                            if not self.showeventsonbt and self.temp1[time_idx] > self.temp2[time_idx] and self.ETcurve:
+                                if self.flagon:
+                                    tempo = self.temp1[time_idx]
+                                else:
+                                    tempo = self.stemp1[time_idx]
+                            elif self.BTcurve:
+                                if self.flagon:
+                                    tempo = self.temp2[time_idx]
+                                else:
+                                    tempo = self.stemp2[time_idx]
+                            if tempo is not None:
+                                self.updateFlagAnno(
+                                    event_type,
+                                    event_anno,
+                                    self.timex[time_idx],
+                                    event_ydata,
+                                    tempo)
                     # redraw
                     if self.flagon:
                         self.redraw_keep_view(recomputeAllDeltas=False)
@@ -3311,13 +3386,28 @@ class tgraphcanvas(FigureCanvas):
                     self.backgroundEvalues[self.background_event_ind] = evalue_internal
                     # put back after rounding and converting back to position
                     ydata[self.background_event_pos] = (evalue if self.clampEvents else (evalue*event_pos_factor)+event_pos_offset)
-                    if event_annos is not None and len(event_annos)>self.background_event_pos:
-                        event_anno = event_annos[self.background_event_pos]
-                        self.updateEventAnno(
-                            event_type,
-                            event_anno,
-                            self.timeB[time_idx],
-                            event_ydata)
+                    if event_annos is not None:
+                        if self.eventsGraphflag == 4 and len(event_annos)>self.background_event_pos:
+                            event_anno = event_annos[self.background_event_pos]
+                            self.updateEventAnno(
+                                event_type,
+                                event_anno,
+                                self.timeB[time_idx],
+                                event_ydata)
+                        elif self.eventsGraphflag == 3 and len(event_annos)>self.background_event_ind:
+                            event_anno = event_annos[self.background_event_ind]
+                            if not self.showeventsonbt and self.temp1B[time_idx] > self.temp2B[time_idx] and self.ETcurve:
+                                tempo = self.temp1B[time_idx]
+                            elif self.BTcurve:
+                                tempo = self.temp2B[time_idx]
+                            if tempo is not None:
+                                self.updateFlagAnno(
+                                    event_type,
+                                    event_anno,
+                                    self.timeB[time_idx],
+                                    event_ydata,
+                                    tempo)
+
                     # redraw
                     if self.flagon:
                         self.redraw_keep_view(recomputeAllDeltas=False)
@@ -3428,6 +3518,26 @@ class tgraphcanvas(FigureCanvas):
             firstletter = ''
         event_anno.set_text(f'{firstletter}{secondletter}{thirdletter}')
 
+    def updateFlagAnno(self, event_type:int, flag_anno:Annotation, x:float, y:float, yy:float) -> None:
+        # update marker position
+        height = 50 if self.mode == 'F' else 20
+        flag_anno.set_position((x,yy+height))
+        flag_anno.xy = (x,yy)
+
+        # update marker text
+        event_pos_offset = self.eventpositionbars[0]
+        event_pos_factor = self.eventpositionbars[1] - self.eventpositionbars[0]
+        if self.clampEvents:
+            evalue = max(0,int(round(y)))
+        else:
+            evalue = max(0,int(round((y - event_pos_offset) / event_pos_factor)))
+        evalue_internal = self.eventsExternal2InternalValue(evalue)
+        # set anno text
+        etype = self.etypesf(event_type)
+        firstletter = self.etypeAbbrev(etype)
+        secondletter = self.eventsvaluesShort(evalue_internal)
+        flag_anno.set_text(f'{firstletter}{secondletter}')
+
     def onmove(self, event:'MouseEvent') -> None:
         if all(x is None for x in [self.foreground_event_ind, self.foreground_event_pos, self.foreground_event_pick_position,
             self.background_event_ind, self.background_event_pos, self.background_event_pick_position]):
@@ -3442,6 +3552,7 @@ class tgraphcanvas(FigureCanvas):
             return
         if event.ydata is None:
             return
+        tempo:Optional[float] = None
         if  (self.foreground_event_ind is not None and self.foreground_event_pos is not None and self.foreground_event_pick_position is not None and
                     len(self.specialeventstype)>self.foreground_event_ind):
             event_type = self.specialeventstype[self.foreground_event_ind]
@@ -3466,13 +3577,34 @@ class tgraphcanvas(FigureCanvas):
                     if not self.flagon and len(ydata) == self.foreground_event_pos + 2: # we also move the last dot up and down with the butlast
                         ydata[-1] = ydata[-2]
                     ldots.set_ydata(ydata)
-                if event_annos is not None and len(event_annos)>self.foreground_event_pos:
-                    event_anno = event_annos[self.foreground_event_pos]
-                    self.updateEventAnno(
-                        event_type,
-                        event_anno,
-                        xdata[self.foreground_event_pos],
-                        ydata[self.foreground_event_pos])
+                if event_annos is not None:
+                    if self.eventsGraphflag == 4 and len(event_annos)>self.foreground_event_pos:
+                        event_anno = event_annos[self.foreground_event_pos]
+                        self.updateEventAnno(
+                            event_type,
+                            event_anno,
+                            xdata[self.foreground_event_pos],
+                            ydata[self.foreground_event_pos])
+                    elif self.eventsGraphflag == 3 and len(event_annos)>self.foreground_event_ind:
+                        event_anno = event_annos[self.foreground_event_ind]
+                        idx = max(0,min(len(self.timex)-1,self.time2index(xdata[self.foreground_event_pos])))
+                        if not self.showeventsonbt and self.temp1[idx] > self.temp2[idx] and self.ETcurve:
+                            if self.flagon:
+                                tempo = self.temp1[idx]
+                            else:
+                                tempo = self.stemp1[idx]
+                        elif self.BTcurve:
+                            if self.flagon:
+                                tempo = self.temp2[idx]
+                            else:
+                                tempo = self.stemp2[idx]
+                        if tempo is not None:
+                            self.updateFlagAnno(
+                                event_type,
+                                event_anno,
+                                xdata[self.foreground_event_pos],
+                                ydata[self.foreground_event_pos],
+                                tempo)
                 self.fig.canvas.draw_idle()
         elif (self.background_event_ind is not None and self.background_event_pos is not None and self.background_event_pick_position is not None and
                     len(self.backgroundEtypes)>self.background_event_ind):
@@ -3506,13 +3638,28 @@ class tgraphcanvas(FigureCanvas):
                     if not self.flagon and len(ydata) == self.background_event_pos + 2: # we also move the last dot up and down with the butlast
                         ydata[-1] = ydata[-2]
                     ldots.set_ydata(ydata)
-                if event_annos is not None and len(event_annos)>self.background_event_pos:
-                    event_anno = event_annos[self.background_event_pos]
-                    self.updateEventAnno(
-                        event_type,
-                        event_anno,
-                        xdata[self.background_event_pos],
-                        ydata[self.background_event_pos])
+                if event_annos is not None:
+                    if self.eventsGraphflag == 4 and len(event_annos)>self.background_event_pos:
+                        event_anno = event_annos[self.background_event_pos]
+                        self.updateEventAnno(
+                            event_type,
+                            event_anno,
+                            xdata[self.background_event_pos],
+                            ydata[self.background_event_pos])
+                    elif self.eventsGraphflag == 3 and len(event_annos)>self.background_event_ind:
+                        event_anno = event_annos[self.background_event_ind]
+                        idx = max(0,min(len(self.timeB)-1,self.backgroundtime2index(xdata[self.background_event_pos])))
+                        if not self.showeventsonbt and self.temp1B[idx] > self.temp2B[idx] and self.ETcurve:
+                            tempo = self.temp1B[idx]
+                        elif self.BTcurve:
+                            tempo = self.temp2B[idx]
+                        if tempo is not None:
+                            self.updateFlagAnno(
+                                event_type,
+                                event_anno,
+                                xdata[self.background_event_pos],
+                                ydata[self.background_event_pos],
+                                tempo)
                 self.fig.canvas.draw_idle()
 
     def clear_last_picked_event_selection(self) -> None:
@@ -3521,9 +3668,16 @@ class tgraphcanvas(FigureCanvas):
             self.foreground_event_last_picked_pos = None
             self.aw.eNumberSpinBox.setValue(0)
 
+    def clear_last_background_picked_event_selection(self) -> None:
+        if self.background_event_last_picked_ind is not None or self.background_event_last_picked_pos is not None:
+            self.background_event_last_picked_ind = None # clear the last picked event index remembered for the delete event by backspace action
+            self.background_event_last_picked_pos = None
+
     def onclick(self, event:'MouseEvent') -> None:
         if self.foreground_event_last_picked_ind is not None and self.foreground_event_last_picked_ind != self.foreground_event_ind:
             self.clear_last_picked_event_selection()
+        if self.background_event_last_picked_ind is not None and self.background_event_last_picked_ind != self.background_event_ind:
+            self.clear_last_background_picked_event_selection()
         self.aw.setFocus() # we set the focus to the ApplicationWindow on clicking the MPL canvas to (re-)gain focus while the event minieditor is open
         try:
             if self.ax is None:
@@ -8921,6 +9075,7 @@ class tgraphcanvas(FigureCanvas):
                     self.l_eventtype2annos = []
                     self.l_eventtype3annos = []
                     self.l_eventtype4annos = []
+                    self.l_eventflagannos = []
                     self.l_backgroundeventtype1dots = None
                     self.l_backgroundeventtype2dots = None
                     self.l_backgroundeventtype3dots = None
@@ -8929,6 +9084,7 @@ class tgraphcanvas(FigureCanvas):
                     self.l_eventtype2backannos = []
                     self.l_eventtype3backannos = []
                     self.l_eventtype4backannos = []
+                    self.l_eventflagbackannos = []
 
                     #update X ticks, labels, and rotating_colors
                     self.xaxistosm(redraw=False)
@@ -9311,6 +9467,7 @@ class tgraphcanvas(FigureCanvas):
                                     except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
                                         pass
                                     self.l_background_annotations.append(anno)
+                                    self.l_eventflagbackannos.append(anno)
                             #background events by value
                             if self.eventsGraphflag in {2, 3, 4}: # 2: step, 3: step+, 4: combo
                                 self.E1backgroundtimex,self.E2backgroundtimex,self.E3backgroundtimex,self.E4backgroundtimex = [],[],[],[]
@@ -9522,7 +9679,7 @@ class tgraphcanvas(FigureCanvas):
                                                                                 marker=(self.EvalueMarker[0] if self.eventsGraphflag != 4 else None),
                                                                                 markersize = self.EvalueMarkerSize[0],
                                                                                 picker=True,
-                                                                                pickradius=3,
+                                                                                pickradius=4,
                                                                                 #markevery=every,
                                                                                 linestyle='-',
                                                                                 drawstyle=(self.drawstyle_default if self.specialeventplaybackramp[0] else 'steps-post'),
@@ -9546,7 +9703,7 @@ class tgraphcanvas(FigureCanvas):
                                                                                 marker=(self.EvalueMarker[1] if self.eventsGraphflag != 4 else None),
                                                                                 markersize = self.EvalueMarkerSize[1],
                                                                                 picker=True,
-                                                                                pickradius=3,
+                                                                                pickradius=4,
                                                                                 #markevery=every,
                                                                                 linestyle='-',
                                                                                 drawstyle=(self.drawstyle_default if self.specialeventplaybackramp[1] else 'steps-post'),
@@ -9570,7 +9727,7 @@ class tgraphcanvas(FigureCanvas):
                                                                                 marker=(self.EvalueMarker[2] if self.eventsGraphflag != 4 else None),
                                                                                 markersize = self.EvalueMarkerSize[2],
                                                                                 picker=True,
-                                                                                pickradius=3,
+                                                                                pickradius=4,
                                                                                 #markevery=every,
                                                                                 linestyle='-',
                                                                                 drawstyle=(self.drawstyle_default if self.specialeventplaybackramp[2] else 'steps-post'),
@@ -9594,7 +9751,7 @@ class tgraphcanvas(FigureCanvas):
                                                                                 marker=(self.EvalueMarker[3] if self.eventsGraphflag != 4 else None),
                                                                                 markersize = self.EvalueMarkerSize[3],
                                                                                 picker=True,
-                                                                                pickradius=3,
+                                                                                pickradius=4,
                                                                                 #markevery=every,
                                                                                 linestyle='-',
                                                                                 drawstyle=(self.drawstyle_default if self.specialeventplaybackramp[3] else 'steps-post'),
@@ -10127,7 +10284,7 @@ class tgraphcanvas(FigureCanvas):
                                                                 marker = (self.EvalueMarker[0] if self.eventsGraphflag != 4 else None),
                                                                 markersize = self.EvalueMarkerSize[0],
                                                                 picker=True,
-                                                                pickradius=3,#markevery=every,
+                                                                pickradius=4,#markevery=every,
                                                                 linestyle='-',drawstyle=ds,linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
                             if len(self.E2timex) > 0 and len(self.E2values) == len(self.E2timex):
                                 pos = max(0,int(round((self.specialeventsvalue[E2_last]-1)*10)))
@@ -10154,7 +10311,7 @@ class tgraphcanvas(FigureCanvas):
                                                                 marker = (self.EvalueMarker[1] if self.eventsGraphflag != 4 else None),
                                                                 markersize = self.EvalueMarkerSize[1],
                                                                 picker=True,
-                                                                pickradius=3,#markevery=every,
+                                                                pickradius=4,#markevery=every,
                                                                 linestyle='-',drawstyle=ds,linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
                             if len(self.E3timex) > 0 and len(self.E3values) == len(self.E3timex):
                                 pos = max(0,int(round((self.specialeventsvalue[E3_last]-1)*10)))
@@ -10181,7 +10338,7 @@ class tgraphcanvas(FigureCanvas):
                                                                 marker = (self.EvalueMarker[2] if self.eventsGraphflag != 4 else None),
                                                                 markersize = self.EvalueMarkerSize[2],
                                                                 picker=True,
-                                                                pickradius=3,#markevery=every,
+                                                                pickradius=4,#markevery=every,
                                                                 linestyle='-',drawstyle=ds,linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
                             if len(self.E4timex) > 0 and len(self.E4values) == len(self.E4timex):
                                 pos = max(0,int(round((self.specialeventsvalue[E4_last]-1)*10)))
@@ -10208,7 +10365,7 @@ class tgraphcanvas(FigureCanvas):
                                                                 marker = (self.EvalueMarker[3] if self.eventsGraphflag != 4 else None),
                                                                 markersize = self.EvalueMarkerSize[3],
                                                                 picker=True,
-                                                                pickradius=3,#markevery=every,
+                                                                pickradius=4,#markevery=every,
                                                                 linestyle='-',drawstyle=ds,linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
                         if Nevents:
                             evalues:List[List[float]] = [[],[],[],[]]
@@ -10311,6 +10468,7 @@ class tgraphcanvas(FigureCanvas):
                                                     self.l_eteventannos.append(anno)
                                                 else:
                                                     self.l_bteventannos.append(anno)
+                                                self.l_eventflagannos.append(anno)
                                             elif self.eventsGraphflag == 4:
                                                 if thirdletter != '':
                                                     firstletter = ''
