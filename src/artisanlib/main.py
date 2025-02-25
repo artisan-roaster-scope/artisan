@@ -8246,8 +8246,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         action = action + 1 # skip the 19: Aillio PRS
             # after adaption: (see eventaction)
                 value = (self.calcSliderSendValue(n) if v is None else v) # preference for the more precise float value if given over the slider value
-                if action not in [6, 14, 15, 21] or (action == 4 and v is None): # only for IO, VOUT, S7 and RC Commands we keep the floats
-                        # and for MODBUS if the optional float value v is not given (only for ramping event replay on MOBDUS; don't use 'write' then to write integers, but 'writeSingle')
+                if action not in {4, 6, 14, 15, 20, 21} or (action in {4,20} and v is None): # only for IO, VOUT, S7 and RC Commands we keep the floats
+                        # and for MODBUS/Artisan Command if the optional float value v is not given (
+                        # only for ramping event replay on MOBDUS; don't use 'write' then to write integers, but 'writeSingle')
                     value = int(round(value))
                 if action in {8, 9, 16, 17, 18}: # for Hottop/R1 Heater or Fan, we just forward the value
                     cmd = str(int(round(value)))

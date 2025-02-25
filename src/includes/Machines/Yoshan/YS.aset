@@ -2,7 +2,7 @@
 Delay=2000
 roastertype_setup=Yoshan YS
 dropDuplicates=true
-dropDuplicatesLimit=0.1
+dropDuplicatesLimit=0.3
 
 [Device]
 id=29
@@ -150,8 +150,8 @@ buttonpalette_slider_alternative_layout=false, false, false, false, false, false
 buttonpalette_tooltips=false, false, false, false, false, false, false, false, false, false
 buttonpalettemaxlen=14, 14, 14, 14, 14, 14, 14, 14, 14, 14
 buttonsize=1
-extraeventbuttoncolor=#ffffff, #43a7cf, #7dbed7, #cccccc, #808080, #ffffff, #49b160, #8bc598, #cccccc, #808080, #ffffff, #ad0427, #be596e, #cccccc, #808080, #cccccc, #808080, #808080, #cccccc
-extraeventbuttontextcolor=#43a7cf, #ffffff, white, white, white, #49b160, #ffffff, white, white, white, #ad0427, #ffffff, white, white, white, white, white, white, white
+extraeventbuttoncolor=#ffffff, #43a7cf, #7dbed7, #e6e6e6, #808080, #ffffff, #49b160, #8bc598, #e6e6e6, #808080, #ffffff, #ad0427, #be596e, #e6e6e6, #808080, #e6e6e6, #808080, #808080, #e6e6e6
+extraeventbuttontextcolor=#43a7cf, #ffffff, white, #404040, white, #49b160, #ffffff, white, #404040, white, #ad0427, #ffffff, white, #404040, white, #404040, white, white, #404040
 extraeventsactions=4, 4, 4, 10, 0, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 0, 4, 4
 extraeventsactionstrings="writeSingle(1,13,100)", "writeSingle(1,9,{})", "writeSingle(1,9,{})", "writeSingle(1,13,0)", , "writeSingle(1,11,100)", "writeSingle(1,7,{})", "writeSingle(1,7,{})", "writeSingle(1,11,0)", , "writeSingle(1,11,100)", "writeSingle(1,7,{})", "writeSingle(1,7,{})", "writeSingle(1,11,0)", "writeSingle(1,19,100)", "writeSingle(1,19,0)", , "writeSingle(1,17,100)", "writeSingle(1,17,0)"
 extraeventsbuttonsflags=0, 1, 1

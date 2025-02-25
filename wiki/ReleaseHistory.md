@@ -28,13 +28,14 @@ v3.1.1
 
 * NEW HARDWARE SUPPORT
   - adds support for [Carmomaq's Stratto Lab sample roaster](https://carmomaq.com.br/en/produtos/stratto-roaster-lab/)
-  - adds a new [IMF](https://artisan-scope.org/machines/imf/) machine setup that supports machine control
+  - adds a new [IMF](https://artisan-scope.org/machines/imf/) machine setup that supports machine control enabling IT/BT and IT/Power profiling
   - updated [Giesen](https://artisan-scope.org/machines/giesen/) machine support (now incl. sample roasters and PRO machines) supporting the control of additional actors
   - adds support for the [DCC1100 and DCC1120 Brushless DC Motor controllers and the DCC1020 DC Motor controller](https://artisan-scope.org/devices/phidgets/#45-dc-motor-control) ([Discussion #1750](../../../discussions/1750))
   - adds [ROEST](https://artisan-scope.org/machines/roest/) CSV import
+  - adds [Thermoworks BlueDOT](https://www.thermoworks.com/bluedot){:target="_blank"} support
 
 * CHANGES
-  - the Phidget driver is now bundled with the Artisan app and does no longer need to be installed separately (but for some legacy USB HID devices, like the original 1046 and 1048, which still need the kernel extension of the driver package installed in the system)
+  - the Phidget driver is now bundled with the Artisan app and does no longer need to be installed separately. NOTE: some legacy USB HID devices, like the original 1046 and 1048, which still need the kernel extension of the driver package installed in the system.
   - indicates [artisan.plus](https://artisan.plus) connection loss more reliable
   - update volume not density if weight changes and volume is set in Roast Properties ([Discussion #1786](../../../discussions/1786))
   - generated WebLCD URL are using more stable host names instead of potentially DHCP assigned IP addresses
@@ -45,6 +46,7 @@ v3.1.1
   - the parameters "max. number of custom buttons per row", "button size", "alternative slider layout", "mark last pressed" and "show tooltips" are now persisted per palette
   - a click in a sliders pane does no longer move the slider, but just gives that slier the input focus (a click in a sliders bar still moves the slider to this position)
   - the quick custom event entry using the q, w, e and e key followed by number keys now requires the ENTER/RETURN key to establish the new value.  The last entered digit can be removed by using the backspace key. ESC cancels the action.
+  - improved accuracy on rendering [artisan.plus](https://artisan.plus) blend component weights
 
 * FIXES
   - ensure complete reset to defaults in energy tab loads tab

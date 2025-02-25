@@ -247,6 +247,7 @@ class PID:
                 self.pidSemaphore.release(1)
 
     def setTarget(self, target:float, init:bool = True) -> None:
+        _log.debug('setTarget(%s,%s)',target,init)
         try:
             self.pidSemaphore.acquire(1)
             self.target = target
@@ -319,7 +320,7 @@ class PID:
         try:
             self.pidSemaphore.acquire(1)
             if self.lastOutput is not None:
-                return int(round(min(self.dutyMax,max(self.dutyMin,self.lastOutput))))
+                return min(self.dutyMax,max(self.dutyMin,self.lastOutput))
             return None
         finally:
             if self.pidSemaphore.available() < 1:
