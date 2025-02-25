@@ -547,7 +547,8 @@ class serialport:
                                    self.SantokerR_BTET,       #171
                                    self.Santoker_IB,          #172
                                    self.Santoker_RR,          #173
-                                   self.ColorTrackBT          #174
+                                   self.ColorTrackBT,         #174
+                                   self.BlueDOT_BTET          #175
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -1719,6 +1720,18 @@ class serialport:
         else:
             t1 = t2 = -1
         return tx,t1,t2 # time, ET RoR (chan2), BT RoR (chan1)
+
+    def BlueDOT_BTET(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        if self.aw.thermoworksBlueDOT is not None:
+            t1 = self.aw.thermoworksBlueDOT.getET()
+            t2 = self.aw.thermoworksBlueDOT.getBT()
+            if self.aw.qmc.mode == 'F':
+                t1 = fromCtoFstrict(t1)
+                t2 = fromCtoFstrict(t2)
+        else:
+            t1 = t2 = -1
+        return tx,t1,t2 # time, ET (chan2), BT (chan1)
 
     def Mugma_BTET(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()

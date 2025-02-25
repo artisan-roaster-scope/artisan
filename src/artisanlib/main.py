@@ -202,6 +202,7 @@ if TYPE_CHECKING:
     from artisanlib.weblcds import WebLCDs # pylint: disable=unused-import
     from artisanlib.santoker import Santoker # pylint: disable=unused-import
     from artisanlib.santoker_r import SantokerR # pylint: disable=unused-import
+    from artisanlib.bluedot import BlueDOT # pylint: disable=unused-import
     from artisanlib.mugma import Mugma # pylint: disable=unused-import
     from artisanlib.kaleido import KaleidoPort # pylint: disable=unused-import
     from artisanlib.ikawa import IKAWA_BLE # pylint: disable=unused-import
@@ -1809,6 +1810,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
         # Santoker R
         self.santokerR:Optional[SantokerR] = None # holds the Santoker R instance created on connect; reset to None on disconnect
+
+        # Thermoworks BlueDOT
+        self.thermoworksBlueDOT:Optional[BlueDOT] = None  # holds the BlueDOT instance created on connect; reset to None on disconnect
 
         # Mugma Network
         self.mugma_default_host:Final[str] = '127.0.0.1'
@@ -6231,6 +6235,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     #      (automatic set if time axis adjust is active, timex=True, during sampling and recording)
     #      if background is False, the RESET min/max times are respected even if a background profile is loaded
     def autoAdjustAxis(self, background:bool = False, timex:bool = True, deltas:bool = True) -> None:
+        _log.debug('PRINT autoAdjustAxis(%s,%s,%s)',background,timex,deltas)
         try:
             if self.qmc.autotimex and timex:
                 # auto timex adjust
@@ -6246,8 +6251,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         t_max = t_max - self.qmc.timex[self.qmc.timeindex[0]]
                 elif len(self.qmc.timex) > 3:
                     t_min,t_max = self.calcAutoAxisForeground()
+                    _log.debug('PRINT self.qmc.timex[-1]: %s', stringfromseconds(self.qmc.timex[-1]))
+                    _log.debug('PRINT calcAutoAxisForeground => t_min,t_max: %s,%s => %s',t_min,t_max,stringfromseconds(t_max))
                     if self.qmc.timeindex[0] != -1 and len(self.qmc.timex) > self.qmc.timeindex[0]:
                         t_max = t_max - self.qmc.timex[self.qmc.timeindex[0]]
+                        _log.debug('PRINT t_max: %s (%s)',t_max, stringfromseconds(t_max))
                 else:
                     t_min = self.qmc.chargemintime
                     t_max = self.qmc.resetmaxtime
@@ -6265,6 +6273,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 else:
                     self.qmc.startofx = t_min
                 self.qmc.endofx = t_max
+                _log.info('PRINT self.qmc.endofx: %s',stringfromseconds(self.qmc.endofx))
             if (self.qmc.autodeltaxET or self.qmc.autodeltaxBT) and deltas:
                 # auto delta adjust
                 if background:
@@ -6335,12 +6344,17 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 t_start = timex[0]
             if self.qmc.autotimexMode == 2 and timeindex[0] > -1:
                 t_end = timex[timeindex[0]]
+                _log.info('PRINT 1')
             elif timeindex[7] > 0 and self.qmc.buttonvisibility[7] and beyondDROP: # COOL set, COOL button shown and the curves are drawn beyond DROP or recording
                 t_end = timex[timeindex[7]]
+                _log.info('PRINT 2')
             elif timeindex[6] > 0: # DROP set
                 t_end = timex[timeindex[6]]
+                _log.info('PRINT 3')
             else:
                 t_end = timex[-1]
+                _log.info('PRINT 4')
+            _log.info('PRINT calcAutoAxis => %s',stringfromseconds(t_end))
             # add padding
             time_period = t_end - t_start
             t_start -= 1/16*time_period
@@ -20219,6 +20233,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 # disconnect Santoker R
                 self.santokerR.stop()
                 self.santokerR = None
+            elif self.qmc.device == 175 and self.thermoworksBlueDOT is not None:
+                # disconnect BlueDOT
+                self.thermoworksBlueDOT.stop()
+                self.thermoworksBlueDOT = None
             elif self.qmc.device == 138 and self.kaleido is not None:
                 # disconnect Kaleido
                 self.kaleido.stop()

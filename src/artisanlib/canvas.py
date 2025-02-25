@@ -906,7 +906,8 @@ class tgraphcanvas(FigureCanvas):
                        'Santoker R BT/ET',          #171
                        '+Santoker IR/Board',        #172
                        '+Santoker DelatBT/DeltaET', #173
-                       'ColorTrack BT'              #174
+                       'ColorTrack BT',             #174
+                       'Thermoworks BlueDOT'        #175
                        ]
 
         # ADD DEVICE:
@@ -972,7 +973,8 @@ class tgraphcanvas(FigureCanvas):
             142, # IKAWA,
             164, # Mugma BT/ET
             171, # Santoker R BT/ET
-            174  # ColorTrack BT
+            174, # ColorTrack BT
+            175  # Thermoworks BlueDOT
         ]
 
         # ADD DEVICE:
@@ -10931,7 +10933,7 @@ class tgraphcanvas(FigureCanvas):
             ax_xlim = self.ax.get_xlim()
             # if annotation is off canvas, the display coordinates are not reliable thus we exclude this one from the check
             if anno_x < ax_xlim[0] or anno_x > ax_xlim[1]:
-                _log.debug('Event annotation off canvas: %s, ax_xlim=%s', anno,ax_xlim)
+                #_log.debug('Event annotation off canvas: %s, ax_xlim=%s', anno,ax_xlim)
                 return False
             xl = annocorners[0]
             xr = annocorners[1]
@@ -12766,6 +12768,14 @@ class tgraphcanvas(FigureCanvas):
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Santoker R'),True,None))
                     self.aw.santokerR.setLogging(self.device_logging)
                     self.aw.santokerR.start(case_sensitive=False)
+                elif self.device == 175:
+                    # connect Thermoworks BlueDOT
+                    from artisanlib.bluedot import BlueDOT
+                    self.aw.thermoworksBlueDOT = BlueDOT(
+                        connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Thermoworks BlueDOT'),True,None),
+                        disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Thermoworks BlueDOT'),True,None))
+                    self.aw.thermoworksBlueDOT.setLogging(self.device_logging)
+                    self.aw.thermoworksBlueDOT.start(case_sensitive=False)
                 elif self.device == 138:
                     # connect Kaleido
                     from artisanlib.kaleido import KaleidoPort
@@ -12917,6 +12927,11 @@ class tgraphcanvas(FigureCanvas):
                 if not bool(self.aw.simulator) and self.device == 171 and self.aw.santokerR is not None:
                     self.aw.santokerR.stop()
                     self.aw.santokerR = None
+
+                # disconnect Thermoworks BlueDOT
+                if not bool(self.aw.simulator) and self.device == 175 and self.aw.thermoworksBlueDOT is not None:
+                    self.aw.thermoworksBlueDOT.stop()
+                    self.aw.thermoworksBlueDOT = None
 
                 # disconnect Kaleido
                 if not bool(self.aw.simulator) and self.device == 138 and self.aw.kaleido is not None:
