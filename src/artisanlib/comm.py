@@ -299,11 +299,11 @@ class serialport:
         self.PhidgetIOsemaphores:List[QSemaphore] = [QSemaphore(1),QSemaphore(1),QSemaphore(1),QSemaphore(1)] # semaphores protecting the access to self.Phidget1048values per channel
         #stores the Phidget Digital Output PMW objects (None if not initialized)
         self.PhidgetDigitalOut:Dict[Optional[str], List[Phidget]] = {} # type:ignore[no-any-unimported,unused-ignore] # a dict associating out serials with lists of channels
-        self.PhidgetDigitalOutLastPWM:Dict[Optional[str], List[int]] = {} # a dict associating out serials with the list of last PWMs per channel
-        self.PhidgetDigitalOutLastToggle:Dict[Optional[str], List[Optional[int]]] = {} # a dict associating out serials with the list of last 'PWM'-toggles per channel; if not None, channel was last toggled OFF and the value indicates that lastPWM on switching OFF
+        self.PhidgetDigitalOutLastPWM:Dict[Optional[str], List[float]] = {} # a dict associating out serials with the list of last PWMs per channel
+        self.PhidgetDigitalOutLastToggle:Dict[Optional[str], List[Optional[float]]] = {} # a dict associating out serials with the list of last 'PWM'-toggles per channel; if not None, channel was last toggled OFF and the value indicates that lastPWM on switching OFF
         self.PhidgetDigitalOutHub:Dict[Optional[str], List[Phidget]] = {} # type:ignore[no-any-unimported,unused-ignore] # a dict associating hub serials with lists of channels
-        self.PhidgetDigitalOutLastPWMhub:Dict[Optional[str], List[int]] = {} # a dict associating hub serials with the list of last PWMs per port of the hub
-        self.PhidgetDigitalOutLastToggleHub:Dict[Optional[str], List[Optional[int]]] = {} # a dict associating hub serials with the list of last toggles per port of the hub; if not None, channel was last toggled OFF and the value indicates that lastPWM on switching OFF
+        self.PhidgetDigitalOutLastPWMhub:Dict[Optional[str], List[float]] = {} # a dict associating hub serials with the list of last PWMs per port of the hub
+        self.PhidgetDigitalOutLastToggleHub:Dict[Optional[str], List[Optional[float]]] = {} # a dict associating hub serials with the list of last toggles per port of the hub; if not None, channel was last toggled OFF and the value indicates that lastPWM on switching OFF
         #store the Phidget Analog Output objects
         self.PhidgetAnalogOut:Dict[Optional[str], List[Phidget]] = {} # type:ignore[no-any-unimported,unused-ignore] # a dict associating serials with lists of channels
         #store the servo objects
@@ -4415,18 +4415,13 @@ class serialport:
     def phidgetOUTpulsePWM(self, channel:int, millis:float, serial:Optional[str]=None) -> None:
         _log.debug('phidgetOUTpulsePWM(%s,%s,%s)',channel,millis,serial)
         self.phidgetOUTsetPWM(channel,100,serial)
-#        QTimer.singleShot(int(round(millis)),lambda : self.phidgetOUTsetPWM(channel,0))
-#        # QTimer (which does not work being called from a QThread) call replaced by the next 2 lines (event actions are now started in an extra thread)
-        # the following solution has the drawback to block the eventaction thread
-#        libtime.sleep(millis/1000.)
-#        self.phidgetOUTsetPWM(channel,0)
         if serial is None:
             self.aw.singleShotPhidgetsPulseOFF.emit(channel,millis,'OUTsetPWM')
         else:
             self.aw.singleShotPhidgetsPulseOFFSerial.emit(channel,millis,'OUTsetPWM',serial)
 
     # value: 0-100
-    def phidgetOUTsetPWM(self, channel:int, value:int, serial:Optional[str]=None) -> None:
+    def phidgetOUTsetPWM(self, channel:int, value:float, serial:Optional[str]=None) -> None:
         _log.debug('phidgetOUTsetPWM(%s,%s,%s)',channel,value,serial)
         self.phidgetOUTattach(channel,serial)
         if serial in self.aw.ser.PhidgetDigitalOut:
@@ -4567,7 +4562,7 @@ class serialport:
     # channel: 0-5
     # value: 0-100
     # serial: optional Phidget HUB serial number with optional port number as string of the form "<serial>[:<port>]"
-    def phidgetOUTsetPWMhub(self, channel:int, value:int, serial:Optional[str]=None) -> None:
+    def phidgetOUTsetPWMhub(self, channel:int, value:float, serial:Optional[str]=None) -> None:
         _log.debug('phidgetOUTsetPWMhub(%s,%s,%s)',channel,value,serial)
         self.phidgetOUTattachHub(channel,serial)
         if serial in self.aw.ser.PhidgetDigitalOutHub:
@@ -5054,7 +5049,7 @@ class serialport:
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
-    def yoctoPWMmove(self, c:int, d:float, t:float, module_id:Optional[str]=None) -> None:
+    def yoctoPWMmove(self, c:int, d:float, t:int, module_id:Optional[str]=None) -> None:
         _log.debug('yoctoPWMmove(%s,%s,%s,%s)',c,d,t,module_id)
         try:
             m = self.yoctoPWMattach(c,module_id)

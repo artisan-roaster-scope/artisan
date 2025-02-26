@@ -5990,7 +5990,7 @@ class tgraphcanvas(FigureCanvas):
                                                 len(self.temp2)> self.specialevents[last_registered_event_idx] and
                                                 len(self.temp2B) > bge):
                                             # we ramp by BT only after TP and if BT increased, however, last event could be before TP
-                                            # we take as last event then one of the foreground profile and not the one of the background assuming it was replayed at the same temp
+                                            # we take as last event the one of the foreground profile and not the one of the background assuming it was replayed at the same temp
                                             # we do not take any last_temp before TP as before TP BT is not monotone increasing, but decreasing
                                             last_event_temp = (self.temp2[self.TPalarmtimeindex] if self.specialevents[last_registered_event_idx] < self.TPalarmtimeindex
                                                     else self.temp2[self.specialevents[last_registered_event_idx]])
@@ -6014,7 +6014,10 @@ class tgraphcanvas(FigureCanvas):
                                             # if background event target temperature did increase we ramp by temperature
                                             coefficients = numpy.polyfit([last_event_temp, next_event_temp] , [last_value, next_value], 1)
                                             ramps[event_type] = numpy.poly1d(coefficients)(current_temp)
-                                        elif len(self.timex)> self.specialevents[last_registered_event_idx] and len(self.timeB)>bge:
+                                        elif  (last_event_temp is None and next_event_temp is None and
+                                                  # if replay by temp (as one or both of those event_temps is not None), but current temp did not increase we don't
+                                                  # ramp by time instead as this would confuse everything.
+                                                len(self.timex)> self.specialevents[last_registered_event_idx] and len(self.timeB)>bge):
                                             # otherwise we ramp by time
                                             last_time = self.timex[self.specialevents[last_registered_event_idx]]
                                             next_time = self.timeB[bge]

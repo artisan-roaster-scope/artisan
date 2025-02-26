@@ -1455,6 +1455,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     adjustSVSignal = pyqtSignal(float)
     setSVSignal = pyqtSignal(float)
     fireslideractionSignal = pyqtSignal(int)
+    fireslideraction_rawSignal = pyqtSignal(int,float)
     moveButtonSignal = pyqtSignal(str)
     sendnotificationMessageSignal = pyqtSignal(str,str,NotificationType)
     updateSubscriptionSignal = pyqtSignal(str)
@@ -1468,6 +1469,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     kaleidoSendMessageSignal = pyqtSignal(str,str)
     kaleidoSendMessageAwaitSignal = pyqtSignal(str,str,int,int)
     addEventSignal = pyqtSignal(int,int,bool,bool,bool)
+    addRawEventSignal = pyqtSignal(int,float,int,bool,bool,bool)
     updateMessageLogSignal = pyqtSignal()
     updateSerialLogSignal = pyqtSignal()
     updateErrorLogSignal = pyqtSignal()
@@ -4074,7 +4076,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.sliderLCDSV.setNumDigits(3)
         self.sliderLCDSV.setStyleSheet('font-weight: bold;')
         sv = max(min(self.pidcontrol.svValue, self.pidcontrol.svSliderMax), self.pidcontrol.svSliderMin)
-        self.sliderLCDSV.display(sv)
+        self.updateSliderLCD(4,sv)
         sliderGrpSV = QVBoxLayout()
         sliderGrpSV.addWidget(self.sliderLCDSV)
         sliderGrpSV.addWidget(self.sliderSV)
@@ -4202,6 +4204,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.adjustSVSignal.connect(self.adjustPIDsv)
         self.setSVSignal.connect(self.setPIDsv)
         self.fireslideractionSignal.connect(self.fireslideraction)
+        self.fireslideraction_rawSignal.connect(self.fireslideraction_raw)
         self.moveButtonSignal.connect(self.moveKbutton)
         self.sendnotificationMessageSignal.connect(self.sendNotificationMessage)
         self.updateSubscriptionSignal.connect(self.updateSubscription)
@@ -4215,6 +4218,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.kaleidoSendMessageSignal.connect(self.kaleidoSendMessage)
         self.kaleidoSendMessageAwaitSignal.connect(self.kaleidoSendMessageAwait)
         self.addEventSignal.connect(self.addEventSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
+        self.addRawEventSignal.connect(self.addRawEventSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
            # by default the connection type is AutoConnection (If the emitter & receiver are in the same thread, a DirectConnection is used. Otherwise, a QueuedConnection is used.)
            # if the signal is send/receveid in the same thread a direct connection equals to a direct function call, the event is NOT put on the event loop and this not potentially processed delays
            # explicitly specifying QueuedConnection puts the message on the event loop and delays the processing potentially also if running in the same thread as the sender
@@ -6235,7 +6239,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     #      (automatic set if time axis adjust is active, timex=True, during sampling and recording)
     #      if background is False, the RESET min/max times are respected even if a background profile is loaded
     def autoAdjustAxis(self, background:bool = False, timex:bool = True, deltas:bool = True) -> None:
-        _log.debug('PRINT autoAdjustAxis(%s,%s,%s)',background,timex,deltas)
         try:
             if self.qmc.autotimex and timex:
                 # auto timex adjust
@@ -6251,11 +6254,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         t_max = t_max - self.qmc.timex[self.qmc.timeindex[0]]
                 elif len(self.qmc.timex) > 3:
                     t_min,t_max = self.calcAutoAxisForeground()
-                    _log.debug('PRINT self.qmc.timex[-1]: %s', stringfromseconds(self.qmc.timex[-1]))
-                    _log.debug('PRINT calcAutoAxisForeground => t_min,t_max: %s,%s => %s',t_min,t_max,stringfromseconds(t_max))
                     if self.qmc.timeindex[0] != -1 and len(self.qmc.timex) > self.qmc.timeindex[0]:
                         t_max = t_max - self.qmc.timex[self.qmc.timeindex[0]]
-                        _log.debug('PRINT t_max: %s (%s)',t_max, stringfromseconds(t_max))
                 else:
                     t_min = self.qmc.chargemintime
                     t_max = self.qmc.resetmaxtime
@@ -6273,7 +6273,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 else:
                     self.qmc.startofx = t_min
                 self.qmc.endofx = t_max
-                _log.info('PRINT self.qmc.endofx: %s',stringfromseconds(self.qmc.endofx))
             if (self.qmc.autodeltaxET or self.qmc.autodeltaxBT) and deltas:
                 # auto delta adjust
                 if background:
@@ -6344,17 +6343,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 t_start = timex[0]
             if self.qmc.autotimexMode == 2 and timeindex[0] > -1:
                 t_end = timex[timeindex[0]]
-                _log.info('PRINT 1')
             elif timeindex[7] > 0 and self.qmc.buttonvisibility[7] and beyondDROP: # COOL set, COOL button shown and the curves are drawn beyond DROP or recording
                 t_end = timex[timeindex[7]]
-                _log.info('PRINT 2')
             elif timeindex[6] > 0: # DROP set
                 t_end = timex[timeindex[6]]
-                _log.info('PRINT 3')
             else:
                 t_end = timex[-1]
-                _log.info('PRINT 4')
-            _log.info('PRINT calcAutoAxis => %s',stringfromseconds(t_end))
             # add padding
             time_period = t_end - t_start
             t_start -= 1/16*time_period
@@ -7927,7 +7921,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     @pyqtSlot(int)
     def updateSVSliderLCD(self, v:int) -> None:
         v = max(min(v, self.pidcontrol.svSliderMax), self.pidcontrol.svSliderMin)
-        self.sliderLCDSV.display(v)
+        self.updateSliderLCD(4,v)
         if self.SVslidermoved:
             if self.sliderLCDSV.intValue() != self.sliderSV.value():
             # if slider was moved by a keyboard action, we have to explicitly update the value and send the signals
@@ -8218,6 +8212,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     @pyqtSlot(int)
     def fireslideraction(self, n:int) -> None:
         self.fireslideraction_internal(n)
+    @pyqtSlot(int,float)
+    def fireslideraction_raw(self, n:int, v:float) -> None:
+        self.fireslideraction_internal(n,v)
 
     # if optional float value is given it is applied to the action instead of the less accurate integer slider value
     # (used by ramping event replay)
@@ -8246,9 +8243,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         action = action + 1 # skip the 19: Aillio PRS
             # after adaption: (see eventaction)
                 value = (self.calcSliderSendValue(n) if v is None else v) # preference for the more precise float value if given over the slider value
-                if action not in {4, 6, 14, 15, 20, 21} or (action in {4,20} and v is None): # only for IO, VOUT, S7 and RC Commands we keep the floats
-                        # and for MODBUS/Artisan Command if the optional float value v is not given (
-                        # only for ramping event replay on MOBDUS; don't use 'write' then to write integers, but 'writeSingle')
+                if action not in {4, 6, 13, 14, 15, 20, 21, 22} or (action in {4,13,20, 22} and v is None): # only for IO, VOUT, S7 and RC Commands we keep the floats always
+                        # and for MODBUS/PWM/Artisan/WebSocket Command if the optional float value v is not given (enabling hi-res ramping event replay)
+                        # NOTE: avoid using 'write({})' in MODBUS commands as {} might be bound to a float and then writing to 2 registers instead of one
+                        #       use the more specific 'writeSingle({})' or 'writeWord({})' instead
                     value = int(round(value))
                 if action in {8, 9, 16, 17, 18}: # for Hottop/R1 Heater or Fan, we just forward the value
                     cmd = str(int(round(value)))
@@ -9372,12 +9370,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     cs_split = cs[4:-1].split(',')
                                     if len(cs_split)>1:
                                         channel=toInt(cs_split[0])
-                                        int_value = toInt(eval(cs_split[1])) # pylint: disable=eval-used
+                                        float_value:float = float(eval(cs_split[1])) # pylint: disable=eval-used
                                         if len(cs_split) == 2:
-                                            self.ser.phidgetOUTsetPWM(channel, int_value)
+                                            self.ser.phidgetOUTsetPWM(channel, float_value)
                                         elif len(cs_split) == 3:
                                             serial=cs_split[2]
-                                            self.ser.phidgetOUTsetPWM(channel, int_value, serial)
+                                            self.ser.phidgetOUTsetPWM(channel, float_value, serial)
                                 elif cs.startswith('frequency(') and len(cs)>14:
                                     cs_split = cs[10:-1].split(',')
                                     if len(cs_split) == 2:
@@ -9393,9 +9391,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 elif cs.startswith('outhub(') and len(cs)>10:
                                     cs_split = cs[7:-1].split(',')
                                     if len(cs_split) == 2:
-                                        self.ser.phidgetOUTsetPWMhub(int(cs_split[0]),toInt(eval(cs_split[1]))) # pylint: disable=eval-used
+                                        self.ser.phidgetOUTsetPWMhub(int(cs_split[0]),float(eval(cs_split[1]))) # pylint: disable=eval-used
                                     elif len(cs_split) == 3:
-                                        self.ser.phidgetOUTsetPWMhub(int(cs_split[0]),toInt(eval(cs_split[1])),cs_split[2]) # pylint: disable=eval-used
+                                        self.ser.phidgetOUTsetPWMhub(int(cs_split[0]),float(eval(cs_split[1])),cs_split[2]) # pylint: disable=eval-used
                                 elif cs.startswith('togglehub(') and len(cs)>11:
                                     cs_split = cs[10:-1].split(',')
                                     if len(cs_split) == 1:
@@ -9405,15 +9403,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 elif cs.startswith('pulsehub(') and len(cs)>12:
                                     cs_split = cs[9:-1].split(',')
                                     if len(cs_split) == 2:
-                                        self.ser.phidgetOUTpulsePWMhub(int(cs_split[0]),int(cs_split[1]))
+                                        self.ser.phidgetOUTpulsePWMhub(int(cs_split[0]),int(round(float(cs_split[1]))))
                                     elif len(cs_split) == 3:
-                                        self.ser.phidgetOUTpulsePWMhub(int(cs_split[0]),int(cs_split[1]),cs_split[2])
+                                        self.ser.phidgetOUTpulsePWMhub(int(cs_split[0]),int(round(float(cs_split[1]))),cs_split[2])
                                 elif cs.startswith('pulse(') and len(cs)>9:
                                     cs_split = cs[6:-1].split(',')
                                     if len(cs_split) == 2:
-                                        self.ser.phidgetOUTpulsePWM(int(cs_split[0]),int(cs_split[1]))
+                                        self.ser.phidgetOUTpulsePWM(int(cs_split[0]),int(round(float(cs_split[1]))))
                                     elif len(cs_split) == 3:
-                                        self.ser.phidgetOUTpulsePWM(int(cs_split[0]),int(cs_split[1]),cs_split[2])
+                                        self.ser.phidgetOUTpulsePWM(int(cs_split[0]),int(round(float(cs_split[1]))),cs_split[2])
                                 elif cs.startswith('sleep') and cs.endswith(')'): # in seconds
                                     cmds = eval(cs[len('sleep'):]) # pylint: disable=eval-used # pylint: disable=W0123
                                     if isinstance(cmds,(float,int)):
@@ -10130,10 +10128,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     sv = max(0,convertTemp(float(eval(cs[len('pidSVC('):-1])), 'C', self.qmc.mode)) # we don't send SV < 0 # pylint: disable=eval-used
                                     if self.qmc.device == 0 and sv != self.fujipid.sv:
                                         self.fujipid.setsv(sv,silent=True)
-                                        self.sendmessage(f'Artisan Command: {cs}')
+#                                        self.sendmessage(f'Artisan Command: pidSVC({float2float(sv)})') # too many messages if used in ramping event reply
                                     elif sv != self.pidcontrol.sv:
                                         self.pidcontrol.setSV(sv,init=False)
-                                        self.sendmessage(f'Artisan Command: {cs}')
+#                                        self.sendmessage(f'Artisan Command: pidSVC({float2float(sv)})') # too many messages if used in ramping event reply
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             # pidSV(<n>) with <n> a number to be used as PID SV
@@ -10142,10 +10140,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     sv = max(0,float(eval(cs[len('pidSV('):-1]))) # we don't send SV < 0 # pylint: disable=eval-used
                                     if self.qmc.device == 0 and sv != self.fujipid.sv:
                                         self.fujipid.setsv(sv,silent=True)
-                                        self.sendmessage(f'Artisan Command: {cs}')
+#                                        self.sendmessage(f'Artisan Command: pidSV({float2float(sv)})') # too many messages if used in ramping event reply
                                     elif sv != self.pidcontrol.sv:
                                         self.pidcontrol.setSV(sv,init=False)
-                                        self.sendmessage(f'Artisan Command: {cs}')
+#                                        self.sendmessage(f'Artisan Command: pidSV({float2float(sv)})') # too many messages if used in ramping event reply
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             # pidRS(<n>) with <n> a number to be used to select the PID RS pattern (1-based for the internal software PID)
@@ -17149,6 +17147,18 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     # if force is True, process even if value is equal to the events lastvalue resp. the current slider value
     @pyqtSlot(int,int,bool,bool,bool)
     def addEventSlot(self, value:int, etype:int, record:bool, fire_slider_action:bool, force:bool) -> None:
+        self.addEvent_internal(value, etype, record, fire_slider_action, force)
+
+    # if record is True, an event is added during recording, otherwise only the slider is moved
+    # if fire_slider_action is True, the slider action is fired
+    # if force is True, process even if value is equal to the events lastvalue resp. the current slider value
+    # raw_value is forwarded to addEvent_internal to be send to the slider action
+    @pyqtSlot(int,float,int,bool,bool,bool)
+    def addRawEventSlot(self, value:int, raw_value:float, etype:int, record:bool, fire_slider_action:bool, force:bool) -> None:
+        self.addEvent_internal(value, etype, record, fire_slider_action, force, raw_value)
+
+    # if raw_value is not None, it is send to the slider action instead of the integer value
+    def addEvent_internal(self, value:int, etype:int, record:bool, fire_slider_action:bool, force:bool, raw_value:Optional[float] = None) -> None:
         # limit value by slider limits
         if -1 < etype < 4:
             new_value = min(self.eventslidermax[etype],max(self.eventslidermin[etype], value))
@@ -17162,7 +17172,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.moveslider(etype,new_value)
                 # optionally we fire the sider action
                 if fire_slider_action:
-                    self.fireslideractionSignal.emit(etype)
+                    if raw_value is None:
+                        self.fireslideractionSignal.emit(etype)
+                    else:
+                        self.fireslideraction_rawSignal.emit(etype,raw_value)
                 # create a new event
                 if record and self.qmc.flagstart:
                     nv:float = self.qmc.eventsExternal2InternalValue(new_value)

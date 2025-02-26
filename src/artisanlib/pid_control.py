@@ -1260,9 +1260,10 @@ class PIDcontrol:
                 # assumption: if self.positiveTargetRangeLimit then slider_min < self.positiveTargetMin < self.positiveTargetMax < slider_max
                 heat_min = (max(self.positiveTargetMin, slider_min) if self.positiveTargetRangeLimit else slider_min)
                 heat_max = (min(self.positiveTargetMax, slider_max) if self.positiveTargetRangeLimit else slider_max)
-                heat = int(round(float(numpy.interp(vx,[0,100],[heat_min,heat_max]))))
+                raw_heat:float = numpy.interp(vx,[0,100],[heat_min,heat_max])
+                heat = int(round(float(raw_heat)))
                 heat = self.aw.applySliderStepSize(slidernr, heat) # quantify by slider step size
-                self.aw.addEventSignal.emit(heat,slidernr,self.createEvents,True,self.slider_force_move)
+                self.aw.addRawEventSignal.emit(heat,raw_heat,slidernr,self.createEvents,True,self.slider_force_move)
                 self.aw.qmc.slider_force_move = False
             if self.pidNegativeTarget:
                 slidernr = self.pidNegativeTarget - 1
@@ -1273,9 +1274,10 @@ class PIDcontrol:
                 # assumption: if self.positiveTargetRangeLimit then slider_min < self.positiveTargetMin < self.positiveTargetMax < slider_max
                 cool_min = (max(self.negativeTargetMin, slider_min) if self.negativeTargetRangeLimit else slider_min)
                 cool_max = (min(self.negativeTargetMax, slider_max) if self.negativeTargetRangeLimit else slider_max)
-                cool = int(round(float(numpy.interp(vx,[-100,0],[cool_max,cool_min]))))
+                raw_cool:float = numpy.interp(vx,[-100,0],[cool_max,cool_min])
+                cool = int(round(float(raw_cool)))
                 cool = self.aw.applySliderStepSize(slidernr, cool) # quantify by slider step size
-                self.aw.addEventSignal.emit(cool,slidernr,self.createEvents,True,self.slider_force_move)
+                self.aw.addRawEventSignal.emit(cool,raw_cool,slidernr,self.createEvents,True,self.slider_force_move)
                 self.slider_force_move = False
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -1644,6 +1646,7 @@ class PIDcontrol:
 
 
     def setSV(self, sv:float, move:bool = True, init:bool = False) -> None:
+        _log.debug('PRINT setSV(%s,%s,%s)',sv,move,init)
 #        if not move:
 #            self.aw.sendmessage(QApplication.translate("Message","SV set to %s"%sv))
         if self.externalPIDControl() == 1:

@@ -153,6 +153,7 @@ def content() -> str:
     tbl_Commands.add_row([QApplication.translate('HelpDlg','p-i-d'),'<p>;<i>;<d>',QApplication.translate('HelpDlg','configures PID to the values <p>;<i>;<d>')])
     tbl_Commands.add_row([QApplication.translate('HelpDlg','Fuji Command'),'write(<unitId>,<register>,<value>)','&#160;'])
     tbl_Commands.add_row([QApplication.translate('HelpDlg','PWM Command'),'out(<channel>,<value>[,<sn>])',QApplication.translate('HelpDlg','PHIDGET PWM Output: <value> in [0-100]')])
+    tbl_Commands.add_row(['&#160;','frequency(<value>[,<sn>])',QApplication.translate('HelpDlg','PHIDGET PWM Frequency: <value> in Hz')])
     tbl_Commands.add_row(['&#160;','toggle(<channel>[,<sn>])',QApplication.translate('HelpDlg','PHIDGET PWM Output: toggles <channel>')])
     tbl_Commands.add_row(['&#160;','pulse(<channel>,<millis>[,<sn>])',QApplication.translate('HelpDlg','PHIDGET PWM Output: turn <channel> on for <millis> milliseconds')])
     tbl_Commands.add_row(['&#160;','outhub(<port>,<value>[,<sn>])',QApplication.translate('HelpDlg','PHIDGET HUB PWM Output ON port <port> to  <value> in [0-100]')])

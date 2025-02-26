@@ -1,6 +1,6 @@
 [General]
 Delay=1000
-roastertype_setup=IMF RM Control
+roastertype_setup=IMF RM Control 2PID
 specialeventplayback=true, true, true, false
 specialeventplaybackramp=false, false, true, false
 
@@ -12,29 +12,29 @@ Controlbuttonflag=true
 ETname=IT
 
 [ExtraComm]
-extrabaudrate=38400, 38400, 38400, 38400
-extrabytesize=8, 8, 8, 8
-extracomport=COM1, COM1, COM1, COM1
-extraparity=E, E, E, E
-extrastopbits=1, 1, 1, 1
-extratimeout=0.5, 0.5, 0.5, 0.5
+extrabaudrate=38400, 38400, 38400, 38400, 9600
+extrabytesize=8, 8, 8, 8, 8
+extracomport=COM1, COM1, COM1, COM1, COM1
+extraparity=E, E, E, E, E
+extrastopbits=1, 1, 1, 1, 1
+extratimeout=0.5, 0.5, 0.5, 0.5, 0.5
 
 [ExtraDev]
-extraCurveVisibility1=true, false, false, false, true, true, true, true, true, true
-extraCurveVisibility2=true, false, false, false, true, true, true, true, true, true
+extraCurveVisibility1=true, false, false, false, false, true, true, true, true, true
+extraCurveVisibility2=true, false, false, false, false, true, true, true, true, true
 extraDelta1=false, false, false, false, false, false, false, false, false, false
 extraDelta2=false, false, false, false, false, false, false, false, false, false
 extraFill1=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 extraFill2=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-extraLCDvisibility1=true, false, false, false, false, false, false, false, false, false
-extraLCDvisibility2=true, true, true, true, false, false, false, false, false, false
-extradevicecolor1=black, #ad0427ff, #49b160ff, #43a7cfff
-extradevicecolor2=#800080ff, #ad0427ff, #49b160ff, #43a7cfff
-extradevices=33, 55, 109, 150
-extramathexpression1=, , , 
-extramathexpression2=, , , 
-extraname1=Burner {4}, {3} SV, {1} SV, {0} SV
-extraname2={2} , {3}, {1}, {0}
+extraLCDvisibility1=true, false, false, false, true, false, false, false, false, false
+extraLCDvisibility2=true, true, true, true, true, false, false, false, false, false
+extradevicecolor1=black, #ad0427ff, #49b160ff, #43a7cfff, #000000
+extradevicecolor2=#800080ff, #ad0427ff, #49b160ff, #43a7cfff, #000000
+extradevices=33, 55, 109, 150, 22
+extramathexpression1=, , , , 
+extramathexpression2=, , , , 
+extraname1=Burner {4}, {3} SV, {1} SV, {0} SV, SV
+extraname2={2}, {3}, {1}, {0}, Duty
 
 [events]
 etypes=, , IT SV, Vortex, 
@@ -44,13 +44,13 @@ clampEvents=true
 [Modbus]
 IP_retries=1
 IP_timeout=0.3
-PID_OFF_action="writeSingle(1,51,256)"
-PID_ON_action="writeSingle(1,51,0)"
-PID_SV_register=24
+PID_OFF_action=
+PID_ON_action=
+PID_SV_register=0
 PID_d_register=0
 PID_i_register=0
 PID_p_register=0
-PID_slave_ID=1
+PID_slave_ID=0
 PIDmultiplier=0
 SVmultiplier=0
 SVwriteLong=false
@@ -171,16 +171,26 @@ timeout=0.4
 type=3
 wordorderLittle=false
 
+
 [ArduinoPID]
-pidSource=4
+pidSource=1
 createEvents=false
 derivative_filter=1
-svLookahead=2
+pidKd=20
+pidKi=0.01
+pidKp=15
+pidNegativeTarget=0
+pidPositiveTarget=3
+pidSource=1
+positiveTargetMax=450
+positiveTargetMin=100
+positiveTargetRangeLimit=true
+svLookahead=8
 svMode=0
+svSlider=true
 svSliderMax=550
 svSliderMin=0
-svValue=180
-pidOnCHARGE=true
+pidOnCHARGE=false
 
 [DefaultButtons]
 buttonactions=0, 0, 0, 0, 0, 0, 0, 0
@@ -188,9 +198,8 @@ buttonactionstrings=, , , , , , ,
 buttonvisibility=true, true, true, true, true, false, true, false
 extrabuttonactions=0, 0, 0
 extrabuttonactionstrings=, , 
-xextrabuttonactions=0, 0
-xextrabuttonactionstrings=, 
-
+xextrabuttonactions=0, 20
+xextrabuttonactionstrings=, 21
 
 [ExtraEventButtons]
 buttonlistmaxlen=13
@@ -205,8 +214,8 @@ buttonpalettemaxlen=14, 13, 13, 13, 14, 14, 14, 14, 14, 14
 buttonsize=1
 extraeventbuttoncolor=#760376, #8a108a, #ac87ac, #967896, #808080, #ad0427, #ad818a, #808080, #43a7cf, #a0c1cf, #808080, #49b160, #84b18e, #6e6e6e, #6e6e6e, #b3b3b3, #808080, #d25343, #d8a098, #808080, #808080, #808080
 extraeventbuttontextcolor=white, white, white, white, white, white, white, white, white, white, white, white, white, white, white, #ffffff, white, white, #ffffff, white, white, white
-extraeventsactions=4, 4, 4, 4, 0, 4, 4, 0, 4, 4, 0, 4, 4, 20, 20, 20, 0, 20, 20, 0, 20, 20
-extraeventsactionstrings="writeWord(1,24,{})", "writeWord(1,24,{})", "writeWord(1,24,{})", "writeWord(1,24,{})", , "writeWord(1,22,{})", "writeWord(1,22,{})", , "writeWord(1,42,{})", "writeWord(1,42,{})", , "writeWord(1,32,{})", "writeWord(1,32,{})", "playbackmode(1);pidmode(0);button(true);button(15,false)", "playbackmode(2);pidmode(0);button(true);button(14,false)", "playbackmode(0);button(14,false);button(15,false)", , "pidmode(2);playback(3,0);button(true)", "pidmode(0);playback(3,1);button(18,false)", , PIDon, PIDoff
+extraeventsactions=4, 4, 4, 4, 0, 4, 4, 0, 4, 4, 0, 4, 4, 20, 20, 20, 0, 20, 20, 0, 4, 4
+extraeventsactionstrings="writeWord(1,24,{})", "writeWord(1,24,{})", "writeWord(1,24,{})", "writeWord(1,24,{})", , "writeWord(1,22,{})", "writeWord(1,22,{})", , "writeWord(1,42,{})", "writeWord(1,42,{})", , "writeWord(1,32,{})", "writeWord(1,32,{})", "playbackmode(1);pidmode(0);button(true);button(15,false)", "playbackmode(2);pidmode(0);button(true);button(14,false)", "playbackmode(0);button(14,false);button(15,false)", , "pidmode(2);playback(3,0);button(true)", "pidmode(0);playback(3,1);button(18,false)", , "writeSingle(1,51,0)", "writeSingle(1,51,256)"
 extraeventsbuttonsflags=0, 1, 1
 extraeventsdescriptions=, , , , , , , , , , , , , , , , , , , , , 
 extraeventslabels=\\t\n\\VC, \\t\n\\VC, \\t\n\\VC, \\t\n\\VC, , \\t\n\\V%, \\t\n\\V%, , \\t\n\\V%, \\t\n\\V%, , \\t\n\\V%, \\t\n\\V%, ⏲ Playback\n\\1, 🌡Playback\n\\1, Playback\n\\0, , Follow SV\n\\1, Follow SV\n\\0, , \\a, \\m
