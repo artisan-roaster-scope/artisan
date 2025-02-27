@@ -57,6 +57,7 @@ v3.1.1
   - fixes regression introduced in v3.0 which prevented the replay of events before CHARGE
   - fixed an issue in event replay where certain events failed to be replayed by temperature
   - fixes an issue where the PID Input for external MODBUS/SV PIDs was not correctly persisted
+  - fixes broken `button` Modbus Command
 
 * REMOVALS
   - support for the non-standard MODBUS little-endian byte order has been removed

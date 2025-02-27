@@ -2269,7 +2269,6 @@ class EventsDlg(ArtisanResizeablDialog):
         self.transferbuttonsto()
 
     def transferbuttonsto(self, pindex:Optional[int] = None) -> None:
-        _log.info('PRINT transferbuttonsto(%s): %s => %s',pindex,self.aw.buttonpalette_buttonsize, self.aw.buttonsize)
         if pindex is None:
             pindex = self.transferpalettecombobox.currentIndex()
         if 0 <= pindex < self.aw.max_palettes:

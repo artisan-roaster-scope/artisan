@@ -8822,7 +8822,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                         arg = cs[len('button('):-1]
                                         if ',' in arg and '(' not in arg:
                                             # no function definition in arg, and exactly on comma, we split into the two args (could be just "button(1,false)" which does not eval above)
-                                            cs_a = [a.strip() for a in arg.split(',')]
+                                            args = [a.strip() for a in arg.split(',')]
                                         else:
                                             args = [c[len('button('):-1].strip()] # just a tag like true would fail to eval
                                     cs_len = 1

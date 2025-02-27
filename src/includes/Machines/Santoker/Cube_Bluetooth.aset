@@ -15,6 +15,9 @@ Controlbuttonflag=true
 [events]
 markTP=false
 
+[Units]
+weight=g
+
 [ExtraComm]
 extrabaudrate=19200, 19200, 19200, 19200
 extrabytesize=8, 8, 8, 8
