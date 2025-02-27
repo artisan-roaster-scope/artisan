@@ -32,15 +32,15 @@ v3.1.1
   - updated [Giesen](https://artisan-scope.org/machines/giesen/) machine support (now incl. sample roasters and PRO machines) supporting the control of additional actors
   - adds support for the [DCC1100 and DCC1120 Brushless DC Motor controllers and the DCC1020 DC Motor controller](https://artisan-scope.org/devices/phidgets/#45-dc-motor-control) ([Discussion #1750](../../../discussions/1750))
   - adds [ROEST](https://artisan-scope.org/machines/roest/) CSV import
-  - adds [Thermoworks BlueDOT](https://www.thermoworks.com/bluedot){:target="_blank"} support
+  - adds [Thermoworks BlueDOT](https://www.thermoworks.com/bluedot) support
 
 * CHANGES
   - the Phidget driver is now bundled with the Artisan app and does no longer need to be installed separately. NOTE: some legacy USB HID devices, like the original 1046 and 1048, which still need the kernel extension of the driver package installed in the system.
   - indicates [artisan.plus](https://artisan.plus) connection loss more reliable
   - update volume not density if weight changes and volume is set in Roast Properties ([Discussion #1786](../../../discussions/1786))
-  - generated WebLCD URL are using more stable host names instead of potentially DHCP assigned IP addresses
+  - generated WebLCD URL is using more stable host names instead of, potentially DHCP assigned, IP addresses
   - updated Turkish translations (thanks to Kemal Akdas)
-  - raises max event button limits from 4 rows a 30 buttons to 10 rows a 50 buttons
+  - raises max event button limits from 4 rows with maximal 30 buttons to 10 rows with maximal 50 buttons
   - keeps custom events ordered by time
   - events were replayed only if the corresponding event slider was visible in previous versions. Now events selected for replay are always replayed, independent of the visibility of the corresponding event slider.
   - the parameters "max. number of custom buttons per row", "button size", "alternative slider layout", "mark last pressed" and "show tooltips" are now persisted per palette
