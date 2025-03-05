@@ -555,6 +555,7 @@ class modbusport:
 
 ##########
 
+
     # function 15 (Write Multiple Coils)
     def writeCoils(self, slave:int, register:int, values:List[bool]) -> None:
         _log.debug('writeCoils(%d,%d,%s)', slave, register, values)
@@ -565,8 +566,11 @@ class modbusport:
             self.COMsemaphore.acquire(1)
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
+                # wrap an Awaitable into a Coroutine
+                async def write_coils_wrapper(client:'ModbusBaseClient', register:int, values:List[bool], slave:int) -> 'ModbusPDU':
+                    return await client.write_coils(register, values, slave=slave)
                 assert self._client is not None
-                asyncio.run_coroutine_threadsafe(self._client.write_coils(int(register),list(values),slave=int(slave)), self._asyncLoopThread.loop).result()
+                asyncio.run_coroutine_threadsafe(write_coils_wrapper(self._client, int(register), list(values), int(slave)), self._asyncLoopThread.loop).result()
 #                time.sleep(.3) # avoid possible hickups on startup
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeCoils(%d,%d,%s)', slave, register, values)
@@ -589,8 +593,11 @@ class modbusport:
             self.COMsemaphore.acquire(1)
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
+                # wrap an Awaitable into a Coroutine
+                async def write_coil_wrapper(client:'ModbusBaseClient', register:int, value:bool, slave:int) -> 'ModbusPDU':
+                    return await client.write_coil(register, value, slave=slave)
                 assert self._client is not None
-                asyncio.run_coroutine_threadsafe(self._client.write_coil(int(register),value,slave=int(slave)), self._asyncLoopThread.loop).result()
+                asyncio.run_coroutine_threadsafe(write_coil_wrapper(self._client, int(register),value,int(slave)), self._asyncLoopThread.loop).result()
 #                time.sleep(.3) # avoid possible hickups on startup
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeCoil(%d,%d,%s) failed', slave, register, value)
@@ -630,7 +637,10 @@ class modbusport:
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
-                asyncio.run_coroutine_threadsafe(self._client.write_register(int(register),int(round(value)),slave=int(slave)), self._asyncLoopThread.loop).result()
+                # wrap an Awaitable into a Coroutine
+                async def write_register_wrapper(client:'ModbusBaseClient', register:int, value:int, slave:int) -> 'ModbusPDU':
+                    return await client.write_register(register, value, slave=slave)
+                asyncio.run_coroutine_threadsafe(write_register_wrapper(self._client, int(register),int(round(value)),int(slave)), self._asyncLoopThread.loop).result()
 #                time.sleep(.03) # avoid possible hickups on startup
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeSingleRegister(%d,%d,%s) failed', slave, register, int(round(value)))
@@ -655,12 +665,17 @@ class modbusport:
             self.COMsemaphore.acquire(1)
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
+                # wrap an Awaitable into a Coroutine
+                async def mask_write_register_wrapper(client:'ModbusBaseClient', register:int, and_mask:int, or_mask:int, slave:int) -> 'ModbusPDU':
+                    return await client.mask_write_register(address=register, and_mask=and_mask, or_mask=or_mask, slave=slave)
                 assert self._client is not None
-                asyncio.run_coroutine_threadsafe(self._client.mask_write_register(
-                    address=int(register),
-                    and_mask=int(and_mask),
-                    or_mask=int(or_mask),
-                    slave=int(slave)), self._asyncLoopThread.loop).result()
+                asyncio.run_coroutine_threadsafe(mask_write_register_wrapper(
+                    self._client,
+                    int(register),
+                    int(and_mask),
+                    int(or_mask),
+                    int(slave)), self._asyncLoopThread.loop).result()
+
 #                time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('maskWriteRegister(%d,%d,%s,%s) failed', slave, register, and_mask, or_mask)
@@ -698,7 +713,10 @@ class modbusport:
                 assert self._client is not None
                 float_values:List[float] = (values if isinstance(values, list) else [float(values)])
                 int_values:List[int] = [int(round(v)) for v in float_values]
-                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),int_values,slave=int(slave)), self._asyncLoopThread.loop).result()
+                # wrap an Awaitable into a Coroutine
+                async def write_registers_wrapper(client:'ModbusBaseClient', register:int, int_values:List[int], slave:int) -> 'ModbusPDU':
+                    return await client.write_registers(register, int_values, slave=slave)
+                asyncio.run_coroutine_threadsafe(write_registers_wrapper(self._client, int(register), int_values, int(slave)), self._asyncLoopThread.loop).result()
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeRegisters(%d,%d,%s) failed', slave, register, values)
             _log.debug(ex)
@@ -724,7 +742,10 @@ class modbusport:
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
                 payload:List[int] = self.convert_float_to_registers(value)
-                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),payload,slave=int(slave)), self._asyncLoopThread.loop).result()
+                # wrap an Awaitable into a Coroutine
+                async def write_registers_wrapper(client:'ModbusBaseClient', register:int, payload:List[int], slave:int) -> 'ModbusPDU':
+                    return await client.write_registers(register, payload, slave=slave)
+                asyncio.run_coroutine_threadsafe(write_registers_wrapper(self._client, int(register), payload, int(slave)), self._asyncLoopThread.loop).result()
 #                time.sleep(.03)
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeWord(%d,%d,%s) failed', slave, register, value)

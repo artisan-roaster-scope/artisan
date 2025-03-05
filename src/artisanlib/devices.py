@@ -35,14 +35,14 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 try:
     from PyQt6.QtCore import (Qt, pyqtSlot, QSettings, QTimer, QRegularExpression) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtGui import (QStandardItemModel, QStandardItem, QColor, QIntValidator, QRegularExpressionValidator) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import (QStandardItemModel, QStandardItem, QColor, QIntValidator, QRegularExpressionValidator, QPixmap) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,  # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QRadioButton, QButtonGroup, # @UnusedImport @Reimport  @UnresolvedImport
                                  QTableWidget, QMessageBox, QHeaderView, QTableWidgetItem, QSizePolicy) # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QTimer, QRegularExpression) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import (QStandardItemModel, QStandardItem, QColor, QIntValidator, QRegularExpressionValidator) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import (QStandardItemModel, QStandardItem, QColor, QIntValidator, QRegularExpressionValidator, QPixmap) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QRadioButton, QButtonGroup, # @UnusedImport @Reimport  @UnresolvedImport
@@ -373,7 +373,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.dataRateCombo1048.setMaximumWidth(width)
 
         phidgetBox1048.addWidget(self.dataRateCombo1048,4,1,1,2)
-        phidgetBox1048.setSpacing(1)
+        phidgetBox1048.setSpacing(2)
 
         typeLabel = QLabel(QApplication.translate('Label','Type'))
         asyncLabel = QLabel(QApplication.translate('Label','Async'))
@@ -398,7 +398,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
         # Phidget IR
         phidgetBox1045 = QGridLayout()
-        phidgetBox1045.setSpacing(1)
+        phidgetBox1045.setSpacing(2)
         self.changeTriggerCombos1045 = QComboBox()
         self.changeTriggerCombos1045.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         model = cast(QStandardItemModel, self.changeTriggerCombos1045.model())
@@ -470,7 +470,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
         # 1046 RTD
         phidgetBox1046 = QGridLayout()
-        phidgetBox1046.setSpacing(1)
+        phidgetBox1046.setSpacing(2)
+        phidgetBox1046.setContentsMargins(0,0,0,0)
         self.gainCombos1046 = []
         self.formulaCombos1046 = []
         self.asyncCheckBoxes1046 = []
@@ -545,7 +546,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.dataRateCombo1046.setMaximumWidth(width)
 
         phidgetBox1046.addWidget(self.dataRateCombo1046,4,1,1,2)
-        phidgetBox1046.setSpacing(5)
+
 
         gainLabel = QLabel(QApplication.translate('Label','Gain'))
         formulaLabel = QLabel(QApplication.translate('Label','Wiring'))
@@ -558,7 +559,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         phidget1046HBox = QHBoxLayout()
         phidget1046HBox.addStretch()
         phidget1046HBox.addLayout(phidgetBox1046)
-        phidget1046HBox.addStretch()
+#        phidget1046HBox.addStretch()
         phidget1046VBox = QVBoxLayout()
         phidget1046VBox.addLayout(phidget1046HBox)
         phidget1046VBox.addStretch()
@@ -570,9 +571,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
         # TMP1200 RTD
         phidgetBox1200 = QGridLayout()
-        phidgetBox1200.setSpacing(1)
+        phidgetBox1200.setSpacing(2)
         phidgetBox1200_2 = QGridLayout()
-        phidgetBox1200_2.setSpacing(1)
+        phidgetBox1200_2.setSpacing(2)
 
         self.formulaCombo1200 = QComboBox()
         self.formulaCombo1200.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -773,7 +774,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         phidgetGroupBoxLayout = QVBoxLayout()
         phidgetGroupBoxLayout.addWidget(phidget1200_tabs)
 
-#        phidgetBox1200_2.setSpacing(1)
         phidgetGroupBoxLayout.setContentsMargins(0,0,0,0) # left, top, right, bottom
 
         phidget1200GroupBox = QGroupBox('TMP1200/1202 RTD')
@@ -802,7 +802,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.modeCombo1400.setMinimumWidth(width)
 
         phidgetBox1400 = QGridLayout()
-        phidgetBox1400.setSpacing(1)
+        phidgetBox1400.setSpacing(2)
+        phidgetBox1400.setContentsMargins(0,0,0,0)
         phidgetBox1400.addWidget(powerLabel,0,0,Qt.AlignmentFlag.AlignRight)
         phidgetBox1400.addWidget(self.powerCombo1400,0,1)
         phidgetBox1400.addWidget(modeLabel,1,0,Qt.AlignmentFlag.AlignRight)
@@ -828,14 +829,14 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         phdget10481045GroupBoxHBox.addWidget(phidget1400GroupBox)
         phdget10481045GroupBoxHBox.addStretch()
         phdget10481045GroupBoxHBox.addWidget(phidget1046GroupBox)
-        phdget10481045GroupBoxHBox.setContentsMargins(2,0,2,0)
-        phdget10481045GroupBoxHBox.setSpacing(1)
+        phdget10481045GroupBoxHBox.setContentsMargins(2,0,0,0) # left, top, right, bottom
+        phdget10481045GroupBoxHBox.setSpacing(2)
 
 
         # Phidget IO 1018
         # per each of the 8-channels: raw flag / data rate popup / change trigger popup
         phidgetBox1018 = QGridLayout()
-        phidgetBox1018.setSpacing(1)
+        phidgetBox1018.setSpacing(2)
         self.asyncCheckBoxes = []
         self.ratioCheckBoxes = []
         self.dataRateCombos = []
@@ -990,13 +991,14 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         phidget10451018HBox.addWidget(phidget1045GroupBox)
         phidget10451018HBox.addStretch()
         phidget10451018HBox.addWidget(phidget1018GroupBox)
-        phidget10451018HBox.setSpacing(1)
+        phidget10451018HBox.setSpacing(2)
         phidgetVBox = QVBoxLayout()
         phidgetVBox.addLayout(phdget10481045GroupBoxHBox)
         phidgetVBox.addLayout(phidget10451018HBox)
         phidgetVBox.addWidget(phidgetNetworkGroupBox)
         phidgetVBox.addStretch()
         phidgetVBox.setSpacing(5)
+        phidgetVBox.setContentsMargins(0,0,0,0)
         # yoctopuce widgets
         self.yoctoBoxRemoteFlag = QCheckBox()
         self.yoctoBoxRemoteFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -1440,6 +1442,111 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         tab7Layout.addLayout(tab7V2Layout)
         tab7Layout.addStretch()
         tab7Layout.setContentsMargins(2,10,2,5)
+
+        self.taskWebDisplayGreenURL = QLabel()
+        self.taskWebDisplayGreenURL.setOpenExternalLinks(True)
+        self.taskWebDisplayGreenFlag = QCheckBox()
+        self.taskWebDisplayGreenFlag.setChecked(self.aw.taskWebDisplayGreenActive)
+        self.taskWebDisplayGreenFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.taskWebDisplayGreenFlag.clicked.connect(self.taskWebDisplayGreen)
+        self.taskWebDisplayGreenPortLabel = QLabel(QApplication.translate('Label', 'Port'))
+        self.taskWebDisplayGreenPort = QLineEdit(str(self.aw.taskWebDisplayGreenPort))
+        self.taskWebDisplayGreenPort.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.taskWebDisplayGreenPort.setValidator(QRegularExpressionValidator(QRegularExpression(r'^[0-9]{1,4}$'),self))
+        self.taskWebDisplayGreenPort.setMaximumWidth(45)
+        self.taskWebDisplayGreenPort.editingFinished.connect(self.changeTaskWebDisplayGreenPort)
+        self.taskWebDisplayGreenPort.setDisabled(self.aw.taskWebDisplayGreenActive)
+        self.taskWebDisplayGreenQRpic = QLabel() # the QLabel holding the QR code image
+        if self.aw.taskWebDisplayGreenActive and self.aw.taskWebDisplayGreen_server is not None:
+            try:
+                self.setTaskGreenURL(self.getTaskURL(self.aw.taskWebDisplayGreenPort, self.aw.taskWebDisplayGreen_server.indexPath()))
+            except Exception: # pylint: disable=broad-except
+                self.taskWebDisplayGreenURL.setText('')
+                self.taskWebDisplayGreenQRpic.setPixmap(QPixmap())
+                self.aw.taskWebDisplayGreenActive = False
+        else:
+            self.taskWebDisplayGreenURL.setText('')
+            self.taskWebDisplayGreenQRpic.setPixmap(QPixmap())
+        taskWebDisplayGreenLayout = QHBoxLayout()
+        taskWebDisplayGreenLayout.addWidget(self.taskWebDisplayGreenFlag)
+        taskWebDisplayGreenLayout.addWidget(self.taskWebDisplayGreenPortLabel)
+        taskWebDisplayGreenLayout.addWidget(self.taskWebDisplayGreenPort)
+        taskWebDisplayGreenLayout.addWidget(self.taskWebDisplayGreenURL)
+        taskWebDisplayGreenLayout.addStretch()
+        taskWebDisplayGreenVLayout = QVBoxLayout()
+        if not self.aw.app.artisanviewerMode:
+            taskWebDisplayGreenVLayout.addLayout(taskWebDisplayGreenLayout)
+            taskWebDisplayGreenHLayout = QHBoxLayout()
+            taskWebDisplayGreenHLayout.addStretch()
+            taskWebDisplayGreenHLayout.addWidget(self.taskWebDisplayGreenQRpic)
+            taskWebDisplayGreenHLayout.addStretch()
+            taskWebDisplayGreenVLayout.addLayout(taskWebDisplayGreenHLayout)
+            taskWebDisplayGreenVLayout.addStretch()
+        else:
+            naLayout = QHBoxLayout()
+            notavailLable = QLabel(QApplication.translate('Label', 'Not available in ArtisanViewer'))
+            naLayout.addWidget(notavailLable)
+            naLayout.addStretch()
+            taskWebDisplayGreenVLayout.addLayout(naLayout)
+
+        self.taskWebDisplayRoastedURL = QLabel()
+        self.taskWebDisplayRoastedURL.setOpenExternalLinks(True)
+        self.taskWebDisplayRoastedFlag = QCheckBox()
+        self.taskWebDisplayRoastedFlag.setChecked(self.aw.taskWebDisplayRoastedActive)
+        self.taskWebDisplayRoastedFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.taskWebDisplayRoastedFlag.clicked.connect(self.taskWebDisplayRoasted)
+        self.taskWebDisplayRoastedPortLabel = QLabel(QApplication.translate('Label', 'Port'))
+        self.taskWebDisplayRoastedPort = QLineEdit(str(self.aw.taskWebDisplayRoastedPort))
+        self.taskWebDisplayRoastedPort.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.taskWebDisplayRoastedPort.setValidator(QRegularExpressionValidator(QRegularExpression(r'^[0-9]{1,4}$'),self))
+        self.taskWebDisplayRoastedPort.setMaximumWidth(45)
+        self.taskWebDisplayRoastedPort.editingFinished.connect(self.changeTaskWebDisplayRoastedPort)
+        self.taskWebDisplayRoastedPort.setDisabled(self.aw.taskWebDisplayRoastedActive)
+        self.taskWebDisplayRoastedQRpic = QLabel() # the QLabel holding the QR code image
+        if self.aw.taskWebDisplayRoastedActive:
+            try:
+                self.setTaskRoastedURL(self.getTaskURL(self.aw.taskWebDisplayRoastedPort, self.aw.taskWebDisplayRoastedIndexPath))
+            except Exception: # pylint: disable=broad-except
+                self.taskWebDisplayRoastedURL.setText('')
+                self.taskWebDisplayRoastedQRpic.setPixmap(QPixmap())
+                self.aw.taskWebDisplayRoastedActive = False
+        else:
+            self.taskWebDisplayRoastedURL.setText('')
+            self.taskWebDisplayRoastedQRpic.setPixmap(QPixmap())
+        taskWebDisplayRoastedLayout = QHBoxLayout()
+        taskWebDisplayRoastedLayout.addWidget(self.taskWebDisplayRoastedFlag)
+        taskWebDisplayRoastedLayout.addWidget(self.taskWebDisplayRoastedPortLabel)
+        taskWebDisplayRoastedLayout.addWidget(self.taskWebDisplayRoastedPort)
+        taskWebDisplayRoastedLayout.addWidget(self.taskWebDisplayRoastedURL)
+        taskWebDisplayRoastedLayout.addStretch()
+        taskWebDisplayRoastedVLayout = QVBoxLayout()
+        if not self.aw.app.artisanviewerMode:
+            taskWebDisplayRoastedVLayout.addLayout(taskWebDisplayRoastedLayout)
+            taskWebDisplayRoastedHLayout = QHBoxLayout()
+            taskWebDisplayRoastedHLayout.addStretch()
+            taskWebDisplayRoastedHLayout.addWidget(self.taskWebDisplayRoastedQRpic)
+            taskWebDisplayRoastedHLayout.addStretch()
+            taskWebDisplayRoastedVLayout.addLayout(taskWebDisplayRoastedHLayout)
+            taskWebDisplayRoastedVLayout.addStretch()
+        else:
+            naLayout = QHBoxLayout()
+            notavailLable = QLabel(QApplication.translate('Label', 'Not available in ArtisanViewer'))
+            naLayout.addWidget(notavailLable)
+            naLayout.addStretch()
+            taskWebDisplayRoastedVLayout.addLayout(naLayout)
+
+        scale1 = QGroupBox('Scale Green/Roasted')
+        scale2 = QGroupBox('Scale')
+        taskGreen = QGroupBox('Task Green')
+        taskGreen.setLayout(taskWebDisplayGreenVLayout)
+        taskRoasted = QGroupBox('Task Roasted')
+        taskRoasted.setLayout(taskWebDisplayRoastedVLayout)
+        tab8Layout = QGridLayout()
+        tab8Layout.addWidget(scale1,0,0)
+        tab8Layout.addWidget(scale2,0,1)
+        tab8Layout.addWidget(taskGreen,1,0)
+        tab8Layout.addWidget(taskRoasted,1,1)
+
         #main tab widget
         self.TabWidget = QTabWidget()
         C1Widget = QWidget()
@@ -1464,6 +1571,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         C7Widget.setLayout(tab7Layout)
         self.TabWidget.addTab(C7Widget,QApplication.translate('Tab','Networks'))
         self.TabWidget.currentChanged.connect(self.tabSwitched)
+        C8Widget = QWidget()
+        C8Widget.setLayout(tab8Layout)
+        self.TabWidget.addTab(C8Widget,QApplication.translate('Tab','Scales'))
+        self.TabWidget.currentChanged.connect(self.tabSwitched)
         #incorporate layouts
         Mlayout = QVBoxLayout()
         Mlayout.addWidget(self.TabWidget)
@@ -1484,6 +1595,110 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         # we set the active tab with a QTimer after the tabbar has been rendered once, as otherwise
         # some tabs are not rendered at all on Windows using Qt v6.5.1 (https://bugreports.qt.io/projects/QTBUG/issues/QTBUG-114204?filter=allissues)
         QTimer.singleShot(50, self.setActiveTab)
+
+
+    @pyqtSlot()
+    def changeTaskWebDisplayGreenPort(self) -> None:
+        try:
+            self.aw.taskWebDisplayGreenPort = int(str(self.taskWebDisplayGreenPort.text()))
+        except Exception: # pylint: disable=broad-except
+            pass
+
+    @pyqtSlot(bool)
+    def taskWebDisplayGreen(self, b:bool = False) -> None:
+        res = False
+        if b:
+            try:
+                self.changeTaskWebDisplayGreenPort()
+                res = self.aw.startWebGreen()
+                if res and self.aw.taskWebDisplayGreen_server is not None:
+                    self.setTaskGreenURL(self.getTaskURL(self.aw.taskWebDisplayGreenPort, self.aw.taskWebDisplayGreen_server.indexPath())) # this might fail if socket cannot be established
+                    self.taskWebDisplayGreenFlag.setChecked(True)
+                    self.taskWebDisplayGreenPort.setDisabled(True)
+            except Exception as e: # pylint: disable=broad-except
+                self.aw.sendmessage(str(e))
+                res = False
+                self.aw.taskWebDisplayGreenActive = False
+        else:
+            self.aw.stopWebGreen()
+        if not res:
+            self.taskWebDisplayGreenFlag.setChecked(False)
+            self.taskWebDisplayGreenPort.setDisabled(False)
+            self.taskWebDisplayGreenURL.setText('')
+            self.taskWebDisplayGreenQRpic.setPixmap(QPixmap())
+
+    def setTaskGreenURL(self, url:str) -> None:
+        # set URL label
+        self.taskWebDisplayGreenURL.setText(f'<a href="{url}">{url}</a>')
+        # set QR label
+        try:
+            from artisanlib.qrcode import QRlabel
+            qr = QRlabel(url)
+            self.taskWebDisplayGreenQRpic.setPixmap(qr.make_image().pixmap())
+        except Exception: # pylint: disable=broad-except
+            pass
+
+    @pyqtSlot()
+    def changeTaskWebDisplayRoastedPort(self) -> None:
+        try:
+            self.aw.taskWebDisplayRoastedPort = int(str(self.taskWebDisplayRoastedPort.text()))
+        except Exception: # pylint: disable=broad-except
+            pass
+
+    @pyqtSlot(bool)
+    def taskWebDisplayRoasted(self, b:bool = False) -> None:
+        res = False
+        if b:
+            try:
+                self.changeTaskWebDisplayRoastedPort()
+                res = self.aw.startWebRoasted()
+                if res:
+                    self.setTaskRoastedURL(self.getTaskURL(self.aw.taskWebDisplayRoastedPort, self.aw.taskWebDisplayRoastedIndexPath)) # this might fail if socket cannot be established
+                    self.taskWebDisplayRoastedFlag.setChecked(True)
+                    self.taskWebDisplayRoastedPort.setDisabled(True)
+            except Exception as e: # pylint: disable=broad-except
+                self.aw.sendmessage(str(e))
+                res = False
+                self.aw.taskWebDisplayRoastedActive = False
+        else:
+            self.aw.stopWebRoasted()
+        if not res:
+            self.taskWebDisplayRoastedFlag.setChecked(False)
+            self.taskWebDisplayRoastedPort.setDisabled(False)
+            self.taskWebDisplayRoastedURL.setText('')
+            self.taskWebDisplayRoastedQRpic.setPixmap(QPixmap())
+
+    def setTaskRoastedURL(self, url:str) -> None:
+        # set URL label
+        self.taskWebDisplayRoastedURL.setText(f'<a href="{url}">{url}</a>')
+        # set QR label
+        try:
+            from artisanlib.qrcode import QRlabel
+            qr = QRlabel(url)
+            self.taskWebDisplayRoastedQRpic.setPixmap(qr.make_image().pixmap())
+        except Exception: # pylint: disable=broad-except
+            pass
+
+    @staticmethod
+    def getTaskURL(port:int, index_path:str) -> str:
+        import socket
+#        # use Artisan's host IP address
+#        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#        s.connect(('8.8.8.8', 80))
+#        localIP = s.getsockname()[0]
+#        s.close()
+#        return f'http://{str(localIP)}:{str(port)}/{index_path}'
+        # use Artisan's host name (more stable over DHCP/zeroconf updates), but cannot be accessed on Windows from iPhone
+        if sys.platform.startswith('darwin'):
+            import subprocess
+            host = subprocess.check_output(['scutil', '--get', 'LocalHostName']).decode('utf-8')
+        else:
+            # on Linux/Windows the mdns name is created by appending ".local" to the hostname
+            host = socket.gethostname()
+        return f"http://{host.strip().replace(' ', '_').casefold()}.local:{str(port)}/{index_path}"
+
+
+
 
     @pyqtSlot()
     def setActiveTab(self) -> None:
@@ -3680,7 +3895,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             #open serial conf Dialog
             #if device is not None or not external-program (don't need serial settings config)
             if (self.aw.qmc.device not in self.aw.qmc.nonSerialDevices or (self.aw.qmc.device == 134 and self.aw.santokerSerial) or
-                (self.aw.qmc.device == 138 and self.aw.kaleidoSerial)):
+                (self.aw.qmc.device == 138 and self.aw.kaleidoSerial)) and self.TabWidget.currentIndex() in {0,1,6}:
                 QTimer.singleShot(700, self.aw.setcommport)
             self.close()
             self.accept()

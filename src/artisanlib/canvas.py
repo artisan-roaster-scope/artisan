@@ -951,6 +951,7 @@ class tgraphcanvas(FigureCanvas):
         # ids of (main) devices (without a + in front of their name string)
         # that do NOT communicate via any serial port thus do not need any serial port configuration
         self.nonSerialDevices : Final[List[int]] = self.phidgetDevices + [
+            18, # NONE (manual)
             27, # Program
             45, # Yocto Thermocouple
             46, # Yocto PT100
@@ -3696,6 +3697,14 @@ class tgraphcanvas(FigureCanvas):
                 QDesktopServices.openUrl(QUrl(roastLink(self.roastUUID), QUrl.ParsingMode.TolerantMode))
                 return
 
+            if event.dblclick and event.button == 1 and not self.designerflag and not self.wheelflag and event.inaxes:
+                if self.ax.get_autoscaley_on():
+                    self.ax.autoscale(enable=False, axis='y', tight=False)
+                    self.redraw(recomputeAllDeltas=False)
+                else:
+                    self.ax.autoscale(enable=True, axis='y', tight=False)
+                    self.fig.canvas.draw_idle()
+
             if not self.wheelflag and event.inaxes is None and event.button == 1 and event.dblclick and event.x > event.y:
                 fig = self.ax.get_figure()
                 if fig is None:
@@ -5837,7 +5846,6 @@ class tgraphcanvas(FigureCanvas):
     # called only after CHARGE
     def playbackevent(self) -> None:
         try:
-
             #needed when using device NONE
             if self.timex:
                 #find time or temp distances
@@ -5874,12 +5882,23 @@ class tgraphcanvas(FigureCanvas):
 
                         timed = self.timeB[bge] - now
                         delta:float = 1 # by default don't trigger this one
+                        increasing:bool = True
                         if self.replayType == 0: # replay by time
                             delta = timed
                         elif not next_byTemp_checked[event_type] and self.replayType == 1: # replay by BT (after TP)
                             if self.TPalarmtimeindex is not None:
                                 if len(self.ctemp2)>0 and self.ctemp2[-1] is not None and len(self.stemp2B)>bge:
                                     delta = self.stemp2B[bge] - self.ctemp2[-1]
+                                    try:
+                                        # if last registered event of event_type has higher BT as next to be replayed one, we
+                                        # expect a temperature decrease instead of an increase
+                                        last_registered_event_index = len(self.specialeventstype) - 1 - self.specialeventstype[::-1].index(event_type)
+                                        if self.stemp2B[self.specialevents[last_registered_event_index]] > self.stemp2B[bge]:
+                                            delta = self.ctemp2[-1] - self.stemp2B[bge]
+                                            increasing = False
+                                    except Exception: # pylint: disable=broad-except
+                                        # a previous event of that type might not yet exist
+                                        pass
                                     next_byTemp_checked[event_type] = True
                             else: # before TP we switch back to time-based
                                 delta = timed
@@ -5888,6 +5907,16 @@ class tgraphcanvas(FigureCanvas):
                             if self.TPalarmtimeindex is not None:
                                 if len(self.ctemp1)> 0 and self.ctemp1[-1] is not None and len(self.stemp1)>bge:
                                     delta = self.stemp1B[bge] - self.ctemp1[-1]
+                                    try:
+                                        # if last registered event of event_type has higher BT as next to be replayed one, we
+                                        # expect a temperature decrease instead of an increase
+                                        last_registered_event_index = len(self.specialeventstype) - 1 - self.specialeventstype[::-1].index(event_type)
+                                        if self.stemp1B[self.specialevents[last_registered_event_index]] > self.stemp1B[bge]:
+                                            delta = self.ctemp1[-1] - self.stemp1B[bge]
+                                            increasing = False
+                                    except Exception: # pylint: disable=broad-except
+                                        # a previous event of that type might not yet exist
+                                        pass
                                     next_byTemp_checked[event_type] = True
                             else: # before TP we switch back to time-based
                                 delta = timed
@@ -5986,7 +6015,8 @@ class tgraphcanvas(FigureCanvas):
 
                                         # for ramp by BT only after TP and if BT increased
                                         if (self.TPalarmtimeindex is not None and self.replayType == 1 and len(self.temp2)>1 and self.temp2[-1] != -1 and
-                                                self.temp2[-2] != -1 and self.temp2[-1] > self.temp2[-2] and len(self.specialevents) > last_registered_event_idx and
+                                                self.temp2[-2] != -1 and ((increasing and self.temp2[-1] >= self.temp2[-2]) or (not increasing and self.temp2[-1] <= self.temp2[-2])) and
+                                                len(self.specialevents) > last_registered_event_idx and
                                                 len(self.temp2)> self.specialevents[last_registered_event_idx] and
                                                 len(self.temp2B) > bge):
                                             # we ramp by BT only after TP and if BT increased, however, last event could be before TP
@@ -5997,7 +6027,8 @@ class tgraphcanvas(FigureCanvas):
                                             next_event_temp = self.temp2B[bge]
                                             current_temp = self.temp2[-1]
                                         elif (self.TPalarmtimeindex is not None and self.replayType == 2 and len(self.temp1)>1 and self.temp1[-1] != -1 and
-                                                self.temp1[-2] != -1 and self.temp1[-1] > self.temp1[-2] and len(self.specialevents) > last_registered_event_idx and
+                                                self.temp1[-2] != -1 and ((increasing and self.temp1[-1] >= self.temp1[-2]) or (not increasing and self.temp1[-1] <= self.temp1[-2])) and
+                                                len(self.specialevents) > last_registered_event_idx and
                                                 len(self.temp1)> self.specialevents[last_registered_event_idx] and
                                                 len(self.temp1B) > bge):
                                             # we ramp by ET only after TP and if ET increased
@@ -6010,15 +6041,15 @@ class tgraphcanvas(FigureCanvas):
 
                                         # compute ramp value if possible
                                         if (self.replayType in {1,2} and last_event_temp is not None and next_event_temp is not None and
-                                                current_temp is not None and next_event_temp > last_event_temp):
-                                            # if background event target temperature did increase we ramp by temperature
+                                                current_temp is not None):
+                                            # if background event target temperature did increase (or decrease) as the foreground, we ramp by temperature
                                             coefficients = numpy.polyfit([last_event_temp, next_event_temp] , [last_value, next_value], 1)
                                             ramps[event_type] = numpy.poly1d(coefficients)(current_temp)
-                                        elif  (last_event_temp is None and next_event_temp is None and
+                                        elif (last_event_temp is None and next_event_temp is None and
                                                   # if replay by temp (as one or both of those event_temps is not None), but current temp did not increase we don't
                                                   # ramp by time instead as this would confuse everything.
                                                 len(self.timex)> self.specialevents[last_registered_event_idx] and len(self.timeB)>bge):
-                                            # otherwise we ramp by time
+                                            # we ramp by time
                                             last_time = self.timex[self.specialevents[last_registered_event_idx]]
                                             next_time = self.timeB[bge]
                                             coefficients = numpy.polyfit([last_time, next_time], [last_value, next_value], 1)

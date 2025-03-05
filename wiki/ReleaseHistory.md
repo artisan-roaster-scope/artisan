@@ -25,6 +25,8 @@ v3.1.1
   - adds quick keyboard focused event slider input using numeric keys followed by the ENTER/RETURN key. The last digit can be removed by using the backspace key. ESC cancels the action.
   - events displayed in step and combo mode can be updated by moving them to a new position. Pressing SHIFT restricts the movement in either the x or the y direction.
   - a picked custom event can be removed using the backspace key
+  - a double click on the graph canvas temporarily scales the y-axis to cover all artists
+
 
 * NEW HARDWARE SUPPORT
   - adds support for [Carmomaq's Stratto Lab sample roaster](https://carmomaq.com.br/en/produtos/stratto-roaster-lab/)
@@ -33,6 +35,7 @@ v3.1.1
   - adds support for the [DCC1100 and DCC1120 Brushless DC Motor controllers and the DCC1020 DC Motor controller](https://artisan-scope.org/devices/phidgets/#45-dc-motor-control) ([Discussion #1750](../../../discussions/1750))
   - adds [ROEST](https://artisan-scope.org/machines/roest/) CSV import
   - adds [Thermoworks BlueDOT](https://www.thermoworks.com/bluedot) support
+  - adds [Atilla](https://artisan-scope.org/machines/atilla/) 'auto' setup which picks up CHARGE and DROP events set from Atilla Gold Plus machines with automation
 
 * CHANGES
   - the Phidget driver is now bundled with the Artisan app and does no longer need to be installed separately. NOTE: some legacy USB HID devices, like the original 1046 and 1048, which still need the kernel extension of the driver package installed in the system.
@@ -47,6 +50,7 @@ v3.1.1
   - a click in a sliders pane does no longer move the slider, but just gives that slier the input focus (a click in a sliders bar still moves the slider to this position)
   - the quick custom event entry using the q, w, e and e key followed by number keys now requires the ENTER/RETURN key to establish the new value.  The last entered digit can be removed by using the backspace key. ESC cancels the action.
   - improved accuracy on rendering [artisan.plus](https://artisan.plus) blend component weights
+  - improved Cropster importer
 
 * FIXES
   - ensure complete reset to defaults in energy tab loads tab

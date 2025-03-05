@@ -33,7 +33,7 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 class WebView:
 
-    __slots__ = [ '_loop', '_thread', '_app', '_port', '_last_send', '_min_send_interval', '_resource_path', '_index_path', '_websocket_path'  ]
+    __slots__ = [ '_loop', '_thread', '_app', '_port', '_last_send', '_min_send_interval', '_resource_path', '_index_path', '_websocket_path', '_runner'  ]
 
     def __init__(self, port:int, resource_path:str, index_path:str, websocket_path:str) -> None:
 
@@ -50,6 +50,8 @@ class WebView:
         self._resource_path:str = resource_path
         self._index_path:str = index_path
         self._websocket_path:str = websocket_path
+
+        self._runner: Optional[web.AppRunner] = None
 
         aiohttp_jinja2.setup(self._app,
             loader=jinja2.FileSystemLoader(resource_path))
@@ -114,10 +116,10 @@ class WebView:
                            message='Server shutdown')
 
     async def startup(self) -> None:
-        runner = web.AppRunner(self._app)
-        await runner.setup()
-        site = web.TCPSite(runner, '0.0.0.0', self._port)
-        await site.start()
+        self._runner = web.AppRunner(self._app)
+        await self._runner.setup()
+        site = web.TCPSite(self._runner, '0.0.0.0', self._port)
+        await asyncio.wait_for(site.start(), 0.7)
 
     @staticmethod
     def start_background_loop(loop: asyncio.AbstractEventLoop) -> None:
@@ -137,20 +139,20 @@ class WebView:
             loop.close()
 
     def startWeb(self) -> bool:
-        try:
-            self._loop = asyncio.new_event_loop()
-            self._thread = Thread(target=self.start_background_loop, args=(self._loop,), daemon=True)
-            self._thread.start()
-            # run web task in async loop
-            asyncio.run_coroutine_threadsafe(self.startup(), self._loop)
-            return True
-        except Exception as e:  # pylint: disable=broad-except
-            _log.exception(e)
-            return False
+        self._loop = asyncio.new_event_loop()
+        self._thread = Thread(target=self.start_background_loop, args=(self._loop,), daemon=True)
+        self._thread.start()
+        # run web task in async loop
+        future = asyncio.run_coroutine_threadsafe(self.startup(), self._loop)
+        future.result()
+        return True
 
     def stopWeb(self) -> None:
         # _loop.stop() needs to be called as follows as the event loop class is not thread safe
         if self._loop is not None:
+            if self._runner is not None:
+                future = asyncio.run_coroutine_threadsafe(self._runner.cleanup(), self._loop)
+                future.result()
             self._loop.call_soon_threadsafe(self._loop.stop)
             self._loop = None
         # wait for the thread to finish
@@ -164,9 +166,9 @@ class WebLCDs(WebView):
     __slots__ = [ '_nonesymbol', '_timecolor', '_timebackground', '_btcolor', '_btbackground', '_etcolor', '_etbackground',
                     '_showetflag', '_showbtflag' ]
 
-    def __init__(self, port:int, resource_path:str, nonesymbol:str, timecolor:str, timebackground:str, btcolor:str,
+    def __init__(self, port:int, resource_path:str, index_path:str, websocket_path:str, nonesymbol:str, timecolor:str, timebackground:str, btcolor:str,
             btbackground:str, etcolor:str, etbackground:str, showetflag:bool, showbtflag:bool) -> None:
-        super().__init__(port, resource_path, 'artisan', 'websocket')
+        super().__init__(port, resource_path, index_path, websocket_path)
 
         self._nonesymbol:str = nonesymbol
         self._timecolor:str = timecolor
@@ -203,4 +205,103 @@ class WebLCDs(WebView):
 
     def stopWeb(self) -> None:
         _log.info('stop WebLCDs')
+        super().stopWeb()
+
+
+class WebGreen(WebView):
+
+    __slots__ = [ '_nonesymbol', '_timecolor', '_timebackground', '_btcolor', '_btbackground', '_etcolor', '_etbackground',
+                    '_showetflag', '_showbtflag' ]
+
+    index_path = 'green'
+
+    def __init__(self, port:int, resource_path:str, nonesymbol:str, timecolor:str, timebackground:str, btcolor:str,
+            btbackground:str, etcolor:str, etbackground:str, showetflag:bool, showbtflag:bool) -> None:
+        super().__init__(port, resource_path, WebGreen.index_path, f'{WebGreen.index_path}_ws')
+
+        self._nonesymbol:str = nonesymbol
+        self._timecolor:str = timecolor
+        self._timebackground:str = timebackground
+        self._btcolor:str = btcolor
+        self._btbackground:str = btbackground
+        self._etcolor:str = etcolor
+        self._etbackground:str = etbackground
+        self._showetflag:bool = showetflag
+        self._showbtflag:bool = showbtflag
+
+    @aiohttp_jinja2.template(f'{index_path}.tpl')
+    async def index(self, _request: 'Request') -> Dict[str,str]:
+        showspace_str = 'inline' if not (self._showbtflag and self._showetflag) else 'none'
+        showbt_str = 'inline' if self._showbtflag else 'none'
+        showet_str = 'inline' if self._showetflag else 'none'
+        return {
+            'port': str(self._port),
+            'nonesymbol': self._nonesymbol,
+            'timecolor': self._timecolor,
+            'timebackground': self._timebackground,
+            'btcolor': self._btcolor,
+            'btbackground': self._btbackground,
+            'etcolor': self._etcolor,
+            'etbackground': self._etbackground,
+            'showbt': showbt_str,
+            'showet': showet_str,
+            'showspace': showspace_str
+        }
+
+    def indexPath(self) -> str:
+        return self.index_path
+
+    def startWeb(self) -> bool:
+        _log.info('start WebGreen on port %s', self._port)
+        return super().startWeb()
+
+    def stopWeb(self) -> None:
+        _log.info('stop WebGreen')
+        super().stopWeb()
+
+
+class WebRoasted(WebView):
+
+    __slots__ = [ '_nonesymbol', '_timecolor', '_timebackground', '_btcolor', '_btbackground', '_etcolor', '_etbackground',
+                    '_showetflag', '_showbtflag' ]
+
+    def __init__(self, port:int, resource_path:str, index_path:str, websocket_path:str, nonesymbol:str, timecolor:str, timebackground:str, btcolor:str,
+            btbackground:str, etcolor:str, etbackground:str, showetflag:bool, showbtflag:bool) -> None:
+        super().__init__(port, resource_path, index_path, websocket_path)
+
+        self._nonesymbol:str = nonesymbol
+        self._timecolor:str = timecolor
+        self._timebackground:str = timebackground
+        self._btcolor:str = btcolor
+        self._btbackground:str = btbackground
+        self._etcolor:str = etcolor
+        self._etbackground:str = etbackground
+        self._showetflag:bool = showetflag
+        self._showbtflag:bool = showbtflag
+
+    @aiohttp_jinja2.template('artisan.tpl')
+    async def index(self, _request: 'Request') -> Dict[str,str]:
+        showspace_str = 'inline' if not (self._showbtflag and self._showetflag) else 'none'
+        showbt_str = 'inline' if self._showbtflag else 'none'
+        showet_str = 'inline' if self._showetflag else 'none'
+        return {
+            'port': str(self._port),
+            'nonesymbol': self._nonesymbol,
+            'timecolor': self._timecolor,
+            'timebackground': self._timebackground,
+            'btcolor': self._btcolor,
+            'btbackground': self._btbackground,
+            'etcolor': self._etcolor,
+            'etbackground': self._etbackground,
+            'showbt': showbt_str,
+            'showet': showet_str,
+            'showspace': showspace_str
+        }
+
+    def startWeb(self) -> bool:
+        _log.info('start WebRoasted on port %s', self._port)
+        return super().startWeb()
+
+    def stopWeb(self) -> None:
+        _log.info('stop WebRoasted')
         super().stopWeb()

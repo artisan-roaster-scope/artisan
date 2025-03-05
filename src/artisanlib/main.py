@@ -199,7 +199,7 @@ if TYPE_CHECKING:
     from artisanlib.comparator import roastCompareDlg # pylint: disable=unused-import
     from artisanlib.wheels import WheelDlg # pylint: disable=unused-import
     from artisanlib.hottop import Hottop # pylint: disable=unused-import
-    from artisanlib.weblcds import WebLCDs # pylint: disable=unused-import
+    from artisanlib.weblcds import WebLCDs, WebGreen, WebRoasted # pylint: disable=unused-import
     from artisanlib.santoker import Santoker # pylint: disable=unused-import
     from artisanlib.santoker_r import SantokerR # pylint: disable=unused-import
     from artisanlib.bluedot import BlueDOT # pylint: disable=unused-import
@@ -1491,6 +1491,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'recentThemeActs', 'applicationDirectory', 'helpdialog', 'redrawTimer', 'lastLoadedProfile', 'lastLoadedBackground', 'LargeScaleLCDsFlag', 'largeScaleLCDs_dialog',
         'analysisresultsanno', 'segmentresultsanno', 'schedule_window', 'scheduleFlag', 'scheduled_items_uuids', 'largeLCDs_dialog', 'LargeLCDsFlag', 'largeDeltaLCDs_dialog', 'LargeDeltaLCDsFlag', 'largePIDLCDs_dialog',
         'LargePIDLCDsFlag', 'largeExtraLCDs_dialog', 'LargeExtraLCDsFlag', 'largePhasesLCDs_dialog', 'LargePhasesLCDsFlag', 'WebLCDs', 'WebLCDsPort', 'weblcds_server',
+        'weblcds_index_path', 'weblcds_websocket_path',
+        'taskWebDisplayGreenActive', 'taskWebDisplayGreenPort', 'taskWebDisplayRoastedActive', 'taskWebDisplayRoastedPort',
+        'taskWebDisplayRoastedIndexPath', 'taskWebDisplayRoastedWebSocketPath', 'taskWebDisplayGreen_server', 'taskWebDisplayRoasted_server',
         'WebLCDsAlerts', 'EventsDlg_activeTab', 'graphColorDlg_activeTab', 'PID_DlgControl_activeTab', 'CurveDlg_activeTab', 'editGraphDlg_activeTab',
         'backgroundDlg_activeTab', 'DeviceAssignmentDlg_activeTab', 'AlarmDlg_activeTab', 'schedule_activeTab', 'StatisticsDlg_activeTab', 'resetqsettings', 'settingspath', 'wheelpath', 'profilepath',
         'userprofilepath', 'printer', 'main_widget', 'defaultdpi', 'dpi', 'qmc', 'HottopControlActive', 'AsyncSamplingTimer', 'wheeldialog',
@@ -1667,6 +1670,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.WebLCDsPort:int = 8080
         self.WebLCDsAlerts:bool = False
 
+        # Tasks Web Displays
+        self.taskWebDisplayGreenActive:bool = False
+        self.taskWebDisplayGreenPort:int = 8081
+        self.taskWebDisplayGreen_server:Optional[WebGreen] = None # holds the Task Green Web display instance
+        self.taskWebDisplayRoastedActive:bool = False
+        self.taskWebDisplayRoastedPort:int = 8082
+        self.taskWebDisplayRoastedIndexPath:Final[str] = 'roasted'
+        self.taskWebDisplayRoastedWebSocketPath:Final[str] = 'roasted_ws'
+        self.taskWebDisplayRoasted_server:Optional[WebRoasted] = None # holds the Roasted Web display instance
+
         # active tab
         self.EventsDlg_activeTab:int = 0
         self.graphColorDlg_activeTab:int = 0
@@ -1796,6 +1809,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.extratimeout:List[float] = []
 
         # WebLCDs
+        self.weblcds_index_path:Final[str] = 'artisan'
+        self.weblcds_websocket_path:Final[str] = 'websocket'
         self.weblcds_server:Optional[WebLCDs] = None # holds the WebLCD instance
 
         # Hottop
@@ -18523,6 +18538,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             settings.endGroup()
 #--- END GROUP WebLCDs
 
+#--- BEGIN GROUP Tasks
+            # Tasks
+            settings.beginGroup('Tasks')
+            self.taskWebDisplayGreenActive = toBool(settings.value('greenActive',self.taskWebDisplayGreenActive))
+            self.taskWebDisplayGreenPort = toInt(settings.value('greenPort',self.taskWebDisplayGreenPort))
+            self.taskWebDisplayRoastedActive = toBool(settings.value('roastedActive',self.taskWebDisplayRoastedActive))
+            self.taskWebDisplayRoastedPort = toInt(settings.value('roastedPort',self.taskWebDisplayRoastedPort))
+            settings.endGroup()
+#--- END GROUP Tasks
+
             self.schedule_day_filter =toBool(settings.value('ScheduleDayFilter',self.schedule_day_filter))
             self.schedule_user_filter = toBool(settings.value('ScheduleUserFilter',self.schedule_user_filter))
             self.schedule_machine_filter = toBool(settings.value('ScheduleMachineFilter',self.schedule_machine_filter))
@@ -18556,9 +18581,17 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.LargePhasesLCDsFlag = toBool(settings.value('LargePhasesLCDs',self.LargePhasesLCDsFlag))
             if self.LargePhasesLCDsFlag:
                 self.largePhasesLCDs()
-            # start server if needed
+
+            # start WebLCD server if needed
             if self.WebLCDs:
-                QTimer.singleShot(5000, self.startWebLCDsforced)
+                QTimer.singleShot(2000, self.startWebLCDsforced)
+            # start Task Green Web Display
+            if self.taskWebDisplayGreenActive:
+                QTimer.singleShot(2500, self.startWebGreenforced)
+            # start Task Roasted Web Display
+            if self.taskWebDisplayRoastedActive:
+                QTimer.singleShot(3000, self.startWebRoastedforced)
+
 
 #--- BEGIN GROUP ExtraEventButtons
             #restore buttons
@@ -18768,17 +18801,21 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
         return res
 
+    ## WebLCDs
+
     @pyqtSlot()
     def startWebLCDsforced(self) -> None:
         self.startWebLCDs(force=True)
 
     def startWebLCDs(self, force:bool = False) -> bool:
         try:
-            if not self.app.artisanviewerMode and not self.WebLCDs or force:
+            if not self.app.artisanviewerMode and (not self.WebLCDs or force):
                 from artisanlib.weblcds import WebLCDs
                 self.weblcds_server = WebLCDs(
                     self.WebLCDsPort,
                     str(getResourcePath()),
+                    self.weblcds_index_path,
+                    self.weblcds_websocket_path,
                     ('&nbsp;&nbsp;-.-' if self.qmc.LCDdecimalplaces else '&nbsp;--'),
                     self.lcdpaletteF['timer'],
                     self.lcdpaletteB['timer'],
@@ -18802,7 +18839,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.WebLCDs = False
             return False
         except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
+            _log.error(e)
             self.qmc.adderror(QApplication.translate('Error Message','Could not start WebLCDs. Selected port might be busy.'))
             self.stopWebLCDs()
             self.WebLCDs = False
@@ -18816,6 +18853,112 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.WebLCDs = False
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
+
+    ## WebGreen
+
+    @pyqtSlot()
+    def startWebGreenforced(self) -> None:
+        self.startWebGreen(force=True)
+
+    def startWebGreen(self, force:bool = False) -> bool:
+        try:
+            if not self.app.artisanviewerMode and (not self.taskWebDisplayGreenActive or force):
+                from artisanlib.weblcds import WebGreen
+                self.taskWebDisplayGreen_server = WebGreen(
+                    self.taskWebDisplayGreenPort,
+                    str(getResourcePath()),
+                    ('&nbsp;&nbsp;-.-' if self.qmc.LCDdecimalplaces else '&nbsp;--'),
+                    self.lcdpaletteF['timer'],
+                    self.lcdpaletteB['timer'],
+                    self.lcdpaletteF['bt'],
+                    self.lcdpaletteB['bt'],
+                    self.lcdpaletteF['et'],
+                    self.lcdpaletteB['et'],
+                    self.qmc.ETlcd,
+                    self.qmc.BTlcd)
+                res = self.taskWebDisplayGreen_server.startWeb()
+                if res:
+                    self.taskWebDisplayGreenActive = True
+                    return True
+                self.stopWebGreen()
+                self.taskWebDisplayGreenActive = False
+                return False
+            return False
+        except ModuleNotFoundError:
+            self.qmc.adderror(QApplication.translate('Error Message','Exception: Task Green remote display not supported by this build'))
+            self.stopWebGreen()
+            self.taskWebDisplayGreenActive = False
+            return False
+        except Exception as e: # pylint: disable=broad-except
+            _log.error(e)
+            self.qmc.adderror(QApplication.translate('Error Message','Could not start Task Green remote display. Selected port might be busy.'))
+            self.stopWebGreen()
+            self.taskWebDisplayGreenActive = False
+            return False
+
+    def stopWebGreen(self) -> None:
+        try:
+            if self.taskWebDisplayGreen_server is not None:
+                self.taskWebDisplayGreen_server.stopWeb()
+            self.taskWebDisplayGreen_server = None
+            self.taskWebDisplayGreenActive = False
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+
+    ## WebGreen
+
+    @pyqtSlot()
+    def startWebRoastedforced(self) -> None:
+        self.startWebRoasted(force=True)
+
+    def startWebRoasted(self, force:bool = False) -> bool:
+        try:
+            if not self.app.artisanviewerMode and (not self.taskWebDisplayRoastedActive or force):
+                from artisanlib.weblcds import WebRoasted
+                self.taskWebDisplayRoasted_server = WebRoasted(
+                    self.taskWebDisplayRoastedPort,
+                    str(getResourcePath()),
+                    self.taskWebDisplayRoastedIndexPath,
+                    self.taskWebDisplayRoastedWebSocketPath,
+                    ('&nbsp;&nbsp;-.-' if self.qmc.LCDdecimalplaces else '&nbsp;--'),
+                    self.lcdpaletteF['timer'],
+                    self.lcdpaletteB['timer'],
+                    self.lcdpaletteF['bt'],
+                    self.lcdpaletteB['bt'],
+                    self.lcdpaletteF['et'],
+                    self.lcdpaletteB['et'],
+                    self.qmc.ETlcd,
+                    self.qmc.BTlcd)
+                res = self.taskWebDisplayRoasted_server.startWeb()
+                if res:
+                    self.taskWebDisplayRoastedActive = True
+                    return True
+                self.stopWebRoasted()
+                self.taskWebDisplayRoastedActive = False
+                return False
+            return False
+        except ModuleNotFoundError:
+            self.qmc.adderror(QApplication.translate('Error Message','Exception: Task Roasted remote display not supported by this build'))
+            self.stopWebRoasted()
+            self.taskWebDisplayRoastedActive = False
+            return False
+        except Exception as e: # pylint: disable=broad-except
+            _log.error(e)
+            self.qmc.adderror(QApplication.translate('Error Message','Could not start Task Roasted remote display. Selected port might be busy.'))
+            self.stopWebRoasted()
+            self.taskWebDisplayRoastedActive = False
+            return False
+
+    def stopWebRoasted(self) -> None:
+        try:
+            if self.taskWebDisplayRoasted_server is not None:
+                self.taskWebDisplayRoasted_server.stopWeb()
+            self.taskWebDisplayRoasted_server = None
+            self.taskWebDisplayRoastedActive = False
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+
+    ##
 
     def applyStandardButtonVisibility(self) -> None:
         if self.eventsbuttonflag:
@@ -20013,6 +20156,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'alerts',self.WebLCDsAlerts, read_defaults)
             settings.endGroup()
 #--- END GROUP WebLCDs
+
+#--- BEGIN GROUP Tasks
+            # Tasks
+            settings.beginGroup('Tasks')
+            self.settingsSetValue(settings, default_settings, 'greenActive',self.taskWebDisplayGreenActive, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'greenPort',self.taskWebDisplayGreenPort, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'roastedActive',self.taskWebDisplayRoastedActive, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'roastedPort',self.taskWebDisplayRoastedPort, read_defaults)
+            settings.endGroup()
+#--- END GROUP Tasks
 
             self.settingsSetValue(settings, default_settings, 'ScheduleDayFilter',self.schedule_day_filter, read_defaults)
             self.settingsSetValue(settings, default_settings, 'ScheduleUserFilter',self.schedule_user_filter, read_defaults)

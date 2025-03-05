@@ -1242,6 +1242,7 @@ class CurvesDlg(ArtisanDialog):
         self.WebLCDsPort.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.WebLCDsPort.setValidator(QRegularExpressionValidator(QRegularExpression(r'^[0-9]{1,4}$'),self))
         self.WebLCDsPort.setMaximumWidth(45)
+        self.WebLCDsPort.setDisabled(self.aw.WebLCDs)
         self.QRpic = QLabel() # the QLabel holding the QR code image
         if self.aw.WebLCDs:
             try:
@@ -1547,7 +1548,7 @@ class CurvesDlg(ArtisanDialog):
     @pyqtSlot()
     def changeWebLCDsPort(self) -> None:
         try:
-            self.aw.WebLCDsPort = int(str(self.WebLCDsPort.text()))
+            self.aw.WebLCDsPort = int(self.WebLCDsPort.text())
         except Exception: # pylint: disable=broad-except
             pass
 
@@ -1570,7 +1571,7 @@ class CurvesDlg(ArtisanDialog):
 #        s.connect(('8.8.8.8', 80))
 #        localIP = s.getsockname()[0]
 #        s.close()
-#        return f'http://{str(localIP)}:{str(self.aw.WebLCDsPort)}/artisan'
+#        return f'http://{str(localIP)}:{str(self.aw.WebLCDsPort)}/{self.aw.weblcds_index_path}'
         # use Artisan's host name (more stable over DHCP/zeroconf updates), but cannot be accessed on Windows from iPhone
         if sys.platform.startswith('darwin'):
             import subprocess
@@ -1578,39 +1579,33 @@ class CurvesDlg(ArtisanDialog):
         else:
             # on Linux/Windows the mdns name is created by appending ".local" to the hostname
             host = socket.gethostname()
-        return f"http://{host.strip().replace(' ', '_').casefold()}.local:{str(self.aw.WebLCDsPort)}/artisan"
+        return f"http://{host.strip().replace(' ', '_').casefold()}.local:{str(self.aw.WebLCDsPort)}/{self.aw.weblcds_index_path}"
+
 
     @pyqtSlot(bool)
     def toggleWebLCDs(self, b:bool = False) -> None:
+        res = False
         if b:
             try:
+                self.changeWebLCDsPort()
                 res = self.aw.startWebLCDs()
-                if not res:
-                    self.WebLCDsPort.setDisabled(False)
-                    self.WebLCDsURL.setText('')
-                    self.QRpic.setPixmap(QPixmap())
-                    self.WebLCDsFlag.setChecked(False)
-                    self.WebLCDsAlerts.setDisabled(True)
-                else:
+                if res:
                     self.setWebLCDsURL() # this might fail if socket cannot be established
                     self.WebLCDsAlerts.setDisabled(False)
                     self.WebLCDsPort.setDisabled(True)
                     self.WebLCDsFlag.setChecked(True)
             except Exception as e: # pylint: disable=broad-except
                 self.aw.sendmessage(str(e))
-                self.WebLCDsAlerts.setDisabled(True)
-                self.WebLCDsFlag.setChecked(False)
-                self.WebLCDsPort.setDisabled(False)
-                self.WebLCDsURL.setText('')
-                self.QRpic.setPixmap(QPixmap())
+                res = False
                 self.aw.WebLCDs = False
         else:
+            self.aw.stopWebLCDs()
+        if not res:
             self.WebLCDsAlerts.setDisabled(True)
             self.WebLCDsFlag.setChecked(False)
             self.WebLCDsPort.setDisabled(False)
             self.WebLCDsURL.setText('')
             self.QRpic.setPixmap(QPixmap())
-            self.aw.stopWebLCDs()
 
 
     def changedpi(self) -> None:
