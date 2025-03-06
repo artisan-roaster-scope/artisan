@@ -17,17 +17,18 @@
 
 import platform
 import logging
+import re
 
 try:
-    from PyQt6.QtCore import Qt, QEvent, QSettings, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import Qt, QEvent, QSettings, pyqtSlot, QRegularExpression # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QWidget, QDialog, QMessageBox, QDialogButtonBox, QTextEdit,  # @UnusedImport @Reimport  @UnresolvedImport
                 QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QLayout)  # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtGui import QKeySequence, QAction, QIntValidator  # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import QKeySequence, QAction, QIntValidator, QTextCharFormat, QTextCursor, QColor  # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
-    from PyQt5.QtCore import Qt, QEvent, QSettings, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import Qt, QEvent, QSettings, pyqtSlot, QRegularExpression # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QAction, QDialog, QMessageBox, QDialogButtonBox, QTextEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                 QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QLayout) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QKeySequence, QIntValidator # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import QKeySequence, QIntValidator, QTextCharFormat, QTextCursor, QColor # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.widgets import MyQComboBox
 
@@ -36,7 +37,7 @@ from typing import Final  # Python <=3.7
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from PyQt6.QtWidgets import QPushButton # pylint: disable=unused-import
-    from PyQt6.QtGui import QCloseEvent, QDragEnterEvent, QDropEvent, QKeyEvent, QShowEvent  # pylint: disable=unused-import
+    from PyQt6.QtGui import QCloseEvent, QDragEnterEvent, QDropEvent, QKeyEvent, QShowEvent, QTextCursor  # pylint: disable=unused-import
     from PyQt6.QtCore import QTimerEvent, QEvent, QObject # pylint: disable=unused-import
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -170,35 +171,164 @@ class HelpDlg(ArtisanDialog):
         if settings.contains('HelpGeometry'):
             self.restoreGeometry(settings.value('HelpGeometry'))
 
-        phelp = QTextEdit()
-        phelp.setHtml(content)
-        phelp.setReadOnly(True)
+        # Load the help content
+        self.phelp = QTextEdit()
+        self.phelp.setHtml(content)
+        self.phelp.setReadOnly(True)
 
-        # connect the ArtisanDialog standard OK/Cancel buttons
+        # Initialize search state variables
+        self.matches: List[QTextCursor] = []
+        self.current_match_index = 0
+        self.previous_search_term = ""
+
+        # Search bar
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText(QApplication.translate('Label', 'Enter text to search'))
+
+        # Connect Enter key to search and navigate results
+        self.search_input.returnPressed.connect(self.doSearch)
+        
+        # Show only the ArtisanDialog standard OK button
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel))
-        self.dialogbuttons.accepted.connect(self.reject)
 
+        # Connect the OK button to handleClose()
+        okButton = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        if okButton:
+            okButton.clicked.connect(self.handleClose)
+
+        # Build the dialog layout
         homeLabel = QLabel()
         homeLabel.setText(f"{QApplication.translate('Label', 'For more details visit')} <a href='https://artisan-scope.org'>artisan-scope.org</a>")
         homeLabel.setOpenExternalLinks(True)
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(homeLabel)
         buttonLayout.addStretch()
+        buttonLayout.addWidget(self.search_input)
+        buttonLayout.addStretch()
         buttonLayout.addWidget(self.dialogbuttons)
         hLayout = QVBoxLayout()
-        hLayout.addWidget(phelp)
+        hLayout.addWidget(self.phelp)
         hLayout.addLayout(buttonLayout)
         self.setLayout(hLayout)
-        okButton: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
-        if okButton is not None:
-            okButton.setFocus()
+
+    def keyPressEvent(self, event: Optional['QKeyEvent']) -> None:
+        if event is not None:
+            key = event.key()
+            # uncomment next lines to find the integer value and name of a key
+            #key_name = QKeySequence(key).toString(QKeySequence.SequenceFormat.PortableText)
+            #_log.info(f'{key=}, {key_name=}')
+
+            modifiers = event.modifiers()
+            # Ctrl+F puts focus in the search box
+            if key == Qt.Key.Key_F and modifiers == Qt.KeyboardModifier.ControlModifier:
+                self.search_input.setFocus()
+            # Esc closes dialog
+            elif key == Qt.Key.Key_Escape:
+                self.handleClose()
+            # Enter/Return only when Ok button or self.phelp has focus
+            elif key in {Qt.Key.Key_Enter, Qt.Key.Key_Return}:
+                focused_widget = self.focusWidget()
+                okButton = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+                if focused_widget is okButton or focused_widget is self.phelp:
+                    self.handleClose()
+            else:
+                super().keyPressEvent(event)
 
     @pyqtSlot('QCloseEvent')
-    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
+    def closeEvent(self, _: Optional['QCloseEvent'] = None) -> None:
+        self.handleClose()
+
+    @pyqtSlot()
+    def handleClose(self) -> None:
         settings = QSettings()
-        #save window geometry
-        settings.setValue('HelpGeometry',self.saveGeometry())
-        self.dialogbuttons.rejected.emit()
+        # Save window geometry
+        settings.setValue('HelpGeometry', self.saveGeometry())
+        self.accept()
+
+    def doSearch(self) -> None:
+        # Always start by clearing extra selections and any active text selection
+        self.phelp.setExtraSelections([])
+        tc = self.phelp.textCursor()
+        tc.clearSelection()
+        self.phelp.setTextCursor(tc)
+        
+        search_term = self.search_input.text().strip()
+        
+        # Clear highlights and state when search term is empty
+        if search_term == "":
+            self.matches = []
+            self.previous_search_term = ""
+            return
+
+        # Do a fresh search when a new search_term is entered
+        if self.previous_search_term.lower() != search_term.lower():
+            self.previous_search_term = search_term
+            self.current_match_index = 0
+            self.matches = []
+            
+            # Create a case-insensitive regular expression.
+            regex = QRegularExpression(re.escape(search_term))
+            regex.setPatternOptions(QRegularExpression.PatternOption.CaseInsensitiveOption)
+            
+            # Start at the beginning of the document.
+            cursor = self.phelp.textCursor()
+            cursor.movePosition(QTextCursor.MoveOperation.Start)
+            
+            # Collect all matches.
+            for _ in range(500000):  # arbitrarily large limit, better than while True, should always exit via break 
+                found = self.phelp.document().find(regex, cursor)  # type: ignore  #self.phelp.document() will never be None
+                if found.isNull():
+                    break
+                self.matches.append(found)
+                cursor.setPosition(found.selectionEnd())
+        else:
+            # For repeated searches with the same search_term, cycle to the next match
+            if not self.matches:
+                # No matches found, ensure all highlights and selections are cleared
+                self.phelp.setExtraSelections([])
+                tc = self.phelp.textCursor()
+                tc.clearSelection()
+                self.phelp.setTextCursor(tc)
+                return
+            self.current_match_index = (self.current_match_index + 1) % len(self.matches)
+
+        extraSelections = []
+        match_text = "black"
+        current_match_highlight = "#A6FF00" 
+        extra_matches_highlight = "yellow"
+        
+        if self.matches:
+            # Highlight all matches, the current match in current_match_highlight and all others in extra_matches_highlight
+            for i, matchCursor in enumerate(self.matches):
+                selection = QTextEdit.ExtraSelection()
+                selection.cursor = matchCursor
+                fmt = QTextCharFormat()
+                fmt.setForeground(QColor(match_text))
+                if i == self.current_match_index:
+                    fmt.setBackground(QColor(current_match_highlight))
+                else:
+                    fmt.setBackground(QColor(extra_matches_highlight))
+                if self.aw.app.darkmode:
+                    fmt.setForeground(QColor("black"))
+                selection.format = fmt
+                extraSelections.append(selection)
+            # Move the visible cursor to the current match and clear its active selection
+            self.phelp.setTextCursor(self.matches[self.current_match_index])
+            tc = self.phelp.textCursor()
+            tc.clearSelection()
+            self.phelp.setTextCursor(tc)
+        else:
+            # No matches found: ensure extra selections are cleared
+            extraSelections = []
+            self.phelp.setExtraSelections(extraSelections)
+            # Also clear any active selection
+            tc = self.phelp.textCursor()
+            tc.clearSelection()
+            self.phelp.setTextCursor(tc)
+            return
+
+        self.phelp.setExtraSelections(extraSelections)
+
 
 class ArtisanInputDialog(ArtisanDialog):
 

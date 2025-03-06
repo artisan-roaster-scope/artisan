@@ -26,6 +26,7 @@ v3.1.1
   - events displayed in step and combo mode can be updated by moving them to a new position. Pressing SHIFT restricts the movement in either the x or the y direction.
   - a picked custom event can be removed using the backspace key
   - a double click on the graph canvas temporarily scales the y-axis to cover all artists
+  - adds search to help pages
 
 
 * NEW HARDWARE SUPPORT

@@ -59,6 +59,7 @@ def content() -> str:
     strlist.append('</b>')
     tbl_AddlShortcuts = prettytable.PrettyTable()
     tbl_AddlShortcuts.field_names = [QApplication.translate('HelpDlg','Key/mouse stroke(s)'),QApplication.translate('HelpDlg','Where'),QApplication.translate('HelpDlg','Action'),QApplication.translate('HelpDlg','Additional Information')]
+    tbl_AddlShortcuts.add_row([QApplication.translate('HelpDlg','⌘+F [Mac]\nCTRL+F [Win]'),QApplication.translate('HelpDlg','Help'),QApplication.translate('HelpDlg','Move cursor to the Search box'),QApplication.translate('HelpDlg','Return/Enter key to execute the search')])
     tbl_AddlShortcuts.add_row([QApplication.translate('HelpDlg','Double click on Roast Title'),QApplication.translate('HelpDlg','Graph'),QApplication.translate('HelpDlg','Open the roast in artisan.plus'),QApplication.translate('HelpDlg','Requires an artisan.plus account')])
     tbl_AddlShortcuts.add_row([QApplication.translate('HelpDlg','Double Click on Background Profile Title'),QApplication.translate('HelpDlg','Graph & Designer'),QApplication.translate('HelpDlg','Toggle Show/Hide Background Profile'),QApplication.translate('HelpDlg','Only when a Background profile is loaded')])
     tbl_AddlShortcuts.add_row([QApplication.translate('HelpDlg','Right click on BT curve'),QApplication.translate('HelpDlg','Graph'),QApplication.translate('HelpDlg','Place or re-place events'),'&#160;'])
@@ -112,7 +113,7 @@ def content() -> str:
     tbl_MenuShortcuts.add_row(['⌘+V [Mac]\nCTRL+V [Win]',QApplication.translate('HelpDlg','Edit'),QApplication.translate('HelpDlg','Paste')])
     tbl_MenuShortcuts.add_row(['⌘+T [Mac]\nCTRL+T [Win]',QApplication.translate('HelpDlg','Roast'),QApplication.translate('HelpDlg','Open Roast Properties dialog')])
     tbl_MenuShortcuts.add_row(['⌘+B [Mac]\nCTRL+B [Win]',QApplication.translate('HelpDlg','Roast'),QApplication.translate('HelpDlg','Open Profile Background dialog')])
-    tbl_MenuShortcuts.add_row(['⌘+F4 [Mac]\nCTRL+F4 [Win]',QApplication.translate('HelpDlg','Roast'),QApplication.translate('HelpDlg','Switch Profiles (Foreground<=>Background)')])
+    tbl_MenuShortcuts.add_row(['⌘+W [Mac]\nCTRL+F4 [Win]',QApplication.translate('HelpDlg','Roast'),QApplication.translate('HelpDlg','Switch Profiles (Foreground<=>Background)')])
     tbl_MenuShortcuts.add_row(['⌘+D [Mac]\nCTRL+D [Win]',QApplication.translate('HelpDlg','Config'),QApplication.translate('HelpDlg','Open Devices dialog')])
     tbl_MenuShortcuts.add_row(['⌘+U [Mac]\nCTRL+U [Win]',QApplication.translate('HelpDlg','Config'),QApplication.translate('HelpDlg','Open Curves dialog')])
     tbl_MenuShortcuts.add_row(['⌘+E [Mac]\nCTRL+E [Win]',QApplication.translate('HelpDlg','Config'),QApplication.translate('HelpDlg','Open Events dialog')])
