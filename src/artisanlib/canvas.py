@@ -6528,7 +6528,7 @@ class tgraphcanvas(FigureCanvas):
                             #Example1 "Y2[-7]" = "Y20070"   Example2 "Y2[+9]" = "Y21191"
                             mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+offset+6:]))
                         #direct index access: e.g. "Y2{CHARGE}" or "Y2{12}"
-                        elif i+5+offset < len(mathexpression) and mathexpression[i+offset+2] == '{' and mathexpression.find('}',i+offset+3) > -1:
+                        elif i+4+offset < mlen and mathexpression[i+offset+2] == '{' and mathexpression.find('}',i+offset+3) > -1:
                             end_idx = mathexpression.index('}',i+offset+3)
                             body = mathexpression[i+3:end_idx]
                             val = -1
@@ -6602,7 +6602,7 @@ class tgraphcanvas(FigureCanvas):
                                 if mathexpression[i+k+1].isdigit():
                                     nint = int(mathexpression[i+k+1])              #Rnumber int
                                     #check for TIMESHIFT 0-9 (one digit). Example: "R1[-2]" or RB1[-2]
-                                    if i+k+5 < len(mathexpression) and mathexpression[i+k+2] == '[':
+                                    if i+k+5 < mlen and mathexpression[i+k+2] == '[':
                                         Yshiftval = int(mathexpression[i+k+4])
                                         sign = mathexpression[i+k+3]
 
@@ -6642,7 +6642,7 @@ class tgraphcanvas(FigureCanvas):
                                         mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+k+6:]))
 
                                     #direct index access: e.g. "R2{CHARGE}" or "R2{12}"
-                                    elif i+k+5 < len(mathexpression) and mathexpression[i+k+2] == '{' and mathexpression.find('}',i+k+3) > -1:
+                                    elif i+k+5 < mlen and mathexpression[i+k+2] == '{' and mathexpression.find('}',i+k+3) > -1:
                                         end_idx = mathexpression.index('}',i+k+3)
                                         body = mathexpression[i+k+3:end_idx]
                                         val = -1
@@ -6757,7 +6757,7 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             timex = self.abs_timeB
                         seconddigitstr = ''
-                        if i+4 < len(mathexpression) and mathexpression[i+1] == '[':
+                        if i+4 < mlen and mathexpression[i+1] == '[':
                             Yshiftval = int(mathexpression[i+3])
                             sign = mathexpression[i+2]
 
@@ -6775,7 +6775,7 @@ class tgraphcanvas(FigureCanvas):
                             timeshiftexpressionsvalues.append(val)
                             mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+5:]))
                         #direct index access: e.g. "t{CHARGE}" or "t{12}"
-                        elif i+3 < len(mathexpression) and mathexpression[i+1] == '{' and mathexpression.find('}',i+2) > -1:
+                        elif i+3 < mlen and mathexpression[i+1] == '{' and mathexpression.find('}',i+2) > -1:
                             end_idx = mathexpression.index('}',i+2)
                             body = mathexpression[i+2:end_idx]
                             if mathexpression[i]=='b':
@@ -6803,7 +6803,7 @@ class tgraphcanvas(FigureCanvas):
                     elif mathexpression[i] == 'P' and i+1 < mlen and mathexpression[i+1].isdigit():                          #check for out of range
                         nint = int(mathexpression[i+1])              #Ynumber int
                         #check for TIMESHIFT 0-9 (one digit). Example: "Y1[-2]"
-                        if i+5 < len(mathexpression) and mathexpression[i+2] == '[' and mathexpression[i+5] == ']':
+                        if i+5 < mlen and mathexpression[i+2] == '[' and mathexpression[i+5] == ']':
                             Yshiftval = int(mathexpression[i+4])
                             sign = mathexpression[i+3]
                             evaltimeexpression = ''.join(('P',mathexpression[i+1],'1'*2,mathexpression[i+4],'1'))
@@ -6827,7 +6827,7 @@ class tgraphcanvas(FigureCanvas):
                             if mathexpression[i+1].isdigit():
                                 nint = int(mathexpression[i+1])              #Bnumber int
                                 #check for TIMESHIFT 0-9 (one digit). Example: "B1[-2]"
-                                if i+5 < len(mathexpression) and mathexpression[i+2] == '[':
+                                if i+5 < mlen and mathexpression[i+2] == '[':
                                     Yshiftval = int(mathexpression[i+4])
                                     sign = mathexpression[i+3]
 
@@ -6877,7 +6877,7 @@ class tgraphcanvas(FigureCanvas):
                                     timeshiftexpressionsvalues.append(val)
                                     mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+6:]))
                                 #direct index access: e.g. "B2{CHARGE}" or "B2{12}"
-                                elif i+5 < len(mathexpression) and mathexpression[i+2] == '{' and mathexpression.find('}',i+3) > -1:
+                                elif i+5 < mlen and mathexpression[i+2] == '{' and mathexpression.find('}',i+3) > -1:
                                     end_idx = mathexpression.index('}',i+3)
                                     body = mathexpression[i+3:end_idx]
                                     val = -1
