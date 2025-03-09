@@ -19,6 +19,7 @@ sidebar:
   - logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
   - gas pressure, drum speed, and airflow (only Atilla GOLD plus 7'' II)
   - gas, drum speed and airflow control (only Atilla GOLD plus 7'' II Control)
+  - the 'auto' setup picks up the CHARGE and DROP events as set on machines with automation
 
 ### Setup
 

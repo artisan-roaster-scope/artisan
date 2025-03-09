@@ -96,7 +96,7 @@ social:
     - "https://www.instagram.com/artisanscope"
     - "https://www.linkedin.com/company/artisan-plus"
     - "https://www.linkedin.com/company/artisan-plus"
-    - "https://www.youtube.com/channel/UCEp-DH_Y7sBR3-X3FWomgog"
+    - "https://www.youtube.com/@artisanplus"
     - "https://masto.ai/@artisan"
     - "https://github.com/artisan-roaster-scope/artisan"
 
@@ -143,7 +143,7 @@ footer:
       url: "https://www.facebook.com/ArtisanScope"
     - label: "YouTube"
       icon: "fab fa-fw fa-youtube"
-      url: "https://www.youtube.com/channel/UCEp-DH_Y7sBR3-X3FWomgog"
+      url: "https://www.youtube.com/@artisanplus"
     - label: "Instagram"
       icon: "fab fa-fw fa-instagram"
       url: "https://www.instagram.com/artisanscope/"
