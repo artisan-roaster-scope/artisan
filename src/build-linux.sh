@@ -195,7 +195,7 @@ for babeltrans in $(find dist/_internal/babel/locale-data -type f -name "*.dat")
     babeltrans_filename="${babeltrans##*/}"
     match=0
     for lang in ${SUPPORTED_LANGUAGES}; do
-        if [ ${babeltrans_filename} = "${lang}.dat" ] ; then
+        if [ ${babeltrans_filename} = "${lang}.dat" ] && [ ${babeltrans_filename} != "root.dat" ] ; then
             match=1
             break
         fi

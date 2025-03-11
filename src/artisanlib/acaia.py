@@ -92,29 +92,30 @@ class ACAIA_TIMER(IntEnum):
     TIMER_STATE_STARTED = 1
     TIMER_STATE_PAUSED = 2
 
+# Acaia legacy service and characteristics UUIDs
+ACAIA_LEGACY_SERVICE_UUID:Final[str] = '00001820-0000-1000-8000-00805f9b34fb' # Internet Protocol Support Service # adverstised service UUID
+ACAIA_LEGACY_NOTIFY_UUID:Final[str] = '00002a80-0000-1000-8000-00805f9b34fb'
+ACAIA_LEGACY_WRITE_UUID:Final[str] = '00002a80-0000-1000-8000-00805f9b34fb' # same as notify!
+
+# Acaia legacy name prefixes
+ACAIA_LEGACY_PEARL_NAME:Final[str] = 'PROCHBT' # Acaia Pearl
+ACAIA_LEGACY_LUNAR_NAME:Final[str] = 'ACAIA'   # Acaia Lunar Legacy
+
+# Acaia service and characteristics UUIDs
+ACAIA_SERVICE_UUID:Final[str] = '49535343-FE7D-4AE5-8FA9-9FAFD205E455'
+ACAIA_NOTIFY_UUID:Final[str] = '49535343-1E4D-4BD9-BA61-23C647249616'
+ACAIA_WRITE_UUID:Final[str] = '49535343-8841-43F4-A8D4-ECBE34729BB3'
+
+# Acaia name prefixes
+ACAIA_PEARL_NAME:Final[str] = 'PEARL-'   # Acaia Pearl (2021)
+ACAIA_PEARLS_NAME:Final[str] = 'PEARLS'  # Acaia Pearl S
+ACAIA_LUNAR_NAME:Final[str] = 'LUNAR-'   # Acaia Lunar (2021)
+ACAIA_CINCO_NAME:Final[str] = 'CINCO'    # Acaia Cinco
+ACAIA_PYXIS_NAME:Final[str] = 'PYXIS'    # Acaia Pyxis
 
 class AcaiaBLE(ClientBLE):
 
-    # Acaia legacy service and characteristics UUIDs
-    ACAIA_LEGACY_SERVICE_UUID:Final[str] = '00001820-0000-1000-8000-00805f9b34fb' # Internet Protocol Support Service # adverstised service UUID
-    ACAIA_LEGACY_NOTIFY_UUID:Final[str] = '00002a80-0000-1000-8000-00805f9b34fb'
-    ACAIA_LEGACY_WRITE_UUID:Final[str] = '00002a80-0000-1000-8000-00805f9b34fb' # same as notify!
 
-    # Acaia legacy name prefixes
-    ACAIA_LEGACY_PEARL_NAME:Final[str] = 'PROCHBT' # Acaia Pearl
-    ACAIA_LEGACY_LUNAR_NAME:Final[str] = 'ACAIA'   # Acaia Lunar Legacy
-
-    # Acaia service and characteristics UUIDs
-    ACAIA_SERVICE_UUID:Final[str] = '49535343-FE7D-4AE5-8FA9-9FAFD205E455'
-    ACAIA_NOTIFY_UUID:Final[str] = '49535343-1E4D-4BD9-BA61-23C647249616'
-    ACAIA_WRITE_UUID:Final[str] = '49535343-8841-43F4-A8D4-ECBE34729BB3'
-
-    # Acaia name prefixes
-    ACAIA_PEARL_NAME:Final[str] = 'PEARL-'   # Acaia Pearl (2021)
-    ACAIA_PEARLS_NAME:Final[str] = 'PEARLS'  # Acaia Pearl S
-    ACAIA_LUNAR_NAME:Final[str] = 'LUNAR-'   # Acaia Lunar (2021)
-    ACAIA_CINCO_NAME:Final[str] = 'CINCO'    # Acaia Cinco
-    ACAIA_PYXIS_NAME:Final[str] = 'PYXIS'    # Acaia Pyxis
 
     # Acaia message constants
     HEADER1:Final[bytes]      = b'\xef'
@@ -157,16 +158,16 @@ class AcaiaBLE(ClientBLE):
         self.set_heartbeat(self.HEARTBEAT_FREQUENCY) # send keep-alive heartbeat all 3-5sec; seems not to be needed any longer after sending ID on newer firmware versions!?
 
         # register Acaia Legacy UUIDs
-        for legacy_name in (self.ACAIA_LEGACY_LUNAR_NAME, self.ACAIA_LEGACY_PEARL_NAME):
-            self.add_device_description(self.ACAIA_LEGACY_SERVICE_UUID, legacy_name)
-        self.add_notify(self.ACAIA_LEGACY_NOTIFY_UUID, self.notify_callback)
-        self.add_write(self.ACAIA_LEGACY_SERVICE_UUID, self.ACAIA_LEGACY_WRITE_UUID)
+        for legacy_name in (ACAIA_LEGACY_LUNAR_NAME, ACAIA_LEGACY_PEARL_NAME):
+            self.add_device_description(ACAIA_LEGACY_SERVICE_UUID, legacy_name)
+        self.add_notify(ACAIA_LEGACY_NOTIFY_UUID, self.notify_callback)
+        self.add_write(ACAIA_LEGACY_SERVICE_UUID, ACAIA_LEGACY_WRITE_UUID)
 
         # register Acaia Current UUIDs
-        for acaia_name in (self.ACAIA_PEARL_NAME, self.ACAIA_PEARLS_NAME, self.ACAIA_LUNAR_NAME, self.ACAIA_PYXIS_NAME, self.ACAIA_CINCO_NAME):
-            self.add_device_description(self.ACAIA_SERVICE_UUID, acaia_name)
-        self.add_notify(self.ACAIA_NOTIFY_UUID, self.notify_callback)
-        self.add_write(self.ACAIA_SERVICE_UUID, self.ACAIA_WRITE_UUID)
+        for acaia_name in (ACAIA_PEARL_NAME, ACAIA_PEARLS_NAME, ACAIA_LUNAR_NAME, ACAIA_PYXIS_NAME, ACAIA_CINCO_NAME):
+            self.add_device_description(ACAIA_SERVICE_UUID, acaia_name)
+        self.add_notify(ACAIA_NOTIFY_UUID, self.notify_callback)
+        self.add_write(ACAIA_SERVICE_UUID, ACAIA_WRITE_UUID)
 
 
     # protocol parser
@@ -186,9 +187,9 @@ class AcaiaBLE(ClientBLE):
         self.fast_notifications_sent = False
         self.slow_notifications_sent = False
         connected_service_UUID = self.connected()
-        if connected_service_UUID == self.ACAIA_LEGACY_SERVICE_UUID:
+        if connected_service_UUID == ACAIA_LEGACY_SERVICE_UUID:
             _log.debug('connected to Acaia Legacy Scale')
-        elif connected_service_UUID == self.ACAIA_SERVICE_UUID:
+        elif connected_service_UUID == ACAIA_SERVICE_UUID:
             _log.debug('connected to Acaia Scale')
         if self._connected_handler is not None:
             self._connected_handler()

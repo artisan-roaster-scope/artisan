@@ -2567,6 +2567,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.roastpropertiesAutoOpenDropFlag = self.org_roastpropertiesAutoOpenDropFlag
 
         self.aw.qmc.clear_last_picked_event_selection()
+        self.aw.eNumberSpinBox.setValue(0)
 
         self.aw.qmc.redraw(recomputeAllDeltas=False)
 
@@ -5272,6 +5273,9 @@ class editGraphDlg(ArtisanResizeablDialog):
         if self.tabInitialized[4]:
             # save column widths
             self.aw.qmc.energytablecolumnwidths = [self.energy_ui.datatable.columnWidth(c) for c in range(self.energy_ui.datatable.columnCount())]
+
+        self.aw.qmc.clear_last_picked_event_selection()
+        self.aw.eNumberSpinBox.setValue(0)
 
         # load selected recent roast template in the background
         if self.aw.loadbackgroundUUID(self.template_file,self.template_uuid):
