@@ -1088,7 +1088,10 @@ class NoDragItem(StandardItem):
             return f'{weight}{task_date_str}'
         except Exception as e: # pylint: disable=broad-except
             # if anything goes wrong here we log an exception and return the empty string
-            _log.exception(e)
+            try: # catch exception on logging exception!
+                _log.error(e)
+            except Exception as e: # pylint: disable=broad-except
+                pass
             return ''
 
     def select(self) -> None:

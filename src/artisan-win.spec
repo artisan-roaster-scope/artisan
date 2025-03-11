@@ -339,7 +339,7 @@ for qt_dir in [r'PyQt5\Qt5\translations', r'PyQt6\Qt6\translations']:
 logging.info(">>>>> Removing unneeded language support from babel")
 for root, _, files in os.walk(rootdir + r'\babel\locale-data'):
     for file in files:
-        if file.endswith('.dat') and (('_' not in file and file.split('.')[0] not in SUPPORTED_LANGUAGES) or
+        if file.endswith('.dat') and file != 'root.dat' and (('_' not in file and file.split('.')[0] not in SUPPORTED_LANGUAGES) or
                 ('_' in file and file.split('.')[0] not in SUPPORTED_LANGUAGES)):
             file_path = os.path.join(root, file)
             del_file(file_path, True)
@@ -458,4 +458,3 @@ size_bytes = get_size(TARGET) - get_size(TARGET + 'vc_redist.x64.exe')
 logging.info(f'>>>>> Net size of install folder: {readable_bytes(size_bytes)}')
 
 ###################################
-

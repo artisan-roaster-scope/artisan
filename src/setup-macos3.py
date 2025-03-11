@@ -470,7 +470,7 @@ print('*** Removing unused language support from babel ***')
 
 for root, _, files in os.walk(f'./Artisan.app/Contents/Resources/lib/{python_version}/babel/locale-data'):
     for file in files:
-        if file.endswith('.dat') and (('_' not in file and file.split('.')[0] not in SUPPORTED_LANGUAGES) or
+        if file.endswith('.dat') and file != 'root.dat' and (('_' not in file and file.split('.')[0] not in SUPPORTED_LANGUAGES) or
                 ('_' in file and file.split('.')[0] not in SUPPORTED_LANGUAGES)):
 #            print('Deleting', file)
             os.remove(os.path.join(root,file))
