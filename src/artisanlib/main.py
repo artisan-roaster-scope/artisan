@@ -6813,8 +6813,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         mindelta = float('nan')
         ioi_start = ''
         ioi_duration = ''
-        ioi_maxdelta = ''
-        ioi_abcprime = ''
+        ioi_maxdelta = 0.
+        ioi_abcprime = 0.
         maxdeltas_seg = numpy.empty(0)
         deltatimes_seg:npt.NDArray[numpy.double] = numpy.empty(0)
         timeindexs_seg:npt.NDArray[numpy.int64] = numpy.empty(0, dtype=numpy.int64)
@@ -7007,7 +7007,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 except Exception:  # pylint: disable=broad-except
                     tra = numpy.trapz(ioi_abs_deltas, x=times_all) # type:ignore [attr-defined, unused-ignore]
                 ioi_abc_deltas = float(numpy.sum(tra))
-                ioi_abcprime = str(ioi_abc_deltas / ioi_seconds)
+                ioi_abcprime = ioi_abc_deltas / ioi_seconds
 
                 # fit RoR in C/min/min
                 if exp == 2:
