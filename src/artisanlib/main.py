@@ -238,6 +238,7 @@ from artisanlib.util import (appFrozen, uchr, decodeLocal, decodeLocalStrict, en
 from artisanlib.qtsingleapplication import QtSingleApplication
 
 
+
 try:
     # spanning a second multiprocessing instance (Hottop server) on macOS falils to import the YAPI interface
     from yoctopuce.yocto_api import YAPI # type: ignore
@@ -756,6 +757,7 @@ from artisanlib.widgets import (MyQLCDNumber, EventPushButton, MajorEventPushBut
 from artisanlib.notifications import Notification, NotificationManager, NotificationType
 from artisanlib.canvas import tgraphcanvas
 from artisanlib.phases_canvas import tphasescanvas
+from artisanlib.scale import ScaleManager
 
 
 # import artisan.plus module
@@ -1494,6 +1496,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'weblcds_index_path', 'weblcds_websocket_path',
         'taskWebDisplayGreenActive', 'taskWebDisplayGreenPort', 'taskWebDisplayRoastedActive', 'taskWebDisplayRoastedPort',
         'taskWebDisplayRoastedIndexPath', 'taskWebDisplayRoastedWebSocketPath', 'taskWebDisplayGreen_server', 'taskWebDisplayRoasted_server',
+        'scale_manager', 'scale1_model', 'scale1_id', 'scale2_model', 'scale2_name', 'scale2_id',
         'WebLCDsAlerts', 'EventsDlg_activeTab', 'graphColorDlg_activeTab', 'PID_DlgControl_activeTab', 'CurveDlg_activeTab', 'editGraphDlg_activeTab',
         'backgroundDlg_activeTab', 'DeviceAssignmentDlg_activeTab', 'AlarmDlg_activeTab', 'schedule_activeTab', 'StatisticsDlg_activeTab', 'resetqsettings', 'settingspath', 'wheelpath', 'profilepath',
         'userprofilepath', 'printer', 'main_widget', 'defaultdpi', 'dpi', 'qmc', 'HottopControlActive', 'AsyncSamplingTimer', 'wheeldialog',
@@ -1679,6 +1682,17 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.taskWebDisplayRoastedIndexPath:Final[str] = 'roasted'
         self.taskWebDisplayRoastedWebSocketPath:Final[str] = 'roasted_ws'
         self.taskWebDisplayRoasted_server:Optional[WebRoasted] = None # holds the Roasted Web display instance
+
+        # Scales
+        self.scale_manager:ScaleManager = ScaleManager()
+        # scale1: for roasted and green (if no second scale is configured, otherwise just for roasted)
+        self.scale1_model:Optional[int] = None
+        self.scale1_name:Optional[str] = None  # the display/local name of the device (like "ACAIA162FC")
+        self.scale1_id:Optional[str] = None    # the id, eg. the BT address (like "24:71:89:cc:09:05")
+        # scale2: just for green
+        self.scale2_model:Optional[int] = None
+        self.scale2_name:Optional[str] = None  # the display/local name of the device (like "ACAIA162FC")
+        self.scale2_id:Optional[str] = None    # the device id, eg. the BT address (like "24:71:89:cc:09:05")
 
         # active tab
         self.EventsDlg_activeTab:int = 0
@@ -18548,6 +18562,18 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             settings.endGroup()
 #--- END GROUP Tasks
 
+#--- BEGIN GROUP Scales
+            # Scales
+            settings.beginGroup('Scales')
+            self.scale1_model = settings.value('scale1_model',self.scale1_model)
+            self.scale1_name = settings.value('scale1_name',self.scale1_name)
+            self.scale1_id = settings.value('scale1_id',self.scale1_id)
+            self.scale2_model = settings.value('scale2_model',self.scale2_model)
+            self.scale2_name = settings.value('scale2_name',self.scale2_name)
+            self.scale2_id = settings.value('scale2_id',self.scale2_id)
+            settings.endGroup()
+#--- END GROUP Tasks
+
             self.schedule_day_filter =toBool(settings.value('ScheduleDayFilter',self.schedule_day_filter))
             self.schedule_user_filter = toBool(settings.value('ScheduleUserFilter',self.schedule_user_filter))
             self.schedule_machine_filter = toBool(settings.value('ScheduleMachineFilter',self.schedule_machine_filter))
@@ -20164,6 +20190,18 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'greenPort',self.taskWebDisplayGreenPort, read_defaults)
             self.settingsSetValue(settings, default_settings, 'roastedActive',self.taskWebDisplayRoastedActive, read_defaults)
             self.settingsSetValue(settings, default_settings, 'roastedPort',self.taskWebDisplayRoastedPort, read_defaults)
+            settings.endGroup()
+#--- END GROUP Tasks
+
+#--- BEGIN GROUP Scales
+            # Scales
+            settings.beginGroup('Scales')
+            self.settingsSetValue(settings, default_settings, 'scale1_model',self.scale1_model, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'scale1_name',self.scale1_name, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'scale1_id',self.scale1_id, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'scale2_model',self.scale2_model, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'scale2_name',self.scale2_name, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'scale2_id',self.scale2_id, read_defaults)
             settings.endGroup()
 #--- END GROUP Tasks
 

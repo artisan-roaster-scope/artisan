@@ -5993,7 +5993,7 @@ class tgraphcanvas(FigureCanvas):
                             # temperatures which are assumed to increase
                             end_reached[event_type] = True
 
-                            if (event_type not in slider_events and # only if the is no slider event of the corresponding type
+                            if (event_type not in slider_events and # only if there is no slider event of the corresponding type
                                     self.specialeventplayback[event_type] and # only replay event types activated for replay
                                     (str(self.etypesf(event_type) == str(self.Betypesf(event_type)))) and
                                     #self.aw.eventslidervisibilities[event_type] and

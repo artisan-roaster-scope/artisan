@@ -62,7 +62,8 @@ class SantokerCube_BLE(ClientBLE):
         self.add_write(self.SANTOKER_CUBE_SERVICE_UUID, self.SANTOKER_CUBE_WRTIE_UUID)
 
     def notify_callback(self, _sender:'BleakGATTCharacteristic', data:bytearray) -> None:
-#        _log.debug("notify: %s => %s", self._read_queue.qsize(), data)
+        if self._logging:
+            _log.debug('notify: %s => %s', self._read_queue.qsize(), data)
         if hasattr(self, '_async_loop_thread') and self._async_loop_thread is not None:
             asyncio.run_coroutine_threadsafe(
                     self._read_queue.put(bytes(data)),
@@ -98,8 +99,10 @@ class Santoker(AsyncComm):
 
     # data targets
     BOARD:Final[bytes] = b'\xF0'
-    BT:Final[bytes] = b'\xF3'
-    ET:Final[bytes] = b'\xF4'
+    BT:Final[bytes] = b'\xF1'
+    ET:Final[bytes] = b'\xF2'
+    OLD_BT:Final[bytes] = b'\xF3'
+    OLD_ET:Final[bytes] = b'\xF4'
     BT_ROR:Final[bytes] = b'\xF5'
     ET_ROR:Final[bytes] = b'\xF6'
     IR:Final[bytes] = b'\xF8'
@@ -112,6 +115,12 @@ class Santoker(AsyncComm):
     FCs:Final = b'\x82'
     SCs:Final = b'\x83'
     DROP:Final = b'\x84'
+    #
+    # unsupported commands:
+    MIN_POWER = b'\x85'
+    MAX_POWER = b'\x86'
+    BT_CALIB = b'\x87'
+    ET_CALIB = b'\x88'
 
     __slots__ = [ 'HEADER', '_charge_handler', '_dry_handler', '_fcs_handler', '_scs_handler', '_drop_handler', '_board', '_bt', '_et',
                     '_bt_ror', '_et_ror', '_ir',
@@ -211,15 +220,19 @@ class Santoker(AsyncComm):
                 value = - value
         else:
             value = int.from_bytes(data, 'big')
-#        _log.info('register_reading(%s,%s)',target,value)
+        if self._logging:
+            _log.debug('register_reading(%s,%s)',target,value)
         if target == self.BOARD:
             self._board = value / 10.0
-        elif target == self.BT:
+        elif target in {self.BT, self.OLD_BT}:
             BT = value / 10.0
             self._bt = (BT if self._bt == -1 else (2*BT + self._bt)/3)
-        elif target == self.ET:
+            _log.debug('BT: %s',self._bt)
+        elif target in {self.ET, self.OLD_ET}:
             ET = value / 10.0
             self._et = (ET if self._et == -1 else (2*ET + self._et)/3)
+            if self._logging:
+                _log.debug('ET: %s',self._et)
         elif target == self.BT_ROR:
             self._bt_ror = value / 10.0
         elif target == self.ET_ROR:
@@ -273,8 +286,10 @@ class Santoker(AsyncComm):
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
             self._DROP = b
-#        else:
-#            _log.debug('unknown data target %s', target)
+        elif self._logging and target in {self.MIN_POWER, self.MAX_POWER, self.BT_CALIB, self.ET_CALIB}:
+            _log.debug('unsupported data target %s', target)
+        elif self._logging:
+            _log.debug('unknown data target %s', target)
 
 
     # asyncio read implementation
@@ -291,7 +306,8 @@ class Santoker(AsyncComm):
         # read code header
         code2 = await stream.readexactly(2)
         if code2 != self.CODE_HEADER:
-#            _log.debug('unexpected CODE_HEADER: %s', code2)
+            if self._logging:
+                _log.debug('unexpected CODE_HEADER: %s', code2)
             return
         # read the data length
         data_len = await stream.readexactly(1)
@@ -301,7 +317,8 @@ class Santoker(AsyncComm):
         calculated_crc = FramerRTU.compute_CRC(self.CODE_HEADER + data_len + data).to_bytes(2, 'big')
 #        if self._verify_crc and crc != calculated_crc: # for whatever reason, the first byte of the received CRC is often wrongly just \x00
         if self._verify_crc and crc != calculated_crc and crc[0] != 0:
-#            _log.debug('CRC error')
+            if self._logging:
+                _log.debug('CRC error')
             return
         # check tail
         tail = await stream.readexactly(4)
@@ -322,7 +339,8 @@ class Santoker(AsyncComm):
     def send_msg(self, target:bytes, value: int) -> None:
         if self._connect_using_ble and hasattr(self, '_ble_client') and self._ble_client is not None:
             # send via BLE
-#            _log.debug("send_msg(%s,%s): %s",target,value,self.create_msg(target, value))
+            if self._logging:
+                _log.debug('send_msg(%s,%s): %s',target,value,self.create_msg(target, value))
             self._ble_client.send(self.create_msg(target, value))
         else:
             # send via socket

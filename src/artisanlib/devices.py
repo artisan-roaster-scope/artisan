@@ -28,7 +28,8 @@ if TYPE_CHECKING:
 
 from artisanlib.util import deltaLabelUTF8, setDeviceDebugLogLevel, argb_colorname2rgba_colorname, rgba_colorname2argb_colorname, toInt
 from artisanlib.dialogs import ArtisanResizeablDialog
-from artisanlib.widgets import MyContentLimitedQComboBox, MyQComboBox, MyQDoubleSpinBox
+from artisanlib.widgets import MyContentLimitedQComboBox, MyQComboBox, MyQDoubleSpinBox, wait_cursor
+from artisanlib.scale import Scale, SUPPORTED_SCALES, ScaleSpecs
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -1443,6 +1444,76 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         tab7Layout.addStretch()
         tab7Layout.setContentsMargins(2,10,2,5)
 
+        self.scale1_devices:ScaleSpecs = [] # discovered scale1 devices
+        self.scale2_devices:ScaleSpecs = [] # discovered scale2 devices
+        self.scale1:Optional[Scale] = None
+        self.scale2:Optional[Scale] = None
+
+        scale1ModelLabel = QLabel(QApplication.translate('Label','Model'))
+        self.scale1ModelComboBox = QComboBox()
+        self.scale1ModelComboBox.setMinimumWidth(150)
+        self.scale1ModelComboBox.addItems([''] + [m for (m,_) in SUPPORTED_SCALES])
+        self.scale1NameLabel = QLabel(QApplication.translate('Label','Name'))
+        self.scale1NameComboBox = QComboBox()
+        self.scale1NameComboBox.setMinimumWidth(150)
+        self.scale1ScanButton = QPushButton(QApplication.translate('Button', 'Scan'))
+        self.scale1ScanButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        if self.aw.scale1_model is None:
+            self.scale1NameComboBox.setEnabled(False)
+            self.scale1ScanButton.setEnabled(False)
+        elif self.aw.scale1_model < len(SUPPORTED_SCALES):
+            self.scale1ModelComboBox.setCurrentIndex(self.aw.scale1_model + 1)
+            if self.aw.scale1_name is None:
+                self.scale1NameComboBox.setEnabled(False)
+            else:
+                self.scale1NameComboBox.setEnabled(True)
+        self.scale1ModelComboBox.currentIndexChanged.connect(self.scale1ModelChanged)
+        self.scale1NameComboBox.currentIndexChanged.connect(self.scale1NameChanged)
+        self.scale1ScanButton.clicked.connect(self.scanScale1)
+
+        scale1Grid = QGridLayout()
+        scale1Grid.addWidget(scale1ModelLabel,0,0)
+        scale1Grid.addWidget(self.scale1ModelComboBox,0,1)
+        scale1Grid.addWidget(self.scale1NameLabel,1,0)
+        scale1Grid.addWidget(self.scale1NameComboBox,1,1)
+        scale1Grid.addWidget(self.scale1ScanButton,1,2)
+        scale1HLayout = QHBoxLayout()
+        scale1HLayout.addLayout(scale1Grid)
+        scale1HLayout.addStretch()
+        scale1Layout = QVBoxLayout()
+        scale1Layout.addLayout(scale1HLayout)
+
+        scale2ModelLabel = QLabel(QApplication.translate('Label','Model'))
+        self.scale2ModelComboBox = QComboBox()
+        self.scale2ModelComboBox.setMinimumWidth(150)
+        self.scale2ModelComboBox.addItems([''] + [m for (m,_) in SUPPORTED_SCALES])
+        self.scale2NameLabel = QLabel(QApplication.translate('Label','Name'))
+        self.scale2NameComboBox = QComboBox()
+        self.scale2NameComboBox.setMinimumWidth(150)
+        self.scale2ScanButton = QPushButton(QApplication.translate('Button', 'Scan'))
+        self.scale2ScanButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        if self.aw.scale2_model is None:
+            self.scale2NameComboBox.setEnabled(False)
+            self.scale2ScanButton.setEnabled(False)
+        elif self.aw.scale2_model < len(SUPPORTED_SCALES):
+            self.scale2ModelComboBox.setCurrentIndex(self.aw.scale2_model + 1)
+            if self.aw.scale2_name is not None:
+                self.scale2NameComboBox.setEnabled(True)
+        self.scale2ModelComboBox.currentIndexChanged.connect(self.scale2ModelChanged)
+        self.scale2ScanButton.clicked.connect(self.scanScale2)
+
+        scale2Grid = QGridLayout()
+        scale2Grid.addWidget(scale2ModelLabel,0,0)
+        scale2Grid.addWidget(self.scale2ModelComboBox,0,1)
+        scale2Grid.addWidget(self.scale2NameLabel,1,0)
+        scale2Grid.addWidget(self.scale2NameComboBox,1,1)
+        scale2Grid.addWidget(self.scale2ScanButton,1,2)
+        scale2HLayout = QHBoxLayout()
+        scale2HLayout.addLayout(scale2Grid)
+        scale2HLayout.addStretch()
+        scale2Layout = QVBoxLayout()
+        scale2Layout.addLayout(scale2HLayout)
+
         self.taskWebDisplayGreenURL = QLabel()
         self.taskWebDisplayGreenURL.setOpenExternalLinks(True)
         self.taskWebDisplayGreenFlag = QCheckBox()
@@ -1535,8 +1606,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             naLayout.addStretch()
             taskWebDisplayRoastedVLayout.addLayout(naLayout)
 
-        scale1 = QGroupBox('Scale Green/Roasted')
-        scale2 = QGroupBox('Scale')
+        scale1 = QGroupBox(QApplication.translate('GroupBox', 'Scale {0}').format(1))
+        scale1.setLayout(scale1Layout)
+        scale2 = QGroupBox(QApplication.translate('GroupBox', 'Scale {0}').format(2))
+        scale2.setLayout(scale2Layout)
         taskGreen = QGroupBox('Task Green')
         taskGreen.setLayout(taskWebDisplayGreenVLayout)
         taskRoasted = QGroupBox('Task Roasted')
@@ -1603,6 +1676,91 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.taskWebDisplayGreenPort = int(str(self.taskWebDisplayGreenPort.text()))
         except Exception: # pylint: disable=broad-except
             pass
+
+    @pyqtSlot(int)
+    def scale1ModelChanged(self, i:int) -> None:
+        if i > 0 and len(SUPPORTED_SCALES) > i-1 and len(SUPPORTED_SCALES[i-1]) > 0:
+            self.aw.scale1_model = i-1
+            self.scale1NameComboBox.setEnabled(False)
+            self.scale1ScanButton.setEnabled(True)
+        else:
+            self.aw.scale1_model = None
+            self.scale1NameComboBox.clear()
+            self.scale1NameComboBox.setEnabled(False)
+            self.scale1ScanButton.setEnabled(False)
+
+    @pyqtSlot(int)
+    def scale1NameChanged(self, i:int) -> None:
+        if 0 <= i < len(self.scale1_devices) and self.aw.scale1_model is not None:
+            if self.scale1 is not None:
+                self.scale1.disconnect()
+            self.scale1 = self.aw.scale_manager.get_scale(self.aw.scale1_model, self.scale1_devices[i][1])
+            if self.scale1 is not None:
+                self.scale1.connect()
+        # i == -1 if self.scale1NameComboBox is empty!
+        elif self.scale1 is not None:
+            self.scale1.disconnect()
+
+    def updateScale1devices(self, devices:ScaleSpecs) -> None:
+        self.scale1_devices = devices
+        self.scale1NameComboBox.clear()
+        if self.scale1_devices:
+            self.scale1NameComboBox.addItems([d[0] for d in self.scale1_devices])
+            self.scale1NameComboBox.setEnabled(True)
+
+    @pyqtSlot(bool)
+    def scanScale1(self, _:bool = False) -> None:
+        if self.aw.scale1_model is not None:
+            with wait_cursor():
+                devices:ScaleSpecs = self.aw.scale_manager.scan_for_scales(self.aw.scale1_model)
+                self.updateScale1devices(devices)
+                if devices:
+                    self.scale1NameComboBox.setEnabled(True)
+                else:
+                    self.scale1NameComboBox.setEnabled(False)
+
+    @pyqtSlot(int)
+    def scale2ModelChanged(self, i:int) -> None:
+        if i > 0 and len(SUPPORTED_SCALES) > i-1 and len(SUPPORTED_SCALES[i-1]) > 0:
+            self.aw.scale2_model = i-1
+            self.scale2NameComboBox.setEnabled(False)
+            self.scale2ScanButton.setEnabled(True)
+        else:
+            self.aw.scale2_model = None
+            self.scale2NameComboBox.clear()
+            self.scale2NameComboBox.setEnabled(False)
+            self.scale2ScanButton.setEnabled(False)
+
+    @pyqtSlot(int)
+    def scale2NameChanged(self, i:int) -> None:
+        if 0 <= i < len(self.scale2_devices) and self.aw.scale2_model is not None:
+            if self.scale2 is not None:
+                self.scale2.disconnect()
+            self.scale2 = self.aw.scale_manager.get_scale(self.aw.scale2_model, self.scale2_devices[i][1])
+            if self.scale2 is not None:
+                self.scale2.connect()
+        # i == -1 if self.scale2NameComboBox is empty!
+        elif self.scale2 is not None:
+            self.scale2.disconnect()
+
+    def updateScale2devices(self, devices:ScaleSpecs) -> None:
+        self.scale2_devices = devices
+        self.scale2NameComboBox.clear()
+        if self.scale2_devices:
+            self.scale2NameComboBox.addItems([d[0] for d in self.scale2_devices])
+            self.scale2NameComboBox.setEnabled(True)
+
+    @pyqtSlot(bool)
+    def scanScale2(self, _:bool = False) -> None:
+        if self.aw.scale2_model is not None:
+            with wait_cursor():
+                devices:ScaleSpecs = self.aw.scale_manager.scan_for_scales(self.aw.scale2_model)
+                self.updateScale2devices(devices)
+                if devices:
+                    self.scale2NameComboBox.setEnabled(True)
+                else:
+                    self.scale2NameComboBox.setEnabled(False)
+
 
     @pyqtSlot(bool)
     def taskWebDisplayGreen(self, b:bool = False) -> None:

@@ -59,6 +59,8 @@ deltaLabelUTF8:Final[str] = 'Delta' if platform.system() == 'Linux' else '\u0394
 deltaLabelBigPrefix:Final[str] = '<big><b>&Delta;</b></big>&thinsp;<big><b>' # same as above for big/bold use cases
 deltaLabelMathPrefix:Final[str] = r'$\Delta\/$'  # prefix for labels in matplibgraphs to compose DeltaET/BT by prepending this prefix to ET/BT labels
 
+
+
 def appFrozen() -> bool:
     ib = False
     try:

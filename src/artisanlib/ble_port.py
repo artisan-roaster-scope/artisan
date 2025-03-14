@@ -79,7 +79,8 @@ class BLE:
             device_descriptions:Dict[Optional[str],Optional[Set[str]]],
             blacklist:Set[str],
             case_sensitive:bool,
-            scan_timeout:float) -> 'Tuple[Optional[BLEDevice], Optional[str]]':
+            scan_timeout:float,
+            address:Optional[str]) -> 'Tuple[Optional[BLEDevice], Optional[str]]':
         try:
             async with asyncio.timeout(scan_timeout): # type:ignore[attr-defined]
                 async with BleakScanner() as scanner:
@@ -88,7 +89,7 @@ class BLE:
                         if self._terminate_scan_event.is_set():
                             return None, None
 #                        _log.debug("device %s, (%s): %s", bd.name, ad.local_name, ad.service_uuids)
-                        if bd.address not in blacklist:
+                        if bd.address not in blacklist and (address is None or bd.address == address):
                             res:bool
                             res_service_uuid:Optional[str]
                             res, res_service_uuid = self.description_match(bd,ad,device_descriptions,case_sensitive)
@@ -106,14 +107,16 @@ class BLE:
                 blacklist:Set[str], # client addresses to ignore
                 case_sensitive:bool,
                 disconnected_callback:Optional[Callable[[BleakClient], None]],
-                scan_timeout:float, connect_timeout:float) -> Tuple[Optional[BleakClient], Optional[str]]:
+                scan_timeout:float, connect_timeout:float,
+                address:Optional[str] = None # if given, connect only to the device with this ble address
+                ) -> Tuple[Optional[BleakClient], Optional[str]]:
         async with self._scan_and_connect_lock:
             # the lock ensures that only one scan/connect operation is running at any time
             # as trying to establish a connection to two devices at the same time
             # can cause errors
             discovered_bd:Optional[BLEDevice] = None
             service_uuid:Optional[str] = None
-            discovered_bd, service_uuid = await self._scan(device_descriptions, blacklist, case_sensitive, scan_timeout)
+            discovered_bd, service_uuid = await self._scan(device_descriptions, blacklist, case_sensitive, scan_timeout, address)
             if discovered_bd is None:
                 return None, None
             client = BleakClient(
@@ -159,7 +162,9 @@ class BLE:
             case_sensitive:bool=True,
             disconnected_callback:Optional[Callable[[BleakClient], None]] = None,
             scan_timeout:float=10,
-            connect_timeout:float=3) -> Tuple[Optional[BleakClient], Optional[str]]:
+            connect_timeout:float=3,
+            address:Optional[str] = None # if given, connect only to the device with this ble address
+            ) -> Tuple[Optional[BleakClient], Optional[str]]:
         if hasattr(self, '_asyncLoopThread') and self._asyncLoopThread is None:
             self._asyncLoopThread = AsyncLoopThread()
         assert self._asyncLoopThread is not None
@@ -170,7 +175,8 @@ class BLE:
                     case_sensitive,
                     disconnected_callback,
                     scan_timeout,
-                    connect_timeout),
+                    connect_timeout,
+                    address),
                 self._asyncLoopThread.loop)
         try:
             return fut.result()
@@ -250,8 +256,9 @@ class ClientBLE:
                 try:
                     ble.start_notify(self._ble_client, notify_uuid, callback)
                     self._active_notification_uuids.add(notify_uuid)
+                    _log.debug('notification on characteristic %s started', notify_uuid)
                 except BleakCharacteristicNotFoundError:
-                    _log.debug('start_notifications: characteristic {notify_uuid} not found')
+                    _log.debug('start_notifications: characteristic %s not found', notify_uuid)
 
     # Notifications are stopped automatically on disconnect, so this method does not need to be called
     # unless notifications need to be stopped before the device disconnects
@@ -262,7 +269,7 @@ class ClientBLE:
                     ble.stop_notify(self._ble_client, notify_uuid)
                     _log.debug('notifications on %s stopped', notify_uuid)
                 except BleakCharacteristicNotFoundError:
-                    _log.debug('start_notifications: characteristic {notify_uuid} not found')
+                    _log.debug('start_notifications: characteristic %s not found', notify_uuid)
         self._active_notification_uuids = set()
 
     def _disconnect(self) -> None:
@@ -277,7 +284,7 @@ class ClientBLE:
 
 
     # connect and re-connect while self._running to BLE
-    async def _connect(self, case_sensitive:bool=True, scan_timeout:float=10, connect_timeout:float=4) -> None:
+    async def _connect(self, case_sensitive:bool=True, scan_timeout:float=10, connect_timeout:float=4, address:Optional[str] = None) -> None:
         blacklist:Set[str] = set()
         while self._running:
             # scan and connect
@@ -290,7 +297,8 @@ class ClientBLE:
                                     case_sensitive,
                                     self.disconnected_callback,
                                     scan_timeout,
-                                    connect_timeout)
+                                    connect_timeout,
+                                    address)
             if service_uuid is not None and self._ble_client is not None and self._ble_client.is_connected:
                 # validate correct service
                 try:
@@ -380,13 +388,13 @@ class ClientBLE:
             await asyncio.sleep(self._heartbeat_frequency)
             self.heartbeat()
 
-    async def _connect_and_keep_alive(self,case_sensitive:bool,scan_timeout:float, connect_timeout:float) -> None:
+    async def _connect_and_keep_alive(self,case_sensitive:bool,scan_timeout:float, connect_timeout:float, address:Optional[str] = None) -> None:
         await asyncio.gather(
-            self._connect(case_sensitive,scan_timeout,connect_timeout),
+            self._connect(case_sensitive,scan_timeout,connect_timeout, address),
             self._keep_alive())
 
 
-    def start(self, case_sensitive:bool=True, scan_timeout:float=10, connect_timeout:float=4) -> None:
+    def start(self, case_sensitive:bool=True, scan_timeout:float=10, connect_timeout:float=4, address:Optional[str] = None) -> None:
         _log.debug('start')
         if self._running:
             _log.error('BLE client already running')
@@ -397,7 +405,7 @@ class ClientBLE:
                     self._async_loop_thread = AsyncLoopThread()
                     # run _connect in async loop
                     asyncio.run_coroutine_threadsafe(
-                        self._connect_and_keep_alive(case_sensitive, scan_timeout, connect_timeout),
+                        self._connect_and_keep_alive(case_sensitive, scan_timeout, connect_timeout, address),
                         self._async_loop_thread.loop)
                     _log.debug('BLE client started')
                     self.on_start()
@@ -480,3 +488,19 @@ class ClientBLE:
         ...
     def heartbeat(self) -> None: # pylint: disable=no-self-use
         ...
+
+
+##
+
+# scans for named BLE devices providing any of the provided servie_uuids
+# returns a list of triples (name, address, Optional[BLEDevice])
+def scan_ble(timeout: float = 3.0) -> 'List[Tuple[BLEDevice, AdvertisementData]]':
+    coro = BleakScanner.discover(
+        timeout=timeout,
+        return_adv=True)
+    try:
+        loop = asyncio.get_running_loop()
+        res = asyncio.run_coroutine_threadsafe(coro, loop).result()
+    except RuntimeError:
+        res = asyncio.run(coro)
+    return list(res.values())

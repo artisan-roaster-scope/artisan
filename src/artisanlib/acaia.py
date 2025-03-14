@@ -24,17 +24,12 @@ if TYPE_CHECKING:
     from bleak.backends.characteristic import BleakGATTCharacteristic  # pylint: disable=unused-import
 
 
-try:
-    from PyQt6.QtCore import QObject, pyqtSignal # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import QObject, pyqtSignal # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-
-
 from artisanlib.ble_port import ClientBLE
 from artisanlib.async_comm import AsyncIterable, IteratorReader
+from artisanlib.scale import Scale
 
 
-_log = logging.getLogger(__name__)
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 ####
@@ -112,6 +107,19 @@ ACAIA_PEARLS_NAME:Final[str] = 'PEARLS'  # Acaia Pearl S
 ACAIA_LUNAR_NAME:Final[str] = 'LUNAR-'   # Acaia Lunar (2021)
 ACAIA_CINCO_NAME:Final[str] = 'CINCO'    # Acaia Cinco
 ACAIA_PYXIS_NAME:Final[str] = 'PYXIS'    # Acaia Pyxis
+
+
+# Acaia scale device name prefixes and product names
+ACAIA_SCALE_NAMES = [
+    (ACAIA_LEGACY_LUNAR_NAME, 'Lunar'), # original Lunar
+    (ACAIA_LUNAR_NAME, 'Lunar'), # Lunar 2021 and later
+    (ACAIA_LEGACY_PEARL_NAME, 'Pearl'), # original Pearl
+    (ACAIA_PEARLS_NAME, 'Pearl S'),
+    (ACAIA_PEARL_NAME, 'Pearl'), # Pearl 2021
+    (ACAIA_CINCO_NAME, 'Cinco'),
+    (ACAIA_PYXIS_NAME, 'Pyxis')]
+
+
 
 class AcaiaBLE(ClientBLE):
 
@@ -510,17 +518,25 @@ class AcaiaBLE(ClientBLE):
 
 
 # QObject needs to go first in this mixing and AcaiaBLE and its super class are not allowed to hold __slots__
-class Acaia(QObject, AcaiaBLE): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
-
-    weight_changed_signal = pyqtSignal(int)   # delivers new weight in g
-    battery_changed_signal = pyqtSignal(int)  # delivers new batter level in %
-    disconnected_signal = pyqtSignal()        # issued on disconnect
+class Acaia(Scale, AcaiaBLE): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
     def __init__(self, connected_handler:Optional[Callable[[], None]] = None,
                        disconnected_handler:Optional[Callable[[], None]] = None):
-        QObject.__init__(self)
+        Scale.__init__(self)
         AcaiaBLE.__init__(self, connected_handler = connected_handler, disconnected_handler=disconnected_handler)
+        self.address:Optional[str] = None # if set, connects are restricted to the device with this BLE address
 
+    def set_address(self, address:Optional[str]) -> None:
+        self.address = address
+
+    def get_address(self) -> Optional[str]:
+        return self.address
+
+    def connect(self) -> None:
+        self.start(address=self.address)
+
+    def disconnect(self) -> None:
+        self.stop()
 
     def weight_changed(self, new_value:int) -> None:
         self.weight_changed_signal.emit(new_value)

@@ -5098,7 +5098,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
             self.saveEventTable()
             self.aw.orderEvents()
-            self.aw.qmc.redraw(recomputeAllDeltas=False)
+            self.aw.qmc.redraw_keep_view(recomputeAllDeltas=False)
         # Update Title
         self.aw.qmc.title = ' '.join(self.titleedit.currentText().split())
         self.aw.qmc.title_show_always = self.titleShowAlwaysFlag.isChecked()
@@ -5292,7 +5292,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             (self.aw.qmc.specialeventsvalue != self.org_specialeventsvalue) or
             (self.aw.qmc.timeindex != self.org_timeindex)):
             # we do a general redraw only if not sampling
-            self.aw.qmc.redraw(recomputeAllDeltas=False)
+            self.aw.qmc.redraw_keep_view(recomputeAllDeltas=False)
         elif (self.org_title != self.aw.qmc.title) or self.org_title_show_always != self.aw.qmc.title_show_always:
             # if title changed we at least update that one
             if self.aw.qmc.flagstart and not self.aw.qmc.title_show_always:

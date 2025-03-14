@@ -15,9 +15,9 @@
 # AUTHOR
 # Marko Luther, 2023
 
-#from artisanlib.main import Artisan
+from contextlib import contextmanager
+from typing import Optional, Dict, Any, Iterator, TYPE_CHECKING
 from artisanlib.util import stringtoseconds, createGradient
-from typing import Optional, Dict, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from PyQt6.QtCore import QCoreApplication, QObject # pylint: disable=unused-import
@@ -37,6 +37,15 @@ except ImportError:
         QTableWidget, QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame, QSlider, QStyle, QStyleOptionSlider) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QPen, QPainter, QFontMetrics, QColor, QCursor, QEnterEvent, QPaintEvent # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
+
+
+@contextmanager
+def wait_cursor() -> Iterator[None]:
+    try:
+        QApplication.setOverrideCursor(Qt.CursorShape.BusyCursor)
+        yield
+    finally:
+        QApplication.restoreOverrideCursor()
 
 class MyQComboBox(QComboBox): # pylint: disable=too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues]# Argument to class must be a base class
     def __init__(self, parent:Optional['QWidget'] = None, **kwargs:Dict[Any,Any]) -> None:
