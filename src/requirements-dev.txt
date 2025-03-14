@@ -7,13 +7,13 @@ types-python-dateutil==2.9.0.20241206
 types-pytz>=2025.1.0.20250204
 types-pyyaml>=6.0.12.20241230
 types-requests>=2.32.0.20250306
-types-setuptools>=75.8.2.20250305
+types-setuptools>=76.0.0.20250313
 types-urllib3>=1.26.25.14
 types-docutils>=0.21.0.20241128
 lxml-stubs>=0.5.1
 mypy==1.15.0
 pyright==1.1.396
-ruff>=0.9.10
+ruff>=0.10.0
 pylint==3.3.5
 pre-commit>=4.1.0
 pytest>=8.3.5
@@ -25,7 +25,7 @@ pytest-cov==6.0.0
 #pytest-bdd==6.1.1
 #pytest-benchmark==4.0.0
 #pytest-mock==3.11.1
-hypothesis>=6.128.2
+hypothesis>=6.129.1
 coverage>=7.6.12
 coverage-badge==1.1.2
 codespell==2.4.1

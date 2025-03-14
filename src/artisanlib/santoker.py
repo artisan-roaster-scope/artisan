@@ -224,11 +224,12 @@ class Santoker(AsyncComm):
             _log.debug('register_reading(%s,%s)',target,value)
         if target == self.BOARD:
             self._board = value / 10.0
-        elif target in {self.BT, self.OLD_BT}:
+        elif target in (self.BT, self.OLD_BT):
             BT = value / 10.0
             self._bt = (BT if self._bt == -1 else (2*BT + self._bt)/3)
-            _log.debug('BT: %s',self._bt)
-        elif target in {self.ET, self.OLD_ET}:
+            if self._logging:
+                _log.debug('BT: %s',self._bt)
+        elif target in (self.ET, self.OLD_ET):
             ET = value / 10.0
             self._et = (ET if self._et == -1 else (2*ET + self._et)/3)
             if self._logging:
@@ -299,7 +300,9 @@ class Santoker(AsyncComm):
         # look for the first header byte
         await stream.readuntil(self.HEADER[0:1])
         # check for the second header byte
-        if await stream.readexactly(1) != self.HEADER[1:2]:
+#        if await stream.readexactly(1) != self.HEADER[1:2]:
+#            return
+        if await stream.readexactly(1) not in (self.HEADER_BT[1:2], self.HEADER_WIFI[1:2]): # we always accept both headers, the one for WiFi and the one for BT
             return
         # read the data target (BT, ET,..)
         target = await stream.readexactly(1)
@@ -316,7 +319,8 @@ class Santoker(AsyncComm):
         crc = await stream.readexactly(2)
         calculated_crc = FramerRTU.compute_CRC(self.CODE_HEADER + data_len + data).to_bytes(2, 'big')
 #        if self._verify_crc and crc != calculated_crc: # for whatever reason, the first byte of the received CRC is often wrongly just \x00
-        if self._verify_crc and crc != calculated_crc and crc[0] != 0:
+#        if self._verify_crc and crc != calculated_crc and crc[0] != 0: # we accept a 0 as first CRC bit always!
+        if self._verify_crc and crc[1] != calculated_crc[1]: # we only check the second CRC bit!
             if self._logging:
                 _log.debug('CRC error')
             return
@@ -349,6 +353,7 @@ class Santoker(AsyncComm):
 
     def start(self, connect_timeout:float=5) -> None:
         if self._connect_using_ble and hasattr(self, '_ble_client') and self._ble_client is not None:
+            self._ble_client.setLogging(self._logging)
             self._ble_client.start(case_sensitive=False)
         else:
             super().start(connect_timeout)
