@@ -13453,11 +13453,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.background = not self.qmc.hideBgafterprofileload
                 self.qmc.timealign(redraw=False)
                 self.qmc.redraw()
-                if self.qmc.backgroundPlaybackEvents:
-                    # first turn playback off to clean previous disabled events
-                    self.qmc.turn_playback_event_OFF()
-                    # turn on again after background load to ignore already passed events
-                    self.qmc.turn_playback_event_ON()
 
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
@@ -20508,6 +20503,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
             self.qmc.stopPhidgetManager()
+        try:
+            self.scale_manager.disconnect_all()
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 
     # returns True if confirmed, False if canceled by the user
     def closeApp(self) -> bool:

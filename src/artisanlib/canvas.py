@@ -5813,12 +5813,10 @@ class tgraphcanvas(FigureCanvas):
             self.adderror((QApplication.translate('Error Message','Exception:') + ' playbackdrop() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
 
-    # turns playback event on and fills self.replayedBackgroundEvents with already passed events (w.r.t. time) if any
-    def turn_playback_event_ON(self) -> None:
-        if not self.backgroundPlaybackEvents:
-            # only if playback is freshly turned ON we consider to enable (potentially) already fired background events to be replayed
-            self.backgroundPlaybackEvents = True
-            self.replayedBackgroundEvents = set()
+    # update the cache (self.replayedBackgroundEvents) which holds the background events considered to have been already triggered to prevent
+    # to have them triggered again. All events before NOW are considered to have been triggered already.
+    def updateReplayedBackgroundEvents(self) -> None:
+        self.replayedBackgroundEvents = set()
         if self.flagstart:
             sample_interval = self.delay/1000. # in sec
             if self.timeindex[0] != -1:
@@ -5838,10 +5836,15 @@ class tgraphcanvas(FigureCanvas):
                     # switching on short after CHARGE, does not disable background events before CHARGE
                     self.replayedBackgroundEvents.add(i)
 
+    # turns playback event on and fills self.replayedBackgroundEvents with already passed events (w.r.t. time) if any
+    def turn_playback_event_ON(self) -> None:
+        self.backgroundPlaybackEvents = True
+        # mark all events before NOW as already replayed to prevent them to replay again
+        self.updateReplayedBackgroundEvents()
+
     def turn_playback_event_OFF(self) -> None:
         self.backgroundPlaybackEvents = False
         self.replayedBackgroundEvents = set()
-
 
     # called only after CHARGE
     def playbackevent(self) -> None:
@@ -5996,68 +5999,104 @@ class tgraphcanvas(FigureCanvas):
                             if (event_type not in slider_events and # only if there is no slider event of the corresponding type
                                     self.specialeventplayback[event_type] and # only replay event types activated for replay
                                     (str(self.etypesf(event_type) == str(self.Betypesf(event_type)))) and
-                                    #self.aw.eventslidervisibilities[event_type] and
+                                    #self.aw.eventslidervisibilities[event_type] and # we ramp also events ofinvisible sliders
                                     self.specialeventplaybackramp[event_type]):   # only calculate ramp for ramping events
 
+                                ## calculate ramping
+
+                                # we pick the left event of the ramp the last event of type event_type either of the foreground or the background, whichever ever is closer
+                                # NOTE: this last event was not necessarily replayed before and might have been manually entered instead
+
+                                last_registered_background_event_idx:Optional[int] = None
+                                last_registered_background_event_time:Optional[float] = None
+                                last_registered_foreground_event_idx:Optional[int] = None
+                                last_registered_foreground_event_time:Optional[float] = None
+                                TP_time:Optional[float] = None
                                 try:
-                                    # get the index of the last event of current event type
-                                    # NOTE: this last event was not necessarily replayed before and might have been manually entered instead
-                                    last_registered_event_idx:Optional[int] = None
-                                    last_event_temp:Optional[float] = None
+                                    previous_background_event_types = self.backgroundEtypes[:i] # check only events before NOW (events before the current checked index bge)
+                                    last_registered_background_event_idx = len(previous_background_event_types) - 1 - previous_background_event_types[::-1].index(event_type) # index of last background event if any; except otherwise
+                                    if last_registered_background_event_idx is not None:
+                                        last_registered_background_event_time = self.timeB[self.backgroundEvents[last_registered_background_event_idx]]
+                                except ValueError: # index access fails if there is no such event/index
+                                    pass
+                                try:
+                                    last_registered_foreground_event_idx = len(self.specialeventstype) - 1 - self.specialeventstype[::-1].index(event_type) # index of last foreground event if any; except otherwise
+                                    if last_registered_foreground_event_idx is not None:
+                                        last_registered_foreground_event_time = self.timex[self.specialevents[last_registered_foreground_event_idx]]
+                                except ValueError:
+                                    pass
+                                try:
+                                    if self.TPalarmtimeindex is not None:
+                                        TP_time = self.timex[self.TPalarmtimeindex]
+                                except ValueError: # index access fails if there is no such event/index
+                                    pass
+
+                                last_event_idx:Optional[int] = last_registered_background_event_idx
+                                last_event_time:Optional[float] = last_registered_background_event_time
+                                last_event_value:Optional[float] = None
+                                last_event_temp1:Optional[float] = None
+                                last_event_temp2:Optional[float] = None
+                                last_event_temp:Optional[float] = None
+
+                                if (last_registered_foreground_event_idx is not None and last_registered_background_event_time is not None and last_registered_foreground_event_time is not None and
+                                    last_registered_foreground_event_time > last_registered_background_event_time):
+                                    # last foreground event is newer then last background event thus we use that foreground one
+                                    last_event_idx = last_registered_foreground_event_idx
+                                    last_event_time = last_registered_foreground_event_time
+                                    last_event_value = self.eventsInternal2ExternalValue(self.specialeventsvalue[last_registered_foreground_event_idx])
+                                    # only if there is a last_event after TP we do ramping by temperature
+                                    if TP_time is not None and TP_time < last_event_time and len(self.specialevents)>last_event_idx:
+                                        last_event_temp1 = self.temp1[self.specialevents[last_event_idx]]
+                                        last_event_temp2 = self.temp2[self.specialevents[last_event_idx]]
+                                elif last_registered_background_event_idx is not None and last_event_time is not None and last_event_idx is not None:
+                                    # use last background event as assigned above is the last we just passed, we add its value
+                                    last_event_value = self.eventsInternal2ExternalValue(self.backgroundEvalues[last_registered_background_event_idx])
+                                    # only if there is a last_event after TP we do ramping by temperature
+                                    if TP_time is not None and TP_time < last_event_time and len(self.backgroundEvents)>last_event_idx:
+                                        last_event_temp1 = self.temp1B[self.backgroundEvents[last_event_idx]]
+                                        last_event_temp2 = self.temp2B[self.backgroundEvents[last_event_idx]]
+
+                                if last_event_idx is not None:
+                                    next_event_value = self.eventsInternal2ExternalValue(self.backgroundEvalues[i])                          # next always from background
                                     next_event_temp:Optional[float] = None
                                     current_temp:Optional[float] = None
 
-                                    last_registered_event_idx = len(self.specialeventstype) - 1 - self.specialeventstype[::-1].index(event_type)
+                                    # for ramp by BT only after TP
+                                    if (last_event_temp2 is not None and self.replayType == 1 and len(self.temp2)>1 and self.temp2[-1] != -1 and
+                                            self.temp2[-2] != -1 and ((increasing and self.temp2[-1] >= self.temp2[-2]) or (not increasing and self.temp2[-1] <= self.temp2[-2])) and
+                                            len(self.temp2B) > bge):
+                                        last_event_temp = last_event_temp2
+                                        next_event_temp = self.temp2B[bge]
+                                        current_temp = self.temp2[-1]
+                                    elif (last_event_temp1 is not None and self.replayType == 2 and len(self.temp1)>1 and self.temp1[-1] != -1 and
+                                            self.temp1[-2] != -1 and ((increasing and self.temp1[-1] >= self.temp1[-2]) or (not increasing and self.temp1[-1] <= self.temp1[-2])) and
+                                            len(self.temp1B) > bge):
+                                        last_event_temp = last_event_temp1
+                                        next_event_temp = self.temp1B[bge]
+                                        current_temp = self.temp1[-1]
 
-                                    if last_registered_event_idx is not None and len(self.specialeventsvalue)>last_registered_event_idx:
-                                        last_value = self.eventsInternal2ExternalValue(self.specialeventsvalue[last_registered_event_idx]) # from foreground
-                                        next_value = self.eventsInternal2ExternalValue(self.backgroundEvalues[i])                          # from background
-
-                                        # for ramp by BT only after TP and if BT increased
-                                        if (self.TPalarmtimeindex is not None and self.replayType == 1 and len(self.temp2)>1 and self.temp2[-1] != -1 and
-                                                self.temp2[-2] != -1 and ((increasing and self.temp2[-1] >= self.temp2[-2]) or (not increasing and self.temp2[-1] <= self.temp2[-2])) and
-                                                len(self.specialevents) > last_registered_event_idx and
-                                                len(self.temp2)> self.specialevents[last_registered_event_idx] and
-                                                len(self.temp2B) > bge):
-                                            # we ramp by BT only after TP and if BT increased, however, last event could be before TP
-                                            # we take as last event the one of the foreground profile and not the one of the background assuming it was replayed at the same temp
-                                            # we do not take any last_temp before TP as before TP BT is not monotone increasing, but decreasing
-                                            last_event_temp = (self.temp2[self.TPalarmtimeindex] if self.specialevents[last_registered_event_idx] < self.TPalarmtimeindex
-                                                    else self.temp2[self.specialevents[last_registered_event_idx]])
-                                            next_event_temp = self.temp2B[bge]
-                                            current_temp = self.temp2[-1]
-                                        elif (self.TPalarmtimeindex is not None and self.replayType == 2 and len(self.temp1)>1 and self.temp1[-1] != -1 and
-                                                self.temp1[-2] != -1 and ((increasing and self.temp1[-1] >= self.temp1[-2]) or (not increasing and self.temp1[-1] <= self.temp1[-2])) and
-                                                len(self.specialevents) > last_registered_event_idx and
-                                                len(self.temp1)> self.specialevents[last_registered_event_idx] and
-                                                len(self.temp1B) > bge):
-                                            # we ramp by ET only after TP and if ET increased
-                                            # NOTE: ET ramp replay might not work well as ET is often not monotonic increasing
-                                            # we do not take any last_temp before TP as before TP BT is not monotone increasing, but decreasing
-                                            last_event_temp = (self.temp1[self.TPalarmtimeindex] if self.specialevents[last_registered_event_idx] < self.TPalarmtimeindex
-                                                    else self.temp1[self.specialevents[last_registered_event_idx]])
-                                            next_event_temp = self.temp1B[bge]
-                                            current_temp = self.temp1[-1]
-
-                                        # compute ramp value if possible
-                                        if (self.replayType in {1,2} and last_event_temp is not None and next_event_temp is not None and
-                                                current_temp is not None):
-                                            # if background event target temperature did increase (or decrease) as the foreground, we ramp by temperature
-                                            coefficients = numpy.polyfit([last_event_temp, next_event_temp] , [last_value, next_value], 1)
+                                    # compute ramp value if possible
+                                    if (self.replayType in {1,2} and last_event_temp is not None and next_event_temp is not None and
+                                            last_event_temp is not None and next_event_temp is not None and
+                                            current_temp is not None):
+                                        # if background event target temperature did increase (or decrease) as the foreground, we ramp by temperature
+                                        if min(last_event_temp, next_event_temp) <= current_temp <= max(last_event_temp, next_event_temp):
+                                            # we ramp only within the limits
+                                            coefficients = numpy.polyfit([last_event_temp, next_event_temp] , [last_event_value, next_event_value], 1)
                                             ramps[event_type] = numpy.poly1d(coefficients)(current_temp)
-                                        elif (last_event_temp is None and next_event_temp is None and
-                                                  # if replay by temp (as one or both of those event_temps is not None), but current temp did not increase we don't
-                                                  # ramp by time instead as this would confuse everything.
-                                                len(self.timex)> self.specialevents[last_registered_event_idx] and len(self.timeB)>bge):
-                                            # we ramp by time
-                                            last_time = self.timex[self.specialevents[last_registered_event_idx]]
-                                            next_time = self.timeB[bge]
-                                            coefficients = numpy.polyfit([last_time, next_time], [last_value, next_value], 1)
+                                    elif (last_event_temp is None and next_event_temp is None and
+                                            (self.replayType == 0 or self.TPalarmtimeindex is None) and # replay by time active
+                                            last_event_time is not None and len(self.timeB)>bge):
+                                              # if replay by temp (as one or both of those event_temps is not None), but current temp did not increase we don't
+                                              # ramp by time instead as this would confuse everything.
+                                        # we ramp by (absolute) time (ignoring relative shift by CHARGE)
+                                        last_time = last_event_time
+                                        next_time = self.timeB[bge]
+                                        if last_time <= now <= next_time:
+                                            # we ramp only within the limits
+                                            coefficients = numpy.polyfit([last_time, next_time], [last_event_value, next_event_value], 1)
                                             ramps[event_type] = numpy.poly1d(coefficients)(now)
 
-                                except ValueError:
-                                    # no previous event found to compute the ramp
-                                    pass
 
                 # now move the sliders to the new values (if any)
                 for k,v in slider_events.items():
@@ -6066,13 +6105,7 @@ class tgraphcanvas(FigureCanvas):
 
                 for k,ramp_value in enumerate(ramps):
                     if ramp_value is not None:
-#                        slider_value = self.aw.eventslidervalues[k]
                         self.aw.moveslider(k, ramp_value)
-# Ramping quantified to integers (only sends a slider action request if quantification leads to a different integer as previously)
-#                        if slider_value != self.aw.eventslidervalues[k]:
-#                            # slider moved to new value thus we fire its action, if any
-#                            self.aw.fireslideraction(k)
-# Ramping using full floats (more slider action requests!)
                         self.aw.fireslideraction_internal(k, ramp_value) # higher precision ramp value send in extern slider actions
 
                 #delete existing message
@@ -16418,9 +16451,9 @@ class tgraphcanvas(FigureCanvas):
                 self.moveBackgroundAnnoPositionsY(-step)
 
             # ensure to deactivate passed background events to prevent their replay
-            if self.backgroundPlaybackEvents:
-                # turn on again after background load to ignore already passed events
-                self.turn_playback_event_ON()
+            if self.backgroundPlaybackEvents and direction in {'left','right'}:
+                # to ignore already passed events
+                self.updateReplayedBackgroundEvents()
         else:
             self.aw.sendmessage(QApplication.translate('Message','Unable to move background'))
 

@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 from artisanlib.util import deltaLabelUTF8, setDeviceDebugLogLevel, argb_colorname2rgba_colorname, rgba_colorname2argb_colorname, toInt
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import MyContentLimitedQComboBox, MyQComboBox, MyQDoubleSpinBox, wait_cursor
-from artisanlib.scale import Scale, SUPPORTED_SCALES, ScaleSpecs
+from artisanlib.scale import SUPPORTED_SCALES, ScaleSpecs
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -64,6 +64,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.org_santokerSerial = self.aw.santokerSerial
         self.org_santokerBLE = self.aw.santokerBLE
         self.org_kaleidoSerial = self.aw.kaleidoSerial
+
+        self.org_scale1_model = self.aw.scale1_model
+        self.org_scale1_name = self.aw.scale1_name
+        self.org_scale1_id = self.aw.scale1_id
+        self.org_scale2_model = self.aw.scale2_model
+        self.org_scale2_name = self.aw.scale2_name
+        self.org_scale2_id = self.aw.scale2_id
 
         ################ TAB 1   WIDGETS
         #ETcurve
@@ -1446,8 +1453,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
         self.scale1_devices:ScaleSpecs = [] # discovered scale1 devices
         self.scale2_devices:ScaleSpecs = [] # discovered scale2 devices
-        self.scale1:Optional[Scale] = None
-        self.scale2:Optional[Scale] = None
 
         scale1ModelLabel = QLabel(QApplication.translate('Label','Model'))
         self.scale1ModelComboBox = QComboBox()
@@ -1470,6 +1475,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.scale1ModelComboBox.currentIndexChanged.connect(self.scale1ModelChanged)
         self.scale1NameComboBox.currentIndexChanged.connect(self.scale1NameChanged)
         self.scale1ScanButton.clicked.connect(self.scanScale1)
+
+        if self.aw.scale1_name and self.aw.scale1_id:
+            self.updateScale1devices([(self.aw.scale1_name, self.aw.scale1_id)])
 
         scale1Grid = QGridLayout()
         scale1Grid.addWidget(scale1ModelLabel,0,0)
@@ -1497,10 +1505,16 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.scale2ScanButton.setEnabled(False)
         elif self.aw.scale2_model < len(SUPPORTED_SCALES):
             self.scale2ModelComboBox.setCurrentIndex(self.aw.scale2_model + 1)
-            if self.aw.scale2_name is not None:
+            if self.aw.scale2_name is None:
+                self.scale2NameComboBox.setEnabled(False)
+            else:
                 self.scale2NameComboBox.setEnabled(True)
         self.scale2ModelComboBox.currentIndexChanged.connect(self.scale2ModelChanged)
+        self.scale2NameComboBox.currentIndexChanged.connect(self.scale2NameChanged)
         self.scale2ScanButton.clicked.connect(self.scanScale2)
+
+        if self.aw.scale2_name and self.aw.scale2_id:
+            self.updateScale2devices([(self.aw.scale2_name, self.aw.scale2_id)])
 
         scale2Grid = QGridLayout()
         scale2Grid.addWidget(scale2ModelLabel,0,0)
@@ -1692,14 +1706,17 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     @pyqtSlot(int)
     def scale1NameChanged(self, i:int) -> None:
         if 0 <= i < len(self.scale1_devices) and self.aw.scale1_model is not None:
-            if self.scale1 is not None:
-                self.scale1.disconnect()
-            self.scale1 = self.aw.scale_manager.get_scale(self.aw.scale1_model, self.scale1_devices[i][1])
-            if self.scale1 is not None:
-                self.scale1.connect()
+            self.aw.scale1_name = self.scale1_devices[i][0]
+            self.aw.scale1_id = self.scale1_devices[i][1]
+            scale = self.aw.scale_manager.get_scale(self.aw.scale1_model, self.scale1_devices[i][1])
+            self.aw.scale_manager.set_scale1(scale)
+            if scale is not None:
+                scale.connect()
         # i == -1 if self.scale1NameComboBox is empty!
-        elif self.scale1 is not None:
-            self.scale1.disconnect()
+        else:
+            scale1 = self.aw.scale_manager.get_scale1()
+            if scale1 is not None:
+                scale1.disconnect()
 
     def updateScale1devices(self, devices:ScaleSpecs) -> None:
         self.scale1_devices = devices
@@ -1734,14 +1751,17 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     @pyqtSlot(int)
     def scale2NameChanged(self, i:int) -> None:
         if 0 <= i < len(self.scale2_devices) and self.aw.scale2_model is not None:
-            if self.scale2 is not None:
-                self.scale2.disconnect()
-            self.scale2 = self.aw.scale_manager.get_scale(self.aw.scale2_model, self.scale2_devices[i][1])
-            if self.scale2 is not None:
-                self.scale2.connect()
+            self.aw.scale2_name = self.scale2_devices[i][0]
+            self.aw.scale2_id = self.scale2_devices[i][1]
+            scale = self.aw.scale_manager.get_scale(self.aw.scale2_model, self.scale2_devices[i][1])
+            self.aw.scale_manager.set_scale2(scale)
+            if scale is not None:
+                scale.connect()
         # i == -1 if self.scale2NameComboBox is empty!
-        elif self.scale2 is not None:
-            self.scale2.disconnect()
+        else:
+            scale2 = self.aw.scale_manager.get_scale2()
+            if scale2 is not None:
+                scale2.disconnect()
 
     def updateScale2devices(self, devices:ScaleSpecs) -> None:
         self.scale2_devices = devices
@@ -2725,6 +2745,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             _t, _e, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' setextracolor(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
+    # close is called from OK and CANCEL
     def close(self) -> bool:
         self.closeHelp()
         settings = QSettings()
@@ -2732,6 +2753,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         settings.setValue('DeviceAssignmentGeometry',self.saveGeometry())
         self.aw.DeviceAssignmentDlg_activeTab = self.TabWidget.currentIndex()
 #        self.aw.closeEventSettings() # save all app settings
+
+        if not self.aw.schedule_window:
+            # we disconnect all scales again if scheduler is not active
+            self.aw.scale_manager.disconnect_all()
+
         return True
 
     @pyqtSlot()
@@ -2743,6 +2769,14 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.aw.santokerSerial = self.org_santokerSerial
         self.aw.santokerBLE = self.org_santokerBLE
         self.aw.kaleidoSerial = self.org_kaleidoSerial
+
+        self.aw.scale1_model = self.org_scale1_model
+        self.aw.scale1_name = self.org_scale1_name
+        self.aw.scale1_id = self.org_scale1_id
+        self.aw.scale2_model = self.org_scale2_model
+        self.aw.scale2_name = self.org_scale2_name
+        self.aw.scale2_id = self.org_scale2_id
+
         self.reject()
 
     @pyqtSlot()

@@ -209,7 +209,7 @@ class Santoker(AsyncComm):
         #if self._logging:
         value:int
         # convert data into the integer data
-        if target in (self.BT_ROR, self.ET_ROR):
+        if target in {self.BT_ROR, self.ET_ROR}:
             # first for bits of the RoR data contain the sign of the value
             if len(data) != 2:
                 return
@@ -220,16 +220,16 @@ class Santoker(AsyncComm):
                 value = - value
         else:
             value = int.from_bytes(data, 'big')
-        if self._logging:
-            _log.debug('register_reading(%s,%s)',target,value)
+#        if self._logging:
+#            _log.debug('register_reading(%s,%s)',target,value)
         if target == self.BOARD:
             self._board = value / 10.0
-        elif target in (self.BT, self.OLD_BT):
+        elif target in {self.BT, self.OLD_BT}:
             BT = value / 10.0
             self._bt = (BT if self._bt == -1 else (2*BT + self._bt)/3)
             if self._logging:
                 _log.debug('BT: %s',self._bt)
-        elif target in (self.ET, self.OLD_ET):
+        elif target in {self.ET, self.OLD_ET}:
             ET = value / 10.0
             self._et = (ET if self._et == -1 else (2*ET + self._et)/3)
             if self._logging:
@@ -287,10 +287,10 @@ class Santoker(AsyncComm):
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
             self._DROP = b
-        elif self._logging and target in {self.MIN_POWER, self.MAX_POWER, self.BT_CALIB, self.ET_CALIB}:
-            _log.debug('unsupported data target %s', target)
-        elif self._logging:
-            _log.debug('unknown data target %s', target)
+#        elif self._logging and target in {self.MIN_POWER, self.MAX_POWER, self.BT_CALIB, self.ET_CALIB}:
+#            _log.debug('unsupported data target %s', target)
+#        elif self._logging:
+#            _log.debug('unknown data target %s', target)
 
 
     # asyncio read implementation
@@ -302,7 +302,17 @@ class Santoker(AsyncComm):
         # check for the second header byte
 #        if await stream.readexactly(1) != self.HEADER[1:2]:
 #            return
-        if await stream.readexactly(1) not in (self.HEADER_BT[1:2], self.HEADER_WIFI[1:2]): # we always accept both headers, the one for WiFi and the one for BT
+#        if await stream.readexactly(1) not in {self.HEADER_BT[1:2], self.HEADER_WIFI[1:2]}: # we always accept both headers, the one for WiFi and the one for BT
+#            return
+        # we accept both headers, BT and WiFi and adjust the self.HEADER to be used on sending messages accordingly
+        # as it seems that some machines connected via bluetooth still send data using the WiFi header and expect that header also on read
+        # so we adjust to the header we receive and use that on sending our messages as well
+        snd_header_byte = await stream.readexactly(1)
+        if snd_header_byte == self.HEADER_BT[1:2]:
+            self.HEADER = self.HEADER_BT
+        elif snd_header_byte == self.HEADER_WIFI[1:2]:
+            self.HEADER = self.HEADER_WIFI
+        else:
             return
         # read the data target (BT, ET,..)
         target = await stream.readexactly(1)

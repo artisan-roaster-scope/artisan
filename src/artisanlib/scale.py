@@ -33,7 +33,7 @@ SUPPORTED_SCALES:Final[List[Tuple[str,int]]] = [
     ('Acaia', 0) # 0
 ]
 
-ScaleSpec = Tuple[str,str]
+ScaleSpec = Tuple[str,str] # scale name, scale id (eg. ble address)
 ScaleSpecs = List[ScaleSpec]
 
 
@@ -58,6 +58,12 @@ class Scale(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to 
 
 
 class ScaleManager:
+
+    __slots__ = [ 'scale1', 'scale2' ]
+
+    def __init__(self) -> None:
+        self.scale1: Optional[Scale] = None
+        self.scale2: Optional[Scale] = None
 
     # returns list of discovered devices as (name, address) tuples matching selected scale model
     @staticmethod
@@ -86,3 +92,27 @@ class ScaleManager:
             scale.set_address(address)
             return scale
         return None
+
+    def set_scale1(self, scale:Optional[Scale]) -> None:
+        if self.scale1 is not None:
+            self.scale1.disconnect()
+        self.scale1 = scale
+
+    def get_scale1(self) -> Optional[Scale]:
+        return self.scale1
+
+    def set_scale2(self, scale:Optional[Scale]) -> None:
+        if self.scale2 is not None:
+            self.scale2.disconnect()
+        self.scale2 = scale
+
+    def get_scale2(self) -> Optional[Scale]:
+        return self.scale2
+
+    def disconnect_all(self) -> None:
+        if self.scale1 is not None:
+            self.scale1.disconnect()
+            self.scale1 = None
+        if self.scale2 is not None:
+            self.scale2.disconnect()
+            self.scale2 = None

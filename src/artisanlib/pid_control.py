@@ -1646,7 +1646,7 @@ class PIDcontrol:
 
 
     def setSV(self, sv:float, move:bool = True, init:bool = False) -> None:
-        _log.debug('PRINT setSV(%s,%s,%s)',sv,move,init)
+#        _log.debug('PRINT setSV(%s,%s,%s)',sv,move,init)
 #        if not move:
 #            self.aw.sendmessage(QApplication.translate("Message","SV set to %s"%sv))
         if self.externalPIDControl() == 1:
