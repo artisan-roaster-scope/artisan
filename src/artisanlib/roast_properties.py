@@ -1374,6 +1374,9 @@ class editGraphDlg(ArtisanResizeablDialog):
                 try:
                     from artisanlib.acaia import Acaia
                     self.acaia = Acaia(
+                        model = 1,
+                        ident = None,
+                        name = 'Acaia',
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Acaia'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Acaia'),True,None))
                     self.acaia.weight_changed_signal.connect(self.ble_weight_changed)
@@ -2569,7 +2572,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.clear_last_picked_event_selection()
         self.aw.eNumberSpinBox.setValue(0)
 
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
+        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=False)
 
         self.clean_up()
         super().reject()
@@ -5282,7 +5285,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             try:
                 self.aw.qmc.background = not self.aw.qmc.hideBgafterprofileload
                 self.aw.qmc.timealign(redraw=False)
-                self.aw.qmc.redraw()
+                self.aw.qmc.redraw_keep_view()
             except Exception: # pylint: disable=broad-except
                 pass
         elif ((not self.aw.qmc.flagon) or

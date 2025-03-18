@@ -186,6 +186,7 @@ class tgraphcanvas(FigureCanvas):
     showEventsSignal = pyqtSignal(int, bool)
     showBackgroundEventsSignal = pyqtSignal(bool)
     redrawSignal = pyqtSignal(bool,bool,bool,bool,bool)
+    redrawKeepViewSignal = pyqtSignal(bool,bool,bool,bool,bool)
 
     umlaute_dict : Final[Dict[str, str]] = {
        uchr(228): 'ae',  # U+00E4   \xc3\xa4
@@ -2417,6 +2418,7 @@ class tgraphcanvas(FigureCanvas):
         self.showEventsSignal.connect(self.showEvents)
         self.showBackgroundEventsSignal.connect(self.showBackgroundEvents)
         self.redrawSignal.connect(self.redraw, type=Qt.ConnectionType.QueuedConnection) # type: ignore
+        self.redrawKeepViewSignal.connect(self.redraw_keep_view, type=Qt.ConnectionType.QueuedConnection) # type: ignore
 
     #NOTE: empty Figure is initially drawn at the end of self.awsettingsload()
     #################################    FUNCTIONS    ###################################
@@ -5896,34 +5898,32 @@ class tgraphcanvas(FigureCanvas):
                                         # if last registered event of event_type has higher BT as next to be replayed one, we
                                         # expect a temperature decrease instead of an increase
                                         last_registered_event_index = len(self.specialeventstype) - 1 - self.specialeventstype[::-1].index(event_type)
-                                        if self.stemp2B[self.specialevents[last_registered_event_index]] > self.stemp2B[bge]:
+                                        if self.ctemp2[self.specialevents[last_registered_event_index]] > self.stemp2B[bge]:
                                             delta = self.ctemp2[-1] - self.stemp2B[bge]
                                             increasing = False
                                     except Exception: # pylint: disable=broad-except
                                         # a previous event of that type might not yet exist
                                         pass
-                                    next_byTemp_checked[event_type] = True
                             else: # before TP we switch back to time-based
                                 delta = timed
-                                next_byTemp_checked[event_type] = True
+                            next_byTemp_checked[event_type] = True
                         elif not next_byTemp_checked[event_type] and self.replayType == 2: # replay by ET (after TP)
                             if self.TPalarmtimeindex is not None:
-                                if len(self.ctemp1)> 0 and self.ctemp1[-1] is not None and len(self.stemp1)>bge:
+                                if len(self.ctemp1)> 0 and self.ctemp1[-1] is not None and len(self.stemp1B)>bge:
                                     delta = self.stemp1B[bge] - self.ctemp1[-1]
                                     try:
                                         # if last registered event of event_type has higher BT as next to be replayed one, we
                                         # expect a temperature decrease instead of an increase
                                         last_registered_event_index = len(self.specialeventstype) - 1 - self.specialeventstype[::-1].index(event_type)
-                                        if self.stemp1B[self.specialevents[last_registered_event_index]] > self.stemp1B[bge]:
+                                        if self.ctemp1[self.specialevents[last_registered_event_index]] > self.stemp1B[bge]:
                                             delta = self.ctemp1[-1] - self.stemp1B[bge]
                                             increasing = False
                                     except Exception: # pylint: disable=broad-except
                                         # a previous event of that type might not yet exist
                                         pass
-                                    next_byTemp_checked[event_type] = True
                             else: # before TP we switch back to time-based
                                 delta = timed
-                                next_byTemp_checked[event_type] = True
+                            next_byTemp_checked[event_type] = True
                         else:
                             delta = 99999 # don't trigger this one
 
@@ -6096,7 +6096,6 @@ class tgraphcanvas(FigureCanvas):
                                             # we ramp only within the limits
                                             coefficients = numpy.polyfit([last_time, next_time], [last_event_value, next_event_value], 1)
                                             ramps[event_type] = numpy.poly1d(coefficients)(now)
-
 
                 # now move the sliders to the new values (if any)
                 for k,v in slider_events.items():
@@ -8853,6 +8852,7 @@ class tgraphcanvas(FigureCanvas):
                     any(self.aw.extraDelta1[:len(self.extratimex)]) or
                     any(self.aw.extraDelta2[:len(self.extratimex)])))
 
+    @pyqtSlot(bool,bool,bool,bool,bool)
     def redraw_keep_view(self, *args:bool, **kwargs:bool) -> None:
         xlimit_min: Optional[float] = None
         xlimit: Optional[float] = None

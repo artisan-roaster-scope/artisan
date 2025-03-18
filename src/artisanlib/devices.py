@@ -1698,6 +1698,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.scale1NameComboBox.setEnabled(False)
             self.scale1ScanButton.setEnabled(True)
         else:
+            self.aw.scale1_name = None
             self.aw.scale1_model = None
             self.scale1NameComboBox.clear()
             self.scale1NameComboBox.setEnabled(False)
@@ -1708,9 +1709,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         if 0 <= i < len(self.scale1_devices) and self.aw.scale1_model is not None:
             self.aw.scale1_name = self.scale1_devices[i][0]
             self.aw.scale1_id = self.scale1_devices[i][1]
-            scale = self.aw.scale_manager.get_scale(self.aw.scale1_model, self.scale1_devices[i][1])
+            scale = self.aw.scale_manager.get_scale(self.aw.scale1_model, self.aw.scale1_id, self.aw.scale1_name)
             self.aw.scale_manager.set_scale1(scale)
             if scale is not None:
+                scale.set_connected_handler(lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format(self.aw.scale1_name),True,None))
+                scale.set_disconnected_handler(lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format(self.aw.scale1_name),True,None))
                 scale.connect()
         # i == -1 if self.scale1NameComboBox is empty!
         else:
@@ -1743,6 +1746,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.scale2NameComboBox.setEnabled(False)
             self.scale2ScanButton.setEnabled(True)
         else:
+            self.aw.scale2_name = None
             self.aw.scale2_model = None
             self.scale2NameComboBox.clear()
             self.scale2NameComboBox.setEnabled(False)
@@ -1753,7 +1757,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         if 0 <= i < len(self.scale2_devices) and self.aw.scale2_model is not None:
             self.aw.scale2_name = self.scale2_devices[i][0]
             self.aw.scale2_id = self.scale2_devices[i][1]
-            scale = self.aw.scale_manager.get_scale(self.aw.scale2_model, self.scale2_devices[i][1])
+            scale = self.aw.scale_manager.get_scale(self.aw.scale2_model, self.aw.scale2_id, self.aw.scale2_name)
             self.aw.scale_manager.set_scale2(scale)
             if scale is not None:
                 scale.connect()

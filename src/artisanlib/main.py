@@ -9953,15 +9953,29 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     if len(args) == 2:
                                         event_type = int(args[0])
                                         if 0 < event_type < 5:
+                                            updated:bool = False
                                             try:
                                                 state = toBool(eval(args[1])) # pylint: disable=eval-used
-                                                self.qmc.specialeventplaybackramp[event_type - 1] = state
+                                                if self.qmc.specialeventplaybackramp[event_type - 1] != state:
+                                                    self.qmc.specialeventplaybackramp[event_type - 1] = state
+                                                    updated = True
                                             except Exception: # pylint: disable=broad-except
                                                 value_str = args[1].strip()
                                                 if value_str.lower() in {'yes', 'true', 't', '1'}:
-                                                    self.qmc.specialeventplaybackramp[event_type - 1] = True
-                                                else:
+                                                    if not self.qmc.specialeventplaybackramp[event_type - 1]:
+                                                        self.qmc.specialeventplaybackramp[event_type - 1] = True
+                                                        updated = True
+                                                elif self.qmc.specialeventplaybackramp[event_type - 1]:
                                                     self.qmc.specialeventplaybackramp[event_type - 1] = False
+                                                    updated = True
+                                            if updated:
+                                                self.qmc.redrawKeepViewSignal.emit(
+                                                    False, # recomputeAllDeltas (default: True)
+                                                    False, # re_smooth_foreground (default: True)
+                                                    True,  # takelock (default: True)
+                                                    False, # forceRenewAxis (default: False)
+                                                    False, # re_smooth_background (default: False)
+                                                    )
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             # playback(<int>, <bool>) with <int> from {1,2,3,4} selecting one of the four event types

@@ -23,6 +23,10 @@ from typing import Optional, Union, List, Tuple, Final, Callable, TYPE_CHECKING
 if TYPE_CHECKING:
     from bleak.backends.characteristic import BleakGATTCharacteristic  # pylint: disable=unused-import
 
+try:
+    from PyQt6.QtCore import QObject # @UnusedImport @Reimport  @UnresolvedImport
+except ImportError:
+    from PyQt5.QtCore import QObject # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.ble_port import ClientBLE
 from artisanlib.async_comm import AsyncIterable, IteratorReader
@@ -121,8 +125,7 @@ ACAIA_SCALE_NAMES = [
 
 
 
-class AcaiaBLE(ClientBLE):
-
+class AcaiaBLE(QObject, ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
 
     # Acaia message constants
@@ -176,6 +179,12 @@ class AcaiaBLE(ClientBLE):
             self.add_device_description(ACAIA_SERVICE_UUID, acaia_name)
         self.add_notify(ACAIA_NOTIFY_UUID, self.notify_callback)
         self.add_write(ACAIA_SERVICE_UUID, ACAIA_WRITE_UUID)
+
+    def set_connected_handler(self, connected_handler:Optional[Callable[[], None]]) -> None:
+        self._connected_handler = connected_handler
+
+    def set_disconnected_handler(self, disconnected_handler:Optional[Callable[[], None]]) -> None:
+        self._disconnected_handler = disconnected_handler
 
 
     # protocol parser
@@ -517,23 +526,16 @@ class AcaiaBLE(ClientBLE):
 
 
 
-# QObject needs to go first in this mixing and AcaiaBLE and its super class are not allowed to hold __slots__
-class Acaia(Scale, AcaiaBLE): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+# AcaiaBLE and its super class are not allowed to hold __slots__
+class Acaia(AcaiaBLE, Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
-    def __init__(self, connected_handler:Optional[Callable[[], None]] = None,
+    def __init__(self, model:int, ident:Optional[str], name:Optional[str], connected_handler:Optional[Callable[[], None]] = None,
                        disconnected_handler:Optional[Callable[[], None]] = None):
-        Scale.__init__(self)
+        Scale.__init__(self, model, ident, name)
         AcaiaBLE.__init__(self, connected_handler = connected_handler, disconnected_handler=disconnected_handler)
-        self.address:Optional[str] = None # if set, connects are restricted to the device with this BLE address
-
-    def set_address(self, address:Optional[str]) -> None:
-        self.address = address
-
-    def get_address(self) -> Optional[str]:
-        return self.address
 
     def connect(self) -> None:
-        self.start(address=self.address)
+        self.start(address=self.ident)
 
     def disconnect(self) -> None:
         self.stop()

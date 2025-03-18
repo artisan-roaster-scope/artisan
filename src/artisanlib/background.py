@@ -765,7 +765,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.aw.qmc.backgroundETcurve = bool(self.backgroundETflag.isChecked())
         self.aw.qmc.backgroundBTcurve = bool(self.backgroundBTflag.isChecked())
         self.aw.qmc.backgroundShowFullflag = bool(self.backgroundFullflag.isChecked())
-        self.aw.qmc.redraw(recomputeAllDeltas=True)
+        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True)
 
     @pyqtSlot(int)
     def changeAlignEventidx(self, i:int) -> None:

@@ -16,12 +16,12 @@
 # Marko Luther, 2025
 
 import logging
-from typing import Final, List, Tuple, Optional
+from typing import Final, List, Tuple, Optional, Callable
 
 try:
-    from PyQt6.QtCore import QObject, pyqtSignal # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import pyqtSignal # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
-    from PyQt5.QtCore import QObject, pyqtSignal # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import pyqtSignal # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -38,22 +38,48 @@ ScaleSpecs = List[ScaleSpec]
 
 
 # NOTE: this class and all subclasses are not allowed to hold __slots__
-class Scale(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class Scale:
 
     weight_changed_signal = pyqtSignal(int)   # delivers new weight in g
     battery_changed_signal = pyqtSignal(int)  # delivers new batter level in %
     disconnected_signal = pyqtSignal()        # issued on disconnect
 
-    def __init__(self) -> None:
-        QObject.__init__(self)
+    def __init__(self, model:int, ident:Optional[str], name:Optional[str]):
+        self.model = model
+        self.ident = ident
+        self.name = name
 
+    def set_model(self, model:int) -> None:
+        self.model = model
+
+    def get_model(self) -> int:
+        return self.model
+
+    def set_ident(self, ident:Optional[str]) -> None:
+        self.ident = ident
+
+    def get_ident(self) -> Optional[str]:
+        return self.ident
+
+    def set_name(self, name:Optional[str]) -> None:
+        self.name = name
+
+    def get_name(self) -> Optional[str]:
+        return self.name
+
+    #---
+
+    def set_connected_handler(self, connected_handler:Optional[Callable[[], None]]) -> None:
+        pass
+
+    def set_disconnected_handler(self, disconnected_handler:Optional[Callable[[], None]]) -> None:
+        pass
 
     def connect(self) -> None:
         pass
 
     def disconnect(self) -> None:
         pass
-
 
 
 
@@ -85,12 +111,10 @@ class ScaleManager:
         return []
 
     @staticmethod
-    def get_scale(model:int, address:str) -> Optional[Scale]:
+    def get_scale(model:int, ident:str, name:str) -> Optional[Scale]:
         if model == 0:
             from artisanlib.acaia import Acaia
-            scale = Acaia()
-            scale.set_address(address)
-            return scale
+            return Acaia(model, ident, name)
         return None
 
     def set_scale1(self, scale:Optional[Scale]) -> None:
