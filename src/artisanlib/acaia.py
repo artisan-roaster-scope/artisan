@@ -534,10 +534,10 @@ class Acaia(AcaiaBLE, Scale): # pyright: ignore [reportGeneralTypeIssues] # Argu
         Scale.__init__(self, model, ident, name)
         AcaiaBLE.__init__(self, connected_handler = connected_handler, disconnected_handler=disconnected_handler)
 
-    def connect(self) -> None:
+    def connect_scale(self) -> None:
         self.start(address=self.ident)
 
-    def disconnect(self) -> None:
+    def disconnect_scale(self) -> None:
         self.stop()
 
     def weight_changed(self, new_value:int) -> None:
@@ -549,3 +549,6 @@ class Acaia(AcaiaBLE, Scale): # pyright: ignore [reportGeneralTypeIssues] # Argu
     def on_disconnect(self) -> None:
         self.disconnected_signal.emit()
         AcaiaBLE.on_disconnect(self)
+
+    def tare_scale(self) -> None:
+        self.send_tare()

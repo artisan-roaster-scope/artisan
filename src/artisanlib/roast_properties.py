@@ -114,7 +114,7 @@ class volumeCalculatorDlg(ArtisanDialog):
 
         # Scale Weight
         self.scale_weight = self.parent_dialog.scale_weight
-        self.scaleWeight = QLabel() # displays the current reading - tare of the connected scale
+        self.scaleWeight = QLabel() # displays the current reading
         if self.parent_dialog.acaia is not None:
             self.update_scale_weight()
             self.parent_dialog.acaia.weight_changed_signal.connect(self.acaia_weight_changed)

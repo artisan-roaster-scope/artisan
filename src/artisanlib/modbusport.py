@@ -304,7 +304,6 @@ class modbusport:
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         self._client = None
-        #del self._asyncLoopThread
         self._asyncLoopThread = None
 
     def clearCommError(self) -> None:

@@ -26,7 +26,8 @@ from typing import Final, Optional, List, Tuple, cast, TYPE_CHECKING
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
 
-from artisanlib.util import deltaLabelUTF8, setDeviceDebugLogLevel, argb_colorname2rgba_colorname, rgba_colorname2argb_colorname, toInt
+from artisanlib.util import (deltaLabelUTF8, setDeviceDebugLogLevel, argb_colorname2rgba_colorname, rgba_colorname2argb_colorname,
+    toInt, weight_units, convertWeight)
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import MyContentLimitedQComboBox, MyQComboBox, MyQDoubleSpinBox, wait_cursor
 from artisanlib.scale import SUPPORTED_SCALES, ScaleSpecs
@@ -1453,6 +1454,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
         self.scale1_devices:ScaleSpecs = [] # discovered scale1 devices
         self.scale2_devices:ScaleSpecs = [] # discovered scale2 devices
+        self.scale1_weight:Optional[float] = None # weight of scale 1 in g
+        self.scale2_weight:Optional[float] = None # weight of scale 2 in g
 
         scale1ModelLabel = QLabel(QApplication.translate('Label','Model'))
         self.scale1ModelComboBox = QComboBox()
@@ -1463,6 +1466,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.scale1NameComboBox.setMinimumWidth(150)
         self.scale1ScanButton = QPushButton(QApplication.translate('Button', 'Scan'))
         self.scale1ScanButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.scale1Weight = QLabel() # displays the current reading
+        self.scale1Weight.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        self.scale1Weight.setMinimumWidth(40)
+        self.scale1Weight.setEnabled(False)
+        self.scale1TareButton = QPushButton(QApplication.translate('Button', 'Tare'))
+        self.scale1TareButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.scale1TareButton.setEnabled(False)
         if self.aw.scale1_model is None:
             self.scale1NameComboBox.setEnabled(False)
             self.scale1ScanButton.setEnabled(False)
@@ -1475,6 +1485,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.scale1ModelComboBox.currentIndexChanged.connect(self.scale1ModelChanged)
         self.scale1NameComboBox.currentIndexChanged.connect(self.scale1NameChanged)
         self.scale1ScanButton.clicked.connect(self.scanScale1)
+        self.scale1TareButton.clicked.connect(self.tareScale1)
+        self.update_scale1_weight(None)
 
         if self.aw.scale1_name and self.aw.scale1_id:
             self.updateScale1devices([(self.aw.scale1_name, self.aw.scale1_id)])
@@ -1485,11 +1497,18 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         scale1Grid.addWidget(self.scale1NameLabel,1,0)
         scale1Grid.addWidget(self.scale1NameComboBox,1,1)
         scale1Grid.addWidget(self.scale1ScanButton,1,2)
+        scale1Grid.addWidget(self.scale1Weight,1,3,Qt.AlignmentFlag.AlignCenter)
+        scale1Grid.addWidget(self.scale1TareButton,1,4,Qt.AlignmentFlag.AlignRight)
+        scale1Grid.setHorizontalSpacing(10)
+        scale1Grid.setVerticalSpacing(10)
+        scale1Grid.setContentsMargins(10,10,10,10)
         scale1HLayout = QHBoxLayout()
         scale1HLayout.addLayout(scale1Grid)
         scale1HLayout.addStretch()
+        scale1HLayout.setContentsMargins(0,0,0,0)
         scale1Layout = QVBoxLayout()
         scale1Layout.addLayout(scale1HLayout)
+        scale1Layout.setContentsMargins(0,0,0,0)
 
         scale2ModelLabel = QLabel(QApplication.translate('Label','Model'))
         self.scale2ModelComboBox = QComboBox()
@@ -1500,6 +1519,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.scale2NameComboBox.setMinimumWidth(150)
         self.scale2ScanButton = QPushButton(QApplication.translate('Button', 'Scan'))
         self.scale2ScanButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.scale2Weight = QLabel() # displays the current reading
+        self.scale2Weight.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        self.scale2Weight.setMinimumWidth(40)
+        self.scale2Weight.setEnabled(False)
+        self.scale2TareButton = QPushButton(QApplication.translate('Button', 'Tare'))
+        self.scale2TareButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.scale2TareButton.setEnabled(False)
         if self.aw.scale2_model is None:
             self.scale2NameComboBox.setEnabled(False)
             self.scale2ScanButton.setEnabled(False)
@@ -1512,6 +1538,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.scale2ModelComboBox.currentIndexChanged.connect(self.scale2ModelChanged)
         self.scale2NameComboBox.currentIndexChanged.connect(self.scale2NameChanged)
         self.scale2ScanButton.clicked.connect(self.scanScale2)
+        self.scale2TareButton.clicked.connect(self.tareScale2)
+        self.update_scale2_weight(None)
 
         if self.aw.scale2_name and self.aw.scale2_id:
             self.updateScale2devices([(self.aw.scale2_name, self.aw.scale2_id)])
@@ -1522,11 +1550,18 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         scale2Grid.addWidget(self.scale2NameLabel,1,0)
         scale2Grid.addWidget(self.scale2NameComboBox,1,1)
         scale2Grid.addWidget(self.scale2ScanButton,1,2)
+        scale2Grid.addWidget(self.scale2Weight,1,3,Qt.AlignmentFlag.AlignCenter)
+        scale2Grid.addWidget(self.scale2TareButton,1,4,Qt.AlignmentFlag.AlignRight)
+        scale2Grid.setHorizontalSpacing(10)
+        scale2Grid.setVerticalSpacing(10)
+        scale2Grid.setContentsMargins(10,10,10,10)
         scale2HLayout = QHBoxLayout()
+        scale2HLayout.setContentsMargins(0,0,0,0)
         scale2HLayout.addLayout(scale2Grid)
         scale2HLayout.addStretch()
         scale2Layout = QVBoxLayout()
         scale2Layout.addLayout(scale2HLayout)
+        scale2Layout.setContentsMargins(0,0,0,0)
 
         self.taskWebDisplayGreenURL = QLabel()
         self.taskWebDisplayGreenURL.setOpenExternalLinks(True)
@@ -1712,14 +1747,50 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             scale = self.aw.scale_manager.get_scale(self.aw.scale1_model, self.aw.scale1_id, self.aw.scale1_name)
             self.aw.scale_manager.set_scale1(scale)
             if scale is not None:
-                scale.set_connected_handler(lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format(self.aw.scale1_name),True,None))
-                scale.set_disconnected_handler(lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format(self.aw.scale1_name),True,None))
-                scale.connect()
+                scale.set_connected_handler(self.scale1connected)
+                scale.set_disconnected_handler(self.scale1disconnected)
+                scale.weight_changed_signal.connect(self.scale1_weight_changed) # type:ignore[call-overload]
+                scale.connect_scale()
         # i == -1 if self.scale1NameComboBox is empty!
         else:
             scale1 = self.aw.scale_manager.get_scale1()
             if scale1 is not None:
-                scale1.disconnect()
+                scale1.weight_changed_signal.disconnect() # type:ignore[call-overload]
+                scale1.disconnect_scale()
+
+    def scale1connected(self) -> None:
+        self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format(self.aw.scale1_name),True,None)
+        self.scale1Weight.setEnabled(True)
+        self.scale1TareButton.setEnabled(True)
+
+    def scale1disconnected(self) -> None:
+        self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format(self.aw.scale1_name),True,None)
+        self.scale1Weight.setEnabled(False)
+        self.scale1TareButton.setEnabled(False)
+        self.update_scale1_weight(None)
+
+    @pyqtSlot(int)
+    def scale1_weight_changed(self, w:int) -> None:
+        self.update_scale1_weight(w)
+
+    # returns formated weight converted to current weight unit
+    def format_scale_weight(self, w:Optional[float]) -> str:
+        if w is None:
+            return ''
+        unit = weight_units.index(self.aw.qmc.weight[2])
+        if unit == 0: # g selected
+            # metric
+            return f'{w:.0f}g' # never show decimals for g
+        if unit == 1: # kg selected
+            # metric (always keep the accuracy to the g
+            return f'{w/1000:.3f}kg'
+        # non-metric
+        v = convertWeight(w,0,weight_units.index(self.aw.qmc.weight[2]))
+        return f'{v:.2f}{self.aw.qmc.weight[2].lower()}'
+
+    def update_scale1_weight(self, weight:Optional[float]) -> None:
+        self.scale1_weight = weight
+        self.scale1Weight.setText(self.format_scale_weight(self.scale1_weight))
 
     def updateScale1devices(self, devices:ScaleSpecs) -> None:
         self.scale1_devices = devices
@@ -1738,6 +1809,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.scale1NameComboBox.setEnabled(True)
                 else:
                     self.scale1NameComboBox.setEnabled(False)
+
+    @pyqtSlot(bool)
+    def tareScale1(self, _:bool = False) -> None:
+        scale = self.aw.scale_manager.get_scale1()
+        if scale is not None:
+            scale.tare_scale()
 
     @pyqtSlot(int)
     def scale2ModelChanged(self, i:int) -> None:
@@ -1760,12 +1837,35 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             scale = self.aw.scale_manager.get_scale(self.aw.scale2_model, self.aw.scale2_id, self.aw.scale2_name)
             self.aw.scale_manager.set_scale2(scale)
             if scale is not None:
-                scale.connect()
+                scale.set_connected_handler(self.scale2connected)
+                scale.set_disconnected_handler(self.scale2disconnected)
+                scale.weight_changed_signal.connect(self.scale2_weight_changed) # type:ignore[call-overload]
+                scale.connect_scale()
         # i == -1 if self.scale2NameComboBox is empty!
         else:
             scale2 = self.aw.scale_manager.get_scale2()
             if scale2 is not None:
-                scale2.disconnect()
+                scale2.weight_changed_signal.disconnect() # type:ignore[call-overload]
+                scale2.disconnect_scale()
+
+    @pyqtSlot(int)
+    def scale2_weight_changed(self, w:int) -> None:
+        self.update_scale2_weight(w)
+
+    def update_scale2_weight(self, weight:Optional[float]) -> None:
+        self.scale2_weight = weight
+        self.scale2Weight.setText(self.format_scale_weight(self.scale2_weight))
+
+    def scale2connected(self) -> None:
+        self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format(self.aw.scale2_name),True,None)
+        self.scale2Weight.setEnabled(True)
+        self.scale2TareButton.setEnabled(True)
+
+    def scale2disconnected(self) -> None:
+        self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format(self.aw.scale2_name),True,None)
+        self.scale2Weight.setEnabled(False)
+        self.scale2TareButton.setEnabled(False)
+        self.update_scale2_weight(None)
 
     def updateScale2devices(self, devices:ScaleSpecs) -> None:
         self.scale2_devices = devices
@@ -1785,6 +1885,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 else:
                     self.scale2NameComboBox.setEnabled(False)
 
+    @pyqtSlot(bool)
+    def tareScale2(self, _:bool = False) -> None:
+        scale = self.aw.scale_manager.get_scale2()
+        if scale is not None:
+            scale.tare_scale()
 
     @pyqtSlot(bool)
     def taskWebDisplayGreen(self, b:bool = False) -> None:

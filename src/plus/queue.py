@@ -141,7 +141,7 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                                     config.app_window.sendmessage(
                                         QApplication.translate(
                                             'Plus',
-                                            'Roast successfully upload to {}'
+                                            'Roast successfully uploaded to {}'
                                         ).format(config.app_name)
                                     )  # @UndefinedVariable
                                 # successfully transmitted, we add/update the

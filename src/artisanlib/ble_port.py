@@ -161,8 +161,8 @@ class BLE:
             blacklist:Set[str], # list of client addresses to ignore as they don't offer the required service
             case_sensitive:bool=True,
             disconnected_callback:Optional[Callable[[BleakClient], None]] = None,
-            scan_timeout:float=10,
-            connect_timeout:float=3,
+            scan_timeout:float=3,
+            connect_timeout:float=2,
             address:Optional[str] = None # if given, connect only to the device with this ble address
             ) -> Tuple[Optional[BleakClient], Optional[str]]:
         if hasattr(self, '_asyncLoopThread') and self._asyncLoopThread is None:
@@ -284,7 +284,7 @@ class ClientBLE:
 
 
     # connect and re-connect while self._running to BLE
-    async def _connect(self, case_sensitive:bool=True, scan_timeout:float=10, connect_timeout:float=4, address:Optional[str] = None) -> None:
+    async def _connect(self, case_sensitive:bool=True, scan_timeout:float=3, connect_timeout:float=2, address:Optional[str] = None) -> None:
         blacklist:Set[str] = set()
         while self._running:
             # scan and connect
@@ -384,7 +384,7 @@ class ClientBLE:
         return None
 
     async def _keep_alive(self) -> None:
-        while self._heartbeat_frequency > 0:
+        while self._heartbeat_frequency > 0 and self._running:
             await asyncio.sleep(self._heartbeat_frequency)
             self.heartbeat()
 
@@ -394,7 +394,7 @@ class ClientBLE:
             self._keep_alive())
 
 
-    def start(self, case_sensitive:bool=True, scan_timeout:float=10, connect_timeout:float=4, address:Optional[str] = None) -> None:
+    def start(self, case_sensitive:bool=True, scan_timeout:float=3, connect_timeout:float=2, address:Optional[str] = None) -> None:
         _log.debug('start')
         if self._running:
             _log.error('BLE client already running')
@@ -420,7 +420,6 @@ class ClientBLE:
             if self._ble_client is None:
                 ble.terminate_scan() # we stop ongoing scanning
             self._disconnect()
-            #del self._async_loop_thread # on this level the released object should be automatically collected by the GC
             self._async_loop_thread = None
             self._ble_client = None
             self._connected_service_uuid = None
