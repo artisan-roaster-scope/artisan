@@ -1773,7 +1773,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     def scale1_weight_changed(self, w:int) -> None:
         self.update_scale1_weight(w)
 
-    # returns formated weight converted to current weight unit
+    # returns formatted weight converted to current weight unit
     def format_scale_weight(self, w:Optional[float]) -> str:
         if w is None:
             return ''
