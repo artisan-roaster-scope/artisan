@@ -18213,6 +18213,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.gasMix_setup = toInt(settings.value('gasMix_setup',self.qmc.gasMix_setup))
             self.qmc.energyresultunit_setup = toInt(settings.value('energyresultunit_setup',self.qmc.energyresultunit_setup))
 #            self.qmc.energytablecolumnwidths = [toInt(x) for x in toList(settings.value("energytablecolumnwidths",self.qmc.energytablecolumnwidths))]
+            self.qmc.perKgRoastMode = toBool(settings.value('perKgRoastMode',self.qmc.perKgRoastMode))
             settings.endGroup()
             self.qmc.restoreEnergyLoadDefaults()
             self.qmc.restoreEnergyProtocolDefaults()
@@ -19979,6 +19980,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'electricEnergyMix_setup',self.qmc.electricEnergyMix_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'gasMix_setup',self.qmc.gasMix_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'energyresultunit_setup',self.qmc.energyresultunit_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'perKgRoastMode',self.qmc.perKgRoastMode, read_defaults)
             settings.endGroup()
 #--- END GROUP EnergyUse
 

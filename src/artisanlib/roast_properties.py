@@ -600,7 +600,8 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         self.batcheditmode = False # a click to the batch label enables the batcheditmode
 
-        self.perKgRoastMode = False # if true only the amount during the roast and not the full batch (incl. preheat and BBP) are displayed), toggled by click on the result widget
+        self.org_perKgRoastMode = self.aw.qmc.perKgRoastMode
+        self.perKgRoastMode = self.aw.qmc.perKgRoastMode # if true only the amount during the roast and not the full batch (incl. preheat and BBP) are displayed), toggled by click on the result widget
 
         self.acaia:'Optional[Acaia]' = None # the BLE interface # noqa: UP037
         self.scale_weight:Optional[float] = None # weight received from a connected scale
@@ -2554,6 +2555,8 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         self.aw.qmc.weight = self.org_weight
         self.aw.qmc.volume = self.org_volume
+
+        self.aw.qmc.perKgRoastMode = self.org_perKgRoastMode
 
         self.aw.qmc.specialevents = self.org_specialevents
         self.aw.qmc.specialeventstype = self.org_specialeventstype
@@ -5265,6 +5268,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.roastbatchprefix = self.batchprefixedit.text()
             self.aw.qmc.roastbatchnr = self.batchcounterSpinBox.value()
             self.aw.qmc.roastbatchpos = self.batchposSpinBox.value()
+
+        self.aw.qmc.perKgRoastMode = self.perKgRoastMode
 
         # if custom events were changed we clear the event flag position cache
         if self.aw.qmc.specialevents != self.org_specialevents:

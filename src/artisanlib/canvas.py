@@ -2308,6 +2308,7 @@ class tgraphcanvas(FigureCanvas):
                           QApplication.translate('Label','Continuous'),
                           QApplication.translate('Label','Roast Event'),
                           QApplication.translate('Label','Meter')]
+        self.perKgRoastMode:bool = False # if true only the amount during the roast and not the full batch (incl. preheat and BBP) are displayed), toggled by click on the result widget
 
         ## working variables (stored in .alog profiles):
         # Burners
