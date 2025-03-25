@@ -2228,10 +2228,14 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.plus_coffee_selected = cd.get('hr_id','')
             origin = ''
             if 'origin' in cd and cd['origin'] is not None:
-                origin = cd['origin'] + ' '
+                origin = cd['origin']
             picked = ''
-            if 'crop_date' in cd and 'picked' in cd['crop_date'] and len(cd['crop_date']['picked']) > 0 and cd['crop_date']['picked'][0] is not None:
+            if 'crop_date' in cd and 'picked' in cd['crop_date'] and len(cd['crop_date']['picked']) > 0 and cd['crop_date']['picked'][0] is not None and plus.stock.has_duplicate_origin_label(cd):
                 picked = f"{cd['crop_date']['picked'][0]}, "
+                if origin:
+                    origin = f'{origin} '
+            elif origin:
+                picked = ', '
             self.plus_coffee_selected_label = f"{origin}{picked}{cd.get('label','')}"
             self.plus_blend_selected_label = None
             self.plus_blend_selected_spec = None

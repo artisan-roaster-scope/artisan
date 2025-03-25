@@ -39,7 +39,7 @@ import logging
 from artisanlib.util import (decodeLocal, encodeLocal, getDirectory, is_int_list, is_float_list, render_weight,
     weight_units, float2float, convertWeight)
 from plus import config, connection, controller, util
-from typing import Final, TypedDict, List, Union, Optional, Tuple, Dict, TextIO
+from typing import Final, TypedDict, List, Union, Optional, Tuple, Dict, TextIO, Set
 from typing_extensions import NotRequired # Python <=3.10
 
 
@@ -138,6 +138,7 @@ BlendStructure = Tuple[str, Tuple[Blend, StockItem, float, CoffeeLabelDict, floa
 BlendList = List[Union[str, List[List[Union[str,float]]]]]
 
 stock:Optional[Stock] = None  # holds the dict with the current stock data (coffees, blends,..)
+duplicate_coffee_origin_labels:Set[str] = set() # set of coffee origin+labels which need to be discrimiated by picked year if available
 
 # in kg; only stock larger than stock_epsilon (10g)
 # will be considered, the rest ignored
@@ -147,6 +148,24 @@ stock_epsilon = 0.01
 #
 
 # updates the stock cache
+
+
+# re-calculate duplicate coffee origin labels
+def update_duplicate_coffee_origin_labels() -> None:
+    global duplicate_coffee_origin_labels  # pylint: disable=global-statement
+    duplicate_coffee_origin_labels = set()
+    if stock is not None and 'coffees' in stock:
+        seen = set()
+        for c in stock['coffees']:
+            origin_label = f"{c.get('origin', '')}{c.get('label', '')}"
+            if origin_label in seen:
+                duplicate_coffee_origin_labels.add(origin_label)
+            else:
+                seen.add(origin_label)
+
+def has_duplicate_origin_label(c:Coffee) -> bool:
+    origin_label = f"{c.get('origin', '')}{c.get('label', '')}"
+    return origin_label in duplicate_coffee_origin_labels
 
 
 ####### Stock Update Thread
@@ -207,6 +226,7 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                         stock = j['result']
                         if stock is not None:
                             stock['retrieved'] = time.time()
+                            update_duplicate_coffee_origin_labels()
                         _log.debug('-> retrieved')
 #                        _log.debug("stock = %s", stock)
                     finally:
@@ -285,6 +305,7 @@ def load() -> None:
         f:TextIO
         with open(stock_cache_path, encoding='utf-8') as f:
             stock = json.load(f)
+            update_duplicate_coffee_origin_labels()
     except Exception as e:  # pylint: disable=broad-except
         _log.info(e)
     finally:
@@ -584,7 +605,7 @@ def coffeeLabel(c:Coffee) -> str:
         pass
     if origin != '':
         try:
-            if 'crop_date' in c:
+            if 'crop_date' in c and has_duplicate_origin_label(c):
                 cy = c['crop_date']
                 if (
                     'picked' in cy
@@ -653,7 +674,7 @@ def getCoffees(weight_unit_idx:int, store:Optional[str]=None) -> List[Tuple[str,
                         pass
                     if origin != '':
                         try:
-                            if 'crop_date' in c:
+                            if 'crop_date' in c and has_duplicate_origin_label(c):
                                 cy = c['crop_date']
                                 if (
                                     'picked' in cy

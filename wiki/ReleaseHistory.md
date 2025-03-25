@@ -53,6 +53,8 @@ v3.1.1
   - improved accuracy on rendering [artisan.plus](https://artisan.plus) blend component weights
   - improved Cropster importer
   - event replay not at any time ensures that only future events are replayed. As the set of future events may change on moving the background profile, an event can be replayed again. In previous Artisan versions, events did replay only once.
+  - persist Energy Tab summary choice
+  - suppresses pick year from [artisan.plus](https://artisan.plus) beans pop up and roast name suggestion if origin/name combination is unique
 
 * FIXES
   - ensure complete reset to defaults in energy tab loads tab
