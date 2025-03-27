@@ -1718,15 +1718,15 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         containerRoastedHLayout.addStretch()
 
         # Bucket Hobbock, Container, Bin
-        containerGreen = QGroupBox('Container Green')
+        containerGreen = QGroupBox(QApplication.translate('GroupBox','Container Green'))
         containerGreen.setLayout(containerGreenHLayout)
-        containerRoasted = QGroupBox('Container Roasted')
+        containerRoasted = QGroupBox(QApplication.translate('GroupBox','Container Roasted'))
         containerRoasted.setLayout(containerRoastedHLayout)
 
 
-        taskGreen = QGroupBox('Task Green')
+        taskGreen = QGroupBox(QApplication.translate('GroupBox', 'Task Green'))
         taskGreen.setLayout(taskWebDisplayGreenVLayout)
-        taskRoasted = QGroupBox('Task Roasted')
+        taskRoasted = QGroupBox(QApplication.translate('GroupBox', 'Task Roasted'))
         taskRoasted.setLayout(taskWebDisplayRoastedVLayout)
         tab8Layout = QGridLayout()
         tab8Layout.addWidget(scale1,0,0)
