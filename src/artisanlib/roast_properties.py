@@ -43,7 +43,7 @@ import plus.blend
 from artisanlib.util import (deltaLabelUTF8, stringfromseconds,stringtoseconds, toInt, toFloat, abbrevString,
         scaleFloat2String, comma2dot, weight_units, render_weight, weight_units_lower, volume_units, float2floatWeightVolume, float2float,
         convertWeight, convertVolume)
-from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog
+from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog, tareDlg
 from artisanlib.widgets import MyQComboBox, ClickableQLabel, ClickableTextEdit, MyTableWidgetItemNumber
 
 
@@ -54,7 +54,7 @@ from uic import MeasureDialog # pyright: ignore[attr-defined] # pylint: disable=
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 try:
-    from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent, QLocale # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent, QLocale, QSignalBlocker # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QColor, QIntValidator, QRegularExpressionValidator, QKeySequence, QPalette # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
                                  QHBoxLayout, QVBoxLayout, QHeaderView, QLabel, QLineEdit, QTextEdit, QListView,  # @UnusedImport @Reimport  @UnresolvedImport
@@ -62,7 +62,7 @@ try:
                                  QGroupBox, QToolButton) # @UnusedImport @Reimport  @UnresolvedImport
 #    from PyQt6 import sip # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
-    from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent, QLocale # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent, QLocale, QSignalBlocker # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QColor, QIntValidator, QRegularExpressionValidator, QKeySequence, QPalette # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QComboBox, QDialogButtonBox, QGridLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QHBoxLayout, QVBoxLayout, QHeaderView, QLabel, QLineEdit, QTextEdit, QListView, # @UnusedImport @Reimport  @UnresolvedImport
@@ -1156,19 +1156,11 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         # container tare
         self.tareComboBox = QComboBox()
-        self.tareComboBox.addItem('<edit> TARE')
-        self.tareComboBox.addItem('')
-        self.tareComboBox.insertSeparator(1)
         self.tareComboBox.setMaximumWidth(80)
         self.tareComboBox.setMinimumWidth(80)
-        self.tareComboBox.addItems(self.aw.qmc.container_names)
-        width = self.tareComboBox.minimumSizeHint().width()
-        tare_view: Optional[QAbstractItemView] = self.tareComboBox.view()
-        if tare_view is not None:
-            tare_view.setMinimumWidth(width)
+        self.updateTarePopup()
         self.tareComboBox.setCurrentIndex(self.aw.qmc.container_idx + 3)
         self.tareComboBox.currentIndexChanged.connect(self.tareChanged)
-        self.tarePopupEnabled = True # controls if the popup will process tareChange events
 
         # in button
         inButton = QPushButton(QApplication.translate('Button', 'in'))
@@ -1609,6 +1601,9 @@ class editGraphDlg(ArtisanResizeablDialog):
         # some tabs are not rendered at all on Windows using Qt v6.5.1 (https://bugreports.qt.io/projects/QTBUG/issues/QTBUG-114204?filter=allissues)
         QTimer.singleShot(50, self.setActiveTab)
 
+    def get_scale_weight(self) -> Optional[float]:
+        return self.scale_weight
+
     @pyqtSlot()
     def setActiveTab(self) -> None:
         self.TabWidget.setCurrentIndex(self.activeTab)
@@ -1820,7 +1815,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             else:
                 v = convertWeight(v,0,weight_units.index(self.aw.qmc.weight[2]))
                 v_formatted = f'{v:.2f}'
-            self.updateWeightLCD(v_formatted, self.aw.qmc.weight[2], self.scale_weight - tare)
+            self.updateWeightLCD(v_formatted, self.aw.qmc.weight[2].lower(), self.scale_weight - tare)
         else:
             self.updateWeightLCD('----')
 
@@ -2640,15 +2635,42 @@ class editGraphDlg(ArtisanResizeablDialog):
             else:
                 super().keyPressEvent(event)
 
+    @staticmethod
+    def container_menu_idx(i:int) -> int: # takes a container idx and returns the index of the corresponding menu item
+        return i + 3 # skip <edit>, separator and empty index
+
+    # update tare popup
+    def updateTarePopup(self) -> None:
+        prev_item_count = self.tareComboBox.count()
+        with QSignalBlocker(self.tareComboBox): # blocking all signals, especially its currentIndexChanged connected to tareChanged which would lead to cycles
+            self.tareComboBox.clear()
+            self.tareComboBox.addItem(f"<{QApplication.translate('Label','edit')}>")
+            self.tareComboBox.insertSeparator(2)
+            self.tareComboBox.addItem('')
+            self.tareComboBox.addItems(self.aw.qmc.container_names)
+            width = self.tareComboBox.minimumSizeHint().width()
+            view: Optional[QAbstractItemView] = self.tareComboBox.view()
+            if view is not None:
+                view.setMinimumWidth(width)
+        if self.tareComboBox.count() > prev_item_count:
+            # if item list is longer (new items added), we select the last item
+            self.aw.qmc.container_idx = self.tareComboBox.count() - 4
+        if len(self.aw.qmc.container_weights) > self.aw.qmc.container_idx:
+            self.tareComboBox.setCurrentIndex(self.container_menu_idx(self.aw.qmc.container_idx))
+        else:
+            self.tareComboBox.setCurrentIndex(2) # reset to the empty entry
+            self.aw.qmc.container_idx = -1
+
     @pyqtSlot(int)
     def tareChanged(self, i:int) -> None:
-        if i == 0 and self.tarePopupEnabled:
-            tareDLG = tareDlg(self,self.aw,self)
+        if i == 0:
+            tareDLG = tareDlg(self,self.aw, self.get_scale_weight)
+            tareDLG.tare_updated_signal.connect(self.updateTarePopup)
             tareDLG.show()
-            # reset index and popup
-            self.tareComboBox.setCurrentIndex(self.aw.qmc.container_idx + 3)
-        # update displayed scale weight
-        self.update_scale_weight()
+        else:
+            self.aw.qmc.container_idx = i - 3
+            # update displayed scale weight
+            self.update_scale_weight()
 
     @pyqtSlot(int)
     def changeWeightUnit(self, i:int) -> None:
@@ -5489,158 +5511,7 @@ class BlendsComboBox(StockComboBox):
         blend_items:List[str] = plus.stock.getBlendLabels(plus_blends)
         return [''] + blend_items
 
-##########################################################################
-#####################  VIEW Tare  ########################################
-##########################################################################
 
-
-class tareDlg(ArtisanDialog):
-    def __init__(self, parent:editGraphDlg, aw:'ApplicationWindow', tarePopup:editGraphDlg) -> None:
-        super().__init__(parent, aw)
-        self.parent_dialog = parent
-        self.tarePopup = tarePopup
-        self.setModal(True)
-        self.setWindowTitle(QApplication.translate('Form Caption','Tare Setup'))
-
-        self.taretable = QTableWidget()
-        self.taretable.setTabKeyNavigation(True)
-        self.createTareTable()
-
-        self.taretable.itemSelectionChanged.connect(self.selectionChanged)
-
-        addButton = QPushButton(QApplication.translate('Button','Add'))
-        addButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.delButton = QPushButton(QApplication.translate('Button','Delete'))
-        self.delButton.setDisabled(True)
-        self.delButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-
-        addButton.clicked.connect(self.addTare)
-        self.delButton.clicked.connect(self.delTare)
-
-        okButton = QPushButton(QApplication.translate('Button','OK'))
-        cancelButton = QPushButton(QApplication.translate('Button','Cancel'))
-        cancelButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        okButton.clicked.connect(self.accept)
-        cancelButton.clicked.connect(self.reject)
-        contentbuttonLayout = QHBoxLayout()
-        contentbuttonLayout.addStretch()
-        contentbuttonLayout.addWidget(addButton)
-        contentbuttonLayout.addWidget(self.delButton)
-        contentbuttonLayout.addStretch()
-
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addStretch()
-        buttonLayout.addWidget(cancelButton)
-        buttonLayout.addWidget(okButton)
-        layout = QVBoxLayout()
-        layout.addWidget(self.taretable)
-        layout.addLayout(contentbuttonLayout)
-        layout.addLayout(buttonLayout)
-        self.setLayout(layout)
-
-    @pyqtSlot()
-    def selectionChanged(self) -> None:
-        if len(self.taretable.selectedRanges()) > 0:
-            self.delButton.setDisabled(False)
-        else:
-            self.delButton.setDisabled(False)
-
-    @pyqtSlot()
-    def accept(self) -> None:
-        self.close()
-        super().accept()
-
-    @pyqtSlot('QCloseEvent')
-    def closeEvent(self,_:Optional['QCloseEvent'] = None) -> None:
-        self.saveTareTable()
-        # update popup
-        self.tarePopup.tarePopupEnabled = False
-        self.tarePopup.tareComboBox.clear()
-        self.tarePopup.tareComboBox.addItem('<edit> TARE')
-        self.tarePopup.tareComboBox.insertSeparator(2)
-        self.tarePopup.tareComboBox.addItem('')
-        self.tarePopup.tareComboBox.addItems(self.aw.qmc.container_names)
-        width = self.tarePopup.tareComboBox.minimumSizeHint().width()
-        view: Optional[QAbstractItemView] = self.tarePopup.tareComboBox.view()
-        if view is not None:
-            view.setMinimumWidth(width)
-        self.tarePopup.tareComboBox.setCurrentIndex(2) # reset to the empty entry
-        self.aw.qmc.container_idx = -1
-        self.tarePopup.tarePopupEnabled = True
-        self.accept()
-
-    @pyqtSlot(bool)
-    def addTare(self, _:bool = False) -> None:
-        rows = self.taretable.rowCount()
-        self.taretable.setRowCount(rows + 1)
-        #add widgets to the table
-        name = QLineEdit()
-        name.setAlignment(Qt.AlignmentFlag.AlignRight)
-        name.setText('name')
-        w,_d,_m = self.aw.scale.readWeight(self.parent_dialog.scale_weight) # read value from scale in 'g'
-        weight = QLineEdit()
-        weight.setAlignment(Qt.AlignmentFlag.AlignRight)
-        if w > -1:
-            weight.setText(str(w))
-        else:
-            weight.setText(str(0))
-        weight.setValidator(QIntValidator(0,999,weight))
-        self.taretable.setCellWidget(rows,0,name)
-        self.taretable.setCellWidget(rows,1,weight)
-
-    @pyqtSlot(bool)
-    def delTare(self, _:bool = False) -> None:
-        selected = self.taretable.selectedRanges()
-        if len(selected) > 0:
-            bindex = selected[0].topRow()
-            if bindex >= 0:
-                self.taretable.removeRow(bindex)
-
-    def saveTareTable(self) -> None:
-        tars = self.taretable.rowCount()
-        names = []
-        weights = []
-        for i in range(tars):
-            nameWidget = cast(QLineEdit, self.taretable.cellWidget(i,0))
-            name = nameWidget.text()
-            weightWidget = cast(QLineEdit, self.taretable.cellWidget(i,1))
-            weight = int(round(float(comma2dot(weightWidget.text()))))
-            names.append(name)
-            weights.append(weight)
-        self.aw.qmc.container_names = names
-        self.aw.qmc.container_weights = weights
-
-    def createTareTable(self) -> None:
-        self.taretable.clear()
-        self.taretable.setRowCount(len(self.aw.qmc.container_names))
-        self.taretable.setColumnCount(2)
-        self.taretable.setHorizontalHeaderLabels([QApplication.translate('Table','Name'),
-                                                         QApplication.translate('Table','Weight')])
-        self.taretable.setAlternatingRowColors(True)
-        self.taretable.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
-        self.taretable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
-        self.taretable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
-        self.taretable.setShowGrid(True)
-        vheader: Optional[QHeaderView] = self.taretable.verticalHeader()
-        if vheader is not None:
-            vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
-        for i, cn in enumerate(self.aw.qmc.container_names):
-            #add widgets to the table
-            name = QLineEdit()
-            name.setAlignment(Qt.AlignmentFlag.AlignRight)
-            name.setText(cn)
-            weight = QLineEdit()
-            weight.setAlignment(Qt.AlignmentFlag.AlignRight)
-            weight.setText(str(self.aw.qmc.container_weights[i]))
-            weight.setValidator(QIntValidator(0,999,weight))
-
-            self.taretable.setCellWidget(i,0,name)
-            self.taretable.setCellWidget(i,1,weight)
-        header: Optional[QHeaderView] = self.taretable.horizontalHeader()
-        if header is not None:
-            header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
-            header.setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)
-        self.taretable.setColumnWidth(1,65)
 
 ########################################################################################
 #####################  ENERGY Measuring Dialog  ########################################

@@ -2444,6 +2444,10 @@ class tgraphcanvas(FigureCanvas):
              device_id in self.specialDevices
              )
 
+    def get_container_weight(self, container_idx:int) -> Optional[int]:
+        if len(self.container_weights) > container_idx >= 0:
+            return self.container_weights[container_idx]
+        return None
 
     # toggles the y cursor coordinate see self.fmt_data_curve
     def nextFmtDataCurve(self) -> None:

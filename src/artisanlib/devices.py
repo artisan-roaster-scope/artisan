@@ -25,10 +25,12 @@ from typing import Final, Optional, List, Tuple, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QAbstractItemView # pylint: disable=unused-import
 
 from artisanlib.util import (deltaLabelUTF8, setDeviceDebugLogLevel, argb_colorname2rgba_colorname, rgba_colorname2argb_colorname,
-    toInt, weight_units, convertWeight)
-from artisanlib.dialogs import ArtisanResizeablDialog
+    toInt, weight_units, convertWeight, render_weight)
+from artisanlib.dialogs import ArtisanResizeablDialog, tareDlg
+
 from artisanlib.widgets import MyContentLimitedQComboBox, MyQComboBox, MyQDoubleSpinBox, wait_cursor
 from artisanlib.scale import SUPPORTED_SCALES, ScaleSpecs
 
@@ -36,14 +38,14 @@ from artisanlib.scale import SUPPORTED_SCALES, ScaleSpecs
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 try:
-    from PyQt6.QtCore import (Qt, pyqtSlot, QSettings, QTimer, QRegularExpression) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import (Qt, pyqtSlot, QSettings, QTimer, QRegularExpression, QSignalBlocker) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import (QStandardItemModel, QStandardItem, QColor, QIntValidator, QRegularExpressionValidator, QPixmap) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,  # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QRadioButton, QButtonGroup, # @UnusedImport @Reimport  @UnresolvedImport
                                  QTableWidget, QMessageBox, QHeaderView, QTableWidgetItem, QSizePolicy) # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
-    from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QTimer, QRegularExpression) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QTimer, QRegularExpression, QSignalBlocker) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import (QStandardItemModel, QStandardItem, QColor, QIntValidator, QRegularExpressionValidator, QPixmap) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
@@ -69,9 +71,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.org_scale1_model = self.aw.scale1_model
         self.org_scale1_name = self.aw.scale1_name
         self.org_scale1_id = self.aw.scale1_id
+        self.org_container1_idx = self.aw.container1_idx
         self.org_scale2_model = self.aw.scale2_model
         self.org_scale2_name = self.aw.scale2_name
         self.org_scale2_id = self.aw.scale2_id
+        self.org_container2_idx = self.aw.container2_idx
 
         ################ TAB 1   WIDGETS
         #ETcurve
@@ -1459,18 +1463,22 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
         scale1ModelLabel = QLabel(QApplication.translate('Label','Model'))
         self.scale1ModelComboBox = QComboBox()
+        self.scale1ModelComboBox.setToolTip(QApplication.translate('Tooltip','Choose the model of your scale'))
         self.scale1ModelComboBox.setMinimumWidth(150)
         self.scale1ModelComboBox.addItems([''] + [m for (m,_) in SUPPORTED_SCALES])
         self.scale1NameLabel = QLabel(QApplication.translate('Label','Name'))
         self.scale1NameComboBox = QComboBox()
+        self.scale1NameComboBox.setToolTip(QApplication.translate('Tooltip','Choose your scale'))
         self.scale1NameComboBox.setMinimumWidth(150)
         self.scale1ScanButton = QPushButton(QApplication.translate('Button', 'Scan'))
+        self.scale1ScanButton.setToolTip(QApplication.translate('Tooltip','Start scanning to discover your scale'))
         self.scale1ScanButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.scale1Weight = QLabel() # displays the current reading
         self.scale1Weight.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
-        self.scale1Weight.setMinimumWidth(40)
+        self.scale1Weight.setMinimumWidth(60)
         self.scale1Weight.setEnabled(False)
         self.scale1TareButton = QPushButton(QApplication.translate('Button', 'Tare'))
+        self.scale1TareButton.setToolTip(QApplication.translate('Tooltip','Tare your scale'))
         self.scale1TareButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.scale1TareButton.setEnabled(False)
         if self.aw.scale1_model is None:
@@ -1512,18 +1520,22 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
         scale2ModelLabel = QLabel(QApplication.translate('Label','Model'))
         self.scale2ModelComboBox = QComboBox()
+        self.scale2ModelComboBox.setToolTip(QApplication.translate('Tooltip','Choose the model of your scale'))
         self.scale2ModelComboBox.setMinimumWidth(150)
         self.scale2ModelComboBox.addItems([''] + [m for (m,_) in SUPPORTED_SCALES])
         self.scale2NameLabel = QLabel(QApplication.translate('Label','Name'))
         self.scale2NameComboBox = QComboBox()
+        self.scale2NameComboBox.setToolTip(QApplication.translate('Tooltip','Choose your scale'))
         self.scale2NameComboBox.setMinimumWidth(150)
         self.scale2ScanButton = QPushButton(QApplication.translate('Button', 'Scan'))
+        self.scale2ScanButton.setToolTip(QApplication.translate('Tooltip','Start scanning to discover your scale'))
         self.scale2ScanButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.scale2Weight = QLabel() # displays the current reading
         self.scale2Weight.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
-        self.scale2Weight.setMinimumWidth(40)
+        self.scale2Weight.setMinimumWidth(60)
         self.scale2Weight.setEnabled(False)
         self.scale2TareButton = QPushButton(QApplication.translate('Button', 'Tare'))
+        self.scale2TareButton.setToolTip(QApplication.translate('Tooltip','Tare your scale'))
         self.scale2TareButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.scale2TareButton.setEnabled(False)
         if self.aw.scale2_model is None:
@@ -1566,11 +1578,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.taskWebDisplayGreenURL = QLabel()
         self.taskWebDisplayGreenURL.setOpenExternalLinks(True)
         self.taskWebDisplayGreenFlag = QCheckBox()
+        self.taskWebDisplayGreenFlag.setToolTip(QApplication.translate('Tooltip','Start/stop the green coffee weighting task web display'))
         self.taskWebDisplayGreenFlag.setChecked(self.aw.taskWebDisplayGreenActive)
         self.taskWebDisplayGreenFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.taskWebDisplayGreenFlag.clicked.connect(self.taskWebDisplayGreen)
         self.taskWebDisplayGreenPortLabel = QLabel(QApplication.translate('Label', 'Port'))
         self.taskWebDisplayGreenPort = QLineEdit(str(self.aw.taskWebDisplayGreenPort))
+        self.taskWebDisplayGreenPort.setToolTip(QApplication.translate('Tooltip','IP port of the green coffee weighting task web display'))
         self.taskWebDisplayGreenPort.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.taskWebDisplayGreenPort.setValidator(QRegularExpressionValidator(QRegularExpression(r'^[0-9]{1,4}$'),self))
         self.taskWebDisplayGreenPort.setMaximumWidth(45)
@@ -1612,11 +1626,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.taskWebDisplayRoastedURL = QLabel()
         self.taskWebDisplayRoastedURL.setOpenExternalLinks(True)
         self.taskWebDisplayRoastedFlag = QCheckBox()
+        self.taskWebDisplayRoastedFlag.setToolTip(QApplication.translate('Tooltip','Start/stop the roasted coffee weighting task web display'))
         self.taskWebDisplayRoastedFlag.setChecked(self.aw.taskWebDisplayRoastedActive)
         self.taskWebDisplayRoastedFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.taskWebDisplayRoastedFlag.clicked.connect(self.taskWebDisplayRoasted)
         self.taskWebDisplayRoastedPortLabel = QLabel(QApplication.translate('Label', 'Port'))
         self.taskWebDisplayRoastedPort = QLineEdit(str(self.aw.taskWebDisplayRoastedPort))
+        self.taskWebDisplayRoastedPort.setToolTip(QApplication.translate('Tooltip','IP port of the roasted coffee weighting task web display'))
         self.taskWebDisplayRoastedPort.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.taskWebDisplayRoastedPort.setValidator(QRegularExpressionValidator(QRegularExpression(r'^[0-9]{1,4}$'),self))
         self.taskWebDisplayRoastedPort.setMaximumWidth(45)
@@ -1659,6 +1675,55 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         scale1.setLayout(scale1Layout)
         scale2 = QGroupBox(QApplication.translate('GroupBox', 'Scale {0}').format(2))
         scale2.setLayout(scale2Layout)
+
+
+        # container green
+        self.containerGreenTareWeight = QLabel('')
+        self.containerGreenTareWeight.setToolTip(QApplication.translate('Tooltip','Weight of your green coffee container'))
+        self.containerGreenComboBox = QComboBox()
+        self.containerGreenComboBox.setToolTip(QApplication.translate('Tooltip','Identify your green coffee container and its weight'))
+        self.containerGreenComboBox.setMaximumWidth(120)
+        self.containerGreenComboBox.setMinimumWidth(120)
+        self.updateGreenContainerPopup()
+        self.containerGreenComboBox.currentIndexChanged.connect(self.greenContainerChanged)
+        self.containerGreenComboBox.setCurrentIndex(self.container_menu_idx(self.aw.container1_idx))
+        self.updateGreenContainerWeight()
+
+        containerGreenGridLayout = QGridLayout()
+        containerGreenGridLayout.addWidget(self.containerGreenComboBox,0,0)
+        containerGreenGridLayout.addWidget(self.containerGreenTareWeight,0,1)
+
+        containerGreenHLayout = QHBoxLayout()
+        containerGreenHLayout.addLayout(containerGreenGridLayout)
+        containerGreenHLayout.addStretch()
+
+        # container roasted
+        self.containerRoastedTareWeight = QLabel('')
+        self.containerRoastedTareWeight.setToolTip(QApplication.translate('Tooltip','Weight of your roasted coffee container'))
+        self.containerRoastedComboBox = QComboBox()
+        self.containerRoastedComboBox.setToolTip(QApplication.translate('Tooltip','Identify your roasted coffee container and its weight'))
+        self.containerRoastedComboBox.setMaximumWidth(120)
+        self.containerRoastedComboBox.setMinimumWidth(120)
+        self.updateRoastedContainerPopup()
+        self.containerRoastedComboBox.currentIndexChanged.connect(self.roastedContainerChanged)
+        self.containerRoastedComboBox.setCurrentIndex(self.container_menu_idx(self.aw.container2_idx))
+        self.updateRoastedContainerWeight()
+
+        containerRoastedGridLayout = QGridLayout()
+        containerRoastedGridLayout.addWidget(self.containerRoastedComboBox,0,0)
+        containerRoastedGridLayout.addWidget(self.containerRoastedTareWeight,0,1)
+
+        containerRoastedHLayout = QHBoxLayout()
+        containerRoastedHLayout.addLayout(containerRoastedGridLayout)
+        containerRoastedHLayout.addStretch()
+
+        # Bucket Hobbock, Container, Bin
+        containerGreen = QGroupBox('Container Green')
+        containerGreen.setLayout(containerGreenHLayout)
+        containerRoasted = QGroupBox('Container Roasted')
+        containerRoasted.setLayout(containerRoastedHLayout)
+
+
         taskGreen = QGroupBox('Task Green')
         taskGreen.setLayout(taskWebDisplayGreenVLayout)
         taskRoasted = QGroupBox('Task Roasted')
@@ -1666,8 +1731,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         tab8Layout = QGridLayout()
         tab8Layout.addWidget(scale1,0,0)
         tab8Layout.addWidget(scale2,0,1)
-        tab8Layout.addWidget(taskGreen,1,0)
-        tab8Layout.addWidget(taskRoasted,1,1)
+        tab8Layout.addWidget(containerGreen,1,0)
+        tab8Layout.addWidget(containerRoasted,1,1)
+        tab8Layout.addWidget(taskGreen,2,0)
+        tab8Layout.addWidget(taskRoasted,2,1)
 
         #main tab widget
         self.TabWidget = QTabWidget()
@@ -1738,6 +1805,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.scale1NameComboBox.clear()
             self.scale1NameComboBox.setEnabled(False)
             self.scale1ScanButton.setEnabled(False)
+            self.update_scale1_weight(None)
 
     @pyqtSlot(int)
     def scale1NameChanged(self, i:int) -> None:
@@ -1776,7 +1844,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     # returns formatted weight converted to current weight unit
     def format_scale_weight(self, w:Optional[float]) -> str:
         if w is None:
-            return ''
+            return '----'
         unit = weight_units.index(self.aw.qmc.weight[2])
         if unit == 0: # g selected
             # metric
@@ -1790,7 +1858,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
     def update_scale1_weight(self, weight:Optional[float]) -> None:
         self.scale1_weight = weight
-        self.scale1Weight.setText(self.format_scale_weight(self.scale1_weight))
+        if self.aw.scale1_name is not None and self.aw.scale1_id is not None:
+            self.scale1Weight.setText(self.format_scale_weight(self.scale1_weight))
+        else:
+            self.scale1Weight.setText('')
 
     def updateScale1devices(self, devices:ScaleSpecs) -> None:
         self.scale1_devices = devices
@@ -1828,6 +1899,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.scale2NameComboBox.clear()
             self.scale2NameComboBox.setEnabled(False)
             self.scale2ScanButton.setEnabled(False)
+            self.update_scale2_weight(None)
 
     @pyqtSlot(int)
     def scale2NameChanged(self, i:int) -> None:
@@ -1854,7 +1926,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
     def update_scale2_weight(self, weight:Optional[float]) -> None:
         self.scale2_weight = weight
-        self.scale2Weight.setText(self.format_scale_weight(self.scale2_weight))
+        if self.aw.scale2_name is not None and self.aw.scale2_id is not None:
+            self.scale2Weight.setText(self.format_scale_weight(self.scale2_weight))
+        else:
+            self.scale2Weight.setText('')
 
     def scale2connected(self) -> None:
         self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format(self.aw.scale2_name),True,None)
@@ -1890,6 +1965,100 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         scale = self.aw.scale_manager.get_scale2()
         if scale is not None:
             scale.tare_scale()
+
+    @staticmethod
+    def container_menu_idx(i:int) -> int: # takes a container idx and returns the index of the corresponding menu item
+        return i + 3 # skip <edit>, separator and empty index
+
+    @pyqtSlot()
+    def updateGreenContainerPopup(self) -> None:
+        prev_item_count = self.containerGreenComboBox.count()
+        with QSignalBlocker(self.containerGreenComboBox): # blocking all signals, especially its currentIndexChanged connected to tareChanged which would lead to cycles
+            self.containerGreenComboBox.clear()
+            self.containerGreenComboBox.addItem(f"<{QApplication.translate('Label','edit')}>")
+            self.containerGreenComboBox.insertSeparator(2)
+            self.containerGreenComboBox.addItem('')
+            self.containerGreenComboBox.addItems(self.aw.qmc.container_names)
+            width = self.containerGreenComboBox.minimumSizeHint().width()
+            view: Optional[QAbstractItemView] = self.containerGreenComboBox.view()
+            if view is not None:
+                view.setMinimumWidth(width)
+        if self.containerGreenComboBox.count() > prev_item_count:
+            # if item list is longer (new items added), we select the last item
+            self.aw.container1_idx = self.containerGreenComboBox.count() - 4
+        if len(self.aw.qmc.container_weights) > self.aw.container1_idx:
+            self.containerGreenComboBox.setCurrentIndex(self.container_menu_idx(self.aw.container1_idx))
+        else:
+            self.containerGreenComboBox.setCurrentIndex(2) # reset to the empty entry
+            self.aw.container1_idx = -1
+
+    @pyqtSlot(int)
+    def greenContainerChanged(self, i:int) -> None:
+        if i == 0:
+            self.containerGreenComboBox.setCurrentIndex(self.container_menu_idx(self.aw.container1_idx))
+            tareDLG = tareDlg(self,self.aw, self.get_scale1_weight)
+            tareDLG.tare_updated_signal.connect(self.updateGreenContainerPopup)
+            tareDLG.show()
+        else:
+            self.aw.container1_idx = i - 3
+            # update displayed scale weight
+            self.updateGreenContainerWeight()
+
+    def updateGreenContainerWeight(self) -> None:
+        weight = self.aw.qmc.get_container_weight(self.aw.container1_idx)
+        if weight is None:
+            self.containerGreenTareWeight.setText('')
+        else:
+            self.containerGreenTareWeight.setText(render_weight(weight, 0,  weight_units.index(self.aw.qmc.weight[2])))
+
+    def get_scale1_weight(self) -> Optional[float]:
+        return self.scale1_weight
+
+
+    @pyqtSlot()
+    def updateRoastedContainerPopup(self) -> None:
+        prev_item_count = self.containerRoastedComboBox.count()
+        with QSignalBlocker(self.containerRoastedComboBox): # blocking all signals, especially its currentIndexChanged connected to tareChanged which would lead to cycles
+            self.containerRoastedComboBox.clear()
+            self.containerRoastedComboBox.addItem(f"<{QApplication.translate('Label','edit')}>")
+            self.containerRoastedComboBox.insertSeparator(2)
+            self.containerRoastedComboBox.addItem('')
+            self.containerRoastedComboBox.addItems(self.aw.qmc.container_names)
+            width = self.containerRoastedComboBox.minimumSizeHint().width()
+            view: Optional[QAbstractItemView] = self.containerGreenComboBox.view()
+            if view is not None:
+                view.setMinimumWidth(width)
+        if self.containerRoastedComboBox.count() > prev_item_count:
+            # if item list is longer (new items added), we select the last item
+            self.aw.container2_idx = self.containerRoastedComboBox.count() - 4
+        if len(self.aw.qmc.container_weights) > self.aw.container2_idx:
+            self.containerRoastedComboBox.setCurrentIndex(self.container_menu_idx(self.aw.container2_idx))
+        else:
+            self.containerRoastedComboBox.setCurrentIndex(2) # reset to the empty entry
+            self.aw.container2_idx = -1
+
+    @pyqtSlot(int)
+    def roastedContainerChanged(self, i:int) -> None:
+        if i == 0:
+            self.containerRoastedComboBox.setCurrentIndex(self.container_menu_idx(self.aw.container2_idx))
+            tareDLG = tareDlg(self,self.aw, self.get_scale2_weight)
+            tareDLG.tare_updated_signal.connect(self.updateRoastedContainerPopup)
+            tareDLG.show()
+        else:
+            self.aw.container2_idx = i - 3
+            # update displayed scale weight
+            self.updateRoastedContainerWeight()
+
+    def updateRoastedContainerWeight(self) -> None:
+        weight = self.aw.qmc.get_container_weight(self.aw.container2_idx)
+        if weight is None:
+            self.containerRoastedTareWeight.setText('')
+        else:
+            self.containerRoastedTareWeight.setText(render_weight(weight, 0,  weight_units.index(self.aw.qmc.weight[2])))
+
+    def get_scale2_weight(self) -> Optional[float]:
+        return self.scale2_weight
+
 
     @pyqtSlot(bool)
     def taskWebDisplayGreen(self, b:bool = False) -> None:
@@ -2882,9 +3051,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.aw.scale1_model = self.org_scale1_model
         self.aw.scale1_name = self.org_scale1_name
         self.aw.scale1_id = self.org_scale1_id
+        self.aw.container1_idx = self.org_container1_idx
         self.aw.scale2_model = self.org_scale2_model
         self.aw.scale2_name = self.org_scale2_name
         self.aw.scale2_id = self.org_scale2_id
+        self.aw.container2_idx = self.org_container2_idx
 
         self.reject()
 
