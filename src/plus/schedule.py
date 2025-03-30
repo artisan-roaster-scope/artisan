@@ -285,8 +285,8 @@ class CompletedItem(BaseModel):
         return int(roastdate.timestamp())
 
     @field_serializer('roastUUID', when_used='json')
-    def serialize_roastUUID_to_str(roastUUID: UUID4) -> str: # type:ignore[misc] # pylint: disable=no-self-argument
-        return roastUUID.hex
+    def serialize_roastUUID_to_str(roastUUID: UUID4) -> str: # pylint: disable=no-self-argument
+        return str(roastUUID.hex)
 
 
     # updates this CompletedItem with the data given in profile_data

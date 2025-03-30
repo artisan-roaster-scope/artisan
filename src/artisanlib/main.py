@@ -886,7 +886,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         except Exception: # pylint: disable=broad-except
             # not yet monkey patched
             formlayout.fedit_org = formlayout.fedit # type: ignore
-            formlayout.fedit = self.my_fedit  # type:ignore[reportPrivateImportUsage]
+            formlayout.fedit = self.my_fedit  # pyright:ignore[reportPrivateImportUsage]
 #        # monkey patch _formlayout to work around a MPL3.5.1 issue on Qt6
 #        # (see https://github.com/matplotlib/matplotlib/issues/22471)
 #        if mpl_version in [[3,5,0], [3,5,1]]:

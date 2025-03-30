@@ -38,7 +38,7 @@ import textwrap
 import functools
 from bisect import bisect_right
 import psutil
-from psutil._common import bytes2human # type:ignore[reportPrivateImportUsage]
+from psutil._common import bytes2human # pyright:ignore[reportPrivateImportUsage]
 
 from typing import Final, Optional, List, Set, Dict, Callable, Tuple, Union, Any, Sequence, cast, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
 
@@ -50,7 +50,7 @@ if TYPE_CHECKING:
     from plus.blend import CustomBlend # pylint: disable=unused-import
     from matplotlib.collections import PolyCollection # pylint: disable=unused-import
     from matplotlib.axes import Axes # pylint: disable=unused-import
-    from matplotlib.axes._base import _AxesBase # type:ignore[reportPrivateImportUsage] # pylint: disable=unused-import
+    from matplotlib.axes._base import _AxesBase # pyright:ignore[reportPrivateImportUsage] # pylint: disable=unused-import
     from matplotlib.image import AxesImage # pylint: disable=unused-import
     from matplotlib.legend import Legend # pylint: disable=unused-import
     from matplotlib.backend_bases import PickEvent, MouseEvent, Event # pylint: disable=unused-import
