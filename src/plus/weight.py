@@ -56,7 +56,7 @@ class RoastedWeightItem(WeightItem):
 #. if green: target weight (counts down)
 #. if green: bean or blend name
 #. if green: container recognized (or not) indicating container name
-#. if roasted: batch number + roast name + green weight
+#. if roasted: batch number + roast name + green weight + weight loss
 #. registered weight (so far)
 
 

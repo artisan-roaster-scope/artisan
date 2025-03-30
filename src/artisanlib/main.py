@@ -886,7 +886,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         except Exception: # pylint: disable=broad-except
             # not yet monkey patched
             formlayout.fedit_org = formlayout.fedit # type: ignore
-            formlayout.fedit = self.my_fedit
+            formlayout.fedit = self.my_fedit  # type:ignore[reportPrivateImportUsage]
 #        # monkey patch _formlayout to work around a MPL3.5.1 issue on Qt6
 #        # (see https://github.com/matplotlib/matplotlib/issues/22471)
 #        if mpl_version in [[3,5,0], [3,5,1]]:
@@ -8273,7 +8273,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     if action > 18:
                         action = action + 1 # skip the 19: Aillio PRS
             # after adaption: (see eventaction)
-                value = (self.calcSliderSendValue(n) if v is None else v) # preference for the more precise float value if given over the slider value
+                value = (self.calcSliderSendValue(n) if v is None else self.calcEventValue(n,v)) # preference for the more precise float value if given over the slider value
                 if action not in {4, 6, 13, 14, 15, 20, 21, 22} or (action in {4,13,20, 22} and v is None): # only for IO, VOUT, S7 and RC Commands we keep the floats always
                         # and for MODBUS/PWM/Artisan/WebSocket Command if the optional float value v is not given (enabling hi-res ramping event replay)
                         # NOTE: avoid using 'write({})' in MODBUS commands as {} might be bound to a float and then writing to 2 registers instead of one
@@ -8308,7 +8308,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.block_quantification_sampling_ticks[n] = self.sampling_ticks_to_block_quantifiction
         self.extraeventsactionslastvalue[n] = self.eventslidervalues[n]
         if self.qmc.flagstart:
-#            value = float2float((self.eventslidervalues[n] + 10.0) / 10.0)
             value = self.qmc.eventsExternal2InternalValue(self.eventslidervalues[n])
             description = str(float2float(self.calcSliderSendValue(n),2)).rstrip('0').rstrip('.') + self.eventsliderunits[n]
             self.qmc.EventRecordAction(extraevent = 1,eventtype=n,eventvalue=value,eventdescription=description)
@@ -24909,178 +24908,179 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if self.qmc.reset():
                 tree = ET.ElementTree(file=filename)
                 root = tree.getroot()
-                self.normalize_tags(root) # normalize tags to lower case
-                self.normalize_attr(root) # normalize attributes to lower case
+                if root is not None:
+                    self.normalize_tags(root) # normalize tags to lower case
+                    self.normalize_attr(root) # normalize attributes to lower case
 
-                if root.tag == 'history':
-                    date = root.find('historydate')
-                    time = root.find('historytime')
-                    if date is not None and time is not None:
-                        date_str = date.text
-                        time_str = time.text
-                        if date_str is not None and time_str is not None:
-                            self.qmc.roastdate = QDateTime(QDate.fromString(date_str,'M/d/yyyy'),QTime.fromString(time_str,'h:mm AP'))
+                    if root.tag == 'history':
+                        date = root.find('historydate')
+                        time = root.find('historytime')
+                        if date is not None and time is not None:
+                            date_str = date.text
+                            time_str = time.text
+                            if date_str is not None and time_str is not None:
+                                self.qmc.roastdate = QDateTime(QDate.fromString(date_str,'M/d/yyyy'),QTime.fromString(time_str,'h:mm AP'))
 
-                title = root.find('roasttype')
-                if title is None:
-                    self.qmc.title = str(os.path.basename(filename))
-                else:
-                    self.qmc.title = str(title.text)
-
-                beans = root.find('coffeetype')
-                if beans is not None and beans.text is not None:
-                    self.qmc.beans = str(beans.text)
-
-                roaster = root.find('roaster')
-                if roaster is not None and roaster.text is not None:
-                    self.qmc.roastertype = str(roaster.text)
-
-                chargestr = root.find('charge')
-                if chargestr is None:
-                    chargestr = root.find('chargingcapacity')
-                if chargestr is not None: # contains floating point number; default unit Kg
-                    try:
-                        weight_in_str = chargestr.text
-                        if weight_in_str is not None:
-                            self.qmc.weight = (float(weight_in_str), self.qmc.weight[1], 'Kg')
-                    except Exception: # pylint: disable=broad-except
-                        pass
-
-                dischargestr = root.find('dischargingcapacity')
-                if dischargestr is not None: # contains floating point number; default unit Kg
-                    try:
-                        weight_out_str = dischargestr.text
-                        if weight_out_str is not None:
-                            self.qmc.weight = (self.qmc.weight[0], float(weight_out_str), 'Kg')
-                    except Exception: # pylint: disable=broad-except
-                        pass
-
-                colorstr = root.find('coffeecolor')
-                if colorstr is not None:
-                    c = None
-                    if colorstr.text is not None:
-                        for e in colorstr.text.strip().split():
-                            try:
-                                c = int(e)
-                                break
-                            except Exception: # pylint: disable=broad-except
-                                pass
-                    if c:
-                        self.qmc.ground_color = c
-
-                notes = root.find('notes')
-                if notes is not None and notes.text is not None:
-                    self.qmc.roastingnotes = str(notes.text)
-
-                recipedata = None
-                historydata = None
-                recipedata = tree.find('recipedata')
-                m = None
-                if recipedata is not None:
-                    m = recipedata.get('temp_unit')
-                else:
-                    mt = tree.find('recipedata_temp_unit')
-                    if mt is not None:
-                        m = mt.text
-                if m is None:
-                    historydata = tree.find('historydata')
-                    if historydata is not None:
-                        m = historydata.get('temp_unit')
+                    title = root.find('roasttype')
+                    if title is None:
+                        self.qmc.title = str(os.path.basename(filename))
                     else:
-                        mt = tree.find('historydata_temp_unit')
+                        self.qmc.title = str(title.text)
+
+                    beans = root.find('coffeetype')
+                    if beans is not None and beans.text is not None:
+                        self.qmc.beans = str(beans.text)
+
+                    roaster = root.find('roaster')
+                    if roaster is not None and roaster.text is not None:
+                        self.qmc.roastertype = str(roaster.text)
+
+                    chargestr = root.find('charge')
+                    if chargestr is None:
+                        chargestr = root.find('chargingcapacity')
+                    if chargestr is not None: # contains floating point number; default unit Kg
+                        try:
+                            weight_in_str = chargestr.text
+                            if weight_in_str is not None:
+                                self.qmc.weight = (float(weight_in_str), self.qmc.weight[1], 'Kg')
+                        except Exception: # pylint: disable=broad-except
+                            pass
+
+                    dischargestr = root.find('dischargingcapacity')
+                    if dischargestr is not None: # contains floating point number; default unit Kg
+                        try:
+                            weight_out_str = dischargestr.text
+                            if weight_out_str is not None:
+                                self.qmc.weight = (self.qmc.weight[0], float(weight_out_str), 'Kg')
+                        except Exception: # pylint: disable=broad-except
+                            pass
+
+                    colorstr = root.find('coffeecolor')
+                    if colorstr is not None:
+                        c = None
+                        if colorstr.text is not None:
+                            for e in colorstr.text.strip().split():
+                                try:
+                                    c = int(e)
+                                    break
+                                except Exception: # pylint: disable=broad-except
+                                    pass
+                        if c:
+                            self.qmc.ground_color = c
+
+                    notes = root.find('notes')
+                    if notes is not None and notes.text is not None:
+                        self.qmc.roastingnotes = str(notes.text)
+
+                    recipedata = None
+                    historydata = None
+                    recipedata = tree.find('recipedata')
+                    m = None
+                    if recipedata is not None:
+                        m = recipedata.get('temp_unit')
+                    else:
+                        mt = tree.find('recipedata_temp_unit')
                         if mt is not None:
                             m = mt.text
-                if m is not None:
-                    m = m.lower()
-                    if m == 'c' and self.qmc.mode == 'F':
-                        self.qmc.celsiusMode()
-                    elif m == 'f' and self.qmc.mode == 'C':
-                        self.qmc.fahrenheitMode()
-
-                # add extra device if needed
-                for __ in range(max(0,1 - len(self.qmc.extradevices))):
-                    self.addDevice()
-                if self.qmc.extraname1[0] == 'Extra 1':
-                    self.qmc.extraname1[0] = 'Burner'
-
-                diagrampoints = None
-                if recipedata is not None:
-                    diagrampoints = tree.find('recipedata/diagrampoints')
-                if diagrampoints is None:
-                    diagrampoints = tree.find('diagrampoints')
-                if diagrampoints is None:
-                    diagrampoints = tree.find('historydata')
-                last_timez = 0.
-                if diagrampoints is not None:
-                    for elem in diagrampoints.findall('data'):
-                        time_entry = elem.find('time')
-                        if time_entry is None:
-                            time_entry = elem.find('stime')
-                        if time_entry is None or time_entry.text is None:
-                            last_timez = last_timez + 1
-                            timez = last_timez
+                    if m is None:
+                        historydata = tree.find('historydata')
+                        if historydata is not None:
+                            m = historydata.get('temp_unit')
                         else:
-                            timez = float(stringtoseconds(time_entry.text))
-                            last_timez = timez
-                        self.qmc.timex.append(timez)
-                        self.qmc.temp1.append(-1)
-                        temp_entry = elem.find('temperature')
-                        if temp_entry is None:
-                            temp_entry = elem.find('ntemperature')
-                        if temp_entry is not None:
-                            bt = temp_entry.text
-                            if bt is not None:
-                                bt = bt.replace(',','.')
-                                self.qmc.temp2.append(float(bt))
-                                self.qmc.extratimex[0].append(timez)
-                                burner_entry = elem.find('burnercapacity')
-                                if burner_entry is None:
-                                    burner_entry = elem.find('nburnercapacity')
-                                if burner_entry is not None:
-                                    burner = burner_entry.text
-                                    if burner is not None:
-                                        burner = burner.replace(',','.')
-                                        self.qmc.extratemp1[0].append(float(burner))
-                                        self.qmc.extratemp2[0].append(-1)
+                            mt = tree.find('historydata_temp_unit')
+                            if mt is not None:
+                                m = mt.text
+                    if m is not None:
+                        m = m.lower()
+                        if m == 'c' and self.qmc.mode == 'F':
+                            self.qmc.celsiusMode()
+                        elif m == 'f' and self.qmc.mode == 'C':
+                            self.qmc.fahrenheitMode()
 
-                if len(self.qmc.timex) > 2:
-                    self.qmc.profile_sampling_interval = (self.qmc.timex[-1] - self.qmc.timex[0])/(len(self.qmc.timex) - 1)
-                self.qmc.updateDeltaSamples()
+                    # add extra device if needed
+                    for __ in range(max(0,1 - len(self.qmc.extradevices))):
+                        self.addDevice()
+                    if self.qmc.extraname1[0] == 'Extra 1':
+                        self.qmc.extraname1[0] = 'Burner'
 
-                # set CHARGE and DROP
-                self.qmc.timeindex[0] = 0
-                self.qmc.timeindex[6] = max(0,len(self.qmc.timex) - 1)
+                    diagrampoints = None
+                    if recipedata is not None:
+                        diagrampoints = tree.find('recipedata/diagrampoints')
+                    if diagrampoints is None:
+                        diagrampoints = tree.find('diagrampoints')
+                    if diagrampoints is None:
+                        diagrampoints = tree.find('historydata')
+                    last_timez = 0.
+                    if diagrampoints is not None:
+                        for elem in diagrampoints.findall('data'):
+                            time_entry = elem.find('time')
+                            if time_entry is None:
+                                time_entry = elem.find('stime')
+                            if time_entry is None or time_entry.text is None:
+                                last_timez = last_timez + 1
+                                timez = last_timez
+                            else:
+                                timez = float(stringtoseconds(time_entry.text))
+                                last_timez = timez
+                            self.qmc.timex.append(timez)
+                            self.qmc.temp1.append(-1)
+                            temp_entry = elem.find('temperature')
+                            if temp_entry is None:
+                                temp_entry = elem.find('ntemperature')
+                            if temp_entry is not None:
+                                bt = temp_entry.text
+                                if bt is not None:
+                                    bt = bt.replace(',','.')
+                                    self.qmc.temp2.append(float(bt))
+                                    self.qmc.extratimex[0].append(timez)
+                                    burner_entry = elem.find('burnercapacity')
+                                    if burner_entry is None:
+                                        burner_entry = elem.find('nburnercapacity')
+                                    if burner_entry is not None:
+                                        burner = burner_entry.text
+                                        if burner is not None:
+                                            burner = burner.replace(',','.')
+                                            self.qmc.extratemp1[0].append(float(burner))
+                                            self.qmc.extratemp2[0].append(-1)
 
-                if recipedata is not None:
-                    switchpoints = tree.find('recipedata/switchpoints')
-                else:
-                    switchpoints = tree.find('switchpoints')
-                if switchpoints is not None:
-                    for elem in switchpoints.findall('data'):
-                        time_entry = elem.find('time')
-                        if time_entry is None:
-                            time_entry = elem.find('stime')
-                        if time_entry is not None:
-                            time_str = time_entry.text
-                            if time_str is not None:
-                                time = float(stringtoseconds(time_str))
-                                burner_entry = elem.find('burnercapacity')
-                                if burner_entry is None:
-                                    burner_entry = elem.find('nburnercapacity')
-                                if burner_entry is not None:
-                                    burner = burner_entry.text
-                                    if burner is not None:
-                                        self.qmc.addEvent(
-                                            self.qmc.time2index(time),
-                                            3,
-                                            '',
-                                            self.qmc.str2eventsvalue(burner))
+                    if len(self.qmc.timex) > 2:
+                        self.qmc.profile_sampling_interval = (self.qmc.timex[-1] - self.qmc.timex[0])/(len(self.qmc.timex) - 1)
+                    self.qmc.updateDeltaSamples()
 
-                self.autoAdjustAxis()
+                    # set CHARGE and DROP
+                    self.qmc.timeindex[0] = 0
+                    self.qmc.timeindex[6] = max(0,len(self.qmc.timex) - 1)
 
-                self.sendmessage(QApplication.translate('Message','Probat Pilot data imported successfully'))
-                self.qmc.redraw()
-                self.qmc.fileDirtySignal.emit()
+                    if recipedata is not None:
+                        switchpoints = tree.find('recipedata/switchpoints')
+                    else:
+                        switchpoints = tree.find('switchpoints')
+                    if switchpoints is not None:
+                        for elem in switchpoints.findall('data'):
+                            time_entry = elem.find('time')
+                            if time_entry is None:
+                                time_entry = elem.find('stime')
+                            if time_entry is not None:
+                                time_str = time_entry.text
+                                if time_str is not None:
+                                    time = float(stringtoseconds(time_str))
+                                    burner_entry = elem.find('burnercapacity')
+                                    if burner_entry is None:
+                                        burner_entry = elem.find('nburnercapacity')
+                                    if burner_entry is not None:
+                                        burner = burner_entry.text
+                                        if burner is not None:
+                                            self.qmc.addEvent(
+                                                self.qmc.time2index(time),
+                                                3,
+                                                '',
+                                                self.qmc.str2eventsvalue(burner))
+
+                    self.autoAdjustAxis()
+
+                    self.sendmessage(QApplication.translate('Message','Probat Pilot data imported successfully'))
+                    self.qmc.redraw()
+                    self.qmc.fileDirtySignal.emit()
         except OSError as ex:
             self.qmc.adderror((QApplication.translate('Error Message','IO Error:') + ' importPilot(): {0}').format(str(ex)))
         except ValueError as ex:
