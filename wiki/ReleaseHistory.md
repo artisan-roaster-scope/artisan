@@ -52,7 +52,7 @@ v3.1.1
   - the quick custom event entry using the q, w, e and e key followed by number keys now requires the ENTER/RETURN key to establish the new value.  The last entered digit can be removed by using the backspace key. ESC cancels the action.
   - improved accuracy on rendering [artisan.plus](https://artisan.plus) blend component weights
   - improved Cropster importer
-  - event replay not at any time ensures that only future events are replayed. As the set of future events may change on moving the background profile, an event can be replayed again. In previous Artisan versions, events did replay only once.
+  - event replay at any time ensures that only future events are replayed. As the set of future events may change on moving the background profile, an event can still be replayed again. In previous Artisan versions, events did replay only once per roast.
   - persist Energy Tab summary choice
   - suppresses pick year from [artisan.plus](https://artisan.plus) beans pop up and roast name suggestion if origin/name combination is unique
 
