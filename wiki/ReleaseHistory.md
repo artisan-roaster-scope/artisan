@@ -2,18 +2,20 @@ Detailed Release History
 ========================
 
 ----
-v3.1.1
+v3.1.2 (April XX, 2025)
 ------------------
 
 
 * ADDITIONS
+  - adds event replay ramping by time and temperature
+  - events displayed in step and combo mode can be updated by moving them to a new position. Pressing SHIFT restricts the movement in either the x or the y direction.
+  - a picked custom event can be removed using the backspace key
   - adds drag-and-drop to Stats Summary table configuration
   - adds hiding of scheduled items via a right-click or drag-out
   - adds support for feeding data from energy meters into Artisans roast energy calculator
   - adds new flag "Set batch size" to background dialog. If ticked the batch size is taken from the background profile on load while scheduler is off
   - adds sorting to the background events table
   - adds configuration to allow to send MODBUS PID SV as 32bit float
-  - adds event replay ramping by time and temperature
   - adds new Artisan Commands (with `n` from `{1,2,3,4}`)
       - `quantifier(n,<bool>)` to toggle quantification per event type
       - `playback(n,<bool>)` to toggle event playback per event type
@@ -23,16 +25,14 @@ v3.1.1
   - adds event slider input dialog via a double-click on a sliders LCD
   - adds slider focus on slider LCD click
   - adds quick keyboard focused event slider input using numeric keys followed by the ENTER/RETURN key. The last digit can be removed by using the backspace key. ESC cancels the action.
-  - events displayed in step and combo mode can be updated by moving them to a new position. Pressing SHIFT restricts the movement in either the x or the y direction.
-  - a picked custom event can be removed using the backspace key
   - a double click on the graph canvas temporarily scales the y-axis to cover all artists
   - adds search to help pages
 
 
 * NEW HARDWARE SUPPORT
-  - adds support for [Carmomaq's Stratto Lab sample roaster](https://carmomaq.com.br/en/produtos/stratto-roaster-lab/)
   - adds a new [IMF](https://artisan-scope.org/machines/imf/) machine setup that supports machine control enabling IT/BT and IT/Power profiling
   - updated [Giesen](https://artisan-scope.org/machines/giesen/) machine support (now incl. sample roasters and PRO machines) supporting the control of additional actors
+  - adds support for [Carmomaq's Stratto Lab sample roaster](https://artisan-scope.org/machines/carmomaq/)
   - adds support for the [DCC1100 and DCC1120 Brushless DC Motor controllers and the DCC1020 DC Motor controller](https://artisan-scope.org/devices/phidgets/#45-dc-motor-control) ([Discussion #1750](../../../discussions/1750))
   - adds [ROEST](https://artisan-scope.org/machines/roest/) CSV import
   - adds [Thermoworks BlueDOT](https://www.thermoworks.com/bluedot) support
@@ -50,17 +50,17 @@ v3.1.1
   - the parameters "max. number of custom buttons per row", "button size", "alternative slider layout", "mark last pressed" and "show tooltips" are now persisted per palette
   - a click in a sliders pane no longer moves the slider, but just gives that slider the input focus (a click in a slider's bar still moves the slider to this position)
   - the quick custom event entry using the q, w, e and e key followed by number keys now requires the ENTER/RETURN key to establish the new value.  The last entered digit can be removed by using the backspace key. ESC cancels the action.
-  - improved accuracy on rendering [artisan.plus](https://artisan.plus) blend component weights
-  - improved Cropster importer
   - event replay at any time ensures that only future events are replayed. As the set of future events may change on moving the background profile, an event can still be replayed again. In previous Artisan versions, events did replay only once per roast.
   - persist Energy Tab summary choice
   - suppresses pick year from [artisan.plus](https://artisan.plus) beans pop up and roast name suggestion if origin/name combination is unique
+  - improved accuracy on rendering [artisan.plus](https://artisan.plus) blend component weights
+  - improved Cropster importer
 
 * FIXES
+  - fixes processing of MODBUS function 2 request which broke the just introduced autoCHARGE/autoDROP triggered by [Loring machines](https://artisan-scope.org/machines/loring/)
   - ensure complete reset to defaults in energy tab loads tab
   - makes loading of (broken) profiles with inconsistent data length more robust
   - prevents exceptions caused by empty event type names ([Discussion #1745](../../../discussions/1745))
-  - fixes processing of MODBUS function 2 request which broke the just introduced autoCHARGE/autoDROP triggered by Loring machines
   - fixes a typo which allowed to open multiple Roast Properties dialogs ([Issue #1781](../../../issues/1781))
   - fixes regression introduced in v3.0 which prevented the replay of events before CHARGE
   - fixes an issue in event replay where certain events failed to be replayed by temperature

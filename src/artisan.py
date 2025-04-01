@@ -14,6 +14,9 @@ from typing import Any
 # which should not be significant
 os.environ['OMP_NUM_THREADS'] = '1'
 
+# deactivate defusedexml in OPENPYXL as it might not be installed or bundled
+os.environ['OPENPYXL_DEFUSEDXML'] = 'False'
+
 # highDPI support must be set before creating the Application instance
 try:
 # the following two lines seem not to be needed any longer with Qt6.1

@@ -22095,6 +22095,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             _, _, exc_tb = sys.exc_info()
                             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' rankingReport() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
+
                     try:
                         # Create a roast phase visualization graph
 
@@ -22249,7 +22250,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         if prev_backgroundpath:
                             self.loadbackground(prev_backgroundpath)
                             self.qmc.background = prev_background
-                        self.qmc.timealign()
+                        if prev_foreground_profile_path or prev_backgroundpath:
+                            self.qmc.timealign()
+                        else:
+                            self.qmc.reset()
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
 

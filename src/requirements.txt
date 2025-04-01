@@ -67,13 +67,13 @@ matplotlib==3.7.3; python_version < '3.9' # last Python 3.8 release
 matplotlib==3.10.0; python_version >= '3.9'
 jinja2==3.1.5
 aiohttp==3.10.11; python_version < '3.9' # last Python 3.8 release
-aiohttp==3.11.14; python_version >= '3.9'
+aiohttp==3.11.15; python_version >= '3.9'
 aiohttp_jinja2==1.6
 python-bidi==0.4.2; python_version < '3.9' # last Python 3.8 release
 python-bidi==0.6.6; python_version >= '3.9'
 arabic-reshaper==3.0.0
 pillow==10.4.0; python_version < '3.9' # last Python 3.8 release
-pillow>=11.1.0; python_version >= '3.9'
+pillow>=11.2.0; python_version >= '3.9'
 pydantic==2.11.1; (platform_system=='Windows' and python_version>'3.10') or sys_platform=='darwin' or platform_system=='Linux'
 pydantic==2.7.1; (platform_system=='Windows' and python_version<'3.9')  # last version working with Windows 7/8 pending resolution of pydantic Issue #9920
 babel==2.17.0
