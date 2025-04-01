@@ -39,8 +39,8 @@ v3.1.1
   - adds [Atilla](https://artisan-scope.org/machines/atilla/) 'auto' setup which picks up CHARGE and DROP events set from Atilla Gold Plus machines with automation
 
 * CHANGES
-  - the Phidget driver is now bundled with the Artisan app and does no longer need to be installed separately. NOTE: some legacy USB HID devices, like the original 1046 and 1048, which still need the kernel extension of the driver package installed in the system.
-  - indicates [artisan.plus](https://artisan.plus) connection loss more reliable
+  - the Phidget driver is now bundled with the Artisan app and no longer needs to be installed separately. NOTE: some legacy USB HID devices, like the original 1046 and 1048 still require the kernel extension of the driver package to be installed in the system.
+  - indication of [artisan.plus](https://artisan.plus) connection loss more reliable
   - update volume not density if weight changes and volume is set in Roast Properties ([Discussion #1786](../../../discussions/1786))
   - generated WebLCD URL is using more stable host names instead of, potentially DHCP assigned, IP addresses
   - updated Turkish translations (thanks to Kemal Akdas)
@@ -48,7 +48,7 @@ v3.1.1
   - keeps custom events ordered by time
   - events were replayed only if the corresponding event slider was visible in previous versions. Now events selected for replay are always replayed, independent of the visibility of the corresponding event slider.
   - the parameters "max. number of custom buttons per row", "button size", "alternative slider layout", "mark last pressed" and "show tooltips" are now persisted per palette
-  - a click in a sliders pane does no longer move the slider, but just gives that slier the input focus (a click in a sliders bar still moves the slider to this position)
+  - a click in a sliders pane no longer moves the slider, but just gives that slider the input focus (a click in a slider's bar still moves the slider to this position)
   - the quick custom event entry using the q, w, e and e key followed by number keys now requires the ENTER/RETURN key to establish the new value.  The last entered digit can be removed by using the backspace key. ESC cancels the action.
   - improved accuracy on rendering [artisan.plus](https://artisan.plus) blend component weights
   - improved Cropster importer
@@ -63,7 +63,7 @@ v3.1.1
   - fixes processing of MODBUS function 2 request which broke the just introduced autoCHARGE/autoDROP triggered by Loring machines
   - fixes a typo which allowed to open multiple Roast Properties dialogs ([Issue #1781](../../../issues/1781))
   - fixes regression introduced in v3.0 which prevented the replay of events before CHARGE
-  - fixed an issue in event replay where certain events failed to be replayed by temperature
+  - fixes an issue in event replay where certain events failed to be replayed by temperature
   - fixes an issue where the PID Input for external MODBUS/SV PIDs was not correctly persisted
   - fixes broken `button` Modbus Command
   - fixes communication with some Santoker R Master Series machines ([Issue #1811](../../../issues/1811))
