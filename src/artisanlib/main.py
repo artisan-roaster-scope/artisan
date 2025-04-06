@@ -4469,6 +4469,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.BTcurve = not self.qmc.BTcurve
             # we reset the cached main event annotation positions as those annotations are now rendered on the other curve
             self.qmc.l_annotations_dict = {}
+            self.qmc.l_event_flags_dict = {}
             # and redraw
             self.qmc.redraw_keep_view(recomputeAllDeltas=False)
 
@@ -4478,6 +4479,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.ETcurve = not self.qmc.ETcurve
             # we reset the cached main event annotation positions as those annotations are now rendered on the other curve
             self.qmc.l_annotations_dict = {}
+            self.qmc.l_event_flags_dict = {}
             self.qmc.redraw_keep_view(recomputeAllDeltas=False)
 
     @pyqtSlot()
@@ -17366,6 +17368,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.plus_language = settings.value('plus_language',self.plus_language)
             self.plus_user_id = settings.value('plus_user_id',self.plus_user_id)
             self.plus_account_id = settings.value('plus_account_id',self.plus_account_id)
+            plus.stock.coffee_label_normal_order = settings.value('standard_bean_labels',plus.stock.coffee_label_normal_order)
             #remember swaplcds and swapdeltalcds
             old_swaplcds = self.qmc.swaplcds
             old_swapdeltalcds = self.qmc.swapdeltalcds
@@ -19355,6 +19358,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.settingsSetValue(settings, default_settings, 'plus_language', self.plus_language, read_defaults)
                 self.settingsSetValue(settings, default_settings, 'plus_user_id', self.plus_user_id, read_defaults)
                 self.settingsSetValue(settings, default_settings, 'plus_account_id', self.plus_account_id, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'standard_bean_labels', plus.stock.coffee_label_normal_order, read_defaults)
 
             if not read_defaults: # we don't add those to the cache forcing those settings to be saved always
                 #save window geometry if not in fullscreen mode

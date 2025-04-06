@@ -59,7 +59,7 @@ try:
     from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
                                  QHBoxLayout, QVBoxLayout, QHeaderView, QLabel, QLineEdit, QTextEdit, QListView,  # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QGroupBox, QToolButton) # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGroupBox, QToolButton, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
 #    from PyQt6 import sip # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent, QLocale, QSignalBlocker # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
@@ -67,7 +67,7 @@ except ImportError:
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QComboBox, QDialogButtonBox, QGridLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QHBoxLayout, QVBoxLayout, QHeaderView, QLabel, QLineEdit, QTextEdit, QListView, # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QGroupBox, QToolButton) # @UnusedImport @Reimport  @UnresolvedImport
+                                 QGroupBox, QToolButton, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
 #    try:
 #        from PyQt5 import sip # type: ignore # @Reimport @UnresolvedImport @UnusedImport
 #    except ImportError:
@@ -983,11 +983,13 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.addRecentButton = QPushButton('+')
         self.addRecentButton.clicked.connect(self.addRecentRoast)
         self.addRecentButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.addRecentButton.setToolTip(QApplication.translate('Tooltip','Add roast properties to list of recent roasts'))
 
         # delete from recent
         self.delRecentButton = QPushButton('-')
         self.delRecentButton.clicked.connect(self.delRecentRoast)
         self.delRecentButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.delRecentButton.setToolTip(QApplication.translate('Tooltip','Remove roast properties from list of recent roasts'))
 
         self.recentRoastEnabled()
 
@@ -1299,7 +1301,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.plus_coffees_combo.setMinimumContentsLength(15)
             self.plus_blends_combo.setMinimumContentsLength(10)
             self.plus_stores_combo.setMinimumContentsLength(10)
-            self.plus_stores_combo.setMaximumWidth(120)
+            self.plus_stores_combo.setMaximumWidth(130)
             self.plus_coffees_combo.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Maximum)
             self.plus_coffees_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
             self.plus_blends_combo.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Maximum)
@@ -1307,18 +1309,41 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.plus_stores_combo.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Maximum)
             self.plus_stores_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
             # plus widget row
+
+            plusLineStores = QHBoxLayout()
+            plusLineStores.addSpacing(10)
+            plusLineStores.addWidget(self.plusStoreslabel)
+            plusLineStores.addSpacing(5)
+            plusLineStores.addWidget(self.plus_stores_combo)
+            plusLineStores.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom
+            plusLineStores.setSpacing(5)
+
+            self.plusLineStoresFrame = QFrame()
+            self.plusLineStoresFrame.setLayout(plusLineStores)
+
             plusLine = QHBoxLayout()
             plusLine.addWidget(self.plus_coffees_combo)
-            plusLine.addSpacing(15)
+            plusLine.addSpacing(10)
             plusLine.addWidget(self.plusBlendslabel)
-            plusLine.addSpacing(5)
+            plusLine.addSpacing(4)
             plusLine.addWidget(self.plus_blends_combo)
             plusLine.addWidget(self.plus_custom_blend_button)
-            plusLine.addSpacing(15)
-            plusLine.addWidget(self.plusStoreslabel)
-            plusLine.addSpacing(5)
-            plusLine.addWidget(self.plus_stores_combo)
-            textLayout.addWidget(self.plus_selected_line,4,1)
+            plusLine.addWidget(self.plusLineStoresFrame)
+
+            plusLine.setStretch(0, 3)
+            plusLine.setStretch(4, 3)
+            plusLine.setStretch(6, 1)
+
+            self.label_origin_flag = QCheckBox(QApplication.translate('CheckBox','Standard bean labels'))
+            self.label_origin_flag.setToolTip(QApplication.translate('Tooltip',"Beans are listed as 'origin, name' if ticked, otherwise as 'name, origin'"))
+            self.label_origin_flag.setChecked(bool(plus.stock.coffee_label_normal_order))
+            self.label_origin_flag.stateChanged.connect(self.labelOriginFlagChanged)
+
+            selectedLineLayout = QHBoxLayout()
+            selectedLineLayout.addWidget(self.plus_selected_line)
+            selectedLineLayout.addStretch()
+            selectedLineLayout.addWidget(self.label_origin_flag)
+            textLayout.addLayout(selectedLineLayout,4,1)
             textLayout.addWidget(plusCoffeeslabel,5,0)
             textLayout.addLayout(plusLine,5,1)
             textLayoutPlusOffset = 2 # to insert the plus widget row, we move the remaining ones one step lower
@@ -1901,19 +1926,13 @@ class editGraphDlg(ArtisanResizeablDialog):
                         if len(self.plus_stores) == 1:
                             self.plus_default_store = plus.stock.getStoreId(self.plus_stores[0])
                         if len(self.plus_stores) < 2:
-                            #self.plusStoreslabel.setVisible(False)
-                            if self.plusStoreslabel.isVisible():
-                                self.plusStoreslabel.hide()
-                            #self.plus_stores_combo.setVisible(False)
-                            if self.plus_stores_combo.isVisible():
-                                self.plus_stores_combo.hide()
+#                            self.plusStoreslabel.hide()
+#                            self.plus_stores_combo.hide()
+                            self.plusLineStoresFrame.hide()
                         else:
-                            #self.plusStoreslabel.setVisible(True)
-                            if not self.plusStoreslabel.isVisible():
-                                self.plusStoreslabel.show()
-                            #self.plus_stores_combo.setVisible(True)
-                            if not self.plus_stores_combo.isVisible():
-                                self.plus_stores_combo.show()
+#                            self.plusStoreslabel.show()
+#                            self.plus_stores_combo.show()
+                            self.plusLineStoresFrame.show()
                     except Exception as e:  # pylint: disable=broad-except
                         _log.exception(e)
                     self.plus_stores_combo.blockSignals(True)
@@ -2221,17 +2240,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.plus_store_selected_label = sd['location_label']
             cd = plus.stock.getCoffeeCoffeeDict(selected_coffee)
             self.plus_coffee_selected = cd.get('hr_id','')
-            origin = ''
-            if 'origin' in cd and cd['origin'] is not None:
-                origin = cd['origin']
-            picked = ''
-            if 'crop_date' in cd and 'picked' in cd['crop_date'] and len(cd['crop_date']['picked']) > 0 and cd['crop_date']['picked'][0] is not None and plus.stock.has_duplicate_origin_label(cd):
-                picked = f"{cd['crop_date']['picked'][0]}, "
-                if origin:
-                    origin = f'{origin} '
-            elif origin:
-                picked = ', '
-            self.plus_coffee_selected_label = f"{origin}{picked}{cd.get('label','')}"
+            self.plus_coffee_selected_label = plus.stock.coffeeLabel(cd)
             self.plus_blend_selected_label = None
             self.plus_blend_selected_spec = None
             self.plus_blend_selected_spec_labels = None
@@ -4167,6 +4176,11 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.roastpropertiesflag = 1
         else:
             self.aw.qmc.roastpropertiesflag = 0
+
+    @pyqtSlot(int)
+    def labelOriginFlagChanged(self, _:int = 0) -> None:
+        plus.stock.coffee_label_normal_order = self.label_origin_flag.isChecked()
+        self.populatePlusCoffeeBlendCombos()  # update the plus stock popups to display the correct bean label format
 
     @pyqtSlot(int)
     def roastpropertiesAutoOpenChanged(self, _:int = 0) -> None:

@@ -765,6 +765,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.aw.qmc.backgroundETcurve = bool(self.backgroundETflag.isChecked())
         self.aw.qmc.backgroundBTcurve = bool(self.backgroundBTflag.isChecked())
         self.aw.qmc.backgroundShowFullflag = bool(self.backgroundFullflag.isChecked())
+        self.aw.qmc.l_annotations_dict = {}
         self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True)
 
     @pyqtSlot(int)

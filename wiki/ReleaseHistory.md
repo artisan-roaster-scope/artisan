@@ -27,6 +27,7 @@ v3.1.2 (April XX, 2025)
   - adds quick keyboard focused event slider input using numeric keys followed by the ENTER/RETURN key. The last digit can be removed by using the backspace key. ESC cancels the action.
   - a double click on the graph canvas temporarily scales the y-axis to cover all artists
   - adds search to help pages
+  - adds artisan.plus inventory non-standard bean label formatting
 
 
 * NEW HARDWARE SUPPORT

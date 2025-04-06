@@ -3255,38 +3255,49 @@ class tgraphcanvas(FigureCanvas):
                     self.resetlines()
                     self.aw.plotEventSelection(ind)
                 if event_annos is not None:
-                    if self.eventsGraphflag == 4 and len(event_annos)>pos:
-                        event_anno = event_annos[pos]
+                    if (foreground and self.foregroundShowFullflag) or (not foreground and self.backgroundShowFullflag):
+                        corrected_event_pos = pos
+                    else: # extra one is added to line at the end, but without anno
+                        corrected_event_pos = pos - max(0, len(xdata) - len(event_annos) - 1) # before first anno there can be others line elements
+                    if self.eventsGraphflag == 4 and len(event_annos)>corrected_event_pos:
+                        event_anno = event_annos[corrected_event_pos]
                         self.updateEventAnno(
                             event_type,
                             event_anno,
                             (self.timex[time_idx] if foreground else self.timeB[time_idx]),
-                            event_ydata)
-                    elif self.eventsGraphflag == 3 and len(event_annos)>ind:
-                        event_anno = event_annos[ind]
-                        tempo:Optional[float] = None
-                        if foreground:
-                            if not self.showeventsonbt and self.temp1[ind] > self.temp2[ind] and self.ETcurve:
-                                if self.flagon:
-                                    tempo = self.temp1[time_idx]
-                                else:
-                                    tempo = self.stemp1[time_idx]
+                            event_ydata,
+                            background = not foreground)
+                    elif self.eventsGraphflag == 3 and ((foreground and (self.ETcurve or self.BTcurve)) or (not foreground and (self.backgroundETcurve or self.backgroundBTcurve))):
+                        event_ind = ind
+                        if foreground and not self.foregroundShowFullflag:
+                            event_ind -= self.foreground_evens_before_CAHRGE()
+                        if not foreground and not self.backgroundShowFullflag:
+                            event_ind -= self.background_evens_before_CAHRGE()
+                        if len(event_annos)>event_ind:
+                            event_anno = event_annos[event_ind]
+                            tempo:Optional[float] = None
+                            if foreground:
+                                if not self.showeventsonbt and self.temp1[ind] > self.temp2[ind] and self.ETcurve:
+                                    if self.flagon:
+                                        tempo = self.temp1[time_idx]
+                                    else:
+                                        tempo = self.stemp1[time_idx]
+                                elif self.BTcurve:
+                                    if self.flagon:
+                                        tempo = self.temp2[time_idx]
+                                    else:
+                                        tempo = self.stemp2[time_idx]
+                            elif not self.showeventsonbt and self.temp1B[ind] > self.temp2B[ind] and self.ETcurve:
+                                tempo = self.temp1B[time_idx]
                             elif self.BTcurve:
-                                if self.flagon:
-                                    tempo = self.temp2[time_idx]
-                                else:
-                                    tempo = self.stemp2[time_idx]
-                        elif not self.showeventsonbt and self.temp1B[ind] > self.temp2B[ind] and self.ETcurve:
-                            tempo = self.temp1B[time_idx]
-                        elif self.BTcurve:
-                            tempo = self.temp2B[time_idx]
-                        if tempo is not None:
-                            self.updateFlagAnno(
-                                event_type,
-                                event_anno,
-                                (self.timex[time_idx] if foreground else self.timeB[time_idx]),
-                                event_ydata,
-                                tempo)
+                                tempo = self.temp2B[time_idx]
+                            if tempo is not None:
+                                self.updateFlagAnno(
+                                    event_type,
+                                    event_anno,
+                                    (self.timex[time_idx] if foreground else self.timeB[time_idx]),
+                                    event_ydata,
+                                    tempo)
                 # redraw
                 if self.flagon:
                     self.redraw_keep_view(recomputeAllDeltas=False)
@@ -3327,32 +3338,41 @@ class tgraphcanvas(FigureCanvas):
                     # put back after rounding and converting back to position
                     ydata[self.foreground_event_pos] = (evalue if self.clampEvents else (evalue*event_pos_factor)+event_pos_offset)
                     if event_annos is not None:
-                        if self.eventsGraphflag == 4 and len(event_annos)>self.foreground_event_pos:
-                            event_anno = event_annos[self.foreground_event_pos]
+                        if self.foregroundShowFullflag:
+                            corrected_foreground_event_pos = self.foreground_event_pos
+                        else: # extra one is added to line at the end, but without anno
+                            corrected_foreground_event_pos = self.foreground_event_pos - max(0, len(xdata) - len(event_annos) - 1) # before first anno there can be others line elements
+                        if self.eventsGraphflag == 4 and len(event_annos)>corrected_foreground_event_pos:
+                            event_anno = event_annos[corrected_foreground_event_pos]
                             self.updateEventAnno(
                                 event_type,
                                 event_anno,
                                 self.timex[time_idx],
                                 event_ydata)
-                        elif self.eventsGraphflag == 3 and len(event_annos)>self.foreground_event_ind:
-                            event_anno = event_annos[self.foreground_event_ind]
-                            if not self.showeventsonbt and self.temp1[time_idx] > self.temp2[time_idx] and self.ETcurve:
-                                if self.flagon:
-                                    tempo = self.temp1[time_idx]
-                                else:
-                                    tempo = self.stemp1[time_idx]
-                            elif self.BTcurve:
-                                if self.flagon:
-                                    tempo = self.temp2[time_idx]
-                                else:
-                                    tempo = self.stemp2[time_idx]
-                            if tempo is not None:
-                                self.updateFlagAnno(
-                                    event_type,
-                                    event_anno,
-                                    self.timex[time_idx],
-                                    event_ydata,
-                                    tempo)
+                        elif self.eventsGraphflag == 3 and (self.ETcurve or self.BTcurve):
+                            event_ind = self.foreground_event_ind
+                            if not self.foregroundShowFullflag:
+                                event_ind -= self.foreground_evens_before_CAHRGE()
+                            if len(event_annos)>event_ind:
+                                event_anno = event_annos[event_ind]
+                                if self.ETcurve and (not self.BTcurve or
+                                            (not self.showeventsonbt and self.temp1[time_idx] > self.temp2[time_idx])):
+                                    if self.flagon:
+                                        tempo = self.temp1[time_idx]
+                                    else:
+                                        tempo = self.stemp1[time_idx]
+                                elif self.BTcurve:
+                                    if self.flagon:
+                                        tempo = self.temp2[time_idx]
+                                    else:
+                                        tempo = self.stemp2[time_idx]
+                                if tempo is not None:
+                                    self.updateFlagAnno(
+                                        event_type,
+                                        event_anno,
+                                        self.timex[time_idx],
+                                        event_ydata,
+                                        tempo)
                     # redraw
                     if self.flagon:
                         self.redraw_keep_view(recomputeAllDeltas=False)
@@ -3397,27 +3417,36 @@ class tgraphcanvas(FigureCanvas):
                     # put back after rounding and converting back to position
                     ydata[self.background_event_pos] = (evalue if self.clampEvents else (evalue*event_pos_factor)+event_pos_offset)
                     if event_annos is not None:
-                        if self.eventsGraphflag == 4 and len(event_annos)>self.background_event_pos:
-                            event_anno = event_annos[self.background_event_pos]
+                        if self.backgroundShowFullflag: # extra one is added to line at the end, but without anno
+                            corrected_backround_event_pos = self.background_event_pos #- max(0, len(xdata) - len(event_annos)) # before first anno there can be others line elements
+                        else:
+                            corrected_backround_event_pos = self.background_event_pos - max(0, len(xdata) - len(event_annos) - 1) # before first anno there can be others line elements
+                        if self.eventsGraphflag == 4 and len(event_annos)>corrected_backround_event_pos:
+                            event_anno = event_annos[corrected_backround_event_pos]
                             self.updateEventAnno(
                                 event_type,
                                 event_anno,
                                 self.timeB[time_idx],
-                                event_ydata)
-                        elif self.eventsGraphflag == 3 and len(event_annos)>self.background_event_ind:
-                            event_anno = event_annos[self.background_event_ind]
-                            if not self.showeventsonbt and self.temp1B[time_idx] > self.temp2B[time_idx] and self.ETcurve:
-                                tempo = self.temp1B[time_idx]
-                            elif self.BTcurve:
-                                tempo = self.temp2B[time_idx]
-                            if tempo is not None:
-                                self.updateFlagAnno(
-                                    event_type,
-                                    event_anno,
-                                    self.timeB[time_idx],
-                                    event_ydata,
-                                    tempo)
-
+                                event_ydata,
+                                background=True)
+                        elif self.eventsGraphflag == 3 and (self.backgroundETcurve or self.backgroundBTcurve):
+                            event_ind = self.background_event_ind
+                            if not self.backgroundShowFullflag:
+                                event_ind -= self.background_evens_before_CAHRGE()
+                            if len(event_annos)>event_ind:
+                                event_anno = event_annos[event_ind]
+                                if self.backgroundETcurve and (not self.backgroundBTcurve or
+                                            (not self.showeventsonbt and self.temp1B[time_idx] > self.temp2B[time_idx])):
+                                    tempo = self.temp1B[time_idx]
+                                elif self.BTcurve:
+                                    tempo = self.temp2B[time_idx]
+                                if tempo is not None:
+                                    self.updateFlagAnno(
+                                        event_type,
+                                        event_anno,
+                                        self.timeB[time_idx],
+                                        event_ydata,
+                                        tempo)
                     # redraw
                     if self.flagon:
                         self.redraw_keep_view(recomputeAllDeltas=False)
@@ -3505,7 +3534,8 @@ class tgraphcanvas(FigureCanvas):
             pass
 
     # update event annotation value and position in combo mode
-    def updateEventAnno(self, event_type:int, event_anno:Annotation, x:float, y:float) -> None:
+    # if background is True, we use the backgrounds event name/letters
+    def updateEventAnno(self, event_type:int, event_anno:Annotation, x:float, y:float, background:bool = False) -> None:
         # update marker position
         event_anno.set_position((x,y))
         # update marker text
@@ -3517,8 +3547,12 @@ class tgraphcanvas(FigureCanvas):
             evalue = max(0,int(round((y - event_pos_offset) / event_pos_factor)))
         evalue_internal = self.eventsExternal2InternalValue(evalue)
         # set anno text
-        etype = self.etypesf(event_type)
-        firstletter = self.etypeAbbrev(etype)
+        if background:
+            Betype = self.Betypesf(event_type)
+            firstletter = self.etypeAbbrev(Betype)
+        else:
+            etype = self.etypesf(event_type)
+            firstletter = self.etypeAbbrev(etype)
         secondletter = self.eventsvaluesShort(evalue_internal)
         if self.aw.eventslidertemp[event_type]:
             thirdletter = self.mode # postfix
@@ -3547,6 +3581,28 @@ class tgraphcanvas(FigureCanvas):
         firstletter = self.etypeAbbrev(etype)
         secondletter = self.eventsvaluesShort(evalue_internal)
         flag_anno.set_text(f'{firstletter}{secondletter}')
+
+    def foreground_evens_before_CAHRGE(self) -> int:
+        if self.timeindex[0] < 0:
+            return 0
+        # assuming self.specialevents are ordered by time
+        count = 0
+        for se in self.specialevents:
+            if se >= self.timeindex[0]:
+                return count
+            count += 1
+        return count
+
+    def background_evens_before_CAHRGE(self) -> int:
+        if self.timeindexB[0] < 0:
+            return 0
+        # assuming self.backgroundEvents are ordered by time
+        count = 0
+        for se in self.backgroundEvents:
+            if se >= self.timeindexB[0]:
+                return count
+            count += 1
+        return count
 
     def onmove(self, event:'MouseEvent') -> None:
         if all(x is None for x in [self.foreground_event_ind, self.foreground_event_pos, self.foreground_event_pick_position,
@@ -3584,37 +3640,47 @@ class tgraphcanvas(FigureCanvas):
                 ydata = ldots.get_ydata()
                 if set_y:
                     ydata[self.foreground_event_pos] = max(0,event.ydata)
-                    if not self.flagon and len(ydata) == self.foreground_event_pos + 2: # we also move the last dot up and down with the butlast
+                    if not self.flagon and len(ydata) == self.foreground_event_pos + 2 and (self.timeindex[6]==0 or self.timex[self.timeindex[6]] >= xdata[-1]):
+                        # we also move the last dot up and down with the butlast if automatically added, but only if that last one is not after DROP
                         ydata[-1] = ydata[-2]
                     ldots.set_ydata(ydata)
                 if event_annos is not None:
-                    if self.eventsGraphflag == 4 and len(event_annos)>self.foreground_event_pos:
-                        event_anno = event_annos[self.foreground_event_pos]
+                    if self.foregroundShowFullflag:
+                        corrected_foreground_event_pos = self.foreground_event_pos
+                    else: # extra one is added to line at the end, but without anno
+                        corrected_foreground_event_pos = self.foreground_event_pos - max(0, len(xdata) - len(event_annos) - 1) # before first anno there can be others line elements
+                    if self.eventsGraphflag == 4 and len(event_annos)>corrected_foreground_event_pos:
+                        event_anno = event_annos[corrected_foreground_event_pos]
                         self.updateEventAnno(
                             event_type,
                             event_anno,
                             xdata[self.foreground_event_pos],
                             ydata[self.foreground_event_pos])
-                    elif self.eventsGraphflag == 3 and len(event_annos)>self.foreground_event_ind:
-                        event_anno = event_annos[self.foreground_event_ind]
-                        idx = max(0,min(len(self.timex)-1,self.time2index(xdata[self.foreground_event_pos])))
-                        if not self.showeventsonbt and self.temp1[idx] > self.temp2[idx] and self.ETcurve:
-                            if self.flagon:
-                                tempo = self.temp1[idx]
-                            else:
-                                tempo = self.stemp1[idx]
-                        elif self.BTcurve:
-                            if self.flagon:
-                                tempo = self.temp2[idx]
-                            else:
-                                tempo = self.stemp2[idx]
-                        if tempo is not None:
-                            self.updateFlagAnno(
-                                event_type,
-                                event_anno,
-                                xdata[self.foreground_event_pos],
-                                ydata[self.foreground_event_pos],
-                                tempo)
+                    elif self.eventsGraphflag == 3 and (self.ETcurve or self.BTcurve):
+                        event_ind = self.foreground_event_ind
+                        if not self.foregroundShowFullflag:
+                            event_ind -= self.foreground_evens_before_CAHRGE()
+                        if len(event_annos)>event_ind:
+                            event_anno = event_annos[event_ind]
+                            idx = max(0,min(len(self.timex)-1,self.time2index(xdata[self.foreground_event_pos])))
+                            if self.ETcurve and (not self.BTcurve or
+                                            (not self.showeventsonbt and self.temp1[idx] > self.temp2[idx])):
+                                if self.flagon:
+                                    tempo = self.temp1[idx]
+                                else:
+                                    tempo = self.stemp1[idx]
+                            elif self.BTcurve:
+                                if self.flagon:
+                                    tempo = self.temp2[idx]
+                                else:
+                                    tempo = self.stemp2[idx]
+                            if tempo is not None:
+                                self.updateFlagAnno(
+                                    event_type,
+                                    event_anno,
+                                    xdata[self.foreground_event_pos],
+                                    ydata[self.foreground_event_pos],
+                                    tempo)
                 self.fig.canvas.draw_idle()
         elif (self.background_event_ind is not None and self.background_event_pos is not None and self.background_event_pick_position is not None and
                     len(self.backgroundEtypes)>self.background_event_ind):
@@ -3645,31 +3711,42 @@ class tgraphcanvas(FigureCanvas):
                 ydata = ldots.get_ydata()
                 if set_y:
                     ydata[self.background_event_pos] = max(0,event.ydata)
-                    if not self.flagon and len(ydata) == self.background_event_pos + 2: # we also move the last dot up and down with the butlast
+                    if not self.flagon and len(ydata) == self.background_event_pos + 2 and (self.timeindex[6]==0 or self.timex[self.timeindex[6]] >= xdata[-1]):
+                        # we also move the last dot up and down with the butlast if automatically added, but only if that last one is not after DROP
                         ydata[-1] = ydata[-2]
                     ldots.set_ydata(ydata)
                 if event_annos is not None:
-                    if self.eventsGraphflag == 4 and len(event_annos)>self.background_event_pos:
-                        event_anno = event_annos[self.background_event_pos]
+                    if self.backgroundShowFullflag:
+                        corrected_background_event_pos = self.background_event_pos
+                    else: # extra one is added to line at the end, but without anno
+                        corrected_background_event_pos = self.background_event_pos - max(0, len(xdata) - len(event_annos) - 1) # before first anno there can be others line elements
+                    if self.eventsGraphflag == 4 and len(event_annos)>corrected_background_event_pos:
+                        event_anno = event_annos[corrected_background_event_pos]
                         self.updateEventAnno(
                             event_type,
                             event_anno,
                             xdata[self.background_event_pos],
-                            ydata[self.background_event_pos])
-                    elif self.eventsGraphflag == 3 and len(event_annos)>self.background_event_ind:
-                        event_anno = event_annos[self.background_event_ind]
-                        idx = max(0,min(len(self.timeB)-1,self.backgroundtime2index(xdata[self.background_event_pos])))
-                        if not self.showeventsonbt and self.temp1B[idx] > self.temp2B[idx] and self.ETcurve:
-                            tempo = self.temp1B[idx]
-                        elif self.BTcurve:
-                            tempo = self.temp2B[idx]
-                        if tempo is not None:
-                            self.updateFlagAnno(
-                                event_type,
-                                event_anno,
-                                xdata[self.background_event_pos],
-                                ydata[self.background_event_pos],
-                                tempo)
+                            ydata[self.background_event_pos],
+                            background=True)
+                    elif self.eventsGraphflag == 3 and (self.backgroundETcurve or self.backgroundBTcurve):
+                        event_ind = self.background_event_ind
+                        if not self.backgroundShowFullflag:
+                            event_ind -= self.background_evens_before_CAHRGE()
+                        if len(event_annos)>event_ind:
+                            event_anno = event_annos[event_ind]
+                            idx = max(0,min(len(self.timeB)-1,self.backgroundtime2index(xdata[self.background_event_pos])))
+                            if self.backgroundETcurve and (not self.backgroundBTcurve or
+                                            (not self.showeventsonbt and self.temp1B[idx] > self.temp2B[idx])):
+                                tempo = self.temp1B[idx]
+                            elif self.BTcurve:
+                                tempo = self.temp2B[idx]
+                            if tempo is not None:
+                                self.updateFlagAnno(
+                                    event_type,
+                                    event_anno,
+                                    xdata[self.background_event_pos],
+                                    ydata[self.background_event_pos],
+                                    tempo)
                 self.fig.canvas.draw_idle()
 
     def clear_last_picked_event_selection(self) -> None:
@@ -9508,13 +9585,14 @@ class tgraphcanvas(FigureCanvas):
                                     alpha=self.backgroundalpha,
                                     label=self.aw.arabicReshape(QApplication.translate('Label', 'BackgroundDeltaBT')))
                         #check backgroundevents flag
-                        if self.backgroundeventsflag:
+                        if self.backgroundeventsflag and (self.backgroundETcurve or self.backgroundBTcurve):
                             height = 50 if self.mode == 'F' else 20
 
                             for p, bge in enumerate(self.backgroundEvents):
                                 if self.eventsGraphflag not in [2,4] or self.backgroundEtypes[p] > 3:
                                     event_idx = bge
-                                    if not self.backgroundShowFullflag and (((not self.autotimex or self.autotimexMode == 0) and event_idx < bcharge_idx) or event_idx > bdrop_idx):
+                                    if (not self.showEtypes[self.backgroundEtypes[p]] or
+                                        (not self.backgroundShowFullflag and (((not self.autotimex or self.autotimexMode == 0) and event_idx < bcharge_idx) or event_idx > bdrop_idx))):
                                         continue
                                     if self.backgroundEtypes[p] < 4:
                                         st1 = f'{self.Betypesf(self.backgroundEtypes[p])[0]}{self.eventsvaluesShort(self.backgroundEvalues[p])}'
@@ -9523,12 +9601,11 @@ class tgraphcanvas(FigureCanvas):
                                         if len(st1) == 0:
                                             st1 = 'E'
                                     # plot events on BT when showeventsonbt is true
-                                    if not self.showeventsonbt and self.temp1B[event_idx] > self.temp2B[event_idx]:
+                                    if self.backgroundETcurve and (not self.backgroundBTcurve or
+                                            (not self.showeventsonbt and self.temp1B[event_idx] > self.temp2B[event_idx])):
                                         temp = self.temp1B[event_idx]
                                     else:
                                         temp = self.temp2B[event_idx]
-                                    if not self.showEtypes[self.backgroundEtypes[p]]:
-                                        continue
                                     anno = self.ax.annotate(st1, xy=(self.timeB[event_idx], temp),path_effects=[],
                                                         xytext=(self.timeB[event_idx], temp+height),
                                                         va='center', ha='center',
@@ -10077,7 +10154,8 @@ class tgraphcanvas(FigureCanvas):
                                 elif self.showEtypes[self.specialeventstype[i]]:
                                     event_idx = int(self.specialevents[i])
                                     try:
-                                        if not(self.flagstart or self.foregroundShowFullflag or (charge_idx <= event_idx <= drop_idx) or (self.autotimex and self.autotimexMode != 0 and event_idx < charge_idx)):
+                                        if not(self.flagstart or self.foregroundShowFullflag or
+                                                (charge_idx <= event_idx <= drop_idx) or (self.autotimex and self.autotimexMode != 0 and event_idx < charge_idx)):
                                             continue
 
                                         firstletter = self.etypeAbbrev(self.etypes[self.specialeventstype[i]])
