@@ -1794,7 +1794,11 @@ class serialport:
                     self.aw.qmc.markSCsSignal.emit(True) # SCs
                 elif event_flag == 7 and self.aw.qmc.timeindex[5] == 0:
                     self.aw.qmc.markSCeSignal.emit(True) # SCe
-                elif event_flag == 8 and self.aw.qmc.timeindex[6] == 0:
+                elif (event_flag == 8 and self.aw.qmc.timeindex[6] == 0 and
+                    self.aw.qmc.timeindex[0] > -1 and self.aw.qmc.autoDropIdx == 0 and
+                    (self.aw.qmc.timex[-1] - self.aw.qmc.timex[self.aw.qmc.timeindex[0]]) > 7*60):
+                    # only after 7min into the roast and if CHARGE is marked
+                    self.aw.qmc.autoDropIdx = len(self.aw.qmc.timex) - 2
                     self.aw.qmc.markDropSignal.emit(True) # DROP
                 elif event_flag == 9 and self.aw.qmc.timeindex[7] == 0:
                     self.aw.qmc.markCoolSignal.emit(True) # COOL

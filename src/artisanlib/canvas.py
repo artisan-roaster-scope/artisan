@@ -4779,10 +4779,10 @@ class tgraphcanvas(FigureCanvas):
                             except Exception as e: # pylint: disable=broad-except
                                 _log.exception(e)
                         # autodetect DROP event
-                        # only if 8min into roast and BT>160C/320F
-                        if self.autoDropIdx == 0 and self.autoDropFlag and self.autoDROPenabled and self.timeindex[0] > -1 and not self.timeindex[6] and \
+                        # only if 7min into roast and BT>160C/320F
+                        if self.autoDropIdx == 0 and self.autoDropFlag and self.autoDROPenabled and self.timeindex[0] > -1 and self.timeindex[6] == 0 and \
                             length_of_qmc_timex >= 5 and ((self.mode == 'C' and sample_temp2[-1] > 160) or (self.mode == 'F' and sample_temp2[-1] > 320)) and\
-                            ((sample_timex[-1] - sample_timex[self.timeindex[0]]) > 420):
+                            ((sample_timex[-1] - sample_timex[self.timeindex[0]]) > 7*60):
                             b = self.aw.BTbreak(length_of_qmc_timex - 1,event='DROP') # call BTbreak with last index
                             if b > 0:
                                 # we found a BT break at the current index minus b
@@ -5881,14 +5881,17 @@ class tgraphcanvas(FigureCanvas):
                 _, _, exc_tb = sys.exc_info()
                 self.adderror((QApplication.translate('Error Message','Exception:') + ' processAlarm() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
-    # called only after CHARGE
+    # called only after CHARGE with at least 7min into the roast
     def playbackdrop(self) -> None:
         try:
             #needed when using device NONE
-            if (self.autoDropIdx == 0 and self.timex and self.timeindexB[6] and not self.timeindex[6] and
+            if (self.timeindex[0] > -1 and self.autoDropIdx == 0 and self.timex and self.timeindexB[6]>0 and self.timeindex[6] == 0 and
+                (self.timex[-1] - self.timex[self.timeindex[0]]) > 7*60 and
                 ((self.replayType == 0 and self.timeB[self.timeindexB[6]] - self.timeclock.elapsed()/1000. <= 0) or # by time
-                    (self.replayType == 1 and self.TPalarmtimeindex and self.ctemp2[-1] is not None and self.stemp2B[self.timeindexB[6]] - self.ctemp2[-1] <= 0) or # by BT
-                    (self.replayType == 2 and self.TPalarmtimeindex and self.ctemp1[-1] is not None and self.stemp1B[self.timeindexB[6]] - self.ctemp1[-1] <= 0))): # by ET
+                    (self.replayType == 1 and len(self.ctemp2)>0 and len(self.stemp2B)>self.timeindexB[6] and  # pylint: disable=chained-comparison
+                        self.TPalarmtimeindex and self.ctemp2[-1] is not None and self.stemp2B[self.timeindexB[6]] - self.ctemp2[-1] <= 0) or # by BT
+                    (self.replayType == 2 and len(self.ctemp1)>0 and len(self.stemp1B)>self.timeindexB[6] and  # pylint: disable=chained-comparison
+                        self.TPalarmtimeindex and self.ctemp1[-1] is not None and self.stemp1B[self.timeindexB[6]] - self.ctemp1[-1] <= 0))): # by ET
                 self.autoDropIdx = len(self.timex) - 2
                 self.markDropSignal.emit(False)
         except Exception as ex: # pylint: disable=broad-except
@@ -14703,7 +14706,7 @@ class tgraphcanvas(FigureCanvas):
                     # we check if this is the first DROP mark on this roast
                     firstDROP = self.timeindex[6] == 0 # on UNDO DROP we do not send the record to plus
                     if self.aw.buttonDROP.isFlat() and self.timeindex[6] > 0:
-                        self.autoDropIdx = -1 # disable autoCharge to allow manual re-CHARGE
+                        self.autoDropIdx = -1 # disable autoDROP to allow manual re-DROP
                         # undo wrongly set FCs
                         # deactivate autoDROP
                         self.autoDROPenabled = False

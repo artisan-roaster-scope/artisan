@@ -57,6 +57,7 @@ v3.1.2 (April XX, 2025)
   - improved accuracy on rendering [artisan.plus](https://artisan.plus) blend component weights
   - improved Cropster importer
   - the autosave mechanism will no longer save accidentally produced recordings on OFF lacking the CHARGE and DROP events. Note that that for roasts longer than 7min, the end of a roast is automatically added as DROP event on OFF, if no DROP event was set before.
+  - disables playback of DROP event, only active after CHARGE, for the first 7min into the roast
 
 * FIXES
   - fixes processing of MODBUS function 2 request which broke the just introduced autoCHARGE/autoDROP triggered by [Loring machines](https://artisan-scope.org/machines/loring/)
@@ -69,6 +70,7 @@ v3.1.2 (April XX, 2025)
   - fixes an issue where the PID Input for external MODBUS/SV PIDs was not correctly persisted
   - fixes broken `button` Modbus Command
   - fixes communication with some Santoker R Master Series machines ([Issue #1811](../../../issues/1811))
+  - fixes DROP being triggered by Kaleido machine on CHARGE ([Issue #1808](../../../issues/1808))
 
 * REMOVALS
   - support for the non-standard MODBUS little-endian byte order has been removed
