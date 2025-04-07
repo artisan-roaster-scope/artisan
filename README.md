@@ -17,7 +17,7 @@ Visual scope for coffee roasters
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 
-*WARNING: pre-release builds may not work.  Use at your own risk.*
+*WARNING: pre-release (continuous) builds may not work.  Use at your own risk.*
 
 
 Summary
