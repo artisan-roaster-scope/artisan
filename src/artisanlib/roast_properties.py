@@ -1331,7 +1331,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             plusLine.addWidget(self.plusLineStoresFrame)
 
             plusLine.setStretch(0, 3)
-            plusLine.setStretch(4, 3)
+            plusLine.setStretch(4, 2)
             plusLine.setStretch(6, 1)
 
             self.label_origin_flag = QCheckBox(QApplication.translate('CheckBox','Standard bean labels'))

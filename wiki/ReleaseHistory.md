@@ -56,6 +56,7 @@ v3.1.2 (April XX, 2025)
   - suppresses pick year from [artisan.plus](https://artisan.plus) beans pop up and roast name suggestion if origin/name combination is unique
   - improved accuracy on rendering [artisan.plus](https://artisan.plus) blend component weights
   - improved Cropster importer
+  - the autosave mechanism will no longer save accidentally produced recordings on OFF lacking the CHARGE and DROP events. Note that that for roasts longer than 7min, the end of a roast is automatically added as DROP event on OFF, if no DROP event was set before.
 
 * FIXES
   - fixes processing of MODBUS function 2 request which broke the just introduced autoCHARGE/autoDROP triggered by [Loring machines](https://artisan-scope.org/machines/loring/)
