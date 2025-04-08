@@ -5646,8 +5646,8 @@ class tgraphcanvas(FigureCanvas):
 
     @pyqtSlot(str,int)
     def moveBackgroundAndRedraw(self, direction:str, step:int) -> None:
-        self.movebackground(direction, step)
-        self.redraw(recomputeAllDeltas=False, #(direction in {'left', 'right'}),
+        self.movebackground(direction, step) # direction in {'left', 'right'}
+        self.redraw_keep_view(recomputeAllDeltas=False,
             re_smooth_foreground=False,
             re_smooth_background=False)
 
@@ -6086,7 +6086,7 @@ class tgraphcanvas(FigureCanvas):
                                 if (event_type not in slider_events and # only if there is no slider event of the corresponding type
                                         self.specialeventplayback[event_type] and # only replay event types activated for replay
                                         (str(self.etypesf(event_type) == str(self.Betypesf(event_type)))) and
-                                        #self.aw.eventslidervisibilities[event_type] and # we ramp also events ofinvisible sliders
+                                        #self.aw.eventslidervisibilities[event_type] and # we ramp also events of invisible sliders
                                         self.specialeventplaybackramp[event_type]):   # only calculate ramp for ramping events
 
                                     ## calculate ramping

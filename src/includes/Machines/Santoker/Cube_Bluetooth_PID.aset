@@ -1,10 +1,12 @@
 [General]
-Delay=500
+Delay=200
 roastertype_setup=Santoker Cube BT PID
 roasterheating_setup=3
 roastersize_setup=0.1
 specialeventplayback=true, true, true, false
 specialeventplaybackramp=false, false, true, false
+dropDuplicates=true
+dropDuplicatesLimit=0.1
 
 [Device]
 id=134
@@ -144,9 +146,9 @@ invertControl=false
 negativeTargetMax=100
 negativeTargetMin=0
 negativeTargetRangeLimit=false
-pidKd=6
-pidKi=0.13
-pidKp=1.1
+pidKp=0.65
+pidKi=0.025
+pidKd=3.5
 pidNegativeTarget=0
 pidOnCHARGE=true
 pidPositiveTarget=4

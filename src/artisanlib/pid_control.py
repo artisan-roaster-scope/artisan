@@ -1694,6 +1694,7 @@ class PIDcontrol:
                 self.aw.moveSVslider(sv,setValue=True)
             self.aw.qmc.pid.setTarget(sv,init=init)
             self.sv = sv # remember last sv
+            self.svValue = sv
 
     # set RS patterns from one of the RS sets
     def setRSpattern(self, n:int) -> None:
