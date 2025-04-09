@@ -32,3 +32,7 @@ outbox/
 #src/translations/*.qm
 #src/help/[!_]*.py
 #doc/help_dialogs/Output_html/[!_]*.html
+/.vs/StarRoaster/CopilotIndices/17.13.441.19478
+/.vs/StarRoaster/FileContentIndex
+/.vs/StarRoaster/v17
+/.vs
