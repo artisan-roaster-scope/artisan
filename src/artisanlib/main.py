@@ -797,7 +797,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 
         # toolitem entries of the form (text, tooltip_text, image_file, callback)
         self.toolitems: Tuple[Union[Tuple[str, ...], Tuple[None, ...]], ...] = (
-                ('Plus', QApplication.translate('Tooltip', 'Connect to plus service'), 'plus', 'plus'),
+                
                 ('', QApplication.translate('Tooltip', 'Subscription'), 'plus-pro', 'subscription'),
                 (QApplication.translate('Toolbar', 'Home'), QApplication.translate('Tooltip', 'Reset original view'), 'home', 'home'),
                 (QApplication.translate('Toolbar', 'Back'), QApplication.translate('Tooltip', 'Back to  previous view'), 'back', 'back'),
@@ -4941,7 +4941,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         else: # we reset the tare value
             self.channel_tare_values[n] = 0
 
+# Comment for disable asrtisan.plus
 #PLUS
+
     @pyqtSlot()
     def updatePlusStatusSlot(self) -> None:
         self.updatePlusStatus()
@@ -5022,7 +5024,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             self.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' updatePlusStatus(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
-
 
 
     # turns channel off after millis
