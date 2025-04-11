@@ -34,6 +34,7 @@ v3.1.2 (April XX, 2025)
   - adds a new [IMF](https://artisan-scope.org/machines/imf/) machine setup that supports machine control enabling IT/BT and IT/Power profiling
   - updated [Giesen](https://artisan-scope.org/machines/giesen/) machine support (now incl. sample roasters and PRO machines) supporting the control of additional actors
   - adds support for [Carmomaq's Stratto Lab sample roaster](https://artisan-scope.org/machines/carmomaq/)
+  - adds [Santoker Cube](https://artisan-scope.org/machines/santoker/) PID setup
   - adds support for the [DCC1100 and DCC1120 Brushless DC Motor controllers and the DCC1020 DC Motor controller](https://artisan-scope.org/devices/phidgets/#45-dc-motor-control) ([Discussion #1750](../../../discussions/1750))
   - adds [ROEST](https://artisan-scope.org/machines/roest/) CSV import
   - adds [Thermoworks BlueDOT](https://www.thermoworks.com/bluedot) support

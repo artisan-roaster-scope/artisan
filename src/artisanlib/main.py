@@ -11618,13 +11618,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.alarmAction.setEnabled(False)
             self.autosaveAction.setEnabled(False)
             self.batchAction.setEnabled(False)
-            self.readingsAction.setEnabled(False)
             self.buttonsAction.setChecked(False)
             self.buttonsAction.setEnabled(False)
             self.slidersAction.setChecked(False)
             self.slidersAction.setEnabled(False)
-            self.eventsEditorAction.setChecked(False)
-            self.eventsEditorAction.setEnabled(False)
             self.simulatorAction.setEnabled(False)
 
     def update_minieventline_visibility(self) -> None:
@@ -19216,7 +19213,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     if isinstance(m, str):
                         self.qmc.EvalueMarker[0] = m
                     self.qmc.EvalueMarkerSize[0] = max(self.qmc.markersize_min, self.qmc.l_eventtype1dots.get_markersize())
-                    self.qmc.EvalueColor[0] = self.getColor(self.qmc.l_eventtype1dots)
+                    self.qmc.EvalueColor[0] = self.getColor(self.qmc.l_eventtype1dots)[:7] # no alpha for event colors as it is handled separately
                     self.qmc.Evaluelinethickness[0] = max(self.qmc.linewidth_min, self.qmc.l_eventtype1dots.get_linewidth())
                     self.qmc.etypes[0] = str(self.qmc.l_eventtype1dots.get_label())
                 if self.qmc.l_eventtype2dots is not None:
@@ -19224,7 +19221,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     if isinstance(m, str):
                         self.qmc.EvalueMarker[1] = m
                     self.qmc.EvalueMarkerSize[1] = max(self.qmc.markersize_min, self.qmc.l_eventtype2dots.get_markersize())
-                    self.qmc.EvalueColor[1] = self.getColor(self.qmc.l_eventtype2dots)
+                    self.qmc.EvalueColor[1] = self.getColor(self.qmc.l_eventtype2dots)[:7] # no alpha for event colors as it is handled separately
                     self.qmc.Evaluelinethickness[1] = max(self.qmc.linewidth_min, self.qmc.l_eventtype2dots.get_linewidth())
                     self.qmc.etypes[1] = str(self.qmc.l_eventtype2dots.get_label())
                 if self.qmc.l_eventtype3dots is not None:
@@ -19232,7 +19229,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     if isinstance(m, str):
                         self.qmc.EvalueMarker[2] = m
                     self.qmc.EvalueMarkerSize[2] = max(self.qmc.markersize_min, self.qmc.l_eventtype3dots.get_markersize())
-                    self.qmc.EvalueColor[2] = self.getColor(self.qmc.l_eventtype3dots)
+                    self.qmc.EvalueColor[2] = self.getColor(self.qmc.l_eventtype3dots)[:7] # no alpha for event colors as it is handled separately
                     self.qmc.Evaluelinethickness[2] = max(self.qmc.linewidth_min, self.qmc.l_eventtype3dots.get_linewidth())
                     self.qmc.etypes[2] = str(self.qmc.l_eventtype3dots.get_label())
                 if self.qmc.l_eventtype4dots is not None:
@@ -19240,7 +19237,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     if isinstance(m, str):
                         self.qmc.EvalueMarker[3] = m
                     self.qmc.EvalueMarkerSize[3] = max(self.qmc.markersize_min, self.qmc.l_eventtype4dots.get_markersize())
-                    self.qmc.EvalueColor[3] = self.getColor(self.qmc.l_eventtype4dots)
+                    self.qmc.EvalueColor[3] = self.getColor(self.qmc.l_eventtype4dots)[:7] # no alpha for event colors as it is handled separately
                     self.qmc.Evaluelinethickness[3] = max(self.qmc.linewidth_min, self.qmc.l_eventtype4dots.get_linewidth())
                     self.qmc.etypes[3] = str(self.qmc.l_eventtype4dots.get_label())
         except Exception as e: # pylint: disable=broad-except

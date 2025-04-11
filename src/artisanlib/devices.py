@@ -1456,159 +1456,163 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         tab7Layout.addStretch()
         tab7Layout.setContentsMargins(2,10,2,5)
 
-        self.scale1_devices:ScaleSpecs = [] # discovered scale1 devices
-        self.scale2_devices:ScaleSpecs = [] # discovered scale2 devices
-        self.scale1_weight:Optional[float] = None # weight of scale 1 in g
-        self.scale2_weight:Optional[float] = None # weight of scale 2 in g
 
-        scale1ModelLabel = QLabel(QApplication.translate('Label','Model'))
-        self.scale1ModelComboBox = QComboBox()
-        self.scale1ModelComboBox.setToolTip(QApplication.translate('Tooltip','Choose the model of your scale'))
-        self.scale1ModelComboBox.setMinimumWidth(150)
-        self.scale1ModelComboBox.addItems([''] + [m for (m,_) in SUPPORTED_SCALES])
-        self.scale1NameLabel = QLabel(QApplication.translate('Label','Name'))
-        self.scale1NameComboBox = QComboBox()
-        self.scale1NameComboBox.setToolTip(QApplication.translate('Tooltip','Choose your scale'))
-        self.scale1NameComboBox.setMinimumWidth(150)
-        self.scale1ScanButton = QPushButton(QApplication.translate('Button', 'Scan'))
-        self.scale1ScanButton.setToolTip(QApplication.translate('Tooltip','Start scanning to discover your scale'))
-        self.scale1ScanButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.scale1Weight = QLabel() # displays the current reading
-        self.scale1Weight.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
-        self.scale1Weight.setMinimumWidth(60)
-        self.scale1Weight.setEnabled(False)
-        self.scale1TareButton = QPushButton(QApplication.translate('Button', 'Tare'))
-        self.scale1TareButton.setToolTip(QApplication.translate('Tooltip','Tare your scale'))
-        self.scale1TareButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.scale1TareButton.setEnabled(False)
-        if self.aw.scale1_model is None:
-            self.scale1NameComboBox.setEnabled(False)
-            self.scale1ScanButton.setEnabled(False)
-        elif self.aw.scale1_model < len(SUPPORTED_SCALES):
-            self.scale1ModelComboBox.setCurrentIndex(self.aw.scale1_model + 1)
-            if self.aw.scale1_name is None:
+        # scale tab
+        tab8Layout = QGridLayout()
+        tab8LayoutOFF = QVBoxLayout()
+        if not self.aw.app.artisanviewerMode:
+            self.scale1_devices:ScaleSpecs = [] # discovered scale1 devices
+            self.scale2_devices:ScaleSpecs = [] # discovered scale2 devices
+            self.scale1_weight:Optional[float] = None # weight of scale 1 in g
+            self.scale2_weight:Optional[float] = None # weight of scale 2 in g
+
+            scale1ModelLabel = QLabel(QApplication.translate('Label','Model'))
+            self.scale1ModelComboBox = QComboBox()
+            self.scale1ModelComboBox.setToolTip(QApplication.translate('Tooltip','Choose the model of your scale'))
+            self.scale1ModelComboBox.setMinimumWidth(150)
+            self.scale1ModelComboBox.addItems([''] + [m for (m,_) in SUPPORTED_SCALES])
+            self.scale1NameLabel = QLabel(QApplication.translate('Label','Name'))
+            self.scale1NameComboBox = QComboBox()
+            self.scale1NameComboBox.setToolTip(QApplication.translate('Tooltip','Choose your scale'))
+            self.scale1NameComboBox.setMinimumWidth(150)
+            self.scale1ScanButton = QPushButton(QApplication.translate('Button', 'Scan'))
+            self.scale1ScanButton.setToolTip(QApplication.translate('Tooltip','Start scanning to discover your scale'))
+            self.scale1ScanButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.scale1Weight = QLabel() # displays the current reading
+            self.scale1Weight.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+            self.scale1Weight.setMinimumWidth(60)
+            self.scale1Weight.setEnabled(False)
+            self.scale1TareButton = QPushButton(QApplication.translate('Button', 'Tare'))
+            self.scale1TareButton.setToolTip(QApplication.translate('Tooltip','Tare your scale'))
+            self.scale1TareButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.scale1TareButton.setEnabled(False)
+            if self.aw.scale1_model is None:
                 self.scale1NameComboBox.setEnabled(False)
-            else:
-                self.scale1NameComboBox.setEnabled(True)
-        self.scale1ModelComboBox.currentIndexChanged.connect(self.scale1ModelChanged)
-        self.scale1NameComboBox.currentIndexChanged.connect(self.scale1NameChanged)
-        self.scale1ScanButton.clicked.connect(self.scanScale1)
-        self.scale1TareButton.clicked.connect(self.tareScale1)
-        self.update_scale1_weight(None)
+                self.scale1ScanButton.setEnabled(False)
+            elif self.aw.scale1_model < len(SUPPORTED_SCALES):
+                self.scale1ModelComboBox.setCurrentIndex(self.aw.scale1_model + 1)
+                if self.aw.scale1_name is None:
+                    self.scale1NameComboBox.setEnabled(False)
+                else:
+                    self.scale1NameComboBox.setEnabled(True)
+            self.scale1ModelComboBox.currentIndexChanged.connect(self.scale1ModelChanged)
+            self.scale1NameComboBox.currentIndexChanged.connect(self.scale1NameChanged)
+            self.scale1ScanButton.clicked.connect(self.scanScale1)
+            self.scale1TareButton.clicked.connect(self.tareScale1)
+            self.update_scale1_weight(None)
 
-        if self.aw.scale1_name and self.aw.scale1_id:
-            self.updateScale1devices([(self.aw.scale1_name, self.aw.scale1_id)])
+            if self.aw.scale1_name and self.aw.scale1_id:
+                self.updateScale1devices([(self.aw.scale1_name, self.aw.scale1_id)])
 
-        scale1Grid = QGridLayout()
-        scale1Grid.addWidget(scale1ModelLabel,0,0)
-        scale1Grid.addWidget(self.scale1ModelComboBox,0,1)
-        scale1Grid.addWidget(self.scale1NameLabel,1,0)
-        scale1Grid.addWidget(self.scale1NameComboBox,1,1)
-        scale1Grid.addWidget(self.scale1ScanButton,1,2)
-        scale1Grid.addWidget(self.scale1Weight,1,3,Qt.AlignmentFlag.AlignCenter)
-        scale1Grid.addWidget(self.scale1TareButton,1,4,Qt.AlignmentFlag.AlignRight)
-        scale1Grid.setHorizontalSpacing(10)
-        scale1Grid.setVerticalSpacing(10)
-        scale1Grid.setContentsMargins(10,10,10,10)
-        scale1HLayout = QHBoxLayout()
-        scale1HLayout.addLayout(scale1Grid)
-        scale1HLayout.addStretch()
-        scale1HLayout.setContentsMargins(0,0,0,0)
-        scale1Layout = QVBoxLayout()
-        scale1Layout.addLayout(scale1HLayout)
-        scale1Layout.setContentsMargins(0,0,0,0)
+            scale1Grid = QGridLayout()
+            scale1Grid.addWidget(scale1ModelLabel,0,0)
+            scale1Grid.addWidget(self.scale1ModelComboBox,0,1)
+            scale1Grid.addWidget(self.scale1NameLabel,1,0)
+            scale1Grid.addWidget(self.scale1NameComboBox,1,1)
+            scale1Grid.addWidget(self.scale1ScanButton,1,2)
+            scale1Grid.addWidget(self.scale1Weight,1,3,Qt.AlignmentFlag.AlignCenter)
+            scale1Grid.addWidget(self.scale1TareButton,1,4,Qt.AlignmentFlag.AlignRight)
+            scale1Grid.setHorizontalSpacing(10)
+            scale1Grid.setVerticalSpacing(10)
+            scale1Grid.setContentsMargins(10,10,10,10)
+            scale1HLayout = QHBoxLayout()
+            scale1HLayout.addLayout(scale1Grid)
+            scale1HLayout.addStretch()
+            scale1HLayout.setContentsMargins(0,0,0,0)
+            scale1Layout = QVBoxLayout()
+            scale1Layout.addLayout(scale1HLayout)
+            scale1Layout.setContentsMargins(0,0,0,0)
 
-        scale2ModelLabel = QLabel(QApplication.translate('Label','Model'))
-        self.scale2ModelComboBox = QComboBox()
-        self.scale2ModelComboBox.setToolTip(QApplication.translate('Tooltip','Choose the model of your scale'))
-        self.scale2ModelComboBox.setMinimumWidth(150)
-        self.scale2ModelComboBox.addItems([''] + [m for (m,_) in SUPPORTED_SCALES])
-        self.scale2NameLabel = QLabel(QApplication.translate('Label','Name'))
-        self.scale2NameComboBox = QComboBox()
-        self.scale2NameComboBox.setToolTip(QApplication.translate('Tooltip','Choose your scale'))
-        self.scale2NameComboBox.setMinimumWidth(150)
-        self.scale2ScanButton = QPushButton(QApplication.translate('Button', 'Scan'))
-        self.scale2ScanButton.setToolTip(QApplication.translate('Tooltip','Start scanning to discover your scale'))
-        self.scale2ScanButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.scale2Weight = QLabel() # displays the current reading
-        self.scale2Weight.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
-        self.scale2Weight.setMinimumWidth(60)
-        self.scale2Weight.setEnabled(False)
-        self.scale2TareButton = QPushButton(QApplication.translate('Button', 'Tare'))
-        self.scale2TareButton.setToolTip(QApplication.translate('Tooltip','Tare your scale'))
-        self.scale2TareButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.scale2TareButton.setEnabled(False)
-        if self.aw.scale2_model is None:
-            self.scale2NameComboBox.setEnabled(False)
-            self.scale2ScanButton.setEnabled(False)
-        elif self.aw.scale2_model < len(SUPPORTED_SCALES):
-            self.scale2ModelComboBox.setCurrentIndex(self.aw.scale2_model + 1)
-            if self.aw.scale2_name is None:
+            scale2ModelLabel = QLabel(QApplication.translate('Label','Model'))
+            self.scale2ModelComboBox = QComboBox()
+            self.scale2ModelComboBox.setToolTip(QApplication.translate('Tooltip','Choose the model of your scale'))
+            self.scale2ModelComboBox.setMinimumWidth(150)
+            self.scale2ModelComboBox.addItems([''] + [m for (m,_) in SUPPORTED_SCALES])
+            self.scale2NameLabel = QLabel(QApplication.translate('Label','Name'))
+            self.scale2NameComboBox = QComboBox()
+            self.scale2NameComboBox.setToolTip(QApplication.translate('Tooltip','Choose your scale'))
+            self.scale2NameComboBox.setMinimumWidth(150)
+            self.scale2ScanButton = QPushButton(QApplication.translate('Button', 'Scan'))
+            self.scale2ScanButton.setToolTip(QApplication.translate('Tooltip','Start scanning to discover your scale'))
+            self.scale2ScanButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.scale2Weight = QLabel() # displays the current reading
+            self.scale2Weight.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+            self.scale2Weight.setMinimumWidth(60)
+            self.scale2Weight.setEnabled(False)
+            self.scale2TareButton = QPushButton(QApplication.translate('Button', 'Tare'))
+            self.scale2TareButton.setToolTip(QApplication.translate('Tooltip','Tare your scale'))
+            self.scale2TareButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.scale2TareButton.setEnabled(False)
+            if self.aw.scale2_model is None:
                 self.scale2NameComboBox.setEnabled(False)
+                self.scale2ScanButton.setEnabled(False)
+            elif self.aw.scale2_model < len(SUPPORTED_SCALES):
+                self.scale2ModelComboBox.setCurrentIndex(self.aw.scale2_model + 1)
+                if self.aw.scale2_name is None:
+                    self.scale2NameComboBox.setEnabled(False)
+                else:
+                    self.scale2NameComboBox.setEnabled(True)
+            self.scale2ModelComboBox.currentIndexChanged.connect(self.scale2ModelChanged)
+            self.scale2NameComboBox.currentIndexChanged.connect(self.scale2NameChanged)
+            self.scale2ScanButton.clicked.connect(self.scanScale2)
+            self.scale2TareButton.clicked.connect(self.tareScale2)
+            self.update_scale2_weight(None)
+
+            if self.aw.scale2_name and self.aw.scale2_id:
+                self.updateScale2devices([(self.aw.scale2_name, self.aw.scale2_id)])
+
+            scale2Grid = QGridLayout()
+            scale2Grid.addWidget(scale2ModelLabel,0,0)
+            scale2Grid.addWidget(self.scale2ModelComboBox,0,1)
+            scale2Grid.addWidget(self.scale2NameLabel,1,0)
+            scale2Grid.addWidget(self.scale2NameComboBox,1,1)
+            scale2Grid.addWidget(self.scale2ScanButton,1,2)
+            scale2Grid.addWidget(self.scale2Weight,1,3,Qt.AlignmentFlag.AlignCenter)
+            scale2Grid.addWidget(self.scale2TareButton,1,4,Qt.AlignmentFlag.AlignRight)
+            scale2Grid.setHorizontalSpacing(10)
+            scale2Grid.setVerticalSpacing(10)
+            scale2Grid.setContentsMargins(10,10,10,10)
+            scale2HLayout = QHBoxLayout()
+            scale2HLayout.setContentsMargins(0,0,0,0)
+            scale2HLayout.addLayout(scale2Grid)
+            scale2HLayout.addStretch()
+            scale2Layout = QVBoxLayout()
+            scale2Layout.addLayout(scale2HLayout)
+            scale2Layout.setContentsMargins(0,0,0,0)
+
+            self.taskWebDisplayGreenURL = QLabel()
+            self.taskWebDisplayGreenURL.setOpenExternalLinks(True)
+            self.taskWebDisplayGreenFlag = QCheckBox()
+            self.taskWebDisplayGreenFlag.setToolTip(QApplication.translate('Tooltip','Start/stop the green coffee weighting task web display'))
+            self.taskWebDisplayGreenFlag.setChecked(self.aw.taskWebDisplayGreenActive)
+            self.taskWebDisplayGreenFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.taskWebDisplayGreenFlag.clicked.connect(self.taskWebDisplayGreen)
+            self.taskWebDisplayGreenPortLabel = QLabel(QApplication.translate('Label', 'Port'))
+            self.taskWebDisplayGreenPort = QLineEdit(str(self.aw.taskWebDisplayGreenPort))
+            self.taskWebDisplayGreenPort.setToolTip(QApplication.translate('Tooltip','IP port of the green coffee weighting task web display'))
+            self.taskWebDisplayGreenPort.setAlignment(Qt.AlignmentFlag.AlignRight)
+            self.taskWebDisplayGreenPort.setValidator(QRegularExpressionValidator(QRegularExpression(r'^[0-9]{1,4}$'),self))
+            self.taskWebDisplayGreenPort.setMaximumWidth(45)
+            self.taskWebDisplayGreenPort.editingFinished.connect(self.changeTaskWebDisplayGreenPort)
+            self.taskWebDisplayGreenPort.setDisabled(self.aw.taskWebDisplayGreenActive)
+            self.taskWebDisplayGreenQRpic = QLabel() # the QLabel holding the QR code image
+            if self.aw.taskWebDisplayGreenActive and self.aw.taskWebDisplayGreen_server is not None:
+                try:
+                    self.setTaskGreenURL(self.getTaskURL(self.aw.taskWebDisplayGreenPort, self.aw.taskWebDisplayGreen_server.indexPath()))
+                except Exception: # pylint: disable=broad-except
+                    self.taskWebDisplayGreenURL.setText('')
+                    self.taskWebDisplayGreenQRpic.setPixmap(QPixmap())
+                    self.aw.taskWebDisplayGreenActive = False
             else:
-                self.scale2NameComboBox.setEnabled(True)
-        self.scale2ModelComboBox.currentIndexChanged.connect(self.scale2ModelChanged)
-        self.scale2NameComboBox.currentIndexChanged.connect(self.scale2NameChanged)
-        self.scale2ScanButton.clicked.connect(self.scanScale2)
-        self.scale2TareButton.clicked.connect(self.tareScale2)
-        self.update_scale2_weight(None)
-
-        if self.aw.scale2_name and self.aw.scale2_id:
-            self.updateScale2devices([(self.aw.scale2_name, self.aw.scale2_id)])
-
-        scale2Grid = QGridLayout()
-        scale2Grid.addWidget(scale2ModelLabel,0,0)
-        scale2Grid.addWidget(self.scale2ModelComboBox,0,1)
-        scale2Grid.addWidget(self.scale2NameLabel,1,0)
-        scale2Grid.addWidget(self.scale2NameComboBox,1,1)
-        scale2Grid.addWidget(self.scale2ScanButton,1,2)
-        scale2Grid.addWidget(self.scale2Weight,1,3,Qt.AlignmentFlag.AlignCenter)
-        scale2Grid.addWidget(self.scale2TareButton,1,4,Qt.AlignmentFlag.AlignRight)
-        scale2Grid.setHorizontalSpacing(10)
-        scale2Grid.setVerticalSpacing(10)
-        scale2Grid.setContentsMargins(10,10,10,10)
-        scale2HLayout = QHBoxLayout()
-        scale2HLayout.setContentsMargins(0,0,0,0)
-        scale2HLayout.addLayout(scale2Grid)
-        scale2HLayout.addStretch()
-        scale2Layout = QVBoxLayout()
-        scale2Layout.addLayout(scale2HLayout)
-        scale2Layout.setContentsMargins(0,0,0,0)
-
-        self.taskWebDisplayGreenURL = QLabel()
-        self.taskWebDisplayGreenURL.setOpenExternalLinks(True)
-        self.taskWebDisplayGreenFlag = QCheckBox()
-        self.taskWebDisplayGreenFlag.setToolTip(QApplication.translate('Tooltip','Start/stop the green coffee weighting task web display'))
-        self.taskWebDisplayGreenFlag.setChecked(self.aw.taskWebDisplayGreenActive)
-        self.taskWebDisplayGreenFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.taskWebDisplayGreenFlag.clicked.connect(self.taskWebDisplayGreen)
-        self.taskWebDisplayGreenPortLabel = QLabel(QApplication.translate('Label', 'Port'))
-        self.taskWebDisplayGreenPort = QLineEdit(str(self.aw.taskWebDisplayGreenPort))
-        self.taskWebDisplayGreenPort.setToolTip(QApplication.translate('Tooltip','IP port of the green coffee weighting task web display'))
-        self.taskWebDisplayGreenPort.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.taskWebDisplayGreenPort.setValidator(QRegularExpressionValidator(QRegularExpression(r'^[0-9]{1,4}$'),self))
-        self.taskWebDisplayGreenPort.setMaximumWidth(45)
-        self.taskWebDisplayGreenPort.editingFinished.connect(self.changeTaskWebDisplayGreenPort)
-        self.taskWebDisplayGreenPort.setDisabled(self.aw.taskWebDisplayGreenActive)
-        self.taskWebDisplayGreenQRpic = QLabel() # the QLabel holding the QR code image
-        if self.aw.taskWebDisplayGreenActive and self.aw.taskWebDisplayGreen_server is not None:
-            try:
-                self.setTaskGreenURL(self.getTaskURL(self.aw.taskWebDisplayGreenPort, self.aw.taskWebDisplayGreen_server.indexPath()))
-            except Exception: # pylint: disable=broad-except
                 self.taskWebDisplayGreenURL.setText('')
                 self.taskWebDisplayGreenQRpic.setPixmap(QPixmap())
-                self.aw.taskWebDisplayGreenActive = False
-        else:
-            self.taskWebDisplayGreenURL.setText('')
-            self.taskWebDisplayGreenQRpic.setPixmap(QPixmap())
-        taskWebDisplayGreenLayout = QHBoxLayout()
-        taskWebDisplayGreenLayout.addWidget(self.taskWebDisplayGreenFlag)
-        taskWebDisplayGreenLayout.addWidget(self.taskWebDisplayGreenPortLabel)
-        taskWebDisplayGreenLayout.addWidget(self.taskWebDisplayGreenPort)
-        taskWebDisplayGreenLayout.addWidget(self.taskWebDisplayGreenURL)
-        taskWebDisplayGreenLayout.addStretch()
-        taskWebDisplayGreenVLayout = QVBoxLayout()
-        if not self.aw.app.artisanviewerMode:
+            taskWebDisplayGreenVLayout = QVBoxLayout()
+            taskWebDisplayGreenLayout = QHBoxLayout()
+            taskWebDisplayGreenLayout.addWidget(self.taskWebDisplayGreenFlag)
+            taskWebDisplayGreenLayout.addWidget(self.taskWebDisplayGreenPortLabel)
+            taskWebDisplayGreenLayout.addWidget(self.taskWebDisplayGreenPort)
+            taskWebDisplayGreenLayout.addWidget(self.taskWebDisplayGreenURL)
+            taskWebDisplayGreenLayout.addStretch()
             taskWebDisplayGreenVLayout.addLayout(taskWebDisplayGreenLayout)
             taskWebDisplayGreenHLayout = QHBoxLayout()
             taskWebDisplayGreenHLayout.addStretch()
@@ -1616,47 +1620,40 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             taskWebDisplayGreenHLayout.addStretch()
             taskWebDisplayGreenVLayout.addLayout(taskWebDisplayGreenHLayout)
             taskWebDisplayGreenVLayout.addStretch()
-        else:
-            naLayout = QHBoxLayout()
-            notavailLable = QLabel(QApplication.translate('Label', 'Not available in ArtisanViewer'))
-            naLayout.addWidget(notavailLable)
-            naLayout.addStretch()
-            taskWebDisplayGreenVLayout.addLayout(naLayout)
 
-        self.taskWebDisplayRoastedURL = QLabel()
-        self.taskWebDisplayRoastedURL.setOpenExternalLinks(True)
-        self.taskWebDisplayRoastedFlag = QCheckBox()
-        self.taskWebDisplayRoastedFlag.setToolTip(QApplication.translate('Tooltip','Start/stop the roasted coffee weighting task web display'))
-        self.taskWebDisplayRoastedFlag.setChecked(self.aw.taskWebDisplayRoastedActive)
-        self.taskWebDisplayRoastedFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.taskWebDisplayRoastedFlag.clicked.connect(self.taskWebDisplayRoasted)
-        self.taskWebDisplayRoastedPortLabel = QLabel(QApplication.translate('Label', 'Port'))
-        self.taskWebDisplayRoastedPort = QLineEdit(str(self.aw.taskWebDisplayRoastedPort))
-        self.taskWebDisplayRoastedPort.setToolTip(QApplication.translate('Tooltip','IP port of the roasted coffee weighting task web display'))
-        self.taskWebDisplayRoastedPort.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.taskWebDisplayRoastedPort.setValidator(QRegularExpressionValidator(QRegularExpression(r'^[0-9]{1,4}$'),self))
-        self.taskWebDisplayRoastedPort.setMaximumWidth(45)
-        self.taskWebDisplayRoastedPort.editingFinished.connect(self.changeTaskWebDisplayRoastedPort)
-        self.taskWebDisplayRoastedPort.setDisabled(self.aw.taskWebDisplayRoastedActive)
-        self.taskWebDisplayRoastedQRpic = QLabel() # the QLabel holding the QR code image
-        if self.aw.taskWebDisplayRoastedActive:
-            try:
-                self.setTaskRoastedURL(self.getTaskURL(self.aw.taskWebDisplayRoastedPort, self.aw.taskWebDisplayRoastedIndexPath))
-            except Exception: # pylint: disable=broad-except
+            self.taskWebDisplayRoastedURL = QLabel()
+            self.taskWebDisplayRoastedURL.setOpenExternalLinks(True)
+            self.taskWebDisplayRoastedFlag = QCheckBox()
+            self.taskWebDisplayRoastedFlag.setToolTip(QApplication.translate('Tooltip','Start/stop the roasted coffee weighting task web display'))
+            self.taskWebDisplayRoastedFlag.setChecked(self.aw.taskWebDisplayRoastedActive)
+            self.taskWebDisplayRoastedFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.taskWebDisplayRoastedFlag.clicked.connect(self.taskWebDisplayRoasted)
+            self.taskWebDisplayRoastedPortLabel = QLabel(QApplication.translate('Label', 'Port'))
+            self.taskWebDisplayRoastedPort = QLineEdit(str(self.aw.taskWebDisplayRoastedPort))
+            self.taskWebDisplayRoastedPort.setToolTip(QApplication.translate('Tooltip','IP port of the roasted coffee weighting task web display'))
+            self.taskWebDisplayRoastedPort.setAlignment(Qt.AlignmentFlag.AlignRight)
+            self.taskWebDisplayRoastedPort.setValidator(QRegularExpressionValidator(QRegularExpression(r'^[0-9]{1,4}$'),self))
+            self.taskWebDisplayRoastedPort.setMaximumWidth(45)
+            self.taskWebDisplayRoastedPort.editingFinished.connect(self.changeTaskWebDisplayRoastedPort)
+            self.taskWebDisplayRoastedPort.setDisabled(self.aw.taskWebDisplayRoastedActive)
+            self.taskWebDisplayRoastedQRpic = QLabel() # the QLabel holding the QR code image
+            if self.aw.taskWebDisplayRoastedActive:
+                try:
+                    self.setTaskRoastedURL(self.getTaskURL(self.aw.taskWebDisplayRoastedPort, self.aw.taskWebDisplayRoastedIndexPath))
+                except Exception: # pylint: disable=broad-except
+                    self.taskWebDisplayRoastedURL.setText('')
+                    self.taskWebDisplayRoastedQRpic.setPixmap(QPixmap())
+                    self.aw.taskWebDisplayRoastedActive = False
+            else:
                 self.taskWebDisplayRoastedURL.setText('')
                 self.taskWebDisplayRoastedQRpic.setPixmap(QPixmap())
-                self.aw.taskWebDisplayRoastedActive = False
-        else:
-            self.taskWebDisplayRoastedURL.setText('')
-            self.taskWebDisplayRoastedQRpic.setPixmap(QPixmap())
-        taskWebDisplayRoastedLayout = QHBoxLayout()
-        taskWebDisplayRoastedLayout.addWidget(self.taskWebDisplayRoastedFlag)
-        taskWebDisplayRoastedLayout.addWidget(self.taskWebDisplayRoastedPortLabel)
-        taskWebDisplayRoastedLayout.addWidget(self.taskWebDisplayRoastedPort)
-        taskWebDisplayRoastedLayout.addWidget(self.taskWebDisplayRoastedURL)
-        taskWebDisplayRoastedLayout.addStretch()
-        taskWebDisplayRoastedVLayout = QVBoxLayout()
-        if not self.aw.app.artisanviewerMode:
+            taskWebDisplayRoastedVLayout = QVBoxLayout()
+            taskWebDisplayRoastedLayout = QHBoxLayout()
+            taskWebDisplayRoastedLayout.addWidget(self.taskWebDisplayRoastedFlag)
+            taskWebDisplayRoastedLayout.addWidget(self.taskWebDisplayRoastedPortLabel)
+            taskWebDisplayRoastedLayout.addWidget(self.taskWebDisplayRoastedPort)
+            taskWebDisplayRoastedLayout.addWidget(self.taskWebDisplayRoastedURL)
+            taskWebDisplayRoastedLayout.addStretch()
             taskWebDisplayRoastedVLayout.addLayout(taskWebDisplayRoastedLayout)
             taskWebDisplayRoastedHLayout = QHBoxLayout()
             taskWebDisplayRoastedHLayout.addStretch()
@@ -1664,77 +1661,79 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             taskWebDisplayRoastedHLayout.addStretch()
             taskWebDisplayRoastedVLayout.addLayout(taskWebDisplayRoastedHLayout)
             taskWebDisplayRoastedVLayout.addStretch()
+
+            scale1 = QGroupBox(QApplication.translate('GroupBox', 'Scale {0}').format(1))
+            scale1.setLayout(scale1Layout)
+            scale2 = QGroupBox(QApplication.translate('GroupBox', 'Scale {0}').format(2))
+            scale2.setLayout(scale2Layout)
+
+
+            # container green
+            self.containerGreenTareWeight = QLabel('')
+            self.containerGreenTareWeight.setToolTip(QApplication.translate('Tooltip','Weight of your green coffee container'))
+            self.containerGreenComboBox = QComboBox()
+            self.containerGreenComboBox.setToolTip(QApplication.translate('Tooltip','Identify your green coffee container and its weight'))
+            self.containerGreenComboBox.setMaximumWidth(120)
+            self.containerGreenComboBox.setMinimumWidth(120)
+            self.updateGreenContainerPopup()
+            self.containerGreenComboBox.currentIndexChanged.connect(self.greenContainerChanged)
+            self.containerGreenComboBox.setCurrentIndex(self.container_menu_idx(self.aw.container1_idx))
+            self.updateGreenContainerWeight()
+
+            containerGreenGridLayout = QGridLayout()
+            containerGreenGridLayout.addWidget(self.containerGreenComboBox,0,0)
+            containerGreenGridLayout.addWidget(self.containerGreenTareWeight,0,1)
+
+            containerGreenHLayout = QHBoxLayout()
+            containerGreenHLayout.addLayout(containerGreenGridLayout)
+            containerGreenHLayout.addStretch()
+
+            # container roasted
+            self.containerRoastedTareWeight = QLabel('')
+            self.containerRoastedTareWeight.setToolTip(QApplication.translate('Tooltip','Weight of your roasted coffee container'))
+            self.containerRoastedComboBox = QComboBox()
+            self.containerRoastedComboBox.setToolTip(QApplication.translate('Tooltip','Identify your roasted coffee container and its weight'))
+            self.containerRoastedComboBox.setMaximumWidth(120)
+            self.containerRoastedComboBox.setMinimumWidth(120)
+            self.updateRoastedContainerPopup()
+            self.containerRoastedComboBox.currentIndexChanged.connect(self.roastedContainerChanged)
+            self.containerRoastedComboBox.setCurrentIndex(self.container_menu_idx(self.aw.container2_idx))
+            self.updateRoastedContainerWeight()
+
+            containerRoastedGridLayout = QGridLayout()
+            containerRoastedGridLayout.addWidget(self.containerRoastedComboBox,0,0)
+            containerRoastedGridLayout.addWidget(self.containerRoastedTareWeight,0,1)
+
+            containerRoastedHLayout = QHBoxLayout()
+            containerRoastedHLayout.addLayout(containerRoastedGridLayout)
+            containerRoastedHLayout.addStretch()
+
+            # Bucket Hobbock, Container, Bin
+            containerGreen = QGroupBox(QApplication.translate('GroupBox','Container Green'))
+            containerGreen.setLayout(containerGreenHLayout)
+            containerRoasted = QGroupBox(QApplication.translate('GroupBox','Container Roasted'))
+            containerRoasted.setLayout(containerRoastedHLayout)
+
+            taskGreen = QGroupBox(QApplication.translate('GroupBox', 'Task Green'))
+            taskGreen.setLayout(taskWebDisplayGreenVLayout)
+            taskRoasted = QGroupBox(QApplication.translate('GroupBox', 'Task Roasted'))
+            taskRoasted.setLayout(taskWebDisplayRoastedVLayout)
+
+            tab8Layout.addWidget(scale1,0,0)
+            tab8Layout.addWidget(scale2,0,1)
+            tab8Layout.addWidget(containerGreen,1,0)
+            tab8Layout.addWidget(containerRoasted,1,1)
+            tab8Layout.addWidget(taskGreen,2,0)
+            tab8Layout.addWidget(taskRoasted,2,1)
         else:
             naLayout = QHBoxLayout()
             notavailLable = QLabel(QApplication.translate('Label', 'Not available in ArtisanViewer'))
+            naLayout.addStretch()
             naLayout.addWidget(notavailLable)
             naLayout.addStretch()
-            taskWebDisplayRoastedVLayout.addLayout(naLayout)
-
-        scale1 = QGroupBox(QApplication.translate('GroupBox', 'Scale {0}').format(1))
-        scale1.setLayout(scale1Layout)
-        scale2 = QGroupBox(QApplication.translate('GroupBox', 'Scale {0}').format(2))
-        scale2.setLayout(scale2Layout)
-
-
-        # container green
-        self.containerGreenTareWeight = QLabel('')
-        self.containerGreenTareWeight.setToolTip(QApplication.translate('Tooltip','Weight of your green coffee container'))
-        self.containerGreenComboBox = QComboBox()
-        self.containerGreenComboBox.setToolTip(QApplication.translate('Tooltip','Identify your green coffee container and its weight'))
-        self.containerGreenComboBox.setMaximumWidth(120)
-        self.containerGreenComboBox.setMinimumWidth(120)
-        self.updateGreenContainerPopup()
-        self.containerGreenComboBox.currentIndexChanged.connect(self.greenContainerChanged)
-        self.containerGreenComboBox.setCurrentIndex(self.container_menu_idx(self.aw.container1_idx))
-        self.updateGreenContainerWeight()
-
-        containerGreenGridLayout = QGridLayout()
-        containerGreenGridLayout.addWidget(self.containerGreenComboBox,0,0)
-        containerGreenGridLayout.addWidget(self.containerGreenTareWeight,0,1)
-
-        containerGreenHLayout = QHBoxLayout()
-        containerGreenHLayout.addLayout(containerGreenGridLayout)
-        containerGreenHLayout.addStretch()
-
-        # container roasted
-        self.containerRoastedTareWeight = QLabel('')
-        self.containerRoastedTareWeight.setToolTip(QApplication.translate('Tooltip','Weight of your roasted coffee container'))
-        self.containerRoastedComboBox = QComboBox()
-        self.containerRoastedComboBox.setToolTip(QApplication.translate('Tooltip','Identify your roasted coffee container and its weight'))
-        self.containerRoastedComboBox.setMaximumWidth(120)
-        self.containerRoastedComboBox.setMinimumWidth(120)
-        self.updateRoastedContainerPopup()
-        self.containerRoastedComboBox.currentIndexChanged.connect(self.roastedContainerChanged)
-        self.containerRoastedComboBox.setCurrentIndex(self.container_menu_idx(self.aw.container2_idx))
-        self.updateRoastedContainerWeight()
-
-        containerRoastedGridLayout = QGridLayout()
-        containerRoastedGridLayout.addWidget(self.containerRoastedComboBox,0,0)
-        containerRoastedGridLayout.addWidget(self.containerRoastedTareWeight,0,1)
-
-        containerRoastedHLayout = QHBoxLayout()
-        containerRoastedHLayout.addLayout(containerRoastedGridLayout)
-        containerRoastedHLayout.addStretch()
-
-        # Bucket Hobbock, Container, Bin
-        containerGreen = QGroupBox(QApplication.translate('GroupBox','Container Green'))
-        containerGreen.setLayout(containerGreenHLayout)
-        containerRoasted = QGroupBox(QApplication.translate('GroupBox','Container Roasted'))
-        containerRoasted.setLayout(containerRoastedHLayout)
-
-
-        taskGreen = QGroupBox(QApplication.translate('GroupBox', 'Task Green'))
-        taskGreen.setLayout(taskWebDisplayGreenVLayout)
-        taskRoasted = QGroupBox(QApplication.translate('GroupBox', 'Task Roasted'))
-        taskRoasted.setLayout(taskWebDisplayRoastedVLayout)
-        tab8Layout = QGridLayout()
-        tab8Layout.addWidget(scale1,0,0)
-        tab8Layout.addWidget(scale2,0,1)
-        tab8Layout.addWidget(containerGreen,1,0)
-        tab8Layout.addWidget(containerRoasted,1,1)
-        tab8Layout.addWidget(taskGreen,2,0)
-        tab8Layout.addWidget(taskRoasted,2,1)
+            tab8LayoutOFF.addStretch()
+            tab8LayoutOFF.addLayout(naLayout)
+            tab8LayoutOFF.addStretch()
 
         #main tab widget
         self.TabWidget = QTabWidget()
@@ -1761,7 +1760,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.TabWidget.addTab(C7Widget,QApplication.translate('Tab','Networks'))
         self.TabWidget.currentChanged.connect(self.tabSwitched)
         C8Widget = QWidget()
-        C8Widget.setLayout(tab8Layout)
+        if not self.aw.app.artisanviewerMode:
+            C8Widget.setLayout(tab8Layout)
+        else:
+            C8Widget.setLayout(tab8LayoutOFF)
         self.TabWidget.addTab(C8Widget,QApplication.translate('Tab','Scales'))
         self.TabWidget.currentChanged.connect(self.tabSwitched)
         #incorporate layouts
