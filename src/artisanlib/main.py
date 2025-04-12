@@ -15962,8 +15962,19 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 # Find the smallest non-zero difference
                 # Exception if there are no non-zero differences
                 try:
-                    resolution = float(numpy.min(numpy.diff(numpy.sort(bt))[numpy.nonzero(numpy.diff(numpy.sort(bt)))]))
+                    # resolution from TP+5 samples to DROP-5 samples (s.b. just increasing trend temps)
+                    tpidx = self.findTP()
+                    rbt = bt[tpidx + 5:self.qmc.timeindex[6] - 5]
+                    resolution_tp = float(numpy.min(numpy.diff(numpy.sort(rbt))[numpy.nonzero(numpy.diff(numpy.sort(rbt)))]))
                 except Exception: # pylint: disable=broad-except
+                    resolution_tp = float('nan')
+                try:
+                    # resolution from CHARGE to DROP (mix of decreasing trend and increasing trend temps)
+                    rbt = bt
+                    resolution = float(numpy.min(numpy.diff(numpy.sort(rbt))[numpy.nonzero(numpy.diff(numpy.sort(rbt)))]))
+                #except Exception: # pylint: disable=broad-except
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
                     resolution = float('nan')
 
                 str_modeChanged = ''
@@ -16019,7 +16030,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     f'Profile quality metrics'
                     f'\n  Title: {self.qmc.title}'
                     f'\n  Meter: {meter}'
-                    f'\n  Resolution: {resolution:.2E} {str_modeChanged}'
+                    f'\n  Resolution: {resolution:.2E}, {resolution_tp:.2E} (TP) {str_modeChanged}'
                     f'\n  Average decimals: {avgDecimal:.2f} {str_modeChanged}'
                     f'\n  Max decimals: {maxDecimal:.2f} {str_modeChanged}'
                     f'\n  Total Samples: {totalSamples}'
@@ -16055,24 +16066,22 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         #Bottom temp@170 - 3min 58sec from drop to bottom temp
                         #Charge temp: 190°C - 25sec from bottom temp to charge
                         output += (
-                            f'\n\n  BBP Metrics'
-                            f'\n  Bottom temp: {bbp_bottom_temp:.2f}{self.qmc.mode} - {bbp_begin_to_bottom_time} from DROP@{self.qmc.temp2[0]:.2f}{self.qmc.mode} to bottom temp'
-                            f'\n  Charge temp: {self.qmc.temp2[self.qmc.timeindex[0]]:.2f} - {bbp_bottom_to_charge_time} from bottom to CHARGE'
+                            f'\n  BBP Bottom temp: {bbp_bottom_temp:.2f}{self.qmc.mode} - {bbp_begin_to_bottom_time} from DROP@{self.qmc.temp2[0]:.2f}{self.qmc.mode} to bottom temp'
+                            f'\n  BBP Charge temp: {self.qmc.temp2[self.qmc.timeindex[0]]:.2f} - {bbp_bottom_to_charge_time} from bottom to CHARGE'
                             f'\n  BBP Low Temp: {bbp_bottom_temp:.2f} {self.qmc.mode}'
                             f'\n  BBP Time Start to Bottom Temp: {bbp_begin_to_bottom_time} at RoR: {bbp_begin_to_bottom_ror:.2f} {self.qmc.mode}/min'
-                            f'\n  BBP RoR Start to Bottom Temp: {bbp_begin_to_bottom_time} at RoR: {bbp_bottom_to_charge_ror:.2f} {self.qmc.mode}/min'
-                            f'\n  BBP Time Bottom Temp to CHARGE: {bbp_bottom_to_charge_time}'
+                            f'\n  BBP Time Bottom Temp to CHARGE: {bbp_bottom_to_charge_time} at RoR: {bbp_bottom_to_charge_ror:.2f} {self.qmc.mode}/min'
                             f'\n  BBP Total Time: {bbp_total_time}'
                             f'\n  '
                         )
                     else:
-                        output += '\n\n  No BBP TP found - Metrics Not Available\n'
+                        output += '\n  BBP: TP not found - Metrics Not Available\n'
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
                     _, _, exc_tb = sys.exc_info()
                     self.qmc.adderror((QApplication.translate('Error Message', 'Error:') + ' profilequality() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             else:
-                output += '\n\n  No BBP - Metrics Not Available\n'
+                output += '\n  BBP: Metrics Not Available\n'
 
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
