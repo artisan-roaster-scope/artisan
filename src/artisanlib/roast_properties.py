@@ -832,7 +832,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 backgroundcolor = QColor(self.aw.qmc.palette['title'][:7]).name()
                 color = QColor(canvas_color).name()
             self.titleedit.setStyleSheet(
-                'QComboBox {font-weight: bold; background-color: ' + backgroundcolor + '; color: ' + color + ';} QComboBox QAbstractItemView {font-weight: normal;}')
+                'QComboBox {padding-left: 2px; padding-right: 2px; padding-top: 1px;  font-weight: bold; background-color: ' + backgroundcolor + '; color: ' + color + ';} QComboBox QAbstractItemView {font-weight: normal;}')
         else:
             color = ''
             if self.aw.qmc.palette['title'] is not None and self.aw.qmc.palette['title'] != 'None':
@@ -841,11 +841,10 @@ class editGraphDlg(ArtisanResizeablDialog):
             if self.aw.qmc.palette['canvas'] is not None and self.aw.qmc.palette['canvas'] != 'None':
                 backgroundcolor = ' background-color: ' + QColor(self.aw.qmc.palette['canvas'][:7]).name() + ';'
             self.titleedit.setStyleSheet(
-                'QComboBox {font-weight: bold;' + color + backgroundcolor + '} QComboBox QAbstractItemView {font-weight: normal;}')
+                'QComboBox {padding-left: 2px; padding-right: 2px; padding-top: 1px; font-weight: bold;' + color + backgroundcolor + '} QComboBox QAbstractItemView {font-weight: normal;}')
         self.titleedit.setView(QListView())
         self.titleShowAlwaysFlag = QCheckBox(QApplication.translate('CheckBox','Show Always'))
         self.titleShowAlwaysFlag.setChecked(self.aw.qmc.title_show_always)
-
         #Date
         datelabel1 = QLabel('<b>' + QApplication.translate('Label', 'Date') + '</b>')
         date = self.aw.qmc.roastdate.date().toString()
