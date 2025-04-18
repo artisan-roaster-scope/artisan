@@ -82,6 +82,8 @@ class ComputedProfileInformation(TypedDict, total=False):
     mid_phase_AUC: int
     finish_phase_AUC: int
     weight_loss: float
+    roast_defects_loss: float
+    total_loss: float
     volume_gain: float
     moisture_loss: float
     organic_loss: float
@@ -89,6 +91,8 @@ class ComputedProfileInformation(TypedDict, total=False):
     volumeout: float
     weightin: float
     weightout: float
+    roast_defects_weight: float
+    total_yield: float
     green_density: float
     roasted_density: float
     set_density: float
@@ -157,6 +161,7 @@ class ProfileData(TypedDict, total=False):
     volume: List[Union[float,str]] # NOTE: internally volume is a typed tuple
     density: List[Union[float,str]] # NOTE: internally density is a typed tuple
     density_roasted: List[Union[float,str]] # NOTE: internally density_roasted is a typed tuple
+    defects_weight:float
     roastertype: str
     roastersize: float
     roasterheating: int
@@ -436,6 +441,7 @@ class ProductionData(TypedDict, total=False):
     roastdate: Optional[QDateTime]
     beans: str
     weight: Optional[Tuple[float,float,str]]
+    defects_weight: float
     whole_color: int
     ground_color: int
     color_system: str
@@ -455,10 +461,14 @@ class ProductionDataStr(TypedDict):
     beans: str
     weight_in: str
     weight_out: str
-    weight_loss :str
+    weight_loss: str
     weight_in_num: float
     weight_out_num: float
     weight_loss_num: float
+    defects_weight: str
+    defects_loss: str
+    defects_weight_num: float
+    defects_loss_num: float
     whole_color: int
     ground_color: int
     color_system: str

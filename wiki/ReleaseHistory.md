@@ -7,14 +7,17 @@ v3.1.2 (April XX, 2025)
 
 
 * ADDITIONS
+  - adds roast defects weight to document results of color sorting
   - adds event replay ramping by time and temperature
   - events displayed in step and combo mode can be updated by moving them to a new position. Pressing SHIFT restricts the movement in either the x or the y direction.
   - a picked custom event can be removed using the backspace key
   - adds drag-and-drop to Stats Summary table configuration
   - adds hiding of scheduled items via a right-click or drag-out
   - adds support for feeding data from energy meters into Artisans roast energy calculator
+  - adds configuration for # of decimals output of percentage values
   - adds new flag "Set batch size" to background dialog. If ticked the batch size is taken from the background profile on load while scheduler is off
   - adds sorting to the background events table
+  - adds support for container weight units others than `g`
   - adds configuration to allow to send MODBUS PID SV as 32bit float
   - adds new Artisan Commands (with `n` from `{1,2,3,4}`)
       - `quantifier(n,<bool>)` to toggle quantification per event type
@@ -27,7 +30,8 @@ v3.1.2 (April XX, 2025)
   - adds quick keyboard focused event slider input using numeric keys followed by the ENTER/RETURN key. The last digit can be removed by using the backspace key. ESC cancels the action.
   - a double click on the graph canvas temporarily scales the y-axis to cover all artists
   - adds search to help pages
-  - adds artisan.plus inventory non-standard bean label formatting
+  - adds [artisan.plus](https://artisan.plus) inventory non-standard bean label formatting
+  - adds implicit automatic reconnection on errors for WebSocket connections
 
 
 * NEW HARDWARE SUPPORT
@@ -42,7 +46,6 @@ v3.1.2 (April XX, 2025)
 
 * CHANGES
   - the Phidget driver is now bundled with the Artisan app and no longer needs to be installed separately. NOTE: some legacy USB HID devices, like the original 1046 and 1048 still require the kernel extension of the driver package to be installed in the system.
-  - indication of [artisan.plus](https://artisan.plus) connection loss more reliable
   - update volume not density if weight changes and volume is set in Roast Properties ([Discussion #1786](../../../discussions/1786))
   - generated WebLCD URL is using more stable host names instead of, potentially DHCP assigned, IP addresses
   - updated Turkish translations (thanks to Kemal Akdas)
@@ -59,6 +62,7 @@ v3.1.2 (April XX, 2025)
   - improved Cropster importer
   - the autosave mechanism will no longer save accidentally produced recordings on OFF lacking the CHARGE and DROP events. Note that that for roasts longer than 7min, the end of a roast is automatically added as DROP event on OFF, if no DROP event was set before.
   - disables playback of DROP event, only active after CHARGE, for the first 7min into the roast
+  - restrict file selection to load background profiles to files with extension .alog
 
 * FIXES
   - fixes processing of MODBUS function 2 request which broke the just introduced autoCHARGE/autoDROP triggered by [Loring machines](https://artisan-scope.org/machines/loring/)
@@ -72,6 +76,13 @@ v3.1.2 (April XX, 2025)
   - fixes broken `button` Modbus Command
   - fixes communication with some Santoker R Master Series machines ([Issue #1811](../../../issues/1811))
   - fixes DROP being triggered by Kaleido machine on CHARGE ([Issue #1808](../../../issues/1808))
+  - ensures that projection lines are immediately redrawn after full redraw ([Issue #1826](../../../issues/1826))
+  - fixes a case where disconnecting from [artisan.plus](https://artisan.plus) was not functional
+  - makes indication of [artisan.plus](https://artisan.plus) connection loss more reliable
+   - list single blend with only replacement stock on [artisan.plus](https://artisan.plus) if no other blend has stock which was not listed by error before
+  - fixes broken rendering of roasting times in CSV production reports
+  - remembered last batch size now correctly converted to current weight unit
+
 
 * REMOVALS
   - support for the non-standard MODBUS little-endian byte order has been removed

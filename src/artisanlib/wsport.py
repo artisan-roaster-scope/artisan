@@ -26,7 +26,7 @@ import socket
 
 from contextlib import suppress
 from threading import Thread
-from typing import Final, Optional, Union, Any, Dict, List, TYPE_CHECKING
+from typing import Final, Optional, Union, Any, Set, Dict, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
@@ -271,35 +271,39 @@ class wsport:
                     hostport = self.host
                 else:
                     hostport = f'{self.host}:{self.port}'
-                async with websockets.connect(
+                async for websocket in websockets.connect(
                         f'ws://{hostport}/{self.path}',
                         compression=('deflate' if self.compression else None),
                         origin=websockets.Origin(f'http://{socket.gethostname()}'),
-                        user_agent_header = f'Artisan/{__version__} websockets') as websocket:
-                    self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('WebSocket'),True,None)
-                    if self._write_queue is None:
-                        self._write_queue = asyncio.Queue()
-                    consumer_task = asyncio.create_task(self.consumer_handler(websocket))
-                    producer_task = asyncio.create_task(self.producer_handler(websocket))
-                    done, pending = await asyncio.wait(
-                        [consumer_task, producer_task],
-                        return_when=asyncio.FIRST_COMPLETED,
-                    )
-
-                    for task in pending:
-                        task.cancel()
-                    for task in done:
-                        exception = task.exception()
-                        if isinstance(exception, Exception):
-                            raise exception
-
+                        user_agent_header = f'Artisan/{__version__} websockets'):
+                    done: Set[asyncio.Task[Any]] = set()
+                    pending: Set[asyncio.Task[Any]] = set()
+                    try:
+                        self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('WebSocket'),True,None)
+                        if self._write_queue is None:
+                            self._write_queue = asyncio.Queue()
+                        consumer_task = asyncio.create_task(self.consumer_handler(websocket))
+                        producer_task = asyncio.create_task(self.producer_handler(websocket))
+                        done, pending = await asyncio.wait(
+                            [consumer_task, producer_task],
+                            return_when=asyncio.FIRST_COMPLETED,
+                        )
+                    except websockets.ConnectionClosed:
+                        continue
+                    finally:
+                        for task in pending:
+                            task.cancel()
+                        for task in done:
+                            exception = task.exception()
+                            if isinstance(exception, Exception):
+                                raise exception
             except asyncio.TimeoutError:
                 _log.info('connection timeout')
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)
 
             self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('WebSocket'),True,None)
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(0.2)
 
 
     def start_background_loop(self, loop: asyncio.AbstractEventLoop) -> None:

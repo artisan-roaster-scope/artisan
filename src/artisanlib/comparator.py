@@ -344,7 +344,7 @@ class RoastProfile:
             self.metadata['ambient_pressure'] = f"{float2float(profile['ambient_pressure']):g}hPa"
         if 'computed' in profile and profile['computed'] is not None and 'weight_loss' in profile['computed'] and \
                 profile['computed']['weight_loss'] is not None:
-            self.metadata['weight_loss'] = f"-{profile['computed']['weight_loss']:.1f}%"
+            self.metadata['weight_loss'] = f"-{profile['computed']['weight_loss']:g}%"
         if 'ground_color' in profile:
             self.metadata['ground_color'] = f"#{profile['ground_color']}"
         if 'computed' in profile and profile['computed'] is not None and 'AUC' in profile['computed'] and profile['computed']['AUC'] is not None and \
@@ -1482,8 +1482,7 @@ class roastCompareDlg(ArtisanDialog):
         header = QTableWidgetItem(profile.label)
         self.profileTable.setVerticalHeaderItem(i,header)
 
-    @staticmethod
-    def renderToolTip(profile:RoastProfile) -> str:
+    def renderToolTip(self, profile:RoastProfile) -> str:
         tooltip:str = ''
         if profile.metadata is not None:
             try:
@@ -1505,7 +1504,7 @@ class roastCompareDlg(ArtisanDialog):
                         tooltip += '\n'
                     tooltip += profile.metadata['beans'].strip()
                     if 'moisture_greens' in profile.metadata:
-                        tooltip += f" ({float2float(profile.metadata['moisture_greens']):g}%)"
+                        tooltip += f" ({float2float(profile.metadata['moisture_greens'],self.aw.percent_decimals):g}%)"
                 if 'ambientTemp' in profile.metadata:
                     if tooltip != '':
                         tooltip += '\n'

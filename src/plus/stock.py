@@ -1066,7 +1066,7 @@ def getBlends(weight_unit_idx:int, store:Optional[str] = None, customBlend:Optio
 #    _log.debug('getBlends(%s,%s)', weight_unit_idx, store)
     try:
         stock_semaphore.acquire(1)
-        if stock is not None and ('blends' in stock or customBlend is not None):
+        if stock is not None and ('blends' in stock or 'replBlends' in stock or customBlend is not None):
             res = {}
             if store is None:
                 stores = [getStoreId(s) for s in getStores(acquire_lock=False)]

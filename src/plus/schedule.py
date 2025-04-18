@@ -285,7 +285,7 @@ class CompletedItem(BaseModel):
         return int(roastdate.timestamp())
 
     @field_serializer('roastUUID', when_used='json')
-    def serialize_roastUUID_to_str(roastUUID: UUID4) -> str: # pylint: disable=no-self-argument
+    def serialize_roastUUID_to_str(roastUUID: UUID4) -> str: # pyright:ignore[reportGeneralTypeIssues] # pylint: disable=no-self-argument
         return str(roastUUID.hex)
 
 
@@ -2155,7 +2155,13 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                 self.selected_completed_item.data.measured = False
                 self.roasted_weight_suffix.setEnabled(False)
             else:
-                self.roasted_weight.setText(comma2dot(text))
+                roasted_weight_txt = comma2dot(text)
+                roasted_weight = float(roasted_weight_txt)
+                if self.aw.qmc.weight[2] == 'Kg' and roasted_weight > self.selected_completed_item.data.batchsize:
+                    # if input is larger than batch size we interpret it as in g
+                    converted_weight = convertWeight(roasted_weight, 0, weight_units.index(self.aw.qmc.weight[2]))
+                    roasted_weight_txt = f'{float2floatWeightVolume(converted_weight):g}'
+                self.roasted_weight.setText(roasted_weight_txt)
                 self.selected_completed_item.data.measured = True
                 self.roasted_weight_suffix.setEnabled(True)
 
@@ -2947,7 +2953,6 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                 item_path = plus.register.getPath(sender_roastUUID)
                 if item_path is not None and os.path.isfile(item_path):
                     try:
-#                        self.aw.loadFile(item_path)
                         self.aw.loadFileSignal.emit(item_path)
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
@@ -3046,25 +3051,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                         else:
                             self.aw.sendmessageSignal.emit(QApplication.translate('Message', 'Fetching completed roast properties failed'), True, None)
                 else:
-                    # edits completed, reset selection
-                    self.selected_completed_item = None
-                    # clear details split view
-                    self.set_details(None)
-                    # remember open height (might be user set)
-                    if len(splitter_sizes)>1:
-                        self.completed_splitter_open_height = splitter_sizes[1]
-                    # close details split
-                    self.completed_splitter.setSizes([sum(splitter_sizes),0])
-                    # disable focus on input widgets to return keyboard focus to parent
-                    self.roasted_weight.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-                    self.roasted_color.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-                    self.roasted_density.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-                    self.roasted_moisture.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-                    self.roasted_notes.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-                    self.cupping_score.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-                    self.cupping_notes.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-                    if self.completed_details_scrollarea.isVisible():
-                        self.completed_details_scrollarea.hide()
+                    self.clearCompletedItemSelection()
             # NOTE: this branch is not reached any longer as if not connected to artisan.plus, the schedule window remains empty with a note
             elif not self.aw.qmc.flagon:
                 # plus controller is not on and Artisan is OFF we first close a potentially pending edit section and then try to load that profile
@@ -3097,6 +3084,29 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                             self.aw.loadFile(item_path)
                         except Exception as e: # pylint: disable=broad-except
                             _log.exception(e)
+
+    def clearCompletedItemSelection(self) -> None:
+        if self.selected_completed_item is not None:
+            splitter_sizes = self.completed_splitter.sizes()
+            # edits completed, reset selection
+            self.selected_completed_item = None
+            # clear details split view
+            self.set_details(None)
+            # remember open height (might be user set)
+            if len(splitter_sizes)>1:
+                self.completed_splitter_open_height = splitter_sizes[1]
+            # close details split
+            self.completed_splitter.setSizes([sum(splitter_sizes),0])
+            # disable focus on input widgets to return keyboard focus to parent
+            self.roasted_weight.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.roasted_color.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.roasted_density.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.roasted_moisture.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.roasted_notes.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.cupping_score.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.cupping_notes.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            if self.completed_details_scrollarea.isVisible():
+                self.completed_details_scrollarea.hide()
 
     def updateRoastedItems(self) -> None:
         self.nodrag_roasted.clearItems()

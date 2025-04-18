@@ -41,14 +41,14 @@ try:
     from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QLayout, QMessageBox, QRadioButton, QStyleFactory, QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QTableWidget, QTableWidgetItem, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
+                                 QTableWidget, QTableWidgetItem, QFrame, QButtonGroup) # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QRegularExpression, QTimer) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import (QColor, QIntValidator, QRegularExpressionValidator, QPixmap) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QLayout, QMessageBox, QRadioButton, QStyleFactory, QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QTableWidget, QTableWidgetItem, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
+                                 QTableWidget, QTableWidgetItem, QFrame, QButtonGroup) # @UnusedImport @Reimport  @UnresolvedImport
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -332,6 +332,8 @@ class CurvesDlg(ArtisanDialog):
         self.org_ETname = self.aw.ETname
         self.org_BTname = self.aw.BTname
         self.org_foregroundShowFullflag = self.aw.qmc.foregroundShowFullflag
+        self.org_LCDdecimalplaces = self.aw.qmc.LCDdecimalplaces
+        self.org_percent_decimals = self.aw.percent_decimals
 
         #delta ET
         self.DeltaET = QCheckBox()
@@ -505,8 +507,31 @@ class CurvesDlg(ArtisanDialog):
         self.swapdeltalcds = QCheckBox(QApplication.translate('CheckBox', 'Swap'))
         self.swapdeltalcds.setChecked(self.aw.qmc.swapdeltalcds)
         DeltaBTlcdLabel = QLabel(deltaLabelPrefix + QApplication.translate('Label', 'BT'))
-        self.DecimalPlaceslcd = QCheckBox(QApplication.translate('CheckBox', 'Decimal Places'))
-        self.DecimalPlaceslcd.setChecked(bool(self.aw.qmc.LCDdecimalplaces))
+        self.temp_no_decimals = QRadioButton(f'181{self.aw.qmc.mode}')
+        self.temp_one_decimal = QRadioButton(f'180.9{self.aw.qmc.mode}')
+        self.temp_two_decimals = QRadioButton(f'180.87{self.aw.qmc.mode}')
+        self.temp_two_decimals.setEnabled(False)
+        temp_decimals = QButtonGroup(self)
+        temp_decimals.addButton(self.temp_no_decimals)
+        temp_decimals.addButton(self.temp_one_decimal)
+        if bool(self.aw.qmc.LCDdecimalplaces):
+            self.temp_one_decimal.setChecked(True)
+        else:
+            self.temp_no_decimals.setChecked(True)
+        self.percent_no_decimal = QRadioButton('15%')
+        self.percent_one_decimal = QRadioButton('14.6%')
+        self.percent_two_decimals = QRadioButton('14.57%')
+        percent_decimals = QButtonGroup(self)
+        percent_decimals.addButton(self.percent_no_decimal)
+        percent_decimals.addButton(self.percent_one_decimal)
+        percent_decimals.addButton(self.percent_two_decimals)
+        if self.aw.percent_decimals == 0:
+            self.percent_no_decimal.setChecked(True)
+        elif self.aw.percent_decimals == 1:
+            self.percent_one_decimal.setChecked(True)
+        else:
+            self.percent_two_decimals.setChecked(True)
+
         self.DeltaETlcd.stateChanged.connect(self.changeDeltaETlcd)         #toggle
         self.DeltaBTlcd.stateChanged.connect(self.changeDeltaBTlcd)         #toggle
         lcdsLayout = QHBoxLayout()
@@ -1221,14 +1246,31 @@ class CurvesDlg(ArtisanDialog):
         setresLayout.addWidget(self.resolutionSpinBox)
         setresLayout.addWidget(resButton)
         setresVLayout = QVBoxLayout()
-        setresVLayout.addWidget(self.DecimalPlaceslcd)
         setresVLayout.addLayout(setresLayout)
         setresVLayout.addStretch()
         resolutionGroupWidget = QGroupBox(QApplication.translate('GroupBox','Resolution'))
         resolutionGroupWidget.setLayout(setresVLayout)
+
+        decimalsGrid = QGridLayout()
+        decimalsGrid.addWidget(self.temp_no_decimals,0,0)
+        decimalsGrid.addWidget(self.temp_one_decimal,1,0)
+        decimalsGrid.addWidget(self.temp_two_decimals,2,0)
+        decimalsGrid.addWidget(self.percent_no_decimal,0,1)
+        decimalsGrid.addWidget(self.percent_one_decimal,1,1)
+        decimalsGrid.addWidget(self.percent_two_decimals,2,1)
+
+        decimalsGroupWidget = QGroupBox(QApplication.translate('CheckBox', 'Decimal Places'))
+        decimalsGroupWidget.setLayout(decimalsGrid)
+
+        resVLayout = QVBoxLayout()
+        resVLayout.addWidget(resolutionGroupWidget)
+        resVLayout.addWidget(decimalsGroupWidget)
+
         appresLayout = QHBoxLayout()
         appresLayout.addWidget(appearanceGroupWidget)
-        appresLayout.addWidget(resolutionGroupWidget)
+#        appresLayout.addWidget(resolutionGroupWidget)
+        appresLayout.addLayout(resVLayout)
+
 
         # tick
         # port
@@ -2288,13 +2330,20 @@ class CurvesDlg(ArtisanDialog):
             self.aw.qmc.updateDeltaSamples()
             self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True)
 
-    def changeDecimalPlaceslcd(self) -> None:
-        if self.DecimalPlaceslcd.isChecked():
+    def changeDecimalPlaces(self) -> None:
+        if self.temp_one_decimal.isChecked():
             self.aw.qmc.LCDdecimalplaces = 1
             self.aw.setLCDsDigitCount(5)
         else:
             self.aw.qmc.LCDdecimalplaces = 0
             self.aw.setLCDsDigitCount(3)
+        if self.percent_no_decimal.isChecked():
+            self.aw.percent_decimals = 0
+        elif self.percent_one_decimal.isChecked():
+            self.aw.percent_decimals = 1
+        else:
+            self.aw.percent_decimals = 2
+
 
     @pyqtSlot(int)
     def changeDeltaBT(self, _:int = 0) -> None:
@@ -2530,6 +2579,8 @@ class CurvesDlg(ArtisanDialog):
         self.aw.ETname = self.org_ETname
         self.aw.BTname = self.org_BTname
         self.aw.qmc.foregroundShowFullflag = self.org_foregroundShowFullflag
+        self.aw.qmc.LCDdecimalplaces = self.org_LCDdecimalplaces
+        self.aw.percent_decimals = self.org_percent_decimals
 
         self.aw.setFonts(False)
         self.aw.qmc.resetlinecountcaches()
@@ -2558,7 +2609,7 @@ class CurvesDlg(ArtisanDialog):
         self.aw.qmc.DeltaBTfunction = str(self.DeltaBTfunctionedit.text())
         if self.aw.largeDeltaLCDs_dialog is not None:
             self.aw.largeDeltaLCDs_dialog.updateVisiblitiesDeltaETBT()
-        self.changeDecimalPlaceslcd()
+        self.changeDecimalPlaces()
         swap = self.swapdeltalcds.isChecked()
         # swap DeltaBT/ET lcds on leaving this dialog
         if self.aw.qmc.swapdeltalcds != swap:
