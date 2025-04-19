@@ -82,6 +82,7 @@ v3.1.2 (April XX, 2025)
    - list single blend with only replacement stock on [artisan.plus](https://artisan.plus) if no other blend has stock which was not listed by error before
   - fixes broken rendering of roasting times in CSV production reports
   - remembered last batch size now correctly converted to current weight unit
+  - sliders send decimal values (instead of rounded integers via MODBUS, PWM, Artisan, WebSocket, IO, VOUT, S7 and RC Commands
 
 
 * REMOVALS
