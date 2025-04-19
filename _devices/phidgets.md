@@ -373,7 +373,7 @@ See [Artisan v1.6.1](https://artisan-roasterscope.blogspot.com/2019/03/artisan-v
 
 ### 4.7 Stepper Motor Control
 
-Artisan v3.2 adds support for stepper motor control.
+Artisan v3.1 adds support for stepper motor control.
 
 * [Phidget STC1002](https://www.phidgets.com/?prodid=1121){:target="_blank"} (8A Stepper Phidget)
 * [Phidget STC1005](https://phidgets.com/?prodid=1278){:target="_blank"} (4A Stepper Phidget) 
