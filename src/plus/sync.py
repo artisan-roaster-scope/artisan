@@ -464,6 +464,7 @@ def applyServerUpdates(data:Dict[str, Any]) -> None:
             win:float = aw.qmc.weight[0]
             wout:float = aw.qmc.weight[1]
             wunit:str = aw.qmc.weight[2]
+            wdefects: float = aw.qmc.roasted_defects_weight
             if 'amount' in data and data['amount'] is not None:
                 assert isinstance(data['amount'], (int, float))
                 w = convertWeight(
@@ -486,6 +487,18 @@ def applyServerUpdates(data:Dict[str, Any]) -> None:
             if dirty:
                 # register new data
                 aw.qmc.weight = (win,wout,wunit)
+            if 'defects_weight' in data and data['defects_weight'] is not None:
+                w = convertWeight(
+                    data['defects_weight'],
+                    weight_units.index('Kg'),
+                    weight_units.index(wunit),
+                )
+                if w != wdefects:
+                    wdefects = w
+                    dirty = True
+            if dirty:
+                # register new data
+                aw.qmc.roasted_defects_weight = wdefects
             if 'batch_number' in data:
                 if data['batch_number'] != aw.qmc.roastbatchnr:
                     aw.qmc.roastbatchnr = data['batch_number']

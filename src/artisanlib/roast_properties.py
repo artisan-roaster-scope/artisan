@@ -2846,7 +2846,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         try:
             if self.aw.schedule_window is not None:
                 # we need to ensure that an open completed item edit is cleared/closed not to use the wrong unit which might have changed here
-                self.aw.schedule_window.clearCompletedItemSelection()
+                self.aw.schedule_window.cancel_completed_item_edit()
         except Exception: # pylint: disable=broad-except
             pass
 
