@@ -3457,11 +3457,12 @@ class tgraphcanvas(FigureCanvas):
                                         self.timeB[time_idx],
                                         event_ydata,
                                         tempo)
-                    # redraw
-                    if self.flagon:
-                        self.redraw_keep_view(recomputeAllDeltas=False)
-                    else:
-                        self.fig.canvas.draw_idle()
+#                    # redraw
+#                    if self.flagon:
+#                        self.redraw_keep_view(recomputeAllDeltas=False)
+#                    else:
+#                         self.fig.canvas.draw_idle()
+                    self.fig.canvas.draw_idle() # seems to be fine even while logging!
                 elif self.legend is not None:
                     QTimer.singleShot(1,self.updateBackground)
 
