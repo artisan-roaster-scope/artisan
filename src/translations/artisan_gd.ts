@@ -64,7 +64,7 @@
       <translation>Inbhe ùrachaidh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="9110" />
+      <location filename="../artisanlib/canvas.py" line="9114" />
       <source>sponsored by {}</source>
       <translation>le taic bho {}</translation>
     </message>
@@ -76,13 +76,13 @@
   <context>
     <name>AddlInfo</name>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11499" />
+      <location filename="../artisanlib/canvas.py" line="11503" />
       <location filename="../artisanlib/statistics.py" line="205" />
       <source>Roast of the Day</source>
       <translation>Ròsta an latha</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11576" />
+      <location filename="../artisanlib/canvas.py" line="11580" />
       <location filename="../artisanlib/statistics.py" line="210" />
       <source>Screen Size</source>
       <translation>Meud an scrion</translation>
@@ -98,85 +98,85 @@
       <translation>Uaine taise</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11594" />
+      <location filename="../artisanlib/canvas.py" line="11598" />
       <location filename="../artisanlib/statistics.py" line="213" />
       <source>Batch Size</source>
       <translation>Meud baidse</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11602" />
+      <location filename="../artisanlib/canvas.py" line="11606" />
       <location filename="../artisanlib/statistics.py" line="214" />
       <source>Density Roasted</source>
       <translation>Dùmhlachd ròsta</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11606" />
+      <location filename="../artisanlib/canvas.py" line="11610" />
       <location filename="../artisanlib/statistics.py" line="215" />
       <source>Moisture Roasted</source>
       <translation>Ròsta taise</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11610" />
+      <location filename="../artisanlib/canvas.py" line="11614" />
       <location filename="../artisanlib/statistics.py" line="216" />
       <source>Ground Color</source>
       <translation>Dath na talmhainn</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11614" />
+      <location filename="../artisanlib/canvas.py" line="11618" />
       <location filename="../artisanlib/statistics.py" line="217" />
       <source>Energy</source>
       <translation>Cumhachd</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11620" />
+      <location filename="../artisanlib/canvas.py" line="11624" />
       <location filename="../artisanlib/statistics.py" line="218" />
       <source>CO2</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11652" />
+      <location filename="../artisanlib/canvas.py" line="11656" />
       <location filename="../artisanlib/statistics.py" line="224" />
       <source>Weight Roasted</source>
       <translation>Cuideam air a ròstadh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11656" />
+      <location filename="../artisanlib/canvas.py" line="11660" />
       <location filename="../artisanlib/statistics.py" line="225" />
       <source>Weight Loss</source>
       <translation>Caill cuideam</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11539" />
+      <location filename="../artisanlib/canvas.py" line="11543" />
       <source>From</source>
       <translation>Bho</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11540" />
+      <location filename="../artisanlib/canvas.py" line="11544" />
       <source>Bottom</source>
       <translation>Bun</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11625" />
+      <location filename="../artisanlib/canvas.py" line="11629" />
       <source>AUC</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11713" />
+      <location filename="../artisanlib/canvas.py" line="11717" />
       <source>Defects Weight</source>
       <translation>A 'call cuideam</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11718" />
+      <location filename="../artisanlib/canvas.py" line="11722" />
       <source>Defects Loss</source>
       <translation>Duilgheadasan Caillte</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11723" />
+      <location filename="../artisanlib/canvas.py" line="11727" />
       <source>Yield</source>
       <translation>Toradh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11729" />
+      <location filename="../artisanlib/canvas.py" line="11733" />
       <source>Total Loss</source>
       <translation>Call iomlan</translation>
     </message>
@@ -860,16 +860,16 @@ Inneal a bharrachd</translation>
       <translation>Teacs</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13198" />
-      <location filename="../artisanlib/canvas.py" line="7540" />
+      <location filename="../artisanlib/canvas.py" line="13202" />
+      <location filename="../artisanlib/canvas.py" line="7544" />
       <location filename="../artisanlib/main.py" line="3210" />
       <source>ON</source>
       <translation>AIR</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13911" />
-      <location filename="../artisanlib/canvas.py" line="11538" />
-      <location filename="../artisanlib/canvas.py" line="7545" />
+      <location filename="../artisanlib/canvas.py" line="13915" />
+      <location filename="../artisanlib/canvas.py" line="11542" />
+      <location filename="../artisanlib/canvas.py" line="7549" />
       <location filename="../artisanlib/main.py" line="3224" />
       <source>START</source>
       <translation>TÒRR</translation>
@@ -908,13 +908,13 @@ CRÌOCH</translation>
       <translation>ATH-SHUIDHICH</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11537" />
+      <location filename="../artisanlib/canvas.py" line="11541" />
       <location filename="../artisanlib/main.py" line="3268" />
       <source>CHARGE</source>
       <translation>ATHARRACHADH</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11538" />
+      <location filename="../artisanlib/canvas.py" line="11542" />
       <location filename="../artisanlib/main.py" line="3273" />
       <source>DROP</source>
       <translation>DROPACH</translation>
@@ -994,25 +994,25 @@ CRÌOCH</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="167" />
-      <location filename="../artisanlib/canvas.py" line="11682" />
+      <location filename="../artisanlib/canvas.py" line="11686" />
       <source>Finishing Phase</source>
       <translation>Ìre Crìochnachaidh</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="162" />
-      <location filename="../artisanlib/canvas.py" line="11690" />
+      <location filename="../artisanlib/canvas.py" line="11694" />
       <source>Maillard Phase</source>
       <translation>Ìre Maillard</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="157" />
-      <location filename="../artisanlib/canvas.py" line="11697" />
+      <location filename="../artisanlib/canvas.py" line="11701" />
       <source>Drying Phase</source>
       <translation>Ìre tiormachaidh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13814" />
-      <location filename="../artisanlib/canvas.py" line="13061" />
+      <location filename="../artisanlib/canvas.py" line="13818" />
+      <location filename="../artisanlib/canvas.py" line="13065" />
       <source>OFF</source>
       <translation type="unfinished">AIRSON</translation>
     </message>
@@ -2674,47 +2674,47 @@ CRÌOCH</translation>
       <translation>Falaich</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17613" />
+      <location filename="../artisanlib/canvas.py" line="17617" />
       <source>Add point</source>
       <translation>Cuir puing ris</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17617" />
+      <location filename="../artisanlib/canvas.py" line="17621" />
       <source>Remove point</source>
       <translation>Thoir air falbh puing</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17623" />
+      <location filename="../artisanlib/canvas.py" line="17627" />
       <source>Load points</source>
       <translation>Luchdaich puingean</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17627" />
+      <location filename="../artisanlib/canvas.py" line="17631" />
       <source>Save points</source>
       <translation>Sàbhail puingean</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17633" />
+      <location filename="../artisanlib/canvas.py" line="17637" />
       <source>Reset Designer</source>
       <translation>Ath-shuidhich Dealbhadair</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17637" />
+      <location filename="../artisanlib/canvas.py" line="17641" />
       <source>Config...</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18405" />
+      <location filename="../artisanlib/canvas.py" line="18409" />
       <source>Add to Cupping Notes</source>
       <translation>Cuir ri Cupping Notes</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18409" />
+      <location filename="../artisanlib/canvas.py" line="18413" />
       <source>Add to Roasting Notes</source>
       <translation>Cuir ri notaichean ròstadh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18415" />
+      <location filename="../artisanlib/canvas.py" line="18419" />
       <source>Edit</source>
       <translation>Deasaich</translation>
     </message>
@@ -4078,79 +4078,79 @@ CRÌOCH</translation>
       <translation>Mearachd IO:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18591" />
-      <location filename="../artisanlib/canvas.py" line="18150" />
-      <location filename="../artisanlib/canvas.py" line="18046" />
-      <location filename="../artisanlib/canvas.py" line="18004" />
-      <location filename="../artisanlib/canvas.py" line="17899" />
-      <location filename="../artisanlib/canvas.py" line="17881" />
-      <location filename="../artisanlib/canvas.py" line="17186" />
-      <location filename="../artisanlib/canvas.py" line="17163" />
-      <location filename="../artisanlib/canvas.py" line="16899" />
-      <location filename="../artisanlib/canvas.py" line="16875" />
-      <location filename="../artisanlib/canvas.py" line="16690" />
-      <location filename="../artisanlib/canvas.py" line="16523" />
-      <location filename="../artisanlib/canvas.py" line="16466" />
-      <location filename="../artisanlib/canvas.py" line="16436" />
-      <location filename="../artisanlib/canvas.py" line="16130" />
-      <location filename="../artisanlib/canvas.py" line="16095" />
-      <location filename="../artisanlib/canvas.py" line="15806" />
-      <location filename="../artisanlib/canvas.py" line="15507" />
-      <location filename="../artisanlib/canvas.py" line="15408" />
-      <location filename="../artisanlib/canvas.py" line="15175" />
-      <location filename="../artisanlib/canvas.py" line="14997" />
-      <location filename="../artisanlib/canvas.py" line="14862" />
-      <location filename="../artisanlib/canvas.py" line="14693" />
-      <location filename="../artisanlib/canvas.py" line="14577" />
-      <location filename="../artisanlib/canvas.py" line="14467" />
-      <location filename="../artisanlib/canvas.py" line="14361" />
-      <location filename="../artisanlib/canvas.py" line="14248" />
-      <location filename="../artisanlib/canvas.py" line="14164" />
-      <location filename="../artisanlib/canvas.py" line="14104" />
-      <location filename="../artisanlib/canvas.py" line="13926" />
-      <location filename="../artisanlib/canvas.py" line="13863" />
-      <location filename="../artisanlib/canvas.py" line="13304" />
-      <location filename="../artisanlib/canvas.py" line="13261" />
-      <location filename="../artisanlib/canvas.py" line="13095" />
-      <location filename="../artisanlib/canvas.py" line="13017" />
-      <location filename="../artisanlib/canvas.py" line="11967" />
-      <location filename="../artisanlib/canvas.py" line="11731" />
-      <location filename="../artisanlib/canvas.py" line="11485" />
-      <location filename="../artisanlib/canvas.py" line="11441" />
-      <location filename="../artisanlib/canvas.py" line="11396" />
-      <location filename="../artisanlib/canvas.py" line="11141" />
-      <location filename="../artisanlib/canvas.py" line="11080" />
-      <location filename="../artisanlib/canvas.py" line="10822" />
-      <location filename="../artisanlib/canvas.py" line="10777" />
-      <location filename="../artisanlib/canvas.py" line="10424" />
-      <location filename="../artisanlib/canvas.py" line="10382" />
-      <location filename="../artisanlib/canvas.py" line="10340" />
-      <location filename="../artisanlib/canvas.py" line="10297" />
-      <location filename="../artisanlib/canvas.py" line="9840" />
-      <location filename="../artisanlib/canvas.py" line="9798" />
-      <location filename="../artisanlib/canvas.py" line="9756" />
-      <location filename="../artisanlib/canvas.py" line="9714" />
-      <location filename="../artisanlib/canvas.py" line="8957" />
-      <location filename="../artisanlib/canvas.py" line="8905" />
-      <location filename="../artisanlib/canvas.py" line="8558" />
-      <location filename="../artisanlib/canvas.py" line="8385" />
-      <location filename="../artisanlib/canvas.py" line="7904" />
-      <location filename="../artisanlib/canvas.py" line="7782" />
-      <location filename="../artisanlib/canvas.py" line="7446" />
-      <location filename="../artisanlib/canvas.py" line="7200" />
-      <location filename="../artisanlib/canvas.py" line="6394" />
-      <location filename="../artisanlib/canvas.py" line="6224" />
-      <location filename="../artisanlib/canvas.py" line="5913" />
-      <location filename="../artisanlib/canvas.py" line="5895" />
-      <location filename="../artisanlib/canvas.py" line="5872" />
-      <location filename="../artisanlib/canvas.py" line="5536" />
-      <location filename="../artisanlib/canvas.py" line="5426" />
-      <location filename="../artisanlib/canvas.py" line="5412" />
-      <location filename="../artisanlib/canvas.py" line="5031" />
-      <location filename="../artisanlib/canvas.py" line="5018" />
-      <location filename="../artisanlib/canvas.py" line="4240" />
-      <location filename="../artisanlib/canvas.py" line="3895" />
-      <location filename="../artisanlib/canvas.py" line="3526" />
+      <location filename="../artisanlib/canvas.py" line="18595" />
+      <location filename="../artisanlib/canvas.py" line="18154" />
+      <location filename="../artisanlib/canvas.py" line="18050" />
+      <location filename="../artisanlib/canvas.py" line="18008" />
+      <location filename="../artisanlib/canvas.py" line="17903" />
+      <location filename="../artisanlib/canvas.py" line="17885" />
+      <location filename="../artisanlib/canvas.py" line="17190" />
+      <location filename="../artisanlib/canvas.py" line="17167" />
+      <location filename="../artisanlib/canvas.py" line="16903" />
+      <location filename="../artisanlib/canvas.py" line="16879" />
+      <location filename="../artisanlib/canvas.py" line="16694" />
+      <location filename="../artisanlib/canvas.py" line="16527" />
+      <location filename="../artisanlib/canvas.py" line="16470" />
+      <location filename="../artisanlib/canvas.py" line="16440" />
+      <location filename="../artisanlib/canvas.py" line="16134" />
+      <location filename="../artisanlib/canvas.py" line="16099" />
+      <location filename="../artisanlib/canvas.py" line="15810" />
+      <location filename="../artisanlib/canvas.py" line="15511" />
+      <location filename="../artisanlib/canvas.py" line="15412" />
+      <location filename="../artisanlib/canvas.py" line="15179" />
+      <location filename="../artisanlib/canvas.py" line="15001" />
+      <location filename="../artisanlib/canvas.py" line="14866" />
+      <location filename="../artisanlib/canvas.py" line="14697" />
+      <location filename="../artisanlib/canvas.py" line="14581" />
+      <location filename="../artisanlib/canvas.py" line="14471" />
+      <location filename="../artisanlib/canvas.py" line="14365" />
+      <location filename="../artisanlib/canvas.py" line="14252" />
+      <location filename="../artisanlib/canvas.py" line="14168" />
+      <location filename="../artisanlib/canvas.py" line="14108" />
+      <location filename="../artisanlib/canvas.py" line="13930" />
+      <location filename="../artisanlib/canvas.py" line="13867" />
+      <location filename="../artisanlib/canvas.py" line="13308" />
+      <location filename="../artisanlib/canvas.py" line="13265" />
+      <location filename="../artisanlib/canvas.py" line="13099" />
+      <location filename="../artisanlib/canvas.py" line="13021" />
+      <location filename="../artisanlib/canvas.py" line="11971" />
+      <location filename="../artisanlib/canvas.py" line="11735" />
+      <location filename="../artisanlib/canvas.py" line="11489" />
+      <location filename="../artisanlib/canvas.py" line="11445" />
+      <location filename="../artisanlib/canvas.py" line="11400" />
+      <location filename="../artisanlib/canvas.py" line="11145" />
+      <location filename="../artisanlib/canvas.py" line="11084" />
+      <location filename="../artisanlib/canvas.py" line="10826" />
+      <location filename="../artisanlib/canvas.py" line="10781" />
+      <location filename="../artisanlib/canvas.py" line="10428" />
+      <location filename="../artisanlib/canvas.py" line="10386" />
+      <location filename="../artisanlib/canvas.py" line="10344" />
+      <location filename="../artisanlib/canvas.py" line="10301" />
+      <location filename="../artisanlib/canvas.py" line="9844" />
+      <location filename="../artisanlib/canvas.py" line="9802" />
+      <location filename="../artisanlib/canvas.py" line="9760" />
+      <location filename="../artisanlib/canvas.py" line="9718" />
+      <location filename="../artisanlib/canvas.py" line="8961" />
+      <location filename="../artisanlib/canvas.py" line="8909" />
+      <location filename="../artisanlib/canvas.py" line="8562" />
+      <location filename="../artisanlib/canvas.py" line="8389" />
+      <location filename="../artisanlib/canvas.py" line="7908" />
+      <location filename="../artisanlib/canvas.py" line="7786" />
+      <location filename="../artisanlib/canvas.py" line="7450" />
+      <location filename="../artisanlib/canvas.py" line="7204" />
+      <location filename="../artisanlib/canvas.py" line="6398" />
+      <location filename="../artisanlib/canvas.py" line="6228" />
+      <location filename="../artisanlib/canvas.py" line="5917" />
+      <location filename="../artisanlib/canvas.py" line="5899" />
+      <location filename="../artisanlib/canvas.py" line="5876" />
+      <location filename="../artisanlib/canvas.py" line="5540" />
+      <location filename="../artisanlib/canvas.py" line="5430" />
+      <location filename="../artisanlib/canvas.py" line="5416" />
+      <location filename="../artisanlib/canvas.py" line="5035" />
+      <location filename="../artisanlib/canvas.py" line="5022" />
+      <location filename="../artisanlib/canvas.py" line="4244" />
+      <location filename="../artisanlib/canvas.py" line="3899" />
+      <location filename="../artisanlib/canvas.py" line="3530" />
       <location filename="../artisanlib/canvas.py" line="3163" />
       <location filename="../artisanlib/devices.py" line="4384" />
       <location filename="../artisanlib/devices.py" line="3030" />
@@ -4461,11 +4461,11 @@ CRÌOCH</translation>
       <translation>Cha b' urrainn do Arduino na criathragan a shuidheachadh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18585" />
-      <location filename="../artisanlib/canvas.py" line="18144" />
-      <location filename="../artisanlib/canvas.py" line="16894" />
-      <location filename="../artisanlib/canvas.py" line="16870" />
-      <location filename="../artisanlib/canvas.py" line="16684" />
+      <location filename="../artisanlib/canvas.py" line="18589" />
+      <location filename="../artisanlib/canvas.py" line="18148" />
+      <location filename="../artisanlib/canvas.py" line="16898" />
+      <location filename="../artisanlib/canvas.py" line="16874" />
+      <location filename="../artisanlib/canvas.py" line="16688" />
       <location filename="../artisanlib/main.py" line="25716" />
       <location filename="../artisanlib/main.py" line="25451" />
       <location filename="../artisanlib/main.py" line="25320" />
@@ -4677,33 +4677,33 @@ CRÌOCH</translation>
       <translation>Dèan mion-sgrùdadh: feumaidh ìomhaigh cùl-fhiosrachaidh tachartasan CHARGE agus DROP</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11732" />
+      <location filename="../artisanlib/canvas.py" line="11736" />
       <source>Unexpected value for n, got</source>
       <translation>Luach ris nach robh dùil airson n, fhuair</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12855" />
+      <location filename="../artisanlib/canvas.py" line="12859" />
       <source>Exception: phidgetServer couldn't be added. Verify that the Phidget driver is correctly installed!</source>
       <translation>Eisimpleir: cha b' urrainn phidgetServer a chur ris. Dèan cinnteach gu bheil an draibhear Phidget air a chuir a-steach ceart!</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12863" />
+      <location filename="../artisanlib/canvas.py" line="12867" />
       <source>Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!</source>
       <translation>Eisimpleir: Cha b' urrainn dhuinn PhidgetManager a thòiseachadh. Dèan cinnteach gu bheil an draibhear Phidget air a stàladh ceart!</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13357" />
-      <location filename="../artisanlib/canvas.py" line="13331" />
+      <location filename="../artisanlib/canvas.py" line="13361" />
+      <location filename="../artisanlib/canvas.py" line="13335" />
       <source>Unstable meter data</source>
       <translation>Dàta meatair neo-sheasmhach</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16836" />
+      <location filename="../artisanlib/canvas.py" line="16840" />
       <source>Error in lnRegression:</source>
       <translation>Mearachd ann an lnRegression:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17544" />
+      <location filename="../artisanlib/canvas.py" line="17548" />
       <source>Exception: redrawdesigner() Roast events may be out of order. Resetting Designer.</source>
       <translation>Eisimpleir: dealbhaiche ath-tharraing () Faodaidh tachartasan ròsta a bhith a-mach à òrdugh. Dealbhadair ath-shuidheachadh.</translation>
     </message>
@@ -5182,15 +5182,15 @@ CRÌOCH</translation>
       <translation>Ath-chluich</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15738" />
-      <location filename="../artisanlib/canvas.py" line="15676" />
+      <location filename="../artisanlib/canvas.py" line="15742" />
+      <location filename="../artisanlib/canvas.py" line="15680" />
       <location filename="../artisanlib/roast_properties.py" line="2930" />
       <source>Energy</source>
       <translation>Cumhachd</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15739" />
-      <location filename="../artisanlib/canvas.py" line="15677" />
+      <location filename="../artisanlib/canvas.py" line="15743" />
+      <location filename="../artisanlib/canvas.py" line="15681" />
       <location filename="../artisanlib/roast_properties.py" line="2931" />
       <source>CO2</source>
       <translation />
@@ -5452,14 +5452,14 @@ CRÌOCH</translation>
   <context>
     <name>HTML Report Template</name>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11659" />
+      <location filename="../artisanlib/canvas.py" line="11663" />
       <location filename="../artisanlib/main.py" line="21597" />
       <location filename="../artisanlib/statistics.py" line="226" />
       <source>BBP Total Time</source>
       <translation>Ùine iomlan BBP</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11662" />
+      <location filename="../artisanlib/canvas.py" line="11666" />
       <location filename="../artisanlib/main.py" line="21598" />
       <location filename="../artisanlib/statistics.py" line="227" />
       <source>BBP Bottom Temp</source>
@@ -5476,7 +5476,7 @@ CRÌOCH</translation>
       <translation>Geàrr-chunntas BBP</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11704" />
+      <location filename="../artisanlib/canvas.py" line="11708" />
       <location filename="../artisanlib/main.py" line="21495" />
       <location filename="../artisanlib/statistics.py" line="234" />
       <source>Whole Color</source>
@@ -6213,7 +6213,7 @@ CRÌOCH</translation>
       <translation>Buidheann:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11633" />
+      <location filename="../artisanlib/canvas.py" line="11637" />
       <location filename="../artisanlib/main.py" line="22990" />
       <source>Cupping:</source>
       <translation>Cupan:</translation>
@@ -8234,13 +8234,13 @@ Luchdaich am pròifil clàraichte air an inneal nas lugha agus fosgail an Transp
       <translation>caochladair a 'cumail an luach mu dheireadh a chaidh a leughadh tro MODBUS</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="247" />
+      <location filename="../help/eventbuttons_help.py" line="250" />
       <location filename="../help/eventbuttons_help.py" line="193" />
       <location filename="../help/eventbuttons_help.py" line="173" />
       <location filename="../help/eventbuttons_help.py" line="170" />
       <location filename="../help/eventbuttons_help.py" line="147" />
       <location filename="../help/eventbuttons_help.py" line="106" />
-      <location filename="../help/eventsliders_help.py" line="170" />
+      <location filename="../help/eventsliders_help.py" line="173" />
       <location filename="../help/eventsliders_help.py" line="120" />
       <location filename="../help/eventsliders_help.py" line="105" />
       <location filename="../help/eventsliders_help.py" line="101" />
@@ -8618,7 +8618,7 @@ Luchdaich am pròifil clàraichte air an inneal nas lugha agus fosgail an Transp
       <translation>ag atharrachadh sianal toraidh binary PHIDGET c dheth (b = 0) agus air adhart (b = 1) agus a’ suidheachadh putan i gu bruthadh no àbhaisteach a rèir an luach b</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="248" />
+      <location filename="../help/eventbuttons_help.py" line="251" />
       <location filename="../help/eventbuttons_help.py" line="174" />
       <location filename="../help/eventbuttons_help.py" line="144" />
       <location filename="../help/eventbuttons_help.py" line="107" />
@@ -8633,7 +8633,7 @@ Luchdaich am pròifil clàraichte air an inneal nas lugha agus fosgail an Transp
       <translation>suidhich putan gus a bhrùthadh ma tha luach b tha, fìor, t, no 1, air dhòigh eile mar as àbhaist</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="250" />
+      <location filename="../help/eventbuttons_help.py" line="253" />
       <location filename="../help/eventbuttons_help.py" line="214" />
       <location filename="../help/eventbuttons_help.py" line="176" />
       <location filename="../help/eventbuttons_help.py" line="146" />
@@ -8667,8 +8667,8 @@ Luchdaich am pròifil clàraichte air an inneal nas lugha agus fosgail an Transp
       <translation>caochladair a 'cumail an luach mu dheireadh air a leughadh tro S7</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="249" />
-      <location filename="../help/eventsliders_help.py" line="171" />
+      <location filename="../help/eventbuttons_help.py" line="252" />
+      <location filename="../help/eventsliders_help.py" line="174" />
       <location filename="../help/eventsliders_help.py" line="106" />
       <source>sets calling button to “pressed” if argument evaluates to 1 or True</source>
       <translation>suidhich putan gairm gu “brùthadh” ma tha argamaid a’ measadh gu 1 no True</translation>
@@ -9058,18 +9058,42 @@ Luchdaich am pròifil clàraichte air an inneal nas lugha agus fosgail an Transp
     <message>
       <location filename="../help/eventbuttons_help.py" line="245" />
       <location filename="../help/eventsliders_help.py" line="169" />
+      <source>Stepper Command</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <location filename="../help/eventbuttons_help.py" line="245" />
+      <location filename="../help/eventsliders_help.py" line="169" />
+      <source>for PHIDGET Stepper Motors: set the target position</source>
+      <translation>airson PHIDGET Stepper Motors: suidhich an suidheachadh targaid</translation>
+    </message>
+    <message>
+      <location filename="../help/eventbuttons_help.py" line="246" />
+      <location filename="../help/eventsliders_help.py" line="170" />
+      <source>for PHIDGET Stepper Motors: set the rescale factor</source>
+      <translation>airson PHIDGET Stepper Motors: suidhich am bàillidh ath-sgèile</translation>
+    </message>
+    <message>
+      <location filename="../help/eventbuttons_help.py" line="247" />
+      <location filename="../help/eventsliders_help.py" line="171" />
+      <source>for PHIDGET Stepper Motors: engage (b=1) or disengage (b = 0)</source>
+      <translation>airson PHIDGET Stepper Motors: gabh an sàs (b = 1) no dì-cheangail (b = 0)</translation>
+    </message>
+    <message>
+      <location filename="../help/eventbuttons_help.py" line="248" />
+      <location filename="../help/eventsliders_help.py" line="172" />
       <source>WebSocket Command</source>
       <translation type="unfinished">Òrdugh WebSocket</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="246" />
-      <location filename="../help/eventsliders_help.py" line="169" />
+      <location filename="../help/eventbuttons_help.py" line="249" />
+      <location filename="../help/eventsliders_help.py" line="172" />
       <source>If {} substitutions are used, json brackets need to be duplicated to escape them like in send({{ “value”: {}}})</source>
       <translation>Ma chleachdar {} ionaid, feumar camagan json a dhùblachadh gus teicheadh orra mar ann an send({{ “value”: {}}})</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="251" />
-      <location filename="../help/eventsliders_help.py" line="172" />
+      <location filename="../help/eventbuttons_help.py" line="254" />
+      <location filename="../help/eventsliders_help.py" line="175" />
       <source>if the `&lt;json&gt;` text respects the JSON format it is send to the connected WebSocket server and the response is bound to the variable `_`</source>
       <translation>ma tha an teacsa `&lt;json&gt;` a' toirt spèis don fhòrmat JSON thèid a chur chun an fhrithealaiche WebSocket ceangailte agus tha am freagairt ceangailte ris a' chaochladair `_`</translation>
     </message>
@@ -9528,7 +9552,7 @@ Gnìomh 4 (Leugh Clàran Inntrigidh): clàran 0 gu 65535 a rèir àireamhan 3000
       <translation>a 'toirt air adhart putanan eile</translation>
     </message>
     <message>
-      <location filename="../help/eventbuttons_help.py" line="245" />
+      <location filename="../help/eventbuttons_help.py" line="248" />
       <location filename="../help/eventbuttons_help.py" line="188" />
       <location filename="../help/eventbuttons_help.py" line="172" />
       <location filename="../help/eventbuttons_help.py" line="128" />
@@ -11723,7 +11747,7 @@ CTRL+SHIFT+F [Buann]</translation>
   <context>
     <name>Label</name>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11641" />
+      <location filename="../artisanlib/canvas.py" line="11645" />
       <location filename="../artisanlib/large_lcds.py" line="840" />
       <location filename="../artisanlib/roast_properties.py" line="897" />
       <location filename="../artisanlib/roast_properties.py" line="234" />
@@ -11756,7 +11780,7 @@ CTRL+SHIFT+F [Buann]</translation>
       <translation>Sgàinidhean</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11585" />
+      <location filename="../artisanlib/canvas.py" line="11589" />
       <location filename="../artisanlib/roast_properties.py" line="988" />
       <location filename="../plus/schedule.py" line="1761" />
       <source>Density</source>
@@ -11770,7 +11794,7 @@ CTRL+SHIFT+F [Buann]</translation>
       <translation>Dath</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11590" />
+      <location filename="../artisanlib/canvas.py" line="11594" />
       <location filename="../artisanlib/roast_properties.py" line="1096" />
       <location filename="../plus/schedule.py" line="1781" />
       <source>Moisture</source>
@@ -11812,9 +11836,9 @@ CTRL+SHIFT+F [Buann]</translation>
       <translation>Ròsta</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11641" />
-      <location filename="../artisanlib/canvas.py" line="11590" />
-      <location filename="../artisanlib/canvas.py" line="11585" />
+      <location filename="../artisanlib/canvas.py" line="11645" />
+      <location filename="../artisanlib/canvas.py" line="11594" />
+      <location filename="../artisanlib/canvas.py" line="11589" />
       <location filename="../artisanlib/roast_properties.py" line="895" />
       <location filename="../artisanlib/roast_properties.py" line="219" />
       <location filename="../plus/schedule.py" line="3570" />
@@ -11921,10 +11945,10 @@ CTRL+SHIFT+F [Buann]</translation>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17475" />
-      <location filename="../artisanlib/canvas.py" line="17465" />
-      <location filename="../artisanlib/canvas.py" line="8848" />
-      <location filename="../artisanlib/canvas.py" line="8792" />
+      <location filename="../artisanlib/canvas.py" line="17479" />
+      <location filename="../artisanlib/canvas.py" line="17469" />
+      <location filename="../artisanlib/canvas.py" line="8852" />
+      <location filename="../artisanlib/canvas.py" line="8796" />
       <location filename="../artisanlib/main.py" line="18141" />
       <location filename="../artisanlib/main.py" line="5815" />
       <location filename="../artisanlib/main.py" line="5809" />
@@ -11954,10 +11978,10 @@ CTRL+SHIFT+F [Buann]</translation>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17472" />
-      <location filename="../artisanlib/canvas.py" line="17461" />
-      <location filename="../artisanlib/canvas.py" line="8821" />
-      <location filename="../artisanlib/canvas.py" line="8770" />
+      <location filename="../artisanlib/canvas.py" line="17476" />
+      <location filename="../artisanlib/canvas.py" line="17465" />
+      <location filename="../artisanlib/canvas.py" line="8825" />
+      <location filename="../artisanlib/canvas.py" line="8774" />
       <location filename="../artisanlib/main.py" line="18134" />
       <location filename="../artisanlib/main.py" line="5812" />
       <location filename="../artisanlib/main.py" line="5806" />
@@ -11995,7 +12019,7 @@ CTRL+SHIFT+F [Buann]</translation>
       <translation>Co-thaobhadh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="3852" />
+      <location filename="../artisanlib/canvas.py" line="3856" />
       <location filename="../artisanlib/canvas.py" line="1206" />
       <location filename="../artisanlib/transposer.py" line="1190" />
       <location filename="../artisanlib/statistics.py" line="104" />
@@ -12081,7 +12105,7 @@ CTRL+SHIFT+F [Buann]</translation>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="3858" />
+      <location filename="../artisanlib/canvas.py" line="3862" />
       <location filename="../artisanlib/canvas.py" line="1212" />
       <location filename="../artisanlib/transposer.py" line="1194" />
       <location filename="../artisanlib/transposer.py" line="1123" />
@@ -12493,8 +12517,8 @@ CTRL+SHIFT+F [Buann]</translation>
       <translation>TÒRR</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15620" />
-      <location filename="../artisanlib/canvas.py" line="15611" />
+      <location filename="../artisanlib/canvas.py" line="15624" />
+      <location filename="../artisanlib/canvas.py" line="15615" />
       <location filename="../artisanlib/events.py" line="592" />
       <source>MET</source>
       <translation type="unfinished" />
@@ -12942,7 +12966,7 @@ CTRL+SHIFT+F [Buann]</translation>
       <translation>Toirt</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="3853" />
+      <location filename="../artisanlib/canvas.py" line="3857" />
       <location filename="../artisanlib/transposer.py" line="1191" />
       <location filename="../artisanlib/transposer.py" line="1120" />
       <location filename="../artisanlib/statistics.py" line="106" />
@@ -12951,7 +12975,7 @@ CTRL+SHIFT+F [Buann]</translation>
       <translation>CRÌOCH DEIREANNACH</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="3854" />
+      <location filename="../artisanlib/canvas.py" line="3858" />
       <location filename="../artisanlib/transposer.py" line="1192" />
       <location filename="../artisanlib/transposer.py" line="1121" />
       <location filename="../artisanlib/statistics.py" line="107" />
@@ -12960,13 +12984,13 @@ CTRL+SHIFT+F [Buann]</translation>
       <translation>TÒRR FC</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="3855" />
+      <location filename="../artisanlib/canvas.py" line="3859" />
       <location filename="../artisanlib/roast_properties.py" line="682" />
       <source>FC END</source>
       <translation>CRÌOCH FC</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="3856" />
+      <location filename="../artisanlib/canvas.py" line="3860" />
       <location filename="../artisanlib/transposer.py" line="1193" />
       <location filename="../artisanlib/transposer.py" line="1122" />
       <location filename="../artisanlib/roast_properties.py" line="697" />
@@ -12974,13 +12998,13 @@ CTRL+SHIFT+F [Buann]</translation>
       <translation>SC TÒISEACH</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="3857" />
+      <location filename="../artisanlib/canvas.py" line="3861" />
       <location filename="../artisanlib/roast_properties.py" line="712" />
       <source>SC END</source>
       <translation>SC CRÌOCH</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="3859" />
+      <location filename="../artisanlib/canvas.py" line="3863" />
       <location filename="../artisanlib/roast_properties.py" line="742" />
       <source>COOL</source>
       <translation>TARRAINGEACH</translation>
@@ -13148,7 +13172,7 @@ CTRL+SHIFT+F [Buann]</translation>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15744" />
+      <location filename="../artisanlib/canvas.py" line="15748" />
       <location filename="../artisanlib/roast_properties.py" line="3566" />
       <location filename="../artisanlib/roast_properties.py" line="3561" />
       <location filename="../artisanlib/roast_properties.py" line="3537" />
@@ -13502,7 +13526,7 @@ LCDs Uile</translation>
       <translation>Chan eil e ri fhaighinn ann an ArtisanViewer</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="3875" />
+      <location filename="../artisanlib/canvas.py" line="3879" />
       <location filename="../artisanlib/curves.py" line="2130" />
       <source>EVENT</source>
       <translation>TACHARTAS</translation>
@@ -13642,8 +13666,8 @@ LCDs Uile</translation>
       <translation>ròsta</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15621" />
-      <location filename="../artisanlib/canvas.py" line="15608" />
+      <location filename="../artisanlib/canvas.py" line="15625" />
+      <location filename="../artisanlib/canvas.py" line="15612" />
       <location filename="../artisanlib/main.py" line="7519" />
       <location filename="../artisanlib/main.py" line="6672" />
       <location filename="../artisanlib/main.py" line="6670" />
@@ -13782,7 +13806,7 @@ LCDs Uile</translation>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16842" />
+      <location filename="../artisanlib/canvas.py" line="16846" />
       <location filename="../artisanlib/main.py" line="26475" />
       <location filename="../artisanlib/main.py" line="7041" />
       <source>ln()</source>
@@ -14042,8 +14066,8 @@ LCDs Uile</translation>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15621" />
-      <location filename="../artisanlib/canvas.py" line="15610" />
+      <location filename="../artisanlib/canvas.py" line="15625" />
+      <location filename="../artisanlib/canvas.py" line="15614" />
       <location filename="../artisanlib/main.py" line="26465" />
       <source>RoR</source>
       <translation type="unfinished" />
@@ -14293,110 +14317,110 @@ LCDs Uile</translation>
       <translation type="unfinished">Meatair</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="3849" />
-      <location filename="../artisanlib/canvas.py" line="3847" />
+      <location filename="../artisanlib/canvas.py" line="3853" />
+      <location filename="../artisanlib/canvas.py" line="3851" />
       <source>at</source>
       <translation>aig</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="9446" />
+      <location filename="../artisanlib/canvas.py" line="9450" />
       <source>BackgroundXT</source>
       <translation>Cùl-fhiosrachadhXT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="9502" />
+      <location filename="../artisanlib/canvas.py" line="9506" />
       <source>BackgroundYT</source>
       <translation>Cùl-fhiosrachadhYT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17440" />
-      <location filename="../artisanlib/canvas.py" line="9536" />
+      <location filename="../artisanlib/canvas.py" line="17444" />
+      <location filename="../artisanlib/canvas.py" line="9540" />
       <source>BackgroundET</source>
       <translation>Cùl-fhiosrachadhET</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17444" />
-      <location filename="../artisanlib/canvas.py" line="9567" />
+      <location filename="../artisanlib/canvas.py" line="17448" />
+      <location filename="../artisanlib/canvas.py" line="9571" />
       <source>BackgroundBT</source>
       <translation>Cùl-fhiosrachadhBT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="9593" />
+      <location filename="../artisanlib/canvas.py" line="9597" />
       <source>BackgroundDeltaET</source>
       <translation>Cùl-fhiosrachadhDeltaET</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="9612" />
+      <location filename="../artisanlib/canvas.py" line="9616" />
       <source>BackgroundDeltaBT</source>
       <translation>Cùl-fhiosrachadhDeltaBT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11041" />
+      <location filename="../artisanlib/canvas.py" line="11045" />
       <source>ETprojection</source>
       <translation>ET ro-mheasadh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11048" />
+      <location filename="../artisanlib/canvas.py" line="11052" />
       <source>DeltaETprojection</source>
       <translation>ro-mheasadh DeltaET</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11054" />
+      <location filename="../artisanlib/canvas.py" line="11058" />
       <source>BTprojection</source>
       <translation>Ro-mheasadh BT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11061" />
+      <location filename="../artisanlib/canvas.py" line="11065" />
       <source>DeltaBTprojection</source>
       <translation>Ro-mheasadh DeltaBT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11065" />
+      <location filename="../artisanlib/canvas.py" line="11069" />
       <source>TIMEguide</source>
       <translation>TIGHMORA</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11070" />
+      <location filename="../artisanlib/canvas.py" line="11074" />
       <source>AUCguide</source>
       <translation type="unfinished" />
     </message>
     <message>
       <location filename="../artisanlib/cup_profile.py" line="80" />
-      <location filename="../artisanlib/canvas.py" line="12631" />
-      <location filename="../artisanlib/canvas.py" line="12476" />
-      <location filename="../artisanlib/canvas.py" line="11708" />
+      <location filename="../artisanlib/canvas.py" line="12635" />
+      <location filename="../artisanlib/canvas.py" line="12480" />
+      <location filename="../artisanlib/canvas.py" line="11712" />
       <source>Correction</source>
       <translation>Ceartachadh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15387" />
+      <location filename="../artisanlib/canvas.py" line="15391" />
       <source>Event #&lt;b&gt;{0} &lt;/b&gt;</source>
       <translation>Tachartas # &lt;b&gt; {0} &lt;/b&gt;</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15623" />
-      <location filename="../artisanlib/canvas.py" line="15614" />
+      <location filename="../artisanlib/canvas.py" line="15627" />
+      <location filename="../artisanlib/canvas.py" line="15618" />
       <source>CM</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15625" />
-      <location filename="../artisanlib/canvas.py" line="15616" />
+      <location filename="../artisanlib/canvas.py" line="15629" />
+      <location filename="../artisanlib/canvas.py" line="15620" />
       <source>FC</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17411" />
+      <location filename="../artisanlib/canvas.py" line="17415" />
       <source>Designer</source>
       <translation>Dealbhaiche</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18204" />
+      <location filename="../artisanlib/canvas.py" line="18208" />
       <source>BT {0} {1}/min for {2}</source>
       <translation>BT {0} {1} / min airson {2}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18217" />
+      <location filename="../artisanlib/canvas.py" line="18221" />
       <source>ET {0} {1}/min for {2}</source>
       <translation>ET {0} {1} / min airson {2}</translation>
     </message>
@@ -15258,19 +15282,19 @@ LCDs Uile</translation>
       <translation>Graf cuibhle air a shàbhaladh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18346" />
+      <location filename="../artisanlib/canvas.py" line="18350" />
       <location filename="../artisanlib/wheels.py" line="655" />
       <source>Open Wheel Graph</source>
       <translation>Graf Cuibhle Fosgailte</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13022" />
-      <location filename="../artisanlib/canvas.py" line="13008" />
-      <location filename="../artisanlib/canvas.py" line="13002" />
-      <location filename="../artisanlib/canvas.py" line="12982" />
-      <location filename="../artisanlib/canvas.py" line="12974" />
-      <location filename="../artisanlib/canvas.py" line="12959" />
-      <location filename="../artisanlib/canvas.py" line="12941" />
+      <location filename="../artisanlib/canvas.py" line="13026" />
+      <location filename="../artisanlib/canvas.py" line="13012" />
+      <location filename="../artisanlib/canvas.py" line="13006" />
+      <location filename="../artisanlib/canvas.py" line="12986" />
+      <location filename="../artisanlib/canvas.py" line="12978" />
+      <location filename="../artisanlib/canvas.py" line="12963" />
+      <location filename="../artisanlib/canvas.py" line="12945" />
       <location filename="../artisanlib/devices.py" line="1937" />
       <location filename="../artisanlib/devices.py" line="1832" />
       <location filename="../artisanlib/roast_properties.py" line="1480" />
@@ -15280,13 +15304,13 @@ LCDs Uile</translation>
       <translation>{} ceangailte</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13023" />
-      <location filename="../artisanlib/canvas.py" line="13009" />
-      <location filename="../artisanlib/canvas.py" line="13003" />
-      <location filename="../artisanlib/canvas.py" line="12983" />
-      <location filename="../artisanlib/canvas.py" line="12975" />
-      <location filename="../artisanlib/canvas.py" line="12960" />
-      <location filename="../artisanlib/canvas.py" line="12942" />
+      <location filename="../artisanlib/canvas.py" line="13027" />
+      <location filename="../artisanlib/canvas.py" line="13013" />
+      <location filename="../artisanlib/canvas.py" line="13007" />
+      <location filename="../artisanlib/canvas.py" line="12987" />
+      <location filename="../artisanlib/canvas.py" line="12979" />
+      <location filename="../artisanlib/canvas.py" line="12964" />
+      <location filename="../artisanlib/canvas.py" line="12946" />
       <location filename="../artisanlib/devices.py" line="1942" />
       <location filename="../artisanlib/devices.py" line="1837" />
       <location filename="../artisanlib/roast_properties.py" line="1481" />
@@ -16320,7 +16344,7 @@ Gus a chumail saor agus gnàthach feuch an toir thu taic dhuinn leis an tabharta
       <translation>Àrdachadh (MASL)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="7377" />
+      <location filename="../artisanlib/canvas.py" line="7381" />
       <location filename="../artisanlib/main.py" line="5705" />
       <location filename="../artisanlib/main.py" line="5511" />
       <source>Action canceled</source>
@@ -17381,433 +17405,433 @@ Ceartaich seo air an tab Config&gt; Curves&gt; Analyze.</translation>
       <translation>diogan às deidh FCn</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="4059" />
+      <location filename="../artisanlib/canvas.py" line="4063" />
       <source>Alarm notice</source>
       <translation>Sanas rabhaidh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="5750" />
+      <location filename="../artisanlib/canvas.py" line="5754" />
       <source>Alarm is calling: {0}</source>
       <translation>Tha inneal-rabhaidh a' gairm: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="5752" />
+      <location filename="../artisanlib/canvas.py" line="5756" />
       <source>Calling alarm failed on {0}</source>
       <translation>Dh'fhàillig a' ghairm rabhaidh air {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="5762" />
+      <location filename="../artisanlib/canvas.py" line="5766" />
       <source>Alarm trigger button error, description '{0}' not a number</source>
       <translation>Mearachd le putan brosnachaidh an rabhaidh, tuairisgeul '{0}' chan e àireamh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="5790" />
+      <location filename="../artisanlib/canvas.py" line="5794" />
       <source>Alarm trigger slider error, description '{0}' not a valid number [0-100]</source>
       <translation>Mearachd sleamhnachan brosnachaidh rabhaidh, chan eil an tuairisgeul ‘{0}’ na àireamh dligheach [0-100]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="5873" />
+      <location filename="../artisanlib/canvas.py" line="5877" />
       <source>Alarm trigger SV slider error, description '{0}' not a valid number</source>
       <translation>Mearachd sleamhnachan SV brosnachaidh inneal-rabhaidh, chan e àireamh dligheach a tha san tuairisgeul ‘{0}’</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="5891" />
+      <location filename="../artisanlib/canvas.py" line="5895" />
       <source>Alarm {0} triggered</source>
       <translation>Alarm {0} air a phiobrachadh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="7360" />
+      <location filename="../artisanlib/canvas.py" line="7364" />
       <source>Save profile?</source>
       <translation>Sàbhail pròifil?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="7369" />
+      <location filename="../artisanlib/canvas.py" line="7373" />
       <source>Profile unsaved</source>
       <translation>Pròifil gun sàbhaladh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="7519" />
+      <location filename="../artisanlib/canvas.py" line="7523" />
       <source>Scope has been reset</source>
       <translation>Chaidh an raon ath-shuidheachadh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11461" />
+      <location filename="../artisanlib/canvas.py" line="11465" />
       <source>Load Image File</source>
       <translation>Luchdaich suas Image File</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11468" />
+      <location filename="../artisanlib/canvas.py" line="11472" />
       <source>Loaded watermark image {0}</source>
       <translation>Dealbh comharra-uisge air a luchdachadh {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11479" />
+      <location filename="../artisanlib/canvas.py" line="11483" />
       <source>Unable to load watermark image {0}</source>
       <translation>Cha ghabh dealbh comharra-uisge {0} a luchdadh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12188" />
+      <location filename="../artisanlib/canvas.py" line="12192" />
       <source>Convert profile data to Fahrenheit?</source>
       <translation>Tionndaidh dàta pròifil gu Fahrenheit?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12301" />
-      <location filename="../artisanlib/canvas.py" line="12249" />
-      <location filename="../artisanlib/canvas.py" line="12239" />
-      <location filename="../artisanlib/canvas.py" line="12189" />
+      <location filename="../artisanlib/canvas.py" line="12305" />
+      <location filename="../artisanlib/canvas.py" line="12253" />
+      <location filename="../artisanlib/canvas.py" line="12243" />
+      <location filename="../artisanlib/canvas.py" line="12193" />
       <source>Convert Profile Temperature</source>
       <translation>Tionndadh teòthachd pròifil</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12236" />
+      <location filename="../artisanlib/canvas.py" line="12240" />
       <source>Profile changed to Fahrenheit</source>
       <translation>Dh'atharraich pròifil gu Fahrenheit</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12240" />
+      <location filename="../artisanlib/canvas.py" line="12244" />
       <source>Unable to comply. You already are in Fahrenheit</source>
       <translation>Cha ghabh gèilleadh. Tha thu mar-thà ann am Fahrenheit</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12303" />
-      <location filename="../artisanlib/canvas.py" line="12241" />
+      <location filename="../artisanlib/canvas.py" line="12307" />
+      <location filename="../artisanlib/canvas.py" line="12245" />
       <source>Profile not changed</source>
       <translation>Pròifil nach deach atharrachadh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12248" />
+      <location filename="../artisanlib/canvas.py" line="12252" />
       <source>Convert profile data to Celsius?</source>
       <translation>Tionndaidh dàta pròifil gu Celsius?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12298" />
+      <location filename="../artisanlib/canvas.py" line="12302" />
       <source>Profile changed to Celsius</source>
       <translation>Chaidh pròifil atharrachadh gu Celsius</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12302" />
+      <location filename="../artisanlib/canvas.py" line="12306" />
       <source>Unable to comply. You already are in Celsius</source>
       <translation>Cha ghabh gèilleadh. Tha thu ann an Celsius mu thràth</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12310" />
+      <location filename="../artisanlib/canvas.py" line="12314" />
       <source>Convert Profile Scale</source>
       <translation>Tionndadh Sgèile Pròifil</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12311" />
+      <location filename="../artisanlib/canvas.py" line="12315" />
       <source>No profile data found</source>
       <translation>Cha deach dàta pròifil a lorg</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12338" />
-      <location filename="../artisanlib/canvas.py" line="12322" />
+      <location filename="../artisanlib/canvas.py" line="12342" />
+      <location filename="../artisanlib/canvas.py" line="12326" />
       <source>Colors set to defaults</source>
       <translation>Dathan air an suidheachadh gu roghainnean bunaiteach</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12326" />
+      <location filename="../artisanlib/canvas.py" line="12330" />
       <source>Colors set to Default Theme</source>
       <translation>Dathan air an suidheachadh gu Cuspair bunaiteach</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12342" />
+      <location filename="../artisanlib/canvas.py" line="12346" />
       <source>Colors set to grey</source>
       <translation>Dathan air an suidheachadh gu liath</translation>
     </message>
     <message>
       <location filename="../artisanlib/cup_profile.py" line="255" />
-      <location filename="../artisanlib/canvas.py" line="12536" />
+      <location filename="../artisanlib/canvas.py" line="12540" />
       <source>Background does not match number of labels</source>
       <translation>Chan eil an cùl-fhiosrachadh a rèir àireamh nan leubail</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12757" />
+      <location filename="../artisanlib/canvas.py" line="12761" />
       <source>Phidget service discovery started...</source>
       <translation>Thòisich lorg seirbheis Phidget...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13013" />
+      <location filename="../artisanlib/canvas.py" line="13017" />
       <source>scanning for device</source>
       <translation>scan airson inneal</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13045" />
+      <location filename="../artisanlib/canvas.py" line="13049" />
       <source>Scope monitoring...</source>
       <translation>Sgrùdadh farsaingeachd ...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13197" />
+      <location filename="../artisanlib/canvas.py" line="13201" />
       <source>Scope stopped</source>
       <translation>Sguir an raon</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13484" />
+      <location filename="../artisanlib/canvas.py" line="13488" />
       <source>Humidity: {}%</source>
       <translation>Taiseachd: {}%</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13492" />
+      <location filename="../artisanlib/canvas.py" line="13496" />
       <source>Temperature: {}{}</source>
       <translation>Teòthachd: {}{}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13498" />
+      <location filename="../artisanlib/canvas.py" line="13502" />
       <source>Pressure: {}hPa</source>
       <translation>Brùthadh: {}hPa</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13808" />
+      <location filename="../artisanlib/canvas.py" line="13812" />
       <source>Scope recording...</source>
       <translation>Clàradh raon...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13910" />
+      <location filename="../artisanlib/canvas.py" line="13914" />
       <source>Scope recording stopped</source>
       <translation>Sguir clàradh farsaingeachd</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14039" />
+      <location filename="../artisanlib/canvas.py" line="14043" />
       <source>Not enough data collected yet. Try again in a few seconds</source>
       <translation>Chan eil dàta gu leòr air a chruinneachadh fhathast. Feuch ris a-rithist ann am beagan dhiog</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14099" />
+      <location filename="../artisanlib/canvas.py" line="14103" />
       <source>CHARGE: Scope is not recording</source>
       <translation>CHARGE: Chan eil farsaingeachd a’ clàradh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14124" />
+      <location filename="../artisanlib/canvas.py" line="14128" />
       <source>Roast time starts now 00:00 BT = {0}</source>
       <translation>Ùine ròsta a' tòiseachadh a-nis 00:00 BT = {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14158" />
+      <location filename="../artisanlib/canvas.py" line="14162" />
       <source>[TP] recorded at {0} BT = {1}</source>
       <translation>[TP] air a chlàradh aig {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14243" />
+      <location filename="../artisanlib/canvas.py" line="14247" />
       <source>DRY END: Scope is not recording</source>
       <translation>CRÌOCH DRY: Chan eil an raon a' clàradh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14279" />
+      <location filename="../artisanlib/canvas.py" line="14283" />
       <source>[DRY END] recorded at {0} BT = {1}</source>
       <translation>[DRY END] air a chlàradh aig {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14356" />
+      <location filename="../artisanlib/canvas.py" line="14360" />
       <source>FC START: Scope is not recording</source>
       <translation>FC START: Chan eil farsaingeachd a’ clàradh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14394" />
+      <location filename="../artisanlib/canvas.py" line="14398" />
       <source>[FC START] recorded at {0} BT = {1}</source>
       <translation>[FC START] air a chlàradh aig {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14462" />
+      <location filename="../artisanlib/canvas.py" line="14466" />
       <source>FC END: Scope is not recording</source>
       <translation>FC CRÌOCH: Chan eil farsaingeachd a’ clàradh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14504" />
+      <location filename="../artisanlib/canvas.py" line="14508" />
       <source>[FC END] recorded at {0} BT = {1}</source>
       <translation>[FC END] air a chlàradh aig {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14572" />
+      <location filename="../artisanlib/canvas.py" line="14576" />
       <source>SC START: Scope is not recording</source>
       <translation>SC START: Chan eil an raon a' clàradh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14620" />
+      <location filename="../artisanlib/canvas.py" line="14624" />
       <source>[SC START] recorded at {0} BT = {1}</source>
       <translation>[SC START] air a chlàradh aig {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14688" />
+      <location filename="../artisanlib/canvas.py" line="14692" />
       <source>SC END: Scope is not recording</source>
       <translation>SC CRÌOCH: Chan eil an raon a' clàradh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14735" />
+      <location filename="../artisanlib/canvas.py" line="14739" />
       <source>[SC END] recorded at {0} BT = {1}</source>
       <translation>[SC END] air a chlàradh aig {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14857" />
+      <location filename="../artisanlib/canvas.py" line="14861" />
       <source>DROP: Scope is not recording</source>
       <translation>DROP: Chan eil farsaingeachd a’ clàradh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14910" />
+      <location filename="../artisanlib/canvas.py" line="14914" />
       <source>Roast ended at {0} BT = {1}</source>
       <translation>Chrìochnaich ròsta aig {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14992" />
+      <location filename="../artisanlib/canvas.py" line="14996" />
       <source>COOL: Scope is not recording</source>
       <translation>COOL: Chan eil farsaingeachd a’ clàradh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15041" />
+      <location filename="../artisanlib/canvas.py" line="15045" />
       <source>[COOL END] recorded at {0} BT = {1}</source>
       <translation>[COOL END] air a chlàradh aig {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15434" />
-      <location filename="../artisanlib/canvas.py" line="15384" />
+      <location filename="../artisanlib/canvas.py" line="15438" />
+      <location filename="../artisanlib/canvas.py" line="15388" />
       <source>Event # {0} recorded at BT = {1}{2} Time = {3}</source>
       <translation>Tachartas # {0} air a chlàradh aig BT = {1}{2} Ùine = {3}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15404" />
+      <location filename="../artisanlib/canvas.py" line="15408" />
       <source>Timer is OFF</source>
       <translation>Tha an timer OFF</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16596" />
+      <location filename="../artisanlib/canvas.py" line="16600" />
       <source>Unable to move background</source>
       <translation>Cha ghabh an cùl-raon a ghluasad</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16653" />
+      <location filename="../artisanlib/canvas.py" line="16657" />
       <source>No finished profile found</source>
       <translation>Cha deach pròifil chrìochnaichte a lorg</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16670" />
+      <location filename="../artisanlib/canvas.py" line="16674" />
       <source>Polynomial coefficients (Horner form):</source>
       <translation>Co-èifeachdan polynomial (foirm Horner):</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16672" />
+      <location filename="../artisanlib/canvas.py" line="16676" />
       <source>Knots:</source>
       <translation>Snaidhmean:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16674" />
+      <location filename="../artisanlib/canvas.py" line="16678" />
       <source>Residual:</source>
       <translation>air fhàgail:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16676" />
+      <location filename="../artisanlib/canvas.py" line="16680" />
       <source>Roots:</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16679" />
+      <location filename="../artisanlib/canvas.py" line="16683" />
       <source>Profile information</source>
       <translation>Fiosrachadh pròifil</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17104" />
+      <location filename="../artisanlib/canvas.py" line="17108" />
       <source>Designer Start</source>
       <translation>Tòisich dealbhaiche</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17105" />
+      <location filename="../artisanlib/canvas.py" line="17109" />
       <source>Importing a profile in to Designer will decimate all data except the main [points].
 Continue?</source>
       <translation>Le bhith a’ toirt a-steach pròifil a-steach gu Designer, lùghdaichidh sin a h-uile dàta ach na prìomh [puingean].
 Lean air adhart?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17149" />
+      <location filename="../artisanlib/canvas.py" line="17153" />
       <source>Save Points</source>
       <translation>Sàbhail puingean</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17159" />
+      <location filename="../artisanlib/canvas.py" line="17163" />
       <source>Points saved</source>
       <translation>Puingean air an sàbhaladh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17169" />
+      <location filename="../artisanlib/canvas.py" line="17173" />
       <source>Load Points</source>
       <translation>Puingean luchdachadh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17182" />
+      <location filename="../artisanlib/canvas.py" line="17186" />
       <source>Points loaded</source>
       <translation>Puingean air an luchdachadh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17252" />
+      <location filename="../artisanlib/canvas.py" line="17256" />
       <source>Designer Init</source>
       <translation>Dealbhadair Init</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17253" />
+      <location filename="../artisanlib/canvas.py" line="17257" />
       <source>Unable to start designer.
 Profile missing [CHARGE] or [DROP]</source>
       <translation>Cha ghabh an dealbhaiche a thòiseachadh.
 Pròifil a dhìth [CHARGE] no [DROP]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17811" />
+      <location filename="../artisanlib/canvas.py" line="17815" />
       <source>[ CHARGE ]</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17814" />
+      <location filename="../artisanlib/canvas.py" line="17818" />
       <source>[ DRY END ]</source>
       <translation>[ CRÌOCH TIOMRADH ]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17817" />
+      <location filename="../artisanlib/canvas.py" line="17821" />
       <source>[ FC START ]</source>
       <translation>[ FC Tòiseachadh ]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17820" />
+      <location filename="../artisanlib/canvas.py" line="17824" />
       <source>[ FC END ]</source>
       <translation>[ FC CRÌOCH ]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17823" />
+      <location filename="../artisanlib/canvas.py" line="17827" />
       <source>[ SC START ]</source>
       <translation>[ SC TEACH ]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17826" />
+      <location filename="../artisanlib/canvas.py" line="17830" />
       <source>[ SC END ]</source>
       <translation>[SC CRÌOCH]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17829" />
+      <location filename="../artisanlib/canvas.py" line="17833" />
       <source>[ DROP ]</source>
       <translation>[DROP]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17832" />
+      <location filename="../artisanlib/canvas.py" line="17836" />
       <source>[ COOL ]</source>
       <translation>[ TARRAINGEACH ]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18140" />
+      <location filename="../artisanlib/canvas.py" line="18144" />
       <source>New profile created</source>
       <translation>Pròifil ùr air a chruthachadh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18360" />
+      <location filename="../artisanlib/canvas.py" line="18364" />
       <source> added to cupping notes</source>
       <translation> air a chur ri notaichean cupping</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18371" />
+      <location filename="../artisanlib/canvas.py" line="18375" />
       <source> added to roasting notes</source>
       <translation> air a chur ri notaichean ròstadh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18639" />
+      <location filename="../artisanlib/canvas.py" line="18643" />
       <source>Mouse Cross ON: move mouse around</source>
       <translation>Crois na luchaige AIR: gluais an luchag timcheall</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18674" />
+      <location filename="../artisanlib/canvas.py" line="18678" />
       <source>Mouse cross OFF</source>
       <translation>Crois na luchaige OFF</translation>
     </message>
@@ -18197,67 +18221,67 @@ Gus a chumail saor agus gnàthach feuch an toir thu taic dhuinn leis an tabharta
   <context>
     <name>Scope Annotation</name>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14067" />
-      <location filename="../artisanlib/canvas.py" line="13999" />
-      <location filename="../artisanlib/canvas.py" line="11858" />
-      <location filename="../artisanlib/canvas.py" line="8182" />
-      <location filename="../artisanlib/canvas.py" line="8177" />
+      <location filename="../artisanlib/canvas.py" line="14071" />
+      <location filename="../artisanlib/canvas.py" line="14003" />
+      <location filename="../artisanlib/canvas.py" line="11862" />
+      <location filename="../artisanlib/canvas.py" line="8186" />
+      <location filename="../artisanlib/canvas.py" line="8181" />
       <source>CHARGE</source>
       <translation>ATHARRACHADH</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14149" />
-      <location filename="../artisanlib/canvas.py" line="8206" />
-      <location filename="../artisanlib/canvas.py" line="8194" />
+      <location filename="../artisanlib/canvas.py" line="14153" />
+      <location filename="../artisanlib/canvas.py" line="8210" />
+      <location filename="../artisanlib/canvas.py" line="8198" />
       <source>TP {0}</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14227" />
-      <location filename="../artisanlib/canvas.py" line="14192" />
-      <location filename="../artisanlib/canvas.py" line="8220" />
+      <location filename="../artisanlib/canvas.py" line="14231" />
+      <location filename="../artisanlib/canvas.py" line="14196" />
+      <location filename="../artisanlib/canvas.py" line="8224" />
       <source>DE {0}</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14342" />
-      <location filename="../artisanlib/canvas.py" line="14307" />
-      <location filename="../artisanlib/canvas.py" line="8235" />
+      <location filename="../artisanlib/canvas.py" line="14346" />
+      <location filename="../artisanlib/canvas.py" line="14311" />
+      <location filename="../artisanlib/canvas.py" line="8239" />
       <source>FCs {0}</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14450" />
-      <location filename="../artisanlib/canvas.py" line="14418" />
-      <location filename="../artisanlib/canvas.py" line="8249" />
+      <location filename="../artisanlib/canvas.py" line="14454" />
+      <location filename="../artisanlib/canvas.py" line="14422" />
+      <location filename="../artisanlib/canvas.py" line="8253" />
       <source>FCe {0}</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14560" />
-      <location filename="../artisanlib/canvas.py" line="14529" />
-      <location filename="../artisanlib/canvas.py" line="8271" />
+      <location filename="../artisanlib/canvas.py" line="14564" />
+      <location filename="../artisanlib/canvas.py" line="14533" />
+      <location filename="../artisanlib/canvas.py" line="8275" />
       <source>SCs {0}</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14676" />
-      <location filename="../artisanlib/canvas.py" line="14645" />
-      <location filename="../artisanlib/canvas.py" line="8285" />
+      <location filename="../artisanlib/canvas.py" line="14680" />
+      <location filename="../artisanlib/canvas.py" line="14649" />
+      <location filename="../artisanlib/canvas.py" line="8289" />
       <source>SCe {0}</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14807" />
-      <location filename="../artisanlib/canvas.py" line="14763" />
-      <location filename="../artisanlib/canvas.py" line="11856" />
-      <location filename="../artisanlib/canvas.py" line="8319" />
+      <location filename="../artisanlib/canvas.py" line="14811" />
+      <location filename="../artisanlib/canvas.py" line="14767" />
+      <location filename="../artisanlib/canvas.py" line="11860" />
+      <location filename="../artisanlib/canvas.py" line="8323" />
       <source>DROP {0}</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14980" />
-      <location filename="../artisanlib/canvas.py" line="14946" />
+      <location filename="../artisanlib/canvas.py" line="14984" />
+      <location filename="../artisanlib/canvas.py" line="14950" />
       <source>CE {0}</source>
       <translation type="unfinished" />
     </message>
@@ -18269,8 +18293,8 @@ Gus a chumail saor agus gnàthach feuch an toir thu taic dhuinn leis an tabharta
   <context>
     <name>Scope Title</name>
     <message>
-      <location filename="../artisanlib/canvas.py" line="8681" />
-      <location filename="../artisanlib/canvas.py" line="7567" />
+      <location filename="../artisanlib/canvas.py" line="8685" />
+      <location filename="../artisanlib/canvas.py" line="7571" />
       <location filename="../artisanlib/canvas.py" line="1236" />
       <location filename="../artisanlib/main.py" line="15460" />
       <location filename="../artisanlib/main.py" line="12369" />
@@ -20783,7 +20807,7 @@ Tha an seòrsa cruth-clò suidhichte ann an Config&gt;&gt; Curves&gt;&gt; tab UI
       <translation>Stoidhlichean loidhne</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13196" />
+      <location filename="../artisanlib/canvas.py" line="13200" />
       <location filename="../artisanlib/main.py" line="3212" />
       <source>Start monitoring</source>
       <translation>Tòisich a 'cumail sùil</translation>
@@ -21117,12 +21141,12 @@ An-dràsta ann an TEMP MODE</translation>
       <translation>Eisimpleir: 100 + x</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13062" />
+      <location filename="../artisanlib/canvas.py" line="13066" />
       <source>Stop monitoring</source>
       <translation>Cuir stad air sgrùdadh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13815" />
+      <location filename="../artisanlib/canvas.py" line="13819" />
       <source>Stop recording</source>
       <translation>Cuir stad air clàradh</translation>
     </message>

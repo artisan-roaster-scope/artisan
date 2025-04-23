@@ -3463,6 +3463,9 @@ class tgraphcanvas(FigureCanvas):
 #                    else:
 #                         self.fig.canvas.draw_idle()
                     self.fig.canvas.draw_idle() # seems to be fine even while logging!
+                    # we update the canvas immediately to get the RoR projections drawn again
+                    if self.flagstart and  self.timeindex[0] > -1:
+                        self.updategraphicsSignal.emit()
                 elif self.legend is not None:
                     QTimer.singleShot(1,self.updateBackground)
 
