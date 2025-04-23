@@ -4010,12 +4010,17 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     message = QApplication.translate('Message','Device set to {0}').format(meter)
                 ##########################
                 ##########################
-                ####  DEVICE 171 is Thermoworks BlueDOT BT
+                ####  DEVICE 175 is Thermoworks BlueDOT BT
                 elif meter == 'Thermoworks BlueDOT':
                     self.aw.qmc.device = 175
                     message = QApplication.translate('Message','Device set to {0}').format(meter)
                 ##########################
-
+                ##########################
+                ####  DEVICE 176 is Aillio Bullet R2
+                ##########################
+                elif meter == 'Aillio Bullet R2':
+                    self.aw.qmc.device = 176
+                    message = QApplication.translate('Message','Device set to {0}').format(meter)
 
                 # ADD DEVICE:
 
@@ -4210,7 +4215,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 172
                 1, # 173
                 1, # 174
-                1  # 175
+                1, # 175
+                1  # 176
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):

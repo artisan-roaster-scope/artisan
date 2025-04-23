@@ -1,0 +1,118 @@
+[General]
+Delay=1000
+roastertype_setup=Aillio Bullet R2
+roastersize_setup=1
+
+[Units]
+weight=g
+
+[Style]
+BTname=IBTS
+ETname=BT
+
+[RoC]
+DeltaBT=true
+DeltaBTlcd=true
+DeltaET=true
+DeltaETlcd=true
+
+[Device]
+Controlbuttonflag=true
+id=176
+
+[DefaultButtons]
+buttonactions=17, 17, 17, 17, 17, 17, 17, 17
+buttonactionstrings=send({\"command\": \"charge\"}), send({\"command\": \"dryEnd\"}), send({\"command\": \"fcStart\"}), send({\"command\": \"fcEnd\"}), send({\"command\": \"scStart\"}), send({\"command\": \"scEnd\"}), send({\"command\": \"drop\"}), send({\"command\": \"coolEnd\"})
+buttonvisibility=true, true, true, true, true, true, true, true
+extrabuttonactions=17, 17, 0
+extrabuttonactionstrings=send({\"command\": \"on\"}), send({\"command\": \"off\"}), send({\"command\": \"sync\"})
+xextrabuttonactions=17, 17
+xextrabuttonactionstrings=send({\"command\": \"reset\"}), send({\"command\": \"start\"})
+
+
+[ExtraComm]
+extrabaudrate=19200, 19200, 19200, 9600
+extrabytesize=8, 8, 8, 8
+extracomport=COM1, COM1, COM1, COM1
+extraparity=E, E, E, E
+extrastopbits=1, 1, 1, 1
+extratimeout=1, 1, 1, 0.5
+
+[ExtraDev]
+extraCurveVisibility1=false, false, false, false, true, true, true, true, true, true
+extraCurveVisibility2=false, false, false, false, true, true, true, true, true, true
+extraDelta1=false, false, false, false, false, false, false, false, false, false
+extraDelta2=false, false, false, false, false, false, false, false, false, false
+extraFill1=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+extraFill2=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+extraLCDvisibility1=false, false, true, false, false, false, false, false, false, false
+extraLCDvisibility2=false, false, true, true, false, false, false, false, false, false
+extradevicecolor1=#ad0427ff, black, black, black
+extradevicecolor2=#43a7cfff, #49b160ff, black, black
+extradevices=84, 85, 86, 87
+extramathexpression1=, , , 
+extramathexpression2=, , , 
+extraname1={3}, BT RoR, Voltage, State
+extraname2={0}, {1}, Exhaust, Fan RPM
+
+[events]
+default_etypes_set=1, 0, 0, 1, 0
+
+[ExtraEventButtons]
+buttonlistmaxlen=11
+buttonpalette_buttonsize=1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+buttonpalette_label=
+buttonpalette_mark_last_button_pressed=true, true, true, true, true, true, true, true, true, true
+buttonpalette_shortcuts=true
+buttonpalette_slider_alternative_layout=false, false, false, false, false, false, false, false, false, false
+buttonpalette_tooltips=false, false, false, false, false, false, false, false, false, false
+buttonpalettemaxlen=14, 14, 14, 14, 14, 14, 14, 14, 14, 14
+buttonsize=1
+extraeventbuttoncolor=#595959, #808080, #808080, #808080, #808080, #808080, #595959
+extraeventbuttontextcolor=white, white, white, white, white, white, white
+extraeventsactions=19, 0, 19, 19, 19, 0, 19
+extraeventsactionstrings=send({{\"command\": \"prs\"}}), , "send({{\"command\": \"preheat\", \"value\": \"200\"}})", "send({{\"command\": \"preheat\", \"value\": \"250\"}})", "send({{\"command\": \"preheat\", \"value\": \"300\"}})", , send({{\"command\": \"dopreheat\"}})
+extraeventsbuttonsflags=0, 1, 1
+extraeventsdescriptions=PRS, , PH200, PH250, PH300, , PRE
+extraeventslabels=PRS, , P200, P250, P300, , PRE
+extraeventstypes=9, 9, 9, 9, 9, 9, 9
+extraeventsvalues=1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1
+extraeventsvisibility=1, 0, 1, 1, 1, 0, 1
+marklastbuttonpressed=false
+showextrabuttontooltips=false
+
+[Sliders]
+ModeTempSliders=C
+eventsliderAlternativeLayout=false
+eventsliderBernoulli=0, 0, 0, 0
+eventsliderKeyboardControl=true
+eventslidercoarse=1, 1, 1, 1
+eventslidersflags=0, 1, 1
+eventslidertemp=0, 0, 0, 0
+eventsliderunits=, , , 
+slideractions=14, 15, 0, 13
+slidercommands="send({{\"command\": \"fan\", \"value\": \"{}\"}})", "send({{\"command\": \"drum\", \"value\": \"{}\"}})", , "send({{\"command\": \"power\", \"value\": \"{}\"}})"
+sliderfactors=1, 1, 1, 1
+slidermax=120, 90, 100, 140
+slidermin=10, 10, 0, 0
+slideroffsets=0, 0, 0, 0
+slidervisibilities=1, 1, 0, 1
+
+[Quantifiers]
+quantifieractive=1, 1, 0, 1
+quantifiersource=3, 5, 0, 2
+quantifiermin=10, 10, 0, 0
+quantifiermax=120, 90, 100, 140
+quantifiercoarse=1, 1, 0, 1
+clusterEventsFlag=false
+
+[ArduinoPID]
+pidPositiveTarget=4
+pidSource=1
+
+[MachineSetup]
+capacity=1
+heating_type=3
+
+[EnergyDefaults]
+ratings=@Variant(\0\0\0\x7f\0\0\0\xePyQt_PyObject\0\0\0\x1\t\x80\x4\x95\xfe\0\0\0\0\0\0\0}\x94K\x3}\x94K\x1}\x94(\x8c\nloadlabels\x94]\x94(\x8c\x6Heater\x94\x8c\0\x94h\x6h\x6\x65\x8c\vloadratings\x94]\x94(G?\xf8\xcc\xcc\xcc\xcc\xcc\xcdK\0K\0K\0\x65\x8c\vratingunits\x94]\x94(K\x3K\0K\0K\0\x65\x8c\vsourcetypes\x94]\x94(K\x2K\0K\0K\0\x65\x8c\vload_etypes\x94]\x94(K\x4K\0K\0K\0\x65\x8c\x12presssure_percents\x94]\x94(\x89\x89\x89\x89\x65\x8c\x12loadevent_zeropcts\x94]\x94(K\0K\0K\0K\0\x65\x8c\x12loadevent_hundpcts\x94]\x94(KdKdKdKdeuss.)

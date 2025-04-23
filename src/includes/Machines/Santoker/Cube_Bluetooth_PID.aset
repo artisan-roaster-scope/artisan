@@ -1,5 +1,5 @@
 [General]
-Delay=200
+Delay=400
 roastertype_setup=Santoker Cube BT PID
 roasterheating_setup=3
 roastersize_setup=0.1

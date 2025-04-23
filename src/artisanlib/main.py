@@ -9695,9 +9695,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.ser.R1.set_fan(int(cmd)/10)
                 elif action == 18 and self.ser.R1 is not None: # Aillio Drum
                     self.ser.R1.set_drum(int(cmd)/10)
-                elif action == 19 and self.ser.R1 is not None:
+                elif action == 19 and self.ser.R1 is not None: #Aillio general command
                     if cmd_str == 'PRS':
                         self.ser.R1.prs()
+                    else:
+                        self.ser.R1.r2_cmd(cmd_str)
                 elif action == 20: # Artisan Command
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(';')) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
