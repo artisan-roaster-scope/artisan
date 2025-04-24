@@ -189,7 +189,7 @@ class AillioR1:
 
     def __del__(self) -> None:
         if not self.simulated:
-            self.__close()
+            self._close_port()
 
     def __dbg(self, msg:str) -> None:
         if self.AILLIO_DEBUG and not self.simulated:
@@ -198,7 +198,7 @@ class AillioR1:
             except OSError:
                 pass
 
-    def __open(self) -> None:
+    def _open_port(self) -> None:
         if self.simulated:
             return
         if self.usbhandle is not None:
@@ -336,7 +336,7 @@ class AillioR1:
             self.ep_in = None
             raise OSError(f'Failed to configure device: {str(e)}') from e
 
-    def __close(self) -> None:
+    def _close_port(self) -> None:
         if self.simulated:
             return
 
@@ -412,7 +412,7 @@ class AillioR1:
             try:
                 # Check connection periodically
                 if self.usbhandle is None:
-                    self.__open()
+                    self._open_port()
 
                 if self.protocol == 1:
                     # V1 protocol - read two 64 byte frames
@@ -576,7 +576,7 @@ class AillioR1:
             return
         # Check connection periodically
         if self.usbhandle is None:
-            self.__open()
+            self._open_port()
 
 
     def get_roast_number(self) -> int:
@@ -1137,7 +1137,7 @@ class AillioR1:
 if __name__ == '__main__':
     R1 = AillioR1(debug=False)
     try:
-        R1.__open() # pylint: disable=protected-access
+        R1._open_port()
         print(f"Connected to {R1.model} using protocol V{R1.protocol}")
 
         # Example reading loop
@@ -1157,4 +1157,4 @@ if __name__ == '__main__':
     except OSError as e:
         print(f"Error: {e}")
     finally:
-        R1.__close() # pylint: disable=protected-access
+        R1._close_port()
