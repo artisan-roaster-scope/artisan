@@ -17,7 +17,7 @@
 
 import asyncio
 import logging
-from enum import IntEnum
+from enum import IntEnum, unique
 from typing import Optional, Union, List, Tuple, Final, Callable, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -38,6 +38,7 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 ####
 
+@unique
 class UNIT(IntEnum):
     KG = 1
     G = 2

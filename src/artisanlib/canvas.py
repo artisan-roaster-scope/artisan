@@ -4776,6 +4776,14 @@ class tgraphcanvas(FigureCanvas):
                                 self.autoChargeIdx = length_of_qmc_timex - b
                                 self.markChargeSignal.emit(False) # this queues an event which forces a realignment/redraw by resetting the cache ax_background and fires the CHARGE action
 
+                        elif self.TPalarmtimeindex is None and self.timeindex[0] > -1 and len(sample_timex)>0 and ((sample_timex[-1] - sample_timex[self.timeindex[0]]) > self.TP_max_roasttime):
+                            try:
+                                # if 2:00min (self.TP_max_roasttime) into the roast and TPalarmtimeindex alarmindex not yet set,
+                                # we place the TPalarmtimeindex at the current index to enable in airoasters without TP the autoDRY and autoFCs functions and activate the TP Phases LCDs
+                                self.TPalarmtimeindex = length_of_qmc_timex - 1
+                            except Exception as e: # pylint: disable=broad-except
+                                _log.exception(e)
+
                         # check for TP event if already CHARGEed and not yet recognized (earliest in the next call to sample())
                         elif self.TPalarmtimeindex is None and self.timeindex[0] > -1 and not self.timeindex[1] and self.timeindex[0]+8 < len(sample_temp2) and self.checkTPalarmtime():
                             try:
@@ -4787,13 +4795,7 @@ class tgraphcanvas(FigureCanvas):
                                     self.markTPSignal.emit() # queued
                             except Exception as e: # pylint: disable=broad-except
                                 _log.exception(e)
-                            try:
-                                # if 2:30min into the roast and TPalarmtimeindex alarmindex not yet set,
-                                # we place the TPalarmtimeindex at the current index to enable in airoasters without TP the autoDRY and autoFCs functions and activate the TP Phases LCDs
-                                if self.TPalarmtimeindex is None and ((sample_timex[-1] - sample_timex[self.timeindex[0]]) > self.TP_max_roasttime):
-                                    self.TPalarmtimeindex = length_of_qmc_timex - 1
-                            except Exception as e: # pylint: disable=broad-except
-                                _log.exception(e)
+
                         # autodetect DROP event
                         # only if 7min into roast and BT>160C/320F
                         if self.autoDropIdx == 0 and self.autoDropFlag and self.autoDROPenabled and self.timeindex[0] > -1 and self.timeindex[6] == 0 and \
@@ -6155,6 +6157,7 @@ class tgraphcanvas(FigureCanvas):
                                         last_event_idx = last_registered_foreground_event_idx
                                         last_event_time = last_registered_foreground_event_time
                                         last_event_value = self.eventsInternal2ExternalValue(self.specialeventsvalue[last_registered_foreground_event_idx])
+
                                         # only if there is a last_event after TP we do ramping by temperature
                                         if TP_time is not None and TP_time < last_event_time and len(self.specialevents)>last_event_idx:
                                             last_event_temp1 = self.temp1[self.specialevents[last_event_idx]]
@@ -6188,7 +6191,6 @@ class tgraphcanvas(FigureCanvas):
 
                                         # compute ramp value if possible
                                         if (self.replayType in {1,2} and last_event_temp is not None and next_event_temp is not None and
-                                                last_event_temp is not None and next_event_temp is not None and
                                                 current_temp is not None):
                                             # if background event target temperature did increase (or decrease) as the foreground, we ramp by temperature
                                             if min(last_event_temp, next_event_temp) <= current_temp <= max(last_event_temp, next_event_temp):
@@ -6196,7 +6198,9 @@ class tgraphcanvas(FigureCanvas):
                                                 coefficients = numpy.polyfit([last_event_temp, next_event_temp] , [last_event_value, next_event_value], 1)
                                                 ramps[event_type] = numpy.poly1d(coefficients)(current_temp)
                                         elif (last_event_temp is None and next_event_temp is None and
-                                                (self.replayType == 0 or self.TPalarmtimeindex is None) and # replay by time active
+                                                (self.replayType == 0 or # if replay by time is selected
+                                                    (last_event_temp1 is None and last_event_temp2 is None) or # if TP is not yet passed or no event after TP and now has been set
+                                                    (last_event_temp2 is not None and self.replayType == 1) or (last_event_temp1 is not None and self.replayType == 2)) and # replay by temp, but temp did not increase
                                                 last_event_time is not None and len(self.timeB)>bge):
                                                   # if replay by temp (as one or both of those event_temps is not None), but current temp did not increase we don't
                                                   # ramp by time instead as this would confuse everything.

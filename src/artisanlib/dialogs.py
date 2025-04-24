@@ -711,7 +711,6 @@ class tareDlg(ArtisanDialog):
 
     @pyqtSlot()
     def weightEdited(self) -> None:
-        _log.debug('PRINT weightEdited')
         sender = self.sender()
         if sender and isinstance(sender, QLineEdit):
             text = sender.text().strip()

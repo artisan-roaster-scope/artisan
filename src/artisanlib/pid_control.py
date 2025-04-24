@@ -1435,18 +1435,19 @@ class PIDcontrol:
             self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PIDactive'])
         elif self.aw.qmc.Controlbuttonflag:
             # software PID
-            self.aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd)
-            self.aw.qmc.pid.setLimits((-100 if self.pidNegativeTarget else 0),(100 if self.pidPositiveTarget else 0))
-            self.aw.qmc.pid.setDutySteps(self.dutySteps)
-            self.aw.qmc.pid.setDutyMin(self.dutyMin)
-            self.aw.qmc.pid.setDutyMax(self.dutyMax)
-            self.aw.qmc.pid.setControl(self.setEnergy)
-            self.aw.qmc.pid.setDerivativeFilterLevel(self.derivative_filter)
-            if self.svMode == 0:
-                self.setSV(self.aw.sliderSV.value())
-            self.pidActive = True
-            self.aw.qmc.pid.on()
-            self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PIDactive'])
+            if not self.pidActive: # only if not yet active!
+                self.aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd)
+                self.aw.qmc.pid.setLimits((-100 if self.pidNegativeTarget else 0),(100 if self.pidPositiveTarget else 0))
+                self.aw.qmc.pid.setDutySteps(self.dutySteps)
+                self.aw.qmc.pid.setDutyMin(self.dutyMin)
+                self.aw.qmc.pid.setDutyMax(self.dutyMax)
+                self.aw.qmc.pid.setControl(self.setEnergy)
+                self.aw.qmc.pid.setDerivativeFilterLevel(self.derivative_filter)
+                if self.svMode == 0:
+                    self.setSV(self.aw.sliderSV.value())
+                self.pidActive = True
+                self.aw.qmc.pid.on()
+                self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PIDactive'])
         if self.sv is None and self.svMode == 0: # only in manual SV mode we initialize the SV on PID ON
             self.setSV(self.svValue)
 

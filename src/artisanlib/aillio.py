@@ -1137,7 +1137,7 @@ class AillioR1:
 if __name__ == '__main__':
     R1 = AillioR1(debug=False)
     try:
-        R1._open_port()
+        R1._open_port() # pylint: disable=protected-access
         print(f"Connected to {R1.model} using protocol V{R1.protocol}")
 
         # Example reading loop
@@ -1157,4 +1157,4 @@ if __name__ == '__main__':
     except OSError as e:
         print(f"Error: {e}")
     finally:
-        R1._close_port()
+        R1._close_port() # pylint: disable=protected-access
