@@ -2,7 +2,7 @@
 layout: single
 permalink: /machines/aillio/
 title: "Aillio"
-excerpt: "Bullet R1"
+excerpt: "Bullet R1/R2"
 header:
   overlay_image: /assets/images/aillio.jpg
   image: /assets/images/aillio.jpg
@@ -12,7 +12,7 @@ sidebar:
 ---
 
 * __Producer:__ [Aillio Limited](https://aillio.com){:target="_blank"}, Taiwan
-* __Machine:__ Bullet R1
+* __Machine:__ Bullet R1 and R2 (incl. R2 Pro)
 * __Connection:__ vendor specific USB protocol
 * __Features:__ 
   - logging of drum temperature (DT), bean temperature (BT), exhaust temperature, BT rate-of-rise curves, and voltage
@@ -58,3 +58,5 @@ temperatures, so you should never leave the roaster alone.
 |:-----|:-----:|:-----:|
 |||
 | Bullet R1 | Elec | 1.55 |
+| Bullet R2 | Elec | 1.7 |
+| Bullet R2 PRO | Elec | 2.3 |
