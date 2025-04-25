@@ -335,7 +335,7 @@ for:
     PYLUPDATE: ./pylupdate6pro.py
 
   install:
-    - echo "RPI Install"
+    - echo "Raspberry Pi Install"
     - chmod +x .ci/*.sh
 
     # update the __revision__ field with the left seven of the GIT commit hash
@@ -346,7 +346,7 @@ for:
     - .ci/install-rpi.sh
 
   build_script:
-    - echo "RPI Build"
+    - echo "Raspberry Pi Build"
     - chmod +x src/*.sh
     - cd src
 
