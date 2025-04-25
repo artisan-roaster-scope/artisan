@@ -32,6 +32,8 @@ environment:
     appveyor_build_worker_image: macos-monterey # macos-bigsur (macOS 11 not support by brew any longer)
   - job_name: linux
     appveyor_build_worker_image: Ubuntu2204
+  - job_name: rpi
+    appveyor_build_worker_image: Ubuntu2204
 
 
 # Generic build number, later set to commit hash by init
@@ -317,3 +319,42 @@ for:
 #  on_finish:
 #    - sh: export APPVEYOR_SSH_BLOCK=true
 #    - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
+
+
+-
+  matrix:
+    only:
+      - job_name: rpi
+    fast_finish: false
+
+  environment:
+    ARTISAN_OS: rpi
+    PYTHONSITEPKGS: /home/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages
+    QT_PATH: $PYTHON_PATH/PyQt6/Qt6
+    PYUIC: pyuic6
+    PYLUPDATE: ./pylupdate6pro.py
+
+  install:
+    - echo "RPI Install"
+    - chmod +x .ci/*.sh
+
+    # update the __revision__ field with the left seven of the GIT commit hash
+    - export GIT_VERSION=`git rev-parse --verify --short HEAD 2>/dev/null|| echo "???"`
+    - sed -i'' -e "s/__revision__ = '.*'/__revision__ = '$GIT_VERSION'/" src/artisanlib/__init__.py
+
+    # run the install script
+    - .ci/install-rpi.sh
+
+  build_script:
+    - echo "RPI Build"
+    - chmod +x src/*.sh
+    - cd src
+
+    # run the build script
+    - ./build-rpi-deb.sh
+
+  artifacts:
+    - path: 'src/%artifact_prefix%-*.deb'
+
+  deploy_script:
+    - ../.ci/upload.sh artisan-*.deb
