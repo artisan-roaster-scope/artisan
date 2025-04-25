@@ -19,12 +19,15 @@ v3.1.2 (April XX, 2025)
   - adds sorting to the background events table
   - adds support for container weight units others than `g`
   - adds configuration to allow to send MODBUS PID SV as 32bit float
+  - adds configuration to specify the mode (by time, BT or ET) for the playback of the DROP event
+  - adds mixed event playback, by time (for increasing event values) and temperature (for decreasing event values)
   - adds new Artisan Commands (with `n` from `{1,2,3,4}`)
       - `quantifier(n,<bool>)` to toggle quantification per event type
       - `playback(n,<bool>)` to toggle event playback per event type
       - `ramp(n,<bool>)` to toggle event playback ramping per event type
       - `alarm(m,<bool>)` enable/disable alarm number `m`
       - `setBatchSize(<float>)` to set the batch size. if the given number is negative the batch size is taken from the background profile, if available
+      - `playbackdropmode(<int>)` to set the mode for the playback of the DROP event (0: by time, 1: by BT, 2: by ET)
   - adds event slider input dialog via a double-click on a sliders LCD
   - adds slider focus on slider LCD click
   - adds quick keyboard focused event slider input using numeric keys followed by the ENTER/RETURN key. The last digit can be removed by using the backspace key. ESC cancels the action.
@@ -43,7 +46,7 @@ v3.1.2 (April XX, 2025)
   - adds support for the [DCC1100 and DCC1120 Brushless DC Motor controllers and the DCC1020 DC Motor controller](https://artisan-scope.org/devices/phidgets/#45-dc-motor-control) ([Discussion #1750](../../../discussions/1750))
   - adds [ROEST](https://artisan-scope.org/machines/roest/) CSV import
   - adds [Thermoworks BlueDOT](https://www.thermoworks.com/bluedot) support
-  - adds [Atilla](https://artisan-scope.org/machines/atilla/) 'auto' setup which picks up CHARGE and DROP events set from Atilla Gold Plus machines with automation
+  - adds [Atilla](https://artisan-scope.org/machines/atilla/) `auto` setup which picks up CHARGE and DROP events set from Atilla Gold Plus machines with automation
 
 * CHANGES
   - the Phidget driver is now bundled with the Artisan app and no longer needs to be installed separately. NOTE: some legacy USB HID devices, like the original 1046 and 1048 still require the kernel extension of the driver package to be installed in the system.
@@ -83,7 +86,7 @@ v3.1.2 (April XX, 2025)
    - list single blend with only replacement stock on [artisan.plus](https://artisan.plus) if no other blend has stock which was not listed by error before
   - fixes broken rendering of roasting times in CSV production reports
   - remembered last batch size now correctly converted to current weight unit
-  - sliders send decimal values (instead of rounded integers via MODBUS, PWM, Artisan, WebSocket, IO, VOUT, S7 and RC Commands
+  - sliders send decimal values (instead of rounded integers via MODBUS, PWM, Artisan, WebSocket, IO, VOUT, S7 and RC Commands)
 
 
 * REMOVALS

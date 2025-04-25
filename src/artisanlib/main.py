@@ -9859,14 +9859,47 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     elif value_int == 2:
                                         self.qmc.replayType = 1
                                         self.qmc.turn_playback_event_ON()
-                                        self.sendmessage(QApplication.translate('Message','playback by BT'))
+                                        self.sendmessage(QApplication.translate('Message','playback by BT').replace('BT', self.BTname))
                                     elif value_int == 3:
                                         self.qmc.replayType = 2
                                         self.qmc.turn_playback_event_ON()
-                                        self.sendmessage(QApplication.translate('Message','playback by ET'))
+                                        self.sendmessage(QApplication.translate('Message','playback by ET').replace('ET', self.ETname))
+
+                                    elif value_int == 4:
+                                        self.qmc.replayType = 3
+                                        self.qmc.turn_playback_event_ON()
+                                        self.sendmessage(QApplication.translate('Message','playback by time/BT').replace('BT', self.BTname))
+                                    elif value_int == 5:
+                                        self.qmc.replayType = 4
+                                        self.qmc.turn_playback_event_ON()
+                                        self.sendmessage(QApplication.translate('Message','playback by time/ET').replace('ET', self.ETname))
                                     self.updatePlaybackIndicatorSignal.emit()
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
+
+                            # playbackdropmode(<n>) with 0: off, 1: time, 2: BT, 3: ET
+                            elif cs.startswith('playbackdropmode(') and cs.endswith(')'):
+                                try:
+                                    value_int = int(cs[len('playbackdropmode('):-1])
+                                    if value_int == 0:
+                                        self.qmc.replayDropType = 0
+                                        self.qmc.backgroundPlaybackDROP = False
+                                        self.sendmessage(QApplication.translate('Message','playback DROP off'))
+                                    elif value_int == 1:
+                                        self.qmc.replayDropType = 0
+                                        self.qmc.backgroundPlaybackDROP = True
+                                        self.sendmessage(QApplication.translate('Message','playback DROP by time'))
+                                    elif value_int == 2:
+                                        self.qmc.replayDropType = 1
+                                        self.qmc.backgroundPlaybackDROP = True
+                                        self.sendmessage(QApplication.translate('Message','playback DROP by BT'))
+                                    elif value_int == 3:
+                                        self.qmc.replayDropType = 2
+                                        self.qmc.backgroundPlaybackDROP = True
+                                        self.sendmessage(QApplication.translate('Message','playback DROP by ET'))
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+
                             # openProperties : open Roast Properties dialog
                             elif cs == 'openProperties':
                                 self.openPropertiesSignal.emit()
@@ -17535,6 +17568,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.backgroundPlaybackEvents = toBool(settings.value('backgroundPlaybackEvents',self.qmc.backgroundPlaybackEvents))
             self.qmc.backgroundPlaybackDROP = toBool(settings.value('backgroundPlaybackDROP',self.qmc.backgroundPlaybackDROP))
             self.qmc.replayType = toInt(settings.value('replayType',self.qmc.replayType))
+            self.qmc.replayDropType = toInt(settings.value('replayDropType',self.qmc.replayDropType))
             self.qmc.specialeventplaybackaid = [toBool(x) for x in toList(settings.value('specialeventplaybackaid',self.qmc.specialeventplaybackaid))]
             self.qmc.specialeventplayback = [toBool(x) for x in toList(settings.value('specialeventplayback',self.qmc.specialeventplayback))]
             self.qmc.specialeventplaybackramp = [toBool(x) for x in toList(settings.value('specialeventplaybackramp',self.qmc.specialeventplaybackramp))]
@@ -19516,6 +19550,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'backgroundPlaybackEvents',self.qmc.backgroundPlaybackEvents, read_defaults)
             self.settingsSetValue(settings, default_settings, 'backgroundPlaybackDROP',self.qmc.backgroundPlaybackDROP, read_defaults)
             self.settingsSetValue(settings, default_settings, 'replayType',self.qmc.replayType, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'replayDropType',self.qmc.replayDropType, read_defaults)
             self.settingsSetValue(settings, default_settings, 'specialeventplaybackaid',self.qmc.specialeventplaybackaid, read_defaults)
             self.settingsSetValue(settings, default_settings, 'specialeventplayback',self.qmc.specialeventplayback, read_defaults)
             self.settingsSetValue(settings, default_settings, 'specialeventplaybackramp',self.qmc.specialeventplaybackramp, read_defaults)

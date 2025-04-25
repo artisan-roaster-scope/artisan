@@ -227,7 +227,7 @@ class tgraphcanvas(FigureCanvas):
         'extraNoneTempHint2', 'plotcurves', 'plotcurvecolor', 'overlapList', 'tight_layout_params', 'fig', 'ax', 'delta_ax', 'legendloc', 'legendloc_pos', 'onclick_cid',
         'oncpick_cid', 'ondraw_cid', 'onmove_cid', 'rateofchange1', 'rateofchange2', 'flagon', 'flagstart', 'flagKeepON', 'flagOpenCompleted', 'flagsampling', 'flagsamplingthreadrunning',
         'manuallogETflag', 'zoom_follow', 'alignEvent', 'compareAlignEvent', 'compareEvents', 'compareET', 'compareBT', 'compareDeltaET', 'compareDeltaBT', 'compareMainEvents', 'compareBBP', 'compareRoast', 'compareExtraCurves1', 'compareExtraCurves2',
-        'replayType', 'replayedBackgroundEvents', 'last_replayed_events', 'beepedBackgroundEvents', 'roastpropertiesflag', 'roastpropertiesAutoOpenFlag', 'roastpropertiesAutoOpenDropFlag',
+        'replayType', 'replayDropType', 'replayedBackgroundEvents', 'last_replayed_events', 'beepedBackgroundEvents', 'roastpropertiesflag', 'roastpropertiesAutoOpenFlag', 'roastpropertiesAutoOpenDropFlag',
         'title', 'title_show_always', 'ambientTemp', 'ambientTempSource', 'ambient_temperature_device', 'ambient_pressure', 'ambient_pressure_device', 'ambient_humidity',
         'ambient_humidity_device', 'elevation', 'temperaturedevicefunctionlist', 'humiditydevicefunctionlist', 'pressuredevicefunctionlist', 'moisture_greens', 'moisture_roasted',
         'greens_temp', 'beansize', 'beansize_min', 'beansize_max', 'whole_color', 'ground_color', 'color_systems', 'color_system_idx', 'heavyFC_flag', 'lowFC_flag', 'lightCut_flag',
@@ -1228,7 +1228,9 @@ class tgraphcanvas(FigureCanvas):
         self.compareBBP:bool = False # if True incl. BBP
         self.compareRoast:bool = True # if False roast should not be compared (self.compareBBP should be True in this case!)
 
-        self.replayType:int = 0 # 0: by time, 1: by BT, 2: by ET
+        self.replayType:int = 0 # 0: by time, 1: by BT, 2: by ET, 3: by time/BT, 4: by time/ET
+        self.replayDropType:int = 0 # 0: by time, 1: by BT, 2: by ET
+
         self.replayedBackgroundEvents:Set[int] = set()  # set of BackgroundEvent indices that have already been replayed (cleared in ClearMeasurements)
         self.beepedBackgroundEvents:Set[int] = set()   # set of BackgroundEvent indices that have already been beeped for (cleared in ClearMeasurements)
 
@@ -5908,10 +5910,10 @@ class tgraphcanvas(FigureCanvas):
             #needed when using device NONE
             if (self.timeindex[0] > -1 and self.autoDropIdx == 0 and len(self.timex)>0 and self.timeindexB[6]>0 and self.timeindex[6] == 0 and
                 (self.timex[-1] - self.timex[self.timeindex[0]]) > self.playbackdrop_min_roasttime and
-                ((self.replayType == 0 and self.timeB[self.timeindexB[6]] - self.timeclock.elapsed()/1000. <= 0) or # by time
-                    (self.replayType == 1 and len(self.ctemp2)>0 and len(self.stemp2B)>self.timeindexB[6] and  # pylint: disable=chained-comparison
+                ((self.replayDropType == 0 and self.timeB[self.timeindexB[6]] - self.timeclock.elapsed()/1000. <= 0) or # by time
+                    (self.replayDropType == 1 and len(self.ctemp2)>0 and len(self.stemp2B)>self.timeindexB[6] and  # pylint: disable=chained-comparison
                         self.TPalarmtimeindex and self.ctemp2[-1] is not None and self.stemp2B[self.timeindexB[6]] - self.ctemp2[-1] <= 0) or # by BT
-                    (self.replayType == 2 and len(self.ctemp1)>0 and len(self.stemp1B)>self.timeindexB[6] and  # pylint: disable=chained-comparison
+                    (self.replayDropType == 2 and len(self.ctemp1)>0 and len(self.stemp1B)>self.timeindexB[6] and  # pylint: disable=chained-comparison
                         self.TPalarmtimeindex and self.ctemp1[-1] is not None and self.stemp1B[self.timeindexB[6]] - self.ctemp1[-1] <= 0))): # by ET
                 self.autoDropIdx = len(self.timex) - 2
                 self.markDropSignal.emit(False)
@@ -5958,6 +5960,15 @@ class tgraphcanvas(FigureCanvas):
 
     # called only after CHARGE
     def playbackevent(self) -> None:
+
+        # returns the last registered foreground event index for the given event type, or None if no event of that type has been registered yet
+        @functools.lru_cache(maxsize=10)
+        def last_registered_foreground_event(event_type:int) -> Optional[int]:
+            try:
+                return len(self.specialeventstype) - 1 - self.specialeventstype[::-1].index(event_type) # index of last foreground event if any; except otherwise
+            except ValueError:
+                return None
+
         try:
             #needed when using device NONE
             if self.timex:
@@ -5992,55 +6003,37 @@ class tgraphcanvas(FigureCanvas):
                         now = self.timeclock.elapsedMilli()
 
                         if (i not in self.replayedBackgroundEvents and # never replay one event twice
-                            not end_reached[event_type] and # we already reached the next event of this type after the first enabled one
+                            not end_reached[event_type] and # we already reached the next event of this type after the first enabled (not yet replayed) one
                             (self.timeindexB[6]==0 or bge <= self.timeindexB[6]) and # don't replay events that happened after DROP in the backgroundprofile
                             event_type < 4 and len(self.timeB)>bge):
 
-                            timed = self.timeB[bge] - now
-                            delta:float = 1 # by default don't trigger this one
-                            increasing:bool = True
+                            last_registered_foreground_event_idx:Optional[int] = last_registered_foreground_event(event_type)
+                            # if last registered foreground event value is lower than this background events value
+                            # we replay this one by temperature, otherwise by time in mixed mode replay mode (self.replayType in {3,4})
+                            value_decreasing:bool = (last_registered_foreground_event_idx is not None and
+                                len(self.specialeventsvalue)>last_registered_foreground_event_idx and
+                                self.specialeventsvalue[last_registered_foreground_event_idx] > self.backgroundEvalues[i])
 
-                            if self.replayType == 0: # replay by time
+                            timed = self.timeB[bge] - now
+                            delta:float = 99999 # by default don't trigger this one
+
+                            if self.replayType == 0 or (self.replayType in {3, 4} and not value_decreasing): # replay by time (also in mixed replay mode if value increases)
                                 delta = timed
 
-                            elif not next_byTemp_checked[event_type] and self.replayType == 1: # replay by BT (after TP)
+                            elif not next_byTemp_checked[event_type] and (self.replayType == 1 or (self.replayType == 3 and value_decreasing)): # replay by BT (after TP)
                                 if self.TPalarmtimeindex is not None:
                                     if len(self.ctemp2)>0 and self.ctemp2[-1] is not None and len(self.stemp2B)>bge:
                                         delta = self.stemp2B[bge] - self.ctemp2[-1]
-#    disable "decreasing" sup for now (might lead to issues)
-#                                       try:
-#                                           # if last registered event of event_type has higher BT as next to be replayed one, we
-#                                           # expect a temperature decrease instead of an increase
-#                                           last_registered_event_index = len(self.specialeventstype) - 1 - self.specialeventstype[::-1].index(event_type)
-#                                           if self.ctemp2[self.specialevents[last_registered_event_index]] > self.stemp2B[bge]:
-#                                               delta = self.ctemp2[-1] - self.stemp2B[bge]
-#                                               increasing = False
-#                                       except Exception: # pylint: disable=broad-except
-#                                           # a previous event of that type might not yet exist
-#                                           pass
                                     next_byTemp_checked[event_type] = True # prevent later events to trigger
                                 else: # before TP we switch back to time-based
                                     delta = timed
-                            elif not next_byTemp_checked[event_type] and self.replayType == 2: # replay by ET (after TP)
+                            elif not next_byTemp_checked[event_type] and (self.replayType == 2 or (self.replayType == 4 and value_decreasing)): # replay by ET (after TP)
                                 if self.TPalarmtimeindex is not None:
                                     if len(self.ctemp1)> 0 and self.ctemp1[-1] is not None and len(self.stemp1B)>bge:
                                         delta = self.stemp1B[bge] - self.ctemp1[-1]
-#    disable "decreasing" sup for now (might lead to issues)
-#                                        try:
-#                                            # if last registered event of event_type has higher BT as next to be replayed one, we
-#                                            # expect a temperature decrease instead of an increase
-#                                            last_registered_event_index = len(self.specialeventstype) - 1 - self.specialeventstype[::-1].index(event_type)
-#                                            if self.ctemp1[self.specialevents[last_registered_event_index]] > self.stemp1B[bge]:
-#                                                delta = self.ctemp1[-1] - self.stemp1B[bge]
-#                                                increasing = False
-#                                        except Exception: # pylint: disable=broad-except
-#                                            # a previous event of that type might not yet exist
-#                                            pass
                                     next_byTemp_checked[event_type] = True # prevent later events to trigger
                                 else: # before TP we switch back to time-based
                                     delta = timed
-                            else:
-                                delta = 99999 # don't trigger this one
 
                             if (reproducing is None and self.specialeventplaybackaid[event_type] and  # only show playback aid for event types with activated playback aid
                                     self.backgroundReproduce and 0 < timed < self.detectBackgroundEventTime):
@@ -6089,7 +6082,7 @@ class tgraphcanvas(FigureCanvas):
                                     #       END ramp soak mode
 
                                     self.aw.fujipid.replay(self.backgroundEStrings[i])
-                                    libtime.sleep(.5)  #avoid possible close times (rounding off)
+                                    libtime.sleep(.3)  #avoid possible close times (rounding off)
 
 
                                 # if playbackevents is active, we fire the event by moving the slider, but only if
@@ -6122,7 +6115,6 @@ class tgraphcanvas(FigureCanvas):
 
                                     last_registered_background_event_idx:Optional[int] = None
                                     last_registered_background_event_time:Optional[float] = None
-                                    last_registered_foreground_event_idx:Optional[int] = None
                                     last_registered_foreground_event_time:Optional[float] = None
                                     TP_time:Optional[float] = None
                                     try:
@@ -6132,12 +6124,8 @@ class tgraphcanvas(FigureCanvas):
                                             last_registered_background_event_time = self.timeB[self.backgroundEvents[last_registered_background_event_idx]]
                                     except ValueError: # index access fails if there is no such event/index
                                         pass
-                                    try:
-                                        last_registered_foreground_event_idx = len(self.specialeventstype) - 1 - self.specialeventstype[::-1].index(event_type) # index of last foreground event if any; except otherwise
-                                        if last_registered_foreground_event_idx is not None:
-                                            last_registered_foreground_event_time = self.timex[self.specialevents[last_registered_foreground_event_idx]]
-                                    except ValueError:
-                                        pass
+                                    if last_registered_foreground_event_idx is not None:
+                                        last_registered_foreground_event_time = self.timex[self.specialevents[last_registered_foreground_event_idx]]
                                     try:
                                         if self.TPalarmtimeindex is not None:
                                             TP_time = self.timex[self.TPalarmtimeindex]
@@ -6176,21 +6164,21 @@ class tgraphcanvas(FigureCanvas):
                                         current_temp:Optional[float] = None
 
                                         # for ramp by BT only after TP
-                                        if (last_event_temp2 is not None and self.replayType == 1 and len(self.temp2)>1 and self.temp2[-1] != -1 and
-                                                self.temp2[-2] != -1 and ((increasing and self.temp2[-1] >= self.temp2[-2]) or (not increasing and self.temp2[-1] <= self.temp2[-2])) and
+                                        if (last_event_temp2 is not None and (self.replayType == 1 or (self.replayType == 3 and value_decreasing)) and len(self.temp2)>1 and self.temp2[-1] != -1 and
+                                                self.temp2[-2] != -1 and self.temp2[-1] >= self.temp2[-2] and
                                                 len(self.temp2B) > bge):
                                             last_event_temp = last_event_temp2
                                             next_event_temp = self.temp2B[bge]
                                             current_temp = self.temp2[-1]
-                                        elif (last_event_temp1 is not None and self.replayType == 2 and len(self.temp1)>1 and self.temp1[-1] != -1 and
-                                                self.temp1[-2] != -1 and ((increasing and self.temp1[-1] >= self.temp1[-2]) or (not increasing and self.temp1[-1] <= self.temp1[-2])) and
+                                        elif (last_event_temp1 is not None and (self.replayType == 2 or (self.replayType == 4 and value_decreasing)) and len(self.temp1)>1 and self.temp1[-1] != -1 and
+                                                self.temp1[-2] != -1 and self.temp1[-1] >= self.temp1[-2] and
                                                 len(self.temp1B) > bge):
                                             last_event_temp = last_event_temp1
                                             next_event_temp = self.temp1B[bge]
                                             current_temp = self.temp1[-1]
 
                                         # compute ramp value if possible
-                                        if (self.replayType in {1,2} and last_event_temp is not None and next_event_temp is not None and
+                                        if ((self.replayType in {1,2} or (self.replayType in {3,4} and value_decreasing)) and last_event_temp is not None and next_event_temp is not None and
                                                 current_temp is not None):
                                             # if background event target temperature did increase (or decrease) as the foreground, we ramp by temperature
                                             if min(last_event_temp, next_event_temp) <= current_temp <= max(last_event_temp, next_event_temp):
@@ -6200,8 +6188,9 @@ class tgraphcanvas(FigureCanvas):
                                         elif (last_event_temp is None and next_event_temp is None and
                                                 (self.replayType == 0 or # if replay by time is selected
                                                     (last_event_temp1 is None and last_event_temp2 is None) or # if TP is not yet passed or no event after TP and now has been set
-                                                    (last_event_temp2 is not None and self.replayType == 1) or (last_event_temp1 is not None and self.replayType == 2)) and # replay by temp, but temp did not increase
-                                                last_event_time is not None and len(self.timeB)>bge):
+                                                    (last_event_temp2 is not None and (self.replayType == 1 or (self.replayType == 3 and not value_decreasing))) or # replay by BT, but BT did not increase
+                                                    (last_event_temp1 is not None and (self.replayType == 2) or (self.replayType == 4 and not value_decreasing))) # replay by ET, but ET did not increase
+                                                and last_event_time is not None and len(self.timeB)>bge):
                                                   # if replay by temp (as one or both of those event_temps is not None), but current temp did not increase we don't
                                                   # ramp by time instead as this would confuse everything.
                                             # we ramp by (absolute) time (ignoring relative shift by CHARGE)
