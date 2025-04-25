@@ -192,6 +192,7 @@ class AillioR1:
             self._close_port()
 
     def __dbg(self, msg:str) -> None:
+        _log.debug('Aillio: %s', msg)
         if self.AILLIO_DEBUG and not self.simulated:
             try:
                 print(f'AillioR1: {msg}')
@@ -219,6 +220,7 @@ class AillioR1:
                         libusb10._load_library = _load_library  # pylint: disable=protected-access # overwrite the overwrite of the pyinstaller runtime hook pyi_rth_usb.py
                         from usb.backend.libusb1 import get_backend  # type: ignore[import-untyped, unused-ignore]
                         backend = get_backend(find_library=lambda _,shared_libusb_path=shared_libusb_path: shared_libusb_path)
+                        self.__dbg(f'shared libusb loadeded from {shared_libusb_path}')
                         break
 
             # Try each known device variant
