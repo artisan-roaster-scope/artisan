@@ -1,23 +1,50 @@
-# Appveyor CI configuration for Cross-build Raspberry Pi DEB + multi-platform build
+# ABOUT
+# Appveyor CI configuration to build Artisan install packages
+#     for Windows, Windows legacy, macOS, and Linux
+#
+# LICENSE
+# This program or module is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 2 of the License, or
+# version 3 of the License, or (at your option) any later versison. It is
+# provided for educational purposes and is distributed in the hope that
+# it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
+# the GNU General Public License for more details.
+#
+# AUTHOR
+# Dave Baxter, Marko Luther 2023
+
+# Include "skip ci" in the commit message to prevent this build process from running
 environment:
+  # Set the default Appveyor Python version here. Does not affect windows_legacy. Can be overridden in platform environment.
   PYTHON_V: 3.13
+  # Upgrade to specific version (for platforms supporting upgrade). Upgrade skipped if env var is missing or blank.
+  PYUPGRADE_WIN_V: 3.13.3
+  #PYUPGRADE_MACOS_V: 3.12.1
 
   matrix:
-  - job_name: rpi
-    appveyor_build_worker_image: Ubuntu2204
+  - job_name: windows_legacy
+    appveyor_build_worker_image: Visual Studio 2019
   - job_name: windows
     appveyor_build_worker_image: Visual Studio 2022
+  - job_name: macos
+    appveyor_build_worker_image: macos-monterey # macos-bigsur (macOS 11 not support by brew any longer)
   - job_name: linux
     appveyor_build_worker_image: Ubuntu2204
-  - job_name: macos
-    appveyor_build_worker_image: macos-monterey
 
+
+# Generic build number, later set to commit hash by init
 version: '{build}'
+
+# Do not build on tags
 skip_tags: true
 clone_depth: 1
 
 init:
+  # Sets the commit hash to "build version number" shown in appveyor build status, the build number keeps it unique
   - ps: Update-AppveyorBuild -Version "$($env:APPVEYOR_REPO_COMMIT.substring(0,7)) ($env:APPVEYOR_BUILD_NUMBER)"
+  # Env used to enable artifact upload for PR builds by providing a valid file name, invalid for REPO builds
   - ps: |
       $env:artifact_prefix = 'disable_artifact'
       if ([bool]$env:APPVEYOR_PULL_REQUEST_NUMBER -eq $true) {
@@ -31,103 +58,262 @@ branches:
 stack:
   python ${PYTHON_V}
 
-# ========== JOB: RPI CROSS BUILD ==========
 for:
 -
   matrix:
     only:
-      - job_name: rpi
+      - job_name: windows_legacy
     fast_finish: false
 
   environment:
-    ARTISAN_OS: rpi
-    PYTHONSITEPKGS: /home/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages
+    PYTHON_PATH: "C:/Python38-x64"
+    QT_PATH: "C:/qt/5.15/msvc2019_64"
+    PYUIC: "pyuic5.exe"
+    PYQT: "5"
+    BUILD_PYINSTALLER: "True"
+    ARTISAN_LEGACY: "True"
+    VC_REDIST: "https://aka.ms/vs/16/release/vc_redist.x64.exe"  #redistributable for VS 2015-2019
+    VCVARSALL: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Auxiliary/Build/vcvarsall.bat"
 
   install:
-    - echo "Raspberry Pi Cross Install"
-    - chmod +x .ci/*.sh
-    - bash .ci/install-rpi-cross.sh
+    - cmd: echo Windows Legacy Install
+
+    # generate the path to PyQt translations files
+    - ps: $env:QT_TRANSL = "$env:PYTHON_PATH/Lib/site-packages/PyQt5/Qt5/translations"
+
+    # pull library versions from requirments file
+    - ps: $env:PYINSTALLER_VER = Select-String -Path ./src/requirements.txt "pyinstaller==([\d\.]*).*platform_system='Windows'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
+    - ps: Write-Host "PYINSTALLER_VER= $env:PYINSTALLER_VER"
+
+    # update path env var
+    - cmd: set PATH=%PYTHON_PATH%;%PYTHON_PATH%\Scripts;%PATH%
+
+    # run the install script
+    - cmd: .ci\install-win.bat
 
   build_script:
-    - echo "Cross-build done inside install step"
+    - cmd: echo Windows Legacy Build
+    - cmd: cd src
+
+    #update the copyright year used by pyinstaller to set exe properties for Windows
+    - ps: $YEAR=(Get-Date).year
+    - ps: gc version-metadata.yml | %{ $_ -replace "yyyy", "$YEAR" } | out-file newfile -encoding ascii
+    - ps: move -force newfile version-metadata.yml
+
+    # update the __revision__ field with the left seven of the GIT commit hash
+    - ps: $GIT_VERSION=git rev-parse --verify --short HEAD
+    - ps: gc artisanlib/__init__.py | %{ $_ -replace "__revision__ = '.*'", "__revision__ = '$GIT_VERSION'" } | out-file newfile -encoding ascii
+    - ps: move -force newfile artisanlib/__init__.py
+
+    # run the build script
+    - cmd: build-win3-pi.bat
+
+#  test_script:
+#    - cmd: python -m unittest discover
 
   artifacts:
-    - path: 'src/%artifact_prefix%-*.deb'
+#    - path: 'generated-win-legacy.zip'
+    - path: 'src\%artifact_prefix%-win*setup.exe'
 
   deploy_script:
-    - bash .ci/upload.sh artisan-*.deb
+    - cmd: bash ../.ci/upload.sh artisan-win*setup.exe
 
-# ========== JOB: WINDOWS ==========
+#  # uncomment this section for remote desktop connection to build image
+#  on_finish:
+#    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
+
 -
   matrix:
     only:
       - job_name: windows
     fast_finish: false
 
+  environment:
+    QT_PATH: "C:/qt/6.5.1/msvc2019_64"  #there is no msvc2022_64 under /qt*
+    PYQT: "6"
+    PYUIC: "pyuic6.exe"
+    BUILD_PYINSTALLER: "True"
+    ARTISAN_LEGACY: "False"
+    VC_REDIST: "https://aka.ms/vs/17/release/vc_redist.x64.exe"  #redistributable for VS 2015-2022
+    VCVARSALL: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Auxiliary/Build/vcvarsall.bat"
+
   install:
     - cmd: echo Windows Install
-    - cmd: .ci\install-win.bat
+
+    # Update the Python version when PYUPGRADE_WIN_V is set.  The upgrade happens in install-win.bat
+    # Note that the paths set below may not exist yet.
+    - ps: |
+        if (Test-Path env:PYUPGRADE_WIN_V) {
+            $env:PREV_PYTHON_V = $env:PYTHON_V
+            $env:PYTHON_V = ($env:PYUPGRADE_WIN_V -split '\.')[0..1] -join '.'
+        }
+
+    # derive the python path from the version number
+    - ps: $env:PYTHON_PATH = "C:/Python$($env:PYTHON_V -replace '\.','')-x64"
+    - ps: Write-Host $env:PYTHON_PATH
+
+    # generate the path to PyQt translations files
+    - ps: $env:QT_TRANSL = "$env:PYTHON_PATH/Lib/site-packages/PyQt6/Qt6/translations"
+
+    # pull library versions from requirments file
+    - ps: $env:PYINSTALLER_VER = Select-String -Path ./src/requirements.txt "pyinstaller==([\d\.]*).*platform_system='Windows'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
+    - ps: Write-Host "PYINSTALLER_VER= $env:PYINSTALLER_VER"
+
+    # update path env var
+    - cmd: set PATH=%PYTHON_PATH%;%PYTHON_PATH%\Scripts;%PATH%
+
+    # run the install script
+    - cmd: .ci/install-win.bat
 
   build_script:
     - cmd: echo Windows Build
     - cmd: cd src
+
+    #update the copyright year used by pyinstaller to set exe properties for Windows
+    - ps: $YEAR=(Get-Date).year
+    - ps: gc version-metadata.yml | %{ $_ -replace "yyyy", "$YEAR" } | out-file newfile -encoding ascii
+    - ps: move -force newfile version-metadata.yml
+
+    # update the __revision__ field with the left seven of the GIT commit hash
+    - ps: $GIT_VERSION=git rev-parse --verify --short HEAD
+    - ps: gc artisanlib/__init__.py | %{ $_ -replace "__revision__ = '.*'", "__revision__ = '$GIT_VERSION'" } | out-file newfile -encoding ascii
+    - ps: move -force newfile artisanlib/__init__.py
+
+    # run the build script
     - cmd: build-win3-pi.bat
 
+#  test_script:
+#    - cmd: python -m unittest discover
+
   artifacts:
+#    - path: 'generated-win.zip'
     - path: 'src\%artifact_prefix%-win*setup.exe'
 
   deploy_script:
-    - bash ../.ci/upload.sh artisan-win*setup.exe
+    - cmd: bash ../.ci/upload.sh artisan-win*setup.exe
 
-# ========== JOB: LINUX ==========
--
-  matrix:
-    only:
-      - job_name: linux
-    fast_finish: false
+#  # uncomment this section for remote desktop connection to build image
+#  on_finish:
+#    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
-  install:
-    - echo Linux Install
-    - chmod +x .ci/*.sh
-    - bash .ci/install-linux.sh
 
-  build_script:
-    - echo Linux Build
-    - chmod +x src/*.sh
-    - cd src
-    - ./build-linux.sh
-    - ./build-linux-pkg.sh
-
-  artifacts:
-    - path: 'src/%artifact_prefix%-*.deb'
-    - path: 'src/%artifact_prefix%-*.rpm'
-    - path: 'src/%artifact_prefix%-*.AppImage'
-
-  deploy_script:
-    - bash ../.ci/upload.sh artisan-*.deb
-    - bash ../.ci/upload.sh artisan-*.rpm
-    - bash ../.ci/upload.sh artisan-*.AppImage
-
-# ========== JOB: MACOS ==========
 -
   matrix:
     only:
       - job_name: macos
     fast_finish: false
 
+  environment:
+    PYTHON_V: 3.12  # Override the stack key
+    ARTISAN_OS: macos
+    MACOSX_DEPLOYMENT_TARGET: 12.0
+    PYTHONSITEPKGS: /Users/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages
+    QT_PATH: ${PYTHONSITEPKGS}/PyQt6/Qt6
+    QT_SRC_PATH: /Users/appveyor/Qt/6.6/macos
+    PYUIC: pyuic6
+    PYLUPDATE: ./pylupdate6pro.py  #the dot slash is necessary
+
   install:
-    - echo MacOS Install
+    - echo "MacOS Install"
     - chmod +x .ci/*.sh
-    - bash .ci/install-macos.sh
+
+    # update the __revision__ field with the left seven of the GIT commit hash
+    - export GIT_VERSION=`git rev-parse --verify --short HEAD 2>/dev/null|| echo "???"`
+    - sed -i'' -e "s/__revision__ = '.*'/__revision__ = '$GIT_VERSION'/" src/artisanlib/__init__.py
+
+    # run the install script
+    - .ci/install-macos.sh
+    - export PATH=/Users/appveyor/venv${PYTHON_V}/bin:${PATH} # required after updating Python in venv
 
   build_script:
-    - echo MacOS Build
+    - echo "MacOS Build"
     - chmod +x src/*.sh
+    - chmod +x src/pylupdate6pro.py
+
+    # run the build script
     - cd src
     - ./build-macos3.sh
 
+# unit test fails as it runs on Py3.9 while the build installs under brew installed Py3.10 (see build-mac3.py)
+#  test_script:
+#    - python -m unittest discover -s src
+
   artifacts:
+#    - path: 'generated-macos.zip'
     - path: 'src/%artifact_prefix%-*.dmg'
 
   deploy_script:
-    - bash ../.ci/upload.sh artisan-*.dmg
+    # we upgrade libidn2 and curl to prevent issues caused by the previous python update
+    # on running curl for later upload (libunistring.2.dylib not found)
+    # this is done here after generating the build to prevent SSL issues
+    - brew upgrade libidn2 # 2.3.4 -> 2.3.4_1
+    - ../.ci/upload.sh artisan-*.dmg
+
+#  # uncomment this section for vnc or ssh connection to the build image
+#  on_finish:
+#    - sh: export APPVEYOR_VNC_BLOCK=true
+#    - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-vnc.sh' | bash -e -
+#    #- sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
+
+
+-
+  matrix:
+    only:
+      - job_name: linux
+    fast_finish: false
+
+  environment:
+    #PYTHON_V: 3.11
+    ARTISAN_OS: linux
+    PYTHONSITEPKGS: /home/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages
+    QT_PATH: $PYTHON_PATH/PyQt6/Qt6
+    QT_SRC_PATH: /home/appveyor/Qt/6.4/gcc_64 # latest points still to 5.15.2
+    PYUIC: pyuic6
+    PYLUPDATE: ./pylupdate6pro.py  #the dot slash is necessary
+
+  install:
+    #- ls -la /home/appveyor/Qt/
+    - echo "Linux Install"
+    - chmod +x .ci/*.sh
+
+    # pull library versions from requirments file
+    - ps: $env:LIBUSB_VER = Select-String -Path ./src/requirements.txt "libusb==([\d\.]*).*platform_system='Linux'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
+    - ps: Write-Host "LIBUSB_VER= $env:LIBUSB_VER"
+    - ps: $env:DOTENV_VER = Select-String -Path ./src/requirements.txt "dotenv==([\d\.]*).*platform_system='Linux'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
+    - ps: Write-Host "DOTENV_VER= $env:DOTENV_VER"
+
+    # update the __revision__ field with the left seven of the GIT commit hash
+    - export GIT_VERSION=`git rev-parse --verify --short HEAD 2>/dev/null|| echo "???"`
+    - sed -i'' -e "s/__revision__ = '.*'/__revision__ = '$GIT_VERSION'/" src/artisanlib/__init__.py
+
+    # run the install script
+    - .ci/install-linux.sh
+
+  build_script:
+    - echo "Linux Build"
+    - chmod +x src/*.sh
+    - cd src
+
+    # run the build scripts
+    - ./build-linux.sh
+    - ./build-linux-pkg.sh
+
+#  test_script:
+#    - QT_QPA_PLATFORM=offscreen python -m unittest discover -s src
+
+  artifacts:
+#    - path: 'generated-linux.zip'
+    - path: 'src/%artifact_prefix%-*.deb'
+    - path: 'src/%artifact_prefix%-*.rpm'
+    - path: 'src/%artifact_prefix%-*.AppImage'
+
+  deploy_script:
+    - ../.ci/upload.sh artisan-*.deb
+    - ../.ci/upload.sh artisan-*.rpm
+    - ../.ci/upload.sh artisan-*.AppImage
+
+#  # uncomment this section for ssh connection to build image
+#  on_finish:
+#    - sh: export APPVEYOR_SSH_BLOCK=true
+#    - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
