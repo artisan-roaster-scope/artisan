@@ -1,14 +1,46 @@
 #!/bin/bash
-set -e
+
+set -e  # lỗi lệnh nào dừng ngay
+set -x  # in các lệnh ra màn hình (debug dễ)
 
 echo "[RPI ARM64] Installing dependencies..."
 
-# Update and install necessary packages
-sudo apt-get update
-sudo apt-get install -y python3 python3-pip python3-dev libffi-dev                         libusb-1.0-0-dev libjpeg-dev libqt6core6 libqt6gui6                         libqt6widgets6 pyqt6-dev-tools qt6-base-dev                         build-essential git curl
+# Update repo
+sudo apt update
 
-# Upgrade pip and install Python dependencies
-python3 -m pip install --upgrade pip
-pip3 install -r src/requirements.txt
+# Fix trusted.gpg warnings nếu cần (chưa làm trong bản này, tập trung cài build trước)
 
-echo "[RPI ARM64] Install complete."
+# Cài các gói cơ bản
+sudo apt install -y \
+    build-essential \
+    python3-dev \
+    python3-pip \
+    python3-setuptools \
+    python3-wheel \
+    python3-venv \
+    git \
+    libffi-dev \
+    libssl-dev \
+    libjpeg-dev \
+    zlib1g-dev \
+    libopenjp2-7-dev \
+    libtiff5-dev \
+    libfreetype6-dev \
+    liblcms2-dev \
+    libwebp-dev \
+    tcl8.6-dev \
+    tk8.6-dev \
+    libharfbuzz-dev \
+    libfribidi-dev \
+    libxcb-xinerama0
+
+# Cài PyQt6 qua pip (vì apt không có pyqt6-dev-tools)
+pip install --upgrade pip
+pip install pyqt6 pyqt6-tools
+
+# In version cho chắc chắn
+python3 --version
+pip show pyqt6
+pip show pyqt6-tools
+
+echo "[RPI ARM64] Dependencies installed successfully!"
