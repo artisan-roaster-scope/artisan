@@ -168,13 +168,14 @@ class CompletedItemDict(TypedDict):
     coffee_label: Optional[str]
     blend_label: Optional[str]
     store_label: Optional[str]
-    batchsize: float # in kg
-    weight: float    # in kg (resulting weight as set by the user if measured is True and otherwise equal to weight_estimate)
+    batchsize: float       # in kg
+    weight: float          # in kg (resulting weight as set by the user if measured is True and otherwise equal to weight_estimate)
     weight_estimate: float # in kg (estimated roasted weight based on profile template or previous roasts or similar)
-    measured: bool   # True if (out-)weight was measured or manually set, False if estimated from server calculated loss or template
+    defects_weight: float  # in kg (weight of defects sorted from roasted weight)
+    measured: bool         # True if (out-)weight was measured or manually set, False if estimated from server calculated loss or template
     color: int
-    moisture: float  # in %
-    density: float   # in g/l
+    moisture: float        # in %
+    density: float         # in g/l
     roastingnotes: str
     cupping_score: float
     cuppingnotes: str
@@ -241,10 +242,11 @@ class CompletedItem(BaseModel):
     coffee_label: Optional[str] = Field(default=None)
     blend_label: Optional[str] = Field(default=None)
     store_label: Optional[str] = Field(default=None)
-    batchsize: float # in kg (weight of greens)
-    weight: float    # in kg (resulting weight of roasted beans)
+    batchsize: float       # in kg (weight of greens)
+    weight: float          # in kg (resulting weight of roasted beans)
     weight_estimate: float # in kg (estimated roasted beans weight based on profile template or previous roasts weight loss)
-    measured: bool = Field(default=False)   # True if (out-)weight was measured or manually set, False if estimated from server calculated loss or template
+    defects_weight: float = Field(default=0)  # in kg (weight of defects sorted from roasted weight)
+    measured: bool = Field(default=False)     # True if (out-)weight was measured or manually set, False if estimated from server calculated loss or template
     color: int
     moisture: float # in %
     density: float  # in g/l
@@ -285,7 +287,7 @@ class CompletedItem(BaseModel):
         return int(roastdate.timestamp())
 
     @field_serializer('roastUUID', when_used='json')
-    def serialize_roastUUID_to_str(roastUUID: UUID4) -> str: # pylint: disable=no-self-argument
+    def serialize_roastUUID_to_str(roastUUID: UUID4) -> str: # pyright:ignore[reportGeneralTypeIssues] # pylint: disable=no-self-argument
         return str(roastUUID.hex)
 
 
@@ -333,6 +335,11 @@ class CompletedItem(BaseModel):
             if end_weight != self.weight:
                 updated = True
                 self.weight = end_weight
+        if 'defects_weight' in profile_data:
+            defects_weight = float(profile_data['defects_weight'])
+            if defects_weight != self.defects_weight:
+                updated = True
+                self.defects_weight = defects_weight
         if 'ground_color' in profile_data:
             ground_color = (0 if profile_data['ground_color'] is None else int(float(round(profile_data['ground_color']))))
             if ground_color != self.color:
@@ -1716,15 +1723,39 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.roasted_weight.receivedFocus.connect(self.roasted_weight_selected)
         self.roasted_weight_suffix = ClickableQLabel(weight_unit_str)
 
+        # calculate unit label max_width
         font = self.roasted_weight_suffix.font()
         fontMetrics = QFontMetrics(font)
-        weight_density_suffix_width = max(fontMetrics.horizontalAdvance(weight_unit_str), fontMetrics.horizontalAdvance(density_unit_str))
-        color_moisture_suffix_width = max(fontMetrics.horizontalAdvance(moisture_unit_str), fontMetrics.horizontalAdvance(color_unit_str))
+        weight_suffix_width = fontMetrics.horizontalAdvance('Kg') # widest possible label
+        color_density_moisture_suffix_width = max(
+                fontMetrics.horizontalAdvance(moisture_unit_str),
+                fontMetrics.horizontalAdvance(density_unit_str),
+                fontMetrics.horizontalAdvance(color_unit_str))
 
         self.roasted_weight_suffix.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-        self.roasted_weight_suffix.setFixedWidth(weight_density_suffix_width)
+        self.roasted_weight_suffix.setFixedWidth(weight_suffix_width)
         self.roasted_weight_suffix.setAlignment (Qt.AlignmentFlag.AlignLeft)
         self.roasted_weight_suffix.clicked.connect(self.roasted_measured_toggle)
+
+        self.roasted_yield = ClickableQLineEdit()
+        self.roasted_yield.setToolTip(QApplication.translate('Label','Yield'))
+        self.roasted_yield.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, self.roasted_yield, ''))
+        self.roasted_yield.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+        self.roasted_yield.editingFinished.connect(self.roasted_yield_changed)
+        self.roasted_yield_suffix = ClickableQLabel(weight_unit_str)
+        self.roasted_yield_suffix.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        self.roasted_yield_suffix.setFixedWidth(weight_suffix_width)
+        self.roasted_yield_suffix.setAlignment (Qt.AlignmentFlag.AlignLeft)
+
+        self.roasted_defects = ClickableQLineEdit()
+        self.roasted_defects.setToolTip(QApplication.translate('Label','Defects'))
+        self.roasted_defects.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, self.roasted_defects, ''))
+        self.roasted_defects.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+        self.roasted_defects.editingFinished.connect(self.defects_weight_changed)
+        self.roasted_defects_suffix = ClickableQLabel(weight_unit_str)
+        self.roasted_defects_suffix.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        self.roasted_defects_suffix.setFixedWidth(weight_suffix_width)
+        self.roasted_defects_suffix.setAlignment (Qt.AlignmentFlag.AlignLeft)
 
         self.roasted_density = QLineEdit()
         self.roasted_density.setToolTip(QApplication.translate('Label','Density'))
@@ -1733,7 +1764,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.roasted_density.editingFinished.connect(self.roasted_density_changed)
         roasted_density_suffix = QLabel(density_unit_str)
         roasted_density_suffix.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-        roasted_density_suffix.setFixedWidth(weight_density_suffix_width)
+        roasted_density_suffix.setFixedWidth(color_density_moisture_suffix_width)
         roasted_density_suffix.setAlignment (Qt.AlignmentFlag.AlignLeft)
 
         self.roasted_color = QLineEdit()
@@ -1743,7 +1774,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.roasted_color.editingFinished.connect(self.roasted_color_changed)
         roasted_color_suffix = QLabel(color_unit_str)
         roasted_color_suffix.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-        roasted_color_suffix.setFixedWidth(color_moisture_suffix_width)
+        roasted_color_suffix.setFixedWidth(color_density_moisture_suffix_width)
         roasted_color_suffix.setAlignment (Qt.AlignmentFlag.AlignLeft)
 
         self.roasted_moisture = QLineEdit()
@@ -1751,10 +1782,9 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.roasted_moisture.setValidator(self.aw.createCLocaleDoubleValidator(0., 100., 1, self.roasted_moisture))
         self.roasted_moisture.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.roasted_moisture.editingFinished.connect(self.roasted_moisture_changed)
-
         roasted_moisture_suffix = QLabel(moisture_unit_str)
         roasted_moisture_suffix.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-        roasted_moisture_suffix.setFixedWidth(color_moisture_suffix_width)
+        roasted_moisture_suffix.setFixedWidth(color_density_moisture_suffix_width)
         roasted_moisture_suffix.setAlignment (Qt.AlignmentFlag.AlignLeft)
 
         self.roasted_notes = QPlainTextEdit()
@@ -1773,29 +1803,46 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.cupping_notes.setPlaceholderText(QApplication.translate('Label', 'Cupping Notes'))
         self.cupping_notes.setToolTip(QApplication.translate('Label', 'Cupping Notes'))
 
+        ##
         roasted_first_line_layout = QHBoxLayout()
         roasted_first_line_layout.setSpacing(0)
         roasted_first_line_layout.addWidget(self.roasted_weight)
         roasted_first_line_layout.addSpacing(2)
         roasted_first_line_layout.addWidget(self.roasted_weight_suffix)
+        #
         roasted_first_line_layout.addSpacing(10)
         roasted_first_line_layout.addWidget(self.roasted_color)
         roasted_first_line_layout.addSpacing(2)
         roasted_first_line_layout.addWidget(roasted_color_suffix)
         roasted_first_line_layout.setContentsMargins(0, 0, 0, 0)
+        ##
         roasted_second_line_layout = QHBoxLayout()
         roasted_second_line_layout.setSpacing(0)
+        roasted_second_line_layout.addWidget(self.roasted_yield)
+        roasted_second_line_layout.addSpacing(2)
+        roasted_second_line_layout.addWidget(self.roasted_yield_suffix)
+        #
+        roasted_second_line_layout.addSpacing(10)
         roasted_second_line_layout.addWidget(self.roasted_density)
         roasted_second_line_layout.addSpacing(2)
         roasted_second_line_layout.addWidget(roasted_density_suffix)
-        roasted_second_line_layout.addSpacing(10)
-        roasted_second_line_layout.addWidget(self.roasted_moisture)
-        roasted_second_line_layout.addSpacing(2)
-        roasted_second_line_layout.addWidget(roasted_moisture_suffix)
         roasted_second_line_layout.setContentsMargins(0, 0, 0, 0)
+        ##
+        roasted_third_line_layout = QHBoxLayout()
+        roasted_third_line_layout.setSpacing(0)
+        roasted_third_line_layout.addWidget(self.roasted_defects)
+        roasted_third_line_layout.addSpacing(2)
+        roasted_third_line_layout.addWidget(self.roasted_defects_suffix)
+        #
+        roasted_third_line_layout.addSpacing(10)
+        roasted_third_line_layout.addWidget(self.roasted_moisture)
+        roasted_third_line_layout.addSpacing(2)
+        roasted_third_line_layout.addWidget(roasted_moisture_suffix)
+        roasted_third_line_layout.setContentsMargins(0, 0, 0, 0)
         roasted_details_layout = QVBoxLayout()
         roasted_details_layout.addLayout(roasted_first_line_layout)
         roasted_details_layout.addLayout(roasted_second_line_layout)
+        roasted_details_layout.addLayout(roasted_third_line_layout)
         roasted_details_layout.setContentsMargins(0, 0, 0, 0)
 
 
@@ -2154,8 +2201,16 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             if text == '':
                 self.selected_completed_item.data.measured = False
                 self.roasted_weight_suffix.setEnabled(False)
+                self.roasted_yield.setText('')
+                self.roasted_defects.setText('0')
             else:
-                self.roasted_weight.setText(comma2dot(text))
+                roasted_weight_txt = comma2dot(text)
+                roasted_weight = float(roasted_weight_txt)
+                if self.aw.qmc.weight[2] == 'Kg' and roasted_weight > self.selected_completed_item.data.batchsize:
+                    # if input is larger than batch size we interpret it as in g
+                    converted_weight = convertWeight(roasted_weight, 0, weight_units.index(self.aw.qmc.weight[2]))
+                    roasted_weight_txt = f'{float2floatWeightVolume(converted_weight):g}'
+                self.roasted_weight.setText(roasted_weight_txt)
                 self.selected_completed_item.data.measured = True
                 self.roasted_weight_suffix.setEnabled(True)
 
@@ -2165,6 +2220,61 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             self.selected_completed_item.data.measured = False
             self.roasted_weight.setText('')
             self.roasted_weight_suffix.setEnabled(False)
+            self.roasted_yield.setText('')
+            self.roasted_defects.setText('0')
+            self.roasted_yield.setPlaceholderText(self.roasted_weight.placeholderText())
+
+
+    @pyqtSlot()
+    def roasted_yield_changed(self) -> None:
+        defects:float = 0
+        roasted_yield:float = 0
+        roasted_weight:float = 0
+        text:str = self.roasted_yield.text()
+        if text != '':
+            roasted_yield_txt = comma2dot(text)
+            roasted_yield = float(roasted_yield_txt)
+        if self.roasted_weight.text().strip() == '' and roasted_yield > 0:
+            # if roasted_weight is empty, we put the yield to the roasted weight field and reset the roasted yield/defects fields
+            roasted_weight_txt = f'{float2floatWeightVolume(roasted_yield):g}'
+            self.roasted_weight.setText(roasted_weight_txt)
+            self.roasted_weight_suffix.setEnabled(True)
+            roasted_weight = roasted_yield
+            roasted_yield = 0
+        else:
+            roasted_weight_txt = self.roasted_weight.text().strip()
+            roasted_weight = (0 if roasted_weight_txt == '' else float(roasted_weight_txt))
+            roasted_yield = max(0,min(roasted_yield,roasted_weight))
+            defects = roasted_weight - roasted_yield
+        if 0 < roasted_yield < roasted_weight:
+            self.roasted_yield.setText(f'{float2floatWeightVolume(roasted_yield):g}')
+            self.roasted_defects.setText(f'{float2floatWeightVolume(defects):g}')
+        else:
+            self.roasted_yield.setText('')
+            self.roasted_defects.setText('0')
+
+    @pyqtSlot()
+    def defects_weight_changed(self) -> None:
+        defects:float = 0
+        roasted_yield:float = 0
+        text:str = self.roasted_defects.text()
+        if text != '' and self.roasted_weight.text().strip() != '':
+            defects_txt = comma2dot(text)
+            defects = float(defects_txt)
+        roasted_weight_txt = self.roasted_weight.text().strip()
+        defects = max(0,defects)
+        roasted_weight = (0 if roasted_weight_txt == '' else float(roasted_weight_txt))
+        if self.aw.qmc.weight[2] == 'Kg' and roasted_weight > 0 and defects > roasted_weight/2:
+            defects = convertWeight(defects,0,1)
+        defects = max(0,min(defects,roasted_weight))
+        if 0 < defects < roasted_weight:
+            roasted_yield = roasted_weight - defects
+            self.roasted_yield.setText(f'{float2floatWeightVolume(roasted_yield):g}')
+            self.roasted_defects.setText(f'{float2floatWeightVolume(defects):g}')
+        else:
+            self.roasted_yield.setText('')
+            self.roasted_defects.setText('0')
+
 
     @pyqtSlot()
     def roasted_color_changed(self) -> None:
@@ -2750,6 +2860,9 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             self.roasted_weight.setText('')
             self.roasted_weight.setPlaceholderText('')
             self.roasted_color.setText('')
+            self.roasted_yield.setText('')
+            self.roasted_yield.setPlaceholderText('')
+            self.roasted_defects.setText('')
             self.roasted_density.setText('')
             self.roasted_moisture.setText('')
             self.roasted_notes.setPlainText('')
@@ -2774,9 +2887,21 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             if data.measured:
                 self.roasted_weight.setText(converted_weight_str)
                 self.roasted_weight_suffix.setEnabled(True)
+                self.roasted_yield.setPlaceholderText(converted_weight_str)
             else:
                 self.roasted_weight.setText('')
                 self.roasted_weight_suffix.setEnabled(False)
+                self.roasted_yield.setPlaceholderText(self.roasted_weight.placeholderText())
+            converted_defects_weight = convertWeight(data.defects_weight, 1, weight_units.index(self.aw.qmc.weight[2]))
+            converted_defects_weight_str = f'{float2floatWeightVolume(converted_defects_weight):g}'
+            self.roasted_defects.setText(converted_defects_weight_str)
+            if data.defects_weight > 0:
+                roasted_yield = data.weight - data.defects_weight
+                converted_yield = convertWeight(roasted_yield, 1, weight_units.index(self.aw.qmc.weight[2]))
+                converted_yield_str = f'{float2floatWeightVolume(converted_yield):g}'
+                self.roasted_yield.setText(converted_yield_str)
+            else:
+                self.roasted_yield.setText('')
             self.roasted_color.setText(str(data.color))
             self.roasted_density.setText(f'{data.density:g}')
             self.roasted_moisture.setText(f'{data.moisture:g}')
@@ -2806,6 +2931,17 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                 if converted_data_weight_str != roasted_weight_value_str:
                     # on textual changes, send updated weight
                     changes['end_weight'] = convertWeight(float(roasted_weight_value_str), weight_units.index(self.aw.qmc.weight[2]), 1)
+        except Exception:  # pylint: disable=broad-except
+            pass
+        try:
+            converted_data_defects_weight = convertWeight(data.defects_weight, 1, weight_units.index(self.aw.qmc.weight[2]))
+            converted_data_defects_weight_str = f'{float2floatWeightVolume(converted_data_defects_weight):g}'
+            roasted_defects_text:str = self.roasted_defects.text()
+            if roasted_defects_text != '':
+                roasted_defects_value_str = comma2dot(roasted_defects_text)
+                if converted_data_defects_weight_str != roasted_defects_value_str:
+                    # on textual changes, send updated weight
+                    changes['defects_weight'] = convertWeight(float(roasted_defects_value_str), weight_units.index(self.aw.qmc.weight[2]), 1)
         except Exception:  # pylint: disable=broad-except
             pass
         current_roasted_color = int(round(float(self.roasted_color.text())))
@@ -2858,6 +2994,12 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                 weight_units.index(wunit)
             )
             self.aw.qmc.weight = (self.aw.qmc.weight[0], wout, self.aw.qmc.weight[2])
+            wdefects = convertWeight(
+                ci.defects_weight,
+                weight_units.index('Kg'),
+                weight_units.index(wunit)
+            )
+            self.aw.qmc.roasted_defects_weight = wdefects
             self.aw.qmc.ground_color = ci.color
             self.aw.qmc.moisture_roasted = ci.moisture
             self.aw.qmc.density_roasted = (ci.density, self.aw.qmc.density_roasted[1], self.aw.qmc.density_roasted[2], self.aw.qmc.density_roasted[3])
@@ -2947,11 +3089,15 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                 item_path = plus.register.getPath(sender_roastUUID)
                 if item_path is not None and os.path.isfile(item_path):
                     try:
-#                        self.aw.loadFile(item_path)
                         self.aw.loadFileSignal.emit(item_path)
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
 
+
+    def cancel_completed_item_edit(self) -> None:
+        if self.selected_completed_item is not None:
+            self.selected_completed_item.deselect()
+            self.clearCompletedItemSelection()
 
     @pyqtSlot()
     def completed_items_selection_changed(self) -> None:
@@ -3019,6 +3165,8 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                             if len(splitter_sizes)>1:
                                 # enable focus on input widgets
                                 self.roasted_weight.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+                                self.roasted_yield.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+                                self.roasted_defects.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
                                 self.roasted_color.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
                                 self.roasted_density.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
                                 self.roasted_moisture.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
@@ -3046,25 +3194,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                         else:
                             self.aw.sendmessageSignal.emit(QApplication.translate('Message', 'Fetching completed roast properties failed'), True, None)
                 else:
-                    # edits completed, reset selection
-                    self.selected_completed_item = None
-                    # clear details split view
-                    self.set_details(None)
-                    # remember open height (might be user set)
-                    if len(splitter_sizes)>1:
-                        self.completed_splitter_open_height = splitter_sizes[1]
-                    # close details split
-                    self.completed_splitter.setSizes([sum(splitter_sizes),0])
-                    # disable focus on input widgets to return keyboard focus to parent
-                    self.roasted_weight.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-                    self.roasted_color.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-                    self.roasted_density.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-                    self.roasted_moisture.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-                    self.roasted_notes.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-                    self.cupping_score.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-                    self.cupping_notes.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-                    if self.completed_details_scrollarea.isVisible():
-                        self.completed_details_scrollarea.hide()
+                    self.clearCompletedItemSelection()
             # NOTE: this branch is not reached any longer as if not connected to artisan.plus, the schedule window remains empty with a note
             elif not self.aw.qmc.flagon:
                 # plus controller is not on and Artisan is OFF we first close a potentially pending edit section and then try to load that profile
@@ -3080,6 +3210,8 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     self.completed_splitter.setSizes([sum(splitter_sizes),0])
                     # disable focus on input widgets to return keyboard focus to parent
                     self.roasted_weight.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+                    self.roasted_yield.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+                    self.roasted_defects.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                     self.roasted_color.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                     self.roasted_density.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                     self.roasted_moisture.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -3097,6 +3229,31 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                             self.aw.loadFile(item_path)
                         except Exception as e: # pylint: disable=broad-except
                             _log.exception(e)
+
+    def clearCompletedItemSelection(self) -> None:
+        if self.selected_completed_item is not None:
+            splitter_sizes = self.completed_splitter.sizes()
+            # edits completed, reset selection
+            self.selected_completed_item = None
+            # clear details split view
+            self.set_details(None)
+            # remember open height (might be user set)
+            if len(splitter_sizes)>1:
+                self.completed_splitter_open_height = splitter_sizes[1]
+            # close details split
+            self.completed_splitter.setSizes([sum(splitter_sizes),0])
+            # disable focus on input widgets to return keyboard focus to parent
+            self.roasted_weight.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.roasted_yield.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.roasted_defects.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.roasted_color.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.roasted_density.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.roasted_moisture.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.roasted_notes.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.cupping_score.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.cupping_notes.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            if self.completed_details_scrollarea.isVisible():
+                self.completed_details_scrollarea.hide()
 
     def updateRoastedItems(self) -> None:
         self.nodrag_roasted.clearItems()
@@ -3291,6 +3448,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     'batchsize': batchsize,
                     'weight': weight,
                     'weight_estimate': weight_estimate,
+                    'defects_weight': self.aw.qmc.roasted_defects_weight,
                     'measured': measured,
                     'color': self.aw.qmc.ground_color,
                     'moisture': self.aw.qmc.moisture_roasted,
@@ -3388,6 +3546,8 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
             # the weight unit might have changed, we update its label
             self.roasted_weight_suffix.setText(self.aw.qmc.weight[2].lower())
+            self.roasted_yield_suffix.setText(self.aw.qmc.weight[2].lower())
+            self.roasted_defects_suffix.setText(self.aw.qmc.weight[2].lower())
             # update next weight item
             self.set_next()
 

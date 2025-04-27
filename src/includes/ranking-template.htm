@@ -42,13 +42,6 @@ td:nth-child(2) {
      overflow: hidden; 
      max-width:1px;
 }
-td:nth-child(3) {
-    text-align: left;
-     width: 50%;
-     text-overflow:ellipsis;
-     overflow: hidden; 
-     max-width:1px;
-}
 tfoot {
     background-color: hsl(200, 5%, 60%) !important;
     color: white !important;
@@ -152,8 +145,7 @@ th {
 <thead>
 <tr>
 <th>#</th>
-<th>$time</th>
-<th>$profile</th>
+<th>$time<br>$profile</th>
 <th>$weightin<br><small>($weight_unit)</small></th>
 <th>CHR<br><small>($temp_unit)</small></th>
 <th>FCs<br><small>(min)</small></th>
@@ -178,7 +170,6 @@ $entries
 <tfoot>
 <tr>
 <td class="inv">AVG</td>
-<td ></td>
 <td ></td>
 <td class="inv">${charges_avg}</td>
 <td class="inv">${charges_temp_avg}</td>

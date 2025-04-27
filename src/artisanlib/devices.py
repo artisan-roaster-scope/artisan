@@ -1675,7 +1675,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.containerGreenComboBox.setToolTip(QApplication.translate('Tooltip','Identify your green coffee container and its weight'))
             self.containerGreenComboBox.setMaximumWidth(120)
             self.containerGreenComboBox.setMinimumWidth(120)
-            self.updateGreenContainerPopup()
+            self.updateGreenContainerPopup(adjust_index=False)
             self.containerGreenComboBox.currentIndexChanged.connect(self.greenContainerChanged)
             self.containerGreenComboBox.setCurrentIndex(self.container_menu_idx(self.aw.container1_idx))
             self.updateGreenContainerWeight()
@@ -1695,7 +1695,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.containerRoastedComboBox.setToolTip(QApplication.translate('Tooltip','Identify your roasted coffee container and its weight'))
             self.containerRoastedComboBox.setMaximumWidth(120)
             self.containerRoastedComboBox.setMinimumWidth(120)
-            self.updateRoastedContainerPopup()
+            self.updateRoastedContainerPopup(adjust_index=False)
             self.containerRoastedComboBox.currentIndexChanged.connect(self.roastedContainerChanged)
             self.containerRoastedComboBox.setCurrentIndex(self.container_menu_idx(self.aw.container2_idx))
             self.updateRoastedContainerWeight()
@@ -1972,8 +1972,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     def container_menu_idx(i:int) -> int: # takes a container idx and returns the index of the corresponding menu item
         return i + 3 # skip <edit>, separator and empty index
 
+    # if adjust_index is True (default), the self.aw.container1_idx is updated to still point to the previous entry if possible
     @pyqtSlot()
-    def updateGreenContainerPopup(self) -> None:
+    def updateGreenContainerPopup(self, adjust_index:bool=True) -> None:
         prev_item_count = self.containerGreenComboBox.count()
         with QSignalBlocker(self.containerGreenComboBox): # blocking all signals, especially its currentIndexChanged connected to tareChanged which would lead to cycles
             self.containerGreenComboBox.clear()
@@ -1985,14 +1986,15 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             view: Optional[QAbstractItemView] = self.containerGreenComboBox.view()
             if view is not None:
                 view.setMinimumWidth(width)
-        if self.containerGreenComboBox.count() > prev_item_count:
-            # if item list is longer (new items added), we select the last item
-            self.aw.container1_idx = self.containerGreenComboBox.count() - 4
-        if len(self.aw.qmc.container_weights) > self.aw.container1_idx:
-            self.containerGreenComboBox.setCurrentIndex(self.container_menu_idx(self.aw.container1_idx))
-        else:
-            self.containerGreenComboBox.setCurrentIndex(2) # reset to the empty entry
-            self.aw.container1_idx = -1
+        if adjust_index:
+            if self.containerGreenComboBox.count() > prev_item_count:
+                # if item list is longer (new items added), we select the last item
+                self.aw.container1_idx = self.containerGreenComboBox.count() - 4
+            if len(self.aw.qmc.container_weights) > self.aw.container1_idx:
+                self.containerGreenComboBox.setCurrentIndex(self.container_menu_idx(self.aw.container1_idx))
+            else:
+                self.containerGreenComboBox.setCurrentIndex(2) # reset to the empty entry
+                self.aw.container1_idx = -1
 
     @pyqtSlot(int)
     def greenContainerChanged(self, i:int) -> None:
@@ -2017,8 +2019,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         return self.scale1_weight
 
 
+    # if adjust_index is True (default), the self.aw.container2_idx is updated to still point to the previous entry if possible
     @pyqtSlot()
-    def updateRoastedContainerPopup(self) -> None:
+    def updateRoastedContainerPopup(self, adjust_index:bool=True) -> None:
         prev_item_count = self.containerRoastedComboBox.count()
         with QSignalBlocker(self.containerRoastedComboBox): # blocking all signals, especially its currentIndexChanged connected to tareChanged which would lead to cycles
             self.containerRoastedComboBox.clear()
@@ -2030,14 +2033,15 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             view: Optional[QAbstractItemView] = self.containerGreenComboBox.view()
             if view is not None:
                 view.setMinimumWidth(width)
-        if self.containerRoastedComboBox.count() > prev_item_count:
-            # if item list is longer (new items added), we select the last item
-            self.aw.container2_idx = self.containerRoastedComboBox.count() - 4
-        if len(self.aw.qmc.container_weights) > self.aw.container2_idx:
-            self.containerRoastedComboBox.setCurrentIndex(self.container_menu_idx(self.aw.container2_idx))
-        else:
-            self.containerRoastedComboBox.setCurrentIndex(2) # reset to the empty entry
-            self.aw.container2_idx = -1
+        if adjust_index:
+            if self.containerRoastedComboBox.count() > prev_item_count:
+                # if item list is longer (new items added), we select the last item
+                self.aw.container2_idx = self.containerRoastedComboBox.count() - 4
+            if len(self.aw.qmc.container_weights) > self.aw.container2_idx:
+                self.containerRoastedComboBox.setCurrentIndex(self.container_menu_idx(self.aw.container2_idx))
+            else:
+                self.containerRoastedComboBox.setCurrentIndex(2) # reset to the empty entry
+                self.aw.container2_idx = -1
 
     @pyqtSlot(int)
     def roastedContainerChanged(self, i:int) -> None:
@@ -4006,12 +4010,17 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     message = QApplication.translate('Message','Device set to {0}').format(meter)
                 ##########################
                 ##########################
-                ####  DEVICE 171 is Thermoworks BlueDOT BT
+                ####  DEVICE 175 is Thermoworks BlueDOT BT
                 elif meter == 'Thermoworks BlueDOT':
                     self.aw.qmc.device = 175
                     message = QApplication.translate('Message','Device set to {0}').format(meter)
                 ##########################
-
+                ##########################
+                ####  DEVICE 176 is Aillio Bullet R2
+                ##########################
+                elif meter == 'Aillio Bullet R2':
+                    self.aw.qmc.device = 176
+                    message = QApplication.translate('Message','Device set to {0}').format(meter)
 
                 # ADD DEVICE:
 
@@ -4206,7 +4215,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 172
                 1, # 173
                 1, # 174
-                1  # 175
+                1, # 175
+                1  # 176
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):

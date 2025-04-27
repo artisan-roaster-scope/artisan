@@ -679,7 +679,7 @@ def convertVolume(v:float, i:int, o:int) -> float:
 #         3 => oz
 # if brief is set to 0 (default 0), 3 decimals are returned for lb/kg and 2 for oz/g, if brief > 0 the number of decimals is reduced by that value and
 # the rendering might loose precision
-# with smart_unit_upgrade, a weight like 1600g is rendered more readable as 1.6kg (but leaves 1610g and 1601g as is)
+# with smart_unit_upgrade (default True), a weight like 1600g is rendered more readable as 1.6kg (but leaves 1610g and 1601g as is)
 def render_weight(amount:float, weight_unit_index:int, target_unit_idx:int,
         right_to_left_lang:bool = False, brief:int=0, smart_unit_upgrade:bool=True) -> str:
     w = convertWeight(

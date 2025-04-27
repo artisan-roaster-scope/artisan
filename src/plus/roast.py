@@ -87,15 +87,15 @@ def getTemplate(bp: 'ProfileData', background:bool=False) -> Dict[str, Any]:  #f
             except Exception as e:  # pylint: disable=broad-except
                 _log.exception(e)
             try:
-                w_in = bp['weight'][1]
-                assert isinstance(w_in, (int, float))
+                w_out = bp['weight'][1]
+                assert isinstance(w_out, (int, float))
                 w_unit = bp['weight'][2]
                 assert isinstance(w_unit, str)
                 w = util.limitnum(
                     0,
                     65534,
                     convertWeight(
-                        w_in,
+                        w_out,
                         weight_units.index(w_unit),
                         weight_units.index('Kg'),
                     ),
@@ -106,6 +106,26 @@ def getTemplate(bp: 'ProfileData', background:bool=False) -> Dict[str, Any]:  #f
                     d['end_weight'] = 0
             except Exception as e:  # pylint: disable=broad-except
                 _log.exception(e)
+            if 'defects_weight' in bp:
+                try:
+                    w_defects:float = bp['defects_weight']
+                    w_unit = bp['weight'][2]
+                    assert isinstance(w_unit, str)
+                    w = util.limitnum(
+                        0,
+                        65534,
+                        convertWeight(
+                            w_defects,
+                            weight_units.index(w_unit),
+                            weight_units.index('Kg'),
+                        ),
+                    )
+                    if w is not None:
+                        d['defects_weight'] = util.float2floatMin(w, 4)  # in kg (send one decimal more than presented to prevent rounding effects)
+                    else:
+                        d['defects_weight'] = 0
+                except Exception as e:  # pylint: disable=broad-except
+                    _log.exception(e)
 
         if 'density_roasted' in bp and bp['density_roasted'][0]:
             try:
@@ -484,12 +504,13 @@ sync_record_empty_string_supressed_attributes: List[str] = [  #for Python >= 3.9
 # those will always be send by Artisan also if None or 0:
 sync_record_non_supressed_attributes: List[str] = [  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
     'roast_id',
-    'location',   # default None
-    'coffee',     # default None
-    'blend',      # default None
-    'amount',     # default 0
-    'end_weight', # default 0
-    's_item_id',  # default None
+    'location',       # default None
+    'coffee',         # default None
+    'blend',          # default None
+    'amount',         # default 0
+    'end_weight',     # default 0
+    'defects_weight', # default 0 # introduced in v3.1.2
+    's_item_id',      # default None
 ]
 
 # all roast record attributes that participate in the sync process

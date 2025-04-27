@@ -114,7 +114,7 @@ class modbusport:
 
         self.modbus_serial_read_delay       :Final[float] = 0.035 # in seconds
         self.modbus_serial_write_delay      :Final[float] = 0.080 # in seconds
-        self.modbus_serial_connect_delay    :float = 0.0          # in seconds (user configurable delay after serial connect; important for Arduino based slaves that reboot on connect)
+        self.modbus_serial_connect_delay    :float = 0.5          # in seconds (user configurable delay after serial connect; important for Arduino based slaves that reboot on connect)
 
         self.maxCount:Final[int] = 125 # the maximum number of registers that can be fetched in one request according to the MODBUS spec
         self.readRetries:int = 0  # retries
@@ -391,10 +391,10 @@ class modbusport:
                 if self.isConnected():
                     self.updateActiveRegisters()
                     self.clearReadingsCache()
-                    if self.type in {0,1}:
+                    if self.type in {0,1}: # RTU/ASCII
                         # respect the user defined connect delay on serial connections
                         await asyncio.sleep(self.modbus_serial_connect_delay)
-                    else:
+                    else: # all others
                         await asyncio.sleep(.3) # avoid possible hickups on startup
                     self.aw.sendmessage(QApplication.translate('Message', 'Connected via MODBUS'))
                 else:
@@ -501,9 +501,6 @@ class modbusport:
                         count:int = seq[1]-seq[0] + 1
                         if 0 < count <= self.maxCount:
                             res:Optional[ModbusPDU] = None
-#                            if just_send:
-#                                await self.sleepBetweenAsync() # we start with a sleep, as it could be that just a send command happened before the semaphore was caught
-#                            just_send = True
                             tx:float = time.time()
                             while True:
                                 _log.debug('readActive(%d,%d,%d,%d)', slave, code, register, count)

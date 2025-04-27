@@ -31,7 +31,7 @@ except ImportError:
     from PyQt5.QtGui import QKeySequence, QIntValidator, QTextCharFormat, QTextCursor, QColor # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.widgets import MyQComboBox, ClickableQLineEdit
-from artisanlib.util import comma2dot
+from artisanlib.util import comma2dot, float2float, float2floatWeightVolume, convertWeight, weight_units
 
 from typing import Optional, List, Tuple, cast, Callable, TYPE_CHECKING
 from typing import Final  # Python <=3.7
@@ -648,14 +648,26 @@ class tareDlg(ArtisanDialog):
         self.close()
         super().accept()
 
+    # weight is always in g
     def setTableRow(self, row:int, name:str, weight:float) -> None:
         name_widget = QLineEdit()
         name_widget.setAlignment(Qt.AlignmentFlag.AlignRight)
         name_widget.setText(name)
         weight_widget = ClickableQLineEdit()
         weight_widget.setAlignment(Qt.AlignmentFlag.AlignRight)
-        weight_widget.setText(str(weight))
-        weight_widget.setValidator(QIntValidator(0,1999, weight_widget))
+        # NOTE: we support container weights up to 5kg (11,023lb)
+        if self.aw.qmc.weight[2] == 'g':
+            weight_widget.setText(str(int(round(weight))))
+            weight_widget.setValidator(QIntValidator(0,9999, weight_widget))
+        elif self.aw.qmc.weight[2] == 'Kg':
+            w = convertWeight(weight,0,weight_units.index(self.aw.qmc.weight[2]))
+            weight_widget.setText(f'{float2floatWeightVolume(w):g}')
+            weight_widget.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, weight_widget)) # the max limit has to be high enough otherwise the connected signals are not send!
+
+        else:
+            w = convertWeight(weight,0,weight_units.index(self.aw.qmc.weight[2]))
+            weight_widget.setText(f'{float2floatWeightVolume(w):g}')
+            weight_widget.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, weight_widget))
         weight_widget.editingFinished.connect(self.weightEdited)
         self.taretable.setCellWidget(row, 0, name_widget)
         self.taretable.setCellWidget(row, 1, weight_widget)
@@ -680,15 +692,16 @@ class tareDlg(ArtisanDialog):
 
     def saveTareTable(self) -> None:
         tars = self.taretable.rowCount()
-        names = []
-        weights = []
+        names:List[str] = []
+        weights:List[float] = []
         for i in range(tars):
             nameWidget = cast(QLineEdit, self.taretable.cellWidget(i,0))
             name = nameWidget.text()
             weightWidget = cast(QLineEdit, self.taretable.cellWidget(i,1))
-            weight = 0
+            weight:float = 0
             try:
-                weight = int(round(float(comma2dot(weightWidget.text()))))
+                w = convertWeight(float(comma2dot(weightWidget.text())),weight_units.index(self.aw.qmc.weight[2]),0)
+                weight = float2float(w) # stored in g as floats with one decimals
             except Exception: # pylint: disable=broad-except
                 pass
             names.append(name)
@@ -698,20 +711,26 @@ class tareDlg(ArtisanDialog):
 
     @pyqtSlot()
     def weightEdited(self) -> None:
-        _log.debug('PRINT weightEdited')
         sender = self.sender()
         if sender and isinstance(sender, QLineEdit):
             text = sender.text().strip()
             if text == '':
-                w = self.get_scale_weight() # read value from scale in 'g'
+                w:Optional[float] = self.get_scale_weight() # read value from scale in 'g'
                 sender.setText(str(w if w is not None and w > 0 else 0))
+            elif self.aw.qmc.weight[2] == 'Kg':
+                # if container weight in kg, but input value > 10, we interpret it as in g
+                w = float(comma2dot(text))
+                if w > 10:
+                    w = convertWeight(w,0,weight_units.index(self.aw.qmc.weight[2]))
+                    sender.setText(f'{float2floatWeightVolume(w):g}')
 
     def createTareTable(self) -> None:
         self.taretable.clear()
         self.taretable.setRowCount(len(self.aw.qmc.container_names))
         self.taretable.setColumnCount(2)
+        unit:str = self.aw.qmc.weight[2].lower()
         self.taretable.setHorizontalHeaderLabels([QApplication.translate('Table','Name'),
-                                                         QApplication.translate('Table','Weight')])
+                                                         f"{QApplication.translate('Table','Weight')} ({unit})"])
         self.taretable.setAlternatingRowColors(True)
         self.taretable.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.taretable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
@@ -728,4 +747,4 @@ class tareDlg(ArtisanDialog):
         if header is not None:
             header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
             header.setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)
-        self.taretable.setColumnWidth(1,65)
+        self.taretable.setColumnWidth(1,80)

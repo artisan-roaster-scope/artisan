@@ -227,7 +227,7 @@ class tgraphcanvas(FigureCanvas):
         'extraNoneTempHint2', 'plotcurves', 'plotcurvecolor', 'overlapList', 'tight_layout_params', 'fig', 'ax', 'delta_ax', 'legendloc', 'legendloc_pos', 'onclick_cid',
         'oncpick_cid', 'ondraw_cid', 'onmove_cid', 'rateofchange1', 'rateofchange2', 'flagon', 'flagstart', 'flagKeepON', 'flagOpenCompleted', 'flagsampling', 'flagsamplingthreadrunning',
         'manuallogETflag', 'zoom_follow', 'alignEvent', 'compareAlignEvent', 'compareEvents', 'compareET', 'compareBT', 'compareDeltaET', 'compareDeltaBT', 'compareMainEvents', 'compareBBP', 'compareRoast', 'compareExtraCurves1', 'compareExtraCurves2',
-        'replayType', 'replayedBackgroundEvents', 'last_replayed_events', 'beepedBackgroundEvents', 'roastpropertiesflag', 'roastpropertiesAutoOpenFlag', 'roastpropertiesAutoOpenDropFlag',
+        'replayType', 'replayDropType', 'replayedBackgroundEvents', 'last_replayed_events', 'beepedBackgroundEvents', 'roastpropertiesflag', 'roastpropertiesAutoOpenFlag', 'roastpropertiesAutoOpenDropFlag',
         'title', 'title_show_always', 'ambientTemp', 'ambientTempSource', 'ambient_temperature_device', 'ambient_pressure', 'ambient_pressure_device', 'ambient_humidity',
         'ambient_humidity_device', 'elevation', 'temperaturedevicefunctionlist', 'humiditydevicefunctionlist', 'pressuredevicefunctionlist', 'moisture_greens', 'moisture_roasted',
         'greens_temp', 'beansize', 'beansize_min', 'beansize_max', 'whole_color', 'ground_color', 'color_systems', 'color_system_idx', 'heavyFC_flag', 'lowFC_flag', 'lightCut_flag',
@@ -325,7 +325,7 @@ class tgraphcanvas(FigureCanvas):
         'foreground_event_pos', 'plus_lockSchedule_sent_account', 'plus_lockSchedule_sent_date', 'specialeventplaybackramp',
         'CO2kg_per_BTU_default', 'CO2kg_per_BTU', 'Biogas_CO2_Reduction', 'Biogas_CO2_Reduction_default',
         'meterunitnames', 'meterreads_default', 'meterreads', 'meterlabels_setup', 'meterlabels', 'meterunits_setup', 'meterunits',
-        'meterfuels_setup', 'meterfuels', 'metersources_setup', 'metersources'
+        'meterfuels_setup', 'meterfuels', 'metersources_setup', 'metersources', 'playbackdrop_min_roasttime', 'TP_max_roasttime'
         ]
 
 
@@ -350,6 +350,10 @@ class tgraphcanvas(FigureCanvas):
         self.palette1 = self.palette.copy()
         self.EvalueColor_default:Final[List[str]] = ['#43a7cf','#49b160','#800080','#ad0427']
         self.EvalueTextColor_default:Final[List[str]] = ['#ffffff','#ffffff','#ffffff','#ffffff']
+
+        self.playbackdrop_min_roasttime:int = 4*60 # in seconds; DROP is not replayed before this time after CHARGE
+
+        self.TP_max_roasttime:int = 2*60 # in seconds; time after CHARGE TP is automatically registered if not registered before (NOTE: event replay by-temp falls back to replay by-time until TP is registered)
 
 
         # standard math functions allowed in symbolic formulas
@@ -908,7 +912,8 @@ class tgraphcanvas(FigureCanvas):
                        '+Santoker IR/Board',        #172
                        '+Santoker DelatBT/DeltaET', #173
                        'ColorTrack BT',             #174
-                       'Thermoworks BlueDOT'        #175
+                       'Thermoworks BlueDOT',       #175
+                       'Aillio Bullet R2'           #176
                        ]
 
         # ADD DEVICE:
@@ -976,7 +981,8 @@ class tgraphcanvas(FigureCanvas):
             164, # Mugma BT/ET
             171, # Santoker R BT/ET
             174, # ColorTrack BT
-            175  # Thermoworks BlueDOT
+            175, # Thermoworks BlueDOT
+            176  # Aillio Bullet R2
         ]
 
         # ADD DEVICE:
@@ -1222,7 +1228,9 @@ class tgraphcanvas(FigureCanvas):
         self.compareBBP:bool = False # if True incl. BBP
         self.compareRoast:bool = True # if False roast should not be compared (self.compareBBP should be True in this case!)
 
-        self.replayType:int = 0 # 0: by time, 1: by BT, 2: by ET
+        self.replayType:int = 0 # 0: by time, 1: by BT, 2: by ET, 3: by time/BT, 4: by time/ET
+        self.replayDropType:int = 0 # 0: by time, 1: by BT, 2: by ET
+
         self.replayedBackgroundEvents:Set[int] = set()  # set of BackgroundEvent indices that have already been replayed (cleared in ClearMeasurements)
         self.beepedBackgroundEvents:Set[int] = set()   # set of BackgroundEvent indices that have already been beeped for (cleared in ClearMeasurements)
 
@@ -1471,7 +1479,7 @@ class tgraphcanvas(FigureCanvas):
         self.roasterheating_setup_default:int = 0 # the default to present on setup as loaded from the machine setup
         self.drumspeed_setup:str = ''
         #
-        self.last_batchsize:float = 0 # in unit of self.weight[2]; remember the last batchsize used to be applied as default for the next batch
+        self.last_batchsize:float = 0 # in g; remember the last batchsize used to be applied as default for the next batch
         #
         self.machinesetup_energy_ratings:Optional[Dict[int,Dict[float, Dict[str,List[Any]]]]] = None # read from predefined machine setups and used if available to set energy defaults
         #
@@ -1610,6 +1618,8 @@ class tgraphcanvas(FigureCanvas):
         #[0]weight in, [1]weight out, [2]units (string)
         self.weight:Tuple[float,float,str] = (0, 0, weight_units[1])
 
+        self.roasted_defects_weight:float = 0 # weight of defects sorted from roasted weight in unit self.weight[2] (should always be positive and less than self.weight[1])
+
         #[0]volume in, [1]volume out, [2]units (string)
         self.volume:Tuple[float,float,str] = (0, 0, volume_units[0])
 
@@ -1618,6 +1628,7 @@ class tgraphcanvas(FigureCanvas):
         # density weight and volume units are not to be used any longer and assumed to be fixed to g/l
         # thus also probe volume is not used anymore, and only self.density[0] holds the green been density in g/l
 
+        self.roasted_defects_mode:bool = True # True: input defects, False, input resulting sorted weight
         self.density_roasted:Tuple[float,str,float,str] = (0,'g',1.,'l') # this holds the roasted beans density in g/l
 
 
@@ -1636,7 +1647,7 @@ class tgraphcanvas(FigureCanvas):
 
         # container scale tare
         self.container_names:List[str] = []
-        self.container_weights:List[int] = [] # all weights in g and as int
+        self.container_weights:List[float] = [] # all weights in g and as float
         self.container_idx:int = -1 # the empty field (as -1 + 2 = 1)
 
         #stores _indexes_ of self.timex to record events.
@@ -2388,7 +2399,7 @@ class tgraphcanvas(FigureCanvas):
         self.lazyredraw_on_resize_timer.timeout.connect(self.lazyredraw_on_resize)
         self.lazyredraw_on_resize_timer.setSingleShot(True)
 
-        self.updategraphicsSignal.connect(self.updategraphics)
+        self.updategraphicsSignal.connect(self.updategraphics, type=Qt.ConnectionType.QueuedConnection) # type: ignore
         self.updateLargeLCDsSignal.connect(self.updateLargeLCDs)
         self.updateLargeLCDsReadingsSignal.connect(self.updateLargeLCDsReadings)
         self.setTimerLargeLCDcolorSignal.connect(self.setTimerLargeLCDcolor)
@@ -2444,7 +2455,7 @@ class tgraphcanvas(FigureCanvas):
              device_id in self.specialDevices
              )
 
-    def get_container_weight(self, container_idx:int) -> Optional[int]:
+    def get_container_weight(self, container_idx:int) -> Optional[float]:
         if len(self.container_weights) > container_idx >= 0:
             return self.container_weights[container_idx]
         return None
@@ -3450,11 +3461,15 @@ class tgraphcanvas(FigureCanvas):
                                         self.timeB[time_idx],
                                         event_ydata,
                                         tempo)
-                    # redraw
-                    if self.flagon:
-                        self.redraw_keep_view(recomputeAllDeltas=False)
-                    else:
-                        self.fig.canvas.draw_idle()
+#                    # redraw
+#                    if self.flagon:
+#                        self.redraw_keep_view(recomputeAllDeltas=False)
+#                    else:
+#                         self.fig.canvas.draw_idle()
+                    self.fig.canvas.draw_idle() # seems to be fine even while logging!
+                    # we update the canvas immediately to get the RoR projections drawn again
+                    if self.flagstart and  self.timeindex[0] > -1:
+                        self.updategraphicsSignal.emit()
                 elif self.legend is not None:
                     QTimer.singleShot(1,self.updateBackground)
 
@@ -4763,6 +4778,14 @@ class tgraphcanvas(FigureCanvas):
                                 self.autoChargeIdx = length_of_qmc_timex - b
                                 self.markChargeSignal.emit(False) # this queues an event which forces a realignment/redraw by resetting the cache ax_background and fires the CHARGE action
 
+                        elif self.TPalarmtimeindex is None and self.timeindex[0] > -1 and len(sample_timex)>0 and ((sample_timex[-1] - sample_timex[self.timeindex[0]]) > self.TP_max_roasttime):
+                            try:
+                                # if 2:00min (self.TP_max_roasttime) into the roast and TPalarmtimeindex alarmindex not yet set,
+                                # we place the TPalarmtimeindex at the current index to enable in airoasters without TP the autoDRY and autoFCs functions and activate the TP Phases LCDs
+                                self.TPalarmtimeindex = length_of_qmc_timex - 1
+                            except Exception as e: # pylint: disable=broad-except
+                                _log.exception(e)
+
                         # check for TP event if already CHARGEed and not yet recognized (earliest in the next call to sample())
                         elif self.TPalarmtimeindex is None and self.timeindex[0] > -1 and not self.timeindex[1] and self.timeindex[0]+8 < len(sample_temp2) and self.checkTPalarmtime():
                             try:
@@ -4774,13 +4797,7 @@ class tgraphcanvas(FigureCanvas):
                                     self.markTPSignal.emit() # queued
                             except Exception as e: # pylint: disable=broad-except
                                 _log.exception(e)
-                            try:
-                                # if 2:30min into the roast and TPalarmtimeindex alarmindex not yet set,
-                                # we place the TPalarmtimeindex at the current index to enable in airoasters without TP the autoDRY and autoFCs functions and activate the TP Phases LCDs
-                                if self.TPalarmtimeindex is None and ((sample_timex[-1] - sample_timex[self.timeindex[0]]) > 150):
-                                    self.TPalarmtimeindex = length_of_qmc_timex - 1
-                            except Exception as e: # pylint: disable=broad-except
-                                _log.exception(e)
+
                         # autodetect DROP event
                         # only if 7min into roast and BT>160C/320F
                         if self.autoDropIdx == 0 and self.autoDropFlag and self.autoDROPenabled and self.timeindex[0] > -1 and self.timeindex[6] == 0 and \
@@ -5452,7 +5469,10 @@ class tgraphcanvas(FigureCanvas):
                         ts = tx
 
                     # if more than max cool (from statistics) past DROP and not yet COOLend turn the time LCD red:
-                    if self.timeindex[0]!=-1 and self.timeindex[6] and not self.timeindex[7] and ((len(self.timex) == 1+self.timeindex[6]) or (4*60+2 > (tx - self.timex[self.timeindex[6]]) > 4*60)):
+                    if (self.timeindex[0]!=-1 and self.timeindex[6] and
+                            not self.timeindex[7] and
+                            ((len(self.timex) == 1+self.timeindex[6]) or
+                                (len(self.timex)>self.timeindex[6] and (4*60+2 > (tx - self.timex[self.timeindex[6]]) > 4*60)))):
                         # switch LCD color to "cooling" color (only after 4min cooling we switch to slowcoolingtimer color)
                         if (tx - self.timex[self.timeindex[6]]) > 4*60:
                             timer_color = 'slowcoolingtimer'
@@ -5884,16 +5904,16 @@ class tgraphcanvas(FigureCanvas):
                 _, _, exc_tb = sys.exc_info()
                 self.adderror((QApplication.translate('Error Message','Exception:') + ' processAlarm() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
-    # called only after CHARGE with at least 7min into the roast
+    # called only after CHARGE with at least 4min into the roast
     def playbackdrop(self) -> None:
         try:
             #needed when using device NONE
-            if (self.timeindex[0] > -1 and self.autoDropIdx == 0 and self.timex and self.timeindexB[6]>0 and self.timeindex[6] == 0 and
-                (self.timex[-1] - self.timex[self.timeindex[0]]) > 7*60 and
-                ((self.replayType == 0 and self.timeB[self.timeindexB[6]] - self.timeclock.elapsed()/1000. <= 0) or # by time
-                    (self.replayType == 1 and len(self.ctemp2)>0 and len(self.stemp2B)>self.timeindexB[6] and  # pylint: disable=chained-comparison
+            if (self.timeindex[0] > -1 and self.autoDropIdx == 0 and len(self.timex)>0 and self.timeindexB[6]>0 and self.timeindex[6] == 0 and
+                (self.timex[-1] - self.timex[self.timeindex[0]]) > self.playbackdrop_min_roasttime and
+                ((self.replayDropType == 0 and self.timeB[self.timeindexB[6]] - self.timeclock.elapsed()/1000. <= 0) or # by time
+                    (self.replayDropType == 1 and len(self.ctemp2)>0 and len(self.stemp2B)>self.timeindexB[6] and  # pylint: disable=chained-comparison
                         self.TPalarmtimeindex and self.ctemp2[-1] is not None and self.stemp2B[self.timeindexB[6]] - self.ctemp2[-1] <= 0) or # by BT
-                    (self.replayType == 2 and len(self.ctemp1)>0 and len(self.stemp1B)>self.timeindexB[6] and  # pylint: disable=chained-comparison
+                    (self.replayDropType == 2 and len(self.ctemp1)>0 and len(self.stemp1B)>self.timeindexB[6] and  # pylint: disable=chained-comparison
                         self.TPalarmtimeindex and self.ctemp1[-1] is not None and self.stemp1B[self.timeindexB[6]] - self.ctemp1[-1] <= 0))): # by ET
                 self.autoDropIdx = len(self.timex) - 2
                 self.markDropSignal.emit(False)
@@ -5904,7 +5924,7 @@ class tgraphcanvas(FigureCanvas):
 
 
     # update the cache (self.replayedBackgroundEvents) which holds the background events considered to have been already triggered to prevent
-    # to have them triggered again. All events before NOW are considered to have been triggered already.
+    # them to be triggered again. All events before NOW are considered to have been triggered already.
     def updateReplayedBackgroundEvents(self) -> None:
         self.replayedBackgroundEvents = set()
         if self.flagstart:
@@ -5926,6 +5946,7 @@ class tgraphcanvas(FigureCanvas):
                     # switching on short after CHARGE, does not disable background events before CHARGE
                     self.replayedBackgroundEvents.add(i)
 
+
     # turns playback event on and fills self.replayedBackgroundEvents with already passed events (w.r.t. time) if any
     def turn_playback_event_ON(self) -> None:
         if not self.backgroundPlaybackEvents:
@@ -5939,6 +5960,15 @@ class tgraphcanvas(FigureCanvas):
 
     # called only after CHARGE
     def playbackevent(self) -> None:
+
+        # returns the last registered foreground event index for the given event type, or None if no event of that type has been registered yet
+        @functools.lru_cache(maxsize=10)
+        def last_registered_foreground_event(event_type:int) -> Optional[int]:
+            try:
+                return len(self.specialeventstype) - 1 - self.specialeventstype[::-1].index(event_type) # index of last foreground event if any; except otherwise
+            except ValueError:
+                return None
+
         try:
             #needed when using device NONE
             if self.timex:
@@ -5956,7 +5986,7 @@ class tgraphcanvas(FigureCanvas):
                 ramps:List[Optional[int]] = [None,None,None,None]  # holds the time or temp ramp value to be applied per event type, calculated from last_replayed_events and the succeeding event
 
                 slider_events = {} # keep event type value pairs to move sliders (but only once per slider and per interval!)
-                next_byTemp_checked:List[bool] = [False,False,False,False] # we take care to reply events by temperature in order
+                next_byTemp_checked:List[bool] = [False,False,False,False] # we take care to reply events by temperature in order; if the next event cannot be triggered by-temp we prevent to trigger the but next as is likely to trigger as we assume always increasing temperatures; but not the next in the row!
 
                 # after an replay by-temp event is checked we set the flag corresponding to its event type in next_byTemp_checked to prevent further checking of this type for by-temp
                 # preventing later events to trigger by-temp to keep events triggered in-order (we assume temps increase and without this all further event will trigger immediately!)
@@ -5973,54 +6003,37 @@ class tgraphcanvas(FigureCanvas):
                         now = self.timeclock.elapsedMilli()
 
                         if (i not in self.replayedBackgroundEvents and # never replay one event twice
-                            not end_reached[event_type] and # we already reached the next event of this type after the first enabled one
+                            not end_reached[event_type] and # we already reached the next event of this type after the first enabled (not yet replayed) one
+                            (self.timeindexB[6]==0 or bge <= self.timeindexB[6]) and # don't replay events that happened after DROP in the backgroundprofile
                             event_type < 4 and len(self.timeB)>bge):
 
-                            timed = self.timeB[bge] - now
-                            delta:float = 1 # by default don't trigger this one
-                            increasing:bool = True
+                            last_registered_foreground_event_idx:Optional[int] = last_registered_foreground_event(event_type)
+                            # if last registered foreground event value is lower than this background events value
+                            # we replay this one by temperature, otherwise by time in mixed mode replay mode (self.replayType in {3,4})
+                            value_decreasing:bool = (last_registered_foreground_event_idx is not None and
+                                len(self.specialeventsvalue)>last_registered_foreground_event_idx and
+                                self.specialeventsvalue[last_registered_foreground_event_idx] > self.backgroundEvalues[i])
 
-                            if (self.timeindexB[6]==0 or bge <= self.timeindexB[6]):
-                                # don't replay events that happened after DROP in the backgroundprofile (but still apply the last ramp!)
-                                if self.replayType == 0: # replay by time
+                            timed = self.timeB[bge] - now
+                            delta:float = 99999 # by default don't trigger this one
+
+                            if self.replayType == 0 or (self.replayType in {3, 4} and not value_decreasing): # replay by time (also in mixed replay mode if value increases)
+                                delta = timed
+
+                            elif not next_byTemp_checked[event_type] and (self.replayType == 1 or (self.replayType == 3 and value_decreasing)): # replay by BT (after TP)
+                                if self.TPalarmtimeindex is not None:
+                                    if len(self.ctemp2)>0 and self.ctemp2[-1] is not None and len(self.stemp2B)>bge:
+                                        delta = self.stemp2B[bge] - self.ctemp2[-1]
+                                    next_byTemp_checked[event_type] = True # prevent later events to trigger
+                                else: # before TP we switch back to time-based
                                     delta = timed
-                                elif not next_byTemp_checked[event_type] and self.replayType == 1: # replay by BT (after TP)
-                                    if self.TPalarmtimeindex is not None:
-                                        if len(self.ctemp2)>0 and self.ctemp2[-1] is not None and len(self.stemp2B)>bge:
-                                            delta = self.stemp2B[bge] - self.ctemp2[-1]
-# disable "decreasing" support for now (might lead to issues)
-#                                            try:
-#                                                # if last registered event of event_type has higher BT as next to be replayed one, we
-#                                                # expect a temperature decrease instead of an increase
-#                                                last_registered_event_index = len(self.specialeventstype) - 1 - self.specialeventstype[::-1].index(event_type)
-#                                                if self.ctemp2[self.specialevents[last_registered_event_index]] > self.stemp2B[bge]:
-#                                                    delta = self.ctemp2[-1] - self.stemp2B[bge]
-#                                                    increasing = False
-#                                            except Exception: # pylint: disable=broad-except
-#                                                # a previous event of that type might not yet exist
-#                                                pass
-                                    else: # before TP we switch back to time-based
-                                        delta = timed
-                                    next_byTemp_checked[event_type] = True
-                                elif not next_byTemp_checked[event_type] and self.replayType == 2: # replay by ET (after TP)
-                                    if self.TPalarmtimeindex is not None:
-                                        if len(self.ctemp1)> 0 and self.ctemp1[-1] is not None and len(self.stemp1B)>bge:
-                                            delta = self.stemp1B[bge] - self.ctemp1[-1]
-#                                            try:
-#                                                # if last registered event of event_type has higher BT as next to be replayed one, we
-#                                                # expect a temperature decrease instead of an increase
-#                                                last_registered_event_index = len(self.specialeventstype) - 1 - self.specialeventstype[::-1].index(event_type)
-#                                                if self.ctemp1[self.specialevents[last_registered_event_index]] > self.stemp1B[bge]:
-#                                                    delta = self.ctemp1[-1] - self.stemp1B[bge]
-#                                                    increasing = False
-#                                            except Exception: # pylint: disable=broad-except
-#                                                # a previous event of that type might not yet exist
-#                                                pass
-                                    else: # before TP we switch back to time-based
-                                        delta = timed
-                                    next_byTemp_checked[event_type] = True
-                                else:
-                                    delta = 99999 # don't trigger this one
+                            elif not next_byTemp_checked[event_type] and (self.replayType == 2 or (self.replayType == 4 and value_decreasing)): # replay by ET (after TP)
+                                if self.TPalarmtimeindex is not None:
+                                    if len(self.ctemp1)> 0 and self.ctemp1[-1] is not None and len(self.stemp1B)>bge:
+                                        delta = self.stemp1B[bge] - self.ctemp1[-1]
+                                    next_byTemp_checked[event_type] = True # prevent later events to trigger
+                                else: # before TP we switch back to time-based
+                                    delta = timed
 
                             if (reproducing is None and self.specialeventplaybackaid[event_type] and  # only show playback aid for event types with activated playback aid
                                     self.backgroundReproduce and 0 < timed < self.detectBackgroundEventTime):
@@ -6069,7 +6082,7 @@ class tgraphcanvas(FigureCanvas):
                                     #       END ramp soak mode
 
                                     self.aw.fujipid.replay(self.backgroundEStrings[i])
-                                    libtime.sleep(.5)  #avoid possible close times (rounding off)
+                                    libtime.sleep(.3)  #avoid possible close times (rounding off)
 
 
                                 # if playbackevents is active, we fire the event by moving the slider, but only if
@@ -6078,23 +6091,21 @@ class tgraphcanvas(FigureCanvas):
                                 if (self.backgroundPlaybackEvents and event_type < 4 and
                                         self.specialeventplayback[event_type] and # only replay event types activated for replay
                                         (str(self.etypesf(event_type) == str(self.Betypesf(event_type)))) and
-                                        #self.aw.eventslidervisibilities[event_type] and
                                         len(self.backgroundEvalues)>i):
                                     slider_events[event_type] = self.eventsInternal2ExternalValue(self.backgroundEvalues[i]) # add to dict (later overwrite earlier slider moves!)
 
                                 self.replayedBackgroundEvents.add(i) # in any case we mark this event as processed
 
-                            elif self.backgroundPlaybackEvents and event_type < 4:
+                            elif self.backgroundPlaybackEvents and event_type < 4: # Note that this playbackevent() is also called if only self.backgroundReproduce is True in which case we do not want any ramping
 
                                 # we reached a background event (in order) which is not yet ready for (direct) replay
                                 # as we assume all further events of this type will as well not fire as they are ordered by time and
                                 # temperatures which are assumed to increase
                                 end_reached[event_type] = True
 
-                                if (event_type not in slider_events and # only if there is no slider event of the corresponding type
-                                        self.specialeventplayback[event_type] and # only replay event types activated for replay
+                                if (event_type not in slider_events and               # only if there is no slider event of the corresponding type
+                                        self.specialeventplayback[event_type] and     # only replay event types activated for replay
                                         (str(self.etypesf(event_type) == str(self.Betypesf(event_type)))) and
-                                        #self.aw.eventslidervisibilities[event_type] and # we ramp also events of invisible sliders
                                         self.specialeventplaybackramp[event_type]):   # only calculate ramp for ramping events
 
                                     ## calculate ramping
@@ -6104,7 +6115,6 @@ class tgraphcanvas(FigureCanvas):
 
                                     last_registered_background_event_idx:Optional[int] = None
                                     last_registered_background_event_time:Optional[float] = None
-                                    last_registered_foreground_event_idx:Optional[int] = None
                                     last_registered_foreground_event_time:Optional[float] = None
                                     TP_time:Optional[float] = None
                                     try:
@@ -6114,12 +6124,8 @@ class tgraphcanvas(FigureCanvas):
                                             last_registered_background_event_time = self.timeB[self.backgroundEvents[last_registered_background_event_idx]]
                                     except ValueError: # index access fails if there is no such event/index
                                         pass
-                                    try:
-                                        last_registered_foreground_event_idx = len(self.specialeventstype) - 1 - self.specialeventstype[::-1].index(event_type) # index of last foreground event if any; except otherwise
-                                        if last_registered_foreground_event_idx is not None:
-                                            last_registered_foreground_event_time = self.timex[self.specialevents[last_registered_foreground_event_idx]]
-                                    except ValueError:
-                                        pass
+                                    if last_registered_foreground_event_idx is not None:
+                                        last_registered_foreground_event_time = self.timex[self.specialevents[last_registered_foreground_event_idx]]
                                     try:
                                         if self.TPalarmtimeindex is not None:
                                             TP_time = self.timex[self.TPalarmtimeindex]
@@ -6139,6 +6145,7 @@ class tgraphcanvas(FigureCanvas):
                                         last_event_idx = last_registered_foreground_event_idx
                                         last_event_time = last_registered_foreground_event_time
                                         last_event_value = self.eventsInternal2ExternalValue(self.specialeventsvalue[last_registered_foreground_event_idx])
+
                                         # only if there is a last_event after TP we do ramping by temperature
                                         if TP_time is not None and TP_time < last_event_time and len(self.specialevents)>last_event_idx:
                                             last_event_temp1 = self.temp1[self.specialevents[last_event_idx]]
@@ -6157,22 +6164,21 @@ class tgraphcanvas(FigureCanvas):
                                         current_temp:Optional[float] = None
 
                                         # for ramp by BT only after TP
-                                        if (last_event_temp2 is not None and self.replayType == 1 and len(self.temp2)>1 and self.temp2[-1] != -1 and
-                                                self.temp2[-2] != -1 and ((increasing and self.temp2[-1] >= self.temp2[-2]) or (not increasing and self.temp2[-1] <= self.temp2[-2])) and
+                                        if (last_event_temp2 is not None and (self.replayType == 1 or (self.replayType == 3 and value_decreasing)) and len(self.temp2)>1 and self.temp2[-1] != -1 and
+                                                self.temp2[-2] != -1 and self.temp2[-1] >= self.temp2[-2] and
                                                 len(self.temp2B) > bge):
                                             last_event_temp = last_event_temp2
                                             next_event_temp = self.temp2B[bge]
                                             current_temp = self.temp2[-1]
-                                        elif (last_event_temp1 is not None and self.replayType == 2 and len(self.temp1)>1 and self.temp1[-1] != -1 and
-                                                self.temp1[-2] != -1 and ((increasing and self.temp1[-1] >= self.temp1[-2]) or (not increasing and self.temp1[-1] <= self.temp1[-2])) and
+                                        elif (last_event_temp1 is not None and (self.replayType == 2 or (self.replayType == 4 and value_decreasing)) and len(self.temp1)>1 and self.temp1[-1] != -1 and
+                                                self.temp1[-2] != -1 and self.temp1[-1] >= self.temp1[-2] and
                                                 len(self.temp1B) > bge):
                                             last_event_temp = last_event_temp1
                                             next_event_temp = self.temp1B[bge]
                                             current_temp = self.temp1[-1]
 
                                         # compute ramp value if possible
-                                        if (self.replayType in {1,2} and last_event_temp is not None and next_event_temp is not None and
-                                                last_event_temp is not None and next_event_temp is not None and
+                                        if ((self.replayType in {1,2} or (self.replayType in {3,4} and value_decreasing)) and last_event_temp is not None and next_event_temp is not None and
                                                 current_temp is not None):
                                             # if background event target temperature did increase (or decrease) as the foreground, we ramp by temperature
                                             if min(last_event_temp, next_event_temp) <= current_temp <= max(last_event_temp, next_event_temp):
@@ -6180,8 +6186,11 @@ class tgraphcanvas(FigureCanvas):
                                                 coefficients = numpy.polyfit([last_event_temp, next_event_temp] , [last_event_value, next_event_value], 1)
                                                 ramps[event_type] = numpy.poly1d(coefficients)(current_temp)
                                         elif (last_event_temp is None and next_event_temp is None and
-                                                (self.replayType == 0 or self.TPalarmtimeindex is None) and # replay by time active
-                                                last_event_time is not None and len(self.timeB)>bge):
+                                                (self.replayType == 0 or # if replay by time is selected
+                                                    (last_event_temp1 is None and last_event_temp2 is None) or # if TP is not yet passed or no event after TP and now has been set
+                                                    (last_event_temp2 is not None and (self.replayType == 1 or (self.replayType == 3 and not value_decreasing))) or # replay by BT, but BT did not increase
+                                                    (last_event_temp1 is not None and (self.replayType == 2) or (self.replayType == 4 and not value_decreasing))) # replay by ET, but ET did not increase
+                                                and last_event_time is not None and len(self.timeB)>bge):
                                                   # if replay by temp (as one or both of those event_temps is not None), but current temp did not increase we don't
                                                   # ramp by time instead as this would confuse everything.
                                             # we ramp by (absolute) time (ignoring relative shift by CHARGE)
@@ -6197,6 +6206,7 @@ class tgraphcanvas(FigureCanvas):
                     self.aw.moveslider(k,v)
                     self.aw.sliderReleased(k,force=True)
 
+                # apply ramps
                 for k,ramp_value in enumerate(ramps):
                     if ramp_value is not None:
                         self.aw.moveslider(k, ramp_value)
@@ -7573,7 +7583,11 @@ class tgraphcanvas(FigureCanvas):
                     self.setBatchSizeFromBackground and self.aw.schedule_window is None):
                     self.weight = (float(self.backgroundprofile['weight'][0]),0,str(self.backgroundprofile['weight'][2]))
                 else:
-                    self.weight = (self.last_batchsize,0,self.weight[2])
+                    max_batch_kg = (self.roastersize_setup if self.roastersize_setup>0 else 500)
+                    if self.last_batchsize <= max_batch_kg*1000:
+                        # only initialize with last batch size if smaller than roasters max batchsize or, if not given, maximal 500kg
+                        self.weight = (convertWeight(self.last_batchsize,0,weight_units.index(self.weight[2])),0,self.weight[2])
+                self.roasted_defects_weight = 0
                 self.volume = (0,0,self.volume[2])
                 self.density = (0,self.density[1],1,self.density[3])
                 # we reset ambient values to the last sampled readings in this session
@@ -10234,180 +10248,181 @@ class tgraphcanvas(FigureCanvas):
                             eventannotationprop.set_size('x-small')
                             for i in range(Nevents):
                                 pos = max(0,int(round((self.specialeventsvalue[i]-1)*10)))
-                                txx = self.timex[self.specialevents[i]]
-                                skip_event = not self.flagstart and ((not self.foregroundShowFullflag and (not self.autotimex or self.autotimexMode == 0) and self.timeindex[0] > -1 and txx < self.timex[self.timeindex[0]]) or
-                                            (not self.foregroundShowFullflag and self.timeindex[6] > 0 and txx > self.timex[self.timeindex[6]]))
-                                try:
-                                    if self.specialeventstype[i] == 0 and self.showEtypes[0]:
-                                        if skip_event:
-                                            if (self.timeindex[0] > -1 and txx < self.timex[self.timeindex[0]]):
-                                                E1_CHARGE = pos # remember event value at CHARGE
-                                                if not self.clampEvents:
-                                                    E1_CHARGE = (E1_CHARGE*event_pos_factor)+event_pos_offset
-                                            # don't draw event lines before CHARGE if foregroundShowFullflag is not set
-                                            continue
-                                        self.E1timex.append(txx)
-                                        if self.clampEvents: # in clamp mode we render also event values higher than 100:
-                                            self.E1values.append(pos)
-                                        else:
-                                            self.E1values.append((pos*event_pos_factor)+event_pos_offset)
-                                        E1_nonempty = True
-                                        E1_last = i
-                                        try:
-                                            if not self.flagon and self.eventsGraphflag!=4 and self.specialeventannovisibilities[0] != 0:
-                                                E1_annotation = self.parseSpecialeventannotation(self.specialeventannotations[0], i)
-                                                temp = self.E1values[-1]
-                                                anno = self.ax.annotate(E1_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
-                                                            alpha=.9,
-                                                            color=self.palette['text'],
-                                                            va='bottom', ha='left',
-                                                            fontproperties=eventannotationprop,
-                                                            path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette['background'])],
-                                                            )
-                                                self.l_eventtype1annos.append(anno)
-                                                try:
-                                                    anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                                except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
-                                                    pass
-                                                try:
-                                                    overlap = self.checkOverlap(anno) #, i, E1_annotation)
-                                                    if overlap:
-                                                        anno.remove()
-                                                except Exception: # pylint: disable=broad-except
-                                                    pass
-                                        except Exception as ex: # pylint: disable=broad-except
-                                            _log.exception(ex)
-                                            _, _, exc_tb = sys.exc_info()
-                                            self.adderror((QApplication.translate('Error Message','Exception:') + ' redraw() anno {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
-                                    elif self.specialeventstype[i] == 1 and self.showEtypes[1]:
-                                        txx = self.timex[self.specialevents[i]]
-                                        if skip_event:
-                                            if (self.timeindex[0] > -1 and txx < self.timex[self.timeindex[0]]):
-                                                E2_CHARGE = pos # remember event value at CHARGE
-                                                if not self.clampEvents:
-                                                    E2_CHARGE = (E2_CHARGE*event_pos_factor)+event_pos_offset
-                                            # don't draw event lines before CHARGE if foregroundShowFullflag is not set
-                                            continue
-                                        self.E2timex.append(txx)
-                                        if self.clampEvents: # in clamp mode we render also event values higher than 100:
-                                            self.E2values.append(pos)
-                                        else:
-                                            self.E2values.append((pos*event_pos_factor)+event_pos_offset)
-                                        E2_nonempty = True
-                                        E2_last = i
-                                        try:
-                                            if not self.flagon and self.eventsGraphflag!=4 and self.specialeventannovisibilities[1] != 0:
-                                                E2_annotation = self.parseSpecialeventannotation(self.specialeventannotations[1], i)
-                                                temp = self.E2values[-1]
-                                                anno = self.ax.annotate(E2_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
-                                                            alpha=.9,
-                                                            color=self.palette['text'],
-                                                            va='bottom', ha='left',
-                                                            fontproperties=eventannotationprop,
-                                                            path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette['background'])],
-                                                            )
-                                                self.l_eventtype2annos.append(anno)
-                                                try:
-                                                    anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                                except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
-                                                    pass
-                                                try:
-                                                    overlap = self.checkOverlap(anno) #, i, E2_annotation)
-                                                    if overlap:
-                                                        anno.remove()
-                                                except Exception: # pylint: disable=broad-except
-                                                    pass
+                                if len(self.timex) > self.specialevents[i]:
+                                    txx = self.timex[self.specialevents[i]]
+                                    skip_event = not self.flagstart and ((not self.foregroundShowFullflag and (not self.autotimex or self.autotimexMode == 0) and self.timeindex[0] > -1 and txx < self.timex[self.timeindex[0]]) or
+                                                (not self.foregroundShowFullflag and self.timeindex[6] > 0 and txx > self.timex[self.timeindex[6]]))
+                                    try:
+                                        if self.specialeventstype[i] == 0 and self.showEtypes[0]:
+                                            if skip_event:
+                                                if (self.timeindex[0] > -1 and txx < self.timex[self.timeindex[0]]):
+                                                    E1_CHARGE = pos # remember event value at CHARGE
+                                                    if not self.clampEvents:
+                                                        E1_CHARGE = (E1_CHARGE*event_pos_factor)+event_pos_offset
+                                                # don't draw event lines before CHARGE if foregroundShowFullflag is not set
+                                                continue
+                                            self.E1timex.append(txx)
+                                            if self.clampEvents: # in clamp mode we render also event values higher than 100:
+                                                self.E1values.append(pos)
+                                            else:
+                                                self.E1values.append((pos*event_pos_factor)+event_pos_offset)
+                                            E1_nonempty = True
+                                            E1_last = i
+                                            try:
+                                                if not self.flagon and self.eventsGraphflag!=4 and self.specialeventannovisibilities[0] != 0:
+                                                    E1_annotation = self.parseSpecialeventannotation(self.specialeventannotations[0], i)
+                                                    temp = self.E1values[-1]
+                                                    anno = self.ax.annotate(E1_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
+                                                                alpha=.9,
+                                                                color=self.palette['text'],
+                                                                va='bottom', ha='left',
+                                                                fontproperties=eventannotationprop,
+                                                                path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette['background'])],
+                                                                )
+                                                    self.l_eventtype1annos.append(anno)
+                                                    try:
+                                                        anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                                    except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
+                                                        pass
+                                                    try:
+                                                        overlap = self.checkOverlap(anno) #, i, E1_annotation)
+                                                        if overlap:
+                                                            anno.remove()
+                                                    except Exception: # pylint: disable=broad-except
+                                                        pass
+                                            except Exception as ex: # pylint: disable=broad-except
+                                                _log.exception(ex)
+                                                _, _, exc_tb = sys.exc_info()
+                                                self.adderror((QApplication.translate('Error Message','Exception:') + ' redraw() anno {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+                                        elif self.specialeventstype[i] == 1 and self.showEtypes[1]:
+                                            txx = self.timex[self.specialevents[i]]
+                                            if skip_event:
+                                                if (self.timeindex[0] > -1 and txx < self.timex[self.timeindex[0]]):
+                                                    E2_CHARGE = pos # remember event value at CHARGE
+                                                    if not self.clampEvents:
+                                                        E2_CHARGE = (E2_CHARGE*event_pos_factor)+event_pos_offset
+                                                # don't draw event lines before CHARGE if foregroundShowFullflag is not set
+                                                continue
+                                            self.E2timex.append(txx)
+                                            if self.clampEvents: # in clamp mode we render also event values higher than 100:
+                                                self.E2values.append(pos)
+                                            else:
+                                                self.E2values.append((pos*event_pos_factor)+event_pos_offset)
+                                            E2_nonempty = True
+                                            E2_last = i
+                                            try:
+                                                if not self.flagon and self.eventsGraphflag!=4 and self.specialeventannovisibilities[1] != 0:
+                                                    E2_annotation = self.parseSpecialeventannotation(self.specialeventannotations[1], i)
+                                                    temp = self.E2values[-1]
+                                                    anno = self.ax.annotate(E2_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
+                                                                alpha=.9,
+                                                                color=self.palette['text'],
+                                                                va='bottom', ha='left',
+                                                                fontproperties=eventannotationprop,
+                                                                path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette['background'])],
+                                                                )
+                                                    self.l_eventtype2annos.append(anno)
+                                                    try:
+                                                        anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                                    except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
+                                                        pass
+                                                    try:
+                                                        overlap = self.checkOverlap(anno) #, i, E2_annotation)
+                                                        if overlap:
+                                                            anno.remove()
+                                                    except Exception: # pylint: disable=broad-except
+                                                        pass
 
-                                        except Exception as ex: # pylint: disable=broad-except
-                                            _log.exception(ex)
-                                            _, _, exc_tb = sys.exc_info()
-                                            self.adderror((QApplication.translate('Error Message','Exception:') + ' redraw() anno {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
-                                    elif self.specialeventstype[i] == 2 and self.showEtypes[2]:
-                                        txx = self.timex[self.specialevents[i]]
-                                        if skip_event:
-                                            if (self.timeindex[0] > -1 and txx < self.timex[self.timeindex[0]]):
-                                                E3_CHARGE = pos # remember event value at CHARGE
-                                                if not self.clampEvents:
-                                                    E3_CHARGE = (E3_CHARGE*event_pos_factor)+event_pos_offset
-                                            # don't draw event lines before CHARGE if foregroundShowFullflag is not set
-                                            continue
-                                        self.E3timex.append(txx)
-                                        if self.clampEvents: # in clamp mode we render also event values higher than 100:
-                                            self.E3values.append(pos)
-                                        else:
-                                            self.E3values.append((pos*event_pos_factor)+event_pos_offset)
-                                        E3_nonempty = True
-                                        E3_last = i
-                                        try:
-                                            if not self.flagon and self.eventsGraphflag!=4 and self.specialeventannovisibilities[2] != 0:
-                                                E3_annotation = self.parseSpecialeventannotation(self.specialeventannotations[2], i)
-                                                temp = self.E3values[-1]
-                                                anno = self.ax.annotate(E3_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
-                                                            alpha=.9,
-                                                            color=self.palette['text'],
-                                                            va='bottom', ha='left',
-                                                            fontproperties=eventannotationprop,
-                                                            path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette['background'])],
-                                                            )
-                                                self.l_eventtype3annos.append(anno)
-                                                try:
-                                                    anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                                except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
-                                                    pass
-                                                try:
-                                                    overlap = self.checkOverlap(anno) #, i, E3_annotation)
-                                                    if overlap:
-                                                        anno.remove()
-                                                except Exception: # pylint: disable=broad-except
-                                                    pass
-                                        except Exception as ex: # pylint: disable=broad-except
-                                            _log.exception(ex)
-                                            _, _, exc_tb = sys.exc_info()
-                                            self.adderror((QApplication.translate('Error Message','Exception:') + ' redraw() anno {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
-                                    elif self.specialeventstype[i] == 3 and self.showEtypes[3]:
-                                        txx = self.timex[self.specialevents[i]]
-                                        if skip_event:
-                                            if (self.timeindex[0] > -1 and txx < self.timex[self.timeindex[0]]):
-                                                E4_CHARGE = pos # remember event value at CHARGE
-                                                if not self.clampEvents:
-                                                    E4_CHARGE = (E4_CHARGE*event_pos_factor)+event_pos_offset
-                                            # don't draw event lines before CHARGE if foregroundShowFullflag is not set
-                                            continue
-                                        self.E4timex.append(txx)
-                                        if self.clampEvents: # in clamp mode we render also event values higher than 100:
-                                            self.E4values.append(pos)
-                                        else:
-                                            self.E4values.append((pos*event_pos_factor)+event_pos_offset)
-                                        E4_nonempty = True
-                                        E4_last = i
-                                        try:
-                                            if not self.flagon and self.eventsGraphflag!=4 and self.specialeventannovisibilities[3] != 0:
-                                                E4_annotation = self.parseSpecialeventannotation(self.specialeventannotations[3], i)
-                                                temp = self.E4values[-1]
-                                                anno = self.ax.annotate(E4_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
-                                                            alpha=.9,
-                                                            color=self.palette['text'],
-                                                            va='bottom', ha='left',
-                                                            fontproperties=eventannotationprop,
-                                                            path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette['background'])],
-                                                            )
-                                                self.l_eventtype4annos.append(anno)
-                                                try:
-                                                    anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                                except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
-                                                    pass
-                                                try:
-                                                    overlap = self.checkOverlap(anno) #, i, E4_annotation)
-                                                    if overlap:
-                                                        anno.remove()
-                                                except Exception: # pylint: disable=broad-except
-                                                    pass
-                                        except Exception as ex: # pylint: disable=broad-except
-                                            _log.exception(ex)
-                                            _, _, exc_tb = sys.exc_info()
-                                            self.adderror((QApplication.translate('Error Message','Exception:') + ' redraw() anno {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
-                                except Exception as e: # pylint: disable=broad-except
-                                    _log.exception(e)
+                                            except Exception as ex: # pylint: disable=broad-except
+                                                _log.exception(ex)
+                                                _, _, exc_tb = sys.exc_info()
+                                                self.adderror((QApplication.translate('Error Message','Exception:') + ' redraw() anno {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+                                        elif self.specialeventstype[i] == 2 and self.showEtypes[2]:
+                                            txx = self.timex[self.specialevents[i]]
+                                            if skip_event:
+                                                if (self.timeindex[0] > -1 and txx < self.timex[self.timeindex[0]]):
+                                                    E3_CHARGE = pos # remember event value at CHARGE
+                                                    if not self.clampEvents:
+                                                        E3_CHARGE = (E3_CHARGE*event_pos_factor)+event_pos_offset
+                                                # don't draw event lines before CHARGE if foregroundShowFullflag is not set
+                                                continue
+                                            self.E3timex.append(txx)
+                                            if self.clampEvents: # in clamp mode we render also event values higher than 100:
+                                                self.E3values.append(pos)
+                                            else:
+                                                self.E3values.append((pos*event_pos_factor)+event_pos_offset)
+                                            E3_nonempty = True
+                                            E3_last = i
+                                            try:
+                                                if not self.flagon and self.eventsGraphflag!=4 and self.specialeventannovisibilities[2] != 0:
+                                                    E3_annotation = self.parseSpecialeventannotation(self.specialeventannotations[2], i)
+                                                    temp = self.E3values[-1]
+                                                    anno = self.ax.annotate(E3_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
+                                                                alpha=.9,
+                                                                color=self.palette['text'],
+                                                                va='bottom', ha='left',
+                                                                fontproperties=eventannotationprop,
+                                                                path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette['background'])],
+                                                                )
+                                                    self.l_eventtype3annos.append(anno)
+                                                    try:
+                                                        anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                                    except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
+                                                        pass
+                                                    try:
+                                                        overlap = self.checkOverlap(anno) #, i, E3_annotation)
+                                                        if overlap:
+                                                            anno.remove()
+                                                    except Exception: # pylint: disable=broad-except
+                                                        pass
+                                            except Exception as ex: # pylint: disable=broad-except
+                                                _log.exception(ex)
+                                                _, _, exc_tb = sys.exc_info()
+                                                self.adderror((QApplication.translate('Error Message','Exception:') + ' redraw() anno {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+                                        elif self.specialeventstype[i] == 3 and self.showEtypes[3]:
+                                            txx = self.timex[self.specialevents[i]]
+                                            if skip_event:
+                                                if (self.timeindex[0] > -1 and txx < self.timex[self.timeindex[0]]):
+                                                    E4_CHARGE = pos # remember event value at CHARGE
+                                                    if not self.clampEvents:
+                                                        E4_CHARGE = (E4_CHARGE*event_pos_factor)+event_pos_offset
+                                                # don't draw event lines before CHARGE if foregroundShowFullflag is not set
+                                                continue
+                                            self.E4timex.append(txx)
+                                            if self.clampEvents: # in clamp mode we render also event values higher than 100:
+                                                self.E4values.append(pos)
+                                            else:
+                                                self.E4values.append((pos*event_pos_factor)+event_pos_offset)
+                                            E4_nonempty = True
+                                            E4_last = i
+                                            try:
+                                                if not self.flagon and self.eventsGraphflag!=4 and self.specialeventannovisibilities[3] != 0:
+                                                    E4_annotation = self.parseSpecialeventannotation(self.specialeventannotations[3], i)
+                                                    temp = self.E4values[-1]
+                                                    anno = self.ax.annotate(E4_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
+                                                                alpha=.9,
+                                                                color=self.palette['text'],
+                                                                va='bottom', ha='left',
+                                                                fontproperties=eventannotationprop,
+                                                                path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette['background'])],
+                                                                )
+                                                    self.l_eventtype4annos.append(anno)
+                                                    try:
+                                                        anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
+                                                    except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
+                                                        pass
+                                                    try:
+                                                        overlap = self.checkOverlap(anno) #, i, E4_annotation)
+                                                        if overlap:
+                                                            anno.remove()
+                                                    except Exception: # pylint: disable=broad-except
+                                                        pass
+                                            except Exception as ex: # pylint: disable=broad-except
+                                                _log.exception(ex)
+                                                _, _, exc_tb = sys.exc_info()
+                                                self.adderror((QApplication.translate('Error Message','Exception:') + ' redraw() anno {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+                                    except Exception as e: # pylint: disable=broad-except
+                                        _log.exception(e)
 
                             E1x:List[Optional[float]]
                             E1y:List[Optional[float]]
@@ -10725,6 +10740,8 @@ class tgraphcanvas(FigureCanvas):
                                         delta=False).tolist()
                                 elif self.interpolateDropsflag: # we don't smooth, but remove the dropouts
                                     self.extrastemp1[i] = fill_gaps(self.extratemp1[i])
+                                else:
+                                    self.extrastemp1[i] = self.extratemp1[i]
                                 if self.aw.extraDelta1[i] and self.delta_ax is not None:
                                     trans = self.delta_ax.transData
                                 else:
@@ -10768,6 +10785,8 @@ class tgraphcanvas(FigureCanvas):
                                         delta=False).tolist()
                                 elif self.interpolateDropsflag:
                                     self.extrastemp2[i] = fill_gaps(self.extratemp2[i])
+                                else:
+                                    self.extrastemp2[i] = self.extratemp2[i]
                                 if self.aw.extraDelta2[i] and self.delta_ax is not None:
                                     trans = self.delta_ax.transData
                                 else:
@@ -11078,6 +11097,10 @@ class tgraphcanvas(FigureCanvas):
                 with warnings.catch_warnings():
                     warnings.simplefilter('ignore')
                     self.fig.canvas.draw_idle()
+
+                # we update the canvas immediately to get the RoR projections drawn again
+                if self.flagstart and  self.timeindex[0] > -1:
+                    self.updategraphicsSignal.emit()
 
     def checkOverlap(self, anno:'Annotation') -> bool:
         if self.ax is None:
@@ -11495,7 +11518,7 @@ class tgraphcanvas(FigureCanvas):
             return notestr
 
         def dropZeroDecimal(value:float, decimals:int) -> float:
-            if int(value) == float2float(value,decimals):
+            if int(round(value)) == float2float(value,decimals):
                 return float2float(value,0)
             return float2float(value, decimals)
 
@@ -11563,7 +11586,7 @@ class tgraphcanvas(FigureCanvas):
                         f'{self.density[1]}/{self.density[3]}')
             elif n == 9:  #Moisture Green
                 if self.moisture_greens:
-                    stattype_str += f"{newline}{QApplication.translate('Label', 'Moisture')} {QApplication.translate('Label', 'Green')}: {dropZeroDecimal(self.moisture_greens,1)}%"
+                    stattype_str += f"{newline}{QApplication.translate('Label', 'Moisture')} {QApplication.translate('Label', 'Green')}: {dropZeroDecimal(self.moisture_greens, self.aw.percent_decimals)}%"
             elif n == 10:  #Batch Size
                 if self.weight[0] != 0:
                     weight_unit_index = weight_units.index(self.weight[2])
@@ -11571,7 +11594,7 @@ class tgraphcanvas(FigureCanvas):
                         f'{render_weight(self.weight[0],weight_unit_index,weight_unit_index)} ')
 
                     if self.weight[1]:
-                        stattype_str += f'(-{dropZeroDecimal(self.aw.weight_loss(self.weight[0],self.weight[1]),1)}%)'
+                        stattype_str += f'(-{dropZeroDecimal(self.aw.weight_loss(self.weight[0],self.weight[1]), self.aw.percent_decimals)}%)'
             elif n == 11:  #Density Roasted
                 roasted_density = (self.aw.qmc.density_roasted[0] if self.aw.qmc.density_roasted[0] != 0 else cp.get('roasted_density', 0))
                 if roasted_density:
@@ -11580,7 +11603,7 @@ class tgraphcanvas(FigureCanvas):
             elif n == 12:  #Moisture Roasted
                 if self.moisture_roasted:
                     stattype_str += (f"{newline}{QApplication.translate('AddlInfo', 'Moisture Roasted')}: "
-                        f'{dropZeroDecimal(self.moisture_roasted,1)}%')
+                        f'{dropZeroDecimal(self.moisture_roasted, self.aw.percent_decimals)}%')
             elif n == 13:  #Ground Color
                 if self.ground_color > 0:
                     stattype_str += (f"{newline}{QApplication.translate('AddlInfo', 'Ground Color')}: #"
@@ -11618,15 +11641,18 @@ class tgraphcanvas(FigureCanvas):
                         f'{render_weight(self.weight[0],weight_unit_index,weight_unit_index)}')
             elif n == 21:  #Weight Roasted
                 if self.weight[1] != 0:
-                    if self.weight[2] == 'g':
-                        w = f'{float2float(self.weight[1],0)}'
-                    else:
-                        w = f'{dropZeroDecimal(self.weight[1],2)}'
+#                    if self.weight[2] == 'g':
+#                        w = f'{float2float(self.weight[1],0)}'
+#                    else:
+#                        w = f'{dropZeroDecimal(self.weight[1],2)}'
+#                    stattype_str += (f"{newline}{QApplication.translate('AddlInfo', 'Weight Roasted')}: "
+#                        f'{w}{self.weight[2].lower()} ')
+                    weight_unit_index = weight_units.index(self.weight[2])
                     stattype_str += (f"{newline}{QApplication.translate('AddlInfo', 'Weight Roasted')}: "
-                        f'{w}{self.weight[2]} ')
+                        f'{render_weight(self.weight[1],weight_unit_index,weight_unit_index)}')
             elif n == 22:  #Weight Loss
                 if self.weight[0] != 0 and self.weight[1] != 0:  # noqa: SIM102
-                    stattype_str += f"{newline}{QApplication.translate('AddlInfo', 'Weight Loss')} -{dropZeroDecimal(self.aw.weight_loss(self.weight[0],self.weight[1]),1)}%"
+                    stattype_str += f"{newline}{QApplication.translate('AddlInfo', 'Weight Loss')} -{dropZeroDecimal(self.aw.weight_loss(self.weight[0],self.weight[1]), self.aw.percent_decimals)}%"
             elif n == 23:  # BBP total time
                 if self.aw.bbp_total_time:
                     stattype_str += f"{newline}{QApplication.translate('HTML Report Template', 'BBP Total Time')} {stringfromseconds(self.aw.bbp_total_time)}"
@@ -11679,6 +11705,27 @@ class tgraphcanvas(FigureCanvas):
             elif n == 32:  #Cupper correction
                 if self.aw.qmc.flavors_total_correction != 0:
                     stattype_str += (f"{newline}{QApplication.translate('Label','Correction')} {self.aw.qmc.flavors_total_correction}")
+            elif n == 33:  #Defects Weight
+                if self.roasted_defects_weight != 0:
+                    weight_unit_index = weight_units.index(self.weight[2])
+                    w = render_weight(self.roasted_defects_weight,weight_unit_index,weight_unit_index)
+                    stattype_str += (f"{newline}{QApplication.translate('AddlInfo', 'Defects Weight')}: "
+                        f'{w}')
+            elif n == 34:  #Defects Loss
+                if self.weight[1] != 0 and self.roasted_defects_weight != 0:  # noqa: SIM102
+                    roast_defects_loss = self.aw.weight_loss(self.weight[1], self.weight[1]-self.roasted_defects_weight)
+                    stattype_str += f"{newline}{QApplication.translate('AddlInfo', 'Defects Loss')} -{dropZeroDecimal(roast_defects_loss, self.aw.percent_decimals)}%"
+            elif n == 35:  #Yield (batch size - roast loss - roast defect loss)
+                if self.weight[0] != 0:  # noqa: SIM102
+                    res_weight = (self.weight[0] - self.roasted_defects_weight if self.weight[1] == 0 else self.weight[1] - self.roasted_defects_weight)
+                    weight_unit_index = weight_units.index(self.weight[2])
+                    stattype_str += (f"{newline}{QApplication.translate('AddlInfo', 'Yield')}: "
+                        f'{render_weight(res_weight, weight_unit_index,weight_unit_index)}')
+            elif n == 36:  #Total Loss (batch size vs resulting weight)
+                if self.weight[0] != 0:  # noqa: SIM102
+                    res_weight = (self.weight[0] - self.roasted_defects_weight if self.weight[1] == 0 else self.weight[1] - self.roasted_defects_weight)
+                    total_loss = self.aw.weight_loss(self.weight[0],res_weight)
+                    stattype_str += f"{newline}{QApplication.translate('AddlInfo', 'Total Loss')} -{dropZeroDecimal(total_loss, self.aw.percent_decimals)}%"
             else:
                 errmsg = (f"{QApplication.translate('Error Message','Exception:')} buildStat() "
                           f"{QApplication.translate('Error Message','Unexpected value for n, got')} {n}")
@@ -15589,12 +15636,12 @@ class tgraphcanvas(FigureCanvas):
                         elif self.ground_color:
                             msg += f'{self.ground_color}#'
                         if self.volume[0] and self.volume[1]:
-                            msg += f'{sep}%{float2float(self.aw.volume_increase(self.volume[0],self.volume[1]),1)}'
+                            msg += f'{sep}%{float2float(self.aw.volume_increase(self.volume[0],self.volume[1]), self.aw.percent_decimals)}'
                         if self.weight[0]:
                             weight_idx = weight_units.index(self.weight[2])
                             msg += f'{sep}{render_weight(self.weight[0], weight_idx, weight_idx)}'
                             if self.weight[1]:
-                                msg += f'{sep}%{float2float(self.aw.weight_loss(self.weight[0],self.weight[1]),1)}-'
+                                msg += f'{sep}%{float2float(self.aw.weight_loss(self.weight[0],self.weight[1]), self.aw.percent_decimals)}-'
                         if totaltime > 0:
                             msg = f'{msg}{sep}{stringfromseconds(totaltime)}'
                         if self.beans and self.beans != '':
@@ -15615,9 +15662,9 @@ class tgraphcanvas(FigureCanvas):
                             weight_idx = weight_units.index(self.weight[2])
                             msg += f'{sep}{render_weight(self.weight[0], weight_idx, weight_idx)}'
                             if self.weight[1]:
-                                msg += f'{sep}{-1*float2float(self.aw.weight_loss(self.weight[0],self.weight[1]),1)}%'
+                                msg += f'{sep}{-1*float2float(self.aw.weight_loss(self.weight[0],self.weight[1]), self.aw.percent_decimals)}%'
                         if self.volume[0] and self.volume[1]:
-                            msg += f'{sep}{float2float(self.aw.volume_increase(self.volume[0],self.volume[1]),1)}%'
+                            msg += f'{sep}{float2float(self.aw.volume_increase(self.volume[0],self.volume[1]), self.aw.percent_decimals)}%'
                         if self.whole_color and self.ground_color:
                             msg += f'{sep}#{self.whole_color}/{self.ground_color}'
                         elif self.ground_color:
@@ -15899,7 +15946,7 @@ class tgraphcanvas(FigureCanvas):
                                 path_effects=[])
                         self.ax.add_patch(rect)
 
-                fmtstr = '{0:.1f}' if self.LCDdecimalplaces else '{0:.0f}'
+                fmtstr = '{0:.1f}' if self.aw.percent_decimals > 0 else '{0:.0f}'
                 if self.statisticstimes[0]:
                     dryphaseP = fmtstr.format(self.statisticstimes[1]*100./self.statisticstimes[0])
                     midphaseP = fmtstr.format(self.statisticstimes[2]*100./self.statisticstimes[0])

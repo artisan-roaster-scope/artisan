@@ -59,6 +59,7 @@
             <th>Action</th>
             <th>Command</th>
             <th>Description</th>
+            <th>&#160;</th>
         </tr>
     </thead>
     <tbody>
@@ -66,661 +67,817 @@
             <td>Serial Command</td>
             <td>ASCII serial command or binary a2b_uu(serial command)</td>
             <td>&#160;</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>Modbus Command</td>
             <td>_</td>
             <td>variable holding the last value read via MODBUS</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>sleep(&lt;float&gt;)</td>
             <td>sleep: add a delay of &lt;float&gt; seconds</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>button(&lt;bool&gt;)</td>
             <td>sets calling button to “pressed” if argument is 1 or True</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>read(slaveID,register)</td>
             <td>reads register from slave slaveID using function 3 (Read Multiple Holding Registers). The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>readSigned(slaveId,register)</td>
             <td>reads 1 16bit register from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as signed integer. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>readBCD(slaveID,register)</td>
             <td>reads 1 16bit register from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as BCD. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>read32(slaveID,register)</td>
             <td>reads 2 16bit registers from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as unsigned integer. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>read32Signed(slaveID,register)</td>
             <td>reads 2 16bit registers from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as signed integer. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>read32BCD(slaveID,register)</td>
             <td>reads 2 16bit register from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as BCD. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>readFloat(slaveID,register)</td>
             <td>reads 2 16bit registers from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as float. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>write(slaveId,register,value) or write([slaveId,register,value],..,[slaveId,register,value])</td>
             <td>write register: MODBUS function 6 (int) or function 16 (float)</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>wcoil(slaveId,register,&lt;bool&gt;)</td>
             <td>write coil: MODBUS function 5</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>wcoils(slaveId,register,[&lt;bool&gt;,..,&lt;bool&gt;])</td>
             <td>write coils: MODBUS function 15</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td> </td>
             <td>mwrite(slaveId,register,andMask,orMask) or mwrite(s,r,am,om,v)</td>
             <td>mask write register: MODBUS function 22 or simulates function 22 with function 6 and the given value v</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>writem(slaveId,register,value) or writem(slaveId,register,[&lt;int&gt;,..,&lt;int&gt;])</td>
             <td>write registers: MODBUS function 16</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>writeBCD(s,r,v) or writeBCD([s,r,v],..,[s,r,v])</td>
             <td>write 16bit BCD encoded value v to register r of slave s </td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>writeWord(slaveId,register,value) or writeWord([slaveId,register,value],..,[slaveId,register,value])</td>
             <td>write 32bit float to two 16bit int registers: MODBUS function 16</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>writeLong(slaveId,register,value) or writeLong([slaveId,register,value],..,[slaveId,register,value])</td>
             <td>write 32bit integer to two 16bit int registers: MODBUS function 16</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>writeSingle(slaveId,register,value) or writeSingle([slaveId,register,value],..,[slaveId,register,value])</td>
             <td>write 16bit integer to a single 16bit register: MODBUS function 6 (int)</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>DTA Command</td>
             <td>Insert Data address : value, ex. 4701:1000 and sv is 100. </td>
             <td>Always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>Call Program</td>
             <td>A program/script path (absolute or relative)</td>
             <td>start and external program</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>Hottop Heater</td>
             <td>&#160;</td>
             <td>sets heater to value</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>Hottop Fan</td>
             <td>&#160;</td>
             <td>sets fan to value</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>Hottop Command</td>
             <td>motor(n),solenoid(n),stirrer(n),heater(h),fan(f) </td>
             <td>with n={0 ,1},h={0,..100},f={0,..10}</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>Fuji Command</td>
             <td>write(&lt;unitId&gt;,&lt;register&gt;,&lt;value&gt;)</td>
+            <td>&#160;</td>
             <td>&#160;</td>
         </tr>
         <tr>
             <td>PWM Command</td>
             <td>out(&lt;channel&gt;,&lt;value&gt;[,&lt;sn&gt;])</td>
             <td>PHIDGET PWM Output: &lt;value&gt; in [0-100]</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>frequency(&lt;value&gt;[,&lt;sn&gt;])</td>
             <td>PHIDGET PWM Frequency: &lt;value&gt; in Hz</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>toggle(&lt;channel&gt;[,&lt;sn&gt;])</td>
             <td>PHIDGET PWM Output: toggles &lt;channel&gt;</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>pulse(&lt;channel&gt;,&lt;millis&gt;[,&lt;sn&gt;])</td>
             <td>PHIDGET PWM Output: turn &lt;channel&gt; on for &lt;millis&gt; milliseconds</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>outhub(&lt;channel&gt;,&lt;value&gt;[,&lt;sn&gt;])</td>
             <td>PHIDGET HUB PWM Output: &lt;value&gt; in [0-100]</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>togglehub(&lt;channel&gt;[,&lt;sn&gt;])</td>
             <td>PHIDGET HUB PWM Output: toggles &lt;channel&gt;</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>pulsehub(&lt;channel&gt;,&lt;millis&gt;[,&lt;sn&gt;])</td>
             <td>PHIDGET HUB PWM Output:  turn &lt;channel&gt; on for &lt;millis&gt; milliseconds</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>enabled(c,b[,sn])</td>
             <td>YOCTOPUCE PWM Output: PWM running state</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>freq(c,f[,sn])</td>
             <td>YOCTOPUCE PWM Output: set PWM frequency to f (Hz)</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>duty(c,d[,sn])</td>
             <td>YOCTOPUCE PWM Output: set PWM period with the duty cycle in % as a float [0.0-100.0]</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>move(c,d,t[,sn])</td>
             <td>YOCTOPUCE PWM Output: changes progressively the PWM to the specified value over the given time interval</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>VOUT Command</td>
             <td>range(c,r[,sn])</td>
             <td>for PHIDGET OUTPUT modules: sets voltage voltage range (r=5 for r5V and r=10 for 10V)</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>out(n,v[,sn])</td>
             <td>for PHIDGET OUTPUT modules: set analog output channel n to output voltage value v in V (eg. 5.5 for 5.5V)</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>vout(c,v[,sn])</td>
             <td>for YOCTOPUCE VOLTAGE OUT modules with c the channel (1 or 2),v the voltage as float [0.0-10.0]</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>cout(c[,sn])</td>
             <td>for YOCTOPUCE CURRENT OUT modules with c the current as float [3.0-21.0]</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>sleep(&lt;float&gt;)</td>
             <td>sleep: add a delay of &lt;float&gt; seconds</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>IO Command</td>
             <td>set(c,b[,sn])</td>
             <td>PHIDGET Binary Output: switches channel c off (b=0) and on (b=1)</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>toggle(c[,sn])</td>
             <td>PHIDGET Binary Output: toggles channel c</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>pulse(c,t[,sn])</td>
             <td>PHIDGET Binary Output: sets the output of channel c to on for time t in milliseconds</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>out(c,v[,sn])</td>
             <td>PHIDGET Voltage Output: sets voltage output of channel c to v (float)</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>accel(c,v[,sn])</td>
             <td>PHIDGET DCMotor: sets acceleration of channel c to v (float)</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>vel(c,v[,sn])</td>
             <td>PHIDGET DCMotor: sets target velocity of channel c to v (float)</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>limit(c,v[,sn])</td>
             <td>PHIDGET DCMotor: sets current limit of channel c to v (float)</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>on(c[,sn])</td>
             <td>YOCTOPUCE Relay Output: turn channel c of the relay module on</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>off(c[,sn])</td>
             <td>YOCTOPUCE Relay Output: turn channel c of the relay module off</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>yset(c,b[,sn])</td>
             <td>YOCTOPUCE Relay Output: switches channel c of the relay module off (b=0) and on (b=1)</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>flip(c[,sn])</td>
             <td>YOCTOPUCE Relay Output: toggle the state of channel c</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>pip(c,delay,duration[,sn])</td>
             <td>YOCTOPUCE Relay Output: pulse the channel c on after a delay of delay milliseconds for the duration of duration milliseconds</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>powerReset([sn])</td>
             <td>YOCTOPUCE resets the power counter of the Yocto-Watt module</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>slider(c,v)</td>
             <td>move slider c to value v</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>button(i,c,b[,sn])</td>
             <td>switches PHIDGET Binary Output channel c off (b=0) and on (b=1) and sets button i to pressed or normal depending on the value b</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>button(i,b)</td>
             <td>sets button i to pressed if value b is yes, true, t, or 1, otherwise to normal</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>button(b)</td>
             <td>sets button to pressed if value b is yes, true, t, or 1, otherwise to normal</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>button()</td>
             <td>toggles the state of the button</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>sleep(&lt;float&gt;)</td>
             <td>sleep: add a delay of &lt;float&gt; seconds</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>santoker(&lt;target&gt;,&lt;value&gt;)</td>
             <td>sends integer &lt;value&gt; to &lt;target&gt; register specified by as byte in hex notation like “fa” via the Santoker Network protocol</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>kaleido(&lt;target&gt;,&lt;value&gt;)</td>
             <td>sends &lt;value&gt; to &lt;target&gt; via the Kaleido Serial or Network protocol</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>S7 Command</td>
             <td>_</td>
             <td>variable holding the last value read via S7</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>sleep(&lt;float&gt;)</td>
             <td>sleep: add a delay of &lt;float&gt; seconds</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>button(&lt;bool&gt;)</td>
             <td>sets calling button to “pressed” if argument evaluates to 1 or True</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>getDBbool(&lt;dbnumber&gt;,&lt;start&gt;,&lt;index&gt;)</td>
             <td>read bool from S7 DB</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>getDBint(&lt;dbnumber&gt;,&lt;start&gt;)</td>
             <td>read int from S7 DB</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>getDBfloat(&lt;dbnumber&gt;,&lt;start&gt;)</td>
             <td>read float from S7 DB</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>setDBbool(&lt;dbnumber&gt;,&lt;start&gt;,&lt;index&gt;,&lt;value&gt;)</td>
             <td>write bool to S7 DB</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>setDBint(&lt;dbnumber&gt;,&lt;start&gt;,&lt;value&gt;)</td>
             <td>write int to S7 DB</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>setDBfloat(&lt;dbnumber&gt;,&lt;start&gt;,&lt;value&gt;)</td>
             <td>write float to S7 DB</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>Aillio R1 Heater</td>
             <td>&#160;</td>
             <td>sets heater to value</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>Aillio R1 Fan</td>
             <td>&#160;</td>
             <td>sets fan to value</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>Aillio R1 Drum</td>
             <td>&#160;</td>
             <td>sets drum speed to value</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>Artisan Command</td>
             <td>&#160;</td>
             <td>enables/disables alarms</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>alarm(n,&lt;bool&gt;)</td>
             <td>enables/disables alarm number n</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>autoCHARGE(&lt;bool&gt;)</td>
             <td>enables/disables autoCHARGE</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>autoDROP(&lt;bool&gt;)</td>
             <td>enables/disables autoDROP</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>sleep(&lt;float&gt;)</td>
             <td>sleep: add a delay of &lt;float&gt; seconds</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>tare(&lt;int&gt;)</td>
             <td>tare channel &lt;int&gt; with 1 =&gt; ET, 2 =&gt; BT, 3 =&gt; E1c1, 4: E1c2,..</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>PIDon</td>
             <td>turns PID on</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>PIDoff</td>
             <td>turns PID off</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>PIDtoggle</td>
             <td>toggles the PID state</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>pidmode(&lt;int&gt;)</td>
             <td>sets PID mode to 0: manual, 1: RS, 2: background follow</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>p-i-d(&lt;p&gt;,&lt;i&gt;,&lt;d&gt;)</td>
             <td>sets the p-i-d parameters of the PID</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>adjustSV(&lt;float&gt;)</td>
             <td>increases or decreases the current target SV value by &lt;float&gt;</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>pidSV(&lt;float&gt;)</td>
             <td>sets the PID target set value SV</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>pidSVC(&lt;float&gt;)</td>
             <td>sets the PID target set value SV given in C</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>pidRS(&lt;rs&gt;)</td>
             <td>activates the PID Ramp-Soak pattern number &lt;rs&gt; (1-based!) or the one labeled &lt;rs&gt;</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>pidSource(&lt;int&gt;)</td>
             <td>selects the PID input source with &lt;n&gt; 0: BT, 1: ET (Software PID); &lt;n&gt; in {0,..,3} (Arduino PID)</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>pidLookahead(&lt;int&gt;)</td>
             <td>sets the PID lookahead</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>popup(&lt;msg&gt;[,&lt;int&gt;])</td>
             <td>shows popup with message &lt;msg&gt; which optionally automatically closes after &lt;int&gt; seconds</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>message(&lt;msg&gt;)</td>
             <td>shows message &lt;msg&gt; in the message line</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>notifications(&lt;bool&gt;)</td>
             <td>enables/disables notifications; while disabled issued notifications are ignored</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>notify(&lt;title&gt;,[&lt;msg&gt;])</td>
             <td>sends notification with title &lt;title&gt; and optional message &lt;msg&gt;</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>setCanvasColor(&lt;color&gt;)</td>
             <td>sets canvas color to the RGB-hex &lt;color&gt; like #27f1d3</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>resetCanvasColor</td>
             <td>resets canvas color</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>button(&lt;name&gt;)</td>
             <td>activates button &lt;name&gt; from { START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF } </td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>palette(&lt;p&gt;)</td>
             <td>activates palette &lt;p&gt; with &lt;p&gt; either a number 0-9 or a palette label</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>playbackmode(&lt;int&gt;)</td>
             <td>sets playback mode to 0: off, 1: time, 2: BT, 3: ET</td>
+            <td>&#160;</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>playbackdropmode(&lt;int&gt;)</td>
+            <td>sets playback DROP mode to 0: off, 1: time, 2: BT, 3: ET</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>playback(n,&lt;bool&gt;)</td>
             <td>toggles playback per event type n from {1,2,3,4}</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>ramp(n,&lt;bool&gt;)</td>
             <td>toggles playback ramping per event type n from {1,2,3,4}</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>quantifier(n,&lt;bool&gt;)</td>
             <td>activate/deactivate quantification per event type n from {1,2,3,4}</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>setBatchSize(&lt;float&gt;)</td>
             <td>set the batch size to the given value. If the value is negative, the batch size is taken from the background profile, if any is loaded</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>openProperties</td>
             <td>opens the Roast Properties dialog</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>loadBackground(&lt;filepath&gt;)</td>
             <td>loads the .alog profile at the given filepath as background profile</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>clearBackground</td>
             <td>clears the current background profile</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>alarmset(&lt;as&gt;)</td>
             <td>activates the alarmset with the given number or label</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>moveBackground(&lt;direction&gt;,&lt;int&gt;)</td>
             <td>moves the background profile the indicated number of steps towards &lt;direction&gt;, with &lt;direction&gt; one of up, down, left, right</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>keyboard(&lt;bool&gt;)</td>
             <td>enables/disables keyboard mode</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>keepON(&lt;bool&gt;)</td>
             <td>enables/disables the Keep ON flag</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>showCurve(&lt;name&gt;,&lt;bool&gt;)</td>
             <td>shows/hides the curve indicated by &lt;name&gt; which is one of { ET, BT, DeltaET, DeltaBT, BackgroundET, BackgroundBT}</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>showExtraCurve(&lt;extra_device&gt;,&lt;curve&gt;,&lt;bool&gt;)</td>
             <td>shows/hides the &lt;curve&gt; (one of {T1,T2}) of the zero-based &lt;extra_device&gt; number</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>showEvents(&lt;event_type&gt;, &lt;bool&gt;)</td>
             <td>shows/hides the events of &lt;event_type&gt; in [1,..,5]</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>showBackgroundEvents(&lt;bool&gt;)</td>
             <td>shows/hides the events of the background profile</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>RC Command</td>
             <td>pulse(ch,min,max[,sn])</td>
             <td>for PHIDGET RC modules: sets the min/max pulse width in microseconds</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>pos(ch,min,max[,sn])</td>
             <td>for PHIDGET RC modules: sets the min/max position</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>engaged(ch,b[,sn])</td>
             <td>for PHIDGET RC modules: engage (b=1) or disengage (b = 0)</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>ramp(ch,b[,sn])</td>
             <td>for PHIDGET RC modules: activates or deactivates the speed ramping state</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>volt(ch,v[,sn])</td>
             <td>for PHIDGET RC modules: set the voltage to one of 5, 6 or 7.4 in Volt</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>accel(ch,a[,sn])</td>
             <td>for PHIDGET RC modules: set the acceleration</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>veloc(ch,v[,sn])</td>
             <td>for PHIDGET RC modules: set the velocity</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>set(ch,pos[,sn])</td>
             <td>for PHIDGET RC modules: set the target position</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>enabled(c,b[,sn])</td>
             <td>for YOCTOPUCE RC modules: with c:int the channel, b a bool (eg. enabled(0,1) or enabled(0,True))</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>move(c,p[,t][,sn])</td>
             <td>for YOCTOPUCE RC modules: with c:int the channel, p:int the target position, the optional t the duration in ms</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>neutral(c,n[,sn])</td>
             <td>for YOCTOPUCE RC modules: with n an int [0..65000] in us</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>range(c,r[,sn])</td>
             <td>for YOCTOPUCE RC modules: with r an int in %</td>
+            <td>&#160;</td>
+        </tr>
+        <tr>
+            <td>Stepper Command</td>
+            <td>set(ch,pos[,sn])</td>
+            <td>for PHIDGET Stepper Motors: set the target position</td>
+            <td>&#160;</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>rescale(ch,val[,sn])</td>
+            <td>for PHIDGET Stepper Motors: set the rescale factor</td>
+            <td>&#160;</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>engaged(ch,b[,sn])</td>
+            <td>for PHIDGET Stepper Motors: engage (b=1) or disengage (b = 0)</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>WebSocket Command</td>
             <td>send(&lt;json&gt;)</td>
             <td>If {} substitutions are used, json brackets need to be duplicated to escape them like in send({{ “value”: {}}})</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>sleep(&lt;float&gt;)</td>
             <td>sleep: add a delay of &lt;float&gt; seconds</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>button(&lt;bool&gt;)</td>
             <td>sets calling button to “pressed” if argument evaluates to 1 or True</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
             <td>read(&lt;json&gt;)</td>
             <td>if the `&lt;json&gt;` text respects the JSON format it is send to the connected WebSocket server and the response is bound to the variable `_`</td>
+            <td>&#160;</td>
         </tr>
     </tbody>
 </table></body>

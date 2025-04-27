@@ -839,6 +839,11 @@
         </tr>
         <tr>
             <td>&#160;</td>
+            <td>playbackdropmode(&lt;int&gt;)</td>
+            <td>sets playback DROP mode to 0: off, 1: time, 2: BT, 3: ET</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
             <td>playback(n,&lt;bool&gt;)</td>
             <td>toggles playback per event type n from {1,2,3,4}</td>
         </tr>
@@ -971,6 +976,21 @@
             <td>&#160;</td>
             <td>range(c,r[,sn])</td>
             <td>for YOCTOPUCE RC modules: with r an int in %</td>
+        </tr>
+        <tr>
+            <td>Stepper Command</td>
+            <td>set(ch,pos[,sn])</td>
+            <td>for PHIDGET Stepper Motors: set the target position</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>rescale(ch,val[,sn])</td>
+            <td>for PHIDGET Stepper Motors: set the rescale factor</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>engaged(ch,b[,sn])</td>
+            <td>for PHIDGET Stepper Motors: engage (b=1) or disengage (b = 0)</td>
         </tr>
         <tr>
             <td>WebSocket Command</td>

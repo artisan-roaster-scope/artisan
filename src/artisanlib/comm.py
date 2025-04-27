@@ -548,7 +548,8 @@ class serialport:
                                    self.Santoker_IB,          #172
                                    self.Santoker_RR,          #173
                                    self.ColorTrackBT,         #174
-                                   self.BlueDOT_BTET          #175
+                                   self.BlueDOT_BTET,         #175
+                                   self.R2_BTIBTS             #176
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -1270,6 +1271,45 @@ class serialport:
 
     def R1_BTIBTS(self) -> Tuple[float,float,float]:
         self.R1_DTBT()
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        # DT is being used as IBTS.
+        return tx, self.aw.qmc.R1_BT, self.aw.qmc.R1_DT
+
+    def R2_BTIBTS(self) -> Tuple[float,float,float]:
+        if self.R1 is None:
+            from artisanlib.aillio import AillioR1
+            self.R1 = AillioR1()
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        try:
+            #removed batchcounter to address issue #667
+            #if self.aw.qmc.batchcounter != -1:
+            #    self.aw.qmc.batchcounter = self.R1.get_roast_number()
+            self.aw.qmc.R1_BT = self.R1.get_bt()
+            self.aw.qmc.R1_DT = self.R1.get_dt()
+            self.aw.qmc.R1_DRUM = self.R1.get_drum() * 10
+            self.aw.qmc.R1_VOLTAGE = self.R1.get_voltage()
+            self.aw.qmc.R1_HEATER = self.R1.get_heater() * 10
+            self.aw.qmc.R1_FAN = self.R1.get_fan() * 10
+            self.aw.qmc.R1_BT_ROR = self.R1.get_bt_ror()
+            self.aw.qmc.R1_DT_ROR = self.R1.get_dt_ror()
+            self.aw.qmc.R1_EXIT_TEMP = self.R1.get_exit_temperature()
+            self.aw.qmc.R1_STATE = self.R1.get_state()
+            self.aw.qmc.R1_FAN_RPM = self.R1.get_fan_rpm()
+            self.aw.qmc.R1_TX = tx
+            newstate = self.R1.get_state_string()
+            if newstate != self.aw.qmc.R1_STATE_STR:
+                self.aw.qmc.R1_STATE_STR = newstate
+                self.aw.sendmessage(QApplication.translate('Message', 'R2 state: ' + newstate))
+            if self.aw.qmc.mode == 'F':
+                self.aw.qmc.R1_DT = fromCtoFstrict(self.aw.qmc.R1_DT)
+                self.aw.qmc.R1_BT = fromCtoFstrict(self.aw.qmc.R1_BT)
+                self.aw.qmc.R1_EXIT_TEMP = fromCtoFstrict(self.aw.qmc.R1_EXIT_TEMP)
+                self.aw.qmc.R1_BT_ROR = RoRfromCtoFstrict(self.aw.qmc.R1_BT_ROR)
+                self.aw.qmc.R1_DT_ROR = RoRfromCtoFstrict(self.aw.qmc.R1_DT_ROR)
+        except Exception as exception: # pylint: disable=broad-except
+            _log.exception(exception)
+            error = QApplication.translate('Error Message', 'Aillio R2: ' + str(exception))
+            self.aw.qmc.adderror(error)
         tx = self.aw.qmc.timeclock.elapsedMilli()
         # DT is being used as IBTS.
         return tx, self.aw.qmc.R1_BT, self.aw.qmc.R1_DT
