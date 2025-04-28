@@ -109,7 +109,7 @@ class AillioBase:
 
             # Create instance using appropriate class name
             roaster_class = getattr(module, detected_device['class_name'])
-            instance = cast(Union[AillioR1,AillioR2], roaster_class(debug=debug))
+            instance = cast('Union[AillioR1,AillioR2]', roaster_class(debug=debug))
 
             _log.info('Created %s instance using protocol V%s', detected_device['model'], detected_device['protocol'])
             return instance

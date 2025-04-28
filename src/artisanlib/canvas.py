@@ -282,7 +282,8 @@ class tgraphcanvas(FigureCanvas):
         'l_temp1', 'l_temp2', 'l_delta1', 'l_delta2', 'l_back1', 'l_back2', 'l_back3', 'l_back4', 'l_delta1B', 'l_delta2B', 'l_BTprojection', 'l_DeltaETprojection', 'l_DeltaBTprojection',
         'l_ETprojection', 'l_AUCguide', 'l_horizontalcrossline', 'l_verticalcrossline', 'l_timeline', 'legend', 'l_eventtype1dots', 'l_eventtype2dots',
         'l_eventtype3dots', 'l_eventtype4dots', 'l_eteventannos', 'l_bteventannos', 'l_eventtype1annos', 'l_eventtype2annos', 'l_eventtype3annos',
-        'l_eventflagannos', 'l_eventflagbackannos',
+        'l_eventflagannos', 'l_eventflagbackannos', 'l_eventtype1special_annos', 'l_eventtype2special_annos', 'l_eventtype3special_annos', 'l_eventtype4special_annos',
+        'l_eventtype1special_backannos', 'l_eventtype2special_backannos', 'l_eventtype3special_backannos', 'l_eventtype4special_backannos',
         'l_eventtype4annos', 'l_annotations', 'l_background_annotations', 'l_annotations_dict', 'l_annotations_pos_dict', 'l_event_flags_dict',
         'l_eventtype1backannos', 'l_eventtype2backannos', 'l_eventtype3backannos', 'l_eventtype4backannos',
         'l_event_flags_pos_dict', 'ai', 'timeclock', 'threadserver', 'designerflag', 'designerconnections', 'mousepress', 'indexpoint',
@@ -1993,6 +1994,16 @@ class tgraphcanvas(FigureCanvas):
         self.l_eventtype3annos:List[Annotation] = []
         self.l_eventtype4annos:List[Annotation] = []
 
+        self.l_eventtype1special_annos:List[Annotation] = []
+        self.l_eventtype2special_annos:List[Annotation] = []
+        self.l_eventtype3special_annos:List[Annotation] = []
+        self.l_eventtype4special_annos:List[Annotation] = []
+
+        self.l_eventtype1special_backannos:List[Annotation] = []
+        self.l_eventtype2special_backannos:List[Annotation] = []
+        self.l_eventtype3special_backannos:List[Annotation] = []
+        self.l_eventtype4special_backannos:List[Annotation] = []
+
         self.l_eventflagannos:List[Annotation] = [] # collects all the foreground profile flag annotations in Step+ mode (self.eventsGraphflag == 3)
 
         self.l_eteventannos:List[Annotation] = []
@@ -3167,52 +3178,72 @@ class tgraphcanvas(FigureCanvas):
             self.adderror((QApplication.translate('Error Message','Exception:') + ' onpick() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     # returns event line artist, if any, and, if events are displayed as Combo also the list event annotations or in Step+ mode also the flag annos
-    def event_type_to_artist(self, event_type:int) -> Tuple[Optional[Line2D],Optional[List[Annotation]]]:
+    # an optional third result lists the specialeventannotations if any
+    def event_type_to_artist(self, event_type:int) -> Tuple[Optional[Line2D],Optional[List[Annotation]],Optional[List[Annotation]]]:
         ldots:Optional[Line2D] = None
         event_annos:Optional[List[Annotation]] = None
+        specialevent_annos:Optional[List[Annotation]] = None
         if event_type == 0:
             ldots = self.l_eventtype1dots
             if self.eventsGraphflag == 4:
                 event_annos = self.l_eventtype1annos
+            elif self.eventsGraphflag in {2,3} and (not self.flagon and self.specialeventannovisibilities[0] != 0):
+                specialevent_annos = self.l_eventtype1special_annos
         elif event_type == 1:
             ldots = self.l_eventtype2dots
             if self.eventsGraphflag == 4:
                 event_annos = self.l_eventtype2annos
+            elif self.eventsGraphflag in {2,3} and (not self.flagon and self.specialeventannovisibilities[1] != 0):
+                specialevent_annos = self.l_eventtype2special_annos
         elif event_type == 2:
             ldots = self.l_eventtype3dots
             if self.eventsGraphflag == 4:
                 event_annos = self.l_eventtype3annos
+            elif self.eventsGraphflag in {2,3} and (not self.flagon and self.specialeventannovisibilities[2] != 0):
+                specialevent_annos = self.l_eventtype3special_annos
         elif event_type == 3:
             ldots = self.l_eventtype4dots
             if self.eventsGraphflag == 4:
                 event_annos = self.l_eventtype4annos
+            elif self.eventsGraphflag in {2,3} and (not self.flagon and self.specialeventannovisibilities[3] != 0):
+                specialevent_annos = self.l_eventtype4special_annos
         if self.eventsGraphflag == 3:
             event_annos = self.l_eventflagannos
-        return ldots, event_annos
+        return ldots, event_annos, specialevent_annos
 
     # returns background event line artist, if any, and, if events are displayed as Combo also the list event annotations or in Step+ mode also the flag annos
-    def event_type_to_background_artist(self, event_type:int) -> Tuple[Optional[Line2D],Optional[List[Annotation]]]:
+    # an optional third result lists the specialeventannotations if any
+    def event_type_to_background_artist(self, event_type:int) -> Tuple[Optional[Line2D],Optional[List[Annotation]],Optional[List[Annotation]]]:
         ldots:Optional[Line2D] = None
         event_annos:Optional[List[Annotation]] = None
+        specialevent_annos:Optional[List[Annotation]] = None
         if event_type == 0:
             ldots = self.l_backgroundeventtype1dots
             if self.eventsGraphflag == 4:
                 event_annos = self.l_eventtype1backannos
+            elif self.eventsGraphflag in {2,3} and self.specialeventannovisibilities[0] != 0:
+                specialevent_annos = self.l_eventtype1special_backannos
         elif event_type == 1:
             ldots = self.l_backgroundeventtype2dots
             if self.eventsGraphflag == 4:
                 event_annos = self.l_eventtype2backannos
+            elif self.eventsGraphflag in {2,3} and self.specialeventannovisibilities[1] != 0:
+                specialevent_annos = self.l_eventtype2special_backannos
         elif event_type == 2:
             ldots = self.l_backgroundeventtype3dots
             if self.eventsGraphflag == 4:
                 event_annos = self.l_eventtype3backannos
+            elif self.eventsGraphflag in {2,3} and self.specialeventannovisibilities[2] != 0:
+                specialevent_annos = self.l_eventtype3special_backannos
         elif event_type == 3:
             ldots = self.l_backgroundeventtype4dots
             if self.eventsGraphflag == 4:
                 event_annos = self.l_eventtype4backannos
+            elif self.eventsGraphflag in {2,3} and self.specialeventannovisibilities[3] != 0:
+                specialevent_annos = self.l_eventtype4special_backannos
         if self.eventsGraphflag == 3:
             event_annos = self.l_eventflagbackannos
-        return ldots, event_annos
+        return ldots, event_annos, specialevent_annos
 
     # ind: the event index in self.specialevents; pos: the index in the corresponding 2DLine artist
     # if foreground, we ind and pos are interpreted against the foreground profile otherwise against the background profile
@@ -3226,9 +3257,7 @@ class tgraphcanvas(FigureCanvas):
             specialeventsvalue[ind] = self.eventsExternal2InternalValue(new_value)
             # establish new artist value
             event_type = specialeventstype[ind]
-            ldots:Optional[Line2D] = None
-            event_annos = None
-            ldots, event_annos = (self.event_type_to_artist(event_type) if foreground else self.event_type_to_background_artist(event_type))
+            ldots, event_annos, specialevent_annos = (self.event_type_to_artist(event_type) if foreground else self.event_type_to_background_artist(event_type))
             if ldots is not None:
                 xdata = ldots.get_xdata()
                 ydata = ldots.get_ydata()
@@ -3312,6 +3341,25 @@ class tgraphcanvas(FigureCanvas):
                                     (self.timex[time_idx] if foreground else self.timeB[time_idx]),
                                     event_ydata,
                                     tempo)
+                    try:
+                        if specialevent_annos is not None and self.eventsGraphflag in {2, 3}:
+                            if (foreground and self.foregroundShowFullflag) or (not foreground and self.backgroundShowFullflag):
+                                corrected_event_pos = pos
+                            else: # extra one is added to line at the end, but without anno
+                                corrected_event_pos = pos - max(0, len(xdata) - len(specialevent_annos) - 1) # before first anno there can be others line elementsbe others line elements
+                            if len(specialevent_annos)>corrected_event_pos:
+                                event_anno = specialevent_annos[corrected_event_pos]
+                                self.updateSpecialEventAnno(
+                                    ind,
+                                    event_type,
+                                    event_anno,
+                                    (self.timex[time_idx] if foreground else self.timeB[time_idx]),
+                                    event_ydata,
+                                    background=not foreground,
+                                    update_text = True)
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
+
                 # redraw
                 if self.flagon:
                     self.redraw_keep_view(recomputeAllDeltas=False)
@@ -3327,9 +3375,7 @@ class tgraphcanvas(FigureCanvas):
             if (self.foreground_event_ind is not None and self.foreground_event_pos is not None and self.foreground_event_pick_position is not None and
                     len(self.specialeventstype)>self.foreground_event_ind):
                 event_type = self.specialeventstype[self.foreground_event_ind]
-                ldots = None
-                event_annos = None
-                ldots, event_annos = self.event_type_to_artist(event_type)
+                ldots, event_annos, specialevent_annos = self.event_type_to_artist(event_type)
                 if ldots is not None:
                     # update the xdata
                     xdata = ldots.get_xdata()
@@ -3387,6 +3433,24 @@ class tgraphcanvas(FigureCanvas):
                                         self.timex[time_idx],
                                         event_ydata,
                                         tempo)
+                    try:
+                        if specialevent_annos is not None and self.eventsGraphflag in {2, 3}:
+                            if self.foregroundShowFullflag:
+                                corrected_foreground_event_pos = self.foreground_event_pos
+                            else: # extra one is added to line at the end, but without anno
+                                corrected_foreground_event_pos = self.foreground_event_pos - max(0, len(xdata) - len(specialevent_annos) - 1) # before first anno there can be others line elements
+                            if len(specialevent_annos)>corrected_foreground_event_pos:
+                                event_anno = specialevent_annos[corrected_foreground_event_pos]
+                                self.updateSpecialEventAnno(
+                                    self.foreground_event_ind,
+                                    event_type,
+                                    event_anno,
+                                    self.timex[time_idx],
+                                    event_ydata,
+                                    update_text=True)
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
+
                     # redraw
                     if self.flagon:
                         self.redraw_keep_view(recomputeAllDeltas=False)
@@ -3408,7 +3472,7 @@ class tgraphcanvas(FigureCanvas):
                 event_type = self.backgroundEtypes[self.background_event_ind]
                 ldots = None
                 event_annos = None
-                ldots, event_annos = self.event_type_to_background_artist(event_type)
+                ldots, event_annos, specialevent_annos = self.event_type_to_background_artist(event_type)
                 if ldots is not None:
                     # update the xdata
                     xdata = ldots.get_xdata()
@@ -3432,11 +3496,11 @@ class tgraphcanvas(FigureCanvas):
                     ydata[self.background_event_pos] = (evalue if self.clampEvents else (evalue*event_pos_factor)+event_pos_offset)
                     if event_annos is not None:
                         if self.backgroundShowFullflag: # extra one is added to line at the end, but without anno
-                            corrected_backround_event_pos = self.background_event_pos #- max(0, len(xdata) - len(event_annos)) # before first anno there can be others line elements
+                            corrected_background_event_pos = self.background_event_pos #- max(0, len(xdata) - len(event_annos)) # before first anno there can be others line elements
                         else:
-                            corrected_backround_event_pos = self.background_event_pos - max(0, len(xdata) - len(event_annos) - 1) # before first anno there can be others line elements
-                        if self.eventsGraphflag == 4 and len(event_annos)>corrected_backround_event_pos:
-                            event_anno = event_annos[corrected_backround_event_pos]
+                            corrected_background_event_pos = self.background_event_pos - max(0, len(xdata) - len(event_annos) - 1) # before first anno there can be others line elements
+                        if self.eventsGraphflag == 4 and len(event_annos)>corrected_background_event_pos:
+                            event_anno = event_annos[corrected_background_event_pos]
                             self.updateEventAnno(
                                 event_type,
                                 event_anno,
@@ -3461,6 +3525,26 @@ class tgraphcanvas(FigureCanvas):
                                         self.timeB[time_idx],
                                         event_ydata,
                                         tempo)
+                    try:
+                        if specialevent_annos is not None and self.eventsGraphflag in {2, 3}:
+                            if self.backgroundShowFullflag: # extra one is added to line at the end, but without anno
+                                corrected_background_event_pos = self.background_event_pos #- max(0, len(xdata) - len(specialevent_annos)) # before first anno there can be others line elements
+                            else:
+                                corrected_background_event_pos = self.background_event_pos - max(0, len(xdata) - len(specialevent_annos) - 1) # before first anno there can be others line elements
+                            if len(specialevent_annos)>corrected_background_event_pos:
+                                event_anno = specialevent_annos[corrected_background_event_pos]
+                                self.updateSpecialEventAnno(
+                                    self.background_event_ind,
+                                    event_type,
+                                    event_anno,
+                                    self.timeB[time_idx],
+                                    event_ydata,
+                                    background=True,
+                                    update_text=True)
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
+
+
 #                    # redraw
 #                    if self.flagon:
 #                        self.redraw_keep_view(recomputeAllDeltas=False)
@@ -3580,6 +3664,17 @@ class tgraphcanvas(FigureCanvas):
             firstletter = ''
         event_anno.set_text(f'{firstletter}{secondletter}{thirdletter}')
 
+    # update event annotation value and position in combo mode
+    # if background is True, we use the backgrounds event name/letters
+    def updateSpecialEventAnno(self, idx:int, event_type:int, event_anno:Annotation, x:float, y:float, background:bool = False, update_text:bool = False) -> None:
+        # update marker position
+        hoffset = 3  #relative to the event dot
+        voffset = (3 if background else 1)  #relative to the event dot
+        event_anno.set_position((hoffset+x,voffset+y))
+        if update_text:
+            annotation_txt = self.parseSpecialeventannotation(self.specialeventannotations[event_type], idx, applyto= ('background' if background else 'foreground'))
+            event_anno.set_text(annotation_txt)
+
     def updateFlagAnno(self, event_type:int, flag_anno:Annotation, x:float, y:float, yy:float) -> None:
         # update marker position
         height = 50 if self.mode == 'F' else 20
@@ -3640,9 +3735,8 @@ class tgraphcanvas(FigureCanvas):
         if  (self.foreground_event_ind is not None and self.foreground_event_pos is not None and self.foreground_event_pick_position is not None and
                     len(self.specialeventstype)>self.foreground_event_ind):
             event_type = self.specialeventstype[self.foreground_event_ind]
-            ldots = None
-            event_annos = None
-            ldots, event_annos = self.event_type_to_artist(event_type)
+            ldots, event_annos, specialevent_annos = self.event_type_to_artist(event_type)
+            _log.debug('PRINT specialevent_annos1: %s',specialevent_annos)
             set_x = True
             set_y = True
             if ldots is not None:
@@ -3699,13 +3793,27 @@ class tgraphcanvas(FigureCanvas):
                                     xdata[self.foreground_event_pos],
                                     ydata[self.foreground_event_pos],
                                     tempo)
+                try:
+                    if specialevent_annos is not None and self.eventsGraphflag in {2, 3}:
+                        if self.foregroundShowFullflag:
+                            corrected_foreground_event_pos = self.foreground_event_pos
+                        else: # extra one is added to line at the end, but without anno
+                            corrected_foreground_event_pos = self.foreground_event_pos - max(0, len(xdata) - len(specialevent_annos) - 1) # before first anno there can be others line elements
+                        if len(specialevent_annos)>corrected_foreground_event_pos:
+                            event_anno = specialevent_annos[corrected_foreground_event_pos]
+                            self.updateSpecialEventAnno(
+                                self.foreground_event_ind,
+                                event_type,
+                                event_anno,
+                                xdata[self.foreground_event_pos],
+                                ydata[self.foreground_event_pos])
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
                 self.fig.canvas.draw_idle()
         elif (self.background_event_ind is not None and self.background_event_pos is not None and self.background_event_pick_position is not None and
                     len(self.backgroundEtypes)>self.background_event_ind):
             event_type = self.backgroundEtypes[self.background_event_ind]
-            ldots = None
-            event_annos = None
-            ldots, event_annos = self.event_type_to_background_artist(event_type)
+            ldots, event_annos, specialevent_annos = self.event_type_to_background_artist(event_type)
             set_x = True
             set_y = True
             if ldots is not None:
@@ -3765,6 +3873,24 @@ class tgraphcanvas(FigureCanvas):
                                     xdata[self.background_event_pos],
                                     ydata[self.background_event_pos],
                                     tempo)
+                try:
+                    if specialevent_annos is not None and self.eventsGraphflag in {2, 3}:
+                        if self.backgroundShowFullflag:
+                            corrected_background_event_pos = self.background_event_pos
+                        else: # extra one is added to line at the end, but without anno
+                            corrected_background_event_pos = self.background_event_pos - max(0, len(xdata) - len(specialevent_annos) - 1) # before first anno there can be others line elements
+                        if len(specialevent_annos)>corrected_background_event_pos:
+                            event_anno = specialevent_annos[corrected_background_event_pos]
+                            self.updateSpecialEventAnno(
+                                self.background_event_ind,
+                                event_type,
+                                event_anno,
+                                xdata[self.background_event_pos],
+                                ydata[self.background_event_pos],
+                                background=True)
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
+
                 self.fig.canvas.draw_idle()
 
     def clear_last_picked_event_selection(self) -> None:
@@ -9253,6 +9379,17 @@ class tgraphcanvas(FigureCanvas):
                     self.l_eventtype2annos = []
                     self.l_eventtype3annos = []
                     self.l_eventtype4annos = []
+
+                    self.l_eventtype1special_annos = []
+                    self.l_eventtype2special_annos = []
+                    self.l_eventtype3special_annos = []
+                    self.l_eventtype4special_annos = []
+
+                    self.l_eventtype1special_backannos = []
+                    self.l_eventtype2special_backannos = []
+                    self.l_eventtype3special_backannos = []
+                    self.l_eventtype4special_backannos = []
+
                     self.l_eventflagannos = []
                     self.l_backgroundeventtype1dots = None
                     self.l_backgroundeventtype2dots = None
@@ -9693,10 +9830,7 @@ class tgraphcanvas(FigureCanvas):
                                                             fontsize='x-small',
                                                             path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette['background'])],
                                                             )
-                                                try:
-                                                    anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                                except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
-                                                    pass
+                                                self.l_eventtype1special_backannos.append(anno)
                                                 try:
                                                     anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                                 except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
@@ -9735,10 +9869,7 @@ class tgraphcanvas(FigureCanvas):
                                                             fontproperties=eventannotationprop,
                                                             path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette['background'])],
                                                             )
-                                                try:
-                                                    anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                                except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
-                                                    pass
+                                                self.l_eventtype2special_backannos.append(anno)
                                                 try:
                                                     anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                                 except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
@@ -9777,10 +9908,7 @@ class tgraphcanvas(FigureCanvas):
                                                             fontproperties=eventannotationprop,
                                                             path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette['background'])],
                                                             )
-                                                try:
-                                                    anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                                except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
-                                                    pass
+                                                self.l_eventtype3special_backannos.append(anno)
                                                 try:
                                                     anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                                 except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
@@ -9819,10 +9947,7 @@ class tgraphcanvas(FigureCanvas):
                                                             fontproperties=eventannotationprop,
                                                             path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette['background'])],
                                                             )
-                                                try:
-                                                    anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
-                                                except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
-                                                    pass
+                                                self.l_eventtype4special_backannos.append(anno)
                                                 try:
                                                     anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                                 except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
@@ -10280,6 +10405,7 @@ class tgraphcanvas(FigureCanvas):
                                                                 path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette['background'])],
                                                                 )
                                                     self.l_eventtype1annos.append(anno)
+                                                    self.l_eventtype1special_annos.append(anno)
                                                     try:
                                                         anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                                     except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
@@ -10322,6 +10448,7 @@ class tgraphcanvas(FigureCanvas):
                                                                 path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette['background'])],
                                                                 )
                                                     self.l_eventtype2annos.append(anno)
+                                                    self.l_eventtype2special_annos.append(anno)
                                                     try:
                                                         anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                                     except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
@@ -10365,6 +10492,7 @@ class tgraphcanvas(FigureCanvas):
                                                                 path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette['background'])],
                                                                 )
                                                     self.l_eventtype3annos.append(anno)
+                                                    self.l_eventtype3special_annos.append(anno)
                                                     try:
                                                         anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                                     except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
@@ -10398,6 +10526,7 @@ class tgraphcanvas(FigureCanvas):
                                             try:
                                                 if not self.flagon and self.eventsGraphflag!=4 and self.specialeventannovisibilities[3] != 0:
                                                     E4_annotation = self.parseSpecialeventannotation(self.specialeventannotations[3], i)
+                                                    _log.debug('PRINT E4_annotation: %s',E4_annotation)
                                                     temp = self.E4values[-1]
                                                     anno = self.ax.annotate(E4_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
                                                                 alpha=.9,
@@ -10407,6 +10536,7 @@ class tgraphcanvas(FigureCanvas):
                                                                 path_effects=[PathEffects.withStroke(linewidth=self.patheffects,foreground=self.palette['background'])],
                                                                 )
                                                     self.l_eventtype4annos.append(anno)
+                                                    self.l_eventtype4special_annos.append(anno)
                                                     try:
                                                         anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                                                     except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
