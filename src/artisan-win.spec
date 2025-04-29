@@ -144,6 +144,15 @@ if not ARTISAN_LEGACY=='True':
                             ]
 
 datas = collect_data_files('bleak', subdir=r'backends\winrt')
+
+# Add Aillio module files
+datas += [
+    (r'artisanlib\aillio\__init__.py', r'artisanlib\aillio'),
+    (r'artisanlib\aillio\aillio.py', r'artisanlib\aillio'),
+    (r'artisanlib\aillio\aillio_r1.py', r'artisanlib\aillio'),
+    (r'artisanlib\aillio\aillio_r2.py', r'artisanlib\aillio')
+]
+
 binaries = collect_dynamic_libs('bleak')
 block_cipher = None
 
