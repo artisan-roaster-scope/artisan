@@ -19,11 +19,11 @@
 # mikefsq, r2 2025
 
 import usb.core # type: ignore[import-untyped]
-from typing import Optional, Union, List, TypedDict, cast, TYPE_CHECKING, Any
 import logging
-from platform import system
 import importlib.util
 import os
+from platform import system
+from typing import Optional, Union, List, TypedDict, cast, TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from artisanlib.aillio.aillio_r1 import AillioR1
@@ -101,9 +101,7 @@ class AillioBase:
                 # Fallback to pyusb backend
                 try:
                     _log.debug('Trying fallback pyusb backend')
-                    import usb.backend.libusb1 # type: ignore[import-untyped, unused-ignore]
-                    import usb.core
-                    import os
+                    import usb.backend.libusb1 # type: ignore[import-untyped, unused-ignore] # pylint: disable=redefined-outer-name
 
                     # Look for libusb DLL in common locations
                     dll_paths = [
@@ -149,7 +147,6 @@ class AillioBase:
                 backend = None
                 if system().startswith('Linux'):
                     # Try to find system libusb
-                    import os
                     for shared_libusb_path in [
                     '/usr/lib/x86_64-linux-gnu/libusb-1.0.so',
                     '/usr/lib/x86_64-linux-gnu/libusb-1.0.so.0',
@@ -164,7 +161,6 @@ class AillioBase:
                             break
 
                 # Try to find device with the backend
-                import usb.core
                 for variant in AillioBase.DEVICE_VARIANTS:
                     device = usb.core.find(idVendor=variant['vid'], idProduct=variant['pid'], backend=backend)
                     if device is not None:
@@ -212,7 +208,7 @@ class AillioBase:
         except usb.core.NoBackendError:
             _log.error('No USB backend available. Please ensure libusb is installed.')
             return None
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             _log.exception('Unexpected error creating Aillio instance: %s', str(e))
             return None
 
