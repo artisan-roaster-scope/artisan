@@ -44,8 +44,8 @@ if TYPE_CHECKING:
     from yoctopuce.yocto_current import YCurrent # type: ignore # pylint: disable=unused-import
     from yoctopuce.yocto_temperature import YTemperature # type: ignore # pylint: disable=unused-import
     from yoctopuce.yocto_api import YMeasure # pylint: disable=unused-import
-    from artisanlib.aillio.aillio_r1 import AillioR1 # pylint: disable=unused-import
-    from artisanlib.aillio.aillio_r2 import AillioR2 # pylint: disable=unused-import
+    from artisanlib.aillio_r1 import AillioR1 # pylint: disable=unused-import
+    from artisanlib.aillio_r2 import AillioR2 # pylint: disable=unused-import
 
 
 
@@ -1237,8 +1237,8 @@ class serialport:
 
     def R1_DTBT(self) -> Tuple[float,float,float]:
         if self.R1 is None:
-            from artisanlib.aillio import Aillio
-            self.R1 = Aillio()
+            from artisanlib.aillio_r1 import AillioR1
+            self.R1 = AillioR1()
         tx = self.aw.qmc.timeclock.elapsedMilli()
         if self.R1 is not None:
             try:
@@ -1279,8 +1279,8 @@ class serialport:
 
     def R2_BTIBTS(self) -> Tuple[float,float,float]:
         if self.R1 is None:
-            from artisanlib.aillio import Aillio
-            self.R1 = Aillio()
+            from artisanlib.aillio_r2 import AillioR2
+            self.R1 = AillioR2()
         tx = self.aw.qmc.timeclock.elapsedMilli()
         if self.R1 is not None:
             try:
