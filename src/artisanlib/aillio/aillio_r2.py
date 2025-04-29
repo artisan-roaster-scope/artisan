@@ -249,10 +249,6 @@ class AillioR2:
 
         # Initialize USB connection and start worker thread
         self._open_port()
-        self.worker_thread = threading.Thread(target=self.__updatestate,
-                                            args=(self.child_pipe,))
-        self.worker_thread.daemon = True
-        self.worker_thread.start()
 
     def __del__(self) -> None:
         if not self.simulated:
@@ -420,12 +416,7 @@ class AillioR2:
             if isinstance(cmd, list):
                 cmd = bytes(cmd)
 
-            # For R2, ensure command is properly formatted with CRC
-            if len(cmd) == 4:  # Basic command without CRC
-                cmd_with_crc = self.prepare_command(cmd)
-                self.ep_out.write(cmd_with_crc, timeout=self.TIMEOUT)
-            else:  # Command already has CRC
-                self.ep_out.write(cmd, timeout=self.TIMEOUT)
+            self.ep_out.write(cmd, timeout=self.TIMEOUT)
 
         except Exception as e: # pylint: disable=broad-except
             raise OSError(f'Failed to send command: {str(e)}') from e
@@ -606,6 +597,8 @@ class AillioR2:
                             f"active_power: {self.active_power:.1f}, reactive_power: {self.reactive_power:.1f}, apparent_power: {self.apparent_power:.1f}, "
                             f"voltage_rms: {self.voltage_rms:.1f}V, current_rms: {self.current_rms:.1f}A ")
 
+                    else:
+                        pass #unparsed
 
                 # Check for and handle commands from the pipe
                 try:
@@ -674,8 +667,6 @@ class AillioR2:
         if isinstance(cmd, list):
             cmd = bytes(cmd)
         cmd_with_crc = bytearray(cmd)
-        while len(cmd_with_crc) < 60:
-            cmd_with_crc.extend([0])
         cmd_with_crc.extend([0, 0, 0, 0])
         crc = self.calculate_crc32(bytes(cmd_with_crc))
         cmd_with_crc[-4:] = crc.to_bytes(4, 'little')
