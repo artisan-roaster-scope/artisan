@@ -1280,7 +1280,12 @@ class serialport:
     def R2_BTIBTS(self) -> Tuple[float,float,float]:
         if self.R1 is None:
             from artisanlib.aillio_r2 import AillioR2
-            self.R1 = AillioR2()
+            try:
+                self.R1 = AillioR2()
+            except Exception as exception: # pylint: disable=broad-except
+                _log.exception(exception)
+                error = QApplication.translate('Error Message', 'Aillio R2: ' + str(exception))
+                self.aw.qmc.adderror(error)
         tx = self.aw.qmc.timeclock.elapsedMilli()
         if self.R1 is not None:
             try:
