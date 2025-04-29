@@ -47,18 +47,10 @@ EXCLUDES = [
 #    'PyQt6.QtWebEngineQuick'
 ]
 
-# Add Aillio module files
-datas = [
-    ('artisanlib/aillio/__init__.py', 'artisanlib/aillio'),
-    ('artisanlib/aillio/aillio.py', 'artisanlib/aillio'),
-    ('artisanlib/aillio/aillio_r1.py', 'artisanlib/aillio'),
-    ('artisanlib/aillio/aillio_r2.py', 'artisanlib/aillio')
-]
-
 a = Analysis(['artisan.py'],
     pathex=[path],
     binaries=BINARIES,
-    datas=datas,
+    datas=[],
     hookspath=[],
     runtime_hooks=[],
     excludes=EXCLUDES,
