@@ -10,15 +10,15 @@ author: Marko Luther
 author_profile: false
 
 gallery:
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.1.0/artisan-linux-3.1.0.AppImage
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.1.2/artisan-linux-3.1.2.AppImage
     image_path: /assets/images/download-icon-linux-AppImage.png
     alt: "Linux AppImage"
     title: "Linux AppImage"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.1.0/artisan-linux-3.1.0.deb
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.1.2/artisan-linux-3.1.2.deb
     image_path: /assets/images/download-icon-linux-deb.png
     alt: "Linux deb"
     title: "Linux deb"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.1.0/artisan-linux-3.1.0.rpm
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.1.2/artisan-linux-3.1.2.rpm
     image_path: /assets/images/download-icon-linux-rpm.png
     alt: "Linux rpm"
     title: "Linux rpm"
@@ -35,7 +35,7 @@ release_sponsor:
 
 ---
 
-[Artisan v3.1.0](https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.1.0)
+[Artisan v3.1.2](https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.1.2)
 {: target="_blank" style="text-align: center; font-weight:bold;"}
 
 {% include gallery id="gallery" %}
