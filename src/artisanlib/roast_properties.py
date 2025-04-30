@@ -5442,8 +5442,15 @@ class editGraphDlg(ArtisanResizeablDialog):
             # we interpret dw as yield
             self.aw.qmc.roasted_defects_weight = min(w1, max(0, w1 - dw))
 
+        # max 140kg green; roasted < green:
         if w2 == 'kg':
             w2 = 'Kg'
+            if w0 > 140:
+                w0 = 0
+        elif (w2 == 'g' and w0 > 140*1000) or (w2 == 'lb' and w0 > 308.5) or (w2 == 'oz' and w0 > 4938):
+            w0 = 0
+        w1 = min(w0,w1)
+        self.aw.qmc.roasted_defects_weight = min(self.aw.qmc.roasted_defects_weight,w0)
         self.aw.qmc.weight = (w0,w1,w2)
 
 

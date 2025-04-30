@@ -1,9 +1,17 @@
+artisan (3.1.2-0) precise; urgency=low
+  * new upstream release
+  * changes since 3.1.0:
+   - additional device and machine support
+   - adds roast defects weight, event replay ramping, and event dragging
+   - bug fixes
+ --  <marko.luther@gmx.net>  Wed, 30 Apr 2025 19:32:14 +0200
+
 artisan (3.1.0-0) precise; urgency=low
   * new upstream release
   * changes since 3.0.2:
    - additional device and machine support
    - bug fixes
- --  <marko.luther@gmx.net>  Fr, 22 Nov 2024 19:32:14 +0200
+ --  <marko.luther@gmx.net>  Fri, 22 Nov 2024 19:32:14 +0200
 
 artisan (3.0.2-0) precise; urgency=low
   * new upstream release

@@ -5795,7 +5795,7 @@ class tgraphcanvas(FigureCanvas):
 
     @pyqtSlot(str,int)
     def moveBackgroundAndRedraw(self, direction:str, step:int) -> None:
-        self.movebackground(direction, step) # direction in {'left', 'right'}
+        self.movebackground(direction, step) # direction in {'left', 'right', 'up', 'down'}
         self.redraw_keep_view(recomputeAllDeltas=False,
             re_smooth_foreground=False,
             re_smooth_background=False)

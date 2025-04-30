@@ -2,7 +2,7 @@ Detailed Release History
 ========================
 
 ----
-v3.1.2 (April XX, 2025)
+v3.1.2 (April 30, 2025)
 ------------------
 
 
@@ -62,7 +62,7 @@ v3.1.2 (April XX, 2025)
   - event replay at any time ensures that only future events are replayed. As the set of future events may change on moving the background profile, an event can still be replayed again. In previous Artisan versions, events did replay only once per roast.
   - persist Energy Tab summary choice
   - suppresses pick year from [artisan.plus](https://artisan.plus) beans pop up and roast name suggestion if origin/name combination is unique
-  - improved accuracy on rendering [artisan.plus](https://artisan.plus) blend component weights
+  - improved accuracy on rendering [artisan.plus](https://artisan.plus) blend component and schedule item weights
   - improved Cropster importer
   - the autosave mechanism will no longer save accidentally produced recordings on OFF lacking the CHARGE and DROP events. Note that that for roasts longer than 7min, the end of a roast is automatically added as DROP event on OFF, if no DROP event was set before.
   - disables playback of DROP event, only active after CHARGE, for the first 7min into the roast
@@ -83,7 +83,7 @@ v3.1.2 (April XX, 2025)
   - ensures that projection lines are immediately redrawn after full redraw ([Issue #1826](../../../issues/1826))
   - fixes a case where disconnecting from [artisan.plus](https://artisan.plus) was not functional
   - makes indication of [artisan.plus](https://artisan.plus) connection loss more reliable
-   - list single blend with only replacement stock on [artisan.plus](https://artisan.plus) if no other blend has stock which was not listed by error before
+  - list single blend with only replacement stock on [artisan.plus](https://artisan.plus) if no other blend has stock which was not listed by error before
   - fixes broken rendering of roasting times in CSV production reports
   - remembered last batch size now correctly converted to current weight unit
   - sliders send decimal values (instead of rounded integers via MODBUS, PWM, Artisan, WebSocket, IO, VOUT, S7 and RC Commands)

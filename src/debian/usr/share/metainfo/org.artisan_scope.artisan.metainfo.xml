@@ -68,6 +68,105 @@
 
   <releases>
 
+    <release version="3.1.2" date="2025-04-30">
+      <url type="details">https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.1.2</url>
+      <description>
+        <p>ADDITIONS</p>
+        <ul>
+          <li>adds roast defects weight to document results of color sorting</li>
+          <li>adds event replay ramping by time and temperature</li>
+          <li>events displayed in step and combo mode can be updated by moving them to a new position. Pressing SHIFT restricts the movement in either the x or the y direction.</li>
+          <li>a picked custom event can be removed using the backspace key</li>
+          <li>adds drag-and-drop to Stats Summary table configuration</li>
+          <li>adds hiding of scheduled items via a right-click or drag-out</li>
+          <li>adds support for feeding data from energy meters into Artisans roast energy calculator</li>
+          <li>adds configuration for # of decimals output of percentage values</li>
+          <li>adds new flag "Set batch size" to background dialog. If ticked the batch size is taken from the background profile on load while scheduler is off</li>
+          <li>adds sorting to the background events table</li>
+          <li>adds support for container weight units others than `g`</li>
+          <li>adds configuration to allow to send MODBUS PID SV as 32bit float</li>
+          <li>adds configuration to specify the mode (by time, BT or ET) for the playback of the DROP event</li>
+          <li>adds mixed event playback, by time (for increasing event values) and temperature (for decreasing event values)</li>
+          <li>adds new Artisan Commands (with `n` from `{1,2,3,4}`)</li>
+            <ul>
+              <li>`quantifier(n,bool)` to toggle quantification per event type</li>
+              <li>`playback(n,bool)` to toggle event playback per event type</li>
+              <li>`ramp(n,bool)` to toggle event playback ramping per event type</li>
+              <li>`alarm(m,bool)` enable/disable alarm number `m`</li>
+              <li>`setBatchSize(float)` to set the batch size. if the given number is negative the batch size is taken from the background profile, if available</li>
+              <li>`playbackdropmode(int)` to set the mode for the playback of the DROP event (0: by time, 1: by BT, 2: by ET)</li>
+            </ul>
+          <li>adds event slider input dialog via a double-click on a sliders LCD</li>
+          <li>adds slider focus on slider LCD click</li>
+          <li>adds quick keyboard focused event slider input using numeric keys followed by the ENTER/RETURN key. The last digit can be removed by using the backspace key. ESC cancels the action.</li>
+          <li>a double click on the graph canvas temporarily scales the y-axis to cover all artists</li>
+          <li>adds search to help pages</li>
+          <li>adds artisan.plus inventory non-standard bean label formatting</li>
+          <li>adds implicit automatic reconnection on errors for WebSocket connections</li>
+        </ul>
+        <p>NEW HARDWARE SUPPORT</p>
+        <ul>
+          <li>adds a new IMF machine setup that supports machine control enabling IT/BT and IT/Power profiling</li>
+          <li>updated Giesen machine support (now incl. sample roasters and PRO machines) supporting the control of additional actors</li>
+          <li>adds support for Carmomaq's Stratto Lab sample roaster</li>
+          <li>adds Santoker Cube PID setup</li>
+          <li>adds Aillio Bullet R2 support (provided by Mike)</li>
+          <li>adds support for the DCC1100 and DCC1120 Brushless DC Motor controllers and the DCC1020 DC Motor controller (Discussion #1750)</li>
+          <li>adds ROEST CSV import</li>
+          <li>adds Thermoworks BlueDOT support</li>
+          <li>adds Atilla `auto` setup which picks up CHARGE and DROP events set from Atilla Gold Plus machines with automation</li>
+        </ul>
+        <p>CHANGES</p>
+        <ul>
+          <li>the Phidget driver is now bundled with the Artisan app and no longer needs to be installed separately. NOTE: some legacy USB HID devices, like the original 1046 and 1048 still require the kernel extension of the driver package to be installed in the system.</li>
+          <li>update volume not density if weight changes and volume is set in Roast Properties (Discussion #1786)</li>
+          <li>generated WebLCD URL is using more stable host names instead of, potentially DHCP assigned, IP addresses</li>
+          <li>updated Turkish translations (thanks to Kemal Akdas)</li>
+          <li>raises max event button limits from 4 rows with maximal 30 buttons to 10 rows with maximal 50 buttons</li>
+          <li>keeps custom events ordered by time</li>
+          <li>events were replayed only if the corresponding event slider was visible in previous versions. Now events selected for replay are always replayed, independent of the visibility of the corresponding event slider.</li>
+          <li>the parameters "max. number of custom buttons per row", "button size", "alternative slider layout", "mark last pressed" and "show tooltips" are now persisted per palette</li>
+          <li>a click in a sliders pane no longer moves the slider, but just gives that slider the input focus (a click in a slider's bar still moves the slider to this position)</li>
+          <li>the quick custom event entry using the q, w, e and e key followed by number keys now requires the ENTER/RETURN key to establish the new value.  The last entered digit can be removed by using the backspace key. ESC cancels the action.</li>
+         <li>event replay at any time ensures that only future events are replayed. As the set of future events may change on moving the background profile, an event can still be replayed again. In previous Artisan versions, events did replay only once per roast.</li>
+         <li>persist Energy Tab summary choice</li>
+         <li>suppresses pick year from artisan.plus beans pop up and roast name suggestion if origin/name combination is unique</li>
+         <li>improved accuracy on rendering artisan.plus blend component and schedule item weights</li>
+         <li>improved Cropster importer</li>
+         <li>the autosave mechanism will no longer save accidentally produced recordings on OFF lacking the CHARGE and DROP events. Note that that for roasts longer than 7min, the end of a roast is automatically added as DROP event on OFF, if no DROP event was set before.</li>
+         <li>disables playback of DROP event, only active after CHARGE, for the first 7min into the roast</li>
+         <li>restrict file selection to load background profiles to files with extension .alog</li>
+        </ul>
+        <p>FIXES</p>
+        <ul>
+          <li>fixes processing of MODBUS function 2 request which broke the just introduced autoCHARGE/autoDROP triggered by Loring machines</li>
+          <li>ensure complete reset to defaults in energy tab loads tab</li>
+          <li>makes loading of (broken) profiles with inconsistent data length more robust</li>
+          <li>prevents exceptions caused by empty event type names (Discussion #1745)</li>
+          <li>fixes a typo which allowed to open multiple Roast Properties dialogs (Issue #1781)</li>
+          <li>fixes regression introduced in v3.0 which prevented the replay of events before CHARGE</li>
+          <li>fixes an issue in event replay where certain events failed to be replayed by temperature</li>
+          <li>fixes an issue where the PID Input for external MODBUS/SV PIDs was not correctly persisted</li>
+          <li>fixes broken `button` Modbus Command</li>
+          <li>fixes communication with some Santoker R Master Series machines (Issue #1811)</li>
+          <li>fixes DROP being triggered by Kaleido machine on CHARGE (Issue #1808)</li>
+          <li>ensures that projection lines are immediately redrawn after full redraw (Issue #1826)</li>
+          <li>fixes a case where disconnecting from artisan.plus was not functional</li>
+          <li>makes indication of artisan.plus connection loss more reliable</li>
+          <li>list single blend with only replacement stock on artisan.plus if no other blend has stock which was not listed by error before</li>
+          <li>fixes broken rendering of roasting times in CSV production reports</li>
+          <li>remembered last batch size now correctly converted to current weight unit</li>
+          <li>sliders send decimal values (instead of rounded integers via MODBUS, PWM, Artisan, WebSocket, IO, VOUT, S7 and RC Commands)</li>
+        </ul>
+        <p>REMOVALS</p>
+        <ul>
+          <li>support for the non-standard MODBUS little-endian byte order has been removed</li>
+          <li>removes the experimental PID P-on-Measurement/Input mode (Issue #1744)</li>
+        </ul>
+      </description>
+    </release>
+
+
     <release version="3.1.1.1" date="2024-12-09">
       <url type="details">https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.1.1.1</url>
       <description>
