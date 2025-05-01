@@ -98,7 +98,7 @@ class Ui_SetupWidget(object):
         self.doubleSpinBoxRoasterSize.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight|QtCore.Qt.AlignmentFlag.AlignTrailing|QtCore.Qt.AlignmentFlag.AlignVCenter)
         self.doubleSpinBoxRoasterSize.setSuffix("kg")
         self.doubleSpinBoxRoasterSize.setDecimals(1)
-        self.doubleSpinBoxRoasterSize.setMaximum(9999.9)
+        self.doubleSpinBoxRoasterSize.setMaximum(140.0)
         self.doubleSpinBoxRoasterSize.setObjectName("doubleSpinBoxRoasterSize")
         self.gridLayoutMachine.addWidget(self.doubleSpinBoxRoasterSize, 0, 2, 1, 1)
         self.labelHeating = QtWidgets.QLabel(parent=self.groupBoxMachine)

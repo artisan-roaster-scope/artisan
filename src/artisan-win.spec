@@ -144,6 +144,7 @@ if not ARTISAN_LEGACY=='True':
                             ]
 
 datas = collect_data_files('bleak', subdir=r'backends\winrt')
+
 binaries = collect_dynamic_libs('bleak')
 block_cipher = None
 

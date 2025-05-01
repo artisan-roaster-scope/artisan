@@ -606,6 +606,7 @@ class modbusport:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
 
+    # DEPRECATED: use writeSingle or writeWord (this one now just calls writeSingle with the value rounded to an integer)
     # write value to register on slave (function 6 for int or function 16 for float)
     # value can be one of string (containing an int or float), an int or a float
     def writeRegister(self, slave:int, register:int, value: Union[int, float, str]) -> None:
@@ -614,13 +615,15 @@ class modbusport:
             return
         if isinstance(value, str):
             if '.' in value:
-                self.writeWord(slave, register, float(value))
+#                self.writeWord(slave, register, float(value))
+                self.writeSingleRegister(slave, register, int(round(float(value))))
             else:
                 self.writeSingleRegister(slave, register, int(value))
         elif isinstance(value, int):
             self.writeSingleRegister(slave,register,value)
         elif isinstance(value, float):
-            self.writeWord(slave,register,value)
+#            self.writeWord(slave,register,value)
+            self.writeSingleRegister(slave,register,int(round(value)))
 
     # function 6 (Write Single Holding Register)
     def writeSingleRegister(self, slave:int, register:int, value:float) -> None:
