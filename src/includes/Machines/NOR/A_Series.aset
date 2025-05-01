@@ -151,11 +151,11 @@ RS_svDescriptions2=, , , , , , ,
 [DefaultButtons]
 buttonvisibility=true, true, true, false, true, false, true, true
 buttonactions=3, 3, 0, 0, 0, 0, 3, 3
-buttonactionstrings="write(1,13,99)", , , , , , "write(1,8,1);write(1,12,99)", "write(1,12,1)"
+buttonactionstrings="writeSingle(1,13,99)", , , , , , "writeSingle(1,8,1);writeSingle(1,12,99)", "writeSingle(1,12,1)"
 extrabuttonactions=3, 3, 0
-extrabuttonactionstrings="write(1,13,99)", "write(1,8,1);write(1,13,1);write(1,12,1)", 
+extrabuttonactionstrings="writeSingle(1,13,99)", "writeSingle(1,8,1);writeSingle(1,13,1);writeSingle(1,12,1)", 
 xextrabuttonactions=3, 3
-xextrabuttonactionstrings="write(1,8,1);write(1,12,1);write(1,13,1)", "write(1,8,99)"
+xextrabuttonactionstrings="writeSingle(1,8,1);writeSingle(1,12,1);writeSingle(1,13,1)", "writeSingle(1,8,99)"
 
 [ExtraEventButtons]
 buttonlistmaxlen=10
@@ -184,7 +184,7 @@ showextrabuttontooltips=false
 [Sliders]
 slidervisibilities=0, 0, 1, 1
 slideractions=0, 0, 2, 2
-slidercommands=, , "write([1,5,{}])", "write([1,4,{}])"
+slidercommands=, , "writeSingle([1,5,{}])", "writeSingle([1,4,{}])"
 slideroffsets=0, 0, 20, 32
 sliderfactors=1, 1, 5.3, 1.5
 slidermin=0, 0, 1, 1

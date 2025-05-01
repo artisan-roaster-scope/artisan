@@ -4497,12 +4497,12 @@ SLUTET</translation>
       <translation>Modbus-fel: kunde inte ansluta</translation>
     </message>
     <message>
-      <location filename="../artisanlib/modbusport.py" line="806" />
-      <location filename="../artisanlib/modbusport.py" line="779" />
-      <location filename="../artisanlib/modbusport.py" line="753" />
-      <location filename="../artisanlib/modbusport.py" line="722" />
-      <location filename="../artisanlib/modbusport.py" line="683" />
-      <location filename="../artisanlib/modbusport.py" line="647" />
+      <location filename="../artisanlib/modbusport.py" line="809" />
+      <location filename="../artisanlib/modbusport.py" line="782" />
+      <location filename="../artisanlib/modbusport.py" line="756" />
+      <location filename="../artisanlib/modbusport.py" line="725" />
+      <location filename="../artisanlib/modbusport.py" line="686" />
+      <location filename="../artisanlib/modbusport.py" line="650" />
       <location filename="../artisanlib/modbusport.py" line="604" />
       <location filename="../artisanlib/modbusport.py" line="577" />
       <location filename="../artisanlib/modbusport.py" line="405" />
@@ -4510,11 +4510,11 @@ SLUTET</translation>
       <translation>Modbus-fel:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/modbusport.py" line="1125" />
-      <location filename="../artisanlib/modbusport.py" line="1081" />
-      <location filename="../artisanlib/modbusport.py" line="1035" />
-      <location filename="../artisanlib/modbusport.py" line="949" />
-      <location filename="../artisanlib/modbusport.py" line="908" />
+      <location filename="../artisanlib/modbusport.py" line="1128" />
+      <location filename="../artisanlib/modbusport.py" line="1084" />
+      <location filename="../artisanlib/modbusport.py" line="1038" />
+      <location filename="../artisanlib/modbusport.py" line="952" />
+      <location filename="../artisanlib/modbusport.py" line="911" />
       <location filename="../artisanlib/modbusport.py" line="548" />
       <source>Modbus Communication Error</source>
       <translation>Modbus-kommunikationsfel</translation>
@@ -6654,7 +6654,7 @@ Larm skannas i ordning från toppen av tabellen till botten.</translation>
     <message>
       <location filename="../help/alarms_help.py" line="54" />
       <source>PopUp TimeOut</source>
-      <translation type="unfinished" />
+      <translation>Popup-tidsgräns</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="54" />
@@ -6806,7 +6806,7 @@ Larm skannas i ordning från toppen av tabellen till botten.</translation>
     <message>
       <location filename="../help/alarms_help.py" line="74" />
       <source>FCs</source>
-      <translation type="unfinished" />
+      <translation>FC:er</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="74" />
@@ -6826,7 +6826,7 @@ Larm skannas i ordning från toppen av tabellen till botten.</translation>
     <message>
       <location filename="../help/alarms_help.py" line="76" />
       <source>SCs</source>
-      <translation type="unfinished" />
+      <translation>SC:er</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="76" />
@@ -6994,7 +6994,7 @@ Artisan kommer att starta programmet varje provperiod. Programutgången måste v
     <message>
       <location filename="../help/programs_help.py" line="25" />
       <source>print("237.1,100.4")</source>
-      <translation type="unfinished" />
+      <translation>skriv ut("237,1,100,4")</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="25" />
@@ -7026,7 +7026,7 @@ Artisan kommer att starta programmet varje provperiod. Programutgången måste v
     <message>
       <location filename="../help/programs_help.py" line="25" />
       <source>import sys</source>
-      <translation type="unfinished" />
+      <translation>importera system</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="25" />
@@ -7041,7 +7041,7 @@ Artisan kommer att starta programmet varje provperiod. Programutgången måste v
     <message>
       <location filename="../help/programs_help.py" line="25" />
       <source>    file.write(f&amp;#39;ET: {ET}, BT: {ET}, ETB: {ETB}, BTB: {BTB};&amp;#39;)</source>
-      <translation type="unfinished" />
+      <translation>file.write(f&amp;#39;ET: {ET}, BT: {ET}, ETB: {ETB}, BTB: {BTB};&amp;#39;)</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="17" />
@@ -8020,7 +8020,7 @@ Håll ned Skift+Alt [Win]</translation>
     <message>
       <location filename="../help/transposer_help.py" line="17" />
       <source>TRANSPOSER</source>
-      <translation type="unfinished" />
+      <translation>TRANSPONERA</translation>
     </message>
     <message>
       <location filename="../help/transposer_help.py" line="21" />
@@ -8292,8 +8292,8 @@ Ladda profilen inspelad på den mindre maskinen och öppna Transposern. Välj de
     <message>
       <location filename="../help/eventbuttons_help.py" line="117" />
       <location filename="../help/eventsliders_help.py" line="52" />
-      <source>write register: MODBUS function 6 (int) or function 16 (float)</source>
-      <translation>skrivregister: MODBUS funktion 6 (int) eller funktion 16 (flytande)</translation>
+      <source>deprecated: use writeSingle for MODBUS function 6 (int) or writeWord for function 16 (float)</source>
+      <translation>föråldrad: använd writeSingle för MODBUS-funktion 6 (int) eller writeWord för funktion 16 (flyttal)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="118" />
@@ -9882,7 +9882,7 @@ För en sensorisk milstolpe (se anmärkningar ovan) motsvarar värdet 50 aromen 
     <message>
       <location filename="../help/eventannotations_help.py" line="54" />
       <source>Gas 50 @340°F</source>
-      <translation type="unfinished" />
+      <translation>Gas 50 @ 175°C</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="55" />
@@ -9917,7 +9917,7 @@ För en sensorisk milstolpe (se anmärkningar ovan) motsvarar värdet 50 aromen 
     <message>
       <location filename="../help/eventannotations_help.py" line="58" />
       <source>Gas ~E% &amp;#39;@~Y2 ~degmode&amp;#39;"@~DTR% DTR"</source>
-      <translation type="unfinished" />
+      <translation>Gas ~E% '@~Y2 ~degmode'"@~DTR% DTR"</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="58" />
@@ -11025,17 +11025,17 @@ Från Rost&gt;Egenskaper&gt;Cupping Notes</translation>
     <message>
       <location filename="../help/symbolic_help.py" line="33" />
       <source>ExtraBackground #1-A</source>
-      <translation type="unfinished" />
+      <translation>Extrabakgrund #1-A</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="34" />
       <source>ExtraBackground #1-B</source>
-      <translation type="unfinished" />
+      <translation>Extrabakgrund #1-B</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="35" />
       <source>ExtraBackground #2-A</source>
-      <translation type="unfinished" />
+      <translation>Extrabakgrund #2-A</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="37" />
@@ -11458,6 +11458,10 @@ Att använda matematiska formler i plottern gör det också möjligt att använd
       <location filename="../help/symbolic_help.py" line="189" />
       <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
       <translation>F1 hänvisar till det tidigare resultatet av den faktiska formeln för att realisera en återkopplingsslinga. Detta är användbart i filterdesigner. På samma sätt hänvisar F2 till det andra föregående resultatet etc.</translation>
+    </message>
+    <message>
+      <source>write register: MODBUS function 6 (int) or function 16 (float)</source>
+      <translation type="vanished">skrivregister: MODBUS funktion 6 (int) eller funktion 16 (flytande)</translation>
     </message>
     <message>
       <source>increases or decreases the current target SV value by &lt;int&gt;</source>

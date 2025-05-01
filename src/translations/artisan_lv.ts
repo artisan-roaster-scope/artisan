@@ -4525,12 +4525,12 @@ BEIGT</translation>
       <translation>Modbus kļūda: neizdevās izveidot savienojumu</translation>
     </message>
     <message>
-      <location filename="../artisanlib/modbusport.py" line="806" />
-      <location filename="../artisanlib/modbusport.py" line="779" />
-      <location filename="../artisanlib/modbusport.py" line="753" />
-      <location filename="../artisanlib/modbusport.py" line="722" />
-      <location filename="../artisanlib/modbusport.py" line="683" />
-      <location filename="../artisanlib/modbusport.py" line="647" />
+      <location filename="../artisanlib/modbusport.py" line="809" />
+      <location filename="../artisanlib/modbusport.py" line="782" />
+      <location filename="../artisanlib/modbusport.py" line="756" />
+      <location filename="../artisanlib/modbusport.py" line="725" />
+      <location filename="../artisanlib/modbusport.py" line="686" />
+      <location filename="../artisanlib/modbusport.py" line="650" />
       <location filename="../artisanlib/modbusport.py" line="604" />
       <location filename="../artisanlib/modbusport.py" line="577" />
       <location filename="../artisanlib/modbusport.py" line="405" />
@@ -4538,11 +4538,11 @@ BEIGT</translation>
       <translation>Modbus kļūda:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/modbusport.py" line="1125" />
-      <location filename="../artisanlib/modbusport.py" line="1081" />
-      <location filename="../artisanlib/modbusport.py" line="1035" />
-      <location filename="../artisanlib/modbusport.py" line="949" />
-      <location filename="../artisanlib/modbusport.py" line="908" />
+      <location filename="../artisanlib/modbusport.py" line="1128" />
+      <location filename="../artisanlib/modbusport.py" line="1084" />
+      <location filename="../artisanlib/modbusport.py" line="1038" />
+      <location filename="../artisanlib/modbusport.py" line="952" />
+      <location filename="../artisanlib/modbusport.py" line="911" />
       <location filename="../artisanlib/modbusport.py" line="548" />
       <source>Modbus Communication Error</source>
       <translation>Modbus komunikācijas kļūda</translation>
@@ -6427,7 +6427,7 @@ Signāli tiek skenēti secībā no tabulas augšdaļas līdz apakšai.</translat
     <message>
       <location filename="../help/alarms_help.py" line="25" />
       <source>Nr</source>
-      <translation type="unfinished" />
+      <translation>Nr.</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="25" />
@@ -6510,7 +6510,7 @@ Signāli tiek skenēti secībā no tabulas augšdaļas līdz apakšai.</translat
       <location filename="../help/eventsliders_help.py" line="29" />
       <location filename="../help/alarms_help.py" line="33" />
       <source>Temp</source>
-      <translation type="unfinished" />
+      <translation>Pagaidu</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="33" />
@@ -6914,7 +6914,7 @@ Signāli tiek skenēti secībā no tabulas augšdaļas līdz apakšai.</translat
     <message>
       <location filename="../help/alarms_help.py" line="82" />
       <source>RampSoak ON</source>
-      <translation type="unfinished" />
+      <translation>RampSoak IESLĒGTS</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="82" />
@@ -6924,7 +6924,7 @@ Signāli tiek skenēti secībā no tabulas augšdaļas līdz apakšai.</translat
     <message>
       <location filename="../help/alarms_help.py" line="83" />
       <source>RampSoak OFF</source>
-      <translation type="unfinished" />
+      <translation>RampSoak IZSLĒGTS</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="83" />
@@ -7069,7 +7069,7 @@ Amatnieks sāks programmu katrā parauga periodā. Programmas izvadei ir jābūt
     <message>
       <location filename="../help/programs_help.py" line="25" />
       <source>    file.write(f&amp;#39;ET: {ET}, BT: {ET}, ETB: {ETB}, BTB: {BTB};&amp;#39;)</source>
-      <translation type="unfinished" />
+      <translation>fails.rakstīt(f&amp;#39;ET: {ET}, BT: {ET}, ETB: {ETB}, BTB: {BTB};&amp;#39;)</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="17" />
@@ -7124,7 +7124,7 @@ Kad Meter=NONE tiek atvērts dialoglodziņš, lai manuāli ievadītu temperatūr
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="28" />
       <source>Autosave + RESET + START</source>
-      <translation type="unfinished" />
+      <translation>Automātiskā saglabāšana + ATSTATĪT + SĀKT</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="29" />
@@ -7541,7 +7541,7 @@ CTRL+SHIFT+PLUS, CTRL+MINUS [Uzvara]</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="80" />
       <source>TAB</source>
-      <translation type="unfinished" />
+      <translation>CILNE</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="83" />
@@ -7797,7 +7797,8 @@ Zaļais svara vai grauzdētā svara lauks</translation>
       <location filename="../help/keyboardshortcuts_help.py" line="96" />
       <source>⌘+C [Mac]
 CTRL+C [Win]</source>
-      <translation type="unfinished" />
+      <translation>⌘+C [Mac]
+CTRL+C [Windows]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="96" />
@@ -8319,8 +8320,8 @@ Ielādējiet mazākajā iekārtā ierakstīto profilu un atveriet Transposer. At
     <message>
       <location filename="../help/eventbuttons_help.py" line="117" />
       <location filename="../help/eventsliders_help.py" line="52" />
-      <source>write register: MODBUS function 6 (int) or function 16 (float)</source>
-      <translation>rakstīšanas reģistrs: MODBUS funkcija 6 (int) vai funkcija 16 (peldēšana)</translation>
+      <source>deprecated: use writeSingle for MODBUS function 6 (int) or writeWord for function 16 (float)</source>
+      <translation>novecojis: izmantojiet writeSingle MODBUS funkcijai 6 (int) vai writeWord funkcijai 16 (float)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="118" />
@@ -9506,7 +9507,7 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
       <location filename="../help/eventbuttons_help.py" line="86" />
       <source>FLAP</source>
-      <translation type="unfinished" />
+      <translation>Atloks</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="87" />
@@ -11485,6 +11486,10 @@ Matemātisko formulu izmantošana ploterī ļauj izmantot arī simboliskos main�
       <location filename="../help/symbolic_help.py" line="189" />
       <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
       <translation>F1 attiecas uz faktiskās formulas iepriekšējo rezultātu, lai realizētu atgriezeniskās saites cilpu. Tas ir noderīgi filtru konstrukcijās. Līdzīgi F2 attiecas uz otro iepriekšējo rezultātu utt.</translation>
+    </message>
+    <message>
+      <source>write register: MODBUS function 6 (int) or function 16 (float)</source>
+      <translation type="vanished">rakstīšanas reģistrs: MODBUS funkcija 6 (int) vai funkcija 16 (peldēšana)</translation>
     </message>
     <message>
       <source>increases or decreases the current target SV value by &lt;int&gt;</source>

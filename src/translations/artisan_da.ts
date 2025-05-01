@@ -4487,12 +4487,12 @@ ENDE</translation>
       <translation>Modbus-fejl: kunne ikke oprette forbindelse</translation>
     </message>
     <message>
-      <location filename="../artisanlib/modbusport.py" line="806" />
-      <location filename="../artisanlib/modbusport.py" line="779" />
-      <location filename="../artisanlib/modbusport.py" line="753" />
-      <location filename="../artisanlib/modbusport.py" line="722" />
-      <location filename="../artisanlib/modbusport.py" line="683" />
-      <location filename="../artisanlib/modbusport.py" line="647" />
+      <location filename="../artisanlib/modbusport.py" line="809" />
+      <location filename="../artisanlib/modbusport.py" line="782" />
+      <location filename="../artisanlib/modbusport.py" line="756" />
+      <location filename="../artisanlib/modbusport.py" line="725" />
+      <location filename="../artisanlib/modbusport.py" line="686" />
+      <location filename="../artisanlib/modbusport.py" line="650" />
       <location filename="../artisanlib/modbusport.py" line="604" />
       <location filename="../artisanlib/modbusport.py" line="577" />
       <location filename="../artisanlib/modbusport.py" line="405" />
@@ -4500,11 +4500,11 @@ ENDE</translation>
       <translation>Modbus fejl:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/modbusport.py" line="1125" />
-      <location filename="../artisanlib/modbusport.py" line="1081" />
-      <location filename="../artisanlib/modbusport.py" line="1035" />
-      <location filename="../artisanlib/modbusport.py" line="949" />
-      <location filename="../artisanlib/modbusport.py" line="908" />
+      <location filename="../artisanlib/modbusport.py" line="1128" />
+      <location filename="../artisanlib/modbusport.py" line="1084" />
+      <location filename="../artisanlib/modbusport.py" line="1038" />
+      <location filename="../artisanlib/modbusport.py" line="952" />
+      <location filename="../artisanlib/modbusport.py" line="911" />
       <location filename="../artisanlib/modbusport.py" line="548" />
       <source>Modbus Communication Error</source>
       <translation>Modbus kommunikationsfejl</translation>
@@ -6405,7 +6405,7 @@ Alarmer scannes i rækkefølge fra toppen af tabellen til bunden.</translation>
     <message>
       <location filename="../help/alarms_help.py" line="25" />
       <source>Nr</source>
-      <translation type="unfinished" />
+      <translation>Nr.</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="25" />
@@ -6877,7 +6877,7 @@ Alarmer scannes i rækkefølge fra toppen af tabellen til bunden.</translation>
     <message>
       <location filename="../help/alarms_help.py" line="80" />
       <source>trigger OFF</source>
-      <translation type="unfinished" />
+      <translation>udløser FRA</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="81" />
@@ -7000,7 +7000,7 @@ Artisan starter programmet hver prøveperiode. Programmets output skal være til
     <message>
       <location filename="../help/programs_help.py" line="25" />
       <source>print("237.1,100.4")</source>
-      <translation type="unfinished" />
+      <translation>udskriv("237,1,100,4")</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="25" />
@@ -7032,7 +7032,7 @@ Artisan starter programmet hver prøveperiode. Programmets output skal være til
     <message>
       <location filename="../help/programs_help.py" line="25" />
       <source>import sys</source>
-      <translation type="unfinished" />
+      <translation>importsystem</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="25" />
@@ -7047,7 +7047,7 @@ Artisan starter programmet hver prøveperiode. Programmets output skal være til
     <message>
       <location filename="../help/programs_help.py" line="25" />
       <source>    file.write(f&amp;#39;ET: {ET}, BT: {ET}, ETB: {ETB}, BTB: {BTB};&amp;#39;)</source>
-      <translation type="unfinished" />
+      <translation>file.write(f&amp;#39;ET: {ET}, BT: {ET}, ETB: {ETB}, BTB: {BTB};&amp;#39;)</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="17" />
@@ -7102,7 +7102,7 @@ Når Meter=NONE åbner dialogen for manuelt at indtaste temperaturer under stegn
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="28" />
       <source>Autosave + RESET + START</source>
-      <translation type="unfinished" />
+      <translation>Automatisk lagring + NULSTIL + START</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="29" />
@@ -7197,7 +7197,7 @@ Når Meter=NONE åbner dialogen for manuelt at indtaste temperaturer under stegn
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="47" />
       <source>Inc/dec PID lookahead</source>
-      <translation type="unfinished" />
+      <translation>Inc/dec PID-overblik</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="48" />
@@ -8104,7 +8104,7 @@ Indlæs profilen, der er optaget på den mindre maskine, og åbn Transposeren. V
     <message>
       <location filename="../help/eventsliders_help.py" line="24" />
       <source>Offset</source>
-      <translation type="unfinished" />
+      <translation>Forskydning</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="24" />
@@ -8124,7 +8124,7 @@ Indlæs profilen, der er optaget på den mindre maskine, og åbn Transposeren. V
     <message>
       <location filename="../help/eventsliders_help.py" line="26" />
       <source>Min</source>
-      <translation type="unfinished" />
+      <translation>Min.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="26" />
@@ -8298,8 +8298,8 @@ Indlæs profilen, der er optaget på den mindre maskine, og åbn Transposeren. V
     <message>
       <location filename="../help/eventbuttons_help.py" line="117" />
       <location filename="../help/eventsliders_help.py" line="52" />
-      <source>write register: MODBUS function 6 (int) or function 16 (float)</source>
-      <translation>skriveregister: MODBUS funktion 6 (int) eller funktion 16 (float)</translation>
+      <source>deprecated: use writeSingle for MODBUS function 6 (int) or writeWord for function 16 (float)</source>
+      <translation>udfaset: brug writeSingle til MODBUS-funktion 6 (int) eller writeWord til funktion 16 (float)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="118" />
@@ -9883,12 +9883,12 @@ For en sensorisk milepæl (se bemærkningerne ovenfor) svarer værdien 50 til "h
     <message>
       <location filename="../help/eventannotations_help.py" line="54" />
       <source>Gas ~E @~Y2~degmode</source>
-      <translation type="unfinished" />
+      <translation>Gas ~E @~Y2~gradmode</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="54" />
       <source>Gas 50 @340°F</source>
-      <translation type="unfinished" />
+      <translation>Gas 50 @ 175°C</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="55" />
@@ -9898,7 +9898,7 @@ For en sensorisk milepæl (se bemærkningerne ovenfor) svarer værdien 50 til "h
     <message>
       <location filename="../help/eventannotations_help.py" line="55" />
       <source>Gas 50% @340F</source>
-      <translation type="unfinished" />
+      <translation>Benzin 50% @ 175°C</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="56" />
@@ -9923,7 +9923,7 @@ For en sensorisk milepæl (se bemærkningerne ovenfor) svarer værdien 50 til "h
     <message>
       <location filename="../help/eventannotations_help.py" line="58" />
       <source>Gas ~E% &amp;#39;@~Y2 ~degmode&amp;#39;"@~DTR% DTR"</source>
-      <translation type="unfinished" />
+      <translation>Gas ~E% '@~Y2 ~degradationsgrad'"@~DTR% DTR"</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="58" />
@@ -9965,7 +9965,7 @@ Gas 50% @12% DTR</translation>
     <message>
       <location filename="../help/eventannotations_help.py" line="60" />
       <source>{20Fresh Cut Grass|50Hay|80Baking Bread|100A Point} @~Y2~degmode</source>
-      <translation type="unfinished" />
+      <translation>{20 Friskslået græs | 50 Hø | 80 Bagning af brød | 100 Et punkt} @~Y2~degmode</translation>
     </message>
     <message>
       <location filename="../help/eventannotations_help.py" line="60" />
@@ -11031,7 +11031,7 @@ Fra Steg&gt;Egenskaber&gt;Cupping noter</translation>
     <message>
       <location filename="../help/symbolic_help.py" line="33" />
       <source>ExtraBackground #1-A</source>
-      <translation type="unfinished" />
+      <translation>Ekstrabaggrund #1-A</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="34" />
@@ -11041,7 +11041,7 @@ Fra Steg&gt;Egenskaber&gt;Cupping noter</translation>
     <message>
       <location filename="../help/symbolic_help.py" line="35" />
       <source>ExtraBackground #2-A</source>
-      <translation type="unfinished" />
+      <translation>Ekstrabaggrund #2-A</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="37" />
@@ -11286,7 +11286,7 @@ Forudsigelsesværdien er den beregnede tid i sekunder for at nå DRY- eller FCs-
     <message>
       <location filename="../help/symbolic_help.py" line="121" />
       <source>AMBIENT</source>
-      <translation type="unfinished" />
+      <translation>OMGIVENDE</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="125" />
@@ -11464,6 +11464,10 @@ Brug af matematiske formler i plotteren giver også mulighed for at bruge de sym
       <location filename="../help/symbolic_help.py" line="189" />
       <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
       <translation>F1 refererer til det tidligere resultat af den faktiske formel for at realisere en feedback-loop. Dette er nyttigt i filterdesign. På samme måde refererer F2 til det andet foregående resultat osv.</translation>
+    </message>
+    <message>
+      <source>write register: MODBUS function 6 (int) or function 16 (float)</source>
+      <translation type="vanished">skriveregister: MODBUS funktion 6 (int) eller funktion 16 (float)</translation>
     </message>
     <message>
       <source>increases or decreases the current target SV value by &lt;int&gt;</source>

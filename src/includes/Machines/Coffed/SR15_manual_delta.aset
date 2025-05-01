@@ -1,4 +1,4 @@
-writeSingle([General]
+[General]
 Delay=3000
 Oversampling=false
 roastertype_setup=Coffed SR15 manual delta

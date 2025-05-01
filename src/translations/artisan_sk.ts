@@ -4517,12 +4517,12 @@ KONIEC</translation>
       <translation>Chyba Modbus: nepodarilo sa pripojiť</translation>
     </message>
     <message>
-      <location filename="../artisanlib/modbusport.py" line="806" />
-      <location filename="../artisanlib/modbusport.py" line="779" />
-      <location filename="../artisanlib/modbusport.py" line="753" />
-      <location filename="../artisanlib/modbusport.py" line="722" />
-      <location filename="../artisanlib/modbusport.py" line="683" />
-      <location filename="../artisanlib/modbusport.py" line="647" />
+      <location filename="../artisanlib/modbusport.py" line="809" />
+      <location filename="../artisanlib/modbusport.py" line="782" />
+      <location filename="../artisanlib/modbusport.py" line="756" />
+      <location filename="../artisanlib/modbusport.py" line="725" />
+      <location filename="../artisanlib/modbusport.py" line="686" />
+      <location filename="../artisanlib/modbusport.py" line="650" />
       <location filename="../artisanlib/modbusport.py" line="604" />
       <location filename="../artisanlib/modbusport.py" line="577" />
       <location filename="../artisanlib/modbusport.py" line="405" />
@@ -4530,11 +4530,11 @@ KONIEC</translation>
       <translation>Chyba Modbus:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/modbusport.py" line="1125" />
-      <location filename="../artisanlib/modbusport.py" line="1081" />
-      <location filename="../artisanlib/modbusport.py" line="1035" />
-      <location filename="../artisanlib/modbusport.py" line="949" />
-      <location filename="../artisanlib/modbusport.py" line="908" />
+      <location filename="../artisanlib/modbusport.py" line="1128" />
+      <location filename="../artisanlib/modbusport.py" line="1084" />
+      <location filename="../artisanlib/modbusport.py" line="1038" />
+      <location filename="../artisanlib/modbusport.py" line="952" />
+      <location filename="../artisanlib/modbusport.py" line="911" />
       <location filename="../artisanlib/modbusport.py" line="548" />
       <source>Modbus Communication Error</source>
       <translation>Chyba komunikácie Modbus</translation>
@@ -6766,7 +6766,7 @@ Alarmy sa skenujú v poradí od vrchu tabuľky po spodok.</translation>
       <location filename="../help/alarms_help.py" line="69" />
       <location filename="../help/alarms_help.py" line="68" />
       <source>&lt;value&gt;</source>
-      <translation type="unfinished" />
+      <translation>&lt;hodnota&gt;</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="68" />
@@ -6906,7 +6906,7 @@ Alarmy sa skenujú v poradí od vrchu tabuľky po spodok.</translation>
     <message>
       <location filename="../help/alarms_help.py" line="82" />
       <source>RampSoak ON</source>
-      <translation type="unfinished" />
+      <translation>RampSoak ZAP</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="82" />
@@ -7046,7 +7046,7 @@ Artisan spustí program každé vzorové obdobie. Výstup programu musí byť st
     <message>
       <location filename="../help/programs_help.py" line="25" />
       <source>import sys</source>
-      <translation type="unfinished" />
+      <translation>importovať systém</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="25" />
@@ -7061,7 +7061,7 @@ Artisan spustí program každé vzorové obdobie. Výstup programu musí byť st
     <message>
       <location filename="../help/programs_help.py" line="25" />
       <source>    file.write(f&amp;#39;ET: {ET}, BT: {ET}, ETB: {ETB}, BTB: {BTB};&amp;#39;)</source>
-      <translation type="unfinished" />
+      <translation>file.write(f&amp;#39;ET: {ET}, BT: {ET}, ETB: {ETB}, BTB: {BTB};&amp;#39;)</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="17" />
@@ -7072,7 +7072,7 @@ Artisan spustí program každé vzorové obdobie. Výstup programu musí byť st
       <location filename="../help/keyboardshortcuts_help.py" line="108" />
       <location filename="../help/keyboardshortcuts_help.py" line="20" />
       <source>Keys</source>
-      <translation type="unfinished" />
+      <translation>Kľúče</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="21" />
@@ -7532,7 +7532,7 @@ CTRL+SHIFT+PLUS, CTRL+MINUS [výhra]</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="80" />
       <source>TAB</source>
-      <translation type="unfinished" />
+      <translation>TABULKA</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="83" />
@@ -7570,7 +7570,8 @@ Klávesové skratky musia byť vypnuté (ENTER)</translation>
       <location filename="../help/keyboardshortcuts_help.py" line="82" />
       <source>OPTION+UP, OPTION+DOWN [Mac]
 PAGEUP,PAGEDOWN [Win]</source>
-      <translation type="unfinished" />
+      <translation>OPTION+HORE, OPTION+DOLE [Mac]
+PAGEUP,PAGEDOWN [Win]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="82" />
@@ -7700,7 +7701,8 @@ ALT kliknite na &amp;#39;+&amp;#39; tlačidlo [Win]</translation>
       <location filename="../help/keyboardshortcuts_help.py" line="90" />
       <source>OPTION File&gt;&gt; New&gt;&gt; &lt;recent-roast&gt; [Mac]
 ALT File&gt;&gt; New&gt;&gt; &lt;recent-roast&gt; [Win]</source>
-      <translation type="unfinished" />
+      <translation>MOŽNOSŤ Súbor&gt;&gt; Nový&gt;&gt; &lt;recent-roast&gt; [Mac]
+ALT Súbor&gt;&gt; Nový&gt;&gt; &lt;recent-roast&gt; [Win]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="90" />
@@ -8036,7 +8038,7 @@ Podržte Shift+Alt [Win]</translation>
     <message>
       <location filename="../help/transposer_help.py" line="17" />
       <source>TRANSPOSER</source>
-      <translation type="unfinished" />
+      <translation>TRANSPOZÉR</translation>
     </message>
     <message>
       <location filename="../help/transposer_help.py" line="21" />
@@ -8134,7 +8136,7 @@ Vložte profil zaznamenaný na menšom stroji a otvorte Transposer. Vyberte line
     <message>
       <location filename="../help/eventsliders_help.py" line="26" />
       <source>Min</source>
-      <translation type="unfinished" />
+      <translation>Minimálna</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="26" />
@@ -8308,8 +8310,8 @@ Vložte profil zaznamenaný na menšom stroji a otvorte Transposer. Vyberte line
     <message>
       <location filename="../help/eventbuttons_help.py" line="117" />
       <location filename="../help/eventsliders_help.py" line="52" />
-      <source>write register: MODBUS function 6 (int) or function 16 (float)</source>
-      <translation>zápis do registra: funkcia MODBUS 6 (int) alebo funkcia 16 (float)</translation>
+      <source>deprecated: use writeSingle for MODBUS function 6 (int) or writeWord for function 16 (float)</source>
+      <translation>zastarané: použite writeSingle pre funkciu MODBUS 6 (int) alebo writeWord pre funkciu 16 (float)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="118" />
@@ -10241,7 +10243,7 @@ Keď je prázdne, predpokladá sa, že zaťaženie má konštantné nastavenie, 
     <message>
       <location filename="../help/energy_help.py" line="58" />
       <source>Meter Source</source>
-      <translation type="unfinished" />
+      <translation>Zdroj merača</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="58" />
@@ -11041,17 +11043,17 @@ Z Pečeň&gt;Vlastnosti&gt;Poznámky k cuppingu</translation>
     <message>
       <location filename="../help/symbolic_help.py" line="33" />
       <source>ExtraBackground #1-A</source>
-      <translation type="unfinished" />
+      <translation>ExtraPozadie #1-A</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="34" />
       <source>ExtraBackground #1-B</source>
-      <translation type="unfinished" />
+      <translation>ExtraPozadie #1-B</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="35" />
       <source>ExtraBackground #2-A</source>
-      <translation type="unfinished" />
+      <translation>ExtraPozadie #2-A</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="37" />
@@ -11188,7 +11190,7 @@ Napríklad, zatiaľ čo "Y2" vráti aktuálnu teplotu fazule (BT), "Y2[-1]" vrá
     <message>
       <location filename="../help/symbolic_help.py" line="78" />
       <source>AXIS MAPPING</source>
-      <translation type="unfinished" />
+      <translation>MAPOVANIE OSI</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="82" />
@@ -11296,7 +11298,7 @@ Predikovaná hodnota je vypočítaný čas v sekundách na dosiahnutie teploty D
     <message>
       <location filename="../help/symbolic_help.py" line="121" />
       <source>AMBIENT</source>
-      <translation type="unfinished" />
+      <translation>OKOLIE</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="125" />
@@ -11474,6 +11476,10 @@ Používanie matematických vzorcov v plotri tiež umožňuje používať symbol
       <location filename="../help/symbolic_help.py" line="189" />
       <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
       <translation>F1 sa vzťahuje na predchádzajúci výsledok skutočného vzorca na realizáciu spätnej väzby. To je užitočné pri návrhoch filtrov. Podobne F2 odkazuje na druhý predchádzajúci výsledok atď.</translation>
+    </message>
+    <message>
+      <source>write register: MODBUS function 6 (int) or function 16 (float)</source>
+      <translation type="vanished">zápis do registra: funkcia MODBUS 6 (int) alebo funkcia 16 (float)</translation>
     </message>
     <message>
       <source>increases or decreases the current target SV value by &lt;int&gt;</source>

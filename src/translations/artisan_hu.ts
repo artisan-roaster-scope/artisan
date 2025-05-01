@@ -4702,12 +4702,12 @@ VÉGE</translation>
       <translation>Modbus hiba: nem sikerült csatlakozni</translation>
     </message>
     <message>
-      <location filename="../artisanlib/modbusport.py" line="806" />
-      <location filename="../artisanlib/modbusport.py" line="779" />
-      <location filename="../artisanlib/modbusport.py" line="753" />
-      <location filename="../artisanlib/modbusport.py" line="722" />
-      <location filename="../artisanlib/modbusport.py" line="683" />
-      <location filename="../artisanlib/modbusport.py" line="647" />
+      <location filename="../artisanlib/modbusport.py" line="809" />
+      <location filename="../artisanlib/modbusport.py" line="782" />
+      <location filename="../artisanlib/modbusport.py" line="756" />
+      <location filename="../artisanlib/modbusport.py" line="725" />
+      <location filename="../artisanlib/modbusport.py" line="686" />
+      <location filename="../artisanlib/modbusport.py" line="650" />
       <location filename="../artisanlib/modbusport.py" line="604" />
       <location filename="../artisanlib/modbusport.py" line="577" />
       <location filename="../artisanlib/modbusport.py" line="405" />
@@ -4715,11 +4715,11 @@ VÉGE</translation>
       <translation>Modbus hiba:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/modbusport.py" line="1125" />
-      <location filename="../artisanlib/modbusport.py" line="1081" />
-      <location filename="../artisanlib/modbusport.py" line="1035" />
-      <location filename="../artisanlib/modbusport.py" line="949" />
-      <location filename="../artisanlib/modbusport.py" line="908" />
+      <location filename="../artisanlib/modbusport.py" line="1128" />
+      <location filename="../artisanlib/modbusport.py" line="1084" />
+      <location filename="../artisanlib/modbusport.py" line="1038" />
+      <location filename="../artisanlib/modbusport.py" line="952" />
+      <location filename="../artisanlib/modbusport.py" line="911" />
       <location filename="../artisanlib/modbusport.py" line="548" />
       <source>Modbus Communication Error</source>
       <translation>Modbus kommunikációs hiba</translation>
@@ -6671,7 +6671,7 @@ A riasztásokat a rendszer az asztal tetejétől az aljáig sorrendben szkenneli
     <message>
       <location filename="../help/alarms_help.py" line="25" />
       <source>Nr</source>
-      <translation type="unfinished" />
+      <translation>Nem</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="25" />
@@ -6926,7 +6926,7 @@ A riasztásokat a rendszer az asztal tetejétől az aljáig sorrendben szkenneli
     <message>
       <location filename="../help/alarms_help.py" line="54" />
       <source>PopUp TimeOut</source>
-      <translation type="unfinished" />
+      <translation>Felugró ablak időtúllépése</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="54" />
@@ -7063,7 +7063,7 @@ A riasztásokat a rendszer az asztal tetejétől az aljáig sorrendben szkenneli
     <message>
       <location filename="../help/alarms_help.py" line="72" />
       <source>trigger START</source>
-      <translation type="unfinished" />
+      <translation>START indítógomb</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="73" />
@@ -7143,7 +7143,7 @@ A riasztásokat a rendszer az asztal tetejétől az aljáig sorrendben szkenneli
     <message>
       <location filename="../help/alarms_help.py" line="80" />
       <source>trigger OFF</source>
-      <translation type="unfinished" />
+      <translation>KI kapcsolás</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="81" />
@@ -7158,7 +7158,7 @@ A riasztásokat a rendszer az asztal tetejétől az aljáig sorrendben szkenneli
     <message>
       <location filename="../help/alarms_help.py" line="82" />
       <source>RampSoak ON</source>
-      <translation type="unfinished" />
+      <translation>Rámpatöltés bekapcsolva</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="82" />
@@ -7168,7 +7168,7 @@ A riasztásokat a rendszer az asztal tetejétől az aljáig sorrendben szkenneli
     <message>
       <location filename="../help/alarms_help.py" line="83" />
       <source>RampSoak OFF</source>
-      <translation type="unfinished" />
+      <translation>Rámpázat KI</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="83" />
@@ -7298,7 +7298,7 @@ Az Artisan minden mintaidőszakban elindítja a programot. A program kimeneténe
     <message>
       <location filename="../help/programs_help.py" line="25" />
       <source>import sys</source>
-      <translation type="unfinished" />
+      <translation>import rendszer</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="25" />
@@ -7313,7 +7313,7 @@ Az Artisan minden mintaidőszakban elindítja a programot. A program kimeneténe
     <message>
       <location filename="../help/programs_help.py" line="25" />
       <source>    file.write(f&amp;#39;ET: {ET}, BT: {ET}, ETB: {ETB}, BTB: {BTB};&amp;#39;)</source>
-      <translation type="unfinished" />
+      <translation>file.write(f&amp;#39;ET: {ET}, BT: {ET}, ETB: {ETB}, BTB: {BTB};&amp;#39;)</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="17" />
@@ -7529,7 +7529,8 @@ Amikor Meter=NONE párbeszédablak nyílik meg a hőmérséklet kézi beviteléh
       <location filename="../help/keyboardshortcuts_help.py" line="62" />
       <source>⌘+F [Mac]
 CTRL+F [Win]</source>
-      <translation type="unfinished" />
+      <translation>⌘+F [Mac]
+CTRL+F [Windows]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="62" />
@@ -7901,7 +7902,8 @@ CTRL Eszközök&gt;&gt; Szimulátor [Win]</translation>
       <location filename="../help/keyboardshortcuts_help.py" line="87" />
       <source>⌘+L [Mac]
 CTRL+L [Win]</source>
-      <translation type="unfinished" />
+      <translation>⌘+L [Mac]
+CTRL+L [Windows]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="93" />
@@ -7985,7 +7987,8 @@ CTRL+I [Győzelem]</translation>
       <location filename="../help/keyboardshortcuts_help.py" line="92" />
       <source>⌘+O [Mac]
 CTRL+O [Win]</source>
-      <translation type="unfinished" />
+      <translation>⌘+O [Mac]
+CTRL+O [Windows]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="92" />
@@ -7996,7 +7999,8 @@ CTRL+O [Win]</source>
       <location filename="../help/keyboardshortcuts_help.py" line="93" />
       <source>⌘+P [Mac]
 CTRL+P [Win]</source>
-      <translation type="unfinished" />
+      <translation>⌘+P [Mac]
+CTRL+P [Windows]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="93" />
@@ -8037,7 +8041,8 @@ Zöld súly vagy pörkölt súly mező</translation>
       <location filename="../help/keyboardshortcuts_help.py" line="96" />
       <source>⌘+C [Mac]
 CTRL+C [Win]</source>
-      <translation type="unfinished" />
+      <translation>⌘+C [Mac]
+CTRL+C [Windows]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="96" />
@@ -8256,7 +8261,7 @@ Tartsa lenyomva a Shift+Alt [Win]</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="123" />
       <source>Analyzer Auto All</source>
-      <translation type="unfinished" />
+      <translation>Analizátor Automatikus Összes</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="124" />
@@ -8385,7 +8390,7 @@ Töltse be a kisebb gépre rögzített profilt, és nyissa meg a Transzponálót
     <message>
       <location filename="../help/eventsliders_help.py" line="26" />
       <source>Min</source>
-      <translation type="unfinished" />
+      <translation>Min.</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="26" />
@@ -8559,8 +8564,8 @@ Töltse be a kisebb gépre rögzített profilt, és nyissa meg a Transzponálót
     <message>
       <location filename="../help/eventbuttons_help.py" line="117" />
       <location filename="../help/eventsliders_help.py" line="52" />
-      <source>write register: MODBUS function 6 (int) or function 16 (float)</source>
-      <translation>írási regiszter: MODBUS 6-os funkció (int) vagy 16-os funkció (float)</translation>
+      <source>deprecated: use writeSingle for MODBUS function 6 (int) or writeWord for function 16 (float)</source>
+      <translation>elavult: a MODBUS 6-os (int) függvényéhez writeSingle, a 16-os (float) függvényhez pedig writeWord függvényt kell használni.</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="118" />
@@ -11725,6 +11730,10 @@ A matematikai képletek használata a plotterben lehetővé teszi a P és F szim
       <location filename="../help/symbolic_help.py" line="189" />
       <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
       <translation>Az F1 a tényleges képlet előző eredményére utal, hogy megvalósítsa a visszacsatolási hurkot. Ez hasznos a szűrők kialakításánál. Hasonlóképpen az F2 a második előző eredményre utal stb.</translation>
+    </message>
+    <message>
+      <source>write register: MODBUS function 6 (int) or function 16 (float)</source>
+      <translation type="vanished">írási regiszter: MODBUS 6-os funkció (int) vagy 16-os funkció (float)</translation>
     </message>
     <message>
       <source>increases or decreases the current target SV value by &lt;int&gt;</source>

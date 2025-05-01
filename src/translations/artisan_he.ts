@@ -4742,12 +4742,12 @@ END</source>
       <translation>שגיאת Modbus: נכשל בחיבור</translation>
     </message>
     <message>
-      <location filename="../artisanlib/modbusport.py" line="806" />
-      <location filename="../artisanlib/modbusport.py" line="779" />
-      <location filename="../artisanlib/modbusport.py" line="753" />
-      <location filename="../artisanlib/modbusport.py" line="722" />
-      <location filename="../artisanlib/modbusport.py" line="683" />
-      <location filename="../artisanlib/modbusport.py" line="647" />
+      <location filename="../artisanlib/modbusport.py" line="809" />
+      <location filename="../artisanlib/modbusport.py" line="782" />
+      <location filename="../artisanlib/modbusport.py" line="756" />
+      <location filename="../artisanlib/modbusport.py" line="725" />
+      <location filename="../artisanlib/modbusport.py" line="686" />
+      <location filename="../artisanlib/modbusport.py" line="650" />
       <location filename="../artisanlib/modbusport.py" line="604" />
       <location filename="../artisanlib/modbusport.py" line="577" />
       <location filename="../artisanlib/modbusport.py" line="405" />
@@ -4755,11 +4755,11 @@ END</source>
       <translation>שגיאת Modbus:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/modbusport.py" line="1125" />
-      <location filename="../artisanlib/modbusport.py" line="1081" />
-      <location filename="../artisanlib/modbusport.py" line="1035" />
-      <location filename="../artisanlib/modbusport.py" line="949" />
-      <location filename="../artisanlib/modbusport.py" line="908" />
+      <location filename="../artisanlib/modbusport.py" line="1128" />
+      <location filename="../artisanlib/modbusport.py" line="1084" />
+      <location filename="../artisanlib/modbusport.py" line="1038" />
+      <location filename="../artisanlib/modbusport.py" line="952" />
+      <location filename="../artisanlib/modbusport.py" line="911" />
       <location filename="../artisanlib/modbusport.py" line="548" />
       <source>Modbus Communication Error</source>
       <translation>שגיאת תקשורת Modbus</translation>
@@ -7369,12 +7369,12 @@ Artisan יתחיל את התוכנית בכל תקופה לדוגמה. פלט ה
       <location filename="../help/programs_help.py" line="25" />
       <location filename="../help/programs_help.py" line="25" />
       <source>#!/usr/bin/env python</source>
-      <translation type="unfinished" />
+      <translation>#!/usr/bin/env פייתון</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="25" />
       <source>print("237.1,100.4")</source>
-      <translation type="unfinished" />
+      <translation>הדפס ("237.1,100.4")</translation>
     </message>
     <message>
       <location filename="../help/programs_help.py" line="25" />
@@ -7421,7 +7421,7 @@ Artisan יתחיל את התוכנית בכל תקופה לדוגמה. פלט ה
     <message>
       <location filename="../help/programs_help.py" line="25" />
       <source>    file.write(f&amp;#39;ET: {ET}, BT: {ET}, ETB: {ETB}, BTB: {BTB};&amp;#39;)</source>
-      <translation type="unfinished" />
+      <translation>file.write(f&amp;#39;ET: {ET}, BT: {ET}, ETB: {ETB}, BTB: {BTB};&amp;#39;)</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="17" />
@@ -7893,7 +7893,7 @@ CTRL+SHIFT+PLUS, CTRL+מינוס [נצח]</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="80" />
       <source>TAB</source>
-      <translation type="unfinished" />
+      <translation>טאב</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="83" />
@@ -8062,7 +8062,8 @@ ALT לחץ על &amp;#39;+&amp;#39; כפתור [נצח]</translation>
       <location filename="../help/keyboardshortcuts_help.py" line="90" />
       <source>OPTION File&gt;&gt; New&gt;&gt; &lt;recent-roast&gt; [Mac]
 ALT File&gt;&gt; New&gt;&gt; &lt;recent-roast&gt; [Win]</source>
-      <translation type="unfinished" />
+      <translation>קובץ OPTION &gt;&gt; חדש &gt;&gt; &lt;recent-roast&gt; [מק]
+קובץ ALT &gt;&gt; חדש &gt;&gt; &lt;recent-roast&gt; [ווינדוס]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="90" />
@@ -8148,7 +8149,8 @@ Green Weight  or Roasted Weight field</source>
       <location filename="../help/keyboardshortcuts_help.py" line="96" />
       <source>⌘+C [Mac]
 CTRL+C [Win]</source>
-      <translation type="unfinished" />
+      <translation>⌘+C [מק]
+CTRL+C [וינדוס]</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="96" />
@@ -8398,7 +8400,7 @@ Hold Shift+Alt [Win]</source>
     <message>
       <location filename="../help/transposer_help.py" line="17" />
       <source>TRANSPOSER</source>
-      <translation type="unfinished" />
+      <translation>משדר</translation>
     </message>
     <message>
       <location filename="../help/transposer_help.py" line="21" />
@@ -8670,8 +8672,8 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
     <message>
       <location filename="../help/eventbuttons_help.py" line="117" />
       <location filename="../help/eventsliders_help.py" line="52" />
-      <source>write register: MODBUS function 6 (int) or function 16 (float)</source>
-      <translation>לכתוב אוגר: MODBUS function 6 (int) או function 16 (float)</translation>
+      <source>deprecated: use writeSingle for MODBUS function 6 (int) or writeWord for function 16 (float)</source>
+      <translation>הוצא משימוש: השתמש ב-writeSingle עבור פונקציית MODBUS 6 (int) או ב-writeWord עבור פונקציה 16 (float)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="118" />
@@ -11403,17 +11405,17 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
     <message>
       <location filename="../help/symbolic_help.py" line="33" />
       <source>ExtraBackground #1-A</source>
-      <translation type="unfinished" />
+      <translation>רקע נוסף #1-A</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="34" />
       <source>ExtraBackground #1-B</source>
-      <translation type="unfinished" />
+      <translation>רקע נוסף #1-B</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="35" />
       <source>ExtraBackground #2-A</source>
-      <translation type="unfinished" />
+      <translation>רקע נוסף #2-A</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="37" />
@@ -11658,7 +11660,7 @@ The prediction value is the calculated time in seconds to reach the DRY or FCs t
     <message>
       <location filename="../help/symbolic_help.py" line="121" />
       <source>AMBIENT</source>
-      <translation type="unfinished" />
+      <translation>אווירה</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="125" />
@@ -11836,6 +11838,10 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <location filename="../help/symbolic_help.py" line="189" />
       <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
       <translation>F1 מתייחס לתוצאה הקודמת של הנוסחה בפועל למימוש לולאת משוב. זה שימושי בעיצובי מסננים. באופן דומה, F2 מתייחס לתוצאה הקודמת השנייה וכו'.</translation>
+    </message>
+    <message>
+      <source>write register: MODBUS function 6 (int) or function 16 (float)</source>
+      <translation type="vanished">לכתוב אוגר: MODBUS function 6 (int) או function 16 (float)</translation>
     </message>
     <message>
       <source>increases or decreases the current target SV value by &lt;int&gt;</source>

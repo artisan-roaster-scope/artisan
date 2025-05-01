@@ -4525,12 +4525,12 @@ LOPPU</translation>
       <translation>Modbus-virhe: yhdistäminen epäonnistui</translation>
     </message>
     <message>
-      <location filename="../artisanlib/modbusport.py" line="806" />
-      <location filename="../artisanlib/modbusport.py" line="779" />
-      <location filename="../artisanlib/modbusport.py" line="753" />
-      <location filename="../artisanlib/modbusport.py" line="722" />
-      <location filename="../artisanlib/modbusport.py" line="683" />
-      <location filename="../artisanlib/modbusport.py" line="647" />
+      <location filename="../artisanlib/modbusport.py" line="809" />
+      <location filename="../artisanlib/modbusport.py" line="782" />
+      <location filename="../artisanlib/modbusport.py" line="756" />
+      <location filename="../artisanlib/modbusport.py" line="725" />
+      <location filename="../artisanlib/modbusport.py" line="686" />
+      <location filename="../artisanlib/modbusport.py" line="650" />
       <location filename="../artisanlib/modbusport.py" line="604" />
       <location filename="../artisanlib/modbusport.py" line="577" />
       <location filename="../artisanlib/modbusport.py" line="405" />
@@ -4538,11 +4538,11 @@ LOPPU</translation>
       <translation>Modbus-virhe:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/modbusport.py" line="1125" />
-      <location filename="../artisanlib/modbusport.py" line="1081" />
-      <location filename="../artisanlib/modbusport.py" line="1035" />
-      <location filename="../artisanlib/modbusport.py" line="949" />
-      <location filename="../artisanlib/modbusport.py" line="908" />
+      <location filename="../artisanlib/modbusport.py" line="1128" />
+      <location filename="../artisanlib/modbusport.py" line="1084" />
+      <location filename="../artisanlib/modbusport.py" line="1038" />
+      <location filename="../artisanlib/modbusport.py" line="952" />
+      <location filename="../artisanlib/modbusport.py" line="911" />
       <location filename="../artisanlib/modbusport.py" line="548" />
       <source>Modbus Communication Error</source>
       <translation>Modbus-yhteysvirhe</translation>
@@ -7069,7 +7069,7 @@ Artisan aloittaa ohjelman jokaisella näytejaksolla. Ohjelman tulosteen tulee ol
     <message>
       <location filename="../help/programs_help.py" line="25" />
       <source>    file.write(f&amp;#39;ET: {ET}, BT: {ET}, ETB: {ETB}, BTB: {BTB};&amp;#39;)</source>
-      <translation type="unfinished" />
+      <translation>file.write(f&amp;#39;ET: {ET}, BT: {ET}, ETB: {ETB}, BTB: {BTB};&amp;#39;)</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="17" />
@@ -7541,7 +7541,7 @@ CTRL+SHIFT+PLUS, CTRL+MIINUS [Voit]</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="80" />
       <source>TAB</source>
-      <translation type="unfinished" />
+      <translation>SARKAIN</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="83" />
@@ -8017,7 +8017,7 @@ Pidä Shift + Alt [Win]</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="123" />
       <source>Analyzer Auto All</source>
-      <translation type="unfinished" />
+      <translation>Analysaattori Auto Kaikki</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="124" />
@@ -8146,7 +8146,7 @@ Lataa pienempään koneeseen tallennettu profiili ja avaa Transposer. Valitse li
     <message>
       <location filename="../help/eventsliders_help.py" line="26" />
       <source>Min</source>
-      <translation type="unfinished" />
+      <translation>Minimi</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="26" />
@@ -8320,8 +8320,8 @@ Lataa pienempään koneeseen tallennettu profiili ja avaa Transposer. Valitse li
     <message>
       <location filename="../help/eventbuttons_help.py" line="117" />
       <location filename="../help/eventsliders_help.py" line="52" />
-      <source>write register: MODBUS function 6 (int) or function 16 (float)</source>
-      <translation>kirjoitusrekisteri: MODBUS-toiminto 6 (int) tai toiminto 16 (float)</translation>
+      <source>deprecated: use writeSingle for MODBUS function 6 (int) or writeWord for function 16 (float)</source>
+      <translation>vanhentunut: käytä writeSingle-funktiota MODBUS-funktiolle 6 (int) tai writeWord-funktiolle 16 (float)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="118" />
@@ -9345,7 +9345,7 @@ Funktio 4 (Lue syöttörekisterit): rekisterit 0-65535, jotka vastaavat numeroit
     <message>
       <location filename="../help/eventbuttons_help.py" line="50" />
       <source>LABELS</source>
-      <translation type="unfinished" />
+      <translation>TARROJA</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="54" />
@@ -10942,7 +10942,7 @@ Kohdasta Roast&gt;Properties&gt;Cupping Notes</translation>
     <message>
       <location filename="../help/autosave_help.py" line="133" />
       <source>Autosave Field</source>
-      <translation type="unfinished" />
+      <translation>Automaattisen tallennuksen kenttä</translation>
     </message>
     <message>
       <location filename="../help/autosave_help.py" line="133" />
@@ -11053,17 +11053,17 @@ Kohdasta Roast&gt;Properties&gt;Cupping Notes</translation>
     <message>
       <location filename="../help/symbolic_help.py" line="33" />
       <source>ExtraBackground #1-A</source>
-      <translation type="unfinished" />
+      <translation>Lisätausta #1-A</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="34" />
       <source>ExtraBackground #1-B</source>
-      <translation type="unfinished" />
+      <translation>Lisätausta #1-B</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="35" />
       <source>ExtraBackground #2-A</source>
-      <translation type="unfinished" />
+      <translation>Lisätausta #2-A</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="37" />
@@ -11308,7 +11308,7 @@ Ennustearvo on sekunteina laskettu aika DRY- tai FCs-lämpötilan saavuttamiseen
     <message>
       <location filename="../help/symbolic_help.py" line="121" />
       <source>AMBIENT</source>
-      <translation type="unfinished" />
+      <translation>YMPÄRISTÖTILA</translation>
     </message>
     <message>
       <location filename="../help/symbolic_help.py" line="125" />
@@ -11486,6 +11486,10 @@ Matemaattisten kaavojen käyttö plotterissa mahdollistaa myös symbolisten muut
       <location filename="../help/symbolic_help.py" line="189" />
       <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
       <translation>F1 viittaa todellisen kaavan edelliseen tulokseen takaisinkytkentäsilmukan toteuttamiseksi. Tästä on hyötyä suodatinmalleissa. Vastaavasti F2 viittaa toiseen edelliseen tulokseen jne.</translation>
+    </message>
+    <message>
+      <source>write register: MODBUS function 6 (int) or function 16 (float)</source>
+      <translation type="vanished">kirjoitusrekisteri: MODBUS-toiminto 6 (int) tai toiminto 16 (float)</translation>
     </message>
     <message>
       <source>increases or decreases the current target SV value by &lt;int&gt;</source>

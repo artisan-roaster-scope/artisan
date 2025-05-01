@@ -4505,12 +4505,12 @@ CRÌOCH</translation>
       <translation>Mearachd Modbus: dh'fhàillig ceangal</translation>
     </message>
     <message>
-      <location filename="../artisanlib/modbusport.py" line="806" />
-      <location filename="../artisanlib/modbusport.py" line="779" />
-      <location filename="../artisanlib/modbusport.py" line="753" />
-      <location filename="../artisanlib/modbusport.py" line="722" />
-      <location filename="../artisanlib/modbusport.py" line="683" />
-      <location filename="../artisanlib/modbusport.py" line="647" />
+      <location filename="../artisanlib/modbusport.py" line="809" />
+      <location filename="../artisanlib/modbusport.py" line="782" />
+      <location filename="../artisanlib/modbusport.py" line="756" />
+      <location filename="../artisanlib/modbusport.py" line="725" />
+      <location filename="../artisanlib/modbusport.py" line="686" />
+      <location filename="../artisanlib/modbusport.py" line="650" />
       <location filename="../artisanlib/modbusport.py" line="604" />
       <location filename="../artisanlib/modbusport.py" line="577" />
       <location filename="../artisanlib/modbusport.py" line="405" />
@@ -4518,11 +4518,11 @@ CRÌOCH</translation>
       <translation>Mearachd Modbus:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/modbusport.py" line="1125" />
-      <location filename="../artisanlib/modbusport.py" line="1081" />
-      <location filename="../artisanlib/modbusport.py" line="1035" />
-      <location filename="../artisanlib/modbusport.py" line="949" />
-      <location filename="../artisanlib/modbusport.py" line="908" />
+      <location filename="../artisanlib/modbusport.py" line="1128" />
+      <location filename="../artisanlib/modbusport.py" line="1084" />
+      <location filename="../artisanlib/modbusport.py" line="1038" />
+      <location filename="../artisanlib/modbusport.py" line="952" />
+      <location filename="../artisanlib/modbusport.py" line="911" />
       <location filename="../artisanlib/modbusport.py" line="548" />
       <source>Modbus Communication Error</source>
       <translation>Mearachd conaltraidh Modbus</translation>
@@ -6490,7 +6490,7 @@ Bithear a’ sganadh rabhaidh ann an òrdugh bho mhullach a’ bhùird gu bonn.<
       <location filename="../help/eventsliders_help.py" line="29" />
       <location filename="../help/alarms_help.py" line="33" />
       <source>Temp</source>
-      <translation type="unfinished" />
+      <translation>Teòthachd</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="33" />
@@ -6701,7 +6701,7 @@ Bithear a’ sganadh rabhaidh ann an òrdugh bho mhullach a’ bhùird gu bonn.<
     <message>
       <location filename="../help/alarms_help.py" line="65" />
       <source>&lt;text&gt;</source>
-      <translation type="unfinished" />
+      <translation>&lt;teacsa&gt;</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="65" />
@@ -6834,7 +6834,7 @@ Bithear a’ sganadh rabhaidh ann an òrdugh bho mhullach a’ bhùird gu bonn.<
     <message>
       <location filename="../help/alarms_help.py" line="76" />
       <source>SCs</source>
-      <translation type="unfinished" />
+      <translation>SCan</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="76" />
@@ -6904,7 +6904,7 @@ Bithear a’ sganadh rabhaidh ann an òrdugh bho mhullach a’ bhùird gu bonn.<
     <message>
       <location filename="../help/alarms_help.py" line="83" />
       <source>RampSoak OFF</source>
-      <translation type="unfinished" />
+      <translation>RampSoak dheth</translation>
     </message>
     <message>
       <location filename="../help/alarms_help.py" line="83" />
@@ -7650,7 +7650,7 @@ CTRL+L [Buann]</translation>
       <location filename="../help/keyboardshortcuts_help.py" line="88" />
       <location filename="../help/keyboardshortcuts_help.py" line="87" />
       <source>Roast Properties Roast tab</source>
-      <translation type="unfinished" />
+      <translation>Togalaichean Ròstadh taba Ròstadh</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="87" />
@@ -7798,7 +7798,7 @@ CTRL+C [Buann]</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="97" />
       <source>Roast Properties Energy tab</source>
-      <translation type="unfinished" />
+      <translation>Taba Lùth Togalaichean Ròsta</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="97" />
@@ -7861,7 +7861,7 @@ Cùm Shift + Alt [Win]</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="100" />
       <source>Skip Settings Load</source>
-      <translation type="unfinished" />
+      <translation>Leum Roghainnean Luchdaich</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="101" />
@@ -7886,7 +7886,7 @@ Cùm Shift + Alt [Win]</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="105" />
       <source>MENU SHORTCUTS</source>
-      <translation type="unfinished" />
+      <translation>Ath-ghoiridean Clàr-taice</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="108" />
@@ -7930,7 +7930,7 @@ Cùm Shift + Alt [Win]</translation>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="114" />
       <source>Paste</source>
-      <translation type="unfinished" />
+      <translation>Cuir a-steach</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="117" />
@@ -7961,7 +7961,7 @@ Cùm Shift + Alt [Win]</translation>
       <location filename="../help/keyboardshortcuts_help.py" line="119" />
       <location filename="../help/keyboardshortcuts_help.py" line="118" />
       <source>Config</source>
-      <translation type="unfinished" />
+      <translation>Rèiteachadh</translation>
     </message>
     <message>
       <location filename="../help/keyboardshortcuts_help.py" line="118" />
@@ -8028,7 +8028,7 @@ Cùm Shift + Alt [Win]</translation>
     <message>
       <location filename="../help/transposer_help.py" line="17" />
       <source>TRANSPOSER</source>
-      <translation type="unfinished" />
+      <translation>TRANSPÒSAIR</translation>
     </message>
     <message>
       <location filename="../help/transposer_help.py" line="21" />
@@ -8106,7 +8106,7 @@ Luchdaich am pròifil clàraichte air an inneal nas lugha agus fosgail an Transp
     <message>
       <location filename="../help/eventsliders_help.py" line="24" />
       <source>Offset</source>
-      <translation type="unfinished" />
+      <translation>Co-rèiteachadh</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="24" />
@@ -8116,7 +8116,7 @@ Luchdaich am pròifil clàraichte air an inneal nas lugha agus fosgail an Transp
     <message>
       <location filename="../help/eventsliders_help.py" line="25" />
       <source>Factor</source>
-      <translation type="unfinished" />
+      <translation>Factar</translation>
     </message>
     <message>
       <location filename="../help/eventsliders_help.py" line="25" />
@@ -8300,8 +8300,8 @@ Luchdaich am pròifil clàraichte air an inneal nas lugha agus fosgail an Transp
     <message>
       <location filename="../help/eventbuttons_help.py" line="117" />
       <location filename="../help/eventsliders_help.py" line="52" />
-      <source>write register: MODBUS function 6 (int) or function 16 (float)</source>
-      <translation>sgrìobh clàr: gnìomh MODBUS 6 (int) no gnìomh 16 (fleòdradh)</translation>
+      <source>deprecated: use writeSingle for MODBUS function 6 (int) or writeWord for function 16 (float)</source>
+      <translation>air a chur às a’ chleachdadh: cleachd writeSingle airson gnìomh MODBUS 6 (int) no writeWord airson gnìomh 16 (fleòdradh)</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="118" />
@@ -9065,7 +9065,7 @@ Luchdaich am pròifil clàraichte air an inneal nas lugha agus fosgail an Transp
       <location filename="../help/eventbuttons_help.py" line="246" />
       <location filename="../help/eventsliders_help.py" line="170" />
       <source>Stepper Command</source>
-      <translation type="unfinished" />
+      <translation>Òrdugh Ceumadair</translation>
     </message>
     <message>
       <location filename="../help/eventbuttons_help.py" line="246" />
@@ -10129,7 +10129,7 @@ Lean na ceumannan gu h-ìosal gus na cuir a-steach lùth a shuidheachadh airson 
     <message>
       <location filename="../help/energy_help.py" line="47" />
       <source>Label</source>
-      <translation type="unfinished" />
+      <translation>Leubail</translation>
     </message>
     <message>
       <location filename="../help/energy_help.py" line="47" />
@@ -11466,6 +11466,10 @@ Le bhith a’ cleachdadh foirmlean matamataigeach anns a’ chuilbheart cuideach
       <location filename="../help/symbolic_help.py" line="189" />
       <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
       <translation>Tha F1 a’ toirt iomradh air an toradh a bh’ ann roimhe den fhìor fhoirmle gus lùb fios-air-ais a thoirt gu buil. Tha seo feumail ann an dealbhadh sìoltachain. San aon dòigh, tha F2 a’ toirt iomradh air an dàrna toradh roimhe msaa.</translation>
+    </message>
+    <message>
+      <source>write register: MODBUS function 6 (int) or function 16 (float)</source>
+      <translation type="vanished">sgrìobh clàr: gnìomh MODBUS 6 (int) no gnìomh 16 (fleòdradh)</translation>
     </message>
     <message>
       <source>increases or decreases the current target SV value by &lt;int&gt;</source>
