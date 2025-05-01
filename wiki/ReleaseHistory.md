@@ -2,6 +2,13 @@ Detailed Release History
 ========================
 
 ----
+v3.1.4 (May 1, 2025)
+------------------
+* FIXES
+  - maps the deprecated MODBUS Command "write" to "writeSingle" for backward compatibility with previous settings
+
+
+----
 v3.1.2 (April 30, 2025)
 ------------------
 

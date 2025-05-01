@@ -1,3 +1,9 @@
+artisan (3.1.4-0) precise; urgency=low
+  * new upstream release
+  * changes since 3.1.2:
+   - fixes backward compatibility for MODBUS configurations
+ --  <marko.luther@gmx.net>  Thu, 1 May 2025 19:32:14 +0200
+
 artisan (3.1.2-0) precise; urgency=low
   * new upstream release
   * changes since 3.1.0:
